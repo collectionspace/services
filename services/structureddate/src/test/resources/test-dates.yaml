@@ -19,6 +19,8 @@
 # Input Display Date        Expected Structured Date
 # ---------------------------------------------------------------------------------------------------
 
+# Valid dates
+
   'circa 2013':             # circaYear
                             earliestSingleDate: [2013,  1,  1, CE, null, MINUS, 5, YEARS]
                             latestDate:         [2013, 12, 31, CE, null, PLUS,  5, YEARS]
@@ -110,9 +112,6 @@
   'Sept 19, 1821':          # strDate
                             earliestSingleDate: [1821,  9, 19, CE]
 
-  'Octo 19, 1821':          # bad format (not a valid month)
-                            null
-
   '2000, April 1':          # invStrDate
                             earliestSingleDate: [2000,  4,  1, CE]
 
@@ -134,19 +133,19 @@
                             earliestSingleDate: [2003,  1,  1, CE]
                             latestDate:         [2003,  2, 28, CE]
 
-  'January - Feb 2004':     # monthOnlyRange (leap year, divisible by 4)
+  'January - Feb 2004':     # monthOnlyRange (leap year: divisible by 4)
                             earliestSingleDate: [2004,  1,  1, CE]
                             latestDate:         [2004,  2, 29, CE]
 
-  'Jan-Feb, 1900':          # monthOnlyRange (not a leap year, divisible by 100)
+  'Jan-Feb, 1900':          # monthOnlyRange (not a leap year: divisible by 100)
                             earliestSingleDate: [1900,  1,  1, CE]
                             latestDate:         [1900,  2, 28, CE]
 
-  'jan-february, 2000':     # monthOnlyRange (leap year, divisible by 400)
+  'january-feb, 2000':     # monthOnlyRange (leap year: divisible by 400)
                             earliestSingleDate: [2000,  1,  1, CE]
                             latestDate:         [2000,  2, 29, CE]
 
-  'jan-february, 1100':     # monthOnlyRange (leap year, divisible by 100, but before Gregorian calendar)
+  'jan-february, 1100':     # monthOnlyRange (leap year: divisible by 100, but before Gregorian calendar)
                             earliestSingleDate: [1100,  1,  1, CE]
                             latestDate:         [1100,  2, 29, CE]
 
@@ -165,7 +164,12 @@
   '09/05 - 18/1776':        # numDateRange
                             earliestSingleDate: [1776,  9,  5, CE]
                             latestDate:         [1776,  9, 18, CE]
-                            
-  'Something else':         # bad format
+                          
+# Invalid dates
+
+  'Octo 19, 1821':          # bad format (not a valid month)
+                            null
+
+  'Something else':         # bad format (totally not a date)
                             null            
                               
