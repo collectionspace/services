@@ -52,6 +52,6 @@ public class DateUtils {
 		
 		int currentYear = new DateTime().year().get();
 	
-		return (((int) Math.round((currentYear - year) * 0.05)) + 5);
+		return (((int) Math.round(Math.abs(currentYear - year) * 0.05)) + 5);
 	}
 }

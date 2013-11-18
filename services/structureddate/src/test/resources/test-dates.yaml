@@ -33,6 +33,10 @@
                             earliestSingleDate: [  10,  1,  1, BCE, null, MINUS, 106, YEARS]
                             latestDate:         [  10, 12, 31, BCE, null, PLUS,  106, YEARS]
 
+  'circa 2100':             # circaYear
+                            earliestSingleDate: [2100,  1,  1, CE, null, MINUS, 9, YEARS]
+                            latestDate:         [2100, 12, 31, CE, null, PLUS,  9, YEARS]
+
   '1997':                   # yearOnly
                             earliestSingleDate: [1997,  1,  1, CE]
                             latestDate:         [1997, 12, 31, CE]

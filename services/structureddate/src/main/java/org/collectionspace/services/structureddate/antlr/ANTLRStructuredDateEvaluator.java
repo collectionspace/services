@@ -73,7 +73,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 	@Override
 	public void exitTodo(TodoContext ctx) {
-		result.setNote("This is a valid date format, but evaluation of this format has not yet been implemented.");
+		result.setNote("Not yet implemented.");
 	}
 
 	@Override
