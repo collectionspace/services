@@ -8,6 +8,13 @@ import org.collectionspace.services.structureddate.antlr.ANTLRStructuredDateEval
  * A CollectionSpace structured date. 
  */
 public class StructuredDate {
+	// The UI layer is interpreting scalarValuesComputed as follows:
+	//  - If true, the UI should compute scalar values
+	//  - If false (or null), the UI should not compute scalar values
+	// Given that interpretation, scalarValuesComputed should default
+	// to true.
+	public static final boolean DEFAULT_SCALAR_VALUES_COMPUTED = true;
+	
 	private static final StructuredDateEvaluator evaluator = new ANTLRStructuredDateEvaluator();
 	
 	private String displayDate;
@@ -21,7 +28,7 @@ public class StructuredDate {
 	private Boolean scalarValuesComputed;
 		
 	public StructuredDate() {
-		
+		scalarValuesComputed = DEFAULT_SCALAR_VALUES_COMPUTED;
 	}
 
 	public String toString() {
