@@ -177,8 +177,7 @@ public class TemplateExpander {
         wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("uri"),
                 getDocUri(tenantId, SERVICE_TYPE, docID, partTmpl));
         wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("refName"),
-                getRefName(tenantId, SERVICE_TYPE, docID, partTmpl).replace("&", "&amp;"));
-
+                getRefName(tenantId, SERVICE_TYPE, docID, partTmpl).replace("&", "&amp;").replace("$", "&#x0024;"));
 
         String serviceDir = outDir + '/' + docID;
         FileTools.saveFile(serviceDir, "document.xml", wrapperTmpl, FileTools.FORCE_CREATE_PARENT_DIRS);
