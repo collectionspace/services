@@ -13,29 +13,13 @@
 # If an input is expected to fail, specify null for the expected structured date.
 #
 # NOTE: "Circa" tests may fail in the future, because the qualifier value is based on the current
-# date. The expected qualifierValue numbers may need to be adjusted.
+#       date. The expected qualifierValue numbers may need to be adjusted.
 # 
 #
 # Input Display Date        Expected Structured Date
 # ---------------------------------------------------------------------------------------------------
 
 # Valid dates
-
-  'circa 2013':             # circaYear
-                            earliestSingleDate: [2013,  1,  1, CE, null, MINUS, 5, YEARS]
-                            latestDate:         [2013, 12, 31, CE, null, PLUS,  5, YEARS]
-
-  'c. 1950':                # circaYear
-                            earliestSingleDate: [1950,  1,  1, CE, null, MINUS, 8, YEARS]
-                            latestDate:         [1950, 12, 31, CE, null, PLUS,  8, YEARS]
-
-  'Circa 10 BC':            # circaYear
-                            earliestSingleDate: [  10,  1,  1, BCE, null, MINUS, 106, YEARS]
-                            latestDate:         [  10, 12, 31, BCE, null, PLUS,  106, YEARS]
-
-  'circa 2100':             # circaYear
-                            earliestSingleDate: [2100,  1,  1, CE, null, MINUS, 9, YEARS]
-                            latestDate:         [2100, 12, 31, CE, null, PLUS,  9, YEARS]
 
   '1997':                   # yearOnly
                             earliestSingleDate: [1997,  1,  1, CE]
@@ -89,6 +73,14 @@
                             earliestSingleDate: [1974,  1,  1, CE]
                             latestDate:         [1974, 12, 31, CE]
 
+  '1974 c.e.':              # yearOnly
+                            earliestSingleDate: [1974,  1,  1, CE]
+                            latestDate:         [1974, 12, 31, CE]
+
+  '1974 ce':                # yearOnly
+                            earliestSingleDate: [1974,  1,  1, CE]
+                            latestDate:         [1974, 12, 31, CE]
+
   '3/12/2013':              # numDate
                             earliestSingleDate: [2013,  3, 12, CE]
 
@@ -113,7 +105,7 @@
   'Sep 19, 1821':           # strDate
                             earliestSingleDate: [1821,  9, 19, CE]
 
-  'Sept 19, 1821':          # strDate
+  'SEPT 19, 1821':          # strDate
                             earliestSingleDate: [1821,  9, 19, CE]
 
   '2000, April 1':          # invStrDate
@@ -168,6 +160,22 @@
   '09/05 - 18/1776':        # numDateRange
                             earliestSingleDate: [1776,  9,  5, CE]
                             latestDate:         [1776,  9, 18, CE]
+
+  'circa 2013':             # circaYear
+                            earliestSingleDate: [2013,  1,  1, CE, null, MINUS, 5, YEARS]
+                            latestDate:         [2013, 12, 31, CE, null, PLUS,  5, YEARS]
+
+  'c. 1950':                # circaYear
+                            earliestSingleDate: [1950,  1,  1, CE, null, MINUS, 8, YEARS]
+                            latestDate:         [1950, 12, 31, CE, null, PLUS,  8, YEARS]
+
+  'Circa 10 BC':            # circaYear
+                            earliestSingleDate: [  10,  1,  1, BCE, null, MINUS, 106, YEARS]
+                            latestDate:         [  10, 12, 31, BCE, null, PLUS,  106, YEARS]
+
+  'circa 2100':             # circaYear
+                            earliestSingleDate: [2100,  1,  1, CE, null, MINUS, 9, YEARS]
+                            latestDate:         [2100, 12, 31, CE, null, PLUS,  9, YEARS]
                           
 # Invalid dates
 

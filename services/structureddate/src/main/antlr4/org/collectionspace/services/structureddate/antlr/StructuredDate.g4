@@ -4,12 +4,11 @@ grammar StructuredDate;
  * This is a grammar for ANTLR 4 (http://www.antlr.org/).
  *
  * TODO: 
- *   Lowercase all strings (assume the input has been normalized to lowercase before parsing)
  *   Allow short months ending with periods
  *   Allow ca '.'? for CIRCA
  *   Allow c1970 for CIRCA
- *   Allow ce for AD
  *   Allow year month
+ *   Allow YYYY-MM-DD and MM-DD-YYYY
  *
  * To generate the lexer, parser, and listener classes, use the command: 
  *     java -jar /usr/local/lib/antlr-4.1-complete.jar -package org.collectionspace.services.structureddate.antlr StructuredDate.g4
@@ -131,30 +130,30 @@ dayOfMonth:     NUMBER ;
  */
 
 WS:             [ \t\r\n]+ -> skip;
-CIRCA:          [Cc] ('irca' | '.') ;
-SPRING:         [Ss] 'pring' ;
-SUMMER:         [Ss] 'ummer' ;
-WINTER:         [Ww] 'inter' ;
-FALL:           [Ff] 'all' | [Aa] 'utumn' ;
-EARLY:          [Ee] 'arly' ;
-MIDDLE:         [Mm] 'id' ;
-LATE:           [Ll] 'ate' ;
-BEFORE:         [Bb] 'efore' | [Pp] 're' ;
-AFTER:          [Aa] 'fter' | [Pp] 'ost' ;
-FIRST:          [Ff] 'irst' ;
-SECOND:         [Ss] 'econd' ;
-THIRD:          [Th] 'ird' ;
-FOURTH:         [Ff] 'ourth' ;
-LAST:           [Ll] 'ast' ;
-QUARTER:        [Qq] 'uarter' ;
-HALF:           [Hh] 'alf' ;
-CENTURY:        [Cc] 'entury' ;
-MILLENIUM:      [Mm] 'illenium' ;
-MONTH:          [Jj] 'anuary' | [Ff] 'ebruary' | [Mm] 'arch' | [Aa] 'pril' | [Mm] 'ay' | [Jj] 'une' | [Jj] 'uly' | [Aa] 'ugust' | [Ss] 'eptember' | [Oo] 'ctober' | [Nn] 'ovember' | [Dd] 'ecember' |
-                [Jj] 'an' | [Ff] 'eb' | [Mm] 'ar' | [Aa] 'pr' | [Jj] 'un' | [Jj] 'ul' | [Aa] 'ug' | [Ss] 'ep' | [Ss] 'ept' | [Oo] 'ct' | [Nn] 'ov' | [Dd] 'ec' ;
-BCE:            [Bb][Cc][Ee]? | [Bb] '.' [Cc] '.' | [Bb] '.' [Cc] '.' [Ee] '.' ;
-AD:             [Aa][Dd] | [Aa] '.' [Dd] '.' ;
-STRING:         [a-zA-Z\.]+ ;
+CIRCA:          'c' ('irca' | '.') ;
+SPRING:         'spring' ;
+SUMMER:         'summer' ;
+WINTER:         'winter' ;
+FALL:           'fall' | 'autumn' ;
+EARLY:          'early' ;
+MIDDLE:         'mid' ;
+LATE:           'late' ;
+BEFORE:         'before' | 'pre' '-'? ;
+AFTER:          'after' | 'post' '-'?;
+FIRST:          'first' ;
+SECOND:         'second' ;
+THIRD:          'third' ;
+FOURTH:         'fourth' ;
+LAST:           'last' ;
+QUARTER:        'quarter' ;
+HALF:           'half' ;
+CENTURY:        'century' ;
+MILLENIUM:      'millenium' ;
+MONTH:          'january' | 'february' | 'march' | 'april' | 'may' | 'june' | 'july' | 'august' | 'september' | 'october' | 'november' | 'december' |
+                'jan' | 'feb' | 'mar' | 'apr' | 'jun' | 'jul' | 'aug' | 'sep' | 'sept' | 'oct' | 'nov' | 'dec' ;
+BCE:            'bc' 'e'? |  'b.c.' | 'b.c.e.' ;
+AD:             'ad' | 'a.d.' | 'ce' | 'c.e.';
+STRING:         [a-z\.]+ ;
 NTHSTR:         [0-9]*? ([0456789] 'th' | '1st' | '2nd' | '3rd' | '11th' | '12th' | '13th') ;
 HUNDREDS:       [0-9]*? '00' S;
 TENS:           [0-9]*? '0' S;

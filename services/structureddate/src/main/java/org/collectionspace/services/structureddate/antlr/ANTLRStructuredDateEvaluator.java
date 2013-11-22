@@ -62,7 +62,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		result = new StructuredDate();
 		result.setDisplayDate(displayDate);
 
-		ANTLRInputStream inputStream = new ANTLRInputStream(displayDate);
+		ANTLRInputStream inputStream = new ANTLRInputStream(displayDate.toLowerCase());
 		StructuredDateLexer lexer = new StructuredDateLexer(inputStream);
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 
@@ -233,7 +233,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitStrMonth(StrMonthContext ctx) {
 		if (ctx.exception != null) return;
 		
-		String monthStr = ctx.MONTH().getText().toLowerCase();
+		String monthStr = ctx.MONTH().getText();
 		
 		if (monthStr.endsWith(".")) {
 			monthStr = monthStr.substring(0, monthStr.length() - 1);
