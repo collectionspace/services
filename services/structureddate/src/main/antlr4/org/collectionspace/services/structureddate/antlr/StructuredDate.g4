@@ -4,11 +4,8 @@ grammar StructuredDate;
  * This is a grammar for ANTLR 4 (http://www.antlr.org/).
  *
  * TODO: 
- *   Allow YYYY-MM-DD and MM-DD-YYYY
+ *   Allow YYYY-MM-DD
  *   Allow month nth, year
- *
- * To generate the lexer, parser, and listener classes, use the command: 
- *     java -jar /usr/local/lib/antlr-4.1-complete.jar -package org.collectionspace.services.structureddate.antlr StructuredDate.g4
  */
 
 /*
@@ -111,7 +108,7 @@ invStrDate:     year COMMA? strMonth dayOfMonth ;
 strDateRange:   strMonth dayOfMonth HYPHEN dayOfMonth COMMA? year ;
 monthOnlyRange: strMonth HYPHEN strMonth COMMA? year ;
 numDateRange:   numMonth SLASH dayOfMonth HYPHEN dayOfMonth SLASH year ;
-numDate:        numMonth SLASH dayOfMonth SLASH year ;
+numDate:        numMonth SLASH dayOfMonth SLASH year | numMonth HYPHEN dayOfMonth HYPHEN year;
 monthYear:      strMonth COMMA? year ;
 invMonthYear:   year COMMA? strMonth ;
 decade:         TENS ;

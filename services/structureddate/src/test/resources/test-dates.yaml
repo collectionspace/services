@@ -103,6 +103,12 @@
   '03/05/13':               # numDate
                             earliestSingleDate: [  13,  3,  5, CE]
 
+  '7-6-1773':               # numDate
+                            earliestSingleDate: [1773,  7,  6, CE]
+
+  '07-06-1773':             # numDate
+                            earliestSingleDate: [1773,  7,  6, CE]
+
   'May 06 1952':            # strDate
                             earliestSingleDate: [1952,  5,  6, CE]
 

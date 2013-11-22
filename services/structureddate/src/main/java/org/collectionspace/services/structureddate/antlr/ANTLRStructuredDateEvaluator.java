@@ -91,7 +91,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitToDo(ToDoContext ctx) {
 		if (ctx.exception != null) return;
 
-		result.setNote("Not yet implemented.");
+		result.setNote("Not yet implemented");
 	}
 
 	@Override
