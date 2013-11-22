@@ -23,19 +23,19 @@ import org.collectionspace.services.structureddate.StructuredDate;
 import org.collectionspace.services.structureddate.StructuredDateEvaluator;
 import org.collectionspace.services.structureddate.StructuredDateFormatException;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.CircaYearContext;
-import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DateRangeOnlyContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.SmallDateRangeOnlyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DayOfMonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.InvMonthYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.InvStrDateContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthInYearRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthOnlyContext;
-import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthOnlyRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDateContext;
-import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDateRangeContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDayInMonthRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumMonthContext;
-import org.collectionspace.services.structureddate.antlr.StructuredDateParser.SingleDateOnlyContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.ExactDateOnlyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrDateContext;
-import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrDateRangeContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrDayInMonthRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrMonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.ToDoContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearContext;
@@ -142,7 +142,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	}
 
 	@Override
-	public void exitSingleDateOnly(SingleDateOnlyContext ctx) {
+	public void exitExactDateOnly(ExactDateOnlyContext ctx) {
 		if (ctx.exception != null) return;
 
 		Era era = ctx.BC() != null ? Era.BCE : Era.CE;
@@ -153,7 +153,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	}
 	
 	@Override
-	public void exitDateRangeOnly(DateRangeOnlyContext ctx) {
+	public void exitSmallDateRangeOnly(SmallDateRangeOnlyContext ctx) {
 		if (ctx.exception != null) return;
 
 		result.setLatestDate((Date) stack.pop());
@@ -161,7 +161,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	}
 
 	@Override
-	public void exitMonthOnlyRange(MonthOnlyRangeContext ctx) {
+	public void exitMonthInYearRange(MonthInYearRangeContext ctx) {
 		if (ctx.exception != null) return;
 
 		Integer year = (Integer) stack.pop();
@@ -173,7 +173,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	}
 	
 	@Override
-	public void exitNumDateRange(NumDateRangeContext ctx) {
+	public void exitNumDayInMonthRange(NumDayInMonthRangeContext ctx) {
 		if (ctx.exception != null) return;
 
 		Integer year = (Integer) stack.pop();
@@ -186,7 +186,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	}
 
 	@Override
-	public void exitStrDateRange(StrDateRangeContext ctx) {
+	public void exitStrDayInMonthRange(StrDayInMonthRangeContext ctx) {
 		if (ctx.exception != null) return;
 
 		Integer year = (Integer) stack.pop();

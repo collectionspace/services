@@ -38,10 +38,10 @@ displayDate:    CIRCA year (BC|AD)?                                    # circaYe
 |               partOf year BC                                         # toDo
 |               month                                                  # monthOnly
 |               month HYPHEN month                                     # toDo
-|               partOf singleDate BC                                   # toDo
-|               partOf singleDate                                      # toDo
-|               singleDate (BC|AD)?                                    # singleDateOnly
-|               singleDate HYPHEN singleDate                           # toDo
+|               partOf exactDate BC                                    # toDo
+|               partOf exactDate                                       # toDo
+|               exactDate (BC|AD)?                                     # exactDateOnly
+|               exactDate HYPHEN exactDate                             # toDo
 |               nth CENTURY                                            # toDo
 |               CIRCA nth CENTURY                                      # toDo
 |               nth CENTURY AD                                         # toDo
@@ -85,15 +85,15 @@ displayDate:    CIRCA year (BC|AD)?                                    # circaYe
 |               partOf decade BC                                       # toDo
 |               CIRCA decade                                           # toDo
 |               CIRCA decade BC                                        # toDo
-|               dateRange                                              # dateRangeOnly
+|               smallDateRange                                         # smallDateRangeOnly
 ;
 
-dateRange:      monthOnlyRange
-|               strDateRange
-|               numDateRange
+smallDateRange: monthInYearRange
+|               strDayInMonthRange
+|               numDayInMonthRange
 ;              
 
-singleDate:     numDate
+exactDate:      numDate
 |               strDate
 |               invStrDate
 ;
@@ -102,23 +102,25 @@ month:          monthYear
 |               invMonthYear
 ;
 
-strDate:        strMonth dayOfMonth COMMA? year ;
-invStrDate:     year COMMA? strMonth dayOfMonth ;
-strDateRange:   strMonth dayOfMonth HYPHEN dayOfMonth COMMA? year ;
-monthOnlyRange: strMonth HYPHEN strMonth COMMA? year ;
-numDateRange:   numMonth SLASH dayOfMonth HYPHEN dayOfMonth SLASH year ;
-numDate:        numMonth SLASH dayOfMonth SLASH year | numMonth HYPHEN dayOfMonth HYPHEN year;
-monthYear:      strMonth COMMA? year ;
-invMonthYear:   year COMMA? strMonth ;
-decade:         TENS ;
-century:        HUNDREDS ;
-season:         SPRING | SUMMER | WINTER | FALL ;
-partOf:         EARLY | MIDDLE | LATE | BEFORE | AFTER ;
-nth:            NTHSTR | FIRST | SECOND | THIRD | FOURTH ;
-strMonth:       MONTH | SHORTMONTH DOT?;
-year:           NUMBER ;
-numMonth:       NUMBER ;
-dayOfMonth:     NUMBER ;
+strDate:            strMonth dayOfMonth COMMA? year ;
+invStrDate:         year COMMA? strMonth dayOfMonth ;
+strDayInMonthRange: strMonth dayOfMonth HYPHEN dayOfMonth COMMA? year ;
+monthInYearRange:   strMonth HYPHEN strMonth COMMA? year ;
+numDayInMonthRange: numMonth SLASH dayOfMonth HYPHEN dayOfMonth SLASH year ;
+numDate:            numMonth SLASH dayOfMonth SLASH year 
+|                   numMonth HYPHEN dayOfMonth HYPHEN year ;
+monthYear:          strMonth COMMA? year ;
+invMonthYear:       year COMMA? strMonth ;
+/*era:              BC | AD ; */
+decade:             TENS ;
+century:            HUNDREDS ;
+season:             SPRING | SUMMER | WINTER | FALL ;
+partOf:             EARLY | MIDDLE | LATE | BEFORE | AFTER ;
+nth:                NTHSTR | FIRST | SECOND | THIRD | FOURTH ;
+strMonth:           MONTH | SHORTMONTH DOT?;
+year:               NUMBER ;
+numMonth:           NUMBER ;
+dayOfMonth:         NUMBER ;
 
 
 /*
@@ -132,7 +134,7 @@ SUMMER:         'summer' ;
 WINTER:         'winter' ;
 FALL:           'fall' | 'autumn' ;
 EARLY:          'early' ;
-MIDDLE:         'mid' ;
+MIDDLE:         'middle' | 'mid' '-'?;
 LATE:           'late' ;
 BEFORE:         'before' | 'pre' '-'? ;
 AFTER:          'after' | 'post' '-'?;
@@ -147,17 +149,14 @@ CENTURY:        'century' ;
 MILLENIUM:      'millenium' ;
 MONTH:          'january' | 'february' | 'march' | 'april' | 'may' | 'june' | 'july' | 'august' | 'september' | 'october' | 'november' | 'december' ;
 SHORTMONTH:     'jan' | 'feb' | 'mar' | 'apr' | 'jun' | 'jul' | 'aug' | 'sep' | 'sept' | 'oct' | 'nov' | 'dec' ;
-BC:             'bc' 'e'? |  'b.c.' | 'b.c.e.' ;
+BC:             'bc' | 'bce' |  'b.c.' | 'b.c.e.' ;
 AD:             'ad' | 'a.d.' | 'ce' | 'c.e.';
-STRING:         [a-z]+ ;
 NTHSTR:         [0-9]*? ([0456789] 'th' | '1st' | '2nd' | '3rd' | '11th' | '12th' | '13th') ;
-HUNDREDS:       [0-9]*? '00' S;
-TENS:           [0-9]*? '0' S;
+HUNDREDS:       [0-9]*? '00' '\''? 's';
+TENS:           [0-9]*? '0' '\''? 's';
 NUMBER:         [0-9]+ ;
 COMMA:          ',' ;
 HYPHEN:         '-' ;
 SLASH:          '/' ;
 DOT:            '.' ;
-
-fragment 
-S:              '\''? 's' ;
+STRING:         [a-z]+ ;
