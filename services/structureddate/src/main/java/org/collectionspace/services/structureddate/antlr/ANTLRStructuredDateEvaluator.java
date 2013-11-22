@@ -13,6 +13,7 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.collectionspace.services.structureddate.Date;
 import org.collectionspace.services.structureddate.DateUtils;
 import org.collectionspace.services.structureddate.Era;
@@ -233,11 +234,13 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitStrMonth(StrMonthContext ctx) {
 		if (ctx.exception != null) return;
 		
-		String monthStr = ctx.MONTH().getText();
+		TerminalNode monthNode = ctx.MONTH();
 		
-		if (monthStr.endsWith(".")) {
-			monthStr = monthStr.substring(0, monthStr.length() - 1);
+		if (monthNode == null) {
+			monthNode = ctx.SHORTMONTH();
 		}
+		
+		String monthStr = monthNode.getText();
 		
 		if (monthStr.equals("sept")) {
 			monthStr = "sep";
@@ -264,7 +267,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			Token startToken = e.getStartToken();
 			String input = (startToken.getType() == Token.EOF ) ? "end of text" : quote(tokens.getText(startToken, e.getOffendingToken()));
 				
-			message = "no viable date format at " + input;
+			message = "no viable date format found at " + input;
 		}
 		else if (re instanceof InputMismatchException) {
 			InputMismatchException e = (InputMismatchException) re;

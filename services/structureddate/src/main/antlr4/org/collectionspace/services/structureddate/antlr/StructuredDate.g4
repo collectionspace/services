@@ -4,7 +4,6 @@ grammar StructuredDate;
  * This is a grammar for ANTLR 4 (http://www.antlr.org/).
  *
  * TODO: 
- *   Allow short months ending with periods
  *   Allow ca '.'? for CIRCA
  *   Allow c1970 for CIRCA
  *   Allow year month
@@ -119,7 +118,7 @@ century:        HUNDREDS ;
 season:         SPRING | SUMMER | WINTER | FALL ;
 partOf:         EARLY | MIDDLE | LATE | BEFORE | AFTER ;
 nth:            NTHSTR | FIRST | SECOND | THIRD | FOURTH ;
-strMonth:       MONTH ;
+strMonth:       MONTH | SHORTMONTH DOT?;
 year:           NUMBER ;
 numMonth:       NUMBER ;
 dayOfMonth:     NUMBER ;
@@ -130,7 +129,7 @@ dayOfMonth:     NUMBER ;
  */
 
 WS:             [ \t\r\n]+ -> skip;
-CIRCA:          'c' ('irca' | '.') ;
+CIRCA:          ('c' | 'ca') '.'? | 'circa' ;
 SPRING:         'spring' ;
 SUMMER:         'summer' ;
 WINTER:         'winter' ;
@@ -149,11 +148,11 @@ QUARTER:        'quarter' ;
 HALF:           'half' ;
 CENTURY:        'century' ;
 MILLENIUM:      'millenium' ;
-MONTH:          'january' | 'february' | 'march' | 'april' | 'may' | 'june' | 'july' | 'august' | 'september' | 'october' | 'november' | 'december' |
-                'jan' | 'feb' | 'mar' | 'apr' | 'jun' | 'jul' | 'aug' | 'sep' | 'sept' | 'oct' | 'nov' | 'dec' ;
+MONTH:          'january' | 'february' | 'march' | 'april' | 'may' | 'june' | 'july' | 'august' | 'september' | 'october' | 'november' | 'december' ;
+SHORTMONTH:     'jan' | 'feb' | 'mar' | 'apr' | 'jun' | 'jul' | 'aug' | 'sep' | 'sept' | 'oct' | 'nov' | 'dec' ;
 BCE:            'bc' 'e'? |  'b.c.' | 'b.c.e.' ;
 AD:             'ad' | 'a.d.' | 'ce' | 'c.e.';
-STRING:         [a-z\.]+ ;
+STRING:         [a-z]+ ;
 NTHSTR:         [0-9]*? ([0456789] 'th' | '1st' | '2nd' | '3rd' | '11th' | '12th' | '13th') ;
 HUNDREDS:       [0-9]*? '00' S;
 TENS:           [0-9]*? '0' S;
@@ -161,6 +160,7 @@ NUMBER:         [0-9]+ ;
 COMMA:          ',' ;
 HYPHEN:         '-' ;
 SLASH:          '/' ;
+DOT:            '.' ;
 
 fragment 
 S:              '\''? 's' ;
