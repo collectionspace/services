@@ -25,8 +25,11 @@ import org.collectionspace.services.structureddate.StructuredDateFormatException
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.CircaYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DateRangeOnlyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DayOfMonthContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.InvMonthYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.InvStrDateContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthOnlyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthOnlyRangeContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDateRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumMonthContext;
@@ -34,7 +37,7 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Si
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrDateRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrMonthContext;
-import org.collectionspace.services.structureddate.antlr.StructuredDateParser.TodoContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.ToDoContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearOnlyContext;
 
@@ -85,7 +88,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	}	
 
 	@Override
-	public void exitTodo(TodoContext ctx) {
+	public void exitToDo(ToDoContext ctx) {
 		if (ctx.exception != null) return;
 
 		result.setNote("Not yet implemented.");
@@ -128,6 +131,14 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 				new Date(year, LAST_MONTH, LAST_DAY_OF_LAST_MONTH)
 					.withEra(era)
 			);
+	}
+
+	@Override
+	public void exitMonthOnly(MonthOnlyContext ctx) {
+		if (ctx.exception != null) return;
+
+		result.setLatestDate((Date) stack.pop());
+		result.setEarliestSingleDate((Date) stack.pop());
 	}
 
 	@Override
@@ -214,6 +225,24 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer numMonth = (Integer) stack.pop();
 		
 		stack.push(new Date(year, numMonth, dayOfMonth));
+	}
+
+	@Override
+	public void exitMonthYear(MonthYearContext ctx) {
+		Integer year = (Integer) stack.pop();
+		Integer numMonth = (Integer) stack.pop();
+		
+		stack.push(new Date(year, numMonth, 1));
+		stack.push(new Date(year, numMonth, DateUtils.getDaysInMonth(numMonth, year)));		
+	}
+	
+	@Override
+	public void exitInvMonthYear(InvMonthYearContext ctx) {
+		Integer numMonth = (Integer) stack.pop();
+		Integer year = (Integer) stack.pop();
+		
+		stack.push(new Date(year, numMonth, 1));
+		stack.push(new Date(year, numMonth, DateUtils.getDaysInMonth(numMonth, year)));		
 	}
 
 	@Override

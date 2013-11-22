@@ -81,6 +81,22 @@
                             earliestSingleDate: [1974,  1,  1, CE]
                             latestDate:         [1974, 12, 31, CE]
 
+  'May 2007':               # monthOnly
+                            earliestSingleDate: [2007,  5,  1, CE]
+                            latestDate:         [2007,  5, 31, CE]
+
+  'Feb. 2007':              # monthOnly
+                            earliestSingleDate: [2007,  2,  1, CE]
+                            latestDate:         [2007,  2, 28, CE]
+
+  '2000, February':         # monthOnly (leap year)
+                            earliestSingleDate: [2000,  2,  1, CE]
+                            latestDate:         [2000,  2, 29, CE]
+
+  '1900 Feb':               # monthOnly
+                            earliestSingleDate: [1900,  2,  1, CE]
+                            latestDate:         [1900,  2, 28, CE]
+
   '3/12/2013':              # numDate
                             earliestSingleDate: [2013,  3, 12, CE]
 
