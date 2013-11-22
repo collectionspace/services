@@ -3,10 +3,16 @@ package org.collectionspace.services.structureddate.antlr;
 import java.util.Stack;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.FailedPredicateException;
+import org.antlr.v4.runtime.InputMismatchException;
+import org.antlr.v4.runtime.NoViableAltException;
+import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.collectionspace.services.structureddate.Date;
 import org.collectionspace.services.structureddate.DateUtils;
 import org.collectionspace.services.structureddate.Era;
@@ -59,25 +65,35 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		ANTLRInputStream inputStream = new ANTLRInputStream(displayDate);
 		StructuredDateLexer lexer = new StructuredDateLexer(inputStream);
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+
 		StructuredDateParser parser = new StructuredDateParser(tokenStream);
-		ErrorListener errorListener = new ErrorListener();
-		
-		parser.addErrorListener(errorListener);
+		parser.setErrorHandler(new BailErrorStrategy());
+		parser.removeErrorListeners();
 		parser.addParseListener(this);
-		parser.oneDisplayDate();
+
+		try {
+			parser.oneDisplayDate();
+		}
+		catch(ParseCancellationException e) {			
+			RecognitionException re = (RecognitionException) e.getCause();
+			
+			throw new StructuredDateFormatException(getErrorMessage(re), re);
+		}
 		
 		return result;
-	}
-	
-	
+	}	
 
 	@Override
 	public void exitTodo(TodoContext ctx) {
+		if (ctx.exception != null) return;
+
 		result.setNote("Not yet implemented.");
 	}
 
 	@Override
 	public void exitCircaYear(CircaYearContext ctx) {
+		if (ctx.exception != null) return;
+
 		Integer year = (Integer) stack.pop();
 		Era era = ctx.BCE() != null ? Era.BCE : Era.CE;
 		int interval = DateUtils.getCircaIntervalYears(year, era);
@@ -97,6 +113,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	
 	@Override
 	public void exitYearOnly(YearOnlyContext ctx) {
+		if (ctx.exception != null) return;
+
 		Integer year = (Integer) stack.pop();
 		Era era = ctx.BCE() != null ? Era.BCE : Era.CE;
 		
@@ -113,17 +131,23 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 	@Override
 	public void exitSingleDateOnly(SingleDateOnlyContext ctx) {
+		if (ctx.exception != null) return;
+
 		result.setEarliestSingleDate((Date) stack.pop());
 	}
 	
 	@Override
 	public void exitDateRangeOnly(DateRangeOnlyContext ctx) {
+		if (ctx.exception != null) return;
+
 		result.setLatestDate((Date) stack.pop());
 		result.setEarliestSingleDate((Date) stack.pop());
 	}
 
 	@Override
 	public void exitMonthOnlyRange(MonthOnlyRangeContext ctx) {
+		if (ctx.exception != null) return;
+
 		Integer year = (Integer) stack.pop();
 		Integer numMonthEnd = (Integer) stack.pop();
 		Integer numMonthStart = (Integer) stack.pop();
@@ -134,6 +158,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	
 	@Override
 	public void exitNumDateRange(NumDateRangeContext ctx) {
+		if (ctx.exception != null) return;
+
 		Integer year = (Integer) stack.pop();
 		Integer dayOfMonthEnd = (Integer) stack.pop();
 		Integer dayOfMonthStart = (Integer) stack.pop();
@@ -145,6 +171,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 	@Override
 	public void exitStrDateRange(StrDateRangeContext ctx) {
+		if (ctx.exception != null) return;
+
 		Integer year = (Integer) stack.pop();
 		Integer dayOfMonthEnd = (Integer) stack.pop();
 		Integer dayOfMonthStart = (Integer) stack.pop();
@@ -156,6 +184,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	
 	@Override
 	public void exitStrDate(StrDateContext ctx) {
+		if (ctx.exception != null) return;
+
 		Integer year = (Integer) stack.pop();
 		Integer dayOfMonth = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
@@ -165,6 +195,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 	@Override
 	public void exitInvStrDate(InvStrDateContext ctx) {
+		if (ctx.exception != null) return;
+
 		Integer dayOfMonth = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
 		Integer year = (Integer) stack.pop();
@@ -174,6 +206,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	
 	@Override
 	public void exitNumDate(NumDateContext ctx) {
+		if (ctx.exception != null) return;
+
 		Integer year = (Integer) stack.pop();
 		Integer dayOfMonth = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
@@ -183,16 +217,22 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 	@Override
 	public void exitYear(YearContext ctx) {
+		if (ctx.exception != null) return;
+
 		stack.push(new Integer(ctx.NUMBER().getText()));
 	}
 
 	@Override
 	public void exitNumMonth(NumMonthContext ctx) {
+		if (ctx.exception != null) return;
+
 		stack.push(new Integer(ctx.NUMBER().getText()));
 	}
 	
 	@Override
 	public void exitStrMonth(StrMonthContext ctx) {
+		if (ctx.exception != null) return;
+		
 		String monthStr = ctx.MONTH().getText().toLowerCase();
 		
 		if (monthStr.endsWith(".")) {
@@ -202,15 +242,74 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		if (monthStr.equals("sept")) {
 			monthStr = "sep";
 		}
-		
-		stack.push(DateUtils.getMonthByName(monthStr));		
+
+		stack.push(DateUtils.getMonthByName(monthStr));
 	}
 
 	@Override
 	public void exitDayOfMonth(DayOfMonthContext ctx) {
+		if (ctx.exception != null) return;
+
 		stack.push(new Integer(ctx.NUMBER().getText()));
 	}
 	
+	protected String getErrorMessage(RecognitionException re) {
+		String message = "";
+		
+		Parser recognizer = (Parser) re.getRecognizer();
+		TokenStream tokens = recognizer.getInputStream();
+		
+		if (re instanceof NoViableAltException) {
+			NoViableAltException e = (NoViableAltException) re;
+			Token startToken = e.getStartToken();
+			String input = (startToken.getType() == Token.EOF ) ? "end of text" : quote(tokens.getText(startToken, e.getOffendingToken()));
+				
+			message = "no viable date format at " + input;
+		}
+		else if (re instanceof InputMismatchException) {
+			InputMismatchException e = (InputMismatchException) re;
+			message = "did not expect " + getTokenDisplayString(e.getOffendingToken()) + " while looking for " +
+			          e.getExpectedTokens().toString(recognizer.getTokenNames());
+		}
+		else if (re instanceof FailedPredicateException) {
+			FailedPredicateException e = (FailedPredicateException) re;
+            String ruleName = recognizer.getRuleNames()[recognizer.getContext().getRuleIndex()];
+            
+            message = "failed predicate " + ruleName + ": " + e.getMessage();
+		}
+		
+		return message;
+	}
+	
+	protected String quote(String text) {
+		return "'" + text + "'";
+	}
+	
+    protected String getTokenDisplayString(Token token) {
+    	String string;
+    	
+        if (token == null) {
+        	string = "[no token]";
+        }
+        else {
+	        String text = token.getText();
+	        
+	        if (text == null) {
+	        	if (token.getType() == Token.EOF ) {
+	        		string = "end of text";
+	            }
+	            else {
+	                string = "[" + token.getType() + "]";
+	            }
+	        }
+	        else {
+	        	string = quote(text);
+	        }
+        }
+        
+        return string;
+    }
+
 	public static void main(String[] args) {
 		StructuredDateEvaluator evaluator = new ANTLRStructuredDateEvaluator();
 		
@@ -221,14 +320,6 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			} catch (StructuredDateFormatException e) {
 				e.printStackTrace();
 			}
-		}
-	}
-	
-	private class ErrorListener extends BaseErrorListener {
-		
-		@Override
-		public void syntaxError(Recognizer<?,?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-			throw(new StructuredDateFormatException(msg, e));
 		}
 	}
 }

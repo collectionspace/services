@@ -10,6 +10,10 @@ public class StructuredDateFormatException extends IllegalArgumentException {
 	public StructuredDateFormatException(Throwable cause) {
 		super(cause);
 	}
+
+	public StructuredDateFormatException(String message) {
+		super(message);
+	}
 	
 	public StructuredDateFormatException(String message, Throwable cause) {
 		super(message, cause);

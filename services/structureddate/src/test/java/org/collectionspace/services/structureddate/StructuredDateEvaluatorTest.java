@@ -41,7 +41,9 @@ public class StructuredDateEvaluatorTest {
 			try {
 				actualStructuredDate = StructuredDate.parse(displayDate);
 			}
-			catch(StructuredDateFormatException e) { }
+			catch(StructuredDateFormatException e) {
+				logger.debug(e.getMessage());
+			}
 			
 			Assert.assertEquals(actualStructuredDate, expectedStructuredDate);
 		}

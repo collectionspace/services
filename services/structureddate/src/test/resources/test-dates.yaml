@@ -171,9 +171,15 @@
                           
 # Invalid dates
 
+  '':                       # empty
+                            null
+                            
   'Octo 19, 1821':          # bad format (not a valid month)
                             null
 
+  'May-Foo 2000':           # bad format (not a valid month)
+                            null
+                            
   'Something else':         # bad format (totally not a date)
                             null            
                               
