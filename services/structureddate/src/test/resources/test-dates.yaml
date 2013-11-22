@@ -85,9 +85,17 @@
                             earliestSingleDate: [2007,  5,  1, CE]
                             latestDate:         [2007,  5, 31, CE]
 
+  'May 2007 AD':            # monthOnly
+                            earliestSingleDate: [2007,  5,  1, CE]
+                            latestDate:         [2007,  5, 31, CE]
+
   'Feb. 2007':              # monthOnly
                             earliestSingleDate: [2007,  2,  1, CE]
                             latestDate:         [2007,  2, 28, CE]
+
+  'Feb. 2007 BC':           # monthOnly
+                            earliestSingleDate: [2007,  2,  1, BCE]
+                            latestDate:         [2007,  2, 28, BCE]
 
   '2000, February':         # monthOnly (leap year)
                             earliestSingleDate: [2000,  2,  1, CE]

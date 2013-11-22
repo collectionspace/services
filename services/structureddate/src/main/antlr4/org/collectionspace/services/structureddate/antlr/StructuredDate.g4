@@ -14,8 +14,8 @@ grammar StructuredDate;
 
 oneDisplayDate: displayDate EOF ; 
  
-displayDate:    CIRCA year (BC|AD)?                                    # circaYear
-|               year (BC|AD)?                                          # yearOnly
+displayDate:    CIRCA year era                                         # circaYear
+|               year era                                               # yearOnly
 |               nth QUARTER year                                       # toDo
 |               LAST QUARTER year                                      # toDo
 |               nth HALF year                                          # toDo
@@ -36,11 +36,11 @@ displayDate:    CIRCA year (BC|AD)?                                    # circaYe
 |               season year BC                                         # toDo
 |               partOf year                                            # toDo
 |               partOf year BC                                         # toDo
-|               month                                                  # monthOnly
+|               month era                                              # monthOnly
 |               month HYPHEN month                                     # toDo
 |               partOf exactDate BC                                    # toDo
 |               partOf exactDate                                       # toDo
-|               exactDate (BC|AD)?                                     # exactDateOnly
+|               exactDate era                                          # exactDateOnly
 |               exactDate HYPHEN exactDate                             # toDo
 |               nth CENTURY                                            # toDo
 |               CIRCA nth CENTURY                                      # toDo
@@ -111,13 +111,13 @@ numDate:            numMonth SLASH dayOfMonth SLASH year
 |                   numMonth HYPHEN dayOfMonth HYPHEN year ;
 monthYear:          strMonth COMMA? year ;
 invMonthYear:       year COMMA? strMonth ;
-/*era:              BC | AD ; */
 decade:             TENS ;
 century:            HUNDREDS ;
 season:             SPRING | SUMMER | WINTER | FALL ;
 partOf:             EARLY | MIDDLE | LATE | BEFORE | AFTER ;
 nth:                NTHSTR | FIRST | SECOND | THIRD | FOURTH ;
 strMonth:           MONTH | SHORTMONTH DOT?;
+era:                BC | AD | ;
 year:               NUMBER ;
 numMonth:           NUMBER ;
 dayOfMonth:         NUMBER ;
