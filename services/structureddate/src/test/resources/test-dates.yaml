@@ -106,6 +106,9 @@
   '7-6-1773':               # numDate
                             earliestSingleDate: [1773,  7,  6, CE]
 
+  '7-6-1773 AD':            # numDate
+                            earliestSingleDate: [1773,  7,  6, CE]
+
   '07-06-1773':             # numDate
                             earliestSingleDate: [1773,  7,  6, CE]
 
@@ -132,6 +135,9 @@
 
   'Sept. 19, 1821':         # strDate
                             earliestSingleDate: [1821,  9, 19, CE]
+
+  'July 1, 560 BC':         # strDate
+                            earliestSingleDate: [ 560,  7,  1, BCE]
 
   '2000, April 1':          # invStrDate
                             earliestSingleDate: [2000,  4,  1, CE]
