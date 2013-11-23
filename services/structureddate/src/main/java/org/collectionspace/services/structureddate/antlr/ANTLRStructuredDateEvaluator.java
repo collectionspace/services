@@ -23,24 +23,29 @@ import org.collectionspace.services.structureddate.StructuredDate;
 import org.collectionspace.services.structureddate.StructuredDateEvaluator;
 import org.collectionspace.services.structureddate.StructuredDateFormatException;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.CircaYearContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.CircaYearRangeContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DateRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.EraContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDayOfMonthContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumYearContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PreciseDateContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PreciseDateRangeContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PreciseMonthContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PreciseYearContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PreciseYearRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.SmallDateRangeOnlyContext;
-import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DayOfMonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.InvMonthYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.InvStrDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthInYearRangeContext;
-import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthOnlyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDayInMonthRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumMonthContext;
-import org.collectionspace.services.structureddate.antlr.StructuredDateParser.ExactDateOnlyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrDayInMonthRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrMonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.ToDoContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearContext;
-import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearOnlyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearRangeContext;
 
 /**
@@ -86,6 +91,16 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			throw new StructuredDateFormatException(getErrorMessage(re), re);
 		}
 		
+		// TODO: Move this somewhere else
+		
+		if (result.getEarliestSingleDate() != null && result.getEarliestSingleDate().getEra() == null) {
+			result.getEarliestSingleDate().setEra(Date.DEFAULT_ERA);
+		}
+		
+		if (result.getLatestDate() != null && result.getLatestDate().getEra() == null) {
+			result.getLatestDate().setEra(Date.DEFAULT_ERA);
+		}
+		
 		return result;
 	}	
 
@@ -100,115 +115,128 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitCircaYear(CircaYearContext ctx) {
 		if (ctx.exception != null) return;
 
-		Era era = (Era) stack.pop();
-		Integer year = (Integer) stack.pop();
+		Date yearEndDate = (Date) stack.pop();
+		Date yearStartDate = (Date) stack.pop();
 		
-		if (era == null) {
-			era = Era.CE;
-		}
-
-		int interval = DateUtils.getCircaIntervalYears(year, era);
+		// Since this is a single year, the year and era are the same for the start and end date.
+		// It doesn't matter which we use to compute the circa interval.
+		int interval = DateUtils.getCircaIntervalYears(yearStartDate.getYear(), yearStartDate.getEra());
 		
-		result.setEarliestSingleDate(
-			new Date(year, FIRST_MONTH, FIRST_DAY_OF_FIRST_MONTH)
-				.withEra(era)
-				.withQualifier(QualifierType.MINUS, interval, QualifierUnit.YEARS)
-		);
-		
-		result.setLatestDate(
-			new Date(year, LAST_MONTH, LAST_DAY_OF_LAST_MONTH)
-				.withEra(era)
-				.withQualifier(QualifierType.PLUS, interval, QualifierUnit.YEARS)
-		);
-	}
-	
-	@Override
-	public void exitYearOnly(YearOnlyContext ctx) {
-		if (ctx.exception != null) return;
-
-		Era era = (Era) stack.pop();
-		Integer year = (Integer) stack.pop();
-		
-		if (era == null) {
-			era = Era.CE;
-		}
-		
-		result.setEarliestSingleDate(
-			new Date(year, FIRST_MONTH, FIRST_DAY_OF_FIRST_MONTH)
-				.withEra(era)
-		);
-		
-		result.setLatestDate(
-			new Date(year, LAST_MONTH, LAST_DAY_OF_LAST_MONTH)
-				.withEra(era)
-		);
+		result.setEarliestSingleDate(yearStartDate.withQualifier(QualifierType.MINUS, interval, QualifierUnit.YEARS));
+		result.setLatestDate(yearEndDate.withQualifier(QualifierType.PLUS, interval, QualifierUnit.YEARS));
 	}
 
 	@Override
-	public void exitYearRange(YearRangeContext ctx) {
+	public void exitPreciseYear(PreciseYearContext ctx) {
 		if (ctx.exception != null) return;
 
-		Era latestEra = (Era) stack.pop();
-		Integer latestYear = (Integer) stack.pop();
-		
-		Era earliestEra = (Era) stack.pop();
-		Integer earliestYear = (Integer) stack.pop();
-		
-		if (latestEra == null) {
-			latestEra = Era.CE;
-		}
-		
-		if (earliestEra == null) {
-			earliestEra = latestEra;
-		}
-		
-		result.setEarliestSingleDate(
-			new Date(earliestYear, FIRST_MONTH, FIRST_DAY_OF_FIRST_MONTH)
-				.withEra(earliestEra)
-		);
-		
-		result.setLatestDate(
-			new Date(latestYear, LAST_MONTH, LAST_DAY_OF_LAST_MONTH)
-				.withEra(latestEra)
-		);
+		Date yearEndDate = (Date) stack.pop();
+		Date yearStartDate = (Date) stack.pop();
+
+		result.setEarliestSingleDate(yearStartDate);		
+		result.setLatestDate(yearEndDate);
 	}
 
 	@Override
-	public void exitMonthOnly(MonthOnlyContext ctx) {
+	public void exitCircaYearRange(CircaYearRangeContext ctx) {
 		if (ctx.exception != null) return;
 
-		Era era = (Era) stack.pop();
+		Date latestDate = (Date) stack.pop();
+		Date earliestDate = (Date) stack.pop();
+
+		int earliestInterval = DateUtils.getCircaIntervalYears(earliestDate.getYear(), earliestDate.getEra());
+		int latestInterval = DateUtils.getCircaIntervalYears(latestDate.getYear(), latestDate.getEra());
+		
+		result.setEarliestSingleDate(earliestDate.withQualifier(QualifierType.MINUS, earliestInterval, QualifierUnit.YEARS));
+		result.setLatestDate(latestDate.withQualifier(QualifierType.PLUS, latestInterval, QualifierUnit.YEARS));	
+	}
+
+	@Override
+	public void exitPreciseYearRange(PreciseYearRangeContext ctx) {
+		if (ctx.exception != null) return;
+		
 		Date latestDate = (Date) stack.pop();
 		Date earliestDate = (Date) stack.pop();
 		
-		if (era == null) {
-			era = Era.CE;
-		}
-		
-		result.setEarliestSingleDate(earliestDate.withEra(era));
-		result.setLatestDate(latestDate.withEra(era));
+		result.setEarliestSingleDate(earliestDate);
+		result.setLatestDate(latestDate);
 	}
 
 	@Override
-	public void exitExactDateOnly(ExactDateOnlyContext ctx) {
+	public void exitPreciseMonth(PreciseMonthContext ctx) {
 		if (ctx.exception != null) return;
 
-		Era era = (Era) stack.pop();
+		Date latestDate = (Date) stack.pop();
+		Date earliestDate = (Date) stack.pop();
+		
+		result.setEarliestSingleDate(earliestDate);
+		result.setLatestDate(latestDate);
+	}
+
+	@Override
+	public void exitPreciseDate(PreciseDateContext ctx) {
+		if (ctx.exception != null) return;
+
 		Date date = (Date) stack.pop();
 
-		if (era == null) {
-			era = Era.CE;
-		}
-
-		result.setEarliestSingleDate(date.withEra(era));
+		result.setEarliestSingleDate(date);
 	}
 	
+	@Override
+	public void exitPreciseDateRange(PreciseDateRangeContext ctx) {
+		if (ctx.exception != null) return;
+
+		Date latestDate = (Date) stack.pop();
+		Date earliestDate = (Date) stack.pop();
+
+		result.setEarliestSingleDate(earliestDate);
+		result.setLatestDate(latestDate);
+	}
+
 	@Override
 	public void exitSmallDateRangeOnly(SmallDateRangeOnlyContext ctx) {
 		if (ctx.exception != null) return;
 
 		result.setLatestDate((Date) stack.pop());
 		result.setEarliestSingleDate((Date) stack.pop());
+	}
+
+	@Override
+	public void exitYearRange(YearRangeContext ctx) {
+		if (ctx.exception != null) return;
+
+		Date secondYearEndDate = (Date) stack.pop();
+		stack.pop(); // secondYearStartDate
+		stack.pop(); // firstYearEndDate
+		Date firstYearStartDate = (Date) stack.pop();
+
+		// If no era was explicitly specified for the first year,
+		// make it inherit the era of the second year.
+
+		if (firstYearStartDate.getEra() == null) {
+			firstYearStartDate.setEra(secondYearEndDate.getEra());
+		}
+		
+		stack.push(firstYearStartDate);
+		stack.push(secondYearEndDate);
+	}
+
+	@Override
+	public void exitDateRange(DateRangeContext ctx) {
+		if (ctx.exception != null) return;
+
+		Date latestDate = (Date) stack.pop();
+		Date earliestDate = (Date) stack.pop();
+	
+		// If no era was explicitly specified for the first year,
+		// make it inherit the era of the second year.
+
+		if (earliestDate.getEra() == null) {
+			earliestDate.setEra(latestDate.getEra());
+		}
+		
+		stack.push(earliestDate);
+		stack.push(latestDate);
 	}
 
 	@Override
@@ -253,11 +281,12 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitStrDate(StrDateContext ctx) {
 		if (ctx.exception != null) return;
 
+		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer dayOfMonth = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
 		
-		stack.push(new Date(year, numMonth, dayOfMonth));
+		stack.push(new Date(year, numMonth, dayOfMonth).withEra(era));
 	}
 
 	@Override
@@ -267,41 +296,60 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer dayOfMonth = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
 		Integer year = (Integer) stack.pop();
+		Era era = (Era) stack.pop();
 		
-		stack.push(new Date(year, numMonth, dayOfMonth));
+		stack.push(new Date(year, numMonth, dayOfMonth).withEra(era));
 	}
 	
 	@Override
 	public void exitNumDate(NumDateContext ctx) {
 		if (ctx.exception != null) return;
 
+		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer dayOfMonth = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
 		
-		stack.push(new Date(year, numMonth, dayOfMonth));
+		stack.push(new Date(year, numMonth, dayOfMonth).withEra(era));
 	}
 
 	@Override
 	public void exitMonthYear(MonthYearContext ctx) {
+		if (ctx.exception != null) return;
+
+		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
 		
-		stack.push(new Date(year, numMonth, 1));
-		stack.push(new Date(year, numMonth, DateUtils.getDaysInMonth(numMonth, year)));		
+		stack.push(new Date(year, numMonth, 1).withEra(era));
+		stack.push(new Date(year, numMonth, DateUtils.getDaysInMonth(numMonth, year)).withEra(era));		
 	}
 	
 	@Override
 	public void exitInvMonthYear(InvMonthYearContext ctx) {
+		if (ctx.exception != null) return;
+
 		Integer numMonth = (Integer) stack.pop();
 		Integer year = (Integer) stack.pop();
+		Era era = (Era) stack.pop();
 		
-		stack.push(new Date(year, numMonth, 1));
-		stack.push(new Date(year, numMonth, DateUtils.getDaysInMonth(numMonth, year)));		
+		stack.push(new Date(year, numMonth, 1).withEra(era));
+		stack.push(new Date(year, numMonth, DateUtils.getDaysInMonth(numMonth, year)).withEra(era));		
 	}
 
 	@Override
 	public void exitYear(YearContext ctx) {
+		if (ctx.exception != null) return;
+
+		Era era = (Era) stack.pop();
+		Integer year = (Integer) stack.pop();
+		
+		stack.push(new Date(year, FIRST_MONTH, FIRST_DAY_OF_FIRST_MONTH).withEra(era));
+		stack.push(new Date(year, LAST_MONTH, LAST_DAY_OF_LAST_MONTH).withEra(era));
+	}
+
+	@Override
+	public void exitNumYear(NumYearContext ctx) {
 		if (ctx.exception != null) return;
 
 		stack.push(new Integer(ctx.NUMBER().getText()));
@@ -350,7 +398,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	}
 
 	@Override
-	public void exitDayOfMonth(DayOfMonthContext ctx) {
+	public void exitNumDayOfMonth(NumDayOfMonthContext ctx) {
 		if (ctx.exception != null) return;
 
 		stack.push(new Integer(ctx.NUMBER().getText()));

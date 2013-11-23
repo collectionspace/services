@@ -21,152 +21,175 @@
 
 # Valid dates
 
-  '1997':                   # yearOnly
+  '1997':                   # preciseYear
                             earliestSingleDate: [1997,  1,  1, CE]
                             latestDate:         [1997, 12, 31, CE]
 
-  '53 BC':                  # yearOnly
+  '53 BC':                  # preciseYear
                             earliestSingleDate: [  53,  1,  1, BCE]
                             latestDate:         [  53, 12, 31, BCE]
 
-  '53 bc':                  # yearOnly
+  '53 bc':                  # preciseYear
                             earliestSingleDate: [  53,  1,  1, BCE]
                             latestDate:         [  53, 12, 31, BCE]
 
-  '53 B.C.':                # yearOnly
+  '53 B.C.':                # preciseYear
                             earliestSingleDate: [  53,  1,  1, BCE]
                             latestDate:         [  53, 12, 31, BCE]
 
-  '53 b.c.':                # yearOnly
+  '53 b.c.':                # preciseYear
                             earliestSingleDate: [  53,  1,  1, BCE]
                             latestDate:         [  53, 12, 31, BCE]
 
-  '53 BCE':                 # yearOnly
+  '53 BCE':                 # preciseYear
                             earliestSingleDate: [  53,  1,  1, BCE]
                             latestDate:         [  53, 12, 31, BCE]
 
-  '53 bce':                 # yearOnly
+  '53 bce':                 # preciseYear
                             earliestSingleDate: [  53,  1,  1, BCE]
                             latestDate:         [  53, 12, 31, BCE]
 
-  '53 B.C.E.':              # yearOnly
+  '53 B.C.E.':              # preciseYear
                             earliestSingleDate: [  53,  1,  1, BCE]
                             latestDate:         [  53, 12, 31, BCE]
 
-  '53 b.c.e.':              # yearOnly
+  '53 b.c.e.':              # preciseYear
                             earliestSingleDate: [  53,  1,  1, BCE]
                             latestDate:         [  53, 12, 31, BCE]
 
-  '1974 AD':                # yearOnly
+  '1974 AD':                # preciseYear
                             earliestSingleDate: [1974,  1,  1, CE]
                             latestDate:         [1974, 12, 31, CE]
 
-  '1974 ad':                # yearOnly
+  '1974 ad':                # preciseYear
                             earliestSingleDate: [1974,  1,  1, CE]
                             latestDate:         [1974, 12, 31, CE]
 
-  '1974 A.D.':              # yearOnly
+  '1974 A.D.':              # preciseYear
                             earliestSingleDate: [1974,  1,  1, CE]
                             latestDate:         [1974, 12, 31, CE]
   
-  '1974 a.d.':              # yearOnly
+  '1974 a.d.':              # preciseYear
                             earliestSingleDate: [1974,  1,  1, CE]
                             latestDate:         [1974, 12, 31, CE]
 
-  '1974 c.e.':              # yearOnly
+  '1974 c.e.':              # preciseYear
                             earliestSingleDate: [1974,  1,  1, CE]
                             latestDate:         [1974, 12, 31, CE]
 
-  '1974 ce':                # yearOnly
+  '1974 ce':                # preciseYear
                             earliestSingleDate: [1974,  1,  1, CE]
                             latestDate:         [1974, 12, 31, CE]
                             
-  '1974-2013':              # yearRange
+  '1974-2013':              # preciseYearRange
                             earliestSingleDate: [1974,  1,  1, CE]
                             latestDate:         [2013, 12, 31, CE]
 
-  '100 BC-12 BC':           # yearRange
+  '100 BC-12 BC':           # preciseYearRange
                             earliestSingleDate: [ 100,  1,  1, BCE]
                             latestDate:         [  12, 12, 31, BCE]
 
-  '100-12 BC':              # yearRange
+  '100-12 BC':              # preciseYearRange
                             earliestSingleDate: [ 100,  1,  1, BCE]
                             latestDate:         [  12, 12, 31, BCE]
-                            
-  'May 2007':               # monthOnly
+
+  '12 BC - 30 AD':          # preciseYearRange
+                            earliestSingleDate: [  12,  1,  1, BCE]
+                            latestDate:         [  30, 12, 31, CE]
+
+  'May 2007':               # preciseMonth
                             earliestSingleDate: [2007,  5,  1, CE]
                             latestDate:         [2007,  5, 31, CE]
 
-  'May 2007 AD':            # monthOnly
+  'May 2007 AD':            # preciseMonth
                             earliestSingleDate: [2007,  5,  1, CE]
                             latestDate:         [2007,  5, 31, CE]
 
-  'Feb. 2007':              # monthOnly
+  'Feb. 2007':              # preciseMonth
                             earliestSingleDate: [2007,  2,  1, CE]
                             latestDate:         [2007,  2, 28, CE]
 
-  'Feb. 2007 BC':           # monthOnly
+  'Feb. 2007 BC':           # preciseMonth
                             earliestSingleDate: [2007,  2,  1, BCE]
                             latestDate:         [2007,  2, 28, BCE]
 
-  '2000, February':         # monthOnly (leap year)
+  '2000, February':         # preciseMonth (leap year)
                             earliestSingleDate: [2000,  2,  1, CE]
                             latestDate:         [2000,  2, 29, CE]
 
-  '1900 Feb':               # monthOnly
+  '1900 Feb':               # preciseMonth
                             earliestSingleDate: [1900,  2,  1, CE]
                             latestDate:         [1900,  2, 28, CE]
 
-  '3/12/2013':              # numDate
+  'B.C.E. 960 Feb':         # preciseMonth
+                            earliestSingleDate: [ 960,  2,  1, BCE]
+                            latestDate:         [ 960,  2, 28, BCE]
+
+  '3/12/2013':              # preciseDate
                             earliestSingleDate: [2013,  3, 12, CE]
 
-  '03/05/13':               # numDate
+  '03/05/13':               # preciseDate
                             earliestSingleDate: [  13,  3,  5, CE]
 
-  '7-6-1773':               # numDate
+  '7-6-1773':               # preciseDate
                             earliestSingleDate: [1773,  7,  6, CE]
 
-  '7-6-1773 AD':            # numDate
+  '7-6-1773 AD':            # preciseDate
                             earliestSingleDate: [1773,  7,  6, CE]
 
-  '07-06-1773':             # numDate
+  '07-06-1773':             # preciseDate
                             earliestSingleDate: [1773,  7,  6, CE]
 
-  'May 06 1952':            # strDate
+  'May 06 1952':            # preciseDate
                             earliestSingleDate: [1952,  5,  6, CE]
 
-  'May 12 1952':            # strDate
+  'May 12 1952':            # preciseDate
                             earliestSingleDate: [1952,  5, 12, CE]
 
-  'May 12, 1952':           # strDate
+  'May 12, 1952':           # preciseDate
                             earliestSingleDate: [1952,  5, 12, CE]
 
-  'may 12, 1952':           # strDate
+  'may 12, 1952':           # preciseDate
                             earliestSingleDate: [1952,  5, 12, CE]
 
-  'September 19, 1821':     # strDate
+  'September 19, 1821':     # preciseDate
                             earliestSingleDate: [1821,  9, 19, CE]
 
-  'Sep 19, 1821':           # strDate
+  'Sep 19, 1821':           # preciseDate
                             earliestSingleDate: [1821,  9, 19, CE]
 
-  'SEPT 19, 1821':          # strDate
+  'SEPT 19, 1821':          # preciseDate
                             earliestSingleDate: [1821,  9, 19, CE]
 
-  'Sept. 19, 1821':         # strDate
+  'Sept. 19, 1821':         # preciseDate
                             earliestSingleDate: [1821,  9, 19, CE]
 
-  'July 1, 560 BC':         # strDate
+  'July 1, 560 BC':         # preciseDate
                             earliestSingleDate: [ 560,  7,  1, BCE]
 
-  '2000, April 1':          # invStrDate
+  '2000, April 1':          # preciseDate
                             earliestSingleDate: [2000,  4,  1, CE]
 
-  '2000 , april 1':         # invStrDate
+  '2000 , april 1':         # preciseDate
                             earliestSingleDate: [2000,  4,  1, CE]
 
-  '2000 Apr 1':             # invStrDate
+  '2000 Apr 1':             # preciseDate
                             earliestSingleDate: [2000,  4,  1, CE]
+
+  'BC 560 July 1':          # preciseDate
+                            earliestSingleDate: [ 560,  7,  1, BCE]
+
+  '5/3/1962-4/5/2013':      # preciseDateRange
+                            earliestSingleDate: [1962,  5,  3, CE]
+                            latestDate:         [2013,  4,  5, CE]
+
+  '5/3/1962-4/5/2013 BC':   # preciseDateRange
+                            earliestSingleDate: [1962,  5,  3, BCE]
+                            latestDate:         [2013,  4,  5, BCE]
+
+  '5/3/1962 BC-4/5/2013':   # preciseDateRange
+                            earliestSingleDate: [1962,  5,  3, BCE]
+                            latestDate:         [2013,  4,  5, CE]
 
   'Apr-Oct 2013':           # monthOnlyRange (31 day end month)
                             earliestSingleDate: [2013,  4,  1, CE]
@@ -188,7 +211,7 @@
                             earliestSingleDate: [1900,  1,  1, CE]
                             latestDate:         [1900,  2, 28, CE]
 
-  'january-feb, 2000':     # monthOnlyRange (leap year: divisible by 400)
+  'january-feb, 2000':      # monthOnlyRange (leap year: divisible by 400)
                             earliestSingleDate: [2000,  1,  1, CE]
                             latestDate:         [2000,  2, 29, CE]
 
@@ -239,7 +262,11 @@
   'circa 2100':             # circaYear
                             earliestSingleDate: [2100,  1,  1, CE, null, MINUS, 9, YEARS]
                             latestDate:         [2100, 12, 31, CE, null, PLUS,  9, YEARS]
-                          
+
+  'c 1950-2013':            # circaYearRange
+                            earliestSingleDate: [1950,  1,  1, CE, null, MINUS, 8, YEARS]
+                            latestDate:         [2013, 12, 31, CE, null, PLUS,  5, YEARS]
+                                                      
 # Invalid dates
 
   '':                       # empty

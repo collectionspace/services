@@ -46,6 +46,10 @@ public class DateUtils {
 		 * that the minimum interval is 5 years.
 		 */
 		
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+		
 		if (era == Era.BCE) {
 			year = -year;
 		}

@@ -15,30 +15,26 @@ grammar StructuredDate;
 
 oneDisplayDate: displayDate EOF ; 
  
-displayDate:    CIRCA year era                                         # circaYear
-|               year era                                               # yearOnly
+displayDate:    CIRCA year                                             # circaYear
+|               year                                                   # preciseYear
 |               nth QUARTER year                                       # toDo
 |               LAST QUARTER year                                      # toDo
 |               nth HALF year                                          # toDo
 |               LAST HALF year                                         # toDo
-|               CIRCA year HYPHEN year                                 # toDo
-|               CIRCA year HYPHEN year BC                              # toDo
-|               CIRCA year BC HYPHEN year BC                           # toDo
-|               CIRCA year BC HYPHEN year                              # toDo
-|               CIRCA year BC HYPHEN year AD                           # toDo
-|               year era HYPHEN year era                               # yearRange
+|               CIRCA yearRange                                        # circaYearRange
+|               yearRange                                              # preciseYearRange
 |               season year                                            # toDo
 |               season HYPHEN season year                              # toDo
 |               season year HYPHEN season year                         # toDo
 |               season year BC                                         # toDo
 |               partOf year                                            # toDo
 |               partOf year BC                                         # toDo
-|               month era                                              # monthOnly
+|               month                                                  # preciseMonth
 |               month HYPHEN month                                     # toDo
-|               partOf exactDate BC                                    # toDo
-|               partOf exactDate                                       # toDo
-|               exactDate era                                          # exactDateOnly
-|               exactDate HYPHEN exactDate                             # toDo
+|               partOf date BC                                         # toDo
+|               partOf date                                            # toDo
+|               date                                                   # preciseDate
+|               dateRange                                              # preciseDateRange
 |               nth CENTURY                                            # toDo
 |               CIRCA nth CENTURY                                      # toDo
 |               nth CENTURY AD                                         # toDo
@@ -85,12 +81,16 @@ displayDate:    CIRCA year era                                         # circaYe
 |               smallDateRange                                         # smallDateRangeOnly
 ;
 
+yearRange:      year HYPHEN year ;
+
+dateRange:      date HYPHEN date ;
+
 smallDateRange: monthInYearRange
 |               strDayInMonthRange
 |               numDayInMonthRange
 ;              
 
-exactDate:      numDate
+date:           numDate
 |               strDate
 |               invStrDate
 ;
@@ -99,15 +99,17 @@ month:          monthYear
 |               invMonthYear
 ;
 
-strDate:            strMonth dayOfMonth COMMA? year ;
-invStrDate:         year COMMA? strMonth dayOfMonth ;
-strDayInMonthRange: strMonth dayOfMonth HYPHEN dayOfMonth COMMA? year ;
-monthInYearRange:   strMonth HYPHEN strMonth COMMA? year ;
-numDayInMonthRange: numMonth SLASH dayOfMonth HYPHEN dayOfMonth SLASH year ;
-numDate:            numMonth SLASH dayOfMonth SLASH year 
-|                   numMonth HYPHEN dayOfMonth HYPHEN year ;
-monthYear:          strMonth COMMA? year ;
-invMonthYear:       year COMMA? strMonth ;
+year:           numYear era ;
+
+strDate:            strMonth numDayOfMonth COMMA? numYear era;
+invStrDate:         era numYear COMMA? strMonth numDayOfMonth ;
+strDayInMonthRange: strMonth numDayOfMonth HYPHEN numDayOfMonth COMMA? numYear ;
+monthInYearRange:   strMonth HYPHEN strMonth COMMA? numYear ;
+numDayInMonthRange: numMonth SLASH numDayOfMonth HYPHEN numDayOfMonth SLASH numYear ;
+numDate:            numMonth SLASH numDayOfMonth SLASH numYear era
+|                   numMonth HYPHEN numDayOfMonth HYPHEN numYear era ;
+monthYear:          strMonth COMMA? numYear era;
+invMonthYear:       era numYear COMMA? strMonth ;
 decade:             TENS ;
 century:            HUNDREDS ;
 season:             SPRING | SUMMER | WINTER | FALL ;
@@ -115,9 +117,9 @@ partOf:             EARLY | MIDDLE | LATE | BEFORE | AFTER ;
 nth:                NTHSTR | FIRST | SECOND | THIRD | FOURTH ;
 strMonth:           MONTH | SHORTMONTH DOT?;
 era:                BC | AD | ;
-year:               NUMBER ;
+numYear:            NUMBER ;
 numMonth:           NUMBER ;
-dayOfMonth:         NUMBER ;
+numDayOfMonth:      NUMBER ;
 
 
 /*
