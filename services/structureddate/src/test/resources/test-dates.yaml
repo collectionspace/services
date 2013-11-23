@@ -80,7 +80,19 @@
   '1974 ce':                # yearOnly
                             earliestSingleDate: [1974,  1,  1, CE]
                             latestDate:         [1974, 12, 31, CE]
+                            
+  '1974-2013':              # yearRange
+                            earliestSingleDate: [1974,  1,  1, CE]
+                            latestDate:         [2013, 12, 31, CE]
 
+  '100 BC-12 BC':           # yearRange
+                            earliestSingleDate: [ 100,  1,  1, BCE]
+                            latestDate:         [  12, 12, 31, BCE]
+
+  '100-12 BC':              # yearRange
+                            earliestSingleDate: [ 100,  1,  1, BCE]
+                            latestDate:         [  12, 12, 31, BCE]
+                            
   'May 2007':               # monthOnly
                             earliestSingleDate: [2007,  5,  1, CE]
                             latestDate:         [2007,  5, 31, CE]

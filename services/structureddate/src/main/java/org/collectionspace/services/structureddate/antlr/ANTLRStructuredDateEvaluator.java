@@ -41,6 +41,7 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.St
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.ToDoContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearOnlyContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearRangeContext;
 
 /**
  * A StructuredDateEvaluator that uses an ANTLR parser to parse the display date,
@@ -101,6 +102,10 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
+		
+		if (era == null) {
+			era = Era.CE;
+		}
 
 		int interval = DateUtils.getCircaIntervalYears(year, era);
 		
@@ -124,15 +129,48 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		
+		if (era == null) {
+			era = Era.CE;
+		}
+		
 		result.setEarliestSingleDate(
-				new Date(year, FIRST_MONTH, FIRST_DAY_OF_FIRST_MONTH)
-					.withEra(era)
-			);
-			
-			result.setLatestDate(
-				new Date(year, LAST_MONTH, LAST_DAY_OF_LAST_MONTH)
-					.withEra(era)
-			);
+			new Date(year, FIRST_MONTH, FIRST_DAY_OF_FIRST_MONTH)
+				.withEra(era)
+		);
+		
+		result.setLatestDate(
+			new Date(year, LAST_MONTH, LAST_DAY_OF_LAST_MONTH)
+				.withEra(era)
+		);
+	}
+
+	@Override
+	public void exitYearRange(YearRangeContext ctx) {
+		if (ctx.exception != null) return;
+
+		Era latestEra = (Era) stack.pop();
+		Integer latestYear = (Integer) stack.pop();
+		
+		Era earliestEra = (Era) stack.pop();
+		Integer earliestYear = (Integer) stack.pop();
+		
+		if (latestEra == null) {
+			latestEra = Era.CE;
+		}
+		
+		if (earliestEra == null) {
+			earliestEra = latestEra;
+		}
+		
+		result.setEarliestSingleDate(
+			new Date(earliestYear, FIRST_MONTH, FIRST_DAY_OF_FIRST_MONTH)
+				.withEra(earliestEra)
+		);
+		
+		result.setLatestDate(
+			new Date(latestYear, LAST_MONTH, LAST_DAY_OF_LAST_MONTH)
+				.withEra(latestEra)
+		);
 	}
 
 	@Override
@@ -142,6 +180,10 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Era era = (Era) stack.pop();
 		Date latestDate = (Date) stack.pop();
 		Date earliestDate = (Date) stack.pop();
+		
+		if (era == null) {
+			era = Era.CE;
+		}
 		
 		result.setEarliestSingleDate(earliestDate.withEra(era));
 		result.setLatestDate(latestDate.withEra(era));
@@ -153,7 +195,11 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		Era era = (Era) stack.pop();
 		Date date = (Date) stack.pop();
-		
+
+		if (era == null) {
+			era = Era.CE;
+		}
+
 		result.setEarliestSingleDate(date.withEra(era));
 	}
 	
@@ -291,7 +337,16 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitEra(EraContext ctx) {
 		if (ctx.exception != null) return;
 
-		stack.push(ctx.BC() != null ? Era.BCE : Era.CE);
+		Era era = null;
+		
+		if (ctx.BC() != null) {
+			era = Era.BCE;
+		}
+		else if (ctx.AD() != null) {
+			era = Era.CE;
+		}
+		
+		stack.push(era);
 	}
 
 	@Override

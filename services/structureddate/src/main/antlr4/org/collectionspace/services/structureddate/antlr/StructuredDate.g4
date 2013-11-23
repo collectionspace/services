@@ -6,6 +6,7 @@ grammar StructuredDate;
  * TODO: 
  *   Allow YYYY-MM-DD
  *   Allow month nth, year
+ *   Allow year season
  */
 
 /*
@@ -20,16 +21,12 @@ displayDate:    CIRCA year era                                         # circaYe
 |               LAST QUARTER year                                      # toDo
 |               nth HALF year                                          # toDo
 |               LAST HALF year                                         # toDo
-|               year HYPHEN year                                       # toDo
 |               CIRCA year HYPHEN year                                 # toDo
 |               CIRCA year HYPHEN year BC                              # toDo
 |               CIRCA year BC HYPHEN year BC                           # toDo
 |               CIRCA year BC HYPHEN year                              # toDo
 |               CIRCA year BC HYPHEN year AD                           # toDo
-|               year BC HYPHEN year BC                                 # toDo
-|               year HYPHEN year BC                                    # toDo
-|               year BC HYPHEN year                                    # toDo
-|               year BC HYPHEN year AD                                 # toDo
+|               year era HYPHEN year era                               # yearRange
 |               season year                                            # toDo
 |               season HYPHEN season year                              # toDo
 |               season year HYPHEN season year                         # toDo
