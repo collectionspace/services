@@ -79,6 +79,7 @@ public class StructuredDate {
 				.append(this.getNote(), that.getNote())
 				.append(this.getPeriod(), that.getPeriod())
 				.append(this.getEarliestSingleDate(), that.getEarliestSingleDate())
+				.append(this.getLatestDate(), that.getLatestDate())
 				.append(this.areScalarValuesComputed(), that.areScalarValuesComputed())
 				.isEquals();
 	}
