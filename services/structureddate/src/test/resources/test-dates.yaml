@@ -123,8 +123,20 @@
 
   'B.C.E. 960 Feb':         # preciseMonth
                             earliestSingleDate: [ 960,  2,  1, BCE]
-                            latestDate:         [ 960,  2, 28, BCE]
+                            latestDate:         [ 960,  2, 29, BCE]
 
+  '2000 Feb-2001 June':     # preciseMonthRange
+                            earliestSingleDate: [2000,  2,  1, CE]
+                            latestDate:         [2001,  6, 30, CE]
+
+  'Dec 58 BC-Feb 3 AD':     # preciseMonthRange
+                            earliestSingleDate: [  58, 12,  1, BCE]
+                            latestDate:         [   3,  2, 28, CE]
+
+  'May 130-May 120 BC':     # preciseMonthRange
+                            earliestSingleDate: [ 130,  5,  1, BCE]
+                            latestDate:         [ 120,  5, 31, BCE]
+                             
   '3/12/2013':              # preciseDate
                             earliestSingleDate: [2013,  3, 12, CE]
 

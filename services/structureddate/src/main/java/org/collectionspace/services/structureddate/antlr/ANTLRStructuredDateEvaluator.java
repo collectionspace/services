@@ -26,11 +26,13 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Ci
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.CircaYearRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DateRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.EraContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDayOfMonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PreciseDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PreciseDateRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PreciseMonthContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PreciseMonthRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PreciseYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PreciseYearRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.SmallDateRangeOnlyContext;
@@ -163,6 +165,19 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	}
 
 	@Override
+	public void exitPreciseMonthRange(PreciseMonthRangeContext ctx) {
+		if (ctx.exception != null) return;
+		
+		Date latestDate = (Date) stack.pop();
+		Date earliestDate = (Date) stack.pop();
+		
+		result.setEarliestSingleDate(earliestDate);
+		result.setLatestDate(latestDate);
+		
+		System.out.println(result.toString());
+	}
+
+	@Override
 	public void exitPreciseMonth(PreciseMonthContext ctx) {
 		if (ctx.exception != null) return;
 
@@ -219,6 +234,26 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		
 		stack.push(firstYearStartDate);
 		stack.push(secondYearEndDate);
+	}
+
+	@Override
+	public void exitMonthRange(MonthRangeContext ctx) {
+		if (ctx.exception != null) return;
+
+		Date secondMonthEndDate = (Date) stack.pop();
+		stack.pop(); // secondMonthStartDate
+		stack.pop(); // firstMonthEndDate
+		Date firstMonthStartDate = (Date) stack.pop();
+
+		// If no era was explicitly specified for the first month,
+		// make it inherit the era of the second month.
+
+		if (firstMonthStartDate.getEra() == null) {
+			firstMonthStartDate.setEra(secondMonthEndDate.getEra());
+		}
+		
+		stack.push(firstMonthStartDate);
+		stack.push(secondMonthEndDate);
 	}
 
 	@Override

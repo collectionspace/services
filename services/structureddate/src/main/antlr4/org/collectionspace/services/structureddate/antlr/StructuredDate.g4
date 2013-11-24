@@ -30,7 +30,7 @@ displayDate:    CIRCA year                                             # circaYe
 |               partOf year                                            # toDo
 |               partOf year BC                                         # toDo
 |               month                                                  # preciseMonth
-|               month HYPHEN month                                     # toDo
+|               monthRange                                             # preciseMonthRange
 |               partOf date BC                                         # toDo
 |               partOf date                                            # toDo
 |               date                                                   # preciseDate
@@ -82,7 +82,7 @@ displayDate:    CIRCA year                                             # circaYe
 ;
 
 yearRange:      year HYPHEN year ;
-
+monthRange:     month HYPHEN month ;
 dateRange:      date HYPHEN date ;
 
 smallDateRange: monthInYearRange
