@@ -97,6 +97,58 @@
                             earliestSingleDate: [  12,  1,  1, BCE]
                             latestDate:         [  30, 12, 31, CE]
 
+  'Winter 2000':            # seasonYear
+                            earliestSingleDate: [2000,  1,  1, CE]
+                            latestDate:         [2000,  3, 31, CE]
+
+  '2000, Winter':           # seasonYear
+                            earliestSingleDate: [2000,  1,  1, CE]
+                            latestDate:         [2000,  3, 31, CE]
+
+  'Spring 2000':            # seasonYear
+                            earliestSingleDate: [2000,  4,  1, CE]
+                            latestDate:         [2000,  6, 30, CE]
+
+  'Summer 2000':            # seasonYear
+                            earliestSingleDate: [2000,  7,  1, CE]
+                            latestDate:         [2000,  9, 30, CE]
+
+  'Fall 2000':              # seasonYear
+                            earliestSingleDate: [2000, 10,  1, CE]
+                            latestDate:         [2000, 12, 31, CE]
+
+  'Autumn 2000':            # seasonYear
+                            earliestSingleDate: [2000, 10,  1, CE]
+                            latestDate:         [2000, 12, 31, CE]
+ 
+  'Summer 12 BC':           # seasonYear
+                            earliestSingleDate: [  12,  7,  1, BCE]
+                            latestDate:         [  12,  9, 30, BCE]
+
+  'BC 12, Summer':          # seasonYear
+                            earliestSingleDate: [  12,  7,  1, BCE]
+                            latestDate:         [  12,  9, 30, BCE]
+
+  '1st Quarter 2000':       # seasonYear
+                            earliestSingleDate: [2000,  1,  1, CE]
+                            latestDate:         [2000,  3, 31, CE]
+
+  '2nd quarter 2000':        # seasonYear
+                            earliestSingleDate: [2000,  4,  1, CE]
+                            latestDate:         [2000,  6, 30, CE]
+
+  '3rd quarter 2000':       # seasonYear
+                            earliestSingleDate: [2000,  7,  1, CE]
+                            latestDate:         [2000,  9, 30, CE]
+
+  '4th quarter 2000':       # seasonYear
+                            earliestSingleDate: [2000, 10,  1, CE]
+                            latestDate:         [2000, 12, 31, CE]
+
+  'last quarter 2000':      # seasonYear
+                            earliestSingleDate: [2000, 10,  1, CE]
+                            latestDate:         [2000, 12, 31, CE]
+  
   'May 2007':               # preciseMonth
                             earliestSingleDate: [2007,  5,  1, CE]
                             latestDate:         [2007,  5, 31, CE]
@@ -295,4 +347,7 @@
                             
   'Something else':         # bad format (totally not a date)
                             null            
+
+  'BC 12, Sumer':           # bad format (not a valid season)
+                            null
                               
