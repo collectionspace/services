@@ -21,9 +21,9 @@ displayDate:    CIRCA year                                             # circaYe
 |               LAST HALF year                                         # toDo
 |               CIRCA yearRange                                        # circaYearRange
 |               yearRange                                              # preciseYearRange
+|               quarterYearRange                                       # preciseQuarterYearRange
+|               quarterInYearRange                                     # preciseQuarterInYearRange
 |               quarterYear                                            # preciseQuarterYear
-/*|               season HYPHEN season year                              # toDo
-|               season year HYPHEN season year                         # toDo */
 |               partOf year                                            # toDo
 |               partOf year BC                                         # toDo
 |               month                                                  # preciseMonth
@@ -78,55 +78,61 @@ displayDate:    CIRCA year                                             # circaYe
 |               smallDateRange                                         # smallDateRangeOnly
 ;
 
-yearRange:      year HYPHEN year ;
-monthRange:     month HYPHEN month ;
-dateRange:      date HYPHEN date ;
+yearRange:          year HYPHEN year ;
+quarterYearRange:   quarterYear HYPHEN quarterYear ;
+monthRange:         month HYPHEN month ;
+dateRange:          date HYPHEN date ;
 
-smallDateRange: monthInYearRange
-|               strDayInMonthRange
-|               numDayInMonthRange
+smallDateRange:     monthInYearRange
+|                   strDayInMonthRange
+|                   numDayInMonthRange
 ;              
 
-date:           numDate
-|               strDate
-|               invStrDate
+quarterInYearRange: nthQuarterInYearRange
+|                   strSeasonInYearRange
 ;
 
-month:          monthYear
-|               invMonthYear
+date:               numDate
+|                   strDate
+|                   invStrDate
 ;
 
-quarterYear:    seasonYear
-|               invSeasonYear
-|               nthQuarterYear
-|               lastQuarterYear 
+month:              monthYear
+|                   invMonthYear
 ;
 
-year:           numYear era ;
+quarterYear:        seasonYear
+|                   invSeasonYear
+|                   nthQuarterYear
+;
 
-strDate:            strMonth numDayOfMonth COMMA? numYear era;
-invStrDate:         era numYear COMMA? strMonth numDayOfMonth ;
-strDayInMonthRange: strMonth numDayOfMonth HYPHEN numDayOfMonth COMMA? numYear ;
-monthInYearRange:   strMonth HYPHEN strMonth COMMA? numYear ;
-numDayInMonthRange: numMonth SLASH numDayOfMonth HYPHEN numDayOfMonth SLASH numYear ;
-numDate:            numMonth SLASH numDayOfMonth SLASH numYear era
-|                   numMonth HYPHEN numDayOfMonth HYPHEN numYear era ;
-monthYear:          strMonth COMMA? numYear era ;
-invMonthYear:       era numYear COMMA? strMonth ;
-seasonYear:         strSeason COMMA? numYear era ;
-invSeasonYear:      era numYear COMMA? strSeason ;
-nthQuarterYear:     nth QUARTER numYear era ;
-lastQuarterYear:    LAST QUARTER numYear era ;
-decade:             TENS ;
-century:            HUNDREDS ;
-strSeason:          SPRING | SUMMER | FALL | WINTER ;
-partOf:             EARLY | MIDDLE | LATE | BEFORE | AFTER ;
-nth:                NTHSTR | FIRST | SECOND | THIRD | FOURTH ;
-strMonth:           MONTH | SHORTMONTH DOT?;
-era:                BC | AD | ;
-numYear:            NUMBER ;
-numMonth:           NUMBER ;
-numDayOfMonth:      NUMBER ;
+year:               numYear era ;
+
+strDate:               strMonth numDayOfMonth COMMA? numYear era;
+invStrDate:            era numYear COMMA? strMonth numDayOfMonth ;
+strDayInMonthRange:    strMonth numDayOfMonth HYPHEN numDayOfMonth COMMA? numYear era ;
+monthInYearRange:      strMonth HYPHEN strMonth COMMA? numYear era ;
+nthQuarterInYearRange: nthQuarter HYPHEN nthQuarter COMMA? numYear era ;
+strSeasonInYearRange:  strSeason HYPHEN strSeason COMMA? numYear era ;
+numDayInMonthRange:    numMonth SLASH numDayOfMonth HYPHEN numDayOfMonth SLASH numYear era ;
+numDate:               numMonth SLASH numDayOfMonth SLASH numYear era
+|                      numMonth HYPHEN numDayOfMonth HYPHEN numYear era ;
+monthYear:             strMonth COMMA? numYear era ;
+invMonthYear:          era numYear COMMA? strMonth ;
+seasonYear:            strSeason COMMA? numYear era ;
+invSeasonYear:         era numYear COMMA? strSeason ;
+nthQuarterYear:        nthQuarter numYear era ;
+nthQuarter:            ( nth | LAST ) QUARTER ;
+decade:                TENS ;
+century:               HUNDREDS ;
+strSeason:             SPRING | SUMMER | FALL | WINTER ;
+partOf:                EARLY | MIDDLE | LATE | BEFORE | AFTER ;
+nth:                   NTHSTR | FIRST | SECOND | THIRD | FOURTH ;
+strMonth:              MONTH | SHORTMONTH DOT?;
+era:                   BC | AD | ;
+numYear:               NUMBER ;
+numMonth:              NUMBER ;
+numDayOfMonth:         NUMBER ;
 
 
 /*

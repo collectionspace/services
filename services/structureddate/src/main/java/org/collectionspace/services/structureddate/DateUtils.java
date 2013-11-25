@@ -18,6 +18,26 @@ public class DateUtils {
 		return dateTime.dayOfMonth().getMaximumValue();
 	}
 	
+	public static Date getQuarterStartDate(int year, int quarter) {
+		int startMonth = getQuarterStartMonth(quarter);
+		
+		return new Date(year, startMonth, 1);
+	}
+	
+	public static Date getQuarterEndDate(int year, int quarter) {
+		int endMonth = getQuarterEndMonth(quarter);
+		
+		return new Date(year, endMonth, DateUtils.getDaysInMonth(endMonth, year));
+	}
+	
+	public static int getQuarterStartMonth(int quarter) {
+		return ((3 * (quarter-1)) + 1);
+	}
+	
+	public static int getQuarterEndMonth(int quarter) {
+		return (getQuarterStartMonth(quarter) + 2);
+	}
+	
 	/**
 	 * Calculates the interval, in years, that should be padded around a date so
 	 * that any date within that interval may be considered to be "circa" the

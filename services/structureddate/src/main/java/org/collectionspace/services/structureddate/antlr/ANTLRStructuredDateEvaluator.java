@@ -28,10 +28,10 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Da
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DateRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.EraContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.InvSeasonYearContext;
-import org.collectionspace.services.structureddate.antlr.StructuredDateParser.LastQuarterYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthQuarterContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthQuarterYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDayOfMonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumYearContext;
@@ -39,10 +39,14 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Pr
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PreciseDateRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PreciseMonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PreciseMonthRangeContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PreciseQuarterInYearRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PreciseQuarterYearContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PreciseQuarterYearRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PreciseYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PreciseYearRangeContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterInYearRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterYearContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterYearRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.SeasonYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.SmallDateRangeOnlyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.InvMonthYearContext;
@@ -186,6 +190,28 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	}
 
 	@Override
+	public void exitPreciseQuarterInYearRange(PreciseQuarterInYearRangeContext ctx) {
+		if (ctx.exception != null) return;
+		
+		Date latestDate = (Date) stack.pop();
+		Date earliestDate = (Date) stack.pop();
+		
+		result.setEarliestSingleDate(earliestDate);
+		result.setLatestDate(latestDate);
+	}
+	
+	@Override
+	public void exitPreciseQuarterYearRange(PreciseQuarterYearRangeContext ctx) {
+		if (ctx.exception != null) return;
+		
+		Date latestDate = (Date) stack.pop();
+		Date earliestDate = (Date) stack.pop();
+		
+		result.setEarliestSingleDate(earliestDate);
+		result.setLatestDate(latestDate);
+	}
+	
+	@Override
 	public void exitPreciseMonthRange(PreciseMonthRangeContext ctx) {
 		if (ctx.exception != null) return;
 		
@@ -256,6 +282,26 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	}
 
 	@Override
+	public void exitQuarterYearRange(QuarterYearRangeContext ctx) {
+		if (ctx.exception != null) return;
+
+		Date secondQuarterEndDate = (Date) stack.pop();
+		stack.pop(); // secondQuarterStartDate
+		stack.pop(); // firstQuarterEndDate
+		Date firstQuarterStartDate = (Date) stack.pop();
+
+		// If no era was explicitly specified for the first year,
+		// make it inherit the era of the second year.
+
+		if (firstQuarterStartDate.getEra() == null) {
+			firstQuarterStartDate.setEra(secondQuarterEndDate.getEra());
+		}
+		
+		stack.push(firstQuarterStartDate);
+		stack.push(secondQuarterEndDate);
+	}
+
+	@Override
 	public void exitMonthRange(MonthRangeContext ctx) {
 		if (ctx.exception != null) return;
 
@@ -297,38 +343,54 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitMonthInYearRange(MonthInYearRangeContext ctx) {
 		if (ctx.exception != null) return;
 
+		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer numMonthEnd = (Integer) stack.pop();
 		Integer numMonthStart = (Integer) stack.pop();
 		
-		stack.push(new Date(year, numMonthStart, 1));
-		stack.push(new Date(year, numMonthEnd, DateUtils.getDaysInMonth(numMonthEnd, year)));		
+		stack.push(new Date(year, numMonthStart, 1).withEra(era));
+		stack.push(new Date(year, numMonthEnd, DateUtils.getDaysInMonth(numMonthEnd, year)).withEra(era));		
 	}
 	
+	@Override
+	public void exitQuarterInYearRange(QuarterInYearRangeContext ctx) {
+		if (ctx.exception != null) return;
+
+		Era era = (Era) stack.pop();
+		Integer year = (Integer) stack.pop();
+		Integer lastQuarter = (Integer) stack.pop();
+		Integer firstQuarter = (Integer) stack.pop();
+		
+		stack.push(DateUtils.getQuarterStartDate(year, firstQuarter).withEra(era));
+		stack.push(DateUtils.getQuarterEndDate(year, lastQuarter).withEra(era));
+	}
+
 	@Override
 	public void exitNumDayInMonthRange(NumDayInMonthRangeContext ctx) {
 		if (ctx.exception != null) return;
 
+		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer dayOfMonthEnd = (Integer) stack.pop();
 		Integer dayOfMonthStart = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
 		
-		stack.push(new Date(year, numMonth, dayOfMonthStart));
-		stack.push(new Date(year, numMonth, dayOfMonthEnd));		
+		stack.push(new Date(year, numMonth, dayOfMonthStart).withEra(era));
+		stack.push(new Date(year, numMonth, dayOfMonthEnd).withEra(era));		
 	}
 
 	@Override
 	public void exitStrDayInMonthRange(StrDayInMonthRangeContext ctx) {
 		if (ctx.exception != null) return;
 
+		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer dayOfMonthEnd = (Integer) stack.pop();
 		Integer dayOfMonthStart = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
 		
-		stack.push(new Date(year, numMonth, dayOfMonthStart));
-		stack.push(new Date(year, numMonth, dayOfMonthEnd));		
+		stack.push(new Date(year, numMonth, dayOfMonthStart).withEra(era));
+		stack.push(new Date(year, numMonth, dayOfMonthEnd).withEra(era));		
 	}
 	
 	@Override
@@ -410,12 +472,9 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Era era = (Era) stack.pop();		
 		Integer year = (Integer) stack.pop();
 		Integer quarter = (Integer) stack.pop();
-		
-		int startMonth = (3 * (quarter-1)) + 1;
-		int endMonth = startMonth + 2;
-		
-		stack.push(new Date(year, startMonth, 1).withEra(era));
-		stack.push(new Date(year, endMonth, DateUtils.getDaysInMonth(endMonth, year)).withEra(era));
+
+		stack.push(DateUtils.getQuarterStartDate(year, quarter).withEra(era));
+		stack.push(DateUtils.getQuarterEndDate(year, quarter).withEra(era));
 	}
 	
 	@Override
@@ -442,20 +501,6 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitNthQuarterYear(NthQuarterYearContext ctx) {
 		// Intentionally left blank.
 	}
-	
-	@Override
-	public void exitLastQuarterYear(LastQuarterYearContext ctx) {
-		// Push quarter=4 on the stack, ahead of the year and era.
-		
-		Era era = (Era) stack.pop();		
-		Integer year = (Integer) stack.pop();
-		Integer quarter = 4;
-		
-		stack.push(quarter);
-		stack.push(year);
-		stack.push(era);		
-	}
-
 
 	@Override
 	public void exitYear(YearContext ctx) {
@@ -482,6 +527,15 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		stack.push(new Integer(ctx.NUMBER().getText()));
 	}
 	
+	@Override
+	public void exitNthQuarter(NthQuarterContext ctx) {
+		if (ctx.exception != null) return;
+
+		if (ctx.LAST() != null) {
+			stack.push(new Integer(4));
+		}
+	}
+
 	@Override
 	public void exitNth(NthContext ctx) {
 		if (ctx.exception != null) return;
