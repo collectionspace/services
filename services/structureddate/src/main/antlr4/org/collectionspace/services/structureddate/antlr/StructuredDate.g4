@@ -13,100 +13,102 @@ grammar StructuredDate;
  * Parser rules
  */
 
-oneDisplayDate: displayDate EOF ; 
- 
-displayDate:    CIRCA year                                             # circaYear
-|               year                                                   # preciseYear
-|               nth HALF year                                          # toDo
-|               LAST HALF year                                         # toDo
-|               CIRCA yearRange                                        # circaYearRange
-|               yearRange                                              # preciseYearRange
-|               quarterYearRange                                       # preciseQuarterYearRange
-|               quarterInYearRange                                     # preciseQuarterInYearRange
-|               quarterYear                                            # preciseQuarterYear
-|               partOf year                                            # toDo
-|               partOf year BC                                         # toDo
-|               month                                                  # preciseMonth
-|               monthRange                                             # preciseMonthRange
-|               partOf date BC                                         # toDo
-|               partOf date                                            # toDo
-|               date                                                   # preciseDate
-|               dateRange                                              # preciseDateRange
-|               nth CENTURY                                            # toDo
-|               CIRCA nth CENTURY                                      # toDo
-|               nth CENTURY AD                                         # toDo
-|               nth CENTURY BC                                         # toDo
-|               CIRCA nth CENTURY BC                                   # toDo
-|               nth CENTURY HYPHEN nth CENTURY                         # toDo
-|               nth HYPHEN nth CENTURY                                 # toDo
-|               nth HYPHEN nth CENTURY BC                              # toDo
-|               nth CENTURY BC HYPHEN nth CENTURY BC                   # toDo
-|               nth CENTURY BC HYPHEN nth CENTURY                      # toDo
-|               nth CENTURY BC HYPHEN nth CENTURY AD                   # toDo
-|               nth QUARTER nth CENTURY                                # toDo
-|               nth QUARTER nth CENTURY HYPHEN nth QUARTER nth CENTURY # toDo
-|               LAST QUARTER nth CENTURY                               # toDo
-|               nth HALF nth CENTURY                                   # toDo
-|               LAST HALF nth CENTURY                                  # toDo
-|               partOf nth CENTURY                                     # toDo
-|               partOf nth CENTURY BC                                  # toDo
-|               partOf nth CENTURY HYPHEN partOf nth CENTURY           # toDo
-|               partOf nth HYPHEN partOf nth CENTURY                   # toDo
-|               partOf nth HYPHEN nth CENTURY                          # toDo
-|               partOf nth CENTURY BC HYPHEN partOf nth CENTURY BC     # toDo
-|               partOf nth CENTURY BC HYPHEN partOf nth CENTURY        # toDo
-|               century                                                # toDo
-|               partOf century                                         # toDo
-|               partOf century HYPHEN partOf century                   # toDo
-|               partOf century BC HYPHEN partOf century BC             # toDo
-|               partOf century BC                                      # toDo
-|               CIRCA century                                          # toDo
-|               CIRCA century BC                                       # toDo
-|               nth MILLENIUM                                          # toDo
-|               nth MILLENIUM BC                                       # toDo
-|               decade                                                 # toDo
-|               decade HYPHEN decade                                   # toDo
-|               decade HYPHEN partOf decade                            # toDo
-|               partOf decade HYPHEN partOf century                    # toDo
-|               partOf decade HYPHEN partOf decade                     # toDo
-|               partOf decade HYPHEN decade                            # toDo
-|               partOf decade                                          # toDo
-|               decade BC                                              # toDo
-|               partOf decade BC                                       # toDo
-|               CIRCA decade                                           # toDo
-|               CIRCA decade BC                                        # toDo
-|               smallDateRange                                         # smallDateRangeOnly
+oneDisplayDate:        displayDate EOF ; 
+
+displayDate:           uncertainDate
+|                      certainDate
 ;
 
-yearRange:          year HYPHEN year ;
-quarterYearRange:   quarterYear HYPHEN quarterYear ;
-monthRange:         month HYPHEN month ;
-dateRange:          date HYPHEN date ;
+uncertainDate:         CIRCA certainDate ;
 
-smallDateRange:     monthInYearRange
-|                   strDayInMonthRange
-|                   numDayInMonthRange
-;              
-
-quarterInYearRange: nthQuarterInYearRange
-|                   strSeasonInYearRange
+certainDate:           hyphenatedRange
+|                      singleInterval
 ;
 
-date:               numDate
-|                   strDate
-|                   invStrDate
+hyphenatedRange:       year HYPHEN year
+|                      quarterYear HYPHEN quarterYear
+|                      month HYPHEN month
+|                      date HYPHEN date
+|                      monthInYearRange
+|                      quarterInYearRange
+|                      strDayInMonthRange
+|                      numDayInMonthRange                                                            
+/* TODO: */
+/*
+|                      nth CENTURY HYPHEN nth CENTURY                         
+|                      nth HYPHEN nth CENTURY                                 
+|                      nth HYPHEN nth CENTURY BC                              
+|                      nth CENTURY BC HYPHEN nth CENTURY BC                   
+|                      nth CENTURY BC HYPHEN nth CENTURY                      
+|                      nth CENTURY BC HYPHEN nth CENTURY AD                   
+|                      partOf nth CENTURY HYPHEN partOf nth CENTURY           
+|                      partOf nth HYPHEN partOf nth CENTURY                   
+|                      partOf nth HYPHEN nth CENTURY                          
+|                      partOf nth CENTURY BC HYPHEN partOf nth CENTURY BC     
+|                      partOf nth CENTURY BC HYPHEN partOf nth CENTURY        
+|                      partOf century HYPHEN partOf century                   
+|                      partOf century BC HYPHEN partOf century BC             
+|                      nth QUARTER nth CENTURY HYPHEN nth QUARTER nth CENTURY 
+|                      decade HYPHEN decade                                   
+|                      decade HYPHEN partOf decade                            
+|                      partOf decade HYPHEN partOf century                    
+|                      partOf decade HYPHEN partOf decade                     
+|                      partOf decade HYPHEN decade                            
+*/
 ;
 
-month:              monthYear
-|                   invMonthYear
+singleInterval:        quarterYear
+|                      year
+|                      month                                                  
+|                      date                                                   
+/* TODO: */
+/*
+|                      nth HALF year                                          
+|                      LAST HALF year                                         
+|                      partOf year                                            
+|                      partOf year BC                                         
+|                      partOf date BC                                         
+|                      partOf date                                            
+|                      nth CENTURY                                            
+|                      nth CENTURY AD                                         
+|                      nth CENTURY BC                                         
+|                      nth QUARTER nth CENTURY                                
+|                      LAST QUARTER nth CENTURY                               
+|                      nth HALF nth CENTURY                                   
+|                      LAST HALF nth CENTURY                                  
+|                      partOf nth CENTURY                                     
+|                      partOf nth CENTURY BC                                  
+|                      century                                                
+|                      partOf century                                         
+|                      partOf century BC                                      
+|                      nth MILLENIUM                                          
+|                      nth MILLENIUM BC                                       
+|                      decade                                                 
+|                      partOf decade                                          
+|                      decade BC                                              
+|                      partOf decade BC                                       
+*/
+;         
+
+quarterInYearRange:    nthQuarterInYearRange
+|                      strSeasonInYearRange
 ;
 
-quarterYear:        seasonYear
-|                   invSeasonYear
-|                   nthQuarterYear
+date:                  numDate
+|                      strDate
+|                      invStrDate
 ;
 
-year:               numYear era ;
+month:                 monthYear
+|                      invMonthYear
+;
+
+quarterYear:           seasonYear
+|                      invSeasonYear
+|                      nthQuarterYear
+;
+
+year:                  numYear era ;
 
 strDate:               strMonth numDayOfMonth COMMA? numYear era;
 invStrDate:            era numYear COMMA? strMonth numDayOfMonth ;
