@@ -338,6 +338,9 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitNumYear(NumYearContext ctx) {
 		if (ctx.exception != null) return;
 
+		// Convert the string to a number,
+		// and push on the stack.
+
 		stack.push(new Integer(ctx.NUMBER().getText()));
 	}
 
@@ -345,6 +348,9 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitNumMonth(NumMonthContext ctx) {
 		if (ctx.exception != null) return;
 
+		// Convert the string to a number,
+		// and push on the stack.
+		
 		stack.push(new Integer(ctx.NUMBER().getText()));
 	}
 	
@@ -352,6 +358,13 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitNthQuarter(NthQuarterContext ctx) {
 		if (ctx.exception != null) return;
 
+		// Convert LAST to a number (the last quarter
+		// is the 4th). If this rule matched the
+		// alternative with nth instead of LAST,
+		// the nth handler will already have pushed
+		// a number on the stack, so there's no need
+		// to do anything here.
+		
 		if (ctx.LAST() != null) {
 			stack.push(new Integer(4));
 		}
@@ -360,6 +373,9 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitNth(NthContext ctx) {
 		if (ctx.exception != null) return;
+		
+		// Convert the string to a number,
+		// and push on the stack.
 		
 		Integer n = null;
 		
@@ -386,6 +402,9 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitStrMonth(StrMonthContext ctx) {
 		if (ctx.exception != null) return;
 		
+		// Convert the month name to a number,
+		// and push on the stack.
+		
 		TerminalNode monthNode = ctx.MONTH();
 		
 		if (monthNode == null) {
@@ -404,6 +423,9 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitStrSeason(StrSeasonContext ctx) {
 		if (ctx.exception != null) return;
+		
+		// Convert the season to a quarter number,
+		// and push on the stack.
 		
 		Integer quarter = null;
 		
@@ -427,6 +449,9 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitEra(EraContext ctx) {
 		if (ctx.exception != null) return;
 
+		// Convert the string to an Era,
+		// and push on the stack.
+		
 		Era era = null;
 		
 		if (ctx.BC() != null) {
