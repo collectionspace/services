@@ -1,0 +1,401 @@
+# This file contains test cases for structured date evaluation.
+#
+# Specify an input display date, and an expected output structured date. Fields expected to be null
+# in the structured date may be omitted.
+#
+# If the structured date's displayDate field is omitted, it will be expected to be equal to the 
+# input display date. This is the usual case.
+#
+# The StructuredDate's earliestSingleDate and latestDate should be specified as a
+# list: [year, month, day, era, certainty, qualifierType, qualifierValue, qualifierUnit, scalarValue]
+# Values at the end of the list may be omitted, in which case they will be expected to be null.
+#
+# If an input is expected to fail, specify null for the expected structured date.
+#
+# Input Display Date        Expected Structured Date
+# ---------------------------------------------------------------------------------------------------
+
+# Valid dates
+
+  '1997':                   # preciseYear
+                            earliestSingleDate: [1997,  1,  1, CE]
+                            latestDate:         [1997, 12, 31, CE]
+
+  '53 BC':                  # preciseYear
+                            earliestSingleDate: [  53,  1,  1, BCE]
+                            latestDate:         [  53, 12, 31, BCE]
+
+  '53 bc':                  # preciseYear
+                            earliestSingleDate: [  53,  1,  1, BCE]
+                            latestDate:         [  53, 12, 31, BCE]
+
+  '53 B.C.':                # preciseYear
+                            earliestSingleDate: [  53,  1,  1, BCE]
+                            latestDate:         [  53, 12, 31, BCE]
+
+  '53 b.c.':                # preciseYear
+                            earliestSingleDate: [  53,  1,  1, BCE]
+                            latestDate:         [  53, 12, 31, BCE]
+
+  '53 BCE':                 # preciseYear
+                            earliestSingleDate: [  53,  1,  1, BCE]
+                            latestDate:         [  53, 12, 31, BCE]
+
+  '53 bce':                 # preciseYear
+                            earliestSingleDate: [  53,  1,  1, BCE]
+                            latestDate:         [  53, 12, 31, BCE]
+
+  '53 B.C.E.':              # preciseYear
+                            earliestSingleDate: [  53,  1,  1, BCE]
+                            latestDate:         [  53, 12, 31, BCE]
+
+  '53 b.c.e.':              # preciseYear
+                            earliestSingleDate: [  53,  1,  1, BCE]
+                            latestDate:         [  53, 12, 31, BCE]
+
+  '1974 AD':                # preciseYear
+                            earliestSingleDate: [1974,  1,  1, CE]
+                            latestDate:         [1974, 12, 31, CE]
+
+  '1974 ad':                # preciseYear
+                            earliestSingleDate: [1974,  1,  1, CE]
+                            latestDate:         [1974, 12, 31, CE]
+
+  '1974 A.D.':              # preciseYear
+                            earliestSingleDate: [1974,  1,  1, CE]
+                            latestDate:         [1974, 12, 31, CE]
+  
+  '1974 a.d.':              # preciseYear
+                            earliestSingleDate: [1974,  1,  1, CE]
+                            latestDate:         [1974, 12, 31, CE]
+
+  '1974 c.e.':              # preciseYear
+                            earliestSingleDate: [1974,  1,  1, CE]
+                            latestDate:         [1974, 12, 31, CE]
+
+  '1974 ce':                # preciseYear
+                            earliestSingleDate: [1974,  1,  1, CE]
+                            latestDate:         [1974, 12, 31, CE]
+                            
+  '1974-2013':              # preciseYearRange
+                            earliestSingleDate: [1974,  1,  1, CE]
+                            latestDate:         [2013, 12, 31, CE]
+
+  '100 BC-12 BC':           # preciseYearRange
+                            earliestSingleDate: [ 100,  1,  1, BCE]
+                            latestDate:         [  12, 12, 31, BCE]
+
+  '100-12 BC':              # preciseYearRange
+                            earliestSingleDate: [ 100,  1,  1, BCE]
+                            latestDate:         [  12, 12, 31, BCE]
+
+  '12 BC - 30 AD':          # preciseYearRange
+                            earliestSingleDate: [  12,  1,  1, BCE]
+                            latestDate:         [  30, 12, 31, CE]
+                            
+  'Spring 1974-Summer 1975': # preciseQuarterYearRange
+                            earliestSingleDate: [1974,  4,  1, CE]
+                            latestDate:         [1975,  9, 30, CE]
+
+  'last quarter 1974-Summer 1975': # preciseQuarterYearRange
+                            earliestSingleDate: [1974, 10,  1, CE]
+                            latestDate:         [1975,  9, 30, CE]
+
+  '4th quarter 1974-first quarter 1975': # preciseQuarterYearRange
+                            earliestSingleDate: [1974, 10,  1, CE]
+                            latestDate:         [1975,  3, 31, CE]
+
+  '4th quarter 1974-first quarter 1975': # preciseQuarterYearRange
+                            earliestSingleDate: [1974, 10,  1, CE]
+                            latestDate:         [1975,  3, 31, CE]
+
+  'Spring 12 BC-Summer 10': # preciseQuarterYearRange
+                            earliestSingleDate: [  12,  4,  1, BCE]
+                            latestDate:         [  10,  9, 30, CE]
+
+  'Spring 12-Summer 10 BC': # preciseQuarterYearRange
+                            earliestSingleDate: [  12,  4,  1, BCE]
+                            latestDate:         [  10,  9, 30, BCE]
+                            
+  'Winter 2000':            # seasonYear
+                            earliestSingleDate: [2000,  1,  1, CE]
+                            latestDate:         [2000,  3, 31, CE]
+
+  '2000, Winter':           # seasonYear
+                            earliestSingleDate: [2000,  1,  1, CE]
+                            latestDate:         [2000,  3, 31, CE]
+
+  'Spring 2000':            # seasonYear
+                            earliestSingleDate: [2000,  4,  1, CE]
+                            latestDate:         [2000,  6, 30, CE]
+
+  'Summer 2000':            # seasonYear
+                            earliestSingleDate: [2000,  7,  1, CE]
+                            latestDate:         [2000,  9, 30, CE]
+
+  'Fall 2000':              # seasonYear
+                            earliestSingleDate: [2000, 10,  1, CE]
+                            latestDate:         [2000, 12, 31, CE]
+
+  'Autumn 2000':            # seasonYear
+                            earliestSingleDate: [2000, 10,  1, CE]
+                            latestDate:         [2000, 12, 31, CE]
+ 
+  'Summer 12 BC':           # seasonYear
+                            earliestSingleDate: [  12,  7,  1, BCE]
+                            latestDate:         [  12,  9, 30, BCE]
+
+  'BC 12, Summer':          # seasonYear
+                            earliestSingleDate: [  12,  7,  1, BCE]
+                            latestDate:         [  12,  9, 30, BCE]
+
+  '1st Quarter 2000':       # seasonYear
+                            earliestSingleDate: [2000,  1,  1, CE]
+                            latestDate:         [2000,  3, 31, CE]
+
+  '2nd quarter 2000':        # seasonYear
+                            earliestSingleDate: [2000,  4,  1, CE]
+                            latestDate:         [2000,  6, 30, CE]
+
+  '3rd quarter 2000':       # seasonYear
+                            earliestSingleDate: [2000,  7,  1, CE]
+                            latestDate:         [2000,  9, 30, CE]
+
+  '4th quarter 2000':       # seasonYear
+                            earliestSingleDate: [2000, 10,  1, CE]
+                            latestDate:         [2000, 12, 31, CE]
+
+  'last quarter 2000':      # seasonYear
+                            earliestSingleDate: [2000, 10,  1, CE]
+                            latestDate:         [2000, 12, 31, CE]
+
+  '1st quarter - 3rd quarter 2000':
+                            earliestSingleDate: [2000,  1,  1, CE]
+                            latestDate:         [2000,  9, 30, CE] 
+
+  '2nd quarter - last quarter 2000':
+                            earliestSingleDate: [2000,  4,  1, CE]
+                            latestDate:         [2000, 12, 31, CE]
+
+  'Spring - Summer 2000':
+                            earliestSingleDate: [2000,  4,  1, CE]
+                            latestDate:         [2000,  9, 30, CE]
+
+  'Spring-Summer 12 BC':    
+                            earliestSingleDate: [  12,  4,  1, BCE]
+                            latestDate:         [  12,  9, 30, BCE]
+  
+  'May 2007':               # preciseMonth
+                            earliestSingleDate: [2007,  5,  1, CE]
+                            latestDate:         [2007,  5, 31, CE]
+
+  'May 2007 AD':            # preciseMonth
+                            earliestSingleDate: [2007,  5,  1, CE]
+                            latestDate:         [2007,  5, 31, CE]
+
+  'Feb. 2007':              # preciseMonth
+                            earliestSingleDate: [2007,  2,  1, CE]
+                            latestDate:         [2007,  2, 28, CE]
+
+  'Feb. 2007 BC':           # preciseMonth
+                            earliestSingleDate: [2007,  2,  1, BCE]
+                            latestDate:         [2007,  2, 28, BCE]
+
+  '2000, February':         # preciseMonth (leap year)
+                            earliestSingleDate: [2000,  2,  1, CE]
+                            latestDate:         [2000,  2, 29, CE]
+
+  '1900 Feb':               # preciseMonth
+                            earliestSingleDate: [1900,  2,  1, CE]
+                            latestDate:         [1900,  2, 28, CE]
+
+  'B.C.E. 960 Feb':         # preciseMonth
+                            earliestSingleDate: [ 960,  2,  1, BCE]
+                            latestDate:         [ 960,  2, 29, BCE]
+
+  '2000 Feb-2001 June':     # preciseMonthRange
+                            earliestSingleDate: [2000,  2,  1, CE]
+                            latestDate:         [2001,  6, 30, CE]
+
+  'Dec 58 BC-Feb 3 AD':     # preciseMonthRange
+                            earliestSingleDate: [  58, 12,  1, BCE]
+                            latestDate:         [   3,  2, 28, CE]
+
+  'May 130-May 120 BC':     # preciseMonthRange
+                            earliestSingleDate: [ 130,  5,  1, BCE]
+                            latestDate:         [ 120,  5, 31, BCE]
+                             
+  '3/12/2013':              # preciseDate
+                            earliestSingleDate: [2013,  3, 12, CE]
+
+  '03/05/13':               # preciseDate
+                            earliestSingleDate: [  13,  3,  5, CE]
+
+  '7-6-1773':               # preciseDate
+                            earliestSingleDate: [1773,  7,  6, CE]
+
+  '7-6-1773 AD':            # preciseDate
+                            earliestSingleDate: [1773,  7,  6, CE]
+
+  '07-06-1773':             # preciseDate
+                            earliestSingleDate: [1773,  7,  6, CE]
+
+  'May 06 1952':            # preciseDate
+                            earliestSingleDate: [1952,  5,  6, CE]
+
+  'May 12 1952':            # preciseDate
+                            earliestSingleDate: [1952,  5, 12, CE]
+
+  'May 12, 1952':           # preciseDate
+                            earliestSingleDate: [1952,  5, 12, CE]
+
+  'may 12, 1952':           # preciseDate
+                            earliestSingleDate: [1952,  5, 12, CE]
+
+  'September 19, 1821':     # preciseDate
+                            earliestSingleDate: [1821,  9, 19, CE]
+
+  'Sep 19, 1821':           # preciseDate
+                            earliestSingleDate: [1821,  9, 19, CE]
+
+  'SEPT 19, 1821':          # preciseDate
+                            earliestSingleDate: [1821,  9, 19, CE]
+
+  'Sept. 19, 1821':         # preciseDate
+                            earliestSingleDate: [1821,  9, 19, CE]
+
+  'July 1, 560 BC':         # preciseDate
+                            earliestSingleDate: [ 560,  7,  1, BCE]
+
+  '2000, April 1':          # preciseDate
+                            earliestSingleDate: [2000,  4,  1, CE]
+
+  '2000 , april 1':         # preciseDate
+                            earliestSingleDate: [2000,  4,  1, CE]
+
+  '2000 Apr 1':             # preciseDate
+                            earliestSingleDate: [2000,  4,  1, CE]
+
+  'BC 560 July 1':          # preciseDate
+                            earliestSingleDate: [ 560,  7,  1, BCE]
+
+  '5/3/1962-4/5/2013':      # preciseDateRange
+                            earliestSingleDate: [1962,  5,  3, CE]
+                            latestDate:         [2013,  4,  5, CE]
+
+  '5/3/1962-4/5/2013 BC':   # preciseDateRange
+                            earliestSingleDate: [1962,  5,  3, BCE]
+                            latestDate:         [2013,  4,  5, BCE]
+
+  '5/3/1962 BC-4/5/2013':   # preciseDateRange
+                            earliestSingleDate: [1962,  5,  3, BCE]
+                            latestDate:         [2013,  4,  5, CE]
+
+  'Apr-Oct 2013':           # monthOnlyRange (31 day end month)
+                            earliestSingleDate: [2013,  4,  1, CE]
+                            latestDate:         [2013, 10, 31, CE]
+
+  'Apr-Sept 2013':          # monthOnlyRange (30 day end month)
+                            earliestSingleDate: [2013,  4,  1, CE]
+                            latestDate:         [2013,  9, 30, CE]
+
+  'Jan-Feb 2003':           # monthOnlyRange (28 day end month)
+                            earliestSingleDate: [2003,  1,  1, CE]
+                            latestDate:         [2003,  2, 28, CE]
+
+  'January - Feb 2004':     # monthOnlyRange (leap year: divisible by 4)
+                            earliestSingleDate: [2004,  1,  1, CE]
+                            latestDate:         [2004,  2, 29, CE]
+
+  'Jan-Feb, 1900':          # monthOnlyRange (not a leap year: divisible by 100)
+                            earliestSingleDate: [1900,  1,  1, CE]
+                            latestDate:         [1900,  2, 28, CE]
+
+  'january-feb, 2000':      # monthOnlyRange (leap year: divisible by 400)
+                            earliestSingleDate: [2000,  1,  1, CE]
+                            latestDate:         [2000,  2, 29, CE]
+
+  'jan-february, 1100':     # monthOnlyRange (leap year: divisible by 100, but before Gregorian calendar)
+                            earliestSingleDate: [1100,  1,  1, CE]
+                            latestDate:         [1100,  2, 29, CE]
+
+  'Jan-Mar 100 B.C.':       # monthOnlyRange
+                            earliestSingleDate: [ 100,  1,  1, BCE]
+                            latestDate:         [ 100,  3, 31, BCE]
+
+  'December 3-9, 2004':     # strDateRange
+                            earliestSingleDate: [2004, 12,  3, CE]
+                            latestDate:         [2004, 12,  9, CE]
+
+  'Jan 5 - 29 1850':        # strDateRange
+                            earliestSingleDate: [1850,  1,  5, CE]
+                            latestDate:         [1850,  1, 29, CE]
+
+  'Jan 5 - 29 100 BCE':     # strDateRange
+                            earliestSingleDate: [ 100,  1,  5, BCE]
+                            latestDate:         [ 100,  1, 29, BCE]
+
+  '1/5-29/1850':            # numDateRange
+                            earliestSingleDate: [1850,  1,  5, CE]
+                            latestDate:         [1850,  1, 29, CE]
+
+  '09/05 - 18/1776':        # numDateRange
+                            earliestSingleDate: [1776,  9,  5, CE]
+                            latestDate:         [1776,  9, 18, CE]
+
+  '09/05 - 18/300 BC':      # numDateRange
+                            earliestSingleDate: [ 300,  9,  5, BCE]
+                            latestDate:         [ 300,  9, 18, BCE]
+
+  'circa 2013':             # circaYear
+                            earliestSingleDate: [2013,  1,  1, CE, null, MINUS, 4, YEARS]
+                            latestDate:         [2013, 12, 31, CE, null, PLUS,  4, YEARS]
+
+  'ca 2013':                # circaYear
+                            earliestSingleDate: [2013,  1,  1, CE, null, MINUS, 4, YEARS]
+                            latestDate:         [2013, 12, 31, CE, null, PLUS,  4, YEARS]
+
+  'ca. 2013':               # circaYear
+                            earliestSingleDate: [2013,  1,  1, CE, null, MINUS, 4, YEARS]
+                            latestDate:         [2013, 12, 31, CE, null, PLUS,  4, YEARS]
+
+  'c. 1950':                # circaYear
+                            earliestSingleDate: [1950,  1,  1, CE, null, MINUS, 8, YEARS]
+                            latestDate:         [1950, 12, 31, CE, null, PLUS,  8, YEARS]
+
+  'c1950':                  # circaYear
+                            earliestSingleDate: [1950,  1,  1, CE, null, MINUS, 8, YEARS]
+                            latestDate:         [1950, 12, 31, CE, null, PLUS,  8, YEARS]
+
+  'Circa 10 BC':            # circaYear
+                            earliestSingleDate: [  10,  1,  1, BCE, null, MINUS, 106, YEARS]
+                            latestDate:         [  10, 12, 31, BCE, null, PLUS,  106, YEARS]
+
+  'circa 2100':             # circaYear
+                            earliestSingleDate: [2100,  1,  1, CE, null, MINUS, 0, YEARS]
+                            latestDate:         [2100, 12, 31, CE, null, PLUS,  0, YEARS]
+
+  'c 1950-2013':            # circaYearRange
+                            earliestSingleDate: [1950,  1,  1, CE, null, MINUS, 8, YEARS]
+                            latestDate:         [2013, 12, 31, CE, null, PLUS,  4, YEARS]
+                                                      
+# Invalid dates
+
+  '':                       # empty
+                            null
+                            
+  'Octo 19, 1821':          # bad format (not a valid month)
+                            null
+
+  'October. 19, 1821':      # bad format (long month with a dot)
+                            null
+
+  'May-Foo 2000':           # bad format (not a valid month)
+                            null
+                            
+  'Something else':         # bad format (totally not a date)
+                            null            
+
+  'BC 12, Sumer':           # bad format (not a valid season)
+                            null
+                              
