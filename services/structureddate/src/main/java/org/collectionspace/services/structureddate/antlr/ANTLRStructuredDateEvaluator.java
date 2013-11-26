@@ -75,7 +75,15 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public static final int LAST_MONTH = 12;
 	public static final int LAST_DAY_OF_LAST_MONTH = 31;
 	
+	/**
+	 * The result of the evaluation.
+	 */
 	protected StructuredDate result;
+	
+	/**
+	 * The operation stack. The parse listener methods implemented here pop input parameters
+	 * off the stack, and push results back on to the stack.
+	 */
 	protected Stack<Object> stack;
 	
 	public ANTLRStructuredDateEvaluator() {
@@ -89,19 +97,29 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		result = new StructuredDate();
 		result.setDisplayDate(displayDate);
 
-		ANTLRInputStream inputStream = new ANTLRInputStream(displayDate.toLowerCase());
+		// Instantiate a parser from the lowercased display date, so that parsing will be
+		// case insensitive.
+		ANTLRInputStream inputStream = new ANTLRInputStream(displayDate.toLowerCase());		
 		StructuredDateLexer lexer = new StructuredDateLexer(inputStream);
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-
 		StructuredDateParser parser = new StructuredDateParser(tokenStream);
+		
+		// Don't try to recover from parse errors, just bail.
 		parser.setErrorHandler(new BailErrorStrategy());
+		
+		// Don't print error messages to the console.
 		parser.removeErrorListeners();
+		
+		// Generate our own custom error messages.
 		parser.addParseListener(this);
 
 		try {
+			// Attempt to fulfill the oneDisplayDate rule of the grammar.
 			parser.oneDisplayDate();
 		}
-		catch(ParseCancellationException e) {			
+		catch(ParseCancellationException e) {
+			// ParseCancellationException is thrown by the BailErrorStrategy when there is a
+			// parse error, with the underlying RecognitionException as the cause.
 			RecognitionException re = (RecognitionException) e.getCause();
 			
 			throw new StructuredDateFormatException(getErrorMessage(re), re);
@@ -117,6 +135,15 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			result.getLatestDate().setEra(Date.DEFAULT_ERA);
 		}
 		
+		
+		// If the earliest date and the latest date are the same, it's just a "single" date.
+		// There's no need to have the latest.
+		
+		if (result.getEarliestSingleDate().equals(result.getLatestDate())) {
+			result.setLatestDate(null);
+		}
+		
+		// The parsing was successful. Return the result.
 		return result;
 	}	
 
@@ -237,9 +264,11 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitPreciseDate(PreciseDateContext ctx) {
 		if (ctx.exception != null) return;
 
-		Date date = (Date) stack.pop();
+		Date latestDate = (Date) stack.pop();
+		Date earliestDate = (Date) stack.pop();
 
-		result.setEarliestSingleDate(date);
+		result.setEarliestSingleDate(earliestDate);
+		result.setLatestDate(latestDate);
 	}
 	
 	@Override
@@ -325,9 +354,13 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitDateRange(DateRangeContext ctx) {
 		if (ctx.exception != null) return;
 
+		System.out.println("in exitDateRange: " + stack.size());
+		
 		Date latestDate = (Date) stack.pop();
+		stack.pop();
+		stack.pop();
 		Date earliestDate = (Date) stack.pop();
-	
+
 		// If no era was explicitly specified for the first year,
 		// make it inherit the era of the second year.
 
@@ -402,6 +435,11 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer dayOfMonth = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
 		
+		// For the latest date we could either return null, or a copy of the earliest date,
+		// since the UI doesn't care. Use a copy of the earliest date, since it makes
+		// things easier.
+		
+		stack.push(new Date(year, numMonth, dayOfMonth).withEra(era));
 		stack.push(new Date(year, numMonth, dayOfMonth).withEra(era));
 	}
 
