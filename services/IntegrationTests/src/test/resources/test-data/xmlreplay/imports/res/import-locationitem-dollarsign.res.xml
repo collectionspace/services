@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="locations">
+    <ns2:locations_common
+        xmlns:ns2="http://collectionspace.org/services/location">
+        <locTermGroupList>
+            <locTermGroup>
+                <termDisplayName>${termDisplayNameValue}</termDisplayName>
+            </locTermGroup>
+        </locTermGroupList>
+        <shortIdentifier>${shortIdentifierValue}</shortIdentifier>
+        <inAuthority>${inAuthorityValue}</inAuthority>
+    </ns2:locations_common>
+    <ns2:collectionspace_core xmlns:ns2="http://collectionspace.org/collectionspace_core/"
+                              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <!-- Note: This test may fail if the identifier for the core tenant changes. -->
+        <tenantId>1</tenantId>
+        <uri>${uriValue}</uri>
+        <refName>urn:cspace:core.collectionspace.org:locationauthorities:name(${shortIdentifierValue})'${termDisplayNameValue}'</refName>
+    </ns2:collectionspace_core>
+</document>
+
