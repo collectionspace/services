@@ -25,8 +25,8 @@ certainDate:           hyphenatedRange
 |                      singleInterval
 ;
 
-hyphenatedRange:       year HYPHEN year
-|                      quarterYear HYPHEN quarterYear
+hyphenatedRange:       quarterYear HYPHEN quarterYear
+|                      year HYPHEN year
 |                      month HYPHEN month
 |                      date HYPHEN date
 |                      monthInYearRange
