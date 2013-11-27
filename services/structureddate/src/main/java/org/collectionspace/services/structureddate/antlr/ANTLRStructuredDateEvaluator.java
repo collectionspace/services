@@ -22,6 +22,7 @@ import org.collectionspace.services.structureddate.QualifierUnit;
 import org.collectionspace.services.structureddate.StructuredDate;
 import org.collectionspace.services.structureddate.StructuredDateEvaluator;
 import org.collectionspace.services.structureddate.StructuredDateFormatException;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.CenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DecadeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DisplayDateContext;
@@ -36,6 +37,7 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Mo
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthHalfContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthQuarterContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumCenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDayInMonthRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDayOfMonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDecadeContext;
@@ -43,6 +45,7 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Nu
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterInYearRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterYearContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrCenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrDayInMonthRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrMonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrSeasonContext;
@@ -164,10 +167,10 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// If no era was explicitly specified for the first date,
 		// make it inherit the era of the second date.
 
-		if (earliestStartDate.getEra() == null) {
+		if (earliestStartDate.getEra() == null && latestEndDate.getEra() != null) {
 			earliestStartDate.setEra(latestEndDate.getEra());
 		}
-		
+
 		stack.push(earliestStartDate);
 		stack.push(latestEndDate);
 	}
@@ -356,7 +359,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		
 		if (era != null) {
 			// If the era was explicitly specified, the start and end years
-			// may be calculated right away.
+			// may be calculated now.
 
 			int startYear = DateUtils.getDecadeStartYear(year, era);
 			int endYear = DateUtils.getDecadeEndYear(year, era);
@@ -366,12 +369,15 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		}
 		else {
 			// If the era was not explicitly specified, the start and end years
-			// can't be calculated yet. This decade may be the start of a 
-			// hyphenated range, where the era is inherited from the era of the
-			// end of the range. The calculation of the start and end years
-			// must be deferred until an era is set. This is done by pushing
-			// anonymous subclasses of Date onto the stack, which do the
-			// appropriate calculations once the era is known.
+			// can't be calculated yet. The calculation must be deferred until
+			// later. For example, this decade may be the start of a hyphenated
+			// range, where the era will be inherited from the era of the end of
+			// the range; this era won't be known until farther up the parse tree,
+			// when both sides of the range will have been parsed.
+
+			// The calculation is deferred by pushing anonymous subclasses of Date
+			// onto the stack, which override setEra so that the appropriate
+			// calculations are done once the era is set.
 			
 			stack.push(new Date(null, 1, 1) {
 				@Override
@@ -392,15 +398,92 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	}	
 
 	@Override
+	public void exitCentury(CenturyContext ctx) {
+		if (ctx.exception != null) return;
+
+		Era era = (Era) stack.pop();
+		final Integer year = (Integer) stack.pop();
+
+		if (era != null) {
+			// If the era was explicitly specified, the start and end years
+			// may be calculated now.
+
+			int startYear = DateUtils.getCenturyStartYear(year, era);
+			int endYear = DateUtils.getCenturyEndYear(year, era);
+			
+			stack.push(new Date(startYear, 1, 1, era));
+			stack.push(new Date(endYear, 12, 31, era));		
+		}
+		else {
+			// If the era was not explicitly specified, the start and end years
+			// can't be calculated yet. The calculation must be deferred until
+			// later. For example, this century may be the start of a hyphenated
+			// range, where the era will be inherited from the era of the end of
+			// the range; this era won't be known until farther up the parse tree,
+			// when both sides of the range will have been parsed.
+
+			// The calculation is deferred by pushing anonymous subclasses of Date
+			// onto the stack, which override setEra so that the appropriate
+			// calculations are done once the era is set.
+			
+			stack.push(new Date(null, 1, 1) {
+				@Override
+				public void setEra(Era era) {
+					super.setEra(era);
+					setYear(DateUtils.getCenturyStartYear(year, era));
+				}
+			});
+			
+			stack.push(new Date(null, 12, 31) {
+				@Override
+				public void setEra(Era era) {
+					super.setEra(era);
+					setYear(DateUtils.getCenturyEndYear(year, era));
+				}				
+			});		
+		}
+	}
+
+	@Override
+	public void exitStrCentury(StrCenturyContext ctx) {
+		if (ctx.exception != null) return;
+		
+		Integer n = (Integer) stack.pop();
+		
+		// Convert the nth number to a year number,
+		// and push on the stack.
+		
+		Integer year = (n-1) * 100 + 1;
+		
+		stack.push(year);
+	}
+
+	@Override
+	public void exitNumCentury(NumCenturyContext ctx) {
+		if (ctx.exception != null) return;
+
+		// Convert the string to a number,
+		// and push on the stack.
+
+		Integer year = new Integer(stripEndLetters(ctx.HUNDREDS().getText()));
+		
+		if (year == 0) {
+			throw new StructuredDateFormatException("unexpected century '0'");
+		}
+		
+		stack.push(year);
+	}
+
+	@Override
 	public void exitNumDecade(NumDecadeContext ctx) {
 		if (ctx.exception != null) return;
 
 		// Convert the string to a number,
 		// and push on the stack.
 
-		Integer n = new Integer(stripEndLetters(ctx.TENS().getText()));
+		Integer year = new Integer(stripEndLetters(ctx.TENS().getText()));
 		
-		stack.push(n);
+		stack.push(year);
 	}
 
 	@Override

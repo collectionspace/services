@@ -63,14 +63,13 @@ public class DateUtils {
 			era = Date.DEFAULT_ERA;
 		}
 		
-		int decade = ((int) Math.floor(year/10)) * 10;
 		int startYear;
 		
 		if (era == Era.BCE) {
-			startYear = decade + 9;
+			startYear = year + 9;
 		}
 		else {
-			startYear = decade;
+			startYear = year;
 		}
 		
 		return startYear;
@@ -81,14 +80,47 @@ public class DateUtils {
 			era = Date.DEFAULT_ERA;
 		}
 		
-		int decade = ((int) Math.floor(year/10)) * 10;
 		int endYear;
 		
 		if (era == Era.BCE) {
-			endYear = decade;
+			endYear = year;
 		}
 		else {
-			endYear = decade + 9;			
+			endYear = year + 9;			
+		}
+		
+		return endYear;
+	}
+	
+	public static int getCenturyStartYear(int year, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+		
+		int startYear;
+		
+		if (era == Era.BCE) {
+			startYear = year + 99;
+		}
+		else {
+			startYear = year;
+		}
+		
+		return startYear;
+	}
+	
+	public static int getCenturyEndYear(int year, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+		
+		int endYear;
+		
+		if (era == Era.BCE) {
+			endYear = year;
+		}
+		else {
+			endYear = year + 99;			
 		}
 		
 		return endYear;

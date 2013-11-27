@@ -78,6 +78,30 @@
                                          earliestSingleDate: [1974,  1,  1, CE]
                                          latestDate:         [1974, 12, 31, CE]
 
+  "1800's-1900's":                       # hyphenatedRange, century
+                                         earliestSingleDate: [1800,  1,  1, CE]
+                                         latestDate:         [1999, 12, 31, CE]
+
+  '19th century-20th century':           # hyphenatedRange, century
+                                         earliestSingleDate: [1801,  1,  1, CE]
+                                         latestDate:         [2000, 12, 31, CE]
+
+  "1700's-20th century":                 # hyphenatedRange, century
+                                         earliestSingleDate: [1700,  1,  1, CE]
+                                         latestDate:         [2000, 12, 31, CE]
+
+  "2nd century BC-first century AD":     # hyphenatedRange, century
+                                         earliestSingleDate: [ 200,  1,  1, BCE]
+                                         latestDate:         [ 100, 12, 31, CE]
+
+  "fourth century-2nd century BC":        # hyphenatedRange, century
+                                         earliestSingleDate: [ 400,  1,  1, BCE]
+                                         latestDate:         [ 101, 12, 31, BCE]
+
+  "300s-200s BC":                        # hyphenatedRange, century
+                                         earliestSingleDate: [ 399,  1,  1, BCE]
+                                         latestDate:         [ 200, 12, 31, BCE]
+                                         
   "1970's-1980's":                       # hyphenatedRange, decade
                                          earliestSingleDate: [1970,  1,  1, CE]
                                          latestDate:         [1989, 12, 31, CE]
@@ -177,6 +201,38 @@
   "20's BC":                             # decade
                                          earliestSingleDate: [  29,  1,  1, BCE]
                                          latestDate:         [  20, 12, 31, BCE]                                                                                             
+
+  '1900s':                               # century
+                                         earliestSingleDate: [1900,  1,  1, CE]
+                                         latestDate:         [1999, 12, 31, CE]                                                                                             
+
+  '20th century':                        # century
+                                         earliestSingleDate: [1901,  1,  1, CE]
+                                         latestDate:         [2000, 12, 31, CE]                                                                                             
+
+  '20th century AD':                     # century
+                                         earliestSingleDate: [1901,  1,  1, CE]
+                                         latestDate:         [2000, 12, 31, CE]                                                                                             
+
+  "1600's":                              # century
+                                         earliestSingleDate: [1600,  1,  1, CE]
+                                         latestDate:         [1699, 12, 31, CE]                                                                                             
+
+  '21st century':                        # century
+                                         earliestSingleDate: [2001,  1,  1, CE]
+                                         latestDate:         [2100, 12, 31, CE]                                                                                                                                                                               
+
+  '1st century BC':                      # century
+                                         earliestSingleDate: [ 100,  1,  1, BCE]
+                                         latestDate:         [   1, 12, 31, BCE]                                                                                             
+
+  '8th century BC':                      # century
+                                         earliestSingleDate: [ 800,  1,  1, BCE]
+                                         latestDate:         [ 701, 12, 31, BCE]                                                                                             
+
+  "100's BC":                            # century
+                                         earliestSingleDate: [ 199,  1,  1, BCE]
+                                         latestDate:         [ 100, 12, 31, BCE]                                                                                             
                             
   'Winter 2000':                         # quarterYear, seasonYear
                                          earliestSingleDate: [2000,  1,  1, CE]
@@ -478,4 +534,8 @@
                                          null                                               
                                                         
   '0th half 1900':                       # invalid half number
-                                         null                                               
+                                         null
+
+  '00s':                                 # invalid century
+                                         null
+                                                                                        
