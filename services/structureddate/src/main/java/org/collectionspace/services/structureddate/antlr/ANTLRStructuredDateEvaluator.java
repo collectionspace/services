@@ -23,6 +23,7 @@ import org.collectionspace.services.structureddate.StructuredDate;
 import org.collectionspace.services.structureddate.StructuredDateEvaluator;
 import org.collectionspace.services.structureddate.StructuredDateFormatException;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DateContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DecadeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DisplayDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.EraContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.HalfYearContext;
@@ -37,6 +38,7 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Nt
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthQuarterContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDayInMonthRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDayOfMonthContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDecadeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumMonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterInYearRangeContext;
@@ -52,12 +54,7 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Ye
  * and an ANTLR listener to generate a structured date from the resulting parse
  * tree.
  */
-public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener implements StructuredDateEvaluator {
-	public static final int FIRST_MONTH = 1;
-	public static final int FIRST_DAY_OF_FIRST_MONTH = 1;
-	public static final int LAST_MONTH = 12;
-	public static final int LAST_DAY_OF_LAST_MONTH = 31;
-	
+public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener implements StructuredDateEvaluator {	
 	/**
 	 * The result of the evaluation.
 	 */
@@ -184,10 +181,10 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer numMonthEnd = (Integer) stack.pop();
 		Integer numMonthStart = (Integer) stack.pop();
 		
-		stack.push(new Date(year, numMonthStart, 1).withEra(era));
-		stack.push(new Date(year, numMonthStart, DateUtils.getDaysInMonth(numMonthStart, year)).withEra(era));
-		stack.push(new Date(year, numMonthEnd, 1).withEra(era));
-		stack.push(new Date(year, numMonthEnd, DateUtils.getDaysInMonth(numMonthEnd, year)).withEra(era));		
+		stack.push(new Date(year, numMonthStart, 1, era));
+		stack.push(new Date(year, numMonthStart, DateUtils.getDaysInMonth(numMonthStart, year), era));
+		stack.push(new Date(year, numMonthEnd, 1, era));
+		stack.push(new Date(year, numMonthEnd, DateUtils.getDaysInMonth(numMonthEnd, year), era));
 	}
 	
 	@Override
@@ -215,10 +212,10 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer dayOfMonthStart = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
 		
-		stack.push(new Date(year, numMonth, dayOfMonthStart).withEra(era));
-		stack.push(new Date(year, numMonth, dayOfMonthStart).withEra(era));		
-		stack.push(new Date(year, numMonth, dayOfMonthEnd).withEra(era));
-		stack.push(new Date(year, numMonth, dayOfMonthEnd).withEra(era));		
+		stack.push(new Date(year, numMonth, dayOfMonthStart, era));
+		stack.push(new Date(year, numMonth, dayOfMonthStart, era));		
+		stack.push(new Date(year, numMonth, dayOfMonthEnd, era));
+		stack.push(new Date(year, numMonth, dayOfMonthEnd, era));		
 	}
 	
 	@Override
@@ -231,10 +228,10 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer dayOfMonthStart = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
 		
-		stack.push(new Date(year, numMonth, dayOfMonthStart).withEra(era));
-		stack.push(new Date(year, numMonth, dayOfMonthStart).withEra(era));
-		stack.push(new Date(year, numMonth, dayOfMonthEnd).withEra(era));		
-		stack.push(new Date(year, numMonth, dayOfMonthEnd).withEra(era));		
+		stack.push(new Date(year, numMonth, dayOfMonthStart, era));
+		stack.push(new Date(year, numMonth, dayOfMonthStart, era));
+		stack.push(new Date(year, numMonth, dayOfMonthEnd, era));		
+		stack.push(new Date(year, numMonth, dayOfMonthEnd, era));		
 	}
 	
 	@Override
@@ -250,8 +247,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// since the UI doesn't care. Use a copy of the earliest date, since it makes
 		// things easier here if we don't have to test for null up the tree.
 		
-		stack.push(new Date(year, numMonth, dayOfMonth).withEra(era));
-		stack.push(new Date(year, numMonth, dayOfMonth).withEra(era));
+		stack.push(new Date(year, numMonth, dayOfMonth, era));
+		stack.push(new Date(year, numMonth, dayOfMonth, era));
 	}
 
 	@Override
@@ -279,8 +276,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer year = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
 		
-		stack.push(new Date(year, numMonth, 1).withEra(era));
-		stack.push(new Date(year, numMonth, DateUtils.getDaysInMonth(numMonth, year)).withEra(era));		
+		stack.push(new Date(year, numMonth, 1, era));
+		stack.push(new Date(year, numMonth, DateUtils.getDaysInMonth(numMonth, year), era));		
 	}
 	
 	@Override
@@ -344,8 +341,66 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		
-		stack.push(new Date(year, FIRST_MONTH, FIRST_DAY_OF_FIRST_MONTH).withEra(era));
-		stack.push(new Date(year, LAST_MONTH, LAST_DAY_OF_LAST_MONTH).withEra(era));
+		stack.push(new Date(year, 1, 1, era));
+		stack.push(new Date(year, 12, 31, era));
+	}
+
+	@Override
+	public void exitDecade(DecadeContext ctx) {
+		if (ctx.exception != null) return;
+
+		Era era = (Era) stack.pop();
+		final Integer year = (Integer) stack.pop();
+
+		// Calculate the start and end year of the decade, which depends on the era.
+		
+		if (era != null) {
+			// If the era was explicitly specified, the start and end years
+			// may be calculated right away.
+
+			int startYear = DateUtils.getDecadeStartYear(year, era);
+			int endYear = DateUtils.getDecadeEndYear(year, era);
+			
+			stack.push(new Date(startYear, 1, 1, era));
+			stack.push(new Date(endYear, 12, 31, era));		
+		}
+		else {
+			// If the era was not explicitly specified, the start and end years
+			// can't be calculated yet. This decade may be the start of a 
+			// hyphenated range, where the era is inherited from the era of the
+			// end of the range. The calculation of the start and end years
+			// must be deferred until an era is set. This is done by pushing
+			// anonymous subclasses of Date onto the stack, which do the
+			// appropriate calculations once the era is known.
+			
+			stack.push(new Date(null, 1, 1) {
+				@Override
+				public void setEra(Era era) {
+					super.setEra(era);
+					setYear(DateUtils.getDecadeStartYear(year, era));
+				}
+			});
+			
+			stack.push(new Date(null, 12, 31) {
+				@Override
+				public void setEra(Era era) {
+					super.setEra(era);
+					setYear(DateUtils.getDecadeEndYear(year, era));
+				}				
+			});		
+		}
+	}	
+
+	@Override
+	public void exitNumDecade(NumDecadeContext ctx) {
+		if (ctx.exception != null) return;
+
+		// Convert the string to a number,
+		// and push on the stack.
+
+		Integer n = new Integer(stripEndLetters(ctx.TENS().getText()));
+		
+		stack.push(n);
 	}
 
 	@Override
@@ -424,7 +479,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer n = null;
 		
 		if (ctx.NTHSTR() != null) {
-			n = new Integer(ctx.NTHSTR().getText().replaceAll("[^\\d]+$", ""));
+			n = new Integer(stripEndLetters(ctx.NTHSTR().getText()));
 		}
 		else if (ctx.FIRST() != null) {
 			n = 1;
@@ -572,6 +627,10 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
         return string;
     }
 
+    protected String stripEndLetters(String input) {
+    	return input.replaceAll("[^\\d]+$", "");
+    }
+    
 	public static void main(String[] args) {
 		StructuredDateEvaluator evaluator = new ANTLRStructuredDateEvaluator();
 		

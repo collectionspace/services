@@ -77,7 +77,27 @@
   '1974 ce':                             # year
                                          earliestSingleDate: [1974,  1,  1, CE]
                                          latestDate:         [1974, 12, 31, CE]
-                            
+
+  "1970's-1980's":                       # hyphenatedRange, decade
+                                         earliestSingleDate: [1970,  1,  1, CE]
+                                         latestDate:         [1989, 12, 31, CE]
+
+  "1920s - 1940's":                      # hyphenatedRange, decade
+                                         earliestSingleDate: [1920,  1,  1, CE]
+                                         latestDate:         [1949, 12, 31, CE]
+
+  '30s BC - 20s CE':                     # hyphenatedRange, decade
+                                         earliestSingleDate: [  39,  1,  1, BCE]
+                                         latestDate:         [  29, 12, 31, CE]
+
+  '30s-20s BC':                          # hyphenatedRange, decade
+                                         earliestSingleDate: [  39,  1,  1, BCE]
+                                         latestDate:         [  20, 12, 31, BCE]
+
+  '30s BC-20s BC':                       # hyphenatedRange, decade
+                                         earliestSingleDate: [  39,  1,  1, BCE]
+                                         latestDate:         [  20, 12, 31, BCE]
+                          
   '1974-2013':                           # hyphenatedRange, year
                                          earliestSingleDate: [1974,  1,  1, CE]
                                          latestDate:         [2013, 12, 31, CE]
@@ -140,7 +160,23 @@
 
   'last half 2000':                      # halfYear
                                          earliestSingleDate: [2000,  7,  1, CE]
-                                         latestDate:         [2000, 12, 31, CE]                                                    
+                                         latestDate:         [2000, 12, 31, CE]   
+
+  '1960s':                               # decade
+                                         earliestSingleDate: [1960,  1,  1, CE]
+                                         latestDate:         [1969, 12, 31, CE]                                                                                             
+
+  "1920's":                              # decade
+                                         earliestSingleDate: [1920,  1,  1, CE]
+                                         latestDate:         [1929, 12, 31, CE]                                                                                             
+
+  '1920S':                               # decade
+                                         earliestSingleDate: [1920,  1,  1, CE]
+                                         latestDate:         [1929, 12, 31, CE]                                                                                             
+
+  "20's BC":                             # decade
+                                         earliestSingleDate: [  29,  1,  1, BCE]
+                                         latestDate:         [  20, 12, 31, BCE]                                                                                             
                             
   'Winter 2000':                         # quarterYear, seasonYear
                                          earliestSingleDate: [2000,  1,  1, CE]

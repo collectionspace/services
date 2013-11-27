@@ -58,6 +58,42 @@ public class DateUtils {
 		return (getHalfYearStartMonth(half) + 5);
 	}
 	
+	public static int getDecadeStartYear(int year, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+		
+		int decade = ((int) Math.floor(year/10)) * 10;
+		int startYear;
+		
+		if (era == Era.BCE) {
+			startYear = decade + 9;
+		}
+		else {
+			startYear = decade;
+		}
+		
+		return startYear;
+	}
+	
+	public static int getDecadeEndYear(int year, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+		
+		int decade = ((int) Math.floor(year/10)) * 10;
+		int endYear;
+		
+		if (era == Era.BCE) {
+			endYear = decade;
+		}
+		else {
+			endYear = decade + 9;			
+		}
+		
+		return endYear;
+	}
+	
 	/**
 	 * Calculates the interval, in years, that should be padded around a date so
 	 * that any date within that interval may be considered to be "circa" the
