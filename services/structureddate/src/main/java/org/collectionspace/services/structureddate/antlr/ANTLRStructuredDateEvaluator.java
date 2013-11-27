@@ -25,6 +25,7 @@ import org.collectionspace.services.structureddate.StructuredDateFormatException
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DisplayDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.EraContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.HalfYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.HyphenatedRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.InvMonthYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.InvSeasonYearContext;
@@ -32,6 +33,7 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.In
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthInYearRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthHalfContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthQuarterContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDayInMonthRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDayOfMonthContext;
@@ -197,10 +199,10 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer lastQuarter = (Integer) stack.pop();
 		Integer firstQuarter = (Integer) stack.pop();
 		
-		stack.push(DateUtils.getQuarterStartDate(year, firstQuarter).withEra(era));
-		stack.push(DateUtils.getQuarterEndDate(year, firstQuarter).withEra(era));
-		stack.push(DateUtils.getQuarterStartDate(year, lastQuarter).withEra(era));
-		stack.push(DateUtils.getQuarterEndDate(year, lastQuarter).withEra(era));
+		stack.push(DateUtils.getQuarterYearStartDate(year, firstQuarter).withEra(era));
+		stack.push(DateUtils.getQuarterYearEndDate(year, firstQuarter).withEra(era));
+		stack.push(DateUtils.getQuarterYearStartDate(year, lastQuarter).withEra(era));
+		stack.push(DateUtils.getQuarterYearEndDate(year, lastQuarter).withEra(era));
 	}
 
 	@Override
@@ -304,10 +306,22 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer year = (Integer) stack.pop();
 		Integer quarter = (Integer) stack.pop();
 
-		stack.push(DateUtils.getQuarterStartDate(year, quarter).withEra(era));
-		stack.push(DateUtils.getQuarterEndDate(year, quarter).withEra(era));
+		stack.push(DateUtils.getQuarterYearStartDate(year, quarter).withEra(era));
+		stack.push(DateUtils.getQuarterYearEndDate(year, quarter).withEra(era));
 	}
 
+	@Override
+	public void exitHalfYear(HalfYearContext ctx) {
+		if (ctx.exception != null) return;
+		
+		Era era = (Era) stack.pop();		
+		Integer year = (Integer) stack.pop();
+		Integer half = (Integer) stack.pop();
+
+		stack.push(DateUtils.getHalfYearStartDate(year, half).withEra(era));
+		stack.push(DateUtils.getHalfYearEndDate(year, half).withEra(era));
+	}	
+	
 	@Override
 	public void exitInvSeasonYear(InvSeasonYearContext ctx) {
 		if (ctx.exception != null) return;
@@ -353,6 +367,29 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		
 		stack.push(new Integer(ctx.NUMBER().getText()));
 	}
+
+	@Override
+	public void exitNthHalf(NthHalfContext ctx) {
+		if (ctx.exception != null) return;
+
+		// Convert LAST to a number (the last half
+		// is the 2nd). If this rule matched the
+		// alternative with nth instead of LAST,
+		// the nth handler will already have pushed
+		// a number on the stack.
+		
+		if (ctx.LAST() != null) {
+			stack.push(new Integer(2));
+		}
+		
+		// Check for a valid half.
+		
+		Integer n = (Integer) stack.peek();
+		
+		if (n < 1 || n > 2) {
+			throw new StructuredDateFormatException("unexpected half '" + n + "'");
+		}
+	}
 	
 	@Override
 	public void exitNthQuarter(NthQuarterContext ctx) {
@@ -362,11 +399,18 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// is the 4th). If this rule matched the
 		// alternative with nth instead of LAST,
 		// the nth handler will already have pushed
-		// a number on the stack, so there's no need
-		// to do anything here.
+		// a number on the stack.
 		
 		if (ctx.LAST() != null) {
 			stack.push(new Integer(4));
+		}
+		
+		// Check for a valid quarter.
+		
+		Integer n = (Integer) stack.peek();
+		
+		if (n < 1 || n > 4) {
+			throw new StructuredDateFormatException("unexpected quarter '" + n + "'");
 		}
 	}
 

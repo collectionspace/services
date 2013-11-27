@@ -5,8 +5,6 @@ grammar StructuredDate;
  *
  * TODO: 
  *   Allow YYYY-MM-DD
- *   Allow month nth, year
- *   Allow year season
  */
 
 /*
@@ -26,6 +24,7 @@ certainDate:           hyphenatedRange
 ;
 
 hyphenatedRange:       quarterYear HYPHEN quarterYear
+|                      halfYear HYPHEN halfYear
 |                      year HYPHEN year
 |                      month HYPHEN month
 |                      date HYPHEN date
@@ -58,13 +57,12 @@ hyphenatedRange:       quarterYear HYPHEN quarterYear
 ;
 
 singleInterval:        quarterYear
+|                      halfYear
 |                      year
 |                      month                                                  
 |                      date                                                   
 /* TODO: */
 /*
-|                      nth HALF year                                          
-|                      LAST HALF year                                         
 |                      partOf year                                            
 |                      partOf year BC                                         
 |                      partOf date BC                                         
@@ -108,9 +106,11 @@ quarterYear:           seasonYear
 |                      nthQuarterYear
 ;
 
+halfYear:              nthHalfYear ;
+
 year:                  numYear era ;
 
-strDate:               strMonth numDayOfMonth COMMA? numYear era;
+strDate:               strMonth (numDayOfMonth | nth) COMMA? numYear era;
 invStrDate:            era numYear COMMA? strMonth numDayOfMonth ;
 strDayInMonthRange:    strMonth numDayOfMonth HYPHEN numDayOfMonth COMMA? numYear era ;
 monthInYearRange:      strMonth HYPHEN strMonth COMMA? numYear era ;
@@ -124,7 +124,9 @@ invMonthYear:          era numYear COMMA? strMonth ;
 seasonYear:            strSeason COMMA? numYear era ;
 invSeasonYear:         era numYear COMMA? strSeason ;
 nthQuarterYear:        nthQuarter numYear era ;
-nthQuarter:            ( nth | LAST ) QUARTER ;
+nthHalfYear:           nthHalf numYear era ;
+nthQuarter:            (nth | LAST) QUARTER ;
+nthHalf:               (nth | LAST) HALF ;
 decade:                TENS ;
 century:               HUNDREDS ;
 strSeason:             SPRING | SUMMER | FALL | WINTER ;

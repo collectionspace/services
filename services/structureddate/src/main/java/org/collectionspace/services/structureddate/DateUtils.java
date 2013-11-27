@@ -18,24 +18,44 @@ public class DateUtils {
 		return dateTime.dayOfMonth().getMaximumValue();
 	}
 	
-	public static Date getQuarterStartDate(int year, int quarter) {
-		int startMonth = getQuarterStartMonth(quarter);
+	public static Date getQuarterYearStartDate(int year, int quarter) {
+		int startMonth = getQuarterYearStartMonth(quarter);
 		
 		return new Date(year, startMonth, 1);
 	}
 	
-	public static Date getQuarterEndDate(int year, int quarter) {
-		int endMonth = getQuarterEndMonth(quarter);
+	public static Date getQuarterYearEndDate(int year, int quarter) {
+		int endMonth = getQuarterYearEndMonth(quarter);
 		
 		return new Date(year, endMonth, DateUtils.getDaysInMonth(endMonth, year));
 	}
 	
-	public static int getQuarterStartMonth(int quarter) {
+	public static int getQuarterYearStartMonth(int quarter) {
 		return ((3 * (quarter-1)) + 1);
 	}
 	
-	public static int getQuarterEndMonth(int quarter) {
-		return (getQuarterStartMonth(quarter) + 2);
+	public static int getQuarterYearEndMonth(int quarter) {
+		return (getQuarterYearStartMonth(quarter) + 2);
+	}
+	
+	public static Date getHalfYearStartDate(int year, int half) {
+		int startMonth = getHalfYearStartMonth(half);
+		
+		return new Date(year, startMonth, 1);
+	}
+
+	public static Date getHalfYearEndDate(int year, int half) {
+		int endMonth = getHalfYearEndMonth(half);
+		
+		return new Date(year, endMonth, DateUtils.getDaysInMonth(endMonth, year));
+	}
+
+	public static int getHalfYearStartMonth(int half) {
+		return ((6 * (half-1)) + 1);
+	}
+	
+	public static int getHalfYearEndMonth(int half) {
+		return (getHalfYearStartMonth(half) + 5);
 	}
 	
 	/**
