@@ -5,8 +5,6 @@ grammar StructuredDate;
  *
  * TODO: 
  *   Allow YYYY-MM-DD
- *   Allow month nth, year
- *   Allow year season
  */
 
 /*
@@ -26,6 +24,9 @@ certainDate:           hyphenatedRange
 ;
 
 hyphenatedRange:       quarterYear HYPHEN quarterYear
+|                      halfYear HYPHEN halfYear
+|                      century HYPHEN century
+|                      decade HYPHEN decade                                   
 |                      year HYPHEN year
 |                      month HYPHEN month
 |                      date HYPHEN date
@@ -35,12 +36,8 @@ hyphenatedRange:       quarterYear HYPHEN quarterYear
 |                      numDayInMonthRange                                                            
 /* TODO: */
 /*
-|                      nth CENTURY HYPHEN nth CENTURY                         
 |                      nth HYPHEN nth CENTURY                                 
 |                      nth HYPHEN nth CENTURY BC                              
-|                      nth CENTURY BC HYPHEN nth CENTURY BC                   
-|                      nth CENTURY BC HYPHEN nth CENTURY                      
-|                      nth CENTURY BC HYPHEN nth CENTURY AD                   
 |                      partOf nth CENTURY HYPHEN partOf nth CENTURY           
 |                      partOf nth HYPHEN partOf nth CENTURY                   
 |                      partOf nth HYPHEN nth CENTURY                          
@@ -49,7 +46,6 @@ hyphenatedRange:       quarterYear HYPHEN quarterYear
 |                      partOf century HYPHEN partOf century                   
 |                      partOf century BC HYPHEN partOf century BC             
 |                      nth QUARTER nth CENTURY HYPHEN nth QUARTER nth CENTURY 
-|                      decade HYPHEN decade                                   
 |                      decade HYPHEN partOf decade                            
 |                      partOf decade HYPHEN partOf century                    
 |                      partOf decade HYPHEN partOf decade                     
@@ -58,34 +54,29 @@ hyphenatedRange:       quarterYear HYPHEN quarterYear
 ;
 
 singleInterval:        quarterYear
+|                      halfYear
+|                      century
+|                      decade
 |                      year
 |                      month                                                  
 |                      date                                                   
 /* TODO: */
 /*
-|                      nth HALF year                                          
-|                      LAST HALF year                                         
 |                      partOf year                                            
 |                      partOf year BC                                         
 |                      partOf date BC                                         
 |                      partOf date                                            
-|                      nth CENTURY                                            
-|                      nth CENTURY AD                                         
-|                      nth CENTURY BC                                         
 |                      nth QUARTER nth CENTURY                                
 |                      LAST QUARTER nth CENTURY                               
 |                      nth HALF nth CENTURY                                   
 |                      LAST HALF nth CENTURY                                  
 |                      partOf nth CENTURY                                     
 |                      partOf nth CENTURY BC                                  
-|                      century                                                
 |                      partOf century                                         
 |                      partOf century BC                                      
 |                      nth MILLENIUM                                          
 |                      nth MILLENIUM BC                                       
-|                      decade                                                 
 |                      partOf decade                                          
-|                      decade BC                                              
 |                      partOf decade BC                                       
 */
 ;         
@@ -108,9 +99,15 @@ quarterYear:           seasonYear
 |                      nthQuarterYear
 ;
 
+halfYear:              nthHalfYear ;
+
 year:                  numYear era ;
 
-strDate:               strMonth numDayOfMonth COMMA? numYear era;
+decade:                numDecade era ;
+
+century:               (strCentury | numCentury) era ;
+
+strDate:               strMonth (numDayOfMonth | nth) COMMA? numYear era;
 invStrDate:            era numYear COMMA? strMonth numDayOfMonth ;
 strDayInMonthRange:    strMonth numDayOfMonth HYPHEN numDayOfMonth COMMA? numYear era ;
 monthInYearRange:      strMonth HYPHEN strMonth COMMA? numYear era ;
@@ -124,9 +121,12 @@ invMonthYear:          era numYear COMMA? strMonth ;
 seasonYear:            strSeason COMMA? numYear era ;
 invSeasonYear:         era numYear COMMA? strSeason ;
 nthQuarterYear:        nthQuarter numYear era ;
-nthQuarter:            ( nth | LAST ) QUARTER ;
-decade:                TENS ;
-century:               HUNDREDS ;
+nthHalfYear:           nthHalf numYear era ;
+nthQuarter:            (nth | LAST) QUARTER ;
+nthHalf:               (nth | LAST) HALF ;
+numDecade:             TENS ;
+strCentury:            nth CENTURY ;
+numCentury:            HUNDREDS ;
 strSeason:             SPRING | SUMMER | FALL | WINTER ;
 partOf:                EARLY | MIDDLE | LATE | BEFORE | AFTER ;
 nth:                   NTHSTR | FIRST | SECOND | THIRD | FOURTH ;

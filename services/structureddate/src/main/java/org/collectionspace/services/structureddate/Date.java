@@ -3,14 +3,7 @@ package org.collectionspace.services.structureddate;
 import org.apache.commons.lang.builder.EqualsBuilder;
 
 public class Date {
-	public static final Integer DEFAULT_YEAR = null;
-	public static final Integer DEFAULT_MONTH = null;
-	public static final Integer DEFAULT_DAY = null;
 	public static final Era DEFAULT_ERA = Era.CE;
-	public static final Certainty DEFAULT_CERTAINTY = null;
-	public static final QualifierType DEFAULT_QUALIFIER = null;
-	public static final Integer DEFAULT_QUALIFIER_VALUE = null;
-	public static final QualifierUnit DEFAULT_QUALIFIER_UNIT = null;
 
 	private Integer year;
 	private Integer month;
@@ -23,11 +16,15 @@ public class Date {
 	private String scalarValue;
 
 	public Date() {
-		this(DEFAULT_YEAR, DEFAULT_MONTH, DEFAULT_DAY, DEFAULT_ERA, DEFAULT_CERTAINTY, DEFAULT_QUALIFIER, DEFAULT_QUALIFIER_VALUE, DEFAULT_QUALIFIER_UNIT);
+		this(null, null, null, null, null, null, null, null);
 	}
 	
 	public Date(Integer year, Integer month, Integer day) {
-		this(year, month, day, DEFAULT_ERA, DEFAULT_CERTAINTY, DEFAULT_QUALIFIER, DEFAULT_QUALIFIER_VALUE, DEFAULT_QUALIFIER_UNIT);
+		this(year, month, day, null, null, null, null, null);
+	}
+
+	public Date(Integer year, Integer month, Integer day, Era era) {
+		this(year, month, day, era, null, null, null, null);
 	}
 
 	public Date(Integer year, Integer month, Integer day, Era era, Certainty certainty, QualifierType qualifierType, Integer qualifierValue, QualifierUnit qualifierUnit) {
@@ -42,7 +39,7 @@ public class Date {
 	}
 	
 	public Date withEra(Era era) {
-		this.setEra(era);
+		setEra(era);
 		
 		return this;
 	}
@@ -76,7 +73,10 @@ public class Date {
 			return true;
 		}
 		
-		if (obj.getClass() != getClass()) {
+		// Consider all subclasses of Date to be equal to each other, as long
+		// as the Date fields are equal.
+		
+		if (!Date.class.isAssignableFrom(obj.getClass())) {
 			return false;
 		}
 		
