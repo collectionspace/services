@@ -15,6 +15,7 @@ import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.client.LoanoutClient;
 import org.collectionspace.services.client.RelationClient;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 
 public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 
@@ -48,6 +49,15 @@ public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 		}
 	}
 
+    @Override
+    public void setRepoSession(RepositoryInstance repoSession) {
+    }
+    
+    @Override
+    public RepositoryInstance getRepoSession() {
+        return null;
+    }
+    
 	/**
 	 * @return a set of modes that this plugin can support on invocation. Must be non-empty.
 	 */
