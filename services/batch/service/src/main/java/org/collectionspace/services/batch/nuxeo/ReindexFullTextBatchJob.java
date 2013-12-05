@@ -108,6 +108,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchInvocable {
 		
 		int batchSize = 0;
 		int batch = 0;
+		String docType = null;
 		
 		for (Param param : this.getParams()) {
 			if (param.getKey().equals("batchSize")) {
@@ -116,11 +117,14 @@ public class ReindexFullTextBatchJob extends AbstractBatchInvocable {
 			else if (param.getKey().equals("batch")) {
 				batch = Integer.parseInt(param.getValue());
 			}
+			else if (param.getKey().equals("docType")) {
+				docType = param.getValue();
+			}
 		}
 		
 		try {
 			coreSession = getRepoSession().getSession();
-			String message = reindexFulltext(batchSize, batch);
+			String message = reindexFulltext(docType, batchSize, batch);
 			
 			InvocationResults results = new InvocationResults();
 			results.setUserNote(message);
@@ -148,7 +152,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchInvocable {
      *            batches; starts at 1
      * @return when done, ok + the total number of docs
      */
-    public String reindexFulltext(int batchSize, int batch) throws Exception {
+    public String reindexFulltext(String docType, int batchSize, int batch) throws Exception {
         Principal principal = coreSession.getPrincipal();
         if (!(principal instanceof NuxeoPrincipal)) {
             return "unauthorized";
@@ -162,7 +166,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchInvocable {
         if (batchSize <= 0) {
             batchSize = DEFAULT_BATCH_SIZE;
         }
-        List<Info> infos = getInfos();
+        List<Info> infos = getInfos(docType);
         int size = infos.size();
         int numBatches = (size + batchSize - 1) / batchSize;
         if (batch < 0 || batch > numBatches) {
@@ -238,11 +242,12 @@ public class ReindexFullTextBatchJob extends AbstractBatchInvocable {
         fulltextInfo = session.getModel().getFulltextInfo();
     }
 
-    protected List<Info> getInfos() throws Exception {
+    protected List<Info> getInfos(String docType) throws Exception {
         getLowLevelSession();
         List<Info> infos = new ArrayList<Info>();
         String query = "SELECT ecm:uuid, ecm:primaryType FROM Document"
                 + " WHERE ecm:isProxy = 0"
+        		+ " AND ecm:primaryType LIKE '" + docType + "%'"
                 + " AND ecm:currentLifeCycleState <> 'deleted'"
                 + " ORDER BY ecm:uuid";
         IterableQueryResult it = session.queryAndFetch(query, NXQL.NXQL,
