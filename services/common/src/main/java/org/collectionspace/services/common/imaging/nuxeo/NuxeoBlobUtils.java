@@ -455,6 +455,7 @@ public class NuxeoBlobUtils {
 			}
 			
 			// Check to see if a thumbnail preview was created by Nuxeo
+			// REM: 11/26/2013 - This looks like dead code?  What are we looking for a thumbnail?
             if (documentModel.hasFacet(ThumbnailConstants.THUMBNAIL_FACET)) {
     			String errorMsg = null;
             	String thumbnailName = null;
