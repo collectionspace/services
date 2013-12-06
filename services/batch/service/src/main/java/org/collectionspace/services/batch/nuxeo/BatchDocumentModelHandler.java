@@ -171,6 +171,7 @@ public class BatchDocumentModelHandler extends DocHandlerBase<BatchCommon> {
 					logger.warn("BatchResource.invoke did not get a resourceMapHolder in Context!");
 				}
 			}
+			batchInstance.setTenantId(ctx.getTenantId());
 			batchInstance.setRepoSession(repoSession);
 			batchInstance.run();
 			int status = batchInstance.getCompletionStatus();

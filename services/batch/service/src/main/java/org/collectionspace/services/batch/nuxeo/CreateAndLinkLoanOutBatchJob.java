@@ -52,12 +52,11 @@ public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
     @Override
     public void setRepoSession(RepositoryInstance repoSession) {
     }
-    
+
     @Override
-    public RepositoryInstance getRepoSession() {
-        return null;
+    public void setTenantId(String tenantId) {
     }
-    
+        
 	/**
 	 * @return a set of modes that this plugin can support on invocation. Must be non-empty.
 	 */

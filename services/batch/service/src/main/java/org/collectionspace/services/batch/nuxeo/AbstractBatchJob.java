@@ -181,7 +181,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		
 		for (String movementCsid : movementCsids) {
 			PoxPayloadOut movementPayload = findMovementByCsid(movementCsid);
-			String movementWorkflowState = getFieldValue(movementPayload, MovementConstants.WORKFLOW_STATE_SCHEMA_NAME, MovementConstants.WORKFLOW_STATE_FIELD_NAME);
+			String movementWorkflowState = getFieldValue(movementPayload, CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA, CollectionSpaceClient.COLLECTIONSPACE_CORE_WORKFLOWSTATE);
 		
 			if (!movementWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
 				if (foundMovementCsid != null) {
@@ -214,20 +214,33 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	
 	protected List<String> findAll(String serviceName, int pageSize, int pageNum) throws URISyntaxException, DocumentException {
 		ResourceBase resource = getResourceMap().get(serviceName);	
-		AbstractCommonList list = resource.getList(this.createPagedListUriInfo(pageNum, pageSize));
+
+		return findAll(resource, pageSize, pageNum);
+	}
+	
+	protected List<String> findAll(ResourceBase resource, int pageSize, int pageNum) throws URISyntaxException, DocumentException {
+		AbstractCommonList list = resource.getList(createPagedListUriInfo(pageNum, pageSize));
 		List<String> csids = new ArrayList<String>();
-		
-		for (AbstractCommonList.ListItem item : list.getListItem()) {
-			for (org.w3c.dom.Element element : item.getAny()) {
-				if (element.getTagName().equals("csid")) {
-					csids.add(element.getTextContent());
-					break;
-				}
+
+		if (list instanceof RelationsCommonList) {
+			for (RelationListItem item : ((RelationsCommonList) list).getRelationListItem()) {
+				csids.add(item.getCsid());
 			}
+		}
+		else {
+			for (AbstractCommonList.ListItem item : list.getListItem()) {
+				for (org.w3c.dom.Element element : item.getAny()) {
+					
+					if (element.getTagName().equals("csid")) {
+						csids.add(element.getTextContent());
+						break;
+					}
+				}
+			}			
 		}
 		
 		return csids;
-	}
+	}	
 	
 	protected List<String> findAllCollectionObjects(int pageSize, int pageNum) throws URISyntaxException, DocumentException {
 		return findAll(CollectionObjectClient.SERVICE_NAME, pageSize, pageNum);
@@ -235,6 +248,11 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	
 	protected List<String> getVocabularyCsids(String serviceName) throws URISyntaxException {
 		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
+
+		return getVocabularyCsids(resource);
+	}
+
+	protected List<String> getVocabularyCsids(AuthorityResource<?, ?> resource) throws URISyntaxException {
 		AbstractCommonList vocabularyList = resource.getAuthorityList(createDeleteFilterUriInfo());
 		List<String> csids = new ArrayList<String>();
 		
@@ -249,6 +267,29 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 
 		return csids;
 	}
+	
+	protected List<String> findAllAuthorityItems(String serviceName, String vocabularyCsid, int pageSize, int pageNum) throws URISyntaxException, DocumentException {
+		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
+
+		return findAllAuthorityItems(resource, vocabularyCsid, pageSize, pageNum);
+	}
+	
+	protected List<String> findAllAuthorityItems(AuthorityResource<?, ?> resource, String vocabularyCsid, int pageSize, int pageNum) throws URISyntaxException, DocumentException {
+		AbstractCommonList list = resource.getAuthorityItemList(vocabularyCsid, createPagedListUriInfo(pageNum, pageSize));
+		List<String> csids = new ArrayList<String>();		
+		
+		for (AbstractCommonList.ListItem item : list.getListItem()) {
+			for (org.w3c.dom.Element element : item.getAny()) {
+				
+				if (element.getTagName().equals("csid")) {
+					csids.add(element.getTextContent());
+					break;
+				}
+			}
+		}
+		
+		return csids;
+	}	
 	
 	protected PoxPayloadOut findAuthorityItemByCsid(String serviceName, String csid) throws URISyntaxException, DocumentException {
 		List<String> vocabularyCsids = getVocabularyCsids(serviceName);

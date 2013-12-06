@@ -16,6 +16,6 @@ public interface BatchInvocable extends Invocable {
 	 */
 	public void setResourceMap(ResourceMap resourceMap);
 
-    public RepositoryInstance getRepoSession();
     public void setRepoSession(RepositoryInstance repoSession);
+    public void setTenantId(String tenantId);
 }

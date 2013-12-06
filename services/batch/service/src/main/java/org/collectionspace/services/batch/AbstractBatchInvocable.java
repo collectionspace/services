@@ -37,6 +37,7 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
     private ResourceMap resourceMap;
     private InvocationContext context;
     private RepositoryInstance repoSession;
+    private String tenantId;
     private int completionStatus;
     private InvocationResults results;
     private InvocationError errorInfo;
@@ -87,9 +88,17 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
         this.repoSession = repoSession;
     }
     
-    @Override
     public RepositoryInstance getRepoSession() {
         return repoSession;
+    }
+    
+    @Override
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+    
+    public String getTenantId() {
+        return tenantId;
     }
 
     @Override
