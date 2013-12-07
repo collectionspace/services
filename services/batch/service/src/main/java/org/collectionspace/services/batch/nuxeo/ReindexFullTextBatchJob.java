@@ -5,6 +5,7 @@
 
 package org.collectionspace.services.batch.nuxeo;
 
+import java.io.File;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
@@ -58,9 +59,14 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
     public static final String DC_TITLE = "dc:title";
     public static final int DEFAULT_BATCH_SIZE = 100;
     public static final int DEFAULT_BATCH_PAUSE = 0;
+    public static final String BATCH_STOP_FILE = "stopBatch";
+    public static final String DOCTYPE_STOP_FILE = "stopDocType";
     
     private int batchSize = DEFAULT_BATCH_SIZE;
     private int batchPause = DEFAULT_BATCH_PAUSE;
+    private int numAffected = 0;
+    
+    private String stopFileDirectory;
 
     private CoreSession coreSession;
     private Session session;
@@ -70,13 +76,17 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 
     public ReindexFullTextBatchJob() {
     	setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_NO_CONTEXT, INVOCATION_MODE_SINGLE, INVOCATION_MODE_LIST));
+    	
+    	stopFileDirectory = System.getProperty("java.io.tmpdir") + File.separator + ReindexFullTextBatchJob.class.getName();
+    	
+    	log.debug("stop file directory is " + stopFileDirectory);
     }
     
 	@Override
 	public void run() {
 		setCompletionStatus(STATUS_MIN_PROGRESS);
 		
-		int numAffected = 0;
+		numAffected = 0;
 		
 		try {
 			coreSession = getRepoSession().getSession();
@@ -96,7 +106,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 
 				log.debug("reindexing " + docType + " record with csid: " + csid);
 				
-				numAffected = reindexDocument(docType, csid);
+				reindexDocument(docType, csid);
 			}
 			else if (requestIsForInvocationModeList()) {
 				ListCSIDs list = getInvocationContext().getListCSIDs();
@@ -114,7 +124,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 
 				log.debug("reindexing " + docType + " records with csids: " + StringUtils.join(csids, ", "));
 				
-				numAffected = reindexDocuments(docType, csids);
+				reindexDocuments(docType, csids);
 			}
 			else if (requestIsForInvocationModeNoContext()) {
 				Set<String> docTypes = new LinkedHashSet<String>();
@@ -155,15 +165,18 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		            TransactionHelper.commitOrRollbackTransaction();
 		        }
 				
-				numAffected = reindexDocuments(docTypes);
+		        try {
+		        	reindexDocuments(docTypes);
 				
-				// This is needed so that when the session is released after this
-				// batch job exits (in BatchDocumentModelHandler), there isn't an exception.
-				// Otherwise, a "Session invoked in a container without a transaction active"
-				// error is thrown from RepositoryJavaClientImpl.releaseRepositorySession.
-			
-		        if (isTransactionActive) {
-		        	TransactionHelper.startTransaction();
+					// This is needed so that when the session is released after this
+					// batch job exits (in BatchDocumentModelHandler), there isn't an exception.
+					// Otherwise, a "Session invoked in a container without a transaction active"
+					// error is thrown from RepositoryJavaClientImpl.releaseRepositorySession.
+		        }
+		        finally {
+			        if (isTransactionActive) {
+			        	TransactionHelper.startTransaction();
+			        }
 		        }
 			}
 			
@@ -175,6 +188,16 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 			
 			setResults(results);
 			setCompletionStatus(STATUS_COMPLETE);
+		}
+		catch(StoppedException e) {
+			log.debug("reindexing terminated by stop file");
+			
+			InvocationResults results = new InvocationResults();
+			results.setNumAffected(numAffected);
+			results.setUserNote("reindexing terminated by stop file");
+			
+			setResults(results);
+			setCompletionStatus(STATUS_COMPLETE);			
 		}
 		catch(Exception e) {
 			setErrorResult(e.getMessage());
@@ -198,9 +221,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		}
 	}
 	
-	private int reindexDocuments(Set<String> docTypes) throws Exception {
-		int affectedCount = 0;
-
+	private void reindexDocuments(Set<String> docTypes) throws Exception {
 		if (docTypes == null) {
 			docTypes = new LinkedHashSet<String>();
 		}
@@ -212,10 +233,8 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		}
 				
 		for (String docType : docTypes) {
-			affectedCount += reindexDocuments(docType);
+			reindexDocuments(docType);
 		}
-		
-		return affectedCount;
 	}
 	
 	private List<String> getAllDocTypes() {
@@ -227,17 +246,19 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		return docTypes;
 	}
 	
-	private int reindexDocuments(String docType) throws Exception {
-		int affectedCount = 0;
-
+	private void reindexDocuments(String docType) throws Exception {
+		// Check for a stop file before reindexing the docType.
+		
+		if (batchStopFileExists() || docTypeStopFileExists()) {
+			throw new StoppedException();
+		}
+		
 		log.debug("reindexing docType " + docType);
 		
 		ResourceBase resource = resourcesByDocType.get(docType);
 		
 		if (resource == null) {
 			log.warn("no resource found for docType " + docType);
-
-			return affectedCount;
 		}
 		
 		boolean isAuthorityItem = false;
@@ -268,12 +289,26 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 				log.debug("reindexing vocabulary of " + docType + " with csid " + vocabularyCsid);
 				
 				do {
+					// Check for a stop file before reindexing the batch.
+					
+					if (batchStopFileExists()) {
+						throw new StoppedException();
+					}
+
 					csids = findAllAuthorityItems((AuthorityResource<?, ?>) resource, vocabularyCsid, pageSize, pageNum);
 					
 					if (csids.size() > 0) {
 						log.debug("reindexing vocabulary of " + docType +" with csid " + vocabularyCsid + ", batch " + (pageNum + 1) + ": " + csids.size() + " records starting with " + csids.get(0));
 						
-						affectedCount += reindexDocuments(docType, csids);
+						// Pause for the configured amount of time.
+						
+				        if (batchPause > 0) {
+				        	log.trace("pausing " + batchPause + " ms");
+				        	
+				        	Thread.sleep(batchPause);
+				        }
+				        
+						reindexDocuments(docType, csids);
 					}
 					
 					pageNum++;
@@ -286,32 +321,44 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 			List<String> csids = null;
 
 			do {
+				// Check for a stop file before reindexing the batch.
+				
+				if (batchStopFileExists()) {
+					throw new StoppedException();
+				}
+				
 				csids = findAll(resource, pageSize, pageNum);
 				
 				if (csids.size() > 0) {
 					log.debug("reindexing " + docType +" batch " + (pageNum + 1) + ": " + csids.size() + " records starting with " + csids.get(0));
 					
-					affectedCount += reindexDocuments(docType, csids);
+					// Pause for the configured amount of time.
+					
+			        if (batchPause > 0) {
+			        	log.trace("pausing " + batchPause + " ms");
+			        	
+			        	Thread.sleep(batchPause);
+			        }
+
+					reindexDocuments(docType, csids);
 				}
 				
 				pageNum++;
 			}
 			while(csids.size() == pageSize);
 		}
-		
-		return affectedCount;
 	}
 	
-	private int reindexDocument(String docType, String csid) throws Exception {
-		return reindexDocuments(docType, Arrays.asList(csid));
+	private void reindexDocument(String docType, String csid) throws Exception {
+		reindexDocuments(docType, Arrays.asList(csid));
 	}
 	
-	private int reindexDocuments(String docType, List<String> csids) throws Exception {
+	private void reindexDocuments(String docType, List<String> csids) throws Exception {
 		// Convert the csids to structs of nuxeo id and type, as expected
 		// by doBatch.
 
 		if (csids == null || csids.size() == 0) {
-			return 0;
+			return;
 		}
 		
         getLowLevelSession();        
@@ -342,15 +389,9 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 	        }
         }
         
-        if (batchPause > 0) {
-        	log.trace("pausing " + batchPause + " ms");
-        	
-        	Thread.sleep(batchPause);
-        }
-        
         doBatch(infos);
         
-        return infos.size();
+        numAffected += infos.size();
 	}
 	
 	private List<String> quoteList(List<String> values) {
@@ -361,6 +402,22 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		}
 		
 		return quoted;
+	}
+	
+	private boolean batchStopFileExists() {
+		return (stopFileDirectory != null && new File(stopFileDirectory + File.separator + BATCH_STOP_FILE).isFile());
+	}
+
+	private boolean docTypeStopFileExists() {
+		return (stopFileDirectory != null && new File(stopFileDirectory + File.separator + DOCTYPE_STOP_FILE).isFile());
+	}
+	
+	private static class StoppedException extends Exception {
+		private static final long serialVersionUID = 8813189331855935939L;
+
+		public StoppedException() {
+			
+		}
 	}
 	
 	/*
