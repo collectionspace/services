@@ -26,6 +26,7 @@
  */
 package org.collectionspace.services.common.imaging.nuxeo;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -49,7 +50,6 @@ import org.nuxeo.ecm.platform.picture.api.ImageInfo;
 import org.nuxeo.ecm.platform.picture.api.ImagingDocumentConstants;
 import org.nuxeo.ecm.platform.picture.api.ImagingService;
 import org.nuxeo.ecm.platform.picture.api.PictureView;
-
 import org.nuxeo.ecm.platform.mimetype.MimetypeDetectionException;
 import org.nuxeo.ecm.platform.mimetype.interfaces.MimetypeRegistry;
 import org.nuxeo.ecm.platform.picture.api.adapters.PictureBlobHolder;
@@ -58,10 +58,8 @@ import org.nuxeo.ecm.platform.filemanager.service.FileManagerService;
 import org.nuxeo.ecm.platform.filemanager.service.extension.FileImporter;
 import org.nuxeo.ecm.platform.filemanager.utils.FileManagerUtils;
 import org.nuxeo.ecm.platform.types.TypeManager;
-
 import org.nuxeo.ecm.core.repository.RepositoryDescriptor;
 import org.nuxeo.ecm.core.repository.RepositoryManager;
-
 import org.nuxeo.ecm.core.repository.RepositoryService;
 import org.nuxeo.ecm.core.storage.sql.BinaryManager;
 import org.nuxeo.ecm.core.storage.sql.DefaultBinaryManager;
@@ -96,14 +94,13 @@ import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.event.EventServiceAdmin;
-
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.schema.types.Schema;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 //import org.nuxeo.ecm.core.repository.jcr.testing.RepositoryOSGITestCase;
 
+import org.apache.commons.io.IOUtils;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.FileUtils;
@@ -136,6 +133,12 @@ public class NuxeoBlobUtils {
 	private static final Logger logger = LoggerFactory
 			.getLogger(NuxeoBlobUtils.class);
 
+	//
+	// A maximum byte size for the byte array used to hold an image.  Images larger than this will
+	// be returned as FileInputStreams rather than ByteArrayInputStreams
+	//
+	private static final int MAX_IMAGE_BUFFER = 256 * 1024; // REM: 11/26/2013 - This should be set in a config/property file.
+	
 	//
 	// File name constants
 	//
@@ -441,6 +444,11 @@ public class NuxeoBlobUtils {
 
 	static private BlobsCommon createBlobsCommon(DocumentModel documentModel,
 			Blob nuxeoBlob) {
+		return createBlobsCommon(documentModel, nuxeoBlob, false);
+	}
+	
+	static private BlobsCommon createBlobsCommon(DocumentModel documentModel,
+			Blob nuxeoBlob, Boolean getContentFlag) {
 		BlobsCommon result = new BlobsCommon();
 
 		if (documentModel != null) {
@@ -448,14 +456,21 @@ public class NuxeoBlobUtils {
 			result.setName(nuxeoBlob.getFilename());
 			result.setLength(Long.toString(nuxeoBlob.getLength()));
 			result.setRepositoryId(documentModel.getId());
-			MeasuredPartGroupList measuredPartGroupList = getDimensions(
-					documentModel, nuxeoBlob);
-			if (measuredPartGroupList != null) {
-				result.setMeasuredPartGroupList(measuredPartGroupList);
+			
+			//
+			// If getContentFlag is true then we're being asked for the blob's content, so we don't
+			// need the measurement info.  Getting the measurement info requires a call to Nuxeo which in turn
+			// calls ImageMagick.
+			//
+			if (getContentFlag.booleanValue() == false) {
+				MeasuredPartGroupList measuredPartGroupList = getDimensions(
+						documentModel, nuxeoBlob);
+				if (measuredPartGroupList != null) {
+					result.setMeasuredPartGroupList(measuredPartGroupList);
+				}
 			}
 			
 			// Check to see if a thumbnail preview was created by Nuxeo
-			// REM: 11/26/2013 - This looks like dead code?  What are we looking for a thumbnail?
             if (documentModel.hasFacet(ThumbnailConstants.THUMBNAIL_FACET)) {
     			String errorMsg = null;
             	String thumbnailName = null;
@@ -1185,6 +1200,38 @@ public class NuxeoBlobUtils {
 		return result;
 	}
 	
+	//
+	//  If the blob is not too big, we return a ByteArrayInputStream.  Otherwise, we return Nuxeo's InputStream
+	//  which is usually a FileInputStream.
+	//
+	static private InputStream getInputStream(BlobsCommon blobsCommon, Blob blob) {
+		InputStream result = null;
+		
+		try {
+			InputStream blobStream = blob.getStream(); // By default, the result will be whatever stream Nuxeo returns to us.
+			int blobSize = blobsCommon.getLength() != null ? Integer.parseInt(blobsCommon.getLength()) : 0;
+			if (blobSize > 0 && blobSize < MAX_IMAGE_BUFFER) {
+				byte[] bytes = IOUtils.toByteArray(blobStream);
+				blobStream.close(); // Close the InputStream that we got from Nuxeo since it's usually a FileInputStream -we definitely want FileInputStreams closed.
+				result = new ByteArrayInputStream(bytes);
+			} else {
+				result = blobStream; // The blob is too large to put into a ByteArrayStream.
+			}
+		} catch (Exception e) {
+			logger.error(String.format("Error getting the InputStream content for file %s.", blobsCommon.getName()), e);
+			if (result != null) {
+				try {
+					result.close();
+					result = null;
+				} catch (Exception x) {
+					logger.debug(String.format("Exception encountered during InputStream cleanup of file %s", blobsCommon.getName()), x);
+				}
+			}			
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * Gets the image.
 	 * 
@@ -1240,19 +1287,21 @@ public class NuxeoBlobUtils {
 				// and an InputStream with the bits if the 'getContentFlag' is
 				// set.
 				//
-				BlobsCommon blobsCommon = createBlobsCommon(documentModel, docBlob);
+				BlobsCommon blobsCommon = createBlobsCommon(documentModel, docBlob, getContentFlag);
 				result.setBlobsCommon(blobsCommon);
 				if (getContentFlag == true) {
 					InputStream remoteStream = null;
 					if (isNonImageDerivative == false) {
-						remoteStream = docBlob.getStream(); // This will fail if the blob's file has been deleted. FileNotFoundException thrown.
+						//remoteStream = docBlob.getStream();
+						remoteStream = getInputStream(blobsCommon, docBlob); // CSPACE-6110 - For small files, return a byte array instead of a file stream
 					} else {
 						remoteStream = getResource(DOCUMENT_PLACEHOLDER_IMAGE);
 						outMimeType.append(MIME_JPEG);
 					}
-					BufferedInputStream bufferedInputStream = new BufferedInputStream(
-							remoteStream); 	
-					result.setBlobInputStream(bufferedInputStream);
+//					BufferedInputStream bufferedInputStream = new BufferedInputStream(
+//							remoteStream); 	
+//					result.setBlobInputStream(bufferedInputStream);
+					result.setBlobInputStream(remoteStream);
 				}
 			} catch (Exception e) {
 				if (logger.isErrorEnabled() == true) {

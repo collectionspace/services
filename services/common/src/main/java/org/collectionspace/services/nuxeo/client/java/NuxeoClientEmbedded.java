@@ -420,6 +420,7 @@ public final class NuxeoClientEmbedded {
     		}
     	}
     	
+    	//  REM 10/29/2013 - We may want to add this clause if (!TransactionHelper.isTransactionActive()) {
     	boolean startTransaction = TransactionHelper.startTransaction();
     	if (startTransaction == false) {
     		logger.warn("Could not start a Nuxeo transaction with the TransactionHelper class.");
@@ -469,6 +470,7 @@ public final class NuxeoClientEmbedded {
 	            			+ repositoryInstances.size());
             	}
             }
+            //if (TransactionHelper.isTransactionActiveOrMarkedRollback())
             TransactionHelper.commitOrRollbackTransaction();
         }
     }

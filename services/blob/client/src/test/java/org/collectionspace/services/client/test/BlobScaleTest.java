@@ -32,6 +32,7 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 	private static final int MAX_FONTSIZE = 60;
 	private static final String IMAGES_TO_CREATE_PROP = "imagesToCreate";
 	private static final int DEFAULT_IMAGES_TO_CREATE = 1;
+	private static final int DEFAULT_IMAGES_TO_GET = 1024;
     private static final String GENERATED_IMAGES = "target/generated_images";
 
 	private static Random generator = new Random(System.currentTimeMillis());
@@ -70,6 +71,21 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
         return result;
 	}
 	
+	@Test(dataProvider = "testName", dependsOnMethods = {"scaleTest"})
+	public void scaleGETTest(String testName) throws MalformedURLException {
+		this.setupRead();
+		String blobToGetID = getKnowResourceId();
+        BlobClient client = new BlobClient();
+        
+        for (int i = 0; i < DEFAULT_IMAGES_TO_GET; i++) {
+	        ClientResponse<Response> res = client.getDerivativeContent(blobToGetID, "Thumbnail");
+	        assertStatusCode(res, testName);
+        }
+        
+        logger.debug(String.format("Performed %d GET operations on blob = %s.", 
+        		DEFAULT_IMAGES_TO_GET, blobToGetID));
+	}
+	
 	@Test(dataProvider = "testName")
 	public void scaleTest(String testName) throws MalformedURLException {
 		this.createDirectory(GENERATED_IMAGES);
@@ -83,7 +99,7 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 			URL url = jpegFile.toURI().toURL();
 			
 	    	profiler.start();
-			ClientResponse<Response> res = client.createBlobFromURI(url.toString());
+			ClientResponse<Response> res = client.createBlobFromURI("http://farm6.static.flickr.com/5289/5688023100_15e00cde47_o.jpg");//url.toString());
 			try {
 				profiler.stop();
 		        assertStatusCode(res, testName);
@@ -96,7 +112,8 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 						+ jpegFile.getAbsolutePath());
 				
 		        String csid = extractId(res);
-		        allResourceIdsCreated.add(csid);
+		        //allResourceIdsCreated.add(csid);
+		        this.knownResourceId = csid;
 			} finally {
 				if (res != null) {
                     res.releaseConnection();

@@ -1737,8 +1737,12 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             }
         }
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("Testing call to getRepository() repository root: " + repoSession.getRootDocument());
+        try {
+	        if (logger.isTraceEnabled()) {
+	            logger.trace("Testing call to getRepository() repository root: " + repoSession.getRootDocument());
+	        }
+        } catch (Throwable e) {
+        	logger.trace("Test call to Nuxeo's getRepository() repository root failed", e);
         }
 
         profiler.stop();
