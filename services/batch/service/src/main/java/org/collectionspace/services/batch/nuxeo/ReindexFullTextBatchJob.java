@@ -53,7 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ReindexFullTextBatchJob extends AbstractBatchJob {
-	final Logger log = LoggerFactory.getLogger(AbstractBatchJob.class);
+	final Logger log = LoggerFactory.getLogger(ReindexFullTextBatchJob.class);
 
     public static final String DC_TITLE = "dc:title";
     public static final int DEFAULT_BATCH_SIZE = 100;
