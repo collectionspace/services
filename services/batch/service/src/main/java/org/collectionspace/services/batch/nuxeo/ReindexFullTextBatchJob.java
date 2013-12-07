@@ -94,7 +94,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 					throw new Exception("no docType was supplied");
 				}
 
-				logger.debug("reindexing " + docType + " record with csid: " + csid);
+				log.debug("reindexing " + docType + " record with csid: " + csid);
 				
 				numAffected = reindexDocument(docType, csid);
 			}
@@ -112,7 +112,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 					throw new Exception("no docType was supplied");
 				}
 
-				logger.debug("reindexing " + docType + " records with csids: " + StringUtils.join(csids, ", "));
+				log.debug("reindexing " + docType + " records with csids: " + StringUtils.join(csids, ", "));
 				
 				numAffected = reindexDocuments(docType, csids);
 			}
@@ -167,7 +167,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		        }
 			}
 			
-			logger.debug("reindexing complete");
+			log.debug("reindexing complete");
 			
 			InvocationResults results = new InvocationResults();
 			results.setNumAffected(numAffected);
@@ -222,7 +222,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		List<String> docTypes = new ArrayList<String>(resourcesByDocType.keySet());
 		Collections.sort(docTypes);
 
-		logger.debug("getAllDocTypes found: " + StringUtils.join(docTypes, ", "));
+		log.debug("getAllDocTypes found: " + StringUtils.join(docTypes, ", "));
 		
 		return docTypes;
 	}
