@@ -1,24 +1,8 @@
 /*
- * This is an adaptation of Florent Guillame's nuxeo-reindex-fulltext module,
- * modified to run as a CollectionSpace batch job. Original copyright below. 
+ * This file contains code from Florent Guillame's nuxeo-reindex-fulltext module.
+ * 
  */
 
-/*
- * (C) Copyright 2012 Nuxeo SA (http://nuxeo.com/) and contributors.
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl.html
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * Contributors:
- *     Florent Guillaume
- */
 package org.collectionspace.services.batch.nuxeo;
 
 import java.io.Serializable;
@@ -35,17 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
-
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.collectionspace.services.batch.AbstractBatchInvocable;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.common.ResourceBase;
-import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.StoredValuesUriTemplate;
 import org.collectionspace.services.common.UriTemplateRegistryKey;
 import org.collectionspace.services.common.invocable.InvocationContext.ListCSIDs;
@@ -71,46 +47,26 @@ import org.nuxeo.ecm.core.storage.sql.Session;
 import org.nuxeo.ecm.core.storage.sql.SimpleProperty;
 import org.nuxeo.ecm.core.storage.sql.coremodel.BinaryTextListener;
 import org.nuxeo.ecm.core.storage.sql.coremodel.SQLSession;
-//import org.nuxeo.ecm.webengine.jaxrs.session.SessionFactory;
 import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.runtime.transaction.TransactionHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * JAX-RS component used to do fulltext reindexing of the whole database.
- *
- */
-//@Path("reindexFulltext")
 public class ReindexFullTextBatchJob extends AbstractBatchJob {
+	final Logger log = LoggerFactory.getLogger(AbstractBatchJob.class);
 
-    public static Log log = LogFactory.getLog(ReindexFullTextBatchJob.class);
-
-    protected static final String DC_TITLE = "dc:title";
-
-    protected static final int DEFAULT_BATCH_SIZE = 100;
+    public static final String DC_TITLE = "dc:title";
+    public static final int DEFAULT_BATCH_SIZE = 100;
+    public static final int DEFAULT_BATCH_PAUSE = 0;
     
-    protected static int batchSize = DEFAULT_BATCH_SIZE;
+    private int batchSize = DEFAULT_BATCH_SIZE;
+    private int batchPause = DEFAULT_BATCH_PAUSE;
 
-    @Context
-    protected HttpServletRequest request;
-
-    protected CoreSession coreSession;
-
-    protected Session session;
-
-    protected ModelFulltext fulltextInfo;
-
-    protected static class Info {
-        public final String id;
-
-        public final String type;
-
-        public Info(String id, String type) {
-            this.id = id;
-            this.type = type;
-        }
-    }
-   
-    protected Map<String, ResourceBase> resourcesByDocType;
+    private CoreSession coreSession;
+    private Session session;
+    private ModelFulltext fulltextInfo;
+    
+    private Map<String, ResourceBase> resourcesByDocType;
 
     public ReindexFullTextBatchJob() {
     	setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_NO_CONTEXT, INVOCATION_MODE_SINGLE, INVOCATION_MODE_LIST));
@@ -119,6 +75,8 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 	@Override
 	public void run() {
 		setCompletionStatus(STATUS_MIN_PROGRESS);
+		
+		int numAffected = 0;
 		
 		try {
 			coreSession = getRepoSession().getSession();
@@ -138,7 +96,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 
 				logger.debug("reindexing " + docType + " record with csid: " + csid);
 				
-				reindexDocument(docType, csid);
+				numAffected = reindexDocument(docType, csid);
 			}
 			else if (requestIsForInvocationModeList()) {
 				ListCSIDs list = getInvocationContext().getListCSIDs();
@@ -156,7 +114,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 
 				logger.debug("reindexing " + docType + " records with csids: " + StringUtils.join(csids, ", "));
 				
-				reindexDocuments(docType, csids);
+				numAffected = reindexDocuments(docType, csids);
 			}
 			else if (requestIsForInvocationModeNoContext()) {
 				Set<String> docTypes = new LinkedHashSet<String>();
@@ -168,12 +126,15 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 					docTypes.add(docType);					
 				}
 				
-				// Read batch size and additional doctypes from params.				
+				// Read batch size, pause, and additional doctypes from params.				
 				
 				for (Param param : this.getParams()) {
 					if (param.getKey().equals("batchSize")) {
 						batchSize = Integer.parseInt(param.getValue());
 					}
+					if (param.getKey().equals("batchPause")) {
+						batchPause = Integer.parseInt(param.getValue());
+					}					
 					else if (param.getKey().equals("docType")) {
 						docType = param.getValue();
 						
@@ -183,38 +144,36 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 					}
 				}
 				
-				// FIXME: This is needed so that resource calls (which start transactions)
+				initResourceMap();
+
+				// This is needed so that resource calls (which start transactions)
 		        // will work. Otherwise, a javax.transaction.NotSupportedException 
 				// ("Nested transactions are not supported") is thrown.
-		        TransactionHelper.commitOrRollbackTransaction();
-
-				initResources();
-				reindexDocuments(docTypes);
+		        boolean isTransactionActive = TransactionHelper.isTransactionActive();
+		        
+		        if (isTransactionActive) {
+		            TransactionHelper.commitOrRollbackTransaction();
+		        }
 				
-				// FIXME: This is needed so that when the session is released after this
+				numAffected = reindexDocuments(docTypes);
+				
+				// This is needed so that when the session is released after this
 				// batch job exits (in BatchDocumentModelHandler), there isn't an exception.
 				// Otherwise, a "Session invoked in a container without a transaction active"
 				// error is thrown from RepositoryJavaClientImpl.releaseRepositorySession.
-				TransactionHelper.startTransaction();
-				
-	//			
-	//			try {
-	//				coreSession = getRepoSession().getSession();
-	//				String message = reindexFulltext(docType, batchSize, batch);
-	//				
-	//				InvocationResults results = new InvocationResults();
-	//				results.setUserNote(message);
-	//				
-	//				setResults(results);
-	//				setCompletionStatus(STATUS_COMPLETE);
-	//			}
-	//			catch(Exception e) {
-	//				this.setErrorResult(e.getMessage());
-	//			}
+			
+		        if (isTransactionActive) {
+		        	TransactionHelper.startTransaction();
+		        }
 			}
 			
 			logger.debug("reindexing complete");
 			
+			InvocationResults results = new InvocationResults();
+			results.setNumAffected(numAffected);
+			results.setUserNote("reindexed " + numAffected + " records");
+			
+			setResults(results);
 			setCompletionStatus(STATUS_COMPLETE);
 		}
 		catch(Exception e) {
@@ -222,7 +181,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		}
 	}
 	
-	private void initResources() {
+	private void initResourceMap() {
 		resourcesByDocType = new HashMap<String, ResourceBase>();
 
 		for (ResourceBase resource : getResourceMap().values()) {
@@ -239,7 +198,9 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		}
 	}
 	
-	private void reindexDocuments(Set<String> docTypes) throws Exception {
+	private int reindexDocuments(Set<String> docTypes) throws Exception {
+		int affectedCount = 0;
+
 		if (docTypes == null) {
 			docTypes = new LinkedHashSet<String>();
 		}
@@ -249,10 +210,12 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		if (docTypes.size() == 0) {
 			docTypes.addAll(getAllDocTypes());
 		}
-		
+				
 		for (String docType : docTypes) {
-			reindexDocuments(docType);
+			affectedCount += reindexDocuments(docType);
 		}
+		
+		return affectedCount;
 	}
 	
 	private List<String> getAllDocTypes() {
@@ -264,14 +227,17 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		return docTypes;
 	}
 	
-	private void reindexDocuments(String docType) throws Exception {
+	private int reindexDocuments(String docType) throws Exception {
+		int affectedCount = 0;
+
 		log.debug("reindexing docType " + docType);
 		
 		ResourceBase resource = resourcesByDocType.get(docType);
 		
 		if (resource == null) {
 			log.warn("no resource found for docType " + docType);
-			return;
+
+			return affectedCount;
 		}
 		
 		boolean isAuthorityItem = false;
@@ -293,7 +259,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		int pageSize = batchSize;
 
 		if (isAuthorityItem) {
-			List<String> vocabularyCsids = getVocabularyCsids((AuthorityResource) resource);
+			List<String> vocabularyCsids = getVocabularyCsids((AuthorityResource<?, ?>) resource);
 
 			for (String vocabularyCsid : vocabularyCsids) {
 				int pageNum = 0;
@@ -302,12 +268,12 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 				log.debug("reindexing vocabulary of " + docType + " with csid " + vocabularyCsid);
 				
 				do {
-					csids = findAllAuthorityItems((AuthorityResource) resource, vocabularyCsid, pageSize, pageNum);
+					csids = findAllAuthorityItems((AuthorityResource<?, ?>) resource, vocabularyCsid, pageSize, pageNum);
 					
 					if (csids.size() > 0) {
 						log.debug("reindexing vocabulary of " + docType +" with csid " + vocabularyCsid + ", batch " + (pageNum + 1) + ": " + csids.size() + " records starting with " + csids.get(0));
 						
-						reindexDocuments(docType, csids);
+						affectedCount += reindexDocuments(docType, csids);
 					}
 					
 					pageNum++;
@@ -325,25 +291,27 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 				if (csids.size() > 0) {
 					log.debug("reindexing " + docType +" batch " + (pageNum + 1) + ": " + csids.size() + " records starting with " + csids.get(0));
 					
-					reindexDocuments(docType, csids);
+					affectedCount += reindexDocuments(docType, csids);
 				}
 				
 				pageNum++;
 			}
 			while(csids.size() == pageSize);
 		}
+		
+		return affectedCount;
 	}
 	
-	private void reindexDocument(String docType, String csid) throws Exception {
-		reindexDocuments(docType, Arrays.asList(csid));
+	private int reindexDocument(String docType, String csid) throws Exception {
+		return reindexDocuments(docType, Arrays.asList(csid));
 	}
 	
-	private void reindexDocuments(String docType, List<String> csids) throws Exception {
+	private int reindexDocuments(String docType, List<String> csids) throws Exception {
 		// Convert the csids to structs of nuxeo id and type, as expected
 		// by doBatch.
 
 		if (csids == null || csids.size() == 0) {
-			return;
+			return 0;
 		}
 		
         getLowLevelSession();        
@@ -374,7 +342,15 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 	        }
         }
         
-        //doBatch(infos);
+        if (batchPause > 0) {
+        	log.trace("pausing " + batchPause + " ms");
+        	
+        	Thread.sleep(batchPause);
+        }
+        
+        doBatch(infos);
+        
+        return infos.size();
 	}
 	
 	private List<String> quoteList(List<String> values) {
@@ -387,12 +363,38 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		return quoted;
 	}
 	
-//    @GET
-//    public String get(@QueryParam("batchSize") int batchSize,
-//            @QueryParam("batch") int batch) throws Exception {
-//        coreSession = SessionFactory.getSession(request);
-//        return reindexFulltext(batchSize, batch);
-//    }
+	/*
+	 * The code below this comment is copied from the nuxeo-reindex-fulltext
+	 * module. The original copyright is below.
+	 */
+	
+	/*
+	 * (C) Copyright 2012 Nuxeo SA (http://nuxeo.com/) and contributors.
+	 *
+	 * All rights reserved. This program and the accompanying materials
+	 * are made available under the terms of the GNU Lesser General Public License
+	 * (LGPL) version 2.1 which accompanies this distribution, and is available at
+	 * http://www.gnu.org/licenses/lgpl.html
+	 *
+	 * This library is distributed in the hope that it will be useful,
+	 * but WITHOUT ANY WARRANTY; without even the implied warranty of
+	 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+	 * Lesser General Public License for more details.
+	 *
+	 * Contributors:
+	 *     Florent Guillaume
+	 */
+	
+    protected static class Info {
+        public final String id;
+
+        public final String type;
+
+        public Info(String id, String type) {
+            this.id = id;
+            this.type = type;
+        }
+    }
     
     /**
      * Launches a fulltext reindexing of the database.
@@ -402,7 +404,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
      *            batches; starts at 1
      * @return when done, ok + the total number of docs
      */
-    public String reindexFulltext(String docType, int batchSize, int batch) throws Exception {
+    public String reindexFulltext(int batchSize, int batch) throws Exception {
         Principal principal = coreSession.getPrincipal();
         if (!(principal instanceof NuxeoPrincipal)) {
             return "unauthorized";
@@ -416,7 +418,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
         if (batchSize <= 0) {
             batchSize = DEFAULT_BATCH_SIZE;
         }
-        List<Info> infos = getInfos(docType);
+        List<Info> infos = getInfos();
         int size = infos.size();
         int numBatches = (size + batchSize - 1) / batchSize;
         if (batch < 0 || batch > numBatches) {
@@ -492,12 +494,11 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
         fulltextInfo = session.getModel().getFulltextInfo();
     }
 
-    protected List<Info> getInfos(String docType) throws Exception {
+    protected List<Info> getInfos() throws Exception {
         getLowLevelSession();
         List<Info> infos = new ArrayList<Info>();
         String query = "SELECT ecm:uuid, ecm:primaryType FROM Document"
                 + " WHERE ecm:isProxy = 0"
-        		+ " AND ecm:primaryType LIKE '" + docType + "%'"
                 + " AND ecm:currentLifeCycleState <> 'deleted'"
                 + " ORDER BY ecm:uuid";
         IterableQueryResult it = session.queryAndFetch(query, NXQL.NXQL,
@@ -617,5 +618,4 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
         EventService eventService = Framework.getLocalService(EventService.class);
         eventService.fireEvent(event);
     }
-
 }
