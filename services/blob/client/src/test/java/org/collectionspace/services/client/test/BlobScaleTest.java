@@ -103,7 +103,8 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 			try {
 				profiler.stop();
 		        assertStatusCode(res, testName);
-				logger.debug(
+
+		        logger.debug(
 						i + ": Uploaded image to Nuxeo in "
 						+ profiler.getCumulativeTime()
 						+ " milleseconds "
@@ -112,8 +113,8 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 						+ jpegFile.getAbsolutePath());
 				
 		        String csid = extractId(res);
-		        //allResourceIdsCreated.add(csid);
 		        this.knownResourceId = csid;
+		        allResourceIdsCreated.add(csid);
 			} finally {
 				if (res != null) {
                     res.releaseConnection();
