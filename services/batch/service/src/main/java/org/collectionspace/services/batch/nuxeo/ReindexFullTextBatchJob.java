@@ -24,6 +24,7 @@ import org.apache.commons.lang.StringUtils;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.StoredValuesUriTemplate;
+import org.collectionspace.services.common.UriTemplateFactory;
 import org.collectionspace.services.common.UriTemplateRegistryKey;
 import org.collectionspace.services.common.invocable.InvocationContext.ListCSIDs;
 import org.collectionspace.services.common.invocable.InvocationContext.Params.Param;
@@ -267,12 +268,13 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 			UriTemplateRegistryKey key = new UriTemplateRegistryKey(getTenantId(), docType);
 			StoredValuesUriTemplate uriTemplate = resource.getUriRegistryEntries().get(key);
 			
-			log.debug(uriTemplate.toString());
+			// log.debug(uriTemplate.toString());
 			
 			// A bit of a hack to determine if this docType is an authority or an item.
 			// If the URL contains "/items/", it's an item.
-			
-			if (StringUtils.contains(uriTemplate.toString(), "/" + AuthorityClient.ITEMS + "/")) {
+
+			if (uriTemplate.getUriTemplateType() == UriTemplateFactory.ITEM) {
+//			if (StringUtils.contains(uriTemplate.toString(), "/" + AuthorityClient.ITEMS + "/")) {
 				isAuthorityItem = true;
 			}
 		}
