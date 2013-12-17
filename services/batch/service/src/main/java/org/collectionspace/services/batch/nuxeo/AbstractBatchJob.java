@@ -209,13 +209,17 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	}
 	
 	protected List<String> findAll(String serviceName, int pageSize, int pageNum) throws URISyntaxException, DocumentException {
-		ResourceBase resource = getResourceMap().get(serviceName);	
-
-		return findAll(resource, pageSize, pageNum);
+		return findAll(serviceName, pageSize, pageNum, null);
 	}
 	
-	protected List<String> findAll(ResourceBase resource, int pageSize, int pageNum) throws URISyntaxException, DocumentException {
-		AbstractCommonList list = resource.getList(createPagedListUriInfo(pageNum, pageSize));
+	protected List<String> findAll(String serviceName, int pageSize, int pageNum, String sortBy) throws URISyntaxException, DocumentException {
+		ResourceBase resource = getResourceMap().get(serviceName);	
+
+		return findAll(resource, pageSize, pageNum, null);
+	}
+	
+	protected List<String> findAll(ResourceBase resource, int pageSize, int pageNum, String sortBy) throws URISyntaxException, DocumentException {
+		AbstractCommonList list = resource.getList(createPagedListUriInfo(pageNum, pageSize, sortBy));
 		List<String> csids = new ArrayList<String>();
 
 		if (list instanceof RelationsCommonList) {
@@ -232,7 +236,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 						break;
 					}
 				}
-			}			
+			}
 		}
 		
 		return csids;
@@ -265,13 +269,17 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	}
 	
 	protected List<String> findAllAuthorityItems(String serviceName, String vocabularyCsid, int pageSize, int pageNum) throws URISyntaxException, DocumentException {
-		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
-
-		return findAllAuthorityItems(resource, vocabularyCsid, pageSize, pageNum);
+		return findAllAuthorityItems(serviceName, vocabularyCsid, pageSize, pageNum, null);
 	}
 	
-	protected List<String> findAllAuthorityItems(AuthorityResource<?, ?> resource, String vocabularyCsid, int pageSize, int pageNum) throws URISyntaxException, DocumentException {
-		AbstractCommonList list = resource.getAuthorityItemList(vocabularyCsid, createPagedListUriInfo(pageNum, pageSize));
+	protected List<String> findAllAuthorityItems(String serviceName, String vocabularyCsid, int pageSize, int pageNum, String sortBy) throws URISyntaxException, DocumentException {
+		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
+
+		return findAllAuthorityItems(resource, vocabularyCsid, pageSize, pageNum, sortBy);
+	}
+	
+	protected List<String> findAllAuthorityItems(AuthorityResource<?, ?> resource, String vocabularyCsid, int pageSize, int pageNum, String sortBy) throws URISyntaxException, DocumentException {
+		AbstractCommonList list = resource.getAuthorityItemList(vocabularyCsid, createPagedListUriInfo(pageNum, pageSize, sortBy));
 		List<String> csids = new ArrayList<String>();		
 		
 		for (AbstractCommonList.ListItem item : list.getListItem()) {
@@ -456,7 +464,11 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	}
 
 	protected UriInfo createPagedListUriInfo(int pageNum, int pageSize) throws URISyntaxException {
-		return createUriInfo("pgSz=" + pageSize + "&pgNum=" + pageNum + "&wf_deleted=false");
+		return createPagedListUriInfo(pageNum, pageSize, null);
+	}
+	
+	protected UriInfo createPagedListUriInfo(int pageNum, int pageSize, String sortBy) throws URISyntaxException {
+		return createUriInfo("pgSz=" + pageSize + "&pgNum=" + pageNum + (sortBy != null ? "&sortBy=" + sortBy : "") + "&wf_deleted=false");
 	}
 
 	protected String escapeQueryString(String queryString) throws URISyntaxException {
