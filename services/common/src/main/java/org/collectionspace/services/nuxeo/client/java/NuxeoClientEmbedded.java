@@ -22,10 +22,8 @@ package org.collectionspace.services.nuxeo.client.java;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Vector;
 
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.transaction.TransactionManager;
@@ -42,7 +40,7 @@ import org.nuxeo.ecm.core.api.repository.RepositoryManager;
 import org.nuxeo.ecm.core.client.ConnectionListener;
 import org.nuxeo.ecm.core.client.DefaultLoginHandler;
 import org.nuxeo.ecm.core.client.LoginHandler;
-import org.nuxeo.ecm.core.repository.RepositoryDescriptor;
+//import org.nuxeo.ecm.core.repository.RepositoryDescriptor;
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.schema.SchemaManagerImpl;
 import org.nuxeo.ecm.core.schema.TypeProvider;
@@ -81,8 +79,6 @@ public final class NuxeoClientEmbedded {
 
     private RepositoryManager repositoryMgr;
 
-    private boolean multiThreadedLogin = false;
-
     private static final NuxeoClientEmbedded instance = new NuxeoClientEmbedded();
 
     private static final Log log = LogFactory.getLog(NuxeoClientEmbedded.class);
@@ -103,161 +99,8 @@ public final class NuxeoClientEmbedded {
         return instance;
     }
 
-    public void setMultiThreadedLogin(boolean useMultiThreadedLogin) {
-        multiThreadedLogin = useMultiThreadedLogin;
-    }
-
-    public boolean getMultiThreadedLogin() {
-        return multiThreadedLogin;
-    }
-
-    public synchronized void connect(String locator) throws Exception {
-        if (this.locator != null) {
-            throw new IllegalStateException("Client is already connected");
-        }
-        doConnect(AutoConfigurationService.createLocator(locator));
-    }
-
-    public synchronized void connect(InvokerLocator locator) throws Exception {
-        if (this.locator != null) {
-            throw new IllegalStateException("Client is already connected");
-        }
-        doConnect(locator);
-    }
-
-    public synchronized void connect(String host, int port) throws Exception {
-        if (locator != null) {
-            throw new IllegalStateException("Client is already connected");
-        }
-        doConnect(AutoConfigurationService.createLocator(host, port));
-    }
-
-    public synchronized void forceConnect(InvokerLocator locator)
-            throws Exception {
-        if (this.locator != null) {
-            disconnect();
-        }
-        doConnect(locator);
-    }
-
-    public synchronized void forceConnect(String locator) throws Exception {
-        if (this.locator != null) {
-            disconnect();
-        }
-        doConnect(AutoConfigurationService.createLocator(locator));
-    }
-
-    public synchronized void forceConnect(String host, int port)
-            throws Exception {
-        if (locator != null) {
-            disconnect();
-        }
-        doConnect(AutoConfigurationService.createLocator(host, port));
-    }
-
-    public synchronized void tryConnect(String host, int port) throws Exception {
-        if (locator != null) {
-            return; // do nothing
-        }
-        doConnect(AutoConfigurationService.createLocator(host, port));
-    }
-
-    public synchronized void tryConnect(String url) throws Exception {
-        if (locator != null) {
-            return; // do nothing
-        }
-        doConnect(AutoConfigurationService.createLocator(url));
-    }
-
-    public synchronized void tryConnect(InvokerLocator locator)
-            throws Exception {
-        if (this.locator != null) {
-            return; // do nothing
-        }
-        doConnect(locator);
-    }
-
     @Deprecated
-    private void doConnect(InvokerLocator locator) throws Exception {
-        this.locator = locator;
-        try {
-            cfg.load(locator);
-            // FIXME TODO workaround to work with nxruntime core 1.3.3
-            // --------------
-            String newPort = Framework.getProperty("org.nuxeo.runtime.1.3.3.streaming.port");
-            if (newPort != null) {
-                StreamingService streamingService = (StreamingService) Framework.getRuntime().getComponent(
-                        StreamingService.NAME);
-                // streaming config
-                String oldLocator = streamingService.getServerLocator();
-                int p = oldLocator.lastIndexOf(':');
-                if (p > -1) {
-                    String withoutPort = oldLocator.substring(0, p);
-                    String serverLocator = withoutPort + ":" + newPort;
-                    streamingService.stopManager();
-                    streamingService.setServerLocator(serverLocator);
-                    streamingService.setServer(false);
-                    streamingService.startManager();
-                }
-            }
-            // FIXME TODO workaround for remote services
-            // -------------------------------
-            schemaRemotingWorkaround(locator.getHost());
-            // workaround for client login configuration - we need to make it
-            // not multi threaded
-            // TODO put an option for this in NuxeoClient
-            if (!multiThreadedLogin) {
-                LoginService ls = Framework.getService(LoginService.class);
-                SecurityDomain sysDomain = ls.getSecurityDomain(LoginComponent.SYSTEM_LOGIN);
-                SecurityDomain clientDomain = ls.getSecurityDomain(LoginComponent.CLIENT_LOGIN);
-                adaptClientSecurityDomain(sysDomain);
-                adaptClientSecurityDomain(clientDomain);
-            }
-            // ----------------
-//            login();
-            if (!multiThreadedLogin) {
-            	throw new RuntimeException("This coode is dead and should never be called?"); //FIXME: REM - If you're reading this, this was left here by mistake and should be removed.
-            }
-        } catch (Exception e) {
-            this.locator = null;
-            throw e;
-        }
-        fireConnected(this);
-    }
-
-    public static void adaptClientSecurityDomain(SecurityDomain sd) {
-        AppConfigurationEntry[] entries = sd.getAppConfigurationEntries();
-        if (entries != null) {
-            for (int i = 0; i < entries.length; i++) {
-                AppConfigurationEntry entry = entries[i];
-                if ("org.jboss.security.ClientLoginModule".equals(entry.getLoginModuleName())) {
-                    Map<String, ?> opts = entry.getOptions();
-                    Map<String, Object> newOpts = new HashMap<String, Object>(
-                            opts);
-                    newOpts.put("multi-threaded", "false");
-                    entries[i] = new AppConfigurationEntry(
-                            entry.getLoginModuleName(), entry.getControlFlag(),
-                            entry.getOptions());
-                }
-            }
-        }
-    }
-
-    /**
-     * Workaround for being able to load schemas from remote
-     * TODO integrate this in core
-     */
-    private static void schemaRemotingWorkaround(String host) throws Exception {
-        ServiceManager serviceManager = Framework.getLocalService(ServiceManager.class);
-        ServiceDescriptor sd = new ServiceDescriptor(TypeProvider.class, "core");
-        sd.setLocator("%TypeProviderBean");
-        serviceManager.registerService(sd);
-        TypeProvider typeProvider = Framework.getService(TypeProvider.class);
-        SchemaManager schemaMgr = Framework.getLocalService(SchemaManager.class);
-        ((SchemaManagerImpl) schemaMgr).importTypes(typeProvider);
-    }
-
-    public synchronized void disconnect() throws Exception {
+    private synchronized void disconnect() throws Exception {
         if (locator == null) {
             throw new IllegalStateException("Client is not connected");
         }
@@ -271,7 +114,6 @@ public final class NuxeoClientEmbedded {
         doDisconnect();
     }
 
-    @Deprecated
     private void doDisconnect() throws Exception {
         locator = null;
         serverName = null;
@@ -286,26 +128,8 @@ public final class NuxeoClientEmbedded {
             }
             it.remove();
         }
-        // logout
-//        logout();
-        if (!multiThreadedLogin) {
-        	throw new RuntimeException("This coode is dead and should never be called?"); //FIXME: REM - If you're reading this, this was left here by mistake and should be removed.
-        }
+
         repositoryMgr = null;
-        fireDisconnected(this);
-    }
-
-    public synchronized void reconnect() throws Exception {
-        if (locator == null) {
-            throw new IllegalStateException("Client is not connected");
-        }
-        InvokerLocator locator = this.locator;
-        disconnect();
-        connect(locator);
-    }
-
-    public AutoConfigurationService getConfigurationService() {
-        return cfg;
     }
 
     public synchronized String getServerName() {
@@ -325,20 +149,6 @@ public final class NuxeoClientEmbedded {
 
     public synchronized boolean isConnected() {
         return true;
-    }
-
-    public String getServerHost() {
-        if (locator == null) {
-            throw new IllegalStateException("Client is not connected");
-        }
-        return locator.getHost();
-    }
-
-    public int getServerPort() {
-        if (locator == null) {
-            throw new IllegalStateException("Client is not connected");
-        }
-        return locator.getPort();
     }
 
     public InvokerLocator getLocator() {
@@ -475,37 +285,8 @@ public final class NuxeoClientEmbedded {
         }
     }
 
-//    public RepositoryInstance[] getRepositoryInstances() {
-//        return repositoryInstances.toArray(new RepositoryInstance[repositoryInstances.size()]);
-//    }
-
     public static RepositoryInstance newRepositoryInstance(Repository repository) {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        if (cl == null) {
-            cl = NuxeoClientEmbedded.class.getClassLoader();
-        }
         return new RepositoryInstanceHandler(repository).getProxy(); // Why a proxy here?
     }
 
-    public void addConnectionListener(ConnectionListener listener) {
-        connectionListeners.add(listener);
-    }
-
-    public void removeConnectionListener(ConnectionListener listener) {
-        connectionListeners.remove(listener);
-    }
-
-    private void fireDisconnected(NuxeoClientEmbedded client) {
-        Object[] listeners = connectionListeners.getListeners();
-        for (Object listener : listeners) {
-//            ((ConnectionListener) listener).disconnected(client);
-        }
-    }
-
-    private void fireConnected(NuxeoClientEmbedded client) {
-        Object[] listeners = connectionListeners.getListeners();
-        for (Object listener : listeners) {
-//            ((ConnectionListener) listener).connected(client);
-        }
-    }    
 }

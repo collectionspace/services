@@ -32,7 +32,7 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 	private static final int MAX_FONTSIZE = 60;
 	private static final String IMAGES_TO_CREATE_PROP = "imagesToCreate";
 	private static final int DEFAULT_IMAGES_TO_CREATE = 1;
-	private static final int DEFAULT_IMAGES_TO_GET = 1024;
+	private static final int DEFAULT_IMAGES_TO_GET = 12; //1024;
     private static final String GENERATED_IMAGES = "target/generated_images";
 
 	private static Random generator = new Random(System.currentTimeMillis());

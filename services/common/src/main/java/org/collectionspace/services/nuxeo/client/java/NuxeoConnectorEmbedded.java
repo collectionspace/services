@@ -2,7 +2,6 @@ package org.collectionspace.services.nuxeo.client.java;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
 
@@ -38,17 +37,10 @@ public class NuxeoConnectorEmbedded {
 	public final static String NUXEO_CLIENT_DIR = JEEServerDeployment.NUXEO_CLIENT_DIR;
 	public final static String NUXEO_SERVER_DIR = JEEServerDeployment.NUXEO_SERVER_DIR;
 	private final static String ERROR_CONNECTOR_NOT_INITIALIZED = "NuxeoConnector is not initialized!";
-
-
-	private static final String HOST = "127.0.0.1";
-	private static final int PORT = 62474;
 		
 	private final static String CSPACE_JEESERVER_HOME = "CSPACE_CONTAINER";
 	private final static String CSPACE_NUXEO_HOME = "CSPACE_NUXEO_HOME";
 	
-	private static final String NUXEO_CLIENT_USERNAME = "NUXEO_CLIENT_USERNAME";
-	private static final String NUXEO_CLIENT_PASSWORD = "NUXEO_CLIENT_PASSWORD";
-
 	private static final NuxeoConnectorEmbedded self = new NuxeoConnectorEmbedded();
 	private NuxeoClientEmbedded client;
 	private ServletContext servletContext = null;
@@ -63,33 +55,6 @@ public class NuxeoConnectorEmbedded {
 
 	public final static NuxeoConnectorEmbedded getInstance() {
 		return self;
-	}
-
-	private String getClientUserName() {
-		String username = System.getenv(NUXEO_CLIENT_USERNAME);
-		if (username == null) {
-			username = "Administrator";
-		}
-		return username;
-	}
-
-	private String getClientPassword() {
-		String password = System.getenv(NUXEO_CLIENT_PASSWORD);
-		if (password == null) {
-			password = "Administrator";
-		}
-		return password;
-	}
-	
-	private String getServerRootPath() {
-		String result = null;
-		
-		String prop = System.getenv(CSPACE_JEESERVER_HOME);
-		if (prop == null || prop.isEmpty()) {
-			logger.error("The following CollectionSpace services' environment variable needs to be set: " + CSPACE_JEESERVER_HOME);
-		}
-		
-		return result;
 	}
 	
 	private String getNuxeoServerPath(String serverRootPath) throws IOException {
@@ -204,6 +169,7 @@ public class NuxeoConnectorEmbedded {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 		ConnectionFactoryImpl connectionFactory = (ConnectionFactoryImpl)repository;
 		ManagedConnectionFactoryImpl managedConnectionFactory = connectionFactory.getManagedConnectionFactory();
 		String serverUrl = managedConnectionFactory.getServerURL();
@@ -236,11 +202,13 @@ public class NuxeoConnectorEmbedded {
 	 */
 	public RepositoryInstance getRepositorySession(RepositoryDomainType repoDomain) throws Exception {
 		RepositoryInstance repoSession = getClient().openRepository(repoDomain);
+		
 		if (logger.isDebugEnabled() && repoSession != null) {
 			logger.debug("getRepositorySession() opened repository session");
 			String repoName = repoDomain.getRepositoryName();
 			String databaseName = this.getDatabaseName(repoName); // For debugging purposes only
 		}
+		
 		return repoSession;
 	}
 
@@ -268,7 +236,6 @@ public class NuxeoConnectorEmbedded {
     
     public RepositoryDescriptor getRepositoryDescriptor(String name) throws Exception {
     	RepositoryDescriptor repo = null;
-
         Iterable<RepositoryDescriptor> descriptorsList = NXCore.getRepositoryService().getRepositoryManager().getDescriptors();
         for (RepositoryDescriptor descriptor : descriptorsList) {
         	String homeDir = descriptor.getHomeDirectory();
@@ -289,15 +256,6 @@ public class NuxeoConnectorEmbedded {
 	public NuxeoClientEmbedded getClient() throws Exception {
 		if (initialized == true) {
 			if (client.isConnected()) {
-//				client.login();
-				return client;
-			} else {
-				client.forceConnect(this.HOST,
-						this.PORT);
-				if (logger.isDebugEnabled()) {
-					logger.debug("getClient(): connection successful port="
-							+ this.PORT);
-				}
 				return client;
 			}
 		}
@@ -310,7 +268,7 @@ public class NuxeoConnectorEmbedded {
 	
 	void releaseClient() throws Exception {
 		if (initialized == true) {
-//			client.logout();
+			// Do nothing.
 		} else {
 			//
 			// Nuxeo connection was not initialized
@@ -378,11 +336,7 @@ public class NuxeoConnectorEmbedded {
 				releaseRepositorySession(repoSession);
 			}
 		}
+		
 		return workspaceIds;
-	}
-	
-	@Deprecated
-    private void loadBundles() throws Exception {
-    }
-    	
+	}    	
 }
