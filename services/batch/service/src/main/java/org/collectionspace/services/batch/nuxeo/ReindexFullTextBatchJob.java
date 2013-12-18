@@ -375,7 +375,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 
 		String query = "SELECT ecm:uuid, ecm:primaryType FROM Document " +
 					   "WHERE ecm:name IN (" + StringUtils.join(quoteList(csids), ',') + ") " +
-					   "AND ecm:primaryType LIKE '" + docType + "%'" +
+					   "AND ecm:primaryType LIKE '" + docType + "%' " +
 					   "AND ecm:isCheckedInVersion = 0 AND ecm.isProxy = 0";
 		IterableQueryResult result = session.queryAndFetch(query, NXQL.NXQL, QueryFilter.EMPTY);
 		
