@@ -41,6 +41,7 @@ import org.collectionspace.services.relation.RelationsCommonList.RelationListIte
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.Node;
+import org.jboss.resteasy.specimpl.PathSegmentImpl;
 import org.jboss.resteasy.specimpl.UriInfoImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -219,7 +220,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	}
 	
 	protected List<String> findAll(ResourceBase resource, int pageSize, int pageNum, String sortBy) throws URISyntaxException, DocumentException {
-		AbstractCommonList list = resource.getList(createPagedListUriInfo(pageNum, pageSize, sortBy));
+		AbstractCommonList list = resource.getList(createPagedListUriInfo(resource.getServiceName(), pageSize, pageNum, sortBy));
 		List<String> csids = new ArrayList<String>();
 
 		if (list instanceof RelationsCommonList) {
@@ -279,7 +280,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	}
 	
 	protected List<String> findAllAuthorityItems(AuthorityResource<?, ?> resource, String vocabularyCsid, int pageSize, int pageNum, String sortBy) throws URISyntaxException, DocumentException {
-		AbstractCommonList list = resource.getAuthorityItemList(vocabularyCsid, createPagedListUriInfo(pageNum, pageSize, sortBy));
+		AbstractCommonList list = resource.getAuthorityItemList(vocabularyCsid, createPagedListUriInfo(resource.getServiceName(), pageNum, pageSize, sortBy));
 		List<String> csids = new ArrayList<String>();		
 		
 		for (AbstractCommonList.ListItem item : list.getListItem()) {
@@ -415,12 +416,16 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	}
 
 	protected UriInfo createUriInfo(String queryString) throws URISyntaxException {
+		return createUriInfo(queryString, Collections.<PathSegment> emptyList());
+	}
+	
+	protected UriInfo createUriInfo(String queryString, List<PathSegment> pathSegments) throws URISyntaxException {
 		queryString = escapeQueryString(queryString);
 		
 		URI	absolutePath = new URI("");
 		URI	baseUri = new URI("");
 
-		return new UriInfoImpl(absolutePath, baseUri, "", queryString, Collections.<PathSegment> emptyList());
+		return new UriInfoImpl(absolutePath, baseUri, "", queryString, pathSegments);
 	}
 	
 	protected UriInfo createDeleteFilterUriInfo() throws URISyntaxException {
@@ -463,12 +468,15 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		return createUriInfo("type=" + type + "&wf_deleted=false");
 	}
 
-	protected UriInfo createPagedListUriInfo(int pageNum, int pageSize) throws URISyntaxException {
-		return createPagedListUriInfo(pageNum, pageSize, null);
+	protected UriInfo createPagedListUriInfo(String serviceName, int pageNum, int pageSize) throws URISyntaxException {
+		return createPagedListUriInfo(serviceName, pageNum, pageSize, null);
 	}
 	
-	protected UriInfo createPagedListUriInfo(int pageNum, int pageSize, String sortBy) throws URISyntaxException {
-		return createUriInfo("pgSz=" + pageSize + "&pgNum=" + pageNum + (sortBy != null ? "&sortBy=" + sortBy : "") + "&wf_deleted=false");
+	protected UriInfo createPagedListUriInfo(String serviceName, int pageNum, int pageSize, String sortBy) throws URISyntaxException {
+		List<PathSegment> pathSegments = new ArrayList<PathSegment>(1);
+		pathSegments.add(new PathSegmentImpl(serviceName, false));
+		
+		return createUriInfo("pgSz=" + pageSize + "&pgNum=" + pageNum + (sortBy != null ? "&sortBy=" + sortBy : "") + "&wf_deleted=false", pathSegments);
 	}
 
 	protected String escapeQueryString(String queryString) throws URISyntaxException {
