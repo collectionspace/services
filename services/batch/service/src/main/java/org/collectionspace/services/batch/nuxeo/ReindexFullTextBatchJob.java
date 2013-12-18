@@ -57,7 +57,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 	final Logger log = LoggerFactory.getLogger(ReindexFullTextBatchJob.class);
 
 	public static final String DC_TITLE = "dc:title";
-	public static final int DEFAULT_BATCH_SIZE = 100;
+	public static final int DEFAULT_BATCH_SIZE = 1000;
 	public static final int DEFAULT_START_BATCH = 0;
 	public static final int DEFAULT_END_BATCH = 0;
 	public static final int DEFAULT_BATCH_PAUSE = 0;
@@ -91,6 +91,16 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		setCompletionStatus(STATUS_MIN_PROGRESS);
 		
 		numAffected = 0;
+		
+		// This is needed so that resource calls (which start transactions)
+		// will work. Otherwise, a javax.transaction.NotSupportedException 
+		// ("Nested transactions are not supported") is thrown.
+		
+		boolean isTransactionActive = TransactionHelper.isTransactionActive();
+		
+		if (isTransactionActive) {
+			TransactionHelper.commitOrRollbackTransaction();
+		}
 		
 		try {
 			coreSession = getRepoSession().getSession();
@@ -165,29 +175,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 				}
 				
 				initResourceMap();
-
-				// This is needed so that resource calls (which start transactions)
-				// will work. Otherwise, a javax.transaction.NotSupportedException 
-				// ("Nested transactions are not supported") is thrown.
-				boolean isTransactionActive = TransactionHelper.isTransactionActive();
-				
-				if (isTransactionActive) {
-					TransactionHelper.commitOrRollbackTransaction();
-				}
-				
-				try {
-					reindexDocuments(docTypes);
-				
-					// This is needed so that when the session is released after this
-					// batch job exits (in BatchDocumentModelHandler), there isn't an exception.
-					// Otherwise, a "Session invoked in a container without a transaction active"
-					// error is thrown from RepositoryJavaClientImpl.releaseRepositorySession.
-				}
-				finally {
-					if (isTransactionActive) {
-						TransactionHelper.startTransaction();
-					}
-				}
+				reindexDocuments(docTypes);
 			}
 			
 			log.debug("reindexing complete");
@@ -211,6 +199,16 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		}
 		catch(Exception e) {
 			setErrorResult(e.getMessage());
+		}	
+		finally {		
+			// This is needed so that when the session is released after this
+			// batch job exits (in BatchDocumentModelHandler), there isn't an exception.
+			// Otherwise, a "Session invoked in a container without a transaction active"
+			// error is thrown from RepositoryJavaClientImpl.releaseRepositorySession.
+
+			if (isTransactionActive) {
+				TransactionHelper.startTransaction();
+			}
 		}
 	}
 	
