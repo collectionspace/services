@@ -14,7 +14,6 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.collectionspace.services.batch.AbstractBatchInvocable;
-import org.collectionspace.services.batch.BatchInvocable;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.CollectionSpaceClientUtils;
@@ -28,18 +27,15 @@ import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceBase;
-import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.UriTemplateRegistry;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
-import org.collectionspace.services.common.invocable.InvocationContext;
-import org.collectionspace.services.common.invocable.InvocationResults;
+import org.collectionspace.services.common.relation.RelationResource;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
-import org.collectionspace.services.common.relation.RelationResource;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
 import org.dom4j.DocumentException;
@@ -181,7 +177,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		
 		for (String movementCsid : movementCsids) {
 			PoxPayloadOut movementPayload = findMovementByCsid(movementCsid);
-			String movementWorkflowState = getFieldValue(movementPayload, MovementConstants.WORKFLOW_STATE_SCHEMA_NAME, MovementConstants.WORKFLOW_STATE_FIELD_NAME);
+			String movementWorkflowState = getFieldValue(movementPayload, CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA, CollectionSpaceClient.COLLECTIONSPACE_CORE_WORKFLOWSTATE);
 		
 			if (!movementWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
 				if (foundMovementCsid != null) {
@@ -213,21 +209,38 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	}
 	
 	protected List<String> findAll(String serviceName, int pageSize, int pageNum) throws URISyntaxException, DocumentException {
+		return findAll(serviceName, pageSize, pageNum, null);
+	}
+	
+	protected List<String> findAll(String serviceName, int pageSize, int pageNum, String sortBy) throws URISyntaxException, DocumentException {
 		ResourceBase resource = getResourceMap().get(serviceName);	
-		AbstractCommonList list = resource.getList(this.createPagedListUriInfo(pageNum, pageSize));
+
+		return findAll(resource, pageSize, pageNum, null);
+	}
+	
+	protected List<String> findAll(ResourceBase resource, int pageSize, int pageNum, String sortBy) throws URISyntaxException, DocumentException {
+		AbstractCommonList list = resource.getList(createPagedListUriInfo(pageNum, pageSize, sortBy));
 		List<String> csids = new ArrayList<String>();
-		
-		for (AbstractCommonList.ListItem item : list.getListItem()) {
-			for (org.w3c.dom.Element element : item.getAny()) {
-				if (element.getTagName().equals("csid")) {
-					csids.add(element.getTextContent());
-					break;
+
+		if (list instanceof RelationsCommonList) {
+			for (RelationListItem item : ((RelationsCommonList) list).getRelationListItem()) {
+				csids.add(item.getCsid());
+			}
+		}
+		else {
+			for (AbstractCommonList.ListItem item : list.getListItem()) {
+				for (org.w3c.dom.Element element : item.getAny()) {
+					
+					if (element.getTagName().equals("csid")) {
+						csids.add(element.getTextContent());
+						break;
+					}
 				}
 			}
 		}
 		
 		return csids;
-	}
+	}	
 	
 	protected List<String> findAllCollectionObjects(int pageSize, int pageNum) throws URISyntaxException, DocumentException {
 		return findAll(CollectionObjectClient.SERVICE_NAME, pageSize, pageNum);
@@ -235,6 +248,11 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	
 	protected List<String> getVocabularyCsids(String serviceName) throws URISyntaxException {
 		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
+
+		return getVocabularyCsids(resource);
+	}
+
+	protected List<String> getVocabularyCsids(AuthorityResource<?, ?> resource) throws URISyntaxException {
 		AbstractCommonList vocabularyList = resource.getAuthorityList(createDeleteFilterUriInfo());
 		List<String> csids = new ArrayList<String>();
 		
@@ -249,6 +267,33 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 
 		return csids;
 	}
+	
+	protected List<String> findAllAuthorityItems(String serviceName, String vocabularyCsid, int pageSize, int pageNum) throws URISyntaxException, DocumentException {
+		return findAllAuthorityItems(serviceName, vocabularyCsid, pageSize, pageNum, null);
+	}
+	
+	protected List<String> findAllAuthorityItems(String serviceName, String vocabularyCsid, int pageSize, int pageNum, String sortBy) throws URISyntaxException, DocumentException {
+		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
+
+		return findAllAuthorityItems(resource, vocabularyCsid, pageSize, pageNum, sortBy);
+	}
+	
+	protected List<String> findAllAuthorityItems(AuthorityResource<?, ?> resource, String vocabularyCsid, int pageSize, int pageNum, String sortBy) throws URISyntaxException, DocumentException {
+		AbstractCommonList list = resource.getAuthorityItemList(vocabularyCsid, createPagedListUriInfo(pageNum, pageSize, sortBy));
+		List<String> csids = new ArrayList<String>();		
+		
+		for (AbstractCommonList.ListItem item : list.getListItem()) {
+			for (org.w3c.dom.Element element : item.getAny()) {
+				
+				if (element.getTagName().equals("csid")) {
+					csids.add(element.getTextContent());
+					break;
+				}
+			}
+		}
+		
+		return csids;
+	}	
 	
 	protected PoxPayloadOut findAuthorityItemByCsid(String serviceName, String csid) throws URISyntaxException, DocumentException {
 		List<String> vocabularyCsids = getVocabularyCsids(serviceName);
@@ -419,7 +464,11 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	}
 
 	protected UriInfo createPagedListUriInfo(int pageNum, int pageSize) throws URISyntaxException {
-		return createUriInfo("pgSz=" + pageSize + "&pgNum=" + pageNum + "&wf_deleted=false");
+		return createPagedListUriInfo(pageNum, pageSize, null);
+	}
+	
+	protected UriInfo createPagedListUriInfo(int pageNum, int pageSize, String sortBy) throws URISyntaxException {
+		return createUriInfo("pgSz=" + pageSize + "&pgNum=" + pageNum + (sortBy != null ? "&sortBy=" + sortBy : "") + "&wf_deleted=false");
 	}
 
 	protected String escapeQueryString(String queryString) throws URISyntaxException {
