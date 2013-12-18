@@ -220,7 +220,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	}
 	
 	protected List<String> findAll(ResourceBase resource, int pageSize, int pageNum, String sortBy) throws URISyntaxException, DocumentException {
-		AbstractCommonList list = resource.getList(createPagedListUriInfo(resource.getServiceName(), pageSize, pageNum, sortBy));
+		AbstractCommonList list = resource.getList(createPagedListUriInfo(resource.getServiceName(), pageNum, pageSize, sortBy));
 		List<String> csids = new ArrayList<String>();
 
 		if (list instanceof RelationsCommonList) {
