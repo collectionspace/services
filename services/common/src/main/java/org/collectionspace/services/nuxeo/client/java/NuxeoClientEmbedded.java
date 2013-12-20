@@ -22,37 +22,22 @@ package org.collectionspace.services.nuxeo.client.java;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.security.auth.login.AppConfigurationEntry;
 import javax.transaction.TransactionManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
 import org.jboss.remoting.InvokerLocator;
-import org.nuxeo.common.collections.ListenerList;
 import org.nuxeo.ecm.core.api.repository.Repository;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstanceHandler;
 import org.nuxeo.ecm.core.api.repository.RepositoryManager;
-import org.nuxeo.ecm.core.client.ConnectionListener;
 import org.nuxeo.ecm.core.client.DefaultLoginHandler;
 import org.nuxeo.ecm.core.client.LoginHandler;
 //import org.nuxeo.ecm.core.repository.RepositoryDescriptor;
-import org.nuxeo.ecm.core.schema.SchemaManager;
-import org.nuxeo.ecm.core.schema.SchemaManagerImpl;
-import org.nuxeo.ecm.core.schema.TypeProvider;
 import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.runtime.api.ServiceDescriptor;
-import org.nuxeo.runtime.api.ServiceManager;
-import org.nuxeo.runtime.api.login.LoginComponent;
-import org.nuxeo.runtime.api.login.LoginService;
-import org.nuxeo.runtime.api.login.SecurityDomain;
-import org.nuxeo.runtime.config.AutoConfigurationService;
-import org.nuxeo.runtime.remoting.RemotingService;
-import org.nuxeo.runtime.services.streaming.StreamingService;
 import org.nuxeo.runtime.transaction.TransactionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,13 +54,7 @@ public final class NuxeoClientEmbedded {
 
     private final HashMap<String, RepositoryInstance> repositoryInstances;
 
-    private final ListenerList connectionListeners;
-
     private InvokerLocator locator;
-
-    private String serverName;
-
-    private final AutoConfigurationService cfg;
 
     private RepositoryManager repositoryMgr;
 
@@ -88,8 +67,6 @@ public final class NuxeoClientEmbedded {
      * of this constructor is recommended.
      */
     public NuxeoClientEmbedded() {
-        connectionListeners = new ListenerList();
-        cfg = new AutoConfigurationService();
         loginHandler = loginHandler == null ? new DefaultLoginHandler()
                 : loginHandler;
         repositoryInstances = new HashMap<String, RepositoryInstance>();
@@ -97,14 +74,6 @@ public final class NuxeoClientEmbedded {
 
     public static NuxeoClientEmbedded getInstance() {
         return instance;
-    }
-
-    @Deprecated
-    private synchronized void disconnect() throws Exception {
-        if (locator == null) {
-            throw new IllegalStateException("Client is not connected");
-        }
-        doDisconnect();
     }
 
     public synchronized void tryDisconnect() throws Exception {
@@ -116,7 +85,6 @@ public final class NuxeoClientEmbedded {
 
     private void doDisconnect() throws Exception {
         locator = null;
-        serverName = null;
         // close repository sessions if any
         Iterator<Entry<String, RepositoryInstance>> it = repositoryInstances.entrySet().iterator();
         while (it.hasNext()) {
@@ -130,21 +98,6 @@ public final class NuxeoClientEmbedded {
         }
 
         repositoryMgr = null;
-    }
-
-    public synchronized String getServerName() {
-        if (locator == null) {
-            throw new IllegalStateException("Client is not connected");
-        }
-        if (serverName == null) {
-            if (cfg == null) { // compatibility
-                serverName = RemotingService.ping(locator.getHost(),
-                        locator.getPort());
-            } else {
-                serverName = cfg.getServerConfiguration().getProductInfo();
-            }
-        }
-        return serverName;
     }
 
     public synchronized boolean isConnected() {
@@ -230,26 +183,41 @@ public final class NuxeoClientEmbedded {
     		}
     	}
     	
-    	//  REM 10/29/2013 - We may want to add this clause if (!TransactionHelper.isTransactionActive()) {
-    	boolean startTransaction = TransactionHelper.startTransaction();
-    	if (startTransaction == false) {
-    		logger.warn("Could not start a Nuxeo transaction with the TransactionHelper class.");
+    	boolean startedTransaction = false;
+    	if (TransactionHelper.isTransactionActive() == false) {
+	    	startedTransaction = TransactionHelper.startTransaction();
+	    	if (startedTransaction == false) {
+	    		String errMsg = "Could not start a Nuxeo transaction with the TransactionHelper class.";
+	    		logger.error(errMsg);
+	    		throw new Exception(errMsg);
+	    	}
+    	} else {
+    		logger.warn("A request to start a new transaction was made, but a transaction is already open.");
     	}
     	
         Repository repository = null;
         if (repoName != null) {
         	repository = getRepositoryManager().getRepository(repoName);
         } else {
-        	repository = getRepositoryManager().getDefaultRepository(); // Add a log info statement here stating that since no repo name was given we'll use the default repo instead
+        	repository = getRepositoryManager().getDefaultRepository();
+        	logger.warn(String.format("Using default repository '%s' because no name was specified.", repository.getName()));
         }
         
         if (repository != null) {
 	        result = newRepositoryInstance(repository);
-	    	String key = result.getSessionId();
-	        repositoryInstances.put(key, result);
-	        if (logger.isTraceEnabled()) {
-	        	logger.trace("Added a new repository instance to our repo list.  Current count is now: "
-	        			+ repositoryInstances.size());
+	        if (result != null) {
+		    	String key = result.getSessionId();
+		        repositoryInstances.put(key, result);
+		        if (logger.isTraceEnabled()) {
+		        	logger.trace(String.format("A new transaction was started on thread '%d' : %s.",
+		        			Thread.currentThread().getId(), startedTransaction ? "true" : "false"));
+		        	logger.trace(String.format("Added a new repository instance to our repo list.  Current count is now: %d",
+		        			repositoryInstances.size()));
+		        }
+	        } else {
+	        	String errMsg = String.format("Could not create a new repository instance for '%s' repository.", repository.getName());
+	        	logger.error(errMsg);
+	        	throw new Exception(errMsg);
 	        }
         } else {
         	String errMsg = String.format("Could not open a session to the Nuxeo repository='%s'", repoName);
@@ -280,8 +248,10 @@ public final class NuxeoClientEmbedded {
 	            			+ repositoryInstances.size());
             	}
             }
-            //if (TransactionHelper.isTransactionActiveOrMarkedRollback())
-            TransactionHelper.commitOrRollbackTransaction();
+            if (TransactionHelper.isTransactionActiveOrMarkedRollback() == true) {
+            	TransactionHelper.commitOrRollbackTransaction();
+            	logger.trace(String.format("Transaction closed on thread '%d'", Thread.currentThread().getId()));
+            }
         }
     }
 

@@ -67,7 +67,7 @@
            username="${db.user}"
            password="${db.user.password}"
            driverClassName="${db.jdbc.driver.class}"
-           url="jdbc:${db}://${db.host}:${db.port}/cspace"
+           url="${db.jdbc.cspace.url}"
            maxActive="8"
            maxIdle="4"/>
 		
@@ -87,7 +87,7 @@
     username="${db.user}"
     password="${db.user.password}"
     driverClassName="${db.jdbc.driver.class}"
-    url="jdbc:${db}://${db.host}:${db.port}"
+    url="${db.jdbc.csadmin.url}"
     maxActive="8"
     maxIdle="4"/>	
   
