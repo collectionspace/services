@@ -223,7 +223,26 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 				String tenantId = key.getTenantId();
 				
 				if (getTenantId().equals(tenantId)) {
-					resourcesByDocType.put(docType, resource);
+					if (resourcesByDocType.containsKey(docType)) {
+						log.warn("multiple resources found for docType " + docType);
+						
+						ResourceBase currentResource = resourcesByDocType.get(docType);
+						ResourceBase candidateResource = resource;
+						
+						// Favor the resource that isn't an AuthorityResource. This
+						// is really just to deal with Contacts, which are handled
+						// by ContactResource, PersonAuthorityResource, and
+						// OrgAuthorityResource. We want to use ContactResource.
+						
+						if (!(candidateResource instanceof AuthorityResource) && (currentResource instanceof AuthorityResource)) {
+							resourcesByDocType.put(docType, candidateResource);
+						}
+						
+						log.warn("using " + resourcesByDocType.get(docType));
+					}
+					else {
+						resourcesByDocType.put(docType, resource);
+					}
 				}				
 			}
 		}
@@ -304,7 +323,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 						throw new StoppedException();
 					}
 
-					csids = findAllAuthorityItems((AuthorityResource<?, ?>) resource, vocabularyCsid, pageSize, pageNum, "collectionspace_core:createdAt");
+					csids = findAllAuthorityItems((AuthorityResource<?, ?>) resource, vocabularyCsid, pageSize, pageNum, "collectionspace_core:createdAt, ecm:name");
 					
 					if (csids.size() > 0) {
 						log.debug("reindexing vocabulary of " + docType +" with csid " + vocabularyCsid + ", batch " + (pageNum + 1) + ": " + csids.size() + " records starting with " + csids.get(0));
@@ -336,7 +355,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 					throw new StoppedException();
 				}
 				
-				csids = findAll(resource, pageSize, pageNum, "collectionspace_core:createdAt");
+				csids = findAll(resource, pageSize, pageNum, "collectionspace_core:createdAt, ecm:name");
 				
 				if (csids.size() > 0) {
 					log.debug("reindexing " + docType +" batch " + (pageNum + 1) + ": " + csids.size() + " records starting with " + csids.get(0));
@@ -375,7 +394,8 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 
 		String query = "SELECT ecm:uuid, ecm:primaryType FROM Document " +
 					   "WHERE ecm:name IN (" + StringUtils.join(quoteList(csids), ',') + ") " +
-					   "AND ecm:primaryType LIKE '" + docType + "%'";
+					   "AND ecm:primaryType LIKE '" + docType + "%' " +
+					   "AND ecm:isCheckedInVersion = 0 AND ecm:isProxy = 0";
 		IterableQueryResult result = session.queryAndFetch(query, NXQL.NXQL, QueryFilter.EMPTY);
 		
 		try {
