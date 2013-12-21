@@ -323,7 +323,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 						throw new StoppedException();
 					}
 
-					csids = findAllAuthorityItems((AuthorityResource<?, ?>) resource, vocabularyCsid, pageSize, pageNum, "collectionspace_core:createdAt");
+					csids = findAllAuthorityItems((AuthorityResource<?, ?>) resource, vocabularyCsid, pageSize, pageNum, "collectionspace_core:createdAt, ecm:name");
 					
 					if (csids.size() > 0) {
 						log.debug("reindexing vocabulary of " + docType +" with csid " + vocabularyCsid + ", batch " + (pageNum + 1) + ": " + csids.size() + " records starting with " + csids.get(0));
@@ -355,7 +355,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 					throw new StoppedException();
 				}
 				
-				csids = findAll(resource, pageSize, pageNum, "collectionspace_core:createdAt");
+				csids = findAll(resource, pageSize, pageNum, "collectionspace_core:createdAt, ecm:name");
 				
 				if (csids.size() > 0) {
 					log.debug("reindexing " + docType +" batch " + (pageNum + 1) + ": " + csids.size() + " records starting with " + csids.get(0));
