@@ -50,7 +50,6 @@ import org.nuxeo.ecm.core.storage.sql.coremodel.BinaryTextListener;
 import org.nuxeo.ecm.core.storage.sql.coremodel.SQLSession;
 import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.runtime.transaction.TransactionHelper;
-import org.nuxeo.runtime.transaction.TransactionRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +63,6 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 	public static final int DEFAULT_BATCH_PAUSE = 0;
 	public static final String BATCH_STOP_FILE = "stopBatch";
 	public static final String DOCTYPE_STOP_FILE = "stopDocType";
-	public static final int RETRY_LIMIT = 10;
 	
 	private int batchSize = DEFAULT_BATCH_SIZE;
 	private int batchPause = DEFAULT_BATCH_PAUSE;
@@ -314,7 +312,6 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 
 			for (String vocabularyCsid : vocabularyCsids) {
 				int pageNum = startPage;
-				int retryCounter = 0;
 				List<String> csids = null;
 
 				log.debug("reindexing vocabulary of " + docType + " with csid " + vocabularyCsid);
@@ -326,45 +323,29 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 						throw new StoppedException();
 					}
 
-					try {
-						csids = findAllAuthorityItems((AuthorityResource<?, ?>) resource, vocabularyCsid, pageSize, pageNum, "collectionspace_core:createdAt, ecm:name");
+					csids = findAllAuthorityItems((AuthorityResource<?, ?>) resource, vocabularyCsid, pageSize, pageNum, "collectionspace_core:createdAt, ecm:name");
+					
+					if (csids.size() > 0) {
+						log.debug("reindexing vocabulary of " + docType +" with csid " + vocabularyCsid + ", batch " + (pageNum + 1) + ": " + csids.size() + " records starting with " + csids.get(0));
 						
-						if (csids.size() > 0) {
-							log.debug("reindexing vocabulary of " + docType +" with csid " + vocabularyCsid + ", batch " + (pageNum + 1) + ": " + csids.size() + " records starting with " + csids.get(0));
+						// Pause for the configured amount of time.
+						
+						if (batchPause > 0) {
+							log.trace("pausing " + batchPause + " ms");
 							
-							// Pause for the configured amount of time.
-							
-							if (batchPause > 0) {
-								log.trace("pausing " + batchPause + " ms");
-								
-								Thread.sleep(batchPause);
-							}
-							
-							reindexDocuments(docType, csids);
+							Thread.sleep(batchPause);
 						}
 						
-						pageNum++;
-						retryCounter = 0;
+						reindexDocuments(docType, csids);
 					}
-					catch(TransactionRuntimeException e) {
-						// The batch failed (probably due to a timeout). Retry the same batch,
-						// as long as the number of retries doesn't exceed the limit.
-						
-						retryCounter++;
-						
-						if (retryCounter > RETRY_LIMIT) {
-							throw e;
-						}
-						
-						log.debug("batch failed, retrying with retryCounter=" + retryCounter);
-					}
+					
+					pageNum++;
 				}
-				while(retryCounter > 0 || (csids.size() == pageSize && pageNum <= endPage));
+				while(csids.size() == pageSize && pageNum <= endPage);
 			}
 		}
 		else {
 			int pageNum = startPage;
-			int retryCounter = 0;
 			List<String> csids = null;
 
 			do {
@@ -374,40 +355,25 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 					throw new StoppedException();
 				}
 				
-				try {
-					csids = findAll(resource, pageSize, pageNum, "collectionspace_core:createdAt, ecm:name");
+				csids = findAll(resource, pageSize, pageNum, "collectionspace_core:createdAt, ecm:name");
+				
+				if (csids.size() > 0) {
+					log.debug("reindexing " + docType +" batch " + (pageNum + 1) + ": " + csids.size() + " records starting with " + csids.get(0));
 					
-					if (csids.size() > 0) {
-						log.debug("reindexing " + docType +" batch " + (pageNum + 1) + ": " + csids.size() + " records starting with " + csids.get(0));
+					// Pause for the configured amount of time.
+					
+					if (batchPause > 0) {
+						log.trace("pausing " + batchPause + " ms");
 						
-						// Pause for the configured amount of time.
-						
-						if (batchPause > 0) {
-							log.trace("pausing " + batchPause + " ms");
-							
-							Thread.sleep(batchPause);
-						}
-	
-						reindexDocuments(docType, csids);
+						Thread.sleep(batchPause);
 					}
-					
-					pageNum++;
-					retryCounter = 0;
+
+					reindexDocuments(docType, csids);
 				}
-				catch(TransactionRuntimeException e) {
-					// The batch failed (probably due to a timeout). Retry the same batch,
-					// as long as the number of retries doesn't exceed the limit.
-					
-					retryCounter++;
-					
-					if (retryCounter > RETRY_LIMIT) {
-						throw e;
-					}
-					
-					log.debug("batch failed, retrying with retryCounter=" + retryCounter);
-				}
+				
+				pageNum++;
 			}
-			while(retryCounter > 0 || (csids.size() == pageSize && pageNum <= endPage));
+			while(csids.size() == pageSize && pageNum <= endPage);
 		}
 	}
 	
