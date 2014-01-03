@@ -136,7 +136,11 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 					throw new Exception("no docType was supplied");
 				}
 
-				log.debug("reindexing " + docType + " records with csids: " + StringUtils.join(csids, ", "));
+				log.debug("reindexing " + csids.size() + " " + docType + " records with csids: " + csids.get(0) + ", ...");
+				
+				if (log.isTraceEnabled()) {
+					log.trace(StringUtils.join(csids, ", "));
+				}
 				
 				reindexDocuments(docType, csids);
 			}
