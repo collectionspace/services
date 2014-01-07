@@ -52,15 +52,26 @@ public class SpringPermissionEvaluator implements CSpacePermissionEvaluator {
 
     @Override
     public boolean hasPermission(CSpaceResource res, CSpaceAction action) {
-        Permission perm = SpringAuthorizationProvider.getPermission(action);
-        Authentication authToken = SecurityContextHolder.getContext().getAuthentication();
-        Serializable objectIdId = SpringAuthorizationProvider.getObjectIdentityIdentifier(res);
-        String objectIdType = SpringAuthorizationProvider.getObjectIdentityType(res);
-        PermissionEvaluator eval = provider.getProviderPermissionEvaluator();
+    	boolean result = false;
+    	
+    	try {
+	        Permission perm = SpringAuthorizationProvider.getPermission(action);
+	        Authentication authToken = SecurityContextHolder.getContext().getAuthentication();
+	        Serializable objectIdId = SpringAuthorizationProvider.getObjectIdentityIdentifier(res);
+	        String objectIdType = SpringAuthorizationProvider.getObjectIdentityType(res);
+	        PermissionEvaluator eval = provider.getProviderPermissionEvaluator();
+	        
+	        debug(res, authToken, objectIdId, objectIdType, perm);
+	        result = eval.hasPermission(authToken,
+	                objectIdId, objectIdType, perm);
+    	} catch (Exception e) {
+    		//
+    		// If this exception is caused by a network timeout, we may want to reattempt
+    		//
+    		log.error("Unexpected exception encountered while evaluating permissions.", e);
+    	}
         
-        debug(res, authToken, objectIdId, objectIdType, perm);
-        return eval.hasPermission(authToken,
-                objectIdId, objectIdType, perm);
+        return result;
     }
     
     private void debug(CSpaceResource res,
