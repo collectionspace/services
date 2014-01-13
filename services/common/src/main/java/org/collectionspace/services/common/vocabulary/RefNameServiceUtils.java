@@ -266,9 +266,9 @@ public class RefNameServiceUtils {
             // the following call, as they pertain to the list of authority
             // references to be returned, not to the list of documents to be
             // scanned for those references.
-            DocumentModelList docList = findAuthorityRefDocs(ctx, repoClient, repoSession,
+            DocumentModelList docList = findAuthorityRefDocsLazy(ctx, repoClient, repoSession,
                     serviceTypes, refName, refPropName, queriedServiceBindings, authRefFieldsByService,
-                    filter.getWhereClause(), null, 0 /* pageSize */, 0 /* pageNum */, computeTotal);
+                    filter.getWhereClause(), null, 2*pageSize /* pageSize */, computeTotal);
 
             if (docList == null) { // found no authRef fields - nothing to process
                 return wrapperList;
@@ -465,7 +465,25 @@ public class RefNameServiceUtils {
         return nRefsFound;
     }
 
-    private static DocumentModelList findAuthorityRefDocs(
+    private static DocumentModelList findAuthorityRefDocsLazy(
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+            RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
+            RepositoryInstance repoSession, List<String> serviceTypes,
+            String refName,
+            String refPropName,
+            Map<String, ServiceBindingType> queriedServiceBindings,
+            Map<String, List<AuthRefConfigInfo>> authRefFieldsByService,
+            String whereClauseAdditions,
+            String orderByClause,
+            int pageSize,
+            boolean computeTotal) throws DocumentException, DocumentNotFoundException {
+    	    	
+    	return new LazyAuthorityRefDocList(ctx, repoClient, repoSession,
+    			serviceTypes, refName, refPropName, queriedServiceBindings, authRefFieldsByService,
+    			whereClauseAdditions, orderByClause, pageSize, computeTotal);
+    }
+    
+    protected static DocumentModelList findAuthorityRefDocs(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
             RepositoryInstance repoSession, List<String> serviceTypes,
