@@ -266,9 +266,16 @@ public class RefNameServiceUtils {
             // the following call, as they pertain to the list of authority
             // references to be returned, not to the list of documents to be
             // scanned for those references.
-            DocumentModelList docList = findAuthorityRefDocs(ctx, repoClient, repoSession,
+            
+            // Get a list of possibly referencing documents. This list is
+            // lazily loaded, page by page. Ideally, only one page will
+            // need to be loaded to fill one page of results. Some number
+            // of possibly referencing documents will be false positives,
+            // so use a page size of double the requested page size to
+            // account for those.
+            DocumentModelList docList = findAllAuthorityRefDocs(ctx, repoClient, repoSession,
                     serviceTypes, refName, refPropName, queriedServiceBindings, authRefFieldsByService,
-                    filter.getWhereClause(), null, 0 /* pageSize */, 0 /* pageNum */, computeTotal);
+                    filter.getWhereClause(), null, 2*pageSize, computeTotal);
 
             if (docList == null) { // found no authRef fields - nothing to process
                 return wrapperList;
@@ -465,7 +472,25 @@ public class RefNameServiceUtils {
         return nRefsFound;
     }
 
-    private static DocumentModelList findAuthorityRefDocs(
+    private static DocumentModelList findAllAuthorityRefDocs(
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+            RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
+            RepositoryInstance repoSession, List<String> serviceTypes,
+            String refName,
+            String refPropName,
+            Map<String, ServiceBindingType> queriedServiceBindings,
+            Map<String, List<AuthRefConfigInfo>> authRefFieldsByService,
+            String whereClauseAdditions,
+            String orderByClause,
+            int pageSize,
+            boolean computeTotal) throws DocumentException, DocumentNotFoundException {
+    	    	
+    	return new LazyAuthorityRefDocList(ctx, repoClient, repoSession,
+    			serviceTypes, refName, refPropName, queriedServiceBindings, authRefFieldsByService,
+    			whereClauseAdditions, orderByClause, pageSize, computeTotal);
+    }
+    
+    protected static DocumentModelList findAuthorityRefDocs(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
             RepositoryInstance repoSession, List<String> serviceTypes,
