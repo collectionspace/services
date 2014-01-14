@@ -19,9 +19,15 @@ import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 
 import com.google.common.collect.AbstractIterator;
 
+/**
+ * A DocumentModelList representing all of the documents that reference an authority item.
+ * List items are lazily fetched one page at a time, as they are accessed through the
+ * list's Iterator, retrieved with the iterator() method. List items may not be accessed
+ * through any other means, including the get() method, or through the ListIterator retrieved
+ * with the listIterator() method. Attempts to do so will result in unspecified behavior.
+ * 
+ */
 public class LazyAuthorityRefDocList extends DocumentModelListImpl {
-	public static final int DEFAULT_PAGE_SIZE = 100;
-	
 	private static final long serialVersionUID = 1L;
 	
 	private ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx;
@@ -34,10 +40,29 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 	private Map<String, List<AuthRefConfigInfo>> authRefFieldsByService;
 	private String whereClauseAdditions;
 	private String orderByClause;
-	private int pageSize = DEFAULT_PAGE_SIZE;
+	private int pageSize;
 	
 	private DocumentModelList firstPageDocList;
 	
+	/**
+	 * Creates a LazyAuthorityRefDocList. The method signature is modeled after
+	 * RefNameServiceUtils.findAuthorityRefDocs (the non-lazy way of doing this).
+	 * 
+	 * @param ctx
+	 * @param repoClient
+	 * @param repoSession
+	 * @param serviceTypes
+	 * @param refName
+	 * @param refPropName
+	 * @param queriedServiceBindings
+	 * @param authRefFieldsByService
+	 * @param whereClauseAdditions
+	 * @param orderByClause
+	 * @param pageSize						The number of documents to retrieve in each page
+	 * @param computeTotal
+	 * @throws DocumentException
+	 * @throws DocumentNotFoundException
+	 */
 	public LazyAuthorityRefDocList(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
@@ -62,13 +87,24 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 		this.whereClauseAdditions = whereClauseAdditions;
 		this.orderByClause = orderByClause;
 		this.pageSize = pageSize;
-		
-		// If totals should be computed, do it on the initial page fetch.
-		// There's probably no need to do it when fetching subsequent pages.
+
+		// Fetch the first page immediately. This is necessary so that calls
+		// to totalSize() will work properly. The computeTotal flag is passed
+		// into this initial page fetch. There's no need to compute totals
+		// when fetching subsequent pages.
 		
 		firstPageDocList = fetchPage(0, computeTotal);
 	}
 
+	/**
+	 * Retrieves a page of authority references.
+	 * 
+	 * @param pageNum		The page number
+	 * @param computeTotal	
+	 * @return
+	 * @throws DocumentNotFoundException
+	 * @throws DocumentException
+	 */
 	private DocumentModelList fetchPage(int pageNum, boolean computeTotal) throws DocumentNotFoundException, DocumentException {
 		return RefNameServiceUtils.findAuthorityRefDocs(ctx, repoClient, repoSession,
                 serviceTypes, refName, refPropName, queriedServiceBindings, authRefFieldsByService,
@@ -77,33 +113,60 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 		
 	@Override
 	public long totalSize() {
+		// Return the totalSize from the first page of documents.
 		return firstPageDocList.totalSize();
 	}
 
 	@Override
 	public Iterator<DocumentModel> iterator() {
+		// Create a new iterator that starts with the first page of documents.
 		return new Itr(0, firstPageDocList);
 	}
 	
+	/**
+	 * An iterator over a LazyAuthorityRefDocList. The iterator keeps one
+	 * page of documents in memory at a time, and traverses that page. A
+	 * new page is fetched only when the current page is exhausted.
+	 *
+	 */
 	private class Itr extends AbstractIterator<DocumentModel> {
-		private DocumentModelList currentPageDocList;
 		private int currentPageNum = 0;
+		private DocumentModelList currentPageDocList;
 		private Iterator<DocumentModel> currentPageIterator;
 		
-		protected Itr(int currentPageNum, DocumentModelList currentPageDocList) {
-			this.currentPageNum = currentPageNum;
-			this.currentPageDocList = currentPageDocList;
-			this.currentPageIterator = currentPageDocList.iterator();
+		/**
+		 * Creates a new iterator.
+		 * 
+		 * @param currentPageNum		The initial page number
+		 * @param currentPageDocList	The initial page of documents
+		 */
+		protected Itr(int pageNum, DocumentModelList pageDocList) {
+			setCurrentPage(pageNum, pageDocList);
+		}
+
+		/**
+		 * Changes the current page.
+		 * 
+		 * @param pageNum		The new page number
+		 * @param pageDocList	The new page of documents
+		 */
+		private void setCurrentPage(int pageNum, DocumentModelList pageDocList) {
+			this.currentPageNum = pageNum;
+			this.currentPageDocList = pageDocList;
+			this.currentPageIterator = pageDocList.iterator();			
 		}
 		
 		@Override
 		protected DocumentModel computeNext() {
+			// Find the next document to return, looking first in the current
+			// page. If the current page is exhausted, fetch the next page.
+			
 			if (currentPageIterator.hasNext()) { 
-				// There are still elements to return in the current page.
+				// There is still an element to return from the current page.
 				return currentPageIterator.next();
 			}
 			
-			// We've exhausted the current page.
+			// The current page is exhausted.
 			
 			if (currentPageDocList.size() < pageSize) { 
 				// There are no more pages.
@@ -125,18 +188,17 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 				return endOfData();					
 			}
 
-			// We successfully retrieved another page. Make it the current page.
+			// There is another page. Make it the current page.
 			
-			currentPageNum = nextPageNum;
-			currentPageDocList = nextPageDocList;
-			currentPageIterator = nextPageDocList.iterator();
+			setCurrentPage(nextPageNum, nextPageDocList);
 			
-			if (!currentPageIterator.hasNext()) {
-				// Shouldn't get here, since we already checked that the size isn't 0.
-				return endOfData();
+			if (currentPageIterator.hasNext()) {
+				return currentPageIterator.next();
 			}
 
-			return currentPageIterator.next();
+			// Shouldn't get here.
+
+			return endOfData();
 		}
 	}
 }

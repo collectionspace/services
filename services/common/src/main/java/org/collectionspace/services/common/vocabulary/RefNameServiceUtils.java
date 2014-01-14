@@ -266,7 +266,14 @@ public class RefNameServiceUtils {
             // the following call, as they pertain to the list of authority
             // references to be returned, not to the list of documents to be
             // scanned for those references.
-            DocumentModelList docList = findAuthorityRefDocsLazy(ctx, repoClient, repoSession,
+        	
+        	// Get a list of possibly referencing documents. This list is
+        	// lazily loaded, page by page. Ideally, only one page will 
+        	// need to be loaded to fill one page of results. Some number
+        	// of possibly referencing documents will be false positives,
+        	// so use a page size of double the requested page size to
+        	// account for those.
+            DocumentModelList docList = findAllAuthorityRefDocs(ctx, repoClient, repoSession,
                     serviceTypes, refName, refPropName, queriedServiceBindings, authRefFieldsByService,
                     filter.getWhereClause(), null, 2*pageSize /* pageSize */, computeTotal);
 
@@ -465,7 +472,7 @@ public class RefNameServiceUtils {
         return nRefsFound;
     }
 
-    private static DocumentModelList findAuthorityRefDocsLazy(
+    private static DocumentModelList findAllAuthorityRefDocs(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
             RepositoryInstance repoSession, List<String> serviceTypes,
