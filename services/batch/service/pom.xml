@@ -31,6 +31,11 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.authority.service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.batch.client</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -47,6 +52,11 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.collectionobject.jaxb</artifactId> <!-- FIXME: REM - Is this really a required dependency? -->
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.collectionobject.service</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -68,7 +78,12 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.relation.client</artifactId>
             <version>${project.version}</version>
-        </dependency>        
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.taxonomy.service</artifactId>
+            <version>${project.version}</version>
+        </dependency>      
         <!-- External dependencies -->        
         <dependency>
             <groupId>junit</groupId>
