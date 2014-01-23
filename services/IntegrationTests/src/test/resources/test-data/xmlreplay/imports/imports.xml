@@ -328,6 +328,55 @@
             <uri>/cspace-services/locationauthorities/${importLocationAuthorityWithGeneratedRefName.recordCSID}</uri>
         </test>
         
+        <!--
+            Import an authority item record containing a dollar sign character in the display name part of its refName.
+        -->
+        <test ID="importLocationItemWithDollarSignInRefName">
+            <expectedCodes>200</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/imports</uri>
+            <filename>imports/import-locationitem-dollarsign.xml</filename>
+            <vars>
+                <var ID="recordCSID">ec1b0f42-70ef-4ab3-b81e-d73cadbc25f5</var>
+                <var ID="shortIdentifierValue">afistfulofdollars</var>
+                <var ID="inAuthorityValue">${importLocationAuthorityWithVarExpansion.recordCSID}</var>
+                <var ID="termDisplayNameValue">A Fistful of $$$ Dollars</var>
+            </vars>
+            <response>
+                <expected level="TEXT" />
+                <filename>imports/res/import-locationitem-dollarsign.res.xml</filename>
+            </response>
+        </test>
+        <!-- Verify values in the collectionspace_core schema as well as in locations_common -->
+        <test ID="verifyLocationItemWithDollarSignInRefName">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/${importLocationAuthorityWithVarExpansion.recordCSID}/items/${importLocationItemWithDollarSignInRefName.recordCSID}</uri>
+            <response>
+                <filename>imports/res/import-locationitem-dollarsign.res.xml</filename>
+                <expected level="ADDOK" />
+                <parts>
+                    <part>
+                        <label>collectionspace_core</label>
+                    </part>
+                    <part>
+                        <label>locations_common</label>
+                    </part>
+                </parts>
+                <vars>
+                    <var ID="shortIdentifierValue">${importLocationItemWithDollarSignInRefName.shortIdentifierValue}</var>
+                    <var ID="inAuthorityValue">${importLocationItemWithDollarSignInRefName.inAuthorityValue}</var>
+                    <var ID="termDisplayNameValue">${importLocationItemWithDollarSignInRefName.termDisplayNameValue}</var>
+                    <var ID="uriValue">/locationauthorities/${importLocationAuthorityWithVarExpansion.recordCSID}/items/${importLocationItemWithDollarSignInRefName.recordCSID}</var>
+                </vars>
+            </response>
+        </test>
+        <test ID="deleteLocationItemWithDollarSignInRefName">
+            <expectedCodes>200</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/locationauthorities/${importLocationAuthorityWithVarExpansion.recordCSID}/items/${importLocationItemWithDollarSignInRefName.recordCSID}</uri>
+        </test>
+        
                 
         <!--
             Import a record containing dollar sign and backslash character(s).
