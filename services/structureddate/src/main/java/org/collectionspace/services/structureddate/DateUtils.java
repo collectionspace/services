@@ -157,4 +157,77 @@ public class DateUtils {
 	
 		return ((int) Math.round(Math.abs(2100 - year) * 0.05));
 	}
+	
+	/**
+	 * Adds a number of years to a date.
+	 * 
+	 * @param date  The date	
+	 * @param years The number of years to add to the date
+	 */
+	public static void addYears(Date date, int years) {
+		Integer currentYear = date.getYear();
+		
+		if (currentYear == null) {
+			throw new IllegalArgumentException("null year in date");
+		}
+
+		Era currentEra = date.getEra();
+		
+		if (currentEra == null) {
+			currentEra = Date.DEFAULT_ERA;
+		}
+
+		int newYear = currentYear;
+		Era newEra = currentEra;
+
+		if (years > 0) {
+			if (currentEra == Era.CE) {
+				newYear = currentYear + years;
+			}
+			else {
+				newYear = currentYear - years;
+				
+				if (newYear <= 0) {
+					// We crossed the BC/AD boundary. Flip the sign, and 
+					// add one, since there's no year zero.					
+					newYear = -newYear + 1;
+					
+					// Change the era.
+					newEra = Era.CE;
+				}
+			}
+		}
+		else if (years < 0) {
+			years = -years;
+			
+			if (currentEra == Era.BCE) {
+				newYear = currentYear + years;
+			}
+			else {
+				newYear = currentYear - years;
+				
+				if (newYear <= 0) {
+					// We crossed the AD/BC boundary. Flip the sign, and
+					// add one, since there's no year zero.
+					newYear = -newYear + 1;
+					
+					// Change the era.
+					newEra = Era.BCE;
+				}
+			}
+		}
+		
+		date.setYear(newYear);
+		date.setEra(newEra);
+	}
+	
+	/**
+	 * Subtracts a number of years from a date.
+	 * 
+	 * @param date  The date	
+	 * @param years The number of years to subtract from the date
+	 */
+	public static void subtractYears(Date date, int years) {
+		addYears(date, -years);
+	}
 }
