@@ -56,17 +56,17 @@ import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BatchDocumentModelHandler 
-	extends DocHandlerBase<BatchCommon> {
-    private final Logger logger = LoggerFactory.getLogger(BatchDocumentModelHandler.class);
+public class BatchDocumentModelHandler extends DocHandlerBase<BatchCommon> {
+	private final Logger logger = LoggerFactory
+			.getLogger(BatchDocumentModelHandler.class);
 
-	protected final int BAD_REQUEST_STATUS = Response.Status.BAD_REQUEST.getStatusCode();
-	
+	protected final int BAD_REQUEST_STATUS = Response.Status.BAD_REQUEST
+			.getStatusCode();
+
 	public InvocationResults invokeBatchJob(
-			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-			String csid,
-			ResourceMap resourceMap, 
-			InvocationContext invContext) throws Exception {
+			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String csid,
+			ResourceMap resourceMap, InvocationContext invContext)
+			throws Exception {
 
 		RepositoryInstance repoSession = null;
 		boolean releaseRepoSession = false;
@@ -74,21 +74,26 @@ public class BatchDocumentModelHandler
 		String invocationMode = invContext.getMode();
 		String modeProperty = null;
 		boolean checkDocType = true;
-		if(BatchInvocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationMode)) {
+		if (BatchInvocable.INVOCATION_MODE_SINGLE
+				.equalsIgnoreCase(invocationMode)) {
 			modeProperty = BatchJAXBSchema.SUPPORTS_SINGLE_DOC;
-		} else if(BatchInvocable.INVOCATION_MODE_LIST.equalsIgnoreCase(invocationMode)) {
+		} else if (BatchInvocable.INVOCATION_MODE_LIST
+				.equalsIgnoreCase(invocationMode)) {
 			modeProperty = BatchJAXBSchema.SUPPORTS_DOC_LIST;
-		} else if(BatchInvocable.INVOCATION_MODE_GROUP.equalsIgnoreCase(invocationMode)) {
+		} else if (BatchInvocable.INVOCATION_MODE_GROUP
+				.equalsIgnoreCase(invocationMode)) {
 			modeProperty = BatchJAXBSchema.SUPPORTS_GROUP;
-		} else if(Invocable.INVOCATION_MODE_NO_CONTEXT.equalsIgnoreCase(invocationMode)) {
+		} else if (Invocable.INVOCATION_MODE_NO_CONTEXT
+				.equalsIgnoreCase(invocationMode)) {
 			modeProperty = InvocableJAXBSchema.SUPPORTS_NO_CONTEXT;
 			checkDocType = false;
 		} else {
-			throw new BadRequestException("BatchResource: unknown Invocation Mode: "
-					+invocationMode);
+			throw new BadRequestException(
+					"BatchResource: unknown Invocation Mode: " + invocationMode);
 		}
 
-		RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
+		RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl) this
+				.getRepositoryClient(ctx);
 		repoSession = this.getRepositorySession();
 		if (repoSession == null) {
 			repoSession = repoClient.getRepositorySession(ctx);
@@ -96,90 +101,106 @@ public class BatchDocumentModelHandler
 		}
 
 		String className = null;
-		// Get properties from the batch docModel, and release the session
+		InvocationResults results = null;
 		try {
-			DocumentWrapper<DocumentModel> wrapper = repoClient.getDoc(repoSession, ctx, csid);
-			DocumentModel docModel = wrapper.getWrappedObject();
-			Boolean supports = (Boolean)docModel.getPropertyValue(modeProperty);
-			if(!supports) {
-				throw new BadRequestException("BatchResource: This Batch Job does not support Invocation Mode: "
-						+invocationMode);
-			}
-			if(checkDocType) {
-				List<String> forDocTypeList = 
-						(List<String>)docModel.getPropertyValue(BatchJAXBSchema.FOR_DOC_TYPES);
-				if(forDocTypeList==null
-						|| !forDocTypeList.contains(invContext.getDocType())) {
+			// Get properties from the batch docModel, and release the session
+			try {
+				DocumentWrapper<DocumentModel> wrapper = repoClient.getDoc(
+						repoSession, ctx, csid);
+				DocumentModel docModel = wrapper.getWrappedObject();
+				Boolean supports = (Boolean) docModel
+						.getPropertyValue(modeProperty);
+				if (!supports) {
 					throw new BadRequestException(
-							"BatchResource: Invoked with unsupported document type: "
-									+invContext.getDocType());
+							"BatchResource: This Batch Job does not support Invocation Mode: "
+									+ invocationMode);
+				}
+				if (checkDocType) {
+					List<String> forDocTypeList = (List<String>) docModel
+							.getPropertyValue(BatchJAXBSchema.FOR_DOC_TYPES);
+					if (forDocTypeList == null
+							|| !forDocTypeList.contains(invContext.getDocType())) {
+						throw new BadRequestException(
+								"BatchResource: Invoked with unsupported document type: "
+										+ invContext.getDocType());
+					}
+				}
+				className = (String) docModel
+						.getPropertyValue(BatchJAXBSchema.BATCH_CLASS_NAME);
+			} catch (PropertyException pe) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("Property exception getting batch values: ", pe);
+				}
+				throw pe;
+			} catch (DocumentException de) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("Problem getting batch doc: ", de);
+				}
+				throw de;
+			} catch (Exception e) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Caught exception ", e);
+                }
+                throw new DocumentException(e);    
+            }
+			className = className.trim();
+			ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+			Class<?> c = tccl.loadClass(className);
+			// enable validation assertions
+			tccl.setClassAssertionStatus(className, true);
+			if (!BatchInvocable.class.isAssignableFrom(c)) {
+				throw new RuntimeException("BatchResource: Class: " + className
+						+ " does not implement BatchInvocable!");
+			}
+			BatchInvocable batchInstance = (BatchInvocable) c.newInstance();
+			List<String> modes = batchInstance.getSupportedInvocationModes();
+			if (!modes.contains(invocationMode)) {
+				throw new BadRequestException(
+						"BatchResource: Invoked with unsupported context mode: "
+								+ invocationMode);
+			}
+			batchInstance.setInvocationContext(invContext);
+			if (resourceMap != null) {
+				batchInstance.setResourceMap(resourceMap);
+			} else {
+				resourceMap = ResteasyProviderFactory
+						.getContextData(ResourceMap.class);
+				if (resourceMap != null) {
+					batchInstance.setResourceMap(resourceMap);
+				} else {
+					logger.warn("BatchResource.invoke did not get a resourceMapHolder in Context!");
 				}
 			}
-			className = (String)docModel.getPropertyValue(BatchJAXBSchema.BATCH_CLASS_NAME);
-		} catch (PropertyException pe) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Property exception getting batch values: ", pe);
+			batchInstance.setTenantId(ctx.getTenantId());
+			batchInstance.setRepoSession(repoSession);
+			batchInstance.run();
+			int status = batchInstance.getCompletionStatus();
+			if (status == Invocable.STATUS_ERROR) {
+				InvocationError error = batchInstance.getErrorInfo();
+				if (error.getResponseCode() == BAD_REQUEST_STATUS) {
+					throw new BadRequestException(
+							"BatchResouce: batchProcess encountered error: "
+									+ batchInstance.getErrorInfo());
+				} else {
+					throw new RuntimeException(
+							"BatchResouce: batchProcess encountered error: "
+									+ batchInstance.getErrorInfo());
+	
+				}
 			}
-			throw pe;
-		} catch (DocumentException de) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Problem getting batch doc: ", de);
-			}
-			throw de;
+			results = batchInstance.getResults();
 		} catch (Exception e) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Caught exception ", e);
 			}
-			throw new DocumentException(e);
+			throw(e);
 		} finally {
+			logger.debug("releasing session");
 			if (releaseRepoSession && repoSession != null) {
 				repoClient.releaseRepositorySession(ctx, repoSession);
 			}
 		}
-		className = className.trim();
-		ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-		Class<?> c = tccl.loadClass(className);
-		// enable validation assertions
-		tccl.setClassAssertionStatus(className, true);
-		if(!BatchInvocable.class.isAssignableFrom(c)) {
-			throw new RuntimeException("BatchResource: Class: "
-					+className+" does not implement BatchInvocable!");
-		}
-		BatchInvocable batchInstance = (BatchInvocable)c.newInstance();
-		List<String> modes = batchInstance.getSupportedInvocationModes();
-		if(!modes.contains(invocationMode)) {
-			throw new BadRequestException(
-					"BatchResource: Invoked with unsupported context mode: "
-							+invocationMode);
-		}
-		batchInstance.setInvocationContext(invContext);
-		if(resourceMap!=null) {
-			batchInstance.setResourceMap(resourceMap);
-		} else {
-			resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
-			if(resourceMap!=null) {
-				batchInstance.setResourceMap(resourceMap);
-			} else {
-				logger.warn("BatchResource.invoke did not get a resourceMapHolder in Context!");
-			}
-		}
-		batchInstance.run();
-		int status = batchInstance.getCompletionStatus();
-		if(status == Invocable.STATUS_ERROR) {
-			InvocationError error = batchInstance.getErrorInfo();
-			if(error.getResponseCode() == BAD_REQUEST_STATUS) {
-				throw new BadRequestException(
-						"BatchResouce: batchProcess encountered error: "
-								+batchInstance.getErrorInfo());
-			} else {
-				throw new RuntimeException(
-						"BatchResouce: batchProcess encountered error: "
-								+batchInstance.getErrorInfo());
-
-			}
-		}
-		InvocationResults results = batchInstance.getResults();
+		
 		return results;
 	}
 }
-
