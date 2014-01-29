@@ -60,20 +60,6 @@
 		</dependency>
     </dependencies>
 
-    <repositories>
-        <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <id>el4jReleaseRepositoryExternal</id>
-            <name>External release repository of the EL4J project</name>
-            <url>http://public-el4.elca-services.ch/el4j/maven2repository</url>
-        </repository>
-    </repositories>
-
     <build>
         <finalName>collectionspace-services-config</finalName>
     	<defaultGoal>install</defaultGoal>

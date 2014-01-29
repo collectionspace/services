@@ -118,6 +118,18 @@
 		</repository>
 
 		<repository>
+			<id>nuxeo-public</id>
+			<name>nuxeo-public</name>
+			<url>http://nightly.collectionspace.org:8081/artifactory/nuxeo-public</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+    
+		<repository>
 			<id>public-snapshot</id>
 			<url>http://maven.nuxeo.org/public-snapshot</url>
 			<!-- Nuxeo Snapshots Repository is disabled. -->
@@ -143,23 +155,6 @@
 		</repository>
 
 		<repository>
-			<id>nuxeo-public</id>
-			<name>nuxeo-public</name>
-			<url>http://nightly.collectionspace.org:8081/artifactory/nuxeo-public</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<!-- This should no longer be needed since we're using only "releases" 
-			artifacts <repository> <id>nuxeo-public-snapshot</id> <name>nuxeo-public-snapshot</name> 
-			<url>http://nightly.collectionspace.org:8081/artifactory/nuxeo-public-snapshot</url> 
-			<releases> <enabled>false</enabled> </releases> <snapshots> <enabled>true</enabled> 
-			<updatePolicy>never</updatePolicy> </snapshots> </repository> -->
-
-		<repository>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -170,15 +165,26 @@
 			<name>External release repository of the EL4J project</name>
 			<url>http://public-el4.elca-services.ch/el4j/maven2repository</url>
 		</repository>
-
+    
+    <repository>
+      <snapshots>
+          <enabled>false</enabled>
+      </snapshots>
+      <releases>
+          <enabled>true</enabled>
+      </releases>
+      <id>Apache</id>
+      <name>External release repository of the Apache projects</name>
+      <url>https://repository.apache.org/content/groups/public/</url>
+    </repository>
 
 	</repositories>
 
 	<pluginRepositories>
 		<pluginRepository>
-			<id>collectionspace-plugins-remote-repos</id>
-			<name>collectionspace-plugins-remote-repos</name>
-			<url>http://nightly.collectionspace.org:8081/artifactory/plugins-remote-repos</url>
+			<id>collectionspace-remote-repos</id>
+			<name>collectionspace-remote-repos</name>
+			<url>http://nightly.collectionspace.org:8081/artifactory/remote-repos</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
