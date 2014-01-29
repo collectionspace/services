@@ -25,6 +25,7 @@ package org.collectionspace.services.common.vocabulary;
 
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -40,11 +41,13 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+
 import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMain;
@@ -140,7 +143,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         }
     }
 
-    protected Specifier getSpecifier(String specifierIn, String method, String op) throws WebApplicationException {
+    protected Specifier getSpecifier(String specifierIn, String method, String op) throws CSWebApplicationException {
         if (logger.isDebugEnabled()) {
             logger.debug("getSpecifier called by: " + method + " with specifier: " + specifierIn);
         }
@@ -168,7 +171,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         Response response = Response.status(Response.Status.BAD_REQUEST).entity(
                 op + " failed on bad or missing Authority specifier").type(
                 "text/plain").build();
-        throw new WebApplicationException(response);
+        throw new CSWebApplicationException(response);
     }
 
     /**
@@ -416,7 +419,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Get failed, the requested Authority specifier:" + specifier + ": was not found.").type(
                     "text/plain").build();
-            throw new WebApplicationException(response);
+            throw new CSWebApplicationException(response);
         }
 
         return result.getBytes();
@@ -657,12 +660,14 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED);
         }
+        
         if (result == null) {
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Get failed, the requested AuthorityItem specifier:" + itemspecifier + ": was not found.").type(
                     "text/plain").build();
-            throw new WebApplicationException(response);
+            throw new CSWebApplicationException(response);
         }
+        
         return result.getBytes();
     }
 
@@ -808,7 +813,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Get failed, the requested Item CSID:" + itemspecifier + ": was not found.").type(
                     "text/plain").build();
-            throw new WebApplicationException(response);
+            throw new CSWebApplicationException(response);
         }
         return authRefDocList;
     }

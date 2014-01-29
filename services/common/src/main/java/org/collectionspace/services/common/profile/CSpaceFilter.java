@@ -17,6 +17,8 @@
 package org.collectionspace.services.common.profile;
 
 import java.io.IOException;
+import java.net.SocketException;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -26,9 +28,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 //import javax.servlet.ServletContext;
 
+
 import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.common.ServletTools;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +53,8 @@ public class CSpaceFilter implements Filter {
     FilterConfig filterConfig = null;
 
     private final String CLASS_NAME = this.getClass().getSimpleName();
+	private static final int MAX_RETRY_SECONDS = 5;
+
 
     /* (non-Javadoc)
      * @see javax.servlet.Filter#destroy()
@@ -96,7 +100,13 @@ public class CSpaceFilter implements Filter {
            profiler.log(csvMsg, FORMAT_LOG_MESSAGE);
 
             // Process the request.
-            chain.doFilter(request, response);
+            //chain.doFilter(request, response);
+			try {
+				invoke(request, response, chain);
+			} catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
             // Stop timing and log performance-related metrics.
             profiler.stop();
@@ -116,6 +126,61 @@ public class CSpaceFilter implements Filter {
             profiler.reset();
         }
     }
+    
+	public void invoke(ServletRequest request, ServletResponse response,
+            FilterChain chain) throws Throwable {
+		Throwable lastException = null;
+		int attempt = 0;
+
+		long quittingTime = System.currentTimeMillis() + MAX_RETRY_SECONDS * 1000;
+		do {
+			try {
+				// proceed to original method call
+				chain.doFilter(request, response);
+				String contentType = response.getContentType();
+				lastException = null;
+				break;
+			} catch (Exception e) {
+				lastException = e;
+				if (exceptionChainContains(lastException, SocketException.class) == false) {
+					// Break if the exception chain does not contain a
+					// SocketException.
+					break;
+				}
+				attempt++;
+				System.out
+						.println(String
+								.format("'%s' URL request failed with exception '%s' at attemp '%d'",
+										ServletTools.getURL((HttpServletRequest) request),
+										lastException.getClass().getName(),
+										attempt));
+			}
+		} while (System.currentTimeMillis() < quittingTime);
+
+		if (lastException != null) {
+			throw lastException;
+		}
+
+		System.out.println("Success!");
+	}
+	
+	private boolean exceptionChainContains(Throwable exceptionChain,
+			Class<?> target) {
+		boolean result = false;
+		Throwable top = exceptionChain;
+
+		while (top != null) {
+			System.out.println(top.getClass().getCanonicalName());
+			if (target.isInstance(top) == true) {
+				result = true;
+				break;
+			}
+			top = top.getCause();
+		}
+
+		return result;
+	}
+    
 
     /* (non-Javadoc)
      * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)

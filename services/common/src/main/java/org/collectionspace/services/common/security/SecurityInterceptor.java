@@ -53,11 +53,11 @@ import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.URIResourceImpl;
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.CollectionSpaceResource;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.common.security.SecurityUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -123,7 +123,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 	 */
 	@Override
 	public ServerResponse preProcess(HttpRequest request, ResourceMethod resourceMethod)
-	throws Failure, WebApplicationException {
+			throws Failure, CSWebApplicationException {
 		ServerResponse result = null; // A null value essentially means success for this method
 		
 		if (isAnonymousRequest(request, resourceMethod) == true) {
@@ -138,13 +138,15 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 		final int servicesResourceLen = servicesResource.length();
 		String httpMethod = request.getHttpMethod();
 		String uriPath = request.getUri().getPath();
+		
 		if (logger.isDebugEnabled()) {
 			String fullRequest = request.getUri().getRequestUri().toString();
 			int servicesResourceIdx = fullRequest.indexOf(servicesResource);
 			String relativeRequest = (servicesResourceIdx<=0)? fullRequest
-												:fullRequest.substring(servicesResourceIdx+servicesResourceLen);
+												: fullRequest.substring(servicesResourceIdx+servicesResourceLen);
 			logger.debug("received " + httpMethod + " on " + relativeRequest);
 		}
+		
 		String resName = SecurityUtils.getResourceName(request.getUri());
 		String resEntity = SecurityUtils.getResourceEntity(resName);
 		
@@ -172,7 +174,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 							+ " user=" + AuthN.get().getUserId());
 					Response response = Response.status(
 							Response.Status.FORBIDDEN).entity(uriPath + " " + httpMethod).type("text/plain").build();
-					throw new WebApplicationException(response);
+					throw new CSWebApplicationException(response);
 			} else {
 				//
 				// They passed the first round of security checks, so now let's check to see if they're trying
@@ -186,7 +188,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 								+ " user=" + AuthN.get().getUserId());
 						Response response = Response.status(
 								Response.Status.FORBIDDEN).entity(uriPath + " " + httpMethod).type("text/plain").build();
-						throw new WebApplicationException(response);
+						throw new CSWebApplicationException(response);
 					}
 				}
 			}
@@ -218,10 +220,14 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 
 	/**
 	 * checkActive check if account is active
-	 * @throws WebApplicationException
+	 * @throws CSWebApplicationException
 	 */
-	private void checkActive() throws WebApplicationException {
+	private void checkActive() throws CSWebApplicationException {
 		String userId = AuthN.get().getUserId();
+		
+		if (true)
+			throw new CSWebApplicationException(new java.net.SocketException("An faux exception thrown for testing."));
+		
 		try {
 			// Need to ensure that user is associated to a tenant
 			String tenantId = AuthN.get().getCurrentTenantId();
@@ -232,8 +238,9 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 			// indicates that authorization has been refused for those credentials.
 			Response response = Response.status(
 					Response.Status.UNAUTHORIZED).entity(msg).type("text/plain").build();
-			throw new WebApplicationException(ise, response);
+			throw new CSWebApplicationException(ise, response);
 		}
+		
 		try {
 			//can't use JAXB here as this runs from the common jar which cannot
 			//depend upon the account service
@@ -247,7 +254,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 				String msg = "User's account not found, userId=" + userId;
 				Response response = Response.status(
 						Response.Status.FORBIDDEN).entity(msg).type("text/plain").build();
-				throw new WebApplicationException(response);
+				throw new CSWebApplicationException(response);
 			}
 			Object status = JaxbUtils.getValue(account, "getStatus");
 			if (status != null) {
@@ -256,7 +263,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 					String msg = "User's account is inactive, userId=" + userId;
 					Response response = Response.status(
 							Response.Status.FORBIDDEN).entity(msg).type("text/plain").build();
-					throw new WebApplicationException(response);
+					throw new CSWebApplicationException(response);
 				}
 			}
 
@@ -264,14 +271,14 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 			String msg = "User's account is in invalid state, userId=" + userId;
 			Response response = Response.status(
 					Response.Status.FORBIDDEN).entity(msg).type("text/plain").build();
-			throw new WebApplicationException(response);
+			throw new CSWebApplicationException(e, response);
 		}
 	}
 	//
 	// Nuxeo login support
 	//
 	public ServerResponse nuxeoPreProcess(HttpRequest request, ResourceMethod resourceMethod)
-			throws Failure, WebApplicationException {
+			throws Failure, CSWebApplicationException {
 		try {
 			nuxeoLogin();
 		} catch (LoginException e) {
@@ -279,7 +286,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 			logger.error(msg, e);
 			Response response = Response.status(
 					Response.Status.INTERNAL_SERVER_ERROR).entity(msg).type("text/plain").build();
-			throw new WebApplicationException(response);
+			throw new CSWebApplicationException(e, response);
 		}
 		
 		return null;

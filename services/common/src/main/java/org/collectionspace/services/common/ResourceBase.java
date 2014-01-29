@@ -253,7 +253,7 @@ public abstract class ResourceBase
             if (result == null) {
                 Response response = Response.status(Response.Status.NOT_FOUND).entity(
                         ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
-                throw new WebApplicationException(response);
+                throw new CSWebApplicationException(response);
             }
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);

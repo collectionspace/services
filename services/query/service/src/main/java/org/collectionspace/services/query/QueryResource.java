@@ -33,6 +33,8 @@ import javax.ws.rs.core.Response;
 //import javax.xml.bind.JAXBContext;
 //import javax.xml.bind.Marshaller;
 
+
+import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.query.QueryManager;
 //import org.collectionspace.services.common.NuxeoClientType;
 /*import org.collectionspace.services.common.ServiceMain;
@@ -66,12 +68,12 @@ public class QueryResource {
         if(logger.isDebugEnabled()){
             verbose("getQuery with csid=" + csid);
         }
-        if(csid == null || "".equals(csid)){
+        if (csid == null || "".equals(csid)){
             logger.error("getQuery: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
                     "get failed on getQuery csid=" + csid).type(
                     "text/plain").build();
-            throw new WebApplicationException(response);
+            throw new CSWebApplicationException(response);
         }
 
         try {
@@ -83,14 +85,14 @@ public class QueryResource {
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Get failed on query csid=" + csid).type(
                     "text/plain").build();
-            throw new WebApplicationException(response);
+            throw new CSWebApplicationException(e, response);
         }
 
-        if(false){
+        if (false) {  // REM - 1/29/2014 : Huh? Why is this essentially commented out?  Should probably clean up.
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Get failed, the requested CSID:" + csid + ": was not found.").type(
                     "text/plain").build();
-            throw new WebApplicationException(response);
+            throw new CSWebApplicationException(response);
         }
 
 //        return intakeObject;

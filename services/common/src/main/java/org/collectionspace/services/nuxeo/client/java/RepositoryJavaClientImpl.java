@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import javax.sql.rowset.CachedRowSet;
 
+import javax.sql.rowset.CachedRowSet;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -46,7 +46,6 @@ import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.common.storage.PreparedStatementSimpleBuilder;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -57,7 +56,6 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.document.TransactionException;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
-
 import org.nuxeo.common.utils.IdUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -76,6 +74,7 @@ import org.nuxeo.runtime.transaction.TransactionRuntimeException;
 //
 import org.apache.chemistry.opencmis.commons.server.CallContext;
 import org.apache.chemistry.opencmis.server.impl.CallContextImpl;
+import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.ConfigUtils;
@@ -85,7 +84,6 @@ import org.collectionspace.services.common.storage.PreparedStatementBuilder;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoCmisService;
 import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoRepository;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -910,7 +908,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception ", e);
+                logger.debug("Caught exception ", e); // REM - 1/17/2014: Check for org.nuxeo.ecm.core.api.ClientException and re-attempt
             }
             throw new DocumentException(e);
         } finally {
@@ -1354,7 +1352,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw bre;
         } catch (DocumentException de) {
             throw de;
-        } catch (WebApplicationException wae) {
+        } catch (CSWebApplicationException wae) {
             throw wae;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {

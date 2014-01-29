@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
-
 import javax.naming.NamingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -64,6 +63,7 @@ import org.collectionspace.services.report.ReportsCommon;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.ReportClient;
+import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.common.api.FileTools;
@@ -358,7 +358,7 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
                     		"Invoke failed (SQL problem) on Report csid=" + reportCSID).type("text/plain").build();
-            throw new WebApplicationException(response);
+            throw new CSWebApplicationException(sqle, response);
         } catch (JRException jre) {
             if (logger.isDebugEnabled()) {
             	logger.debug("JR Exception: " + jre.getLocalizedMessage() + " Cause: "+jre.getCause());
@@ -366,7 +366,7 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
                     		"Invoke failed (Jasper problem) on Report csid=" + reportCSID).type("text/plain").build();
-            throw new WebApplicationException(response);
+            throw new CSWebApplicationException(jre, response);
         } catch (FileNotFoundException fnfe) {
             if (logger.isDebugEnabled()) {
             	logger.debug("FileNotFoundException: " + fnfe.getLocalizedMessage());
@@ -374,11 +374,11 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
                     		"Invoke failed (SQL problem) on Report csid=" + reportCSID).type("text/plain").build();
-            throw new WebApplicationException(response);
+            throw new CSWebApplicationException(fnfe, response);
 		} finally {
-        	if(conn!=null) {
+        	if (conn!=null) {
         		try {
-        		conn.close();
+        			conn.close();
                 } catch (SQLException sqle) {
                     // SQLExceptions can be chained. We have at least one exception, so
                     // set up a loop to make sure we let the user know about all of them
