@@ -153,18 +153,18 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		
 		// Express the circa interval as a qualifier.
 		
-		stack.push(earliestDate.withQualifier(QualifierType.MINUS, earliestInterval, QualifierUnit.YEARS));
-		stack.push(latestDate.withQualifier(QualifierType.PLUS, latestInterval, QualifierUnit.YEARS));
+		// stack.push(earliestDate.withQualifier(QualifierType.MINUS, earliestInterval, QualifierUnit.YEARS));
+		// stack.push(latestDate.withQualifier(QualifierType.PLUS, latestInterval, QualifierUnit.YEARS));
 		
 		// OR:
 		
-		// Express the circa interval as an offset to the year.
+		// Express the circa interval as an offset calculated into the year.
 		
-		// DateUtils.subtractYears(earliestDate, earliestInterval);
-		// DateUtils.addYears(latestDate, latestInterval);
+		DateUtils.subtractYears(earliestDate, earliestInterval);
+		DateUtils.addYears(latestDate, latestInterval);
 		
-		// stack.push(earliestDate);
-		// stack.push(latestDate);
+		stack.push(earliestDate);
+		stack.push(latestDate);
 	}
 
 	@Override
