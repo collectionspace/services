@@ -470,77 +470,77 @@
                                          earliestSingleDate: [ 300,  9,  5, BCE]
                                          latestDate:         [ 300,  9, 18, BCE]
 
-  'circa 2013':                          # uncertainDate, year
-                                         earliestSingleDate: [2013,  1,  1, CE, null, MINUS, 4, YEARS]
-                                         latestDate:         [2013, 12, 31, CE, null, PLUS,  4, YEARS]
-
   # 'circa 2013':                          # uncertainDate, year
-  #                                        earliestSingleDate: [2009,  1,  1, CE]
-  #                                        latestDate:         [2017, 12, 31, CE]
+  #                                        earliestSingleDate: [2013,  1,  1, CE, null, MINUS, 4, YEARS]
+  #                                        latestDate:         [2013, 12, 31, CE, null, PLUS,  4, YEARS]
 
-  'ca 2013':                             # uncertainDate, year
-                                         earliestSingleDate: [2013,  1,  1, CE, null, MINUS, 4, YEARS]
-                                         latestDate:         [2013, 12, 31, CE, null, PLUS,  4, YEARS]
+  'circa 2013':                          # uncertainDate, year
+                                         earliestSingleDate: [2009,  1,  1, CE]
+                                         latestDate:         [2017, 12, 31, CE]
 
   # 'ca 2013':                             # uncertainDate, year
-  #                                        earliestSingleDate: [2009,  1,  1, CE]
-  #                                        latestDate:         [2017, 12, 31, CE]
+  #                                        earliestSingleDate: [2013,  1,  1, CE, null, MINUS, 4, YEARS]
+  #                                        latestDate:         [2013, 12, 31, CE, null, PLUS,  4, YEARS]
 
-  'ca. 2013':                            # uncertainDate, year
-                                         earliestSingleDate: [2013,  1,  1, CE, null, MINUS, 4, YEARS]
-                                         latestDate:         [2013, 12, 31, CE, null, PLUS,  4, YEARS]
+  'ca 2013':                             # uncertainDate, year
+                                         earliestSingleDate: [2009,  1,  1, CE]
+                                         latestDate:         [2017, 12, 31, CE]
 
   # 'ca. 2013':                            # uncertainDate, year
-  #                                        earliestSingleDate: [2009,  1,  1, CE]
-  #                                        latestDate:         [2017, 12, 31, CE]
+  #                                        earliestSingleDate: [2013,  1,  1, CE, null, MINUS, 4, YEARS]
+  #                                        latestDate:         [2013, 12, 31, CE, null, PLUS,  4, YEARS]
 
-  'c. 1950':                             # uncertainDate, year
-                                         earliestSingleDate: [1950,  1,  1, CE, null, MINUS, 8, YEARS]
-                                         latestDate:         [1950, 12, 31, CE, null, PLUS,  8, YEARS]
+  'ca. 2013':                            # uncertainDate, year
+                                         earliestSingleDate: [2009,  1,  1, CE]
+                                         latestDate:         [2017, 12, 31, CE]
 
   # 'c. 1950':                             # uncertainDate, year
-  #                                        earliestSingleDate: [1942,  1,  1, CE]
-  #                                        latestDate:         [1958, 12, 31, CE]
+  #                                        earliestSingleDate: [1950,  1,  1, CE, null, MINUS, 8, YEARS]
+  #                                        latestDate:         [1950, 12, 31, CE, null, PLUS,  8, YEARS]
 
-  'c1950':                               # uncertainDate, year
-                                         earliestSingleDate: [1950,  1,  1, CE, null, MINUS, 8, YEARS]
-                                         latestDate:         [1950, 12, 31, CE, null, PLUS,  8, YEARS]
+  'c. 1950':                             # uncertainDate, year
+                                         earliestSingleDate: [1942,  1,  1, CE]
+                                         latestDate:         [1958, 12, 31, CE]
 
   # 'c1950':                               # uncertainDate, year
-  #                                        earliestSingleDate: [1942,  1,  1, CE]
-  #                                        latestDate:         [1958, 12, 31, CE]
+  #                                        earliestSingleDate: [1950,  1,  1, CE, null, MINUS, 8, YEARS]
+  #                                        latestDate:         [1950, 12, 31, CE, null, PLUS,  8, YEARS]
 
-  'Circa 10 BC':                         # uncertainDate, year
-                                         earliestSingleDate: [  10,  1,  1, BCE, null, MINUS, 106, YEARS]
-                                         latestDate:         [  10, 12, 31, BCE, null, PLUS,  106, YEARS]
+  'c1950':                               # uncertainDate, year
+                                         earliestSingleDate: [1942,  1,  1, CE]
+                                         latestDate:         [1958, 12, 31, CE]
 
   # 'Circa 10 BC':                         # uncertainDate, year
-  #                                        earliestSingleDate: [ 116,  1,  1, BCE]
-  #                                        latestDate:         [  97, 12, 31, CE]
+  #                                        earliestSingleDate: [  10,  1,  1, BCE, null, MINUS, 106, YEARS]
+  #                                        latestDate:         [  10, 12, 31, BCE, null, PLUS,  106, YEARS]
 
-  'Circa 10':                            # uncertainDate, year
-                                         earliestSingleDate: [  10,  1,  1, CE, null, MINUS, 105, YEARS]
-                                         latestDate:         [  10, 12, 31, CE, null, PLUS,  105, YEARS]
+  'Circa 10 BC':                         # uncertainDate, year
+                                         earliestSingleDate: [ 116,  1,  1, BCE]
+                                         latestDate:         [  97, 12, 31, CE]
 
   # 'Circa 10':                            # uncertainDate, year
-  #                                        earliestSingleDate: [  96,  1,  1, BCE]
-  #                                        latestDate:         [ 115, 12, 31, CE]
+  #                                        earliestSingleDate: [  10,  1,  1, CE, null, MINUS, 105, YEARS]
+  #                                        latestDate:         [  10, 12, 31, CE, null, PLUS,  105, YEARS]
 
-  'circa 2100':                          # uncertainDate, year
-                                         earliestSingleDate: [2100,  1,  1, CE, null, MINUS, 0, YEARS]
-                                         latestDate:         [2100, 12, 31, CE, null, PLUS,  0, YEARS]
+  'Circa 10':                            # uncertainDate, year
+                                         earliestSingleDate: [  96,  1,  1, BCE]
+                                         latestDate:         [ 115, 12, 31, CE]
 
   # 'circa 2100':                          # uncertainDate, year
-  #                                        earliestSingleDate: [2100,  1,  1, CE]
-  #                                        latestDate:         [2100, 12, 31, CE]
+  #                                        earliestSingleDate: [2100,  1,  1, CE, null, MINUS, 0, YEARS]
+  #                                        latestDate:         [2100, 12, 31, CE, null, PLUS,  0, YEARS]
 
-  'c 1950-2013':                         # uncertainDate, hyphenatedRange, year
-                                         earliestSingleDate: [1950,  1,  1, CE, null, MINUS, 8, YEARS]
-                                         latestDate:         [2013, 12, 31, CE, null, PLUS,  4, YEARS]
+  'circa 2100':                          # uncertainDate, year
+                                         earliestSingleDate: [2100,  1,  1, CE]
+                                         latestDate:         [2100, 12, 31, CE]
 
   # 'c 1950-2013':                         # uncertainDate, hyphenatedRange, year
-  #                                        earliestSingleDate: [1942,  1,  1, CE]
-  #                                        latestDate:         [2017, 12, 31, CE]
+  #                                        earliestSingleDate: [1950,  1,  1, CE, null, MINUS, 8, YEARS]
+  #                                        latestDate:         [2013, 12, 31, CE, null, PLUS,  4, YEARS]
+
+  'c 1950-2013':                         # uncertainDate, hyphenatedRange, year
+                                         earliestSingleDate: [1942,  1,  1, CE]
+                                         latestDate:         [2017, 12, 31, CE]
          
 # -------------------------------------------------------------------------------------------------------                                         
 # Invalid dates
