@@ -8,6 +8,8 @@
     <!-- enviornment should be declared before reading build.properties -->
     <property environment="env" />
     <property file="${services.trunk}/build.properties" />
+	<property name="application.trunk" location="${services.trunk}/../application" />
+	<property name="cspace.tool.csmake" value="csmake" />
     <property name="mvn.opts" value="-V" />
     <property name="src" location="src"/>
 
@@ -138,12 +140,39 @@
         </exec>
     </target>
 
-    <target name="deploy" depends="package"
+    <target name="deploy" depends="package,deploy_services_artifacts"
     description="deploy cspace services in ${jee.server.cspace}">
 		<delete file="${catalina.context.cspace}"/> <!-- This is a Tomcat specific file that we seem to need to delete inorder for it to be replace with a more recent one during deployment -->
 		<delete dir="${jee.deploy.cspace}/${cspace.services.context}"/>
         <copy file="${basedir}/target/${cspace.services.war}" todir="${jee.deploy.cspace}"/>
     </target>
+	
+	<!--
+		This target attempts to generate a set of Service artifacts (Nuxeo bundles and tenant bindings) by using the
+		Application layer's configuration files.
+		
+		This target has a dependency on the Application layer's source tree.  It assumes the Application layer's src tree root
+		is a directory sibling of the Source layer's source tree root.  Also, it assumes the "csmake.jar" exists in the target
+		directory of the Application layer's "tomcat-main" module.
+		
+		This target also assumes that the system environment variable 'CSPACE_JEESERVER_HOME' is set and pointing to the root
+		JEE server (usually Apache Tomcat) where CollectionSpace is installed.  All generated Service artifacts wi
+	-->
+	<target name="deploy_services_artifacts"
+		description="Generates and deploys the CollectionSpace Services' schema bundles, doctype bundles, and tenant bindings.">
+		<exec executable="${env.JAVA_HOME}/bin/java" failonerror="true">
+			<arg value="-Done-jar.silent=true" />
+			<arg value="-Dcatalina.home=${env.CSPACE_JEESERVER_HOME}" />
+			<arg value="-jar" />
+			<arg value="${application.trunk}/tomcat-main/target/${cspace.tool.csmake}.jar" />
+			<arg value="-ac" />
+			<arg value="${application.trunk}/tomcat-main/src/main/resources" />
+			<arg value="-sc" />
+			<arg value="${services.trunk}/services/common/src/main" />
+			<arg value="-o" />
+			<arg value="${env.CSPACE_JEESERVER_HOME}" />
+		</exec>
+	</target>
 
     <target name="undeploy"
     description="undeploy cspace services from ${jee.server.cspace}">

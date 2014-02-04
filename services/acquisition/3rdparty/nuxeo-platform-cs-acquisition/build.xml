@@ -1,4 +1,4 @@
-
+<?xml version="1.0" encoding="UTF-8"?>
 <project name="nuxeo-platform-cs-acquisition" default="package" basedir=".">
     <description>
         acquisition nuxeo document type
@@ -10,10 +10,16 @@
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="-V" />
     <property name="src" location="src"/>
-    <property name="nuxeo.acquisition.jar"
-        value="org.collectionspace.services.acquisition.3rdparty.nuxeo-${cspace.release}.jar"/>
-    <property name="nuxeo.acquisition.jars.all"
+    <!-- JAR files used by CollectionSpace 4.0 and later -->
+    <property name="nuxeo.acquisition.doctype.jars.all"
+        value="collectionspace.acquisition.doctype.*.jar"/>
+    <property name="nuxeo.acquisition.schema.jars.all"
+        value="collectionspace.acquisition.schema.*.jar"/>
+    <!-- Legacy JAR files used by CollectionSpace 3.3 and earlier --> 
+    <property name="nuxeo.acquisition.legacy.jars.all"
         value="org.collectionspace.services.acquisition.3rdparty.nuxeo-*.jar"/>
+    <property name="nuxeo.acquisition.legacy.jar"
+        value="org.collectionspace.services.acquisition.3rdparty.nuxeo-${cspace.release}.jar"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -114,15 +120,31 @@
 
     <target name="deploy" depends="install"
         description="deploy acquisition doctype in ${jee.server.nuxeo}">
-        <copy file="${basedir}/target/${nuxeo.acquisition.jar}"
-        todir="${jee.deploy.nuxeo.plugins}"/>
+        <!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
+        leaving this only for backwards compatibility reasons. -->  
+        <copy file="${basedir}/target/${nuxeo.acquisition.legacy.jar}"
+            todir="${jee.deploy.nuxeo.plugins}"/>
     </target>
 
     <target name="undeploy"
         description="undeploy acquisition doctype from ${jee.server.nuxeo}">
         <delete>
+            <!-- Undeploy doctype and schema artifacts -->
             <fileset dir="${jee.deploy.nuxeo.plugins}">
-                <include name="${nuxeo.acquisition.jars.all}"/>
+                <include name="${nuxeo.acquisition.doctype.jars.all}"/>
+            </fileset>
+            <fileset dir="${jee.deploy.nuxeo.plugins}">
+                <include name="${nuxeo.acquisition.schema.jars.all}"/>
+            </fileset>
+            <!-- Undeploy legacy artifacts -->
+            <fileset dir="${jee.deploy.nuxeo.plugins}">
+                <include name="${nuxeo.acquisition.legacy.jars.all}"/>
+            </fileset>
+        </delete>
+        <!-- Undeploy legacy artifacts from old deployment location through release 0.6 -->
+        <delete quiet="true">
+            <fileset dir="${jee.deploy.nuxeo.system}">
+                <include name="${nuxeo.acquisition.legacy.jars.all}"/>
             </fileset>
         </delete>
     </target>
@@ -130,7 +152,7 @@
     <target name="dist"
         description="generate distribution for acquisition doctype" depends="package">
         <copy todir="${services.trunk}/${dist.deploy.nuxeo.plugins}">
-            <fileset file="${basedir}/target/${nuxeo.acquisition.jar}"/>
+            <fileset file="${basedir}/target/${nuxeo.acquisition.legacy.jar}"/>
         </copy>
     </target>
 

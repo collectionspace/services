@@ -3,6 +3,7 @@
     <auths>
         <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
         <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+        <auth ID="admin@lifesci.collectionspace.org">YWRtaW5AbGlmZXNjaS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
     </auths>
         
     <!-- This tests the UpdateObjectLocationOnMoveEventListener -->
@@ -500,7 +501,96 @@
         </test>
         
     </testGroup>
-    
+ 
+    <!-- These tests verify that updates to the computed current location values -->
+    <!-- in CollectionObject records succeed, even in tenants where Movement -->
+    <!-- records are configured to be versioned. See CSPACE-6171 for more details. -->    
+    <testGroup ID="updateObjectLocationOnMoveInVersioningEnabledTenant" autoDeletePOSTS="true">
+
+        <test ID="createCollectionObjectInVersioningTenant" auth="admin@lifesci.collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <filename>listener/collectionobject.xml</filename>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="createMovementInVersioningTenant" auth="admin@lifesci.collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/movements</uri>
+            <filename>listener/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Ecatepec13582155455560)'Ecatepec, Mexico'</var>
+                <var ID="locationDate">2000-01-01</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="relateCollectionObjectToMovementInVersioningTenant" auth="admin@lifesci.collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/relations</uri>
+            <filename>listener/relation.xml</filename>
+            <vars>
+                <var ID="subjectCsid">${createCollectionObjectInVersioningTenant.CSID}</var>
+                <var ID="subjectDocumentType">CollectionObject</var>
+                <var ID="objectCsid">${createMovementInVersioningTenant.CSID}</var>
+                <var ID="objectDocumentType">Movement</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <!-- See comment on updateMovement1 in the updateObjectLocationOnMoveEventListener -->
+        <!-- test group for an explanation of why this update is needed, after -->
+        <!-- creating a new relation -->
+        <test ID="updateMovementInVersioningTenant" auth="admin@lifesci.collectionspace.org">
+            <method>PUT</method>
+            <uri>/cspace-services/movements/${createMovementInVersioningTenant.CSID}</uri>
+            <filename>listener/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">${createMovementInVersioningTenant.currentLocation}</var>
+                <var ID="locationDate">${createMovementInVersioningTenant.locationDate}</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="readCollectionObjectAfterRelatingToMovementInVersioningTenant" auth="admin@lifesci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObjectInVersioningTenant.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>listener/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${createMovementInVersioningTenant.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="modifyMovementInVersioningTenant" auth="admin@lifesci.collectionspace.org">
+            <method>PUT</method>
+            <uri>/cspace-services/movements/${createMovementInVersioningTenant.CSID}</uri>
+            <filename>listener/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Guadalajara13582155455562)'Guadalajara, Mexico'</var>
+                <var ID="locationDate">2000-01-02</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="readCollectionObjectAfterModifyingMovementInVersioningTenant" auth="admin@lifesci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObjectInVersioningTenant.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>listener/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${modifyMovementInVersioningTenant.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+    </testGroup>
+        
     <!-- Some of the following tests pertain to CSPACE-5793, not yet -->
     <!-- resolved as of this writing. - ADR 2013-02-14 -->
     
@@ -545,6 +635,6 @@
         </test>
         
     </testGroup>
-    
+        
 </xmlReplay>
 

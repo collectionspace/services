@@ -24,16 +24,16 @@
 package org.collectionspace.services.common.config;
 
 import java.io.File;
+import org.collectionspace.services.common.api.JEEServerDeployment;
 
 /**
  * ConfigReader is an interface for a configuration reader
  */
 public interface ConfigReader<T> {
 
-    final public static String CSPACE_DIR_NAME = "cspace";
-    final public static String CONFIG_DIR_PATH = "config" + File.separator + "services";
     final public static String RESOURCES_DIR_NAME = "resources";
-    final public static String RESOURCES_DIR_PATH = CSPACE_DIR_NAME + File.separator + CONFIG_DIR_PATH + File.separator + RESOURCES_DIR_NAME;
+    final public static String RESOURCES_DIR_PATH = JEEServerDeployment.CSPACE_DIR_NAME + File.separator +
+    		JEEServerDeployment.CONFIG_DIR_PATH + File.separator + RESOURCES_DIR_NAME;
 
     /**
      * getFileName - get configuration file name
@@ -42,17 +42,17 @@ public interface ConfigReader<T> {
     public String getFileName();
 
     /**
-     * read parse and read the default configruation file from default location
+     * read parse and read the default configuration file from default location
      * @throws Exception
      */
-    public void read() throws Exception;
+    public void read(boolean useAppGeneratedBindings) throws Exception;
 
     /**
      * read parse and read the given configruation file.
      * @param configFile fully qualified file name
      * @throws Exception
      */
-    public void read(String configFile) throws Exception;
+    public void read(String configFile, boolean useAppGeneratedBindings) throws Exception;
 
     /**
      * getConfig get configuration binding

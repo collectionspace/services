@@ -92,19 +92,28 @@ public class AuthorizationSeed {
      */
     public void seedPermissions(List<Permission> permList, List<PermissionRole> permRoleList)
             throws Exception {
+    	if (logger.isInfoEnabled() == true) {
+    		logger.info("Started seeding Spring Security Tables...");
+    	}
+    	int factor = permRoleList.size();
+    	int permsToSeed = permList.size() * factor;
+    	int permsSeeded = 0;
+    	
         for (Permission p : permList) {
-            if (logger.isTraceEnabled()) {
-                logger.trace("adding permission for res=" + p.getResourceName() +
-                        " for tenant=" + p.getTenantId());
-            }
+        	if (permsSeeded++ % 10 == 0 && logger.isInfoEnabled()) {
+        		logger.info(String.format("Seeded %d permissions of %d...", permsSeeded * factor, permsToSeed));
+        	}
             for (PermissionRole pr : permRoleList) {
                 if (pr.getPermission().get(0).getPermissionId().equals(p.getCsid())) {
                 	AuthorizationCommon.addPermissionsForUri(p, pr);
                 }
             }
         }
+        
+        if (logger.isInfoEnabled() == true) {
+        	logger.info("Finished seeding Spring Security Tables.");
+        }
     }
-    
     
     /**
      * getAction is a convenience method to get corresponding action for

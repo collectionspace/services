@@ -1,15 +1,13 @@
-
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.organization</artifactId>
-        <version>3.3-SNAPSHOT</version>
+        <version>4.0-SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.organization.3rdparty</artifactId>
     <name>services.organization.3rdparty</name>
     <packaging>pom</packaging>
@@ -25,8 +23,10 @@
     </properties>
 
     <modules>
+    <!-- This module is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <module>nuxeo-platform-cs-organization</module>
         <module>nuxeo-platform-organization-naturalhistory</module>
         <module>nuxeo-platform-organization-ucjeps</module>
+        -->
     </modules>
 </project>
