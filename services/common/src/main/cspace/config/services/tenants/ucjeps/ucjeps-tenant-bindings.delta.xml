@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tenant:TenantBindingConfig
+	xmlns:merge="http://xmlmerge.el4j.elca.ch"
+	xmlns:tenant="http://collectionspace.org/services/config/tenant">
+	
+	<tenant:tenantBinding id="20">
+		<tenant:properties>
+			<types:item xmlns:types="http://collectionspace.org/services/config/types" id="ptstartingwildcard" merge:matcher="id" merge:action="replace">
+				<types:key>ptStartingWildcard</types:key>
+				<types:value>false</types:value>
+			</types:item>
+			<types:item xmlns:types="http://collectionspace.org/services/config/types" id="maxlistitemsjdbc" merge:matcher="id" merge:action="replace">
+				<types:key>maxListItemsReturnedLimitOnJdbcQueries</types:key>
+				<types:value>100</types:value>
+			</types:item>
+			<types:item xmlns:types="http://collectionspace.org/services/config/types" id="jdbcqueriestenantrestricted" merge:matcher="id" merge:action="replace">
+				<types:key>jdbcQueriesAreTenantIdRestricted</types:key>
+				<types:value>false</types:value>
+			</types:item>
+		</tenant:properties>
+		
+		<!-- <tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
+			<service:validatorHandler merge:matcher="tag" merge:action="replace" xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.collectionobject.nuxeo.UcjepsCollectionObjectValidatorHandler</service:validatorHandler>
+		</tenant:serviceBindings> -->
+		
+		<tenant:serviceBindings merge:matcher="id" id="idgenerators">
+			<service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
+				<service:params>
+					<service:property merge:matcher="skip" merge:action="insert">
+						<service:key>sqlScriptName</service:key>
+						<service:value>load_ucjeps_id_generators.sql</service:value>
+					</service:property>
+				</service:params>
+			</service:initHandler>
+		</tenant:serviceBindings>
+	</tenant:tenantBinding>
+</tenant:TenantBindingConfig>
