@@ -53,7 +53,8 @@ hyphenatedRange:       quarterYear HYPHEN quarterYear
 */
 ;
 
-singleInterval:        quarterYear
+singleInterval:        yearSpanningWinter
+|                      quarterYear
 |                      halfYear
 |                      century
 |                      decade
@@ -93,6 +94,8 @@ date:                  numDate
 month:                 monthYear
 |                      invMonthYear
 ;
+
+yearSpanningWinter:    WINTER numYear SLASH numYear era ;
 
 quarterYear:           seasonYear
 |                      invSeasonYear
@@ -143,10 +146,10 @@ numDayOfMonth:         NUMBER ;
 
 WS:             [ \t\r\n]+ -> skip;
 CIRCA:          ('c' | 'ca') '.'? | 'circa' ;
-SPRING:         'spring' ;
-SUMMER:         'summer' ;
-WINTER:         'winter' ;
-FALL:           'fall' | 'autumn' ;
+SPRING:         'spring' | 'spr' ;
+SUMMER:         'summer' | 'sum' ;
+WINTER:         'winter' | 'win' ;
+FALL:           'fall' | 'autumn' | 'fal' | 'aut' ;
 EARLY:          'early' ;
 MIDDLE:         'middle' | 'mid' '-'?;
 LATE:           'late' ;

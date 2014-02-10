@@ -246,7 +246,15 @@
                                          earliestSingleDate: [2000,  4,  1, CE]
                                          latestDate:         [2000,  6, 30, CE]
 
+  'Spr 2000':                            # quarterYear, seasonYear
+                                         earliestSingleDate: [2000,  4,  1, CE]
+                                         latestDate:         [2000,  6, 30, CE]
+
   'Summer 2000':                         # quarterYear, seasonYear
+                                         earliestSingleDate: [2000,  7,  1, CE]
+                                         latestDate:         [2000,  9, 30, CE]
+
+  'Sum 2000':                            # quarterYear, seasonYear
                                          earliestSingleDate: [2000,  7,  1, CE]
                                          latestDate:         [2000,  9, 30, CE]
 
@@ -254,17 +262,33 @@
                                          earliestSingleDate: [2000, 10,  1, CE]
                                          latestDate:         [2000, 12, 31, CE]
 
+  'Fal 2000':                            # quarterYear, seasonYear
+                                         earliestSingleDate: [2000, 10,  1, CE]
+                                         latestDate:         [2000, 12, 31, CE]
+
   'Autumn 2000':                         # quarterYear, seasonYear
                                          earliestSingleDate: [2000, 10,  1, CE]
                                          latestDate:         [2000, 12, 31, CE]
  
-  'Summer 12 BC':                        # quarterYear, seasonYear
+  'Aut 2000':                            # quarterYear, seasonYear
+                                         earliestSingleDate: [2000, 10,  1, CE]
+                                         latestDate:         [2000, 12, 31, CE]
+ 
+  'Sum 12 BC':                           # quarterYear, seasonYear
                                          earliestSingleDate: [  12,  7,  1, BCE]
                                          latestDate:         [  12,  9, 30, BCE]
 
   'BC 12, Summer':                       # quarterYear, seasonYear
                                          earliestSingleDate: [  12,  7,  1, BCE]
                                          latestDate:         [  12,  9, 30, BCE]
+
+  'Winter 2000/2001':                    # yearSpanningWinter
+                                         earliestSingleDate: [2000, 12,  1, CE]
+                                         latestDate:         [2001,  3, 31, CE]
+
+  'Winter 10/9 BC':                      # yearSpanningWinter
+                                         earliestSingleDate: [10, 12,  1, BCE]
+                                         latestDate:         [ 9,  3, 31, BCE]
 
   '1st Quarter 2000':                    # quarterYear
                                          earliestSingleDate: [2000,  1,  1, CE]
