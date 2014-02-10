@@ -25,11 +25,11 @@ package org.collectionspace.services.authorization.spring;
 
 import java.util.List;
 import java.io.Serializable;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.authorization.CSpaceAction;
 import org.collectionspace.services.authorization.spi.CSpacePermissionEvaluator;
-
 import org.collectionspace.services.authorization.CSpaceResource;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.acls.model.Permission;
@@ -64,10 +64,13 @@ public class SpringPermissionEvaluator implements CSpacePermissionEvaluator {
 	        debug(res, authToken, objectIdId, objectIdType, perm);
 	        result = eval.hasPermission(authToken,
 	                objectIdId, objectIdType, perm);
-    	} catch (Exception e) {
-    		//
-    		// If this exception is caused by a network timeout, we may want to reattempt
-    		//
+    	} catch (Throwable e) {
+    		if (exceptionChainContainsNetworkError(e) == true) {
+        		//
+        		// If this exception is caused by a network timeout, we want to re-attempt
+        		//
+    			throw e;
+    		}
     		log.error("Unexpected exception encountered while evaluating permissions.", e);
     	}
         
@@ -92,4 +95,32 @@ public class SpringPermissionEvaluator implements CSpacePermissionEvaluator {
 	    	System.out.println("");
     	}
     }
+    
+	public static boolean exceptionChainContainsNetworkError(Throwable exceptionChain) {
+		boolean result = false;
+		Throwable cause = exceptionChain;
+
+		while (cause != null) {
+			if (isCauseNetworkRelated(cause) == true) {
+				result = true;
+				break;
+			}
+			
+			cause = cause.getCause();
+		}
+
+		return result;
+	}
+	
+	private static boolean isCauseNetworkRelated(Throwable cause) {
+		boolean result = false;
+
+		String className = cause.getClass().getCanonicalName();
+		if (className.contains("java.net") || className.contains("java.io")) {
+			result = true;
+		}
+
+		return result;
+	}
+    
 }

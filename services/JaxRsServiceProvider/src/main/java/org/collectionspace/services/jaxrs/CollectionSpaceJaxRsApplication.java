@@ -51,8 +51,6 @@ import org.collectionspace.services.organization.OrgAuthorityResource;
 import org.collectionspace.services.person.PersonAuthorityResource;
 import org.collectionspace.services.citation.CitationAuthorityResource;
 
-//import org.collectionspace.services.query.QueryResource;
-
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Application;
 
@@ -130,7 +128,6 @@ public class CollectionSpaceJaxRsApplication extends Application
         /*
         singletons.add(new WorkflowResource());
         */
-//        singletons.add(new QueryResource());
 //        singletons.add(new DomainIdentifierResource());
 //        singletons.add(new PingResource());
     }

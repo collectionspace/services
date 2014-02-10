@@ -207,7 +207,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw bre;
         } catch (Exception e) {
             logger.error("Caught exception ", e);
-            throw new DocumentException(e);
+            throw new NuxeoDocumentException(e);
         } finally {
             if (repoSession != null) {
                 releaseRepositorySession(ctx, repoSession);
@@ -265,7 +265,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
-            throw new DocumentException(e);
+            throw new NuxeoDocumentException(e);
         } finally {
             if (repoSession != null) {
                 releaseRepositorySession(ctx, repoSession);
@@ -320,7 +320,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
-            throw new DocumentException(e);
+            throw new NuxeoDocumentException(e);
         } finally {
             if (repoSession != null) {
                 releaseRepositorySession(ctx, repoSession);
@@ -383,7 +383,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
-            throw new DocumentException(e);
+            throw new NuxeoDocumentException(e);
         } finally {
             if (repoSession != null) {
                 releaseRepositorySession(ctx, repoSession);
@@ -430,7 +430,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
-            throw new DocumentException(e);
+            throw new NuxeoDocumentException(e);
         }
 
         return wrapDoc;
@@ -458,7 +458,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             repoSession = getRepositorySession(ctx);
             wrapDoc = findDoc(repoSession, ctx, whereClause);
         } catch (Exception e) {
-            throw new DocumentException("Unable to create a Nuxeo repository session.", e);
+            throw new NuxeoDocumentException("Unable to create a Nuxeo repository session.", e);
         } finally {
             if (repoSession != null) {
                 releaseRepositorySession(ctx, repoSession);
@@ -507,7 +507,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
-            throw new DocumentException(e);
+            throw new NuxeoDocumentException(e);
         } finally {
             if (releaseSession && (repoSession != null)) {
                 this.releaseRepositorySession(ctx, repoSession);
@@ -547,7 +547,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
-            throw new DocumentException(e);
+            throw new NuxeoDocumentException(e);
         }
 
         return wrapDoc;
@@ -610,7 +610,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
-            throw new DocumentException(e);
+            throw new NuxeoDocumentException(e);
         }
 
         return wrapDoc;
@@ -646,7 +646,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
-            throw new DocumentException(e);
+            throw new NuxeoDocumentException(e);
         } finally {
             if (repoSession != null) {
                 releaseRepositorySession(ctx, repoSession);
@@ -694,7 +694,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
-            throw new DocumentException(e);
+            throw new NuxeoDocumentException(e);
         } finally {
             if (repoSession != null) {
                 releaseRepositorySession(ctx, repoSession);
@@ -745,7 +745,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
-            throw new DocumentException(e);
+            throw new NuxeoDocumentException(e);
         } finally {
             if (repoSession != null) {
                 releaseRepositorySession(ctx, repoSession);
@@ -910,7 +910,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e); // REM - 1/17/2014: Check for org.nuxeo.ecm.core.api.ClientException and re-attempt
             }
-            throw new DocumentException(e);
+            throw new NuxeoDocumentException(e);
         } finally {
             if (repoSession != null) {
                 releaseRepositorySession(ctx, repoSession);
@@ -1248,7 +1248,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
-            throw new DocumentException(e);
+            throw new NuxeoDocumentException(e);
         }
 
         //
@@ -1323,7 +1323,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                 /* Once we advance to 5.5 or later, we can add this. 
                  * See also https://jira.nuxeo.com/browse/NXP-8506
                  if(!doc.isVersionable()) {
-                 throw new DocumentException("Configuration for: "
+                 throw new NuxeoDocumentException("Configuration for: "
                  +handler.getServiceContextPath()+" supports versioning, but Nuxeo config does not!");
                  }
                  */
@@ -1358,7 +1358,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
-            throw new DocumentException(e);
+            throw new NuxeoDocumentException(e);
         } finally {
             if (repoSession != null) {
                 releaseRepositorySession(ctx, repoSession);
@@ -1395,7 +1395,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
-            throw new DocumentException(e);
+            throw new NuxeoDocumentException(e);
         }
     }
 
@@ -1426,7 +1426,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw ce;
         } catch (Exception e) {
             logger.error("Caught exception ", e);
-            throw new DocumentException(e);
+            throw new NuxeoDocumentException(e);
         }
     }
 
@@ -1474,7 +1474,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
-            throw new DocumentException(e);
+            throw new NuxeoDocumentException(e);
         } finally {
             if (repoSession != null) {
                 releaseRepositorySession(ctx, repoSession);
@@ -1681,7 +1681,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
-            throw new DocumentException(e);
+            throw new NuxeoDocumentException(e);
         } finally {
             if (repoSession != null) {
                 releaseRepositorySession(null, repoSession);

@@ -28,7 +28,6 @@ package org.collectionspace.services.common.query;
 
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -37,10 +36,6 @@ import org.collectionspace.services.config.tenant.TenantBindingType;
 
 public class QueryManager {
 	static private final IQueryManager queryManager = new QueryManagerNuxeoImpl();
-	
-	static public void execQuery(String queryString) {
-		queryManager.execQuery(queryString);
-	}
 	
 	/**
 	 * Creates the where clause from keywords.

@@ -155,22 +155,6 @@ public final class NuxeoClientEmbedded {
         return openRepository(repoName, -1);
     }    
 
-    /*
-     * Open a Nuxeo repo session using the default repo with the specified (passed in) tx timeout period
-     */
-    @Deprecated
-    public RepositoryInstance openRepository(int timeoutSeconds) throws Exception {
-        return openRepository(null, timeoutSeconds);
-    }
-
-    /*
-     * Open a Nuxeo repo session using the default repo with the default tx timeout period
-     */
-    @Deprecated
-    public RepositoryInstance openRepository() throws Exception {
-        return openRepository(null, -1 /*default timeout period*/);
-    }
-
     public RepositoryInstance openRepository(String repoName, int timeoutSeconds) throws Exception {
     	RepositoryInstance result = null;
     	

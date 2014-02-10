@@ -32,16 +32,11 @@ import org.slf4j.LoggerFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 //import org.nuxeo.ecm.core.client.NuxeoClient;
 
 import org.collectionspace.services.jaxb.InvocableJAXBSchema;
 //import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
 //import org.collectionspace.services.nuxeo.client.java.NxConnect;
-import org.collectionspace.services.nuxeo.client.java.NuxeoClientEmbedded;
-import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.common.invocable.InvocableUtils;
@@ -105,32 +100,7 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	@Override
 	@Deprecated
 	public void execQuery(String queryString) {
-		NuxeoClientEmbedded client = null;
-		try {
-			client = NuxeoConnectorEmbedded.getInstance().getClient();
-			RepositoryInstance repoSession = client.openRepository();
-
-			DocumentModelList docModelList = repoSession
-					.query("SELECT * FROM Relation WHERE relations_common:subjectCsid='updated-Subject-1'");
-			// DocumentModelList docModelList =
-			// repoSession.query("SELECT * FROM Relation");
-			// DocumentModelList docModelList =
-			// repoSession.query("SELECT * FROM CollectionObject WHERE collectionobject:objectNumber='objectNumber-1251305545865'");
-			for (DocumentModel docModel : docModelList) {
-				System.out
-						.println("--------------------------------------------");
-				System.out.println(docModel.getPathAsString());
-				System.out.println(docModel.getName());
-				System.out.println(docModel.getPropertyValue("dc:title"));
-				// System.out.println("subjectCsid=" +
-				// docModel.getProperty("relations_common",
-				// "subjectCsid").toString());
-			}
-
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		// Intentionally left blank
 	}
 
 	@Override

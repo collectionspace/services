@@ -114,5 +114,16 @@ public class DocumentException extends ServiceException {
     public DocumentException(Throwable cause) {
         super(cause);
     }
+    
+	public String getCausesClassName() {
+		String result = null;
+		
+		Throwable cause = super.getCause();
+		if (cause != null) {
+			result = cause.getClass().getCanonicalName();
+		}
+		
+		return result;
+	}
 
 }
