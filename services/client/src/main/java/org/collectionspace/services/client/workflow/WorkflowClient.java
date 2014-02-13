@@ -44,6 +44,7 @@ public class WorkflowClient extends AbstractCommonListPoxServiceClientImpl<Workf
 	public static final String WORKFLOWSTATE_DELETED = "deleted";
 	
 	public static final String WORKFLOWSTATE_ACTIVE = "active";
+	public static final String WORKFLOWSTATE_PROJECT = "project";
 	
 	public static final String WORKFLOWTRANSITION_LOCK = "lock";
 	public static final String WORKFLOWSTATE_LOCKED = "locked";
