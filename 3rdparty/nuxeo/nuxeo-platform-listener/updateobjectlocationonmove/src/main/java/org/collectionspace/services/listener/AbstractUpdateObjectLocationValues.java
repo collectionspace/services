@@ -152,8 +152,10 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
         }
 
         if (collectionObjectCsids.isEmpty()) {
-            logger.warn("Could not obtain any CSIDs of related CollectionObject records.");
-            logger.warn(NO_FURTHER_PROCESSING_MESSAGE);
+            if (logger.isTraceEnabled()) {
+                logger.trace("Could not obtain any CSIDs of related CollectionObject records.");
+                logger.trace(NO_FURTHER_PROCESSING_MESSAGE);
+            }
             return;
         } else {
             if (logger.isTraceEnabled()) {
