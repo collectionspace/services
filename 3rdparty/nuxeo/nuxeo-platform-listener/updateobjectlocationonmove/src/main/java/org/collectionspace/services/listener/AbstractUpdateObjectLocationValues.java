@@ -42,6 +42,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
     protected final static String CURRENT_LOCATION_PROPERTY = "currentLocation"; // FIXME: Get from external constant
     protected final static String COLLECTIONSPACE_CORE_SCHEMA = "collectionspace_core"; // FIXME: Get from external constant
     protected final static String CREATED_AT_PROPERTY = "createdAt"; // FIXME: Get from external constant
+    protected final static String UPDATED_AT_PROPERTY = "updatedAt"; // FIXME: Get from external constant
     private final static String NONVERSIONED_NONPROXY_DOCUMENT_WHERE_CLAUSE_FRAGMENT =
             "AND ecm:isCheckedInVersion = 0"
             + "AND ecm:isProxy = 0 ";
@@ -101,9 +102,9 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
             if (logger.isTraceEnabled()) {
                 logger.trace("An event involving a Movement document was received by UpdateObjectLocationOnMove ...");
             }
-            // FIXME: exclude creation events for Movement records here, if we can
-            // identify that we'l still be properly handling creation events
-            // that include a relations list as part of the creation payload,
+            // FIXME: exclude update events for Movement records here, if we can
+            // identify that we'll still be properly handling update events
+            // that include a relations list as part of the update payload,
             // perhaps because that may trigger a separate event notification.
             movementCsid = NuxeoUtils.getCsid(docModel);
             if (Tools.isBlank(movementCsid)) {
@@ -400,7 +401,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
         // Note: the following value is used to compare any two records, rather
         // than to identify the most recent value so far encountered. Thus, it may
         // occasionally be set backward or forward in time, within the loop below.
-        GregorianCalendar comparisonCreationDate = EARLIEST_COMPARISON_DATE;
+        GregorianCalendar comparisonUpdatedDate = EARLIEST_COMPARISON_DATE;
         DocumentModel movementDocModel;
         Set<String> alreadyProcessedMovementCsids = new HashSet<>();
         String relatedMovementCsid;
@@ -450,22 +451,22 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
             if (locationDate == null) {
                 continue;
             }
-            GregorianCalendar creationDate =
-                    (GregorianCalendar) movementDocModel.getProperty(COLLECTIONSPACE_CORE_SCHEMA, CREATED_AT_PROPERTY);
+            GregorianCalendar updatedDate =
+                    (GregorianCalendar) movementDocModel.getProperty(COLLECTIONSPACE_CORE_SCHEMA, UPDATED_AT_PROPERTY);
             if (locationDate.after(mostRecentLocationDate)) {
                 mostRecentLocationDate = locationDate;
-                if (creationDate != null) {
-                    comparisonCreationDate = creationDate;
+                if (updatedDate != null) {
+                    comparisonUpdatedDate = updatedDate;
                 }
                 mostRecentMovementDocModel = movementDocModel;
                 // If the current Movement record's location date is identical
                 // to that of the (at this time) most recent Movement record, then
-                // instead compare the two records using their creation date values
+                // instead compare the two records using their update date values
             } else if (locationDate.compareTo(mostRecentLocationDate) == 0) {
-                if (creationDate != null && creationDate.after(comparisonCreationDate)) {
+                if (updatedDate != null && updatedDate.after(comparisonUpdatedDate)) {
                     // The most recent location date value doesn't need to be
                     // updated here, as the two records' values are identical
-                    comparisonCreationDate = creationDate;
+                    comparisonUpdatedDate = updatedDate;
                     mostRecentMovementDocModel = movementDocModel;
                 }
             }
