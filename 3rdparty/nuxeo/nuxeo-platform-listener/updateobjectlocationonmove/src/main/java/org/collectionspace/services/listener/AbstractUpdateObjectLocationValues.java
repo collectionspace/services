@@ -103,7 +103,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
                 logger.trace("An event involving a Movement document was received by UpdateObjectLocationOnMove ...");
             }
             // FIXME: exclude update events for Movement records here, if we can
-            // identify that we'l still be properly handling update events
+            // identify that we'll still be properly handling update events
             // that include a relations list as part of the update payload,
             // perhaps because that may trigger a separate event notification.
             movementCsid = NuxeoUtils.getCsid(docModel);
