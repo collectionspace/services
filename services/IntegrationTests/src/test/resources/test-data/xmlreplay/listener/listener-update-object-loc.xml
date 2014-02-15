@@ -390,9 +390,9 @@
             <expectedCodes>200</expectedCodes>
         </test>
         
-        <!-- CSPACE-6019: A Movement with a later creation timestamp is -->
+        <!-- CSPACE-6309: A Movement with a later update timestamp is -->
         <!-- deemed to have taken place later than a Movement with an earlier -->
-        <!-- creation timestamp, if both have identical location dates. -->
+        <!-- update timestamp, if both have identical location dates. -->
         
         <test ID="createMovement6">
             <method>POST</method>
@@ -452,6 +452,30 @@
                 <filename>listener/res/collectionobject.res.xml</filename>
                 <vars>
                     <var ID="computedCurrentLocationValue">${createMovement6.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="updateMovement3">
+            <method>PUT</method>
+            <uri>/cspace-services/movements/${createMovement3.CSID}</uri>
+            <filename>listener/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">${createMovement3.currentLocation}</var>
+                <var ID="locationDate">${updateMovement3WithNonBlankCurrentLocation.locationDate}</var> <!-- Identical to Movement 6 -->
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="readCollectionObject1AfterUpdateOfMovement3">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>listener/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${createMovement3.currentLocation}</var>
                 </vars>
             </response>
             <expectedCodes>200</expectedCodes>
