@@ -115,13 +115,17 @@
 
     <target name="deploy" depends="install"
     description="deploy collectionobject in ${jee.server.nuxeo}">
+    	<!-- These targets are obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool    	
         <ant antfile="${nuxeo-platform-collectionobject}/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="${nuxeo-platform-collectionobject-lifesci}/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="${nuxeo-platform-collectionobject-botgarden}/build.xml" target="deploy" inheritall="false"/>
+        -->
     </target>
 
     <target name="undeploy"
     description="undeploy collectionobject from ${jee.server.nuxeo}">
+    	<!-- These targets are obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
+    	leaving this only for backwards compatibility reasons. -->    	
         <ant antfile="${nuxeo-platform-collectionobject}/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="${nuxeo-platform-collectionobject-lifesci}/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="${nuxeo-platform-collectionobject-botgarden}/build.xml" target="undeploy" inheritall="false"/>

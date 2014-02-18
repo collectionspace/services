@@ -57,6 +57,7 @@ import org.collectionspace.services.client.OrgAuthorityClient;
 import org.collectionspace.services.client.LocationAuthorityClient;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.client.PlaceAuthorityClient;
+import org.collectionspace.services.client.WorkAuthorityClient;
 import org.collectionspace.services.client.ConceptAuthorityClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 

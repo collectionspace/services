@@ -36,8 +36,10 @@
     <run controlFile="authrefs/authrefsSimple.xml" testGroup="AuthRefsSimple" />
     <run controlFile="authrefs/authrefsComplex.xml" testGroup="AuthRefsComplex" />
     <run controlFile="authority/authority.xml" testGroup="TestAuthoritiesMultiVocabSearch" />
-    <run controlFile="imports/imports.xml" testGroup="importsTestGroup" />
     
+    <run controlFile="imports/imports.xml" testGroup="importsTestGroup" />
+    <run controlFile="imports/imports.xml" testGroup="importsSeparateRepoTestGroup" />
+
     <run controlFile="collectionobject/collectionobject-hierarchy-csid.xml" testGroup="CreateUpdateReadStructuredObjects" />
     <run controlFile="collectionobject/collectionobject-hierarchy-refname.xml" testGroup="CreateUpdateReadStructuredObjects" />
     <run controlFile="collectionobject/collectionobject-displayname-update.xml" testGroup="DisplayNameChangesReflectedInRefNames" />
@@ -55,7 +57,8 @@
     -->
     
     <run controlFile="listener/listener-update-object-loc.xml" testGroup="updateObjectLocationOnMoveEventListener" />
-    
+    <run controlFile="listener/listener-update-object-loc.xml" testGroup="updateObjectLocationOnMoveInVersioningEnabledTenant"/>    
+
     <!-- Broken tests -->
     
     <!-- FIXME: the following tests were commented out without any annotation as to why this was done. -->

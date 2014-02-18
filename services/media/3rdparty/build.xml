@@ -110,12 +110,16 @@
 
     <target name="deploy" depends="install"
     description="deploy media in ${jee.server.nuxeo}">
+    	<!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <ant antfile="nuxeo-platform-cs-media/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-media-botgarden/build.xml" target="deploy" inheritall="false"/>
+        -->
     </target>
 
     <target name="undeploy"
     description="undeploy media from ${jee.server.nuxeo}">
+    	<!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
+    	leaving this only for backwards compatibility reasons. -->
         <ant antfile="nuxeo-platform-cs-media/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-media-botgarden/build.xml" target="undeploy" inheritall="false"/>
     </target>
@@ -125,6 +129,5 @@
         <ant antfile="nuxeo-platform-cs-media/build.xml" target="dist" inheritall="false"/>
         <ant antfile="nuxeo-platform-media-botgarden/build.xml" target="dist" inheritall="false"/>
     </target>
-
-
+	
 </project>

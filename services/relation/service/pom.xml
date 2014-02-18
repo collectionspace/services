@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.relation</artifactId>
-        <version>3.3-SNAPSHOT</version>
+        <version>4.0-SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
@@ -64,6 +64,11 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.place.client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.work.client</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

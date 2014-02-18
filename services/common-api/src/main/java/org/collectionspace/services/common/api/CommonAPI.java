@@ -15,5 +15,9 @@ public class CommonAPI {
     public static String showRelations_QP = "showRelations";
     public static String showSiblings_QP = "showSiblings";
     public static String showAllRelations_QP = "showAllRelations";
+    
+	public static final String GENERATE_BUNDLES = "core";
+	public static final String GENERATE_BINDINGS = "delta";
+
 }
 

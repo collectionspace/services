@@ -16,7 +16,6 @@
 	</pers:persons_common>
 	<pnh:persons_naturalhistory xmlns:pnh="http://collectionspace.org/services/person/domain/naturalhistory">
 		<entityType>${entityType}</entityType>
-		<lifeSpan>${lifeSpan}</lifeSpan>
 	</pnh:persons_naturalhistory>
 	<relns:relations-common-list xmlns:relns="http://collectionspace.org/services/relation">
     <relation-list-item>

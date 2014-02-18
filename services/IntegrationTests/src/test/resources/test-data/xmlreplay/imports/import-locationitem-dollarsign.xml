@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<imports>
+    <import service="Locations" type="Locationitem" CSID="${recordCSID}">
+        <schema xmlns:locations_common="http://collectionspace.org/services/location" 
+                name="locations_common">
+            <locTermGroupList>
+                <locTermGroup>
+                    <termDisplayName>${termDisplayNameValue}</termDisplayName>
+                </locTermGroup>
+            </locTermGroupList>
+            <shortIdentifier>${shortIdentifierValue}</shortIdentifier>
+            <refName>urn:cspace:core.collectionspace.org:locationauthorities:name(${shortIdentifierValue})'${termDisplayNameValue}'</refName>
+            <inAuthority>${inAuthorityValue}</inAuthority>
+        </schema>
+    </import>
+</imports>

@@ -5,11 +5,10 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.taxonomy</artifactId>
-        <version>3.3-SNAPSHOT</version>
+        <version>4.0-SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.taxonomy.3rdparty</artifactId>
     <name>services.taxonomy.3rdparty</name>
     <packaging>pom</packaging>
@@ -25,8 +24,10 @@
     </properties>
 
     <modules>
+    <!-- This module is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <module>nuxeo-platform-cs-taxonomy</module>
         <module>nuxeo-platform-taxonomy-naturalhistory</module>
         <module>nuxeo-platform-taxonomy-botgarden</module>
+        -->
     </modules>
 </project>

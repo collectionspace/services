@@ -36,12 +36,16 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.collectionspace.services.authorization.driver.AuthorizationSeedDriver;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * ImportAuthz imports default permissions and roles for a tenant(s)
  * @authorF
  */
 public class ImportAuthz {
+	private static final Logger logger = LoggerFactory.getLogger(ImportAuthz.class);
 
 	final private static String OPTIONS_GENERATE_ONLY = "generate only";
     final private static String OPTIONS_USERNAME = "username";
@@ -52,8 +56,8 @@ public class ImportAuthz {
     final private static String OPTIONS_HELP = "help";
 
     final private static String MSG_SEPARATOR = "--";
-    final private static String LOGGING_SEPARATOR_HEAD = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>";
-    final private static String LOGGING_SEPARATOR_TAIL = "<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+    final private static String LOGGING_SEPARATOR_HEAD = "[>>>>>>>>>>>>>>>>>>>>>>>>>>>>]";
+    final private static String LOGGING_SEPARATOR_TAIL = "[<<<<<<<<<<<<<<<<<<<<<<<<<<<<]";
     final private static String LOGGING_INFO_PREFIX = "[INFO] ";
     final private static String LOGGING_ERROR_PREFIX = "[ERROR] ";
 
@@ -78,20 +82,18 @@ public class ImportAuthz {
     }
     
     private static void logInfo(String infoMessage) {
-    	logInfo(System.out, infoMessage);
+    	logger.info(infoMessage);
     }
     
     private static void logConfiguration(String user,
     		String password,
     		String tenantBinding,
     		String exportDir) {
-    	logInfo(LOGGING_SEPARATOR_HEAD);
     	logInfo("Creating CollectionSpace authorization metadata using the following settings:");
     	logInfo("\tuser=" + user);
     	logInfo("\tpassword=" + password);
     	logInfo("\ttenantBinding=" + tenantBinding);
     	logInfo("\texportDir=" + exportDir);
-    	logInfo(LOGGING_SEPARATOR_TAIL);
     }
     
     private static void printUsage(PrintStream outStream) {
@@ -161,6 +163,7 @@ public class ImportAuthz {
             AuthorizationSeedDriver driver = new AuthorizationSeedDriver(
                     user, password, tenantBinding, exportDir);
             driver.generate();
+            logger.info("Finished processing all tenant bindings files and generating all AuthN/AuthZ metadata.");
             //
             // If the "-g" option was set, then we will NOT seed the AuthZ tables.  Instead, we'll
             // just merge the prototypical tenant bindings and generate the permissions XML output

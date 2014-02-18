@@ -108,15 +108,17 @@
         </exec>
     </target>
 
-    <target name="deploy" depends="install"
-    description="deploy concept in ${jee.server.nuxeo}">
+    <target name="deploy" depends="install" description="deploy concept in ${jee.server.nuxeo}">
+    	<!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <ant antfile="nuxeo-platform-cs-concept/build.xml" target="deploy" inheritall="false"/>
 		<ant antfile="nuxeo-platform-concept-naturalhistory/build.xml" target="deploy" inheritall="false"/>
 		<ant antfile="nuxeo-platform-concept-botgarden/build.xml" target="deploy" inheritall="false"/>
+        -->
     </target>
 
-    <target name="undeploy"
-    description="undeploy concept from ${jee.server.nuxeo}">
+    <target name="undeploy" description="undeploy concept from ${jee.server.nuxeo}">
+    	<!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
+    	leaving this only for backwards compatibility reasons. -->
         <ant antfile="nuxeo-platform-cs-concept/build.xml" target="undeploy" inheritall="false"/>
 		<ant antfile="nuxeo-platform-concept-naturalhistory/build.xml" target="undeploy" inheritall="false"/>
 		<ant antfile="nuxeo-platform-concept-botgarden/build.xml" target="undeploy" inheritall="false"/>

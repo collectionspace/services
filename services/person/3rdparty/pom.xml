@@ -5,11 +5,10 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.person</artifactId>
-        <version>3.3-SNAPSHOT</version>
+        <version>4.0-SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.person.3rdparty</artifactId>
     <name>services.person.3rdparty</name>
     <packaging>pom</packaging>
@@ -18,7 +17,9 @@
     </description>
 
     <modules>
+    <!-- These modules are obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <module>nuxeo-platform-cs-person</module>
         <module>nuxeo-platform-person-lifesci</module>
+        -->
     </modules>
 </project>
