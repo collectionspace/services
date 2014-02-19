@@ -49,11 +49,16 @@
     <run controlFile="batch/batch.xml" />
     
     <!-- Uncomment the following when needed to test the UpdateObjectLocationBatchJob -->
-    <!-- which updates the computed current location value in CollectionObject records. -->
+    <!-- which updates the computed current location values in CollectionObject records. -->
+    <!-- For these tests to be meaningful, you will also first need to disable the event listener -->
+    <!-- that auto-updates these values, by removing the JAR file whose name begins with -->
+    <!-- 'org.collectionspace.services.listener.updateobjectlocationonmove' -->
+    <!-- from $CSPACE_JSEESERVER_HOME/nuxeo-server/plugins, and then restarting Tomcat. -->
     <!--
     <run controlFile="batch/batch-update-object-loc.xml" testGroup="invocationModeSingle" />
     <run controlFile="batch/batch-update-object-loc.xml" testGroup="invocationModeList" />
     <run controlFile="batch/batch-update-object-loc.xml" testGroup="invocationModeGroup" />
+    <run controlFile="batch/batch-update-object-loc.xml" testGroup="invocationModeSingleInVersioningEnabledTenant" />
     -->
     
     <run controlFile="listener/listener-update-object-loc.xml" testGroup="updateObjectLocationOnMoveEventListener" />
