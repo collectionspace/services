@@ -1,4 +1,4 @@
-
+<?xml version="1.0" encoding="UTF-8"?>
 <project name="nuxeo-platform-cs-propagation" default="package" basedir=".">
     <description>
         propagation nuxeo document type
@@ -10,10 +10,17 @@
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="-V" />
     <property name="src" location="src"/>
-    <property name="nuxeo.propagation.jar"
-        value="org.collectionspace.services.propagation.3rdparty.nuxeo-${cspace.release}.jar"/>
-    <property name="nuxeo.propagation.jars.all"
+    
+    <!-- JAR files used by CollectionSpace 4.0 and later -->
+    <property name="nuxeo.propagation.doctype.jars.all"
+        value="collectionspace.propagation.doctype.*.jar"/>
+    <property name="nuxeo.propagation.schema.jars.all"
+        value="collectionspace.propagation.schema.*.jar"/>
+    <!-- Legacy JAR files used by CollectionSpace 3.3 and earlier --> 
+    <property name="nuxeo.propagation.legacy.jars.all"
         value="org.collectionspace.services.propagation.3rdparty.nuxeo-*.jar"/>
+    <property name="nuxeo.propagation.legacy.jar"
+        value="org.collectionspace.services.propagation.3rdparty.nuxeo-${cspace.release}.jar"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -114,15 +121,31 @@
 
     <target name="deploy" depends="install"
         description="deploy propagation doctype in ${jee.server.nuxeo}">
-        <copy file="${basedir}/target/${nuxeo.propagation.jar}"
+        <!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
+        leaving this only for backwards compatibility reasons. -->  
+        <copy file="${basedir}/target/${nuxeo.propagation.legacy.jar}"
         todir="${jee.deploy.nuxeo.plugins}"/>
     </target>
 
     <target name="undeploy"
         description="undeploy propagation doctype from ${jee.server.nuxeo}">
         <delete>
+            <!-- Undeploy doctype and schema artifacts -->
             <fileset dir="${jee.deploy.nuxeo.plugins}">
-                <include name="${nuxeo.propagation.jars.all}"/>
+                <include name="${nuxeo.propagation.doctype.jars.all}"/>
+            </fileset>
+            <fileset dir="${jee.deploy.nuxeo.plugins}">
+                <include name="${nuxeo.propagation.schema.jars.all}"/>
+            </fileset>
+            <!-- Undeploy legacy artifacts -->
+            <fileset dir="${jee.deploy.nuxeo.plugins}">
+                <include name="${nuxeo.propagation.legacy.jars.all}"/>
+            </fileset>
+        </delete>
+        <!-- Undeploy legacy artifacts from old deployment location through release 0.6 -->
+        <delete quiet="true">
+            <fileset dir="${jee.deploy.nuxeo.system}">
+                <include name="${nuxeo.propagation.legacy.jars.all}"/>
             </fileset>
         </delete>
     </target>
@@ -130,7 +153,7 @@
     <target name="dist"
         description="generate distribution for propagation doctype" depends="package">
         <copy todir="${services.trunk}/${dist.deploy.nuxeo.plugins}">
-            <fileset file="${basedir}/target/${nuxeo.propagation.jar}"/>
+            <fileset file="${basedir}/target/${nuxeo.propagation.legacy.jar}"/>
         </copy>
     </target>
 
