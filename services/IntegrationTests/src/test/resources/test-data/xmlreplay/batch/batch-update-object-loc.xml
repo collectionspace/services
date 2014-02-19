@@ -3,6 +3,7 @@
     <auths>
         <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
         <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+        <auth ID="admin@lifesci.collectionspace.org">YWRtaW5AbGlmZXNjaS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
     </auths>
         
     <!-- This tests the UpdateObjectLocationBatchJob -->
@@ -596,7 +597,7 @@
     <!-- These tests verify that updates to the computed current location values -->
     <!-- in CollectionObject records succeed, even in tenants where Movement -->
     <!-- records are configured to be versioned. See CSPACE-6188 for more details. -->    
-    <testGroup ID="invocationModeSingleInVersioningEnabledTenant" autoDeletePOSTS="false">
+    <testGroup ID="invocationModeSingleInVersioningEnabledTenant" autoDeletePOSTS="true">
         
         <test ID="createBatchRecordInVersioningTenant" auth="admin@lifesci.collectionspace.org">
             <method>POST</method>
