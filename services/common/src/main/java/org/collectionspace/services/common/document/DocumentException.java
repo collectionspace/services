@@ -22,6 +22,7 @@ import java.sql.BatchUpdateException;
 
 import javax.persistence.RollbackException;
 
+import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ServiceException;
 
 /**
@@ -114,16 +115,20 @@ public class DocumentException extends ServiceException {
     public DocumentException(Throwable cause) {
         super(cause);
     }
-    
-	public String getCausesClassName() {
-		String result = null;
+     
+	public boolean exceptionChainContainsNetworkError() {
+		boolean result = false;
 		
-		Throwable cause = super.getCause();
-		if (cause != null) {
-			result = cause.getClass().getCanonicalName();
+		Throwable cause = this;
+		while (cause != null) {
+			if (CSWebApplicationException.isExceptionNetworkRelated(cause) == true) {
+				result = true;
+				break;
+			}
+			
+			cause = cause.getCause();
 		}
-		
+
 		return result;
 	}
-
 }

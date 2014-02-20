@@ -1,5 +1,6 @@
 package org.collectionspace.services.nuxeo.client.java;
 
+import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.document.DocumentException;
 import org.nuxeo.ecm.core.api.WrappedException;
 
@@ -39,29 +40,34 @@ public class NuxeoDocumentException extends DocumentException {
 		// TODO Auto-generated constructor stub
 	}
 	
-	@Override
-	public String getCausesClassName() {
+	private static String getExceptionClassName(Throwable exception) {
 		String result = null;
-		Throwable cause = super.getCause();
 		
-		if (cause != null && cause instanceof WrappedException) {
-			WrappedException wrappedException = (WrappedException)cause;
-			result = wrappedException.getClassName();
-		} else {
-			result = cause != null ? super.getCausesClassName() : null;
+		if (exception != null) {
+			result = exception.getClass().getCanonicalName();
+			if (exception instanceof WrappedException) {
+				result = ((WrappedException)exception).getClassName();  // Nuxeo wraps the original exception, so we need to get the name of it.
+			}
 		}
 		
 		return result;
 	}
-		
-	protected boolean isNuxeoWrappedException(Throwable cause) {
+
+	@Override
+	public boolean exceptionChainContainsNetworkError() {
 		boolean result = false;
 		
-		String className = cause.getClass().getCanonicalName();
-		if (className.contains("org.nuxeo.ecm.core.api.WrappedException") == true) {
-			result = true;
+		Throwable cause = this;
+		while (cause != null) {
+			String exceptionClassName = getExceptionClassName(cause);
+			if (CSWebApplicationException.isExceptionNetworkRelated(exceptionClassName) == true) {
+				result = true;
+				break;
+			}
+			
+			cause = cause.getCause();
 		}
-		
+
 		return result;
 	}
 	

@@ -17,19 +17,22 @@
 package org.collectionspace.services.common;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.ConnectException;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.catalina.connector.CoyoteInputStream;
+import org.apache.catalina.connector.InputBuffer;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ServletTools;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,7 +134,7 @@ public class NetworkErrorRetryFilter implements Filter {
 			}
         }
     }
-    
+        
     //
     // This method will attempt to repeat the chain.doFilter() method if it fails because of a
     // network related reason.  It looks for failures in two ways:

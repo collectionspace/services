@@ -30,7 +30,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.sql.rowset.CachedRowSet;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
@@ -820,7 +819,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     /*
      * See CSPACE-5036 - How to make CMISQL queries from Nuxeo
      */
-    private IterableQueryResult makeCMISQLQuery(RepositoryInstance repoSession, String query, QueryContext queryContext) {
+    private IterableQueryResult makeCMISQLQuery(RepositoryInstance repoSession, String query, QueryContext queryContext) throws DocumentException {
         IterableQueryResult result = null;
 
         // the NuxeoRepository should be constructed only once, then cached
@@ -843,6 +842,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         } catch (ClientException e) {
             // TODO Auto-generated catch block
             logger.error("Encounter trouble making the following CMIS query: " + query, e);
+            throw new NuxeoDocumentException(e);
         }
 
         return result;
@@ -1184,8 +1184,14 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         Collections.sort(result, new Comparator<DocumentModel>() {
             @Override
             public int compare(DocumentModel doc1, DocumentModel doc2) {
-                String termDisplayName1 = (String) NuxeoUtils.getXPathValue(doc1, COMMON_PART_SCHEMA, DISPLAY_NAME_XPATH);
-                String termDisplayName2 = (String) NuxeoUtils.getXPathValue(doc2, COMMON_PART_SCHEMA, DISPLAY_NAME_XPATH);
+            	String termDisplayName1 = null;
+            	String termDisplayName2 = null;
+            	try {
+	                termDisplayName1 = (String) NuxeoUtils.getXPathValue(doc1, COMMON_PART_SCHEMA, DISPLAY_NAME_XPATH);
+	                termDisplayName2 = (String) NuxeoUtils.getXPathValue(doc2, COMMON_PART_SCHEMA, DISPLAY_NAME_XPATH);
+            	} catch (NuxeoDocumentException e) {
+            		throw new RuntimeException(e);  // We need to throw a RuntimeException because the compare() method of the Comparator interface does not support throwing an Exception
+            	}
                 return termDisplayName1.compareToIgnoreCase(termDisplayName2);
             }
         });

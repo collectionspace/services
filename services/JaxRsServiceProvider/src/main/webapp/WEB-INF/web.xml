@@ -70,7 +70,7 @@
 		<filter-class>org.collectionspace.services.common.NetworkErrorRetryFilter</filter-class>
 		<init-param>
       		<param-name>maxRetrySeconds</param-name>
-      		<param-value>5</param-value>
+      		<param-value>5000</param-value>
    		</init-param>
 		<init-param>
       		<param-name>delayBetweenAttemptsMillis</param-name>

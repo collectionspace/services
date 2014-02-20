@@ -844,9 +844,10 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
      * @param schema The name of the schema (part)
      * @param xpath The XPath expression (without schema prefix)
      * @return value the indicated property value as a String
+     * @throws DocumentException 
      */
 	protected Object getListResultValue(DocumentModel docModel, // REM - CSPACE-5133
-			String schema, ListResultField field) {
+			String schema, ListResultField field) throws DocumentException {
 		Object result = null;
 
 		result = NuxeoUtils.getXPathValue(docModel, schema, field.getXpath());
@@ -855,7 +856,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
 	}
 	
 	protected String getStringValue(DocumentModel docModel,
-			String schema, ListResultField field) {
+			String schema, ListResultField field) throws DocumentException {
 		String result = null;
 		
 		Object value = getListResultValue(docModel, schema, field);

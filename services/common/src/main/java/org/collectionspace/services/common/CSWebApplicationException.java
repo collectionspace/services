@@ -82,48 +82,50 @@ public class CSWebApplicationException extends WebApplicationException {
 		
 		Throwable cause = exceptionChain;
 		while (cause != null) {
-			if (isExceptionNetworkRelated(cause) == true) {
+			if (cause instanceof DocumentException) {
+				if (((DocumentException)cause).exceptionChainContainsNetworkError() == true) {  // org.collectionspace.services.common.document.DocumentException (and subclasses) are a special case
+					result = true;
+					break;
+				}
+			} else if (isExceptionNetworkRelated(cause) == true) {
 				result = true;
 				break;
 			}
 			
-			Throwable nextCause = cause.getCause();
-			if (nextCause == null) {
-				// Since we reached the end of the exception chain, we can see if the last code
-				// executed was network related.
-				StackTraceElement[] finalStackTrace = cause.getStackTrace();
-			}
+			cause = cause.getCause();
 		}
 
 		return result;
 	}
 	
-	private static boolean isStackTraceNetworkRelated(StackTraceElement[] stackTraceElementList) {
+	//
+	// We're using this method to try and figure out if the the exception is network related.  Ideally,
+	// the exception's class name contains "java.net".  Unfortunately, Nuxeo consumes some of these exceptions and
+	// returns a more general "java.sql" exception so we need to check for that as well.
+	//
+	public static boolean isExceptionNetworkRelated(String exceptionClassName) {
 		boolean result = false;
 		
-		for (StackTraceElement stackTraceElement : stackTraceElementList) {
-			if (stackTraceElement.getClassName().contains("") == true) {
-				
+		if (exceptionClassName != null) {
+			if (exceptionClassName.contains("java.net")) {
+				result = true;
+			} else if (exceptionClassName.contains("java.sql")) {
+				result = true;
 			}
 		}
 		
 		return result;
 	}
-	
+
 	/*
 	 * Return 'true' if the exception is in the "java.net" package.
 	 */
-	private static boolean isExceptionNetworkRelated(Throwable cause) {
+	public static boolean isExceptionNetworkRelated(Throwable exception) {
 		boolean result = false;
-
-		if (cause != null) {
-			String className = cause.getClass().getCanonicalName();
-			if (cause instanceof DocumentException) {
-				className = ((DocumentException) cause).getCausesClassName();  // Since Nuxeo wraps the real exception, we needed to create this special getCausesClassName() method -see NuxeoDocumentException for details
-			}
-			if (className != null && className.contains("java.net") == true) {
-				result = true;
-			}
+		
+		if (exception != null) {
+			String className = exception.getClass().getCanonicalName();
+			result = isExceptionNetworkRelated(className);
 		}
 		
 		return result;
