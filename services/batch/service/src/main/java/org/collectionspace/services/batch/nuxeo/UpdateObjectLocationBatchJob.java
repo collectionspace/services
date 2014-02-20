@@ -41,6 +41,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
     private final static String LIFECYCLE_STATE_ELEMENT_NAME = "currentLifeCycleState";
     private final static String LOCATION_DATE_ELEMENT_NAME = "locationDate";
     private final static String OBJECT_NUMBER_ELEMENT_NAME = "objectNumber";
+    private final static String UPDATE_DATE_ELEMENT_NAME = "updatedAt";
     private final static String WORKFLOW_COMMON_SCHEMA_NAME = "workflow_common";
     private final static String WORKFLOW_COMMON_NAMESPACE_PREFIX = "ns2";
     private final static String WORKFLOW_COMMON_NAMESPACE_URI =
@@ -200,7 +201,9 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         String movementCsid;
         String currentLocation;
         String locationDate;
+        String updateDate;
         String mostRecentLocationDate = "";
+        String comparisonUpdateDate = "";
         for (AbstractCommonList.ListItem movementListItem : relatedMovements.getListItem()) {
             movementCsid = AbstractCommonListUtils.ListItemGetElementValue(movementListItem, CSID_ELEMENT_NAME);
             if (Tools.isBlank(movementCsid)) {
@@ -218,6 +221,10 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             if (Tools.isBlank(locationDate)) {
                 continue;
             }
+            updateDate = AbstractCommonListUtils.ListItemGetElementValue(movementListItem, UPDATE_DATE_ELEMENT_NAME);
+            if (Tools.isBlank(updateDate)) {
+                continue;
+            }
             currentLocation = AbstractCommonListUtils.ListItemGetElementValue(movementListItem, CURRENT_LOCATION_ELEMENT_NAME);
             if (Tools.isBlank(currentLocation)) {
                 continue;
@@ -229,6 +236,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             // value of a parameter passed in during batch job invocation.
             if (logger.isTraceEnabled()) {
                 logger.trace("Location date value = " + locationDate);
+                logger.trace("Update date value = " + updateDate);
                 logger.trace("Current location value = " + currentLocation);
             }
             // If this record's location date value is more recent than that of other
@@ -244,6 +252,15 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             if (locationDate.compareTo(mostRecentLocationDate) > 0) {
                 mostRecentLocationDate = locationDate;
                 mostRecentMovement = movementListItem;
+                comparisonUpdateDate = updateDate;
+            } else if (locationDate.compareTo(mostRecentLocationDate) == 0) {
+                // If the two location dates match, then use a tiebreaker
+                if (updateDate.compareTo(comparisonUpdateDate) > 0) {
+                    // The most recent location date value doesn't need to be
+                    // updated here, as the two records' values are identical
+                    mostRecentMovement = movementListItem;
+                    comparisonUpdateDate = updateDate;
+                }
             }
 
         }
