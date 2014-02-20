@@ -32,7 +32,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-1</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Seattle1358215545509)'Seattle, WA, USA'</var>
                 <var ID="locationDate">1900-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -47,7 +47,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-2</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Portland1358215545512)'Portland, OR, USA'</var>
                 <var ID="locationDate">2000-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -58,7 +58,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-3</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Victoria1358215545515)'Victoria, BC, Canada'</var>
                 <var ID="locationDate">1800-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -144,7 +144,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-4</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Vancouver1358215545518)'Vancouver, BC, Canada'</var>
                 <var ID="locationDate">2100-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -304,7 +304,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-1-with-tiebreaker</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Olympia1358215545521)'Olympia, WA, USA'</var>
                 <var ID="locationDate">1900-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -315,7 +315,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-2-with-tiebreaker</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Ottawa1358215545567)'Ottawa, ON, Canada'</var>
                 <var ID="locationDate">${createMovement1WithTiebreaker.locationDate}</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -326,7 +326,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-3-with-tiebreaker</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Spokane1358215545524)'Spokane, WA, USA'</var>
                 <var ID="locationDate">${createMovement1WithTiebreaker.locationDate}</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -376,7 +376,7 @@
             <uri>/cspace-services/movements/${createMovement1WithTiebreaker.CSID}</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-1-modified-with-tiebreaker</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Guadalajara13582155455562)'Guadalajara, Mexico'</var>
                 <var ID="locationDate">${createMovement1WithTiebreaker.locationDate}</var>
             </vars>
             <expectedCodes>200</expectedCodes>
@@ -417,7 +417,7 @@
             <uri>/cspace-services/movements/${createMovement2WithTiebreaker.CSID}</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-2-modified-with-tiebreaker</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Ecatepec13582155455560)'Ecatepec, Mexico'</var>
                 <var ID="locationDate">${createMovement1WithTiebreaker.locationDate}</var>
             </vars>
             <expectedCodes>200</expectedCodes>
@@ -452,7 +452,7 @@
             <uri>/cspace-services/movements/${createMovement3WithTiebreaker.CSID}</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-3-modified-with-tiebreaker</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Calgary1358215545564)'Calgary, AB, Canada'</var>
                 <var ID="locationDate">${createMovement1WithTiebreaker.locationDate}</var>
             </vars>
             <expectedCodes>200</expectedCodes>
@@ -512,7 +512,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-1</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Winnipeg13582155455568)'Winnipeg, MB, Canada'</var>
                 <var ID="locationDate">1900-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -523,7 +523,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-2</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Saskatoon13582155455570)'Saskatoon, SK, Canada'</var>
                 <var ID="locationDate">2000-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -534,7 +534,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-3</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Montreal13582155455570)'Montreal, QC, Canada'</var>
                 <var ID="locationDate">1800-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -652,7 +652,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-1</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Eugene13582155455572)'Eugene, OR, USA'</var>
                 <var ID="locationDate">1900-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -663,7 +663,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-2</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Salem13582155455574)'Salem, OR, USA'</var>
                 <var ID="locationDate">2000-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -674,7 +674,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-3</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Gresham13582155455574)'Gresham, OR, USA'</var>
                 <var ID="locationDate">1800-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -941,7 +941,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-nocontext-1</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Hillsboro13582155455576)'Hillsboro, OR, USA'</var>
                 <var ID="locationDate">2050-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -952,7 +952,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-nocontext-2</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Beaverton13582155455578)'Beaverton, OR, USA'</var>
                 <var ID="locationDate">1950-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
