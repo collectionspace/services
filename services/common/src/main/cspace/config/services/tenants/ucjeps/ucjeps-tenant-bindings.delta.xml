@@ -19,9 +19,9 @@
 			</types:item>
 		</tenant:properties>
 		
-		<!-- <tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
-			<service:validatorHandler merge:matcher="tag" merge:action="replace" xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.collectionobject.nuxeo.UcjepsCollectionObjectValidatorHandler</service:validatorHandler>
-		</tenant:serviceBindings> -->
+		<tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
+			<service:validatorHandler merge:matcher="tag" merge:action="replace" xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.collectionobject.nuxeo.UCJepsCollectionObjectValidatorHandler</service:validatorHandler>
+		</tenant:serviceBindings>
 		
 		<tenant:serviceBindings merge:matcher="id" id="idgenerators">
 			<service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
