@@ -54,6 +54,7 @@ import java.security.acl.Group;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.springframework.security.authentication.jaas.AuthorityGranter;
 
 /**
@@ -66,7 +67,7 @@ public class CSpaceAuthorityGranter implements AuthorityGranter {
         Set<String> authorities = new HashSet<String>();
         if (principal instanceof Group) {
             Group g = (Group) principal;
-            Enumeration members = g.members();
+            Enumeration<? extends Principal> members = g.members();
             while (members.hasMoreElements()) {
                 Principal p = (Principal) members.nextElement();
                 authorities.add(p.getName());

@@ -34,6 +34,7 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.ServiceGroupClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
+import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
@@ -183,7 +184,7 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
             	// 404 if there are no mappings.
                 Response response = Response.status(Response.Status.NOT_FOUND).entity(
                         ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(groupname)).type("text/plain").build();
-                throw new WebApplicationException(response);
+                throw new CSWebApplicationException(response);
             }
         	//Otherwise, build the response with a list
             ServicegroupsCommon common = new ServicegroupsCommon();

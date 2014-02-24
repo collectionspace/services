@@ -23,7 +23,12 @@ package org.collectionspace.services.common.document;
  */
 public class TransactionException extends DocumentException {
 
-    // Custom HTTP status code, per the extensibility offered via RFC-2616
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	// Custom HTTP status code, per the extensibility offered via RFC-2616
     // e.g. http://tools.ietf.org/html/rfc2616#section-6.1.1
     final public static int HTTP_CODE = 590;
     

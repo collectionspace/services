@@ -49,6 +49,7 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.config.ServiceConfigUtils;
@@ -80,12 +81,10 @@ import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsDocListItem;
 import org.collectionspace.services.relation.RelationshipType;
 import org.dom4j.Element;
-
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -620,7 +619,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         	boolean releaseRepoSession = false;
         	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
         	RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
-        	RepositoryInstance repoSession = this.getRepositorySession();
+        	RepositoryInstanceInterface repoSession = this.getRepositorySession();
         	if (repoSession == null) {
         		repoSession = repoClient.getRepositorySession(ctx);
         		releaseRepoSession = true;
@@ -664,7 +663,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
                     "Failed to retrieve authority references").type(
                     "text/plain").build();
-            throw new WebApplicationException(response);
+            throw new CSWebApplicationException(e, response);
         }
 
         return authRefList;
@@ -845,9 +844,10 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
      * @param schema The name of the schema (part)
      * @param xpath The XPath expression (without schema prefix)
      * @return value the indicated property value as a String
+     * @throws DocumentException 
      */
 	protected Object getListResultValue(DocumentModel docModel, // REM - CSPACE-5133
-			String schema, ListResultField field) {
+			String schema, ListResultField field) throws DocumentException {
 		Object result = null;
 
 		result = NuxeoUtils.getXPathValue(docModel, schema, field.getXpath());
@@ -856,7 +856,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
 	}
 	
 	protected String getStringValue(DocumentModel docModel,
-			String schema, ListResultField field) {
+			String schema, ListResultField field) throws DocumentException {
 		String result = null;
 		
 		Object value = getListResultValue(docModel, schema, field);
@@ -1431,7 +1431,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         if (hasRefNameUpdate() == true) {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient = getRepositoryClient(ctx);
-            RepositoryInstance repoSession = this.getRepositorySession();
+            RepositoryInstanceInterface repoSession = this.getRepositorySession();
             
             // Update all the relationship records that referred to the old refName
             RefNameServiceUtils.updateRefNamesInRelations(ctx, repoClient, repoSession,

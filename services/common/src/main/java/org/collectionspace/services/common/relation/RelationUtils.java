@@ -9,6 +9,7 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.repository.RepositoryClient;
+import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -28,7 +29,7 @@ public class RelationUtils {
      */
     private static DocumentModelList findRelationsWithRefName(
             ServiceContext ctx,
-            RepositoryInstance repoSession,
+            RepositoryInstanceInterface repoSession,
             String refName,
             String targetField,
             String orderByField,
@@ -73,7 +74,7 @@ public class RelationUtils {
     public static void updateRefNamesInRelations(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
-            RepositoryInstance repoSession,
+            RepositoryInstanceInterface repoSession,
             String targetField,
             String oldRefName,
             String newRefName) {

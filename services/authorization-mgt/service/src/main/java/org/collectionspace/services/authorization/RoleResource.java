@@ -32,6 +32,8 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
+import org.collectionspace.services.common.CSWebApplicationException;
+
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,7 +135,7 @@ public class RoleResource extends SecurityResourceBase {
 	        if(RoleClient.IMMUTABLE.equals(role.getMetadataProtection())) {
 	            Response response = 
 	            	Response.status(Response.Status.FORBIDDEN).entity("Role: "+csid+" is immutable.").type("text/plain").build();
-                throw new WebApplicationException(response);
+                throw new CSWebApplicationException(response);
 	        }
 	        return (Role)update(csid, theUpdate, Role.class);
         } catch (Exception e) {

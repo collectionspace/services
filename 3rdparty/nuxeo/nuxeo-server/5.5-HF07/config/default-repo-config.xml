@@ -5,6 +5,8 @@
 		<repository name="default"
 			factory="org.nuxeo.ecm.core.storage.sql.ra.PoolingRepositoryFactory">
 			<repository name="default">
+				<pool minPoolSize="0" maxPoolSize="20"
+          			blockingTimeoutMillis="100" idleTimeoutMinutes="10" />
 		        <clustering enabled="false" delay="1000" />
 		        <binaryStore path="" />
 				<!-- The transactional datasource for Nuxeo -->
