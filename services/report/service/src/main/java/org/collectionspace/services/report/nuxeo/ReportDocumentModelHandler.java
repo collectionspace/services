@@ -78,6 +78,7 @@ import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.jaxb.InvocableJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.jfree.util.Log;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -108,7 +109,7 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 			InvocationContext invContext,
 			StringBuffer outMimeType,
 			StringBuffer outReportFileName) throws Exception {
-		RepositoryInstance repoSession = null;
+		RepositoryInstanceInterface repoSession = null;
 		boolean releaseRepoSession = false;
 
 		String invocationMode = invContext.getMode();

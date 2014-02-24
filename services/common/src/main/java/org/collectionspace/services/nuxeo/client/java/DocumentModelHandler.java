@@ -77,7 +77,7 @@ public abstract class DocumentModelHandler<T, TL>
         extends AbstractMultipartDocumentHandlerImpl<T, TL, DocumentModel, DocumentModelList> {
 
     private final Logger logger = LoggerFactory.getLogger(DocumentModelHandler.class);
-    private RepositoryInstance repositorySession;
+    private RepositoryInstanceInterface repositorySession;
 
     protected String oldRefNameOnUpdate = null;  // FIXME: REM - We should have setters and getters for these
     protected String newRefNameOnUpdate = null;  // FIXME: two fields.
@@ -211,7 +211,7 @@ public abstract class DocumentModelHandler<T, TL>
      * getRepositorySession returns Nuxeo Repository Session
      * @return
      */
-    public RepositoryInstance getRepositorySession() {
+    public RepositoryInstanceInterface getRepositorySession() {
     	
         return repositorySession;
     }
@@ -220,7 +220,7 @@ public abstract class DocumentModelHandler<T, TL>
      * setRepositorySession sets repository session
      * @param repoSession
      */
-    public void setRepositorySession(RepositoryInstance repoSession) {
+    public void setRepositorySession(RepositoryInstanceInterface repoSession) {
         this.repositorySession = repoSession;
     }
 

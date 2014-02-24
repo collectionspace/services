@@ -118,6 +118,7 @@ import org.collectionspace.services.blob.MeasuredPartGroup;
 import org.collectionspace.services.blob.MeasuredPartGroupList;
 import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
+import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.nuxeo.extension.thumbnail.ThumbnailConstants;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
@@ -297,7 +298,7 @@ public class NuxeoBlobUtils {
 		return result;
 	}
 
-	static public CommonList getBlobDerivatives(RepositoryInstance repoSession,
+	static public CommonList getBlobDerivatives(RepositoryInstanceInterface repoSession,
 			String repositoryId, List<ListResultField> resultsFields, String uri)
 			throws Exception {
 		CommonList commonList = new CommonList();
@@ -501,7 +502,7 @@ public class NuxeoBlobUtils {
 	 * This is a prototype method that is not currently used as of 1/1/2012.  However,
 	 * it may be useful now that we've transitioned to using an embedded Nuxeo server.
 	 */
-	static private File getBlobFile(RepositoryInstance ri,
+	static private File getBlobFile(RepositoryInstanceInterface ri,
 			DocumentModel documentModel, Blob blob) {
 		DefaultBinaryManager binaryManager = null;
 		RepositoryDescriptor descriptor = null;
@@ -576,11 +577,11 @@ public class NuxeoBlobUtils {
 	 *            the id
 	 * @return the blob
 	 */
-	static private Blob getBlob(RepositoryInstance nuxeoSession, String id) {
+	static private Blob getBlob(RepositoryInstanceInterface repoSession, String id) {
 		Blob result = null;
 
 		try {
-			Repository repository = nuxeoSession.getRepository();
+			Repository repository = repoSession.getRepositoryInstance().getRepository();
 			// binaryManager.initialize(new RepositoryDescriptor());
 			// binaryManager.getBinary("a4cac052ae0281979f2dcf5ab2e61a6c");
 			// DocumentResolver.resolveReference(nuxeoSession, documentRef);
@@ -876,8 +877,8 @@ public class NuxeoBlobUtils {
 		return result;
 	}
 	
-	static private RepositoryInstance getRepositorySession(ServiceContext ctx, RepositoryClient repositoryClient) {
-		RepositoryInstance result = null;		
+	static private RepositoryInstanceInterface getRepositorySession(ServiceContext ctx, RepositoryClient repositoryClient) {
+		RepositoryInstanceInterface result = null;		
 		RepositoryJavaClientImpl nuxeoClient = (RepositoryJavaClientImpl)repositoryClient;
 		
 		try {
@@ -889,7 +890,7 @@ public class NuxeoBlobUtils {
 		return result;
 	}
 	
-	static private void releaseRepositorySession(ServiceContext ctx, RepositoryClient repositoryClient, RepositoryInstance repoSession) throws TransactionException {
+	static private void releaseRepositorySession(ServiceContext ctx, RepositoryClient repositoryClient, RepositoryInstanceInterface repoSession) throws TransactionException {
 		RepositoryJavaClientImpl nuxeoClient = (RepositoryJavaClientImpl)repositoryClient;
 		nuxeoClient.releaseRepositorySession(ctx, repoSession);
 	}
@@ -907,7 +908,7 @@ public class NuxeoBlobUtils {
     }
 	
 	private static DocumentModel createDocumentFromBlob(
-			RepositoryInstance repoSession,
+			RepositoryInstanceInterface repoSession,
             Blob inputStreamBlob, 
             String blobLocation, 
             boolean overwrite, 
@@ -922,7 +923,7 @@ public class NuxeoBlobUtils {
 			// image derivatives.
 			//
 			result = getFileManager().createDocumentFromBlob(
-					repoSession, inputStreamBlob, blobLocation, true, blobName);
+					repoSession.getRepositoryInstance(), inputStreamBlob, blobLocation, true, blobName);
 		} else {
 			//
 			// User Nuxeo's default file importer/adapter explicitly.  This avoids specialized functionality from happening like
@@ -936,7 +937,7 @@ public class NuxeoBlobUtils {
 
 			FileImporter defaultFileImporter = fileManagerService.getPluginByName("DefaultFileImporter");
 			result = defaultFileImporter.create(
-					repoSession, inputStreamBlob, blobLocation, true, blobName, getTypeService());			
+					repoSession.getRepositoryInstance(), inputStreamBlob, blobLocation, true, blobName, getTypeService());			
 		}
 		
 		return result;
@@ -951,7 +952,7 @@ public class NuxeoBlobUtils {
 		BlobsCommon result = null;
 
 		boolean repoSessionCleanup = false;
-		RepositoryInstance repoSession = (RepositoryInstance)ctx.getCurrentRepositorySession();
+		RepositoryInstanceInterface repoSession = (RepositoryInstanceInterface)ctx.getCurrentRepositorySession();
 		if (repoSession == null) {
 			repoSession = getRepositorySession(ctx, repositoryClient);
 			repoSessionCleanup = true;
@@ -998,7 +999,7 @@ public class NuxeoBlobUtils {
 	 */
 	public static BlobsCommon createBlobInRepository(
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-			RepositoryInstance repoSession,
+			RepositoryInstanceInterface repoSession,
 			BlobInput blobInput,
 			boolean purgeOriginal,
 			boolean useNuxeoAdaptors) throws Exception {
@@ -1084,7 +1085,7 @@ public class NuxeoBlobUtils {
 	 *            the mime type
 	 * @return the string
 	 */
-	static private BlobsCommon createBlobInRepository(RepositoryInstance nuxeoSession,
+	static private BlobsCommon createBlobInRepository(RepositoryInstanceInterface nuxeoSession,
 			DocumentModel blobLocation,
 			boolean purgeOriginal,
 			File file,
@@ -1178,7 +1179,7 @@ public class NuxeoBlobUtils {
 		BlobOutput result = null;
 		
 		boolean repoSessionCleanup = false;
-		RepositoryInstance repoSession = (RepositoryInstance)ctx.getCurrentRepositorySession();
+		RepositoryInstanceInterface repoSession = (RepositoryInstanceInterface)ctx.getCurrentRepositorySession();
 		if (repoSession == null) {
 			repoSession = getRepositorySession(ctx, repositoryClient);
 			repoSessionCleanup = true;
@@ -1244,7 +1245,7 @@ public class NuxeoBlobUtils {
 	 * @return the image
 	 */
 	static public BlobOutput getBlobOutput(ServiceContext ctx,
-			RepositoryInstance repoSession,
+			RepositoryInstanceInterface repoSession,
 			String repositoryId,
 			String derivativeTerm,
 			Boolean getContentFlag,

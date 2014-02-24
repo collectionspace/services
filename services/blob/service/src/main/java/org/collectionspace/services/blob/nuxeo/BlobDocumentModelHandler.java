@@ -42,11 +42,11 @@ import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 
 
+import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,7 +115,7 @@ extends DocHandlerBase<BlobsCommon> {
         ObjectPartType partMeta = partsMetaMap.get(metadataLabel);
 
         if (partMeta != null) {
-			RepositoryInstance repoSession = this.getRepositorySession();
+        	RepositoryInstanceInterface repoSession = this.getRepositorySession();
 			if (nuxeoImageID != null && nuxeoImageID.isEmpty() == false) try {
 				IdRef documentRef = new IdRef(nuxeoImageID);
 				DocumentModel docModel = repoSession.getDocument(documentRef);
@@ -139,7 +139,7 @@ extends DocHandlerBase<BlobsCommon> {
 			throws Exception {
 		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
 		BlobInput blobInput = BlobUtil.getBlobInput(ctx); // the blobInput was set by the Blob JAX-RS resource code and put into the service context
-		RepositoryInstance repoSession = this.getRepositorySession();
+		RepositoryInstanceInterface repoSession = this.getRepositorySession();
 		DocumentModel docModel = wrapDoc.getWrappedObject();
 		BlobsCommon blobsCommon = this.getCommonPartProperties(docModel);		
 		String blobRepositoryId = blobsCommon.getRepositoryId(); //cache the value to pass to the blob retriever
@@ -220,7 +220,7 @@ extends DocHandlerBase<BlobsCommon> {
 			// If blobInput has a file then we just received a multipart/form-data file post or a URI query parameter
 			//
 			DocumentModel documentModel = wrapDoc.getWrappedObject();
-			RepositoryInstance repoSession = this.getRepositorySession();
+			RepositoryInstanceInterface repoSession = this.getRepositorySession();
 	        
 			BlobsCommon blobsCommon = NuxeoBlobUtils.createBlobInRepository(ctx, repoSession, blobInput, purgeOriginal, true);
 			blobInput.setBlobCsid(documentModel.getName()); //Assumption here is that the documentModel "name" field is storing a CSID

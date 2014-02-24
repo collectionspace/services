@@ -79,6 +79,7 @@ import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
+import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.workflow.WorkflowCommon;
@@ -326,7 +327,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * Resource. They then call this method on that resource.
      */
     @Override
-   	public DocumentModel getDocModelForAuthorityItem(RepositoryInstance repoSession, RefName.AuthorityItem item) 
+   	public DocumentModel getDocModelForAuthorityItem(RepositoryInstanceInterface repoSession, RefName.AuthorityItem item) 
    			throws Exception, DocumentNotFoundException {
     	if(item == null) {
     		return null;

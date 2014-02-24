@@ -35,6 +35,7 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.ServiceGroupListItemJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -84,7 +85,7 @@ public class ServiceGroupDocumentModelHandler
     		List<String> serviceGroupNames) throws Exception {
         CommonList commonList = new CommonList();
         AbstractCommonList list = (AbstractCommonList)commonList;
-    	RepositoryInstance repoSession = null;
+        RepositoryInstanceInterface repoSession = null;
     	boolean releaseRepoSession = false;
         
     	try { 

@@ -384,6 +384,11 @@
             <version>${spring.security.version}</version>
             <scope>provided</scope>
         </dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+			<version>${spring.version}</version>
+		</dependency>        
     </dependencies>
 
     <repositories>

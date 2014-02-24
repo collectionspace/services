@@ -41,10 +41,9 @@ import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentException;
-
+import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
-
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.ClientException;
@@ -67,7 +66,6 @@ import org.nuxeo.ecm.core.search.api.client.querymodel.descriptor.QueryModelDesc
 import org.nuxeo.ecm.core.storage.sql.Binary;
 import org.nuxeo.ecm.core.storage.sql.coremodel.SQLBlob;
 import org.nuxeo.runtime.api.Framework;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -222,7 +220,7 @@ public class NuxeoUtils {
      * @return
      * @throws DocumentException
      */
-    public static Document getDocument(RepositoryInstance repoSession, DocumentModel nuxeoDoc)
+    public static Document getDocument(RepositoryInstanceInterface repoSession, DocumentModel nuxeoDoc)
             throws DocumentException {
         Document doc = null;
         DocumentWriter writer = null;
@@ -232,7 +230,7 @@ public class NuxeoUtils {
         try {
             baos = new ByteArrayOutputStream();
             //nuxeo io.impl begin
-            reader = new SingleDocumentReader(repoSession, nuxeoDoc);
+            reader = new SingleDocumentReader(repoSession.getRepositoryInstance(), nuxeoDoc);
             writer = new XMLDocumentWriter(baos);
             DocumentPipe pipe = new DocumentPipeImpl();
             //nuxeo io.impl end
@@ -282,7 +280,7 @@ public class NuxeoUtils {
      *
      * @throws DocumentException the document exception
      */
-    public static Document getDocument(RepositoryInstance repoSession, String csid)
+    public static Document getDocument(RepositoryInstanceInterface repoSession, String csid)
             throws DocumentException {
         Document result = null;
 
@@ -305,7 +303,7 @@ public class NuxeoUtils {
      * @throws ClientException the client exception
      */
     public static DocumentModel getWorkspaceModel(
-            RepositoryInstance repoSession, String workspaceName)
+    		RepositoryInstanceInterface repoSession, String workspaceName)
             throws DocumentException, IOException, ClientException {
         DocumentModel result = null;
         //FIXME: commented out as this does not work without tenant qualification
@@ -332,7 +330,7 @@ public class NuxeoUtils {
      * @throws DocumentException the document exception
      */
     public static DocumentModel getDocumentModel(
-            RepositoryInstance repoSession, String nuxeoId)
+    		RepositoryInstanceInterface repoSession, String nuxeoId)
             throws DocumentException {
         DocumentModel result = null;
 
@@ -538,7 +536,7 @@ public class NuxeoUtils {
     
     static public DocumentModel getDocFromCsid(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-    		RepositoryInstance repoSession,
+    		RepositoryInstanceInterface repoSession,
     		String csid) throws Exception {
 	    DocumentModel result = null;
 	
@@ -623,7 +621,7 @@ public class NuxeoUtils {
         return id;
     }
     
-    public static boolean documentExists(RepositoryInstance repoSession,
+    public static boolean documentExists(RepositoryInstanceInterface repoSession,
     		String csid) throws ClientException {
 		boolean result = false;
 		

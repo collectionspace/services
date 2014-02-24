@@ -26,6 +26,7 @@ package org.collectionspace.services.common;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
@@ -33,7 +34,6 @@ import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
@@ -47,19 +47,16 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
-
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.service.DocHandlerParams;
 import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ServiceBindingType;
-
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
+import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.util.HttpResponseCodes;
-
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
@@ -506,7 +503,7 @@ public abstract class ResourceBase
      * for all inheriting resource classes. Just use ServiceContext.getResourceMap() to get
      * the map, and pass it in.
      */
-    public static DocumentModel getDocModelForRefName(RepositoryInstance repoSession, String refName, ResourceMap resourceMap) 
+    public static DocumentModel getDocModelForRefName(RepositoryInstanceInterface repoSession, String refName, ResourceMap resourceMap) 
    			throws Exception, DocumentNotFoundException {
     	RefName.AuthorityItem item = RefName.AuthorityItem.parse(refName);
     	if(item != null) {
@@ -529,13 +526,13 @@ public abstract class ResourceBase
 
     // THis is ugly, but prevents us parsing the refName twice. Once we make refName a little more
     // general, and less Authority(Item) specific, this will look better.
-   	public DocumentModel getDocModelForAuthorityItem(RepositoryInstance repoSession, RefName.AuthorityItem item) 
+   	public DocumentModel getDocModelForAuthorityItem(RepositoryInstanceInterface repoSession, RefName.AuthorityItem item) 
    			throws Exception, DocumentNotFoundException {
    		logger.warn("Default (ResourceBase) getDocModelForAuthorityItem called - should not happen!");
    		return null;
    	}
 
-    public DocumentModel getDocModelForRefName(RepositoryInstance repoSession, String refName) 
+    public DocumentModel getDocModelForRefName(RepositoryInstanceInterface repoSession, String refName) 
    			throws Exception, DocumentNotFoundException {
     	return getDocModelForAuthorityItem(repoSession, RefName.AuthorityItem.parse(refName));
     }

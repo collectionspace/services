@@ -13,10 +13,10 @@ import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.config.RepositoryClientConfigType;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+
 import org.nuxeo.ecm.core.NXCore;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.model.Repository;
 import org.nuxeo.osgi.application.FrameworkBootstrap;
 import org.nuxeo.ecm.core.repository.RepositoryDescriptor;
@@ -145,7 +145,7 @@ public class NuxeoConnectorEmbedded {
 					this.servletContext = servletContext;
 					this.repositoryClientConfig = repositoryClientConfig;
 					startNuxeoEP(serverRootPath);
-					client = new NuxeoClientEmbedded();
+					client = NuxeoClientEmbedded.getInstance();
 					initialized = true;
 				}
 			}
@@ -183,7 +183,7 @@ public class NuxeoConnectorEmbedded {
 	 * @param repoSession
 	 * @throws java.lang.Exception
 	 */
-	public void releaseRepositorySession(RepositoryInstance repoSession)
+	public void releaseRepositorySession(RepositoryInstanceInterface repoSession)
 			throws Exception {
 		if (repoSession != null) {
 			getClient().releaseRepository(repoSession);
@@ -200,8 +200,8 @@ public class NuxeoConnectorEmbedded {
 	 * @return RepositoryInstance
 	 * @throws java.lang.Exception
 	 */
-	public RepositoryInstance getRepositorySession(RepositoryDomainType repoDomain) throws Exception {
-		RepositoryInstance repoSession = getClient().openRepository(repoDomain);
+	public RepositoryInstanceInterface getRepositorySession(RepositoryDomainType repoDomain) throws Exception {
+		RepositoryInstanceInterface repoSession = getClient().openRepository(repoDomain);
 		
 		if (logger.isDebugEnabled() && repoSession != null) {
 			logger.debug("getRepositorySession() opened repository session");
@@ -288,7 +288,7 @@ public class NuxeoConnectorEmbedded {
 	 */
 	public Hashtable<String, String> retrieveWorkspaceIds(RepositoryDomainType repoDomain)
 			throws Exception {
-		RepositoryInstance repoSession = null;
+		RepositoryInstanceInterface repoSession = null;
 		Hashtable<String, String> workspaceIds = new Hashtable<String, String>();
 		try {
 			repoSession = getRepositorySession(repoDomain);
