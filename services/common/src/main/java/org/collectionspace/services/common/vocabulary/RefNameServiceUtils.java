@@ -36,8 +36,10 @@ import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
 import org.nuxeo.ecm.core.api.model.impl.primitives.StringProperty;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -475,7 +477,7 @@ public class RefNameServiceUtils {
     private static DocumentModelList findAllAuthorityRefDocs(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
-            RepositoryInstance repoSession, List<String> serviceTypes,
+            RepositoryInstanceInterface repoSession, List<String> serviceTypes,
             String refName,
             String refPropName,
             Map<String, ServiceBindingType> queriedServiceBindings,

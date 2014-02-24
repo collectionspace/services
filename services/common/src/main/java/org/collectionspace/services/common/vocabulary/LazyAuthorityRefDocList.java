@@ -12,6 +12,8 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
 import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
+
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
@@ -35,7 +37,7 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 	
 	private ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx;
 	private RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient;
-	private RepositoryInstance repoSession;
+	private RepositoryInstanceInterface repoSession;
 	private List<String> serviceTypes;
 	private String refName;
 	private String refPropName;
@@ -69,7 +71,7 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 	public LazyAuthorityRefDocList(
 	        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
 	        RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
-	        RepositoryInstance repoSession, List<String> serviceTypes,
+	        RepositoryInstanceInterface repoSession, List<String> serviceTypes,
 	        String refName,
 	        String refPropName,
 	        Map<String, ServiceBindingType> queriedServiceBindings,
