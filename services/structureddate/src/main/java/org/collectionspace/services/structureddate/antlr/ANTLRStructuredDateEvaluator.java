@@ -17,8 +17,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.collectionspace.services.structureddate.Date;
 import org.collectionspace.services.structureddate.DateUtils;
 import org.collectionspace.services.structureddate.Era;
-import org.collectionspace.services.structureddate.QualifierType;
-import org.collectionspace.services.structureddate.QualifierUnit;
 import org.collectionspace.services.structureddate.StructuredDate;
 import org.collectionspace.services.structureddate.StructuredDateEvaluator;
 import org.collectionspace.services.structureddate.StructuredDateFormatException;
@@ -51,6 +49,7 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.St
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrSeasonContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.UncertainDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearSpanningWinterContext;
 
 /**
  * A StructuredDateEvaluator that uses an ANTLR parser to parse the display date,
@@ -153,18 +152,18 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		
 		// Express the circa interval as a qualifier.
 		
-		stack.push(earliestDate.withQualifier(QualifierType.MINUS, earliestInterval, QualifierUnit.YEARS));
-		stack.push(latestDate.withQualifier(QualifierType.PLUS, latestInterval, QualifierUnit.YEARS));
+		// stack.push(earliestDate.withQualifier(QualifierType.MINUS, earliestInterval, QualifierUnit.YEARS));
+		// stack.push(latestDate.withQualifier(QualifierType.PLUS, latestInterval, QualifierUnit.YEARS));
 		
 		// OR:
 		
-		// Express the circa interval as an offset to the year.
+		// Express the circa interval as an offset calculated into the year.
 		
-		// DateUtils.subtractYears(earliestDate, earliestInterval);
-		// DateUtils.addYears(latestDate, latestInterval);
+		DateUtils.subtractYears(earliestDate, earliestInterval);
+		DateUtils.addYears(latestDate, latestInterval);
 		
-		// stack.push(earliestDate);
-		// stack.push(latestDate);
+		stack.push(earliestDate);
+		stack.push(latestDate);
 	}
 
 	@Override
@@ -308,6 +307,18 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		stack.push(numMonth);
 		stack.push(year);
 		stack.push(era);
+	}
+	
+	@Override
+	public void exitYearSpanningWinter(YearSpanningWinterContext ctx) {
+		if (ctx.exception != null) return;
+		
+		Era era = (Era) stack.pop();		
+		Integer endYear = (Integer) stack.pop();
+		Integer startYear = (Integer) stack.pop();
+		
+		stack.push(new Date(startYear, 12, 1).withEra(era));
+		stack.push(DateUtils.getQuarterYearEndDate(endYear, 1).withEra(era));
 	}
 
 	@Override
