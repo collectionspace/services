@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<component name="config:default-repository">
+    <extension target="org.nuxeo.ecm.core.repository.RepositoryService"
+                   point="repository">
+        <repository name="default"
+                            factory="org.nuxeo.ecm.core.storage.sql.ra.PoolingRepositoryFactory">
+            <repository name="default">
+                <pool minPoolSize="0" maxPoolSize="20"
+                                      blockingTimeoutMillis="100" idleTimeoutMinutes="10" />
+                <clustering enabled="false" delay="1000" />
+                <binaryStore path="" />
+                <!-- The transactional datasource for Nuxeo -->
+                <xa-datasource>@XA_DATASOURCE@</xa-datasource>				
+                <property name="URL">@DB_URL@</property>
+                <property name="ServerName">@DB_SERVER_HOSTNAME@</property>				
+                <property name="DatabaseName">nuxeo</property>
+                <property name="User">@NUXEO_USER@</property>
+                <property name="Password">@NUXEO_PW@</property>
+            </repository>
+        </repository>
+    </extension>
+
+    <extension target="org.nuxeo.ecm.core.api.repository.RepositoryManager"
+                   point="repositories">
+        <documentation>The default repository</documentation>
+        <repository name="default" label="Default Repository" />
+    </extension>
+</component>

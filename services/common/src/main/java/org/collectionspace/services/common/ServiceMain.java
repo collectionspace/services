@@ -6,8 +6,6 @@ package org.collectionspace.services.common;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,6 +20,7 @@ import javax.sql.DataSource;
 
 import org.collectionspace.authentication.AuthN;
 
+import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.config.ConfigReader;
 import org.collectionspace.services.common.config.ConfigUtils;
@@ -43,7 +42,7 @@ import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 import org.collectionspace.services.nuxeo.client.java.TenantRepository;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
-import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
+import org.dom4j.Document;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +70,7 @@ public class ServiceMain {
     
     private static final String SERVER_HOME_PROPERTY = "catalina.home";
 	private static final boolean USE_APP_GENERATED_CONFIG = true;
-    
+        
     private ServiceMain() {
     	//empty
     }
@@ -156,6 +155,42 @@ public class ServiceMain {
         readConfig();
     	setDataSources();
         propagateConfiguredProperties();
+        
+        // Ensure that Nuxeo config files exist for each repository
+        // specified in tenant bindings
+        File prototypeNuxeoConfigFile =
+                new File(getNuxeoConfigDir() + File.separator + getNuxeoProtoConfigFilename());
+        logger.warn("Prototype Nuxeo config file path=" + prototypeNuxeoConfigFile.getCanonicalPath());
+        if (! prototypeNuxeoConfigFile.canRead()) {
+            // FIXME: Handle this error appropriately here.
+        }
+        logger.warn("Can read prototype Nuxeo config file.");
+        Document prototypeDoc = XmlTools.fileToXMLDocument(prototypeNuxeoConfigFile);
+        // FIXME: Can the variable below reasonably be made a class variable? Its value
+        // is used in at least one other method in this class.
+        Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
+        for (TenantBindingType tbt : tenantBindingTypeMap.values()) {
+            List<String> repositoryNameList = ConfigUtils.getRepositoryNameList(tbt);
+            if (repositoryNameList != null && repositoryNameList.isEmpty() == false) {
+                Document repoDoc = null;
+		for (String repositoryName : repositoryNameList) {
+                    logger.warn("Repository name=" + repositoryName);
+                    repoDoc = (Document) prototypeDoc.clone();
+                    logger.warn("Before attribute edits=\n" + repoDoc.asXML());
+                    // FIXME: Set up constants and/or methods for XPath expressions, element and attribute names
+                    repoDoc = XmlTools.setAttributeValue(repoDoc, "/component/extension[@point='repository']/repository", "name", repositoryName);
+                    logger.warn("After first attribute edit=\n" + repoDoc.asXML());
+                    repoDoc = XmlTools.setAttributeValue(repoDoc, "/component/extension[@point='repository']/repository/repository", "name", repositoryName);
+                    logger.warn("After second attribute edit=\n" + repoDoc.asXML());
+                    repoDoc = XmlTools.setAttributeValue(repoDoc, "/component/extension[@point='repositories']/repository", "name", repositoryName);
+                    logger.warn("After third attribute edit=\n" + repoDoc.asXML());
+                    // FIXME: Edit additional element and/or attribute values.
+                    // FIXME: Emit serialized XML and write it to an appropriately named file
+                    // in the Nuxeo server config directory.
+                    repoDoc = null;
+                }
+            }
+        }
         //
         // Start up and initialize our embedded Nuxeo server instance
         //
@@ -366,6 +401,14 @@ public class ServiceMain {
      */
     public String getServerRootDir() {
         return serverRootDir;
+    }
+    
+    public String getNuxeoConfigDir() {
+        return getServerRootDir() + JEEServerDeployment.NUXEO_SERVER_CONFIG_DIR;
+    }
+    
+    public String getNuxeoProtoConfigFilename() {
+        return JEEServerDeployment.NUXEO_PROTOTYPE_CONFIG_FILENAME;
     }
     
     /**

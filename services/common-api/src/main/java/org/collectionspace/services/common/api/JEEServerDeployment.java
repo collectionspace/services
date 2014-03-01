@@ -12,6 +12,9 @@ public interface JEEServerDeployment {
 	
 	public final static String NUXEO_CLIENT_DIR = "nuxeo-client";
 	public final static String NUXEO_SERVER_DIR = "nuxeo-server";
+	public final static String NUXEO_CONFIG_DIR = "config";
+	public final static String NUXEO_SERVER_CONFIG_DIR = NUXEO_SERVER_DIR + File.separator + NUXEO_CONFIG_DIR;
+        public final static String NUXEO_PROTOTYPE_CONFIG_FILENAME = "proto-repo-config.xml";
 	public final static String NUXEO_PLUGINS_DIR = "plugins";
 	public final static String NUXEO_SERVER_PLUGINS_DIR = NUXEO_SERVER_DIR + File.separator + NUXEO_PLUGINS_DIR;
 }
