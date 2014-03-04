@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <component name="config:default-repository">
     <extension target="org.nuxeo.ecm.core.repository.RepositoryService"
-                   point="repository">
+               point="repository">
         <repository name="default"
-                            factory="org.nuxeo.ecm.core.storage.sql.ra.PoolingRepositoryFactory">
+                    factory="org.nuxeo.ecm.core.storage.sql.ra.PoolingRepositoryFactory">
             <repository name="default">
                 <pool minPoolSize="0" maxPoolSize="20"
-                                      blockingTimeoutMillis="100" idleTimeoutMinutes="10" />
+                      blockingTimeoutMillis="100" idleTimeoutMinutes="10" />
                 <clustering enabled="false" delay="1000" />
                 <binaryStore path="" />
                 <!-- The transactional datasource for Nuxeo -->
@@ -21,7 +21,7 @@
     </extension>
 
     <extension target="org.nuxeo.ecm.core.api.repository.RepositoryManager"
-                   point="repositories">
+               point="repositories">
         <documentation>The default repository</documentation>
         <repository name="default" label="Default Repository" />
     </extension>

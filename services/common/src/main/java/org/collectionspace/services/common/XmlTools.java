@@ -122,6 +122,35 @@ public class XmlTools {
     }
     
     /**
+     * Sets the (text node) value of a specified element in a dom4j XML document.
+     * @param   doc  A dom4j XML document.
+     * @param   xpathExpr  An XPath expression intended to match a single element
+     * in the XML document, in the default namespace.
+     * @param   elementValue  The value that the element should contain.
+     * @return  The document with the (text node) value of the matched element, if
+     * any, set to the provided value.
+     */
+    public static Document setElementValue(Document doc, String xpathExpr,
+            String elementValue) {
+        if (Tools.isBlank(xpathExpr)) {
+            return doc;
+        }
+        try {
+            Node node = doc.selectSingleNode(xpathExpr);
+            if ((node == null) || (node.getNodeType() != Node.ELEMENT_NODE)) {
+                return doc;
+            }
+            Element element = (Element) node;
+            element.setText(elementValue == null ? "" : elementValue);
+            return doc;
+        } catch (Exception e) {
+            System.out.println(e.getStackTrace());
+        } finally {
+            return doc;
+        }
+    }
+    
+    /**
      * Sets the value of a specified attribute in a dom4j XML document.
      * @param   doc  A dom4j XML document.
      * @param   xpathExpr  An XPath expression intended to match a single element
@@ -144,7 +173,7 @@ public class XmlTools {
                 return doc;
             }
             Element element = (Element) node;
-            element.addAttribute(attributeName, attributeValue);
+            element.addAttribute(attributeName, attributeValue == null ? "" : attributeValue);
             return doc;
         } catch (Exception e) {
             System.out.println(e.getStackTrace());

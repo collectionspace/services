@@ -182,6 +182,8 @@ public class ServiceMain {
                         logger.warn("After second attribute edit=\n" + repoDoc.asXML());
                         repoDoc = XmlTools.setAttributeValue(repoDoc, "/component/extension[@point='repositories']/repository", "name", repositoryName);
                         logger.warn("After third attribute edit=\n" + repoDoc.asXML());
+                        repoDoc = XmlTools.setElementValue(repoDoc, "/component/extension[@point='repository']/repository/repository/property[@name='DatabaseName']", repositoryName);
+                        logger.warn("After first element edit=\n" + repoDoc.asXML());
                         // FIXME: Edit additional element and/or attribute values.
                         // FIXME: Emit serialized XML and write it to an appropriately named file
                         // in the Nuxeo server config directory.
@@ -189,6 +191,9 @@ public class ServiceMain {
                     }
                 }
             }
+        } else {
+            logger.error(String.format("Could not either find, or read, the prototype Nuxeo config file '%s'",
+                    prototypeNuxeoConfigFile.getCanonicalPath()));
         }
         //
         // Start up and initialize our embedded Nuxeo server instance
