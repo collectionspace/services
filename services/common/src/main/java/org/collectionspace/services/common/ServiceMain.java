@@ -21,6 +21,7 @@ import javax.sql.DataSource;
 import org.collectionspace.authentication.AuthN;
 
 import org.collectionspace.services.common.api.JEEServerDeployment;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.config.ConfigReader;
 import org.collectionspace.services.common.config.ConfigUtils;
@@ -69,8 +70,14 @@ public class ServiceMain {
     private UriTemplateRegistry uriTemplateRegistry = new UriTemplateRegistry();
     
     private static final String SERVER_HOME_PROPERTY = "catalina.home";
-	private static final boolean USE_APP_GENERATED_CONFIG = true;
-        
+    private static final boolean USE_APP_GENERATED_CONFIG = true;
+    
+    private static final String COMPONENT_EXTENSION_XPATH = "/component/extension[@point='%s']";
+    private static final String REPOSITORY_EXTENSION_POINT_XPATH =
+            String.format(COMPONENT_EXTENSION_XPATH, "repository");
+    private static final String REPOSITORIES_EXTENSION_POINT_XPATH =
+            String.format(COMPONENT_EXTENSION_XPATH, "repositories");
+            
     private ServiceMain() {
     	//empty
     }
@@ -171,19 +178,50 @@ public class ServiceMain {
                 List<String> repositoryNameList = ConfigUtils.getRepositoryNameList(tbt);
                 if (repositoryNameList != null && repositoryNameList.isEmpty() == false) {
                     Document repoDoc = null;
+                    final String PLACEHOLDER = "placeholder";
                     for (String repositoryName : repositoryNameList) {
+                        if (Tools.isBlank(repositoryName)) {
+                            continue;
+                        }
+                        // FIXME: Remove this and other, similar log statements before merging. 
                         logger.warn("Repository name=" + repositoryName);
                         repoDoc = (Document) prototypeDoc.clone();
-                        logger.warn("Before attribute edits=\n" + repoDoc.asXML());
-                        // FIXME: Set up constants and/or methods for XPath expressions, element and attribute names
-                        repoDoc = XmlTools.setAttributeValue(repoDoc, "/component/extension[@point='repository']/repository", "name", repositoryName);
-                        logger.warn("After first attribute edit=\n" + repoDoc.asXML());
-                        repoDoc = XmlTools.setAttributeValue(repoDoc, "/component/extension[@point='repository']/repository/repository", "name", repositoryName);
-                        logger.warn("After second attribute edit=\n" + repoDoc.asXML());
-                        repoDoc = XmlTools.setAttributeValue(repoDoc, "/component/extension[@point='repositories']/repository", "name", repositoryName);
-                        logger.warn("After third attribute edit=\n" + repoDoc.asXML());
-                        repoDoc = XmlTools.setElementValue(repoDoc, "/component/extension[@point='repository']/repository/repository/property[@name='DatabaseName']", repositoryName);
-                        logger.warn("After first element edit=\n" + repoDoc.asXML());
+                        logger.warn("Before edits=\n" + repoDoc.asXML());
+                        // Text substitutions within first extension point
+                        repoDoc = XmlTools.setAttributeValue(repoDoc,
+                                REPOSITORY_EXTENSION_POINT_XPATH + "/repository", "name", repositoryName);
+                        logger.warn("After edit=\n" + repoDoc.asXML());
+                        repoDoc = XmlTools.setAttributeValue(repoDoc,
+                                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository", "name", repositoryName);
+                        logger.warn("After edit=\n" + repoDoc.asXML());
+                        repoDoc = XmlTools.setElementValue(repoDoc,
+                                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/xa-datasource", PLACEHOLDER);
+                        logger.warn("After edit=\n" + repoDoc.asXML());
+                        repoDoc = XmlTools.setElementValue(repoDoc,
+                                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='URL']", PLACEHOLDER);
+                        logger.warn("After edit=\n" + repoDoc.asXML());
+                        repoDoc = XmlTools.setElementValue(repoDoc,
+                                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='ServerName']", PLACEHOLDER);
+                        logger.warn("After edit=\n" + repoDoc.asXML());
+                        repoDoc = XmlTools.setElementValue(repoDoc,
+                                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='DatabaseName']", repositoryName);
+                        logger.warn("After edit=\n" + repoDoc.asXML());
+                        repoDoc = XmlTools.setElementValue(repoDoc,
+                                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='User']", PLACEHOLDER);
+                        logger.warn("After edit=\n" + repoDoc.asXML());
+                        repoDoc = XmlTools.setElementValue(repoDoc,
+                                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='Password']", PLACEHOLDER);
+                        logger.warn("After edit=\n" + repoDoc.asXML());
+                        // Text substitutions within second extension point
+                        repoDoc = XmlTools.setElementValue(repoDoc,
+                                REPOSITORIES_EXTENSION_POINT_XPATH + "/documentation", PLACEHOLDER);
+                        logger.warn("After edit=\n" + repoDoc.asXML());
+                        repoDoc = XmlTools.setAttributeValue(repoDoc,
+                                REPOSITORIES_EXTENSION_POINT_XPATH + "/repository", "name", repositoryName);
+                        logger.warn("After edit=\n" + repoDoc.asXML());
+                        repoDoc = XmlTools.setAttributeValue(repoDoc,
+                                REPOSITORIES_EXTENSION_POINT_XPATH + "/repository", "label", PLACEHOLDER);
+                        logger.warn("After edit=\n" + repoDoc.asXML());
                         // FIXME: Edit additional element and/or attribute values.
                         // FIXME: Emit serialized XML and write it to an appropriately named file
                         // in the Nuxeo server config directory.
@@ -413,6 +451,10 @@ public class ServiceMain {
     
     public String getNuxeoProtoConfigFilename() {
         return JEEServerDeployment.NUXEO_PROTOTYPE_CONFIG_FILENAME;
+    }
+    
+    public String getNuxeoConfigFilename(String reponame) {
+        return reponame + JEEServerDeployment.NUXEO_REPO_CONFIG_FILENAME_SUFFIX;
     }
     
     /**
