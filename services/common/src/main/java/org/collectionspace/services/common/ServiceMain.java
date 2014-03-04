@@ -161,33 +161,32 @@ public class ServiceMain {
         File prototypeNuxeoConfigFile =
                 new File(getNuxeoConfigDir() + File.separator + getNuxeoProtoConfigFilename());
         logger.warn("Prototype Nuxeo config file path=" + prototypeNuxeoConfigFile.getCanonicalPath());
-        if (! prototypeNuxeoConfigFile.canRead()) {
-            // FIXME: Handle this error appropriately here.
-        }
-        logger.warn("Can read prototype Nuxeo config file.");
-        Document prototypeDoc = XmlTools.fileToXMLDocument(prototypeNuxeoConfigFile);
-        // FIXME: Can the variable below reasonably be made a class variable? Its value
-        // is used in at least one other method in this class.
-        Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
-        for (TenantBindingType tbt : tenantBindingTypeMap.values()) {
-            List<String> repositoryNameList = ConfigUtils.getRepositoryNameList(tbt);
-            if (repositoryNameList != null && repositoryNameList.isEmpty() == false) {
-                Document repoDoc = null;
-		for (String repositoryName : repositoryNameList) {
-                    logger.warn("Repository name=" + repositoryName);
-                    repoDoc = (Document) prototypeDoc.clone();
-                    logger.warn("Before attribute edits=\n" + repoDoc.asXML());
-                    // FIXME: Set up constants and/or methods for XPath expressions, element and attribute names
-                    repoDoc = XmlTools.setAttributeValue(repoDoc, "/component/extension[@point='repository']/repository", "name", repositoryName);
-                    logger.warn("After first attribute edit=\n" + repoDoc.asXML());
-                    repoDoc = XmlTools.setAttributeValue(repoDoc, "/component/extension[@point='repository']/repository/repository", "name", repositoryName);
-                    logger.warn("After second attribute edit=\n" + repoDoc.asXML());
-                    repoDoc = XmlTools.setAttributeValue(repoDoc, "/component/extension[@point='repositories']/repository", "name", repositoryName);
-                    logger.warn("After third attribute edit=\n" + repoDoc.asXML());
-                    // FIXME: Edit additional element and/or attribute values.
-                    // FIXME: Emit serialized XML and write it to an appropriately named file
-                    // in the Nuxeo server config directory.
-                    repoDoc = null;
+        if (prototypeNuxeoConfigFile.canRead()) {
+            logger.warn("Can read prototype Nuxeo config file.");
+            Document prototypeDoc = XmlTools.fileToXMLDocument(prototypeNuxeoConfigFile);
+            // FIXME: Can the variable below reasonably be made a class variable? Its value
+            // is used in at least one other method in this class.
+            Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
+            for (TenantBindingType tbt : tenantBindingTypeMap.values()) {
+                List<String> repositoryNameList = ConfigUtils.getRepositoryNameList(tbt);
+                if (repositoryNameList != null && repositoryNameList.isEmpty() == false) {
+                    Document repoDoc = null;
+                    for (String repositoryName : repositoryNameList) {
+                        logger.warn("Repository name=" + repositoryName);
+                        repoDoc = (Document) prototypeDoc.clone();
+                        logger.warn("Before attribute edits=\n" + repoDoc.asXML());
+                        // FIXME: Set up constants and/or methods for XPath expressions, element and attribute names
+                        repoDoc = XmlTools.setAttributeValue(repoDoc, "/component/extension[@point='repository']/repository", "name", repositoryName);
+                        logger.warn("After first attribute edit=\n" + repoDoc.asXML());
+                        repoDoc = XmlTools.setAttributeValue(repoDoc, "/component/extension[@point='repository']/repository/repository", "name", repositoryName);
+                        logger.warn("After second attribute edit=\n" + repoDoc.asXML());
+                        repoDoc = XmlTools.setAttributeValue(repoDoc, "/component/extension[@point='repositories']/repository", "name", repositoryName);
+                        logger.warn("After third attribute edit=\n" + repoDoc.asXML());
+                        // FIXME: Edit additional element and/or attribute values.
+                        // FIXME: Emit serialized XML and write it to an appropriately named file
+                        // in the Nuxeo server config directory.
+                        repoDoc = null;
+                    }
                 }
             }
         }
@@ -404,7 +403,7 @@ public class ServiceMain {
     }
     
     public String getNuxeoConfigDir() {
-        return getServerRootDir() + JEEServerDeployment.NUXEO_SERVER_CONFIG_DIR;
+        return getServerRootDir() + File.separator + JEEServerDeployment.NUXEO_SERVER_CONFIG_DIR;
     }
     
     public String getNuxeoProtoConfigFilename() {

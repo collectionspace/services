@@ -138,13 +138,19 @@ public class XmlTools {
         if (Tools.isBlank(xpathExpr) || Tools.isBlank(attributeName)) {
             return doc;
         }
-        Node node = doc.selectSingleNode(xpathExpr);
-        if ((node == null) || (node.getNodeType() != Node.ELEMENT_NODE)) {
+        try {
+            Node node = doc.selectSingleNode(xpathExpr);
+            if ((node == null) || (node.getNodeType() != Node.ELEMENT_NODE)) {
+                return doc;
+            }
+            Element element = (Element) node;
+            element.addAttribute(attributeName, attributeValue);
+            return doc;
+        } catch (Exception e) {
+            System.out.println(e.getStackTrace());
+        } finally {
             return doc;
         }
-        Element element = (Element) node;
-        element.addAttribute(attributeName, attributeValue);
-        return doc;
     }
 
     public static String prettyPrint(String xml) throws Exception {
