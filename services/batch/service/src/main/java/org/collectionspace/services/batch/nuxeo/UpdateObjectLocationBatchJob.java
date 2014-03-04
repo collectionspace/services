@@ -20,6 +20,7 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
+import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -41,6 +42,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
     private final static String LIFECYCLE_STATE_ELEMENT_NAME = "currentLifeCycleState";
     private final static String LOCATION_DATE_ELEMENT_NAME = "locationDate";
     private final static String OBJECT_NUMBER_ELEMENT_NAME = "objectNumber";
+    private final static String UPDATE_DATE_ELEMENT_NAME = "updatedAt";
     private final static String WORKFLOW_COMMON_SCHEMA_NAME = "workflow_common";
     private final static String WORKFLOW_COMMON_NAMESPACE_PREFIX = "ns2";
     private final static String WORKFLOW_COMMON_NAMESPACE_URI =
@@ -200,7 +202,9 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         String movementCsid;
         String currentLocation;
         String locationDate;
+        String updateDate;
         String mostRecentLocationDate = "";
+        String comparisonUpdateDate = "";
         for (AbstractCommonList.ListItem movementListItem : relatedMovements.getListItem()) {
             movementCsid = AbstractCommonListUtils.ListItemGetElementValue(movementListItem, CSID_ELEMENT_NAME);
             if (Tools.isBlank(movementCsid)) {
@@ -218,19 +222,32 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             if (Tools.isBlank(locationDate)) {
                 continue;
             }
+            updateDate = AbstractCommonListUtils.ListItemGetElementValue(movementListItem, UPDATE_DATE_ELEMENT_NAME);
+            if (Tools.isBlank(updateDate)) {
+                continue;
+            }
             currentLocation = AbstractCommonListUtils.ListItemGetElementValue(movementListItem, CURRENT_LOCATION_ELEMENT_NAME);
             if (Tools.isBlank(currentLocation)) {
                 continue;
             }
-            // FIXME: Add optional validation here that this Movement record's
-            // currentLocation value parses successfully as an item refName,
-            // before identifying that record as the most recent Movement.
-            // Consider making this optional validation, in turn dependent on the
+            // Validate that this Movement record's currentLocation value parses
+            // successfully as an item refName, before identifying that record
+            // as the most recent Movement.
+            //
+            // TODO: Consider making this optional validation, in turn dependent on the
             // value of a parameter passed in during batch job invocation.
+            if (RefNameUtils.parseAuthorityTermInfo(currentLocation) == null) {
+                logger.warn(String.format("Could not parse current location refName '%s' in Movement record",
+                    currentLocation));
+                 continue;
+            }
+           
             if (logger.isTraceEnabled()) {
                 logger.trace("Location date value = " + locationDate);
+                logger.trace("Update date value = " + updateDate);
                 logger.trace("Current location value = " + currentLocation);
             }
+            
             // If this record's location date value is more recent than that of other
             // Movement records processed so far, set the current Movement record
             // as the most recent Movement.
@@ -244,6 +261,15 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             if (locationDate.compareTo(mostRecentLocationDate) > 0) {
                 mostRecentLocationDate = locationDate;
                 mostRecentMovement = movementListItem;
+                comparisonUpdateDate = updateDate;
+            } else if (locationDate.compareTo(mostRecentLocationDate) == 0) {
+                // If the two location dates match, then use a tiebreaker
+                if (updateDate.compareTo(comparisonUpdateDate) > 0) {
+                    // The most recent location date value doesn't need to be
+                    // updated here, as the two records' values are identical
+                    mostRecentMovement = movementListItem;
+                    comparisonUpdateDate = updateDate;
+                }
             }
 
         }
@@ -303,12 +329,16 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             return numUpdated;
         }
 
-        // Update the location.
-        // (Updated location values can legitimately be blank, to 'null out' existing locations.)  
+        // At this point in the code, the most recent related Movement record
+        // should not have a null current location, as such records are
+        // excluded from consideration altogether in getMostRecentMovement().
+        // This is a redundant fallback check, in case that code somehow fails
+        // or is modified or deleted.
         if (computedCurrentLocation == null) {
-            computedCurrentLocation = "";
+            return numUpdated;
         }
 
+        // Update the location.
         String collectionObjectUpdatePayload =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 + "<document name=\"collectionobject\">"
