@@ -125,53 +125,28 @@ public class XmlTools {
     }
     
     /**
-     * Writes a dom4j XML document to a file on disk, using a default
-     * pretty-printed output format.  Uses UTF-8 character encoding.
-     * @param  doc  A dom4j XML document.
-     * @param  file  A file.
-     */
-    public static void xmlDocumentToFile(Document doc, File file) throws Exception {
-        xmlDocumentToFile(doc, file, PRETTY_PRINT_OUTPUT_FORMAT);
-    }
-    
-    /**
      * Writes a dom4j XML document to a file on disk. Uses UTF-8 character
      * encoding.
      * @param  doc  A dom4j XML document.
      * @param  file  A file.
-     * @param  outputFormat  An output format.
      */
-    public static void xmlDocumentToFile(Document doc, File file, OutputFormat outputFormat) throws Exception {
+    public static void xmlDocumentToFile(Document doc, File file) throws Exception {
         if (doc == null) {
-            System.out.println("Document is null");
             System.err.println("Document is null");
             return;
         }
         FileWriter filewriter = null;
-        XMLWriter writer = null;
         try {
             filewriter = new FileWriter(file);
+            // asXML() appears to output an adequate serialization, thus
+            // obviating the need to use an XML-aware writer here.
             filewriter.write(doc.asXML());
             filewriter.flush();
             filewriter.close();
-//            XMLWriter writer = new XMLWriter(filewriter, outputFormat);
-//            writer.write(doc);
-//            writer.flush();
         } catch (Exception e) {
-            System.out.println(e.getStackTrace());
             System.err.println(e.getStackTrace());
             throw e;
         } finally {
-            // XMLWriter doesn't implement Closeable, so
-            // we'll need to close it directly here, rather
-            // than invoking closeQuietly().
-//            if (writer != null) {
-//                try {
-//                    writer.close();
-//                } catch (IOException e) {
-//                    // Do nothing here
-//                }
-//            }
             closeQuietly(filewriter);
        }
     }

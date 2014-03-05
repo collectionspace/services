@@ -204,9 +204,7 @@ public class ServiceMain {
                     File repofile = new File(getNuxeoConfigDir() + File.separator +
                             repositoryName + JEEServerDeployment.NUXEO_REPO_CONFIG_FILENAME_SUFFIX);
                     logger.warn(String.format("Repository config filepath is %s", repofile.getAbsolutePath()));
-                    // FIXME: Remove the duplicate call here (likely the first)
                     XmlTools.xmlDocumentToFile(repositoryConfigDoc, repofile);
-                    XmlTools.xmlDocumentToFile(repositoryConfigDoc, repofile, null);
                 }
             }
         }
@@ -806,42 +804,32 @@ public class ServiceMain {
     private Document updateRepositoryConfigDoc(Document repoConfigDoc, String repositoryName) {
         // FIXME: Remove this temporary placeholder variable used only during development.
         final String PLACEHOLDER = "placeholder";
-        // logger.warn("Before edits=\n" + repoConfigDoc.asXML());
-        // Text substitutions within first extension point
+        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
+                "/component", "name", String.format("config:%s-repository", repositoryName));
+        // Text substitutions within first extension point, "repository"
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
                 REPOSITORY_EXTENSION_POINT_XPATH + "/repository", "name", repositoryName);
-        // logger.warn("After edit=\n" + repoConfigDoc.asXML());
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
                 REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository", "name", repositoryName);
-        // logger.warn("After edit=\n" + repoConfigDoc.asXML());
         repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
                 REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/xa-datasource", PLACEHOLDER);
-        // logger.warn("After edit=\n" + repoConfigDoc.asXML());
         repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
                 REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='URL']", PLACEHOLDER);
-        // logger.warn("After edit=\n" + repoConfigDoc.asXML());
         repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
                 REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='ServerName']", PLACEHOLDER);
-        // logger.warn("After edit=\n" + repoConfigDoc.asXML());
         repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
                 REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='DatabaseName']", repositoryName);
-        // logger.warn("After edit=\n" + repoConfigDoc.asXML());
         repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
                 REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='User']", PLACEHOLDER);
-        // logger.warn("After edit=\n" + repoConfigDoc.asXML());
         repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
                 REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='Password']", PLACEHOLDER);
-        // logger.warn("After edit=\n" + repoConfigDoc.asXML());
-        // Text substitutions within second extension point
+        // Text substitutions within second extension point, "repositories"
         repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
                 REPOSITORIES_EXTENSION_POINT_XPATH + "/documentation", PLACEHOLDER);
-        // logger.warn("After edit=\n" + repoConfigDoc.asXML());
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
                 REPOSITORIES_EXTENSION_POINT_XPATH + "/repository", "name", repositoryName);
-        // logger.warn("After edit=\n" + repoConfigDoc.asXML());
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
                 REPOSITORIES_EXTENSION_POINT_XPATH + "/repository", "label", PLACEHOLDER);
-        // logger.warn("After edit=\n" + repoConfigDoc.asXML());
         return repoConfigDoc;
     }
 
