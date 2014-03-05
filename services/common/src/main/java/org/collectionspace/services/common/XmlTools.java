@@ -1,6 +1,9 @@
 package org.collectionspace.services.common;
 
+import java.io.Closeable;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.StringWriter;
 import org.collectionspace.services.common.api.Tools;
 import org.dom4j.Document;
@@ -122,6 +125,74 @@ public class XmlTools {
     }
     
     /**
+     * Writes a dom4j XML document to a file on disk, using a default
+     * pretty-printed output format.  Uses UTF-8 character encoding.
+     * @param  doc  A dom4j XML document.
+     * @param  file  A file.
+     */
+    public static void xmlDocumentToFile(Document doc, File file) throws Exception {
+        xmlDocumentToFile(doc, file, PRETTY_PRINT_OUTPUT_FORMAT);
+    }
+    
+    /**
+     * Writes a dom4j XML document to a file on disk. Uses UTF-8 character
+     * encoding.
+     * @param  doc  A dom4j XML document.
+     * @param  file  A file.
+     * @param  outputFormat  An output format.
+     */
+    public static void xmlDocumentToFile(Document doc, File file, OutputFormat outputFormat) throws Exception {
+        if (doc == null) {
+            System.out.println("Document is null");
+            System.err.println("Document is null");
+            return;
+        }
+        FileWriter filewriter = null;
+        XMLWriter writer = null;
+        try {
+            filewriter = new FileWriter(file);
+            filewriter.write(doc.asXML());
+            filewriter.flush();
+            filewriter.close();
+//            XMLWriter writer = new XMLWriter(filewriter, outputFormat);
+//            writer.write(doc);
+//            writer.flush();
+        } catch (Exception e) {
+            System.out.println(e.getStackTrace());
+            System.err.println(e.getStackTrace());
+            throw e;
+        } finally {
+            // XMLWriter doesn't implement Closeable, so
+            // we'll need to close it directly here, rather
+            // than invoking closeQuietly().
+//            if (writer != null) {
+//                try {
+//                    writer.close();
+//                } catch (IOException e) {
+//                    // Do nothing here
+//                }
+//            }
+            closeQuietly(filewriter);
+       }
+    }
+    
+    /**
+     * Attempt to close a resource, swallowing any Exceptions thrown.
+     * This method should only be called from within the 'finally' portion
+     * of a 'catch/try/finally' block.
+     * See http://stackoverflow.com/questions/2699209/java-io-ugly-try-finally-block
+     * and http://stackoverflow.com/questions/341971/what-is-the-execute-around-idiom
+     * @param c A closeable resource.
+     */
+    public static void closeQuietly(Closeable c) {
+        if (c != null) try {
+            c.close();
+        } catch(Exception e) {
+            // Do nothing here
+        }
+    }
+    
+    /**
      * Sets the (text node) value of a specified element in a dom4j XML document.
      * @param   doc  A dom4j XML document.
      * @param   xpathExpr  An XPath expression intended to match a single element
@@ -144,7 +215,7 @@ public class XmlTools {
             element.setText(elementValue == null ? "" : elementValue);
             return doc;
         } catch (Exception e) {
-            System.out.println(e.getStackTrace());
+            System.err.println(e.getStackTrace());
         } finally {
             return doc;
         }
@@ -176,7 +247,7 @@ public class XmlTools {
             element.addAttribute(attributeName, attributeValue == null ? "" : attributeValue);
             return doc;
         } catch (Exception e) {
-            System.out.println(e.getStackTrace());
+            System.err.println(e.getStackTrace());
         } finally {
             return doc;
         }

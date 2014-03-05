@@ -163,76 +163,54 @@ public class ServiceMain {
     	setDataSources();
         propagateConfiguredProperties();
         
-        // Ensure that Nuxeo config files exist for each repository
-        // specified in tenant bindings
+        // Ensure that Nuxeo repository config files exist for each repository
+        // specified in tenant bindings.
+        
+        // Get the prototype copy of the Nuxeo repository config file.
+        // This file will then be cloned, creating a separate config file
+        // for each repository.
         File prototypeNuxeoConfigFile =
                 new File(getNuxeoConfigDir() + File.separator + getNuxeoProtoConfigFilename());
         logger.warn("Prototype Nuxeo config file path=" + prototypeNuxeoConfigFile.getCanonicalPath());
-        if (prototypeNuxeoConfigFile.canRead()) {
-            logger.warn("Can read prototype Nuxeo config file.");
-            Document prototypeDoc = XmlTools.fileToXMLDocument(prototypeNuxeoConfigFile);
-            // FIXME: Can the variable below reasonably be made a class variable? Its value
-            // is used in at least one other method in this class.
-            Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
-            for (TenantBindingType tbt : tenantBindingTypeMap.values()) {
-                List<String> repositoryNameList = ConfigUtils.getRepositoryNameList(tbt);
-                if (repositoryNameList != null && repositoryNameList.isEmpty() == false) {
-                    Document repoDoc = null;
-                    final String PLACEHOLDER = "placeholder";
-                    for (String repositoryName : repositoryNameList) {
-                        if (Tools.isBlank(repositoryName)) {
-                            continue;
-                        }
-                        // FIXME: Remove this and other, similar log statements before merging. 
-                        logger.warn("Repository name=" + repositoryName);
-                        repoDoc = (Document) prototypeDoc.clone();
-                        logger.warn("Before edits=\n" + repoDoc.asXML());
-                        // Text substitutions within first extension point
-                        repoDoc = XmlTools.setAttributeValue(repoDoc,
-                                REPOSITORY_EXTENSION_POINT_XPATH + "/repository", "name", repositoryName);
-                        logger.warn("After edit=\n" + repoDoc.asXML());
-                        repoDoc = XmlTools.setAttributeValue(repoDoc,
-                                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository", "name", repositoryName);
-                        logger.warn("After edit=\n" + repoDoc.asXML());
-                        repoDoc = XmlTools.setElementValue(repoDoc,
-                                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/xa-datasource", PLACEHOLDER);
-                        logger.warn("After edit=\n" + repoDoc.asXML());
-                        repoDoc = XmlTools.setElementValue(repoDoc,
-                                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='URL']", PLACEHOLDER);
-                        logger.warn("After edit=\n" + repoDoc.asXML());
-                        repoDoc = XmlTools.setElementValue(repoDoc,
-                                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='ServerName']", PLACEHOLDER);
-                        logger.warn("After edit=\n" + repoDoc.asXML());
-                        repoDoc = XmlTools.setElementValue(repoDoc,
-                                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='DatabaseName']", repositoryName);
-                        logger.warn("After edit=\n" + repoDoc.asXML());
-                        repoDoc = XmlTools.setElementValue(repoDoc,
-                                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='User']", PLACEHOLDER);
-                        logger.warn("After edit=\n" + repoDoc.asXML());
-                        repoDoc = XmlTools.setElementValue(repoDoc,
-                                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='Password']", PLACEHOLDER);
-                        logger.warn("After edit=\n" + repoDoc.asXML());
-                        // Text substitutions within second extension point
-                        repoDoc = XmlTools.setElementValue(repoDoc,
-                                REPOSITORIES_EXTENSION_POINT_XPATH + "/documentation", PLACEHOLDER);
-                        logger.warn("After edit=\n" + repoDoc.asXML());
-                        repoDoc = XmlTools.setAttributeValue(repoDoc,
-                                REPOSITORIES_EXTENSION_POINT_XPATH + "/repository", "name", repositoryName);
-                        logger.warn("After edit=\n" + repoDoc.asXML());
-                        repoDoc = XmlTools.setAttributeValue(repoDoc,
-                                REPOSITORIES_EXTENSION_POINT_XPATH + "/repository", "label", PLACEHOLDER);
-                        logger.warn("After edit=\n" + repoDoc.asXML());
-                        // FIXME: Edit additional element and/or attribute values.
-                        // FIXME: Emit serialized XML and write it to an appropriately named file
-                        // in the Nuxeo server config directory.
-                        repoDoc = null;
+        if (! prototypeNuxeoConfigFile.canRead()) {
+            String msg = String.format("Could not find and/or read the prototype Nuxeo config file '%s'",
+                    prototypeNuxeoConfigFile.getCanonicalPath());
+            throw new RuntimeException(msg);
+        }
+        logger.warn("Can read prototype Nuxeo config file.");
+        Document prototypeConfigDoc = XmlTools.fileToXMLDocument(prototypeNuxeoConfigFile);
+        Document repositoryConfigDoc = null;
+        // FIXME: Can the variable below reasonably be made a class variable? Its value
+        // is used in at least one other method in this class.
+        Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
+        for (TenantBindingType tbt : tenantBindingTypeMap.values()) {
+            List<String> repositoryNameList = ConfigUtils.getRepositoryNameList(tbt);
+            logger.warn("Getting repository name(s) for tenant " + tbt.getName());
+            if (repositoryNameList == null || repositoryNameList.isEmpty() == true) {
+              logger.warn(String.format("Could not get repository name(s) for tenant %s", tbt.getName()));
+              continue;
+            } else {
+                for (String repositoryName : repositoryNameList) {
+                    if (Tools.isBlank(repositoryName)) {
+                        continue;
                     }
+                    logger.warn(String.format("Repository name is %s", repositoryName));
+                    repositoryConfigDoc = (Document) prototypeConfigDoc.clone();
+                    // Update the newly-cloned repository config file by inserting
+                    // values specific to the current repo.
+                    repositoryConfigDoc = updateRepositoryConfigDoc(repositoryConfigDoc, repositoryName);
+                    logger.warn("repositoryConfigDoc=\n" + repositoryConfigDoc.asXML());
+                    // Write this repository config file to the Nuxeo server config directory.
+                    File repofile = new File(getNuxeoConfigDir() + File.separator +
+                            repositoryName + JEEServerDeployment.NUXEO_REPO_CONFIG_FILENAME_SUFFIX);
+                    logger.warn(String.format("Repository config filepath is %s", repofile.getAbsolutePath()));
+                    // FIXME: Remove the duplicate call here (likely the first)
+                    XmlTools.xmlDocumentToFile(repositoryConfigDoc, repofile);
+                    XmlTools.xmlDocumentToFile(repositoryConfigDoc, repofile, null);
                 }
             }
-        } else {
-            logger.error(String.format("Could not either find, or read, the prototype Nuxeo config file '%s'",
-                    prototypeNuxeoConfigFile.getCanonicalPath()));
         }
+        
         //
         // Start up and initialize our embedded Nuxeo server instance
         //
@@ -823,6 +801,48 @@ public class ServiceMain {
             populateUriTemplateRegistry();
         }
         return uriTemplateRegistry;
+    }
+
+    private Document updateRepositoryConfigDoc(Document repoConfigDoc, String repositoryName) {
+        // FIXME: Remove this temporary placeholder variable used only during development.
+        final String PLACEHOLDER = "placeholder";
+        // logger.warn("Before edits=\n" + repoConfigDoc.asXML());
+        // Text substitutions within first extension point
+        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
+                REPOSITORY_EXTENSION_POINT_XPATH + "/repository", "name", repositoryName);
+        // logger.warn("After edit=\n" + repoConfigDoc.asXML());
+        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
+                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository", "name", repositoryName);
+        // logger.warn("After edit=\n" + repoConfigDoc.asXML());
+        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
+                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/xa-datasource", PLACEHOLDER);
+        // logger.warn("After edit=\n" + repoConfigDoc.asXML());
+        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
+                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='URL']", PLACEHOLDER);
+        // logger.warn("After edit=\n" + repoConfigDoc.asXML());
+        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
+                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='ServerName']", PLACEHOLDER);
+        // logger.warn("After edit=\n" + repoConfigDoc.asXML());
+        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
+                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='DatabaseName']", repositoryName);
+        // logger.warn("After edit=\n" + repoConfigDoc.asXML());
+        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
+                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='User']", PLACEHOLDER);
+        // logger.warn("After edit=\n" + repoConfigDoc.asXML());
+        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
+                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='Password']", PLACEHOLDER);
+        // logger.warn("After edit=\n" + repoConfigDoc.asXML());
+        // Text substitutions within second extension point
+        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
+                REPOSITORIES_EXTENSION_POINT_XPATH + "/documentation", PLACEHOLDER);
+        // logger.warn("After edit=\n" + repoConfigDoc.asXML());
+        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
+                REPOSITORIES_EXTENSION_POINT_XPATH + "/repository", "name", repositoryName);
+        // logger.warn("After edit=\n" + repoConfigDoc.asXML());
+        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
+                REPOSITORIES_EXTENSION_POINT_XPATH + "/repository", "label", PLACEHOLDER);
+        // logger.warn("After edit=\n" + repoConfigDoc.asXML());
+        return repoConfigDoc;
     }
 
 
