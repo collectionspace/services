@@ -24,6 +24,8 @@ import org.slf4j.LoggerFactory;
 
 public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 	final Logger logger = LoggerFactory.getLogger(UpdateRareFlagBatchJob.class);
+	
+	public final List<String> nonRareConservationCategoryPrefixes = Arrays.asList("DD ", "LC ");
 
 	private final String[] TAXON_FIELD_NAME_PARTS = CollectionObjectConstants.TAXON_FIELD_NAME.split("\\/");
 	private final String TAXON_FIELD_NAME_WITHOUT_PATH = TAXON_FIELD_NAME_PARTS[TAXON_FIELD_NAME_PARTS.length - 1];
@@ -198,8 +200,8 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 					List<String> conservationCategories = getFieldValues(taxonPayload, TaxonConstants.CONSERVATION_CATEGORY_SCHEMA_NAME, TaxonConstants.CONSERVATION_CATEGORY_FIELD_NAME);
 					
 					for (String conservationCategory : conservationCategories) {
-						if (StringUtils.isNotEmpty(conservationCategory)) {
-							logger.debug("found non-null conservation category: " + conservationCategory);
+						if (isRare(conservationCategory)) {
+							logger.debug("found rare conservation category: " + conservationCategory);
 							
 							newIsRare = "true";
 							break;
@@ -225,6 +227,32 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 		}
 		
 		return results;
+	}
+	
+	public boolean isRare(String conservationCategoryRefName) {
+		boolean isRare = false;
+		
+		if (StringUtils.isNotEmpty(conservationCategoryRefName)) {
+			// The conservation category is non-empty, so it's rare...
+			isRare = true;
+
+			// ...unless it's one of the non-rare ones.
+			
+			// Check if the display name starts with a string that
+			// indicates that it isn't rare.
+			
+			RefName.AuthorityItem item = RefName.AuthorityItem.parse(conservationCategoryRefName);
+			String displayName = item.getDisplayName();
+			
+			for (String prefix : nonRareConservationCategoryPrefixes) {
+				if (displayName.startsWith(prefix)) {
+					isRare = false;
+					break;
+				}
+			}
+		}
+		
+		return isRare;
 	}
 	
 	/**
