@@ -375,6 +375,10 @@ public class ServiceMain {
     public String getServerRootDir() {
         return serverRootDir;
     }
+
+    public String getCspaceServicesConfigDir() {
+        return getServerRootDir() + File.separator + JEEServerDeployment.CSPACE_SERVICES_DIR_PATH;
+    }
     
     public String getNuxeoConfigDir() {
         return getServerRootDir() + File.separator + JEEServerDeployment.NUXEO_SERVER_CONFIG_DIR;
@@ -764,7 +768,7 @@ public class ServiceMain {
         
         // Get the prototype copy of the Nuxeo repository config file.
         File prototypeNuxeoConfigFile =
-                new File(getNuxeoConfigDir() + File.separator + getNuxeoProtoConfigFilename());
+                new File(getCspaceServicesConfigDir() + File.separator + getNuxeoProtoConfigFilename());
         // FIXME: Consider checking for the presence of existing configuration files,
         // rather than always failing outright if the prototype file for creating
         // new or updated files can't be located.
