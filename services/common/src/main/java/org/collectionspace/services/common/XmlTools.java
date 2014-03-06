@@ -1,14 +1,20 @@
 package org.collectionspace.services.common;
 
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.StringWriter;
 import org.collectionspace.services.common.api.Tools;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.Node;
 import org.dom4j.io.HTMLWriter;
 import org.dom4j.io.OutputFormat;
+import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
-
-import java.io.StringWriter;
 
 public class XmlTools {
 
@@ -85,7 +91,7 @@ public class XmlTools {
     }
 
     /**
-     * Returns an XML document, when provided with a String
+     * Returns a dom4j XML document, when provided with a String
      * representation of that XML document.
      * @param   xmlStr  A String representation of an XML document.
      * @return  A dom4j XML document.
@@ -99,6 +105,127 @@ public class XmlTools {
           throw e;
         }
         return doc;
+    }
+    
+    /**
+     * Returns a dom4j XML document, when provided with a file
+     * containing a well-formed XML document.
+     * @param   file  A file containing a well-formed XML document.
+     * @return  A dom4j XML document.
+     */
+    public static Document fileToXMLDocument(File file) throws Exception {
+        Document doc = null;
+        try {
+            SAXReader reader = new SAXReader();
+            doc = reader.read(file);
+        } catch (DocumentException e) {
+            throw e;
+        }
+        return doc;
+    }
+    
+    /**
+     * Writes a dom4j XML document to a file on disk. Uses UTF-8 character
+     * encoding.
+     * @param  doc  A dom4j XML document.
+     * @param  file  A file.
+     */
+    public static void xmlDocumentToFile(Document doc, File file) throws Exception {
+        if (doc == null) {
+            System.err.println("Document is null");
+            return;
+        }
+        FileWriter filewriter = null;
+        try {
+            filewriter = new FileWriter(file);
+            // asXML() appears to output an adequate serialization, thus
+            // obviating the need to use an XML-aware writer here.
+            filewriter.write(doc.asXML());
+            filewriter.flush();
+            filewriter.close();
+        } catch (Exception e) {
+            System.err.println(e.getStackTrace());
+            throw e;
+        } finally {
+            closeQuietly(filewriter);
+       }
+    }
+    
+    /**
+     * Attempt to close a resource, swallowing any Exceptions thrown.
+     * This method should only be called from within the 'finally' portion
+     * of a 'catch/try/finally' block.
+     * See http://stackoverflow.com/questions/2699209/java-io-ugly-try-finally-block
+     * and http://stackoverflow.com/questions/341971/what-is-the-execute-around-idiom
+     * @param c A closeable resource.
+     */
+    public static void closeQuietly(Closeable c) {
+        if (c != null) try {
+            c.close();
+        } catch(Exception e) {
+            // Do nothing here
+        }
+    }
+    
+    /**
+     * Sets the (text node) value of a specified element in a dom4j XML document.
+     * @param   doc  A dom4j XML document.
+     * @param   xpathExpr  An XPath expression intended to match a single element
+     * in the XML document, in the default namespace.
+     * @param   elementValue  The value that the element should contain.
+     * @return  The document with the (text node) value of the matched element, if
+     * any, set to the provided value.
+     */
+    public static Document setElementValue(Document doc, String xpathExpr,
+            String elementValue) {
+        if (Tools.isBlank(xpathExpr)) {
+            return doc;
+        }
+        try {
+            Node node = doc.selectSingleNode(xpathExpr);
+            if ((node == null) || (node.getNodeType() != Node.ELEMENT_NODE)) {
+                return doc;
+            }
+            Element element = (Element) node;
+            element.setText(elementValue == null ? "" : elementValue);
+            return doc;
+        } catch (Exception e) {
+            System.err.println(e.getStackTrace());
+        } finally {
+            return doc;
+        }
+    }
+    
+    /**
+     * Sets the value of a specified attribute in a dom4j XML document.
+     * @param   doc  A dom4j XML document.
+     * @param   xpathExpr  An XPath expression intended to match a single element
+     * in the XML document, in the default namespace.
+     * @param   attributeName  An attribute name.
+     * @param   attributeValue  The value that the attribute should contain.
+     * @return  The document with the specified attribute of the matched element, if
+     * any, set to the provided value. If the attribute doesn't already exist,
+     * it will be created and assigned the provided value.  If the provided
+     * value is null, the attribute, if any, will be removed.
+     */
+    public static Document setAttributeValue(Document doc, String xpathExpr,
+            String attributeName, String attributeValue) {
+        if (Tools.isBlank(xpathExpr) || Tools.isBlank(attributeName)) {
+            return doc;
+        }
+        try {
+            Node node = doc.selectSingleNode(xpathExpr);
+            if ((node == null) || (node.getNodeType() != Node.ELEMENT_NODE)) {
+                return doc;
+            }
+            Element element = (Element) node;
+            element.addAttribute(attributeName, attributeValue == null ? "" : attributeValue);
+            return doc;
+        } catch (Exception e) {
+            System.err.println(e.getStackTrace());
+        } finally {
+            return doc;
+        }
     }
 
     public static String prettyPrint(String xml) throws Exception {

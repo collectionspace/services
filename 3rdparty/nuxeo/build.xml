@@ -116,6 +116,9 @@
     <target name="deploy" depends="package"
     	description="deploy nuxeo server libs to ${jee.server.cspace}">
         <copy todir="${jee.server.cspace}/nuxeo-server">
+           <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}">
+                <exclude name="**/config/*-repo-config.xml"/>
+           </fileset>
            <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}"/>
         </copy>
         <copy todir="${jee.server.cspace}/nuxeo-server/config" overwrite="true">
@@ -130,6 +133,9 @@
                 <filter token="NUXEO_PW" value="${db.nuxeo.user.password}" />
             </filterset>
         </copy>
+        <echo message="Copying Nuxeo prototype repo config file ..."/>
+        <copy file="${basedir}/nuxeo-server/${nuxeo.release}/config/proto-repo-config.xml"
+            todir="${jee.server.cspace}/cspace/services" overwrite="true"/>
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-listener/build.xml" target="deploy" inheritall="false"/>
 				<!-- Disabled due to integration issues between ImageMagick and Ghostscript on Linux systems        
@@ -142,6 +148,7 @@
         <delete dir="${jee.server.cspace}/nuxeo-server/bundles"/>
         <delete dir="${jee.server.cspace}/nuxeo-server/config"/>
         <delete dir="${jee.server.cspace}/nuxeo-server/lib"/>
+        <delete file="${jee.server.cspace}/cspace/config/services/proto-repo-config.xml" failonerror="false"/>
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-listener/build.xml" target="undeploy" inheritall="false"/>
 		<ant antfile="nuxeo-platform-quote/build.xml" target="undeploy" inheritall="false"/>
