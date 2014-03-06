@@ -25,10 +25,10 @@ import org.slf4j.LoggerFactory;
 public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 	final Logger logger = LoggerFactory.getLogger(UpdateRareFlagBatchJob.class);
 	
-	public final List<String> nonRareConservationCategoryPrefixes = Arrays.asList("DD ", "LC ");
+	public static final List<String> NON_RARE_CONSERVATION_CATEGORY_PREFIXES = Arrays.asList("DD ", "LC ");
 
-	private final String[] TAXON_FIELD_NAME_PARTS = CollectionObjectConstants.TAXON_FIELD_NAME.split("\\/");
-	private final String TAXON_FIELD_NAME_WITHOUT_PATH = TAXON_FIELD_NAME_PARTS[TAXON_FIELD_NAME_PARTS.length - 1];
+	private static final String[] TAXON_FIELD_NAME_PARTS = CollectionObjectConstants.TAXON_FIELD_NAME.split("\\/");
+	private static final String TAXON_FIELD_NAME_WITHOUT_PATH = TAXON_FIELD_NAME_PARTS[TAXON_FIELD_NAME_PARTS.length - 1];
 	
 	public UpdateRareFlagBatchJob() {
 		this.setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_SINGLE, INVOCATION_MODE_LIST, INVOCATION_MODE_NO_CONTEXT));
@@ -229,7 +229,7 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 		return results;
 	}
 	
-	public boolean isRare(String conservationCategoryRefName) {
+	public static boolean isRare(String conservationCategoryRefName) {
 		boolean isRare = false;
 		
 		if (StringUtils.isNotEmpty(conservationCategoryRefName)) {
@@ -244,7 +244,7 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 			RefName.AuthorityItem item = RefName.AuthorityItem.parse(conservationCategoryRefName);
 			String displayName = item.getDisplayName();
 			
-			for (String prefix : nonRareConservationCategoryPrefixes) {
+			for (String prefix : NON_RARE_CONSERVATION_CATEGORY_PREFIXES) {
 				if (displayName.startsWith(prefix)) {
 					isRare = false;
 					break;

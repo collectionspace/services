@@ -34,7 +34,7 @@ public class UpdateRareFlagListener implements EventListener {
 	final Log logger = LogFactory.getLog(UpdateRareFlagListener.class);
 
 	public static final String PREVIOUS_TAXON_PROPERTY_NAME = "UpdateRareFlagListener.previousTaxon";
-	public static final String PREVIOUS_HAS_CONSERVATION_CATEGORY_PROPERTY_NAME = "UpdateRareFlagListener.previousHasConservationCategory";
+	public static final String PREVIOUS_HAS_RARE_CONSERVATION_CATEGORY_PROPERTY_NAME = "UpdateRareFlagListener.previousHasRareConservationCategory";
 	
 	private static final String[] CONSERVATION_CATEGORY_PATH_ELEMENTS = TaxonConstants.CONSERVATION_CATEGORY_FIELD_NAME.split("/");
 	private static final String PLANT_ATTRIBUTES_GROUP_LIST_FIELD_NAME = CONSERVATION_CATEGORY_PATH_ELEMENTS[0];
@@ -57,10 +57,10 @@ public class UpdateRareFlagListener implements EventListener {
 				if (event.getName().equals(DocumentEventTypes.BEFORE_DOC_UPDATE)) {
 					// Stash the previous primary taxonomic ident, so it can be retrieved in the documentModified handler.
 					
-					DocumentModel previousDoc = (DocumentModel) context.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);	            	
+					DocumentModel previousDoc = (DocumentModel) context.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
 					String previousTaxon = (String) previousDoc.getProperty(CollectionObjectConstants.TAXON_SCHEMA_NAME, CollectionObjectConstants.PRIMARY_TAXON_FIELD_NAME);
 
-					context.setProperty(PREVIOUS_TAXON_PROPERTY_NAME, previousTaxon);					
+					context.setProperty(PREVIOUS_TAXON_PROPERTY_NAME, previousTaxon);
 				}
 				else {
 					boolean updateRequired = false;
@@ -115,27 +115,27 @@ public class UpdateRareFlagListener implements EventListener {
 				if (event.getName().equals(DocumentEventTypes.BEFORE_DOC_UPDATE)) {
 					// Stash whether there was previously a non-empty conservation category, so it can be retrieved in the documentModified handler.
 					
-					DocumentModel previousDoc = (DocumentModel) context.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);	            	
-					boolean previousHasConservationCategory = hasConservationCategory(previousDoc);
+					DocumentModel previousDoc = (DocumentModel) context.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
+					boolean previousHasRareConservationCategory = hasRareConservationCategory(previousDoc);
 					
-					context.setProperty(PREVIOUS_HAS_CONSERVATION_CATEGORY_PROPERTY_NAME, new Boolean(previousHasConservationCategory));					
+					context.setProperty(PREVIOUS_HAS_RARE_CONSERVATION_CATEGORY_PROPERTY_NAME, new Boolean(previousHasRareConservationCategory));
 				}
 				else {
 					boolean updateRequired = false;
 					
 					if (event.getName().equals(DocumentEventTypes.DOCUMENT_UPDATED)) {
-						// A taxon record was modified. As an optimization, check if there is now a non-empty 
+						// A taxon record was modified. As an optimization, check if there is now a rare
 						// conservation category when there wasn't before, or vice versa. We only need to update
 						// the rare flags of referencing collectionobjects if there was a change.
 
-						boolean previousHasConservationCategory = (Boolean) context.getProperty(PREVIOUS_HAS_CONSERVATION_CATEGORY_PROPERTY_NAME);
-						boolean currentHasConservationCategory = hasConservationCategory(doc);
+						boolean previousHasRareConservationCategory = (Boolean) context.getProperty(PREVIOUS_HAS_RARE_CONSERVATION_CATEGORY_PROPERTY_NAME);
+						boolean currentHasRareConservationCategory = hasRareConservationCategory(doc);
 
-						if (previousHasConservationCategory == currentHasConservationCategory) {
-							logger.debug("update not required: previousHasConservationCategory=" + previousHasConservationCategory + " currentHasConservationCategory=" + currentHasConservationCategory);						
+						if (previousHasRareConservationCategory == currentHasRareConservationCategory) {
+							logger.debug("update not required: previousHasRareConservationCategory=" + previousHasRareConservationCategory + " currentHasRareConservationCategory=" + currentHasRareConservationCategory);
 						}
 						else {
-							logger.debug("update required: previousHaConservationCategory=" + previousHasConservationCategory + " currentHasConservationCategory=" + currentHasConservationCategory);
+							logger.debug("update required: previousHasRareConservationCategory=" + previousHasRareConservationCategory + " currentHasRareConservationCategory=" + currentHasRareConservationCategory);
 							updateRequired = true;
 						}
 					}
@@ -156,20 +156,20 @@ public class UpdateRareFlagListener implements EventListener {
 		}
 	}
 	
-	private boolean hasConservationCategory(DocumentModel doc) throws ClientException {
+	private boolean hasRareConservationCategory(DocumentModel doc) throws ClientException {
 		List<Map<String, Object>> plantAttributesGroupList = (List<Map<String, Object>>) doc.getProperty(TaxonConstants.CONSERVATION_CATEGORY_SCHEMA_NAME, PLANT_ATTRIBUTES_GROUP_LIST_FIELD_NAME);
-		boolean hasConservationCategory = false;
+		boolean hasRareConservationCategory = false;
 
 		for (Map<String, Object> plantAttributesGroup : plantAttributesGroupList) {
 			String conservationCategory = (String) plantAttributesGroup.get(CONSERVATION_CATEGORY_FIELD_NAME);
 
-			if (StringUtils.isNotEmpty(conservationCategory)) {
-				hasConservationCategory = true;
+			if (UpdateRareFlagBatchJob.isRare(conservationCategory)) {
+				hasRareConservationCategory = true;
 				break;
 			}
 		}		
 		
-		return hasConservationCategory;
+		return hasRareConservationCategory;
 	}
 
 	private UpdateRareFlagBatchJob createUpdater() {
