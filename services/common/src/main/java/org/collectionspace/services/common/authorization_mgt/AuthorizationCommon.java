@@ -231,9 +231,9 @@ public class AuthorizationCommon {
         }
     }
     
-    private static Connection getConnection() throws NamingException, SQLException {
+    private static Connection getConnection(String databaseName) throws NamingException, SQLException {
         return JDBCTools.getConnection(JDBCTools.CSPACE_DATASOURCE_NAME,
-        		JDBCTools.DEFAULT_CSPACE_DATABASE_NAME);
+        		databaseName);
     }
     
     /*
@@ -915,11 +915,15 @@ public class AuthorizationCommon {
     	}
     }
     
-    public static void createDefaultAccounts(TenantBindingConfigReaderImpl tenantBindingConfigReader) {
+    public static void createDefaultAccounts(
+    		TenantBindingConfigReaderImpl tenantBindingConfigReader,
+    		DatabaseProductType databaseProductType,
+    		String cspaceDatabaseName) throws Exception {
     	if (logger.isDebugEnabled()) {
     		logger.debug("ServiceMain.createDefaultAccounts starting...");
     	}
     	
+    	String cspaceDbName = tenantBindingConfigReader.getRepositoryDomain(null).getStorageName();
         Hashtable<String, String> tenantInfo = getTenantNamesFromConfig(tenantBindingConfigReader);
         
         Connection conn = null;
@@ -930,9 +934,7 @@ public class AuthorizationCommon {
         // and we're not touching that, so we could safely toss the 
         // accounts, users, account-tenants, account-roles, and start over.
         try {
-    		DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType(JDBCTools.CSPACE_DATASOURCE_NAME,
-            		JDBCTools.DEFAULT_CSPACE_DATABASE_NAME);
-        	conn = getConnection();
+        	conn = getConnection(cspaceDatabaseName);
 	        ArrayList<String> existingTenants = compileExistingTenants(conn, tenantInfo);
 	        
 	    	// Note that this only creates tenants not marked as "createDisabled"
@@ -967,42 +969,19 @@ public class AuthorizationCommon {
 	    				TENANT_MANAGER_USER, AuthN.TENANT_MANAGER_ACCT_ID, 
 	    				tenantManagerRoleCSID, ROLE_ALL_TENANTS_MANAGER);
     		}
-        } catch (RuntimeException rte) {
-        	if (logger.isDebugEnabled()) {
-        		logger.debug("Exception in createDefaultAccounts: "+
-						rte.getLocalizedMessage());
-        		logger.debug(rte.getStackTrace().toString());
-        	}
-            throw rte;
-        } catch (SQLException sqle) {
-            // SQLExceptions can be chained. We have at least one exception, so
-            // set up a loop to make sure we let the user know about all of them
-            // if there happens to be more than one.
-        	if (logger.isDebugEnabled()) {
-        		SQLException tempException = sqle;
-        		while (null != tempException) {
-        			logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
-        			tempException = tempException.getNextException();
-        		}
-        		logger.debug(sqle.getStackTrace().toString());
-        	}
-            throw new RuntimeException("SQL problem in createDefaultAccounts: ", sqle);
         } catch (Exception e) {
-        	if (logger.isDebugEnabled()) {
-        		logger.debug("Exception in createDefaultAccounts: "+
-						e.getLocalizedMessage());
-        	}
-        } finally {
-        	try {
-            	if(conn!=null)
-                    conn.close();
-            } catch (SQLException sqle) {
-            	if (logger.isDebugEnabled()) {
-        			logger.debug("SQL Exception closing statement/connection: "
-        					+ sqle.getLocalizedMessage());
-            	}
-        	}
-        }    	
+			logger.debug("Exception in createDefaultAccounts: " + e.getLocalizedMessage());
+        	throw e;
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException sqle) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("SQL Exception closing statement/connection: " + sqle.getLocalizedMessage());
+				}
+			}
+		}    	
     }
     
     private static String getDefaultAdminRole(String tenantId) {

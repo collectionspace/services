@@ -43,9 +43,9 @@
     
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="${db.jdbc.driver.class}"/>
-        <property name="url" value="jdbc:${db}://${db.host}:${db.port}/cspace"/>
-        <property name="username" value="${db.user}"/>
-        <property name="password" value="${db.user.password}"/>
+        <property name="url" value="jdbc:${db}://${db.host}:${db.port}/${db.cspace.name}"/>
+        <property name="username" value="${db.cspace.user}"/>
+        <property name="password" value="${db.cspace.user.password}"/>
     </bean>    
 
     <bean id="lookupStrategy" class="org.springframework.security.acls.jdbc.BasicLookupStrategy">

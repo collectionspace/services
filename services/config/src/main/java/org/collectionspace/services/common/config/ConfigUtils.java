@@ -12,7 +12,7 @@ public class ConfigUtils {
     final static Logger logger = LoggerFactory.getLogger(ConfigUtils.class);
     
     // Default database names
-    public static String DEFAULT_CSPACE_DATABASE_NAME = "cspace";
+//    public static String DEFAULT_CSPACE_DATABASE_NAME = "cspace";
     public static String DEFAULT_NUXEO_REPOSITORY_NAME = "default";
     public static String DEFAULT_NUXEO_DATABASE_NAME = "nuxeo";
     

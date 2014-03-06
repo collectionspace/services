@@ -416,6 +416,6 @@
 	<extension target="org.nuxeo.ecm.core.api.repository.RepositoryManager"
 		point="repositories">
 		<documentation>The lifesci_domain repository</documentation>
-		<repository name="lifesci_domain" label="Default Repository" />
+		<repository name="lifesci_domain" label="lifesci_domain Repository" />
 	</extension>
 </component>

@@ -215,8 +215,8 @@
             description="create nuxeo database">
 		<sql driver="${db.jdbc.driver.class}"
              url="${db.jdbc.csadmin.url}"
-             userid="${db.user}"
-             password="${db.user.password}"
+             userid="${db.csadmin.user}"
+             password="${db.csadmin.user.password}"
 						 autocommit="true"
              src="${db.script.dir}/init_nuxeo_db.sql"
              >
@@ -231,8 +231,8 @@
 		description="create cspace database">
 		<sql driver="${db.jdbc.driver.class}"
              url="${db.jdbc.csadmin.url}"
-             userid="${db.user}"
-             password="${db.user.password}"
+             userid="${db.csadmin.user}"
+             password="${db.csadmin.user.password}"
 						 autocommit="true"
              src="${db.script.dir}/init_cspace_db.sql"
              >
@@ -261,24 +261,35 @@
 	<target name="checkvars">
 		<fail unless="env.CSPACE_JEESERVER_HOME" 
 							message="Required environment variable CSPACE_JEESERVER_HOME has not been set."/>
-		<fail unless="env.DB_PASSWORD_CSPACE" 
-							message="Required environment variable DB_PASSWORD_CSPACE has not been set."/>
-		<fail unless="env.DB_PASSWORD_NUXEO" 
-							message="Required environment variable DB_PASSWORD_NUXEO has not been set."/>
-		<fail unless="env.DB_PASSWORD" 
-							message="Required environment variable DB_PASSWORD has not been set."/>
+		<fail unless="env.DB_CSPACE_PASSWORD" 
+							message="Required environment variable DB_CSPACE_PASSWORD has not been set."/>
+		<fail unless="env.DB_NUXEO_PASSWORD" 
+							message="Required environment variable DB_NUXEO_PASSWORD has not been set."/>
+		<fail unless="env.DB_READER_PASSWORD"
+							message="Required environment variable DB_READER_PASSWORD has not been set."/>
+		<fail unless="env.DB_CSADMIN_PASSWORD" 
+							message="Required environment variable DB_CSADMIN_PASSWORD has not been set."/>
 	</target>
 
 	<target name="setup_initdb.sql" description="copy init_db scripts, replacing keywords">
 		<copy todir="${jee.server.cspace}/cspace/services/db">
 			<fileset dir="${src}/main/resources/db"/>
 			<filterset>
-				<!-- Note: double-subs from ${db.xyz.password} fail -->
+				<filter token="DB_CSADMIN_NAME" value="${db.csadmin.name}" />
+				<filter token="DB_CSADMIN_USER" value="${db.csadmin.user}" />
+				<filter token="DB_CSADMIN_PASSWORD" value="${env.DB_CSADMIN_PASSWORD}" /> <!-- Note: double-subs from ${db.xyz.password} fail -->
+
+				<filter token="DB_CSPACE_NAME" value="${db.cspace.name}" />
 				<filter token="DB_CSPACE_USER" value="${db.cspace.user}" />
+				<filter token="DB_CSPACE_PASSWORD" value="${env.DB_CSPACE_PASSWORD}" /> <!-- Note: double-subs from ${db.xyz.password} fail -->
+				
+				<filter token="DB_NUXEO_NAME" value="${db.nuxeo.name}" />
 				<filter token="DB_NUXEO_USER" value="${db.nuxeo.user}" />
-				<filter token="DB_CSPACE_PASSWORD" value="${env.DB_PASSWORD_CSPACE}" />
-				<filter token="DB_NUXEO_PASSWORD" value="${env.DB_PASSWORD_NUXEO}" />
-			</filterset>
+				<filter token="DB_NUXEO_PASSWORD" value="${env.DB_NUXEO_PASSWORD}" /> <!-- Note: double-subs from ${db.xyz.password} fail -->
+
+				<filter token="DB_READER_USER" value="${db.reader.user}" />
+				<filter token="DB_READER_PASSWORD" value="${env.DB_READER_PASSWORD}" /> <!-- Note: double-subs from ${db.xyz.password} fail -->
+	</filterset>
 		</copy>
 	</target>
 

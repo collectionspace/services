@@ -1,9 +1,9 @@
 -- drop all the objects before dropping roles
-DROP database IF EXISTS nuxeo;
+DROP database IF EXISTS @DB_NUXEO_NAME@;
 DROP database IF EXISTS lifesci_domain;
 
-DROP USER IF EXISTS nuxeo;
-DROP USER IF EXISTS reader;
+DROP USER IF EXISTS @DB_NUXEO_USER@;
+DROP USER IF EXISTS @DB_READER_USER@;
 
 -- All the rest of what is commented out below is now handled at startup
 -- by the services web-app

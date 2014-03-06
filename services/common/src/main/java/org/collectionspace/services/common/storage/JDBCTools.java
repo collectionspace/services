@@ -17,9 +17,9 @@
  */
 package org.collectionspace.services.common.storage;
 
+import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.ConfigUtils;
-import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +27,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+
 import java.sql.DatabaseMetaData;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -38,9 +39,12 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetFactory;
 import javax.sql.rowset.RowSetProvider;
+
+import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 
 /**
  * User: laramie
@@ -52,10 +56,10 @@ public class JDBCTools {
     public static String CSPACE_DATASOURCE_NAME = "CspaceDS";
     public static String NUXEO_DATASOURCE_NAME = "NuxeoDS";
     // Default database names
-    public static String DEFAULT_CSPACE_DATABASE_NAME = ConfigUtils.DEFAULT_CSPACE_DATABASE_NAME;
+//    public static String DEFAULT_CSPACE_DATABASE_NAME = ConfigUtils.DEFAULT_CSPACE_DATABASE_NAME;
     public static String DEFAULT_NUXEO_REPOSITORY_NAME = ConfigUtils.DEFAULT_NUXEO_REPOSITORY_NAME;
     public static String DEFAULT_NUXEO_DATABASE_NAME = ConfigUtils.DEFAULT_NUXEO_DATABASE_NAME;
-    public static String NUXEO_MANAGER_DATASOURCE_NAME = "NuxeoMgrDS";
+    public static String CSADMIN_DATASOURCE_NAME = "CsadminDS";
     public static String NUXEO_READER_DATASOURCE_NAME = "NuxeoReaderDS";
     public static String NUXEO_USER_NAME = "nuxeo";
     public static String SQL_WILDCARD = "%";
@@ -70,6 +74,11 @@ public class JDBCTools {
 	private static final CharSequence URL_DATABASE_NAME = "${DatabaseName}";
     private static String JDBC_URL_DATABASE_SEPARATOR = "\\/";
         
+	//
+	// As a side-effect of calling JDBCTools.getDataSource(...), the DataSource instance will be
+	// cached in a static hash map of the JDBCTools class.  This will speed up lookups as well as protect our
+	// code from JNDI lookup problems -for example, if the JNDI context gets stepped on or corrupted.
+	//    
     public static DataSource getDataSource(String dataSourceName) throws NamingException {
     	DataSource result = null;
     	
@@ -142,8 +151,7 @@ public class JDBCTools {
     	 */
     	Connection conn = null;
     	synchronized (JDBCTools.class) {
-    		org.apache.tomcat.dbcp.dbcp.BasicDataSource dataSource = 
-    				(org.apache.tomcat.dbcp.dbcp.BasicDataSource)getDataSource(dataSourceName);
+    		BasicDataSource dataSource = (BasicDataSource)getDataSource(dataSourceName);
     		// Get the template URL value from the JNDI datasource and substitute the databaseName
 	        String urlTemplate = dataSource.getUrl();
 	        String databaseName = getDatabaseName(repositoryName);
@@ -412,18 +420,29 @@ public class JDBCTools {
         return result;
     }
     
+    public static String getDatabaseName(String repoName, String cspaceInstanceId) {
+    	String result = repoName;
+    	
+    	//
+    	// Insert code here if you want to map the repo name to a database name -otherwise
+    	// we'll assume they are the same thing.
+    	//
+    	if (repoName.equalsIgnoreCase(DEFAULT_NUXEO_REPOSITORY_NAME)) {
+    		result = DEFAULT_NUXEO_DATABASE_NAME;
+    	}
+    	
+    	result = result + cspaceInstanceId;
+    	
+    	return result;
+    }
+    
     /*
      * By convention, the repository name and database name are the same.  However, this
      * call encapulates that convention and allows overrides.
      */
     public static String getDatabaseName(String repoName) {
-    	String result = repoName;
-    	
-    	if (result.equalsIgnoreCase(DEFAULT_NUXEO_REPOSITORY_NAME) == true) {
-    		result = DEFAULT_NUXEO_DATABASE_NAME;
-    	}
-    	
-    	return result;
+    	String cspaceInstanceId = ServiceMain.getInstance().getCspaceInstanceId();
+    	return getDatabaseName(repoName, cspaceInstanceId);
     }
     
     /**
