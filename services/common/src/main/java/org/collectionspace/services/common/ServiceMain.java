@@ -162,53 +162,8 @@ public class ServiceMain {
         readConfig();
     	setDataSources();
         propagateConfiguredProperties();
-        
-        // Ensure that Nuxeo repository config files exist for each repository
-        // specified in tenant bindings.
-        
-        // Get the prototype copy of the Nuxeo repository config file.
-        // This file will then be cloned, creating a separate config file
-        // for each repository.
-        File prototypeNuxeoConfigFile =
-                new File(getNuxeoConfigDir() + File.separator + getNuxeoProtoConfigFilename());
-        logger.warn("Prototype Nuxeo config file path=" + prototypeNuxeoConfigFile.getCanonicalPath());
-        if (! prototypeNuxeoConfigFile.canRead()) {
-            String msg = String.format("Could not find and/or read the prototype Nuxeo config file '%s'",
-                    prototypeNuxeoConfigFile.getCanonicalPath());
-            throw new RuntimeException(msg);
-        }
-        logger.warn("Can read prototype Nuxeo config file.");
-        Document prototypeConfigDoc = XmlTools.fileToXMLDocument(prototypeNuxeoConfigFile);
-        Document repositoryConfigDoc = null;
-        // FIXME: Can the variable below reasonably be made a class variable? Its value
-        // is used in at least one other method in this class.
-        Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
-        for (TenantBindingType tbt : tenantBindingTypeMap.values()) {
-            List<String> repositoryNameList = ConfigUtils.getRepositoryNameList(tbt);
-            logger.warn("Getting repository name(s) for tenant " + tbt.getName());
-            if (repositoryNameList == null || repositoryNameList.isEmpty() == true) {
-              logger.warn(String.format("Could not get repository name(s) for tenant %s", tbt.getName()));
-              continue;
-            } else {
-                for (String repositoryName : repositoryNameList) {
-                    if (Tools.isBlank(repositoryName)) {
-                        continue;
-                    }
-                    logger.warn(String.format("Repository name is %s", repositoryName));
-                    repositoryConfigDoc = (Document) prototypeConfigDoc.clone();
-                    // Update the newly-cloned repository config file by inserting
-                    // values specific to the current repo.
-                    repositoryConfigDoc = updateRepositoryConfigDoc(repositoryConfigDoc, repositoryName);
-                    logger.warn("repositoryConfigDoc=\n" + repositoryConfigDoc.asXML());
-                    // Write this repository config file to the Nuxeo server config directory.
-                    File repofile = new File(getNuxeoConfigDir() + File.separator +
-                            repositoryName + JEEServerDeployment.NUXEO_REPO_CONFIG_FILENAME_SUFFIX);
-                    logger.warn(String.format("Repository config filepath is %s", repofile.getAbsolutePath()));
-                    XmlTools.xmlDocumentToFile(repositoryConfigDoc, repofile);
-                }
-            }
-        }
-        
+        createOrUpdateNuxeoRepositoryConfigFiles();
+                
         //
         // Start up and initialize our embedded Nuxeo server instance
         //
@@ -801,6 +756,72 @@ public class ServiceMain {
         return uriTemplateRegistry;
     }
 
+   /**
+    * Ensure that Nuxeo repository configuration files exist for each repository
+    * specified in tenant bindings. Create or update these files, as needed.
+    */
+    private void createOrUpdateNuxeoRepositoryConfigFiles() throws Exception {
+        
+        // Get the prototype copy of the Nuxeo repository config file.
+        File prototypeNuxeoConfigFile =
+                new File(getNuxeoConfigDir() + File.separator + getNuxeoProtoConfigFilename());
+        // FIXME: Consider checking for the presence of existing configuration files,
+        // rather than always failing outright if the prototype file for creating
+        // new or updated files can't be located.
+        if (! prototypeNuxeoConfigFile.canRead()) {
+            String msg = String.format("Could not find and/or read the prototype Nuxeo config file '%s'",
+                    prototypeNuxeoConfigFile.getCanonicalPath());
+            throw new RuntimeException(msg);
+        }
+        if (logger.isTraceEnabled()) {
+            logger.trace("Found and can read prototype Nuxeo config file at path %s", prototypeNuxeoConfigFile.getAbsolutePath());
+        }
+        Document prototypeConfigDoc = XmlTools.fileToXMLDocument(prototypeNuxeoConfigFile);
+        Document repositoryConfigDoc = null;
+        // FIXME: Can the variable below reasonably be made a class variable? Its value
+        // is used in at least one other method in this class.
+        Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
+        for (TenantBindingType tbt : tenantBindingTypeMap.values()) {
+            List<String> repositoryNameList = ConfigUtils.getRepositoryNameList(tbt);
+            if (logger.isTraceEnabled()) {
+                logger.trace("Getting repository name(s) for tenant " + tbt.getName());
+            }
+            if (repositoryNameList == null || repositoryNameList.isEmpty() == true) {
+              logger.warn(String.format("Could not get repository name(s) for tenant %s", tbt.getName()));
+              continue;
+            } else {
+                for (String repositoryName : repositoryNameList) {
+                    if (Tools.isBlank(repositoryName)) {
+                        continue;
+                    }
+                    if (logger.isTraceEnabled()) {
+                        logger.trace(String.format("Repository name is %s", repositoryName));
+                    }
+                    // FIXME: As per above, we might check for the presence of an existing
+                    // config file for this repository and, if present, not fail even if
+                    // the code below fails to update that file on any given system startup.
+                    //
+                    // Clone the prototype copy of the Nuxeo repository config file,
+                    // thus creating a separate config file for the current repository.
+                    repositoryConfigDoc = (Document) prototypeConfigDoc.clone();
+                    // Update this config file by inserting values pertinent to the
+                    // current repository.
+                    repositoryConfigDoc = updateRepositoryConfigDoc(repositoryConfigDoc, repositoryName);
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("Updated Nuxeo repo config file contents=\n" + repositoryConfigDoc.asXML());
+                    }
+                    // Write this config file to the Nuxeo server config directory.
+                    File repofile = new File(getNuxeoConfigDir() + File.separator +
+                            repositoryName + JEEServerDeployment.NUXEO_REPO_CONFIG_FILENAME_SUFFIX);
+                    if (logger.isTraceEnabled()) {
+                        logger.trace(String.format("Attempting to write Nuxeo repo config file to %s", repofile.getAbsolutePath()));
+                    }
+                    XmlTools.xmlDocumentToFile(repositoryConfigDoc, repofile);
+                }
+            }
+        }
+    }
+    
     private Document updateRepositoryConfigDoc(Document repoConfigDoc, String repositoryName) {
         // FIXME: Remove this temporary placeholder variable used only during development.
         final String PLACEHOLDER = "placeholder";
@@ -832,6 +853,5 @@ public class ServiceMain {
                 REPOSITORIES_EXTENSION_POINT_XPATH + "/repository", "label", PLACEHOLDER);
         return repoConfigDoc;
     }
-
 
 }
