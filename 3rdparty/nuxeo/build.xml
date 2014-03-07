@@ -121,21 +121,21 @@
            </fileset>
            <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}"/>
         </copy>
-        <copy todir="${jee.server.cspace}/nuxeo-server/config" overwrite="true">
-            <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}/config"/>
+        <echo message="Copying Nuxeo prototype repo config file ..."/>
+        <copy todir="${jee.server.cspace}/cspace/services" overwrite="true">
+            <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}/config/proto-repo-config.xml"/>
             <filterset>
-                <filter token="DB" value="${db}" />
-				<filter token="DB_NUXEO_NAME" value="${db.nuxeo.name}" />
-				<filter token="DB_URL" value="jdbc:${db}://${db.host}:${db.port}/${db.nuxeo.name}"/>
+		<filter token="DB_NUXEO_NAME" value="${db.nuxeo.name}" />
+		<!-- The specific database name will be appended to the following JDBC URL during system -->
+		<!-- startup, within each repository-specific config file that is 'cloned' from the -->
+		<!-- prototype repo config file being written to here. -->
+		<filter token="DB_URL" value="jdbc:${db}://${db.host}:${db.port}/"/>
             	<filter token="DB_SERVER_HOSTNAME" value="${db.host}"/>
-				<filter token="XA_DATASOURCE" value="${db.xaDataSource}" />
+		<filter token="XA_DATASOURCE" value="${db.xaDataSource}" />
                 <filter token="NUXEO_USER" value="${db.nuxeo.user}" />
                 <filter token="NUXEO_PW" value="${db.nuxeo.user.password}" />
             </filterset>
         </copy>
-        <echo message="Copying Nuxeo prototype repo config file ..."/>
-        <copy file="${basedir}/nuxeo-server/${nuxeo.release}/config/proto-repo-config.xml"
-            todir="${jee.server.cspace}/cspace/services" overwrite="true"/>
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-listener/build.xml" target="deploy" inheritall="false"/>
 				<!-- Disabled due to integration issues between ImageMagick and Ghostscript on Linux systems        

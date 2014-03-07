@@ -17,6 +17,7 @@ import java.util.*;
 import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
+import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.common.api.Tools;
@@ -822,25 +823,32 @@ public class ServiceMain {
                 REPOSITORY_EXTENSION_POINT_XPATH + "/repository", "name", repositoryName);
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
                 REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository", "name", repositoryName);
-        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/xa-datasource", PLACEHOLDER);
-        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='URL']", PLACEHOLDER);
-        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='ServerName']", PLACEHOLDER);
+//        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
+//                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/xa-datasource", PLACEHOLDER);
+        String url = XmlTools.getElementValue(repoConfigDoc,
+                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='URL']");
+        if (! Tools.isBlank(url)) {
+            repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
+                    REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='URL']",
+                    url + repositoryName);
+        }
+//        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
+//                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='ServerName']", PLACEHOLDER);
         repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
                 REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='DatabaseName']", repositoryName);
-        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='User']", PLACEHOLDER);
-        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='Password']", PLACEHOLDER);
+//        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
+//                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='User']", PLACEHOLDER);
+//        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
+//                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='Password']", PLACEHOLDER);
         // Text substitutions within second extension point, "repositories"
         repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
-                REPOSITORIES_EXTENSION_POINT_XPATH + "/documentation", PLACEHOLDER);
+                REPOSITORIES_EXTENSION_POINT_XPATH + "/documentation",
+                String.format("The %s repository", repositoryName));
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
                 REPOSITORIES_EXTENSION_POINT_XPATH + "/repository", "name", repositoryName);
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                REPOSITORIES_EXTENSION_POINT_XPATH + "/repository", "label", PLACEHOLDER);
+                REPOSITORIES_EXTENSION_POINT_XPATH + "/repository", "label",
+                String.format("%s Repository", repositoryName));
         return repoConfigDoc;
     }
 }

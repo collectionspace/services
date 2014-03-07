@@ -168,11 +168,38 @@ public class XmlTools {
     }
     
     /**
+     * Returns the (text node) value of a specified element in a dom4j XML document.
+     * @param   doc  A dom4j XML document.
+     * @param   xpathExpr  An XPath expression intended to match a single element
+     * in the XML document, in the default namespace.
+     * @return  The (text node) value of the matched element, if any.
+     */
+    public static String getElementValue(Document doc, String xpathExpr) {
+        String elementValue = "";
+        if (Tools.isBlank(xpathExpr)) {
+            return elementValue;
+        }
+        try {
+            Node node = doc.selectSingleNode(xpathExpr);
+            if ((node == null) || (node.getNodeType() != Node.ELEMENT_NODE)) {
+                return elementValue;
+            }
+            Element element = (Element) node;
+            elementValue = element.getText();
+        } catch (Exception e) {
+            System.err.println(e.getStackTrace());
+        } finally {
+            return elementValue;
+        }
+    }
+    
+    /**
      * Sets the (text node) value of a specified element in a dom4j XML document.
      * @param   doc  A dom4j XML document.
      * @param   xpathExpr  An XPath expression intended to match a single element
      * in the XML document, in the default namespace.
-     * @param   elementValue  The value that the element should contain.
+     * @param   elementValue  The value that the element should contain. If this
+     * provided value is null, the element's value will be set to an empty string.
      * @return  The document with the (text node) value of the matched element, if
      * any, set to the provided value.
      */
