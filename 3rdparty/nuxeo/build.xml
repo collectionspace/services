@@ -119,7 +119,6 @@
            <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}">
                 <exclude name="**/config/*-repo-config.xml"/>
            </fileset>
-           <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}"/>
         </copy>
         <echo message="Copying Nuxeo prototype repo config file ..."/>
         <copy todir="${jee.server.cspace}/cspace/services" overwrite="true">
