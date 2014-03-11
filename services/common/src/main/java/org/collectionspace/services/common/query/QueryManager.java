@@ -63,6 +63,7 @@ public class QueryManager {
 	static public String createWhereClauseForPartialMatch(ServiceContext ctx,
 			String field,
 			String partialTerm) throws Exception {
+		String cspaceInstanceId = ServiceMain.getInstance().getCspaceInstanceId();
 		String repositoryName = ctx.getRepositoryName();
         // Otherwise, generate that list and cache it for re-use.
         TenantBindingConfigReaderImpl tReader =
@@ -74,7 +75,7 @@ public class QueryManager {
         			|| Boolean.parseBoolean(ptStartingWildcardValue);
 
 		return queryManager.createWhereClauseForPartialMatch(queryManager.getDatasourceName(),
-				repositoryName, field, ptStartingWildcard, partialTerm);
+				repositoryName, cspaceInstanceId, field, ptStartingWildcard, partialTerm);
 	}
 	
 	/**

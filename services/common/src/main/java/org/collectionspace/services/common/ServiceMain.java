@@ -23,6 +23,7 @@ import org.collectionspace.services.common.config.ConfigReader;
 import org.collectionspace.services.common.config.ConfigUtils;
 import org.collectionspace.services.common.config.ServicesConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.init.AddIndices;
 import org.collectionspace.services.config.service.InitHandler.Params.Field;
 import org.collectionspace.services.common.init.IInitHandler;
@@ -165,12 +166,15 @@ public class ServiceMain {
         	throw new RuntimeException("Unknown CollectionSpace services client type: " + getClientType());
         }
         //
-        // Create all the default user accounts and permissions
+        // Create all the default user accounts and permissions.  Since some of our "cspace" database config files
+        // for Spring need to be created at build time, the "cspace" database already will be suffixed with the
+        // correct 'cspaceInstanceId' so we don't need to pass it to the JDBCTools methods.
         //
 		try {
 			AuthorizationCommon.createDefaultWorkflowPermissions(tenantBindingConfigReader);
 			String cspaceDatabaseName = getCspaceDatabaseName();
-			DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType(JDBCTools.CSPACE_DATASOURCE_NAME, cspaceDatabaseName);
+			DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType(JDBCTools.CSPACE_DATASOURCE_NAME,
+					cspaceDatabaseName);
 			AuthorizationCommon.createDefaultAccounts(tenantBindingConfigReader, databaseProductType,
 					cspaceDatabaseName);
 		} catch (Exception e) {
@@ -241,6 +245,7 @@ public class ServiceMain {
         //
         //Loop through all tenants in tenant-bindings.xml
         //
+        String cspaceInstanceId = getCspaceInstanceId();
         for (TenantBindingType tbt : tenantBindingTypeMap.values()) {
         	List<String> repositoryNameList = ConfigUtils.getRepositoryNameList(tbt);
 			if (repositoryNameList != null && repositoryNameList.isEmpty() == false) {
@@ -274,7 +279,8 @@ public class ServiceMain {
 																// 1
 						fields.add(field);
 					}
-					addindices.onRepositoryInitialized(JDBCTools.NUXEO_DATASOURCE_NAME, repositoryName, null, fields, null);
+					addindices.onRepositoryInitialized(JDBCTools.NUXEO_DATASOURCE_NAME, repositoryName, cspaceInstanceId,
+							null, fields, null);
 				}
 			} else {
 				String errMsg = "repositoryNameList was empty or null.";
@@ -289,13 +295,17 @@ public class ServiceMain {
         //
         //Loop through all tenants in tenant-bindings.xml
         //
+        String cspaceInstanceId = getCspaceInstanceId();
         for (TenantBindingType tbt : tenantBindingTypeMap.values()) {
         	//
         	//Loop through all the services in this tenant
         	//
             List<ServiceBindingType> sbtList = tbt.getServiceBindings();
             for (ServiceBindingType sbt: sbtList) {
-            	String repositoryName = ConfigUtils.getRepositoryName(tbt, sbt.getRepositoryDomain()); // Each service can have a different repo domain
+            	String repositoryName = null;
+            	if (sbt.getType().equalsIgnoreCase(ServiceBindingUtils.SERVICE_TYPE_SECURITY) == false) {
+            		repositoryName = ConfigUtils.getRepositoryName(tbt, sbt.getRepositoryDomain()); // Each service can have a different repo domain
+            	}
                 //Get the list of InitHandler elements, extract the first one (only one supported right now) and fire it using reflection.
                 List<org.collectionspace.services.config.service.InitHandler> list = sbt.getInitHandler();
                 if (list != null && list.size() > 0) {
@@ -313,7 +323,8 @@ public class ServiceMain {
                     Object o = instantiate(initHandlerClassname, IInitHandler.class);
                     if (o != null && o instanceof IInitHandler){
                         IInitHandler handler = (IInitHandler)o;
-                        handler.onRepositoryInitialized(JDBCTools.NUXEO_DATASOURCE_NAME, repositoryName, sbt, fields, props);
+                        handler.onRepositoryInitialized(JDBCTools.NUXEO_DATASOURCE_NAME, repositoryName, cspaceInstanceId,
+                        		sbt, fields, props);
                         //The InitHandler may be the default one,
                         //  or specialized classes which still implement this interface and are registered in tenant-bindings.xml.
                     }

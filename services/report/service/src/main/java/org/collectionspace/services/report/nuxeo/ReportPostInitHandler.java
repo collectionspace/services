@@ -18,12 +18,9 @@
 package org.collectionspace.services.report.nuxeo;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
-
-import javax.sql.DataSource;
 
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.init.IInitHandler;
@@ -59,6 +56,7 @@ public class ReportPostInitHandler extends InitHandler implements IInitHandler {
     @Override
     public void onRepositoryInitialized(String dataSourceName,
     		String repositoryName,
+    		String cspaceInstanceId,
     		ServiceBindingType sbt, 
     		List<Field> fields, 
     		List<Property> propertyList) throws Exception {
@@ -73,11 +71,13 @@ public class ReportPostInitHandler extends InitHandler implements IInitHandler {
 	            }
     		}
         }
+    	
         Connection conn = null;
         Statement stmt = null;
         String sql = "";
         try {
-            DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType(dataSourceName, repositoryName);
+            DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType(dataSourceName, repositoryName,
+            		cspaceInstanceId);
             if (databaseProductType == DatabaseProductType.MYSQL) {
             	// Nothing to do: MYSQL already does wildcard grants in init_db.sql
             } else if(databaseProductType != DatabaseProductType.POSTGRESQL) {

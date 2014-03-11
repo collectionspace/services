@@ -57,6 +57,7 @@ public class RunSqlScripts extends InitHandler implements IInitHandler {
     @Override
     public void onRepositoryInitialized(String dataSourceName,
             String repositoryName,
+            String cspaceInstanceId,
             ServiceBindingType sbt,
             List<Field> fields,
             List<Property> properties) throws Exception {
@@ -90,7 +91,7 @@ public class RunSqlScripts extends InitHandler implements IInitHandler {
                 logger.warn(CANNOT_PERFORM_TASKS_MESSAGE);
                 continue;
             }
-            runScript(dataSourceName, repositoryName, scriptContents, "resource path " + scriptPath);
+            runScript(dataSourceName, repositoryName, cspaceInstanceId, scriptContents, "resource path " + scriptPath);
         }
 
         // Next, run a second sequence of SQL scripts, where those scripts may be
@@ -114,7 +115,7 @@ public class RunSqlScripts extends InitHandler implements IInitHandler {
                 logger.warn(CANNOT_PERFORM_TASKS_MESSAGE);
                 continue;
             }
-            runScript(dataSourceName, repositoryName, scriptContents, "file " + scriptFile.getName());
+            runScript(dataSourceName, repositoryName, cspaceInstanceId, scriptContents, "file " + scriptFile.getName());
         }
 
     }
@@ -236,10 +237,10 @@ public class RunSqlScripts extends InitHandler implements IInitHandler {
         return sb.toString();
     }
 
-    private void runScript(String dataSourceName, String repositoryName, String scriptContents, String scriptPath) {
+    private void runScript(String dataSourceName, String repositoryName, String cspaceInstanceId, String scriptContents, String scriptPath) {
         int rows = 0;
         try {
-            rows = JDBCTools.executeUpdate(dataSourceName, repositoryName, scriptContents);
+            rows = JDBCTools.executeUpdate(dataSourceName, repositoryName, cspaceInstanceId, scriptContents);
         } catch (Throwable e) {
             logger.warn("Running SQL script from " + scriptPath + " resulted in error: ", e.getMessage());
             rows = -1;

@@ -919,13 +919,10 @@ public class AuthorizationCommon {
     		TenantBindingConfigReaderImpl tenantBindingConfigReader,
     		DatabaseProductType databaseProductType,
     		String cspaceDatabaseName) throws Exception {
-    	if (logger.isDebugEnabled()) {
-    		logger.debug("ServiceMain.createDefaultAccounts starting...");
-    	}
+
+    	logger.debug("ServiceMain.createDefaultAccounts starting...");
     	
-    	String cspaceDbName = tenantBindingConfigReader.getRepositoryDomain(null).getStorageName();
         Hashtable<String, String> tenantInfo = getTenantNamesFromConfig(tenantBindingConfigReader);
-        
         Connection conn = null;
         // TODO - need to put in tests for existence first.
         // We could just look for the accounts per tenant up front, and assume that
@@ -1041,14 +1038,16 @@ public class AuthorizationCommon {
 		}
 		
 		if (result == null) {
-			logger.warn("Could not retrieve a lifecycle transition definition list from: "
-					+ serviceBinding.getName()
-					+ " with tenant ID = "
-					+ tenantBinding.getId());			
+			if (serviceBinding.getType().equalsIgnoreCase(ServiceBindingUtils.SERVICE_TYPE_SECURITY) == false) {
+				logger.warn("Could not retrieve a lifecycle transition definition list from: "
+						+ serviceBinding.getName()
+						+ " with tenant ID = "
+						+ tenantBinding.getId());
+			}
 			// return an empty list			
 			result = new TransitionDefList();
 		} else {
-			logger.debug("Successfully etrieved a lifecycle transition definition list from: "
+			logger.debug("Successfully retrieved a lifecycle transition definition list from: "
 					+ serviceBinding.getName()
 					+ " with tenant ID = "
 					+ tenantBinding.getId());

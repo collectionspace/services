@@ -134,6 +134,7 @@ public interface IQueryManager {
 	 */
 	public String createWhereClauseForPartialMatch(String dataSourceName,
 			String repositoryName,
+			String cspaceInstanceId,
 			String field,
 			boolean startingWildcard,
 			String partialTerm);

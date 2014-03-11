@@ -129,7 +129,18 @@ public class JDBCTools {
     	return result;
     }
     
-    public static Connection getConnection(String dataSourceName, String repositoryName) throws NamingException, SQLException {
+    //
+    // Use this version of the getConnection() method when you don't want to qualify the database name
+    // with a CollectionSpace instance ID.
+    //
+    public static Connection getConnection(String dataSourceName,
+    		String databaseName) throws NamingException, SQLException {
+    	return getConnection(dataSourceName, databaseName, null);
+    }
+    
+    public static Connection getConnection(String dataSourceName,
+    		String repositoryName,
+    		String cspaceInstanceId) throws NamingException, SQLException {
     	Connection result = null;
     	
     	if (Tools.isEmpty(dataSourceName) || Tools.isEmpty(repositoryName)) {
@@ -154,7 +165,7 @@ public class JDBCTools {
     		BasicDataSource dataSource = (BasicDataSource)getDataSource(dataSourceName);
     		// Get the template URL value from the JNDI datasource and substitute the databaseName
 	        String urlTemplate = dataSource.getUrl();
-	        String databaseName = getDatabaseName(repositoryName);
+	        String databaseName = getDatabaseName(repositoryName, cspaceInstanceId);
 	        String connectionUrl = urlTemplate.replace(URL_DATABASE_NAME, databaseName);
 
 	        // ATTENTION!
@@ -181,11 +192,11 @@ public class JDBCTools {
         return result;
     }
 
-    public static CachedRowSet executeQuery(String dataSourceName, String repositoryName, String sql) throws Exception {
+    public static CachedRowSet executeQuery(String dataSourceName, String repositoryName, String cspaceInstanceId, String sql) throws Exception {
         Connection conn = null;
         Statement stmt = null;
         try {
-            conn = getConnection(dataSourceName, repositoryName);
+            conn = getConnection(dataSourceName, repositoryName, cspaceInstanceId);
             stmt = conn.createStatement();
              
             RowSetFactory rowSetFactory = RowSetProvider.newFactory();
@@ -219,11 +230,11 @@ public class JDBCTools {
     }
     
     public static CachedRowSet executePreparedQuery(final PreparedStatementBuilder builder,
-            String dataSourceName, String repositoryName) throws Exception {
+            String dataSourceName, String repositoryName, String cspaceInstanceId) throws Exception {
         Connection conn = null;
         PreparedStatement ps = null;
         try {
-            conn = getConnection(dataSourceName, repositoryName);
+            conn = getConnection(dataSourceName, repositoryName, cspaceInstanceId);
             RowSetFactory rowSetFactory = RowSetProvider.newFactory();
             CachedRowSet crs = rowSetFactory.createCachedRowSet();
             ps = builder.build(conn);
@@ -260,12 +271,12 @@ public class JDBCTools {
     // FIXME: This method's code significantly overlaps that of executePrepareQuery(), above,
     // and the two could be refactored into a single method, if desired.
     public static List<CachedRowSet> executePreparedQueries(final List<PreparedStatementBuilder> builders,
-            String dataSourceName, String repositoryName, Boolean executeWithinTransaction) throws Exception {
+            String dataSourceName, String repositoryName, String cspaceInstanceId, Boolean executeWithinTransaction) throws Exception {
         Connection conn = null;
         PreparedStatement ps = null;
         List<CachedRowSet> results = new ArrayList<>();
         try {
-            conn = getConnection(dataSourceName, repositoryName);
+            conn = getConnection(dataSourceName, repositoryName, cspaceInstanceId);
             if (executeWithinTransaction) {
                 conn.setAutoCommit(false);
             }
@@ -288,6 +299,7 @@ public class JDBCTools {
                     }
                 } catch (Exception e) {
                     int rowcount = ps.executeUpdate();
+                	logger.debug(String.format("Row count for builder %s is %d", ps.toString(), rowcount));
                     // Throw uncaught exception here if update attempt also fails
                 }
             }
@@ -320,11 +332,14 @@ public class JDBCTools {
         }
     }
 
-    public static int executeUpdate(String dataSourceName, String repositoryName, String sql) throws Exception {
+    public static int executeUpdate(String dataSourceName,
+    		String repositoryName, 
+    		String cspaceInstanceId, 
+    		String sql) throws Exception {
         Connection conn = null;
         Statement stmt = null;
         try {
-            conn = getConnection(dataSourceName, repositoryName);
+            conn = getConnection(dataSourceName, repositoryName, cspaceInstanceId);
             stmt = conn.createStatement();
             int rows = stmt.executeUpdate(sql);
             stmt.close();
@@ -371,11 +386,12 @@ public class JDBCTools {
      * @return the database product name
      */
     public static String getDatabaseProductName(String dataSourceName,
-    		String repositoryName) {
+    		String repositoryName,
+    		String cspaceInstanceId) {
     	if (DBProductName == null) {
 	        Connection conn = null;
 	        try {
-	            conn = getConnection(dataSourceName, repositoryName);
+	            conn = getConnection(dataSourceName, repositoryName, cspaceInstanceId);
 	            DBProductName = conn.getMetaData().getDatabaseProductName();
 	        } catch (Exception e) {
 	        	if (logger.isTraceEnabled() == true) {
@@ -405,10 +421,11 @@ public class JDBCTools {
      * @throws Exception 
      */
     public static DatabaseProductType getDatabaseProductType(String dataSourceName,
-    		String repositoryName) throws Exception {
+    		String repositoryName,
+    		String cspaceInstanceId) throws Exception {
     	DatabaseProductType result = DatabaseProductType.UNRECOGNIZED;
     	
-        String productName = getDatabaseProductName(dataSourceName, repositoryName);
+        String productName = getDatabaseProductName(dataSourceName, repositoryName, cspaceInstanceId);
         if (productName.matches("(?i).*mysql.*")) {
         	result = DatabaseProductType.MYSQL;
         } else if (productName.matches("(?i).*postgresql.*")) {
@@ -420,6 +437,29 @@ public class JDBCTools {
         return result;
     }
     
+    //
+    // Same as method above except the cspace instance ID is not needed.
+    //
+    public static DatabaseProductType getDatabaseProductType(String dataSourceName,
+    		String repositoryName) throws Exception {
+    	DatabaseProductType result = DatabaseProductType.UNRECOGNIZED;
+    	
+        String productName = getDatabaseProductName(dataSourceName, repositoryName, null);
+        if (productName.matches("(?i).*mysql.*")) {
+        	result = DatabaseProductType.MYSQL;
+        } else if (productName.matches("(?i).*postgresql.*")) {
+        	result = DatabaseProductType.POSTGRESQL;
+        } else {
+            throw new Exception("Unrecognized database system " + productName);
+        }
+    	
+        return result;
+    }
+    
+    /*
+     * By convention, the repository name and database name are the same.  However, this
+     * call encapulates that convention and allows overrides.
+     */
     public static String getDatabaseName(String repoName, String cspaceInstanceId) {
     	String result = repoName;
     	
@@ -431,20 +471,19 @@ public class JDBCTools {
     		result = DEFAULT_NUXEO_DATABASE_NAME;
     	}
     	
-    	result = result + cspaceInstanceId;
+    	//
+    	// If we have a non-null 'cspaceInstanceId' instance ID then we need to append it
+    	// as a suffix to the database name.
+    	//
+    	if (cspaceInstanceId != null && !cspaceInstanceId.trim().isEmpty()) {
+    		if (result.endsWith(cspaceInstanceId) == false) { // ensure we don't already have the suffix
+    			result = result + cspaceInstanceId;
+    		}
+    	}
     	
     	return result;
     }
-    
-    /*
-     * By convention, the repository name and database name are the same.  However, this
-     * call encapulates that convention and allows overrides.
-     */
-    public static String getDatabaseName(String repoName) {
-    	String cspaceInstanceId = ServiceMain.getInstance().getCspaceInstanceId();
-    	return getDatabaseName(repoName, cspaceInstanceId);
-    }
-    
+        
     /**
      * Returns the catalog/database name for an open JDBC connection.
      * 
@@ -454,6 +493,7 @@ public class JDBCTools {
      */
     public static String getDatabaseName(String dataSourceName,
     		String repositoryName,
+    		String cspaceInstanceId,
     		Connection conn) throws Exception {
         String databaseName = null;
         
@@ -463,13 +503,13 @@ public class JDBCTools {
 	        
 	        // Format of the PostgreSQL JDBC URL:
 	        // http://jdbc.postgresql.org/documentation/80/connect.html
-	        if (getDatabaseProductType(dataSourceName, repositoryName) == DatabaseProductType.POSTGRESQL) {
+	        if (getDatabaseProductType(dataSourceName, repositoryName, cspaceInstanceId) == DatabaseProductType.POSTGRESQL) {
 	            String tokens[] = urlStr.split(JDBC_URL_DATABASE_SEPARATOR);
 	            databaseName = tokens[tokens.length - 1];
 	            // Format of the MySQL JDBC URL:
 	            // http://dev.mysql.com/doc/refman/5.1/en/connector-j-reference-configuration-properties.html
 	            // FIXME: the last token could contain optional parameters, not accounted for here.
-	        } else if (getDatabaseProductType(dataSourceName, repositoryName) == DatabaseProductType.MYSQL) {
+	        } else if (getDatabaseProductType(dataSourceName, repositoryName, cspaceInstanceId) == DatabaseProductType.MYSQL) {
 	            String tokens[] = urlStr.split(JDBC_URL_DATABASE_SEPARATOR);
 	            databaseName = tokens[tokens.length - 1];
 	        }
