@@ -17,7 +17,10 @@ import java.util.*;
 import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
+import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.collectionspace.authentication.AuthN;
+import org.collectionspace.services.common.api.JEEServerDeployment;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.config.ConfigReader;
 import org.collectionspace.services.common.config.ConfigUtils;
@@ -39,7 +42,7 @@ import org.collectionspace.services.config.types.PropertyType;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 import org.collectionspace.services.nuxeo.client.java.TenantRepository;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
+import org.dom4j.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +72,12 @@ public class ServiceMain {
     private UriTemplateRegistry uriTemplateRegistry = new UriTemplateRegistry();
     
     
+    private static final String COMPONENT_EXTENSION_XPATH = "/component/extension[@point='%s']";
+    private static final String REPOSITORY_EXTENSION_POINT_XPATH =
+            String.format(COMPONENT_EXTENSION_XPATH, "repository");
+    private static final String REPOSITORIES_EXTENSION_POINT_XPATH =
+            String.format(COMPONENT_EXTENSION_XPATH, "repositories");
+            
     private ServiceMain() {
     	//empty
     }
@@ -146,8 +155,8 @@ public class ServiceMain {
     	
     	// Please document this step
         propagateConfiguredProperties();
-        
-        // Create each tenant's Nuxeo database
+        createOrUpdateNuxeoRepositoryConfigFiles();
+                
     	createNuxeoDatabases();
 
         //
@@ -375,6 +384,22 @@ public class ServiceMain {
      */
     public String getServerRootDir() {
         return serverRootDir;
+    }
+
+    public String getCspaceServicesConfigDir() {
+        return getServerRootDir() + File.separator + JEEServerDeployment.CSPACE_SERVICES_DIR_PATH;
+    }
+    
+    public String getNuxeoConfigDir() {
+        return getServerRootDir() + File.separator + JEEServerDeployment.NUXEO_SERVER_CONFIG_DIR;
+    }
+    
+    public String getNuxeoProtoConfigFilename() {
+        return JEEServerDeployment.NUXEO_PROTOTYPE_CONFIG_FILENAME;
+    }
+    
+    public String getNuxeoConfigFilename(String reponame) {
+        return reponame + JEEServerDeployment.NUXEO_REPO_CONFIG_FILENAME_SUFFIX;
     }
     
     /**
@@ -732,5 +757,109 @@ public class ServiceMain {
             populateUriTemplateRegistry();
         }
         return uriTemplateRegistry;
+    }
+   /**
+    * Ensure that Nuxeo repository configuration files exist for each repository
+    * specified in tenant bindings. Create or update these files, as needed.
+    */
+    private void createOrUpdateNuxeoRepositoryConfigFiles() throws Exception {
+        
+        // Get the prototype copy of the Nuxeo repository config file.
+        File prototypeNuxeoConfigFile =
+                new File(getCspaceServicesConfigDir() + File.separator + getNuxeoProtoConfigFilename());
+        // FIXME: Consider checking for the presence of existing configuration files,
+        // rather than always failing outright if the prototype file for creating
+        // new or updated files can't be located.
+        if (! prototypeNuxeoConfigFile.canRead()) {
+            String msg = String.format("Could not find and/or read the prototype Nuxeo config file '%s'",
+                    prototypeNuxeoConfigFile.getCanonicalPath());
+            throw new RuntimeException(msg);
+        }
+        if (logger.isTraceEnabled()) {
+            logger.trace("Found and can read prototype Nuxeo config file at path %s", prototypeNuxeoConfigFile.getAbsolutePath());
+        }
+        Document prototypeConfigDoc = XmlTools.fileToXMLDocument(prototypeNuxeoConfigFile);
+        Document repositoryConfigDoc = null;
+        // FIXME: Can the variable below reasonably be made a class variable? Its value
+        // is used in at least one other method in this class.
+        Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
+        for (TenantBindingType tbt : tenantBindingTypeMap.values()) {
+            List<String> repositoryNameList = ConfigUtils.getRepositoryNameList(tbt);
+            if (logger.isTraceEnabled()) {
+                logger.trace("Getting repository name(s) for tenant " + tbt.getName());
+            }
+            if (repositoryNameList == null || repositoryNameList.isEmpty() == true) {
+              logger.warn(String.format("Could not get repository name(s) for tenant %s", tbt.getName()));
+              continue;
+            } else {
+                for (String repositoryName : repositoryNameList) {
+                    if (Tools.isBlank(repositoryName)) {
+                        continue;
+                    }
+                    if (logger.isTraceEnabled()) {
+                        logger.trace(String.format("Repository name is %s", repositoryName));
+                    }
+                    // FIXME: As per above, we might check for the presence of an existing
+                    // config file for this repository and, if present, not fail even if
+                    // the code below fails to update that file on any given system startup.
+                    //
+                    // Clone the prototype copy of the Nuxeo repository config file,
+                    // thus creating a separate config file for the current repository.
+                    repositoryConfigDoc = (Document) prototypeConfigDoc.clone();
+                    // Update this config file by inserting values pertinent to the
+                    // current repository.
+                    repositoryConfigDoc = updateRepositoryConfigDoc(repositoryConfigDoc, repositoryName);
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("Updated Nuxeo repo config file contents=\n" + repositoryConfigDoc.asXML());
+                    }
+                    // Write this config file to the Nuxeo server config directory.
+                    File repofile = new File(getNuxeoConfigDir() + File.separator +
+                            repositoryName + JEEServerDeployment.NUXEO_REPO_CONFIG_FILENAME_SUFFIX);
+                    if (logger.isTraceEnabled()) {
+                        logger.trace(String.format("Attempting to write Nuxeo repo config file to %s", repofile.getAbsolutePath()));
+                    }
+                    XmlTools.xmlDocumentToFile(repositoryConfigDoc, repofile);
+                }
+            }
+        }
+    }
+    
+    private Document updateRepositoryConfigDoc(Document repoConfigDoc, String repositoryName) {
+        // FIXME: Remove this temporary placeholder variable used only during development.
+        final String PLACEHOLDER = "placeholder";
+        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
+                "/component", "name", String.format("config:%s-repository", repositoryName));
+        // Text substitutions within first extension point, "repository"
+        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
+                REPOSITORY_EXTENSION_POINT_XPATH + "/repository", "name", repositoryName);
+        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
+                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository", "name", repositoryName);
+//        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
+//                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/xa-datasource", PLACEHOLDER);
+        String url = XmlTools.getElementValue(repoConfigDoc,
+                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='URL']");
+        if (! Tools.isBlank(url)) {
+            repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
+                    REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='URL']",
+                    url + repositoryName);
+        }
+//        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
+//                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='ServerName']", PLACEHOLDER);
+        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
+                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='DatabaseName']", repositoryName);
+//        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
+//                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='User']", PLACEHOLDER);
+//        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
+//                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='Password']", PLACEHOLDER);
+        // Text substitutions within second extension point, "repositories"
+        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
+                REPOSITORIES_EXTENSION_POINT_XPATH + "/documentation",
+                String.format("The %s repository", repositoryName));
+        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
+                REPOSITORIES_EXTENSION_POINT_XPATH + "/repository", "name", repositoryName);
+        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
+                REPOSITORIES_EXTENSION_POINT_XPATH + "/repository", "label",
+                String.format("%s Repository", repositoryName));
+        return repoConfigDoc;
     }
 }

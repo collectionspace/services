@@ -116,16 +116,21 @@
     <target name="deploy" depends="package"
     	description="deploy nuxeo server libs to ${jee.server.cspace}">
         <copy todir="${jee.server.cspace}/nuxeo-server">
-           <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}"/>
+           <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}">
+                <exclude name="**/config/*-repo-config.xml"/>
+           </fileset>
         </copy>
-        <copy todir="${jee.server.cspace}/nuxeo-server/config" overwrite="true">
-            <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}/config"/>
+        <echo message="Copying Nuxeo prototype repo config file ..."/>
+        <copy todir="${jee.server.cspace}/cspace/services" overwrite="true">
+            <fileset file="${basedir}/nuxeo-server/${nuxeo.release}/config/proto-repo-config.xml"/>
             <filterset>
-                <filter token="DB" value="${db}" />
-				<filter token="DB_NUXEO_NAME" value="${db.nuxeo.name}" />
-				<filter token="DB_URL" value="jdbc:${db}://${db.host}:${db.port}/${db.nuxeo.name}"/>
+		<filter token="DB_NUXEO_NAME" value="${db.nuxeo.name}" />
+		<!-- The specific database name will be appended to the following JDBC URL during system -->
+		<!-- startup, within each repository-specific config file that is 'cloned' from the -->
+		<!-- prototype repo config file being written to here. -->
+		<filter token="DB_URL" value="jdbc:${db}://${db.host}:${db.port}/"/>
             	<filter token="DB_SERVER_HOSTNAME" value="${db.host}"/>
-				<filter token="XA_DATASOURCE" value="${db.xaDataSource}" />
+		<filter token="XA_DATASOURCE" value="${db.xaDataSource}" />
                 <filter token="NUXEO_USER" value="${db.nuxeo.user}" />
                 <filter token="NUXEO_PW" value="${db.nuxeo.user.password}" />
             </filterset>
@@ -142,6 +147,7 @@
         <delete dir="${jee.server.cspace}/nuxeo-server/bundles"/>
         <delete dir="${jee.server.cspace}/nuxeo-server/config"/>
         <delete dir="${jee.server.cspace}/nuxeo-server/lib"/>
+        <delete file="${jee.server.cspace}/cspace/config/services/proto-repo-config.xml" failonerror="false"/>
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-listener/build.xml" target="undeploy" inheritall="false"/>
 		<ant antfile="nuxeo-platform-quote/build.xml" target="undeploy" inheritall="false"/>

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<component name="config:default-repository">
+    <extension target="org.nuxeo.ecm.core.repository.RepositoryService"
+               point="repository">
+        <repository name="default"
+                    factory="org.nuxeo.ecm.core.storage.sql.ra.PoolingRepositoryFactory">
+            <repository name="default">
+                <pool minPoolSize="0" maxPoolSize="20"
+                      blockingTimeoutMillis="100" idleTimeoutMinutes="10" />
+                <clustering enabled="false" delay="1000" />
+                <binaryStore path="" />
+                <!-- Values in the following elements are primarily added during execution -->
+                <!-- of the 'ant deploy' command, within the Services source code tree. -->
+                <!-- (Several values are also added during system startup, into repository-specific -->
+                <!-- 'clones' of this prototype configuration file, as noted below.) --> 
+                <!-- The transactional datasource for Nuxeo -->
+                <xa-datasource>@XA_DATASOURCE@</xa-datasource>	
+                <!-- While the following element's value is primarily inserted during 'ant deploy' -->
+                <!-- the database name at the end of this JDBC URL is added during system startup. -->				
+                <property name="URL">@DB_URL@</property>
+                <property name="ServerName">@DB_SERVER_HOSTNAME@</property>
+                <!-- The value of the following element is added during system startup. -->				
+                <property name="DatabaseName"></property>
+                <property name="User">@NUXEO_USER@</property>
+                <property name="Password">@NUXEO_PW@</property>
+            </repository>
+        </repository>
+    </extension>
+
+    <extension target="org.nuxeo.ecm.core.api.repository.RepositoryManager"
+               point="repositories">
+        <documentation>The default repository</documentation>
+        <repository name="default" label="Default Repository" />
+    </extension>
+</component>
