@@ -1,6 +1,10 @@
 package org.collectionspace.services.common.relation;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -8,6 +12,7 @@ import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
@@ -29,42 +34,29 @@ public class RelationUtils {
      */
     private static DocumentModelList findRelationsWithRefName(
             ServiceContext ctx,
+            RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
             RepositoryInstanceInterface repoSession,
             String refName,
             String targetField,
-            String orderByField,
+            String orderByClause,
             int pageSize,
             int pageNum,
-            boolean computeTotal) {
-        DocumentModelList result = null;
+            boolean computeTotal) throws DocumentException, DocumentNotFoundException {
         
+        List<String> docTypes = Arrays.asList(IRelationsManager.DOC_TYPE);
+
         String escapedRefName = refName.replace("'", "\\'"); // We need to escape single quotes for NXQL
         // e.g., "SELECT * FROM Relation WHERE 
         // collectionspace_core:tenantid = '1' AND
         // relations_common:subjectRefName = 'urn:cspace:core.collectionspace.org:placeauthorities:name(place):item:name(Amystan1348082103923)\'Amystan\''"
-        String query = String.format("SELECT * FROM %s WHERE %s:%s = '%s' AND %s:%s = '%s'",
-                IRelationsManager.DOC_TYPE,
-                CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
-                CollectionSpaceClient.COLLECTIONSPACE_CORE_TENANTID,
-                ctx.getTenantId(),
-                IRelationsManager.SERVICE_COMMONPART_NAME,
-                targetField,
-                escapedRefName);
+        String query = String.format("%s:%s = '%s'", IRelationsManager.SERVICE_COMMONPART_NAME, targetField, escapedRefName);
 
-        if (logger.isDebugEnabled() == true) {
-            logger.debug(String.format("findRelationsWithRefName NXQL query is %s", query));
-        }
-
-        try {
-            result = repoSession.query(query, null, pageSize, pageNum, computeTotal);
-        } catch (ClientException e) {
-            if (logger.isDebugEnabled() == true) {
-                logger.debug(String.format("Exception caught while looking for refNames in relationship records for updating: refName %s",
-                        refName), e);
-            }
-        }
-
-        return result;
+        RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl) repoClient;
+        DocumentWrapper<DocumentModelList> docListWrapper = nuxeoRepoClient.findDocs(ctx, repoSession,
+                docTypes, query, orderByClause, pageSize, pageNum, computeTotal);
+        DocumentModelList docList = docListWrapper.getWrappedObject();
+        
+        return docList;
     }
 
     /*
@@ -77,65 +69,74 @@ public class RelationUtils {
             RepositoryInstanceInterface repoSession,
             String targetField,
             String oldRefName,
-            String newRefName) {
+            String newRefName) throws Exception {
 
         int docsUpdated = 0;
         int currentPage = 0;
         int docsInCurrentPage = 0;
+        final String ORDER_BY_VALUE = CollectionSpaceClient.CORE_CREATED_AT
+                                          + ", " + IQueryManager.NUXEO_UUID; // CSPACE-6333: Add secondary sort on uuid, in case records have the same createdAt timestamp.
 
-        boolean morePages = true;
-        while (morePages) {
-
-            DocumentModelList docModelList = findRelationsWithRefName(
-                    ctx,
-                    repoSession,
-                    oldRefName,
-                    targetField,
-                    CollectionSpaceClient.CORE_CREATED_AT,
-                    DEFAULT_PAGE_SIZE,
-                    currentPage,
-                    true);
-
-            if (docModelList == null) {
-                logger.trace("updateRefNamesInRelations: no documents could be found that referenced the old refName");
-                break;
-            }
-            docsInCurrentPage = docModelList.size();
-            logger.trace("updateRefNamesInRelations: current page=" + currentPage + " documents included in page=" + docsInCurrentPage);
-            if (docsInCurrentPage == 0) {
-                logger.trace("updateRefNamesInRelations: no more documents requiring refName updates could be found");
-                break;
-            }
-            if (docsInCurrentPage < DEFAULT_PAGE_SIZE) {
-                logger.trace("updateRefNamesInRelations: assuming no more documents requiring refName updates will be found, as docsInCurrentPage < pageSize");
-                morePages = false;
-            }
-
-            for (DocumentModel docModel : docModelList) {
+        try {
+            boolean morePages = true;
+            while (morePages) {
+    
+                DocumentModelList docModelList = findRelationsWithRefName(
+                        ctx,
+                        repoClient,
+                        repoSession,
+                        oldRefName,
+                        targetField,
+                        ORDER_BY_VALUE,
+                        DEFAULT_PAGE_SIZE,
+                        currentPage,
+                        true);
+    
+                if (docModelList == null) {
+                    logger.trace("updateRefNamesInRelations: no documents could be found that referenced the old refName");
+                    break;
+                }
+                docsInCurrentPage = docModelList.size();
+                logger.trace("updateRefNamesInRelations: current page=" + currentPage + " documents included in page=" + docsInCurrentPage);
+                if (docsInCurrentPage == 0) {
+                    logger.trace("updateRefNamesInRelations: no more documents requiring refName updates could be found");
+                    break;
+                }
+                if (docsInCurrentPage < DEFAULT_PAGE_SIZE) {
+                    logger.trace("updateRefNamesInRelations: assuming no more documents requiring refName updates will be found, as docsInCurrentPage < pageSize");
+                    morePages = false;
+                }
+    
+                for (DocumentModel docModel : docModelList) {
+                    try {
+                        docModel.setProperty(IRelationsManager.SERVICE_COMMONPART_NAME, targetField, newRefName);
+                        repoSession.saveDocument(docModel);
+                    } catch (ClientException e) {
+                        logger.error(String.format("Could not update field '%s' with updated refName '%s' for relations record CSID=%s",
+                                targetField, newRefName, docModel.getName()));
+                    }
+                }
+                //
+                // Flush the results
+                //
                 try {
-                    docModel.setProperty(IRelationsManager.SERVICE_COMMONPART_NAME, targetField, newRefName);
-                    repoSession.saveDocument(docModel);
+                    repoSession.save();
                 } catch (ClientException e) {
-                    logger.error(String.format("Could not update field '%s' with updated refName '%s' for relations record CSID=%s",
-                            targetField, newRefName, docModel.getName()));
+                    // TODO Auto-generated catch block
+                    logger.error("Could not flush results of relation-refName payload updates to Nuxeo repository");
+                }
+    
+                // FIXME: Per REM, set a limit of num objects - something like
+                // 1000K objects - and also add a log Warning after some threshold
+                docsUpdated += docsInCurrentPage;
+                if (morePages) {
+                    currentPage++;
                 }
             }
-            //
-            // Flush the results
-            //
-            try {
-                repoSession.save();
-            } catch (ClientException e) {
-                // TODO Auto-generated catch block
-                logger.error("Could not flush results of relation-refName payload updates to Nuxeo repository");
-            }
-
-            // FIXME: Per REM, set a limit of num objects - something like
-            // 1000K objects - and also add a log Warning after some threshold
-            docsUpdated += docsInCurrentPage;
-            if (morePages) {
-                currentPage++;
-            }
+        } catch (Exception e) {
+            logger.error("Internal error updating the ref names in relations: " + e.getLocalizedMessage());
+            logger.debug(Tools.errorToString(e, true));
+            throw e;
         }
         
         logger.debug("updateRefNamesInRelations updated " + docsUpdated + " relations document(s)"

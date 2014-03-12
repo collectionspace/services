@@ -46,6 +46,7 @@ public interface IQueryManager {
 	//
 	// Nuxeo pseudo-values (and filters) for special document properties.
 	//
+	final static String NUXEO_UUID = "ecm:uuid";
 	final static String NUXEO_IS_PROXY = "ecm:isProxy";
 	final static String NUXEO_IS_PROXY_FILTER = NUXEO_IS_PROXY + " = 0";
 	final static String NUXEO_IS_VERSION = "ecm:isCheckedInVersion";
