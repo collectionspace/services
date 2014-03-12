@@ -121,7 +121,7 @@
            </fileset>
         </copy>
         <echo message="Copying Nuxeo prototype repo config file ..."/>
-        <copy todir="${jee.server.cspace}/cspace/services" overwrite="true">
+        <copy todir="${jee.server.cspace}/cspace/config/services" overwrite="true">
             <fileset file="${basedir}/nuxeo-server/${nuxeo.release}/config/proto-repo-config.xml"/>
             <filterset>
 		<filter token="DB_NUXEO_NAME" value="${db.nuxeo.name}" />

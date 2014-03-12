@@ -386,19 +386,19 @@ public class ServiceMain {
         return serverRootDir;
     }
 
-    public String getCspaceServicesConfigDir() {
+    private String getCspaceServicesConfigDir() {
         return getServerRootDir() + File.separator + JEEServerDeployment.CSPACE_SERVICES_DIR_PATH;
     }
     
-    public String getNuxeoConfigDir() {
+    private String getNuxeoConfigDir() {
         return getServerRootDir() + File.separator + JEEServerDeployment.NUXEO_SERVER_CONFIG_DIR;
     }
     
-    public String getNuxeoProtoConfigFilename() {
+    private String getNuxeoProtoConfigFilename() {
         return JEEServerDeployment.NUXEO_PROTOTYPE_CONFIG_FILENAME;
     }
     
-    public String getNuxeoConfigFilename(String reponame) {
+    private String getNuxeoConfigFilename(String reponame) {
         return reponame + JEEServerDeployment.NUXEO_REPO_CONFIG_FILENAME_SUFFIX;
     }
     
@@ -808,7 +808,7 @@ public class ServiceMain {
                     repositoryConfigDoc = (Document) prototypeConfigDoc.clone();
                     // Update this config file by inserting values pertinent to the
                     // current repository.
-                    repositoryConfigDoc = updateRepositoryConfigDoc(repositoryConfigDoc, repositoryName);
+                    repositoryConfigDoc = updateRepositoryConfigDoc(repositoryConfigDoc, repositoryName, this.getCspaceInstanceId());
                     if (logger.isTraceEnabled()) {
                         logger.trace("Updated Nuxeo repo config file contents=\n" + repositoryConfigDoc.asXML());
                     }
@@ -824,9 +824,10 @@ public class ServiceMain {
         }
     }
     
-    private Document updateRepositoryConfigDoc(Document repoConfigDoc, String repositoryName) {
+    private Document updateRepositoryConfigDoc(Document repoConfigDoc, String repositoryName, String cspaceInstanceId) {
+        String databaseName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
+
         // FIXME: Remove this temporary placeholder variable used only during development.
-        final String PLACEHOLDER = "placeholder";
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
                 "/component", "name", String.format("config:%s-repository", repositoryName));
         // Text substitutions within first extension point, "repository"
@@ -834,24 +835,17 @@ public class ServiceMain {
                 REPOSITORY_EXTENSION_POINT_XPATH + "/repository", "name", repositoryName);
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
                 REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository", "name", repositoryName);
-//        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
-//                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/xa-datasource", PLACEHOLDER);
         String url = XmlTools.getElementValue(repoConfigDoc,
                 REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='URL']");
         if (! Tools.isBlank(url)) {
             repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
                     REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='URL']",
-                    url + repositoryName);
+                    url + databaseName);
         }
-//        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
-//                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='ServerName']", PLACEHOLDER);
         repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='DatabaseName']", repositoryName);
-//        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
-//                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='User']", PLACEHOLDER);
-//        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
-//                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='Password']", PLACEHOLDER);
-        // Text substitutions within second extension point, "repositories"
+                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='DatabaseName']",
+                databaseName);
+        // Text substitutions within second extension point, "repositories" 
         repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
                 REPOSITORIES_EXTENSION_POINT_XPATH + "/documentation",
                 String.format("The %s repository", repositoryName));
