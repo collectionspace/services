@@ -115,15 +115,6 @@ public class RelationUtils {
                                 targetField, newRefName, docModel.getName()));
                     }
                 }
-                //
-                // Flush the results
-                //
-                try {
-                    repoSession.save();
-                } catch (ClientException e) {
-                    // TODO Auto-generated catch block
-                    logger.error("Could not flush results of relation-refName payload updates to Nuxeo repository");
-                }
     
                 // FIXME: Per REM, set a limit of num objects - something like
                 // 1000K objects - and also add a log Warning after some threshold
@@ -137,7 +128,17 @@ public class RelationUtils {
             logger.debug(Tools.errorToString(e, true));
             throw e;
         }
-        
+
+        //
+        // Flush the results
+        //
+        try {
+            repoSession.save();
+        } catch (ClientException e) {
+            // TODO Auto-generated catch block
+            logger.error("Could not flush results of relation-refName payload updates to Nuxeo repository");
+        }
+
         logger.debug("updateRefNamesInRelations updated " + docsUpdated + " relations document(s)"
                 + " with new refName " + newRefName
                 + " where " + targetField + " contained old refName " + oldRefName);
