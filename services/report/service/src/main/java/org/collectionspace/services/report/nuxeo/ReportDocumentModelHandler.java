@@ -102,7 +102,7 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
     private static String REPORTS_STD_GROUPCSID_PARAM = "groupcsid";
     private static String REPORTS_STD_CSIDLIST_PARAM = "csidlist";
     private static String REPORTS_STD_TENANTID_PARAM = "tenantid";
-	
+    
 	public InputStream invokeReport(
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
 			String csid,
@@ -404,7 +404,9 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
     	try {
     		String repositoryName = ctx.getRepositoryName();
 	    	if (repositoryName != null && repositoryName.trim().isEmpty() == false) {
-	    		result = JDBCTools.getConnection(JDBCTools.NUXEO_DATASOURCE_NAME, repositoryName);
+                        String cspaceInstanceId = ServiceMain.getInstance().getCspaceInstanceId();
+                        String databaseName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
+	    		result = JDBCTools.getConnection(JDBCTools.NUXEO_DATASOURCE_NAME, databaseName);
 	    	}
 		} catch (Exception e) {
 			Log.error(e);
