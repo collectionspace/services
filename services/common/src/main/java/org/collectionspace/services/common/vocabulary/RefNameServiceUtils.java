@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -215,7 +216,7 @@ public class RefNameServiceUtils {
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
             RepositoryInstance repoSession,
             String oldRefName,
-            String newRefName) {
+            String newRefName) throws Exception {
     	//
     	// First, look for and update all the places where the refName is the "subject" of the relationship
     	//
@@ -414,7 +415,8 @@ public class RefNameServiceUtils {
         int currentPage = 0;
         int docsInCurrentPage = 0;
         final String WHERE_CLAUSE_ADDITIONS_VALUE = null;
-        final String ORDER_BY_VALUE = CollectionSpaceClient.CORE_CREATED_AT; // "collectionspace_core:createdAt";
+        final String ORDER_BY_VALUE = CollectionSpaceClient.CORE_CREATED_AT  // "collectionspace_core:createdAt";
+                                          + ", " + IQueryManager.NUXEO_UUID; // CSPACE-6333: Add secondary sort on uuid, in case records have the same createdAt timestamp.
 
         if (repoClient instanceof RepositoryJavaClientImpl == false) {
             throw new InternalError("updateAuthorityRefDocs() called with unknown repoClient type!");
