@@ -155,9 +155,17 @@ public class ServiceMain {
     	
     	// Please document this step
         propagateConfiguredProperties();
+        
+        // Create or update Nuxeo's per-repository configuration files.
         createOrUpdateNuxeoRepositoryConfigFiles();
-                
-    	createNuxeoDatabases();
+        
+        // Create the Nuxeo-managed databases, along with the requisite
+        // access rights to each.
+    	HashSet<String> dbsCheckedOrCreated = createNuxeoDatabases();
+        
+        // Update the SQL script that drops databases, so they can be
+        // reinitialized, to reflect each of the Nuxeo-managed databases.
+        updateInitializationScript(dbsCheckedOrCreated);
 
         //
         // Start up and initialize our embedded Nuxeo instance.
@@ -431,7 +439,7 @@ public class ServiceMain {
 	 * There may be only one, one per tenant, or something in between.
      * 
      */
-    private void createNuxeoDatabases() throws Exception {
+    private HashSet<String> createNuxeoDatabases() throws Exception {
     	final String DB_EXISTS_QUERY_PSQL = 
     			"SELECT 1 AS result FROM pg_database WHERE datname=?";
     	final String DB_EXISTS_QUERY_MYSQL = 
@@ -524,6 +532,8 @@ public class ServiceMain {
     			se.printStackTrace();
     		}
     	}
+                
+        return nuxeoDBsChecked;
     	
     }
     
@@ -855,5 +865,11 @@ public class ServiceMain {
                 REPOSITORIES_EXTENSION_POINT_XPATH + "/repository", "label",
                 String.format("%s Repository", repositoryName));
         return repoConfigDoc;
+    }
+
+    private void updateInitializationScript(HashSet<String> dbsCheckedOrCreated) {
+        for (String dbName : dbsCheckedOrCreated) {
+            logger.debug("dbName=" + dbName);
+        }
     }
 }
