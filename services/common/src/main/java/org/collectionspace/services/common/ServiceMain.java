@@ -837,7 +837,6 @@ public class ServiceMain {
     private Document updateRepositoryConfigDoc(Document repoConfigDoc, String repositoryName, String cspaceInstanceId) {
         String databaseName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
 
-        // FIXME: Remove this temporary placeholder variable used only during development.
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
                 "/component", "name", String.format("config:%s-repository", repositoryName));
         // Text substitutions within first extension point, "repository"
