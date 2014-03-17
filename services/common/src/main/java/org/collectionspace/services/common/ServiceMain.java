@@ -395,7 +395,7 @@ public class ServiceMain {
     }
 
     private String getCspaceServicesConfigDir() {
-        return getServerRootDir() + File.separator + JEEServerDeployment.CSPACE_SERVICES_DIR_PATH;
+        return getServerRootDir() + File.separator + JEEServerDeployment.CSPACE_CONFIG_SERVICES_DIR_PATH;
     }
     
     private String getNuxeoConfigDir() {

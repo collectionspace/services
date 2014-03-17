@@ -7,9 +7,7 @@ public interface JEEServerDeployment {
     final public static String CSPACE_DIR_NAME = "cspace";
     final public static String SERVICES_DIR_NAME = "services";
     final public static String CONFIG_DIR_PATH = CONFIG_DIR_NAME + File.separator + SERVICES_DIR_NAME;
-    
-    final public static String CSPACE_SERVICES_DIR_PATH = CSPACE_DIR_NAME + File.separator + CONFIG_DIR_NAME +
-    		File.separator + SERVICES_DIR_NAME;
+    final public static String CSPACE_CONFIG_SERVICES_DIR_PATH = CSPACE_DIR_NAME + File.separator + CONFIG_DIR_PATH;
 
     final public static String TENANT_BINDINGS_FILENAME_PREFIX = "tenant-bindings";
     final public static String TENANT_BINDINGS_PROTOTYPE_FILENAME = TENANT_BINDINGS_FILENAME_PREFIX + "-proto.xml";
