@@ -232,8 +232,7 @@ public class XmlTools {
      * @param   attributeValue  The value that the attribute should contain.
      * @return  The document with the specified attribute of the matched element, if
      * any, set to the provided value. If the attribute doesn't already exist,
-     * it will be created and assigned the provided value.  If the provided
-     * value is null, the attribute, if any, will be removed.
+     * it will be created and assigned the provided value.
      */
     public static Document setAttributeValue(Document doc, String xpathExpr,
             String attributeName, String attributeValue) {
