@@ -869,7 +869,7 @@ public class ServiceMain {
 
     private void updateInitializationScript(HashSet<String> dbsCheckedOrCreated) {
         for (String dbName : dbsCheckedOrCreated) {
-            logger.debug("dbName=" + dbName);
+            logger.warn("DROP DATABASE IF EXISTS " + dbName); // Temporary for debugging
         }
     }
 }
