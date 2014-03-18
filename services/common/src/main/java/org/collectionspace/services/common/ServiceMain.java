@@ -6,6 +6,7 @@ package org.collectionspace.services.common;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,6 +21,7 @@ import javax.sql.DataSource;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.common.api.JEEServerDeployment;
+import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.config.ConfigReader;
@@ -163,9 +165,9 @@ public class ServiceMain {
         // access rights to each.
     	HashSet<String> dbsCheckedOrCreated = createNuxeoDatabases();
         
-        // Update the SQL script that drops databases, so they can be
-        // reinitialized, to reflect each of the Nuxeo-managed databases.
-        updateInitializationScript(dbsCheckedOrCreated);
+        // Update the SQL script that drops databases so that they can be
+        // reinitialized, to include each of the Nuxeo-managed database names.
+        updateInitializationScript(getNuxeoDatabasesInitScriptFilename(), dbsCheckedOrCreated);
 
         //
         // Start up and initialize our embedded Nuxeo instance.
@@ -405,9 +407,25 @@ public class ServiceMain {
     private String getNuxeoProtoConfigFilename() {
         return JEEServerDeployment.NUXEO_PROTOTYPE_CONFIG_FILENAME;
     }
-    
+        
     private String getNuxeoConfigFilename(String reponame) {
         return reponame + JEEServerDeployment.NUXEO_REPO_CONFIG_FILENAME_SUFFIX;
+    }
+    
+    private String getDatabaseScriptsPath() {
+        String cspaceInstanceId = getCspaceInstanceId();
+        String DATABASE_PRODUCT_NAME = "postgrres"; // FIXME: Hack during dev PLEASE REPLACE!!
+        return JEEServerDeployment.DATABASE_SCRIPTS_DIR_PATH + File.separator +
+                DATABASE_PRODUCT_NAME;
+//                + JDBCTools.getDatabaseProductName(
+//                JDBCTools.CSADMIN_DATASOURCE_NAME,
+//    		JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId),
+//    		cspaceInstanceId);
+    }
+    
+    private String getNuxeoDatabasesInitScriptFilename() {
+        return getDatabaseScriptsPath()
+                + File.separator + JEEServerDeployment.NUXEO_DB_INIT_SCRIPT_FILENAME;
     }
     
     /**
@@ -866,9 +884,50 @@ public class ServiceMain {
         return repoConfigDoc;
     }
 
-    private void updateInitializationScript(HashSet<String> dbsCheckedOrCreated) {
-        for (String dbName : dbsCheckedOrCreated) {
-            logger.warn("DROP DATABASE IF EXISTS " + dbName); // Temporary for debugging
+    private void updateInitializationScript(String dbInitializationScriptFilePath,
+            HashSet<String> dbsCheckedOrCreated) {
+        // Get the current copy of the Nuxeo databases initialization script file,
+        // if that file exists, and read all of its lines except for those which
+        // drop databases.
+        List<String> lines = null;
+        File nuxeoDatabasesInitScriptFile = new File(dbInitializationScriptFilePath);
+        try {
+            if (! nuxeoDatabasesInitScriptFile.canRead()) {
+                String msg = String.format("Could not find and/or read the Nuxeo databases initialization script file '%s'",
+                        nuxeoDatabasesInitScriptFile.getCanonicalPath());
+                logger.warn(msg);
+            } else {
+                // Note: Exceptions are written only to the console, not thrown, by
+                // this method in the common-api package.
+                lines = FileTools.readFileAsLines(dbInitializationScriptFilePath);
+                for (String line : lines) {
+                    // Elide current DROP DATABASE statements
+                    if (line.toLowerCase().contains("DROP DATABASE".toLowerCase())) {
+                        continue;
+                    }
+                }
+            }
+            // Write new DROP DATABASE lines for every Nuxeo-managed database.
+            List<String> replacementLines = new ArrayList<String>();
+            for (String dbName : dbsCheckedOrCreated) {
+              replacementLines.add("DROP DATABASE IF EXISTS " + dbName);
+            }
+            // Append all (non-DROP DATABASE) existing lines from that file, if any.
+            if (lines != null && ! lines.isEmpty()) {
+                replacementLines.addAll(lines);
+            }
+            if (! nuxeoDatabasesInitScriptFile.canWrite()) {
+                String msg = String.format("Could not find and/or write the Nuxeo databases initialization script file '%s'",
+                        nuxeoDatabasesInitScriptFile.getCanonicalPath());
+                logger.warn(msg);
+            } else {
+                // Note: Exceptions are written only to the console, not thrown, by
+                // this method in the common-api package.
+                FileTools.writeFileFromLines(dbInitializationScriptFilePath, replacementLines);
+            }
+        } catch (Exception e) {
+
         }
+
     }
 }
