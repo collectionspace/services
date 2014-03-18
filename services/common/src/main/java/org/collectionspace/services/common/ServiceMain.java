@@ -79,6 +79,11 @@ public class ServiceMain {
             String.format(COMPONENT_EXTENSION_XPATH, "repository");
     private static final String REPOSITORIES_EXTENSION_POINT_XPATH =
             String.format(COMPONENT_EXTENSION_XPATH, "repositories");
+    
+    private static final String DROP_DATABASE_SQL_CMD = "DROP DATABASE";
+    private static final String DROP_DATABASE_IF_EXISTS_SQL_CMD = DROP_DATABASE_SQL_CMD + " IF EXISTS %s";
+    private static final String DROP_OBJECTS_SQL_COMMENT = "-- drop all the objects before dropping roles";
+
             
     private ServiceMain() {
     	//empty
@@ -884,6 +889,14 @@ public class ServiceMain {
         return repoConfigDoc;
     }
 
+    /**
+     * Update the current copy of the Nuxeo databases initialization script file,
+     * by removing all existing DROP DATABASE commands, then adding a DROP DATABASE
+     * command for each current database, at the top of that file.
+     * 
+     * @param dbInitializationScriptFilePath
+     * @param dbsCheckedOrCreated 
+     */
     private void updateInitializationScript(String dbInitializationScriptFilePath,
             HashSet<String> dbsCheckedOrCreated) {
         // Get the current copy of the Nuxeo databases initialization script file,
@@ -898,21 +911,33 @@ public class ServiceMain {
                 logger.warn(msg);
             } else {
                 // Note: Exceptions are written only to the console, not thrown, by
-                // this method in the common-api package.
+                // the readFileAsLines() method in the common-api package.
                 lines = FileTools.readFileAsLines(dbInitializationScriptFilePath);
-                for (String line : lines) {
-                    // Elide current DROP DATABASE statements
-                    if (line.toLowerCase().contains("DROP DATABASE".toLowerCase())) {
-                        continue;
+                Iterator<String> linesIterator = lines.iterator();
+                String currentLine;
+                while (linesIterator.hasNext()) {
+                    currentLine = linesIterator.next();
+                    // Elide all existing DROP DATABASE statements.
+                    if (currentLine.toLowerCase().contains(DROP_DATABASE_SQL_CMD.toLowerCase())) {
+                        linesIterator.remove();
+                    }
+                    // Elide a comment pertaining to the existing
+                    // DROP DATABASE statements.
+                    if (currentLine.toLowerCase().contains(DROP_OBJECTS_SQL_COMMENT.toLowerCase())) {
+                        linesIterator.remove();
                     }
                 }
             }
-            // Write new DROP DATABASE lines for every Nuxeo-managed database.
             List<String> replacementLines = new ArrayList<String>();
+            // Add back the comment elided above
+            replacementLines.add(DROP_OBJECTS_SQL_COMMENT);
+            // Add new DROP DATABASE lines for every Nuxeo-managed database.
             for (String dbName : dbsCheckedOrCreated) {
-              replacementLines.add("DROP DATABASE IF EXISTS " + dbName);
+              replacementLines.add(String.format(DROP_DATABASE_IF_EXISTS_SQL_CMD, dbName));
             }
-            // Append all (non-DROP DATABASE) existing lines from that file, if any.
+            replacementLines.add(System.getProperty("line.separator"));
+            // Now append all existing lines from that file, except for
+            // any lines that were elided above.
             if (lines != null && ! lines.isEmpty()) {
                 replacementLines.addAll(lines);
             }
@@ -922,7 +947,7 @@ public class ServiceMain {
                 logger.warn(msg);
             } else {
                 // Note: Exceptions are written only to the console, not thrown, by
-                // this method in the common-api package.
+                // the writeFileFromLines() method in the common-api package.
                 FileTools.writeFileFromLines(dbInitializationScriptFilePath, replacementLines);
             }
         } catch (Exception e) {

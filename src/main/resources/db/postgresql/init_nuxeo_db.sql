@@ -24,4 +24,3 @@ DROP USER IF EXISTS @DB_READER_USER@;
 -- GRANT SELECT ON ALL TABLES IN SCHEMA public TO reader;
 -- This must be run by hand, after the system has already started up,
 -- so that it gives access to all the tables created on init.
-
