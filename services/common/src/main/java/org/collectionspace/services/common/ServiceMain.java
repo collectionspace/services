@@ -415,7 +415,7 @@ public class ServiceMain {
     private String getDatabaseScriptsPath() {
         String cspaceInstanceId = getCspaceInstanceId();
         String DATABASE_PRODUCT_NAME = "postgres"; // FIXME: Hack during dev PLEASE REPLACE!!
-        return JEEServerDeployment.DATABASE_SCRIPTS_DIR_PATH + File.separator +
+        return getServerRootDir() + File.separator + JEEServerDeployment.DATABASE_SCRIPTS_DIR_PATH + File.separator +
                 DATABASE_PRODUCT_NAME;
 //                + JDBCTools.getDatabaseProductName(
 //                JDBCTools.CSADMIN_DATASOURCE_NAME,
