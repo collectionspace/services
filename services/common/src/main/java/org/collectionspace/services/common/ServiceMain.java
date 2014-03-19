@@ -935,7 +935,6 @@ public class ServiceMain {
             for (String dbName : dbsCheckedOrCreated) {
               replacementLines.add(String.format(DROP_DATABASE_IF_EXISTS_SQL_CMD, dbName));
             }
-            replacementLines.add(System.getProperty("line.separator"));
             // Now append all existing lines from that file, except for
             // any lines that were elided above.
             if (lines != null && ! lines.isEmpty()) {
