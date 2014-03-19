@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.init.IInitHandler;
 import org.collectionspace.services.common.init.InitHandler;
@@ -49,7 +50,7 @@ public class ReportPostInitHandler extends InitHandler implements IInitHandler {
 
     final Logger logger = LoggerFactory.getLogger(ReportPostInitHandler.class);
     public static final String READ_ROLE_NAME_KEY = "readerRoleName";
-    private String readerRoleName = "reader";
+    private String readerRoleName = "reader" + ServiceMain.getInstance().getCspaceInstanceId();
 
     /** See the class javadoc for this class: it shows the syntax supported in the configuration params.
      */

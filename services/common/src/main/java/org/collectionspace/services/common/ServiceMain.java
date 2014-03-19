@@ -81,7 +81,7 @@ public class ServiceMain {
             String.format(COMPONENT_EXTENSION_XPATH, "repositories");
     
     private static final String DROP_DATABASE_SQL_CMD = "DROP DATABASE";
-    private static final String DROP_DATABASE_IF_EXISTS_SQL_CMD = DROP_DATABASE_SQL_CMD + " IF EXISTS %s";
+    private static final String DROP_DATABASE_IF_EXISTS_SQL_CMD = DROP_DATABASE_SQL_CMD + " IF EXISTS %s;";
     private static final String DROP_OBJECTS_SQL_COMMENT = "-- drop all the objects before dropping roles";
 
             
