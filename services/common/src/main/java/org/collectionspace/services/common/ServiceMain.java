@@ -696,7 +696,7 @@ public class ServiceMain {
             if (basicDataSource == null) {
                 return password;
             }
-            password = basicDataSource.getUsername();
+            password = basicDataSource.getPassword();
             return password;
         }
      
