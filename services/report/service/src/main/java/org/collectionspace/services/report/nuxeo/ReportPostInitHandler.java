@@ -83,7 +83,8 @@ public class ReportPostInitHandler extends InitHandler implements IInitHandler {
             } else if(databaseProductType != DatabaseProductType.POSTGRESQL) {
                 throw new Exception("Unrecognized database system " + databaseProductType);
             } else {
-                conn = JDBCTools.getConnection(dataSourceName, repositoryName);
+                String databaseName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
+                conn = JDBCTools.getConnection(dataSourceName, databaseName);
                 stmt = conn.createStatement();                
                 //sql = "REVOKE SELECT ON ALL TABLES IN SCHEMA public FROM "+readerRoleName;
                 //stmt.execute(sql);
