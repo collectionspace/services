@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 
+import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
@@ -82,6 +83,8 @@ public class ServiceMain {
     
     private static final String DROP_DATABASE_SQL_CMD = "DROP DATABASE";
     private static final String DROP_DATABASE_IF_EXISTS_SQL_CMD = DROP_DATABASE_SQL_CMD + " IF EXISTS %s;";
+    private static final String DROP_USER_SQL_CMD = "DROP USER";
+    private static final String DROP_USER_IF_EXISTS_SQL_CMD = DROP_USER_SQL_CMD + " IF EXISTS %s;";
     private static final String DROP_OBJECTS_SQL_COMMENT = "-- drop all the objects before dropping roles";
 
             
@@ -171,9 +174,12 @@ public class ServiceMain {
         // access rights to each.
     	HashSet<String> dbsCheckedOrCreated = createNuxeoDatabases();
         
-        // Update the SQL script that drops databases so that they can be
-        // reinitialized, to include each of the Nuxeo-managed database names.
-        updateInitializationScript(getNuxeoDatabasesInitScriptFilename(), dbsCheckedOrCreated);
+        // Update the SQL script that drops databases and users,
+        // to include DROP statements for each of the Nuxeo-managed
+        // database names and for each relevant datasource user.
+        String[] dataSourceNames = {JDBCTools.NUXEO_DATASOURCE_NAME, JDBCTools.NUXEO_READER_DATASOURCE_NAME};
+        updateInitializationScript(getNuxeoDatabasesInitScriptFilename(),
+                dbsCheckedOrCreated, dataSourceNames);
 
         //
         // Start up and initialize our embedded Nuxeo instance.
@@ -469,21 +475,11 @@ public class ServiceMain {
     	final String DB_EXISTS_QUERY_MYSQL = 
     			"SELECT 1 AS result FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME=?";
     	    	
-    	DataSource nuxeoDataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_DATASOURCE_NAME);
-       	BasicDataSource tomcatDataSource = (BasicDataSource)nuxeoDataSource;
-    	String nuxeoUser = tomcatDataSource.getUsername();
-    	String nuxeoPW = tomcatDataSource.getPassword();
+        String nuxeoUser = getBasicDataSourceUsername(JDBCTools.NUXEO_DATASOURCE_NAME);
+    	String nuxeoPW = getBasicDataSourceUsername(JDBCTools.NUXEO_DATASOURCE_NAME);
 
-    	// Get reader data source, if any
-    	DataSource nuxeoReaderDataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_READER_DATASOURCE_NAME);
-    	String readerUser = null;
-    	String readerPW = null;
-    	if (nuxeoReaderDataSource!= null) {
-	    	tomcatDataSource = (BasicDataSource)nuxeoReaderDataSource;
-	    	// Get the template URL value from the JNDI datasource and substitute the databaseName
-	    	readerUser = tomcatDataSource.getUsername();
-	    	readerPW = tomcatDataSource.getPassword();
-    	}
+        String readerUser = getBasicDataSourcePassword(JDBCTools.NUXEO_READER_DATASOURCE_NAME);
+    	String readerPW = getBasicDataSourcePassword(JDBCTools.NUXEO_READER_DATASOURCE_NAME);
     	
     	DatabaseProductType dbType = JDBCTools.getDatabaseProductType(JDBCTools.CSADMIN_DATASOURCE_NAME,
     			getServiceConfig().getDbCsadminName());
@@ -667,7 +663,43 @@ public class ServiceMain {
 		}
 
 	}
-    
+        
+        private BasicDataSource getBasicDataSource(String dataSourceName) {
+            BasicDataSource basicDataSource = null;
+            if (Tools.isBlank(dataSourceName)) {
+                return basicDataSource;
+            }
+            try {
+                DataSource dataSource = JDBCTools.getDataSource(dataSourceName);
+                basicDataSource = (BasicDataSource) dataSource;
+            } catch (NamingException ne) {
+                logger.warn("Error attempting to retrieve basic datasource '%s': %s",
+                        dataSourceName, ne.getMessage());
+                return basicDataSource;
+            }
+            return basicDataSource;
+        }
+        
+        private String getBasicDataSourceUsername(String dataSourceName) {
+            String username = null;
+            BasicDataSource basicDataSource = getBasicDataSource(dataSourceName);
+            if (basicDataSource == null) {
+                return username;
+            }
+            username = basicDataSource.getUsername();
+            return username;
+        }
+        
+        private String getBasicDataSourcePassword(String dataSourceName) {
+            String password = null;
+            BasicDataSource basicDataSource = getBasicDataSource(dataSourceName);
+            if (basicDataSource == null) {
+                return password;
+            }
+            password = basicDataSource.getUsername();
+            return password;
+        }
+     
     /*
      * This might be useful for something, but the reader grants are better handled in the ReportPostInitHandler.
      * 
@@ -891,15 +923,20 @@ public class ServiceMain {
     }
 
     /**
-     * Update the current copy of the Nuxeo databases initialization script file,
-     * by removing all existing DROP DATABASE commands, then adding a DROP DATABASE
-     * command for each current database, at the top of that file.
+     * Update the current copy of the Nuxeo databases initialization script file by
+     * 
+     * <ul>
+     *   <li>Removing all existing DROP DATABASE commands</li>
+     *   <li>Removing all existing DROP USER commands</li>
+     *   <li>Adding a DROP DATABASE command for each current database, at the top of that file.</li>
+     *   <li>Adding DROP USER commands for each provided datasource, following the DROP DATABASE commands.</li>
+     * </ul>
      * 
      * @param dbInitializationScriptFilePath
      * @param dbsCheckedOrCreated 
      */
     private void updateInitializationScript(String dbInitializationScriptFilePath,
-            HashSet<String> dbsCheckedOrCreated) {
+            HashSet<String> dbsCheckedOrCreated, String[] dataSourceNames) {
         // Get the current copy of the Nuxeo databases initialization script file,
         // if that file exists, and read all of its lines except for those which
         // drop databases.
@@ -927,6 +964,10 @@ public class ServiceMain {
                     if (currentLine.toLowerCase().contains(DROP_OBJECTS_SQL_COMMENT.toLowerCase())) {
                         linesIterator.remove();
                     }
+                    // Elide all existing DROP USER statements.
+                    if (currentLine.toLowerCase().contains(DROP_USER_SQL_CMD.toLowerCase())) {
+                        linesIterator.remove();
+                    }
                 }
             }
             List<String> replacementLines = new ArrayList<String>();
@@ -934,7 +975,17 @@ public class ServiceMain {
             replacementLines.add(DROP_OBJECTS_SQL_COMMENT);
             // Add new DROP DATABASE lines for every Nuxeo-managed database.
             for (String dbName : dbsCheckedOrCreated) {
-              replacementLines.add(String.format(DROP_DATABASE_IF_EXISTS_SQL_CMD, dbName));
+              if (Tools.notBlank(dbName)) {
+                  replacementLines.add(String.format(DROP_DATABASE_IF_EXISTS_SQL_CMD, dbName));
+              }
+            }
+            // Add new DROP USER commands for every provided datasource.
+            String username;
+            for (String dataSourceName : dataSourceNames) {
+                username = getBasicDataSourceUsername(dataSourceName);
+                if (Tools.notBlank(username)) {
+                    replacementLines.add(String.format(DROP_USER_IF_EXISTS_SQL_CMD, username));
+                }
             }
             // Now append all existing lines from that file, except for
             // any lines that were elided above.
