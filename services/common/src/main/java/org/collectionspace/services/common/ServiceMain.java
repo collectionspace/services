@@ -160,7 +160,8 @@ public class ServiceMain {
     	// Set our AuthN's datasource to for the cspaceDataSource
     	AuthN.setDataSource(JDBCTools.getDataSource(JDBCTools.CSPACE_DATASOURCE_NAME));
     	
-    	// Please document this step
+    	// In each tenant, set properties that don't already have values
+    	// to their default values.
         propagateConfiguredProperties();
         
         // Create or update Nuxeo's per-repository configuration files.
