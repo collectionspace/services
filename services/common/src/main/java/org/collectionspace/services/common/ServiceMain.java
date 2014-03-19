@@ -476,9 +476,9 @@ public class ServiceMain {
     			"SELECT 1 AS result FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME=?";
     	    	
         String nuxeoUser = getBasicDataSourceUsername(JDBCTools.NUXEO_DATASOURCE_NAME);
-    	String nuxeoPW = getBasicDataSourceUsername(JDBCTools.NUXEO_DATASOURCE_NAME);
+    	String nuxeoPW = getBasicDataSourcePassword(JDBCTools.NUXEO_DATASOURCE_NAME);
 
-        String readerUser = getBasicDataSourcePassword(JDBCTools.NUXEO_READER_DATASOURCE_NAME);
+        String readerUser = getBasicDataSourceUsername(JDBCTools.NUXEO_READER_DATASOURCE_NAME);
     	String readerPW = getBasicDataSourcePassword(JDBCTools.NUXEO_READER_DATASOURCE_NAME);
     	
     	DatabaseProductType dbType = JDBCTools.getDatabaseProductType(JDBCTools.CSADMIN_DATASOURCE_NAME,
