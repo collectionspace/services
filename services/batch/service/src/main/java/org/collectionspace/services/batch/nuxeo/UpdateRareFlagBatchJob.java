@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 	final Logger logger = LoggerFactory.getLogger(UpdateRareFlagBatchJob.class);
 	
+	// Conservation categories are considered "rare", except for ones that start with the following prefixes.
 	public static final List<String> NON_RARE_CONSERVATION_CATEGORY_PREFIXES = Arrays.asList("DD ", "LC ");
 
 	private static final String[] TAXON_FIELD_NAME_PARTS = CollectionObjectConstants.TAXON_FIELD_NAME.split("\\/");
@@ -197,16 +198,24 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 				}
 				
 				if (taxonPayload != null) {
-					List<String> conservationCategories = getFieldValues(taxonPayload, TaxonConstants.CONSERVATION_CATEGORY_SCHEMA_NAME, TaxonConstants.CONSERVATION_CATEGORY_FIELD_NAME);
+					// UCBG-369: Changing this so that it only checks the primary conservation category.
 					
-					for (String conservationCategory : conservationCategories) {
-						if (isRare(conservationCategory)) {
-							logger.debug("found rare conservation category: " + conservationCategory);
-							
-							newIsRare = "true";
-							break;
-						}
+					String conservationCategory = getFieldValue(taxonPayload, TaxonConstants.CONSERVATION_CATEGORY_SCHEMA_NAME, TaxonConstants.CONSERVATION_CATEGORY_FIELD_NAME);
+
+					if (isRare(conservationCategory)) {
+						newIsRare = "true";
 					}
+
+//					List<String> conservationCategories = getFieldValues(taxonPayload, TaxonConstants.CONSERVATION_CATEGORY_SCHEMA_NAME, TaxonConstants.CONSERVATION_CATEGORY_FIELD_NAME);
+//					
+//					for (String conservationCategory : conservationCategories) {
+//						if (isRare(conservationCategory)) {
+//							logger.debug("found rare conservation category: " + conservationCategory);
+//							
+//							newIsRare = "true";
+//							break;
+//						}
+//					}
 				}
 			}
 			

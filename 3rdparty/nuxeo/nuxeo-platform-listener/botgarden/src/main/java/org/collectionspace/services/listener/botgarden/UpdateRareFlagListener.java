@@ -160,14 +160,25 @@ public class UpdateRareFlagListener implements EventListener {
 		List<Map<String, Object>> plantAttributesGroupList = (List<Map<String, Object>>) doc.getProperty(TaxonConstants.CONSERVATION_CATEGORY_SCHEMA_NAME, PLANT_ATTRIBUTES_GROUP_LIST_FIELD_NAME);
 		boolean hasRareConservationCategory = false;
 
-		for (Map<String, Object> plantAttributesGroup : plantAttributesGroupList) {
-			String conservationCategory = (String) plantAttributesGroup.get(CONSERVATION_CATEGORY_FIELD_NAME);
+		// UCBG-369: Changing this so that it only checks the primary conservation category.
 
+		if (plantAttributesGroupList.size() > 0) {
+			Map<String, Object> plantAttributesGroup = plantAttributesGroupList.get(0);
+			String conservationCategory = (String) plantAttributesGroup.get(CONSERVATION_CATEGORY_FIELD_NAME);
+			
 			if (UpdateRareFlagBatchJob.isRare(conservationCategory)) {
 				hasRareConservationCategory = true;
-				break;
 			}
-		}		
+		}
+		
+//		for (Map<String, Object> plantAttributesGroup : plantAttributesGroupList) {
+//			String conservationCategory = (String) plantAttributesGroup.get(CONSERVATION_CATEGORY_FIELD_NAME);
+//
+//			if (UpdateRareFlagBatchJob.isRare(conservationCategory)) {
+//				hasRareConservationCategory = true;
+//				break;
+//			}
+//		}
 		
 		return hasRareConservationCategory;
 	}
