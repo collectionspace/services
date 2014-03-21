@@ -425,19 +425,35 @@ public class ServiceMain {
     }
     
     private String getDatabaseScriptsPath() {
-        String cspaceInstanceId = getCspaceInstanceId();
-        String DATABASE_PRODUCT_NAME = "postgresql"; // FIXME: Hack during dev PLEASE REPLACE!!
-        return getServerRootDir() + File.separator + JEEServerDeployment.DATABASE_SCRIPTS_DIR_PATH + File.separator +
-                DATABASE_PRODUCT_NAME;
-//                + JDBCTools.getDatabaseProductName(
-//                JDBCTools.CSADMIN_DATASOURCE_NAME,
-//    		JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId),
-//    		cspaceInstanceId);
+        DatabaseProductType dbType;
+        String databaseProductName;
+        String databaseScriptsPath = "";
+        try {
+            // This call makes a connection to the database server, using a default database
+            // name and retrieves the database product name from metadata provided by the server.
+            dbType = JDBCTools.getDatabaseProductType(JDBCTools.CSADMIN_DATASOURCE_NAME,
+    			getServiceConfig().getDbCsadminName());
+            databaseProductName = dbType.getName();
+            databaseScriptsPath = getServerRootDir() + File.separator
+                    + JEEServerDeployment.DATABASE_SCRIPTS_DIR_PATH + File.separator + databaseProductName;
+            // An Exception occurring here will cause an empty path to be returned, ultimately
+            // resulting in a failure to find the Nuxeo databases initialization script file.
+        } catch (Exception e) {
+            logger.warn(String.format("Could not get database product type: %s", e.getMessage()));
+        }
+        return databaseScriptsPath;
+
     }
     
+    /**
+     * Returns the full filesystem path to the Nuxeo databases initialization script file.
+     * 
+     * @return the full path to the Nuxeo databases initialization script file.
+     * Returns an empty String for the path if the database scripts path is null or empty.
+     */
     private String getNuxeoDatabasesInitScriptFilename() {
-        return getDatabaseScriptsPath()
-                + File.separator + JEEServerDeployment.NUXEO_DB_INIT_SCRIPT_FILENAME;
+        return Tools.notBlank(getDatabaseScriptsPath()) ?
+                getDatabaseScriptsPath() + File.separator + JEEServerDeployment.NUXEO_DB_INIT_SCRIPT_FILENAME : "";
     }
     
     /**
@@ -941,6 +957,9 @@ public class ServiceMain {
         // if that file exists, and read all of its lines except for those which
         // drop databases.
         List<String> lines = null;
+        // "If the given string" for the pathname provided here "is the empty string, then the
+        // result is the empty abstract pathname," according to Oracle's Javadoc for File.
+        // An empty path string might be provided here if a call to get the database product name failed earlier.
         File nuxeoDatabasesInitScriptFile = new File(dbInitializationScriptFilePath);
         try {
             if (! nuxeoDatabasesInitScriptFile.canRead()) {
