@@ -3,9 +3,11 @@
     <auths>
         <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
         <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+        <auth ID="admin@lifesci.collectionspace.org">YWRtaW5AbGlmZXNjaS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
     </auths>
         
     <!-- This tests the UpdateObjectLocationBatchJob -->
+    <!-- in various invocation modes -->
         
     <testGroup ID="invocationModeSingle" autoDeletePOSTS="true">
         
@@ -30,7 +32,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-1</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Seattle1358215545509)'Seattle, WA, USA'</var>
                 <var ID="locationDate">1900-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -45,7 +47,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-2</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Portland1358215545512)'Portland, OR, USA'</var>
                 <var ID="locationDate">2000-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -56,7 +58,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-3</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Victoria1358215545515)'Victoria, BC, Canada'</var>
                 <var ID="locationDate">1800-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -142,7 +144,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-4</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Vancouver1358215545518)'Vancouver, BC, Canada'</var>
                 <var ID="locationDate">2100-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -281,6 +283,207 @@
         
     </testGroup>
     
+    <testGroup ID="invocationModeSingleWithTiebreaker" autoDeletePOSTS="true">
+                    
+        <test ID="createBatchRecordWithTiebreaker">
+            <method>POST</method>
+            <uri>/cspace-services/batch</uri>
+            <filename>batch/batch-create-updateobjloc.xml</filename>
+            <expectedCodes>201</expectedCodes>
+        </test>
+                
+        <test ID="createCollectionObjectWithTiebreaker">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <filename>batch/collObj1.xml</filename>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="createMovement1WithTiebreaker">
+            <method>POST</method>
+            <uri>/cspace-services/movements</uri>
+            <filename>batch/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Olympia1358215545521)'Olympia, WA, USA'</var>
+                <var ID="locationDate">1900-01-01</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="createMovement2WithTiebreaker">
+            <method>POST</method>
+            <uri>/cspace-services/movements</uri>
+            <filename>batch/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Ottawa1358215545567)'Ottawa, ON, Canada'</var>
+                <var ID="locationDate">${createMovement1WithTiebreaker.locationDate}</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="createMovement3WithTiebreaker">
+            <method>POST</method>
+            <uri>/cspace-services/movements</uri>
+            <filename>batch/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Spokane1358215545524)'Spokane, WA, USA'</var>
+                <var ID="locationDate">${createMovement1WithTiebreaker.locationDate}</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="relateCollectionObjectToMovement1WithTiebreaker">
+            <method>POST</method>
+            <uri>/cspace-services/relations</uri>
+            <filename>batch/relation.xml</filename>
+            <vars>
+                <var ID="subjectCsid">${createCollectionObjectWithTiebreaker.CSID}</var>
+                <var ID="subjectDocumentType">CollectionObject</var>
+                <var ID="objectCsid">${createMovement1WithTiebreaker.CSID}</var>
+                <var ID="objectDocumentType">Movement</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="relateCollectionObjectToMovement2WithTiebreaker">
+            <method>POST</method>
+            <uri>/cspace-services/relations</uri>
+            <filename>batch/relation.xml</filename>
+            <vars>
+                <var ID="subjectCsid">${createCollectionObjectWithTiebreaker.CSID}</var>
+                <var ID="subjectDocumentType">CollectionObject</var>
+                <var ID="objectCsid">${createMovement2WithTiebreaker.CSID}</var>
+                <var ID="objectDocumentType">Movement</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+         
+        <test ID="relateCollectionObjectToMovement3WithTiebreaker">
+            <method>POST</method>
+            <uri>/cspace-services/relations</uri>
+            <filename>batch/relation.xml</filename>
+            <vars>
+                <var ID="subjectCsid">${createCollectionObjectWithTiebreaker.CSID}</var>
+                <var ID="subjectDocumentType">CollectionObject</var>
+                <var ID="objectCsid">${createMovement3WithTiebreaker.CSID}</var>
+                <var ID="objectDocumentType">Movement</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+
+        <test ID="modifyMovement1WithTiebreaker">
+            <method>PUT</method>
+            <uri>/cspace-services/movements/${createMovement1WithTiebreaker.CSID}</uri>
+            <filename>batch/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Guadalajara13582155455562)'Guadalajara, Mexico'</var>
+                <var ID="locationDate">${createMovement1WithTiebreaker.locationDate}</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+ 
+        <test ID="invokeBatchAfterMovement1ModificationWithTiebreaker" auth="test" autoDeletePOSTS="false">
+            <method>POST</method>
+            <uri>/cspace-services/batch/${createBatchRecordWithTiebreaker.CSID}</uri>
+            <filename>batch/batch-invoke-updateobjloc-single.xml</filename>
+            <vars>
+                <var ID="collectionObjectCSID">${createCollectionObjectWithTiebreaker.CSID}</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test> 
+        
+        <!-- Verify that, following the invocation of the batch job, the -->
+        <!-- computedCurrentLocation field in the CollectionObject record has -->
+        <!-- been updated to the appropriate value, reflecting the most recent -->
+        <!-- movement (e.g. the Movement record with the most recent locationDate, -->
+        <!-- and, as in this test group - where two Movement records have identical -->
+        <!-- locationDate values - the Movement record that has been updated most recently. -->
+        <test ID="readCollectionObjectAfterMovement1ModificationWithTiebreaker">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObjectWithTiebreaker.CSID}</uri>
+            <filename>batch/updateobjloc.xml</filename>
+            <response>
+                <expected level="ADDOK" />
+                <filename>batch/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${modifyMovement1WithTiebreaker.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>      
+
+        <test ID="modifyMovement2WithTiebreaker">
+            <method>PUT</method>
+            <uri>/cspace-services/movements/${createMovement2WithTiebreaker.CSID}</uri>
+            <filename>batch/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Ecatepec13582155455560)'Ecatepec, Mexico'</var>
+                <var ID="locationDate">${createMovement1WithTiebreaker.locationDate}</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+ 
+        <test ID="invokeBatchAfterMovement2ModificationWithTiebreaker" auth="test" autoDeletePOSTS="false">
+            <method>POST</method>
+            <uri>/cspace-services/batch/${createBatchRecordWithTiebreaker.CSID}</uri>
+            <filename>batch/batch-invoke-updateobjloc-single.xml</filename>
+            <vars>
+                <var ID="collectionObjectCSID">${createCollectionObjectWithTiebreaker.CSID}</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test> 
+        
+        <test ID="readCollectionObjectRecordAfterMovement2ModificationWithTiebreaker">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObjectWithTiebreaker.CSID}</uri>
+            <filename>batch/updateobjloc.xml</filename>
+            <response>
+                <expected level="ADDOK" />
+                <filename>batch/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${modifyMovement2WithTiebreaker.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="modifyMovement3WithTiebreaker">
+            <method>PUT</method>
+            <uri>/cspace-services/movements/${createMovement3WithTiebreaker.CSID}</uri>
+            <filename>batch/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Calgary1358215545564)'Calgary, AB, Canada'</var>
+                <var ID="locationDate">${createMovement1WithTiebreaker.locationDate}</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+ 
+        <test ID="invokeBatchAfterMovement3ModificationWithTiebreaker" auth="test" autoDeletePOSTS="false">
+            <method>POST</method>
+            <uri>/cspace-services/batch/${createBatchRecordWithTiebreaker.CSID}</uri>
+            <filename>batch/batch-invoke-updateobjloc-single.xml</filename>
+            <vars>
+                <var ID="collectionObjectCSID">${createCollectionObjectWithTiebreaker.CSID}</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test> 
+        
+        <test ID="readCollectionObjectRecordAfterMovement3ModificationWithTiebreaker">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObjectWithTiebreaker.CSID}</uri>
+            <filename>batch/updateobjloc.xml</filename>
+            <response>
+                <expected level="ADDOK" />
+                <filename>batch/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${modifyMovement3WithTiebreaker.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+            
+    </testGroup>
+    
     <testGroup ID="invocationModeList" autoDeletePOSTS="true">
         
         <test ID="createBatchRecord">
@@ -309,7 +512,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-1</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Winnipeg13582155455568)'Winnipeg, MB, Canada'</var>
                 <var ID="locationDate">1900-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -320,7 +523,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-2</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Saskatoon13582155455570)'Saskatoon, SK, Canada'</var>
                 <var ID="locationDate">2000-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -331,7 +534,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-3</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Montreal13582155455570)'Montreal, QC, Canada'</var>
                 <var ID="locationDate">1800-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -449,7 +652,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-1</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Eugene13582155455572)'Eugene, OR, USA'</var>
                 <var ID="locationDate">1900-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -460,7 +663,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-2</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Salem13582155455574)'Salem, OR, USA'</var>
                 <var ID="locationDate">2000-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -471,7 +674,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-3</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Gresham13582155455574)'Gresham, OR, USA'</var>
                 <var ID="locationDate">1800-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -593,6 +796,110 @@
         
     </testGroup>
     
+    <!-- These tests verify that updates to the computed current location values -->
+    <!-- in CollectionObject records succeed, even in tenants where Movement -->
+    <!-- records are configured to be versioned. See CSPACE-6188 for more details. -->    
+    <testGroup ID="invocationModeSingleInVersioningEnabledTenant" autoDeletePOSTS="true">
+        
+        <test ID="createBatchRecordInVersioningTenant" auth="admin@lifesci.collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/batch</uri>
+            <filename>batch/batch-create-updateobjloc.xml</filename>
+            <expectedCodes>201</expectedCodes>
+        </test>
+
+        <test ID="createCollectionObjectInVersioningTenant" auth="admin@lifesci.collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <filename>batch/collObj1.xml</filename>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="createMovementInVersioningTenant" auth="admin@lifesci.collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/movements</uri>
+            <filename>batch/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Ecatepec13582155455560)'Ecatepec, Mexico'</var>
+                <var ID="locationDate">2000-01-01</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="relateCollectionObjectToMovementInVersioningTenant" auth="admin@lifesci.collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/relations</uri>
+            <filename>batch/relation.xml</filename>
+            <vars>
+                <var ID="subjectCsid">${createCollectionObjectInVersioningTenant.CSID}</var>
+                <var ID="subjectDocumentType">CollectionObject</var>
+                <var ID="objectCsid">${createMovementInVersioningTenant.CSID}</var>
+                <var ID="objectDocumentType">Movement</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <!-- Posts of batch job invocation requests don't create new records, -->
+        <!-- so we need to exclude them from the post-run auto-deletion of records. -->
+        <test ID="invokeBatchAfterRelatingMovementInVersioningTenant" auth="admin@lifesci.collectionspace.org" autoDeletePOSTS="false">
+            <method>POST</method>
+            <uri>/cspace-services/batch/${createBatchRecordInVersioningTenant.CSID}</uri>
+            <filename>batch/batch-invoke-updateobjloc-single.xml</filename>
+            <vars>
+                <var ID="collectionObjectCSID">${createCollectionObjectInVersioningTenant.CSID}</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="readCollectionObjectAfterRelatingToMovementInVersioningTenant" auth="admin@lifesci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObjectInVersioningTenant.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>batch/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${createMovementInVersioningTenant.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="modifyMovementInVersioningTenant" auth="admin@lifesci.collectionspace.org">
+            <method>PUT</method>
+            <uri>/cspace-services/movements/${createMovementInVersioningTenant.CSID}</uri>
+            <filename>batch/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Guadalajara13582155455562)'Guadalajara, Mexico'</var>
+                <var ID="locationDate">2000-01-02</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="invokeBatchAfterModifyingMovementInVersioningTenant" auth="admin@lifesci.collectionspace.org" autoDeletePOSTS="false">
+            <method>POST</method>
+            <uri>/cspace-services/batch/${createBatchRecordInVersioningTenant.CSID}</uri>
+            <filename>batch/batch-invoke-updateobjloc-single.xml</filename>
+            <vars>
+                <var ID="collectionObjectCSID">${createCollectionObjectInVersioningTenant.CSID}</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="readCollectionObjectAfterModifyingMovementInVersioningTenant" auth="admin@lifesci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObjectInVersioningTenant.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>batch/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${modifyMovementInVersioningTenant.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+    </testGroup>
+    
     <!--
         WARNING: DANGER, WILL ROBINSON! This test group will process every active
         CollectionObject record available to the batch job.
@@ -634,7 +941,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-nocontext-1</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Hillsboro13582155455576)'Hillsboro, OR, USA'</var>
                 <var ID="locationDate">2050-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -645,7 +952,7 @@
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
             <vars>
-                <var ID="currentLocation">location-nocontext-2</var>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Beaverton13582155455578)'Beaverton, OR, USA'</var>
                 <var ID="locationDate">1950-01-01</var>
             </vars>
             <expectedCodes>201</expectedCodes>

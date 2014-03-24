@@ -87,6 +87,8 @@ public final class NuxeoClientEmbedded {
 
     private static final Log log = LogFactory.getLog(NuxeoClientEmbedded.class);
 
+    private static final int DEFAULT_TX_TIMEOUT = 86400; // 24 hours
+    
     /**
      * Constructs a new NuxeoClient. NOTE: Using {@link #getInstance()} instead
      * of this constructor is recommended.
@@ -382,14 +384,14 @@ public final class NuxeoClientEmbedded {
      * Open a Nuxeo repo session using the passed in repoDomain and use the default tx timeout period
      */
     public RepositoryInstance openRepository(RepositoryDomainType repoDomain) throws Exception {
-        return openRepository(repoDomain.getRepositoryName(), -1);
+        return openRepository(repoDomain.getRepositoryName(), DEFAULT_TX_TIMEOUT);
     }
     
     /*
      * Open a Nuxeo repo session using the passed in repoDomain and use the default tx timeout period
      */
     public RepositoryInstance openRepository(String repoName) throws Exception {
-        return openRepository(repoName, -1);
+        return openRepository(repoName, DEFAULT_TX_TIMEOUT);
     }    
 
     /*
@@ -405,7 +407,7 @@ public final class NuxeoClientEmbedded {
      */
     @Deprecated
     public RepositoryInstance openRepository() throws Exception {
-        return openRepository(null, -1 /*default timeout period*/);
+        return openRepository(null, DEFAULT_TX_TIMEOUT /*default timeout period*/);
     }
 
     public RepositoryInstance openRepository(String repoName, int timeoutSeconds) throws Exception {
@@ -414,8 +416,8 @@ public final class NuxeoClientEmbedded {
     	if (timeoutSeconds > 0) {
     		TransactionManager transactionMgr = TransactionHelper.lookupTransactionManager();
     		transactionMgr.setTransactionTimeout(timeoutSeconds);
-    		if (logger.isInfoEnabled()) {
-    			logger.info(String.format("Changing current request's transaction timeout period to %d seconds",
+    		if (logger.isDebugEnabled()) {
+    			logger.debug(String.format("Changing current request's transaction timeout period to %d seconds",
     					timeoutSeconds));
     		}
     	}

@@ -1,6 +1,5 @@
 package org.collectionspace.services.listener;
 
-import java.io.Serializable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.common.api.RefNameUtils;
@@ -37,11 +36,16 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
         // reference (refName) to an authority term (such as a storage
         // location or organization term):
         //
-        // * If it is not blank ...
-        // * Is then capable of being successfully parsed by an authority item parser.
-        if (Tools.notBlank(currentLocationRefName)
-                && RefNameUtils.parseAuthorityTermInfo(currentLocationRefName) == null) {
-            logger.warn("Could not parse current location refName '" + currentLocationRefName + "'");
+        // * Is not blank
+        // * Is capable of being successfully parsed by an authority item parser.
+        if (Tools.isBlank(currentLocationRefName)) {
+            if (logger.isTraceEnabled()) {
+                logger.trace("Current location in Movement record was blank");
+            }
+            return collectionObjectDocModel;
+        } else if (RefNameUtils.parseAuthorityTermInfo(currentLocationRefName) == null) {
+            logger.warn(String.format("Could not parse current location refName '%s' in Movement record",
+                    currentLocationRefName));
             return collectionObjectDocModel;
         } else {
             if (logger.isTraceEnabled()) {
@@ -59,22 +63,14 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
             logger.trace("Existing computedCurrentLocation refName=" + existingComputedCurrentLocationRefName);
         }
 
-        // If the new value is blank, any non-blank existing value should always
-        // be overwritten ('nulled out') with a blank value.
-        if (Tools.isBlank(currentLocationRefName) && Tools.notBlank(existingComputedCurrentLocationRefName)) {
-            collectionObjectDocModel.setProperty(COLLECTIONOBJECTS_COMMON_SCHEMA,
-                    COMPUTED_CURRENT_LOCATION_PROPERTY, (Serializable) null);
-            // Otherwise, if the new value is not blank, and
-            // * the existing value is blank, or
-            // * the new value is different than the existing value ...
-        } else if (Tools.notBlank(currentLocationRefName) &&
-                    (Tools.isBlank(existingComputedCurrentLocationRefName)
-                    || !currentLocationRefName.equals(existingComputedCurrentLocationRefName))) {
+        // If the new value is not blank (redundant with a check just above, but
+        // a quick, extra guard) and the new value is different than the existing value ...
+        if ( (Tools.notBlank(currentLocationRefName)) && (!currentLocationRefName.equals(existingComputedCurrentLocationRefName))) {
             if (logger.isTraceEnabled()) {
                 logger.trace("computedCurrentLocation refName requires updating.");
             }
-            // ... update the existing value in the CollectionObject with the
-            // new value from the Movement.
+            // ... update the existing value (in the CollectionObject) with the
+            // new value (from the Movement).
             collectionObjectDocModel.setProperty(COLLECTIONOBJECTS_COMMON_SCHEMA,
                     COMPUTED_CURRENT_LOCATION_PROPERTY, currentLocationRefName);
 
