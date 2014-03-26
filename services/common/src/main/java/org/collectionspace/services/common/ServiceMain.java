@@ -853,7 +853,8 @@ public class ServiceMain {
         // rather than always failing outright if the prototype file for creating
         // new or updated files can't be located.
         if (! prototypeNuxeoConfigFile.canRead()) {
-            String msg = String.format("Could not find and/or read the prototype Nuxeo config file '%s'",
+            String msg = String.format("Could not find and/or read the prototype Nuxeo config file '%s'. "
+                    + "Please redeploy this file by running 'ant deploy' from the Services layer source code's '3rdparty/nuxeo' module.",
                     prototypeNuxeoConfigFile.getCanonicalPath());
             throw new RuntimeException(msg);
         }
