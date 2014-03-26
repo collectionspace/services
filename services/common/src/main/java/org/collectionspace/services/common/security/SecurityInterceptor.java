@@ -72,7 +72,7 @@ import org.slf4j.LoggerFactory;
 public class SecurityInterceptor implements PreProcessInterceptor, PostProcessInterceptor {
 	
 	static {
-		System.err.println("Static initializtion of: " + SecurityInterceptor.class.getCanonicalName());
+		System.err.println("Static initialization of: " + SecurityInterceptor.class.getCanonicalName());
 	}
 
 	/** The Constant logger. */
