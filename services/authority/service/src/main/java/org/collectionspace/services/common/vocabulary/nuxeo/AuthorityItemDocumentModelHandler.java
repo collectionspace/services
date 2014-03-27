@@ -572,8 +572,8 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	List<String> result = new ArrayList<>();
     	
     	for (String termDisplayName : termDisplayNameList) {
-    		if (filterAnchorAndWildcardChars(termDisplayName).toLowerCase()
-                        .contains(filterAnchorAndWildcardChars(partialTerm).toLowerCase()) == true) {
+    		if (termDisplayName.toLowerCase()
+                        .matches(filterAnchorAndWildcardChars(partialTerm).toLowerCase()) == true) {
     			result.add(termDisplayName);
     		}
     	}
@@ -582,19 +582,20 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     }
     
     /**
-     * Filters out anchor and wildcard characters from a String.
+     * Filters out anchor characters from a String and replace wildcard
+     * characters with regular expressions to match zero or more characters.
      * This makes it feasible, for instance, to meaningfully compare a partial
      * term matching query string that contains one or more of those characters
      * to a term display name that may not.
-     * @param term a term from which to remove anchor and wildcard characters.
-     * @return the term with those characters removed.
+     * @param term a term from which to filter anchor and wildcard characters.
+     * @return the term with those characters filtered.
      */
     protected String filterAnchorAndWildcardChars(String term) {
         if (Tools.isBlank(term)) {
             return term;
         }
         return term
-                .replaceAll(RepositoryJavaClientImpl.USER_SUPPLIED_WILDCARD_REGEX, "")
+                .replaceAll(RepositoryJavaClientImpl.USER_SUPPLIED_WILDCARD_REGEX, ".*")
                 .replaceAll(RepositoryJavaClientImpl.USER_SUPPLIED_ANCHOR_CHAR_REGEX, "");
     }
     
