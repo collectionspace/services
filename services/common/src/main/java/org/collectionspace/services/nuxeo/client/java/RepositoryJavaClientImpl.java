@@ -105,9 +105,11 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     public static final String NUXEO_CORE_TYPE_DOMAIN = "Domain";
     public static final String NUXEO_CORE_TYPE_WORKSPACEROOT = "WorkspaceRoot";
     // FIXME: Get this value from an existing constant, if available
-    private static final String USER_SUPPLIED_WILDCARD = "*";
-    private static final String USER_SUPPLIED_WILDCARD_REGEX = "\\" + USER_SUPPLIED_WILDCARD;
-    private static final String USER_SUPPLIED_ANCHOR_CHAR = "^";
+    public static final String BACKSLASH = "\\";
+    public static final String USER_SUPPLIED_WILDCARD = "*";
+    public static final String USER_SUPPLIED_WILDCARD_REGEX = BACKSLASH + USER_SUPPLIED_WILDCARD;
+    public static final String USER_SUPPLIED_ANCHOR_CHAR = "^";
+    public static final String USER_SUPPLIED_ANCHOR_CHAR_REGEX = BACKSLASH + USER_SUPPLIED_ANCHOR_CHAR;
 
     
     /**

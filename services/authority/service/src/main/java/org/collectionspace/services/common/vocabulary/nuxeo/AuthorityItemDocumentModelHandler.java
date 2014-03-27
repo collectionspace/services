@@ -557,16 +557,45 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         }
     }
     
+    /**
+     * Returns the items in a list of term display names whose names contain
+     * a partial term (as might be submitted in a search query, for instance).
+     * @param termDisplayNameList a list of term display names.
+     * @param partialTerm a partial term display name; that is, a portion
+     * of a display name that might be expected to match 0-n terms in the list.
+     * @return a list of term display names that matches the partial term.
+     * Matches are case-insensitive. As well, before matching is performed, any
+     * special-purpose characters that may appear in the partial term (such as
+     * wildcards and anchor characters) are filtered out from both compared terms.
+     */
     protected List<String> getPartialTermDisplayNameMatches(List<String> termDisplayNameList, String partialTerm) {
-    	List<String> result = new ArrayList<String>();
+    	List<String> result = new ArrayList<>();
     	
     	for (String termDisplayName : termDisplayNameList) {
-    		if (termDisplayName.toLowerCase().contains(partialTerm.toLowerCase()) == true) {
+    		if (filterAnchorAndWildcardChars(termDisplayName).toLowerCase()
+                        .contains(filterAnchorAndWildcardChars(partialTerm).toLowerCase()) == true) {
     			result.add(termDisplayName);
     		}
     	}
     	
     	return result;
+    }
+    
+    /**
+     * Filters out anchor and wildcard characters from a String.
+     * This makes it feasible, for instance, to meaningfully compare a partial
+     * term matching query string that contains one or more of those characters
+     * to a term display name that may not.
+     * @param term a term from which to remove anchor and wildcard characters.
+     * @return the term with those characters removed.
+     */
+    protected String filterAnchorAndWildcardChars(String term) {
+        if (Tools.isBlank(term)) {
+            return term;
+        }
+        return term
+                .replaceAll(RepositoryJavaClientImpl.USER_SUPPLIED_WILDCARD_REGEX, "")
+                .replaceAll(RepositoryJavaClientImpl.USER_SUPPLIED_ANCHOR_CHAR_REGEX, "");
     }
     
     @SuppressWarnings("unchecked")
