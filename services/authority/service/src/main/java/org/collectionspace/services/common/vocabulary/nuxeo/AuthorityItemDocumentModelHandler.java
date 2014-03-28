@@ -600,7 +600,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         if (term.length() < 3) {
             return term;
         }
-        logger.info(String.format("Term = %s", term));
+        if (logger.isTraceEnabled()) {
+            logger.trace(String.format("Term = %s", term));
+        }
         Boolean anchorAtStart = false;
         Boolean anchorAtEnd = false;
         String filteredTerm;
@@ -622,7 +624,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
                         filteredTermBuilder.deleteCharAt(0);
                         break;
                 }
-                logger.info(String.format("After first char filtering = %s", filteredTermBuilder.toString()));
+                if (logger.isTraceEnabled()) {
+                    logger.trace(String.format("After first char filtering = %s", filteredTermBuilder.toString()));
+                }
                 // Filter the ending anchor or wildcard character, if any.
                 int lastPos = filteredTermBuilder.length() - 1;
                 String lastChar = filteredTermBuilder.substring(lastPos);
@@ -636,11 +640,15 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
                         filteredTermBuilder.deleteCharAt(lastPos);
                         break;
                 }
-                logger.info(String.format("After last char filtering = %s", filteredTermBuilder.toString()));
+                if (logger.isTraceEnabled()) {
+                    logger.trace(String.format("After last char filtering = %s", filteredTermBuilder.toString()));
+                }
                 filteredTerm = filteredTermBuilder.toString();
                 // Filter all other wildcards, if any.
                 filteredTerm = filteredTerm.replaceAll(RepositoryJavaClientImpl.USER_SUPPLIED_WILDCARD_REGEX, ZERO_OR_MORE_ANY_CHAR_REGEX);
-                logger.info(String.format("After replacing user wildcards = %s", filteredTerm));
+                if (logger.isTraceEnabled()) {
+                    logger.trace(String.format("After replacing user wildcards = %s", filteredTerm));
+                }
             } catch (Exception e) {
                 logger.warn(String.format("Error filtering anchor and wildcard characters from string: %s", e.getMessage()));
                 return term;
