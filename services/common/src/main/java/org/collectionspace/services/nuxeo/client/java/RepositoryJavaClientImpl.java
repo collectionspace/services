@@ -110,6 +110,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     public static final String USER_SUPPLIED_WILDCARD_REGEX = BACKSLASH + USER_SUPPLIED_WILDCARD;
     public static final String USER_SUPPLIED_ANCHOR_CHAR = "^";
     public static final String USER_SUPPLIED_ANCHOR_CHAR_REGEX = BACKSLASH + USER_SUPPLIED_ANCHOR_CHAR;
+    public static final String ENDING_ANCHOR_CHAR = "$";
+    public static final String ENDING_ANCHOR_CHAR_REGEX = BACKSLASH + ENDING_ANCHOR_CHAR;
 
     
     /**

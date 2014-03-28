@@ -67,6 +67,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 //import org.collectionspace.services.common.authority.AuthorityItemRelations;
 /**
@@ -90,6 +91,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     // Used to determine when the displayName changes as part of the update.
     protected String oldDisplayNameOnUpdate = null;
     private final static String LIST_SUFFIX = "List";
+    private final static String ZERO_OR_MORE_ANY_CHAR_REGEX = ".*";
 
     public AuthorityItemDocumentModelHandler(String authorityItemCommonSchemaName) {
         this.authorityItemCommonSchemaName = authorityItemCommonSchemaName;
@@ -570,33 +572,85 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
      */
     protected List<String> getPartialTermDisplayNameMatches(List<String> termDisplayNameList, String partialTerm) {
     	List<String> result = new ArrayList<>();
-    	
-    	for (String termDisplayName : termDisplayNameList) {
-    		if (termDisplayName.toLowerCase()
-                        .matches(filterAnchorAndWildcardChars(partialTerm).toLowerCase()) == true) {
-    			result.add(termDisplayName);
-    		}
-    	}
-    	
+    	String partialTermMatchExpression = filterAnchorAndWildcardChars(partialTerm).toLowerCase();
+        try {
+            for (String termDisplayName : termDisplayNameList) {
+                if (termDisplayName.toLowerCase()
+                        .matches(partialTermMatchExpression) == true) {
+                        result.add(termDisplayName);
+                }
+            }
+        } catch (PatternSyntaxException pse) {
+            logger.warn("Error in regex match pattern '%s' for term display names: %s",
+                    partialTermMatchExpression, pse.getMessage());
+        }
     	return result;
     }
     
     /**
-     * Filters out anchor characters from a String and replace wildcard
-     * characters with regular expressions to match zero or more characters.
-     * This makes it feasible, for instance, to meaningfully compare a partial
-     * term matching query string that contains one or more of those characters
-     * to a term display name that may not.
-     * @param term a term from which to filter anchor and wildcard characters.
+     * Filters user-supplied anchor and wildcard characters in a string,
+     * replacing them with equivalent regular expressions.
+     * @param term a term in which to filter anchor and wildcard characters.
      * @return the term with those characters filtered.
      */
     protected String filterAnchorAndWildcardChars(String term) {
         if (Tools.isBlank(term)) {
             return term;
         }
-        return term
-                .replaceAll(RepositoryJavaClientImpl.USER_SUPPLIED_WILDCARD_REGEX, ".*")
-                .replaceAll(RepositoryJavaClientImpl.USER_SUPPLIED_ANCHOR_CHAR_REGEX, "");
+        if (term.length() < 3) {
+            return term;
+        }
+        logger.info(String.format("Term = %s", term));
+        Boolean anchorAtStart = false;
+        Boolean anchorAtEnd = false;
+        String filteredTerm;
+        StringBuilder filteredTermBuilder = new StringBuilder(term);
+        // Term contains no anchor or wildcard characters.
+        if ( (! term.contains(RepositoryJavaClientImpl.USER_SUPPLIED_ANCHOR_CHAR))
+                && (! term.contains(RepositoryJavaClientImpl.USER_SUPPLIED_WILDCARD)) ) {
+            filteredTerm = term;
+        } else {
+            // Term contains at least one such character.
+            try {
+                // Filter the starting anchor or wildcard character, if any.
+                String firstChar = filteredTermBuilder.substring(0,1);
+                switch (firstChar) {
+                    case RepositoryJavaClientImpl.USER_SUPPLIED_ANCHOR_CHAR:
+                        anchorAtStart = true;
+                        break;
+                    case RepositoryJavaClientImpl.USER_SUPPLIED_WILDCARD:
+                        filteredTermBuilder.deleteCharAt(0);
+                        break;
+                }
+                logger.info(String.format("After first char filtering = %s", filteredTermBuilder.toString()));
+                // Filter the ending anchor or wildcard character, if any.
+                int lastPos = filteredTermBuilder.length() - 1;
+                String lastChar = filteredTermBuilder.substring(lastPos);
+                switch (lastChar) {
+                    case RepositoryJavaClientImpl.USER_SUPPLIED_ANCHOR_CHAR:
+                        filteredTermBuilder.deleteCharAt(lastPos);
+                        filteredTermBuilder.insert(filteredTermBuilder.length(), RepositoryJavaClientImpl.ENDING_ANCHOR_CHAR);
+                        anchorAtEnd = true;
+                        break;
+                    case RepositoryJavaClientImpl.USER_SUPPLIED_WILDCARD:
+                        filteredTermBuilder.deleteCharAt(lastPos);
+                        break;
+                }
+                logger.info(String.format("After last char filtering = %s", filteredTermBuilder.toString()));
+                filteredTerm = filteredTermBuilder.toString();
+                // Filter all other wildcards, if any.
+                filteredTerm = filteredTerm.replaceAll(RepositoryJavaClientImpl.USER_SUPPLIED_WILDCARD_REGEX, ZERO_OR_MORE_ANY_CHAR_REGEX);
+                logger.info(String.format("After replacing user wildcards = %s", filteredTerm));
+            } catch (Exception e) {
+                logger.warn(String.format("Error filtering anchor and wildcard characters from string: %s", e.getMessage()));
+                return term;
+            }
+        }
+        // Wrap the term in beginning and ending regex wildcards, unless a
+        // starting or ending anchor character was present.
+        return (anchorAtStart ? "" : ZERO_OR_MORE_ANY_CHAR_REGEX)
+                + filteredTerm
+                + (anchorAtEnd ? "" : ZERO_OR_MORE_ANY_CHAR_REGEX);
     }
     
     @SuppressWarnings("unchecked")
