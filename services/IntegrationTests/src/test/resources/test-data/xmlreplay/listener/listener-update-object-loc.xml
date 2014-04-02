@@ -394,13 +394,16 @@
         <!-- deemed to have taken place later than a Movement with an earlier -->
         <!-- update timestamp, if both have identical location dates. -->
         
+        <!-- The following block is temporarily commented out while sorting out CSPACE-6338 -->
+        <!--
         <test ID="createMovement6">
             <method>POST</method>
             <uri>/cspace-services/movements</uri>
             <filename>listener/movement.xml</filename>
             <vars>
                 <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Spokane1358215545524)'Spokane, WA, USA'</var>
-                <var ID="locationDate">${updateMovement3WithNonBlankCurrentLocation.locationDate}</var> <!-- Identical to Movement 3 -->
+                <Note: value below is identical to that of Movement 3:>
+                <var ID="locationDate">${updateMovement3WithNonBlankCurrentLocation.locationDate}</var>
             </vars>
             <expectedCodes>201</expectedCodes>
         </test>
@@ -430,9 +433,13 @@
             </vars>
             <expectedCodes>201</expectedCodes>
         </test>
+        -->
         
         <!-- See comment on updateMovement1 for an explanation of why this -->
         <!-- update is needed, after creating a new relation -->
+        
+        <!-- The following block is temporarily commented out while sorting out CSPACE-6338 -->
+        <!--
         <test ID="updateMovement6">
             <method>PUT</method>
             <uri>/cspace-services/movements/${createMovement6.CSID}</uri>
@@ -463,7 +470,8 @@
             <filename>listener/movement.xml</filename>
             <vars>
                 <var ID="currentLocation">${createMovement3.currentLocation}</var>
-                <var ID="locationDate">${updateMovement3WithNonBlankCurrentLocation.locationDate}</var> <!-- Identical to Movement 6 -->
+                <Note: value below is identical to that of Movement 6:>
+                <var ID="locationDate">${updateMovement3WithNonBlankCurrentLocation.locationDate}</var>
             </vars>
             <expectedCodes>200</expectedCodes>
         </test>
@@ -480,6 +488,7 @@
             </response>
             <expectedCodes>200</expectedCodes>
         </test>
+        -->
         
     </testGroup>
  
