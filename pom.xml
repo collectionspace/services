@@ -12,20 +12,14 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		
+		<cspace.services.version>4.1-SNAPSHOT</cspace.services.version>
+		<cspace.services.client.version>4.1-SNAPSHOT</cspace.services.client.version>
 		<nuxeo.general.release>5.5.0-HF07</nuxeo.general.release>
 		<nuxeo.shell.version>${nuxeo.general.release}</nuxeo.shell.version>
 		<nuxeo.platform.version>${nuxeo.general.release}</nuxeo.platform.version>
-		<nuxeo.core.version>${nuxeo.general.release}</nuxeo.core.version>		
-<!--
-		<nuxeo.shell.version>5.5-I20111104_1115</nuxeo.shell.version>
-		<nuxeo.platform.version>5.5-I20111104_1115</nuxeo.platform.version>
-		<nuxeo.core.version>5.5-I20111104_1115</nuxeo.core.version>
--->
-		<cspace.services.version>4.1-SNAPSHOT</cspace.services.version>
-		<cspace.services.client.version>4.1-SNAPSHOT</cspace.services.client.version>
+		<nuxeo.core.version>${nuxeo.general.release}</nuxeo.core.version>
 		<spring.version>3.0.5.RELEASE</spring.version>
-        <spring.security.version>3.0.5.RELEASE</spring.security.version>
+		<spring.security.version>3.0.5.RELEASE</spring.security.version>
 	</properties>
 
 	<distributionManagement>
@@ -128,7 +122,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-    
+
 		<repository>
 			<id>public-snapshot</id>
 			<url>http://maven.nuxeo.org/public-snapshot</url>
@@ -165,18 +159,18 @@
 			<name>External release repository of the EL4J project</name>
 			<url>http://public-el4.elca-services.ch/el4j/maven2repository</url>
 		</repository>
-    
-    <repository>
-      <snapshots>
-          <enabled>false</enabled>
-      </snapshots>
-      <releases>
-          <enabled>true</enabled>
-      </releases>
-      <id>Apache</id>
-      <name>External release repository of the Apache projects</name>
-      <url>https://repository.apache.org/content/groups/public/</url>
-    </repository>
+
+		<repository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<id>Apache</id>
+			<name>External release repository of the Apache projects</name>
+			<url>https://repository.apache.org/content/groups/public/</url>
+		</repository>
 
 	</repositories>
 
@@ -250,16 +244,10 @@
 					<configuration>
 					</configuration>
 				</plugin>
-				<!--
-				<plugin>
-				    <groupId>org.apache.maven.plugins</groupId>
-				    <artifactId>maven-site-plugin</artifactId> 
-					<configuration>
-					    <dependencyLocationEnabled>false</dependencyLocationEnabled> 
-					    <unzipCommand>/usr/bin/unzip -o &gt; err.txt</unzipCommand>
-					</configuration> 
-				</plugin>
-				-->
+				<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-site-plugin</artifactId> 
+					<configuration> <dependencyLocationEnabled>false</dependencyLocationEnabled> 
+					<unzipCommand>/usr/bin/unzip -o &gt; err.txt</unzipCommand> </configuration> 
+					</plugin> -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
@@ -295,7 +283,8 @@
 						</execution>
 					</executions>
 				</plugin>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -346,6 +335,38 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 			</plugin>
+			<!-- 
+				This plugin ensures that the required environment variables are set before we perform
+				any build related tasks.
+			 -->
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>check-environment-vars</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<fail unless="env.CSPACE_JEESERVER_HOME" message="Required environment variable CSPACE_JEESERVER_HOME has not been set." />
+								<fail unless="env.DB_CSPACE_PASSWORD" message="Required environment variable DB_CSPACE_PASSWORD has not been set." />
+								<fail unless="env.DB_NUXEO_PASSWORD" message="Required environment variable DB_NUXEO_PASSWORD has not been set." />
+								<fail unless="env.DB_READER_PASSWORD" message="Required environment variable DB_READER_PASSWORD has not been set." />
+								<fail unless="env.DB_CSADMIN_PASSWORD" message="Required environment variable DB_CSADMIN_PASSWORD has not been set." />
+								<!--
+									Fail if these deprecated environment variables are set.
+								-->
+								<fail if="env.DB_USER" message="The deprecated environment variable DB_USER should not be set." />
+								<fail if="env.DB_PASSWORD" message="The deprecated environment variable DB_PASSWORD should not be set.  Ensure that DB_CSADMIN_PASSWORD is set instead." />
+								<fail if="env.DB_PASSWORD_CSPACE" message="The deprecated environment variable DB_PASSWORD_CSPACE should not be set.  Ensure that DB_CSPACE_PASSWORD is set instead." />
+								<fail if="env.DB_PASSWORD_NUXEO" message="The deprecated environment variable DB_PASSWORD_NUXEO should not be set.  Ensure that DB_NUXEO_PASSWORD is set instead." />
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -361,13 +382,13 @@
 				<artifactId>slf4j-log4j12</artifactId>
 				<version>1.6.1</version>
 			</dependency>
-            <dependency>
-                <groupId>org.testng</groupId>
-                <artifactId>testng</artifactId>
+			<dependency>
+				<groupId>org.testng</groupId>
+				<artifactId>testng</artifactId>
 				<version>6.1.1</version>
-                <!-- <version>5.6</version> -->
-                <scope>test</scope>
-            </dependency>			
+				<!-- <version>5.6</version> -->
+				<scope>test</scope>
+			</dependency>
 			<dependency>
 				<groupId>javax.ejb</groupId>
 				<artifactId>ejb</artifactId>
@@ -390,9 +411,7 @@
 				<groupId>javax.transaction</groupId>
 				<artifactId>jta</artifactId>
 				<version>1.1</version>
-				<!--
-				<scope>provided</scope>
-				-->
+				<!-- <scope>provided</scope> -->
 			</dependency>
 
 			<dependency>
@@ -439,16 +458,9 @@
 					</reportSet>
 				</reportSets>
 			</plugin>
-			<!--
-			<plugin>
-			    <groupId>org.apache.maven.plugins</groupId>
-			    <artifactId>maven-javadoc-plugin</artifactId> 
-				<version>2.6.1</version>
-				<configuration>
-				    <show>public</show>
-				</configuration> 
-			</plugin>
-			-->
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-javadoc-plugin</artifactId> 
+				<version>2.6.1</version> <configuration> <show>public</show> </configuration> 
+				</plugin> -->
 		</plugins>
 	</reporting>
 
