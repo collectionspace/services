@@ -190,16 +190,26 @@
 		<ant antfile="services/build.xml" target="gen_ddl" inheritAll="false" />
 	</target>
 
-	<target name="create_db" description="create database(s), invoke subtasks for indexes, etc.">
-		<exec executable="cmd" failonerror="true">
-			<arg value="/c" />
-			<arg value="mvn.bat" />
-			<arg value="validate" />
-			<arg value="${mvn.opts}" />
-		</exec>
+	<target name="create_db" depends="create_db-unix,create_db-windows" description="create database(s), invoke subtasks for indexes, etc.">
 		<antcall target="create_nuxeo_db" />
 		<antcall target="create_cspace_db" />
 	</target>
+	
+	<target name="create_db-unix" if="osfamily-unix">
+		<exec executable="mvn" failonerror="true">
+			<arg value="validate" /> <!-- Ensure proper env vars are set -->
+			<arg value="${mvn.opts}" />
+		</exec>
+	</target>
+	<target name="create_db-windows" if="osfamily-windows">
+		<exec executable="cmd" failonerror="true">
+			<arg value="/c" />
+			<arg value="mvn.bat" />
+			<arg value="validate" /> <!-- Ensure proper env vars are set -->
+			<arg value="${mvn.opts}" />
+		</exec>
+	</target>
+	
 
 	<target name="create_nuxeo_db" description="create nuxeo database">
 		<sql driver="${db.jdbc.driver.class}" url="${db.jdbc.csadmin.url}" userid="${db.csadmin.user}" password="${db.csadmin.user.password}" autocommit="true" src="${db.script.dir}/init_nuxeo_db.sql">
