@@ -1124,8 +1124,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         final Boolean EXECUTE_WITHIN_TRANSACTION = true;
         Set<String> docIds = new HashSet<>();
         try {
+        	String cspaceInstanceId = ServiceMain.getInstance().getCspaceInstanceId();
             List<CachedRowSet> resultsList = JDBCTools.executePreparedQueries(builders,
-                dataSourceName, repositoryName, EXECUTE_WITHIN_TRANSACTION);
+                dataSourceName, repositoryName, cspaceInstanceId, EXECUTE_WITHIN_TRANSACTION);
 
             // At least one set of results is expected, from the second prepared
             // statement to be executed.

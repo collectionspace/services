@@ -22,9 +22,9 @@
             <property name="hibernate.max_fetch_depth" value="3"/>
 			<!-- Until our JNDI issue with Nuxeo is resolved, we have to use these JDBC properties rather than a datasource -->
 			<property name="hibernate.connection.driver_class" value="${db.jdbc.driver.class}"/>
-			<property name="hibernate.connection.username" value="${db.user}"/>
-			<property name="hibernate.connection.password" value="${db.user.password}"/>
-			<property name="hibernate.connection.url" value="jdbc:${db}://${db.host}:${db.port}/cspace"/>
+			<property name="hibernate.connection.username" value="${db.cspace.user}"/>
+			<property name="hibernate.connection.password" value="${db.cspace.user.password}"/>
+			<property name="hibernate.connection.url" value="jdbc:${db}://${db.host}:${db.port}/${db.cspace.name}"/>
             <!--property name="hibernate.hbm2ddl.auto" value="create-drop"/-->
         </properties>
 

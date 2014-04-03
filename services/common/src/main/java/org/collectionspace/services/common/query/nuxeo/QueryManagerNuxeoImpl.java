@@ -66,10 +66,10 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	private static Pattern advSearchSqlWildcard = Pattern.compile(".*?[I]*LIKE\\s*\\\"\\%\\\".*?");
 
 
-	private static String getLikeForm(String dataSourceName, String repositoryName) {
+	private static String getLikeForm(String dataSourceName, String repositoryName, String cspaceInstanceId) {
 		if (SEARCH_LIKE_FORM == null) {
 			try {
-				DatabaseProductType type = JDBCTools.getDatabaseProductType(dataSourceName, repositoryName);
+				DatabaseProductType type = JDBCTools.getDatabaseProductType(dataSourceName, repositoryName, cspaceInstanceId);
 				if (type == DatabaseProductType.MYSQL) {
 					SEARCH_LIKE_FORM = IQueryManager.SEARCH_LIKE;
 				} else if (type == DatabaseProductType.POSTGRESQL) {
@@ -239,6 +239,7 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	@Override
 	public String createWhereClauseForPartialMatch(String dataSourceName,
 			String repositoryName,
+			String cspaceInstanceId,
 			String field,
 			boolean startingWildcard,
 			String partialTerm) {
@@ -259,7 +260,7 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 			
 		StringBuilder ptClause = new StringBuilder(trimmed.length()+field.length()+20);
 		ptClause.append(field);
-		ptClause.append(getLikeForm(dataSourceName, repositoryName));
+		ptClause.append(getLikeForm(dataSourceName, repositoryName, cspaceInstanceId));
 		ptClause.append(startingWildcard?"'%":"'");
 		ptClause.append(unescapedSingleQuote.matcher(trimmed).replaceAll("\\\\'"));
 		ptClause.append("%'");
