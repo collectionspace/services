@@ -876,28 +876,32 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             repoSession = getRepositorySession(ctx); //Keeps a refcount here for the repository session so you need to release this when finished
 
             DocumentModelList docList = null;
-            String query = NuxeoUtils.buildNXQLQuery(ctx, queryContext);
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("Executing NXQL query: " + query.toString());
-            }
-
-            // If we have limit and/or offset, then pass true to get totalSize
-            // in returned DocumentModelList.
-            Profiler profiler = new Profiler(this, 2);
-            profiler.log("Executing NXQL query: " + query.toString());
-            profiler.start();
+            // JDBC query
             if (handler.isJDBCQuery() == true) {
                 docList = getFilteredJDBC(repoSession, ctx, handler);
+            // CMIS query
             } else if (handler.isCMISQuery() == true) {
                 docList = getFilteredCMIS(repoSession, ctx, handler, queryContext); //FIXME: REM - Need to deal with paging info in CMIS query
-            } else if ((queryContext.getDocFilter().getOffset() > 0) || (queryContext.getDocFilter().getPageSize() > 0)) {
-                docList = repoSession.query(query, null,
-                        queryContext.getDocFilter().getPageSize(), queryContext.getDocFilter().getOffset(), true);
+            // NXQL query
             } else {
-                docList = repoSession.query(query);
+                String query = NuxeoUtils.buildNXQLQuery(ctx, queryContext);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Executing NXQL query: " + query.toString());
+                }
+                Profiler profiler = new Profiler(this, 2);
+                profiler.log("Executing NXQL query: " + query.toString());
+                profiler.start();
+                // If we have a page size and/or offset, then reflect those values
+                // when constructing the query, and also pass 'true' to get totalSize
+                // in the returned DocumentModelList.
+                if ((queryContext.getDocFilter().getOffset() > 0) || (queryContext.getDocFilter().getPageSize() > 0)) {
+                    docList = repoSession.query(query, null,
+                            queryContext.getDocFilter().getPageSize(), queryContext.getDocFilter().getOffset(), true);
+                } else {
+                    docList = repoSession.query(query);
+                }
+                profiler.stop();
             }
-            profiler.stop();
 
             //set repoSession to handle the document
             ((DocumentModelHandler) handler).setRepositorySession(repoSession);
@@ -923,10 +927,11 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * based on filter criteria.
      * 
      * Although this method currently has a general-purpose name, it is
-     * currently dedicated to a specific task: improving performance for
-     * partial term matching queries on authority items / terms, via
-     * the use of a hand-tuned SQL query, rather than the generated SQL
-     * produced by Nuxeo from an NXQL query.
+     * currently dedicated to a specific task: that of improving performance
+     * for partial term matching queries on authority items / terms, via
+     * the use of a hand-tuned SQL query, rather than via the generated SQL
+     * produced by Nuxeo from an NXQL query.  (See CSPACE-6361 for a task
+     * to generalize this method.)
      * 
      * @param repoSession a repository session.
      * @param ctx the service context.
@@ -1174,7 +1179,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             if (docModel == null) {
                 logger.warn("Could not obtain document model for document with ID " + docId);
             } else {
-                result.add(NuxeoUtils.getDocumentModel(repoSession, docId));
+                result.add(docModel);
             }
         }
         
