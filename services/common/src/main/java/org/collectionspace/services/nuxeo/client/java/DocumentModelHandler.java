@@ -389,7 +389,7 @@ public abstract class DocumentModelHandler<T, TL>
     	boolean result = false;
     	
     	if (Tools.notBlank(newRefNameOnUpdate) && Tools.notBlank(oldRefNameOnUpdate)) {
-    		if (newRefNameOnUpdate.equalsIgnoreCase(oldRefNameOnUpdate) == false) {
+    		if (newRefNameOnUpdate.equals(oldRefNameOnUpdate) == false) {
     			result = true; // refNames are different so updates are needed
     		}
     	}
