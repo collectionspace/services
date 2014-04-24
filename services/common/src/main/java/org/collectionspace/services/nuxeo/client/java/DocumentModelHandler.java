@@ -391,6 +391,9 @@ public abstract class DocumentModelHandler<T, TL>
     	boolean result = false;
     	
     	if (Tools.notBlank(newRefNameOnUpdate) && Tools.notBlank(oldRefNameOnUpdate)) {
+    		// CSPACE-6372: refNames are different if:
+    		//   - any part of the refName is different, using a case insensitive comparison, or
+    		//   - the display name portions are different, using a case sensitive comparison
     		if (newRefNameOnUpdate.equalsIgnoreCase(oldRefNameOnUpdate) == false) {
     			result = true; // refNames are different so updates are needed
     		}
