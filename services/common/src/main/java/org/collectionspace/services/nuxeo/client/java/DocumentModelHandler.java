@@ -410,6 +410,13 @@ public abstract class DocumentModelHandler<T, TL>
     	return result;
     }
     
+    /**
+     * Extracts the display name from a refname. This method may be
+     * overridden to handle refnames of various document types.
+     * 
+     * @param refName The refname
+     * @return        The display name part of the refname
+     */
     protected String getDisplayNameFromRefName(String refName) {
     	return RefNameUtils.parseAuthorityInfo(refName).displayName;
     }
