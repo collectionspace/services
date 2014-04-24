@@ -267,8 +267,8 @@ public class RefNameUtils {
     	}
     	catch(IllegalArgumentException invalidAuthorityTermRefNameException) {
         	try {   		
-        		AuthorityInfo termInfo = parseAuthorityInfo(refName);
-        		displayName = termInfo.displayName;
+        		AuthorityInfo authorityInfo = parseAuthorityInfo(refName);
+        		displayName = authorityInfo.displayName;
         	}
         	catch(IllegalArgumentException invalidRefNameException) {
         		throw new IllegalArgumentException("Invalid refName");
