@@ -28,6 +28,7 @@ import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.commons.lang.StringUtils;
 import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
@@ -37,6 +38,7 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.RefName.RefNameInterface;
+import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -389,12 +391,34 @@ public abstract class DocumentModelHandler<T, TL>
     	boolean result = false;
     	
     	if (Tools.notBlank(newRefNameOnUpdate) && Tools.notBlank(oldRefNameOnUpdate)) {
+    		// CSPACE-6372: refNames are different if:
+    		//   - any part of the refName is different, using a case insensitive comparison, or
+    		//   - the display name portions are different, using a case sensitive comparison
     		if (newRefNameOnUpdate.equalsIgnoreCase(oldRefNameOnUpdate) == false) {
     			result = true; // refNames are different so updates are needed
+    		}
+    		else {
+    			String newDisplayNameOnUpdate = getDisplayNameFromRefName(newRefNameOnUpdate);
+    			String oldDisplayNameOnUpdate = getDisplayNameFromRefName(oldRefNameOnUpdate);
+    			
+    			if (StringUtils.equals(newDisplayNameOnUpdate, oldDisplayNameOnUpdate) == false) {
+    				result = true; // refNames are different so updates are needed
+    			}
     		}
     	}
     	
     	return result;
+    }
+    
+    /**
+     * Extracts the display name from a refname. This method may be
+     * overridden to handle refnames of various document types.
+     * 
+     * @param refName The refname
+     * @return        The display name part of the refname
+     */
+    protected String getDisplayNameFromRefName(String refName) {
+    	return RefNameUtils.parseAuthorityInfo(refName).displayName;
     }
     
     protected void handleRefNameChanges(ServiceContext ctx, DocumentModel docModel) throws ClientException {
