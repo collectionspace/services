@@ -29,6 +29,7 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.UriTemplateRegistry;
 import org.collectionspace.services.common.api.RefName;
+import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.context.MultipartServiceContext;
@@ -147,6 +148,11 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	}
 
         return refname;
+    }
+
+    @Override
+    protected String getDisplayNameFromRefName(String refName) {
+    	return RefNameUtils.parseAuthorityTermInfo(refName).displayName;
     }
     
     public void setInAuthority(String inAuthority) {
