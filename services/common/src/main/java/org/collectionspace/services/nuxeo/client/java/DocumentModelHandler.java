@@ -28,6 +28,7 @@ import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.commons.lang.StringUtils;
 import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
@@ -37,6 +38,7 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.RefName.RefNameInterface;
+import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -392,6 +394,14 @@ public abstract class DocumentModelHandler<T, TL>
     	if (Tools.notBlank(newRefNameOnUpdate) && Tools.notBlank(oldRefNameOnUpdate)) {
     		if (newRefNameOnUpdate.equals(oldRefNameOnUpdate) == false) {
     			result = true; // refNames are different so updates are needed
+    		}
+    		else {
+    			String newDisplayNameOnUpdate = RefNameUtils.getDisplayName(newRefNameOnUpdate);
+    			String oldDisplayNameOnUpdate = RefNameUtils.getDisplayName(oldRefNameOnUpdate);
+    			
+    			if (StringUtils.equals(newDisplayNameOnUpdate, oldDisplayNameOnUpdate) == false) {
+    				result = true; // display names are different so updates are needed
+    			}
     		}
     	}
     	
