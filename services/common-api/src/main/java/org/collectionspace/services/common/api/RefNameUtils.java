@@ -249,6 +249,34 @@ public class RefNameUtils {
         }
         return name;
     }
+    
+    
+    /**
+     * Extracts the display name from a refName. The refName may either be for an
+     * authority term, or an authority/procedure.
+     *
+     * @param  refName The refName
+     * @return The display name contained in the refName
+     */
+    public static String getDisplayName(String refName) throws IllegalArgumentException {
+    	String displayName = null;
+    	
+    	try {
+    		AuthorityTermInfo authorityTermInfo = parseAuthorityTermInfo(refName);
+    		displayName = authorityTermInfo.displayName;
+    	}
+    	catch(IllegalArgumentException invalidAuthorityTermRefNameException) {
+        	try {   		
+        		AuthorityInfo authorityInfo = parseAuthorityInfo(refName);
+        		displayName = authorityInfo.displayName;
+        	}
+        	catch(IllegalArgumentException invalidRefNameException) {
+        		throw new IllegalArgumentException("Invalid refName");
+        	}
+    	}
+    	
+    	return displayName;
+    }
 
     /**
      * Creates a refName in the name / shortIdentifier form.
