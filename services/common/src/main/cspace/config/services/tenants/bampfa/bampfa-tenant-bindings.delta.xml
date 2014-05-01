@@ -3,12 +3,16 @@
 	xmlns:merge='http://xmlmerge.el4j.elca.ch'
 	xmlns:tenant='http://collectionspace.org/services/config/tenant'>
     
-    <!-- Add your changes, if any, within the following tag pair. -->
-    <!-- The value of the 'id' attribute, below, should match the corresponding -->
-    <!-- value in cspace/config/services/tenants/core-tenant-bindings-proto.xml -->
-    <!--
-    <tenant:tenantBinding id="1">
-    </tenant:tenantBinding>
-    -->
-	    	       
+	<tenant:tenantBinding id="55">
+		<tenant:serviceBindings merge:matcher="id" id="idgenerators">
+			<service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
+				<service:params>
+					<service:property merge:matcher="skip" merge:action="insert">
+						<service:key>sqlScriptName</service:key>
+						<service:value>set_bampfa_vocabulary_csids.sql</service:value>
+					</service:property>
+				</service:params>
+			</service:initHandler>
+		</tenant:serviceBindings>
+	</tenant:tenantBinding>
 </tenant:TenantBindingConfig>
