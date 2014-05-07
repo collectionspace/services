@@ -75,6 +75,14 @@ public class ParseDates {
 				earliestSingleDate.getDay() + " " +
 				earliestSingleDate.getEra().toDisplayString(); // use toString() to get the data value (refname)
 			
+				// These don't get filled in by the parser, so no need to print.
+			
+				// earliestSingleDate.getCertainty();
+				// earliestSingleDate.getQualifierType();
+				// earliestSingleDate.getQualifierValue();
+				// earliestSingleDate.getQualifierUnit();
+				// earliestSingleDate.getScalarValue();
+			
 			if (latestDate != null) {
 				result += " - " +
 					latestDate.getYear() + "-" +
