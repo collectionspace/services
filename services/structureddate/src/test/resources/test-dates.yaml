@@ -325,7 +325,31 @@
   'Spring-Summer 12 BC':                 # hyphenatedRange, quarterYear, seasonYear
                                          earliestSingleDate: [  12,  4,  1, BCE]
                                          latestDate:         [  12,  9, 30, BCE]
-  
+
+  'early 2000':                          # partOfYear
+                                         earliestSingleDate: [2000,  1,  1, CE]
+                                         latestDate:         [2000,  4, 30, CE]
+
+  'mid-2000':                            # partOfYear
+                                         earliestSingleDate: [2000,  5,  1, CE]
+                                         latestDate:         [2000,  8, 31, CE]
+
+  'Middle 2000':                         # partOfYear
+                                         earliestSingleDate: [2000,  5,  1, CE]
+                                         latestDate:         [2000,  8, 31, CE]
+
+  'mid 2000':                            # partOfYear
+                                         earliestSingleDate: [2000,  5,  1, CE]
+                                         latestDate:         [2000,  8, 31, CE]
+
+  'Late 2000':                           # partOfYear
+                                         earliestSingleDate: [2000,  9,  1, CE]
+                                         latestDate:         [2000, 12, 31, CE]
+
+  'Late 1200 BC':                        # partOfYear
+                                         earliestSingleDate: [1200,  9,  1, BCE]
+                                         latestDate:         [1200, 12, 31, BCE]
+
   'May 2007':                            # month
                                          earliestSingleDate: [2007,  5,  1, CE]
                                          latestDate:         [2007,  5, 31, CE]

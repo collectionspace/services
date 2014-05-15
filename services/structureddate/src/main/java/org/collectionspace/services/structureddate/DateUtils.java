@@ -53,9 +53,60 @@ public class DateUtils {
 	public static int getHalfYearStartMonth(int half) {
 		return ((6 * (half-1)) + 1);
 	}
-	
+
 	public static int getHalfYearEndMonth(int half) {
 		return (getHalfYearStartMonth(half) + 5);
+	}
+	
+	
+	public static Date getPartYearStartDate(int year, Part part) {
+		int startMonth = getPartYearStartMonth(part);
+		
+		return new Date(year, startMonth, 1);
+	}
+
+	public static Date getPartYearEndDate(int year, Part part) {
+		int endMonth = getPartYearEndMonth(part);
+		
+		return new Date(year, endMonth, DateUtils.getDaysInMonth(endMonth, year));
+	}
+	
+	public static int getPartYearStartMonth(Part part) {
+		int month;
+		
+		if (part == Part.EARLY) {
+			month = 1;
+		}
+		else if (part == Part.MIDDLE) {
+			month = 5;
+		}
+		else if (part == Part.LATE) {
+			month = 9;
+		}
+		else {
+			throw new IllegalArgumentException("unexpected part");
+		}
+		
+		return month;
+	}
+	
+	public static int getPartYearEndMonth(Part part) {
+		int month;
+		
+		if (part == Part.EARLY) {
+			month = 4;
+		}
+		else if (part == Part.MIDDLE) {
+			month = 8;
+		}
+		else if (part == Part.LATE) {
+			month = 12;
+		}
+		else {
+			throw new IllegalArgumentException("unexpected part");
+		}
+		
+		return month;
 	}
 	
 	public static int getDecadeStartYear(int year, Era era) {

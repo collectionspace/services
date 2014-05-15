@@ -17,6 +17,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.collectionspace.services.structureddate.Date;
 import org.collectionspace.services.structureddate.DateUtils;
 import org.collectionspace.services.structureddate.Era;
+import org.collectionspace.services.structureddate.Part;
 import org.collectionspace.services.structureddate.StructuredDate;
 import org.collectionspace.services.structureddate.StructuredDateEvaluator;
 import org.collectionspace.services.structureddate.StructuredDateFormatException;
@@ -42,6 +43,8 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Nu
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDecadeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumMonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumYearContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartOfContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartOfYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterInYearRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrCenturyContext;
@@ -344,7 +347,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitYearSpanningWinter(YearSpanningWinterContext ctx) {
 		if (ctx.exception != null) return;
 		
-		Era era = (Era) stack.pop();		
+		Era era = (Era) stack.pop();
 		Integer endYear = (Integer) stack.pop();
 		Integer startYear = (Integer) stack.pop();
 		
@@ -353,10 +356,22 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	}
 
 	@Override
+	public void exitPartOfYear(PartOfYearContext ctx) {
+		if (ctx.exception != null) return;
+		
+		Era era = (Era) stack.pop();
+		Integer year = (Integer) stack.pop();
+		Part part = (Part) stack.pop();
+		
+		stack.push(DateUtils.getPartYearStartDate(year, part).withEra(era));
+		stack.push(DateUtils.getPartYearEndDate(year, part).withEra(era));
+	}
+
+	@Override
 	public void exitQuarterYear(QuarterYearContext ctx) {
 		if (ctx.exception != null) return;
 		
-		Era era = (Era) stack.pop();		
+		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer quarter = (Integer) stack.pop();
 
@@ -368,7 +383,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitHalfYear(HalfYearContext ctx) {
 		if (ctx.exception != null) return;
 		
-		Era era = (Era) stack.pop();		
+		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer half = (Integer) stack.pop();
 
@@ -407,7 +422,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		if (ctx.exception != null) return;
 
 		Era era = (Era) stack.pop();
-		final Integer year = (Integer) stack.pop();
+		Integer year = (Integer) stack.pop();
 
 		// Calculate the start and end year of the decade, which depends on the era.
 		
@@ -439,7 +454,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		if (ctx.exception != null) return;
 
 		Era era = (Era) stack.pop();
-		final Integer year = (Integer) stack.pop();
+		Integer year = (Integer) stack.pop();
 
 		if (era != null) {
 			// If the era was explicitly specified, the start and end years
@@ -645,6 +660,28 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		}
 		
 		stack.push(quarter);
+	}
+
+	@Override
+	public void exitPartOf(PartOfContext ctx) {
+		if (ctx.exception != null) return;
+		
+		// Convert the string to a Part,
+		// and push on the stack.
+		
+		Part part = null;
+		
+		if (ctx.EARLY() != null) {
+			part = Part.EARLY;
+		}
+		else if (ctx.MIDDLE() != null) {
+			part = Part.MIDDLE;
+		}
+		else if (ctx.LATE() != null) {
+			part = Part.LATE;
+		}
+		
+		stack.push(part);
 	}
 
 	@Override
