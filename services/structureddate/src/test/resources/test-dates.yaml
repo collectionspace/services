@@ -233,6 +233,30 @@
   "100's BC":                            # century
                                          earliestSingleDate: [ 199,  1,  1, BCE]
                                          latestDate:         [ 100, 12, 31, BCE]                                                                                             
+
+  '1st millennium':                      # millennium
+                                         earliestSingleDate: [   1,  1,  1, CE]
+                                         latestDate:         [1000, 12, 31, CE]                                                                                             
+
+  '2nd millennium':                      # millennium
+                                         earliestSingleDate: [1001,  1,  1, CE]
+                                         latestDate:         [2000, 12, 31, CE]                                                                                             
+
+  '3rd millennium':                      # millennium
+                                         earliestSingleDate: [2001,  1,  1, CE]
+                                         latestDate:         [3000, 12, 31, CE]                                                                                             
+
+  '5th millennium':                      # millennium
+                                         earliestSingleDate: [4001,  1,  1, CE]
+                                         latestDate:         [5000, 12, 31, CE]                                                                                             
+
+  '1st Millennium BC':                   # millennium
+                                         earliestSingleDate: [1000,  1,  1, BCE]
+                                         latestDate:         [   1, 12, 31, BCE]                                                                                             
+
+  '2nd millennium B.C.E.':               # millennium
+                                         earliestSingleDate: [2000,  1,  1, BCE]
+                                         latestDate:         [1001, 12, 31, BCE]                                                                                             
                             
   'Winter 2000':                         # quarterYear, seasonYear
                                          earliestSingleDate: [2000,  1,  1, CE]

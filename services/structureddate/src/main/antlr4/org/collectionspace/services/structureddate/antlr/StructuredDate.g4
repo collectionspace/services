@@ -57,6 +57,7 @@ singleInterval:        yearSpanningWinter
 |                      partOfYear
 |                      quarterYear
 |                      halfYear
+|                      millennium
 |                      century
 |                      decade
 |                      year
@@ -64,6 +65,7 @@ singleInterval:        yearSpanningWinter
 |                      date
 /* TODO: */
 /*
+
 |                      partOf date BC                                         
 |                      partOf date                                            
 |                      nth QUARTER nth CENTURY                                
@@ -74,12 +76,10 @@ singleInterval:        yearSpanningWinter
 |                      partOf nth CENTURY BC                                  
 |                      partOf century                                         
 |                      partOf century BC                                      
-|                      nth MILLENIUM                                          
-|                      nth MILLENIUM BC                                       
 |                      partOf decade                                          
 |                      partOf decade BC                                       
 */
-;         
+;
 
 quarterInYearRange:    nthQuarterInYearRange
 |                      strSeasonInYearRange
@@ -110,6 +110,8 @@ year:                  numYear era ;
 decade:                numDecade era ;
 
 century:               (strCentury | numCentury) era ;
+
+millennium:            nth MILLENNIUM era ;
 
 strDate:               strMonth (numDayOfMonth | nth) COMMA? numYear era;
 invStrDate:            era numYear COMMA? strMonth numDayOfMonth ;
@@ -163,7 +165,7 @@ LAST:           'last' ;
 QUARTER:        'quarter' ;
 HALF:           'half' ;
 CENTURY:        'century' ;
-MILLENIUM:      'millenium' ;
+MILLENNIUM:     'millennium' ;
 MONTH:          'january' | 'february' | 'march' | 'april' | 'may' | 'june' | 'july' | 'august' | 'september' | 'october' | 'november' | 'december' ;
 SHORTMONTH:     'jan' | 'feb' | 'mar' | 'apr' | 'jun' | 'jul' | 'aug' | 'sep' | 'sept' | 'oct' | 'nov' | 'dec' ;
 BC:             'bc' | 'bce' |  'b.c.' | 'b.c.e.' ;

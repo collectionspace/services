@@ -171,12 +171,46 @@ public class DateUtils {
 			endYear = year;
 		}
 		else {
-			endYear = year + 99;			
+			endYear = year + 99;
 		}
 		
 		return endYear;
 	}
 	
+	public static int getMillenniumStartYear(int n, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+		
+		int year;
+
+		if (era == Era.BCE) {
+			year = n * 1000;
+		}
+		else {
+			year = (n - 1) * 1000 + 1;
+		}
+		
+		return year;
+	}
+
+	public static int getMillenniumEndYear(int n, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+		
+		int year;
+
+		if (era == Era.BCE) {
+			year = (n - 1) * 1000 + 1;
+		}
+		else {
+			year = n * 1000;
+		}
+		
+		return year;
+	}
+
 	/**
 	 * Calculates the interval, in years, that should be padded around a date so
 	 * that any date within that interval may be considered to be "circa" the

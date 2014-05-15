@@ -32,6 +32,7 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Hy
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.InvMonthYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.InvSeasonYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.InvStrDateContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MillenniumContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthInYearRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthContext;
@@ -477,6 +478,20 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			stack.push(new DeferredCenturyStartDate(year));
 			stack.push(new DeferredCenturyEndDate(year));
 		}
+	}
+
+	@Override
+	public void exitMillennium(MillenniumContext ctx) {
+		if (ctx.exception != null) return;
+		
+		Era era = (Era) stack.pop();
+		Integer n = (Integer) stack.pop();
+
+		int startYear = DateUtils.getMillenniumStartYear(n, era);
+		int endYear = DateUtils.getMillenniumEndYear(n, era);
+
+		stack.push(new Date(startYear, 1, 1, era));
+		stack.push(new Date(endYear, 12, 31, era));
 	}
 
 	@Override
