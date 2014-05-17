@@ -4,9 +4,9 @@ package org.collectionspace.services.structureddate.antlr;
  * A deferred date that represents an endpoint of a decade.
  */
 public abstract class DeferredDecadeDate extends DeferredDate {
-	protected Integer decade;
+	protected int decade;
 	
-	public DeferredDecadeDate(Integer decade) {
+	public DeferredDecadeDate(int decade) {
 		this.decade = decade;
 	}
 }

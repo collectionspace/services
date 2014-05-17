@@ -109,6 +109,26 @@ public class DateUtils {
 		return month;
 	}
 	
+	public static Date getDecadeStartDate(int year, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+
+		int startYear = getDecadeStartYear(year, era);
+		
+		return new Date(startYear, 1, 1, era);
+	}
+	
+	public static Date getDecadeEndDate(int year, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+
+		int endYear = getDecadeEndYear(year, era);
+		
+		return new Date(endYear, 12, 31, era);
+	}
+	
 	public static int getDecadeStartYear(int year, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
@@ -143,6 +163,26 @@ public class DateUtils {
 		return endYear;
 	}
 	
+	public static Date getCenturyStartDate(int year, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+
+		int startYear = getCenturyStartYear(year, era);
+		
+		return new Date(startYear, 1, 1, era);
+	}
+
+	public static Date getCenturyEndDate(int year, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+
+		int endYear = getCenturyEndYear(year, era);
+		
+		return new Date(endYear, 12, 31, era);
+	}
+	
 	public static int getCenturyStartYear(int year, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
@@ -172,6 +212,60 @@ public class DateUtils {
 		}
 		else {
 			endYear = year + 99;
+		}
+		
+		return endYear;
+	}
+	
+	public static Date getQuarterCenturyStartDate(int year, int quarter, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+		
+		int startYear = getQuarterCenturyStartYear(year, quarter, era);
+		
+		return new Date(startYear, 1, 1, era);
+	}
+
+	public static Date getQuarterCenturyEndDate(int year, int quarter, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+		
+		int endYear = getQuarterCenturyEndYear(year, quarter, era);
+		
+		return new Date(endYear, 12, 31, era);
+	}
+	
+	public static int getQuarterCenturyStartYear(int year, int quarter, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+		
+		int startYear;
+		
+		if (era == Era.BCE) {
+			startYear = (year + 99) - (25 * (quarter - 1));
+		}
+		else {
+			startYear = year + (25 * (quarter - 1));
+		}
+		
+		return startYear;
+	}
+	
+	public static int getQuarterCenturyEndYear(int year, int quarter, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+		
+		int endYear;
+		
+		if (era == Era.BCE) {
+			endYear = (year + 99) - (25 * quarter) + 1;
+		}
+		else {
+			endYear = year + (25 * quarter) - 1;
 		}
 		
 		return endYear;

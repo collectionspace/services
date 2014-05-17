@@ -4,15 +4,10 @@ import org.collectionspace.services.structureddate.Date;
 import org.collectionspace.services.structureddate.DateUtils;
 import org.collectionspace.services.structureddate.Era;
 
-/**
- * A deferred date that represents the end of a decade. The end year
- * can not be determined until the era of the decade is known. Once the 
- * era is known, finalizeDate() may be called to calculate the year.
- */
-public class DeferredDecadeEndDate extends DeferredDecadeDate {
+public class DeferredQuarterCenturyEndDate extends DeferredQuarterCenturyDate {
 
-	public DeferredDecadeEndDate(Integer decade) {
-		super(decade);
+	public DeferredQuarterCenturyEndDate(int century, int quarter) {
+		super(century, quarter);
 	}
 	
 	@Override
@@ -23,7 +18,7 @@ public class DeferredDecadeEndDate extends DeferredDecadeDate {
 			era = Date.DEFAULT_ERA;
 		}
 		
-		Date endDate = DateUtils.getDecadeEndDate(decade, era);
+		Date endDate = DateUtils.getQuarterCenturyEndDate(century, quarter, era);
 		
 		setYear(endDate.getYear());
 		setMonth(endDate.getMonth());

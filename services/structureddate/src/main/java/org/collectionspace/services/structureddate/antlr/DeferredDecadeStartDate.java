@@ -13,9 +13,6 @@ public class DeferredDecadeStartDate extends DeferredDecadeDate {
 
 	public DeferredDecadeStartDate(Integer decade) {
 		super(decade);
-		
-		setMonth(1);
-		setDay(1);
 	}
 	
 	@Override
@@ -24,9 +21,13 @@ public class DeferredDecadeStartDate extends DeferredDecadeDate {
 		
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
-			setEra(era);
 		}
 		
-		setYear(DateUtils.getDecadeStartYear(decade, era));
+		Date startDate = DateUtils.getDecadeStartDate(decade, era);
+		
+		setYear(startDate.getYear());
+		setMonth(startDate.getMonth());
+		setDay(startDate.getDay());
+		setEra(startDate.getEra());
 	}
 }

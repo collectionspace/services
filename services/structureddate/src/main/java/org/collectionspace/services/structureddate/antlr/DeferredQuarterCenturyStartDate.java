@@ -4,17 +4,12 @@ import org.collectionspace.services.structureddate.Date;
 import org.collectionspace.services.structureddate.DateUtils;
 import org.collectionspace.services.structureddate.Era;
 
-/**
- * A deferred date that represents the start of a century. The start year
- * can not be determined until the era of the century is known. Once the 
- * era is known, finalizeDate() may be called to calculate the year.
- */
-public class DeferredCenturyStartDate extends DeferredCenturyDate {
+public class DeferredQuarterCenturyStartDate extends DeferredQuarterCenturyDate {
 
-	public DeferredCenturyStartDate(int century) {
-		super(century);
+	public DeferredQuarterCenturyStartDate(Integer century, Integer quarter) {
+		super(century, quarter);
 	}
-	
+
 	@Override
 	public void finalizeDate() {
 		Era era = getEra();
@@ -23,7 +18,7 @@ public class DeferredCenturyStartDate extends DeferredCenturyDate {
 			era = Date.DEFAULT_ERA;
 		}
 		
-		Date startDate = DateUtils.getCenturyStartDate(century, era);
+		Date startDate = DateUtils.getQuarterCenturyStartDate(century, quarter, era);
 		
 		setYear(startDate.getYear());
 		setMonth(startDate.getMonth());

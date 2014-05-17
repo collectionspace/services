@@ -11,7 +11,7 @@ import org.collectionspace.services.structureddate.Era;
  */
 public class DeferredCenturyEndDate extends DeferredCenturyDate {
 
-	public DeferredCenturyEndDate(Integer century) {
+	public DeferredCenturyEndDate(int century) {
 		super(century);
 		
 		setMonth(12);
@@ -24,9 +24,13 @@ public class DeferredCenturyEndDate extends DeferredCenturyDate {
 		
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
-			setEra(era);
 		}
 		
-		setYear(DateUtils.getCenturyEndYear(century, era));
+		Date endDate = DateUtils.getCenturyEndDate(century, era);
+		
+		setYear(endDate.getYear());
+		setMonth(endDate.getMonth());
+		setDay(endDate.getDay());
+		setEra(endDate.getEra());
 	}
 }

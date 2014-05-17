@@ -46,6 +46,7 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Nu
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartOfContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartOfYearContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterCenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterInYearRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrCenturyContext;
@@ -431,11 +432,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			// If the era was explicitly specified, the start and end years
 			// may be calculated now.
 
-			int startYear = DateUtils.getDecadeStartYear(year, era);
-			int endYear = DateUtils.getDecadeEndYear(year, era);
-			
-			stack.push(new Date(startYear, 1, 1, era));
-			stack.push(new Date(endYear, 12, 31, era));
+			stack.push(DateUtils.getDecadeStartDate(year, era));
+			stack.push(DateUtils.getDecadeEndDate(year, era));
 		}
 		else {
 			// If the era was not explicitly specified, the start and end years
@@ -451,6 +449,34 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	}
 
 	@Override
+	public void exitQuarterCentury(QuarterCenturyContext ctx) {
+		if (ctx.exception != null) return;
+
+		Era era = (Era) stack.pop();
+		Integer year = (Integer) stack.pop();
+		Integer quarter = (Integer) stack.pop();
+		
+		if (era != null) {
+			// If the era was explicitly specified, the start and end years
+			// may be calculated now.
+
+			stack.push(DateUtils.getQuarterCenturyStartDate(year, quarter, era));
+			stack.push(DateUtils.getQuarterCenturyEndDate(year, quarter, era));
+		}
+		else {
+			// If the era was not explicitly specified, the start and end years
+			// can't be calculated yet. The calculation must be deferred until
+			// later. For example, this century may be the start of a hyphenated
+			// range, where the era will be inherited from the era of the end of
+			// the range; this era won't be known until farther up the parse tree,
+			// when both sides of the range will have been parsed.
+			
+			stack.push(new DeferredQuarterCenturyStartDate(year, quarter));
+			stack.push(new DeferredQuarterCenturyEndDate(year, quarter));
+		}		
+	}
+
+	@Override
 	public void exitCentury(CenturyContext ctx) {
 		if (ctx.exception != null) return;
 
@@ -461,11 +487,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			// If the era was explicitly specified, the start and end years
 			// may be calculated now.
 
-			int startYear = DateUtils.getCenturyStartYear(year, era);
-			int endYear = DateUtils.getCenturyEndYear(year, era);
-			
-			stack.push(new Date(startYear, 1, 1, era));
-			stack.push(new Date(endYear, 12, 31, era));
+			stack.push(DateUtils.getCenturyStartDate(year, era));
+			stack.push(DateUtils.getCenturyEndDate(year, era));
 		}
 		else {
 			// If the era was not explicitly specified, the start and end years
