@@ -13,9 +13,6 @@ public class DeferredCenturyEndDate extends DeferredCenturyDate {
 
 	public DeferredCenturyEndDate(int century) {
 		super(century);
-		
-		setMonth(12);
-		setDay(31);
 	}
 	
 	@Override

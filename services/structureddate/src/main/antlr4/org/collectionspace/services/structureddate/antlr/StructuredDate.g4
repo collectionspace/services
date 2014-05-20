@@ -59,6 +59,7 @@ singleInterval:        yearSpanningWinter
 |                      halfYear
 |                      millennium
 |                      quarterCentury
+|                      halfCentury
 |                      century
 |                      decade
 |                      year
@@ -69,10 +70,6 @@ singleInterval:        yearSpanningWinter
 
 |                      partOf date BC                                         
 |                      partOf date                                            
-|                      nth QUARTER nth CENTURY                                
-|                      LAST QUARTER nth CENTURY                               
-|                      nth HALF nth CENTURY                                   
-|                      LAST HALF nth CENTURY                                  
 |                      partOf nth CENTURY                                     
 |                      partOf nth CENTURY BC                                  
 |                      partOf century                                         
@@ -111,6 +108,8 @@ year:                  numYear era ;
 decade:                numDecade era ;
 
 quarterCentury:        nthQuarter (strCentury | numCentury) era ;
+
+halfCentury:           nthHalf (strCentury | numCentury) era ;
 
 century:               (strCentury | numCentury) era ;
 

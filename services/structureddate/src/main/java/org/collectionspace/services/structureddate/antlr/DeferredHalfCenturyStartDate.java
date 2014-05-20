@@ -4,10 +4,10 @@ import org.collectionspace.services.structureddate.Date;
 import org.collectionspace.services.structureddate.DateUtils;
 import org.collectionspace.services.structureddate.Era;
 
-public class DeferredQuarterCenturyStartDate extends DeferredQuarterCenturyDate {
+public class DeferredHalfCenturyStartDate extends DeferredHalfCenturyDate {
 
-	public DeferredQuarterCenturyStartDate(int century, int quarter) {
-		super(century, quarter);
+	public DeferredHalfCenturyStartDate(int century, int half) {
+		super(century, half);
 	}
 
 	@Override
@@ -18,7 +18,7 @@ public class DeferredQuarterCenturyStartDate extends DeferredQuarterCenturyDate 
 			era = Date.DEFAULT_ERA;
 		}
 		
-		Date startDate = DateUtils.getQuarterCenturyStartDate(century, quarter, era);
+		Date startDate = DateUtils.getHalfCenturyStartDate(century, half, era);
 		
 		setYear(startDate.getYear());
 		setMonth(startDate.getMonth());

@@ -17,7 +17,7 @@ public class DateUtils {
 		
 		return dateTime.dayOfMonth().getMaximumValue();
 	}
-	
+		
 	public static Date getQuarterYearStartDate(int year, int quarter) {
 		int startMonth = getQuarterYearStartMonth(quarter);
 		
@@ -157,12 +157,12 @@ public class DateUtils {
 			endYear = year;
 		}
 		else {
-			endYear = year + 9;			
+			endYear = year + 9;
 		}
 		
 		return endYear;
 	}
-	
+		
 	public static Date getCenturyStartDate(int year, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
@@ -212,6 +212,61 @@ public class DateUtils {
 		}
 		else {
 			endYear = year + 99;
+		}
+		
+		return endYear;
+	}
+	
+	public static Date getHalfCenturyStartDate(int year, int half, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+
+		int startYear = getHalfCenturyStartYear(year, half, era);
+		
+		return new Date(startYear, 1, 1, era);
+	}
+
+	public static Date getHalfCenturyEndDate(int year, int half, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+
+		int endYear = getHalfCenturyEndYear(year, half, era);
+		
+		return new Date(endYear, 12, 31, era);
+	}
+	
+	
+	public static int getHalfCenturyStartYear(int year, int half, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+		
+		int startYear;
+		
+		if (era == Era.BCE) {
+			startYear = (year + 99) - (50 * (half - 1));
+		}
+		else {
+			startYear = year + (50 * (half - 1));
+		}
+		
+		return startYear;
+	}
+	
+	public static int getHalfCenturyEndYear(int year, int half, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+		
+		int endYear;
+		
+		if (era == Era.BCE) {
+			endYear = (year + 99) - (50 * half) + 1;
+		}
+		else {
+			endYear = year + (50 * half) - 1;
 		}
 		
 		return endYear;

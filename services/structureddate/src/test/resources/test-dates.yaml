@@ -290,6 +290,54 @@
                                          earliestSingleDate: [ 125,  1,  1, BCE]
                                          latestDate:         [ 101, 12, 31, BCE]                                                                                             
 
+  'last quarter 2nd century b.c.e.':     # quarterCentury
+                                         earliestSingleDate: [ 125,  1,  1, BCE]
+                                         latestDate:         [ 101, 12, 31, BCE]                                                                                             
+
+  '1st half 1900s':                      # halfCentury
+                                         earliestSingleDate: [1900,  1,  1, CE]
+                                         latestDate:         [1949, 12, 31, CE]                                                                                             
+
+  'second half 1900s':                   # halfCentury
+                                         earliestSingleDate: [1950,  1,  1, CE]
+                                         latestDate:         [1999, 12, 31, CE]                                                                                             
+
+  'last half 1900s':                     # halfCentury
+                                         earliestSingleDate: [1950,  1,  1, CE]
+                                         latestDate:         [1999, 12, 31, CE]                                                                                             
+
+  'first half 20th century':             # halfCentury
+                                         earliestSingleDate: [1901,  1,  1, CE]
+                                         latestDate:         [1950, 12, 31, CE]                                                                                             
+
+  '2nd half 20th century':               # halfCentury
+                                         earliestSingleDate: [1951,  1,  1, CE]
+                                         latestDate:         [2000, 12, 31, CE]                                                                                             
+
+  '1st half 1900s A.D.':                 # halfCentury
+                                         earliestSingleDate: [1900,  1,  1, CE]
+                                         latestDate:         [1949, 12, 31, CE]                                                                                             
+
+  "second half 1900's c.e.":             # halfCentury
+                                         earliestSingleDate: [1950,  1,  1, CE]
+                                         latestDate:         [1999, 12, 31, CE]                                                                                             
+
+  '1st half 1900s B.C.':                 # halfCentury
+                                         earliestSingleDate: [1999,  1,  1, BCE]
+                                         latestDate:         [1950, 12, 31, BCE]                                                                                             
+
+  "second half 1900's b.c.e.":           # halfCentury
+                                         earliestSingleDate: [1949,  1,  1, BCE]
+                                         latestDate:         [1900, 12, 31, BCE]                                                                                             
+
+  'first half first century b.c.':       # halfCentury
+                                         earliestSingleDate: [ 100,  1,  1, BCE]
+                                         latestDate:         [  51, 12, 31, BCE]                                                                                             
+
+  "second half 1st century BCE":         # halfCentury
+                                         earliestSingleDate: [  50,  1,  1, BCE]
+                                         latestDate:         [   1, 12, 31, BCE]                                                                                             
+
   '1900s':                               # century
                                          earliestSingleDate: [1900,  1,  1, CE]
                                          latestDate:         [1999, 12, 31, CE]                                                                                             

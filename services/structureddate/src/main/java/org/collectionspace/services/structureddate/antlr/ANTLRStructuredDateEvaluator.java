@@ -27,6 +27,7 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Da
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DecadeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DisplayDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.EraContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.HalfCenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.HalfYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.HyphenatedRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.InvMonthYearContext;
@@ -473,7 +474,35 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			
 			stack.push(new DeferredQuarterCenturyStartDate(year, quarter));
 			stack.push(new DeferredQuarterCenturyEndDate(year, quarter));
-		}		
+		}
+	}
+
+	@Override
+	public void exitHalfCentury(HalfCenturyContext ctx) {
+		if (ctx.exception != null) return;
+		
+		Era era = (Era) stack.pop();
+		Integer year = (Integer) stack.pop();
+		Integer half = (Integer) stack.pop();
+		
+		if (era != null) {
+			// If the era was explicitly specified, the start and end years
+			// may be calculated now.
+
+			stack.push(DateUtils.getHalfCenturyStartDate(year, half, era));
+			stack.push(DateUtils.getHalfCenturyEndDate(year, half, era));
+		}
+		else {
+			// If the era was not explicitly specified, the start and end years
+			// can't be calculated yet. The calculation must be deferred until
+			// later. For example, this half century may be the start of a hyphenated
+			// range, where the era will be inherited from the era of the end of
+			// the range; this era won't be known until farther up the parse tree,
+			// when both sides of the range will have been parsed.
+			
+			stack.push(new DeferredHalfCenturyStartDate(year, half));
+			stack.push(new DeferredHalfCenturyEndDate(year, half));
+		}
 	}
 
 	@Override
@@ -493,7 +522,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		else {
 			// If the era was not explicitly specified, the start and end years
 			// can't be calculated yet. The calculation must be deferred until
-			// later. For example, this century may be the start of a hyphenated
+			// later. For example, this quarter century may be the start of a hyphenated
 			// range, where the era will be inherited from the era of the end of
 			// the range; this era won't be known until farther up the parse tree,
 			// when both sides of the range will have been parsed.
