@@ -9,9 +9,9 @@ import org.collectionspace.services.structureddate.Date;
 public abstract class DeferredDate extends Date {
 	
 	/**
-	 * Finalizes the date by executing the deferred
+	 * Resolves the date by executing the deferred
 	 * calculation. This causes all of the date parts
 	 * to be determined.
 	 */
-	public abstract void finalizeDate();
+	public abstract void resolveDate();
 }

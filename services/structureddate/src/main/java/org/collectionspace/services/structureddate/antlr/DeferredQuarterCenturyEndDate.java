@@ -11,7 +11,7 @@ public class DeferredQuarterCenturyEndDate extends DeferredQuarterCenturyDate {
 	}
 	
 	@Override
-	public void finalizeDate() {
+	public void resolveDate() {
 		Era era = getEra();
 		
 		if (era == null) {

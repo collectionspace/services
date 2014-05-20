@@ -182,11 +182,11 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// Finalize any deferred calculations.
 		
 		if (latestDate instanceof DeferredDate) {
-			((DeferredDate) latestDate).finalizeDate();
+			((DeferredDate) latestDate).resolveDate();
 		}
 		
 		if (earliestDate instanceof DeferredDate) {
-			((DeferredDate) earliestDate).finalizeDate();
+			((DeferredDate) earliestDate).resolveDate();
 		}
 	
 		stack.push(earliestDate);
@@ -212,11 +212,11 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// Finalize any deferred calculations.
 		
 		if (earliestStartDate instanceof DeferredDate) {
-			((DeferredDate) earliestStartDate).finalizeDate();
+			((DeferredDate) earliestStartDate).resolveDate();
 		}
 
 		if (latestEndDate instanceof DeferredDate) {
-			((DeferredDate) latestEndDate).finalizeDate();
+			((DeferredDate) latestEndDate).resolveDate();
 		}
 
 		stack.push(earliestStartDate);

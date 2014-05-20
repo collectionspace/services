@@ -16,7 +16,7 @@ public class DeferredCenturyEndDate extends DeferredCenturyDate {
 	}
 	
 	@Override
-	public void finalizeDate() {
+	public void resolveDate() {
 		Era era = getEra();
 		
 		if (era == null) {
