@@ -1,4 +1,4 @@
-package org.collectionspace.services.structureddate.antlr;
+package org.collectionspace.services.structureddate;
 
 public abstract class DeferredQuarterCenturyDate extends DeferredCenturyDate {
 	protected int quarter;

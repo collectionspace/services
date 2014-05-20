@@ -1,8 +1,5 @@
-package org.collectionspace.services.structureddate.antlr;
+package org.collectionspace.services.structureddate;
 
-import org.collectionspace.services.structureddate.Date;
-import org.collectionspace.services.structureddate.DateUtils;
-import org.collectionspace.services.structureddate.Era;
 
 public class DeferredQuarterCenturyEndDate extends DeferredQuarterCenturyDate {
 

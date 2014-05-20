@@ -1,6 +1,5 @@
-package org.collectionspace.services.structureddate.antlr;
+package org.collectionspace.services.structureddate;
 
-import org.collectionspace.services.structureddate.Date;
 
 /**
  * Represents a date that is not completely known, and whose

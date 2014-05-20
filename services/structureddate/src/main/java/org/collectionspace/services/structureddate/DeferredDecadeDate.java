@@ -1,4 +1,4 @@
-package org.collectionspace.services.structureddate.antlr;
+package org.collectionspace.services.structureddate;
 
 /**
  * A deferred date that represents an endpoint of a decade.
