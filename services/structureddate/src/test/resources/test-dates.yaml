@@ -202,6 +202,66 @@
                                          earliestSingleDate: [  29,  1,  1, BCE]
                                          latestDate:         [  20, 12, 31, BCE]                                                                                             
 
+  'early 1900s':                         # partialCentury
+                                         earliestSingleDate: [1900,  1,  1, CE]
+                                         latestDate:         [1933, 12, 31, CE]                                                                                             
+
+  'mid 1900s':                           # partialCentury
+                                         earliestSingleDate: [1933,  1,  1, CE]
+                                         latestDate:         [1966, 12, 31, CE]                                                                                             
+
+  "Late 1900's":                         # partialCentury
+                                         earliestSingleDate: [1966,  1,  1, CE]
+                                         latestDate:         [1999, 12, 31, CE]                                                                                             
+
+  'early 1900s ad':                      # partialCentury
+                                         earliestSingleDate: [1900,  1,  1, CE]
+                                         latestDate:         [1933, 12, 31, CE]                                                                                             
+
+  'mid 1900s CE':                        # partialCentury
+                                         earliestSingleDate: [1933,  1,  1, CE]
+                                         latestDate:         [1966, 12, 31, CE]                                                                                             
+
+  "Late 1900's A.D.":                    # partialCentury
+                                         earliestSingleDate: [1966,  1,  1, CE]
+                                         latestDate:         [1999, 12, 31, CE]                                                                                             
+
+  'early 18th century':                  # partialCentury
+                                         earliestSingleDate: [1701,  1,  1, CE]
+                                         latestDate:         [1734, 12, 31, CE]                                                                                             
+
+  'mid-18th century':                    # partialCentury
+                                         earliestSingleDate: [1734,  1,  1, CE]
+                                         latestDate:         [1767, 12, 31, CE]                                                                                             
+
+  'Late 18th century':                   # partialCentury
+                                         earliestSingleDate: [1767,  1,  1, CE]
+                                         latestDate:         [1800, 12, 31, CE]                                                                                             
+
+  'early 100s b.c.':                     # partialCentury
+                                         earliestSingleDate: [ 199,  1,  1, BCE]
+                                         latestDate:         [ 166, 12, 31, BCE]                                                                                             
+
+  'middle 100s bc':                      # partialCentury
+                                         earliestSingleDate: [ 166,  1,  1, BCE]
+                                         latestDate:         [ 133, 12, 31, BCE]                                                                                             
+
+  "Late 100's B.C.":                     # partialCentury
+                                         earliestSingleDate: [ 133,  1,  1, BCE]
+                                         latestDate:         [ 100, 12, 31, BCE]                                                                                             
+
+  'early 2nd century b.c.':              # partialCentury
+                                         earliestSingleDate: [ 200,  1,  1, BCE]
+                                         latestDate:         [ 167, 12, 31, BCE]                                                                                             
+
+  'mid 2nd century bc':                  # partialCentury
+                                         earliestSingleDate: [ 167,  1,  1, BCE]
+                                         latestDate:         [ 134, 12, 31, BCE]                                                                                             
+
+  'Late 2nd Century B.C.':               # partialCentury
+                                         earliestSingleDate: [ 134,  1,  1, BCE]
+                                         latestDate:         [ 101, 12, 31, BCE]                                                                                             
+
   '1st quarter 1900s':                   # quarterCentury
                                          earliestSingleDate: [1900,  1,  1, CE]
                                          latestDate:         [1924, 12, 31, CE]                                                                                             

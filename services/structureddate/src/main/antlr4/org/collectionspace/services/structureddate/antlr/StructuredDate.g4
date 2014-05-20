@@ -54,10 +54,11 @@ hyphenatedRange:       quarterYear HYPHEN quarterYear
 ;
 
 singleInterval:        yearSpanningWinter
-|                      partOfYear
+|                      partialYear
 |                      quarterYear
 |                      halfYear
 |                      millennium
+|                      partialCentury
 |                      quarterCentury
 |                      halfCentury
 |                      century
@@ -67,13 +68,8 @@ singleInterval:        yearSpanningWinter
 |                      date
 /* TODO: */
 /*
-
 |                      partOf date BC                                         
 |                      partOf date                                            
-|                      partOf nth CENTURY                                     
-|                      partOf nth CENTURY BC                                  
-|                      partOf century                                         
-|                      partOf century BC                                      
 |                      partOf decade                                          
 |                      partOf decade BC                                       
 */
@@ -94,7 +90,7 @@ month:                 monthYear
 
 yearSpanningWinter:    WINTER numYear SLASH numYear era ;
 
-partOfYear:            partOf numYear era ;
+partialYear:           partOf numYear era ;
 
 quarterYear:           seasonYear
 |                      invSeasonYear
@@ -106,6 +102,8 @@ halfYear:              nthHalf numYear era ;
 year:                  numYear era ;
 
 decade:                numDecade era ;
+
+partialCentury:        partOf (strCentury | numCentury) era ;
 
 quarterCentury:        nthQuarter (strCentury | numCentury) era ;
 

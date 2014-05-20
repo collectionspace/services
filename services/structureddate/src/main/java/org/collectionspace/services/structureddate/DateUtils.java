@@ -59,19 +59,19 @@ public class DateUtils {
 	}
 	
 	
-	public static Date getPartYearStartDate(int year, Part part) {
-		int startMonth = getPartYearStartMonth(part);
+	public static Date getPartialYearStartDate(int year, Part part) {
+		int startMonth = getPartialYearStartMonth(part);
 		
 		return new Date(year, startMonth, 1);
 	}
 
-	public static Date getPartYearEndDate(int year, Part part) {
-		int endMonth = getPartYearEndMonth(part);
+	public static Date getPartialYearEndDate(int year, Part part) {
+		int endMonth = getPartialYearEndMonth(part);
 		
 		return new Date(year, endMonth, DateUtils.getDaysInMonth(endMonth, year));
 	}
 	
-	public static int getPartYearStartMonth(Part part) {
+	public static int getPartialYearStartMonth(Part part) {
 		int month;
 		
 		if (part == Part.EARLY) {
@@ -90,7 +90,7 @@ public class DateUtils {
 		return month;
 	}
 	
-	public static int getPartYearEndMonth(Part part) {
+	public static int getPartialYearEndMonth(Part part) {
 		int month;
 		
 		if (part == Part.EARLY) {
@@ -212,6 +212,96 @@ public class DateUtils {
 		}
 		else {
 			endYear = year + 99;
+		}
+		
+		return endYear;
+	}
+	
+	public static Date getPartialCenturyStartDate(int year, Part part, Era era) {
+		int startYear = getPartialCenturyStartYear(year, part, era);
+		
+		return new Date(startYear, 1, 1, era);
+	}
+	
+	public static Date getPartialCenturyEndDate(int year, Part part, Era era) {
+		int endYear = getPartialCenturyEndYear(year, part, era);
+		
+		return new Date(endYear, 12, 31, era);
+	}
+	
+	public static int getPartialCenturyStartYear(int year, Part part, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+		
+		int startYear;
+		
+		if (era == Era.BCE) {
+			if (part == Part.EARLY) {
+				startYear = year + 99;
+			}
+			else if (part == Part.MIDDLE) {
+				startYear = year + 66;
+			}
+			else if (part == Part.LATE) {
+				startYear = year + 33;
+			}
+			else {
+				throw new IllegalArgumentException("unexpected part");
+			}
+		}
+		else {
+			if (part == Part.EARLY) {
+				startYear = year;
+			}
+			else if (part == Part.MIDDLE) {
+				startYear = year + 33;
+			}
+			else if (part == Part.LATE) {
+				startYear = year + 66;
+			}
+			else {
+				throw new IllegalArgumentException("unexpected part");
+			}
+		}
+		
+		return startYear;
+	}
+	
+	public static int getPartialCenturyEndYear(int year, Part part, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+		
+		int endYear;
+		
+		if (era == Era.BCE) {
+			if (part == Part.EARLY) {
+				endYear = year + 66;
+			}
+			else if (part == Part.MIDDLE) {
+				endYear = year + 33;
+			}
+			else if (part == Part.LATE) {
+				endYear = year;
+			}
+			else {
+				throw new IllegalArgumentException("unexpected part");
+			}
+		}
+		else {
+			if (part == Part.EARLY) {
+				endYear = year + 33;
+			}
+			else if (part == Part.MIDDLE) {
+				endYear = year + 66;
+			}
+			else if (part == Part.LATE) {
+				endYear = year + 99;
+			}
+			else {
+				throw new IllegalArgumentException("unexpected part");
+			}
 		}
 		
 		return endYear;

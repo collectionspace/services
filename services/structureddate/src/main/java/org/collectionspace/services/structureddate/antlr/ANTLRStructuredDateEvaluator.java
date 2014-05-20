@@ -23,6 +23,8 @@ import org.collectionspace.services.structureddate.DeferredDecadeEndDate;
 import org.collectionspace.services.structureddate.DeferredDecadeStartDate;
 import org.collectionspace.services.structureddate.DeferredHalfCenturyEndDate;
 import org.collectionspace.services.structureddate.DeferredHalfCenturyStartDate;
+import org.collectionspace.services.structureddate.DeferredPartialCenturyEndDate;
+import org.collectionspace.services.structureddate.DeferredPartialCenturyStartDate;
 import org.collectionspace.services.structureddate.DeferredQuarterCenturyEndDate;
 import org.collectionspace.services.structureddate.DeferredQuarterCenturyStartDate;
 import org.collectionspace.services.structureddate.Era;
@@ -55,7 +57,8 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Nu
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumMonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartOfContext;
-import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartOfYearContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartialCenturyContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartialYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterCenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterInYearRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterYearContext;
@@ -368,15 +371,15 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	}
 
 	@Override
-	public void exitPartOfYear(PartOfYearContext ctx) {
+	public void exitPartialYear(PartialYearContext ctx) {
 		if (ctx.exception != null) return;
 		
 		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Part part = (Part) stack.pop();
 		
-		stack.push(DateUtils.getPartYearStartDate(year, part).withEra(era));
-		stack.push(DateUtils.getPartYearEndDate(year, part).withEra(era));
+		stack.push(DateUtils.getPartialYearStartDate(year, part).withEra(era));
+		stack.push(DateUtils.getPartialYearEndDate(year, part).withEra(era));
 	}
 
 	@Override
@@ -456,6 +459,34 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			stack.push(new DeferredDecadeStartDate(year));
 			stack.push(new DeferredDecadeEndDate(year));
 		}
+	}
+
+	@Override
+	public void exitPartialCentury(PartialCenturyContext ctx) {
+		if (ctx.exception != null) return;
+
+		Era era = (Era) stack.pop();
+		Integer year = (Integer) stack.pop();
+		Part part = (Part) stack.pop();
+		
+		if (era != null) {
+			// If the era was explicitly specified, the start and end years
+			// may be calculated now.
+
+			stack.push(DateUtils.getPartialCenturyStartDate(year, part, era));
+			stack.push(DateUtils.getPartialCenturyEndDate(year, part, era));
+		}
+		else {
+			// If the era was not explicitly specified, the start and end years
+			// can't be calculated yet. The calculation must be deferred until
+			// later. For example, this partial century may be the start of a hyphenated
+			// range, where the era will be inherited from the era of the end of
+			// the range; this era won't be known until farther up the parse tree,
+			// when both sides of the range will have been parsed.
+			
+			stack.push(new DeferredPartialCenturyStartDate(year, part));
+			stack.push(new DeferredPartialCenturyEndDate(year, part));
+		}		
 	}
 
 	@Override
