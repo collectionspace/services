@@ -186,6 +186,42 @@
                                          earliestSingleDate: [2000,  7,  1, CE]
                                          latestDate:         [2000, 12, 31, CE]   
 
+  'early 1960s':                         # partialDecade
+                                         earliestSingleDate: [1960,  1,  1, CE]
+                                         latestDate:         [1963, 12, 31, CE]                                                                                             
+
+  "mid 1960's":                          # partialDecade
+                                         earliestSingleDate: [1964,  1,  1, CE]
+                                         latestDate:         [1966, 12, 31, CE]                                                                                             
+
+  'late 1960s':                          # partialDecade
+                                         earliestSingleDate: [1967,  1,  1, CE]
+                                         latestDate:         [1969, 12, 31, CE]                                                                                             
+
+  'early 1960s ce':                      # partialDecade
+                                         earliestSingleDate: [1960,  1,  1, CE]
+                                         latestDate:         [1963, 12, 31, CE]                                                                                             
+
+  "mid-1960's a.d.":                     # partialDecade
+                                         earliestSingleDate: [1964,  1,  1, CE]
+                                         latestDate:         [1966, 12, 31, CE]                                                                                             
+
+  'late 1960s AD':                       # partialDecade
+                                         earliestSingleDate: [1967,  1,  1, CE]
+                                         latestDate:         [1969, 12, 31, CE]                                                                                             
+
+  'early 530s bc':                       # partialDecade
+                                         earliestSingleDate: [ 539,  1,  1, BCE]
+                                         latestDate:         [ 537, 12, 31, BCE]                                                                                             
+
+  "middle 530's b.c.":                   # partialDecade
+                                         earliestSingleDate: [ 536,  1,  1, BCE]
+                                         latestDate:         [ 534, 12, 31, BCE]                                                                                             
+
+  'late 530s B.C.':                      # partialDecade
+                                         earliestSingleDate: [ 533,  1,  1, BCE]
+                                         latestDate:         [ 530, 12, 31, BCE]                                                                                             
+
   '1960s':                               # decade
                                          earliestSingleDate: [1960,  1,  1, CE]
                                          latestDate:         [1969, 12, 31, CE]                                                                                             

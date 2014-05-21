@@ -109,6 +109,96 @@ public class DateUtils {
 		return month;
 	}
 	
+	public static Date getPartialDecadeStartDate(int year, Part part, Era era) {
+		int startYear = getPartialDecadeStartYear(year, part, era);
+		
+		return new Date(startYear, 1, 1, era);
+	}
+
+	public static Date getPartialDecadeEndDate(int year, Part part, Era era) {
+		int endYear = getPartialDecadeEndYear(year, part, era);
+		
+		return new Date(endYear, 12, 31, era);
+	}
+	
+	public static int getPartialDecadeStartYear(int year, Part part, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+		
+		int startYear;
+		
+		if (era == Era.BCE) {
+			if (part == Part.EARLY) {
+				startYear = year + 9;
+			}
+			else if (part == Part.MIDDLE) {
+				startYear = year + 6;
+			}
+			else if (part == Part.LATE) {
+				startYear = year + 3;
+			}
+			else {
+				throw new IllegalArgumentException("unexpected part");
+			}
+		}
+		else {
+			if (part == Part.EARLY) {
+				startYear = year;
+			}
+			else if (part == Part.MIDDLE) {
+				startYear = year + 4;
+			}
+			else if (part == Part.LATE) {
+				startYear = year + 7;
+			}
+			else {
+				throw new IllegalArgumentException("unexpected part");
+			}
+		}
+		
+		return startYear;
+	}
+	
+	public static int getPartialDecadeEndYear(int year, Part part, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+		
+		int endYear;
+		
+		if (era == Era.BCE) {
+			if (part == Part.EARLY) {
+				endYear = year + 7;
+			}
+			else if (part == Part.MIDDLE) {
+				endYear = year + 4;
+			}
+			else if (part == Part.LATE) {
+				endYear = year;
+			}
+			else {
+				throw new IllegalArgumentException("unexpected part");
+			}
+		}
+		else {
+			if (part == Part.EARLY) {
+				endYear = year + 3;
+			}
+			else if (part == Part.MIDDLE) {
+				endYear = year + 6;
+			}
+			else if (part == Part.LATE) {
+				endYear = year + 9;
+			}
+			else {
+				throw new IllegalArgumentException("unexpected part");
+			}
+		}
+		
+		return endYear;
+	}
+
 	public static Date getDecadeStartDate(int year, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
