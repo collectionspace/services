@@ -36,6 +36,7 @@ import org.collectionspace.services.structureddate.Part;
 import org.collectionspace.services.structureddate.StructuredDate;
 import org.collectionspace.services.structureddate.StructuredDateEvaluator;
 import org.collectionspace.services.structureddate.StructuredDateFormatException;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.AllOrPartOfContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.CenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.CertainDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DateContext;
@@ -51,6 +52,7 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.In
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MillenniumContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthInYearRangeContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthCenturyRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthHalfContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthQuarterContext;
@@ -241,6 +243,29 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	}
 
 	@Override
+	public void exitNthCenturyRange(NthCenturyRangeContext ctx) {
+		if (ctx.exception != null) return;
+		
+		Era era = (Era) stack.pop();
+		Integer endN = (Integer) stack.pop();
+		Part endPart = (Part) stack.pop();		
+		Integer startN = (Integer) stack.pop();
+		Part startPart = (Part) stack.pop();
+		
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+		
+		int startYear = DateUtils.nthCenturyToYear(startN);
+		int endYear = DateUtils.nthCenturyToYear(endN);
+		
+		stack.push(startPart == null ? DateUtils.getCenturyStartDate(startYear, era) : DateUtils.getPartialCenturyStartDate(startYear, startPart, era));
+		stack.push(startPart == null ? DateUtils.getCenturyEndDate(startYear, era) : DateUtils.getPartialCenturyEndDate(startYear, startPart, era));
+		stack.push(endPart == null ? DateUtils.getCenturyStartDate(endYear, era) : DateUtils.getPartialCenturyStartDate(endYear, endPart, era));
+		stack.push(endPart == null ? DateUtils.getCenturyEndDate(endYear, era) : DateUtils.getPartialCenturyEndDate(endYear, endPart, era));
+	}
+
+	@Override
 	public void exitMonthInYearRange(MonthInYearRangeContext ctx) {
 		if (ctx.exception != null) return;
 
@@ -281,9 +306,9 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer numMonth = (Integer) stack.pop();
 		
 		stack.push(new Date(year, numMonth, dayOfMonthStart, era));
-		stack.push(new Date(year, numMonth, dayOfMonthStart, era));		
+		stack.push(new Date(year, numMonth, dayOfMonthStart, era));
 		stack.push(new Date(year, numMonth, dayOfMonthEnd, era));
-		stack.push(new Date(year, numMonth, dayOfMonthEnd, era));		
+		stack.push(new Date(year, numMonth, dayOfMonthEnd, era));
 	}
 	
 	@Override
@@ -298,8 +323,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		
 		stack.push(new Date(year, numMonth, dayOfMonthStart, era));
 		stack.push(new Date(year, numMonth, dayOfMonthStart, era));
-		stack.push(new Date(year, numMonth, dayOfMonthEnd, era));		
-		stack.push(new Date(year, numMonth, dayOfMonthEnd, era));		
+		stack.push(new Date(year, numMonth, dayOfMonthEnd, era));
+		stack.push(new Date(year, numMonth, dayOfMonthEnd, era));
 	}
 	
 	@Override
@@ -345,7 +370,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer numMonth = (Integer) stack.pop();
 		
 		stack.push(new Date(year, numMonth, 1, era));
-		stack.push(new Date(year, numMonth, DateUtils.getDaysInMonth(numMonth, year), era));		
+		stack.push(new Date(year, numMonth, DateUtils.getDaysInMonth(numMonth, year), era));
 	}
 	
 	@Override
@@ -641,7 +666,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// Convert the nth number to a year number,
 		// and push on the stack.
 		
-		Integer year = (n-1) * 100 + 1;
+		Integer year = DateUtils.nthCenturyToYear(n);
 		
 		stack.push(year);
 	}
@@ -813,6 +838,19 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		}
 		
 		stack.push(quarter);
+	}
+
+	@Override
+	public void exitAllOrPartOf(AllOrPartOfContext ctx) {
+		if (ctx.exception != null) return;
+		
+		// If a part was specified, it will have been
+		// pushed on the stack in exitPartOf(). If not,
+		// push null on the stack.
+		
+		if (ctx.partOf() == null) {
+			stack.push(null);
+		}
 	}
 
 	@Override

@@ -24,17 +24,11 @@ certainDate:           hyphenatedRange
 ;
 
 hyphenatedRange:       singleInterval HYPHEN singleInterval
+|                      nthCenturyRange
 |                      monthInYearRange
 |                      quarterInYearRange
 |                      strDayInMonthRange
 |                      numDayInMonthRange
-/* TODO: */
-/*
-|                      nth HYPHEN nth CENTURY                                 
-|                      nth HYPHEN nth CENTURY BC                              
-|                      partOf nth HYPHEN partOf nth CENTURY                   
-|                      partOf nth HYPHEN nth CENTURY                          
-*/
 ;
 
 /* TODO: */
@@ -119,7 +113,9 @@ nthHalf:               (nth | LAST) HALF ;
 numDecade:             TENS ;
 strCentury:            nth CENTURY ;
 numCentury:            HUNDREDS ;
+nthCenturyRange:       allOrPartOf nth HYPHEN allOrPartOf nth CENTURY era ;
 strSeason:             SPRING | SUMMER | FALL | WINTER ;
+allOrPartOf:           partOf | ;
 partOf:                EARLY | MIDDLE | LATE ; 
 nth:                   NTHSTR | FIRST | SECOND | THIRD | FOURTH ;
 strMonth:              MONTH | SHORTMONTH DOT? ;

@@ -910,6 +910,42 @@
                                          earliestSingleDate: [1962,  5,  3, BCE]
                                          latestDate:         [2013,  4,  5, CE]
 
+  '19th-20th century':                   # hyphenatedRange, nthCenturyRange
+                                         earliestSingleDate: [1801,  1,  1, CE]
+                                         latestDate:         [2000, 12, 31, CE]
+
+  '19th-20th century a.d.':              # hyphenatedRange, nthCenturyRange
+                                         earliestSingleDate: [1801,  1,  1, CE]
+                                         latestDate:         [2000, 12, 31, CE]
+
+  '5th - 1st century bc':                # hyphenatedRange, nthCenturyRange
+                                         earliestSingleDate: [ 500,  1,  1, BCE]
+                                         latestDate:         [   1, 12, 31, BCE]
+
+  'late 19th - mid-20th century':        # hyphenatedRange, nthCenturyRange (partial)
+                                         earliestSingleDate: [1867,  1,  1, CE]
+                                         latestDate:         [1967, 12, 31, CE]
+
+  'late 18th - 19th century':            # hyphenatedRange, nthCenturyRange (partial)
+                                         earliestSingleDate: [1767,  1,  1, CE]
+                                         latestDate:         [1900, 12, 31, CE]
+
+  '18th - early 19th century':           # hyphenatedRange, nthCenturyRange (partial)
+                                         earliestSingleDate: [1701,  1,  1, CE]
+                                         latestDate:         [1834, 12, 31, CE]
+
+  'late 10th - early 8th century bc':    # hyphenatedRange, nthCenturyRange (partial)
+                                         earliestSingleDate: [ 934,  1,  1, BCE]
+                                         latestDate:         [ 767, 12, 31, BCE]
+
+  '10th - early 8th century bc':         # hyphenatedRange, nthCenturyRange (partial)
+                                         earliestSingleDate: [1000,  1,  1, BCE]
+                                         latestDate:         [ 767, 12, 31, BCE]
+
+  'late 10th - 9th century bc':          # hyphenatedRange, nthCenturyRange (partial)
+                                         earliestSingleDate: [ 934,  1,  1, BCE]
+                                         latestDate:         [ 801, 12, 31, BCE]
+
   'Apr-Oct 2013':                        # hyphenatedRange, monthInYearRange (31 day end month)
                                          earliestSingleDate: [2013,  4,  1, CE]
                                          latestDate:         [2013, 10, 31, CE]

@@ -522,6 +522,14 @@ public class DateUtils {
 		return endYear;
 	}
 	
+	public static int nthCenturyToYear(int n) {
+		// Convert the nth number to a year number.
+		
+		int year = (n-1) * 100 + 1;
+		
+		return year;
+	}
+	
 	public static Date getMillenniumStartDate(int n, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
