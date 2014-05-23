@@ -23,6 +23,8 @@ import org.collectionspace.services.structureddate.DeferredDecadeEndDate;
 import org.collectionspace.services.structureddate.DeferredDecadeStartDate;
 import org.collectionspace.services.structureddate.DeferredHalfCenturyEndDate;
 import org.collectionspace.services.structureddate.DeferredHalfCenturyStartDate;
+import org.collectionspace.services.structureddate.DeferredMillenniumEndDate;
+import org.collectionspace.services.structureddate.DeferredMillenniumStartDate;
 import org.collectionspace.services.structureddate.DeferredPartialCenturyEndDate;
 import org.collectionspace.services.structureddate.DeferredPartialCenturyStartDate;
 import org.collectionspace.services.structureddate.DeferredPartialDecadeEndDate;
@@ -610,11 +612,24 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Era era = (Era) stack.pop();
 		Integer n = (Integer) stack.pop();
 
-		int startYear = DateUtils.getMillenniumStartYear(n, era);
-		int endYear = DateUtils.getMillenniumEndYear(n, era);
+		if (era != null) {
+			// If the era was explicitly specified, the start and end years
+			// may be calculated now.
 
-		stack.push(new Date(startYear, 1, 1, era));
-		stack.push(new Date(endYear, 12, 31, era));
+			stack.push(DateUtils.getMillenniumStartDate(n, era));
+			stack.push(DateUtils.getMillenniumEndDate(n, era));
+		}
+		else {
+			// If the era was not explicitly specified, the start and end years
+			// can't be calculated yet. The calculation must be deferred until
+			// later. For example, this millennium may be the start of a hyphenated
+			// range, where the era will be inherited from the era of the end of
+			// the range; this era won't be known until farther up the parse tree,
+			// when both sides of the range will have been parsed.
+			
+			stack.push(new DeferredMillenniumStartDate(n));
+			stack.push(new DeferredMillenniumEndDate(n));
+		}
 	}
 
 	@Override

@@ -110,12 +110,20 @@ public class DateUtils {
 	}
 	
 	public static Date getPartialDecadeStartDate(int year, Part part, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+
 		int startYear = getPartialDecadeStartYear(year, part, era);
 		
 		return new Date(startYear, 1, 1, era);
 	}
 
 	public static Date getPartialDecadeEndDate(int year, Part part, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+
 		int endYear = getPartialDecadeEndYear(year, part, era);
 		
 		return new Date(endYear, 12, 31, era);
@@ -308,12 +316,20 @@ public class DateUtils {
 	}
 	
 	public static Date getPartialCenturyStartDate(int year, Part part, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+
 		int startYear = getPartialCenturyStartYear(year, part, era);
 		
 		return new Date(startYear, 1, 1, era);
 	}
 	
 	public static Date getPartialCenturyEndDate(int year, Part part, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+
 		int endYear = getPartialCenturyEndYear(year, part, era);
 		
 		return new Date(endYear, 12, 31, era);
@@ -504,6 +520,26 @@ public class DateUtils {
 		}
 		
 		return endYear;
+	}
+	
+	public static Date getMillenniumStartDate(int n, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+
+		int startYear = getMillenniumStartYear(n, era);
+		
+		return new Date(startYear, 1, 1, era);
+	}
+	
+	public static Date getMillenniumEndDate(int n, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+
+		int endYear = getMillenniumEndYear(n, era);
+		
+		return new Date(endYear, 12, 31, era);
 	}
 	
 	public static int getMillenniumStartYear(int n, Era era) {

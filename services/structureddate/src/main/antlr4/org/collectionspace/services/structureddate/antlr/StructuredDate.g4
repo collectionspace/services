@@ -23,13 +23,7 @@ certainDate:           hyphenatedRange
 |                      singleInterval
 ;
 
-hyphenatedRange:       quarterYear HYPHEN quarterYear
-|                      halfYear HYPHEN halfYear
-|                      century HYPHEN century
-|                      decade HYPHEN decade
-|                      year HYPHEN year
-|                      month HYPHEN month
-|                      date HYPHEN date
+hyphenatedRange:       singleInterval HYPHEN singleInterval
 |                      monthInYearRange
 |                      quarterInYearRange
 |                      strDayInMonthRange
@@ -38,18 +32,8 @@ hyphenatedRange:       quarterYear HYPHEN quarterYear
 /*
 |                      nth HYPHEN nth CENTURY                                 
 |                      nth HYPHEN nth CENTURY BC                              
-|                      partOf nth CENTURY HYPHEN partOf nth CENTURY           
 |                      partOf nth HYPHEN partOf nth CENTURY                   
 |                      partOf nth HYPHEN nth CENTURY                          
-|                      partOf nth CENTURY BC HYPHEN partOf nth CENTURY BC     
-|                      partOf nth CENTURY BC HYPHEN partOf nth CENTURY        
-|                      partOf century HYPHEN partOf century                   
-|                      partOf century BC HYPHEN partOf century BC             
-|                      nth QUARTER nth CENTURY HYPHEN nth QUARTER nth CENTURY 
-|                      decade HYPHEN partOf decade                            
-|                      partOf decade HYPHEN partOf century                    
-|                      partOf decade HYPHEN partOf decade                     
-|                      partOf decade HYPHEN decade                            
 */
 ;
 
