@@ -8,69 +8,155 @@ import org.joda.time.format.DateTimeFormatter;
 public class DateUtils {
 	private static DateTimeFormatter monthFormatter = DateTimeFormat.forPattern("MMMM");
 	
+	/**
+	 * Gets the number (1-12) of a month for a given name.
+	 * 
+	 * @param monthName The name of the month
+	 * @return          The number of the month, between 1 and 12
+	 */
 	public static int getMonthByName(String monthName) {
 		return monthFormatter.parseDateTime(monthName).getMonthOfYear();
 	}
 	
+	/**
+	 * Gets the number of days in a given month.
+	 * 
+	 * @param month The month number, between 1 and 12
+	 * @param year  The year (in order to account for leap years)
+	 * @return      The number of days in the month
+	 */
+	// FIXME: This should also take era as an argument. Currently, A.D. is assumed.
 	public static int getDaysInMonth(int month, int year) {
 		DateTime dateTime = new DateTime(GJChronology.getInstance()).withYear(year).withMonthOfYear(month);
 		
 		return dateTime.dayOfMonth().getMaximumValue();
 	}
-		
+	
+	/**
+	 * Gets the Date representing the first day of a given quarter year.
+	 * 
+	 * @param year    The year
+	 * @param quarter The quarter, between 1 and 4
+	 * @return        The first day of the quarter year
+	 */
 	public static Date getQuarterYearStartDate(int year, int quarter) {
 		int startMonth = getQuarterYearStartMonth(quarter);
 		
 		return new Date(year, startMonth, 1);
 	}
 	
+	/**
+	 * Gets the Date representing the last day of a given quarter year.
+	 * 
+	 * @param year    The year
+	 * @param quarter The quarter, between 1 and 4
+	 * @return        The last day of the quarter year
+	 */
 	public static Date getQuarterYearEndDate(int year, int quarter) {
 		int endMonth = getQuarterYearEndMonth(quarter);
 		
 		return new Date(year, endMonth, DateUtils.getDaysInMonth(endMonth, year));
 	}
 	
+	/**
+	 * Gets the first month of a given quarter in a year.
+	 * 
+	 * @param quarter The quarter, between 1 and 4
+	 * @return        The number of the first month in the quarter
+	 */
 	public static int getQuarterYearStartMonth(int quarter) {
 		return ((3 * (quarter-1)) + 1);
 	}
 	
+	/**
+	 * Gets the last month of a given quarter in a year.
+	 * 
+	 * @param quarter The quarter, between 1 and 4
+	 * @return        The number of the last month in the quarter
+	 */
 	public static int getQuarterYearEndMonth(int quarter) {
 		return (getQuarterYearStartMonth(quarter) + 2);
 	}
-	
+
+	/**
+	 * Gets the Date representing the first day of a given half year.
+	 * 
+	 * @param year The year
+	 * @param half The half, between 1 and 2
+	 * @return     The first day of the half year
+	 */
 	public static Date getHalfYearStartDate(int year, int half) {
 		int startMonth = getHalfYearStartMonth(half);
 		
 		return new Date(year, startMonth, 1);
 	}
 
+
+	/**
+	 * Gets the Date representing the last day of a given half year.
+	 * 
+	 * @param year The year
+	 * @param half The half, between 1 and 2
+	 * @return     The last day of the half year
+	 */
 	public static Date getHalfYearEndDate(int year, int half) {
 		int endMonth = getHalfYearEndMonth(half);
 		
 		return new Date(year, endMonth, DateUtils.getDaysInMonth(endMonth, year));
 	}
 
+	/**
+	 * Gets the first month of a given half in a year.
+	 * 
+	 * @param half The half, between 1 and 2
+	 * @return     The number of the first month in the half
+	 */
 	public static int getHalfYearStartMonth(int half) {
 		return ((6 * (half-1)) + 1);
 	}
 
+	/**
+	 * Gets the last month of a given half in a year.
+	 * 
+	 * @param half The half, between 1 and 2
+	 * @return     The number of the last month in the half
+	 */
 	public static int getHalfYearEndMonth(int half) {
 		return (getHalfYearStartMonth(half) + 5);
 	}
 	
-	
+	/**
+	 * Gets the Date representing the first day of a given partial year.
+	 * 
+	 * @param year The year
+	 * @param part The part
+	 * @return     The first day of the partial year
+	 */
 	public static Date getPartialYearStartDate(int year, Part part) {
 		int startMonth = getPartialYearStartMonth(part);
 		
 		return new Date(year, startMonth, 1);
 	}
 
+	/**
+	 * Gets the Date representing the last day of a given partial year.
+	 * 
+	 * @param year The year
+	 * @param part The part
+	 * @return     The last day of the partial year
+	 */
 	public static Date getPartialYearEndDate(int year, Part part) {
 		int endMonth = getPartialYearEndMonth(part);
 		
 		return new Date(year, endMonth, DateUtils.getDaysInMonth(endMonth, year));
 	}
 	
+	/**
+	 * Gets the first month of a given part of a year.
+	 * 
+	 * @param part The part
+	 * @return     The number of the first month in the part
+	 */
 	public static int getPartialYearStartMonth(Part part) {
 		int month;
 		
@@ -90,6 +176,12 @@ public class DateUtils {
 		return month;
 	}
 	
+	/**
+	 * Gets the last month of a given part of a year.
+	 * 
+	 * @param part The part
+	 * @return     The number of the last month in the part
+	 */
 	public static int getPartialYearEndMonth(Part part) {
 		int month;
 		
@@ -109,27 +201,57 @@ public class DateUtils {
 		return month;
 	}
 	
-	public static Date getPartialDecadeStartDate(int year, Part part, Era era) {
+	/**
+	 * Gets the Date representing the first day of a given partial decade.
+	 * 
+	 * @param decade The decade, specified as a number ending in 0.
+	 *               For decades A.D., this is the first year of the decade. For 
+	 *               decades B.C., this is the last year of the decade.
+	 * @param part   The part
+	 * @param era    The era of the decade. If null, Date.DEFAULT_ERA is assumed.
+	 * @return       The first day of the partial decade
+	 */
+	public static Date getPartialDecadeStartDate(int decade, Part part, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
 
-		int startYear = getPartialDecadeStartYear(year, part, era);
+		int startYear = getPartialDecadeStartYear(decade, part, era);
 		
 		return new Date(startYear, 1, 1, era);
 	}
 
-	public static Date getPartialDecadeEndDate(int year, Part part, Era era) {
+	/**
+	 * Gets the Date representing the last day of a given partial decade.
+	 * 
+	 * @param decade The decade, specified as a number ending in 0.
+	 *               For decades A.D., this is the first year of the decade. For 
+	 *               decades B.C., this is the last year of the decade.
+	 * @param part   The part
+	 * @param era    The era of the decade. If null, Date.DEFAULT_ERA is assumed.
+	 * @return       The last day of the partial decade
+	 */
+	public static Date getPartialDecadeEndDate(int decade, Part part, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
 
-		int endYear = getPartialDecadeEndYear(year, part, era);
+		int endYear = getPartialDecadeEndYear(decade, part, era);
 		
 		return new Date(endYear, 12, 31, era);
 	}
 	
-	public static int getPartialDecadeStartYear(int year, Part part, Era era) {
+	/**
+	 * Gets the first year of a given part of a decade.
+	 * 
+	 * @param decade The decade, specified as a number ending in 0.
+	 *               For decades A.D., this is the first year of the decade. For 
+	 *               decades B.C., this is the last year of the decade.
+	 * @param part   The part
+	 * @param era    The era of the decade. If null, Date.DEFAULT_ERA is assumed.
+	 * @return       The first year in the part
+	 */
+	public static int getPartialDecadeStartYear(int decade, Part part, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
@@ -138,13 +260,13 @@ public class DateUtils {
 		
 		if (era == Era.BCE) {
 			if (part == Part.EARLY) {
-				startYear = year + 9;
+				startYear = decade + 9;
 			}
 			else if (part == Part.MIDDLE) {
-				startYear = year + 6;
+				startYear = decade + 6;
 			}
 			else if (part == Part.LATE) {
-				startYear = year + 3;
+				startYear = decade + 3;
 			}
 			else {
 				throw new IllegalArgumentException("unexpected part");
@@ -152,13 +274,13 @@ public class DateUtils {
 		}
 		else {
 			if (part == Part.EARLY) {
-				startYear = year;
+				startYear = decade;
 			}
 			else if (part == Part.MIDDLE) {
-				startYear = year + 4;
+				startYear = decade + 4;
 			}
 			else if (part == Part.LATE) {
-				startYear = year + 7;
+				startYear = decade + 7;
 			}
 			else {
 				throw new IllegalArgumentException("unexpected part");
@@ -168,7 +290,17 @@ public class DateUtils {
 		return startYear;
 	}
 	
-	public static int getPartialDecadeEndYear(int year, Part part, Era era) {
+	/**
+	 * Gets the last year of a given part of a decade.
+	 * 
+	 * @param decade The decade, specified as a number ending in 0.
+	 *               For decades A.D., this is the first year of the decade. For 
+	 *               decades B.C., this is the last year of the decade.
+	 * @param part   The part
+	 * @param era    The era of the decade. If null, Date.DEFAULT_ERA is assumed.
+	 * @return       The last year in the part
+	 */
+	public static int getPartialDecadeEndYear(int decade, Part part, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
@@ -177,13 +309,13 @@ public class DateUtils {
 		
 		if (era == Era.BCE) {
 			if (part == Part.EARLY) {
-				endYear = year + 7;
+				endYear = decade + 7;
 			}
 			else if (part == Part.MIDDLE) {
-				endYear = year + 4;
+				endYear = decade + 4;
 			}
 			else if (part == Part.LATE) {
-				endYear = year;
+				endYear = decade;
 			}
 			else {
 				throw new IllegalArgumentException("unexpected part");
@@ -191,13 +323,13 @@ public class DateUtils {
 		}
 		else {
 			if (part == Part.EARLY) {
-				endYear = year + 3;
+				endYear = decade + 3;
 			}
 			else if (part == Part.MIDDLE) {
-				endYear = year + 6;
+				endYear = decade + 6;
 			}
 			else if (part == Part.LATE) {
-				endYear = year + 9;
+				endYear = decade + 9;
 			}
 			else {
 				throw new IllegalArgumentException("unexpected part");
@@ -207,27 +339,54 @@ public class DateUtils {
 		return endYear;
 	}
 
-	public static Date getDecadeStartDate(int year, Era era) {
+	/**
+	 * Gets the Date representing the first day of a given decade.
+	 * 
+	 * @param decade The decade, specified as a number ending in 0.
+	 *               For decades A.D., this is the first year of the decade. For 
+	 *               decades B.C., this is the last year of the decade.
+	 * @param era    The era of the decade. If null, Date.DEFAULT_ERA is assumed.
+	 * @return       The first day of the decade
+	 */
+	public static Date getDecadeStartDate(int decade, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
 
-		int startYear = getDecadeStartYear(year, era);
+		int startYear = getDecadeStartYear(decade, era);
 		
 		return new Date(startYear, 1, 1, era);
 	}
 	
-	public static Date getDecadeEndDate(int year, Era era) {
+	/**
+	 * Gets the Date representing the last day of a given decade.
+	 * 
+	 * @param decade The decade, specified as a number ending in 0.
+	 *               For decades A.D., this is the first year of the decade. For 
+	 *               decades B.C., this is the last year of the decade.
+	 * @param era    The era of the decade. If null, Date.DEFAULT_ERA is assumed.
+	 * @return       The last day of the decade
+	 */
+	public static Date getDecadeEndDate(int decade, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
 
-		int endYear = getDecadeEndYear(year, era);
+		int endYear = getDecadeEndYear(decade, era);
 		
 		return new Date(endYear, 12, 31, era);
 	}
 	
-	public static int getDecadeStartYear(int year, Era era) {
+	/**
+	 * Gets the first year of a given decade.
+	 * 
+	 * @param decade The decade, specified as a number ending in 0.
+	 *               For decades A.D., this is the first year of the decade. For 
+	 *               decades B.C., this is the last year of the decade.
+	 * @param era    The era of the decade. If null, Date.DEFAULT_ERA is assumed.
+	 * @return       The first year of the decade
+	 */
+	public static int getDecadeStartYear(int decade, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
@@ -235,16 +394,25 @@ public class DateUtils {
 		int startYear;
 		
 		if (era == Era.BCE) {
-			startYear = year + 9;
+			startYear = decade + 9;
 		}
 		else {
-			startYear = year;
+			startYear = decade;
 		}
 		
 		return startYear;
 	}
-	
-	public static int getDecadeEndYear(int year, Era era) {
+
+	/**
+	 * Gets the last year of a given decade.
+	 * 
+	 * @param decade The decade, specified as a number ending in 0.
+	 *               For decades A.D., this is the first year of the decade. For 
+	 *               decades B.C., this is the last year of the decade.
+	 * @param era    The era of the decade. If null, Date.DEFAULT_ERA is assumed.
+	 * @return       The last year of the decade
+	 */
+	public static int getDecadeEndYear(int decade, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
@@ -252,36 +420,72 @@ public class DateUtils {
 		int endYear;
 		
 		if (era == Era.BCE) {
-			endYear = year;
+			endYear = decade;
 		}
 		else {
-			endYear = year + 9;
+			endYear = decade + 9;
 		}
 		
 		return endYear;
 	}
 		
-	public static Date getCenturyStartDate(int year, Era era) {
+	/**
+	 * Gets the Date representing the first day of a given century.
+	 * 
+	 * @param century The century, specified as a number ending in 00 or 01.
+	 *                For centuries A.D., this is the first year of the century. For 
+	 *                centuries B.C., this is the last year of the century. For example,
+	 *                the "21st century" would be specified as 2001, whereas the "2000's"
+	 *                would be specified as 2000. The "2nd century B.C." would be specified
+	 *                as 101. The "100's B.C." would be specified as 100.
+	 * @param era     The era of the century. If null, Date.DEFAULT_ERA is assumed.
+	 * @return        The first day of the century
+	 */
+	public static Date getCenturyStartDate(int century, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
 
-		int startYear = getCenturyStartYear(year, era);
+		int startYear = getCenturyStartYear(century, era);
 		
 		return new Date(startYear, 1, 1, era);
 	}
 
-	public static Date getCenturyEndDate(int year, Era era) {
+	/**
+	 * Gets the Date representing the last day of a given century.
+	 * 
+	 * @param century The century, specified as a number ending in 00 or 01.
+	 *                For centuries A.D., this is the first year of the century. For 
+	 *                centuries B.C., this is the last year of the century. For example,
+	 *                the "21st century" would be specified as 2001, whereas the "2000's"
+	 *                would be specified as 2000. The "2nd century B.C." would be specified
+	 *                as 101. The "100's B.C." would be specified as 100.
+	 * @param era     The era of the century. If null, Date.DEFAULT_ERA is assumed.
+	 * @return        The last day of the century
+	 */
+	public static Date getCenturyEndDate(int century, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
 
-		int endYear = getCenturyEndYear(year, era);
+		int endYear = getCenturyEndYear(century, era);
 		
 		return new Date(endYear, 12, 31, era);
 	}
 	
-	public static int getCenturyStartYear(int year, Era era) {
+	/**
+	 * Gets the first year of a given century.
+	 * 
+	 * @param century The century, specified as a number ending in 00 or 01.
+	 *                For centuries A.D., this is the first year of the century. For 
+	 *                centuries B.C., this is the last year of the century. For example,
+	 *                the "21st century" would be specified as 2001, whereas the "2000's"
+	 *                would be specified as 2000. The "2nd century B.C." would be specified
+	 *                as 101. The "100's B.C." would be specified as 100.
+	 * @param era     The era of the century. If null, Date.DEFAULT_ERA is assumed.
+	 * @return        The first year of the century
+	 */
+	public static int getCenturyStartYear(int century, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
@@ -289,16 +493,28 @@ public class DateUtils {
 		int startYear;
 		
 		if (era == Era.BCE) {
-			startYear = year + 99;
+			startYear = century + 99;
 		}
 		else {
-			startYear = year;
+			startYear = century;
 		}
 		
 		return startYear;
 	}
 	
-	public static int getCenturyEndYear(int year, Era era) {
+	/**
+	 * Gets the last year of a given century.
+	 * 
+	 * @param century The century, specified as a number ending in 00 or 01.
+	 *                For centuries A.D., this is the first year of the century. For 
+	 *                centuries B.C., this is the last year of the century. For example,
+	 *                the "21st century" would be specified as 2001, whereas the "2000's"
+	 *                would be specified as 2000. The "2nd century B.C." would be specified
+	 *                as 101. The "100's B.C." would be specified as 100.
+	 * @param era     The era of the century. If null, Date.DEFAULT_ERA is assumed.
+	 * @return        The last year of the century
+	 */
+	public static int getCenturyEndYear(int century, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
@@ -306,36 +522,75 @@ public class DateUtils {
 		int endYear;
 		
 		if (era == Era.BCE) {
-			endYear = year;
+			endYear = century;
 		}
 		else {
-			endYear = year + 99;
+			endYear = century + 99;
 		}
 		
 		return endYear;
 	}
 	
-	public static Date getPartialCenturyStartDate(int year, Part part, Era era) {
+	/**
+	 * Gets the Date representing the first day of a given partial century.
+	 * 
+	 * @param century The century, specified as a number ending in 00 or 01.
+	 *                For centuries A.D., this is the first year of the century. For 
+	 *                centuries B.C., this is the last year of the century. For example,
+	 *                the "21st century" would be specified as 2001, whereas the "2000's"
+	 *                would be specified as 2000. The "2nd century B.C." would be specified
+	 *                as 101. The "100's B.C." would be specified as 100.
+	 * @param part    The part
+	 * @param era     The era of the century. If null, Date.DEFAULT_ERA is assumed.
+	 * @return        The first day of the partial century
+	 */
+	public static Date getPartialCenturyStartDate(int century, Part part, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
 
-		int startYear = getPartialCenturyStartYear(year, part, era);
+		int startYear = getPartialCenturyStartYear(century, part, era);
 		
 		return new Date(startYear, 1, 1, era);
 	}
 	
-	public static Date getPartialCenturyEndDate(int year, Part part, Era era) {
+	/**
+	 * Gets the Date representing the last day of a given partial century.
+	 * 
+	 * @param century The century, specified as a number ending in 00 or 01.
+	 *                For centuries A.D., this is the first year of the century. For 
+	 *                centuries B.C., this is the last year of the century. For example,
+	 *                the "21st century" would be specified as 2001, whereas the "2000's"
+	 *                would be specified as 2000. The "2nd century B.C." would be specified
+	 *                as 101. The "100's B.C." would be specified as 100.
+	 * @param part    The part
+	 * @param era     The era of the century. If null, Date.DEFAULT_ERA is assumed.
+	 * @return        The last day of the partial century
+	 */
+	public static Date getPartialCenturyEndDate(int century, Part part, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
 
-		int endYear = getPartialCenturyEndYear(year, part, era);
+		int endYear = getPartialCenturyEndYear(century, part, era);
 		
 		return new Date(endYear, 12, 31, era);
 	}
 	
-	public static int getPartialCenturyStartYear(int year, Part part, Era era) {
+	/**
+	 * Gets the first year of a given partial century.
+	 * 
+	 * @param century The century, specified as a number ending in 00 or 01.
+	 *                For centuries A.D., this is the first year of the century. For 
+	 *                centuries B.C., this is the last year of the century. For example,
+	 *                the "21st century" would be specified as 2001, whereas the "2000's"
+	 *                would be specified as 2000. The "2nd century B.C." would be specified
+	 *                as 101. The "100's B.C." would be specified as 100.
+	 * @param part    The part
+	 * @param era     The era of the century. If null, Date.DEFAULT_ERA is assumed.
+	 * @return        The first year of the partial century
+	 */
+	public static int getPartialCenturyStartYear(int century, Part part, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
@@ -344,13 +599,13 @@ public class DateUtils {
 		
 		if (era == Era.BCE) {
 			if (part == Part.EARLY) {
-				startYear = year + 99;
+				startYear = century + 99;
 			}
 			else if (part == Part.MIDDLE) {
-				startYear = year + 66;
+				startYear = century + 66;
 			}
 			else if (part == Part.LATE) {
-				startYear = year + 33;
+				startYear = century + 33;
 			}
 			else {
 				throw new IllegalArgumentException("unexpected part");
@@ -358,13 +613,13 @@ public class DateUtils {
 		}
 		else {
 			if (part == Part.EARLY) {
-				startYear = year;
+				startYear = century;
 			}
 			else if (part == Part.MIDDLE) {
-				startYear = year + 33;
+				startYear = century + 33;
 			}
 			else if (part == Part.LATE) {
-				startYear = year + 66;
+				startYear = century + 66;
 			}
 			else {
 				throw new IllegalArgumentException("unexpected part");
@@ -374,7 +629,20 @@ public class DateUtils {
 		return startYear;
 	}
 	
-	public static int getPartialCenturyEndYear(int year, Part part, Era era) {
+	/**
+	 * Gets the last year of a given partial century.
+	 * 
+	 * @param century The century, specified as a number ending in 00 or 01.
+	 *                For centuries A.D., this is the first year of the century. For 
+	 *                centuries B.C., this is the last year of the century. For example,
+	 *                the "21st century" would be specified as 2001, whereas the "2000's"
+	 *                would be specified as 2000. The "2nd century B.C." would be specified
+	 *                as 101. The "100's B.C." would be specified as 100.
+	 * @param part    The part
+	 * @param era     The era of the century. If null, Date.DEFAULT_ERA is assumed.
+	 * @return        The last year of the partial century
+	 */
+	public static int getPartialCenturyEndYear(int century, Part part, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
@@ -383,13 +651,13 @@ public class DateUtils {
 		
 		if (era == Era.BCE) {
 			if (part == Part.EARLY) {
-				endYear = year + 66;
+				endYear = century + 66;
 			}
 			else if (part == Part.MIDDLE) {
-				endYear = year + 33;
+				endYear = century + 33;
 			}
 			else if (part == Part.LATE) {
-				endYear = year;
+				endYear = century;
 			}
 			else {
 				throw new IllegalArgumentException("unexpected part");
@@ -397,13 +665,13 @@ public class DateUtils {
 		}
 		else {
 			if (part == Part.EARLY) {
-				endYear = year + 33;
+				endYear = century + 33;
 			}
 			else if (part == Part.MIDDLE) {
-				endYear = year + 66;
+				endYear = century + 66;
 			}
 			else if (part == Part.LATE) {
-				endYear = year + 99;
+				endYear = century + 99;
 			}
 			else {
 				throw new IllegalArgumentException("unexpected part");
@@ -413,28 +681,66 @@ public class DateUtils {
 		return endYear;
 	}
 	
-	public static Date getHalfCenturyStartDate(int year, int half, Era era) {
+	/**
+	 * Gets the Date representing the first day of a given half century.
+	 * 
+	 * @param century The century, specified as a number ending in 00 or 01.
+	 *                For centuries A.D., this is the first year of the century. For 
+	 *                centuries B.C., this is the last year of the century. For example,
+	 *                the "21st century" would be specified as 2001, whereas the "2000's"
+	 *                would be specified as 2000. The "2nd century B.C." would be specified
+	 *                as 101. The "100's B.C." would be specified as 100.
+	 * @param half    The half
+	 * @param era     The era of the century. If null, Date.DEFAULT_ERA is assumed.
+	 * @return        The first day of the half century
+	 */
+	public static Date getHalfCenturyStartDate(int century, int half, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
 
-		int startYear = getHalfCenturyStartYear(year, half, era);
+		int startYear = getHalfCenturyStartYear(century, half, era);
 		
 		return new Date(startYear, 1, 1, era);
 	}
 
-	public static Date getHalfCenturyEndDate(int year, int half, Era era) {
+	/**
+	 * Gets the Date representing the last day of a given half century.
+	 * 
+	 * @param century The century, specified as a number ending in 00 or 01.
+	 *                For centuries A.D., this is the first year of the century. For 
+	 *                centuries B.C., this is the last year of the century. For example,
+	 *                the "21st century" would be specified as 2001, whereas the "2000's"
+	 *                would be specified as 2000. The "2nd century B.C." would be specified
+	 *                as 101. The "100's B.C." would be specified as 100.
+	 * @param half    The half
+	 * @param era     The era of the century. If null, Date.DEFAULT_ERA is assumed.
+	 * @return        The last day of the half century
+	 */
+	public static Date getHalfCenturyEndDate(int century, int half, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
 
-		int endYear = getHalfCenturyEndYear(year, half, era);
+		int endYear = getHalfCenturyEndYear(century, half, era);
 		
 		return new Date(endYear, 12, 31, era);
 	}
 	
-	
-	public static int getHalfCenturyStartYear(int year, int half, Era era) {
+	/**
+	 * Gets the first year of a given half century.
+	 * 
+	 * @param century The century, specified as a number ending in 00 or 01.
+	 *                For centuries A.D., this is the first year of the century. For 
+	 *                centuries B.C., this is the last year of the century. For example,
+	 *                the "21st century" would be specified as 2001, whereas the "2000's"
+	 *                would be specified as 2000. The "2nd century B.C." would be specified
+	 *                as 101. The "100's B.C." would be specified as 100.
+	 * @param half    The half
+	 * @param era     The era of the century. If null, Date.DEFAULT_ERA is assumed.
+	 * @return        The first year of the half century
+	 */
+	public static int getHalfCenturyStartYear(int century, int half, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
@@ -442,16 +748,29 @@ public class DateUtils {
 		int startYear;
 		
 		if (era == Era.BCE) {
-			startYear = (year + 99) - (50 * (half - 1));
+			startYear = (century + 99) - (50 * (half - 1));
 		}
 		else {
-			startYear = year + (50 * (half - 1));
+			startYear = century + (50 * (half - 1));
 		}
 		
 		return startYear;
 	}
 	
-	public static int getHalfCenturyEndYear(int year, int half, Era era) {
+	/**
+	 * Gets the last year of a given half century.
+	 * 
+	 * @param century The century, specified as a number ending in 00 or 01.
+	 *                For centuries A.D., this is the first year of the century. For 
+	 *                centuries B.C., this is the last year of the century. For example,
+	 *                the "21st century" would be specified as 2001, whereas the "2000's"
+	 *                would be specified as 2000. The "2nd century B.C." would be specified
+	 *                as 101. The "100's B.C." would be specified as 100.
+	 * @param half    The half
+	 * @param era     The era of the century. If null, Date.DEFAULT_ERA is assumed.
+	 * @return        The last year of the half century
+	 */
+	public static int getHalfCenturyEndYear(int century, int half, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
@@ -459,36 +778,75 @@ public class DateUtils {
 		int endYear;
 		
 		if (era == Era.BCE) {
-			endYear = (year + 99) - (50 * half) + 1;
+			endYear = (century + 99) - (50 * half) + 1;
 		}
 		else {
-			endYear = year + (50 * half) - 1;
+			endYear = century + (50 * half) - 1;
 		}
 		
 		return endYear;
 	}
 	
-	public static Date getQuarterCenturyStartDate(int year, int quarter, Era era) {
+	/**
+	 * Gets the Date representing the first day of a given quarter century.
+	 * 
+	 * @param century The century, specified as a number ending in 00 or 01.
+	 *                For centuries A.D., this is the first year of the century. For 
+	 *                centuries B.C., this is the last year of the century. For example,
+	 *                the "21st century" would be specified as 2001, whereas the "2000's"
+	 *                would be specified as 2000. The "2nd century B.C." would be specified
+	 *                as 101. The "100's B.C." would be specified as 100.
+	 * @param quarter The quarter
+	 * @param era     The era of the century. If null, Date.DEFAULT_ERA is assumed.
+	 * @return        The first day of the quarter century
+	 */
+	public static Date getQuarterCenturyStartDate(int century, int quarter, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
 		
-		int startYear = getQuarterCenturyStartYear(year, quarter, era);
+		int startYear = getQuarterCenturyStartYear(century, quarter, era);
 		
 		return new Date(startYear, 1, 1, era);
 	}
 
-	public static Date getQuarterCenturyEndDate(int year, int quarter, Era era) {
+	/**
+	 * Gets the Date representing the last day of a given quarter century.
+	 * 
+	 * @param century The century, specified as a number ending in 00 or 01.
+	 *                For centuries A.D., this is the first year of the century. For 
+	 *                centuries B.C., this is the last year of the century. For example,
+	 *                the "21st century" would be specified as 2001, whereas the "2000's"
+	 *                would be specified as 2000. The "2nd century B.C." would be specified
+	 *                as 101. The "100's B.C." would be specified as 100.
+	 * @param quarter The quarter
+	 * @param era     The era of the century. If null, Date.DEFAULT_ERA is assumed.
+	 * @return        The last day of the quarter century
+	 */
+	public static Date getQuarterCenturyEndDate(int century, int quarter, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
 		
-		int endYear = getQuarterCenturyEndYear(year, quarter, era);
+		int endYear = getQuarterCenturyEndYear(century, quarter, era);
 		
 		return new Date(endYear, 12, 31, era);
 	}
 	
-	public static int getQuarterCenturyStartYear(int year, int quarter, Era era) {
+	/**
+	 * Gets the first year of a given quarter century.
+	 * 
+	 * @param century The century, specified as a number ending in 00 or 01.
+	 *                For centuries A.D., this is the first year of the century. For 
+	 *                centuries B.C., this is the last year of the century. For example,
+	 *                the "21st century" would be specified as 2001, whereas the "2000's"
+	 *                would be specified as 2000. The "2nd century B.C." would be specified
+	 *                as 101. The "100's B.C." would be specified as 100.
+	 * @param quarter The quarter
+	 * @param era     The era of the century. If null, Date.DEFAULT_ERA is assumed.
+	 * @return        The first year of the quarter century
+	 */
+	public static int getQuarterCenturyStartYear(int century, int quarter, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
@@ -496,16 +854,29 @@ public class DateUtils {
 		int startYear;
 		
 		if (era == Era.BCE) {
-			startYear = (year + 99) - (25 * (quarter - 1));
+			startYear = (century + 99) - (25 * (quarter - 1));
 		}
 		else {
-			startYear = year + (25 * (quarter - 1));
+			startYear = century + (25 * (quarter - 1));
 		}
 		
 		return startYear;
 	}
 	
-	public static int getQuarterCenturyEndYear(int year, int quarter, Era era) {
+	/**
+	 * Gets the last year of a given quarter century.
+	 * 
+	 * @param century The century, specified as a number ending in 00 or 01.
+	 *                For centuries A.D., this is the first year of the century. For 
+	 *                centuries B.C., this is the last year of the century. For example,
+	 *                the "21st century" would be specified as 2001, whereas the "2000's"
+	 *                would be specified as 2000. The "2nd century B.C." would be specified
+	 *                as 101. The "100's B.C." would be specified as 100.
+	 * @param quarter The quarter
+	 * @param era     The era of the century. If null, Date.DEFAULT_ERA is assumed.
+	 * @return        The last year of the quarter century
+	 */
+	public static int getQuarterCenturyEndYear(int century, int quarter, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
@@ -513,23 +884,38 @@ public class DateUtils {
 		int endYear;
 		
 		if (era == Era.BCE) {
-			endYear = (year + 99) - (25 * quarter) + 1;
+			endYear = (century + 99) - (25 * quarter) + 1;
 		}
 		else {
-			endYear = year + (25 * quarter) - 1;
+			endYear = century + (25 * quarter) - 1;
 		}
 		
 		return endYear;
 	}
 	
+	/**
+	 * Converts an nth century number to a year. For example, to convert "21st century"
+	 * to a year, call nthCenturyToYear(21), which returns 2001. For centuries A.D., the
+	 * year returned is the first year of the nth century. For centuries B.C., the
+	 * year returned is the last year of the nth century. 
+	 * 
+	 * @param n The nth century number
+	 * @return  The first year in the nth century, for centuries A.D.
+	 *          The last year of the nth century, for centuries B.C.
+	 */
 	public static int nthCenturyToYear(int n) {
-		// Convert the nth number to a year number.
-		
 		int year = (n-1) * 100 + 1;
 		
 		return year;
 	}
 	
+	/**
+	 * Gets the Date representing the first day of a given millennium.
+	 * 
+	 * @param n   The nth millennium number
+	 * @param era The era of the millennium. If null, Date.DEFAULT_ERA is assumed.
+	 * @return    The first day of the millennium
+	 */
 	public static Date getMillenniumStartDate(int n, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
@@ -539,7 +925,14 @@ public class DateUtils {
 		
 		return new Date(startYear, 1, 1, era);
 	}
-	
+
+	/**
+	 * Gets the Date representing the last day of a given millennium.
+	 * 
+	 * @param n   The nth millennium number
+	 * @param era The era of the millennium. If null, Date.DEFAULT_ERA is assumed.
+	 * @return    The last day of the millennium
+	 */
 	public static Date getMillenniumEndDate(int n, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
@@ -550,6 +943,13 @@ public class DateUtils {
 		return new Date(endYear, 12, 31, era);
 	}
 	
+	/**
+	 * Gets the first year of a given millennium.
+	 * 
+	 * @param n   The nth millennium number
+	 * @param era The era of the millennium. If null, Date.DEFAULT_ERA is assumed.
+	 * @return    The first year of the millennium
+	 */
 	public static int getMillenniumStartYear(int n, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
@@ -567,6 +967,13 @@ public class DateUtils {
 		return year;
 	}
 
+	/**
+	 * Gets the last year of a given millennium.
+	 * 
+	 * @param n   The nth millennium number
+	 * @param era The era of the millennium. If null, Date.DEFAULT_ERA is assumed.
+	 * @return    The last year of the millennium
+	 */
 	public static int getMillenniumEndYear(int n, Era era) {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
@@ -583,6 +990,14 @@ public class DateUtils {
 		
 		return year;
 	}
+	
+	public static Date getBeforeDate(int year, Era era) {
+		return null;
+	}
+	
+	public static Date getAfterDate(int year, Era era) {
+		return null;
+	}
 
 	/**
 	 * Calculates the interval, in years, that should be padded around a date so
@@ -591,7 +1006,7 @@ public class DateUtils {
 	 * 
 	 * @param  year The year of the date
 	 * @param  era  The era of the date. If null, Date.DEFAULT_ERA is assumed.
-	 * @return      The number of "circa" years before and after the date  
+	 * @return      The number of "circa" years before and after the date
 	 */
 	public static int getCircaIntervalYears(int year, Era era) {
 		/*
