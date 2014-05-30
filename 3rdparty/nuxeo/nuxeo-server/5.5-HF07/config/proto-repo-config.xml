@@ -8,7 +8,7 @@
                 <pool minPoolSize="0" maxPoolSize="20"
                       blockingTimeoutMillis="100" idleTimeoutMinutes="10" />
                 <clustering enabled="false" delay="1000" />
-                <binaryStore path="" />
+                <binaryStore path="" /> <!-- Should be parameterized. See CSPACE-6393 -->
                 <!-- Values in the following elements are primarily added during execution -->
                 <!-- of the 'ant deploy' command, within the Services source code tree. -->
                 <!-- (Several values are also added during system startup, into repository-specific -->
