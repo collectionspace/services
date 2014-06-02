@@ -565,6 +565,11 @@
   'c 1950-2013':                         # uncertainDate, hyphenatedRange, year
                                          earliestSingleDate: [1942,  1,  1, CE]
                                          latestDate:         [2017, 12, 31, CE]
+
+  "ca. 1730's":                           # uncertainDate, decade
+                                         earliestSingleDate: [1711,  1,  1, CE]
+                                         latestDate:         [1757, 12, 31, CE]
+
          
 # -------------------------------------------------------------------------------------------------------                                         
 # Invalid dates

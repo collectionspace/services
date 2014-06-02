@@ -13,4 +13,10 @@ public enum Era {
 	public String toString() {
 		return value;
 	}
+	
+	public String toDisplayString() {
+		int index = value.indexOf("'");
+		
+		return value.substring(index + 1, value.length() - 1);
+	}
 }

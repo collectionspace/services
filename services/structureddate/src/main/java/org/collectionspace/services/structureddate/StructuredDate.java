@@ -50,7 +50,7 @@ public class StructuredDate {
 			string += 
 				"\n" +
 				"\tlatestDate: \n" +
-				getLatestDate().toString() + "\n";			
+				getLatestDate().toString() + "\n";
 		}
 		
 		return string;
