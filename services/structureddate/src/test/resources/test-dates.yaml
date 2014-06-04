@@ -1002,83 +1002,82 @@
                                          earliestSingleDate: [ 300,  9,  5, BCE]
                                          latestDate:         [ 300,  9, 18, BCE]
 
-  # 'circa 2013':                          # uncertainDate, year
-  #                                        earliestSingleDate: [2013,  1,  1, CE, null, MINUS, 4, YEARS]
-  #                                        latestDate:         [2013, 12, 31, CE, null, PLUS,  4, YEARS]
+  # 'circa 2013':                        # uncertainDate, year
+  #                                      earliestSingleDate: [2013,  1,  1, CE, null, MINUS, 4, YEARS]
+  #                                      latestDate:         [2013, 12, 31, CE, null, PLUS,  4, YEARS]
 
   'circa 2013':                          # uncertainDate, year
                                          earliestSingleDate: [2009,  1,  1, CE]
                                          latestDate:         [2017, 12, 31, CE]
 
-  # 'ca 2013':                             # uncertainDate, year
-  #                                        earliestSingleDate: [2013,  1,  1, CE, null, MINUS, 4, YEARS]
-  #                                        latestDate:         [2013, 12, 31, CE, null, PLUS,  4, YEARS]
+  # 'ca 2013':                           # uncertainDate, year - using qualifier/value/unit fields
+  #                                      earliestSingleDate: [2013,  1,  1, CE, null, MINUS, 4, YEARS]
+  #                                      latestDate:         [2013, 12, 31, CE, null, PLUS,  4, YEARS]
 
   'ca 2013':                             # uncertainDate, year
                                          earliestSingleDate: [2009,  1,  1, CE]
                                          latestDate:         [2017, 12, 31, CE]
 
-  # 'ca. 2013':                            # uncertainDate, year
-  #                                        earliestSingleDate: [2013,  1,  1, CE, null, MINUS, 4, YEARS]
-  #                                        latestDate:         [2013, 12, 31, CE, null, PLUS,  4, YEARS]
+  # 'ca. 2013':                          # uncertainDate, year - using qualifier/value/unit fields
+  #                                      earliestSingleDate: [2013,  1,  1, CE, null, MINUS, 4, YEARS]
+  #                                      latestDate:         [2013, 12, 31, CE, null, PLUS,  4, YEARS]
 
-  'ca. 2013':                            # uncertainDate, year
+  'ca. 2013':                            # uncertainDate, year - calculating the uncertainty into the year field
                                          earliestSingleDate: [2009,  1,  1, CE]
                                          latestDate:         [2017, 12, 31, CE]
 
-  # 'c. 1950':                             # uncertainDate, year
-  #                                        earliestSingleDate: [1950,  1,  1, CE, null, MINUS, 8, YEARS]
-  #                                        latestDate:         [1950, 12, 31, CE, null, PLUS,  8, YEARS]
+  # 'c. 1950':                           # uncertainDate, year - using qualifier/value/unit fields
+  #                                      earliestSingleDate: [1950,  1,  1, CE, null, MINUS, 8, YEARS]
+  #                                      latestDate:         [1950, 12, 31, CE, null, PLUS,  8, YEARS]
 
-  'c. 1950':                             # uncertainDate, year
+  'c. 1950':                             # uncertainDate, year - calculating the uncertainty into the year field
                                          earliestSingleDate: [1942,  1,  1, CE]
                                          latestDate:         [1958, 12, 31, CE]
 
-  # 'c1950':                               # uncertainDate, year
-  #                                        earliestSingleDate: [1950,  1,  1, CE, null, MINUS, 8, YEARS]
-  #                                        latestDate:         [1950, 12, 31, CE, null, PLUS,  8, YEARS]
+  # 'c1950':                             # uncertainDate, year - using qualifier/value/unit fields
+  #                                      earliestSingleDate: [1950,  1,  1, CE, null, MINUS, 8, YEARS]
+  #                                      latestDate:         [1950, 12, 31, CE, null, PLUS,  8, YEARS]
 
-  'c1950':                               # uncertainDate, year
+  'c1950':                               # uncertainDate, year - calculating the uncertainty into the year field
                                          earliestSingleDate: [1942,  1,  1, CE]
                                          latestDate:         [1958, 12, 31, CE]
 
-  # 'Circa 10 BC':                         # uncertainDate, year
-  #                                        earliestSingleDate: [  10,  1,  1, BCE, null, MINUS, 106, YEARS]
-  #                                        latestDate:         [  10, 12, 31, BCE, null, PLUS,  106, YEARS]
+  # 'Circa 10 BC':                       # uncertainDate, year - using qualifier/value/unit fields
+  #                                      earliestSingleDate: [  10,  1,  1, BCE, null, MINUS, 106, YEARS]
+  #                                      latestDate:         [  10, 12, 31, BCE, null, PLUS,  106, YEARS]
 
-  'Circa 10 BC':                         # uncertainDate, year
+  'Circa 10 BC':                         # uncertainDate, year - calculating the uncertainty into the year field
                                          earliestSingleDate: [ 116,  1,  1, BCE]
                                          latestDate:         [  97, 12, 31, CE]
 
-  # 'Circa 10':                            # uncertainDate, year
-  #                                        earliestSingleDate: [  10,  1,  1, CE, null, MINUS, 105, YEARS]
-  #                                        latestDate:         [  10, 12, 31, CE, null, PLUS,  105, YEARS]
+  # 'Circa 10':                          # uncertainDate, year - using qualifier/value/unit fields
+  #                                      earliestSingleDate: [  10,  1,  1, CE, null, MINUS, 105, YEARS]
+  #                                      latestDate:         [  10, 12, 31, CE, null, PLUS,  105, YEARS]
 
-  'Circa 10':                            # uncertainDate, year
+  'Circa 10':                            # uncertainDate, year - calculating the uncertainty into the year field
                                          earliestSingleDate: [  96,  1,  1, BCE]
                                          latestDate:         [ 115, 12, 31, CE]
 
-  # 'circa 2100':                          # uncertainDate, year
-  #                                        earliestSingleDate: [2100,  1,  1, CE, null, MINUS, 0, YEARS]
-  #                                        latestDate:         [2100, 12, 31, CE, null, PLUS,  0, YEARS]
+  # 'circa 2100':                        # uncertainDate, year - using qualifier/value/unit fields
+  #                                      earliestSingleDate: [2100,  1,  1, CE, null, MINUS, 0, YEARS]
+  #                                      latestDate:         [2100, 12, 31, CE, null, PLUS,  0, YEARS]
 
-  'circa 2100':                          # uncertainDate, year
+  'circa 2100':                          # uncertainDate, year - calculating the uncertainty into the year field
                                          earliestSingleDate: [2100,  1,  1, CE]
                                          latestDate:         [2100, 12, 31, CE]
 
-  # 'c 1950-2013':                         # uncertainDate, hyphenatedRange, year
-  #                                        earliestSingleDate: [1950,  1,  1, CE, null, MINUS, 8, YEARS]
-  #                                        latestDate:         [2013, 12, 31, CE, null, PLUS,  4, YEARS]
+  # 'c 1950-2013':                       # uncertainDate, hyphenatedRange, year - using qualifier/value/unit fields
+  #                                      earliestSingleDate: [1950,  1,  1, CE, null, MINUS, 8, YEARS]
+  #                                      latestDate:         [2013, 12, 31, CE, null, PLUS,  4, YEARS]
 
-  'c 1950-2013':                         # uncertainDate, hyphenatedRange, year
+  'c 1950-2013':                         # uncertainDate, hyphenatedRange, year - calculating the uncertainty into the year field
                                          earliestSingleDate: [1942,  1,  1, CE]
                                          latestDate:         [2017, 12, 31, CE]
 
-  "ca. 1730's":                           # uncertainDate, decade
+  "ca. 1730's":                          # uncertainDate, decade - calculating the uncertainty into the year field
                                          earliestSingleDate: [1711,  1,  1, CE]
                                          latestDate:         [1757, 12, 31, CE]
 
-         
 # -------------------------------------------------------------------------------------------------------                                         
 # Invalid dates
 # -------------------------------------------------------------------------------------------------------

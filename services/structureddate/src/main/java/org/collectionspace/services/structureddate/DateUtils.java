@@ -991,14 +991,128 @@ public class DateUtils {
 		return year;
 	}
 	
-	public static Date getBeforeDate(int year, Era era) {
-		return null;
+	/**
+	 * Calculates the earliest date that may be considered to be "before"
+	 * a given date.
+	 * 
+	 * @param date The date
+	 * @return     The earliest date "before" the date
+	 */
+	public static Date getEarliestBeforeDate(Date date) {
+		return getEarliestBeforeDate(date, null);
 	}
 	
-	public static Date getAfterDate(int year, Era era) {
+	/**
+	 * Calculates the latest date that may be considered to be "after"
+	 * a given date.
+	 * 
+	 * @param date The date
+	 * @return     The latest date "after" the date
+	 */
+	public static Date getLatestAfterDate(Date date) {
+		return getLatestAfterDate(date, null);
+	}
+	
+	/**
+	 * Calculates the earliest date that may be considered to be "before"
+	 * a given date range.
+	 * 
+	 * @param startDate The first date in the range
+	 * @param endDate   The last date in the range
+	 * @return          The earliest date "before" the range
+	 */
+	public static Date getEarliestBeforeDate(Date startDate, Date endDate) {
+		// TODO
+		return null;
+		
+		/*
+		// This algorithm is inherited from the XDB fuzzydate parser,
+		// which considers "before" to mean "within a lifetime before".
+
+		if (endDate == null) {
+			endDate = startDate;
+		}
+		
+		int difference = getYearDifference(startDate, endDate);
+		
+		Date earliestDate = startDate.copy();
+		subtractYears(earliestDate, 1);
+		earliestDate.setMonth(1);
+		earliestDate.setDay(1);
+		
+		if (difference < 100) {
+			// The comment from the XDB fuzzydate parser states:
+			//
+			//    Before/after years are really about birth/death dates
+			//    so we use average life-span of 75 years
+
+			subtractYears(earliestDate, 75);
+		}
+		else {
+			// The comment from the XDB fuzzydate parser states:
+			//
+			//    Before/after years are really about birth/death dates
+			//    so we use average life-span of 75 years
+			//    but since  the spec was a century, e.g. pre 20th century
+			//    we'll make the range a bit bigger
+			//    sheesh...
+
+			subtractYears(earliestDate, 175);
+		}
+		
+		return earliestDate;
+		*/
+	}
+	
+	/**
+	 * Calculates the latest date that may be considered to be "after"
+	 * a given date range.
+	 * 
+	 * @param startDate The first date in the range
+	 * @param endDate   The last date in the range
+	 * @return          The latest date "after" the range
+	 */
+	public static Date getLatestAfterDate(Date startDate, Date endDate) {
+		// TODO
 		return null;
 	}
 
+	public static int getYearDifference(Date startDate, Date endDate) {
+		if (startDate == null || endDate == null) {
+			throw new IllegalArgumentException("null date not allowed");
+		}
+		
+		Integer startYear = startDate.getYear();
+		Integer endYear = endDate.getYear();
+		
+		if (startYear == null || endYear == null) {
+			throw new IllegalArgumentException("null year not allowed");
+		}
+		
+		Era startEra = startDate.getEra();
+		Era endEra = endDate.getEra();
+		
+		if (startEra == null || endEra == null) {
+			throw new IllegalArgumentException("null era not allowed");
+		}
+		
+		if (startEra == Era.BCE) {
+			startYear = -startYear;
+		}
+		
+		if (endEra == Era.BCE) {
+			endYear = -endYear;
+		}
+		
+		int difference = Math.abs(endYear - startYear);
+		
+		if (startEra != endEra) {
+			difference = difference - 1;
+		}
+		
+		return difference;
+	}
+	
 	/**
 	 * Calculates the interval, in years, that should be padded around a date so
 	 * that any date within that interval may be considered to be "circa" the

@@ -62,6 +62,22 @@ public class Date {
 			"\t\tqualifierUnit:  " + getQualifierUnit() + "\n" +
 			"\t\tscalarValue:    " + getScalarValue() + "\n";
 	}
+	
+	public Date copy() {
+		Date newDate = new Date();
+		
+		newDate.setYear(getYear());
+		newDate.setMonth(getMonth());
+		newDate.setDay(getDay());
+		newDate.setEra(getEra());
+		newDate.setCertainty(getCertainty());
+		newDate.setQualifierType(getQualifierType());
+		newDate.setQualifierValue(getQualifierValue());
+		newDate.setQualifierUnit(getQualifierUnit());
+		newDate.setScalarValue(getScalarValue());
+		
+		return newDate;
+	}
 
 	@Override
 	public boolean equals(Object obj) {

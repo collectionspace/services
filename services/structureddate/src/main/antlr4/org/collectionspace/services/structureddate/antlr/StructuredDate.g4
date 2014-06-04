@@ -15,7 +15,12 @@ oneDisplayDate:        displayDate EOF ;
 
 displayDate:           uncertainDate
 |                      certainDate
+/* TODO: Need to decide what "before" and "after" actually mean
+|                      beforeOrAfterDate
+*/
 ;
+
+beforeOrAfterDate:     ( BEFORE | AFTER ) singleInterval ;
 
 uncertainDate:         CIRCA certainDate ;
 
@@ -30,13 +35,6 @@ hyphenatedRange:       singleInterval HYPHEN singleInterval
 |                      strDayInMonthRange
 |                      numDayInMonthRange
 ;
-
-/* TODO: */
-/*
-before:                BEFORE singleInterval ;
-
-after:                 AFTER singleInterval ;
-*/
 
 singleInterval:        yearSpanningWinter
 |                      partialYear

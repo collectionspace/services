@@ -37,6 +37,7 @@ import org.collectionspace.services.structureddate.StructuredDate;
 import org.collectionspace.services.structureddate.StructuredDateEvaluator;
 import org.collectionspace.services.structureddate.StructuredDateFormatException;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.AllOrPartOfContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.BeforeOrAfterDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.CenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.CertainDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DateContext;
@@ -153,6 +154,48 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		result.setEarliestSingleDate(earliestDate);
 		result.setLatestDate(latestDate);
+	}
+
+	@Override
+	public void exitBeforeOrAfterDate(BeforeOrAfterDateContext ctx) {
+		if (ctx.exception != null) return;
+
+		Date latestDate = (Date) stack.pop();
+		Date earliestDate = (Date) stack.pop();
+
+		// Set null eras to the default.
+		
+		if (earliestDate.getEra() == null) {
+			earliestDate.setEra(Date.DEFAULT_ERA);
+		}
+		
+		if (latestDate.getEra() == null) {
+			latestDate.setEra(Date.DEFAULT_ERA);
+		}
+		
+		// Finalize any deferred calculations.
+		
+		if (latestDate instanceof DeferredDate) {
+			((DeferredDate) latestDate).resolveDate();
+		}
+		
+		if (earliestDate instanceof DeferredDate) {
+			((DeferredDate) earliestDate).resolveDate();
+		}
+		
+		// Calculate the earliest date or end date.
+		
+		if (ctx.BEFORE() != null) {
+			latestDate = earliestDate;
+			earliestDate = DateUtils.getEarliestBeforeDate(earliestDate, latestDate);
+		}
+		else if (ctx.AFTER() != null) {
+			earliestDate = latestDate;
+			latestDate = DateUtils.getLatestAfterDate(earliestDate, latestDate);
+		}
+
+		stack.push(earliestDate);
+		stack.push(latestDate);
 	}
 
 	@Override
