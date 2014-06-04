@@ -1,8 +1,5 @@
-package org.collectionspace.services.structureddate.antlr;
+package org.collectionspace.services.structureddate;
 
-import org.collectionspace.services.structureddate.Date;
-import org.collectionspace.services.structureddate.DateUtils;
-import org.collectionspace.services.structureddate.Era;
 
 /**
  * A deferred date that represents the start of a decade. The start year
@@ -13,20 +10,21 @@ public class DeferredDecadeStartDate extends DeferredDecadeDate {
 
 	public DeferredDecadeStartDate(Integer decade) {
 		super(decade);
-		
-		setMonth(1);
-		setDay(1);
 	}
 	
 	@Override
-	public void finalizeDate() {
+	public void resolveDate() {
 		Era era = getEra();
 		
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
-			setEra(era);
 		}
 		
-		setYear(DateUtils.getDecadeStartYear(decade, era));
+		Date startDate = DateUtils.getDecadeStartDate(decade, era);
+		
+		setYear(startDate.getYear());
+		setMonth(startDate.getMonth());
+		setDay(startDate.getDay());
+		setEra(startDate.getEra());
 	}
 }

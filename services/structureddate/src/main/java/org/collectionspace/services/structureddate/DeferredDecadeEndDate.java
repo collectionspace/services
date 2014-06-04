@@ -1,8 +1,5 @@
-package org.collectionspace.services.structureddate.antlr;
+package org.collectionspace.services.structureddate;
 
-import org.collectionspace.services.structureddate.Date;
-import org.collectionspace.services.structureddate.DateUtils;
-import org.collectionspace.services.structureddate.Era;
 
 /**
  * A deferred date that represents the end of a decade. The end year
@@ -13,20 +10,21 @@ public class DeferredDecadeEndDate extends DeferredDecadeDate {
 
 	public DeferredDecadeEndDate(Integer decade) {
 		super(decade);
-		
-		setMonth(12);
-		setDay(31);
 	}
 	
 	@Override
-	public void finalizeDate() {
+	public void resolveDate() {
 		Era era = getEra();
 		
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
-			setEra(era);
 		}
 		
-		setYear(DateUtils.getDecadeEndYear(decade, era));
+		Date endDate = DateUtils.getDecadeEndDate(decade, era);
+		
+		setYear(endDate.getYear());
+		setMonth(endDate.getMonth());
+		setDay(endDate.getDay());
+		setEra(endDate.getEra());
 	}
 }
