@@ -724,7 +724,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer year = new Integer(stripEndLetters(ctx.HUNDREDS().getText()));
 		
 		if (year == 0) {
-			throw new StructuredDateFormatException("unexpected century '0'");
+			throw new StructuredDateFormatException("unexpected century '" + ctx.HUNDREDS().getText() + "'");
 		}
 		
 		stack.push(year);
@@ -738,7 +738,11 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// and push on the stack.
 
 		Integer year = new Integer(stripEndLetters(ctx.TENS().getText()));
-		
+
+		if (year == 0) {
+			throw new StructuredDateFormatException("unexpected decade '" + ctx.TENS().getText() + "'");
+		}
+
 		stack.push(year);
 	}
 
@@ -748,18 +752,30 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		// Convert the string to a number,
 		// and push on the stack.
+		
+		Integer year = new Integer(ctx.NUMBER().getText());
+				
+		if (year == 0) {
+			throw new StructuredDateFormatException("unexpected year '" + ctx.NUMBER().getText() + "'");
+		}
 
-		stack.push(new Integer(ctx.NUMBER().getText()));
+		stack.push(year);
 	}
 
 	@Override
 	public void exitNumMonth(NumMonthContext ctx) {
 		if (ctx.exception != null) return;
 
-		// Convert the string to a number,
+		// Convert the string a number,
 		// and push on the stack.
 		
-		stack.push(new Integer(ctx.NUMBER().getText()));
+		Integer month = new Integer(ctx.NUMBER().getText());
+		
+		if (month < 1 || month > 12) {
+			throw new StructuredDateFormatException("unexpected month '" + ctx.NUMBER().getText() + "'");
+		}
+		
+		stack.push(month);
 	}
 
 	@Override
@@ -850,10 +866,6 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		}
 		
 		String monthStr = monthNode.getText();
-		
-		if (monthStr.equals("sept")) {
-			monthStr = "sep";
-		}
 
 		stack.push(DateUtils.getMonthByName(monthStr));
 	}
@@ -900,7 +912,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitPartOf(PartOfContext ctx) {
 		if (ctx.exception != null) return;
 		
-		// Convert the string to a Part,
+		// Convert the token to a Part,
 		// and push on the stack.
 		
 		Part part = null;
@@ -922,7 +934,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitEra(EraContext ctx) {
 		if (ctx.exception != null) return;
 
-		// Convert the string to an Era,
+		// Convert the token to an Era,
 		// and push on the stack.
 		
 		Era era = null;
@@ -941,6 +953,9 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitNumDayOfMonth(NumDayOfMonthContext ctx) {
 		if (ctx.exception != null) return;
 
+		// Convert the numeric string to an Integer,
+		// and push on the stack.
+		
 		stack.push(new Integer(ctx.NUMBER().getText()));
 	}
 	

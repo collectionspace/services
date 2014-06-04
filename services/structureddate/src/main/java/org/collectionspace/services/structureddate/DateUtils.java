@@ -15,6 +15,13 @@ public class DateUtils {
 	 * @return          The number of the month, between 1 and 12
 	 */
 	public static int getMonthByName(String monthName) {
+		// Normalize "sept" to "sep", since DateTimeFormat doesn't
+		// understand the former.
+		
+		if (monthName.equals("sept")) {
+			monthName = "sep";
+		}
+		
 		return monthFormatter.parseDateTime(monthName).getMonthOfYear();
 	}
 	
