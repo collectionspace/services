@@ -1,8 +1,8 @@
 package org.collectionspace.services.structureddate;
 
 public enum Era {
-	BCE ("urn:cspace:cinefiles.cspace.berkeley.edu:vocabularies:name(dateera):item:name(bce)'BCE'"),
-	CE  ("urn:cspace:cinefiles.cspace.berkeley.edu:vocabularies:name(dateera):item:name(ce)'CE'");
+	BCE ("urn:cspace:bampfa.cspace.berkeley.edu:vocabularies:name(dateera):item:name(bce)'BC'"),
+	CE  ("urn:cspace:bampfa.cspace.berkeley.edu:vocabularies:name(dateera):item:name(ce)'AD'");
 	
 	private final String value;
 	
