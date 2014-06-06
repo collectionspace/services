@@ -4,6 +4,7 @@ import org.joda.time.Chronology;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.Days;
+import org.joda.time.IllegalFieldValueException;
 import org.joda.time.MutableDateTime;
 import org.joda.time.Years;
 import org.joda.time.chrono.GJChronology;
@@ -1225,7 +1226,15 @@ public class DateUtils {
 			era = Date.DEFAULT_ERA;
 		}
 		
-		MutableDateTime dateTime = convertToDateTime(date);
+		MutableDateTime dateTime = null;
+		
+		try {
+			dateTime = convertToDateTime(date);
+		}
+		catch(IllegalFieldValueException e) {
+			throw new InvalidDateException(e.getMessage());
+		}
+		
 		String scalarDate = scalarDateFormatter.print(dateTime);
 		
 		return scalarDate;
@@ -1238,7 +1247,15 @@ public class DateUtils {
 			era = Date.DEFAULT_ERA;
 		}
 		
-		MutableDateTime dateTime = convertToDateTime(date);
+		MutableDateTime dateTime = null;
+		
+		try {
+			dateTime = convertToDateTime(date);
+		}
+		catch(IllegalFieldValueException e) {
+			throw new InvalidDateException(e.getMessage());
+		}
+		
 		dateTime.setTime(23, 59, 59, 999);
 		
 		String scalarDate = scalarDateFormatter.print(dateTime);

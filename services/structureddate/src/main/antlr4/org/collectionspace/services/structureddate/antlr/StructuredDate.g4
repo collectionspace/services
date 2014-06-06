@@ -11,7 +11,7 @@ grammar StructuredDate;
  * Parser rules
  */
 
-oneDisplayDate:        displayDate EOF ; 
+oneDisplayDate:        displayDate DOT? EOF ; 
 
 displayDate:           uncertainDate
 |                      certainDate
@@ -134,7 +134,7 @@ SUMMER:         'summer' | 'sum' ;
 WINTER:         'winter' | 'win' ;
 FALL:           'fall' | 'autumn' | 'fal' | 'aut' ;
 EARLY:          'early' ;
-MIDDLE:         'middle' | 'mid' '-'?;
+MIDDLE:         'middle' | 'mid' ('-' | DOT)?;
 LATE:           'late' ;
 BEFORE:         'before' | 'pre' '-'? ;
 AFTER:          'after' | 'post' '-'?;
