@@ -4,11 +4,11 @@ package org.collectionspace.services.structureddate;
 /**
  * A deferred date that represents the start of a decade. The start year
  * can not be determined until the era of the decade is known. Once the 
- * era is known, finalizeDate() may be called to calculate the year.
+ * era is known, resolveDate() may be called to calculate the year.
  */
 public class DeferredDecadeStartDate extends DeferredDecadeDate {
 
-	public DeferredDecadeStartDate(Integer decade) {
+	public DeferredDecadeStartDate(int decade) {
 		super(decade);
 	}
 	

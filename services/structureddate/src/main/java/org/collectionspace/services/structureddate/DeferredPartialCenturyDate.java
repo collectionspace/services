@@ -1,5 +1,8 @@
 package org.collectionspace.services.structureddate;
 
+/**
+ * A deferred date that represents an endpoint of a partial century.
+ */
 public abstract class DeferredPartialCenturyDate extends DeferredCenturyDate {
 	protected Part part;
 	

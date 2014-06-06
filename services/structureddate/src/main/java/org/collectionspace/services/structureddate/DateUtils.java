@@ -1,12 +1,39 @@
 package org.collectionspace.services.structureddate;
 
+import org.joda.time.Chronology;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
+import org.joda.time.Days;
+import org.joda.time.IllegalFieldValueException;
+import org.joda.time.MutableDateTime;
+import org.joda.time.Years;
 import org.joda.time.chrono.GJChronology;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 public class DateUtils {
-	private static DateTimeFormatter monthFormatter = DateTimeFormat.forPattern("MMMM");
+	private static final DateTimeFormatter monthFormatter = DateTimeFormat.forPattern("MMMM");
+	private static final DateTimeFormatter scalarDateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+	// The chronology to use for date calculations, which are done using the joda-time library.
+	// See http://www.joda.org/joda-time/apidocs/org/joda/time/Chronology.html for descriptions of
+	// the chronologies supported by joda-time.
+	
+	// GJChronology (http://www.joda.org/joda-time/apidocs/org/joda/time/chrono/GJChronology.html)
+	// seems best for representing a mix of modern and historical dates, as might be seen by an
+	// anthropology museum.
+	
+	private static final Chronology chronology = GJChronology.getInstance();
+	
+	// Define the DateTime that serves as the basis for circa calculations, using the algorithm
+	// ported from the XDB date parser. Its comment states:
+	//
+	//    We define circa year/century specifications offsets
+	//    as +/- 5% of the difference between that year/century
+	//    and the present (2100), so that the farther we go back
+	//    in time, the wider the range of meaning of "circa."
+	
+	private static final DateTime circaBaseDateTime = new DateTime(2100, 12, 31, 0, 0, 0, 0, chronology);
 	
 	/**
 	 * Gets the number (1-12) of a month for a given name.
@@ -32,10 +59,16 @@ public class DateUtils {
 	 * @param year  The year (in order to account for leap years)
 	 * @return      The number of days in the month
 	 */
-	// FIXME: This should also take era as an argument. Currently, A.D. is assumed.
-	public static int getDaysInMonth(int month, int year) {
-		DateTime dateTime = new DateTime(GJChronology.getInstance()).withYear(year).withMonthOfYear(month);
+	public static int getDaysInMonth(int month, int year, Era era) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
 		
+		DateTime dateTime = new DateTime(chronology)
+				.withEra((era == Era.BCE) ? DateTimeConstants.BC : DateTimeConstants.AD)
+				.withYearOfEra(year)
+				.withMonthOfYear(month);
+
 		return dateTime.dayOfMonth().getMaximumValue();
 	}
 	
@@ -46,7 +79,7 @@ public class DateUtils {
 	 * @param quarter The quarter, between 1 and 4
 	 * @return        The first day of the quarter year
 	 */
-	public static Date getQuarterYearStartDate(int year, int quarter) {
+	public static Date getQuarterYearStartDate(int quarter, int year) {
 		int startMonth = getQuarterYearStartMonth(quarter);
 		
 		return new Date(year, startMonth, 1);
@@ -59,10 +92,10 @@ public class DateUtils {
 	 * @param quarter The quarter, between 1 and 4
 	 * @return        The last day of the quarter year
 	 */
-	public static Date getQuarterYearEndDate(int year, int quarter) {
+	public static Date getQuarterYearEndDate(int quarter, int year, Era era) {
 		int endMonth = getQuarterYearEndMonth(quarter);
 		
-		return new Date(year, endMonth, DateUtils.getDaysInMonth(endMonth, year));
+		return new Date(year, endMonth, DateUtils.getDaysInMonth(endMonth, year, era));
 	}
 	
 	/**
@@ -92,7 +125,7 @@ public class DateUtils {
 	 * @param half The half, between 1 and 2
 	 * @return     The first day of the half year
 	 */
-	public static Date getHalfYearStartDate(int year, int half) {
+	public static Date getHalfYearStartDate(int half, int year) {
 		int startMonth = getHalfYearStartMonth(half);
 		
 		return new Date(year, startMonth, 1);
@@ -106,10 +139,10 @@ public class DateUtils {
 	 * @param half The half, between 1 and 2
 	 * @return     The last day of the half year
 	 */
-	public static Date getHalfYearEndDate(int year, int half) {
+	public static Date getHalfYearEndDate(int half, int year, Era era) {
 		int endMonth = getHalfYearEndMonth(half);
 		
-		return new Date(year, endMonth, DateUtils.getDaysInMonth(endMonth, year));
+		return new Date(year, endMonth, DateUtils.getDaysInMonth(endMonth, year, era));
 	}
 
 	/**
@@ -139,7 +172,7 @@ public class DateUtils {
 	 * @param part The part
 	 * @return     The first day of the partial year
 	 */
-	public static Date getPartialYearStartDate(int year, Part part) {
+	public static Date getPartialYearStartDate(Part part, int year) {
 		int startMonth = getPartialYearStartMonth(part);
 		
 		return new Date(year, startMonth, 1);
@@ -152,10 +185,10 @@ public class DateUtils {
 	 * @param part The part
 	 * @return     The last day of the partial year
 	 */
-	public static Date getPartialYearEndDate(int year, Part part) {
+	public static Date getPartialYearEndDate(Part part, int year, Era era) {
 		int endMonth = getPartialYearEndMonth(part);
 		
-		return new Date(year, endMonth, DateUtils.getDaysInMonth(endMonth, year));
+		return new Date(year, endMonth, DateUtils.getDaysInMonth(endMonth, year, era));
 	}
 	
 	/**
@@ -1040,7 +1073,7 @@ public class DateUtils {
 			endDate = startDate;
 		}
 		
-		int difference = getYearDifference(startDate, endDate);
+		int difference = getYearsBetween(startDate, endDate);
 		
 		Date earliestDate = startDate.copy();
 		subtractYears(earliestDate, 1);
@@ -1084,40 +1117,31 @@ public class DateUtils {
 		return null;
 	}
 
-	public static int getYearDifference(Date startDate, Date endDate) {
+	public static int getYearsBetween(Date startDate, Date endDate) {
 		if (startDate == null || endDate == null) {
-			throw new IllegalArgumentException("null date not allowed");
+			throw new InvalidDateException("date must not be null");
 		}
 		
 		Integer startYear = startDate.getYear();
 		Integer endYear = endDate.getYear();
 		
 		if (startYear == null || endYear == null) {
-			throw new IllegalArgumentException("null year not allowed");
+			throw new IllegalArgumentException("year must not be null");
 		}
 		
 		Era startEra = startDate.getEra();
 		Era endEra = endDate.getEra();
 		
 		if (startEra == null || endEra == null) {
-			throw new IllegalArgumentException("null era not allowed");
+			throw new IllegalArgumentException("era must not be null");
 		}
 		
-		if (startEra == Era.BCE) {
-			startYear = -startYear;
-		}
+		MutableDateTime startDateTime = convertToDateTime(startDate);
+		MutableDateTime endDateTime = convertToDateTime(endDate);
 		
-		if (endEra == Era.BCE) {
-			endYear = -endYear;
-		}
+		int years = Years.yearsBetween(startDateTime, endDateTime).getYears();
 		
-		int difference = Math.abs(endYear - startYear);
-		
-		if (startEra != endEra) {
-			difference = difference - 1;
-		}
-		
-		return difference;
+		return years;
 	}
 	
 	/**
@@ -1145,83 +1169,135 @@ public class DateUtils {
 			era = Date.DEFAULT_ERA;
 		}
 		
-		if (era == Era.BCE) {
-			year = -year;
-		}
-	
-		return ((int) Math.round(Math.abs(2100 - year) * 0.05));
+		MutableDateTime dateTime = new MutableDateTime(chronology);
+		dateTime.era().set((era == Era.BCE) ? DateTimeConstants.BC : DateTimeConstants.AD);
+		dateTime.yearOfEra().set(year);
+		dateTime.monthOfYear().set(1);
+		dateTime.dayOfMonth().set(1);
+		dateTime.setTime(0, 0, 0, 0);
+		
+		int years = Years.yearsBetween(dateTime, circaBaseDateTime).getYears();
+
+		return ((int) Math.round(years * 0.05));
 	}
 	
 	/**
-	 * Adds a number of years to a date.
+	 * Adds a number of days to a date.
+	 * 
+	 * @param date The date	
+	 * @param days The number of days to add to the date
+	 */
+	public static void addDays(Date date, int days) {
+		MutableDateTime dateTime = convertToDateTime(date);
+		
+		dateTime.add(Days.days(days));
+		
+		setFromDateTime(date, dateTime);
+	}
+	
+	/**
+	 * Adds a number of years to a date's year.
 	 * 
 	 * @param date  The date	
 	 * @param years The number of years to add to the date
 	 */
 	public static void addYears(Date date, int years) {
-		Integer currentYear = date.getYear();
-		
-		if (currentYear == null) {
-			throw new IllegalArgumentException("null year in date");
-		}
+		MutableDateTime dateTime = convertToDateTime(date);
 
-		Era currentEra = date.getEra();
+		dateTime.add(Years.years(years));
 		
-		if (currentEra == null) {
-			currentEra = Date.DEFAULT_ERA;
-		}
-
-		int newYear = currentYear;
-		Era newEra = currentEra;
-
-		if (years > 0) {
-			if (currentEra == Era.CE) {
-				newYear = currentYear + years;
-			}
-			else {
-				newYear = currentYear - years;
-				
-				if (newYear <= 0) {
-					// We crossed the BC/AD boundary. Flip the sign, and 
-					// add one, since there's no year zero.					
-					newYear = -newYear + 1;
-					
-					// Change the era.
-					newEra = Era.CE;
-				}
-			}
-		}
-		else if (years < 0) {
-			years = -years;
-			
-			if (currentEra == Era.BCE) {
-				newYear = currentYear + years;
-			}
-			else {
-				newYear = currentYear - years;
-				
-				if (newYear <= 0) {
-					// We crossed the AD/BC boundary. Flip the sign, and
-					// add one, since there's no year zero.
-					newYear = -newYear + 1;
-					
-					// Change the era.
-					newEra = Era.BCE;
-				}
-			}
-		}
-		
-		date.setYear(newYear);
-		date.setEra(newEra);
+		setFromDateTime(date, dateTime);
 	}
 	
 	/**
-	 * Subtracts a number of years from a date.
+	 * Subtracts a number of years from a date's year.
 	 * 
 	 * @param date  The date	
 	 * @param years The number of years to subtract from the date
 	 */
 	public static void subtractYears(Date date, int years) {
 		addYears(date, -years);
+	}
+	
+	public static String getEarliestTimestamp(Date date) {
+		Era era = date.getEra();
+		
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+		
+		MutableDateTime dateTime = null;
+		
+		try {
+			dateTime = convertToDateTime(date);
+		}
+		catch(IllegalFieldValueException e) {
+			throw new InvalidDateException(e.getMessage());
+		}
+		
+		String scalarDate = scalarDateFormatter.print(dateTime);
+		
+		return scalarDate;
+	}
+	
+	public static String getLatestTimestamp(Date date) {
+		Era era = date.getEra();
+		
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+		
+		MutableDateTime dateTime = null;
+		
+		try {
+			dateTime = convertToDateTime(date);
+		}
+		catch(IllegalFieldValueException e) {
+			throw new InvalidDateException(e.getMessage());
+		}
+		
+		dateTime.setTime(23, 59, 59, 999);
+		
+		String scalarDate = scalarDateFormatter.print(dateTime);
+		
+		return scalarDate;
+	}
+	
+	
+	/**
+	 * Converts a Date to a joda-time DateTime.
+	 * 
+	 * @param  date The Date
+	 * @return      A MutableDateTime representing the same date
+	 */
+	private static MutableDateTime convertToDateTime(Date date) {
+		Era era = date.getEra();
+		
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+
+		MutableDateTime dateTime = new MutableDateTime(chronology);
+		dateTime.era().set((era == Era.BCE) ? DateTimeConstants.BC : DateTimeConstants.AD);
+		dateTime.yearOfEra().set(date.getYear());
+		dateTime.monthOfYear().set(date.getMonth());
+		dateTime.dayOfMonth().set(date.getDay());
+		dateTime.setTime(0, 0, 0, 0);
+
+		return dateTime;
+	}
+	
+	/**
+	 * Sets the fields in a Date so that it represents the same date
+	 * as a given DateTime.
+	 * 
+	 * @param date     The Date to set
+	 * @param dateTime A MutableDateTime representing the desired date
+	 */
+	private static void setFromDateTime(Date date, MutableDateTime dateTime) {
+		date.setYear(dateTime.getYearOfEra());
+		date.setMonth(dateTime.getMonthOfYear());
+		date.setDay(dateTime.getDayOfMonth());
+		date.setEra((dateTime.getEra() == DateTimeConstants.BC) ? Era.BCE : Era.CE);
 	}
 }

@@ -318,9 +318,9 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer numMonthStart = (Integer) stack.pop();
 		
 		stack.push(new Date(year, numMonthStart, 1, era));
-		stack.push(new Date(year, numMonthStart, DateUtils.getDaysInMonth(numMonthStart, year), era));
+		stack.push(new Date(year, numMonthStart, DateUtils.getDaysInMonth(numMonthStart, year, era), era));
 		stack.push(new Date(year, numMonthEnd, 1, era));
-		stack.push(new Date(year, numMonthEnd, DateUtils.getDaysInMonth(numMonthEnd, year), era));
+		stack.push(new Date(year, numMonthEnd, DateUtils.getDaysInMonth(numMonthEnd, year, era), era));
 	}
 	
 	@Override
@@ -332,10 +332,10 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer lastQuarter = (Integer) stack.pop();
 		Integer firstQuarter = (Integer) stack.pop();
 		
-		stack.push(DateUtils.getQuarterYearStartDate(year, firstQuarter).withEra(era));
-		stack.push(DateUtils.getQuarterYearEndDate(year, firstQuarter).withEra(era));
-		stack.push(DateUtils.getQuarterYearStartDate(year, lastQuarter).withEra(era));
-		stack.push(DateUtils.getQuarterYearEndDate(year, lastQuarter).withEra(era));
+		stack.push(DateUtils.getQuarterYearStartDate(firstQuarter, year).withEra(era));
+		stack.push(DateUtils.getQuarterYearEndDate(firstQuarter, year, era).withEra(era));
+		stack.push(DateUtils.getQuarterYearStartDate(lastQuarter, year).withEra(era));
+		stack.push(DateUtils.getQuarterYearEndDate(lastQuarter, year, era).withEra(era));
 	}
 
 	@Override
@@ -413,7 +413,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer numMonth = (Integer) stack.pop();
 		
 		stack.push(new Date(year, numMonth, 1, era));
-		stack.push(new Date(year, numMonth, DateUtils.getDaysInMonth(numMonth, year), era));
+		stack.push(new Date(year, numMonth, DateUtils.getDaysInMonth(numMonth, year, era), era));
 	}
 	
 	@Override
@@ -440,7 +440,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer startYear = (Integer) stack.pop();
 		
 		stack.push(new Date(startYear, 12, 1).withEra(era));
-		stack.push(DateUtils.getQuarterYearEndDate(endYear, 1).withEra(era));
+		stack.push(DateUtils.getQuarterYearEndDate(1, endYear, era).withEra(era));
 	}
 
 	@Override
@@ -451,8 +451,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer year = (Integer) stack.pop();
 		Part part = (Part) stack.pop();
 		
-		stack.push(DateUtils.getPartialYearStartDate(year, part).withEra(era));
-		stack.push(DateUtils.getPartialYearEndDate(year, part).withEra(era));
+		stack.push(DateUtils.getPartialYearStartDate(part, year).withEra(era));
+		stack.push(DateUtils.getPartialYearEndDate(part, year, era).withEra(era));
 	}
 
 	@Override
@@ -463,8 +463,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer year = (Integer) stack.pop();
 		Integer quarter = (Integer) stack.pop();
 
-		stack.push(DateUtils.getQuarterYearStartDate(year, quarter).withEra(era));
-		stack.push(DateUtils.getQuarterYearEndDate(year, quarter).withEra(era));
+		stack.push(DateUtils.getQuarterYearStartDate(quarter, year).withEra(era));
+		stack.push(DateUtils.getQuarterYearEndDate(quarter, year, era).withEra(era));
 	}
 
 	@Override
@@ -475,8 +475,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer year = (Integer) stack.pop();
 		Integer half = (Integer) stack.pop();
 
-		stack.push(DateUtils.getHalfYearStartDate(year, half).withEra(era));
-		stack.push(DateUtils.getHalfYearEndDate(year, half).withEra(era));
+		stack.push(DateUtils.getHalfYearStartDate(half, year).withEra(era));
+		stack.push(DateUtils.getHalfYearEndDate(half, year, era).withEra(era));
 	}	
 	
 	@Override
