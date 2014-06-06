@@ -13,7 +13,6 @@ public class Date {
 	private QualifierType qualifierType;
 	private Integer qualifierValue;
 	private QualifierUnit qualifierUnit;
-	private String scalarValue;
 
 	public Date() {
 		this(null, null, null, null, null, null, null, null);
@@ -59,8 +58,7 @@ public class Date {
 			"\t\tcertainty:      " + getCertainty() + "\n" +
 			"\t\tqualifierType:  " + getQualifierType() + "\n" +
 			"\t\tqualifierValue: " + getQualifierValue() + "\n" +
-			"\t\tqualifierUnit:  " + getQualifierUnit() + "\n" +
-			"\t\tscalarValue:    " + getScalarValue() + "\n";
+			"\t\tqualifierUnit:  " + getQualifierUnit() + "\n";
 	}
 	
 	public Date copy() {
@@ -74,7 +72,6 @@ public class Date {
 		newDate.setQualifierType(getQualifierType());
 		newDate.setQualifierValue(getQualifierValue());
 		newDate.setQualifierUnit(getQualifierUnit());
-		newDate.setScalarValue(getScalarValue());
 		
 		return newDate;
 	}
@@ -108,7 +105,6 @@ public class Date {
 				.append(this.getQualifierType(), that.getQualifierType())
 				.append(this.getQualifierValue(), that.getQualifierValue())
 				.append(this.getQualifierUnit(), that.getQualifierUnit())
-				.append(this.getScalarValue(), that.getScalarValue())
 				.isEquals();
 	}
 
@@ -180,14 +176,6 @@ public class Date {
 		this.qualifierType = qualifierType;
 		this.qualifierValue = qualifierValue;
 		this.qualifierUnit = qualifierUnit;
-	}
-	
-	public String getScalarValue() {
-		return scalarValue;
-	}
-
-	public void setScalarValue(String scalarValue) {
-		this.scalarValue = scalarValue;
 	}
 }
 

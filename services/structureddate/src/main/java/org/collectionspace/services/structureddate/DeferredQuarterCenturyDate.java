@@ -1,5 +1,8 @@
 package org.collectionspace.services.structureddate;
 
+/**
+ * A deferred date that represents an endpoint of a quarter century.
+ */
 public abstract class DeferredQuarterCenturyDate extends DeferredCenturyDate {
 	protected int quarter;
 	
