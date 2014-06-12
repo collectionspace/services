@@ -66,7 +66,7 @@ public class StructuredDatePreprocessor {
 				String month = matcher.group(2);
 				String day = matcher.group(3);
 				
-				date = month + "/" day + "/" + year;
+				date = month + "/" + day + "/" + year;
 				
 				success = true;
 			}
