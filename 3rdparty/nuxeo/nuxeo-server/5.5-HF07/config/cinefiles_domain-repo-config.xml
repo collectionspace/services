@@ -407,6 +407,10 @@
 					<field type="largetext">locations_common:accessNote</field>
 
 				</schema>
+
+				<indexing>
+					<fulltext analyzer="unaccent_english"/>
+				</indexing>
 			</repository>
 		</repository>
 	</extension>
