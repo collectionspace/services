@@ -28,7 +28,7 @@ public class StructuredDatePreprocessor {
 		Formatter formatter = new Formatter(date);
 		
 		boolean success =
-			formatter.formatYearMonthDayAsDayMonthYear() ||
+			formatter.formatYearMonthDayAsMonthDayYear() ||
 			formatter.formatYearNumericMonthAsMonthYear() ||
 			formatter.formatMonthDayTwoDigitYearAsMonthDayYear();
 		
@@ -57,7 +57,7 @@ public class StructuredDatePreprocessor {
 			this.date = date;
 		}
 		
-		public boolean formatYearMonthDayAsDayMonthYear() {
+		public boolean formatYearMonthDayAsMonthDayYear() {
 			boolean success = false;
 			Matcher matcher = YEAR_MONTH_DAY_PATTERN.matcher(date);
 			
@@ -66,7 +66,8 @@ public class StructuredDatePreprocessor {
 				String month = matcher.group(2);
 				String day = matcher.group(3);
 				
-				date = day + "/" + month + "/" + year;
+				date = month + "/" day + "/" + year;
+				
 				success = true;
 			}
 			
