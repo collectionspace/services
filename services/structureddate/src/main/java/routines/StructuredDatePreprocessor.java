@@ -1,5 +1,6 @@
 package routines;
 
+import org.apache.commons.lang.StringUtils;
 import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,7 +55,7 @@ public class StructuredDatePreprocessor {
 		public String date;
 		
 		public Formatter(String date) {
-			this.date = date;
+			this.date = StringUtils.trim(date);
 		}
 		
 		public boolean formatYearMonthDayAsMonthDayYear() {
@@ -145,7 +146,8 @@ public class StructuredDatePreprocessor {
 				"12/13/89",
 				"2/1/14",
 				"3/4/15",
-				"6/9/2000"
+				"6/9/2000",
+				"1998-9-22 "
 		};
 		
 		for (String date : dates) {
