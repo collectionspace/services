@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.IllegalFieldValueException;
 
 public class ParseDates {
 	
@@ -63,6 +64,7 @@ public class ParseDates {
 		System.out.print(displayDate + "\t");
 		
 		String result = "";
+		String scalar = "";
 		
 		try {
 			StructuredDate structuredDate = StructuredDate.parse(displayDate);
@@ -74,7 +76,7 @@ public class ParseDates {
 				earliestSingleDate.getMonth() + "-" +
 				earliestSingleDate.getDay() + " " +
 				earliestSingleDate.getEra().toDisplayString(); // use toString() to get the data value (refname)
-			
+
 				// These don't get filled in by the parser, so no need to print.
 			
 				// earliestSingleDate.getCertainty();
@@ -90,11 +92,21 @@ public class ParseDates {
 					latestDate.getDay() + " " +
 					latestDate.getEra().toDisplayString(); // use toString() to get the data value (refname)
 			}
+			
+			try {
+				structuredDate.computeScalarValues();
+			
+				scalar = structuredDate.getEarliestScalarDate() + " - " + structuredDate.getLatestScalarDate();
+			}
+			catch(InvalidDateException e) {
+				scalar = "[invalid date: " + e.getMessage() + "]";
+			}
 		}
 		catch(StructuredDateFormatException e) {
 			result = "[unable to parse]";
+			scalar = "";
 		}
 		
-		System.out.println(result);
+		System.out.println(result + "\t" + scalar);
 	}
 }

@@ -16,7 +16,7 @@ import org.yaml.snakeyaml.Yaml;
 
 public class StructuredDateEvaluatorTest {
 	public static final String TEST_CASE_FILE = "/test-dates.yaml";
-	public static final List<String> YAML_DATE_SPEC = Arrays.asList("year", "month", "day", "era", "certainty", "qualifierType", "qualifierValue", "qualifierUnit", "scalarValue");
+	public static final List<String> YAML_DATE_SPEC = Arrays.asList("year", "month", "day", "era", "certainty", "qualifierType", "qualifierValue", "qualifierUnit");
 
 	final Logger logger = LoggerFactory.getLogger(StructuredDateEvaluatorTest.class);
 
@@ -44,7 +44,11 @@ public class StructuredDateEvaluatorTest {
 			catch(StructuredDateFormatException e) {
 				logger.debug(e.getMessage());
 			}
-			
+
+if (actualStructuredDate != null) {
+actualStructuredDate.computeScalarValues();
+logger.debug(actualStructuredDate.getEarliestScalarDate() + " - " + actualStructuredDate.getLatestScalarDate());
+}
 			Assert.assertEquals(actualStructuredDate, expectedStructuredDate);
 		}
 	}
