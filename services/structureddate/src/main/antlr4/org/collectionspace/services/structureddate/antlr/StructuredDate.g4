@@ -11,7 +11,7 @@ grammar StructuredDate;
  * Parser rules
  */
 
-oneDisplayDate:        displayDate DOT? EOF ; 
+oneDisplayDate:        displayDate (DOT | QUESTION)? EOF ; 
 
 displayDate:           uncertainDate
 |                      certainDate
@@ -159,4 +159,6 @@ COMMA:          ',' ;
 HYPHEN:         '-' ;
 SLASH:          '/' ;
 DOT:            '.' ;
+QUESTION:       '?' ;
 STRING:         [a-z]+ ;
+OTHER:          . ;

@@ -1078,6 +1078,12 @@
                                          earliestSingleDate: [1711,  1,  1, CE]
                                          latestDate:         [1757, 12, 31, CE]
 
+  "3/4/2000.":                           # oneDisplayDate - with period
+                                         earliestSingleDate: [2000,  3,  4, CE]
+
+  "3/4/2000?":                           # oneDisplayDate - with question mark
+                                         earliestSingleDate: [2000,  3,  4, CE]
+
 # -------------------------------------------------------------------------------------------------------                                         
 # Invalid dates
 # -------------------------------------------------------------------------------------------------------
@@ -1113,5 +1119,11 @@
                                          null
 
   '00s':                                 # invalid century
+                                         null
+
+  '3/4/2005 (something)':                # parentheses
+                                         null
+
+  '3/4?/2005':                           # question mark
                                          null
                                                                                         
