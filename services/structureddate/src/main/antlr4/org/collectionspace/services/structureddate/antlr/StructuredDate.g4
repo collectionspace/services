@@ -3,15 +3,13 @@ grammar StructuredDate;
 /*
  * This is a grammar for ANTLR 4 (http://www.antlr.org/).
  *
- * TODO: 
- *   Allow YYYY-MM-DD
  */
 
 /*
  * Parser rules
  */
 
-oneDisplayDate:        displayDate DOT? EOF ; 
+oneDisplayDate:        displayDate (DOT | QUESTION)? EOF ; 
 
 displayDate:           uncertainDate
 |                      certainDate
@@ -99,8 +97,8 @@ monthInYearRange:      strMonth HYPHEN strMonth COMMA? numYear era ;
 nthQuarterInYearRange: nthQuarter HYPHEN nthQuarter COMMA? numYear era ;
 strSeasonInYearRange:  strSeason HYPHEN strSeason COMMA? numYear era ;
 numDayInMonthRange:    numMonth SLASH numDayOfMonth HYPHEN numDayOfMonth SLASH numYear era ;
-numDate:               numMonth SLASH numDayOfMonth SLASH numYear era
-|                      numMonth HYPHEN numDayOfMonth HYPHEN numYear era ;
+numDate:               num SLASH num SLASH num era
+|                      num HYPHEN num HYPHEN num era ;
 monthYear:             strMonth COMMA? numYear era ;
 invMonthYear:          era numYear COMMA? strMonth ;
 seasonYear:            strSeason COMMA? numYear era ;
@@ -121,6 +119,7 @@ era:                   BC | AD | ;
 numYear:               NUMBER ;
 numMonth:              NUMBER ;
 numDayOfMonth:         NUMBER ;
+num:                   NUMBER ;
 
 
 /*
@@ -159,4 +158,6 @@ COMMA:          ',' ;
 HYPHEN:         '-' ;
 SLASH:          '/' ;
 DOT:            '.' ;
+QUESTION:       '?' ;
 STRING:         [a-z]+ ;
+OTHER:          . ;
