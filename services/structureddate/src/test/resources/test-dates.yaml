@@ -842,7 +842,7 @@
                                          earliestSingleDate: [2013,  3, 12, CE]
 
   '03/05/13':                            # date
-                                         earliestSingleDate: [  13,  3,  5, CE]
+                                         earliestSingleDate: [   3,  5, 13, CE]
 
   '7-6-1773':                            # date
                                          earliestSingleDate: [1773,  7,  6, CE]
@@ -852,6 +852,24 @@
 
   '07-06-1773':                          # date
                                          earliestSingleDate: [1773,  7,  6, CE]
+
+  '1773-07-06':                          # date
+                                         earliestSingleDate: [1773,  7,  6, CE]
+
+  '1773/07/06':                          # date
+                                         earliestSingleDate: [1773,  7,  6, CE]
+
+  '13-12-3':                             # date
+                                         earliestSingleDate: [  13, 12,  3, CE]
+
+  '12-12-3':                             # date
+                                         earliestSingleDate: [  12, 12,  3, CE]
+
+  '3-12-12':                             # date
+                                         earliestSingleDate: [   3, 12, 12, CE]
+
+  '3-12-32':                             # date
+                                         earliestSingleDate: [  32,  3, 12, CE]
 
   'May 06 1952':                         # date
                                          earliestSingleDate: [1952,  5,  6, CE]
