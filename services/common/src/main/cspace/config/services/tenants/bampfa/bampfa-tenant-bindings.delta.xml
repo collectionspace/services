@@ -14,5 +14,22 @@
 				</service:params>
 			</service:initHandler>
 		</tenant:serviceBindings>
+		
+		<!-- An attempt to add a local schema extension to Dimensions. Neither the services, app, or UI layers handle this properly. -->
+		<!-- <tenant:serviceBindings merge:matcher="id" id="Dimensions">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service">
+				<service:part id="3" control_group="Managed" versionable="true" auditable="false" label="dimensions_bampfa" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/dimension/local/bampfa" schemaLocation="http://collectionspace.org/services/dimension/local/bampfa http://collectionspace.org/services/dimension/local/dimensions_bampfa.xsd"/>
+					</service:content>
+					<service:properties>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>bampfaMeasuredPartGroupList/*/bampfaDimensionSubGroupList/*/bampfaMeasuredBy</types:value>
+						</types:item>
+					</service:properties>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings> -->
 	</tenant:tenantBinding>
 </tenant:TenantBindingConfig>
