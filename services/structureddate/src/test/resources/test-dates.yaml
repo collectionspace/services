@@ -90,7 +90,7 @@
                                          earliestSingleDate: [1700,  1,  1, CE]
                                          latestDate:         [2000, 12, 31, CE]
 
-  "2nd century BC-first century AD":     # hyphenatedRange, century
+  "2nd century BC—first century AD":     # hyphenatedRange, century (em dash)
                                          earliestSingleDate: [ 200,  1,  1, BCE]
                                          latestDate:         [ 100, 12, 31, CE]
 
@@ -274,7 +274,7 @@
                                          earliestSingleDate: [1960,  1,  1, CE]
                                          latestDate:         [1989, 12, 31, CE]                                                                                             
 
-  '1960s-1920s B.C.':                    # hyphenatedRange, decade
+  '1960s–1920s B.C.':                    # hyphenatedRange, decade (en dash)
                                          earliestSingleDate: [1969,  1,  1, BCE]
                                          latestDate:         [1920, 12, 31, BCE]                                                                                             
 
