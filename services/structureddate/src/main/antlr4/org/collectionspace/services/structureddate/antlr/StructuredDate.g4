@@ -9,7 +9,7 @@ grammar StructuredDate;
  * Parser rules
  */
 
-oneDisplayDate:        displayDate (DOT | QUESTION)? EOF ; 
+oneDisplayDate:        displayDate ( DOT | QUESTION )? EOF ; 
 
 displayDate:           uncertainDate
 |                      certainDate
@@ -18,15 +18,15 @@ displayDate:           uncertainDate
 */
 ;
 
-beforeOrAfterDate:     ( BEFORE | AFTER ) singleInterval ;
-
 uncertainDate:         CIRCA certainDate ;
 
 certainDate:           hyphenatedRange
 |                      singleInterval
 ;
 
-hyphenatedRange:       singleInterval HYPHEN singleInterval
+beforeOrAfterDate:     ( BEFORE | AFTER ) singleInterval ;
+
+hyphenatedRange:       singleInterval ( HYPHEN | DASH ) singleInterval
 |                      nthCenturyRange
 |                      monthInYearRange
 |                      quarterInYearRange
@@ -80,23 +80,23 @@ partialDecade:         partOf numDecade era ;
 
 decade:                numDecade era ;
 
-partialCentury:        partOf (strCentury | numCentury) era ;
+partialCentury:        partOf ( strCentury | numCentury ) era ;
 
-quarterCentury:        nthQuarter (strCentury | numCentury) era ;
+quarterCentury:        nthQuarter ( strCentury | numCentury ) era ;
 
-halfCentury:           nthHalf (strCentury | numCentury) era ;
+halfCentury:           nthHalf ( strCentury | numCentury ) era ;
 
-century:               (strCentury | numCentury) era ;
+century:               ( strCentury | numCentury ) era ;
 
 millennium:            nth MILLENNIUM era ;
 
-strDate:               strMonth (numDayOfMonth | nth) COMMA? numYear era;
+strDate:               strMonth ( numDayOfMonth | nth ) COMMA? numYear era;
 invStrDate:            era numYear COMMA? strMonth numDayOfMonth ;
-strDayInMonthRange:    strMonth numDayOfMonth HYPHEN numDayOfMonth COMMA? numYear era ;
-monthInYearRange:      strMonth HYPHEN strMonth COMMA? numYear era ;
-nthQuarterInYearRange: nthQuarter HYPHEN nthQuarter COMMA? numYear era ;
-strSeasonInYearRange:  strSeason HYPHEN strSeason COMMA? numYear era ;
-numDayInMonthRange:    numMonth SLASH numDayOfMonth HYPHEN numDayOfMonth SLASH numYear era ;
+strDayInMonthRange:    strMonth numDayOfMonth ( HYPHEN | DASH ) numDayOfMonth COMMA? numYear era ;
+monthInYearRange:      strMonth ( HYPHEN | DASH ) strMonth COMMA? numYear era ;
+nthQuarterInYearRange: nthQuarter ( HYPHEN | DASH ) nthQuarter COMMA? numYear era ;
+strSeasonInYearRange:  strSeason ( HYPHEN | DASH ) strSeason COMMA? numYear era ;
+numDayInMonthRange:    numMonth SLASH numDayOfMonth ( HYPHEN | DASH ) numDayOfMonth SLASH numYear era ;
 numDate:               num SLASH num SLASH num era
 |                      num HYPHEN num HYPHEN num era ;
 monthYear:             strMonth COMMA? numYear era ;
@@ -104,12 +104,12 @@ invMonthYear:          era numYear COMMA? strMonth ;
 seasonYear:            strSeason COMMA? numYear era ;
 invSeasonYear:         era numYear COMMA? strSeason ;
 nthQuarterYear:        nthQuarter numYear era ;
-nthQuarter:            (nth | LAST) QUARTER ;
-nthHalf:               (nth | LAST) HALF ;
+nthQuarter:            ( nth | LAST ) QUARTER ;
+nthHalf:               ( nth | LAST ) HALF ;
 numDecade:             TENS ;
 strCentury:            nth CENTURY ;
 numCentury:            HUNDREDS ;
-nthCenturyRange:       allOrPartOf nth HYPHEN allOrPartOf nth CENTURY era ;
+nthCenturyRange:       allOrPartOf nth ( HYPHEN | DASH ) allOrPartOf nth CENTURY era ;
 strSeason:             SPRING | SUMMER | FALL | WINTER ;
 allOrPartOf:           partOf | ;
 partOf:                EARLY | MIDDLE | LATE ; 
@@ -127,16 +127,16 @@ num:                   NUMBER ;
  */
 
 WS:             [ \t\r\n]+ -> skip;
-CIRCA:          ('c' | 'ca') '.'? | 'circa' ;
+CIRCA:          ('c' | 'ca') DOT? | 'circa' ;
 SPRING:         'spring' | 'spr' ;
 SUMMER:         'summer' | 'sum' ;
 WINTER:         'winter' | 'win' ;
 FALL:           'fall' | 'autumn' | 'fal' | 'aut' ;
 EARLY:          'early' ;
-MIDDLE:         'middle' | 'mid' ('-' | DOT)?;
+MIDDLE:         'middle' | 'mid' ( HYPHEN | DOT )?;
 LATE:           'late' ;
-BEFORE:         'before' | 'pre' '-'? ;
-AFTER:          'after' | 'post' '-'?;
+BEFORE:         'before' | 'pre' HYPHEN? ;
+AFTER:          'after' | 'post' HYPHEN? ;
 FIRST:          'first' ;
 SECOND:         'second' ;
 THIRD:          'third' ;
@@ -156,6 +156,7 @@ TENS:           [0-9]*? '0' '\''? 's';
 NUMBER:         [0-9]+ ;
 COMMA:          ',' ;
 HYPHEN:         '-' ;
+DASH:           [—–] ; /* EM DASH, EN DASH */
 SLASH:          '/' ;
 DOT:            '.' ;
 QUESTION:       '?' ;
