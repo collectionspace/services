@@ -58,6 +58,8 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Nt
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthHalfContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthQuarterContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumCenturyContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDayInMonthRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDayOfMonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDecadeContext;
@@ -71,6 +73,7 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Qu
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterInYearRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrCenturyContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrDayInMonthRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrMonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrSeasonContext;
@@ -108,7 +111,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		// Instantiate a parser from the lowercased display date, so that parsing will be
 		// case insensitive.
-		ANTLRInputStream inputStream = new ANTLRInputStream(displayDate.toLowerCase());		
+		ANTLRInputStream inputStream = new ANTLRInputStream(displayDate.toLowerCase());
 		StructuredDateLexer lexer = new StructuredDateLexer(inputStream);
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 		StructuredDateParser parser = new StructuredDateParser(tokenStream);
@@ -374,10 +377,13 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitDate(DateContext ctx) {
 		if (ctx.exception != null) return;
 
+		// Expect the canonical year-month-day-era ordering
+		// to be on the stack.
+		
 		Era era = (Era) stack.pop();
-		Integer year = (Integer) stack.pop();
 		Integer dayOfMonth = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
+		Integer year = (Integer) stack.pop();
 		
 		// For the latest date we could either return null, or a copy of the earliest date,
 		// since the UI doesn't care. Use a copy of the earliest date, since it makes
@@ -386,21 +392,79 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		stack.push(new Date(year, numMonth, dayOfMonth, era));
 		stack.push(new Date(year, numMonth, dayOfMonth, era));
 	}
+	
+	
+	@Override
+	public void exitNumDate(NumDateContext ctx) {
+		if (ctx.exception != null) return;
+		
+		// This could either be year-month-day, or
+		// month-day-year. Try to determine which,
+		// and reorder the stack into the canonical
+		// year-month-day-era ordering.
+		
+		Era era = (Era) stack.pop();
+		Integer num3 = (Integer) stack.pop();
+		Integer num2 = (Integer) stack.pop();
+		Integer num1 = (Integer) stack.pop();
+		
+		// Default to a year-month-day interpretation.
+		
+		int year = num1;
+		int numMonth = num2;
+		int dayOfMonth = num3;
+		
+		if (DateUtils.isValidDate(num1, num2, num3, era)) {
+			// Interpreting as year-month-day produces a valid date. Go with it.
+		}
+		else if (DateUtils.isValidDate(num3, num1, num2, era)) {
+			// Interpreting as year-month-day doesn't produce a valid date, but
+			// month-day-year does. Go with month-day-year.
+			
+			year = num3;
+			numMonth = num1;
+			dayOfMonth = num2;
+		}
+		
+		stack.push(year);
+		stack.push(numMonth);
+		stack.push(dayOfMonth);
+		stack.push(era);
+	}
+
+	@Override
+	public void exitStrDate(StrDateContext ctx) {
+		if (ctx.exception != null) return;
+
+		// Reorder the stack into a canonical ordering,
+		// year-month-day-era.
+		
+		Era era = (Era) stack.pop();
+		Integer year = (Integer) stack.pop();
+		Integer dayOfMonth = (Integer) stack.pop();
+		Integer numMonth = (Integer) stack.pop();
+
+		stack.push(year);
+		stack.push(numMonth);
+		stack.push(dayOfMonth);
+		stack.push(era);
+	}
 
 	@Override
 	public void exitInvStrDate(InvStrDateContext ctx) {
 		if (ctx.exception != null) return;
 
-		// Reorder the arguments.
+		// Reorder the stack into a canonical ordering,
+		// year-month-day-era.
 		
 		Integer dayOfMonth = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Era era = (Era) stack.pop();
 		
+		stack.push(year);
 		stack.push(numMonth);
 		stack.push(dayOfMonth);
-		stack.push(year);
 		stack.push(era);
 	}
 
@@ -956,9 +1020,27 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// Convert the numeric string to an Integer,
 		// and push on the stack.
 		
-		stack.push(new Integer(ctx.NUMBER().getText()));
+		Integer dayOfMonth = new Integer(ctx.NUMBER().getText());
+		
+		if (dayOfMonth == 0 || dayOfMonth > 31) {
+			throw new StructuredDateFormatException("unexpected day of month '" + ctx.NUMBER().getText() + "'");
+		}
+
+		stack.push(dayOfMonth);
 	}
 	
+	@Override
+	public void exitNum(NumContext ctx) {
+		if (ctx.exception != null) return;
+
+		// Convert the numeric string to an Integer,
+		// and push on the stack.
+
+		Integer num = new Integer(ctx.NUMBER().getText());
+		
+		stack.push(num);
+	}
+
 	protected String getErrorMessage(RecognitionException re) {
 		String message = "";
 		

@@ -45,10 +45,6 @@ public class StructuredDateEvaluatorTest {
 				logger.debug(e.getMessage());
 			}
 
-if (actualStructuredDate != null) {
-actualStructuredDate.computeScalarValues();
-logger.debug(actualStructuredDate.getEarliestScalarDate() + " - " + actualStructuredDate.getLatestScalarDate());
-}
 			Assert.assertEquals(actualStructuredDate, expectedStructuredDate);
 		}
 	}
