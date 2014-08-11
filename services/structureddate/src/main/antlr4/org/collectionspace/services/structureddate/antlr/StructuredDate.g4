@@ -3,18 +3,19 @@ grammar StructuredDate;
 /*
  * This is a grammar for ANTLR 4 (http://www.antlr.org/).
  *
- * TODO: 
- *   Allow YYYY-MM-DD
  */
 
 /*
  * Parser rules
  */
 
-oneDisplayDate:        displayDate EOF ; 
+oneDisplayDate:        displayDate ( DOT | QUESTION )? EOF ; 
 
 displayDate:           uncertainDate
 |                      certainDate
+/* TODO: Need to decide what "before" and "after" actually mean
+|                      beforeOrAfterDate
+*/
 ;
 
 uncertainDate:         CIRCA certainDate ;
@@ -23,64 +24,31 @@ certainDate:           hyphenatedRange
 |                      singleInterval
 ;
 
-hyphenatedRange:       quarterYear HYPHEN quarterYear
-|                      halfYear HYPHEN halfYear
-|                      century HYPHEN century
-|                      decade HYPHEN decade
-|                      year HYPHEN year
-|                      month HYPHEN month
-|                      date HYPHEN date
+beforeOrAfterDate:     ( BEFORE | AFTER ) singleInterval ;
+
+hyphenatedRange:       singleInterval ( HYPHEN | DASH ) singleInterval
+|                      nthCenturyRange
 |                      monthInYearRange
 |                      quarterInYearRange
 |                      strDayInMonthRange
 |                      numDayInMonthRange
-/* TODO: */
-/*
-|                      nth HYPHEN nth CENTURY                                 
-|                      nth HYPHEN nth CENTURY BC                              
-|                      partOf nth CENTURY HYPHEN partOf nth CENTURY           
-|                      partOf nth HYPHEN partOf nth CENTURY                   
-|                      partOf nth HYPHEN nth CENTURY                          
-|                      partOf nth CENTURY BC HYPHEN partOf nth CENTURY BC     
-|                      partOf nth CENTURY BC HYPHEN partOf nth CENTURY        
-|                      partOf century HYPHEN partOf century                   
-|                      partOf century BC HYPHEN partOf century BC             
-|                      nth QUARTER nth CENTURY HYPHEN nth QUARTER nth CENTURY 
-|                      decade HYPHEN partOf decade                            
-|                      partOf decade HYPHEN partOf century                    
-|                      partOf decade HYPHEN partOf decade                     
-|                      partOf decade HYPHEN decade                            
-*/
 ;
 
 singleInterval:        yearSpanningWinter
+|                      partialYear
 |                      quarterYear
 |                      halfYear
+|                      millennium
+|                      partialCentury
+|                      quarterCentury
+|                      halfCentury
 |                      century
+|                      partialDecade
 |                      decade
 |                      year
 |                      month
 |                      date
-/* TODO: */
-/*
-|                      partOf year                                            
-|                      partOf year BC                                         
-|                      partOf date BC                                         
-|                      partOf date                                            
-|                      nth QUARTER nth CENTURY                                
-|                      LAST QUARTER nth CENTURY                               
-|                      nth HALF nth CENTURY                                   
-|                      LAST HALF nth CENTURY                                  
-|                      partOf nth CENTURY                                     
-|                      partOf nth CENTURY BC                                  
-|                      partOf century                                         
-|                      partOf century BC                                      
-|                      nth MILLENIUM                                          
-|                      nth MILLENIUM BC                                       
-|                      partOf decade                                          
-|                      partOf decade BC                                       
-*/
-;         
+;
 
 quarterInYearRange:    nthQuarterInYearRange
 |                      strSeasonInYearRange
@@ -97,47 +65,61 @@ month:                 monthYear
 
 yearSpanningWinter:    WINTER numYear SLASH numYear era ;
 
+partialYear:           partOf numYear era ;
+
 quarterYear:           seasonYear
 |                      invSeasonYear
 |                      nthQuarterYear
 ;
 
-halfYear:              nthHalfYear ;
+halfYear:              nthHalf numYear era ;
 
 year:                  numYear era ;
 
+partialDecade:         partOf numDecade era ;
+
 decade:                numDecade era ;
 
-century:               (strCentury | numCentury) era ;
+partialCentury:        partOf ( strCentury | numCentury ) era ;
 
-strDate:               strMonth (numDayOfMonth | nth) COMMA? numYear era;
+quarterCentury:        nthQuarter ( strCentury | numCentury ) era ;
+
+halfCentury:           nthHalf ( strCentury | numCentury ) era ;
+
+century:               ( strCentury | numCentury ) era ;
+
+millennium:            nth MILLENNIUM era ;
+
+strDate:               strMonth ( numDayOfMonth | nth ) COMMA? numYear era;
 invStrDate:            era numYear COMMA? strMonth numDayOfMonth ;
-strDayInMonthRange:    strMonth numDayOfMonth HYPHEN numDayOfMonth COMMA? numYear era ;
-monthInYearRange:      strMonth HYPHEN strMonth COMMA? numYear era ;
-nthQuarterInYearRange: nthQuarter HYPHEN nthQuarter COMMA? numYear era ;
-strSeasonInYearRange:  strSeason HYPHEN strSeason COMMA? numYear era ;
-numDayInMonthRange:    numMonth SLASH numDayOfMonth HYPHEN numDayOfMonth SLASH numYear era ;
-numDate:               numMonth SLASH numDayOfMonth SLASH numYear era
-|                      numMonth HYPHEN numDayOfMonth HYPHEN numYear era ;
+strDayInMonthRange:    strMonth numDayOfMonth ( HYPHEN | DASH ) numDayOfMonth COMMA? numYear era ;
+monthInYearRange:      strMonth ( HYPHEN | DASH ) strMonth COMMA? numYear era ;
+nthQuarterInYearRange: nthQuarter ( HYPHEN | DASH ) nthQuarter COMMA? numYear era ;
+strSeasonInYearRange:  strSeason ( HYPHEN | DASH ) strSeason COMMA? numYear era ;
+numDayInMonthRange:    numMonth SLASH numDayOfMonth ( HYPHEN | DASH ) numDayOfMonth SLASH numYear era ;
+numDate:               num SLASH num SLASH num era
+|                      num HYPHEN num HYPHEN num era ;
 monthYear:             strMonth COMMA? numYear era ;
 invMonthYear:          era numYear COMMA? strMonth ;
 seasonYear:            strSeason COMMA? numYear era ;
 invSeasonYear:         era numYear COMMA? strSeason ;
 nthQuarterYear:        nthQuarter numYear era ;
-nthHalfYear:           nthHalf numYear era ;
-nthQuarter:            (nth | LAST) QUARTER ;
-nthHalf:               (nth | LAST) HALF ;
+nthQuarter:            ( nth | LAST ) QUARTER ;
+nthHalf:               ( nth | LAST ) HALF ;
 numDecade:             TENS ;
 strCentury:            nth CENTURY ;
 numCentury:            HUNDREDS ;
+nthCenturyRange:       allOrPartOf nth ( HYPHEN | DASH ) allOrPartOf nth CENTURY era ;
 strSeason:             SPRING | SUMMER | FALL | WINTER ;
-partOf:                EARLY | MIDDLE | LATE | BEFORE | AFTER ;
+allOrPartOf:           partOf | ;
+partOf:                EARLY | MIDDLE | LATE ; 
 nth:                   NTHSTR | FIRST | SECOND | THIRD | FOURTH ;
-strMonth:              MONTH | SHORTMONTH DOT?;
+strMonth:              MONTH | SHORTMONTH DOT? ;
 era:                   BC | AD | ;
 numYear:               NUMBER ;
 numMonth:              NUMBER ;
 numDayOfMonth:         NUMBER ;
+num:                   NUMBER ;
 
 
 /*
@@ -145,16 +127,16 @@ numDayOfMonth:         NUMBER ;
  */
 
 WS:             [ \t\r\n]+ -> skip;
-CIRCA:          ('c' | 'ca') '.'? | 'circa' ;
+CIRCA:          ('c' | 'ca') DOT? | 'circa' ;
 SPRING:         'spring' | 'spr' ;
 SUMMER:         'summer' | 'sum' ;
 WINTER:         'winter' | 'win' ;
 FALL:           'fall' | 'autumn' | 'fal' | 'aut' ;
 EARLY:          'early' ;
-MIDDLE:         'middle' | 'mid' '-'?;
+MIDDLE:         'middle' | 'mid' ( HYPHEN | DOT )?;
 LATE:           'late' ;
-BEFORE:         'before' | 'pre' '-'? ;
-AFTER:          'after' | 'post' '-'?;
+BEFORE:         'before' | 'pre' HYPHEN? ;
+AFTER:          'after' | 'post' HYPHEN? ;
 FIRST:          'first' ;
 SECOND:         'second' ;
 THIRD:          'third' ;
@@ -163,7 +145,7 @@ LAST:           'last' ;
 QUARTER:        'quarter' ;
 HALF:           'half' ;
 CENTURY:        'century' ;
-MILLENIUM:      'millenium' ;
+MILLENNIUM:     'millennium' ;
 MONTH:          'january' | 'february' | 'march' | 'april' | 'may' | 'june' | 'july' | 'august' | 'september' | 'october' | 'november' | 'december' ;
 SHORTMONTH:     'jan' | 'feb' | 'mar' | 'apr' | 'jun' | 'jul' | 'aug' | 'sep' | 'sept' | 'oct' | 'nov' | 'dec' ;
 BC:             'bc' | 'bce' |  'b.c.' | 'b.c.e.' ;
@@ -174,6 +156,9 @@ TENS:           [0-9]*? '0' '\''? 's';
 NUMBER:         [0-9]+ ;
 COMMA:          ',' ;
 HYPHEN:         '-' ;
+DASH:           [—–] ; /* EM DASH, EN DASH */
 SLASH:          '/' ;
 DOT:            '.' ;
+QUESTION:       '?' ;
 STRING:         [a-z]+ ;
+OTHER:          . ;
