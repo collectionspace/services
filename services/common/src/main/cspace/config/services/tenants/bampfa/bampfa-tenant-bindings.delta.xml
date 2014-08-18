@@ -4,6 +4,10 @@
 	xmlns:tenant='http://collectionspace.org/services/config/tenant'>
     
 	<tenant:tenantBinding id="55">
+		<tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
+			<service:validatorHandler merge:matcher="tag" merge:action="replace" xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.collectionobject.nuxeo.BAMPFACollectionObjectValidatorHandler</service:validatorHandler>
+		</tenant:serviceBindings>
+		
 		<tenant:serviceBindings merge:matcher="id" id="idgenerators">
 			<service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
 				<service:params>
