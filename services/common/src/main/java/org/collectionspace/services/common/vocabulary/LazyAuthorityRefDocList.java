@@ -168,7 +168,7 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 			
 			// The current page is exhausted.
 			
-			if (currentPageDocList.size() < pageSize) { 
+			if (pageSize == 0 || (currentPageDocList.size() < pageSize)) { 
 				// There are no more pages.
 				return endOfData();
 			}
@@ -185,7 +185,7 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 			
 			if (nextPageDocList == null || nextPageDocList.size() == 0) {
 				// There are no more pages.
-				return endOfData();					
+				return endOfData();
 			}
 
 			// There is another page. Make it the current page.
