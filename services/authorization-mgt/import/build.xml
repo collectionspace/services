@@ -140,7 +140,7 @@
         <property name="dest.appContext.cfg" value="${basedir}/target/classes/applicationContext-authorization-test.xml"/>
         <delete file="${dest.hibernate.cfg}" verbose="true" />
         <delete file="${dest.appContext.cfg}" verbose="true" />
-        <filter token="DB_URL" value="${db.jdbc.cspace.url}" />
+        <filter token="DB_URL" value="${db.jdbc.cspace.url.encoded}" />
         <filter token="DB_DRIVER_CLASS" value="${db.jdbc.driver.class}" />
         <filter token="DB_USER" value="${db.cspace.user}" /> <!-- double-sub from ${db.user} fails -->
         <filter token="DB_PASSWORD" value="${env.DB_PASSWORD_CSPACE}" /> <!-- double-sub from ${db.j2ee.user.password} fails -->
