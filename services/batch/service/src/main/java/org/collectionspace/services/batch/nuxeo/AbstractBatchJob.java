@@ -429,11 +429,11 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	}
 	
 	protected UriInfo createDeleteFilterUriInfo() throws URISyntaxException {
-		return createUriInfo("wf_deleted=false");
+		return createUriInfo("wf_deleted=false&pgSz=0");
 	}
 
 	protected UriInfo createKeywordSearchUriInfo(String schemaName, String fieldName, String value) throws URISyntaxException {
-		return createUriInfo("kw=&as=( (" +schemaName + ":" + fieldName + " ILIKE \"" + value + "\") )&wf_deleted=false");
+		return createUriInfo("kw=&as=( (" +schemaName + ":" + fieldName + " ILIKE \"" + value + "\") )&wf_deleted=false&pgSz=0");
 	}
 
 	protected UriInfo createRelationSearchUriInfo(String subjectCsid, String subjectDocType, String predicate, String objectCsid, String objectDocType) throws URISyntaxException {
@@ -460,12 +460,13 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		}
 				
 		queryParams.add("wf_deleted=false");
+		queryParams.add("pgSz=0");
 		
 		return createUriInfo(StringUtils.join(queryParams, "&"));
 	}
 	
 	protected UriInfo createRefSearchFilterUriInfo(String type) throws URISyntaxException {
-		return createUriInfo("type=" + type + "&wf_deleted=false");
+		return createUriInfo("type=" + type + "&wf_deleted=false&pgSz=0");
 	}
 
 	protected UriInfo createPagedListUriInfo(String serviceName, int pageNum, int pageSize) throws URISyntaxException {

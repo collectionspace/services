@@ -8,10 +8,10 @@
 		        <clustering enabled="false" delay="1000" />
 		        <binaryStore path="" />
 				<!-- The transactional datasource for Nuxeo -->
-				<xa-datasource>@XA_DATASOURCE@</xa-datasource>				
-				<property name="URL">jdbc:postgresql://localhost:5432/lifesci_domain</property>
-				<property name="ServerName">@DB_SERVER_HOSTNAME@</property>				
-				<property name="DatabaseName">lifesci_domain</property>
+				<xa-datasource>@XA_DATASOURCE@</xa-datasource>
+				<property name="ServerName">@DB_SERVER_HOSTNAME@</property>
+				<property name="PortNumber">@DB_PORT@</property>
+				<property name="DatabaseName">lifesci_domain?@DB_JDBC_OPTIONS@</property>
 				<property name="User">@NUXEO_USER@</property>
 				<property name="Password">@NUXEO_PW@</property>
 
