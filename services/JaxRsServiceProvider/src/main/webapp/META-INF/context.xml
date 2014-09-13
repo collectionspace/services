@@ -67,7 +67,7 @@
            username="${db.user}"
            password="${db.user.password}"
            driverClassName="${db.jdbc.driver.class}"
-           url="jdbc:${db}://${db.host}:${db.port}/cspace"
+           url="${db.jdbc.cspace.url.encoded}"
            maxActive="8"
            maxIdle="4"/>
 		
@@ -77,7 +77,7 @@
            username="${db.nuxeo.user}"
            password="${db.nuxeo.user.password}"
            driverClassName="${db.jdbc.driver.class}"
-           url="jdbc:${db}://${db.host}:${db.port}/${DatabaseName}"
+           url="${db.jdbc.nuxeo.url.encoded}"
            maxActive="8"
            maxIdle="4"/>	
 
@@ -87,7 +87,7 @@
     username="${db.user}"
     password="${db.user.password}"
     driverClassName="${db.jdbc.driver.class}"
-    url="jdbc:${db}://${db.host}:${db.port}"
+    url="${db.jdbc.csadmin.url.encoded}"
     maxActive="8"
     maxIdle="4"/>	
   
@@ -97,7 +97,7 @@
            username="reader"
            password="read"
            driverClassName="${db.jdbc.driver.class}"
-           url="jdbc:${db}://${db.host}:${db.port}/${DatabaseName}"
+           url="${db.jdbc.nuxeo.url.encoded}"
            maxActive="8"
            maxIdle="4"/>	
 

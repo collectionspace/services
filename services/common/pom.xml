@@ -385,31 +385,6 @@
         </dependency>
     </dependencies>
 
-    <repositories>
-        <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <id>el4jReleaseRepositoryExternal</id>
-            <name>External release repository of the EL4J project</name>
-            <url>http://public-el4.elca-services.ch/el4j/maven2repository</url>
-        </repository>
-        <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <id>Apache</id>
-            <name>External release repository of the Apache projects</name>
-            <url>https://repository.apache.org/content/groups/public/</url>
-        </repository>
-    </repositories>
-
     <build>
         <finalName>collectionspace-services-common</finalName>
     	<defaultGoal>install</defaultGoal>
