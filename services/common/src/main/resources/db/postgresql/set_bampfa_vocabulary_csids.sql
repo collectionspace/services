@@ -10,6 +10,7 @@ update hierarchy set name='51d6d3d1-160d-48ee-99bb' where id = (select common.id
 update hierarchy set name='189d3168-0619-43fa-94b4' where id = (select common.id from conceptauthorities_common common inner join collectionspace_core cc on common.id=cc.id where cc.tenantid=55 and shortidentifier='material_ca');
 
 -- Location
+update hierarchy set name='50257c73-875c-434e-81a7' where id = (select common.id from locationauthorities_common common inner join collectionspace_core cc on common.id=cc.id where cc.tenantid=55 and shortidentifier='crate');
 update hierarchy set name='e2b86b91-0f93-48ed-820c' where id = (select common.id from locationauthorities_common common inner join collectionspace_core cc on common.id=cc.id where cc.tenantid=55 and shortidentifier='location');
 update hierarchy set name='01d6aa09-181e-46d8-81fe' where id = (select common.id from locationauthorities_common common inner join collectionspace_core cc on common.id=cc.id where cc.tenantid=55 and shortidentifier='offsite_sla');
 
