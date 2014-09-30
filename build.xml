@@ -214,7 +214,7 @@
 	<target name="create_nuxeo_db" 
             description="create nuxeo database">
 		<sql driver="${db.jdbc.driver.class}"
-             url="${db.jdbc.baseurl}"
+             url="${db.jdbc.csadmin.url}"
              userid="${db.user}"
              password="${db.user.password}"
 						 autocommit="true"
@@ -230,7 +230,7 @@
 	<target name="create_cspace_db" 
 		description="create cspace database">
 		<sql driver="${db.jdbc.driver.class}"
-             url="${db.jdbc.baseurl}"
+             url="${db.jdbc.csadmin.url}"
              userid="${db.user}"
              password="${db.user.password}"
 						 autocommit="true"

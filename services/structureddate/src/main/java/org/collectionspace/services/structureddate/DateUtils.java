@@ -1263,6 +1263,18 @@ public class DateUtils {
 		return scalarDate;
 	}
 	
+	public static boolean isValidDate(int year, int month, int day, Era era) {
+		boolean isValid = true;
+		
+		try {
+			convertToDateTime(new Date(year, month,day, era));
+		}
+		catch(IllegalFieldValueException e) {
+			isValid = false;
+		}
+		
+		return isValid;
+	}
 	
 	/**
 	 * Converts a Date to a joda-time DateTime.

@@ -7,11 +7,14 @@
 			<repository name="default">
 		        <clustering enabled="false" delay="1000" />
 		        <binaryStore path="" />
+				<!-- Uncomment the following line to use the S3 connector to store binaries. -->
+				<!-- <binaryManager class="org.nuxeo.ecm.core.storage.sql.S3BinaryManager"/> -->
+
 				<!-- The transactional datasource for Nuxeo -->
-				<xa-datasource>@XA_DATASOURCE@</xa-datasource>				
-				<property name="URL">@DB_URL@</property>
-				<property name="ServerName">@DB_SERVER_HOSTNAME@</property>				
-				<property name="DatabaseName">nuxeo</property>
+				<xa-datasource>@XA_DATASOURCE@</xa-datasource>
+				<property name="ServerName">@DB_SERVER_HOSTNAME@</property>
+				<property name="PortNumber">@DB_PORT@</property>				
+				<property name="DatabaseName">nuxeo?@DB_JDBC_OPTIONS@</property>
 				<property name="User">@NUXEO_USER@</property>
 				<property name="Password">@NUXEO_PW@</property>
 
