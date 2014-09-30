@@ -7,6 +7,9 @@
 			<repository name="bampfa_domain">
 		        <clustering enabled="false" delay="1000" />
 		        <binaryStore path="" />
+				<!-- Uncomment the following line to use the S3 connector to store binaries. -->
+				<!-- <binaryManager class="org.nuxeo.ecm.core.storage.sql.S3BinaryManager"/> -->
+
 				<!-- The transactional datasource for Nuxeo -->
 				<xa-datasource>@XA_DATASOURCE@</xa-datasource>				
 				<property name="URL">jdbc:postgresql://localhost:5432/bampfa_domain</property>
