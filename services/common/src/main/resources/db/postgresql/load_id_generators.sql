@@ -721,3 +721,39 @@ purposes.',
         SELECT  csid
         FROM    id_generators
         );
+
+-- VALUATION_CONTROL_REFERENCE_NUMBER
+
+INSERT INTO id_generators
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
+  SELECT
+     'eafbc0cd-70fe-4802-8476-b931b1b0e381',
+     'Valuation Control Reference Number',
+     'Identifies the valuation control of an object record.',
+     '9',
+     '',
+'<org.collectionspace.services.id.SettableIDGenerator>
+  <parts>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>VC</initialValue>
+      <currentValue>VC</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.YearIDGeneratorPart>
+      <currentValue></currentValue>
+    </org.collectionspace.services.id.YearIDGeneratorPart>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>.</initialValue>
+      <currentValue>.</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.NumericIDGeneratorPart>
+      <maxLength>6</maxLength>
+      <initialValue>1</initialValue>
+      <currentValue>-1</currentValue>
+    </org.collectionspace.services.id.NumericIDGeneratorPart>
+  </parts>
+</org.collectionspace.services.id.SettableIDGenerator>'
+  WHERE 'eafbc0cd-70fe-4802-8476-b931b1b0e381' NOT IN
+        (
+        SELECT  csid
+        FROM    id_generators
+        );
