@@ -26,7 +26,7 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 	final Logger logger = LoggerFactory.getLogger(UpdateRareFlagBatchJob.class);
 	
 	// Conservation categories are considered "rare", except for ones that start with the following prefixes.
-	public static final List<String> NON_RARE_CONSERVATION_CATEGORY_PREFIXES = Arrays.asList("DD ", "LC ");
+	public static final List<String> NON_RARE_CONSERVATION_CATEGORY_PREFIXES = Arrays.asList("none", "DD ", "LC ", "LR (lc) ");
 
 	private static final String[] TAXON_FIELD_NAME_PARTS = CollectionObjectConstants.TAXON_FIELD_NAME.split("\\/");
 	private static final String TAXON_FIELD_NAME_WITHOUT_PATH = TAXON_FIELD_NAME_PARTS[TAXON_FIELD_NAME_PARTS.length - 1];
