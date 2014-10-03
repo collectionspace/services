@@ -50,6 +50,7 @@ import org.collectionspace.services.vocabulary.VocabularyResource;
 import org.collectionspace.services.organization.OrgAuthorityResource;
 import org.collectionspace.services.person.PersonAuthorityResource;
 import org.collectionspace.services.citation.CitationAuthorityResource;
+import org.collectionspace.services.conditioncheck.ConditioncheckResource;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Application;
@@ -115,6 +116,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new RelationResource());
         addResourceToMapAndSingletons(new LoaninResource());
         addResourceToMapAndSingletons(new LoanoutResource());
+        addResourceToMapAndSingletons(new ConditioncheckResource());
         addResourceToMapAndSingletons(new ObjectExitResource());
         addResourceToMapAndSingletons(new BatchResource());
         addResourceToMapAndSingletons(new MediaResource());

@@ -154,6 +154,42 @@ acquired for the archives.',
         FROM    id_generators
         );
 
+-- CONDITIONCHECK_NUMBER
+
+INSERT INTO id_generators
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
+  SELECT
+     '585af100-1a35-11e2-892e-0800200c9a66',
+     'Condition Check Number',
+     'Identifies a condition check record.',
+     '9',
+     '',
+'<org.collectionspace.services.id.SettableIDGenerator>
+  <parts>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>CC</initialValue>
+      <currentValue>CC</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.YearIDGeneratorPart>
+      <currentValue></currentValue>
+    </org.collectionspace.services.id.YearIDGeneratorPart>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>.</initialValue>
+      <currentValue>.</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.NumericIDGeneratorPart>
+      <maxLength>6</maxLength>
+      <initialValue>1</initialValue>
+      <currentValue>-1</currentValue>
+    </org.collectionspace.services.id.NumericIDGeneratorPart>
+  </parts>
+</org.collectionspace.services.id.SettableIDGenerator>'
+  WHERE '585af100-1a35-11e2-892e-0800200c9a66' NOT IN
+        (
+        SELECT  csid
+        FROM    id_generators
+        );
+
 -- EVALUATION_NUMBER
 
 INSERT INTO id_generators
