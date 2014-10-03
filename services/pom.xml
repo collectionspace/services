@@ -62,6 +62,7 @@
         <module>loanin</module>
         <module>loanout</module>
         <module>conditioncheck</module>
+        <module>valuationcontrol</module>
         <module>objectexit</module>
         <module>batch</module>
         <module>imports</module>
