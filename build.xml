@@ -190,17 +190,58 @@
 		<ant antfile="services/build.xml" target="gen_ddl" inheritAll="false" />
 	</target>
 
-	<target name="create_db" depends="create_db-unix,create_db-windows" description="create database(s), invoke subtasks for indexes, etc.">
+	<!--
+		Top-level target to create (or recreate) CollectionSpace related databases.  Checks the 
+		'recreate_db' property or environment variable.
+	-->
+	<target name="create_db" depends="-create_db, -create_db_erase, -create_db_warn"
+		description="Creates or recreates CollectionSpace database(s), invoke subtasks for indexes, etc.">
+	</target>
+	
+	<!--
+		This target sets the Ant property 'create_db.recreate' based on the value of the Ant environment variable 'recreate_db'
+		and the command line property 'recreate_db'.  A command line value of 'true' for the 'recreate_db' property will override
+		the environment variable 'recreate_db' value.
+		
+		If the environment variable 'recreate_db' is set to true then the Ant property 'create_db.recreate' will get set to true; otherwise,
+		it will get set to the current value of the Ant property 'recreate_db' -which will be null if not set on the command line.
+	-->
+	<target name="-create_db">
+		<property environment="env"/>
+		<condition property="create_db.recreate" else="${recreate_db}" value="true">
+			<equals arg1="${env.recreate_db}" arg2="true"/>
+		</condition>
+	</target>	
+
+	<!--
+		This target sends the 'create_nuxeo_db' and 'create_nuxeo_db' targets to all the Ant sub-modules/directories
+	-->
+	<target name="-create_db_erase" if="${create_db.recreate}" depends="create_db-unix, create_db-windows">
 		<antcall target="create_nuxeo_db" />
 		<antcall target="create_cspace_db" />
 	</target>
 	
+	<!--
+		Outputs a warning to the user that existing CollectionSpace databases will be replaced/overridden.
+	-->
+	<target name="-create_db_warn" unless="${create_db.recreate}">
+		<echo message="*** WARNING!  This target will delete any and all existing CollectionSpace databases."/>
+		<echo message="*** WARNING!  You must set the Ant recreate_db property to 'true' to invoke this target."/>
+		<echo message="*** WARNING!  For example,"/>
+		<echo message="*** WARNING!"/>
+		<echo message="*** WARNING!      'ant create_db -Drecreate_db=true'."/>
+		<echo message="*** WARNING!"/>
+		<echo message="*** WARNING!  Optionally, you can set an environment variable named recreate_db=true as well."/>
+		<fail message="*** ERROR - Ant property 'recreate_db' was not set to 'true'. See warning messages above."/>
+	</target>	
+
 	<target name="create_db-unix" if="osfamily-unix">
 		<exec executable="mvn" failonerror="true">
 			<arg value="validate" /> <!-- Ensure proper env vars are set -->
 			<arg value="${mvn.opts}" />
 		</exec>
 	</target>
+	
 	<target name="create_db-windows" if="osfamily-windows">
 		<exec executable="cmd" failonerror="true">
 			<arg value="/c" />
