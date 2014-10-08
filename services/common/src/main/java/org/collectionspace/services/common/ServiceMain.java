@@ -873,7 +873,7 @@ public class ServiceMain {
             }
             if (repositoryNameList == null || repositoryNameList.isEmpty() == true) {
               logger.warn(String.format("Could not get repository name(s) for tenant %s", tbt.getName()));
-              continue;
+              continue; //break out of loop
             } else {
                 for (String repositoryName : repositoryNameList) {
                     if (Tools.isBlank(repositoryName)) {
@@ -891,7 +891,9 @@ public class ServiceMain {
                     repositoryConfigDoc = (Document) prototypeConfigDoc.clone();
                     // Update this config file by inserting values pertinent to the
                     // current repository.
-                    repositoryConfigDoc = updateRepositoryConfigDoc(repositoryConfigDoc, repositoryName, this.getCspaceInstanceId());
+                    String binaryStorePath = tbt.getBinaryStorePath();
+                    repositoryConfigDoc = updateRepositoryConfigDoc(repositoryConfigDoc, repositoryName,
+                    		this.getCspaceInstanceId(), binaryStorePath);
                     if (logger.isTraceEnabled()) {
                         logger.trace("Updated Nuxeo repo config file contents=\n" + repositoryConfigDoc.asXML());
                     }
@@ -907,7 +909,11 @@ public class ServiceMain {
         }
     }
     
-    private Document updateRepositoryConfigDoc(Document repoConfigDoc, String repositoryName, String cspaceInstanceId) {
+    /*
+     * This method is filling out the proto-repo-config.xml file with tenant specific repository information.
+     */
+    private Document updateRepositoryConfigDoc(Document repoConfigDoc, String repositoryName,
+    		String cspaceInstanceId, String binaryStorePath) {
         String databaseName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
 
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
@@ -917,6 +923,9 @@ public class ServiceMain {
                 REPOSITORY_EXTENSION_POINT_XPATH + "/repository", "name", repositoryName);
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
                 REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository", "name", repositoryName);
+        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
+                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/binaryStore", "path",
+                Tools.isBlank(binaryStorePath) ? repositoryName : binaryStorePath);  // Can be either partial or full path.  Partial path will be relative to Nuxeo's data directory
         String url = XmlTools.getElementValue(repoConfigDoc,
                 REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='URL']");
         if (! Tools.isBlank(url)) {

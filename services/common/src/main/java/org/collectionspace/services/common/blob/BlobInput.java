@@ -184,7 +184,7 @@ public class BlobInput {
 		URL blobUrl = new URL(theBlobUri);
     	File theBlobFile = null;
 
-		if (blobUrl.getProtocol().equalsIgnoreCase("http")) {
+		if (blobUrl.getProtocol().equalsIgnoreCase("http")) { //REM: Add support for https as well
 			Download fetchedFile = new Download(blobUrl);
 			if (logger.isDebugEnabled() == true) {
 				logger.debug("Starting blob download into temp file:" + fetchedFile.getFilePath());

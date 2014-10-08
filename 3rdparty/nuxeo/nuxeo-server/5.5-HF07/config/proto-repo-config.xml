@@ -1,4 +1,23 @@
 <?xml version="1.0"?>
+<!--
+	This is a prototype/template file for Nuxeo repository configuration files.
+	For each tenant that has their own repository specified in the CollectionSpace
+	tenant bindings file, we will create a corresponding Nuxeo repository config-
+	uration file.  You won't have to change the value for most of these elements
+	and attributes because they will be set when CollectionSpace starts.
+	
+	*** NOTE *** One value you may want to change is the 'binaryStore' path which is the location
+	that Nuxeo places binary files like images and PDF documents. Be sure to read the comment to
+	the right of the <binaryStore> element below.
+-->
+
+<!-- *** WARNING *** Don't manually change the values here unless you know exactly what you're doing. -->
+
+<!-- Values in the following elements are primarily added during execution -->
+<!-- of the 'ant deploy' command, within the Services source code tree. -->
+<!-- (Several values are also added during system startup, into repository-specific -->
+<!-- 'clones' of this prototype configuration file, as noted below.) --> 
+
 <component name="config:default-repository">
     <extension target="org.nuxeo.ecm.core.repository.RepositoryService"
                point="repository">
@@ -7,14 +26,9 @@
             <repository name="default">
                 <pool minPoolSize="0" maxPoolSize="20"
                       blockingTimeoutMillis="100" idleTimeoutMinutes="10" />
-                <clustering enabled="false" delay="1000" />
-                <binaryStore path="" /> <!-- Should be parameterized. See CSPACE-6393 -->
-                <!-- Values in the following elements are primarily added during execution -->
-                <!-- of the 'ant deploy' command, within the Services source code tree. -->
-                <!-- (Several values are also added during system startup, into repository-specific -->
-                <!-- 'clones' of this prototype configuration file, as noted below.) --> 
-                <!-- The transactional datasource for Nuxeo -->
-                <xa-datasource>@XA_DATASOURCE@</xa-datasource>	
+                <clustering enabled="false" delay="1000" />                
+                <binaryStore path="" /> <!-- Default value will be repository/database name.  Can be partial or full system path.  Partial path is relative to Nuxeo's data dir -->
+                <xa-datasource>@XA_DATASOURCE@</xa-datasource> <!-- The transactional datasource for Nuxeo -->
                 <!-- While the following element's value is primarily inserted during 'ant deploy' -->
                 <!-- the database name at the end of this JDBC URL is added during system startup. -->				
                 <property name="URL">@DB_URL@</property>
