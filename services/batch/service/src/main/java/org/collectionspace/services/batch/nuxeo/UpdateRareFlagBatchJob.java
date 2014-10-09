@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 	final Logger logger = LoggerFactory.getLogger(UpdateRareFlagBatchJob.class);
 	
-	// Conservation categories are considered "rare", except for ones that start with the following prefixes.
+	// All conservation categories are considered rare, except for ones that start with the following prefixes.
 	public static final List<String> NON_RARE_CONSERVATION_CATEGORY_PREFIXES = Arrays.asList("none", "DD ", "LC ", "LR (lc) ");
 
 	private static final String[] TAXON_FIELD_NAME_PARTS = CollectionObjectConstants.TAXON_FIELD_NAME.split("\\/");
@@ -157,8 +157,8 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 	/**
 	 * Updates the rare flag of the specified collectionobject. The rare flag is determined by looking at
 	 * the taxon record that is referenced by the primary taxonomic determination of the collectionobject.
-	 * If the taxon record has any non-null conservation category, the rare flag is set to true. Otherwise,
-	 * it is set to false.
+	 * If the taxon record has a conservation category that is considered rare in its primary plant attributes
+	 * group, the rare flag is set to true. Otherwise, it is set to false.
 	 * 
 	 * @param collectionObjectPayload	The payload representing the collectionobject
 	 * @return
@@ -205,17 +205,6 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 					if (isRare(conservationCategory)) {
 						newIsRare = "true";
 					}
-
-//					List<String> conservationCategories = getFieldValues(taxonPayload, TaxonConstants.CONSERVATION_CATEGORY_SCHEMA_NAME, TaxonConstants.CONSERVATION_CATEGORY_FIELD_NAME);
-//					
-//					for (String conservationCategory : conservationCategories) {
-//						if (isRare(conservationCategory)) {
-//							logger.debug("found rare conservation category: " + conservationCategory);
-//							
-//							newIsRare = "true";
-//							break;
-//						}
-//					}
 				}
 			}
 			
@@ -247,7 +236,7 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 
 			// ...unless it's one of the non-rare ones.
 			
-			// Check if the display name starts with a string that
+			// Check if the display name starts with a prefix that
 			// indicates that it isn't rare.
 			
 			RefName.AuthorityItem item = RefName.AuthorityItem.parse(conservationCategoryRefName);
