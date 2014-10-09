@@ -24,7 +24,7 @@
 			<property name="hibernate.connection.driver_class" value="${db.jdbc.driver.class}"/>
 			<property name="hibernate.connection.username" value="${db.cspace.user}"/>
 			<property name="hibernate.connection.password" value="${db.cspace.user.password}"/>
-			<property name="hibernate.connection.url" value="jdbc:${db}://${db.host}:${db.port}/${db.cspace.name}"/>
+			<property name="hibernate.connection.url" value="${db.jdbc.cspace.url.encoded}"/>
             <!--property name="hibernate.hbm2ddl.auto" value="create-drop"/-->
         </properties>
 

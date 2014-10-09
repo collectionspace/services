@@ -29,12 +29,10 @@
                 <clustering enabled="false" delay="1000" />                
                 <binaryStore path="" /> <!-- Default value will be repository/database name.  Can be partial or full system path.  Partial path is relative to Nuxeo's data dir -->
                 <xa-datasource>@XA_DATASOURCE@</xa-datasource> <!-- The transactional datasource for Nuxeo -->
-                <!-- While the following element's value is primarily inserted during 'ant deploy' -->
-                <!-- the database name at the end of this JDBC URL is added during system startup. -->				
-                <property name="URL">@DB_URL@</property>
                 <property name="ServerName">@DB_SERVER_HOSTNAME@</property>
-                <!-- The value of the following element is added during system startup. -->				
-                <property name="DatabaseName"></property>
+                <property name="DatabaseName"></property> <!-- The value of the database name element is inserted during system startup. -->
+                <property name="JDBCOptions">@DB_JDBC_OPTIONS@</property>
+                <property name="PortNumber">@DB_PORT@</property>
                 <property name="User">@NUXEO_USER@</property>
                 <property name="Password">@NUXEO_PW@</property>
             </repository>

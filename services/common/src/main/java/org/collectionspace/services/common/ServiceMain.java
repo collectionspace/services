@@ -916,35 +916,44 @@ public class ServiceMain {
     		String cspaceInstanceId, String binaryStorePath) {
         String databaseName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
 
-        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                "/component", "name", String.format("config:%s-repository", repositoryName));
+        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc, "/component", "name",
+                String.format("config:%s-repository", repositoryName));
+        
         // Text substitutions within first extension point, "repository"
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository", "name", repositoryName);
+                REPOSITORY_EXTENSION_POINT_XPATH + "/repository", "name",
+                repositoryName);
+        
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository", "name", repositoryName);
+                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository", "name",
+                repositoryName);
+        
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
                 REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/binaryStore", "path",
                 Tools.isBlank(binaryStorePath) ? repositoryName : binaryStorePath);  // Can be either partial or full path.  Partial path will be relative to Nuxeo's data directory
-        String url = XmlTools.getElementValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='URL']");
-        if (! Tools.isBlank(url)) {
-            repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
-                    REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='URL']",
-                    url + databaseName);
-        }
+
+        /* Create the JDBC url options if any exist */
+        String jdbcOptions = XmlTools.getElementValue(repoConfigDoc,
+                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='JDBCOptions']");
+        jdbcOptions = Tools.isBlank(jdbcOptions) ? "" : "?" + jdbcOptions;
+        
         repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
                 REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='DatabaseName']",
-                databaseName);
+                databaseName + jdbcOptions);
+        
         // Text substitutions within second extension point, "repositories" 
         repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
                 REPOSITORIES_EXTENSION_POINT_XPATH + "/documentation",
                 String.format("The %s repository", repositoryName));
+        
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                REPOSITORIES_EXTENSION_POINT_XPATH + "/repository", "name", repositoryName);
+                REPOSITORIES_EXTENSION_POINT_XPATH + "/repository", "name",
+                repositoryName);
+        
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
                 REPOSITORIES_EXTENSION_POINT_XPATH + "/repository", "label",
                 String.format("%s Repository", repositoryName));
+        
         return repoConfigDoc;
     }
 

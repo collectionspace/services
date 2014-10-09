@@ -1,164 +1,158 @@
-
 <project name="nuxeo" default="package" basedir=".">
-    <description>
-        collectionspace nuxeo
-    </description>
+    <description> collectionspace nuxeo </description>
     <!-- set global properties for this build -->
     <property name="services.trunk" value="../.."/>
     <!-- environment should be declared before reading build.properties -->
-    <property environment="env" />
-    <property file="${services.trunk}/build.properties" />
-    <property name="mvn.opts" value="-V" />
+    <property environment="env"/>
+    <property file="${services.trunk}/build.properties"/>
+    <property name="mvn.opts" value="-V"/>
     <property name="src" location="src"/>
     <property name="build" location="build"/>
-    <property name="dist"  location="dist"/>
+    <property name="dist" location="dist"/>
 
     <condition property="osfamily-unix">
-        <os family="unix" />
+        <os family="unix"/>
     </condition>
     <condition property="osfamily-windows">
-        <os family="windows" />
+        <os family="windows"/>
     </condition>
 
     <target name="init">
-    <!-- Create the time stamp -->
+        <!-- Create the time stamp -->
         <tstamp/>
-    <!-- Create the build directory structure used by compile -->
+        <!-- Create the build directory structure used by compile -->
         <mkdir dir="${build}"/>
-
     </target>
 
     <target name="package" depends="package-unix,package-windows"
-    	description="Package CollectionSpace Services" />
+        description="Package CollectionSpace Services"/>
     <target name="package-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
-            <arg value="package" />
-            <arg value="-Dmaven.test.skip=true" />
-            <arg value="-f" />
-            <arg value="${basedir}/pom.xml" />
-            <arg value="-N" />
-            <arg value="${mvn.opts}" />
+            <arg value="package"/>
+            <arg value="-Dmaven.test.skip=true"/>
+            <arg value="-f"/>
+            <arg value="${basedir}/pom.xml"/>
+            <arg value="-N"/>
+            <arg value="${mvn.opts}"/>
         </exec>
     </target>
     <target name="package-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
-            <arg value="/c" />
-            <arg value="mvn.bat" />
-            <arg value="package" />
-            <arg value="-Dmaven.test.skip=true" />
-            <arg value="-f" />
-            <arg value="${basedir}/pom.xml" />
-            <arg value="-N" />
-            <arg value="${mvn.opts}" />
+            <arg value="/c"/>
+            <arg value="mvn.bat"/>
+            <arg value="package"/>
+            <arg value="-Dmaven.test.skip=true"/>
+            <arg value="-f"/>
+            <arg value="${basedir}/pom.xml"/>
+            <arg value="-N"/>
+            <arg value="${mvn.opts}"/>
         </exec>
     </target>
 
-    <target name="install" depends="package,install-unix,install-windows"
-    	description="Install" />
+    <target name="install" depends="package,install-unix,install-windows" description="Install"/>
     <target name="install-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
-            <arg value="install" />
-            <arg value="-Dmaven.test.skip=true" />
-            <arg value="-f" />
-            <arg value="${basedir}/pom.xml" />
-            <arg value="-N" />
-            <arg value="${mvn.opts}" />
+            <arg value="install"/>
+            <arg value="-Dmaven.test.skip=true"/>
+            <arg value="-f"/>
+            <arg value="${basedir}/pom.xml"/>
+            <arg value="-N"/>
+            <arg value="${mvn.opts}"/>
         </exec>
     </target>
     <target name="install-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
-            <arg value="/c" />
-            <arg value="mvn.bat" />
-            <arg value="install" />
-            <arg value="-Dmaven.test.skip=true" />
-            <arg value="-f" />
-            <arg value="${basedir}/pom.xml" />
-            <arg value="-N" />
-            <arg value="${mvn.opts}" />
+            <arg value="/c"/>
+            <arg value="mvn.bat"/>
+            <arg value="install"/>
+            <arg value="-Dmaven.test.skip=true"/>
+            <arg value="-f"/>
+            <arg value="${basedir}/pom.xml"/>
+            <arg value="-N"/>
+            <arg value="${mvn.opts}"/>
         </exec>
     </target>
 
-    <target name="clean" depends="clean-unix,clean-windows"
-    	description="Delete target directories" >
+    <target name="clean" depends="clean-unix,clean-windows" description="Delete target directories">
         <delete dir="${build}"/>
     </target>
     <target name="clean-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
-            <arg value="clean" />
-            <arg value="${mvn.opts}" />
+            <arg value="clean"/>
+            <arg value="${mvn.opts}"/>
         </exec>
     </target>
     <target name="clean-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
-            <arg value="/c" />
-            <arg value="mvn.bat" />
-            <arg value="clean" />
-            <arg value="${mvn.opts}" />
+            <arg value="/c"/>
+            <arg value="mvn.bat"/>
+            <arg value="clean"/>
+            <arg value="${mvn.opts}"/>
         </exec>
     </target>
 
-    <target name="test" depends="test-unix,test-windows" description="Run tests" />
+    <target name="test" depends="test-unix,test-windows" description="Run tests"/>
     <target name="test-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
-            <arg value="test" />
-            <arg value="${mvn.opts}" />
+            <arg value="test"/>
+            <arg value="${mvn.opts}"/>
         </exec>
     </target>
     <target name="test-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
-            <arg value="/c" />
-            <arg value="mvn.bat" />
-            <arg value="test" />
-            <arg value="${mvn.opts}" />
+            <arg value="/c"/>
+            <arg value="mvn.bat"/>
+            <arg value="test"/>
+            <arg value="${mvn.opts}"/>
         </exec>
     </target>
 
     <target name="deploy" depends="package"
-    	description="deploy nuxeo server libs to ${jee.server.cspace}">
+        description="deploy nuxeo server libs to ${jee.server.cspace}">
         <copy todir="${jee.server.cspace}/nuxeo-server">
-           <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}">
+            <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}">
                 <exclude name="**/config/*-repo-config.xml"/>
-           </fileset>
+            </fileset>
         </copy>
         <echo message="Copying Nuxeo prototype repo config file ..."/>
         <copy todir="${jee.server.cspace}/cspace/config/services" overwrite="true">
             <fileset file="${basedir}/nuxeo-server/${nuxeo.release}/config/proto-repo-config.xml"/>
             <filterset>
-		<filter token="DB_NUXEO_NAME" value="${db.nuxeo.name}" />
-		<!-- The specific database name will be appended to the following JDBC URL during system -->
-		<!-- startup, within each repository-specific config file that is 'cloned' from the -->
-		<!-- prototype repo config file being written to here. -->
-		<filter token="DB_URL" value="jdbc:${db}://${db.host}:${db.port}/"/>
-            	<filter token="DB_SERVER_HOSTNAME" value="${db.host}"/>
-		<filter token="XA_DATASOURCE" value="${db.xaDataSource}" />
-                <filter token="NUXEO_USER" value="${db.nuxeo.user}" />
-                <filter token="NUXEO_PW" value="${db.nuxeo.user.password}" />
+                <filter token="DB_NUXEO_NAME" value="${db.nuxeo.name}"/>
+                <!-- The actual database name will be substituted during system -->
+                <!-- startup, within each repository-specific config file that is 'cloned' from the -->
+                <!-- prototype repo config file being written to here. -->
+                <filter token="DB_SERVER_HOSTNAME" value="${db.host}"/>
+                <filter token="DB_PORT" value="${db.port}"/>
+                <filter token="DB_JDBC_OPTIONS" value="${db.jdbc.urloptions.encoded}"/>
+                <filter token="XA_DATASOURCE" value="${db.xaDataSource}"/>
+                <filter token="NUXEO_USER" value="${db.nuxeo.user}"/>
+                <filter token="NUXEO_PW" value="${db.nuxeo.user.password}"/>
             </filterset>
         </copy>
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-listener/build.xml" target="deploy" inheritall="false"/>
-				<!-- Disabled due to integration issues between ImageMagick and Ghostscript on Linux systems        
+        <!-- Disabled due to integration issues between ImageMagick and Ghostscript on Linux systems        
         <ant antfile="nuxeo-platform-thumbnail/build.xml" target="deploy" inheritall="false"/>
         -->
     </target>
 
-    <target name="undeploy"
-    	description="undeploy nuxeo server libs from ${jee.server.cspace}">
+    <target name="undeploy" description="undeploy nuxeo server libs from ${jee.server.cspace}">
         <delete dir="${jee.server.cspace}/nuxeo-server/bundles"/>
         <delete dir="${jee.server.cspace}/nuxeo-server/config"/>
         <delete dir="${jee.server.cspace}/nuxeo-server/lib"/>
-        <delete file="${jee.server.cspace}/cspace/config/services/proto-repo-config.xml" failonerror="false"/>
+        <delete file="${jee.server.cspace}/cspace/config/services/proto-repo-config.xml"
+            failonerror="false"/>
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-listener/build.xml" target="undeploy" inheritall="false"/>
-		<ant antfile="nuxeo-platform-quote/build.xml" target="undeploy" inheritall="false"/>
-		<ant antfile="nuxeo-platform-quote-api/build.xml" target="undeploy" inheritall="false"/>
-		<!-- Disabled due to integration issues between ImageMagick and Ghostscript on Linux systems
+        <ant antfile="nuxeo-platform-quote/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-quote-api/build.xml" target="undeploy" inheritall="false"/>
+        <!-- Disabled due to integration issues between ImageMagick and Ghostscript on Linux systems
 		<ant antfile="nuxeo-platform-thumbnail/build.xml" target="undeploy" inheritall="false"/>
 		-->
     </target>
 
-    <target name="dist"
-    	description="generate distribution for nuxeo server libs" depends="package">
+    <target name="dist" description="generate distribution for nuxeo server libs" depends="package">
         <copy todir="${services.trunk}/${dist.server.cspace}/nuxeo-server">
             <fileset dir="${basedir}/nuxeo-server"/>
         </copy>
