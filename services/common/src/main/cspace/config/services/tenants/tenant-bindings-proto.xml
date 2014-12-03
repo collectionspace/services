@@ -1653,6 +1653,13 @@
             <service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.report.nuxeo.ReportValidatorHandler</service:validatorHandler>
             <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
                 <service:classname>org.collectionspace.services.report.nuxeo.ReportPostInitHandler</service:classname>
+                <!-- The name of a database account (role) that will provide remote access for building and running reports  -->
+                <service:params>
+                    <service:property>
+                        <service:key>reporterRoleName</service:key>
+                        <service:value>reporter</service:value>
+                    </service:property>
+                </service:params>
                 <service:params>
                     <service:property>
                         <service:key>readerRoleName</service:key>
