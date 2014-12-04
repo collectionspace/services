@@ -6,7 +6,6 @@ package org.collectionspace.services.common;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -342,6 +341,12 @@ public class ServiceMain {
                 if (list != null && list.size() > 0) {
                 	org.collectionspace.services.config.service.InitHandler handlerType = list.get(0);  // REM - 12/2012: We might want to think about supporting multiple post-init handlers
                     String initHandlerClassname = handlerType.getClassname();
+                    if (Tools.isEmpty(initHandlerClassname)) {
+                        continue;
+                    }
+                    if (logger.isInfoEnabled()) {
+                        logger.info(String.format("Firing post-init handler %s ...", initHandlerClassname));
+                    }
 
                     List<org.collectionspace.services.config.service.InitHandler.Params.Field>
                             fields = handlerType.getParams().getField();
@@ -522,7 +527,9 @@ public class ServiceMain {
 				List<RepositoryDomainType> repoDomainList = tenantBinding.getRepositoryDomain();
 				for (RepositoryDomainType repoDomain : repoDomainList) {
 					String repoDomainName = repoDomain.getName();
-					String dbName = JDBCTools.getDatabaseName(repoDomain.getRepositoryName(), getCspaceInstanceId());
+                                        String repositoryName = repoDomain.getRepositoryName();
+                                        String cspaceInstanceId = getCspaceInstanceId();
+					String dbName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
 					if (nuxeoDBsChecked.contains(dbName)) {
 						if (logger.isDebugEnabled()) {
 							logger.debug("Another user of db: " + dbName + ": Repo: " + repoDomainName
@@ -545,9 +552,9 @@ public class ServiceMain {
 							}
 						} else {
 							// Create the user as needed
-							createUserIfNotExists(conn, dbType, nuxeoUser, nuxeoPW);
+							JDBCTools.createNewDatabaseUser(JDBCTools.CSADMIN_DATASOURCE_NAME, repositoryName, cspaceInstanceId, dbType, nuxeoUser, nuxeoPW);
 							if (readerUser != null) {
-								createUserIfNotExists(conn, dbType, readerUser, readerPW);
+                                                            JDBCTools.createNewDatabaseUser(JDBCTools.CSADMIN_DATASOURCE_NAME, repositoryName, cspaceInstanceId, dbType, readerUser, readerPW);
 							}
 							// Create the database
 							createDatabaseWithRights(conn, dbType, dbName, nuxeoUser, nuxeoPW, readerUser, readerPW);
@@ -572,57 +579,6 @@ public class ServiceMain {
         return nuxeoDBsChecked;
     	
     }
-    
-	private void createUserIfNotExists(Connection conn, DatabaseProductType dbType, String username, String userPW)
-			throws Exception {
-		PreparedStatement pstmt = null;
-		Statement stmt = null;
-		final String USER_EXISTS_QUERY_PSQL = "SELECT 1 AS result FROM pg_roles WHERE rolname=?";
-		String userExistsQuery;
-		
-		if (dbType == DatabaseProductType.POSTGRESQL) {
-			userExistsQuery = USER_EXISTS_QUERY_PSQL;
-		} else {
-			throw new UnsupportedOperationException("CreateUserIfNotExists only supports PSQL - MySQL NYI!");
-		}
-		
-		try {
-			pstmt = conn.prepareStatement(userExistsQuery); // create a
-															// statement
-			pstmt.setString(1, username); // set dbName param
-			ResultSet rs = pstmt.executeQuery();
-			// extract data from the ResultSet
-			boolean userExists = rs.next();
-			rs.close();
-			if (userExists) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("User: " + username + " already exists.");
-				}
-			} else {
-				stmt = conn.createStatement();
-				String sql = "CREATE ROLE " + username + " WITH PASSWORD '" + userPW + "' LOGIN";
-				stmt.executeUpdate(sql);
-				// Really should do the grants as well.
-				if (logger.isDebugEnabled()) {
-					logger.debug("Created Users: '" + username + "' and 'reader'");
-				}
-			}
-		} catch (Exception e) {
-			logger.error("createUserIfNotExists failed on exception: " + e.getLocalizedMessage());
-			throw e; // propagate
-		} finally { // close resources
-			try {
-				if (pstmt != null) {
-					pstmt.close();
-				}
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException se) {
-				// nothing we can do
-			}
-		}
-	}
     
 	private void createDatabaseWithRights(Connection conn, DatabaseProductType dbType, String dbName, String ownerName,
 			String ownerPW, String readerName, String readerPW) throws Exception {

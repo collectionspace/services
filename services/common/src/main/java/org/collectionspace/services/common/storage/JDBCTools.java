@@ -17,7 +17,6 @@
  */
 package org.collectionspace.services.common.storage;
 
-import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.ConfigUtils;
 import org.slf4j.Logger;
@@ -45,6 +44,7 @@ import javax.sql.rowset.RowSetFactory;
 import javax.sql.rowset.RowSetProvider;
 
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
+import org.collectionspace.services.common.ServiceMain;
 
 /**
  * User: laramie
@@ -56,13 +56,15 @@ public class JDBCTools {
     public static String CSPACE_DATASOURCE_NAME = "CspaceDS";
     public static String NUXEO_DATASOURCE_NAME = "NuxeoDS";
     // Default database names
-//    public static String DEFAULT_CSPACE_DATABASE_NAME = ConfigUtils.DEFAULT_CSPACE_DATABASE_NAME;
+    // public static String DEFAULT_CSPACE_DATABASE_NAME = ConfigUtils.DEFAULT_CSPACE_DATABASE_NAME;
     public static String DEFAULT_NUXEO_REPOSITORY_NAME = ConfigUtils.DEFAULT_NUXEO_REPOSITORY_NAME;
     public static String DEFAULT_NUXEO_DATABASE_NAME = ConfigUtils.DEFAULT_NUXEO_DATABASE_NAME;
     public static String CSADMIN_DATASOURCE_NAME = "CsadminDS";
     public static String NUXEO_READER_DATASOURCE_NAME = "NuxeoReaderDS";
     public static String NUXEO_USER_NAME = "nuxeo";
     public static String SQL_WILDCARD = "%";
+    public static String DATABASE_SELECT_PRIVILEGE_NAME = "SELECT";
+
     
     //
     // Private constants
@@ -517,6 +519,165 @@ public class JDBCTools {
         
         return databaseName;
     }
+    
+    /**
+     * Grant a specified privilege to a database user. This privilege will
+     * be applied to all 'public' schema tables within the specified repository.
+     * 
+     * @param dataSourceName a JDBC datasource name.
+     * @param repositoryName a repository (e.g. RDBMS database) name.
+     * @param cspaceInstanceId a CollectionSpace instance identifier.
+     * @param privilegeName a database privilege (e.g. SELECT) to be granted.
+     * @param databaseUserName a database user to receive the privilege grant.
+     */
+    public static void grantPrivilegeToDatabaseUser(String dataSourceName, String repositoryName,
+             String cspaceInstanceId, String privilegeName, String databaseUserName) {
+        Statement stmt = null;
+        Connection conn = null;
+        String sql = String.format("GRANT %s ON ALL TABLES IN SCHEMA public TO %s", privilegeName, databaseUserName);
+        try {
+            DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType(dataSourceName, repositoryName,
+            		cspaceInstanceId);
+            if (databaseProductType == DatabaseProductType.MYSQL) {
+                // Nothing to do here: MYSQL already does wildcard grants in init_db.sql
+            } else if(databaseProductType != DatabaseProductType.POSTGRESQL) {
+                throw new Exception("Unrecognized database system " + databaseProductType);
+            } else {
+                String databaseName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
+                // Verify that the database user exists before executing the grant
+                if (hasDatabaseUser(dataSourceName, repositoryName, cspaceInstanceId,
+                        databaseProductType, databaseUserName)) {
+                    conn = getConnection(dataSourceName, repositoryName, cspaceInstanceId);
+                    stmt = conn.createStatement();                
+                    stmt.execute(sql);
+                }
+            }
+            
+        } catch (SQLException sqle) {
+            SQLException tempException = sqle;
+            // SQLExceptions can be chained. Loop to log all.
+            while (null != tempException) {
+                logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
+                tempException = tempException.getNextException();
+            }
+            logger.debug("SQL problem in executeQuery: ", sqle);
+        } catch (Throwable e) {
+            logger.debug(String.format("Problem granting privileges to database user: %s SQL: %s ERROR: %s",
+                    databaseUserName, sql, e));
+        } finally {
+            try {
+                if (stmt != null) {
+                    stmt.close();
+                }
+                 if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException sqle) {
+                // nothing we can do here except log
+                logger.warn("SQL Exception when closing statement/connection: " + sqle.getLocalizedMessage());
+            }
+        }
+    }
+    
+    /**
+     * Create a database user, if that user doesn't already exist.
+     * 
+     * @param conn a database connection.
+     * @param dbType a database product type.
+     * @param username the name of the database user to create.
+     * @param userPW the initial password for that database user.
+     */
+    public static void createNewDatabaseUser(String dataSourceName, String repositoryName,
+             String cspaceInstanceId, DatabaseProductType dbType, String username, String userPW) throws Exception {
+        Statement stmt = null;
+        Connection conn = null;
+        if (dbType != DatabaseProductType.POSTGRESQL) {
+            throw new UnsupportedOperationException("createNewDatabaseUser only supports PostgreSQL");
+        }
+        try {
+            if (hasDatabaseUser(dataSourceName, repositoryName, cspaceInstanceId, dbType, username)) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("User: " + username + " already exists.");
+                }
+            } else {
+                conn = getConnection(dataSourceName, repositoryName, cspaceInstanceId);
+                stmt = conn.createStatement();
+                String sql = "CREATE ROLE " + username + " WITH PASSWORD '" + userPW + "' LOGIN";
+                stmt.executeUpdate(sql);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Created User: " + username);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("createNewDatabaseUser failed on exception: " + e.getLocalizedMessage());
+            throw e;
+        } finally {
+            try {
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException sqle) {
+                // nothing we can do here except log
+                logger.warn("SQL Exception when closing statement/connection: " + sqle.getLocalizedMessage());
+            }
+        }
+    }
+    
+    /**
+     * Identify whether a database user already exists.
+     * 
+     * @param dataSourceName a JDBC datasource name.
+     * @param repositoryName a repository (e.g. RDBMS database) name.
+     * @param cspaceInstanceId a CollectionSpace instance identifier.
+     * @param dbType a database product type.
+     * @param username the name of the database user to create.
+     * @param userPW the initial password for that database user.
+     */
+    public static boolean hasDatabaseUser(String dataSourceName, String repositoryName,
+             String cspaceInstanceId, DatabaseProductType dbType, String username) throws Exception {
+        PreparedStatement pstmt = null;
+        Statement stmt = null;
+        Connection conn = null;
+        final String USER_EXISTS_QUERY_POSTGRESQL = "SELECT 1 AS result FROM pg_roles WHERE rolname=?";
+        if (dbType != DatabaseProductType.POSTGRESQL) {
+            throw new UnsupportedOperationException("hasDatabaseUser only supports PostgreSQL");
+        }
+        try {
+            conn = getConnection(dataSourceName, repositoryName, cspaceInstanceId);
+            pstmt = conn.prepareStatement(USER_EXISTS_QUERY_POSTGRESQL);
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+            boolean userExists = rs.next(); // Will return a value of 1 if user exists
+            rs.close();
+            return userExists;
+        } catch (Exception e) {
+            logger.error("hasDatabaseUser failed on exception: " + e.getLocalizedMessage());
+            throw e;
+        } finally {
+            try {
+                if (pstmt != null) {
+                    pstmt.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException sqle) {
+                // nothing we can do here except log
+                logger.warn("SQL Exception when closing statement/connection: " + sqle.getLocalizedMessage());
+           }
+        }
+    }
+    
+    
+    // -----------------------------
+    // Utility methods for debugging
+    // -----------------------------
 
     /**
      * Prints metadata, such as database username and connection URL,
@@ -543,7 +704,7 @@ public class JDBCTools {
      * @param rs a ResultSet.
      * @throws SQLException 
      */
-    public void printResultSetMetaData(ResultSet rs) throws SQLException {
+    public static void printResultSetMetaData(ResultSet rs) throws SQLException {
         if (rs == null) {
             return;
         }
