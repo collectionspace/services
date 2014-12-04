@@ -357,18 +357,21 @@
 			</service:DocHandlerParams>
 			<service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.report.nuxeo.ReportValidatorHandler
 			</service:validatorHandler>
-      <!-- Commented out per http://issues.collectionspace.org/browse/CSPACE-6346 --> 
-      <!--
 			<service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
 				<service:classname>org.collectionspace.services.report.nuxeo.ReportPostInitHandler</service:classname>
 				<service:params>
-					<service:property>
-						<service:key>readerRoleName</service:key>
-						<service:value>reader</service:value>
-					</service:property>
+                                    <!-- The name of a database account (role) that will provide remote access for building and running reports  -->
+                                    <service:property>
+                                        <service:key>reporterRoleName</service:key>
+                                        <service:value>reporter</service:value>
+                                    </service:property>
+                                    <!-- Currently retained for backward compatibility -->
+                                    <service:property>
+                                            <service:key>readerRoleName</service:key>
+                                            <service:value>reader</service:value>
+                                    </service:property>
 				</service:params>
 			</service:initHandler>
-      -->
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" name="Report"
 				version="1.0">
 				<service:part id="0" control_group="Managed" versionable="true" auditable="false" label="reports-system"

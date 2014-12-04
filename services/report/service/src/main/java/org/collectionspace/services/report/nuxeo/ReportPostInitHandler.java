@@ -49,16 +49,15 @@ import org.slf4j.LoggerFactory;
 public class ReportPostInitHandler extends InitHandler implements IInitHandler {
 
     final Logger logger = LoggerFactory.getLogger(ReportPostInitHandler.class);
-    public static final String DATABASE_SELECT_PRIVILEGE_NAME = "SELECT";
    
+//    public static final String REPORTER_ROLE_NAME_KEY = "reporterRoleName";
+//    public static final String DEFAULT_REPORTER_ROLE_NAME = "reporter" + ServiceMain.getInstance().getCspaceInstanceId();
+//    private String reporterRoleName = DEFAULT_REPORTER_ROLE_NAME;
+    
     // Currently retained for backward compatibility
     public static final String READER_ROLE_NAME_KEY = "readerRoleName";
     public static final String DEFAULT_READER_ROLE_NAME = "reader" + ServiceMain.getInstance().getCspaceInstanceId();
     private String readerRoleName = DEFAULT_READER_ROLE_NAME;
-   
-    public static final String REPORTER_ROLE_NAME_KEY = "reporterRoleName";
-    public static final String DEFAULT_REPORTER_ROLE_NAME = "reporter" + ServiceMain.getInstance().getCspaceInstanceId();
-    private String reporterRoleName = DEFAULT_REPORTER_ROLE_NAME;
     
     /** See the class javadoc for this class: it shows the syntax supported in the configuration params.
      */
@@ -71,14 +70,14 @@ public class ReportPostInitHandler extends InitHandler implements IInitHandler {
     		List<Property> propertyList) throws Exception {
         //Check for existing privileges, and if not there, grant them
     	for(Property prop : propertyList) {
-                if(REPORTER_ROLE_NAME_KEY.equals(prop.getKey())) {
-                    String value = prop.getValue();
-                    if(Tools.notEmpty(value) && !DEFAULT_REPORTER_ROLE_NAME.equals(value)){
-                        reporterRoleName = value + ServiceMain.getInstance().getCspaceInstanceId();
-                        logger.debug("ReportPostInitHandler: overriding reporterRoleName default value to use: "
-                                + value);
-                    }
-                }
+//                if(REPORTER_ROLE_NAME_KEY.equals(prop.getKey())) {
+//                    String value = prop.getValue();
+//                    if(Tools.notEmpty(value) && !DEFAULT_REPORTER_ROLE_NAME.equals(value)){
+//                        reporterRoleName = value + ServiceMain.getInstance().getCspaceInstanceId();
+//                        logger.debug("ReportPostInitHandler: overriding reporterRoleName default value to use: "
+//                                + value);
+//                    }
+//                }
                 // FIXME: Currently retained for backward compatibility; remove this block when appropriate
                 if(READER_ROLE_NAME_KEY.equals(prop.getKey())) {
                     String value = prop.getValue();
@@ -89,57 +88,10 @@ public class ReportPostInitHandler extends InitHandler implements IInitHandler {
                 }
             }
         }
-        String privilegeName = DATABASE_SELECT_PRIVILEGE_NAME;
-        grantPrivilegeToDatabaseRole(dataSourceName, repositoryName, cspaceInstanceId, privilegeName, reporterRoleName);
+        String privilegeName = JDBCTools.DATABASE_SELECT_PRIVILEGE_NAME;
+//        JDBCTools.grantPrivilegeToDatabaseUser(dataSourceName, repositoryName, cspaceInstanceId, privilegeName, reporterRoleName);
         // FIXME: Currently retained for backward compatibility; remove the following line when appropriate
-        grantPrivilegeToDatabaseRole(dataSourceName, repositoryName, cspaceInstanceId, privilegeName, readerRoleName);
-    }
-
-    // FIXME: This method might be refactorable / movable to the
-    // org.collectionspace.services.common.storage.JDBCTools class.
-    // If so, any database privilege constants here should be moved with it.
-    private void grantPrivilegeToDatabaseRole(String dataSourceName, String repositoryName, String cspaceInstanceId,
-            String privilegeName, String roleName) {
-        Connection conn = null;
-        Statement stmt = null;
-        String sql = "";
-        try {
-            DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType(dataSourceName, repositoryName,
-            		cspaceInstanceId);
-            if (databaseProductType == DatabaseProductType.MYSQL) {
-                    // Nothing to do: MYSQL already does wildcard grants in init_db.sql
-            } else if(databaseProductType != DatabaseProductType.POSTGRESQL) {
-                throw new Exception("Unrecognized database system " + databaseProductType);
-            } else {
-                String databaseName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
-                conn = JDBCTools.getConnection(dataSourceName, databaseName);
-                stmt = conn.createStatement();                
-                // FIXME: Check first that role exists before executing the grant
-                sql = String.format("GRANT %s ON ALL TABLES IN SCHEMA public TO %s", privilegeName, roleName);
-                stmt.execute(sql);
-            }
-            
-        } catch (SQLException sqle) {
-            SQLException tempException = sqle;
-            while (null != tempException) {       // SQLExceptions can be chained. Loop to log all.
-                logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
-                tempException = tempException.getNextException();
-            }
-            logger.debug("ReportPostInitHandler: SQL problem in executeQuery: ", sqle);
-        } catch (Throwable e) {
-            logger.debug("ReportPostInitHandler: problem checking/adding grant for reader: "+readerRoleName+") SQL: "+sql+" ERROR: "+e);
-        } finally {
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException sqle) {
-                logger.debug("SQL Exception closing statement/connection in executeQuery: " + sqle.getLocalizedMessage());
-            }
-        }
+        JDBCTools.grantPrivilegeToDatabaseUser(dataSourceName, repositoryName, cspaceInstanceId, privilegeName, readerRoleName);
     }
     
 
