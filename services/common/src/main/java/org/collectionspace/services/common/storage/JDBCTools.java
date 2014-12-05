@@ -627,7 +627,54 @@ public class JDBCTools {
     }
     
     /**
-     * Identify whether a database user already exists.
+     * Identify whether a database exists.
+     * 
+     * @param dbType a database product type.
+     * @param dbName a database product name.
+     * @return true if a database with that name exists, false if that database does not exit.
+     * @throws Exception
+     */
+    public static boolean hasDatabase(DatabaseProductType dbType, String dbName) throws Exception {
+        PreparedStatement pstmt = null;
+        Connection conn = null;
+        String dbExistsQuery = "";
+        if (dbType == DatabaseProductType.POSTGRESQL) {
+           dbExistsQuery = "SELECT 1 AS result FROM pg_database WHERE datname=?";
+        } else if (dbType == DatabaseProductType.MYSQL) {
+           dbExistsQuery = "SELECT 1 AS result FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME=?";
+        } else {
+            throw new UnsupportedOperationException("hasDatabase encountered unknown database product type");
+        }
+        try {
+            DataSource csadminDataSource = JDBCTools.getDataSource(JDBCTools.CSADMIN_DATASOURCE_NAME);
+            conn = csadminDataSource.getConnection();
+            pstmt = conn.prepareStatement(dbExistsQuery); // create a statement
+            pstmt.setString(1, dbName); // set dbName param
+            ResultSet rs = pstmt.executeQuery();
+            // extract data from the ResultSet
+            boolean dbExists = rs.next();  // Will return a value of 1 if database exists
+            rs.close();
+            return dbExists;
+        } catch (Exception e) {
+            logger.error("hasDatabase failed on exception: " + e.getLocalizedMessage());
+            throw e;
+        } finally {
+            try {
+                if (pstmt != null) {
+                    pstmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException sqle) {
+                // nothing we can do here except log
+                logger.warn("SQL Exception when closing statement/connection: " + sqle.getLocalizedMessage());
+           }
+        }
+    }
+    
+    /**
+     * Identify whether a database user exists.
      * 
      * @param dataSourceName a JDBC datasource name.
      * @param repositoryName a repository (e.g. RDBMS database) name.
@@ -635,6 +682,8 @@ public class JDBCTools {
      * @param dbType a database product type.
      * @param username the name of the database user to create.
      * @param userPW the initial password for that database user.
+     * @return true if a database user with that name exists, false if that user does not exist.
+     * @throws Exception
      */
     public static boolean hasDatabaseUser(String dataSourceName, String repositoryName,
              String cspaceInstanceId, DatabaseProductType dbType, String username) throws Exception {
