@@ -360,12 +360,6 @@
 			<service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
 				<service:classname>org.collectionspace.services.report.nuxeo.ReportPostInitHandler</service:classname>
 				<service:params>
-                                    <!-- The name of a database account (role) that will provide remote access for building and running reports  -->
-                                    <service:property>
-                                        <service:key>reporterRoleName</service:key>
-                                        <service:value>reporter</service:value>
-                                    </service:property>
-                                    <!-- Currently retained for backward compatibility -->
                                     <service:property>
                                             <service:key>readerRoleName</service:key>
                                             <service:value>reader</service:value>
