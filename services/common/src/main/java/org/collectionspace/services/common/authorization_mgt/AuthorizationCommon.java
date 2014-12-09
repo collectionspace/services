@@ -231,9 +231,9 @@ public class AuthorizationCommon {
         }
     }
     
-    private static Connection getConnection() throws NamingException, SQLException {
+    private static Connection getConnection(String databaseName) throws NamingException, SQLException {
         return JDBCTools.getConnection(JDBCTools.CSPACE_DATASOURCE_NAME,
-        		JDBCTools.DEFAULT_CSPACE_DATABASE_NAME);
+        		databaseName);
     }
     
     /*
@@ -915,13 +915,14 @@ public class AuthorizationCommon {
     	}
     }
     
-    public static void createDefaultAccounts(TenantBindingConfigReaderImpl tenantBindingConfigReader) {
-    	if (logger.isDebugEnabled()) {
-    		logger.debug("ServiceMain.createDefaultAccounts starting...");
-    	}
+    public static void createDefaultAccounts(
+    		TenantBindingConfigReaderImpl tenantBindingConfigReader,
+    		DatabaseProductType databaseProductType,
+    		String cspaceDatabaseName) throws Exception {
+
+    	logger.debug("ServiceMain.createDefaultAccounts starting...");
     	
         Hashtable<String, String> tenantInfo = getTenantNamesFromConfig(tenantBindingConfigReader);
-        
         Connection conn = null;
         // TODO - need to put in tests for existence first.
         // We could just look for the accounts per tenant up front, and assume that
@@ -930,9 +931,7 @@ public class AuthorizationCommon {
         // and we're not touching that, so we could safely toss the 
         // accounts, users, account-tenants, account-roles, and start over.
         try {
-    		DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType(JDBCTools.CSPACE_DATASOURCE_NAME,
-            		JDBCTools.DEFAULT_CSPACE_DATABASE_NAME);
-        	conn = getConnection();
+        	conn = getConnection(cspaceDatabaseName);
 	        ArrayList<String> existingTenants = compileExistingTenants(conn, tenantInfo);
 	        
 	    	// Note that this only creates tenants not marked as "createDisabled"
@@ -967,42 +966,19 @@ public class AuthorizationCommon {
 	    				TENANT_MANAGER_USER, AuthN.TENANT_MANAGER_ACCT_ID, 
 	    				tenantManagerRoleCSID, ROLE_ALL_TENANTS_MANAGER);
     		}
-        } catch (RuntimeException rte) {
-        	if (logger.isDebugEnabled()) {
-        		logger.debug("Exception in createDefaultAccounts: "+
-						rte.getLocalizedMessage());
-        		logger.debug(rte.getStackTrace().toString());
-        	}
-            throw rte;
-        } catch (SQLException sqle) {
-            // SQLExceptions can be chained. We have at least one exception, so
-            // set up a loop to make sure we let the user know about all of them
-            // if there happens to be more than one.
-        	if (logger.isDebugEnabled()) {
-        		SQLException tempException = sqle;
-        		while (null != tempException) {
-        			logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
-        			tempException = tempException.getNextException();
-        		}
-        		logger.debug(sqle.getStackTrace().toString());
-        	}
-            throw new RuntimeException("SQL problem in createDefaultAccounts: ", sqle);
         } catch (Exception e) {
-        	if (logger.isDebugEnabled()) {
-        		logger.debug("Exception in createDefaultAccounts: "+
-						e.getLocalizedMessage());
-        	}
-        } finally {
-        	try {
-            	if(conn!=null)
-                    conn.close();
-            } catch (SQLException sqle) {
-            	if (logger.isDebugEnabled()) {
-        			logger.debug("SQL Exception closing statement/connection: "
-        					+ sqle.getLocalizedMessage());
-            	}
-        	}
-        }    	
+			logger.debug("Exception in createDefaultAccounts: " + e.getLocalizedMessage());
+        	throw e;
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException sqle) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("SQL Exception closing statement/connection: " + sqle.getLocalizedMessage());
+				}
+			}
+		}    	
     }
     
     private static String getDefaultAdminRole(String tenantId) {
@@ -1062,14 +1038,16 @@ public class AuthorizationCommon {
 		}
 		
 		if (result == null) {
-			logger.warn("Could not retrieve a lifecycle transition definition list from: "
-					+ serviceBinding.getName()
-					+ " with tenant ID = "
-					+ tenantBinding.getId());			
+			if (serviceBinding.getType().equalsIgnoreCase(ServiceBindingUtils.SERVICE_TYPE_SECURITY) == false) {
+				logger.warn("Could not retrieve a lifecycle transition definition list from: "
+						+ serviceBinding.getName()
+						+ " with tenant ID = "
+						+ tenantBinding.getId());
+			}
 			// return an empty list			
 			result = new TransitionDefList();
 		} else {
-			logger.debug("Successfully etrieved a lifecycle transition definition list from: "
+			logger.debug("Successfully retrieved a lifecycle transition definition list from: "
 					+ serviceBinding.getName()
 					+ " with tenant ID = "
 					+ tenantBinding.getId());

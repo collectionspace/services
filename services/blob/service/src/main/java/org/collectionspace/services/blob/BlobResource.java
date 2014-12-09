@@ -38,6 +38,8 @@ import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.publicitem.PublicItemUtil;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
+import org.collectionspace.services.common.CSWebApplicationException;
+
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
@@ -122,7 +124,7 @@ public class BlobResource extends ResourceBase {
     private InputStream getBlobContent(ServiceContext ctx,
     		String csid, 
     		String derivativeTerm, 
-    		StringBuffer outMimeType) throws WebApplicationException {
+    		StringBuffer outMimeType) throws CSWebApplicationException {
     	InputStream result = null;
     	
     	try {
@@ -152,7 +154,7 @@ public class BlobResource extends ResourceBase {
 	        Response response = Response.status(
 	                Response.Status.INTERNAL_SERVER_ERROR).entity(
 	                		"Index failed. Could not get the contents for the Blob.").type("text/plain").build();
-	        throw new WebApplicationException(response);
+	        throw new CSWebApplicationException(response);
     	}
     	
     	return result;
@@ -366,7 +368,7 @@ public class BlobResource extends ResourceBase {
             if (result == null) {
                 Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
-                throw new WebApplicationException(response);
+                throw new CSWebApplicationException(response);
             }
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);
@@ -387,7 +389,7 @@ public class BlobResource extends ResourceBase {
             if (result == null) {
                 Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
-                throw new WebApplicationException(response);
+                throw new CSWebApplicationException(response);
             }
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);

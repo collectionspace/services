@@ -18,13 +18,11 @@
 package org.collectionspace.services.report.nuxeo;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import javax.sql.DataSource;
-
+import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.init.IInitHandler;
 import org.collectionspace.services.common.init.InitHandler;
@@ -52,13 +50,14 @@ public class ReportPostInitHandler extends InitHandler implements IInitHandler {
 
     final Logger logger = LoggerFactory.getLogger(ReportPostInitHandler.class);
     public static final String READ_ROLE_NAME_KEY = "readerRoleName";
-    private String readerRoleName = "reader";
+    private String readerRoleName = "reader" + ServiceMain.getInstance().getCspaceInstanceId();
 
     /** See the class javadoc for this class: it shows the syntax supported in the configuration params.
      */
     @Override
     public void onRepositoryInitialized(String dataSourceName,
     		String repositoryName,
+    		String cspaceInstanceId,
     		ServiceBindingType sbt, 
     		List<Field> fields, 
     		List<Property> propertyList) throws Exception {
@@ -73,17 +72,20 @@ public class ReportPostInitHandler extends InitHandler implements IInitHandler {
 	            }
     		}
         }
+    	
         Connection conn = null;
         Statement stmt = null;
         String sql = "";
         try {
-            DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType(dataSourceName, repositoryName);
+            DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType(dataSourceName, repositoryName,
+            		cspaceInstanceId);
             if (databaseProductType == DatabaseProductType.MYSQL) {
             	// Nothing to do: MYSQL already does wildcard grants in init_db.sql
             } else if(databaseProductType != DatabaseProductType.POSTGRESQL) {
                 throw new Exception("Unrecognized database system " + databaseProductType);
             } else {
-                conn = JDBCTools.getConnection(dataSourceName, repositoryName);
+                String databaseName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
+                conn = JDBCTools.getConnection(dataSourceName, databaseName);
                 stmt = conn.createStatement();                
                 //sql = "REVOKE SELECT ON ALL TABLES IN SCHEMA public FROM "+readerRoleName;
                 //stmt.execute(sql);

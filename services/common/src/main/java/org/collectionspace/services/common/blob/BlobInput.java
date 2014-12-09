@@ -20,6 +20,7 @@ import org.apache.commons.io.FileUtils;
 public class BlobInput {
 	private final Logger logger = LoggerFactory.getLogger(BlobInput.class);
 	private final static String FILE_ACCESS_ERROR = "The following file is either missing or cannot be read: ";
+	private final static String URL_DOWNLOAD_FAILED = "Could not download file from the following URL: ";
 	
 	private String blobCsid = null;
 	private File blobFile = null;
@@ -183,7 +184,7 @@ public class BlobInput {
 		URL blobUrl = new URL(theBlobUri);
     	File theBlobFile = null;
 
-		if (blobUrl.getProtocol().equalsIgnoreCase("http")) {
+		if (blobUrl.getProtocol().equalsIgnoreCase("http")) { //REM: Add support for https as well
 			Download fetchedFile = new Download(blobUrl);
 			if (logger.isDebugEnabled() == true) {
 				logger.debug("Starting blob download into temp file:" + fetchedFile.getFilePath());
@@ -198,7 +199,11 @@ public class BlobInput {
 			int status = fetchedFile.getStatus();
 			if (status == Download.COMPLETE) {
 				theBlobFile = fetchedFile.getFile();
-			} //FIXME: REM - We should throw an exception here if we couldn't download the file.
+			} else {
+				String msg = URL_DOWNLOAD_FAILED + theBlobUri;
+				logger.error(msg);
+				throw new DocumentException(msg);
+			}
 		} else if (blobUrl.getProtocol().equalsIgnoreCase("file")) {
 			theBlobFile = FileUtils.toFile(blobUrl);
 			if (theBlobFile.exists() == false || theBlobFile.canRead() == false) {

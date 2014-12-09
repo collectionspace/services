@@ -390,7 +390,7 @@ public class IDResource extends AbstractCollectionSpaceResourceImpl<PoxPayloadIn
 
     //////////////////////////////////////////////////////////////////////
     /**
-     * Creates a new ID generator instance.
+     * Deletes an ID generator instance.
      *
      */
     @DELETE

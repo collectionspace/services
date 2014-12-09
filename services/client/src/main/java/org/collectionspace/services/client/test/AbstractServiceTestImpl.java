@@ -563,6 +563,47 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
             }
             Assert.assertEquals(result, STATUS_NOT_FOUND);
 
+            //
+            // Undelete the soft-deleted record
+            //
+            this.setupUpdate();
+            this.updateLifeCycleState(testName, csid, WorkflowClient.WORKFLOWTRANSITION_UNDELETE, WorkflowClient.WORKFLOWSTATE_PROJECT);
+
+            //
+            // Read the list of existing non-deleted records, to verify that
+            // the undeleted record is once again returned in that list.
+            //
+            updatedTotal = readIncludeDeleted(testName, Boolean.FALSE);
+            Assert.assertEquals(updatedTotal, existingRecords + OBJECTS_TO_CREATE, "Expected item is missing from list results.");
+
+            //
+            // Next, test that a GET with WorkflowClient.WORKFLOWSTATE_DELETED query param set to 'false' returns a 200;
+            // that the formerly 'Not Found' record is once again being found.
+            //
+            trials = 0;
+            result = 0;
+            while (trials < 30) {
+	            CollectionSpacePoxClient client = this.assertPoxClient();
+	            ClientResponse<String> res = client.readIncludeDeleted(csid, Boolean.FALSE);
+	            result = res.getStatus();
+	            if (result == STATUS_OK) {
+	            	logger.info("Workflow transition to 'project' is complete");
+	            	break;
+	            } else {
+	            	/*
+	            	 * This should never happen, but if it does we need a full stack trace to help track it down.
+	            	 */
+	            	try {
+		            	throw new RuntimeException(ERROR_WORKFLOW_TRANSITION);
+	            	} catch (RuntimeException e) {
+		            	logger.info(ERROR_WORKFLOW_TRANSITION, e);
+	            	}
+	            }
+	            trials++;
+            }
+            Assert.assertEquals(result, STATUS_OK);
+
+
         } catch (UnsupportedOperationException e) {
             logger.warn(this.getClass().getName() + " did not implement createWorkflowTarget() method.  No workflow tests performed.");
             return;

@@ -52,7 +52,8 @@ public class InitHandler implements IInitHandler {
     @Override
     public void onRepositoryInitialized(String dataSourceName,
     		String repositoryName,
-    		ServiceBindingType sbt, 
+    		String cspaceInstanceId,
+    		ServiceBindingType sbt,
     		List<Field> fields, 
     		List<Property> properties) throws Exception {
 
