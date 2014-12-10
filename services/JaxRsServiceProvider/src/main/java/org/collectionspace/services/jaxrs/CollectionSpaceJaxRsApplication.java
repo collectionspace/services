@@ -54,8 +54,6 @@ import org.collectionspace.services.citation.CitationAuthorityResource;
 import org.collectionspace.services.claim.ClaimResource;
 import org.collectionspace.services.conditioncheck.ConditioncheckResource;
 
-//import org.collectionspace.services.query.QueryResource;
-
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Application;
 
