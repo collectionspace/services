@@ -28,6 +28,8 @@
                       blockingTimeoutMillis="100" idleTimeoutMinutes="10" />
                 <clustering enabled="false" delay="1000" />                
                 <binaryStore path="" /> <!-- Default value will be repository/database name.  Can be partial or full system path.  Partial path is relative to Nuxeo's data dir -->
+                <!-- Uncomment the following line to use the S3 connector to store binaries. -->
+                <!-- <binaryManager class="org.nuxeo.ecm.core.storage.sql.S3BinaryManager"/> -->
                 <xa-datasource>@XA_DATASOURCE@</xa-datasource> <!-- The transactional datasource for Nuxeo -->
                 <property name="ServerName">@DB_SERVER_HOSTNAME@</property>
                 <property name="DatabaseName"></property> <!-- The value of the database name element is inserted during system startup. -->
