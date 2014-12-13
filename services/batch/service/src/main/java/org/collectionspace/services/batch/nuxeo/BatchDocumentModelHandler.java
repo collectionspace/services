@@ -32,6 +32,7 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.BatchJAXBSchema;
 import org.collectionspace.services.jaxb.InvocableJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.batch.BatchCommon;
 import org.collectionspace.services.batch.BatchInvocable;
@@ -68,7 +69,7 @@ public class BatchDocumentModelHandler extends DocHandlerBase<BatchCommon> {
 			ResourceMap resourceMap, InvocationContext invContext)
 			throws Exception {
 
-		RepositoryInstance repoSession = null;
+		RepositoryInstanceInterface repoSession = null;
 		boolean releaseRepoSession = false;
 
 		String invocationMode = invContext.getMode();

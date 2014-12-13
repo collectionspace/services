@@ -43,6 +43,7 @@ import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.AbstractMultipartDocumentHandlerImpl;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
@@ -57,7 +58,6 @@ import org.collectionspace.services.lifecycle.StateList;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.lifecycle.TransitionDefList;
 import org.collectionspace.services.lifecycle.TransitionList;
-
 import org.nuxeo.ecm.core.NXCore;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -65,7 +65,6 @@ import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.lifecycle.LifeCycleService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +79,7 @@ public abstract class DocumentModelHandler<T, TL>
         extends AbstractMultipartDocumentHandlerImpl<T, TL, DocumentModel, DocumentModelList> {
 
     private final Logger logger = LoggerFactory.getLogger(DocumentModelHandler.class);
-    private RepositoryInstance repositorySession;
+    private RepositoryInstanceInterface repositorySession;
 
     protected String oldRefNameOnUpdate = null;  // FIXME: REM - We should have setters and getters for these
     protected String newRefNameOnUpdate = null;  // FIXME: two fields.
@@ -214,7 +213,7 @@ public abstract class DocumentModelHandler<T, TL>
      * getRepositorySession returns Nuxeo Repository Session
      * @return
      */
-    public RepositoryInstance getRepositorySession() {
+    public RepositoryInstanceInterface getRepositorySession() {
     	
         return repositorySession;
     }
@@ -223,7 +222,7 @@ public abstract class DocumentModelHandler<T, TL>
      * setRepositorySession sets repository session
      * @param repoSession
      */
-    public void setRepositorySession(RepositoryInstance repoSession) {
+    public void setRepositorySession(RepositoryInstanceInterface repoSession) {
         this.repositorySession = repoSession;
     }
 
@@ -467,9 +466,10 @@ public abstract class DocumentModelHandler<T, TL>
 	 * 		1. Document 'B' is the subject of the relationship
 	 * 		2. Document 'B' is the object of the relationship
 	 * 		3. Document 'B' is either the object or the subject of the relationship
+	 * @throws DocumentException 
 	 */
     @Override
-    public String getCMISQuery(QueryContext queryContext) {
+    public String getCMISQuery(QueryContext queryContext) throws DocumentException {
     	String result = null;
     	
     	if (isCMISQuery() == true) {

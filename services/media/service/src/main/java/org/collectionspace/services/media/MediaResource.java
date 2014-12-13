@@ -181,7 +181,7 @@ public class MediaResource extends ResourceBase {
         	String blobCsid = CollectionSpaceClientUtils.extractId(blobresult);
         	queryParams.add(BlobClient.BLOB_CSID_PARAM, blobCsid); // Add the new blob's csid as an artificial query param -the media doc handler will look for this
         }
-       	return super.update(parentCtx, resourceMap, ui, csid, xmlPayload); // Now call the parent to finish the media resource POST request
+       	return super.update(parentCtx, resourceMap, ui, csid, xmlPayload); // Now call the parent to finish the media resource PUT request
     }
 
     /*
@@ -213,7 +213,17 @@ public class MediaResource extends ResourceBase {
 
 		return response;
     }    
-        
+   
+    @PUT
+    @Path("{csid}/blob")
+    @Consumes("multipart/form-data")
+    @Produces("application/xml")
+    public Response updateMediaByCreatingBlob(@Context HttpServletRequest req,
+    		@PathParam("csid") String csid,
+    		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri) {
+    	return this.createBlob(req, csid, blobUri);
+    }
+    
     /*
      * Creates a new blob (using the incoming multipart form data) and associates it with an existing media record/resource.
      * If a URL query param is passed in as well, we use the URL to create the new blob instead of the multipart form data.
@@ -222,6 +232,7 @@ public class MediaResource extends ResourceBase {
     @Path("{csid}")
     @Consumes("multipart/form-data")
     @Produces("application/xml")
+    @Deprecated
     public Response createBlob(@Context HttpServletRequest req,
     		@PathParam("csid") String csid,
     		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri) {

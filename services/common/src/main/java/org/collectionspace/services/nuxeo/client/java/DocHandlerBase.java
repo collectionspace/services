@@ -177,7 +177,7 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
     public AbstractCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
     	CommonList commonList = new CommonList();
         String markRtSbj = null;
-    	RepositoryInstance repoSession = null;
+        RepositoryInstanceInterface repoSession = null;
     	RepositoryJavaClientImpl repoClient = null;
     	RepositoryJavaClientImpl nuxeoRepoClient = null;
     	boolean releaseRepoSession = false;

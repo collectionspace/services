@@ -6,7 +6,7 @@ import java.util.Set;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.invocable.Invocable;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
 
 public interface BatchInvocable extends Invocable {
 
@@ -16,6 +16,6 @@ public interface BatchInvocable extends Invocable {
 	 */
 	public void setResourceMap(ResourceMap resourceMap);
 
-    public void setRepoSession(RepositoryInstance repoSession);
+    public void setRepoSession(RepositoryInstanceInterface repoSession);
     public void setTenantId(String tenantId);
 }

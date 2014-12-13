@@ -47,6 +47,7 @@
         factory="org.nuxeo.runtime.jtajca.NuxeoTransactionManagerFactory"
         transactionTimeoutSeconds="86400"/>
     <Transaction factory="org.nuxeo.runtime.jtajca.NuxeoUserTransactionFactory"/>
+    
     <Resource name="NuxeoConnectionManager" auth="Container"
         type="javax.resource.spi.ConnectionManager"
         factory="org.nuxeo.runtime.jtajca.NuxeoConnectionManagerFactory" minPoolSize="0"
@@ -61,44 +62,57 @@
     <!-- 
 		For CollectionSpace services
 	 -->
-    <Resource name="jdbc/CspaceDS"
-           auth="Container"
-           type="javax.sql.DataSource"
-           username="${db.user}"
-           password="${db.user.password}"
-           driverClassName="${db.jdbc.driver.class}"
-           url="${db.jdbc.cspace.url.encoded}"
-           maxActive="8"
-           maxIdle="4"/>
+	 
+	<Resource name="jdbc/CspaceDS"
+		auth="Container"
+		type="javax.sql.DataSource"
+		username="${db.cspace.user}"
+		password="${db.cspace.user.password}"
+		driverClassName="${db.jdbc.driver.class}"
+		url="${db.jdbc.cspace.url.encoded}"
+		maxActive="8"
+		maxIdle="4"
+		testWhileIdle="true"
+		validationQuery="SELECT 1"
+		logAbandoned="true"/>
 		
 	<Resource name="jdbc/NuxeoDS"
-           auth="Container"
-           type="javax.sql.DataSource"
-           username="${db.nuxeo.user}"
-           password="${db.nuxeo.user.password}"
-           driverClassName="${db.jdbc.driver.class}"
-           url="${db.jdbc.nuxeo.url.encoded}"
-           maxActive="8"
-           maxIdle="4"/>	
+		auth="Container"
+		type="javax.sql.DataSource"
+		username="${db.nuxeo.user}"
+		password="${db.nuxeo.user.password}"
+		driverClassName="${db.jdbc.driver.class}"
+		url="${db.jdbc.nuxeo.url.encoded}"
+		maxActive="8"
+		maxIdle="4"
+		testWhileIdle="true"
+		validationQuery="SELECT 1"
+		logAbandoned="true"/>
 
-  <Resource name="jdbc/NuxeoMgrDS"
-    auth="Container"
-    type="javax.sql.DataSource"
-    username="${db.user}"
-    password="${db.user.password}"
-    driverClassName="${db.jdbc.driver.class}"
-    url="${db.jdbc.csadmin.url.encoded}"
-    maxActive="8"
-    maxIdle="4"/>	
+	<Resource name="jdbc/CsadminDS"
+		auth="Container"
+		type="javax.sql.DataSource"
+		username="${db.csadmin.user}"
+		password="${db.csadmin.user.password}"
+		driverClassName="${db.jdbc.driver.class}"
+		url="${db.jdbc.csadmin.url.encoded}"
+		maxActive="8"
+		maxIdle="4"
+		testWhileIdle="true"
+		validationQuery="SELECT 1"
+		logAbandoned="true"/>
   
   <Resource name="jdbc/NuxeoReaderDS"
-           auth="Container"
-           type="javax.sql.DataSource"
-           username="reader"
-           password="read"
-           driverClassName="${db.jdbc.driver.class}"
-           url="${db.jdbc.nuxeo.url.encoded}"
-           maxActive="8"
-           maxIdle="4"/>	
+		auth="Container"
+		type="javax.sql.DataSource"
+		username="${db.reader.user}"
+		password="${db.reader.user.password}"
+		driverClassName="${db.jdbc.driver.class}"
+		url="${db.jdbc.nuxeo.url.encoded}"
+		maxActive="8"
+		maxIdle="4"
+		testWhileIdle="true"
+		validationQuery="SELECT 1"
+		logAbandoned="true"/>
 
 </Context>

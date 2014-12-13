@@ -33,7 +33,6 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.config.service.ServiceBindingType;

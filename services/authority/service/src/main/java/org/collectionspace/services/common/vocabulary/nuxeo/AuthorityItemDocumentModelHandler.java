@@ -27,7 +27,6 @@ import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-
 import org.collectionspace.services.common.UriTemplateRegistry;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
@@ -42,24 +41,20 @@ import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
-
 import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ObjectPartType;
-
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentException;
+import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsDocListItem;
-
 import org.collectionspace.services.vocabulary.VocabularyItemJAXBSchema;
-
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -361,7 +356,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             }
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient = getRepositoryClient(ctx);
-            RepositoryInstance repoSession = this.getRepositorySession();
+            RepositoryInstanceInterface repoSession = this.getRepositorySession();
             
             // Update all the existing records that have a field with the old refName in it
             int nUpdated = RefNameServiceUtils.updateAuthorityRefDocs(ctx, repoClient, repoSession,
@@ -476,7 +471,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     		String propertyName,
             String itemcsid) throws Exception {
         AuthorityRefDocList authRefDocList = null;
-    	RepositoryInstance repoSession = null;
+        RepositoryInstanceInterface repoSession = null;
     	boolean releaseRepoSession = false;
         
     	try {
@@ -611,7 +606,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
 
     @Override
 	protected Object getListResultValue(DocumentModel docModel, // REM - CSPACE-5133
-			String schema, ListResultField field) {
+			String schema, ListResultField field) throws DocumentException {
 		Object result = null;		
 
 		result = NuxeoUtils.getXPathValue(docModel, schema, field.getXpath());
