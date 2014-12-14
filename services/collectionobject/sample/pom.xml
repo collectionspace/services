@@ -4,7 +4,7 @@
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.collectionobject.client.samples</artifactId>
     <packaging>pom</packaging>
-    <version>4.1-SNAPSHOT</version>
+    <version>4.0</version>
     <name>collectionobject.client.samples</name>
 
     <modules>
