@@ -4,7 +4,7 @@
     <parent>
         <artifactId>org.collectionspace.services.authorization-mgt</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>4.1</version>
+        <version>4.1.1</version>
     </parent>
 
     <artifactId>org.collectionspace.services.authorization-mgt.service</artifactId>
@@ -53,7 +53,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>

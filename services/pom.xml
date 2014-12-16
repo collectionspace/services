@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services</artifactId>
-        <version>4.1</version>
+        <version>4.1.1</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -374,6 +374,13 @@
 				<artifactId>postgresql</artifactId>
 				<version>${postgres.driver.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.1</version>
+				<scope>test</scope>
+			</dependency>
+
         </dependencies>
     </dependencyManagement>
 </project>

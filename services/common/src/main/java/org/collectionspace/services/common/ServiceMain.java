@@ -6,7 +6,6 @@ package org.collectionspace.services.common;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -342,6 +341,12 @@ public class ServiceMain {
                 if (list != null && list.size() > 0) {
                 	org.collectionspace.services.config.service.InitHandler handlerType = list.get(0);  // REM - 12/2012: We might want to think about supporting multiple post-init handlers
                     String initHandlerClassname = handlerType.getClassname();
+                    if (Tools.isEmpty(initHandlerClassname)) {
+                        continue;
+                    }
+                    if (logger.isInfoEnabled()) {
+                        logger.info(String.format("Firing post-init handler %s ...", initHandlerClassname));
+                    }
 
                     List<org.collectionspace.services.config.service.InitHandler.Params.Field>
                             fields = handlerType.getParams().getField();
@@ -486,11 +491,6 @@ public class ServiceMain {
      * 
      */
     private HashSet<String> createNuxeoDatabases() throws Exception {
-    	final String DB_EXISTS_QUERY_PSQL = 
-    			"SELECT 1 AS result FROM pg_database WHERE datname=?";
-    	final String DB_EXISTS_QUERY_MYSQL = 
-    			"SELECT 1 AS result FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME=?";
-    	    	
         String nuxeoUser = getBasicDataSourceUsername(JDBCTools.NUXEO_DATASOURCE_NAME);
     	String nuxeoPW = getBasicDataSourcePassword(JDBCTools.NUXEO_DATASOURCE_NAME);
 
@@ -499,138 +499,78 @@ public class ServiceMain {
     	
     	DatabaseProductType dbType = JDBCTools.getDatabaseProductType(JDBCTools.CSADMIN_DATASOURCE_NAME,
     			getServiceConfig().getDbCsadminName());
-    	String dbExistsQuery = (dbType == DatabaseProductType.POSTGRESQL) ? DB_EXISTS_QUERY_PSQL :
-    		DB_EXISTS_QUERY_MYSQL;
 
     	Hashtable<String, TenantBindingType> tenantBindings =
     			tenantBindingConfigReader.getTenantBindings();
     	HashSet<String> nuxeoDBsChecked = new HashSet<String>();
-    	PreparedStatement pstmt = null;
-    	Statement stmt = null;
-		Connection conn = null;
-    	
-		try {
-			DataSource csadminDataSource = JDBCTools.getDataSource(JDBCTools.CSADMIN_DATASOURCE_NAME);
-			conn = csadminDataSource.getConnection();
-			pstmt = conn.prepareStatement(dbExistsQuery); // create a statement
-			stmt = conn.createStatement();
 
-			// First check and create the roles as needed. (nuxeo and reader)
-			for (TenantBindingType tenantBinding : tenantBindings.values()) {
-				String tId = tenantBinding.getId();
-				String tName = tenantBinding.getName();
-				List<RepositoryDomainType> repoDomainList = tenantBinding.getRepositoryDomain();
-				for (RepositoryDomainType repoDomain : repoDomainList) {
-					String repoDomainName = repoDomain.getName();
-					String dbName = JDBCTools.getDatabaseName(repoDomain.getRepositoryName(), getCspaceInstanceId());
-					if (nuxeoDBsChecked.contains(dbName)) {
-						if (logger.isDebugEnabled()) {
-							logger.debug("Another user of db: " + dbName + ": Repo: " + repoDomainName
-									+ " and tenant: " + tName + " (id:" + tId + ")");
-						}
-					} else {
-						if (logger.isDebugEnabled()) {
-							logger.debug("Need to prepare db: " + dbName + " for Repo: " + repoDomainName
-									+ " and tenant: " + tName + " (id:" + tId + ")");
-						}
-
-						pstmt.setString(1, dbName); // set dbName param
-						ResultSet rs = pstmt.executeQuery();
-						// extract data from the ResultSet
-						boolean dbExists = rs.next();
-						rs.close();
-						if (dbExists) {
-							if (logger.isDebugEnabled()) {
-								logger.debug("Database: " + dbName + " already exists.");
-							}
-						} else {
-							// Create the user as needed
-							createUserIfNotExists(conn, dbType, nuxeoUser, nuxeoPW);
-							if (readerUser != null) {
-								createUserIfNotExists(conn, dbType, readerUser, readerPW);
-							}
-							// Create the database
-							createDatabaseWithRights(conn, dbType, dbName, nuxeoUser, nuxeoPW, readerUser, readerPW);
-						}
-						nuxeoDBsChecked.add(dbName);
-					}
-				} // Loop on repos for tenant
-			} // Loop on tenants
-		} finally {   //close resources
-    		try {
-    			if (stmt != null) {
-    				stmt.close();
-    			}
-    			if (conn != null) {
-    				conn.close();
-    			}
-    		} catch(SQLException se) {
-    			se.printStackTrace();
-    		}
-    	}
+        // First check and create the roles as needed. (nuxeo and reader)
+        for (TenantBindingType tenantBinding : tenantBindings.values()) {
+                String tId = tenantBinding.getId();
+                String tName = tenantBinding.getName();
+                List<RepositoryDomainType> repoDomainList = tenantBinding.getRepositoryDomain();
+                for (RepositoryDomainType repoDomain : repoDomainList) {
+                        String repoDomainName = repoDomain.getName();
+                        String repositoryName = repoDomain.getRepositoryName();
+                        String cspaceInstanceId = getCspaceInstanceId();
+                        String dbName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
+                        if (nuxeoDBsChecked.contains(dbName)) {
+                                if (logger.isDebugEnabled()) {
+                                        logger.debug("Another user of db: " + dbName + ": Repo: " + repoDomainName
+                                                        + " and tenant: " + tName + " (id:" + tId + ")");
+                                }
+                        } else {
+                                if (logger.isDebugEnabled()) {
+                                        logger.debug("Need to prepare db: " + dbName + " for Repo: " + repoDomainName
+                                                        + " and tenant: " + tName + " (id:" + tId + ")");
+                                }
+                                boolean dbExists = JDBCTools.hasDatabase(dbType, dbName);
+                                if (dbExists) {
+                                        if (logger.isDebugEnabled()) {
+                                                logger.debug("Database: " + dbName + " already exists.");
+                                        }
+                                } else {
+                                        // Create the user as needed
+                                        JDBCTools.createNewDatabaseUser(JDBCTools.CSADMIN_DATASOURCE_NAME, repositoryName, cspaceInstanceId, dbType, nuxeoUser, nuxeoPW);
+                                        if (readerUser != null) {
+                                            JDBCTools.createNewDatabaseUser(JDBCTools.CSADMIN_DATASOURCE_NAME, repositoryName, cspaceInstanceId, dbType, readerUser, readerPW);
+                                        }
+                                        // Create the database
+                                        createDatabaseWithRights(dbType, dbName, nuxeoUser, nuxeoPW, readerUser, readerPW);
+                                }
+                                nuxeoDBsChecked.add(dbName);
+                        }
+                } // Loop on repos for tenant
+        } // Loop on tenants
                 
         return nuxeoDBsChecked;
     	
     }
     
-	private void createUserIfNotExists(Connection conn, DatabaseProductType dbType, String username, String userPW)
-			throws Exception {
-		PreparedStatement pstmt = null;
-		Statement stmt = null;
-		final String USER_EXISTS_QUERY_PSQL = "SELECT 1 AS result FROM pg_roles WHERE rolname=?";
-		String userExistsQuery;
-		
-		if (dbType == DatabaseProductType.POSTGRESQL) {
-			userExistsQuery = USER_EXISTS_QUERY_PSQL;
-		} else {
-			throw new UnsupportedOperationException("CreateUserIfNotExists only supports PSQL - MySQL NYI!");
-		}
-		
-		try {
-			pstmt = conn.prepareStatement(userExistsQuery); // create a
-															// statement
-			pstmt.setString(1, username); // set dbName param
-			ResultSet rs = pstmt.executeQuery();
-			// extract data from the ResultSet
-			boolean userExists = rs.next();
-			rs.close();
-			if (userExists) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("User: " + username + " already exists.");
-				}
-			} else {
-				stmt = conn.createStatement();
-				String sql = "CREATE ROLE " + username + " WITH PASSWORD '" + userPW + "' LOGIN";
-				stmt.executeUpdate(sql);
-				// Really should do the grants as well.
-				if (logger.isDebugEnabled()) {
-					logger.debug("Created Users: '" + username + "' and 'reader'");
-				}
-			}
-		} catch (Exception e) {
-			logger.error("createUserIfNotExists failed on exception: " + e.getLocalizedMessage());
-			throw e; // propagate
-		} finally { // close resources
-			try {
-				if (pstmt != null) {
-					pstmt.close();
-				}
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException se) {
-				// nothing we can do
-			}
-		}
-	}
-    
-	private void createDatabaseWithRights(Connection conn, DatabaseProductType dbType, String dbName, String ownerName,
+        /**
+         * Creates a Nuxeo-managed database, sets up an owner for that
+         * database, and adds (at least) connection privileges to a reader
+         * of that database.
+         * 
+         * @param conn
+         * @param dbType
+         * @param dbName
+         * @param ownerName
+         * @param ownerPW
+         * @param readerName
+         * @param readerPW
+         * @throws Exception 
+         */
+	private void createDatabaseWithRights(DatabaseProductType dbType, String dbName, String ownerName,
 			String ownerPW, String readerName, String readerPW) throws Exception {
+                Connection conn = null;
 		Statement stmt = null;
 		try {
+			DataSource csadminDataSource = JDBCTools.getDataSource(JDBCTools.CSADMIN_DATASOURCE_NAME);
+			conn = csadminDataSource.getConnection();
 			stmt = conn.createStatement();
 			if (dbType == DatabaseProductType.POSTGRESQL) {
-				// Postgres does not need passwords.
+				// PostgreSQL does not need passwords in grant statements.
 				String sql = "CREATE DATABASE " + dbName + " ENCODING 'UTF8' OWNER " + ownerName;
 				stmt.executeUpdate(sql);
 				if (logger.isDebugEnabled()) {
@@ -673,6 +613,9 @@ public class ServiceMain {
 				if (stmt != null) {
 					stmt.close();
 				}
+                                if (conn != null) {
+                                        conn.close();
+                                }
 			} catch (SQLException se) {
 				se.printStackTrace();
 			}
