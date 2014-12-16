@@ -4,7 +4,7 @@
     <parent>
         <artifactId>org.collectionspace.services.main</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>4.1</version>
+        <version>4.1.1</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -294,7 +294,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.1</version>
             <scope>test</scope>
         </dependency>
 

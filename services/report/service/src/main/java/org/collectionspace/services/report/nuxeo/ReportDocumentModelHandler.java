@@ -406,7 +406,7 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 	    	if (repositoryName != null && repositoryName.trim().isEmpty() == false) {
                         String cspaceInstanceId = ServiceMain.getInstance().getCspaceInstanceId();
                         String databaseName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
-	    		result = JDBCTools.getConnection(JDBCTools.NUXEO_DATASOURCE_NAME, databaseName);
+	    		result = JDBCTools.getConnection(JDBCTools.NUXEO_READER_DATASOURCE_NAME, databaseName);
 	    	}
 		} catch (Exception e) {
 			Log.error(e);
