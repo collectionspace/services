@@ -18,7 +18,6 @@
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.collectionspace.services</groupId>
 	<artifactId>org.collectionspace.services.jaxb</artifactId>
 	<name>services.jaxb</name>
 
@@ -30,7 +29,6 @@
 		<dependency>
 			<groupId>org.jvnet.jaxb2_commons</groupId>
 			<artifactId>jaxb2-basics</artifactId>
-			<version>${jaxb2-basics.version}</version>
 		</dependency>
 	</dependencies>
 
