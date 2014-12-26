@@ -360,7 +360,7 @@
                 <groupId>org.jvnet.hyperjaxb3</groupId>
                 <!-- for time type adapters -->
                 <artifactId>hyperjaxb3-ejb-runtime</artifactId>
-                <version>0.5.6</version>
+                <version>0.6.0</version>
             </dependency>
             <dependency>
                 <groupId>mysql</groupId>
