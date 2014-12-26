@@ -645,11 +645,11 @@ public class AuthorizationCommon {
     		String insertAccountTenantSQL;
     		if (databaseProductType == DatabaseProductType.MYSQL) {
     			insertAccountTenantSQL =
-    					"INSERT INTO accounts_tenants (TENANTS_ACCOUNTSCOMMON_CSID,tenant_id) "
+    					"INSERT INTO accounts_tenants (TENANTS_ACCOUNTS_COMMON_CSID,tenant_id) "
     							+ " VALUES(?, ?)";
     		} else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
     			insertAccountTenantSQL =
-    					"INSERT INTO accounts_tenants (HJID, TENANTS_ACCOUNTSCOMMON_CSID,tenant_id) "
+    					"INSERT INTO accounts_tenants (HJID, TENANTS_ACCOUNTS_COMMON_CSID,tenant_id) "
     							+ " VALUES(nextval('hibernate_sequence'), ?, ?)";
     		} else {
     			throw new Exception("Unrecognized database system.");
