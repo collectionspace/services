@@ -24,6 +24,7 @@
 package org.collectionspace.services.workflow;
 
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
@@ -101,7 +102,7 @@ public class WorkflowResource extends ResourceBase {
 		Response response = Response.status(Response.Status.BAD_REQUEST)
 				.entity(ServiceMessages.GET_LIST_UNSUPPORTED).type("text/plain")
 				.build();
-		throw new WebApplicationException(response);
+		throw new CSWebApplicationException(response);
 	}
     
 }

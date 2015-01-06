@@ -27,15 +27,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
 import java.security.acl.Group;
+
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginException;
 
 import org.collectionspace.authentication.realm.db.CSpaceDbRealm;
 import org.jboss.security.auth.spi.UsernamePasswordLoginModule;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,10 +67,26 @@ public class CSpaceJBossDBLoginModule extends UsernamePasswordLoginModule {
         realm = new CSpaceDbRealm(options);
     }
 
+    @Override
+    protected String createPasswordHash(String username, String password,
+    	     String digestOption)
+    	     throws LoginException {
+    	String result = super.createPasswordHash(username, password, digestOption);
+    	
+    	if (result == null) {
+    		String message = "Could not create a password hash for the supplied password.  Check your login.conf configuration's hash algorithm setting.";
+    		log.error(message);
+    		throw new LoginException(message);
+    	}
+    	
+    	return result;
+    }
+    
     protected String getUsersPassword() throws LoginException {
 
         String username = getUsername();
         String password = null;
+        
         try {
             password = realm.getUsersPassword(username);
             password = convertRawPassword(password);
@@ -79,12 +94,15 @@ public class CSpaceJBossDBLoginModule extends UsernamePasswordLoginModule {
             	logger.debug("Obtained user password for: " + username);
             }
         } catch (LoginException lex) {
+        	log.error("Could not retrieve user password for: " + username, lex);
             throw lex;
         } catch (Exception ex) {
+        	log.error("Could not retrieve user password for: " + username, ex);
             LoginException le = new LoginException("Unknown Exception");
             le.initCause(ex);
             throw le;
         }
+        
         return password;
     }
     

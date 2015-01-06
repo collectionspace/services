@@ -15,7 +15,7 @@ import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.client.LoanoutClient;
 import org.collectionspace.services.client.RelationClient;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
 
 public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 
@@ -50,7 +50,7 @@ public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 	}
 
     @Override
-    public void setRepoSession(RepositoryInstance repoSession) {
+    public void setRepoSession(RepositoryInstanceInterface repoSession) {
     }
 
     @Override

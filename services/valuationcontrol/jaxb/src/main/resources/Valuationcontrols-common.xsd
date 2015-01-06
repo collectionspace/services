@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Valuation Control schema (XSD)
+    
+    Entity  : Valuation Control 
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns:ns="http://collectionspace.org/services/valuationcontrol"
+  xmlns="http://collectionspace.org/services/valuationcontrol"
+  targetNamespace="http://collectionspace.org/services/valuationcontrol"
+  version="0.1"
+>
+
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+--> 
+    
+    <!--  Valuation Control Information Group -->
+    <xs:element name="valuationcontrols_common">
+        <xs:complexType>
+            <xs:sequence> 
+                <xs:element name="valuationcontrolRefNumber" type="xs:string"/>
+                <xs:element name="valueAmountsList" type="valueAmountsList"/>
+                <xs:element name="valueDate" type="xs:date"/>
+                <xs:element name="valueRenewalDate" type="xs:date"/>
+                <xs:element name="valueSource" type="xs:string"/>
+                <xs:element name="valueType" type="xs:string"/>
+                <xs:element name="valueNote" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="valueAmountsList">
+        <xs:sequence>
+            <xs:element name="valueAmounts" type="valueAmounts" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="valueAmounts">
+        <xs:sequence>
+            <xs:element name="valueAmount" type="xs:string"/>
+            <xs:element name="valueCurrency" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

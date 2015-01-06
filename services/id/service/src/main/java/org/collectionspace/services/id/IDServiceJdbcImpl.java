@@ -76,6 +76,8 @@ import javax.security.auth.login.LoginException;
 
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
@@ -99,6 +101,9 @@ public class IDServiceJdbcImpl implements IDService {
     final String TABLE_NAME = "id_generator";
     boolean jdbcDriverInstantiated = false;
     boolean hasPreconditions = true;
+    
+    final static String CSPACE_INSTANCE_ID = ServiceMain.getInstance().getCspaceInstanceId();
+
 
     //////////////////////////////////////////////////////////////////////
     /**
@@ -236,7 +241,8 @@ public class IDServiceJdbcImpl implements IDService {
 
         Connection conn = null;
         try {
-            conn = getJdbcConnection(ctx.getRepositoryName());
+            String repositoryName = ctx.getRepositoryName();
+            conn = getJdbcConnection(getDatabaseName(repositoryName));
             conn.setAutoCommit(false);
             Statement stmt = conn.createStatement();
 
@@ -337,8 +343,8 @@ public class IDServiceJdbcImpl implements IDService {
         String lastId = null;
         Connection conn = null;
         try {
-        	String repositoryName = ctx.getRepositoryName();
-            conn = getJdbcConnection(repositoryName);
+            String repositoryName = ctx.getRepositoryName();
+            conn = getJdbcConnection(getDatabaseName(repositoryName));
             Statement stmt = conn.createStatement();
 
             ResultSet rs = stmt.executeQuery(
@@ -451,16 +457,16 @@ public class IDServiceJdbcImpl implements IDService {
 
         // @TODO Add checks for authorization to perform this operation.
 
-        if (serializedIDGenerator == null || serializedIDGenerator.equals("")) {
-            throw new BadRequestException(
-                    "Could not understand or parse this representation "
-                    + "of an ID generator.");
+        if (Tools.isBlank(serializedIDGenerator)) {
+            String msg = String.format("ID generator payload is null or empty.");
+            logger.warn(msg);
+            throw new BadRequestException(msg);
         }
 
         Connection conn = null;
         try {
-        	String repositoryName = ctx.getRepositoryName();
-            conn = getJdbcConnection(repositoryName);
+            String repositoryName = ctx.getRepositoryName();
+            conn = getJdbcConnection(getDatabaseName(repositoryName));
             Statement stmt = conn.createStatement();
 
             // Test whether this ID generator already exists in the database.
@@ -486,11 +492,10 @@ public class IDServiceJdbcImpl implements IDService {
             // conflict has occurred, so that this status can be reported
             // to the client.
             if (idGeneratorFound) {
-                throw new IllegalStateException(
-                        "Conflict with existing generator when attempting to add "
-                        + "new ID generator with ID '"
-                        + csid
-                        + "' to the database.");
+                String msg = String.format("Conflict with existing generator when attempting to add "
+                        + "new ID generator with ID '%s' to the database.", csid);
+                logger.warn(msg);
+                throw new IllegalStateException(msg);
 
                 // Otherwise, add this new ID generator, as a new record to
                 // the database.
@@ -512,9 +517,10 @@ public class IDServiceJdbcImpl implements IDService {
 
                 int rowsUpdated = ps.executeUpdate();
                 if (rowsUpdated != 1) {
-                    throw new IllegalStateException(
-                            "Error adding new ID generator '" + csid
-                            + "'" + " to the database.");
+                    String msg =
+                        String.format("Error adding new ID generator '%s'to the database.", csid);
+                    logger.warn(msg);
+                    throw new IllegalStateException(msg);
                 }
 
             } // end if (idGeneratorFound)
@@ -524,8 +530,9 @@ public class IDServiceJdbcImpl implements IDService {
         } catch (IllegalStateException ise) {
             throw ise;
         } catch (SQLException e) {
-            throw new IllegalStateException("Error adding new ID "
-                    + "generator to the database: " + e.getMessage());
+            String msg = "Error adding new ID generator to the database: " + e.getMessage();
+            logger.warn(msg);
+            throw new IllegalStateException(msg);
         } finally {
             try {
                 if (conn != null) {
@@ -560,7 +567,8 @@ public class IDServiceJdbcImpl implements IDService {
 
         Connection conn = null;
         try {
-            conn = getJdbcConnection(ctx.getRepositoryName());
+            String repositoryName = ctx.getRepositoryName();
+            conn = getJdbcConnection(getDatabaseName(repositoryName));
             Statement stmt = conn.createStatement();
 
             ResultSet rs = stmt.executeQuery(
@@ -629,8 +637,8 @@ public class IDServiceJdbcImpl implements IDService {
 
         Connection conn = null;
         try {
-
-            conn = getJdbcConnection(ctx.getRepositoryName());
+            String repositoryName = ctx.getRepositoryName();
+            conn = getJdbcConnection(getDatabaseName(repositoryName));
             Statement stmt = conn.createStatement();
 
             ResultSet rs = stmt.executeQuery(
@@ -772,7 +780,8 @@ public class IDServiceJdbcImpl implements IDService {
 
         Connection conn = null;
         try {
-            conn = getJdbcConnection(ctx.getRepositoryName());
+            String repositoryName = ctx.getRepositoryName();
+            conn = getJdbcConnection(getDatabaseName(repositoryName));
             conn.setAutoCommit(false);
             Statement stmt = conn.createStatement();
 
@@ -868,7 +877,8 @@ public class IDServiceJdbcImpl implements IDService {
 
         Connection conn = null;
         try {
-            conn = getJdbcConnection(ctx.getRepositoryName());
+            String repositoryName = ctx.getRepositoryName();
+            conn = getJdbcConnection(getDatabaseName(repositoryName));
             Statement stmt = conn.createStatement();
 
             // Test whether this ID generator already exists in the database.
@@ -935,18 +945,19 @@ public class IDServiceJdbcImpl implements IDService {
     /**
      * Opens a connection to the database and returns a JDBC Connection object.
      *
-     * @return  A JDBC database Connection object.
+     * @param   databaseName a JDBC database name. 
+     * @return  a JDBC database Connection object.
      *
      * @throws  LoginException
      * @throws  SQLException if a storage-related error occurred.
      */
-    public Connection getJdbcConnection(String repositoryName) throws NamingException, SQLException {
+    public Connection getJdbcConnection(String databaseName) throws NamingException, SQLException {
 
         logger.debug("> in getJdbcConnection");
         
         Connection conn = null;
         try {
-            conn = JDBCTools.getConnection(JDBCTools.NUXEO_DATASOURCE_NAME, repositoryName);
+            conn = JDBCTools.getConnection(JDBCTools.NUXEO_DATASOURCE_NAME, databaseName);
         } catch (NamingException e) {
             throw e;
         } catch (SQLException e) {
@@ -978,7 +989,8 @@ public class IDServiceJdbcImpl implements IDService {
 
         Connection conn = null;
         try {
-            conn = getJdbcConnection(ctx.getRepositoryName());
+            String repositoryName = ctx.getRepositoryName();
+            conn = getJdbcConnection(getDatabaseName(repositoryName));
 
             // Retrieve a list of tables in the current database.
             final String CATALOG_NAME = null;
@@ -1012,5 +1024,9 @@ public class IDServiceJdbcImpl implements IDService {
             }
         }
 
+    }
+
+    private String getDatabaseName(String repositoryName) {
+        return JDBCTools.getDatabaseName(repositoryName, CSPACE_INSTANCE_ID);
     }
 }

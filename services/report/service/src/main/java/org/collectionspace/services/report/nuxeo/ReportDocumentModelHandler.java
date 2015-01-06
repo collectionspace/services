@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
-
 import javax.naming.NamingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -64,6 +63,7 @@ import org.collectionspace.services.report.ReportsCommon;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.ReportClient;
+import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.common.api.FileTools;
@@ -78,6 +78,7 @@ import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.jaxb.InvocableJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.jfree.util.Log;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -101,14 +102,14 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
     private static String REPORTS_STD_GROUPCSID_PARAM = "groupcsid";
     private static String REPORTS_STD_CSIDLIST_PARAM = "csidlist";
     private static String REPORTS_STD_TENANTID_PARAM = "tenantid";
-	
+    
 	public InputStream invokeReport(
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
 			String csid,
 			InvocationContext invContext,
 			StringBuffer outMimeType,
 			StringBuffer outReportFileName) throws Exception {
-		RepositoryInstance repoSession = null;
+		RepositoryInstanceInterface repoSession = null;
 		boolean releaseRepoSession = false;
 
 		String invocationMode = invContext.getMode();
@@ -358,7 +359,7 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
                     		"Invoke failed (SQL problem) on Report csid=" + reportCSID).type("text/plain").build();
-            throw new WebApplicationException(response);
+            throw new CSWebApplicationException(sqle, response);
         } catch (JRException jre) {
             if (logger.isDebugEnabled()) {
             	logger.debug("JR Exception: " + jre.getLocalizedMessage() + " Cause: "+jre.getCause());
@@ -366,7 +367,7 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
                     		"Invoke failed (Jasper problem) on Report csid=" + reportCSID).type("text/plain").build();
-            throw new WebApplicationException(response);
+            throw new CSWebApplicationException(jre, response);
         } catch (FileNotFoundException fnfe) {
             if (logger.isDebugEnabled()) {
             	logger.debug("FileNotFoundException: " + fnfe.getLocalizedMessage());
@@ -374,11 +375,11 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
                     		"Invoke failed (SQL problem) on Report csid=" + reportCSID).type("text/plain").build();
-            throw new WebApplicationException(response);
+            throw new CSWebApplicationException(fnfe, response);
 		} finally {
-        	if(conn!=null) {
+        	if (conn!=null) {
         		try {
-        		conn.close();
+        			conn.close();
                 } catch (SQLException sqle) {
                     // SQLExceptions can be chained. We have at least one exception, so
                     // set up a loop to make sure we let the user know about all of them
@@ -403,7 +404,9 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
     	try {
     		String repositoryName = ctx.getRepositoryName();
 	    	if (repositoryName != null && repositoryName.trim().isEmpty() == false) {
-	    		result = JDBCTools.getConnection(JDBCTools.NUXEO_DATASOURCE_NAME, repositoryName);
+                        String cspaceInstanceId = ServiceMain.getInstance().getCspaceInstanceId();
+                        String databaseName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
+	    		result = JDBCTools.getConnection(JDBCTools.NUXEO_READER_DATASOURCE_NAME, databaseName);
 	    	}
 		} catch (Exception e) {
 			Log.error(e);

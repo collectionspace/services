@@ -26,6 +26,7 @@ package org.collectionspace.services.contact;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -40,7 +41,9 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+
 import org.collectionspace.services.client.*;
+import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.StoredValuesUriTemplate;
 import org.collectionspace.services.common.UriTemplateFactory;
 import org.collectionspace.services.common.UriTemplateRegistryKey;
@@ -222,7 +225,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
         }
         if (result == null) {
             Response response = Response.status(Response.Status.NOT_FOUND).entity("Get failed, the requested Contact CSID:" + csid + ": was not found.").type("text/plain").build();
-            throw new WebApplicationException(response);
+            throw new CSWebApplicationException(response);
         }
         return result.toXML();
     }

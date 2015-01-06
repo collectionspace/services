@@ -16,6 +16,7 @@
  */
 package org.collectionspace.services.client;
 
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -70,5 +71,15 @@ public class BlobClient extends AbstractCommonListPoxServiceClientImpl<BlobProxy
     
     public ClientResponse<Response> createBlobFromURI(String blobUri) {
         return getProxy().createBlobFromURI("".getBytes(), blobUri);
+    }
+    
+    public ClientResponse<Response> getBlobContent(String csid) {
+    	return getProxy().getBlobContent(csid);
+    }
+    
+    public ClientResponse<Response> getDerivativeContent(
+    		@PathParam("csid") String csid,
+    		@PathParam("derivativeTerm") String derivativeTerm) {
+    	return getProxy().getDerivativeContent(csid, derivativeTerm);
     }
 }

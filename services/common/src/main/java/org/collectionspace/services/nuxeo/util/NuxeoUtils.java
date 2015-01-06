@@ -22,8 +22,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.File;
 import java.lang.reflect.Field;
-
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -35,44 +33,39 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.query.QueryContext;
-
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentException;
+import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
-
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.api.Blob;
+import org.nuxeo.ecm.core.api.ConnectionException;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.ecm.core.api.model.PropertyException;
-
 import org.nuxeo.ecm.core.io.DocumentPipe;
 import org.nuxeo.ecm.core.io.DocumentReader;
 import org.nuxeo.ecm.core.io.DocumentWriter;
 import org.nuxeo.ecm.core.io.impl.DocumentPipeImpl;
 import org.nuxeo.ecm.core.io.impl.plugins.SingleDocumentReader;
 import org.nuxeo.ecm.core.io.impl.plugins.XMLDocumentWriter;
-
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.search.api.client.querymodel.descriptor.QueryModelDescriptor;
 import org.nuxeo.ecm.core.storage.sql.Binary;
 import org.nuxeo.ecm.core.storage.sql.coremodel.SQLBlob;
 import org.nuxeo.runtime.api.Framework;
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -227,7 +220,7 @@ public class NuxeoUtils {
      * @return
      * @throws DocumentException
      */
-    public static Document getDocument(RepositoryInstance repoSession, DocumentModel nuxeoDoc)
+    public static Document getDocument(RepositoryInstanceInterface repoSession, DocumentModel nuxeoDoc)
             throws DocumentException {
         Document doc = null;
         DocumentWriter writer = null;
@@ -237,7 +230,7 @@ public class NuxeoUtils {
         try {
             baos = new ByteArrayOutputStream();
             //nuxeo io.impl begin
-            reader = new SingleDocumentReader(repoSession, nuxeoDoc);
+            reader = new SingleDocumentReader(repoSession.getRepositoryInstance(), nuxeoDoc);
             writer = new XMLDocumentWriter(baos);
             DocumentPipe pipe = new DocumentPipeImpl();
             //nuxeo io.impl end
@@ -247,6 +240,8 @@ public class NuxeoUtils {
             bais = new ByteArrayInputStream(baos.toByteArray());
             SAXReader saxReader = new SAXReader();
             doc = saxReader.read(bais);
+        } catch (ClientException ce) {
+        	throw new NuxeoDocumentException(ce);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception while processing document ", e);
@@ -285,7 +280,7 @@ public class NuxeoUtils {
      *
      * @throws DocumentException the document exception
      */
-    public static Document getDocument(RepositoryInstance repoSession, String csid)
+    public static Document getDocument(RepositoryInstanceInterface repoSession, String csid)
             throws DocumentException {
         Document result = null;
 
@@ -308,7 +303,7 @@ public class NuxeoUtils {
      * @throws ClientException the client exception
      */
     public static DocumentModel getWorkspaceModel(
-            RepositoryInstance repoSession, String workspaceName)
+    		RepositoryInstanceInterface repoSession, String workspaceName)
             throws DocumentException, IOException, ClientException {
         DocumentModel result = null;
         //FIXME: commented out as this does not work without tenant qualification
@@ -335,7 +330,7 @@ public class NuxeoUtils {
      * @throws DocumentException the document exception
      */
     public static DocumentModel getDocumentModel(
-            RepositoryInstance repoSession, String nuxeoId)
+    		RepositoryInstanceInterface repoSession, String nuxeoId)
             throws DocumentException {
         DocumentModel result = null;
 
@@ -343,7 +338,7 @@ public class NuxeoUtils {
             DocumentRef documentRef = new IdRef(nuxeoId);
             result = repoSession.getDocument(documentRef);
         } catch (ClientException e) {
-            e.printStackTrace();
+            throw new NuxeoDocumentException(e);
         }
 
         return result;
@@ -541,7 +536,7 @@ public class NuxeoUtils {
     
     static public DocumentModel getDocFromCsid(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-    		RepositoryInstance repoSession,
+    		RepositoryInstanceInterface repoSession,
     		String csid) throws Exception {
 	    DocumentModel result = null;
 	
@@ -626,7 +621,7 @@ public class NuxeoUtils {
         return id;
     }
     
-    public static boolean documentExists(RepositoryInstance repoSession,
+    public static boolean documentExists(RepositoryInstanceInterface repoSession,
     		String csid) throws ClientException {
 		boolean result = false;
 		
@@ -696,24 +691,30 @@ public class NuxeoUtils {
     	return result;
     }
 
-    public static String getTenantQualifiedDocType(ServiceContext ctx) {
+    public static String getTenantQualifiedDocType(ServiceContext ctx) throws NuxeoDocumentException {
     	String result = null;
+
     	try {
-    		String docType = ctx.getDocumentType();
-    		result = getTenantQualifiedDocType(ctx, docType);
+			String docType = ctx.getDocumentType();
+			result = getTenantQualifiedDocType(ctx, docType);
     	} catch (Exception e) {
-    		logger.error("Could not get tentant qualified doctype.", e);
+    		throw new NuxeoDocumentException(e);
     	}
+    	
     	return result;
     }
     
     public static String getTenantQualifiedDocType(QueryContext queryCtx, String docType) throws Exception {
     	String result = docType;
     	
-    	String tenantQualifiedDocType = queryCtx.getTenantQualifiedDoctype();
-		if (docTypeExists(tenantQualifiedDocType) == true) {
-			result = tenantQualifiedDocType;
-		}
+    	try {
+	    	String tenantQualifiedDocType = queryCtx.getTenantQualifiedDoctype();
+			if (docTypeExists(tenantQualifiedDocType) == true) {
+				result = tenantQualifiedDocType;
+			}
+    	} catch (ClientException ce) {
+    		throw new NuxeoDocumentException(ce);
+    	}
 		
     	return result;
     }
@@ -728,11 +729,14 @@ public class NuxeoUtils {
         SchemaManager schemaManager = null;
     	try {
 			schemaManager = Framework.getService(org.nuxeo.ecm.core.schema.SchemaManager.class);
+    	} catch (ClientException ce) {
+    		throw new NuxeoDocumentException(ce);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			logger.error("Could not get Nuxeo SchemaManager instance.", e1);
 			throw e1;
 		}
+    	
 		Set<String> docTypes = schemaManager.getDocumentTypeNamesExtending(docType);
 		if (docTypes != null && docTypes.contains(docType)) {
 			result = true;
@@ -758,7 +762,7 @@ public class NuxeoUtils {
      * @return value the indicated property value as a String
      */
 	public static Object getXPathValue(DocumentModel docModel,
-			String schema, String xpath) {
+			String schema, String xpath) throws NuxeoDocumentException {
 		Object result = null;
 
 		xpath = schema + ":" + xpath;
@@ -771,11 +775,14 @@ public class NuxeoUtils {
                             returnVal = DocumentUtils.propertyValueAsString(value, docModel, xpath);
 			}
 			result = returnVal;
-		} catch (PropertyException pe) {
-			throw new RuntimeException("Problem retrieving property {" + xpath
-					+ "}. Bad XPath spec?" + pe.getLocalizedMessage());
+		} catch (ClientException ce) {
+			String msg = "Unknown Nuxeo client exception.";
+			if (ce instanceof PropertyException) {
+				msg = "Problem retrieving property {" + xpath + "}. Bad XPath spec?" + ce.getLocalizedMessage();
+			}
+			throw new NuxeoDocumentException(msg, ce);  // We need to wrap this exception in order to retry failed requests caused by network errors
 		} catch (ClassCastException cce) {
-			throw new RuntimeException("Problem retrieving property {" + xpath
+			throw new ClassCastException("Problem retrieving property {" + xpath
 					+ "} as String. Not a String property?"
 					+ cce.getLocalizedMessage());
 		} catch (IndexOutOfBoundsException ioobe) {
@@ -793,12 +800,9 @@ public class NuxeoUtils {
 			}
 			// Otherwise, e.g., for true OOB indices, propagate the exception.
 			if (result == null) {
-				throw new RuntimeException("Problem retrieving property {" + xpath
+				throw new IndexOutOfBoundsException("Problem retrieving property {" + xpath
 						+ "}:" + ioobe.getLocalizedMessage());
 			}
-		} catch (Exception e) {
-			throw new RuntimeException("Unknown problem retrieving property {"
-					+ xpath + "}." + e.getLocalizedMessage());
 		}
 
 		return result;

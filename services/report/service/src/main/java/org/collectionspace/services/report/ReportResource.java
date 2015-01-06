@@ -32,6 +32,7 @@ import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.ReportClient;
+import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
@@ -228,7 +229,7 @@ public class ReportResource extends ResourceBase {
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
                     "invoke failed on Report csid=" + csid).type(
                     "text/plain").build();
-            throw new WebApplicationException(response);
+            throw new CSWebApplicationException(response);
         }
         
         if (logger.isTraceEnabled()) {

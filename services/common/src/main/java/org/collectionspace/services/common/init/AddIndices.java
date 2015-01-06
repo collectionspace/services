@@ -89,6 +89,7 @@ public class AddIndices extends InitHandler implements IInitHandler {
     @Override
     public void onRepositoryInitialized(String dataSourceName,
     		String repositoryName,
+    		String cspaceInstanceId,
     		ServiceBindingType sbt, 
     		List<Field> fields, 
     		List<Property> properties) throws Exception {
@@ -107,16 +108,17 @@ public class AddIndices extends InitHandler implements IInitHandler {
             if(Tools.notEmpty(param) && (param.indexOf(',')>-1)){
                 String[] fieldNames = param.split(",");
                 for (String fn: fieldNames){
-                    rows = addOneIndex(dataSourceName, repositoryName, tableName, fn);
+                    rows = addOneIndex(dataSourceName, repositoryName, cspaceInstanceId, tableName, fn);
                 }
             } else {
-                rows = addOneIndex(dataSourceName, repositoryName, tableName, fieldName);
+                rows = addOneIndex(dataSourceName, repositoryName, cspaceInstanceId, tableName, fieldName);
             }
         }
     }
 
     private int addOneIndex(String dataSourceName,
-    		String repositoryName, 
+    		String repositoryName,
+    		String cspaceInstanceId,
     		String tableName, 
     		String columnName) {
         int rows = 0;
@@ -124,7 +126,7 @@ public class AddIndices extends InitHandler implements IInitHandler {
         String indexName = tableName + INDEX_SEP + columnName + INDEX_SUFFIX;
         try {
         	DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType(dataSourceName, repositoryName);
-            if (indexExists(dataSourceName, repositoryName, databaseProductType,
+            if (indexExists(dataSourceName, repositoryName, cspaceInstanceId, databaseProductType,
             		tableName, columnName, indexName)) {
                 logger.trace("Index already exists for column " + columnName
                         + " in table " + tableName);
@@ -153,7 +155,7 @@ public class AddIndices extends InitHandler implements IInitHandler {
                 //
                 // If this assumption is no longer valid, we might instead
                 // identify the relevant repository from the table name here.
-                rows = JDBCTools.executeUpdate(dataSourceName, repositoryName, sql);
+                rows = JDBCTools.executeUpdate(dataSourceName, repositoryName, cspaceInstanceId, sql);
                 logger.trace("Index added to column ("+columnName+") on table ("+tableName+")");
             }
             return rows;
@@ -165,6 +167,7 @@ public class AddIndices extends InitHandler implements IInitHandler {
 
     private boolean indexExists(String dataSourceName,
     		String repositoryName,
+    		String cspaceInstanceId,
     		DatabaseProductType databaseProductType,
             String tableName, 
             String colName, 
@@ -210,7 +213,7 @@ public class AddIndices extends InitHandler implements IInitHandler {
             //
             // If this assumption is no longer valid, we might instead
             // identify the relevant repository from the table name here.
-            conn = JDBCTools.getConnection(dataSourceName, repositoryName);
+            conn = JDBCTools.getConnection(dataSourceName, repositoryName, cspaceInstanceId);
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             if (rs.next()) {
