@@ -250,7 +250,7 @@
 		</dependency>
         <!-- nuxeo -->
 	    <dependency>
-	      <groupId>org.nuxeo.runtime</groupId>
+	      <groupId>org.nuxeo.lib.runtime</groupId>
 	      <artifactId>nuxeo-runtime-launcher</artifactId>
 	      <version>${nuxeo.platform.version}</version>
 	    </dependency>
@@ -304,11 +304,13 @@
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-api</artifactId>
         </dependency>
+        <!--
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-client</artifactId>
             <version>${nuxeo.core.version}</version>
         </dependency>
+        -->
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-query</artifactId>
