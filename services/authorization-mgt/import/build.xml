@@ -22,7 +22,6 @@
         <tstamp/>
     </target>
 
-
     <target name="package" depends="package-unix,package-windows"
             description="Package CollectionSpace Services" />
     <target name="package-unix" if="osfamily-unix">
@@ -132,7 +131,6 @@
         </exec>
     </target>
 
-
     <target name="setup_hibernate.cfg" description="replace property keywords in hibernate.cfg.xml" depends="install">
         <property name="src.hibernate.cfg" value="${basedir}/src/main/resources/hibernate.cfg.xml"/>
         <property name="dest.hibernate.cfg" value="${basedir}/target/classes/hibernate.cfg.xml"/>
@@ -140,10 +138,10 @@
         <property name="dest.appContext.cfg" value="${basedir}/target/classes/applicationContext-authorization-test.xml"/>
         <delete file="${dest.hibernate.cfg}" verbose="true" />
         <delete file="${dest.appContext.cfg}" verbose="true" />
-        <filter token="DB_URL" value="${db.jdbc.cspace.url.encoded}" />
+        <filter token="DB_CSPACE_URL" value="${db.jdbc.cspace.url.encoded}" />
         <filter token="DB_DRIVER_CLASS" value="${db.jdbc.driver.class}" />
-        <filter token="DB_USER" value="${db.cspace.user}" /> <!-- double-sub from ${db.user} fails -->
-        <filter token="DB_PASSWORD" value="${env.DB_PASSWORD_CSPACE}" /> <!-- double-sub from ${db.j2ee.user.password} fails -->
+        <filter token="DB_CSPACE_USER" value="${db.cspace.user}" />
+        <filter token="DB_CSPACE_PASSWORD" value="${env.DB_CSPACE_PASSWORD}" /> <!-- double-sub from ${db.cspace.user.password} fails -->
         <filter token="DB_DIALECT" value="${db.dialect}" />
         <filter token="CLASS_ID_QUERY" value="${db.spring.acl.classIdentityQuery}" />
         <filter token="SID_ID_QUERY" value="${db.spring.acl.sidIdentityQuery}" />

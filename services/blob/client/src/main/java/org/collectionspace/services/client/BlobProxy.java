@@ -1,8 +1,10 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
@@ -27,5 +29,14 @@ public interface BlobProxy extends CollectionSpaceCommonListPoxProxy {
     @POST
     @Consumes("multipart/form-data")
     ClientResponse<Response> createBlobFromFormData(MultipartFormDataOutput formDataOutput);
-        
+
+    @GET
+    @Path("{csid}/content")
+    ClientResponse<Response> getBlobContent(@PathParam("csid") String csid);
+    
+    @GET
+    @Path("{csid}/derivatives/{derivativeTerm}/content")
+    public ClientResponse<Response> getDerivativeContent(
+    		@PathParam("csid") String csid,
+    		@PathParam("derivativeTerm") String derivativeTerm);    
 }

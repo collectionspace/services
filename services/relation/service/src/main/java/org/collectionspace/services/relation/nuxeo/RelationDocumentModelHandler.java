@@ -60,9 +60,9 @@ import org.collectionspace.services.client.PlaceAuthorityClient;
 import org.collectionspace.services.client.WorkAuthorityClient;
 import org.collectionspace.services.client.ConceptAuthorityClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
-
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
+import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -101,7 +101,7 @@ public class RelationDocumentModelHandler
     	DocumentModel relationDocModel = wrapDoc.getWrappedObject();
     	String errMsg = ERROR_TERMS_IN_WORKFLOWSTATE + workflowState;
     			
-        RepositoryInstance repoSession = this.getRepositorySession();
+    	RepositoryInstanceInterface repoSession = this.getRepositorySession();
         try {
 			DocumentModel subjectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, SUBJ_DOC_MODEL);
 			DocumentModel objectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, OBJ_DOC_MODEL);
@@ -178,7 +178,7 @@ public class RelationDocumentModelHandler
         // Note that this introduces another caching problem... 
         DocumentModel relationDocModel = wrapDoc.getWrappedObject();
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
-        RepositoryInstance repoSession = this.getRepositorySession();
+        RepositoryInstanceInterface repoSession = this.getRepositorySession();
         
         DocumentModel subjectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, SUBJ_DOC_MODEL);
         DocumentModel objectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, OBJ_DOC_MODEL);
@@ -376,7 +376,7 @@ public class RelationDocumentModelHandler
     private final boolean OBJ_DOC_MODEL = false;
     
     private DocumentModel getSubjectOrObjectDocModel(
-    		RepositoryInstance repoSession,
+    		RepositoryInstanceInterface repoSession,
     		DocumentModel relationDocModel,
     		boolean fSubject) throws Exception {
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();

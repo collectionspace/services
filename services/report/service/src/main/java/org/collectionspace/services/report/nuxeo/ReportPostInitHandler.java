@@ -18,13 +18,11 @@
 package org.collectionspace.services.report.nuxeo;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import javax.sql.DataSource;
-
+import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.init.IInitHandler;
 import org.collectionspace.services.common.init.InitHandler;
@@ -51,67 +49,33 @@ import org.slf4j.LoggerFactory;
 public class ReportPostInitHandler extends InitHandler implements IInitHandler {
 
     final Logger logger = LoggerFactory.getLogger(ReportPostInitHandler.class);
-    public static final String READ_ROLE_NAME_KEY = "readerRoleName";
-    private String readerRoleName = "reader";
-
+   
+    public static final String READER_ROLE_NAME_KEY = "readerRoleName";
+    public static final String DEFAULT_READER_ROLE_NAME = "reader" + ServiceMain.getInstance().getCspaceInstanceId();
+    private String readerRoleName = DEFAULT_READER_ROLE_NAME;
+    
     /** See the class javadoc for this class: it shows the syntax supported in the configuration params.
      */
     @Override
     public void onRepositoryInitialized(String dataSourceName,
     		String repositoryName,
+    		String cspaceInstanceId,
     		ServiceBindingType sbt, 
     		List<Field> fields, 
     		List<Property> propertyList) throws Exception {
         //Check for existing privileges, and if not there, grant them
     	for(Property prop : propertyList) {
-    		if(READ_ROLE_NAME_KEY.equals(prop.getKey())) {
-	            String value = prop.getValue();
-	            if(Tools.notEmpty(value) && !readerRoleName.equals(value)){
-	                readerRoleName = value;
-	                logger.debug("ReportPostInitHandler: overriding readerRoleName to use: "
-	                        + value);
-	            }
-    		}
-        }
-        Connection conn = null;
-        Statement stmt = null;
-        String sql = "";
-        try {
-            DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType(dataSourceName, repositoryName);
-            if (databaseProductType == DatabaseProductType.MYSQL) {
-            	// Nothing to do: MYSQL already does wildcard grants in init_db.sql
-            } else if(databaseProductType != DatabaseProductType.POSTGRESQL) {
-                throw new Exception("Unrecognized database system " + databaseProductType);
-            } else {
-                conn = JDBCTools.getConnection(dataSourceName, repositoryName);
-                stmt = conn.createStatement();                
-                //sql = "REVOKE SELECT ON ALL TABLES IN SCHEMA public FROM "+readerRoleName;
-                //stmt.execute(sql);
-                sql = "GRANT SELECT ON ALL TABLES IN SCHEMA public TO "+readerRoleName;
-                stmt.execute(sql);
-            }
-            
-        } catch (SQLException sqle) {
-            SQLException tempException = sqle;
-            while (null != tempException) {       // SQLExceptions can be chained. Loop to log all.
-                logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
-                tempException = tempException.getNextException();
-            }
-            logger.debug("ReportPostInitHandler: SQL problem in executeQuery: ", sqle);
-        } catch (Throwable e) {
-            logger.debug("ReportPostInitHandler: problem checking/adding grant for reader: "+readerRoleName+") SQL: "+sql+" ERROR: "+e);
-        } finally {
-            try {
-                if (conn != null) {
-                    conn.close();
+                if(READER_ROLE_NAME_KEY.equals(prop.getKey())) {
+                    String value = prop.getValue();
+                    if(Tools.notEmpty(value) && !DEFAULT_READER_ROLE_NAME.equals(value)){
+                        readerRoleName = value + ServiceMain.getInstance().getCspaceInstanceId();
+                        logger.debug("ReportPostInitHandler: overriding readerRoleName default value to use: "
+                                + value);
                 }
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException sqle) {
-                logger.debug("SQL Exception closing statement/connection in executeQuery: " + sqle.getLocalizedMessage());
             }
         }
+        String privilegeName = JDBCTools.DATABASE_SELECT_PRIVILEGE_NAME;
+        JDBCTools.grantPrivilegeToDatabaseUser(dataSourceName, repositoryName, cspaceInstanceId, privilegeName, readerRoleName);
     }
     
 

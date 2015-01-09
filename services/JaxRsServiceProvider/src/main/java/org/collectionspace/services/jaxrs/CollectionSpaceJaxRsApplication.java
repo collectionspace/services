@@ -32,6 +32,7 @@ import org.collectionspace.services.group.GroupResource;
 import org.collectionspace.services.intake.IntakeResource;
 import org.collectionspace.services.loanin.LoaninResource;
 import org.collectionspace.services.loanout.LoanoutResource;
+import org.collectionspace.services.valuationcontrol.ValuationcontrolResource;
 import org.collectionspace.services.objectexit.ObjectExitResource;
 import org.collectionspace.services.batch.BatchResource;
 import org.collectionspace.services.imports.ImportsResource;
@@ -53,8 +54,7 @@ import org.collectionspace.services.organization.OrgAuthorityResource;
 import org.collectionspace.services.person.PersonAuthorityResource;
 import org.collectionspace.services.citation.CitationAuthorityResource;
 import org.collectionspace.services.claim.ClaimResource;
-
-//import org.collectionspace.services.query.QueryResource;
+import org.collectionspace.services.conditioncheck.ConditioncheckResource;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Application;
@@ -120,6 +120,8 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new RelationResource());
         addResourceToMapAndSingletons(new LoaninResource());
         addResourceToMapAndSingletons(new LoanoutResource());
+        addResourceToMapAndSingletons(new ConditioncheckResource());
+        addResourceToMapAndSingletons(new ValuationcontrolResource());
         addResourceToMapAndSingletons(new ObjectExitResource());
         addResourceToMapAndSingletons(new BatchResource());
         addResourceToMapAndSingletons(new MediaResource());
@@ -136,7 +138,6 @@ public class CollectionSpaceJaxRsApplication extends Application
         /*
         singletons.add(new WorkflowResource());
         */
-//        singletons.add(new QueryResource());
 //        singletons.add(new DomainIdentifierResource());
 //        singletons.add(new PingResource());
     }

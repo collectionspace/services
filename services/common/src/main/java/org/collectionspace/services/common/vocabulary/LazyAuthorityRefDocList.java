@@ -12,6 +12,8 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
 import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
+
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
@@ -20,11 +22,14 @@ import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import com.google.common.collect.AbstractIterator;
 
 /**
- * A DocumentModelList representing all of the documents that reference an authority item.
- * List items are lazily fetched one page at a time, as they are accessed through the
- * list's Iterator, retrieved with the iterator() method. List items may not be accessed
- * through any other means, including the get() method, or through the ListIterator retrieved
- * with the listIterator() method. Attempts to do so will result in unspecified behavior.
+ * A DocumentModelList representing all of the documents that potentially reference an
+ * authority item, found via full text search. This list must be post-processed to
+ * eliminate false positives.
+ *
+ * Documents in this list are lazily fetched one page at a time, as they are accessed through
+ * the list's Iterator, retrieved with the iterator() method. List items may not be accessed
+ * through any other means, including the get() method, and the ListIterator retrieved
+ * with listIterator(). Attempts to do so will result in unspecified behavior.
  * 
  */
 public class LazyAuthorityRefDocList extends DocumentModelListImpl {
@@ -32,7 +37,7 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 	
 	private ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx;
 	private RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient;
-	private RepositoryInstance repoSession;
+	private RepositoryInstanceInterface repoSession;
 	private List<String> serviceTypes;
 	private String refName;
 	private String refPropName;
@@ -64,17 +69,17 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 	 * @throws DocumentNotFoundException
 	 */
 	public LazyAuthorityRefDocList(
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-            RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
-            RepositoryInstance repoSession, List<String> serviceTypes,
-            String refName,
-            String refPropName,
-            Map<String, ServiceBindingType> queriedServiceBindings,
-            Map<String, List<AuthRefConfigInfo>> authRefFieldsByService,
-            String whereClauseAdditions,
-            String orderByClause,
-            int pageSize,
-            boolean computeTotal) throws DocumentException, DocumentNotFoundException {
+	        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+	        RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
+	        RepositoryInstanceInterface repoSession, List<String> serviceTypes,
+	        String refName,
+	        String refPropName,
+	        Map<String, ServiceBindingType> queriedServiceBindings,
+	        Map<String, List<AuthRefConfigInfo>> authRefFieldsByService,
+	        String whereClauseAdditions,
+	        String orderByClause,
+	        int pageSize,
+	        boolean computeTotal) throws DocumentException, DocumentNotFoundException {
 
 		this.ctx = ctx;
 		this.repoClient = repoClient;
@@ -89,7 +94,7 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 		this.pageSize = pageSize;
 
 		// Fetch the first page immediately. This is necessary so that calls
-		// to totalSize() will work properly. The computeTotal flag is passed
+		// to totalSize() will work immediately. The computeTotal flag is passed
 		// into this initial page fetch. There's no need to compute totals
 		// when fetching subsequent pages.
 		
@@ -107,8 +112,8 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 	 */
 	private DocumentModelList fetchPage(int pageNum, boolean computeTotal) throws DocumentNotFoundException, DocumentException {
 		return RefNameServiceUtils.findAuthorityRefDocs(ctx, repoClient, repoSession,
-                serviceTypes, refName, refPropName, queriedServiceBindings, authRefFieldsByService,
-                whereClauseAdditions, orderByClause, pageSize, pageNum, computeTotal);
+		        serviceTypes, refName, refPropName, queriedServiceBindings, authRefFieldsByService,
+		        whereClauseAdditions, orderByClause, pageSize, pageNum, computeTotal);
 	}
 		
 	@Override
@@ -125,8 +130,9 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 	
 	/**
 	 * An iterator over a LazyAuthorityRefDocList. The iterator keeps one
-	 * page of documents in memory at a time, and traverses that page. A
-	 * new page is fetched only when the current page is exhausted.
+	 * page of documents in memory at a time, and traverses that page until
+	 * no items remain. A new page is fetched only when the current page is
+	 * exhausted.
 	 *
 	 */
 	private class Itr extends AbstractIterator<DocumentModel> {
@@ -138,7 +144,7 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 		 * Creates a new iterator.
 		 * 
 		 * @param currentPageNum		The initial page number
-		 * @param currentPageDocList	The initial page of documents
+		 * @param currentPageDocList	The documents in the initial page
 		 */
 		protected Itr(int pageNum, DocumentModelList pageDocList) {
 			setCurrentPage(pageNum, pageDocList);
@@ -148,12 +154,12 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 		 * Changes the current page.
 		 * 
 		 * @param pageNum		The new page number
-		 * @param pageDocList	The new page of documents
+		 * @param pageDocList	The documents in the new page
 		 */
 		private void setCurrentPage(int pageNum, DocumentModelList pageDocList) {
 			this.currentPageNum = pageNum;
 			this.currentPageDocList = pageDocList;
-			this.currentPageIterator = pageDocList.iterator();			
+			this.currentPageIterator = pageDocList.iterator();
 		}
 		
 		@Override
@@ -161,7 +167,7 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 			// Find the next document to return, looking first in the current
 			// page. If the current page is exhausted, fetch the next page.
 			
-			if (currentPageIterator.hasNext()) { 
+			if (currentPageIterator.hasNext()) {
 				// There is still an element to return from the current page.
 				return currentPageIterator.next();
 			}

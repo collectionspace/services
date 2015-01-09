@@ -14,7 +14,12 @@
                      xmlns:types='http://collectionspace.org/services/config/types'
                      xsi:schemaLocation='http://collectionspace.org/services/config ../resources/common.xsd'>
 
+	<cspace-instance-id>@CSPACE_INSTANCE_ID@</cspace-instance-id>
+	<db-csadmin-name>@DB_CSADMIN_NAME@</db-csadmin-name>
+	<db-nuxeo-name>@DB_NUXEO_NAME@</db-nuxeo-name>
+	<db-cspace-name>@DB_CSPACE_NAME@</db-cspace-name>
 	<use-app-generated-tenant-bindings>true</use-app-generated-tenant-bindings>
+    
     <!-- name of the repository client is referred in each service binding -->
     <repository-client name="nuxeo-java" default="true">
         <!-- ip of network interface to which Nuxeo server is listening on -->
@@ -30,6 +35,5 @@
             <types:item><types:key>refreshAuthZOnStartup</types:key><types:value>true</types:value></types:item>
         </properties>
     </repository-client>
-
 
 </svc:service-config>

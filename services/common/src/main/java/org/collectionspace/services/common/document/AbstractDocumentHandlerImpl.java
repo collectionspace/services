@@ -426,9 +426,10 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     /**
      * Creates the CMIS query from the service context.  Each document handler is responsible for returning a valid CMIS query using the
      * information in the current service context -which includes things like the query parameters, etc.
+     * @throws DocumentException 
      */
     @Override
-    public String getCMISQuery(QueryContext queryContext) {
+    public String getCMISQuery(QueryContext queryContext) throws DocumentException {
     	//
     	// By default, return nothing.  Child classes can override if they want.
     	//

@@ -45,6 +45,7 @@
         </xs:annotation>
         <xs:sequence>
             <xs:element name="repositoryDomain" type="RepositoryDomainType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="binaryStorePath" type="xs:string" minOccurs="0" maxOccurs="1"/>
             <xs:element name="properties" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="serviceBindings" type="service:ServiceBindingType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>

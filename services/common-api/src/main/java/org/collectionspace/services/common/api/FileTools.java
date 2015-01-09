@@ -29,6 +29,13 @@ package org.collectionspace.services.common.api;
 //  albeit with different functions, which does have dependencies.
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.xml.bind.JAXBContext;
@@ -43,6 +50,7 @@ public class FileTools {
     
     public static String DEFAULT_ENCODING = "";
     public static String UTF8_ENCODING = "UTF-8";
+    public static Charset UTF8_CHARSET = java.nio.charset.StandardCharsets.UTF_8;
     public static boolean FORCE_CREATE_PARENT_DIRS = true;
     private static String JAVA_TEMP_DIR_PROPERTY = "java.io.tmpdir";
 
@@ -166,6 +174,27 @@ public class FileTools {
         } catch (Exception e) {  // can't find the file
             System.out.println("ERROR: "+e);
             return null;
+        }
+    }
+    
+    public static List<String> readFileAsLines(String filePath) {
+        List<String> lines = new ArrayList<String>();
+        try {
+            Path path = Paths.get(filePath);
+            lines = Files.readAllLines(path, UTF8_CHARSET);
+        } catch (Exception e) {
+            System.out.println("ERROR: " + e);
+            return null;
+        }
+        return lines;
+    }
+    
+    public static void writeFileFromLines(String filePath, Iterable<? extends CharSequence> lines) {
+        try {
+            Path path = Paths.get(filePath);
+            Files.write(path, lines, UTF8_CHARSET, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (Exception e) {
+            System.out.println("ERROR: " + e);
         }
     }
 

@@ -29,6 +29,7 @@ package org.collectionspace.services.common.relation;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -38,7 +39,6 @@ import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.common.relation.nuxeo.RelationsUtils;
 import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,7 +101,7 @@ public class RelationResource extends ResourceBase {
     		String subjectCsid, String subjectType,
     		String predicate,
     		String objectCsid,
-    		String objectType) throws WebApplicationException {
+    		String objectType) throws CSWebApplicationException {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
             if (parentCtx != null) { // If the parent context has an open repository session then use it

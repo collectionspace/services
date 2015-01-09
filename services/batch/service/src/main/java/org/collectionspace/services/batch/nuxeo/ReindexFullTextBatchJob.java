@@ -103,7 +103,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		}
 		
 		try {
-			coreSession = getRepoSession().getSession();
+			coreSession = getRepoSession().getRepositoryInstance().getSession();
 
 			if (requestIsForInvocationModeSingle()) {
 				String csid = getInvocationContext().getSingleCSID();
