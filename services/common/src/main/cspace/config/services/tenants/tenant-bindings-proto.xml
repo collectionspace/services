@@ -182,36 +182,6 @@
             <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
                 <service:classname>org.collectionspace.services.common.init.ModifyFieldDatatypes</service:classname>
                 <service:params>
-                    <service:field>
-                        <service:table>collectionobjects_common_briefdescriptions</service:table>
-                        <service:col>item</service:col>
-                        <service:type>LARGETEXT</service:type>
-                        <service:param />
-                    </service:field>
-                    <service:field>
-                        <service:table>collectionobjects_common_comments</service:table>
-                        <service:col>item</service:col>
-                        <service:type>LARGETEXT</service:type>
-                        <service:param />
-                    </service:field>
-                    <service:field>
-                        <service:table>collectionobjects_common_objectproductionreasons</service:table>
-                        <service:col>item</service:col>
-                        <service:type>LARGETEXT</service:type>
-                        <service:param />
-                    </service:field>
-                    <service:field>
-                        <service:table>collectionobjects_common_ownersreferences</service:table>
-                        <service:col>item</service:col>
-                        <service:type>LARGETEXT</service:type>
-                        <service:param />
-                    </service:field>
-                    <service:field>
-                        <service:table>collectionobjects_common_viewersreferences</service:table>
-                        <service:col>item</service:col>
-                        <service:type>LARGETEXT</service:type>
-                        <service:param />
-                    </service:field>
                 </service:params>
             </service:initHandler>
             <service:properties xmlns:service="http://collectionspace.org/services/config/service">
@@ -1047,6 +1017,165 @@
             </service:object>
         </tenant:serviceBindings>
         <!-- end loanout service meta-data -->
+
+        <!-- begin conditioncheck service meta-data -->
+        <tenant:serviceBindings id="Conditionchecks" name="Conditionchecks" type="procedure" version="0.1">
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.conditioncheck.nuxeo.ConditioncheckDocumentModelHandler</service:documentHandler>
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+                <service:params>
+                    <service:ListResultsFields>
+                        <service:ListResultField>
+                            <service:element>conditionCheckRefNumber</service:element>
+                            <service:xpath>conditionCheckRefNumber</service:xpath>
+                        </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>condition</service:element>
+                            <service:xpath>conditionCheckGroupList/[0]/condition</service:xpath>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
+            <service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.conditioncheck.nuxeo.ConditioncheckValidatorHandler</service:validatorHandler>
+            <service:properties xmlns:service="http://collectionspace.org/services/config/service">
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNameProperty</types:key>
+                    <types:value>conditionCheckGroupList/[0]/condition</types:value>
+                </types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNumberProperty</types:key>
+                    <types:value>conditionCheckRefNumber</types:value>
+                </types:item>
+            </service:properties>
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="Conditioncheck" version="0.1">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="conditionchecks-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="conditionchecks_common" updated="" order="1">
+                    <service:properties>
+                        <!-- Fields containing authority term references -->
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>conditionChecker</types:value>
+                        </types:item>
+                        <!-- Fields containing term list / controlled vocabulary references -->
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>objectAuditCategory</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>completenessGroupList/*/completeness</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>conditionCheckGroupList/*/condition</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>conservationTreatmentPriority</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>hazardGroupList/*/hazard</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>conditionCheckMethod</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>conditionCheckReason</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>salvagePriorityCodeGroupList/*/salvagePriorityCode</types:value>
+                        </types:item>
+                    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/conditioncheck" schemaLocation="http://collectionspace.org/services/conditioncheck http://services.collectionspace.org/conditioncheck/conditionchecks_common.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/" schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end conditioncheck service meta-data -->
+        
+        <!-- begin valuationcontrol service meta-data -->
+        <tenant:serviceBindings id="Valuationcontrols" name="Valuationcontrols" type="procedure" version="0.1">
+            <!-- other URI paths through which this service could be accessed -->
+            <!--
+            <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
+                /valuationcontrols/*/authorityrefs/
+            </service:uriPath>
+            -->
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.valuationcontrol.nuxeo.ValuationcontrolDocumentModelHandler</service:documentHandler>
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+                <service:params>
+                    <service:ListResultsFields>
+                        <service:ListResultField>
+                            <service:element>valuationcontrolRefNumber</service:element>
+                            <service:xpath>valuationcontrolRefNumber</service:xpath>
+                        </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>valueType</service:element>
+                            <service:xpath>valueType</service:xpath>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
+            <service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.valuationcontrol.nuxeo.ValuationcontrolValidatorHandler</service:validatorHandler>
+            <service:properties xmlns:service="http://collectionspace.org/services/config/service">
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNameProperty</types:key>
+                    <types:value>valueType</types:value>
+                </types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNumberProperty</types:key>
+                    <types:value>valuationcontrolRefNumber</types:value>
+                </types:item>
+            </service:properties>
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="Valuationcontrol" version="0.1">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="valuationcontrols-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="valuationcontrols_common" updated="" order="1">
+                    <service:properties>
+                        <!-- Fields containing term list / controlled vocabulary references -->
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>valueSource</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>valueType</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>valueTypesList/*/valueCurrency</types:value>
+                        </types:item>
+                    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/valuationcontrol" schemaLocation="http://collectionspace.org/services/valuationcontrol http://services.collectionspace.org/valuationcontrol/valuationcontrols_common.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/" schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end valuationcontrol service meta-data -->
     
         <!-- begin objectexit service meta-data -->
         <tenant:serviceBindings id="ObjectExit" name="ObjectExit" type="procedure" version="0.1">
@@ -3558,31 +3687,7 @@
             </service:object>
         </tenant:serviceBindings>
         <!-- end contact service meta-data -->
-    
-        <!-- begin note service meta-data -->
-        <tenant:serviceBindings id="Notes" name="Notes" type="utility" version="0.1">
-            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
-            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.note.nuxeo.NoteDocumentModelHandler</service:documentHandler>
-            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="CSNote" version="0.1">
-                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="notes-system" updated="" order="0">
-                    <service:content contentType="application/xml">
-                        <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
-                    </service:content>
-                </service:part>
-                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="notes_common" updated="" order="1">
-                    <service:content contentType="application/xml">
-                        <service:xmlContent namespaceURI="http://collectionspace.org/services/note" schemaLocation="http://collectionspace.org/services/note http://services.collectionspace.org/note/notes_common.xsd" />
-                    </service:content>
-                </service:part>
-                <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
-                    <service:content contentType="application/xml">
-                        <service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/" schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd" />
-                    </service:content>
-                </service:part>
-            </service:object>
-        </tenant:serviceBindings>
-        <!-- end note service meta-data -->
-    
+        
         <!-- begin role service meta-data -->
         <tenant:serviceBindings id="authorization/roles" name="authorization/roles" type="security" version="0.1">
             <!-- other URI paths through which this service could be accessed -->

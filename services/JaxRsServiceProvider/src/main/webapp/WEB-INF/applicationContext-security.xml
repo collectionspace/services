@@ -12,9 +12,11 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:sec="http://www.springframework.org/schema/security"
        xmlns:util="http://www.springframework.org/schema/util"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
-       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans 		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/security 	http://www.springframework.org/schema/security/spring-security.xsd
+       http://www.springframework.org/schema/util 		http://www.springframework.org/schema/util/spring-util.xsd">
 
     <!--
         debugging tips : enable following categories in
@@ -81,7 +83,7 @@
             <value>cspace</value> <!-- value should be same as in application-policy in JBoss login-config.xml -->
         </property>
         <property name="loginConfig">
-            <value>/WEB-INF/login.conf</value> <!-- filler, not used at runtime -->
+            <value>/WEB-INF/login.conf</value>
         </property>
         <property name="callbackHandlers">
             <list>

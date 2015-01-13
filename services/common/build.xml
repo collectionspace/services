@@ -142,9 +142,14 @@
             description="deploy tenant configuration">
         <copy todir="${jee.server.cspace}/cspace/config/services">
             <fileset dir="${basedir}/src/main/cspace/config/services"/>
+			<filterset>
+				<filter token="CSPACE_INSTANCE_ID" value="${cspace.instance.id}" />
+				<filter token="DB_CSADMIN_NAME" value="${db.csadmin.name}" />
+				<filter token="DB_NUXEO_NAME" value="${db.nuxeo.name}" />
+				<filter token="DB_CSPACE_NAME" value="${db.cspace.name}" />
+			</filterset>
         </copy>
     </target>
-	
 
     <target name="deploy" depends="install"
             description="deploy common elements in ${jee.server.cspace}">

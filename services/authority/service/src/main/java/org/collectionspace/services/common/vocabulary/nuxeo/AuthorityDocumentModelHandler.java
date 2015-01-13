@@ -38,8 +38,8 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.config.service.ObjectPartType;
-
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -159,7 +159,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     
     public String getShortIdentifier(String authCSID, String schemaName) throws Exception {
         String shortIdentifier = null;
-        RepositoryInstance repoSession = null;
+        RepositoryInstanceInterface repoSession = null;
 
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
     	RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);

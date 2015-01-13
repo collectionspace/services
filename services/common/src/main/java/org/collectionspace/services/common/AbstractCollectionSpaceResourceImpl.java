@@ -33,6 +33,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextProperties;
@@ -46,6 +47,7 @@ import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
+
 import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.spi.HttpRequest;
 
@@ -404,45 +406,45 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     	return result;
     }
 
-    public void checkResult(Object resultToCheck, String csid, String serviceMessage) throws WebApplicationException {
+    public void checkResult(Object resultToCheck, String csid, String serviceMessage) throws CSWebApplicationException {
         if (resultToCheck == null) {
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     serviceMessage + "csid=" + csid
                     + ": was not found.").type(
                     "text/plain").build();
-            throw new WebApplicationException(response);
+            throw new CSWebApplicationException(response);
         }
     }
 
-    protected void ensureCSID(String csid, String crudType) throws WebApplicationException {
+    protected void ensureCSID(String csid, String crudType) throws CSWebApplicationException {
         ensureCSID(csid, crudType, "csid");
     }
 
-    protected void ensureCSID(String csid, String crudType, String whichCsid) throws WebApplicationException {
+    protected void ensureCSID(String csid, String crudType, String whichCsid) throws CSWebApplicationException {
            if (logger.isDebugEnabled()) {
                logger.debug(crudType + " for " + getClass().getName() + " with csid=" + csid);
            }
            if (csid == null || "".equals(csid)) {
                logger.error(crudType + " for " + getClass().getName() + " missing csid!");
                Response response = Response.status(Response.Status.BAD_REQUEST).entity(crudType + " failed on " + getClass().getName() + ' '+whichCsid+'=' + csid).type("text/plain").build();
-               throw new WebApplicationException(response);
+               throw new CSWebApplicationException(response);
            }
        }
 
-    protected WebApplicationException bigReThrow(Exception e, String serviceMsg) throws WebApplicationException {
+    protected CSWebApplicationException bigReThrow(Exception e, String serviceMsg) throws CSWebApplicationException {
         return bigReThrow(e, serviceMsg, "");
     }
 
-    protected WebApplicationException bigReThrow(Exception e, String serviceMsg, String csid) throws WebApplicationException {
+    protected CSWebApplicationException bigReThrow(Exception e, String serviceMsg, String csid) throws CSWebApplicationException {
     	boolean logException = true;
-    	WebApplicationException result = null;
+    	CSWebApplicationException result = null;
         Response response;
-        
         String detail = Tools.errorToString(e, true);
         String detailNoTrace = Tools.errorToString(e, true, 3);
+        
         if (e instanceof UnauthorizedException) {
             response = Response.status(Response.Status.UNAUTHORIZED).entity(serviceMsg + e.getMessage()).type("text/plain").build();
-            result = new WebApplicationException(response);
+            result = new CSWebApplicationException(e, response);
 
         } else if (e instanceof DocumentNotFoundException) {
         	//
@@ -450,12 +452,12 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         	//
         	logException = false;
             response = Response.status(Response.Status.NOT_FOUND).entity(serviceMsg + " on " + getClass().getName() + " csid=" + csid).type("text/plain").build();
-            result = new WebApplicationException(response);
+            result = new CSWebApplicationException(e, response);
             
         } else if (e instanceof TransactionException) {
             int code = ((TransactionException) e).getErrorCode();
             response = Response.status(code).entity(e.getMessage()).type("text/plain").build();
-            result = new WebApplicationException(response);
+            result = new CSWebApplicationException(e, response);
 
         } else if (e instanceof BadRequestException) {
             int code = ((BadRequestException) e).getErrorCode();
@@ -465,7 +467,7 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
             // CSPACE-1110
             response = Response.status(code).entity(serviceMsg + e.getMessage()).type("text/plain").build();
             // return new WebApplicationException(e, code);
-            result = new WebApplicationException(response);
+            result = new CSWebApplicationException(e, response);
 
         } else if (e instanceof DocumentException) {
             int code = ((DocumentException) e).getErrorCode();
@@ -475,16 +477,16 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
             // CSPACE-1110
             response = Response.status(code).entity(serviceMsg + e.getMessage()).type("text/plain").build();
             // return new WebApplicationException(e, code);
-            result = new WebApplicationException(response);
+            result = new CSWebApplicationException(e, response);
            
-        } else if (e instanceof WebApplicationException) {
+        } else if (e instanceof CSWebApplicationException) {
             // subresource may have already thrown this exception
             // so just pass it on
-            result = (WebApplicationException) e;
+            result = (CSWebApplicationException) e;
 
         } else { // e is now instanceof Exception
             response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(serviceMsg + " detail: " + detailNoTrace).type("text/plain").build();
-            result = new WebApplicationException(response);
+            result = new CSWebApplicationException(e, response);
         }
         //
         // Some exceptions like DocumentNotFoundException won't be logged unless we're in 'trace' mode

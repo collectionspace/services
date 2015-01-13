@@ -17,6 +17,7 @@
 package org.collectionspace.services.common.profile;
 
 import java.io.IOException;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -24,7 +25,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-//import javax.servlet.ServletContext;
 
 import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.common.ServletTools;
@@ -46,10 +46,10 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class CSpaceFilter implements Filter {
+    final Logger logger = LoggerFactory.getLogger(CSpaceFilter.class);
 
     /** The filter config. */
     FilterConfig filterConfig = null;
-
     private final String CLASS_NAME = this.getClass().getSimpleName();
 
     /* (non-Javadoc)
@@ -116,7 +116,7 @@ public class CSpaceFilter implements Filter {
             profiler.reset();
         }
     }
-
+    
     /* (non-Javadoc)
      * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
      */

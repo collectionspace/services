@@ -9,13 +9,6 @@
         <class>org.collectionspace.services.authorization.AccountRoleRel</class>
         <properties>
             <property name="hibernate.ejb.cfgfile" value="hibernate.cfg.xml"/>
-
-            <!--property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
-            <property name="hibernate.max_fetch_depth" value="3"/>
-            <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
-            <property name="hibernate.connection.username" value="test"/>
-            <property name="hibernate.connection.password" value="test"/>
-            <property name="hibernate.connection.url" value="jdbc:mysql://${db.host}:3306/cspace"/-->
         </properties>
     </persistence-unit>
 </persistence>

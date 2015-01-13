@@ -542,7 +542,7 @@ public class JpaStorageUtils {
             if (logger.isDebugEnabled()) {
                 logger.debug("could not find entity (2) with where=" + whereClause, e);
             }
-            //returns null
+            throw e;
         } finally {
             if (em != null) {
                 releaseEntityManagerFactory(emf);

@@ -17,8 +17,6 @@ import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import java.lang.IndexOutOfBoundsException;
-import java.util.GregorianCalendar;
-import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.slf4j.Logger;

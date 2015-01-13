@@ -12,7 +12,7 @@ public class ConfigUtils {
     final static Logger logger = LoggerFactory.getLogger(ConfigUtils.class);
     
     // Default database names
-    public static String DEFAULT_CSPACE_DATABASE_NAME = "cspace";
+//    public static String DEFAULT_CSPACE_DATABASE_NAME = "cspace";
     public static String DEFAULT_NUXEO_REPOSITORY_NAME = "default";
     public static String DEFAULT_NUXEO_DATABASE_NAME = "nuxeo";
     
@@ -36,7 +36,6 @@ public class ConfigUtils {
     public static String getRepositoryName(TenantBindingType tenantBindingType, String domainName) {
 		String result = null;
 		
-		
 		if (domainName != null && domainName.trim().isEmpty() == false) {
 			List<RepositoryDomainType> repoDomainList = tenantBindingType.getRepositoryDomain();
 			if (repoDomainList != null && repoDomainList.isEmpty() == false) {
@@ -48,7 +47,7 @@ public class ConfigUtils {
 				}
 			}
 		} else {
-			logger.error(String.format("No domain name was specified on call to getRepositoryName() method."));
+			logger.error(String.format("There was no domain name specified on a call to getRepositoryName() method."));
 		}
 		
 		if (result == null && logger.isTraceEnabled()) {

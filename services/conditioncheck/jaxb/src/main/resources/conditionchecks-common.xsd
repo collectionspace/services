@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Condition check schema (XSD)
+    
+    Entity  : Conditioncheck
+    Part    : Common
+    Used for: Nuxeo EP core document type
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns:ns="http://collectionspace.org/services/conditioncheck"
+  xmlns="http://collectionspace.org/services/conditioncheck"
+  targetNamespace="http://collectionspace.org/services/conditioncheck"
+  version="0.1"
+>
+
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+
+<!-- See http://wiki.collectionspace.org/display/collectionspace/Object+Condition+Checking+and+Technical+Assessment+Schema -->
+
+    <!--  Conditioncheck Information Group -->
+    <xs:element name="conditionchecks_common">
+        <xs:complexType>
+            <xs:sequence> 
+                <!--  Object Condition and Technical Assessment Information Group -->
+                <xs:element name="objectAuditCategory" type="xs:string"/>
+                <xs:element name="completenessGroupList" type="completenessGroupList"/>
+                <xs:element name="conditionCheckGroupList" type="conditionCheckGroupList"/>
+                <xs:element name="conservationTreatmentPriority" type="xs:string"/>
+                <xs:element name="envConditionNoteGroupList" type="envConditionNoteGroupList"/>
+                <xs:element name="nextConditionCheckDate" type="xs:string"/>
+                <xs:element name="techAssessmentGroupList" type="techAssessmentGroupList"/>
+                <xs:element name="hazardGroupList" type="hazardGroupList"/>
+
+                <!--  Condition Check and Technical Assessment Information Group -->
+                <xs:element name="conditionCheckAssessmentDatesList" type="conditionCheckAssessmentDatesList"/>
+                <xs:element name="conditionCheckMethod" type="xs:string"/>
+                <xs:element name="conditionCheckNote" type="xs:string"/>
+                <xs:element name="conditionCheckReason" type="xs:string"/>
+                <xs:element name="conditionCheckRefNumber" type="xs:string"/>
+                <xs:element name="conditionChecker" type="xs:string"/>
+
+                <!--  Object Requirement Information Group -->
+                <xs:element name="displayRecommendations" type="xs:string"/>
+                <xs:element name="envRecommendations" type="xs:string"/>
+                <xs:element name="handlingRecommendations" type="xs:string"/>
+                <xs:element name="packingRecommendations" type="xs:string"/>
+                <xs:element name="securityRecommendations" type="xs:string"/>
+                <xs:element name="specialRequirements" type="xs:string"/>
+                <xs:element name="storageRequirements" type="xs:string"/>
+                <xs:element name="salvagePriorityCodeGroupList" type="salvagePriorityCodeGroupList"/>
+                <xs:element name="salvagePriorityCode" type="xs:string"/>
+                <xs:element name="salvagePriorityCodeDate" type="xs:string"/>
+                <xs:element name="legalRequirements" type="xs:string"/>
+                <xs:element name="legalReqsHeldGroupList" type="legalReqsHeldGroupList"/>
+
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Repeating Groups -->
+
+    <!-- =================================================================
+        Condition Check Assessment Dates List repeating field
+        ================================================================= -->
+    <xs:complexType name="conditionCheckAssessmentDatesList">
+        <xs:sequence>
+            <xs:element name="conditionCheckAssessmentDate" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- =================================================================
+        Completeness Group repeating structure
+        ================================================================= -->
+    <xs:complexType name="completenessGroupList">
+        <xs:sequence>
+            <xs:element name="completenessGroup" type="completenessGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="completenessGroup">
+        <xs:sequence>
+            <xs:element name="completeness" type="xs:string"/>
+            <xs:element name="completenessDate" type="xs:string"/>
+            <xs:element name="completenessNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- =================================================================
+         Condition Check Group repeating structure
+         ================================================================= -->
+    <xs:complexType name="conditionCheckGroupList">
+        <xs:sequence>
+            <xs:element name="conditionCheckGroup" type="conditionCheckGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="conditionCheckGroup">
+        <xs:sequence>
+            <xs:element name="condition" type="xs:string"/>
+            <xs:element name="conditionDate" type="xs:string"/>
+            <xs:element name="conditionNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- =================================================================
+         Environmental Condition Group repeating structure
+         ================================================================= -->
+    <xs:complexType name="envConditionNoteGroupList">
+        <xs:sequence>
+            <xs:element name="envConditionNoteGroup" type="envConditionNoteGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="envConditionNoteGroup">
+        <xs:sequence>
+            <xs:element name="envConditionNote" type="xs:string"/>
+            <xs:element name="envConditionNoteDate" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- =================================================================
+         Technical Assessment Group repeating structure
+         ================================================================= -->
+    <xs:complexType name="techAssessmentGroupList">
+        <xs:sequence>
+            <xs:element name="techAssessmentGroup" type="techAssessmentGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="techAssessmentGroup">
+        <xs:sequence>
+            <xs:element name="techAssessment" type="xs:string"/>
+            <xs:element name="techAssessmentDate" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- =================================================================
+         Hazard Group repeating structure
+         ================================================================= -->
+    <xs:complexType name="hazardGroupList">
+        <xs:sequence>
+            <xs:element name="hazardGroup" type="hazardGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="hazardGroup">
+        <xs:sequence>
+            <xs:element name="hazard" type="xs:string"/>
+            <xs:element name="hazardDate" type="xs:string"/>
+            <xs:element name="hazardNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- =================================================================
+         Salvage Priority Group repeating structure
+         ================================================================= -->
+    <xs:complexType name="salvagePriorityCodeGroupList">
+        <xs:sequence>
+            <xs:element name="salvagePriorityCodeGroup" type="salvagePriorityCodeGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="salvagePriorityCodeGroup">
+        <xs:sequence>
+            <xs:element name="salvagePriorityCode" type="xs:string"/>
+            <xs:element name="salvagePriorityCodeDate" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- =================================================================
+         Legal/License Requirements Held Group repeating structure
+         ================================================================= -->
+    <xs:complexType name="legalReqsHeldGroupList">
+        <xs:sequence>
+            <xs:element name="legalReqsHeldGroup" type="legalReqsHeldGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="legalReqsHeldGroup">
+        <xs:sequence>
+            <xs:element name="legalReqsHeld" type="xs:string"/>
+            <xs:element name="legalReqsHeldBeginDate" type="xs:string"/>
+            <xs:element name="legalReqsHeldEndDate" type="xs:string"/>
+            <xs:element name="legalReqsHeldNumber" type="xs:string"/>
+            <xs:element name="legalReqsHeldRenewDate" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+</xs:schema>

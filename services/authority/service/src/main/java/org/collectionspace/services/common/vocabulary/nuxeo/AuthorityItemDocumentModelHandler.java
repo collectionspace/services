@@ -27,7 +27,6 @@ import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-
 import org.collectionspace.services.common.UriTemplateRegistry;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
@@ -42,24 +41,20 @@ import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
-
 import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ObjectPartType;
-
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentException;
+import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsDocListItem;
-
 import org.collectionspace.services.vocabulary.VocabularyItemJAXBSchema;
-
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +67,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 //import org.collectionspace.services.common.authority.AuthorityItemRelations;
 /**
@@ -95,6 +91,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     // Used to determine when the displayName changes as part of the update.
     protected String oldDisplayNameOnUpdate = null;
     private final static String LIST_SUFFIX = "List";
+    private final static String ZERO_OR_MORE_ANY_CHAR_REGEX = ".*";
 
     public AuthorityItemDocumentModelHandler(String authorityItemCommonSchemaName) {
         this.authorityItemCommonSchemaName = authorityItemCommonSchemaName;
@@ -361,7 +358,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             }
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient = getRepositoryClient(ctx);
-            RepositoryInstance repoSession = this.getRepositorySession();
+            RepositoryInstanceInterface repoSession = this.getRepositorySession();
             
             // Update all the existing records that have a field with the old refName in it
             int nUpdated = RefNameServiceUtils.updateAuthorityRefDocs(ctx, repoClient, repoSession,
@@ -476,7 +473,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     		String propertyName,
             String itemcsid) throws Exception {
         AuthorityRefDocList authRefDocList = null;
-    	RepositoryInstance repoSession = null;
+        RepositoryInstanceInterface repoSession = null;
     	boolean releaseRepoSession = false;
         
     	try {
@@ -562,16 +559,106 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         }
     }
     
+    /**
+     * Returns the items in a list of term display names whose names contain
+     * a partial term (as might be submitted in a search query, for instance).
+     * @param termDisplayNameList a list of term display names.
+     * @param partialTerm a partial term display name; that is, a portion
+     * of a display name that might be expected to match 0-n terms in the list.
+     * @return a list of term display names that matches the partial term.
+     * Matches are case-insensitive. As well, before matching is performed, any
+     * special-purpose characters that may appear in the partial term (such as
+     * wildcards and anchor characters) are filtered out from both compared terms.
+     */
     protected List<String> getPartialTermDisplayNameMatches(List<String> termDisplayNameList, String partialTerm) {
-    	List<String> result = new ArrayList<String>();
-    	
-    	for (String termDisplayName : termDisplayNameList) {
-    		if (termDisplayName.toLowerCase().contains(partialTerm.toLowerCase()) == true) {
-    			result.add(termDisplayName);
-    		}
-    	}
-    	
+    	List<String> result = new ArrayList<>();
+    	String partialTermMatchExpression = filterAnchorAndWildcardChars(partialTerm).toLowerCase();
+        try {
+            for (String termDisplayName : termDisplayNameList) {
+                if (termDisplayName.toLowerCase()
+                        .matches(partialTermMatchExpression) == true) {
+                        result.add(termDisplayName);
+                }
+            }
+        } catch (PatternSyntaxException pse) {
+            logger.warn("Error in regex match pattern '%s' for term display names: %s",
+                    partialTermMatchExpression, pse.getMessage());
+        }
     	return result;
+    }
+    
+    /**
+     * Filters user-supplied anchor and wildcard characters in a string,
+     * replacing them with equivalent regular expressions.
+     * @param term a term in which to filter anchor and wildcard characters.
+     * @return the term with those characters filtered.
+     */
+    protected String filterAnchorAndWildcardChars(String term) {
+        if (Tools.isBlank(term)) {
+            return term;
+        }
+        if (term.length() < 3) {
+            return term;
+        }
+        if (logger.isTraceEnabled()) {
+            logger.trace(String.format("Term = %s", term));
+        }
+        Boolean anchorAtStart = false;
+        Boolean anchorAtEnd = false;
+        String filteredTerm;
+        StringBuilder filteredTermBuilder = new StringBuilder(term);
+        // Term contains no anchor or wildcard characters.
+        if ( (! term.contains(RepositoryJavaClientImpl.USER_SUPPLIED_ANCHOR_CHAR))
+                && (! term.contains(RepositoryJavaClientImpl.USER_SUPPLIED_WILDCARD)) ) {
+            filteredTerm = term;
+        } else {
+            // Term contains at least one such character.
+            try {
+                // Filter the starting anchor or wildcard character, if any.
+                String firstChar = filteredTermBuilder.substring(0,1);
+                switch (firstChar) {
+                    case RepositoryJavaClientImpl.USER_SUPPLIED_ANCHOR_CHAR:
+                        anchorAtStart = true;
+                        break;
+                    case RepositoryJavaClientImpl.USER_SUPPLIED_WILDCARD:
+                        filteredTermBuilder.deleteCharAt(0);
+                        break;
+                }
+                if (logger.isTraceEnabled()) {
+                    logger.trace(String.format("After first char filtering = %s", filteredTermBuilder.toString()));
+                }
+                // Filter the ending anchor or wildcard character, if any.
+                int lastPos = filteredTermBuilder.length() - 1;
+                String lastChar = filteredTermBuilder.substring(lastPos);
+                switch (lastChar) {
+                    case RepositoryJavaClientImpl.USER_SUPPLIED_ANCHOR_CHAR:
+                        filteredTermBuilder.deleteCharAt(lastPos);
+                        filteredTermBuilder.insert(filteredTermBuilder.length(), RepositoryJavaClientImpl.ENDING_ANCHOR_CHAR);
+                        anchorAtEnd = true;
+                        break;
+                    case RepositoryJavaClientImpl.USER_SUPPLIED_WILDCARD:
+                        filteredTermBuilder.deleteCharAt(lastPos);
+                        break;
+                }
+                if (logger.isTraceEnabled()) {
+                    logger.trace(String.format("After last char filtering = %s", filteredTermBuilder.toString()));
+                }
+                filteredTerm = filteredTermBuilder.toString();
+                // Filter all other wildcards, if any.
+                filteredTerm = filteredTerm.replaceAll(RepositoryJavaClientImpl.USER_SUPPLIED_WILDCARD_REGEX, ZERO_OR_MORE_ANY_CHAR_REGEX);
+                if (logger.isTraceEnabled()) {
+                    logger.trace(String.format("After replacing user wildcards = %s", filteredTerm));
+                }
+            } catch (Exception e) {
+                logger.warn(String.format("Error filtering anchor and wildcard characters from string: %s", e.getMessage()));
+                return term;
+            }
+        }
+        // Wrap the term in beginning and ending regex wildcards, unless a
+        // starting or ending anchor character was present.
+        return (anchorAtStart ? "" : ZERO_OR_MORE_ANY_CHAR_REGEX)
+                + filteredTerm
+                + (anchorAtEnd ? "" : ZERO_OR_MORE_ANY_CHAR_REGEX);
     }
     
     @SuppressWarnings("unchecked")
@@ -611,7 +698,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
 
     @Override
 	protected Object getListResultValue(DocumentModel docModel, // REM - CSPACE-5133
-			String schema, ListResultField field) {
+			String schema, ListResultField field) throws DocumentException {
 		Object result = null;		
 
 		result = NuxeoUtils.getXPathValue(docModel, schema, field.getXpath());

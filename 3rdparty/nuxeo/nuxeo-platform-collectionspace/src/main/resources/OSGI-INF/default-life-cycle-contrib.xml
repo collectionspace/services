@@ -17,6 +17,9 @@
         <transition name="delete" destinationState="deleted">
           <description>Move document to trash (temporary delete)</description>
         </transition>
+        <transition name="undelete" destinationState="project">
+          <description>Undelete the document.</description>
+        </transition>        
       </transitions>
       <states>
         <state name="project" description="Default state" initial="true">
@@ -25,7 +28,9 @@
           </transitions>
         </state>
         <state name="deleted" description="Document is deleted">
-        	<!-- No transitions allowed from locked state. -->
+          <transitions>
+            <transition>undelete</transition>
+          </transitions>
         </state>
       </states>
     </lifecycle>
@@ -43,6 +48,9 @@
         <transition name="delete" destinationState="deleted">
           <description>Move document to trash (temporary delete)</description>
         </transition>
+        <transition name="undelete" destinationState="project">
+          <description>Undelete the document.</description>
+        </transition>        
       </transitions>	  
       <states>
         <state name="project" description="Default state" initial="true">
@@ -55,7 +63,9 @@
         	<!-- No transitions allowed from locked state. -->
         </state>
         <state name="deleted" description="Document is deleted">
-        	<!-- No transitions allowed from locked state. -->
+          <transitions>
+            <transition>undelete</transition>
+          </transitions>
         </state>
       </states>
     </lifecycle>
