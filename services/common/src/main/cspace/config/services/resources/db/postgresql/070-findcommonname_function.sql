@@ -23,7 +23,7 @@ BEGIN
       $CF$
       LANGUAGE SQL IMMUTABLE
       RETURNS NULL ON NULL INPUT;
-      ALTER FUNCTION findcommonname(character varying) OWNER TO nuxeo;
+      ALTER FUNCTION findcommonname(character varying) OWNER TO nuxeo_botgarden;
       GRANT EXECUTE ON FUNCTION findcommonname(character varying) to public;
    EXCEPTION
       WHEN undefined_table THEN

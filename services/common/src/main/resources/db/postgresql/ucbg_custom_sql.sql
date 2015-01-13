@@ -10,7 +10,7 @@ BEGIN
          pg_catalog.pg_namespace n
       WHERE n.nspname = 'utils' )
    THEN
-      CREATE SCHEMA utils AUTHORIZATION nuxeo;
+      CREATE SCHEMA utils AUTHORIZATION nuxeo_botgarden;
       GRANT USAGE ON SCHEMA utils TO PUBLIC;
       ALTER DEFAULT PRIVILEGES IN SCHEMA utils
          GRANT SELECT ON TABLES TO PUBLIC;

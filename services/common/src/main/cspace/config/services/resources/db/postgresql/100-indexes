@@ -26,7 +26,7 @@ IF NOT EXISTS( SELECT 1
       n.nspname = 'public' )
 THEN
    CREATE INDEX hierarchy_name_idx ON hierarchy (name);
-   ALTER INDEX hierarchy_name_idx OWNER to nuxeo;
+   ALTER INDEX hierarchy_name_idx OWNER to nuxeo_botgarden;
 END IF;
 
 IF NOT EXISTS( SELECT 1
@@ -40,7 +40,7 @@ IF NOT EXISTS( SELECT 1
       n.nspname = 'public' )
 THEN
    CREATE INDEX hierarchy_pos_idx ON hierarchy (pos);
-   ALTER INDEX hierarchy_pos_idx OWNER to nuxeo;
+   ALTER INDEX hierarchy_pos_idx OWNER to nuxeo_botgarden;
 END IF;
 END$$;
 
@@ -74,7 +74,7 @@ IF NOT EXISTS( SELECT 1
       n.nspname = 'public' )
 THEN
    CREATE INDEX misc_lifecyclestate_idx ON misc (lifecyclestate) ;
-   ALTER INDEX misc_lifecyclestate_idx OWNER TO nuxeo;
+   ALTER INDEX misc_lifecyclestate_idx OWNER TO nuxeo_botgarden;
 END IF;
 END$$;
 
@@ -109,7 +109,7 @@ IF NOT EXISTS( SELECT 1
       n.nspname = 'public' )
 THEN
    CREATE INDEX collectionobjects_botgarden_deadflag_idx ON collectionobjects_botgarden (deadflag);
-   ALTER INDEX collectionobjects_botgarden_deadflag_idx OWNER TO nuxeo;
+   ALTER INDEX collectionobjects_botgarden_deadflag_idx OWNER TO nuxeo_botgarden;
 END IF;
 END$$;
 
@@ -144,7 +144,7 @@ IF NOT EXISTS( SELECT 1
       n.nspname = 'public' )
 THEN
    CREATE INDEX collectionobjects_naturalhistory_rare_idx ON collectionobjects_naturalhistory (rare);
-   ALTER INDEX collectionobjects_naturalhistory_rare_idx OWNER TO nuxeo;
+   ALTER INDEX collectionobjects_naturalhistory_rare_idx OWNER TO nuxeo_botgarden;
 END IF;
 END$$;
 
@@ -179,7 +179,7 @@ IF NOT EXISTS( SELECT 1
       n.nspname = 'public' )
 THEN
    CREATE INDEX relations_common_objectdocumenttype_idx ON relations_common (objectdocumenttype);
-   ALTER INDEX relations_common_objectdocumenttype_idx OWNER TO nuxeo;
+   ALTER INDEX relations_common_objectdocumenttype_idx OWNER TO nuxeo_botgarden;
 END IF;
 
 IF NOT EXISTS( SELECT 1
@@ -193,7 +193,7 @@ IF NOT EXISTS( SELECT 1
       n.nspname = 'public' )
 THEN
    CREATE INDEX relations_common_subjectdocumenttype_idx ON relations_common (subjectdocumenttype);
-   ALTER INDEX relations_common_subjectdocumenttype_idx OWNER to nuxeo;
+   ALTER INDEX relations_common_subjectdocumenttype_idx OWNER to nuxeo_botgarden;
 END IF;
 END$$;
 
@@ -228,7 +228,7 @@ IF NOT EXISTS( SELECT 1
       n.nspname = 'public' )
 THEN
    CREATE INDEX taxonomicIdentGroup_taxon_idx ON taxonomicIdentGroup (taxon);
-   ALTER INDEX taxonomicIdentGroup_taxon_idx OWNER TO nuxeo;
+   ALTER INDEX taxonomicIdentGroup_taxon_idx OWNER TO nuxeo_botgarden;
 END IF;
 END$$;
 

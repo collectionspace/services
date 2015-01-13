@@ -109,7 +109,7 @@ BEGIN
       $CF$
       LANGUAGE 'plpgsql' IMMUTABLE
       RETURNS NULL ON NULL INPUT;
-      ALTER FUNCTION findvoucherlabels() OWNER TO nuxeo;
+      ALTER FUNCTION findvoucherlabels() OWNER TO nuxeo_botgarden;
       GRANT EXECUTE ON FUNCTION findvoucherlabels() to public;
    EXCEPTION
       WHEN undefined_table THEN

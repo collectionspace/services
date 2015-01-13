@@ -17,7 +17,7 @@ BEGIN
          annotation varchar,
          vouchercollectioninfo varchar
       );
-      ALTER TYPE voucherlabeltype OWNER TO nuxeo;
+      ALTER TYPE voucherlabeltype OWNER TO nuxeo_botgarden;
    EXCEPTION
       WHEN duplicate_object THEN
          RAISE NOTICE 'NOTICE: voucherlabeltype already exists';

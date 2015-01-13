@@ -20,7 +20,7 @@ BEGIN
          AND tc1.refname = $1
       $CF$
       LANGUAGE SQL IMMUTABLE RETURNS NULL ON NULL INPUT;
-      ALTER FUNCTION findsectionparent(character varying) OWNER TO nuxeo;
+      ALTER FUNCTION findsectionparent(character varying) OWNER TO nuxeo_botgarden;
       GRANT EXECUTE ON FUNCTION findsectionparent(character varying) to public;
    EXCEPTION
       WHEN undefined_table THEN

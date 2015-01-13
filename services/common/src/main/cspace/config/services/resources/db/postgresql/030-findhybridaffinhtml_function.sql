@@ -165,7 +165,7 @@ BEGIN
       $CF$
       LANGUAGE 'plpgsql' IMMUTABLE
       RETURNS NULL ON NULL INPUT;
-      ALTER FUNCTION findhybridaffinhtml (tigid varchar) OWNER TO nuxeo;
+      ALTER FUNCTION findhybridaffinhtml (tigid varchar) OWNER TO nuxeo_botgarden;
       GRANT EXECUTE ON FUNCTION findhybridaffinhtml(tgid varchar) to public;
    EXCEPTION
       WHEN undefined_table THEN

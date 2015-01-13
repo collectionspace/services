@@ -9,7 +9,7 @@ BEGIN
       $$
       LANGUAGE SQL IMMUTABLE
       RETURNS NULL ON NULL INPUT;
-      ALTER FUNCTION getdispl(in text) OWNER TO nuxeo;
+      ALTER FUNCTION getdispl(in text) OWNER TO nuxeo_botgarden;
       GRANT EXECUTE ON FUNCTION getdispl(in text) to public;
    EXCEPTION
       WHEN OTHERS THEN
