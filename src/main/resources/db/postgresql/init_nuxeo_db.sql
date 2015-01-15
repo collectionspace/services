@@ -1,28 +1,22 @@
--- drop all the objects before dropping roles
-DROP database IF EXISTS nuxeo;
-DROP database IF EXISTS lifesci_domain;
-DROP database IF EXISTS bampfa_domain;
 
-DROP USER IF EXISTS nuxeo;
-DROP USER IF EXISTS reader;
+-- init_nuxeo_db.sql
 
--- All the rest of what is commented out below is now handled at startup
--- by the services web-app
+-- This file holds SQL statements which can be run to initialize
+-- the Nuxeo-managed databases. A copy of this file is deployed to the 
+-- CollectionSpace server folder during a build of the Services layer.
 
--- CREATE ROLE @DB_NUXEO_USER@ WITH PASSWORD '@DB_NUXEO_PASSWORD@' LOGIN;
--- CREATE ROLE reader WITH PASSWORD 'read' LOGIN;
+-- You can manually invoke the initialization commands in that file
+-- by entering the command "ant create_nuxeo_db" from the top of the
+-- Services layer source code tree. (Please note that doing so will DELETE
+-- the Nuxeo-managed databases and their associated user roles, and
+-- will irrevocably DESTROY your data contained in those databases.)
 
---
--- recreate nuxeo database
---
--- CREATE DATABASE nuxeo ENCODING 'UTF8' OWNER @DB_NUXEO_USER@;
+-- Beginning with CollectionSpace version 4.1, the contents of the deployed
+-- copy of this file are no longer static. Rather, that file's contents are
+-- now written during each CollectionSpace system startup, via Services
+-- layer code. (Code-written contents appear at the top of that file.)
 
---
--- Grant privileges to read-only user on Nuxeo, for reporting. 
---
--- GRANT CONNECT ON DATABASE nuxeo TO reader;
-
--- GRANT SELECT ON ALL TABLES IN SCHEMA public TO reader;
--- This must be run by hand, after the system has already started up,
--- so that it gives access to all the tables created on init.
-
+-- Any additional initialization statements not already written to that
+-- file during startup can be added here, following this comment. You'll
+-- need to deploy this file to the CollectionSpace server folder, via the
+-- command "ant deploy", to have those additional statements take effect:

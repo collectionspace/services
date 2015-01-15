@@ -16,7 +16,7 @@
             <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
             <property name="hibernate.connection.username" value="test"/>
             <property name="hibernate.connection.password" value="test"/>
-			<property name="hibernate.connection.url" value="${db.jdbc.cspace.url.encoded}"/>-->
+            <property name="hibernate.connection.url" value="${db.jdbc.cspace.url.encoded}"/-->
         </properties>
     </persistence-unit>
 </persistence>

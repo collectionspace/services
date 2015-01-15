@@ -35,12 +35,14 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.ServiceGroupListItemJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.StoredValuesUriTemplate;
@@ -83,7 +85,7 @@ public class ServiceGroupDocumentModelHandler
     		List<String> serviceGroupNames) throws Exception {
         CommonList commonList = new CommonList();
         AbstractCommonList list = (AbstractCommonList)commonList;
-    	RepositoryInstance repoSession = null;
+        RepositoryInstanceInterface repoSession = null;
     	boolean releaseRepoSession = false;
         
     	try { 
@@ -113,7 +115,7 @@ public class ServiceGroupDocumentModelHandler
                     Response response = Response.status(Response.Status.NOT_FOUND).entity(
                             ServiceMessages.READ_FAILED + 
                             ServiceMessages.resourceNotFoundMsg(implode(serviceGroupNames, ","))).type("text/plain").build();
-                    throw new WebApplicationException(response);
+                    throw new CSWebApplicationException(response);
     	        }
     	        servicebindings = SecurityUtils.getReadableServiceBindingsForCurrentUser(servicebindings);
     	        // Build the list of docTypes for allowed serviceBindings
@@ -161,7 +163,8 @@ public class ServiceGroupDocumentModelHandler
     			logger.debug("Caught exception ", e);
     		}
     		throw new DocumentException(e);
-    	}	        
+    	}
+    	
         return list;
     }
     

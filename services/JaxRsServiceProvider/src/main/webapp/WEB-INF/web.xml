@@ -36,7 +36,7 @@
 
     <!--
       - Location of the XML file that defines the root application context
-      - Applied by ContextLoaderListener.
+      - Applied by Spring's ContextLoaderListener.
       -->
     <context-param>
         <param-name>contextConfigLocation</param-name>
@@ -45,6 +45,9 @@
         </param-value>
     </context-param>
 
+    <!--
+    	Spring Security Filter
+    -->
     <filter>
         <filter-name>springSecurityFilterChain</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
@@ -55,6 +58,36 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
+	<!--
+	- A filter that will attempt to retry requests that fail due to network errors.
+	-
+	-		maxRetrySeconds - How long to keep retrying a request.
+	-		delayBetweenAttemptsMillis - How long to wait between retries.
+	-
+	-->
+	<!-- 
+	<filter>
+		<filter-name>networkErrorRetryFilter</filter-name>
+		<filter-class>org.collectionspace.services.common.NetworkErrorRetryFilter</filter-class>
+		<init-param>
+      		<param-name>maxRetrySeconds</param-name>
+      		<param-value>5000</param-value>
+   		</init-param>
+		<init-param>
+      		<param-name>delayBetweenAttemptsMillis</param-name>
+      		<param-value>200</param-value>
+   		</init-param>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>networkErrorRetryFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+     -->
+     
+	<!--
+		A filter that logs profiling information.
+	 -->
     <filter>
 		<filter-name>CSpaceFilter</filter-name>
         <filter-class>org.collectionspace.services.common.profile.CSpaceFilter</filter-class>

@@ -56,6 +56,7 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
     @Override
     public void onRepositoryInitialized(String dataSourceName,
     		String repositoryName,
+    		String cspaceInstanceId,
     		ServiceBindingType sbt, 
     		List<Field> fields, 
     		List<Property> properties) throws Exception {
@@ -72,7 +73,8 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
             for (Field field : fields) {
                 datatype = getDatatypeFromLogicalType(databaseProductType, field.getType());
                 // If the field is already of the desired datatype, skip it.
-                if (fieldHasDesiredDatatype(dataSourceName, repositoryName, databaseProductType, field, datatype)) {
+                if (fieldHasDesiredDatatype(dataSourceName, repositoryName, cspaceInstanceId, databaseProductType,
+                		field, datatype)) {
                     logger.trace("Field " + field.getTable() + "." + field.getCol()
                             + " is already of desired datatype " + datatype);
                     continue;
@@ -102,7 +104,7 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
                 //
                 // If this assumption is no longer valid, we might instead
                 // identify the relevant repository from the table name here.
-                rows = JDBCTools.executeUpdate(dataSourceName, repositoryName, sql);
+                rows = JDBCTools.executeUpdate(dataSourceName, repositoryName, cspaceInstanceId, sql);
             }
         } catch (Exception e) {
             throw e;
@@ -146,6 +148,7 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
 
     private boolean fieldHasDesiredDatatype(String dataSourceName,
     		String repositoryName,
+    		String cspaceInstanceId,
     		DatabaseProductType databaseProductType,
             Field field, String datatype) {
         
@@ -162,9 +165,9 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
         ResultSet rs = null;
 
         try {
-            conn = JDBCTools.getConnection(dataSourceName, repositoryName);
+            conn = JDBCTools.getConnection(dataSourceName, repositoryName, cspaceInstanceId);
             stmt = conn.createStatement();
-            String databaseName = JDBCTools.getDatabaseName(dataSourceName, repositoryName, conn);
+            String databaseName = JDBCTools.getDatabaseName(dataSourceName, repositoryName, cspaceInstanceId, conn);
             
             if (databaseProductType == DatabaseProductType.MYSQL) {
                 sql = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS "
