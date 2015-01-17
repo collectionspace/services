@@ -25,6 +25,8 @@
     <xs:element name="measuredBy" type="xs:string"/>
     <xs:element name="measurementUnit" type="xs:string"/>
     <xs:element name="measurementMethod" type="xs:string"/>
+    <!-- For bampfa, value needs to be a string (BAMPFA-208). -->
+    <!-- Schema extensions don't seem to work properly on dimensions, so hack the common schema. See CSPACE-6399. -->
     <xs:element name="value" type="xs:string"/>
     <xs:element name="valueDate" type="xs:string"/>
     <xs:element name="valueQualifier" type="xs:string"/>
