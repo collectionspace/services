@@ -10,18 +10,19 @@ import org.nuxeo.ecm.core.api.Filter;
 import org.nuxeo.ecm.core.api.IterableQueryResult;
 import org.nuxeo.ecm.core.api.NoRollbackOnException;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.nuxeo.ecm.core.api.impl.LifeCycleFilter;
+import org.nuxeo.ecm.core.api.CoreSession;
 
-public class RepositoryInstanceWrapper implements RepositoryInstanceInterface {
+public class CoreSessionWrapper implements CoreSessionInterface {
 
-	private RepositoryInstance repoSession;
+	private CoreSession repoSession;
 	
-	public RepositoryInstanceWrapper(RepositoryInstance repoSession) {
+	public CoreSessionWrapper(CoreSession repoSession) {
 		this.repoSession = repoSession;
 	}
 
 	@Override
-	public 	RepositoryInstance getRepositoryInstance() {
+	public 	CoreSession getCoreSession() {
 		return repoSession;
 	}
 	
@@ -87,6 +88,11 @@ public class RepositoryInstanceWrapper implements RepositoryInstanceInterface {
 	@Override
 	public DocumentModelList query(String query) throws ClientException {
 		return repoSession.query(query);
+	}
+	
+	@Override
+	public DocumentModelList query(String query, LifeCycleFilter workflowStateFilter) {
+		return repoSession.query(query, workflowStateFilter);
 	}
 
     /**

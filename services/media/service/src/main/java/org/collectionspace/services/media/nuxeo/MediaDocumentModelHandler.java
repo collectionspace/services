@@ -24,7 +24,7 @@
 package org.collectionspace.services.media.nuxeo;
 
 import org.collectionspace.services.MediaJAXBSchema;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.client.BlobClient;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.blob.BlobUtil;
@@ -43,7 +43,7 @@ import javax.ws.rs.core.MultivaluedMap;
  * The Class MediaDocumentModelHandler.
  */
 public class MediaDocumentModelHandler
-        extends DocHandlerBase<MediaCommon> {
+        extends NuxeoDocumentModelHandler<MediaCommon> {
 
     //==============================================================================
 

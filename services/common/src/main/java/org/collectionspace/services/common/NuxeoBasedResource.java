@@ -53,21 +53,21 @@ import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
-import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
+
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.util.HttpResponseCodes;
+
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-
 
 /**
  * $LastChangedRevision:  $
  * $LastChangedDate:  $
  * Author: Laramie Crocker
  */
-public abstract class ResourceBase
+public abstract class NuxeoBasedResource
         extends AbstractMultiPartCollectionSpaceResourceImpl {
 
     public static final String CREATE = "create";
@@ -332,7 +332,8 @@ public abstract class ResourceBase
         }
     }
 
-    protected AbstractCommonList finish_getList(ServiceContext ctx, DocumentHandler handler) {
+    protected AbstractCommonList finish_getList(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, 
+    		DocumentHandler handler) {
         try {
             getRepositoryClient(ctx).getFiltered(ctx, handler); // REM - Side effect of this call sets the handler's common part list value
             return (AbstractCommonList) handler.getCommonPartList();
@@ -503,17 +504,17 @@ public abstract class ResourceBase
      * for all inheriting resource classes. Just use ServiceContext.getResourceMap() to get
      * the map, and pass it in.
      */
-    public static DocumentModel getDocModelForRefName(RepositoryInstanceInterface repoSession, String refName, ResourceMap resourceMap) 
+    public static DocumentModel getDocModelForRefName(CoreSessionInterface repoSession, String refName, ResourceMap resourceMap) 
    			throws Exception, DocumentNotFoundException {
     	RefName.AuthorityItem item = RefName.AuthorityItem.parse(refName);
     	if(item != null) {
-        	ResourceBase resource = resourceMap.get(item.inAuthority.resource);
+        	NuxeoBasedResource resource = resourceMap.get(item.inAuthority.resource);
         	return resource.getDocModelForAuthorityItem(repoSession, item);
     	}
     	RefName.Authority authority = RefName.Authority.parse(refName);
     	// Handle case of objects refNames, which must be csid based.
     	if(authority != null && !Tools.isEmpty(authority.csid)) {
-        	ResourceBase resource = resourceMap.get(authority.resource);
+        	NuxeoBasedResource resource = resourceMap.get(authority.resource);
             // Ensure we have the right context.
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = 
             		resource.createServiceContext(authority.resource);
@@ -524,15 +525,15 @@ public abstract class ResourceBase
     	return null;
     }
 
-    // THis is ugly, but prevents us parsing the refName twice. Once we make refName a little more
+    // This is ugly, but prevents us parsing the refName twice. Once we make refName a little more
     // general, and less Authority(Item) specific, this will look better.
-   	public DocumentModel getDocModelForAuthorityItem(RepositoryInstanceInterface repoSession, RefName.AuthorityItem item) 
+   	public DocumentModel getDocModelForAuthorityItem(CoreSessionInterface repoSession, RefName.AuthorityItem item) 
    			throws Exception, DocumentNotFoundException {
    		logger.warn("Default (ResourceBase) getDocModelForAuthorityItem called - should not happen!");
    		return null;
    	}
 
-    public DocumentModel getDocModelForRefName(RepositoryInstanceInterface repoSession, String refName) 
+    public DocumentModel getDocModelForRefName(CoreSessionInterface repoSession, String refName) 
    			throws Exception, DocumentNotFoundException {
     	return getDocModelForAuthorityItem(repoSession, RefName.AuthorityItem.parse(refName));
     }
@@ -623,7 +624,5 @@ public abstract class ResourceBase
     protected TenantBindingConfigReaderImpl getTenantBindingsReader() {
         return ServiceMain.getInstance().getTenantBindingConfigReader();
     }
-
-
     
 }

@@ -1,9 +1,10 @@
 package org.collectionspace.services.nuxeo.extension.thumbnail;
 
+/*
+ * An example Nuxeo event "listener".
+ */
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -43,7 +44,7 @@ public class AddThumbnailUnrestricted extends UnrestrictedSessionRunner {
      * (non-Javadoc)
      * @see org.nuxeo.ecm.core.api.UnrestrictedSessionRunner#run()
      * 
-     * Creates a new thumbnail image and associates it with the document blob by adding a "Thumnail" facet
+     * Creates a new thumbnail image and associates it with the document blob by adding a "Thumbnail" facet
      * to the document blob.
      */
     @Override

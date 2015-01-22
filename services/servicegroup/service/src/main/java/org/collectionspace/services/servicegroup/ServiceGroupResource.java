@@ -35,33 +35,22 @@ import org.collectionspace.services.client.ServiceGroupClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.CSWebApplicationException;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
-import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
-import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
-import org.collectionspace.services.common.document.DocumentHandler;
-import org.collectionspace.services.common.document.DocumentNotFoundException;
-import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.QueryManager;
-import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.service.ServiceObjectType;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.servicegroup.nuxeo.ServiceGroupDocumentModelHandler;
-import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.model.PropertyException;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +59,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -79,7 +67,7 @@ import javax.ws.rs.core.UriInfo;
 @Path(ServiceGroupClient.SERVICE_PATH)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
+public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<PoxPayloadIn, PoxPayloadOut> {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     
@@ -103,7 +91,7 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
 
     @Override
     //public Class<ServicegroupsCommon> getCommonPartClass() {
-    public Class getCommonPartClass() {
+    public Class<?> getCommonPartClass() {
     	try {
             return Class.forName("org.collectionspace.services.servicegroup.ServicegroupsCommon");//.class;
         } catch (ClassNotFoundException e){
@@ -166,7 +154,7 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
             @Context UriInfo ui,
             @PathParam("csid") String groupname) {
         PoxPayloadOut result = null;
-        ensureCSID(groupname, ResourceBase.READ);
+        ensureCSID(groupname, NuxeoBasedResource.READ);
         try {
 	        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             TenantBindingConfigReaderImpl tReader =
@@ -220,7 +208,7 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
     public AbstractCommonList getItems(
             @Context UriInfo ui,
             @PathParam("csid") String serviceGroupName) {
-        ensureCSID(serviceGroupName, ResourceBase.READ);
+        ensureCSID(serviceGroupName, NuxeoBasedResource.READ);
         AbstractCommonList list = null;
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);

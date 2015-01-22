@@ -3,17 +3,18 @@ package org.collectionspace.services.nuxeo.client.java;
 import java.security.Principal;
 
 import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.Filter;
 import org.nuxeo.ecm.core.api.IterableQueryResult;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.nuxeo.ecm.core.api.impl.LifeCycleFilter;
 
-public interface RepositoryInstanceInterface {
+public interface CoreSessionInterface {
 
-	public RepositoryInstance getRepositoryInstance();
+	public CoreSession getCoreSession();
 	
     /**
      * Gets the root document of this repository.
@@ -70,6 +71,17 @@ public interface RepositoryInstanceInterface {
      * @throws ClientException
      */
     public DocumentModelList query(String query, int max) throws ClientException;
+    
+    /**
+     * Executes the given NXQL query and returns the result that matches the
+     * filter.
+     *
+     * @param query the query to execute
+     * @param filter the filter to apply to result
+     * @return the query result
+     * @throws ClientException
+     */
+    public DocumentModelList query(String query, LifeCycleFilter workflowStateFilter);
 
     /**
      * Gets a document model given its reference.

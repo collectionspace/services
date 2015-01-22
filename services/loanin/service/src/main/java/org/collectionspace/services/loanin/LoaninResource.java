@@ -24,7 +24,7 @@
 package org.collectionspace.services.loanin;
 
 import org.collectionspace.services.client.LoaninClient;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ import javax.ws.rs.Produces;
 @Path(LoaninClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class LoaninResource extends ResourceBase {
+public class LoaninResource extends NuxeoBasedResource {
 
     final Logger logger = LoggerFactory.getLogger(LoaninResource.class);
 

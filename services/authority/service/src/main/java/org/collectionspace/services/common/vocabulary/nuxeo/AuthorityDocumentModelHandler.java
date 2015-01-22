@@ -25,25 +25,20 @@ package org.collectionspace.services.common.vocabulary.nuxeo;
 
 import java.util.Map;
 
-import javax.ws.rs.core.MultivaluedMap;
-
-import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.RefName.Authority;
 import org.collectionspace.services.common.api.Tools;
-import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.config.service.ObjectPartType;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
-import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public abstract class AuthorityDocumentModelHandler<AuthCommon>
-        extends DocHandlerBase<AuthCommon> {
+        extends NuxeoDocumentModelHandler<AuthCommon> {
 
     private final Logger logger = LoggerFactory.getLogger(AuthorityDocumentModelHandler.class);	
     private String authorityCommonSchemaName;
@@ -150,7 +145,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     	String result = null;
     	
     	DocumentModel docModel = docWrapper.getWrappedObject();
-    	ServiceContext ctx = this.getServiceContext();
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
     	RefName.Authority refname = (RefName.Authority)getRefName(ctx, docModel);
     	result = refname.getDisplayName();
     	
@@ -159,7 +154,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     
     public String getShortIdentifier(String authCSID, String schemaName) throws Exception {
         String shortIdentifier = null;
-        RepositoryInstanceInterface repoSession = null;
+        CoreSessionInterface repoSession = null;
 
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
     	RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);

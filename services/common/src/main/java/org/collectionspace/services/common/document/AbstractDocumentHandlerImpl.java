@@ -26,13 +26,13 @@ package org.collectionspace.services.common.document;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import java.util.StringTokenizer;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.QueryContext;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -161,7 +161,16 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
                 validate(action);
                 prepareDelete();
                 break;
-
+                
+			case WORKFLOW:
+				logger.error("Should never get to this code path.  If you did, there is a bug in the code.");
+				Thread.dumpStack();
+				break;
+				
+			default:
+				logger.error("Should never get to this code path.  If you did, there is a bug in the code.");
+				Thread.dumpStack();
+				break;
         }
     }
 
@@ -225,7 +234,16 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
             case DELETE:
                 handleDelete((DocumentWrapper<WT>) wrapDoc);
                 break;
-
+                
+			case WORKFLOW:
+				logger.error("Should never get to this code path.  If you did, there is a bug in the code.");
+				Thread.dumpStack();
+				break;
+				
+			default:
+				logger.error("Should never get to this code path.  If you did, there is a bug in the code.");
+				Thread.dumpStack();
+				break;
         }
     }
 
@@ -286,6 +304,16 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
             case DELETE:
                 completeDelete((DocumentWrapper<WT>) wrapDoc);
                 break;
+                
+			case WORKFLOW:
+				logger.error("Should never get to this code path.  If you did, there is a bug in the code.");
+				Thread.dumpStack();
+				break;
+				
+			default:
+				logger.error("Should never get to this code path.  If you did, there is a bug in the code.");
+				Thread.dumpStack();
+				break;                
         }
     }
 

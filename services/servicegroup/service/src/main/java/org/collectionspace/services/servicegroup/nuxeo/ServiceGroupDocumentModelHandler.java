@@ -29,19 +29,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.ServiceGroupListItemJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
-import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
@@ -49,29 +48,26 @@ import org.collectionspace.services.common.StoredValuesUriTemplate;
 import org.collectionspace.services.common.UriTemplateFactory;
 import org.collectionspace.services.common.UriTemplateRegistry;
 import org.collectionspace.services.common.UriTemplateRegistryKey;
-import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
-import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.query.QueryManager;
-import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.security.SecurityUtils;
+
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.service.ServiceObjectType;
 import org.collectionspace.services.servicegroup.ServicegroupsCommon;
+
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.model.PropertyException;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ServiceGroupDocumentModelHandler 
-	extends DocHandlerBase<ServicegroupsCommon> {
+	extends NuxeoDocumentModelHandler<ServicegroupsCommon> {
 	
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     
@@ -85,7 +81,7 @@ public class ServiceGroupDocumentModelHandler
     		List<String> serviceGroupNames) throws Exception {
         CommonList commonList = new CommonList();
         AbstractCommonList list = (AbstractCommonList)commonList;
-        RepositoryInstanceInterface repoSession = null;
+        CoreSessionInterface repoSession = null;
     	boolean releaseRepoSession = false;
         
     	try { 

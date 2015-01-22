@@ -24,7 +24,7 @@
 package org.collectionspace.services.intake.nuxeo;
 
 import org.collectionspace.services.intake.IntakesCommon;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 
 /**
  * IntakeDocumentModelHandler
@@ -33,6 +33,6 @@ import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
  * $LastChangedDate: $
  */
 public class IntakeDocumentModelHandler
-        extends DocHandlerBase<IntakesCommon> {
+        extends NuxeoDocumentModelHandler<IntakesCommon> {
 }
 

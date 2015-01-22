@@ -18,7 +18,7 @@ import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.MovementClient;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
@@ -130,8 +130,8 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
 
     private InvocationResults updateComputedCurrentLocations(List<String> csids) {
         ResourceMap resourcemap = getResourceMap();
-        ResourceBase collectionObjectResource = resourcemap.get(CollectionObjectClient.SERVICE_NAME);
-        ResourceBase movementResource = resourcemap.get(MovementClient.SERVICE_NAME);
+        NuxeoBasedResource collectionObjectResource = resourcemap.get(CollectionObjectClient.SERVICE_NAME);
+        NuxeoBasedResource movementResource = resourcemap.get(MovementClient.SERVICE_NAME);
         String computedCurrentLocation;
         int numUpdated = 0;
 
@@ -282,7 +282,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
     //
     // Note: any such values must first be exposed in Movement list items,
     // in turn via configuration in Services tenant bindings ("listResultsField").
-    protected int updateCollectionObjectValues(ResourceBase collectionObjectResource,
+    protected int updateCollectionObjectValues(NuxeoBasedResource collectionObjectResource,
             String collectionObjectCsid, AbstractCommonList.ListItem mostRecentMovement,
             ResourceMap resourcemap, int numUpdated)
             throws DocumentException, URISyntaxException {
@@ -377,11 +377,11 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
     // UC Berkeley Botanical Garden v2.4 implementation.
     // #################################################################
     protected PoxPayloadOut findByCsid(String serviceName, String csid) throws URISyntaxException, DocumentException {
-        ResourceBase resource = getResourceMap().get(serviceName);
+        NuxeoBasedResource resource = getResourceMap().get(serviceName);
         return findByCsid(resource, csid);
     }
 
-    protected PoxPayloadOut findByCsid(ResourceBase resource, String csid) throws URISyntaxException, DocumentException {
+    protected PoxPayloadOut findByCsid(NuxeoBasedResource resource, String csid) throws URISyntaxException, DocumentException {
         byte[] response = resource.get(null, createUriInfo(), csid);
         PoxPayloadOut payload = new PoxPayloadOut(response);
         return payload;
@@ -432,7 +432,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         return value;
     }
 
-    private boolean isRecordDeleted(ResourceBase resource, String collectionObjectCsid)
+    private boolean isRecordDeleted(NuxeoBasedResource resource, String collectionObjectCsid)
             throws URISyntaxException, DocumentException {
         boolean isDeleted = false;
         byte[] workflowResponse = resource.getWorkflow(createUriInfo(), collectionObjectCsid);
@@ -456,7 +456,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         return uriInfo;
     }
 
-    private AbstractCommonList getRecordsRelatedToCsid(ResourceBase resource, String csid,
+    private AbstractCommonList getRecordsRelatedToCsid(NuxeoBasedResource resource, String csid,
             String relationshipDirection, boolean excludeDeletedRecords) throws URISyntaxException {
         UriInfo uriInfo = createUriInfo();
         uriInfo.getQueryParameters().add(relationshipDirection, csid);
@@ -486,7 +486,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
      * record
      * @throws URISyntaxException
      */
-    private AbstractCommonList getRecordsRelatedToObjectCsid(ResourceBase resource, String csid, boolean excludeDeletedRecords) throws URISyntaxException {
+    private AbstractCommonList getRecordsRelatedToObjectCsid(NuxeoBasedResource resource, String csid, boolean excludeDeletedRecords) throws URISyntaxException {
         return getRecordsRelatedToCsid(resource, csid, IQueryManager.SEARCH_RELATED_TO_CSID_AS_OBJECT, excludeDeletedRecords);
     }
 
@@ -503,11 +503,11 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
      * record
      * @throws URISyntaxException
      */
-    private AbstractCommonList getRecordsRelatedToSubjectCsid(ResourceBase resource, String csid, boolean excludeDeletedRecords) throws URISyntaxException {
+    private AbstractCommonList getRecordsRelatedToSubjectCsid(NuxeoBasedResource resource, String csid, boolean excludeDeletedRecords) throws URISyntaxException {
         return getRecordsRelatedToCsid(resource, csid, IQueryManager.SEARCH_RELATED_TO_CSID_AS_SUBJECT, excludeDeletedRecords);
     }
 
-    private AbstractCommonList getRelatedRecords(ResourceBase resource, String csid, boolean excludeDeletedRecords)
+    private AbstractCommonList getRelatedRecords(NuxeoBasedResource resource, String csid, boolean excludeDeletedRecords)
             throws URISyntaxException, DocumentException {
         AbstractCommonList relatedRecords = new AbstractCommonList();
         AbstractCommonList recordsRelatedToObjectCSID = getRecordsRelatedToObjectCsid(resource, csid, excludeDeletedRecords);
@@ -536,11 +536,11 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
 
     private List<String> getMemberCsidsFromGroup(String serviceName, String groupCsid) throws URISyntaxException, DocumentException {
         ResourceMap resourcemap = getResourceMap();
-        ResourceBase resource = resourcemap.get(serviceName);
+        NuxeoBasedResource resource = resourcemap.get(serviceName);
         return getMemberCsidsFromGroup(resource, groupCsid);
     }
 
-    private List<String> getMemberCsidsFromGroup(ResourceBase resource, String groupCsid) throws URISyntaxException, DocumentException {
+    private List<String> getMemberCsidsFromGroup(NuxeoBasedResource resource, String groupCsid) throws URISyntaxException, DocumentException {
         // The 'resource' type used here identifies the record type of the
         // related records to be retrieved
         AbstractCommonList relatedRecords =
@@ -551,7 +551,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
 
     private List<String> getNoContextCsids() throws URISyntaxException {
         ResourceMap resourcemap = getResourceMap();
-        ResourceBase collectionObjectResource = resourcemap.get(CollectionObjectClient.SERVICE_NAME);
+        NuxeoBasedResource collectionObjectResource = resourcemap.get(CollectionObjectClient.SERVICE_NAME);
         UriInfo uriInfo = createUriInfo();
         uriInfo = addFilterToExcludeSoftDeletedRecords(uriInfo);
         AbstractCommonList collectionObjects = collectionObjectResource.getList(uriInfo);

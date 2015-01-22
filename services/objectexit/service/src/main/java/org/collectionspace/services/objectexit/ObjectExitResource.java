@@ -24,7 +24,7 @@
 package org.collectionspace.services.objectexit;
 
 import org.collectionspace.services.client.ObjectExitClient;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
@@ -33,7 +33,7 @@ import javax.ws.rs.Produces;
 @Path(ObjectExitClient.SERVICE_PATH)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public class ObjectExitResource extends ResourceBase {
+public class ObjectExitResource extends NuxeoBasedResource {
 
     @Override
     public String getServiceName(){

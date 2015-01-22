@@ -24,7 +24,7 @@
 package org.collectionspace.services.movement.nuxeo;
 
 import org.collectionspace.services.movement.MovementsCommon;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate$
  */
 public class MovementDocumentModelHandler
-        extends DocHandlerBase<MovementsCommon> {
+        extends NuxeoDocumentModelHandler<MovementsCommon> {
 
     final Logger logger = LoggerFactory.getLogger(MovementDocumentModelHandler.class);
 }

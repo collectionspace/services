@@ -14,13 +14,12 @@ import org.collectionspace.services.config.RepositoryClientConfigType;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
-import org.nuxeo.ecm.core.NXCore;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.repository.RepositoryManager;
 import org.nuxeo.ecm.core.model.Repository;
 import org.nuxeo.osgi.application.FrameworkBootstrap;
-import org.nuxeo.ecm.core.repository.RepositoryDescriptor;
-import org.nuxeo.ecm.core.repository.RepositoryFactory;
+import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.ecm.core.storage.sql.ra.ConnectionFactoryImpl;
 import org.nuxeo.ecm.core.storage.sql.ra.ManagedConnectionFactoryImpl;
 
@@ -38,19 +37,19 @@ public class NuxeoConnectorEmbedded {
 	public final static String NUXEO_SERVER_DIR = JEEServerDeployment.NUXEO_SERVER_DIR;
 	private final static String ERROR_CONNECTOR_NOT_INITIALIZED = "NuxeoConnector is not initialized!";
 		
-	private final static String CSPACE_JEESERVER_HOME = "CSPACE_CONTAINER";
 	private final static String CSPACE_NUXEO_HOME = "CSPACE_NUXEO_HOME";
 	
 	private static final NuxeoConnectorEmbedded self = new NuxeoConnectorEmbedded();
 	private NuxeoClientEmbedded client;
-	private ServletContext servletContext = null;
 	private volatile boolean initialized = false; // use volatile for lazy
 													// initialization in
 													// singleton
-	private RepositoryClientConfigType repositoryClientConfig;
 	public FrameworkBootstrap fb;
+	private ServletContext servletContext;
+	private RepositoryClientConfigType repositoryClientConfig;
 
 	private NuxeoConnectorEmbedded() {
+		// empty constructor
 	}
 
 	public final static NuxeoConnectorEmbedded getInstance() {
@@ -152,15 +151,20 @@ public class NuxeoConnectorEmbedded {
 		}
 	}
 	
+	/*
+	 * This is a debug-only method.  Use to look at runtime values of Nuxeo internal
+	 * data structures.
+	 */
 	public String getDatabaseName(String repoName) {
 		String result = null;
-		
-		try {
-			this.getRepositoryDescriptor(repoName);
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+
+// TODO: Remove after CSPACE-6375 issue is resolved.
+//		try {
+//			List<RepositoryDescriptor> repositoryDescriptorList = this.getRepositoryDescriptor(repoName);
+//		} catch (Exception e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
 		
 		Repository repository = null;
 		try {
@@ -172,7 +176,7 @@ public class NuxeoConnectorEmbedded {
 		
 		ConnectionFactoryImpl connectionFactory = (ConnectionFactoryImpl)repository;
 		ManagedConnectionFactoryImpl managedConnectionFactory = connectionFactory.getManagedConnectionFactory();
-		String serverUrl = managedConnectionFactory.getServerURL();
+		String property = managedConnectionFactory.getProperty();
 		
 		return result;
 	}
@@ -183,7 +187,7 @@ public class NuxeoConnectorEmbedded {
 	 * @param repoSession
 	 * @throws java.lang.Exception
 	 */
-	public void releaseRepositorySession(RepositoryInstanceInterface repoSession)
+	public void releaseRepositorySession(CoreSessionInterface repoSession)
 			throws Exception {
 		if (repoSession != null) {
 			getClient().releaseRepository(repoSession);
@@ -200,8 +204,8 @@ public class NuxeoConnectorEmbedded {
 	 * @return RepositoryInstance
 	 * @throws java.lang.Exception
 	 */
-	public RepositoryInstanceInterface getRepositorySession(RepositoryDomainType repoDomain) throws Exception {
-		RepositoryInstanceInterface repoSession = getClient().openRepository(repoDomain);
+	public CoreSessionInterface getRepositorySession(RepositoryDomainType repoDomain) throws Exception {
+		CoreSessionInterface repoSession = getClient().openRepository(repoDomain);
 		
 		if (logger.isDebugEnabled() && repoSession != null) {
 			logger.debug("getRepositorySession() opened repository session");
@@ -214,37 +218,42 @@ public class NuxeoConnectorEmbedded {
 
     public Repository lookupRepository(String name) throws Exception {
         Repository repo;
+		RepositoryManager repositoryManager = Framework.getService(RepositoryManager.class);
+
         try {
             // needed by glassfish
-            repo = (Repository) new InitialContext().lookup("NXRepository/"
-                    + name);
+            repo = (Repository) new InitialContext().lookup("NXRepository/" + name);
         } catch (NamingException e) {
             try {
                 // needed by jboss
                 repo = (Repository) new InitialContext().lookup("java:NXRepository/"
                         + name);
             } catch (NamingException ee) {
-                repo = (Repository) NXCore.getRepositoryService().getRepositoryManager().getRepository(
+                repo = (Repository) repositoryManager.getRepository(
                         name);
             }
         }
+        
         if (repo == null) {
             throw new IllegalArgumentException("Repository not found: " + name);
         }
+        
         return repo;
     }
     
-    public RepositoryDescriptor getRepositoryDescriptor(String name) throws Exception {
-    	RepositoryDescriptor repo = null;
-        Iterable<RepositoryDescriptor> descriptorsList = NXCore.getRepositoryService().getRepositoryManager().getDescriptors();
-        for (RepositoryDescriptor descriptor : descriptorsList) {
-        	String homeDir = descriptor.getHomeDirectory();
-        	String config = descriptor.getConfigurationFile();
-        	RepositoryFactory factor = descriptor.getFactory();
-        }
-
-        return repo;
-    }
+// TODO: Remove after CSPACE-6375 issue is resolved.
+//    public List<RepositoryDescriptor> getRepositoryDescriptor(String name) throws Exception {
+//    	RepositoryDescriptor repo = null;
+//		RepositoryManager repositoryManager = Framework.getService(RepositoryManager.class);
+//        Iterable<RepositoryDescriptor> descriptorsList = repositoryManager.getDescriptors();
+//        for (RepositoryDescriptor descriptor : descriptorsList) {
+//        	String homeDir = descriptor.getHomeDirectory();
+//        	String config = descriptor.getConfigurationFile();
+//        	RepositoryFactory factor = descriptor.getFactory();
+//        }
+//
+//        return repo;
+//    }
 	
 	/**
 	 * getClient get Nuxeo client for accessing Nuxeo services remotely using
@@ -255,9 +264,7 @@ public class NuxeoConnectorEmbedded {
 	 */
 	public NuxeoClientEmbedded getClient() throws Exception {
 		if (initialized == true) {
-			if (client.isConnected()) {
-				return client;
-			}
+			return client;
 		}
 		//
 		// Nuxeo connection was not initialized
@@ -288,7 +295,7 @@ public class NuxeoConnectorEmbedded {
 	 */
 	public Hashtable<String, String> retrieveWorkspaceIds(RepositoryDomainType repoDomain)
 			throws Exception {
-		RepositoryInstanceInterface repoSession = null;
+		CoreSessionInterface repoSession = null;
 		Hashtable<String, String> workspaceIds = new Hashtable<String, String>();
 		try {
 			repoSession = getRepositorySession(repoDomain);

@@ -28,7 +28,7 @@ package org.collectionspace.services.collectionobject;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.Profiler;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationshipType;
@@ -54,7 +54,7 @@ import java.util.List;
 @Path(CollectionObjectClient.SERVICE_PATH_COMPONENT)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class CollectionObjectResource extends ResourceBase {
+public class CollectionObjectResource extends NuxeoBasedResource {
     
     final Logger logger = LoggerFactory.getLogger(CollectionObjectResource.class);
 

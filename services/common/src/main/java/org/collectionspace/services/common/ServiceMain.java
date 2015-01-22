@@ -761,9 +761,9 @@ public class ServiceMain {
      */
     private synchronized void populateUriTemplateRegistry() {
        if (uriTemplateRegistry.isEmpty()) {
-            ResourceBase resource = null;
+            NuxeoBasedResource resource = null;
             ResourceMap resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
-            for (Map.Entry<String, ResourceBase> entry : resourceMap.entrySet()) {
+            for (Map.Entry<String, NuxeoBasedResource> entry : resourceMap.entrySet()) {
                 resource = entry.getValue();
                 Map<UriTemplateRegistryKey, StoredValuesUriTemplate> entries =
                         resource.getUriRegistryEntries();

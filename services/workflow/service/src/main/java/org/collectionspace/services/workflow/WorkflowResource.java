@@ -25,7 +25,7 @@ package org.collectionspace.services.workflow;
 
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.CSWebApplicationException;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -45,7 +45,7 @@ import javax.ws.rs.core.UriInfo;
 @Path(WorkflowClient.SERVICE_PATH)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public class WorkflowResource extends ResourceBase {
+public class WorkflowResource extends NuxeoBasedResource {
 
     @Override
     public String getServiceName(){
