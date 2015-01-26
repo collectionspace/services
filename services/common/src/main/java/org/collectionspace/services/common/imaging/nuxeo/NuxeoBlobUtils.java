@@ -113,8 +113,32 @@ public class NuxeoBlobUtils {
     private static final String NUXEO_FILENAME_VALID_STRING = "[a-zA-Z_0-9-.%:/\\ ]+";
 
 	public static final String DOCUMENT_PLACEHOLDER_IMAGE = "documentImage.jpg";
-	public static final String DOCUMENT_MISSING_PLACEHOLDER_IMAGE = "documentImageMissing.jpg";
+	//public static final String DOCUMENT_MISSING_PLACEHOLDER_IMAGE = "documentImageMissing.jpg";
+	public static final String DOCUMENT_PLACEHOLDER_CSV  = "documentCSV.jpg";
+	public static final String DOCUMENT_PLACEHOLDER_DOC  = "documentDOC.jpg";
+	public static final String DOCUMENT_PLACEHOLDER_DOCX = "documentDOC.jpg";
+	public static final String DOCUMENT_PLACEHOLDER_MP3  = "documentMP3.jpg";
+	public static final String DOCUMENT_PLACEHOLDER_PDF  = "documentPDF.jpg";
+	public static final String DOCUMENT_PLACEHOLDER_PPT  = "documentPPT.jpg";
+	public static final String DOCUMENT_PLACEHOLDER_PPTX = "documentPPT.jpg";
+	public static final String DOCUMENT_PLACEHOLDER_RTF  = "documentRTF.jpg";
+	public static final String DOCUMENT_PLACEHOLDER_XLS  = "documentXLS.jpg";
+	public static final String DOCUMENT_PLACEHOLDER_XLSX = "documentXLS.jpg";
+	public static final String DOCUMENT_PLACEHOLDER_ZIP  = "documentZIP.jpg";
+
+	public static final String MIME_CSV  = "text/csv";
+	public static final String MIME_DOC  = "application/msword";
+	public static final String MIME_DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 	public static final String MIME_JPEG = "image/jpeg";
+	public static final String MIME_MP3  = "audio/mpeg";
+	public static final String MIME_PDF  = "application/pdf";
+	public static final String MIME_PPT  = "application/vnd.ms-powerpoint";
+	public static final String MIME_PPTX = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+	public static final String MIME_RTF  = "text/rtf";
+	public static final String MIME_XLS  = "application/vnd.ms-excel";
+	public static final String MIME_XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+	public static final String MIME_ZIP  = "application/zip";
+
 	/*
 	 * FIXME: REM - These constants should be coming from configuration and NOT
 	 * hard coded.
@@ -951,7 +975,44 @@ public class NuxeoBlobUtils {
 						//remoteStream = docBlob.getStream();
 						remoteStream = getInputStream(blobsCommon, docBlob); // CSPACE-6110 - For small files, return a byte array instead of a file stream
 					} else {
-						remoteStream = getResource(DOCUMENT_PLACEHOLDER_IMAGE);
+						String docBlobMimetype = docBlob.getMimeType();
+						switch(docBlobMimetype) {
+							case MIME_CSV:
+								remoteStream = getResource(DOCUMENT_PLACEHOLDER_CSV);
+								break;
+							case MIME_DOC:
+								remoteStream = getResource(DOCUMENT_PLACEHOLDER_DOC);
+								break;
+							case MIME_DOCX:
+								remoteStream = getResource(DOCUMENT_PLACEHOLDER_DOCX);
+								break;
+							case MIME_MP3:
+								remoteStream = getResource(DOCUMENT_PLACEHOLDER_MP3);
+								break;
+							case MIME_PDF:
+								remoteStream = getResource(DOCUMENT_PLACEHOLDER_PDF);
+								break;
+							case MIME_PPT:
+								remoteStream = getResource(DOCUMENT_PLACEHOLDER_PPT);
+								break;
+							case MIME_PPTX:
+								remoteStream = getResource(DOCUMENT_PLACEHOLDER_PPTX);
+								break;
+							case MIME_RTF:
+								remoteStream = getResource(DOCUMENT_PLACEHOLDER_RTF);
+								break;
+							case MIME_XLS:
+								remoteStream = getResource(DOCUMENT_PLACEHOLDER_XLS);
+								break;
+							case MIME_XLSX:
+								remoteStream = getResource(DOCUMENT_PLACEHOLDER_XLSX);
+								break;
+							case MIME_ZIP:
+								remoteStream = getResource(DOCUMENT_PLACEHOLDER_ZIP);
+								break;
+							default:
+								remoteStream = getResource(DOCUMENT_PLACEHOLDER_IMAGE);
+						}
 						outMimeType.append(MIME_JPEG);
 					}
 //					BufferedInputStream bufferedInputStream = new BufferedInputStream(
