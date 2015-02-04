@@ -13,10 +13,6 @@
 				<types:key>maxListItemsReturnedLimitOnJdbcQueries</types:key>
 				<types:value>425</types:value>
 			</types:item>
-			<types:item xmlns:types="http://collectionspace.org/services/config/types" id="jdbcqueriestenantrestricted" merge:matcher="id" merge:action="replace">
-				<types:key>jdbcQueriesAreTenantIdRestricted</types:key>
-				<types:value>false</types:value>
-			</types:item>
 		</tenant:properties>
 		
 		<tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
