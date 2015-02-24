@@ -27,8 +27,6 @@
     <modules>
     <!-- This module is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <module>nuxeo-platform-cs-claim</module>
-        <module>nuxeo-platform-claim-anthropology</module>
-        <module>nuxeo-platform-claim-pahma</module>
         -->
     </modules>
 </project>
