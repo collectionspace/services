@@ -15,18 +15,9 @@
     3rd party build for organization service
     </description>
 
-    <properties>
-        <ServiceName>organization</ServiceName>
-        <NuxeoDocTypeName>Organization</NuxeoDocTypeName>  
-        <CommonSchemaName>organizations_common</CommonSchemaName>
-        <TenantPrefix>Tenant</TenantPrefix>
-    </properties>
-
     <modules>
     <!-- This module is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <module>nuxeo-platform-cs-organization</module>
-        <module>nuxeo-platform-organization-naturalhistory</module>
-        <module>nuxeo-platform-organization-ucjeps</module>
         -->
     </modules>
 </project>

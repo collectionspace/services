@@ -17,18 +17,9 @@
         3rd party build for loanin service
     </description>
 
-    <properties>
-        <ServiceName>loanin</ServiceName>
-        <NuxeoDocTypeName>Loanin</NuxeoDocTypeName>
-        <CommonSchemaName>loansin_common</CommonSchemaName>
-        <TenantPrefix>Tenant</TenantPrefix>
-    </properties>
-
     <modules>
     <!-- This module is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <module>nuxeo-platform-cs-loanin</module>
-        <module>nuxeo-platform-loanin-naturalhistory</module>
-        <module>nuxeo-platform-loanin-ucjeps</module>
         -->
     </modules>
 </project>
