@@ -16,17 +16,9 @@
         3rd party build for media service
     </description>
 
-    <properties>
-        <ServiceName>media</ServiceName>
-        <NuxeoDocTypeName>Media</NuxeoDocTypeName>  
-        <CommonSchemaName>media_common</CommonSchemaName>
-        <TenantPrefix>Tenant</TenantPrefix>
-    </properties>
-
     <modules>
     <!-- This module is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <module>nuxeo-platform-cs-media</module>
-        <module>nuxeo-platform-media-botgarden</module>
         -->
     </modules>
 </project>

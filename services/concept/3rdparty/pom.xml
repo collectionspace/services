@@ -16,18 +16,9 @@
         3rd party build for concept service
     </description>
 
-	<properties>
-		<ServiceName>concept</ServiceName>
-		<NuxeoDocTypeName>Conceptitem</NuxeoDocTypeName>
-		<CommonSchemaName>concepts_common</CommonSchemaName>
-		<TenantPrefix>Tenant</TenantPrefix>
-	</properties>
-
     <modules>
     <!-- This module is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <module>nuxeo-platform-cs-concept</module>
-		<module>nuxeo-platform-concept-naturalhistory</module>
-		<module>nuxeo-platform-concept-botgarden</module>
         -->
     </modules>
 </project>
