@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Exhibition schema (XSD)
+    
+    Entity  : Exhibition
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns:ns="http://collectionspace.org/services/exhibition"
+  xmlns="http://collectionspace.org/services/exhibition"
+  targetNamespace="http://collectionspace.org/services/exhibition"
+  version="0.1"
+>
+
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+--> 
+    
+    <!--  Exhibition Information Group -->
+    <xs:element name="exhibitions_common">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="exhibitionNumber" type="xs:string"/>
+                <xs:element name="generalNote" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
