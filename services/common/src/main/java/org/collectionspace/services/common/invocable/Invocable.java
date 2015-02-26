@@ -25,7 +25,6 @@ package org.collectionspace.services.common.invocable;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import java.util.List;
 import org.collectionspace.services.common.api.Tools;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 
 /**
  * Invocable defines an interface for invocable jobs (batch, reports, exports,
@@ -86,7 +85,7 @@ public interface Invocable {
      * @param context an instance of InvocationContext.
      */
     public void setInvocationContext(InvocationContext context);
-    
+
     /**
      * The main work logic of the batch job. Will be called after setContext.
      */
