@@ -113,7 +113,8 @@ public class NuxeoBlobUtils {
     private static final String NUXEO_FILENAME_VALID_STRING = "[a-zA-Z_0-9-.%:/\\ ]+";
 
 	public static final String DOCUMENT_PLACEHOLDER_IMAGE = "documentImage.jpg";
-	//public static final String DOCUMENT_MISSING_PLACEHOLDER_IMAGE = "documentImageMissing.jpg";
+	public static final String DOCUMENT_MISSING_PLACEHOLDER_IMAGE = "documentImageMissing.jpg";
+	
 	public static final String DOCUMENT_PLACEHOLDER_CSV  = "documentCSV.jpg";
 	public static final String DOCUMENT_PLACEHOLDER_DOC  = "documentDOC.jpg";
 	public static final String DOCUMENT_PLACEHOLDER_DOCX = "documentDOC.jpg";
