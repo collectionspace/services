@@ -7,14 +7,12 @@
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.authentication.service</artifactId>
     <name>services.authentication.service</name>
     <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.security.version>3.0.2.RELEASE</spring.security.version>
     </properties>
 
     <dependencies>

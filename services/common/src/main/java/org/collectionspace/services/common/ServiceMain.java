@@ -8,8 +8,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
@@ -73,12 +71,9 @@ public class ServiceMain {
     private TenantBindingConfigReaderImpl tenantBindingConfigReader;
     private UriTemplateRegistry uriTemplateRegistry = new UriTemplateRegistry();
     
-    
     private static final String COMPONENT_EXTENSION_XPATH = "/component/extension[@point='%s']";
-    private static final String REPOSITORY_EXTENSION_POINT_XPATH =
-            String.format(COMPONENT_EXTENSION_XPATH, "repository");
-    private static final String REPOSITORIES_EXTENSION_POINT_XPATH =
-            String.format(COMPONENT_EXTENSION_XPATH, "repositories");
+    private static final String DATASOURCE_EXTENSION_POINT_XPATH = String.format(COMPONENT_EXTENSION_XPATH, "datasources");
+    private static final String REPOSITORY_EXTENSION_POINT_XPATH = String.format(COMPONENT_EXTENSION_XPATH, "repository");
     
     private static final String DROP_DATABASE_SQL_CMD = "DROP DATABASE";
     private static final String DROP_DATABASE_IF_EXISTS_SQL_CMD = DROP_DATABASE_SQL_CMD + " IF EXISTS %s;";
@@ -86,9 +81,8 @@ public class ServiceMain {
     private static final String DROP_USER_IF_EXISTS_SQL_CMD = DROP_USER_SQL_CMD + " IF EXISTS %s;";
     private static final String DROP_OBJECTS_SQL_COMMENT = "-- drop all the objects before dropping roles";
 
-            
     private ServiceMain() {
-    	//empty
+    	// Intentionally blank
     }
     
     /*
@@ -165,8 +159,9 @@ public class ServiceMain {
     	// In each tenant, set properties that don't already have values
     	// to their default values.
         propagateConfiguredProperties();
-        
+                
         // Create or update Nuxeo's per-repository configuration files.
+        createOrUpdateNuxeoDatasourceConfigFiles();
         createOrUpdateNuxeoRepositoryConfigFiles();
         
         // Create the Nuxeo-managed databases, along with the requisite
@@ -424,10 +419,10 @@ public class ServiceMain {
     private String getNuxeoProtoConfigFilename() {
         return JEEServerDeployment.NUXEO_PROTOTYPE_CONFIG_FILENAME;
     }
-        
-    private String getNuxeoConfigFilename(String reponame) {
-        return reponame + JEEServerDeployment.NUXEO_REPO_CONFIG_FILENAME_SUFFIX;
-    }
+    
+    private String getNuxeoProtoDatasourceFilename() {
+        return JEEServerDeployment.NUXEO_PROTOTYPE_DATASOURCE_FILENAME;
+    }    
     
     private String getDatabaseScriptsPath() {
         DatabaseProductType dbType;
@@ -783,6 +778,71 @@ public class ServiceMain {
         }
         return uriTemplateRegistry;
     }
+    
+	/**
+     * 
+     */
+	private void createOrUpdateNuxeoDatasourceConfigFiles() throws Exception {
+		// Get the prototype copy of the Nuxeo datasource config file.
+		File prototypeNuxeoDatasourceFile = new File(getCspaceServicesConfigDir() + File.separator
+				+ getNuxeoProtoDatasourceFilename());
+		// FIXME: Consider checking for the presence of existing configuration files,
+		// rather than always failing outright if the prototype file for creating
+		// new or updated files can't be located.
+		if (prototypeNuxeoDatasourceFile.canRead() == false) {
+			String msg = String
+					.format("Could not find and/or read the prototype Nuxeo datasource file '%s'. "
+							+ "Please redeploy this file by running 'ant deploy' from the Services layer source code's '3rdparty/nuxeo' module.",
+							prototypeNuxeoDatasourceFile.getCanonicalPath());
+			throw new RuntimeException(msg);
+		}
+
+		if (logger.isInfoEnabled()) {
+			logger.info("Found and can read prototype Nuxeo config file at path %s",
+					prototypeNuxeoDatasourceFile.getAbsolutePath());
+		}
+
+		//
+		// For each tenant config we find, create the xml datasource config file and fill in the correct values.
+		//
+		Document prototypeConfigDoc = XmlTools.fileToXMLDocument(prototypeNuxeoDatasourceFile);
+		Document datasourceConfigDoc = null;
+
+		Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
+		for (TenantBindingType tbt : tenantBindingTypeMap.values()) {
+			List<String> repositoryNameList = ConfigUtils.getRepositoryNameList(tbt);
+			logger.debug("Getting repository name(s) for tenant " + tbt.getName());
+
+			if (repositoryNameList == null || repositoryNameList.isEmpty() == true) {
+				logger.error(String.format("Could not get repository name(s) for tenant %s", tbt.getName()));
+				continue; // break out of loop and go to the next tenant binding
+			} else {
+				for (String repositoryName : repositoryNameList) {
+					if (Tools.isBlank(repositoryName)) {
+						logger.error(String.format("Repository name(s) for tenant %s was empty.", tbt.getName()));
+						continue;
+					}
+					logger.debug(String.format("Repository name is %s", repositoryName));
+					//
+					// Clone the prototype copy of the Nuxeo datasource config file,
+					// thus creating a separate config file for the current repository.
+					//
+					datasourceConfigDoc = (Document) prototypeConfigDoc.clone();
+					// Update this config file by inserting values pertinent to the
+					// current repository.
+					datasourceConfigDoc = updateRepositoryDatasourceDoc(datasourceConfigDoc, repositoryName, this.getCspaceInstanceId());
+					logger.debug("Updated Nuxeo datasource config file contents=\n" + datasourceConfigDoc.asXML());
+
+					// Write this config file to the Nuxeo server config directory.
+					File repofile = new File(getNuxeoConfigDir() + File.separator + repositoryName
+							+ JEEServerDeployment.NUXEO_DATASOURCE_CONFIG_FILENAME_SUFFIX);
+					logger.debug(String.format("Attempting to write Nuxeo datasource config file to %s", repofile.getAbsolutePath()));
+					XmlTools.xmlDocumentToFile(datasourceConfigDoc, repofile);
+				}
+			}
+		}
+	}
+    
    /**
     * Ensure that Nuxeo repository configuration files exist for each repository
     * specified in tenant bindings. Create or update these files, as needed.
@@ -801,9 +861,13 @@ public class ServiceMain {
                     prototypeNuxeoConfigFile.getCanonicalPath());
             throw new RuntimeException(msg);
         }
-        if (logger.isTraceEnabled()) {
-            logger.trace("Found and can read prototype Nuxeo config file at path %s", prototypeNuxeoConfigFile.getAbsolutePath());
+        if (logger.isInfoEnabled()) {
+            logger.info("Found and can read prototype Nuxeo config file at path %s", prototypeNuxeoConfigFile.getAbsolutePath());
         }
+        
+        //
+        // Create the xml config file and fill in the correct values.
+        //
         Document prototypeConfigDoc = XmlTools.fileToXMLDocument(prototypeNuxeoConfigFile);
         Document repositoryConfigDoc = null;
         // FIXME: Can the variable below reasonably be made a class variable? Its value
@@ -868,37 +932,82 @@ public class ServiceMain {
                 repositoryName);
         
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository", "name",
+                REPOSITORY_EXTENSION_POINT_XPATH + "/repository", "name",
                 repositoryName);
         
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/binaryStore", "path",
+                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/binaryStore", "path",
                 Tools.isBlank(binaryStorePath) ? repositoryName : binaryStorePath);  // Can be either partial or full path.  Partial path will be relative to Nuxeo's data directory
 
         /* Create the JDBC url options if any exist */
         String jdbcOptions = XmlTools.getElementValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='JDBCOptions']");
+                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/property[@name='JDBCOptions']");
         jdbcOptions = Tools.isBlank(jdbcOptions) ? "" : "?" + jdbcOptions;
         
         repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/repository/property[@name='DatabaseName']",
+                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/property[@name='DatabaseName']",
                 databaseName + jdbcOptions);
-        
-        // Text substitutions within second extension point, "repositories" 
-        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
-                REPOSITORIES_EXTENSION_POINT_XPATH + "/documentation",
-                String.format("The %s repository", repositoryName));
-        
-        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                REPOSITORIES_EXTENSION_POINT_XPATH + "/repository", "name",
-                repositoryName);
-        
-        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                REPOSITORIES_EXTENSION_POINT_XPATH + "/repository", "label",
-                String.format("%s Repository", repositoryName));
-        
+                
         return repoConfigDoc;
     }
+    
+    /*
+     * This method is filling out the proto-datasource-config.xml file with tenant specific repository information.
+     */
+    private Document updateRepositoryDatasourceDoc(Document repoConfigDoc, String repositoryName,
+    		String cspaceInstanceId) {
+        String databaseName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
+
+        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc, "/component", "name",
+                String.format("config:%s-datasource", repositoryName));
+        
+        // Set the <datasource> element's  name attribute
+        String datasoureName = "jdbc/" + repositoryName;
+        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
+                DATASOURCE_EXTENSION_POINT_XPATH + "/datasource", "name", datasoureName);
+        
+        // Get the DB server name
+        String serverName = XmlTools.getElementValue(repoConfigDoc,
+        		DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='ServerName']");
+        // Get the JDBC options
+        String jdbcOptions = XmlTools.getElementValue(repoConfigDoc,
+        		DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='JDBCOptions']");
+        jdbcOptions = Tools.isBlank(jdbcOptions) ? "" : "?" + jdbcOptions;
+        // Get the DB port nubmer
+        String portNumber = XmlTools.getElementValue(repoConfigDoc,
+        		DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='PortNumber']");
+        // Build the JDBC URL from the parts
+        String jdbcUrl = String.format("jdbc:postgresql://%s:%s/%s%s", //FIXME: 'postgresql' string should not be hard coded here
+        		serverName, portNumber, databaseName, jdbcOptions);
+        
+        // Set the <datasource> element's url attribute
+        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
+                DATASOURCE_EXTENSION_POINT_XPATH + "/datasource", "url", jdbcUrl);
+        logger.debug(String.format("Built up the following JDBC url: %s", jdbcUrl));
+        
+        // Get the DB username
+        String username = XmlTools.getElementValue(repoConfigDoc,
+        		DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='User']");
+        // Set the <datasource> element's user attribute
+        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
+                DATASOURCE_EXTENSION_POINT_XPATH + "/datasource", "username", username);
+        
+        // Get the DB password
+        String password = XmlTools.getElementValue(repoConfigDoc,
+        		DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='Password']");
+        // Set the <datasource> element's password attribute
+        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
+                DATASOURCE_EXTENSION_POINT_XPATH + "/datasource", "password", password);
+        
+        // Set the <link> element's name attribute
+        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
+                DATASOURCE_EXTENSION_POINT_XPATH + "/link", "name", "jdbc/repository_" + repositoryName);
+        // Set the <link> element's global attribute
+        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
+                DATASOURCE_EXTENSION_POINT_XPATH + "/link", "global", datasoureName);
+        
+        return repoConfigDoc;
+    }    
 
     /**
      * Update the current copy of the Nuxeo databases initialization script file by

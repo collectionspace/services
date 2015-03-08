@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Iterator;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 
 import org.collectionspace.services.common.api.JEEServerDeployment;
@@ -16,12 +14,7 @@ import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.repository.RepositoryManager;
-import org.nuxeo.ecm.core.model.Repository;
 import org.nuxeo.osgi.application.FrameworkBootstrap;
-import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.ecm.core.storage.sql.ra.ConnectionFactoryImpl;
-import org.nuxeo.ecm.core.storage.sql.ra.ManagedConnectionFactoryImpl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,6 +108,9 @@ public class NuxeoConnectorEmbedded {
 		
 		fb = new FrameworkBootstrap(NuxeoConnectorEmbedded.class.getClassLoader(),
 				nuxeoHomeDir);
+		fb.setHostName("Tomcat");
+		fb.setHostVersion("7.0.57"); //FIXME: Should not be hard coded.
+		
 		fb.initialize();
 		fb.start();
 	}
@@ -151,36 +147,6 @@ public class NuxeoConnectorEmbedded {
 		}
 	}
 	
-	/*
-	 * This is a debug-only method.  Use to look at runtime values of Nuxeo internal
-	 * data structures.
-	 */
-	public String getDatabaseName(String repoName) {
-		String result = null;
-
-// TODO: Remove after CSPACE-6375 issue is resolved.
-//		try {
-//			List<RepositoryDescriptor> repositoryDescriptorList = this.getRepositoryDescriptor(repoName);
-//		} catch (Exception e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-		
-		Repository repository = null;
-		try {
-			repository = this.lookupRepository(repoName);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		ConnectionFactoryImpl connectionFactory = (ConnectionFactoryImpl)repository;
-		ManagedConnectionFactoryImpl managedConnectionFactory = connectionFactory.getManagedConnectionFactory();
-		String property = managedConnectionFactory.getProperty();
-		
-		return result;
-	}
-
 	/**
 	 * releaseRepositorySession releases given repository session
 	 * 
@@ -208,38 +174,14 @@ public class NuxeoConnectorEmbedded {
 		CoreSessionInterface repoSession = getClient().openRepository(repoDomain);
 		
 		if (logger.isDebugEnabled() && repoSession != null) {
-			logger.debug("getRepositorySession() opened repository session");
 			String repoName = repoDomain.getRepositoryName();
-			String databaseName = this.getDatabaseName(repoName); // For debugging purposes only
+			logger.debug("getRepositorySession() opened repository session on: %s repo", 
+					repoName != null ? repoName : "unknown");			
 		}
 		
 		return repoSession;
 	}
 
-    public Repository lookupRepository(String name) throws Exception {
-        Repository repo;
-		RepositoryManager repositoryManager = Framework.getService(RepositoryManager.class);
-
-        try {
-            // needed by glassfish
-            repo = (Repository) new InitialContext().lookup("NXRepository/" + name);
-        } catch (NamingException e) {
-            try {
-                // needed by jboss
-                repo = (Repository) new InitialContext().lookup("java:NXRepository/"
-                        + name);
-            } catch (NamingException ee) {
-                repo = (Repository) repositoryManager.getRepository(
-                        name);
-            }
-        }
-        
-        if (repo == null) {
-            throw new IllegalArgumentException("Repository not found: " + name);
-        }
-        
-        return repo;
-    }
     
 // TODO: Remove after CSPACE-6375 issue is resolved.
 //    public List<RepositoryDescriptor> getRepositoryDescriptor(String name) throws Exception {

@@ -111,7 +111,7 @@
         description="deploy nuxeo server libs to ${jee.server.cspace}">
         <copy todir="${jee.server.cspace}/nuxeo-server">
             <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}">
-                <exclude name="**/config/*-repo-config.xml"/>
+                <exclude name="**/config/proto-*-config.xml"/>
             </fileset>
         </copy>
         <echo message="Copying Nuxeo prototype repo config file ..."/>
@@ -130,6 +130,17 @@
                 <filter token="NUXEO_PW" value="${db.nuxeo.user.password}"/>
             </filterset>
         </copy>
+        <copy todir="${jee.server.cspace}/cspace/config/services" overwrite="true">
+            <fileset file="${basedir}/nuxeo-server/${nuxeo.release}/config/proto-datasource-config.xml"/>
+            <filterset>
+                <filter token="DB_SERVER_HOSTNAME" value="${db.host}"/>
+                <filter token="DB_PORT" value="${db.port}"/>
+                <filter token="DB_JDBC_OPTIONS" value="${db.jdbc.urloptions.encoded}"/>
+                <filter token="NUXEO_USER" value="${db.nuxeo.user}"/>
+                <filter token="NUXEO_PW" value="${db.nuxeo.user.password}"/>
+            </filterset>
+        </copy>
+		
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-listener/build.xml" target="deploy" inheritall="false"/>
         <!-- Disabled due to integration issues between ImageMagick and Ghostscript on Linux systems        
@@ -141,8 +152,8 @@
         <delete dir="${jee.server.cspace}/nuxeo-server/bundles"/>
         <delete dir="${jee.server.cspace}/nuxeo-server/config"/>
         <delete dir="${jee.server.cspace}/nuxeo-server/lib"/>
-        <delete file="${jee.server.cspace}/cspace/config/services/proto-repo-config.xml"
-            failonerror="false"/>
+        <delete file="${jee.server.cspace}/cspace/config/services/proto-repo-config.xml" failonerror="false"/>
+        <delete file="${jee.server.cspace}/cspace/config/services/proto-datasource-config.xml" failonerror="false"/>
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-listener/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-quote/build.xml" target="undeploy" inheritall="false"/>

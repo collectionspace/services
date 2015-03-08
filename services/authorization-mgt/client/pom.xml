@@ -11,10 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.collectionspace.services.authorization-mgt.client</artifactId>
     <name>services.authorization-mgt.client</name>
-    <properties>
-        <spring.version>3.0.0.RELEASE</spring.version>
-        <spring.security.version>3.0.2.RELEASE</spring.security.version>
-    </properties>
+
     <dependencies>
         <!-- keep slf4j dependencies on the top -->
         <dependency>

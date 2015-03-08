@@ -7,14 +7,10 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.account.service</artifactId>
     <name>services.account.service</name>
     <packaging>jar</packaging>
 
-    <properties>
-        <spring.security.version>3.0.2.RELEASE</spring.security.version>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
