@@ -822,6 +822,10 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     	} catch(ClassCastException cce) {
     		throw new RuntimeException("Problem retrieving property {"+xpath+"} as String. Not a String property?"
     				+cce.getLocalizedMessage());
+    	} catch(NullPointerException npe) {
+    		// Getting here because of a bug in Nuxeo when value in repository is unknown/empty/null
+    		logger.warn(String.format("Nuxeo repo unexpectedly returned an Null Pointer Exception when asked for the value of {%s}.",
+    				xpath));
     	} catch(Exception e) {
     		throw new RuntimeException("Unknown problem retrieving property {"+xpath+"}."
     				+e.getLocalizedMessage());
