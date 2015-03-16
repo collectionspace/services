@@ -52,6 +52,7 @@
         <module>acquisition</module>
         <module>claim</module>
         <module>exhibition</module>
+        <module>osteology</module>
         <module>vocabulary</module>
         <module>organization</module>
         <module>person</module>

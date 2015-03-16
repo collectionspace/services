@@ -53,6 +53,7 @@ import org.collectionspace.services.person.PersonAuthorityResource;
 import org.collectionspace.services.citation.CitationAuthorityResource;
 import org.collectionspace.services.claim.ClaimResource;
 import org.collectionspace.services.exhibition.ExhibitionResource;
+import org.collectionspace.services.osteology.OsteologyResource;
 import org.collectionspace.services.conditioncheck.ConditioncheckResource;
 
 import javax.servlet.ServletContext;
@@ -128,6 +129,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new MovementResource());
         addResourceToMapAndSingletons(new ClaimResource());
         addResourceToMapAndSingletons(new ExhibitionResource());
+        addResourceToMapAndSingletons(new OsteologyResource());
         addResourceToMapAndSingletons(new ReportResource());
         addResourceToMapAndSingletons(new PublicItemResource());
 
