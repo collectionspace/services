@@ -450,6 +450,10 @@
       <param name="property-to-check-value" value="${tenant.id}"/>
     </antcall>
     <echo message="tenant.id=${tenant.id}"/>
+    <!-- Internet domain of the new tenant to create
+         Note: Although this property is included in the provided tenant.properties file
+         and in documentation, for the purpose of simplicity and consistency across all
+         three layers, it is not currently used (nor is it checked here) in the Services layer -->
   </target>
 
 </project>
