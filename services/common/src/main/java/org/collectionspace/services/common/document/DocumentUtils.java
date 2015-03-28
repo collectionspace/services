@@ -24,7 +24,6 @@
 package org.collectionspace.services.common.document;
 
 import java.lang.reflect.Array;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,8 +33,9 @@ import java.io.StringWriter;
 import java.text.DecimalFormat;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
-
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -63,7 +63,6 @@ import org.collectionspace.services.config.service.ObjectPartContentType;
 import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.config.service.XmlContentType;
 import org.dom4j.io.DOMReader;
-
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 //import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -88,10 +87,8 @@ import org.nuxeo.ecm.core.schema.types.primitives.StringType;
 import org.nuxeo.ecm.core.schema.types.FieldImpl;
 import org.nuxeo.ecm.core.schema.types.QName;
 import org.nuxeo.runtime.api.Framework;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -578,6 +575,34 @@ public class DocumentUtils {
 		}
 	}
 
+	/*
+	 * String-encode Nuxeo date types (DateType) as ISO8601 timestamps.  If the value passed in is not a Nuxeo date type,
+	 * use Nuxeo's "encode" method for the type to string-encode the value.
+	 */
+	private static String encodeValue(Type type, Object value) {
+		String result = null;
+		
+		if (type != null && value != null) {
+			if (type instanceof DateType) {
+				Date dateResult = null;
+				if (value instanceof Calendar) {
+					dateResult = ((Calendar)value).getTime();
+				} else if (value instanceof Date) {
+					dateResult = (Date)value;
+				} else {
+					logger.error(String.format("Cannot encode type %s with value %s", type, value));
+				}
+				if (dateResult != null) {
+					result = GregorianCalendarDateTimeUtils.formatAsISO8601Timestamp(dateResult);
+				}
+			} else {
+				result = type.encode(value); // If it's not of type DateType, use the default mechanism to encode the value
+			}
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * Builds the property.
 	 *
@@ -616,7 +641,7 @@ public class DocumentUtils {
                 }
                 */
                 } else {
-                    String encodedVal = type.encode(value);
+                    String encodedVal = encodeValue(type, value); // get a String representation of the value
                     element.setTextContent(encodedVal);
                 }
             } else if (type.isComplexType()) {

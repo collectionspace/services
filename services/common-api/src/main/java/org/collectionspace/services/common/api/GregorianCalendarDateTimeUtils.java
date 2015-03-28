@@ -18,12 +18,8 @@
 package org.collectionspace.services.common.api;
 
 import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Locale;
 import java.util.TimeZone;
 
 import org.slf4j.Logger;
@@ -49,32 +45,7 @@ public class GregorianCalendarDateTimeUtils {
      */
      public static String timestampUTC() {
          return formatAsISO8601Timestamp(currentDateAndTime(DateUtils.UTCTimeZone()));
-     }
-     
-     //
-     // This is code take from the Nuxeo 6 code base.  It is stripping off the thousandths place of the milliseconds value.  I'm
-     // not sure why they are doing this.
-     //
-     public static String formatW3CDateTime(Date date) {
-         if (date == null) {
-             return null;
-         }
-         Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-         cal.setTime(date);
-         StringBuilder buf = new StringBuilder(32);
-         return buf.append(cal.get(Calendar.YEAR)).append('-').append(
-                 pad(cal.get(Calendar.MONTH) + 1)).append('-').append(
-                 pad(cal.get(Calendar.DATE))).append('T').append(
-                 pad(cal.get(Calendar.HOUR_OF_DAY))).append(':').append(
-                 pad(cal.get(Calendar.MINUTE))).append(':').append(
-                 pad(cal.get(Calendar.SECOND))).append('.').append(
-                 pad(cal.get(Calendar.MILLISECOND) / 10)).append('Z').toString();
-     }
-     
-     private final static String pad(int i) {
-         return i < 10 ? "0".concat(String.valueOf(i)) : String.valueOf(i);
-     }
-     
+     }     
      
     /**
      * Returns a String representing the current date and time instance.
@@ -114,6 +85,20 @@ public class GregorianCalendarDateTimeUtils {
         return gcal;
     }
 
+    /**
+     * Returns a representation of a calendar date
+     * as an ISO 8601-formatted timestamp in the UTC time zone.
+     *
+     * @param cal a calendar date and time instance.
+     *
+     * @return    a representation of that calendar date and time instance,
+     *            as an ISO 8601-formatted timestamp in the UTC time zone.
+     */
+    public static String formatAsISO8601Timestamp(Date date) {
+        GregorianCalendar gcal = new GregorianCalendar();
+        gcal.setTime(date);
+        return formatAsISO8601Timestamp(gcal);
+    }
     
     /**
      * Returns a representation of a calendar date and time instance,
