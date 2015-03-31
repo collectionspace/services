@@ -202,8 +202,8 @@ extends NuxeoDocumentModelHandler<BlobsCommon> {
 		super.extractAllParts(wrapDoc);
 	}
 
-	@Override
-	public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {
+	@Deprecated
+	public void xfillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {
 		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
 		BlobInput blobInput = BlobUtil.getBlobInput(ctx); // The blobInput should have been put into the context by the Blob or Media resource
 		if (blobInput != null && blobInput.getBlobFile() != null) {    		

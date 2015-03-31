@@ -788,6 +788,9 @@ public class NuxeoUtils {
 				throw new IndexOutOfBoundsException("Problem retrieving property {" + xpath
 						+ "}:" + ioobe.getLocalizedMessage());
 			}
+		} catch (NullPointerException npe) {
+			logger.error(String.format("Null value found for property %s for document with ID %s",
+					xpath, docModel.getId()), npe);
 		}
 
 		return result;
