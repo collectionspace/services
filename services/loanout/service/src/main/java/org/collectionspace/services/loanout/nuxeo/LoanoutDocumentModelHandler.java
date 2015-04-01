@@ -24,13 +24,13 @@
 package org.collectionspace.services.loanout.nuxeo;
 
 import org.collectionspace.services.loanout.LoansoutCommon;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 
 /**
  * The Class LoanoutDocumentModelHandler.
  */
 public class LoanoutDocumentModelHandler
-        extends DocHandlerBase<LoansoutCommon> {
+        extends NuxeoDocumentModelHandler<LoansoutCommon> {
  
 }
 

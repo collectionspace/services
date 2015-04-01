@@ -3,11 +3,13 @@ package org.collectionspace.services.listener;
 import java.util.ArrayList;
 import java.util.IllegalFormatException;
 import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
 import org.nuxeo.ecm.core.api.ClientException;
-import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.impl.LifeCycleFilter;
@@ -73,7 +75,7 @@ public class UpdateRelationsOnDelete implements EventListener {
             LifeCycleFilter workflowStateFilter = new LifeCycleFilter(null, workflowStatesToFilter);
             
             // Perform the filtered query
-            CoreSession session = docModel.getCoreSession();
+            CoreSessionInterface session = new CoreSessionWrapper(docModel.getCoreSession());
             DocumentModelList matchingDocuments;
             try {
                 matchingDocuments = session.query(queryString.toString(), workflowStateFilter);

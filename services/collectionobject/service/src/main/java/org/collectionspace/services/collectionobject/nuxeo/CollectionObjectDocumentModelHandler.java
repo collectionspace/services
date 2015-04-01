@@ -24,7 +24,7 @@
 package org.collectionspace.services.collectionobject.nuxeo;
 
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 
 /**
  * CollectionObjectDocumentModelHandler
@@ -33,6 +33,6 @@ import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
  * $LastChangedDate: $
  */
 public class CollectionObjectDocumentModelHandler
-        extends DocHandlerBase<CollectionobjectsCommon> {
+        extends NuxeoDocumentModelHandler<CollectionobjectsCommon> {
 }
 

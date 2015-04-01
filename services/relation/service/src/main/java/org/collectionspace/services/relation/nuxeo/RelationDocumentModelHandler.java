@@ -29,10 +29,9 @@ import java.net.HttpURLConnection;
 
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ServiceException;
 import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
@@ -48,27 +47,18 @@ import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
 import org.collectionspace.services.relation.RelationsDocListItem;
-
-// HACK HACK HACK
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.PersonAuthorityClient;
-import org.collectionspace.services.client.CitationAuthorityClient;
-import org.collectionspace.services.client.OrgAuthorityClient;
-import org.collectionspace.services.client.LocationAuthorityClient;
-import org.collectionspace.services.client.TaxonomyAuthorityClient;
-import org.collectionspace.services.client.PlaceAuthorityClient;
-import org.collectionspace.services.client.WorkAuthorityClient;
-import org.collectionspace.services.client.ConceptAuthorityClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
-import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
+
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,7 +91,7 @@ public class RelationDocumentModelHandler
     	DocumentModel relationDocModel = wrapDoc.getWrappedObject();
     	String errMsg = ERROR_TERMS_IN_WORKFLOWSTATE + workflowState;
     			
-    	RepositoryInstanceInterface repoSession = this.getRepositorySession();
+    	CoreSessionInterface repoSession = this.getRepositorySession();
         try {
 			DocumentModel subjectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, SUBJ_DOC_MODEL);
 			DocumentModel objectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, OBJ_DOC_MODEL);
@@ -177,8 +167,7 @@ public class RelationDocumentModelHandler
         // we will also set those.
         // Note that this introduces another caching problem... 
         DocumentModel relationDocModel = wrapDoc.getWrappedObject();
-        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
-        RepositoryInstanceInterface repoSession = this.getRepositorySession();
+        CoreSessionInterface repoSession = this.getRepositorySession();
         
         DocumentModel subjectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, SUBJ_DOC_MODEL);
         DocumentModel objectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, OBJ_DOC_MODEL);
@@ -230,7 +219,7 @@ public class RelationDocumentModelHandler
     public RelationsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         RelationsCommonList relList = this.extractPagingInfo(new RelationsCommonList(), wrapDoc);
         relList.setFieldsReturned("subjectCsid|relationshipType|predicateDisplayName|relationshipMetaType|objectCsid|uri|csid|subject|object");
-        ServiceContext ctx = getServiceContext();
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
         String serviceContextPath = getServiceContextPath();
 
         TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
@@ -376,7 +365,7 @@ public class RelationDocumentModelHandler
     private final boolean OBJ_DOC_MODEL = false;
     
     private DocumentModel getSubjectOrObjectDocModel(
-    		RepositoryInstanceInterface repoSession,
+    		CoreSessionInterface repoSession,
     		DocumentModel relationDocModel,
     		boolean fSubject) throws Exception {
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
@@ -405,7 +394,7 @@ public class RelationDocumentModelHandler
             try {
             	refName = (String) relationDocModel.getProperty(commonPartLabel, 
             			(fSubject?RelationJAXBSchema.SUBJECT_REFNAME:RelationJAXBSchema.OBJECT_REFNAME));
-            	docModel = ResourceBase.getDocModelForRefName(repoSession, refName, ctx.getResourceMap());
+            	docModel = NuxeoBasedResource.getDocModelForRefName(repoSession, refName, ctx.getResourceMap());
             } catch (Exception e) {
                 throw new InvalidDocumentException(
                         "Relation record must have a CSID or refName to identify the object of the relation.", e);

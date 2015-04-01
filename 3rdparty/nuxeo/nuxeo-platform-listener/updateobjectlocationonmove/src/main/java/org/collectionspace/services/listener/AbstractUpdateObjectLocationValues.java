@@ -3,14 +3,18 @@ package org.collectionspace.services.listener;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+
 import org.nuxeo.ecm.core.api.ClientException;
-import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.event.Event;
@@ -83,7 +87,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
         // (The rest of the code flow below is then identical to that which
         // is followed when this document event involves a Movement record.
         String movementCsid = "";
-        Enum notificationDocumentType;
+        Enum<EventNotificationDocumentType> notificationDocumentType;
         if (documentMatchesType(docModel, RELATION_DOCTYPE)) {
             if (logger.isTraceEnabled()) {
                 logger.trace("An event involving a Relation document was received by UpdateObjectLocationOnMove ...");
@@ -141,7 +145,9 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
             logger.trace("Notification document type=" + notificationDocumentType.name());
         }
 
-        CoreSession coreSession = docEventContext.getCoreSession();
+        // All Nuxeo sessions that get passed around to CollectionSpace code need to be
+        // wrapped inside of a CoreSessionWrapper
+        CoreSessionInterface coreSession = new CoreSessionWrapper(docEventContext.getCoreSession());
         Set<String> collectionObjectCsids = new HashSet<>();
 
         if (notificationDocumentType == EventNotificationDocumentType.RELATION) {
@@ -210,7 +216,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
      * related to the Movement record.
      */
     private Set<String> getCollectionObjectCsidsRelatedToMovement(String movementCsid,
-            CoreSession coreSession) throws ClientException {
+            CoreSessionInterface coreSession) throws ClientException {
 
         Set<String> csids = new HashSet<>();
 
@@ -314,7 +320,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
      * @return a document model for the document identified by the supplied
      * CSID.
      */
-    protected static DocumentModel getCurrentDocModelFromCsid(CoreSession session, String collectionObjectCsid) {
+    protected static DocumentModel getCurrentDocModelFromCsid(CoreSessionInterface session, String collectionObjectCsid) {
         DocumentModelList collectionObjectDocModels = null;
         try {
             final String query = "SELECT * FROM "
@@ -365,7 +371,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
      * @return the most recent Movement record related to the CollectionObject
      * identified by the supplied CSID.
      */
-    protected static DocumentModel getMostRecentMovement(CoreSession session, String collectionObjectCsid)
+    protected static DocumentModel getMostRecentMovement(CoreSessionInterface session, String collectionObjectCsid)
             throws ClientException {
         DocumentModel mostRecentMovementDocModel = null;
         // Get Relation records for Movements related to this CollectionObject.

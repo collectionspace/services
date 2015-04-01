@@ -3,7 +3,7 @@ package org.collectionspace.services.batch;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.invocable.Invocable;
 

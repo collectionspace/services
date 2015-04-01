@@ -14,10 +14,11 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<cspace.services.version>4.2-SNAPSHOT</cspace.services.version>
 		<cspace.services.client.version>4.2-SNAPSHOT</cspace.services.client.version>
-		<nuxeo.general.release>5.5.0-HF07</nuxeo.general.release>
+		<nuxeo.general.release>6.0</nuxeo.general.release>
 		<nuxeo.shell.version>${nuxeo.general.release}</nuxeo.shell.version>
 		<nuxeo.platform.version>${nuxeo.general.release}</nuxeo.platform.version>
 		<nuxeo.core.version>${nuxeo.general.release}</nuxeo.core.version>
+		<chemistry.opencmis.version.nx>0.12.0-NX2</chemistry.opencmis.version.nx>
 		<spring.version>3.0.5.RELEASE</spring.version>
 		<spring.security.version>3.0.5.RELEASE</spring.security.version>
 	</properties>
@@ -292,7 +293,8 @@
 					</executions>
 				</plugin>
 
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -325,12 +327,10 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
-		
+
 		<plugins>
-			<!-- 
-				This plugin ensures that the required environment variables are set before we perform
-				any build related tasks.
-			 -->
+			<!-- This plugin ensures that the required environment variables are set 
+				before we perform any build related tasks. -->
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
@@ -342,18 +342,25 @@
 						</goals>
 						<configuration>
 							<tasks>
-								<fail unless="env.CSPACE_JEESERVER_HOME" message="Required environment variable CSPACE_JEESERVER_HOME has not been set." />
-								<fail unless="env.DB_CSPACE_PASSWORD" message="Required environment variable DB_CSPACE_PASSWORD has not been set." />
-								<fail unless="env.DB_NUXEO_PASSWORD" message="Required environment variable DB_NUXEO_PASSWORD has not been set." />
-								<fail unless="env.DB_READER_PASSWORD" message="Required environment variable DB_READER_PASSWORD has not been set." />
-								<fail unless="env.DB_CSADMIN_PASSWORD" message="Required environment variable DB_CSADMIN_PASSWORD has not been set." />
-								<!--
-									Fail if these deprecated environment variables are set.
-								-->
-								<fail if="env.DB_USER" message="The deprecated environment variable DB_USER should not be set." />
-								<fail if="env.DB_PASSWORD" message="The deprecated environment variable DB_PASSWORD should not be set.  Ensure that DB_CSADMIN_PASSWORD is set instead." />
-								<fail if="env.DB_PASSWORD_CSPACE" message="The deprecated environment variable DB_PASSWORD_CSPACE should not be set.  Ensure that DB_CSPACE_PASSWORD is set instead." />
-								<fail if="env.DB_PASSWORD_NUXEO" message="The deprecated environment variable DB_PASSWORD_NUXEO should not be set.  Ensure that DB_NUXEO_PASSWORD is set instead." />
+								<fail unless="env.CSPACE_JEESERVER_HOME"
+									message="Required environment variable CSPACE_JEESERVER_HOME has not been set." />
+								<fail unless="env.DB_CSPACE_PASSWORD"
+									message="Required environment variable DB_CSPACE_PASSWORD has not been set." />
+								<fail unless="env.DB_NUXEO_PASSWORD"
+									message="Required environment variable DB_NUXEO_PASSWORD has not been set." />
+								<fail unless="env.DB_READER_PASSWORD"
+									message="Required environment variable DB_READER_PASSWORD has not been set." />
+								<fail unless="env.DB_CSADMIN_PASSWORD"
+									message="Required environment variable DB_CSADMIN_PASSWORD has not been set." />
+								<!-- Fail if these deprecated environment variables are set. -->
+								<fail if="env.DB_USER"
+									message="The deprecated environment variable DB_USER should not be set." />
+								<fail if="env.DB_PASSWORD"
+									message="The deprecated environment variable DB_PASSWORD should not be set.  Ensure that DB_CSADMIN_PASSWORD is set instead." />
+								<fail if="env.DB_PASSWORD_CSPACE"
+									message="The deprecated environment variable DB_PASSWORD_CSPACE should not be set.  Ensure that DB_CSPACE_PASSWORD is set instead." />
+								<fail if="env.DB_PASSWORD_NUXEO"
+									message="The deprecated environment variable DB_PASSWORD_NUXEO should not be set.  Ensure that DB_NUXEO_PASSWORD is set instead." />
 							</tasks>
 						</configuration>
 					</execution>

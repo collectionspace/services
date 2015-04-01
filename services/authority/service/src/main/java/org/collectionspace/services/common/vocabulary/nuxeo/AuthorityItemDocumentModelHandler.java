@@ -43,18 +43,15 @@ import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ObjectPartType;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
-import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentException;
-import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.relation.RelationsCommonList;
-import org.collectionspace.services.relation.RelationsDocListItem;
 import org.collectionspace.services.vocabulary.VocabularyItemJAXBSchema;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.PropertyException;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +74,7 @@ import java.util.regex.PatternSyntaxException;
  * $LastChangedDate: $
  */
 public abstract class AuthorityItemDocumentModelHandler<AICommon>
-        extends DocHandlerBase<AICommon> {
+        extends NuxeoDocumentModelHandler<AICommon> {
 
     private final Logger logger = LoggerFactory.getLogger(AuthorityItemDocumentModelHandler.class);
     private String authorityItemCommonSchemaName;
@@ -102,7 +99,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	String result = null;
     	
     	DocumentModel docModel = docWrapper.getWrappedObject();
-    	ServiceContext ctx = this.getServiceContext();
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
     	RefName.AuthorityItem refname = (RefName.AuthorityItem)getRefName(ctx, docModel);
     	result = refname.getDisplayName();
     	
@@ -358,7 +355,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             }
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient = getRepositoryClient(ctx);
-            RepositoryInstanceInterface repoSession = this.getRepositorySession();
+            CoreSessionInterface repoSession = this.getRepositorySession();
             
             // Update all the existing records that have a field with the old refName in it
             int nUpdated = RefNameServiceUtils.updateAuthorityRefDocs(ctx, repoClient, repoSession,
@@ -473,7 +470,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     		String propertyName,
             String itemcsid) throws Exception {
         AuthorityRefDocList authRefDocList = null;
-        RepositoryInstanceInterface repoSession = null;
+        CoreSessionInterface repoSession = null;
     	boolean releaseRepoSession = false;
         
     	try {

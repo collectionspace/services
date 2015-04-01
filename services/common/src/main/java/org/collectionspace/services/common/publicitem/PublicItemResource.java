@@ -30,7 +30,7 @@ import org.collectionspace.services.publicitem.PublicitemsCommon;
 import org.collectionspace.services.client.PublicItemClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.blob.BlobOutput;
 import org.collectionspace.services.common.context.RemoteServiceContext;
@@ -54,7 +54,7 @@ import javax.ws.rs.core.UriInfo;
 @Path(PublicItemClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class PublicItemResource extends ResourceBase {
+public class PublicItemResource extends NuxeoBasedResource {
 
     final Logger logger = LoggerFactory.getLogger(PublicItemResource.class);
 

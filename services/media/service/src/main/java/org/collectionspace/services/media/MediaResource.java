@@ -31,7 +31,7 @@ import org.collectionspace.services.client.MediaClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.blob.BlobInput;
@@ -60,7 +60,7 @@ import javax.ws.rs.core.UriInfo;
 @Path(MediaClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class MediaResource extends ResourceBase {
+public class MediaResource extends NuxeoBasedResource {
     final Logger logger = LoggerFactory.getLogger(MediaResource.class);
     final static MediaClient mediaClient = new MediaClient();
 

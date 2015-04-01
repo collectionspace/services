@@ -29,7 +29,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import org.collectionspace.services.client.AcquisitionClient;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 @Path(AcquisitionClient.SERVICE_PATH)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public class AcquisitionResource extends ResourceBase {
+public class AcquisitionResource extends NuxeoBasedResource {
 
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(AcquisitionResource.class);

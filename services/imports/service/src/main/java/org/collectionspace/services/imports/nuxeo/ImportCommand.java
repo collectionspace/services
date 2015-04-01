@@ -6,13 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 
-import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.nuxeo.client.java.NuxeoClientEmbedded;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
-import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentRef;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.io.DocumentPipe;
 import org.nuxeo.ecm.core.io.DocumentReader;
 import org.nuxeo.ecm.core.io.DocumentTranslationMap;
@@ -32,7 +30,7 @@ public class ImportCommand {
         File file = new File(src);
         ///cspace way of configuring client and auth:
         NuxeoClientEmbedded client = NuxeoConnectorEmbedded.getInstance().getClient();
-        RepositoryInstanceInterface repoSession = null;
+        CoreSessionInterface repoSession = null;
         try {
             repoSession = client.openRepository(repoName, timeOut);
             if (logger.isDebugEnabled()) {
@@ -51,7 +49,7 @@ public class ImportCommand {
         }
     }
 
-    String importTree(RepositoryInstanceInterface repoSession, File file, String toPath) throws Exception {
+    String importTree(CoreSessionInterface repoSession, File file, String toPath) throws Exception {
         Exception failed = null;
         DocumentReader reader = null;
         DocumentWriter writer = null;
@@ -67,7 +65,7 @@ public class ImportCommand {
                 logger.info("importTree reading file: " + file + (file != null ? " exists? " + file.exists() : " file param is null"));
             }
             reader = new LoggedXMLDirectoryReader(file);  //our overload of XMLDirectoryReader.
-            writer = new DocumentModelWriter(repoSession.getRepositoryInstance(), toPath, 10);
+            writer = new DocumentModelWriter(repoSession.getCoreSession(), toPath, 10);
             DocumentPipe pipe = new DocumentPipeImpl(10);
             // pipe.addTransformer(transformer);
             pipe.setReader(reader);
@@ -75,7 +73,7 @@ public class ImportCommand {
             DocumentTranslationMap dtm = pipe.run();
             Map<DocumentRef, DocumentRef> documentRefs = dtm.getDocRefMap(); // FIXME: Should be checking for null here!
             dump.append("<importedRecords>");
-            for (Map.Entry entry : documentRefs.entrySet()) {
+            for (Map.Entry<DocumentRef, DocumentRef> entry : documentRefs.entrySet()) {
                 keyDocRef = (DocumentRef) entry.getKey();
                 valueDocRef = (DocumentRef) entry.getValue();
                 if (keyDocRef == null || valueDocRef == null) {

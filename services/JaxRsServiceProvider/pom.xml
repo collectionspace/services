@@ -14,8 +14,6 @@
 
     <properties>
         <cs.release>0.5</cs.release>
-        <spring.version>3.0.0.RELEASE</spring.version>
-        <spring.security.version>3.0.2.RELEASE</spring.security.version>
     </properties>
 
     <dependencies>
@@ -62,6 +60,10 @@
             		<artifactId>servlet-api-2.5</artifactId>
             		<groupId>org.mortbay.jetty</groupId>
             	</exclusion>
+            	<exclusion>
+            		<artifactId>jaxb-xjc</artifactId>
+            		<groupId>com.sun.xml.bind</groupId>
+            	</exclusion>
             </exclusions>
         </dependency>        
         <dependency>
@@ -75,17 +77,40 @@
             	</exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.common</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-            	<exclusion>
-            		<artifactId>servlet-api-2.5</artifactId>
-            		<groupId>org.mortbay.jetty</groupId>
-            	</exclusion>
-            </exclusions>
-        </dependency>
+		<dependency>
+			<groupId>org.collectionspace.services</groupId>
+			<artifactId>org.collectionspace.services.common</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>servlet-api-2.5</artifactId>
+					<groupId>org.mortbay.jetty</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>spring-core</artifactId>
+					<groupId>org.springframework</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>spring-beans</artifactId>
+					<groupId>org.springframework</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jsf-api</artifactId>
+					<groupId>com.sun.faces</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jersey-server</artifactId>
+					<groupId>com.sun.jersey</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jersey-servlet</artifactId>
+					<groupId>com.sun.jersey</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jersey-core</artifactId>
+					<groupId>com.sun.jersey</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>        
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.account.service</artifactId>
@@ -301,6 +326,16 @@
             <artifactId>spring-security-core</artifactId>
             <version>${spring.security.version}</version>
             <scope>provided</scope>
+            <exclusions>
+            	<exclusion>
+            		<artifactId>spring-core</artifactId>
+            		<groupId>org.springframework</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>spring-beans</artifactId>
+            		<groupId>org.springframework</groupId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -319,49 +354,49 @@
             <artifactId>spring-context</artifactId>
             <version>${spring.version}</version>
             <scope>provided</scope>
+            <exclusions>
+            	<exclusion>
+            		<artifactId>spring-core</artifactId>
+            		<groupId>org.springframework</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>spring-beans</artifactId>
+            		<groupId>org.springframework</groupId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
             <version>${spring.version}</version>
             <scope>provided</scope>
+            <exclusions>
+            	<exclusion>
+            		<artifactId>spring-core</artifactId>
+            		<groupId>org.springframework</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>spring-beans</artifactId>
+            		<groupId>org.springframework</groupId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <version>${spring.version}</version>
             <scope>provided</scope>
+            <exclusions>
+            	<exclusion>
+            		<artifactId>spring-core</artifactId>
+            		<groupId>org.springframework</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>spring-beans</artifactId>
+            		<groupId>org.springframework</groupId>
+            	</exclusion>
+            </exclusions>
         </dependency>
-        <!--dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-acl</artifactId>
-            <version>${spring.security.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aop</artifactId>
-            <version>${spring.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>aopalliance</groupId>
-            <artifactId>aopalliance</artifactId>
-            <version>1.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-tx</artifactId>
-            <version>${spring.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache</artifactId>
-            <version>1.6.2</version>
-            <optional>true</optional>
-        </dependency-->
 
         <!-- javax -->
         <dependency>
@@ -410,7 +445,7 @@
 			<version>${nuxeo.core.version}</version>            
         </dependency>
         <dependency>
-            <groupId>org.nuxeo.ecm.core</groupId>
+            <groupId>org.nuxeo.lib.core</groupId>
             <artifactId>nuxeo-core-storage-sql-extensions</artifactId>
 			<version>${nuxeo.core.version}</version>            
         </dependency>
@@ -418,17 +453,6 @@
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-storage-sql-ra</artifactId>
 			<version>${nuxeo.core.version}</version>            
-        </dependency>
-        <dependency>
-            <groupId>org.nuxeo.ecm.core</groupId>
-            <artifactId>nuxeo-core-client</artifactId>
-			<version>${nuxeo.core.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.jboss.jbossas</groupId>
-                    <artifactId>jboss-as-jbossas-remoting</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
@@ -551,6 +575,38 @@
 				<exclusion>
 					<artifactId>oauth</artifactId>
 					<groupId>net.oauth.core</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jboss-seam-remoting</artifactId>
+					<groupId>org.jboss.seam</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jboss-seam-ui</artifactId>
+					<groupId>org.jboss.seam</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jboss-seam</artifactId>
+					<groupId>org.jboss.seam</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>richfaces</artifactId>
+					<groupId>org.richfaces</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>richfaces-a4j</artifactId>
+					<groupId>org.richfaces</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>richfaces-core</artifactId>
+					<groupId>org.richfaces</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jsf-api</artifactId>
+					<groupId>com.sun.faces</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jsf-impl</artifactId>
+					<groupId>com.sun.faces</groupId>
 				</exclusion>
 			</exclusions>
         </dependency>

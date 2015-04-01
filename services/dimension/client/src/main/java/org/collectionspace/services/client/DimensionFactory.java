@@ -28,6 +28,7 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.MediaType;
+
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.dimension.DimensionsCommon;
@@ -40,7 +41,8 @@ import org.slf4j.LoggerFactory;
  */
 public class DimensionFactory {
 
-    static private final Logger logger =
+    @SuppressWarnings("unused")
+	static private final Logger logger =
             LoggerFactory.getLogger(DimensionFactory.class);
 
     final static String SERVICE_PATH_COMPONENT = "dimensions";

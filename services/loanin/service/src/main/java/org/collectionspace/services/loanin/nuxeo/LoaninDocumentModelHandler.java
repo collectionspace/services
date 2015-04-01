@@ -24,13 +24,13 @@
 package org.collectionspace.services.loanin.nuxeo;
 
 import org.collectionspace.services.loanin.LoansinCommon;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 
 /** LoaninDocumentModelHandler
  *  $LastChangedRevision$
  *  $LastChangedDate$
  */
 public class LoaninDocumentModelHandler
-        extends DocHandlerBase<LoansinCommon> {
+        extends NuxeoDocumentModelHandler<LoansinCommon> {
 }
 

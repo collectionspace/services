@@ -44,7 +44,6 @@ import javax.sql.rowset.RowSetFactory;
 import javax.sql.rowset.RowSetProvider;
 
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
-import org.collectionspace.services.common.ServiceMain;
 
 /**
  * User: laramie
@@ -54,7 +53,7 @@ import org.collectionspace.services.common.ServiceMain;
 public class JDBCTools {
     public static HashMap<String, DataSource> cachedDataSources = new HashMap<String, DataSource>();
     public static String CSPACE_DATASOURCE_NAME = "CspaceDS";
-    public static String NUXEO_DATASOURCE_NAME = "NuxeoDS";
+    public static String NUXEO_DATASOURCE_NAME = "NuxeoDS_CS"; // Starting with v4.2 release we renamed this from NuxeoDS to NuxeoDS_CS to void namespace conflict with Nuxeo EP
     // Default database names
     // public static String DEFAULT_CSPACE_DATABASE_NAME = ConfigUtils.DEFAULT_CSPACE_DATABASE_NAME;
     public static String DEFAULT_NUXEO_REPOSITORY_NAME = ConfigUtils.DEFAULT_NUXEO_REPOSITORY_NAME;
@@ -389,7 +388,11 @@ public class JDBCTools {
      */
     public static String getDatabaseProductName(String dataSourceName,
     		String repositoryName,
-    		String cspaceInstanceId) {
+    		String cspaceInstanceId) throws Exception {
+    	
+    	@SuppressWarnings("unused")
+		Object driver = Class.forName("org.postgresql.Driver"); // For some reason, we need to make sure the org.postgresql.Driver class in on the classpath
+    	
     	if (DBProductName == null) {
 	        Connection conn = null;
 	        try {
@@ -399,6 +402,7 @@ public class JDBCTools {
 	        	if (logger.isTraceEnabled() == true) {
 	        		logger.trace(String.format("Could not open a connection. DataSource='%s' DB='%s'.",
 	        				dataSourceName, repositoryName));
+	                throw e;
 	        	}
 	        } finally {
 	            try {

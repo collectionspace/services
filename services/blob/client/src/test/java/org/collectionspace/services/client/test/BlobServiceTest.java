@@ -100,7 +100,7 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
 	protected void setupCreate() {
         super.setupCreate();
         String noBlobCleanup = System.getProperty(NO_BLOB_CLEANUP);
-    	if(Boolean.TRUE.toString().equalsIgnoreCase(noBlobCleanup)) {
+    	if (Boolean.TRUE.toString().equalsIgnoreCase(noBlobCleanup)) {
     		//
     		// Don't delete the blobs that we created during the test cycle
     		//
@@ -140,7 +140,7 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
 		        		if (fromUri == true) {
 		        			if (uri != null) {
 			        			res = client.createBlobFromURI(uri);
-			        			break;
+			        			//break;
 		        			} else {
 			        			URL childUrl = child.toURI().toURL();
 			        			res = client.createBlobFromURI(childUrl.toString());

@@ -11,10 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.collectionspace.services.authorization-mgt.client</artifactId>
     <name>services.authorization-mgt.client</name>
-    <properties>
-        <spring.version>3.0.0.RELEASE</spring.version>
-        <spring.security.version>3.0.2.RELEASE</spring.security.version>
-    </properties>
+
     <dependencies>
         <!-- keep slf4j dependencies on the top -->
         <dependency>
@@ -83,7 +80,6 @@
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
         </dependency>
 
         <dependency>
@@ -143,7 +139,6 @@
         <dependency>
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache</artifactId>
-            <version>1.6.2</version>
             <optional>true</optional>
         </dependency>
         <dependency>

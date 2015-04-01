@@ -23,16 +23,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.security.Principal;
 
 import org.collectionspace.services.common.repository.RepositoryInstanceWrapperAdvice;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
-import org.jboss.remoting.InvokerLocator;
+
 import org.nuxeo.ecm.core.api.repository.Repository;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstanceHandler;
+import org.nuxeo.ecm.core.api.CoreInstance;
+import org.nuxeo.ecm.core.api.CoreSession;
+import org.nuxeo.ecm.core.api.NuxeoPrincipal;
+import org.nuxeo.ecm.core.api.SystemPrincipal;
 import org.nuxeo.ecm.core.api.repository.RepositoryManager;
-import org.nuxeo.ecm.core.client.DefaultLoginHandler;
-import org.nuxeo.ecm.core.client.LoginHandler;
 import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.runtime.transaction.TransactionHelper;
 
@@ -50,11 +51,7 @@ public final class NuxeoClientEmbedded {
 
 	private Logger logger = LoggerFactory.getLogger(NuxeoClientEmbedded.class);
 	
-    private LoginHandler loginHandler;
-
-    private final HashMap<String, RepositoryInstanceInterface> repositoryInstances;
-
-    private InvokerLocator locator;
+    private final HashMap<String, CoreSessionInterface> repositoryInstances;
 
     private RepositoryManager repositoryMgr;
 
@@ -65,9 +62,7 @@ public final class NuxeoClientEmbedded {
      * of this constructor is recommended.
      */
     private NuxeoClientEmbedded() {
-        loginHandler = loginHandler == null ? new DefaultLoginHandler()
-                : loginHandler;
-        repositoryInstances = new HashMap<String, RepositoryInstanceInterface>();
+        repositoryInstances = new HashMap<String, CoreSessionInterface>();
     }
     
     public static NuxeoClientEmbedded getInstance() {
@@ -75,18 +70,14 @@ public final class NuxeoClientEmbedded {
     }
 
     public synchronized void tryDisconnect() throws Exception {
-        if (locator == null) {
-            return; // do nothing
-        }
         doDisconnect();
     }
 
     private void doDisconnect() throws Exception {
-        locator = null;
-        // close repository sessions if any
-        Iterator<Entry<String, RepositoryInstanceInterface>> it = repositoryInstances.entrySet().iterator();
+        // close the open Nuxeo repository sessions if any
+        Iterator<Entry<String, CoreSessionInterface>> it = repositoryInstances.entrySet().iterator();
         while (it.hasNext()) {
-            Entry<String, RepositoryInstanceInterface> repo = it.next();
+            Entry<String, CoreSessionInterface> repo = it.next();
             try {
                 repo.getValue().close();
             } catch (Exception e) {
@@ -96,22 +87,6 @@ public final class NuxeoClientEmbedded {
         }
 
         repositoryMgr = null;
-    }
-
-    public synchronized boolean isConnected() {
-        return true;
-    }
-
-    public InvokerLocator getLocator() {
-        return locator;
-    }
-
-    public synchronized LoginHandler getLoginHandler() {
-        return loginHandler;
-    }
-
-    public synchronized void setLoginHandler(LoginHandler loginHandler) {
-        this.loginHandler = loginHandler;
     }
 
     public RepositoryManager getRepositoryManager() throws Exception {
@@ -142,19 +117,19 @@ public final class NuxeoClientEmbedded {
     /*
      * Open a Nuxeo repo session using the passed in repoDomain and use the default tx timeout period
      */
-    public RepositoryInstanceInterface openRepository(RepositoryDomainType repoDomain) throws Exception {
+    public CoreSessionInterface openRepository(RepositoryDomainType repoDomain) throws Exception {
         return openRepository(repoDomain.getRepositoryName(), -1);
     }
     
     /*
      * Open a Nuxeo repo session using the passed in repoDomain and use the default tx timeout period
      */
-    public RepositoryInstanceInterface openRepository(String repoName) throws Exception {
+    public CoreSessionInterface openRepository(String repoName) throws Exception {
         return openRepository(repoName, -1);
     }    
 
-    public RepositoryInstanceInterface openRepository(String repoName, int timeoutSeconds) throws Exception {
-    	RepositoryInstanceInterface result = null;
+    public CoreSessionInterface openRepository(String repoName, int timeoutSeconds) throws Exception {
+    	CoreSessionInterface result = null;
     	
     	//
     	// If the called passed in a custom timeout setting, use it to configure Nuxeo's transaction manager.
@@ -200,7 +175,7 @@ public final class NuxeoClientEmbedded {
         // Nuxeo repository so we can check for network related failures and perform a series of retries.
         //
         if (repository != null) {
-            result = getRepositoryInstanceWrapper(repository);
+            result = getCoreSessionWrapper(repository);
         	logger.trace(String.format("A new transaction was started on thread '%d' : %s.",
         			Thread.currentThread().getId(), startedTransaction ? "true" : "false"));
         	logger.trace(String.format("Added a new repository instance to our repo list.  Current count is now: %d",
@@ -220,39 +195,45 @@ public final class NuxeoClientEmbedded {
     // wrap each call to the Nuxeo repo with code that catches network related errors/exceptions and
     // re-attempts the calls to see if it recovers.
     //
-    private RepositoryInstanceInterface getAOPProxy(RepositoryInstance repositoryInstance) {
-    	RepositoryInstanceInterface result = null;
+    private CoreSessionInterface getAOPProxy(CoreSession repositoryInstance) {
+    	CoreSessionInterface result = null;
     	
     	try {
-			ProxyFactory factory = new ProxyFactory(new RepositoryInstanceWrapper(repositoryInstance));
+			ProxyFactory factory = new ProxyFactory(new CoreSessionWrapper(repositoryInstance));
 			factory.addAdvice(new RepositoryInstanceWrapperAdvice());
 			factory.setExposeProxy(true);
-			result = (RepositoryInstanceInterface)factory.getProxy();
+			result = (CoreSessionInterface)factory.getProxy();
     	} catch (Exception e) {
-    		logger.error("Could not create AOP proxy for: " + RepositoryInstanceWrapper.class.getName(), e);
+    		logger.error("Could not create AOP proxy for: " + CoreSessionWrapper.class.getName(), e);
     	}
     	
     	return result;
     }
     
+	private Principal getSystemPrincipal() {
+		NuxeoPrincipal principal = new SystemPrincipal(null);
+		return principal;
+	}
+
     /*
      * From the Repository object (a description of the repository), get repository instance wrapper.  Our wrapper
      * will using the Spring AOP mechanism to intercept all calls to the repository.  We will wrap all the calls to the
      * Nuxeo repository and check for network related failures.  We will retry all calls to the Nuxeo repo that fail because
      * of network erros.
      */
-    private RepositoryInstanceInterface getRepositoryInstanceWrapper(Repository repository) throws Exception {
-    	RepositoryInstanceInterface result = null;
+    private CoreSessionInterface getCoreSessionWrapper(Repository repository) throws Exception {
+    	CoreSessionInterface result = null;
     	    	
-    	RepositoryInstance repositoryInstance = new RepositoryInstanceHandler(repository).getProxy();  // A Nuxeo repo instance handler proxy
-        if (repositoryInstance != null) {
-        	result = this.getAOPProxy(repositoryInstance);  // This is our AOP proxy
+    	CoreSession coreSession  = CoreInstance.openCoreSession(repository.getName(), getSystemPrincipal());  // A Nuxeo repo instance handler proxy
+    	
+        if (coreSession != null) {
+        	result = this.getAOPProxy(coreSession);  // This is our AOP proxy
         	if (result != null) {
 		    	String key = result.getSessionId();
 		        repositoryInstances.put(key, result);
         	} else {
         		String errMsg = String.format("Could not instantiate a Spring AOP proxy for class '%s'.",
-        				RepositoryInstanceWrapper.class.getName());
+        				CoreSessionWrapper.class.getName());
         		logger.error(errMsg);
         		throw new Exception(errMsg);
         	}
@@ -265,17 +246,20 @@ public final class NuxeoClientEmbedded {
     	return result;
     }
 
-    public void releaseRepository(RepositoryInstanceInterface repo) throws Exception {
-    	String key = repo.getSessionId();
+    public void releaseRepository(CoreSessionInterface repoSession) throws Exception {
+    	String key = repoSession.getSessionId();
+    	String name = repoSession.getRepositoryName();
 
         try {
-        	repo.save();
-            repo.close();
+        	repoSession.save();
+        	repoSession.close();
         } catch (Exception e) {
-        	logger.error("Possible data loss.  Could not save and/or release the repository.", e);
+        	String errMsg = String.format("Possible data loss.  Could not save and/or close the Nuxeo repository name = '%s'.",
+        			name);
+        	logger.error(errMsg, e);
         	throw e;
         } finally {
-            RepositoryInstanceInterface wasRemoved = repositoryInstances.remove(key);
+        	CoreSessionInterface wasRemoved = repositoryInstances.remove(key);
             if (logger.isTraceEnabled()) {
             	if (wasRemoved != null) {
 	            	logger.trace("Removed a repository instance from our repo list.  Current count is now: "

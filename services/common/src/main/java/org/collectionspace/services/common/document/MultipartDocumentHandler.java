@@ -17,8 +17,6 @@
  */
 package org.collectionspace.services.common.document;
 
-import org.collectionspace.services.common.document.DocumentHandler.Action;
-
 /**
  * MultipartDocumentHandler is a DocumentHandler provides document processing
  * methods for entities using schema extension that are mapped to multipart
