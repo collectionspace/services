@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
@@ -31,9 +33,10 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 	private static final int MIN_FONTSIZE = 15;
 	private static final int MAX_FONTSIZE = 60;
 	private static final String IMAGES_TO_CREATE_PROP = "imagesToCreate";
-	private static final int DEFAULT_IMAGES_TO_CREATE = 1;
-	private static final int DEFAULT_IMAGES_TO_GET = 12; //1024;
+	private static final int DEFAULT_IMAGES_TO_CREATE = 3; // Override this value by setting a system property named 'imagesToCreate' -i.e., mvn test -DimagesToCreate=30
+	private static final int DEFAULT_IMAGES_TO_GET = DEFAULT_IMAGES_TO_CREATE;
     private static final String GENERATED_IMAGES = "target/generated_images";
+    private List<String> allGeneratedImages = new ArrayList<String>();
 
 	private static Random generator = new Random(System.currentTimeMillis());
 	
@@ -74,16 +77,14 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 	@Test(dataProvider = "testName", dependsOnMethods = {"scaleTest"})
 	public void scaleGETTest(String testName) throws MalformedURLException {
 		this.setupRead();
-		String blobToGetID = getKnowResourceId();
         BlobClient client = new BlobClient();
         
-        for (int i = 0; i < DEFAULT_IMAGES_TO_GET; i++) {
-	        ClientResponse<Response> res = client.getDerivativeContent(blobToGetID, "Thumbnail");
+        for (int i = 0; i < allGeneratedImages.size(); i++) {
+	        ClientResponse<Response> res = client.getDerivativeContent(allGeneratedImages.get(i), "Thumbnail");
 	        assertStatusCode(res, testName);
-        }
-        
-        logger.debug(String.format("Performed %d GET operations on blob = %s.", 
-        		DEFAULT_IMAGES_TO_GET, blobToGetID));
+	        logger.debug(String.format("Performed GET operation on Thumbnail derivative of image blob ID = '%s'.", 
+	        		allGeneratedImages.get(i)));
+        }        
 	}
 	
 	@Test(dataProvider = "testName")
@@ -115,6 +116,7 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 		        String csid = extractId(res);
 		        this.knownResourceId = csid;
 		        allResourceIdsCreated.add(csid);
+		        allGeneratedImages.add(csid);
 			} finally {
 				if (res != null) {
                     res.releaseConnection();

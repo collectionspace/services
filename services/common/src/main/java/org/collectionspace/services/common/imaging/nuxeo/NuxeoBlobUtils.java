@@ -149,15 +149,16 @@ public class NuxeoBlobUtils {
 			+ "_";
 
 	public static final String DERIVATIVE_ORIGINAL_JPEG = "OriginalJpeg";
-	public static final String DERIVATIVE_ORIGINAL_JPEG_TAG = DERIVATIVE_ORIGINAL_JPEG
-			+ "_";
+	public static final String DERIVATIVE_ORIGINAL_JPEG_TAG = DERIVATIVE_ORIGINAL_JPEG + "_";
 
 	public static final String DERIVATIVE_MEDIUM = "Medium";
 	public static final String DERIVATIVE_MEDIUM_TAG = DERIVATIVE_MEDIUM + "_";
 
+	public static final String DERIVATIVE_SMALL = "Small";
+	public static final String DERIVATIVE_SMALL_TAG = DERIVATIVE_SMALL + "_";
+
 	public static final String DERIVATIVE_THUMBNAIL = "Thumbnail";
-	public static final String DERIVATIVE_THUMBNAIL_TAG = DERIVATIVE_THUMBNAIL
-			+ "_";
+	public static final String DERIVATIVE_THUMBNAIL_TAG = DERIVATIVE_THUMBNAIL + "_";
 
 	public static final String DERIVATIVE_UNKNOWN = "_UNKNOWN_DERIVATIVE_NAME_";
 
@@ -209,6 +210,8 @@ public class NuxeoBlobUtils {
 			result = DERIVATIVE_ORIGINAL_JPEG;
 		} else if (derivativeName.startsWith(DERIVATIVE_MEDIUM_TAG) == true) {
 			result = DERIVATIVE_MEDIUM;
+		} else if (derivativeName.startsWith(DERIVATIVE_SMALL_TAG) == true) {
+			result = DERIVATIVE_SMALL;
 		} else if (derivativeName.startsWith(DERIVATIVE_THUMBNAIL_TAG) == true) {
 			result = DERIVATIVE_THUMBNAIL;
 		}
