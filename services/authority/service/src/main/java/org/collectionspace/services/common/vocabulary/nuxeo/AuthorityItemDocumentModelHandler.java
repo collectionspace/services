@@ -485,7 +485,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     		try {
     			DocumentWrapper<DocumentModel> wrapper = repoClient.getDoc(repoSession, ctx, itemcsid);
     			DocumentModel docModel = wrapper.getWrappedObject();
-    			String refName = (String) docModel.getPropertyValue(AuthorityItemJAXBSchema.REF_NAME);
+    			String refName = (String) NuxeoUtils.getProperyValue(docModel, AuthorityItemJAXBSchema.REF_NAME); //docModel.getPropertyValue(AuthorityItemJAXBSchema.REF_NAME);
                 authRefDocList = RefNameServiceUtils.getAuthorityRefDocs(
                 		repoSession, ctx, uriTemplateRegistry, repoClient,
                         serviceTypes,

@@ -730,6 +730,27 @@ public class NuxeoUtils {
     	return result;
     }
     
+    /*
+     * Returns the property value for an instance of a DocumentModel.  If there is no value for the
+     * property, we'll return null.
+     * 
+     * Beginning in Nuxeo 6, if a DocumentModel has no value for the property, we get a NPE when calling
+     * the DocumentModel.getPropertyValue method.  This method catches that NPE and instead returns null.
+     */
+    public static Object getProperyValue(DocumentModel docModel,
+    		String propertyName) throws ClientException, PropertyException {
+    	Object result = null;
+    	
+    	try {
+    		result = docModel.getPropertyValue(propertyName);
+    	} catch (NullPointerException npe) {
+			logger.warn(String.format("Could not get a value for the property '%s' in Nuxeo document with CSID '%s'.",
+					propertyName, docModel.getName()));
+    	}
+    	
+    	return result;
+    }
+    
     /**
      * Gets XPath value from schema. Note that only "/" and "[n]" are
      * supported for xpath. Can omit grouping elements for repeating complex types, 
@@ -750,20 +771,22 @@ public class NuxeoUtils {
 			String schema, String xpath) throws NuxeoDocumentException {
 		Object result = null;
 
+		String targetCSID = null;
 		xpath = schema + ":" + xpath;
 		try {
 			Object value = docModel.getPropertyValue(xpath);
+			targetCSID = docModel.getName();
 			String returnVal = null;
 			if (value == null) {
-		            // Nothing to do - leave returnVal null
+				// Nothing to do - leave returnVal null
 			} else {
-                            returnVal = DocumentUtils.propertyValueAsString(value, docModel, xpath);
+				returnVal = DocumentUtils.propertyValueAsString(value, docModel, xpath);
 			}
 			result = returnVal;
 		} catch (ClientException ce) {
 			String msg = "Unknown Nuxeo client exception.";
 			if (ce instanceof PropertyException) {
-				msg = "Problem retrieving property {" + xpath + "}. Bad XPath spec?" + ce.getLocalizedMessage();
+				msg = String.format("Problem retrieving property for xpath { %s } with CSID = %s.", xpath, targetCSID);
 			}
 			throw new NuxeoDocumentException(msg, ce);  // We need to wrap this exception in order to retry failed requests caused by network errors
 		} catch (ClassCastException cce) {
@@ -789,8 +812,8 @@ public class NuxeoUtils {
 						+ "}:" + ioobe.getLocalizedMessage());
 			}
 		} catch (NullPointerException npe) {
-			logger.error(String.format("Null value found for property %s for document with ID %s",
-					xpath, docModel.getId()), npe);
+			logger.error(String.format("Null value found for property '%s' for document with ID %s",
+					xpath, docModel.getName()), npe);
 		}
 
 		return result;

@@ -218,11 +218,12 @@ public class ServiceGroupDocumentModelHandler
  	    Map<String, String> additionalValues = new HashMap<String, String>();
  	    if (storedValuesResourceTemplate.getUriTemplateType() == UriTemplateFactory.ITEM) {
                 try {
-                    String inAuthorityCsid = (String) docModel.getPropertyValue("inAuthority"); // AuthorityItemJAXBSchema.IN_AUTHORITY
+                    String inAuthorityCsid = (String) NuxeoUtils.getProperyValue(docModel, "inAuthority"); //docModel.getPropertyValue("inAuthority"); // AuthorityItemJAXBSchema.IN_AUTHORITY
                     additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, inAuthorityCsid);
                     additionalValues.put(UriTemplateFactory.ITEM_IDENTIFIER_VAR, csid);
                 } catch (Exception e) {
-                    logger.warn("Could not extract inAuthority property from authority item record: " + e.getMessage());
+                	String msg = String.format("Could not extract inAuthority property from authority item with CSID = ", docModel.getName());
+                    logger.warn(msg, e);
                 }
  	    } else {
                 additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, csid);
@@ -240,12 +241,18 @@ public class ServiceGroupDocumentModelHandler
 
             String value = ServiceBindingUtils.getMappedFieldInDoc(sb, 
             						ServiceBindingUtils.OBJ_NUMBER_PROP, docModel);
-            item.put(DOC_NUMBER_FIELD, value);
+            if (value != null) {
+            	item.put(DOC_NUMBER_FIELD, value);
+            }
+            
             value = ServiceBindingUtils.getMappedFieldInDoc(sb, 
             						ServiceBindingUtils.OBJ_NAME_PROP, docModel);
-            item.put(DOC_NAME_FIELD, value);
-            item.put(DOC_TYPE_FIELD, docType);
+            if (value != null) {
+            	item.put(DOC_NAME_FIELD, value);
+            }
             
+            item.put(DOC_TYPE_FIELD, docType);
+            // add the item to the list
             list.addItem(item);
             item.clear();
         }

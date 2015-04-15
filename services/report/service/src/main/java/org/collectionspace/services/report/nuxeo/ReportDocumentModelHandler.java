@@ -76,6 +76,7 @@ import org.collectionspace.services.jaxb.InvocableJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.jfree.util.Log;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.PropertyException;
@@ -151,7 +152,6 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
         			+invocationMode);
 		}
 		
-		
 		RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
 		repoSession = this.getRepositorySession();
 		if (repoSession == null) {
@@ -164,24 +164,23 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 		try {
 			DocumentWrapper<DocumentModel> wrapper = repoClient.getDoc(repoSession, ctx, csid);
 			DocumentModel docModel = wrapper.getWrappedObject();
-			Boolean supports = (Boolean)docModel.getPropertyValue(modeProperty);
+			Boolean supports = (Boolean) NuxeoUtils.getProperyValue(docModel, modeProperty); //docModel.getPropertyValue(modeProperty);
 			if(supports == null || !supports) {
 				throw new BadRequestException(
 						"ReportResource: This Report does not support Invocation Mode: "
 	        			+invocationMode);
 			}
-	    	if(checkDocType) {
+	    	if (checkDocType) {
 	    		List<String> forDocTypeList = 
-	    			(List<String>)docModel.getPropertyValue(InvocableJAXBSchema.FOR_DOC_TYPES);
-	    		if(forDocTypeList==null
-	    				|| !forDocTypeList.contains(invContext.getDocType())) {
+	    			(List<String>) NuxeoUtils.getProperyValue(docModel, InvocableJAXBSchema.FOR_DOC_TYPES); //docModel.getPropertyValue(InvocableJAXBSchema.FOR_DOC_TYPES);
+	    		if (forDocTypeList==null || !forDocTypeList.contains(invContext.getDocType())) {
 	        		throw new BadRequestException(
 	        				"ReportResource: Invoked with unsupported document type: "
 	        				+invContext.getDocType());
 	        	}
 	    	}
-	    	reportFileNameProperty = ((String)docModel.getPropertyValue(ReportJAXBSchema.FILENAME)); // Set the outgoing param with the report file name
-			String reportOutputMime = (String)docModel.getPropertyValue(ReportJAXBSchema.OUTPUT_MIME);
+	    	reportFileNameProperty = (String) NuxeoUtils.getProperyValue(docModel, ReportJAXBSchema.FILENAME); //docModel.getPropertyValue(ReportJAXBSchema.FILENAME)); // Set the outgoing param with the report file name
+			String reportOutputMime = (String) NuxeoUtils.getProperyValue(docModel, ReportJAXBSchema.OUTPUT_MIME); //docModel.getPropertyValue(ReportJAXBSchema.OUTPUT_MIME);
 			if(!Tools.isEmpty(reportOutputMime)) {
 				outMimeType.append(reportOutputMime);
 			} else {

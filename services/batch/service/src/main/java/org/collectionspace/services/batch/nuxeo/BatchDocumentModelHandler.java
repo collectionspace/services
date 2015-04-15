@@ -32,6 +32,7 @@ import org.collectionspace.services.jaxb.InvocableJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.batch.BatchCommon;
 import org.collectionspace.services.batch.BatchInvocable;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -45,12 +46,9 @@ import org.collectionspace.services.common.invocable.Invocable;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.invocable.Invocable.InvocationError;
-
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.PropertyException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,19 +91,19 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 		try {
 			DocumentWrapper<DocumentModel> wrapper = repoClient.getDoc(repoSession, ctx, csid);
 			DocumentModel docModel = wrapper.getWrappedObject();
-			Boolean supports = (Boolean) docModel.getPropertyValue(modeProperty);
+			Boolean supports = (Boolean) NuxeoUtils.getProperyValue(docModel, modeProperty);
 			if (!supports) {
 				throw new BadRequestException("BatchResource: This Batch Job does not support Invocation Mode: "
 						+ invocationMode);
 			}
 			if (checkDocType) {
-				List<String> forDocTypeList = (List<String>) docModel.getPropertyValue(BatchJAXBSchema.FOR_DOC_TYPES);
+				List<String> forDocTypeList = (List<String>) NuxeoUtils.getProperyValue(docModel, BatchJAXBSchema.FOR_DOC_TYPES); //docModel.getPropertyValue(BatchJAXBSchema.FOR_DOC_TYPES);
 				if (forDocTypeList == null || !forDocTypeList.contains(invContext.getDocType())) {
 					throw new BadRequestException("BatchResource: Invoked with unsupported document type: "
 							+ invContext.getDocType());
 				}
 			}
-			className = (String) docModel.getPropertyValue(BatchJAXBSchema.BATCH_CLASS_NAME);
+			className = (String) NuxeoUtils.getProperyValue(docModel, BatchJAXBSchema.BATCH_CLASS_NAME); //docModel.getPropertyValue(BatchJAXBSchema.BATCH_CLASS_NAME);
 		} catch (PropertyException pe) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Property exception getting batch values: ", pe);

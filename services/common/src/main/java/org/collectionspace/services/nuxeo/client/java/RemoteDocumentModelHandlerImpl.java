@@ -756,7 +756,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     protected String getSimpleStringProperty(DocumentModel docModel, String schema, String propName) {
     	String xpath = "/"+schema+":"+propName;
     	try {
-	    	return (String)docModel.getPropertyValue(xpath);
+	    	return (String) NuxeoUtils.getProperyValue(docModel, xpath); //docModel.getPropertyValue(xpath);
     	} catch(PropertyException pe) {
     		throw new RuntimeException("Problem retrieving property {"+xpath+"}. Not a simple String property?"
     				+pe.getLocalizedMessage());
@@ -777,27 +777,27 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
      * @param listName The name of the scalar list property
      * @return first value in list, as a String, or empty string if the list is empty
      */
-    protected String getFirstRepeatingStringProperty(
-    		DocumentModel docModel, String schema, String listName) {
-    	String xpath = "/"+schema+":"+listName+"/[0]";
-    	try {
-	    	return (String)docModel.getPropertyValue(xpath);
-    	} catch(PropertyException pe) {
-    		throw new RuntimeException("Problem retrieving property {"+xpath+"}. Not a repeating scalar?"
-    				+pe.getLocalizedMessage());
-    	} catch(IndexOutOfBoundsException ioobe) {
-    		// Nuxeo sometimes handles missing sub, and sometimes does not. Odd.
-    		return "";	// gracefully handle missing elements
-    	} catch(ClassCastException cce) {
-    		throw new RuntimeException("Problem retrieving property {"+xpath+"} as String. Not a repeating String property?"
-    				+cce.getLocalizedMessage());
-    	} catch(Exception e) {
-    		throw new RuntimeException("Unknown problem retrieving property {"+xpath+"}."
-    				+e.getLocalizedMessage());
-    	}
-    }
+	protected String getFirstRepeatingStringProperty(DocumentModel docModel,
+			String schema, String listName) {
+		String xpath = "/" + schema + ":" + listName + "/[0]";
+		try {
+			return (String) NuxeoUtils.getProperyValue(docModel, xpath); // docModel.getPropertyValue(xpath);
+		} catch (PropertyException pe) {
+			throw new RuntimeException("Problem retrieving property {" + xpath
+					+ "}. Not a repeating scalar?" + pe.getLocalizedMessage());
+		} catch (IndexOutOfBoundsException ioobe) {
+			// Nuxeo sometimes handles missing sub, and sometimes does not. Odd.
+			return ""; // gracefully handle missing elements
+		} catch (ClassCastException cce) {
+			throw new RuntimeException("Problem retrieving property {" + xpath
+					+ "} as String. Not a repeating String property?"
+					+ cce.getLocalizedMessage());
+		} catch (Exception e) {
+			throw new RuntimeException("Unknown problem retrieving property {"
+					+ xpath + "}." + e.getLocalizedMessage());
+		}
+	}
    
-
     /**
      * Gets first of a repeating list of scalar values, as a String, from the document.
      *
@@ -812,7 +812,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     	
     	String xpath = "/" + NuxeoUtils.getPrimaryXPathPropertyName(schema, complexPropertyName, fieldName);
     	try {
-	    	result = (String)docModel.getPropertyValue(xpath);
+	    	result = (String) NuxeoUtils.getProperyValue(docModel, xpath); //docModel.getPropertyValue(xpath);
     	} catch(PropertyException pe) {
     		throw new RuntimeException("Problem retrieving property {"+xpath+"}. Bad propertyNames?"
     				+pe.getLocalizedMessage());

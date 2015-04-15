@@ -704,7 +704,7 @@ public class RefNameServiceUtils {
                         uri = template.buildUri(additionalValues);
                     } else if (template.getUriTemplateType() == UriTemplateFactory.ITEM) {
                         try {
-                            String inAuthorityCsid = (String) docModel.getPropertyValue("inAuthority"); // AuthorityItemJAXBSchema.IN_AUTHORITY
+                            String inAuthorityCsid = (String) NuxeoUtils.getProperyValue(docModel, "inAuthority"); //docModel.getPropertyValue("inAuthority"); // AuthorityItemJAXBSchema.IN_AUTHORITY
                             additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, inAuthorityCsid);
                             additionalValues.put(UriTemplateFactory.ITEM_IDENTIFIER_VAR, csid);
                             uri = template.buildUri(additionalValues);
