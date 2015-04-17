@@ -409,7 +409,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
      * @return the most recent Movement record related to the CollectionObject
      * identified by the supplied CSID.
      */
-    protected static DocumentModel getMostRecentMovement(CoreSession session, String collectionObjectCsid,
+    protected static DocumentModel getMostRecentMovement(CoreSessionInterface session, String collectionObjectCsid,
             boolean isAboutToBeRemovedEvent, String aboutToBeRemovedMovementCsidToFilter)
             throws ClientException {
         DocumentModel mostRecentMovementDocModel = null;
