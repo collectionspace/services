@@ -80,11 +80,10 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
         DocumentEventContext docEventContext = (DocumentEventContext) eventContext;
         DocumentModel docModel = docEventContext.getSourceDocument();
 
+        eventType = event.getName();
         if (logger.isTraceEnabled()) {
-            eventType = event.getName();
             logger.trace("A(n) " + eventType + " event was received by UpdateObjectLocationOnMove ...");
         }
-
         if (eventType.equals(DocumentEventTypes.ABOUT_TO_REMOVE)) {
             isAboutToBeRemovedEvent = true;
         }
