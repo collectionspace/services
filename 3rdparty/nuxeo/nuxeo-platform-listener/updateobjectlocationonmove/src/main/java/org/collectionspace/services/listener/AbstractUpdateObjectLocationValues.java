@@ -54,7 +54,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
     private final static String ACTIVE_DOCUMENT_WHERE_CLAUSE_FRAGMENT =
             "AND (ecm:currentLifeCycleState <> 'deleted') "
             + NONVERSIONED_NONPROXY_DOCUMENT_WHERE_CLAUSE_FRAGMENT;
-    private boolean isAboutToBeRemovedEvent = false;
+    private boolean isAboutToBeRemovedEvent;
     private String movementCsidToFilter;
     private String eventType;
     
@@ -84,6 +84,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
         if (logger.isTraceEnabled()) {
             logger.trace("A(n) " + eventType + " event was received by UpdateObjectLocationOnMove ...");
         }
+        isAboutToBeRemovedEvent = false;
         if (eventType.equals(DocumentEventTypes.ABOUT_TO_REMOVE)) {
             isAboutToBeRemovedEvent = true;
         }
@@ -116,7 +117,9 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
                 return;
             }
             // If this Relation record is about to be (hard) deleted, set aside
-            // its CSID so it can filtered out in all subsequent processing.
+            // the CSID for the Movement record to which it pertains, so it can
+            // be filtered out in all subsequent processing of the pertinent
+            // Cataloging record's computed current location.
             if (isAboutToBeRemovedEvent) {
                 movementCsidToFilter = movementCsid;
             }
@@ -137,7 +140,8 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
                 return;
             }
             // If this Movement record is about to be (hard) deleted, set aside
-            // its CSID so it can filtered out in all subsequent processing.
+            // its CSID so it can be filtered out in all subsequent processing
+            // of the pertinent Cataloging record's computed current location.
             if (isAboutToBeRemovedEvent) {
                 movementCsidToFilter = movementCsid;
             }
@@ -402,8 +406,9 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
      * @param isAboutToBeRemovedEvent whether the current event involves a
      * record that is slated for removal (hard deletion)
      * @param movementCsidToFilter the CSID of a Movement record slated for
-     * deletion. This record should be filtered out, prior to returning the most
-     * recent Movement record.
+     * deletion, or of a Movement record referenced by a Relation record slated
+     * for deletion. This record should be filtered out, prior to returning the
+     * most recent Movement record.
      * @throws ClientException
      * @return the most recent Movement record related to the CollectionObject
      * identified by the supplied CSID.
@@ -475,7 +480,8 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
                 logger.trace("Related movement CSID=" + relatedMovementCsid);
             }
             // If our event involves a Movement record that is about to be
-            // (hard) deleted, filter out that record.
+            // (hard) deleted, or a Movement record referenced by a Relation
+            // record that is about to be (hard) deleted, filter out that record.
             if (isAboutToBeRemovedEvent && Tools.notBlank(aboutToBeRemovedMovementCsidToFilter)) {
                 if (relatedMovementCsid.equals(aboutToBeRemovedMovementCsidToFilter)) {
                     if (logger.isTraceEnabled()) {
