@@ -341,8 +341,6 @@
 						</goals>
 						<configuration>
 							<tasks>
-								<fail unless="env.CSPACE_INSTANCE_ID"
-									message="Required environment variable CSPACE_INSTANCE_ID has not been set." />
 								<fail unless="env.DB_HOST"
 									message="Required environment variable DB_HOST has not been set." />
 								<fail unless="env.CSPACE_JEESERVER_HOME"
