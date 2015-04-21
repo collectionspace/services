@@ -91,6 +91,21 @@
             </vars>
             <expectedCodes>201</expectedCodes>
         </test>
+        <test ID="readRelateCollectionObject1ToMovement1">
+            <method>GET</method>
+            <uri>/cspace-services/relations/${relateCollectionObject1ToMovement1.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>listener/res/relation.res.xml</filename>
+                <vars>
+                    <var ID="subjectCsid">${createCollectionObject1.CSID}</var>
+                    <var ID="subjectDocumentType">CollectionObject</var>
+                    <var ID="objectCsid">${createMovement1.CSID}</var>
+                    <var ID="objectDocumentType">Movement</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
         
         <test ID="relateCollectionObject2ToMovement1">
             <method>POST</method>
@@ -103,6 +118,21 @@
                 <var ID="objectDocumentType">Movement</var>
             </vars>
             <expectedCodes>201</expectedCodes>
+        </test>
+        <test ID="readRelateCollectionObject2ToMovement1">
+            <method>GET</method>
+            <uri>/cspace-services/relations/${relateCollectionObject2ToMovement1.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>listener/res/relation.res.xml</filename>
+                <vars>
+                    <var ID="subjectCsid">${createCollectionObject2.CSID}</var>
+                    <var ID="subjectDocumentType">CollectionObject</var>
+                    <var ID="objectCsid">${createMovement1.CSID}</var>
+                    <var ID="objectDocumentType">Movement</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
         </test>
         
         <!-- Computed current location doesn't appear to be updated -->
@@ -160,6 +190,21 @@
             </vars>
             <expectedCodes>201</expectedCodes>
         </test>
+        <test ID="readRelateMovement2ToCollectionObject1">
+            <method>GET</method>
+            <uri>/cspace-services/relations/${relateMovement2ToCollectionObject1.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>listener/res/relation.res.xml</filename>
+                <vars>
+                    <var ID="subjectCsid">${createMovement2.CSID}</var>
+                    <var ID="subjectDocumentType">Movement</var>
+                    <var ID="objectCsid">${createCollectionObject1.CSID}</var>
+                    <var ID="objectDocumentType">CollectionObject</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
         
         <test ID="updateMovement2">
             <method>PUT</method>
@@ -200,7 +245,7 @@
         
         <test ID="updateMovement3">
             <method>PUT</method>
-            <uri>/cspace-services/movements/${createMovement2.CSID}</uri>
+            <uri>/cspace-services/movements/${createMovement3.CSID}</uri>
             <filename>listener/movement.xml</filename>
             <vars>
                 <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Victoria1358215545515)'Victoria, BC, Canada'</var>
