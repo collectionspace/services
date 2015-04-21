@@ -54,9 +54,6 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
     private final static String ACTIVE_DOCUMENT_WHERE_CLAUSE_FRAGMENT =
             "AND (ecm:currentLifeCycleState <> 'deleted') "
             + NONVERSIONED_NONPROXY_DOCUMENT_WHERE_CLAUSE_FRAGMENT;
-    private boolean isAboutToBeRemovedEvent;
-    private String movementCsidToFilter;
-    private String eventType;
     
     public enum EventNotificationDocumentType {
         // Document type about which we've received a notification
@@ -66,6 +63,10 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
 
     @Override
     public void handleEvent(Event event) throws ClientException {
+    
+        boolean isAboutToBeRemovedEvent = false;
+        String movementCsidToFilter = "";
+        String eventType = "";
 
         logger.trace("In handleEvent in UpdateObjectLocationOnMove ...");
 
@@ -84,7 +85,6 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
         if (logger.isTraceEnabled()) {
             logger.trace("A(n) " + eventType + " event was received by UpdateObjectLocationOnMove ...");
         }
-        isAboutToBeRemovedEvent = false;
         if (eventType.equals(DocumentEventTypes.ABOUT_TO_REMOVE)) {
             isAboutToBeRemovedEvent = true;
         }
