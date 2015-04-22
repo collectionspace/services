@@ -351,6 +351,11 @@
   <property name="src.dir" value="${basedir}" />
   <property name="tenants.dir" value="${src.dir}/services/common/src/main/cspace/config/services/tenants"/>
 
+  <!-- Imports a set of utility routines for managing tenant folders
+       from a separate Ant buildfile.
+       See http://wiki.apache.org/ant/NewAntFeaturesInDetail/Import -->
+  <import file="./tenant-utils-build.xml"/>
+  
   <!-- Locations of the tenant folders for the
        template tenant and newly-cloned tenant. -->
   <property name="template.tenant.dir" value="${tenants.dir}/${template.tenant.shortname}"/>
@@ -363,11 +368,6 @@
     value="${template.tenant.dir}/${template.tenant.shortname}${tenant.bindings.delta.suffix}"/>
   <property name="tenant.bindings.delta.file"
     value="${tenant.dir}/${tenant.shortname}${tenant.bindings.delta.suffix}"/>
-  
-  <!-- Imports a set of utility routines for managing tenant folders
-       from a separate Ant buildfile.
-       See http://wiki.apache.org/ant/NewAntFeaturesInDetail/Import -->
-  <import file="./tenant-utils-build.xml"/>
   
    <!-- This target inherits from an existing target in the imported
         utility routines buildfile, and adds its own behavior specific to this
