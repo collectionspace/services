@@ -7,6 +7,7 @@
             <event>documentCreated</event>
             <event>documentModified</event>
             <event>lifecycle_transition_event</event>
+            <event>aboutToRemove</event>
         </listener>
     </extension>
 
