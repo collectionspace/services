@@ -75,9 +75,13 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 	}
 	
 	@Test(dataProvider = "testName", dependsOnMethods = {"scaleTest"})
-	public void scaleGETTest(String testName) throws MalformedURLException {
+	public void scaleGETTest(String testName) throws MalformedURLException, InterruptedException {
 		this.setupRead();
         BlobClient client = new BlobClient();
+        
+        // We seem to sometimes need a delay before Nuxeo finishes creating all the derivatives, so
+        // we'll put our thread to sleep for 3 seconds before checking
+        Thread.sleep(3000); // sleep for 3 seconds
         
         for (int i = 0; i < allGeneratedImages.size(); i++) {
 	        ClientResponse<Response> res = client.getDerivativeContent(allGeneratedImages.get(i), "Thumbnail");
