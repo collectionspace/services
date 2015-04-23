@@ -140,7 +140,7 @@
       </delete>
     </target>
 
-    <target name="deploy" depends="install,deploy_source_report_files"
+    <target name="deploy" depends="install,deploy_report_files"
       description="Deploy report-related artifacts">
       <!--
         The following ant call is obsolete.  The Nuxeo artifacts are now created 
