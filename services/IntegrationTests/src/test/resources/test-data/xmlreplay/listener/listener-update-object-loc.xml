@@ -464,59 +464,19 @@
             <expectedCodes>200</expectedCodes>
         </test>
         
-        <!-- The following tests pertain to CSPACE-5793 -->
+        <!-- 
+             CSPACE-6307: A Movement with a later update timestamp is
+             deemed to have taken place later than a Movement with an earlier
+             update timestamp, if both have identical location dates.
+        -->
         
-        <test ID="hardDeleteRelationBetweenCollectionObject1AndMovement3">
-            <method>DELETE</method>
-            <uri>/cspace-services/relations/${relateMovement3ToCollectionObject1.CSID}</uri>
-            <expectedCodes>200</expectedCodes>
-        </test>
-        
-        <test ID="readCollectionObject1AfterRelationDelete">
-            <method>GET</method>
-            <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
-            <response>
-                <expected level="ADDOK" />
-                <filename>listener/res/collectionobject.res.xml</filename>
-                <vars>
-                    <var ID="computedCurrentLocationValue">${createMovement2.currentLocation}</var>
-                </vars>
-            </response>
-            <expectedCodes>200</expectedCodes>
-        </test>
-        
-        <test ID="hardDeleteMovement2">
-            <method>DELETE</method>
-            <uri>/cspace-services/movements/${createMovement2.CSID}</uri>
-            <expectedCodes>200</expectedCodes>
-        </test>
-        
-        <test ID="readCollectionObject1AfterMovement3Delete">
-            <method>GET</method>
-            <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
-            <response>
-                <expected level="ADDOK" />
-                <filename>listener/res/collectionobject.res.xml</filename>
-                <vars>
-                    <var ID="computedCurrentLocationValue">${createMovement1.currentLocation}</var>
-                </vars>
-            </response>
-            <expectedCodes>200</expectedCodes>
-        </test>
-        
-        <!-- CSPACE-6309: A Movement with a later update timestamp is -->
-        <!-- deemed to have taken place later than a Movement with an earlier -->
-        <!-- update timestamp, if both have identical location dates. -->
-        
-        <!-- The following block is temporarily commented out while sorting out CSPACE-6338 -->
-        <!--
         <test ID="createMovement6">
             <method>POST</method>
             <uri>/cspace-services/movements</uri>
             <filename>listener/movement.xml</filename>
             <vars>
                 <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Spokane1358215545524)'Spokane, WA, USA'</var>
-                <Note: value below is identical to that of Movement 3:>
+                <!-- Note: value below is identical to that of Movement 3: -->
                 <var ID="locationDate">${updateMovement3WithNonBlankCurrentLocation.locationDate}</var>
             </vars>
             <expectedCodes>201</expectedCodes>
@@ -551,9 +511,6 @@
         
         <!-- See comment on updateMovement1 for an explanation of why this -->
         <!-- update is needed, after creating a new relation -->
-        
-        <!-- The following block is temporarily commented out while sorting out CSPACE-6338 -->
-        <!--
         <test ID="updateMovement6">
             <method>PUT</method>
             <uri>/cspace-services/movements/${createMovement6.CSID}</uri>
@@ -584,7 +541,7 @@
             <filename>listener/movement.xml</filename>
             <vars>
                 <var ID="currentLocation">${createMovement3.currentLocation}</var>
-                <Note: value below is identical to that of Movement 6:>
+                <!-- Note: value below is identical to that of Movement 6: -->
                 <var ID="locationDate">${updateMovement3WithNonBlankCurrentLocation.locationDate}</var>
             </vars>
             <expectedCodes>200</expectedCodes>
@@ -602,7 +559,81 @@
             </response>
             <expectedCodes>200</expectedCodes>
         </test>
+
+        <!-- The following tests pertain to CSPACE-5793 -->
+        
+        <!-- 
+             At this point in the test sequence, four Movement records exist
+             and are related to CollectionObject1. From most to least
+             recent movements (including tiebreakers), these are ordered:
+        
+             Movement3
+             Movement6 (same location date as Movement3; updated less recently)
+             Movement2
+             Movement1
+          
+             The following tests sequentially hard delete the relations to
+             the two most recent Movements, and then hard delete the third
+             most recent Movement record outright, leaving only the least
+             recent Movement (Movement1).
         -->
+        
+        <test ID="hardDeleteRelationBetweenCollectionObject1AndMovement3">
+            <method>DELETE</method>
+            <uri>/cspace-services/relations/${relateMovement3ToCollectionObject1.CSID}</uri>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="readCollectionObject1AfterRelationToMovement3Delete">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>listener/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${createMovement6.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="hardDeleteRelationBetweenCollectionObject1AndMovement6">
+            <method>DELETE</method>
+            <uri>/cspace-services/relations/${relateCollectionObject1ToMovement6.CSID}</uri>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="readCollectionObject1AfterRelationToMovement6Delete">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>listener/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${createMovement2.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="hardDeleteMovement2">
+            <method>DELETE</method>
+            <uri>/cspace-services/movements/${createMovement2.CSID}</uri>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="readCollectionObject1AfterMovement2Delete">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>listener/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${createMovement1.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
         
     </testGroup>
  
