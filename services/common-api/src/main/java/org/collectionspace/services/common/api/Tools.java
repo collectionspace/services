@@ -94,19 +94,20 @@ public class Tools {
         return notEmpty(test) && (new Boolean(test)).booleanValue();
     }
 
-                    /*  Example usage of searchAndReplace:
-                        for (Map.Entry<String,String> entry : variablesMap.entrySet()){
-                            String key = entry.getKey();
-                            String replace = entry.getValue();
-                            String find = "\\$\\{"+key+"\\}";   //must add expression escapes
-                                                                //because $ and braces are "special", and we want to find "${object.CSID}"
-                            uri = Tools.searchAndReplace(uri, find, replace);
-                            System.out.println("---- REPLACE.uri:        "+initURI);
-                            System.out.println("---- REPLACE.find:       "+find);
-                            System.out.println("---- REPLACE.replace:    "+replace);
-                            System.out.println("---- REPLACE.uri result: "+uri);
-                        }
-                    */
+    /*  Example usage of searchAndReplace:
+    for (Map.Entry<String,String> entry : variablesMap.entrySet()){
+        String key = entry.getKey();
+        String replace = entry.getValue();
+        String find = "\\$\\{"+key+"\\}";   //must add expression escapes
+                                            //because $ and braces are "special", and we want to find "${object.CSID}"
+        uri = Tools.searchAndReplace(uri, find, replace);
+        System.out.println("---- REPLACE.uri:        "+initURI);
+        System.out.println("---- REPLACE.find:       "+find);
+        System.out.println("---- REPLACE.replace:    "+replace);
+        System.out.println("---- REPLACE.uri result: "+uri);
+    }
+    */
+
     public static String  searchAndReplace(String source, String find, String replace){
         Pattern pattern = Pattern.compile(find);
         Matcher matcher = pattern.matcher(source);
