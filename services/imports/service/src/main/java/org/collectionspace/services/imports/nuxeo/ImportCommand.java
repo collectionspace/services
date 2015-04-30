@@ -9,6 +9,7 @@ import java.util.TreeSet;
 import org.collectionspace.services.nuxeo.client.java.NuxeoClientEmbedded;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
+
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.io.DocumentPipe;
@@ -26,18 +27,18 @@ public class ImportCommand {
 
     private final Logger logger = LoggerFactory.getLogger(ImportCommand.class);
 
-    public String run(String src, String repoName, String workspacesPath, int timeOut) throws Exception {
+    public String run(String src, String repoName, String workspacesPath, int timeout) throws Exception {
         File file = new File(src);
         ///cspace way of configuring client and auth:
         NuxeoClientEmbedded client = NuxeoConnectorEmbedded.getInstance().getClient();
         CoreSessionInterface repoSession = null;
         try {
-            repoSession = client.openRepository(repoName, timeOut);
+            repoSession = client.openRepository(repoName, timeout);
             if (logger.isDebugEnabled()) {
                 String msg = String.format("Start of import is Local time: %tT", Calendar.getInstance());
                 logger.debug(msg);
             }
-            return importTree(repoSession, file, workspacesPath);
+            return importTree(repoSession, file, workspacesPath, timeout);
         } catch (Exception e) {
             throw e;
         } finally {
@@ -49,7 +50,10 @@ public class ImportCommand {
         }
     }
 
-    String importTree(CoreSessionInterface repoSession, File file, String toPath) throws Exception {
+    /*
+     * If the import exceeds the number of seconds in 'timeout', we'll thrown an exception and rollback all import work
+     */
+    String importTree(CoreSessionInterface repoSession, File file, String toPath, int timeout) throws Exception {
         Exception failed = null;
         DocumentReader reader = null;
         DocumentWriter writer = null;
@@ -62,9 +66,10 @@ public class ImportCommand {
         int totalRecordsImported = 0;
         try {
             if (logger.isInfoEnabled()) {
-                logger.info("importTree reading file: " + file + (file != null ? " exists? " + file.exists() : " file param is null"));
+                logger.info("ImportCommand.importTree() method reading file: " + file + (file != null ? " exists? " + file.exists() : " file param is null"));
+                logger.info(String.format("ImportCommand.importTree() will timeout if import does not complete in %d seconds.", timeout));
             }
-            reader = new LoggedXMLDirectoryReader(file);  //our overload of XMLDirectoryReader.
+            reader = new LoggedXMLDirectoryReader(file, timeout);  //our overload of XMLDirectoryReader.
             writer = new DocumentModelWriter(repoSession.getCoreSession(), toPath, 10);
             DocumentPipe pipe = new DocumentPipeImpl(10);
             // pipe.addTransformer(transformer);

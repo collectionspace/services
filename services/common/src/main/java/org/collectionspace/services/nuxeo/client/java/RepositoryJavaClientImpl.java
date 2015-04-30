@@ -34,14 +34,12 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.client.workflow.WorkflowClient;
-
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.repository.RepositoryClient;
@@ -63,7 +61,6 @@ import org.collectionspace.services.common.config.ConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingUtils;
 import org.collectionspace.services.common.storage.PreparedStatementBuilder;
-
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
 
@@ -74,7 +71,6 @@ import org.apache.chemistry.opencmis.commons.enums.CmisVersion;
 import org.apache.chemistry.opencmis.commons.server.CallContext;
 import org.apache.chemistry.opencmis.server.impl.CallContextImpl;
 import org.apache.chemistry.opencmis.server.shared.ThresholdOutputStreamFactory;
-
 import org.nuxeo.common.utils.IdUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -88,7 +84,6 @@ import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.runtime.transaction.TransactionRuntimeException;
 import org.nuxeo.ecm.core.opencmis.bindings.NuxeoCmisServiceFactory;
 import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoCmisService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1719,11 +1714,11 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     }
 
     public CoreSessionInterface getRepositorySession(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) throws Exception {
-        return getRepositorySession(ctx, ctx.getRepositoryName());
+        return getRepositorySession(ctx, ctx.getRepositoryName(), ctx.getTimeoutSecs());
     }
 
     public CoreSessionInterface getRepositorySession(String repoName) throws Exception {
-        return getRepositorySession(null, repoName);
+        return getRepositorySession(null, repoName, ServiceContext.DEFAULT_TX_TIMEOUT);
     }
 
     /**
@@ -1733,7 +1728,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * @return the repository session
      * @throws Exception the exception
      */
-    public CoreSessionInterface getRepositorySession(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String repoName) throws Exception {
+    public CoreSessionInterface getRepositorySession(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    		String repoName,
+    		int timeoutSeconds) throws Exception {
     	CoreSessionInterface repoSession = null;
 
         Profiler profiler = new Profiler("getRepositorySession():", 2);
@@ -1755,7 +1752,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         //
         if (repoSession == null) {
             NuxeoClientEmbedded client = NuxeoConnectorEmbedded.getInstance().getClient();
-            repoSession = client.openRepository(repoName);
+            repoSession = client.openRepository(repoName, timeoutSeconds);
         } else {
             if (logger.isDebugEnabled() == true) {
                 logger.warn("Reusing the current context's repository session.");
@@ -1797,11 +1794,23 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                 client.releaseRepository(repoSession); //repo session was acquired without a service context
             }
         } catch (TransactionRuntimeException tre) {
-            TransactionException te = new TransactionException(tre);
+        	String causeMsg = null;
+        	Throwable cause = tre.getCause();
+        	if (cause != null) {
+        		causeMsg = cause.getMessage();
+        	}
+        	
+            TransactionException te; // a CollectionSpace specific tx exception
+            if (causeMsg != null) {
+            	te = new TransactionException(causeMsg, tre);
+            } else {
+            	te = new TransactionException(tre);
+            }
+            
             logger.error(te.getMessage(), tre); // Log the standard transaction exception message, plus an exception-specific stack trace
             throw te;
         } catch (Exception e) {
-            logger.error("Could not close the repository session", e);
+            logger.error("Could not close the repository session.", e);
             // no need to throw this service specific exception
         }
     }

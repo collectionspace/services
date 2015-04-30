@@ -24,7 +24,6 @@
 package org.collectionspace.services.imports;
 
 import org.collectionspace.authentication.AuthN;
-import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
@@ -37,6 +36,7 @@ import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.api.ZipTools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
 import org.collectionspace.services.config.tenant.TenantBindingType;
@@ -46,7 +46,6 @@ import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-import org.xml.sax.InputSource;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -57,7 +56,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import java.io.ByteArrayInputStream;
@@ -67,8 +67,10 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
 
 // The modified Nuxeo ImportCommand from nuxeo's shell:
 
@@ -80,13 +82,11 @@ import org.slf4j.LoggerFactory;
 @Consumes({ "application/xml" })
 public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayloadIn, PoxPayloadOut> {
     
-        private final static Logger logger = LoggerFactory.getLogger(TemplateExpander.class);
+	private final static Logger logger = LoggerFactory.getLogger(TemplateExpander.class);
 
 	public static final String SERVICE_NAME = "imports";
 	public static final String SERVICE_PATH = "/" + SERVICE_NAME;
-        private static String NUXEO_SPACES_PATH_DELIMITER = "/";
-
-	private static final int DEFAULT_TX_TIMEOUT = 600; // timeout period in seconds
+    private static String NUXEO_SPACES_PATH_DELIMITER = "/";
 
 	/*
 	 * ASSUMPTION: All Nuxeo services of a given tenancy store their stuff in
@@ -189,26 +189,6 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 	// }
 	// }
 
-	private int getTimeoutParam(UriInfo ui) {
-		int result = DEFAULT_TX_TIMEOUT;
-
-		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-		if (queryParams != null) {
-			String timeoutString = queryParams
-					.getFirst(IClientQueryParams.IMPORT_TIMEOUT_PARAM);
-			if (timeoutString != null)
-				try {
-					result = Integer.parseInt(timeoutString);
-				} catch (NumberFormatException e) {
-					logger.warn(
-							"Timeout period parameter could not be parsed.  The characters in the parameter string must all be decimal digits.  The Import service will use the default timeout period instead.",
-							e);
-				}
-		}
-
-		return result;
-	}
-
 	/**
 	 * you can test this with something like: curl -X POST
 	 * http://localhost:8180/cspace-services/imports -i -u
@@ -220,21 +200,22 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 	@POST
 	@Consumes("application/xml")
 	@Produces("application/xml")
-	public javax.ws.rs.core.Response create(@Context UriInfo ui,
+	public Response create(@Context UriInfo ui,
 			String xmlPayload) {
 		String result = null;
-		javax.ws.rs.core.Response.ResponseBuilder rb;
+		ResponseBuilder rb;
 		try {
-			int timeout = getTimeoutParam(ui);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
+			int timeout = ctx.getTimeoutSecs(); // gets it from query param 'impTimout' or uses default if no query param specified
 			// InputSource inputSource = payloadToInputSource(xmlPayload);
 			// result = createFromInputSource(inputSource);
 			String inputFilename = payloadToFilename(xmlPayload);
 			result = createFromFilename(inputFilename, timeout);
-			rb = javax.ws.rs.core.Response.ok();
+			rb = Response.ok();
 		} catch (Exception e) {
 			result = Tools.errorToString(e, true);
-			rb = javax.ws.rs.core.Response
-					.status(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR);
+			rb = Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR);
 		}
 		rb.entity(result);
 		return rb.build();
@@ -423,25 +404,24 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 	@POST
 	@Consumes("multipart/form-data")
 	@Produces("application/xml")
-	public javax.ws.rs.core.Response acceptUpload(@Context UriInfo ui,
+	public Response acceptUpload(@Context UriInfo ui,
 			@Context HttpServletRequest req, MultipartFormDataInput partFormData) {
-		javax.ws.rs.core.Response response = null;
+		Response response = null;
 		StringBuffer resultBuf = new StringBuffer();
+		
 		try {
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
+			int timeout = ctx.getTimeoutSecs(); // gets it from query param 'impTimout' or uses default if no query param specified
+			
 			InputStream fileStream = null;
 			String preamble = partFormData.getPreamble();
-                        if (logger.isTraceEnabled()) {
-                            logger.trace("Preamble type is:" + preamble);
-                        }
-			Map<String, List<InputPart>> partsMap = partFormData
-					.getFormDataMap();
+			logger.trace("Preamble type is:" + preamble);
+                        
+			Map<String, List<InputPart>> partsMap = partFormData.getFormDataMap();
 			List<InputPart> fileParts = partsMap.get("file");
-			int timeout = this.getTimeoutParam(ui);
 			for (InputPart part : fileParts) {
 				String mediaType = part.getMediaType().toString();
-                                if (logger.isTraceEnabled()) {
-                                    logger.trace("Media type is:" + mediaType);
-                                }
+				logger.trace("Media type is:" + mediaType);
 				if (mediaType.equalsIgnoreCase(MediaType.APPLICATION_XML)
 						|| mediaType.equalsIgnoreCase(MediaType.TEXT_XML)) {
 					// FIXME For an alternate approach, potentially preferable,
@@ -459,45 +439,41 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 				}
 
 				//
-				// This code was never finished to support the import of a zipped directory
+				// TODO: This code was never finished to support the import of a zipped directory
 				//
 				if (mediaType.equalsIgnoreCase("application/zip")) {
-					logger.error("The Import service does not yet support .zip files."); //We should also send back a meaningful error message and status code here.
+					logger.error("The Import service does not yet support .zip files."); // We should also send back a meaningful error message and status code here.
 
 					fileStream = part.getBody(InputStream.class, null);
 
 					File zipfile = FileUtils.createTmpFile(fileStream,
 							getServiceName() + "_");
 					String zipfileName = zipfile.getCanonicalPath();
-                                        if (logger.isTraceEnabled()) {
-                                            logger.trace("Imports zip file saved to:"
-                                                            + zipfileName);
-                                        }
+					logger.trace("Imports zip file saved to:" + zipfileName);
 
 					String baseOutputDir = FileTools.createTmpDir("imports-")
 							.getCanonicalPath();
 					File indir = new File(baseOutputDir + "/in");
 					indir.mkdir();
 					ZipTools.unzip(zipfileName, indir.getCanonicalPath());
-                                        String result = "\r\n<zipResult>Zipfile " + zipfileName
-                                                + "extracted to: " + indir.getCanonicalPath()
-                                                + "</zipResult>";
-                                        if (logger.isTraceEnabled()) {
-                                            logger.trace(result);
-                                        }
-					long start = System.currentTimeMillis();
+                    String result = "\r\n<zipResult>Zipfile " + zipfileName
+                            + "extracted to: " + indir.getCanonicalPath()
+                            + "</zipResult>";
+                    logger.trace(result);
+
 					// TODO: now call import service...
 					resultBuf.append(result);
 					continue;
 				}
 			}
-			javax.ws.rs.core.Response.ResponseBuilder rb = javax.ws.rs.core.Response
-					.ok();
+			
+			Response.ResponseBuilder rb = Response.ok();
 			rb.entity(resultBuf.toString());
 			response = rb.build();
 		} catch (Exception e) {
 			throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
 		}
+		
 		return response;
 	}
 

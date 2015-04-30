@@ -25,9 +25,9 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.security.Principal;
 
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.repository.RepositoryInstanceWrapperAdvice;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
-
 import org.nuxeo.ecm.core.api.repository.Repository;
 import org.nuxeo.ecm.core.api.CoreInstance;
 import org.nuxeo.ecm.core.api.CoreSession;
@@ -35,9 +35,11 @@ import org.nuxeo.ecm.core.api.NuxeoPrincipal;
 import org.nuxeo.ecm.core.api.SystemPrincipal;
 import org.nuxeo.ecm.core.api.repository.RepositoryManager;
 import org.nuxeo.runtime.api.Framework;
+import org.nuxeo.runtime.jtajca.NuxeoContainer;
 import org.nuxeo.runtime.transaction.TransactionHelper;
 
 import javax.transaction.TransactionManager;
+import javax.transaction.UserTransaction;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,14 +120,14 @@ public final class NuxeoClientEmbedded {
      * Open a Nuxeo repo session using the passed in repoDomain and use the default tx timeout period
      */
     public CoreSessionInterface openRepository(RepositoryDomainType repoDomain) throws Exception {
-        return openRepository(repoDomain.getRepositoryName(), -1);
+        return openRepository(repoDomain.getRepositoryName(), ServiceContext.DEFAULT_TX_TIMEOUT);
     }
     
     /*
      * Open a Nuxeo repo session using the passed in repoDomain and use the default tx timeout period
      */
     public CoreSessionInterface openRepository(String repoName) throws Exception {
-        return openRepository(repoName, -1);
+        return openRepository(repoName, ServiceContext.DEFAULT_TX_TIMEOUT);
     }    
 
     public CoreSessionInterface openRepository(String repoName, int timeoutSeconds) throws Exception {
@@ -136,7 +138,14 @@ public final class NuxeoClientEmbedded {
     	//
     	if (timeoutSeconds > 0) {
     		TransactionManager transactionMgr = TransactionHelper.lookupTransactionManager();
-    		transactionMgr.setTransactionTimeout(timeoutSeconds);
+            TransactionManager tm = NuxeoContainer.getTransactionManager();
+            if (logger.isDebugEnabled()) {
+            	if (tm != transactionMgr) {
+            		logger.debug("TransactionHelper's manager is different than NuxeoContainer's.");
+            	}
+            }
+    		
+    		transactionMgr.setTransactionTimeout(timeoutSeconds); // For the current thread only
     		if (logger.isInfoEnabled()) {
     			logger.info(String.format("Changing current request's transaction timeout period to %d seconds",
     					timeoutSeconds));
@@ -268,9 +277,14 @@ public final class NuxeoClientEmbedded {
             		logger.trace("Could not remove a repository instance from our repo list.  Current count is now: "
 	            			+ repositoryInstances.size());
             	}
-            }
+            }            
+            //
+            // Last but not least, try to commit the current Nuxeo-related transaction.
+            //
             if (TransactionHelper.isTransactionActiveOrMarkedRollback() == true) {
             	TransactionHelper.commitOrRollbackTransaction();
+            	UserTransaction ut = TransactionHelper.lookupUserTransaction();
+            	TransactionManager tm = TransactionHelper.lookupTransactionManager();            	
             	logger.trace(String.format("Transaction closed on thread '%d'", Thread.currentThread().getId()));
             }
         }

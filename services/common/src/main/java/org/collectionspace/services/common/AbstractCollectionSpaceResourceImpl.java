@@ -46,10 +46,8 @@ import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
-
 import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.spi.HttpRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +72,7 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     
     /** The storage client. */
     private StorageClient storageClient;
-
+    
     /**
      * Extract id.
      *
@@ -87,8 +85,8 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         String[] segments = uri.split("/");
         String id = segments[segments.length - 1];
         return id;
-    }    
-    
+    }
+            
     /**
      * Instantiates a new abstract collection space resource.
      */
