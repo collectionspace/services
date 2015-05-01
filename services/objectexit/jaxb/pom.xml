@@ -9,7 +9,6 @@
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.objectexit.jaxb</artifactId>
     <name>services.objectexit.jaxb</name>
     

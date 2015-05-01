@@ -7,7 +7,6 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.person</artifactId>
     <name>services.person</name>
     <packaging>pom</packaging>

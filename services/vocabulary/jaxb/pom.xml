@@ -9,7 +9,6 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.vocabulary.jaxb</artifactId>
     <name>services.vocabulary.jaxb</name>
 
@@ -18,7 +17,6 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <!-- External dependencies -->
         <dependency>

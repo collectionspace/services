@@ -7,7 +7,6 @@
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.acquisition.service</artifactId>
     <name>services.acquisition.service</name>
     <packaging>jar</packaging>    
@@ -16,8 +15,7 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+            </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.acquisition.jaxb</artifactId>

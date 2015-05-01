@@ -8,7 +8,6 @@
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.imports</artifactId>
     <name>services.imports</name>
     <packaging>pom</packaging>

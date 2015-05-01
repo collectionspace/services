@@ -37,7 +37,6 @@
 		<dependency>
 			<groupId>org.collectionspace.services</groupId>
 			<artifactId>org.collectionspace.services.common</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.collectionspace.services</groupId>
@@ -246,13 +245,6 @@
 			<artifactId>nuxeo-core-storage-sql</artifactId>
 			<version>${nuxeo.core.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.nuxeo.ecm.core</groupId>
-			<artifactId>nuxeo-core-io</artifactId>
-			<version>${nuxeo.core.version}</version>
-		</dependency>
-		<!-- <dependency> <groupId>org.nuxeo.ecm.core</groupId> <artifactId>nuxeo-core-facade</artifactId> 
-			<version>${nuxeo.core.version}</version> </dependency> -->
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-io</artifactId>

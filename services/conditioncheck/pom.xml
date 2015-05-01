@@ -8,7 +8,6 @@
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.conditioncheck</artifactId>
     <name>services.conditioncheck</name>
     <packaging>pom</packaging>

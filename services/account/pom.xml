@@ -7,7 +7,6 @@
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.account</artifactId>
     <name>services.account</name>
     <packaging>pom</packaging>
