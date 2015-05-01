@@ -32,6 +32,7 @@
         <client-class>org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl</client-class>
         <properties>
             <types:item><types:key>pageSizeDefault</types:key><types:value>40</types:value></types:item>
+            <types:item><types:key>pageSizeMax</types:key><types:value>10</types:value></types:item>
             <types:item><types:key>refreshAuthZOnStartup</types:key><types:value>true</types:value></types:item>
         </properties>
     </repository-client>

@@ -31,14 +31,16 @@ import org.collectionspace.services.common.context.ServiceContext;
 //FIXME: it would be nice to instantiate the doc filter with the service context
 //so tenant context and other things available from the service context
 //could be utilized while building the where clause.
-public class DocumentFilter {
+public abstract class DocumentFilter {
 
     /** The Constant DEFAULT_PAGE_SIZE_INIT. */
-    public static final int DEFAULT_PAGE_SIZE_INIT = 40;
+    public static final int DEFAULT_PAGE_SIZE_INIT = 40; 		// Default page size if one is specified in the service-config.xml
+    public static final int DEFAULT_PAGE_SIZE_MAX_INIT = 1000;	// Default page size max if one is specified in the service-config.xml
+    
     /** The Constant PAGE_SIZE_DEFAULT_PROPERTY. */
     public static final String PAGE_SIZE_DEFAULT_PROPERTY = "pageSizeDefault";
-    /** The default page size. */
-    public static int defaultPageSize = DEFAULT_PAGE_SIZE_INIT;
+    public static final String PAGE_SIZE_MAX_PROPERTY = "pageSizeMax";
+    
     /** The where clause. */
     protected String whereClause;	// Filtering clause. Omit the "WHERE".
     /** The order by clause. */
@@ -46,10 +48,16 @@ public class DocumentFilter {
     public static final String EMPTY_ORDER_BY_CLAUSE = "";
     public static final String ORDER_BY_LAST_UPDATED = CollectionSpaceClient.CORE_UPDATED_AT + " DESC";
     public static final String ORDER_BY_CREATED_AT = CollectionSpaceClient.CORE_CREATED_AT + " DESC";
+
+    /** The max page size. */
+    protected int pageSizeMax = DEFAULT_PAGE_SIZE_MAX_INIT;		// The largest page size allowed.  Can be overridden in the service-config.xml
+    /** The default page size. */
+    public static int defaultPageSize = DEFAULT_PAGE_SIZE_INIT; // Default page size if one is specified in the service-config.xml
     /** The start page. */
     protected int startPage;		// Pagination offset for list results
     /** The page size. */
     protected int pageSize;			// Pagination limit for list results
+    
     //queryParams is not initialized as it would require a multi-valued map implementation
     //unless it is used from opensource lib...this variable holds ref to
     //implementation available in JBoss RESTeasy
@@ -122,9 +130,13 @@ public class DocumentFilter {
     public DocumentFilter(ServiceContext ctx) {
     	// Ignore errors - some contexts do not have proper service binding info
     	try {
+    		String pageSizeMaxString = ctx.getServiceBindingPropertyValue(
+                    DocumentFilter.PAGE_SIZE_MAX_PROPERTY); 
+    		this.setPageSizeMax(pageSizeMaxString);
+
     		String pageSizeString = ctx.getServiceBindingPropertyValue(
                     DocumentFilter.PAGE_SIZE_DEFAULT_PROPERTY); 
-    		this.setPageSize(pageSizeString);
+    		this.setPageSize(pageSizeString);    		
     	} catch(Exception e) {
     		this.setPageSize(defaultPageSize);
     	} 
@@ -343,19 +355,24 @@ public class DocumentFilter {
      *
      * @return the page size dirty
      */
-    public boolean getPageSizeDirty() {
-        return this.getPageSizeDirty();
-    }
+    abstract public boolean getPageSizeDirty();
 
     /**
      * Sets the page size.
      *
      * @param thePageSize the new page size
+     * Never allow the page size to be larger than the 'pageSizeMax' value
      */
     public void setPageSize(int thePageSize) {
-        this.pageSize = thePageSize;
+    	if (thePageSize > this.pageSizeMax) {
+    		this.pageSize = this.pageSizeMax; // page size can't be greater than the max page size
+    	} else if (thePageSize == 0) {
+    		this.pageSize = this.pageSizeMax; // a page size of 0 means use the max page size
+    	} else {
+    		this.pageSize = thePageSize;
+    	}
     }
-
+    
     /**
      * Sets the page size.
      *
@@ -376,6 +393,28 @@ public class DocumentFilter {
 
         setPageSize(newPageSize);
     }
+    
+    /**
+     * Sets the page size.
+     *
+     * @param thePageSizeStr the new page size
+     */
+    public void setPageSizeMax(String thePageSizeMaxStr) {
+        int newPageSizeMax = DocumentFilter.DEFAULT_PAGE_SIZE_MAX_INIT;
+        if (thePageSizeMaxStr != null) {
+            try {
+                newPageSizeMax = Integer.valueOf(thePageSizeMaxStr);
+            } catch (NumberFormatException e) {
+                //FIXME This should cause a warning in the log file and should result in the
+                //FIXME page size being set to the default.  We don't need to throw an exception here.
+                throw new NumberFormatException("Bad value in service-config.xml for: "
+                        + PAGE_SIZE_MAX_PROPERTY);
+            }
+        }
+
+        this.pageSizeMax = newPageSizeMax;
+    }
+    
 
     /**
      * Sets the start page.

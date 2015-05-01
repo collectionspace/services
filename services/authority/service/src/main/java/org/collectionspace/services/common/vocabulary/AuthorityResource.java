@@ -79,6 +79,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentFilter;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.workflow.WorkflowCommon;
@@ -404,7 +405,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
                 getRepositoryClient(ctx).get(ctx, spec.value, handler);
             } else {
                 String whereClause = buildWhereForAuthByName(spec.value);
-                DocumentFilter myFilter = new DocumentFilter(whereClause, 0, 1);
+                DocumentFilter myFilter = new NuxeoDocumentFilter(whereClause, 0, 1);
                 handler.setDocumentFilter(myFilter);
                 getRepositoryClient(ctx).get(ctx, handler);
             }
@@ -650,7 +651,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             } else {
                 String itemWhereClause =
                         buildWhereForAuthItemByName(itemSpec.value, parentcsid);
-                DocumentFilter myFilter = new DocumentFilter(itemWhereClause, 0, 1);
+                DocumentFilter myFilter = new NuxeoDocumentFilter(itemWhereClause, 0, 1); // start at page 0 and get 1 item
                 handler.setDocumentFilter(myFilter);
                 getRepositoryClient(ctx).get(ctx, handler);
             }

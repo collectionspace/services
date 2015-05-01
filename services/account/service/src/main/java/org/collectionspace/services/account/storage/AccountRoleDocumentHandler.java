@@ -33,12 +33,11 @@ import org.collectionspace.services.authorization.AccountValue;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.storage.jpa.JpaDocumentFilter;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
-
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.context.ServiceContextProperties;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -339,7 +338,7 @@ public class AccountRoleDocumentHandler
      */
     @Override
     public DocumentFilter createDocumentFilter() {
-        return new DocumentFilter(this.getServiceContext());
+        return new JpaDocumentFilter(this.getServiceContext());
     }
 
     /**

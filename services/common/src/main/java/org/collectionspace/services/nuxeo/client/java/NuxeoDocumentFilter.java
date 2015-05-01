@@ -50,6 +50,8 @@
 
 package org.collectionspace.services.nuxeo.client.java;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.context.ServiceContext;
 
@@ -57,8 +59,18 @@ import org.collectionspace.services.common.context.ServiceContext;
  * NXQL specific document filter
  */
 public class NuxeoDocumentFilter extends DocumentFilter {
-	public NuxeoDocumentFilter(ServiceContext ctx) {
+	public NuxeoDocumentFilter(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
 		super(ctx);
+	}
+
+	public NuxeoDocumentFilter(String whereClause, int theStartPage, int thePageSize) {
+		super(whereClause, theStartPage, thePageSize);
+	}
+
+	@Override
+	public boolean getPageSizeDirty() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }
