@@ -77,6 +77,9 @@ public class ImportCommand {
             pipe.setWriter(writer);
             DocumentTranslationMap dtm = pipe.run();
             Map<DocumentRef, DocumentRef> documentRefs = dtm.getDocRefMap(); // FIXME: Should be checking for null here!
+            if (documentRefs != null && documentRefs.isEmpty()) {
+                throw new Exception("No valid records found in import payload. Check XML markup for not-well-formed errors, elements not matching import or document-specific schema, etc.");
+            }
             dump.append("<importedRecords>");
             for (Map.Entry<DocumentRef, DocumentRef> entry : documentRefs.entrySet()) {
                 keyDocRef = (DocumentRef) entry.getKey();

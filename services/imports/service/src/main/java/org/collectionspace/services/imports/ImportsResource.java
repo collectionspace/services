@@ -247,7 +247,7 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 					+ report + "</import>";
 		} catch (Exception e) {
 			result = "<?xml version=\"1.0\"?><import><msg>ERROR</msg><report>"
-					+ Tools.errorToString(e, true) + "</report></import>";
+					+ e.getMessage() + "</report></import>";
 		}
 		return result;
 	}
@@ -278,7 +278,7 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 					+ report + "</import>";
 		} catch (Exception e) {
 			result = "<?xml version=\"1.0\"?><import><msg>ERROR</msg><report>"
-					+ Tools.errorToString(e, true) + "</report></import>";
+					+ e.getMessage() + "</report></import>";
 		}
 		return result;
 	}
