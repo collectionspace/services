@@ -61,6 +61,7 @@
         <module>intake</module>
         <module>loanin</module>
         <module>loanout</module>
+        <module>exhibition</module>
         <module>conditioncheck</module>
         <module>valuationcontrol</module>
         <module>objectexit</module>

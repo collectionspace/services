@@ -170,6 +170,7 @@
         <ant antfile="imports/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="loanin/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="loanout/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="exhibition/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="conditioncheck/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="valuationcontrol/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="objectexit/build.xml" target="deploy" inheritAll="false"/>
@@ -212,6 +213,7 @@
         <ant antfile="location/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="objectexit/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="valuationcontrol/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="exhibition/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="conditioncheck/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="batch/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="report/build.xml" target="undeploy" inheritAll="false"/>
@@ -267,6 +269,7 @@
         <ant antfile="work/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="concept/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="taxonomy/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="exhibition/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="conditioncheck/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="valuationcontrol/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="objectexit/build.xml" target="dist" inheritAll="false"/>
