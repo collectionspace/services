@@ -60,7 +60,7 @@ public class ServiceMain {
     private static volatile ServiceMain instance = null;
     private static volatile boolean initFailed = false;
 
-    private static final String SERVER_HOME_PROPERTY = "catalina.home";
+    private static final String SERVER_HOME_PROPERTY = "catalina.base";
 	private static final boolean USE_APP_GENERATED_CONFIG = true;
 	
 	private static ServletContext servletContext = null;
