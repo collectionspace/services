@@ -342,11 +342,13 @@
 						<configuration>
 							<tasks>
 								<fail unless="env.CSPACE_INSTANCE_ID"
-									message="Required environment variable CSPACE_INSTANCE_ID has not been set." />
+									message="Required environment variable CSPACE_INSTANCE_ID has not been set. Use '_default' as a default value." />
 								<fail unless="env.DB_HOST"
-									message="Required environment variable DB_HOST has not been set." />
+									message="Required environment variable DB_HOST has not been set.  Use 'localhost' as a default value." />
+								<fail unless="env.DB_PORT"
+									message="Required environment variable DB_PORT has not been set.  Use 5432 as a default value." />
 								<fail unless="env.CSPACE_JEESERVER_HOME"
-									message="Required environment variable CSPACE_JEESERVER_HOME has not been set." />
+									message="Required environment variable CSPACE_JEESERVER_HOME has not been set.  Usually the same value as CATALINA_HOME environment variable." />
 								<fail unless="env.DB_CSPACE_PASSWORD"
 									message="Required environment variable DB_CSPACE_PASSWORD has not been set." />
 								<fail unless="env.DB_NUXEO_PASSWORD"
