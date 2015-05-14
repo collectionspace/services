@@ -4,7 +4,7 @@
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.vocabulary.client.sample</artifactId>
     <packaging>jar</packaging>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
     <name>vocabulary.client.sample</name>
     
     <dependencies>
