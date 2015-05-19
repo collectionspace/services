@@ -28,7 +28,7 @@
 					</service:property>
 					<service:property merge:matcher="skip" merge:action="insert">
 						<service:key>sqlScriptName</service:key>
-						<service:value>ucbg_custom_sql.sql</service:value>
+						<service:value>grant_botgarden_reporters_privileges.sql</service:value>
 					</service:property>
 				</service:params>
 			</service:initHandler>

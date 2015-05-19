@@ -48,7 +48,6 @@ BEGIN
       WHERE pc.printlabels = 'yes'
       ORDER BY row_number() OVER (ORDER BY pc.id);
       ALTER VIEW utils.plantsalespottags OWNER TO nuxeo_botgarden;
-      GRANT SELECT ON utils.plantsalespottags to PUBLIC;
    EXCEPTION
       WHEN undefined_table THEN
          RAISE NOTICE 'NOTICE: Creating view utils.plantsalespottags: missing relation';
