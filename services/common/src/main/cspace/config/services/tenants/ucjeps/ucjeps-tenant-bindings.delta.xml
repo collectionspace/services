@@ -22,6 +22,10 @@
 						<service:key>sqlScriptName</service:key>
 						<service:value>load_ucjeps_id_generators.sql</service:value>
 					</service:property>
+					<service:property merge:matcher="skip" merge:action="insert">
+						<service:key>sqlScriptName</service:key>
+						<service:value>grant_ucjeps_reporters_privileges.sql</service:value>
+					</service:property>
 				</service:params>
 			</service:initHandler>
 		</tenant:serviceBindings>
