@@ -1,9 +1,9 @@
 package org.collectionspace.services.structureddate;
 
 public enum QualifierUnit {
-	DAYS   ("urn:cspace:pahma.cspace.berkeley.edu:vocabularies:name(datequalifier):item:name(days)'day(s)'"),
-	MONTHS ("urn:cspace:pahma.cspace.berkeley.edu:vocabularies:name(datequalifier):item:name(month)'month(s)'"),
-	YEARS  ("urn:cspace:pahma.cspace.berkeley.edu:vocabularies:name(datequalifier):item:name(years)'year(s)'");
+	DAYS   ("days"),
+	MONTHS ("month"),
+	YEARS  ("years");
 	
 	private final String value;
 	
