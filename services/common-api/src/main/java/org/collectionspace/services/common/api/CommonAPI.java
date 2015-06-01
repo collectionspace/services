@@ -18,6 +18,15 @@ public class CommonAPI {
     
 	public static final String GENERATE_BUNDLES = "core";
 	public static final String GENERATE_BINDINGS = "delta";
-
+	
+	//
+	// A Nuxeo facet that let's us know whether or not the image/picture was sourced
+	// from an external URL.
+	//
+    public static final String URL_SOURCED_PICTURE = "URLSourcedPicture";
+    public static final String NUXEO_DUBLINCORE_SCHEMANAME = "dublincore";
+    public static final String NUXEO_DUBLINCORE_TITLE = "title";
+    public static final String NUXEO_DUBLINCORE_SOURCE = "source";
+    
 }
 
