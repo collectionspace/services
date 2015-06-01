@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.nuxeo.runtime.api.Framework;
-
 import org.nuxeo.ecm.platform.picture.api.ImageInfo;
 import org.nuxeo.ecm.platform.picture.api.ImagingDocumentConstants;
 import org.nuxeo.ecm.platform.picture.api.ImagingService;
@@ -51,7 +50,6 @@ import org.nuxeo.ecm.platform.filemanager.service.FileManagerService;
 import org.nuxeo.ecm.platform.filemanager.service.extension.FileImporter;
 import org.nuxeo.ecm.platform.filemanager.utils.FileManagerUtils;
 import org.nuxeo.ecm.platform.types.TypeManager;
-
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.blobholder.BlobHolder;
@@ -62,12 +60,10 @@ import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentRef;
-
+import org.nuxeo.ecm.core.api.VersioningOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.apache.commons.io.IOUtils;
-
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.FileUtils;
@@ -76,6 +72,7 @@ import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.TransactionException;
 import org.collectionspace.services.common.repository.RepositoryClient;
+import org.collectionspace.services.common.api.CommonAPI;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.blob.BlobOutput;
 import org.collectionspace.services.blob.BlobsCommon;
@@ -105,6 +102,8 @@ public class NuxeoBlobUtils {
 	// be returned as FileInputStreams rather than ByteArrayInputStreams
 	//
 	private static final int MAX_IMAGE_BUFFER = 256 * 1024; // REM: 11/26/2013 - This should be set in a config/property file.
+	
+
 	
 	//
 	// File name constants
@@ -607,7 +606,7 @@ public class NuxeoBlobUtils {
 			// image derivatives.
 			//
 			result = getFileManager().createDocumentFromBlob(
-					repoSession.getCoreSession(), inputStreamBlob, blobLocation, true, blobName);
+					repoSession.getCoreSession(), inputStreamBlob, blobLocation, overwrite, blobName);
 		} else {
 			//
 			// User Nuxeo's default file importer/adapter explicitly.  This avoids specialized functionality from happening like
@@ -620,7 +619,7 @@ public class NuxeoBlobUtils {
 
 			FileImporter defaultFileImporter = fileManagerService.getPluginByName("DefaultFileImporter");
 			result = defaultFileImporter.create(
-					repoSession.getCoreSession(), inputStreamBlob, blobLocation, true, blobName, getTypeService());			
+					repoSession.getCoreSession(), inputStreamBlob, blobLocation, overwrite, blobName, getTypeService());			
 		}
 		
 		return result;
@@ -652,7 +651,7 @@ public class NuxeoBlobUtils {
 					repoSession,
 		            inputStreamBlob, 
 		            blobLocation.getPathAsString(), 
-		            true, 
+		            false, 
 		            blobName,
 		            useNuxeoAdaptors);
 			result = createBlobsCommon(documentModel, inputStreamBlob); // Now create the metadata about the Nuxeo blob document
@@ -778,42 +777,62 @@ public class NuxeoBlobUtils {
 
 		try {
 			Blob fileBlob = createNuxeoFileBasedBlob(file);
-			
 			DocumentModel documentModel = createDocumentFromBlob(
 					nuxeoSession, fileBlob,
 					blobLocation.getPathAsString(),
-					true,
+					false,
 					file.getName(),
 					useNuxeoAdaptors);
 
 			result = createBlobsCommon(documentModel, fileBlob); // Now create our metadata resource document
 
-			// If the sender wanted us to generate only derivatives, we need to purge/clear the original contents
+			// If the requester wants us to generate only derivatives, we need to purge/clear the original image file
 			if (purgeOriginal == true && isPurgeAllowed(documentModel) == true) {
+				
 				// Empty the document model's "content" property -this does not delete the actual file/blob
-				documentModel.setPropertyValue("file:content", (Serializable) null);
+				//documentModel.setPropertyValue("file:content", (Serializable) null);
 				
 				if (documentModel.hasFacet(ImagingDocumentConstants.PICTURE_FACET)) {
+					//
+					// We're going to use the "source" property field of the Dublin Core schema as a way of indicating to
+					// our event listener (See UpdateImageDerivatives.java) that the original image needs to be
+					// purged.  The "source" property does not seem to be used by Nuxeo for Picture documents as of v6.0.  However, this might
+					// break in future releases of Nuxeo, so we'll emit a warning to the logs if we find a value in this
+					// property.
+					//
+					String source = (String)documentModel.getProperty(CommonAPI.NUXEO_DUBLINCORE_SCHEMANAME,
+							CommonAPI.NUXEO_DUBLINCORE_SOURCE);
+					if (source != null) {
+						logger.warn(String.format("The Nuxeo dublin core property '%s' is set to '%s'.  We expected it to be empty. See JIRA issue CSPACE-6679 for details.",
+								CommonAPI.NUXEO_DUBLINCORE_SOURCE, source));
+					}
+					documentModel.setProperty(CommonAPI.NUXEO_DUBLINCORE_SCHEMANAME,
+							CommonAPI.NUXEO_DUBLINCORE_SOURCE, CommonAPI.URL_SOURCED_PICTURE);
+					
 					// Now with no content, the derivative listener wants to update the derivatives. So to
 					// prevent the listener, we remove the "Picture" facet from the document
-					NuxeoUtils.removeFacet(documentModel, ImagingDocumentConstants.PICTURE_FACET); // Removing this facet ensures the original derivatives are unchanged.
-					nuxeoSession.saveDocument(documentModel);
+					//NuxeoUtils.removeFacet(documentModel, ImagingDocumentConstants.PICTURE_FACET); // Removing this facet ensures the original derivatives are unchanged.
 					// Now that we've emptied the document model's content field, we can add back the Picture facet
-					NuxeoUtils.addFacet(documentModel, ImagingDocumentConstants.PICTURE_FACET);
+					//NuxeoUtils.addFacet(documentModel, ImagingDocumentConstants.PICTURE_FACET);
 				}
 				
-				nuxeoSession.saveDocument(documentModel);
+				//nuxeoSession.saveDocument(documentModel);
 				// Next, we need to remove the actual file from Nuxeo's data directory
-				DocumentBlobHolder docBlobHolder = (DocumentBlobHolder) documentModel
-						.getAdapter(BlobHolder.class);
-				Blob blob = docBlobHolder.getBlob();
-				if(blob == null) {
-					logger.error("Could not get blob for original image. Trying to delete original for: {}",
-							file.getName());
-				} else {
-					boolean deleteSuccess = NuxeoUtils.deleteFileOfBlob(docBlobHolder.getBlob());
-				}
+//				Blob blob = docBlobHolder.getBlob();
+//				if(blob == null) {
+//					logger.error("Could not get blob for original image. Trying to delete original for: {}",
+//							file.getName());
+//				} else {
+//					boolean deleteSuccess = NuxeoUtils.deleteFileOfBlob(docBlobHolder.getBlob());
+//				}
 			}
+			
+			//
+			// Persist/save any changes.
+			//
+			nuxeoSession.saveDocument(documentModel);
+			nuxeoSession.save();
+
 		} catch (Exception e) {
 			result = null;
 			logger.error("Could not create new Nuxeo blob document.", e); //FIXME: REM - This should probably be re-throwing the exception?

@@ -15,6 +15,7 @@
     <modules>
         <module>updateobjectlocationonmove</module>
         <module>updaterelationsondelete</module>
+        <module>updateimagederivatives</module>
     </modules>
 
     <dependencies>

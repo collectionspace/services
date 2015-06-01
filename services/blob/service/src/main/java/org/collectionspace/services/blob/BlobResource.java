@@ -145,9 +145,10 @@ public class BlobResource extends NuxeoBasedResource {
     	}
     	
     	if (result == null) {
+    		String errMsg = String.format("Index failed. Could not get the contents for the Blob with CSID = '%s'.",
+    				csid);
 	        Response response = Response.status(
-	                Response.Status.INTERNAL_SERVER_ERROR).entity(
-	                		"Index failed. Could not get the contents for the Blob.").type("text/plain").build();
+	                Response.Status.INTERNAL_SERVER_ERROR).entity(errMsg).type("text/plain").build();
 	        throw new CSWebApplicationException(response);
     	}
     	

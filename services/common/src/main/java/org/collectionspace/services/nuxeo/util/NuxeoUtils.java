@@ -42,10 +42,9 @@ import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentException;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
-
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
-
+import org.mortbay.log.Log;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.ClientException;
@@ -54,6 +53,7 @@ import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.PathRef;
+import org.nuxeo.ecm.core.api.impl.blob.BlobWrapper;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.io.DocumentPipe;
 import org.nuxeo.ecm.core.io.DocumentReader;
@@ -62,10 +62,10 @@ import org.nuxeo.ecm.core.io.impl.DocumentPipeImpl;
 import org.nuxeo.ecm.core.io.impl.plugins.SingleDocumentReader;
 import org.nuxeo.ecm.core.io.impl.plugins.XMLDocumentWriter;
 import org.nuxeo.ecm.core.schema.SchemaManager;
+import org.nuxeo.ecm.core.storage.StorageBlob;
 import org.nuxeo.ecm.core.storage.binary.Binary;
 import org.nuxeo.ecm.core.storage.sql.coremodel.SQLBlob;
 import org.nuxeo.runtime.api.Framework;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,15 +92,31 @@ public class NuxeoUtils {
     private static final String ORDER_BY_CLAUSE_REGEX = "\\w+(_\\w+)?:\\w+(/(\\*|\\w+))*( ASC| DESC)?(, \\w+(_\\w+)?:\\w+(/(\\*|\\w+))*( ASC| DESC)?)*";
 	
     /* 
-     * Keep this method private.  This method uses reflection to gain access to a protected field in Nuxeo's "Binary" class.  Once we learn how
+     * Keep this method private.  This method uses reflection to gain access to a protected field in Nuxeo's "Binary" class.  If and when we learn how
      * to locate the "file" field of a Binary instance without breaking our "contract" with this class, we should minimize
      * our use of this method.
      */
     private static File getFileOfBlob(Blob blob) {
     	File result = null;
     	
-    	if (blob instanceof SQLBlob) {
-    		SQLBlob sqlBlob = (SQLBlob)blob;
+    	if (blob instanceof BlobWrapper) {
+    		BlobWrapper blobWrapper = (BlobWrapper)blob;
+			try {
+				Field blobField;
+				blobField = blobWrapper.getClass().getDeclaredField("blob");
+				boolean accessibleState = blobField.isAccessible();
+				if (accessibleState == false) {
+					blobField.setAccessible(true);
+				}
+    			blob = (StorageBlob)blobField.get(blobWrapper);
+    			blobField.setAccessible(accessibleState); // set it back to its original access state				
+			} catch (Exception e) {
+				logger.error("blob field of BlobWrapper is not accessible.", e);
+			}
+    	}
+    	
+    	if (blob instanceof StorageBlob) {
+    		StorageBlob sqlBlob = (StorageBlob)blob;
     		Binary binary = sqlBlob.getBinary();
     		try {
     			Field fileField = binary.getClass().getDeclaredField("file");
@@ -118,13 +134,77 @@ public class NuxeoUtils {
     	return result;
     }
     
-    static public boolean deleteFileOfBlob(Blob blob) {
-    	boolean result = false;
+    static public Thread deleteFileOfBlobAsync(Blob blob) {
+    	Thread result = null;
     	
+    	//
+    	// Define a new thread that will try to delete the file of the blob.  We
+    	// need this to happen on a separate thread because our current thread seems
+    	// to still have an active handle to the file so our non-thread delete calls
+    	// are failing.  The new thread will make 10 attempts, separated by 1 second, to
+    	// delete the file.  If after 10 attempts, it still can't delete the file, it will
+    	// log an error.
+    	//
+    	final File fileToDelete = getFileOfBlob(blob);
+    	final String blobName = blob.getFilename();
+    	Thread deleteFileThread = new Thread() {
+    		@Override public void run() {
+	    		boolean deleteSuccess = false;
+	    		int attempts = 0;
+	    		while (attempts++ < 10 && deleteSuccess != true) {
+	    			deleteSuccess = deleteFile(fileToDelete);
+	    			if (deleteSuccess == false) {
+	    				//
+	    				// We couldn't delete the file, so some other thread might still
+	    				// have a handle to it.  Let's put this thread to sleep for 1 second
+	    				// before trying to delete it again.
+	    				//
+		    			try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							logger.error(String.format("Unable to delete file '%s' of blob '%s'.",
+		    					fileToDelete.getAbsoluteFile(), blobName), e);
+						}
+	    			}
+	    		}
+	    		//
+	    		// Now log the result.
+	    		//
+	    		if (deleteSuccess) {
+	    			logger.debug(String.format("Successfully deleted file '%s' of blob '%s'.",
+	    					fileToDelete.getAbsoluteFile(), blobName));
+	    		} else {
+	    			logger.error(String.format("Unable to delete file '%s' of blob '%s'.",
+	    					fileToDelete.getAbsoluteFile(), blobName));
+	    		}
+    		}
+    	};
+    	deleteFileThread.start();
+    	result = deleteFileThread;
+    	
+    	return result;
+    }
+    
+    static public boolean deleteFileOfBlob(Blob blob) {
     	File fileToDelete = getFileOfBlob(blob);
-    	result = fileToDelete.delete();
+    	return deleteFile(fileToDelete);
+    }
+    
+    static public boolean deleteFile(File fileToDelete) {
+    	boolean result = true;
+    	
+    	Exception deleteException = null;
+    	try {
+			java.nio.file.Files.delete(fileToDelete.toPath());
+			Log.debug(String.format("Deleted file '%s'.", fileToDelete.getCanonicalPath()));
+		} catch (IOException e) {
+			deleteException = e;
+			result = false;
+		}
+    	
 		if (result == false) {
-			logger.warn("Could not delete the blob file at: " + fileToDelete.getAbsolutePath());
+			logger.warn("Could not delete the file at: " + fileToDelete.getAbsolutePath(),
+					deleteException);
 		}
     	
     	return result;

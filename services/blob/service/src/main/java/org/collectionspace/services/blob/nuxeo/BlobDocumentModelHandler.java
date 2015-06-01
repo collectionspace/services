@@ -166,9 +166,7 @@ extends NuxeoDocumentModelHandler<BlobsCommon> {
 				if (blobOutput != null) {
 					blobInput.setContentStream(blobOutput.getBlobInputStream());
 				} else {
-					// If we can't find the blob's content, we'll return a "missing document" image
-					blobInput.setContentStream(NuxeoBlobUtils.getResource(NuxeoBlobUtils.DOCUMENT_MISSING_PLACEHOLDER_IMAGE));
-					mimeTypeBuffer.append(NuxeoBlobUtils.MIME_JPEG);
+					blobInput.setContentStream(null);
 				}
 			}
 	
