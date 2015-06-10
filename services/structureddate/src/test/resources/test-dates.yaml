@@ -694,6 +694,10 @@
                                          earliestSingleDate: [2000, 12,  1, CE]
                                          latestDate:         [2001,  3, 31, CE]
 
+  'Winter, 2000/2001':                   # yearSpanningWinter
+                                         earliestSingleDate: [2000, 12,  1, CE]
+                                         latestDate:         [2001,  3, 31, CE]
+
   'Winter 10/9 BC':                      # yearSpanningWinter
                                          earliestSingleDate: [  10, 12,  1, BCE]
                                          latestDate:         [   9,  3, 31, BCE]
