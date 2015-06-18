@@ -892,7 +892,7 @@ public class NuxeoUtils {
 						+ "}:" + ioobe.getLocalizedMessage());
 			}
 		} catch (NullPointerException npe) {
-			logger.error(String.format("Null value found for property '%s' for document with ID %s",
+			logger.trace(String.format("Null value found for property '%s' for document with ID %s",
 					xpath, docModel.getName()), npe);
 		}
 
