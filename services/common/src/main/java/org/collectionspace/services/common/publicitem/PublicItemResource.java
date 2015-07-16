@@ -24,6 +24,7 @@
 package org.collectionspace.services.common.publicitem;
 
 import java.io.InputStream;
+import java.lang.reflect.Method;
 
 import org.collectionspace.authentication.spi.AuthNContext;
 import org.collectionspace.services.publicitem.PublicitemsCommon;
@@ -35,9 +36,9 @@ import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.blob.BlobOutput;
 import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.imaging.nuxeo.NuxeoBlobUtils;
-import org.jboss.resteasy.core.ResourceMethod;
+//import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.spi.HttpRequest;
-
+import org.jboss.resteasy.spi.metadata.ResourceMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +77,7 @@ public class PublicItemResource extends NuxeoBasedResource {
 
 	@Override
 	public boolean allowAnonymousAccess(HttpRequest request,
-			ResourceMethod method) {
+			Method method) {
 		return true;
 	}
 	

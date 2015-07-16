@@ -27,11 +27,13 @@
  */
 package org.collectionspace.services.common.security;
 
+import java.lang.reflect.Method;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.jboss.resteasy.core.ResourceMethod;
+//import org.jboss.resteasy.core.ResourceMethod;
+import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.interception.PostProcessInterceptor;
 import org.jboss.resteasy.spi.interception.PreProcessInterceptor;
@@ -39,7 +41,6 @@ import org.jboss.resteasy.annotations.interception.SecurityPrecedence;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
 import org.jboss.resteasy.spi.Failure;
 import org.jboss.resteasy.spi.HttpRequest;
-
 import org.nuxeo.runtime.api.Framework;
 
 import javax.security.auth.Subject;
@@ -58,7 +59,6 @@ import org.collectionspace.services.common.CollectionSpaceResource;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.common.security.SecurityUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,10 +89,10 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
     private static final String ERROR_NUXEO_LOGOUT = "Attempt to logout when Nuxeo login context was null";
     private static final String ERROR_UNBALANCED_LOGINS = "The number of Logins vs Logouts to the Nuxeo framework was unbalanced.";    
 	    
-    private boolean isAnonymousRequest(HttpRequest request, ResourceMethod resourceMethod) {
+    private boolean isAnonymousRequest(HttpRequest request, Method resourceMethod) {
     	boolean result = false;
     	
-		Class<?> resourceClass = resourceMethod.getResourceClass();
+		Class<?> resourceClass = resourceMethod.getClass();
 		try {
 			CollectionSpaceResource resourceInstance = (CollectionSpaceResource)resourceClass.newInstance();
 			result = resourceInstance.allowAnonymousAccess(request, resourceMethod);
@@ -109,9 +109,10 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 	 * @see org.jboss.resteasy.spi.interception.PreProcessInterceptor#preProcess(org.jboss.resteasy.spi.HttpRequest, org.jboss.resteasy.core.ResourceMethod)
 	 */
 	@Override
-	public ServerResponse preProcess(HttpRequest request, ResourceMethod resourceMethod)
+	public ServerResponse preProcess(HttpRequest request, ResourceMethodInvoker resourceMethodInvoker)
 			throws Failure, CSWebApplicationException {
 		ServerResponse result = null; // A null value essentially means success for this method
+		Method resourceMethod = resourceMethodInvoker.getMethod();
 		
 		try {
 			if (isAnonymousRequest(request, resourceMethod) == true) {
@@ -268,7 +269,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 	//
 	// Nuxeo login support
 	//
-	public ServerResponse nuxeoPreProcess(HttpRequest request, ResourceMethod resourceMethod)
+	public ServerResponse nuxeoPreProcess(HttpRequest request, Method resourceMethod)
 			throws Failure, CSWebApplicationException {
 		try {
 			nuxeoLogin();

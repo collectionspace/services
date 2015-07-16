@@ -16,6 +16,7 @@
 		<jaxb2-basics.version>0.6.2</jaxb2-basics.version>
 		<maven-jaxb2-plugin.version>0.12.3</maven-jaxb2-plugin.version>
 		<jaxb.version>2.2.4-1</jaxb.version>
+		<resteasy.version>3.0.9.Final</resteasy.version>
 		<mysql.driver.version>5.1.8</mysql.driver.version>
 		<postgres.driver.version>9.1-901.jdbc4</postgres.driver.version>
 		<!-- The default life cycle policy for Nuxeo document types -->
@@ -334,22 +335,22 @@
             <dependency>
                 <groupId>org.jboss.resteasy</groupId>
                 <artifactId>jaxrs-api</artifactId>
-                <version>2.2.2.GA</version>
+                <version>${resteasy.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.resteasy</groupId>
                 <artifactId>resteasy-jaxrs</artifactId>
-                <version>2.2.2.GA</version>
+                <version>${resteasy.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.resteasy</groupId>
                 <artifactId>resteasy-jaxb-provider</artifactId>
-                <version>2.2.2.GA</version>
+                <version>${resteasy.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.resteasy</groupId>
                 <artifactId>resteasy-multipart-provider</artifactId>
-                <version>2.2.2.GA</version>
+                <version>${resteasy.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-httpclient</groupId>

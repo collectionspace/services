@@ -34,16 +34,15 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope; //import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
-
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-
 import org.jboss.resteasy.client.ClientResponse; //import org.collectionspace.services.common.context.ServiceContext;
 import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
+import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
+//import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +74,8 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
     private URL url;
     /** The http client. */
     private HttpClient httpClient;
+    private org.apache.http.client.HttpClient httpClient4;
+
     /** The RESTEasy proxy */
     private P proxy;
 
@@ -147,6 +148,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
     protected AbstractServiceClientImpl() {
         readProperties();
         setupHttpClient();
+        setupHttpClient4(); // temp fix for CSPACE-6281
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         RegisterBuiltin.register(factory);
         setProxy();        
@@ -221,6 +223,10 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
         return httpClient;
     }
 
+    public org.apache.http.client.HttpClient getHttpClient4() {
+        return httpClient4;
+    }
+    
     /*
      * (non-Javadoc)
      *
@@ -342,6 +348,40 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
     		e.printStackTrace();
     	}
     }
+    
+    /*
+     * This is a temp fix for RESTEasy upgrade in CSPACE-6281.  The long-term solution will be to use
+     * the non-deprecated approach per the RESTEasy documentation.
+     */
+    public void setupHttpClient4() {
+    	try {
+	        this.httpClient4 = new DefaultHttpClient();
+	        if (useAuth()) {
+	            String user = properties.getProperty(USER_PROPERTY);
+	            String password = properties.getProperty(PASSWORD_PROPERTY);
+	            if (logger.isDebugEnabled()) {
+	                logger.debug("setupHttpClient() using url=" + url + " user="
+	                        + user + " password=" + password);
+	            }
+	
+	            httpClient.getState().setCredentials(
+	                    new AuthScope(url.getHost(), url.getPort(),
+	                    AuthScope.ANY_REALM),
+	                    new UsernamePasswordCredentials(user, password));
+	            // JAXRS client library requires HTTP preemptive authentication
+	            httpClient.getParams().setAuthenticationPreemptive(true);
+	            if (logger.isDebugEnabled()) {
+	                logger.debug("setupHttpClient: set preemptive authentication");
+	            }
+	        } else {
+	            if (logger.isDebugEnabled()) {
+	                logger.debug("setupHttpClient() : no auth mode!");
+	            }
+	        }
+    	} catch (Throwable e) {
+    		e.printStackTrace();
+    	}
+    }    
 
     /*
      * (non-Javadoc)
@@ -368,7 +408,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
     	Class<P> proxyClass = this.getProxyClass();
         if (useAuth()) {
             proxy = ProxyFactory.create(proxyClass,
-                    getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));
+                    getBaseURL(), new ApacheHttpClient4Executor(getHttpClient4()));
         } else {
         	proxy = ProxyFactory.create(proxyClass,
                     getBaseURL());
@@ -397,6 +437,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
             removeProperty(CollectionSpaceClient.AUTH_PROPERTY);
         }
         setupHttpClient();
+        setupHttpClient(); // temp fix for CSPACE-6281
         setProxy();
     }
     
