@@ -83,7 +83,12 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.taxonomy.service</artifactId>
             <version>${project.version}</version>
-        </dependency>      
+        </dependency> 
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.media.client</artifactId>
+            <version>${project.version}</version>
+        </dependency>        
         <!-- External dependencies -->        
         <dependency>
             <groupId>junit</groupId>
