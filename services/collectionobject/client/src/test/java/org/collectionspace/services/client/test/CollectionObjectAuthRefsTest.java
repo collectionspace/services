@@ -190,14 +190,14 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
         // Submit the request to the service and store the response.
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
+        Response res = collectionObjectClient.create(multipart);
         String newCsid = null;
         try {
         	assertStatusCode(res, testName);
         	newCsid = extractId(res);
         } finally {
         	if (res != null) {
-        		res.releaseConnection();
+        		res.close();
         	}
         }
         // Store the ID returned from the first resource created
@@ -225,14 +225,17 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     			displayName, shortIdentifier, personAuthClient.getCommonPartName());
-        ClientResponse<Response> res = personAuthClient.create(multipart);
+        Response res = personAuthClient.create(multipart);
         int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-        personAuthCSID = extractId(res);
-        personAuthRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
+        try {
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        personAuthCSID = extractId(res);
+	        personAuthRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
+        } finally {
+        	res.close();
+        }
     }
 
     /**
@@ -325,14 +328,18 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
         PoxPayloadOut multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
     			displayName, shortIdentifier, orgAuthClient.getCommonPartName());
-        ClientResponse<Response> res = orgAuthClient.create(multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-        orgAuthCSID = extractId(res);
-        orgAuthRefName = OrgAuthorityClientUtils.getAuthorityRefName(orgAuthCSID, null);
+        Response res = orgAuthClient.create(multipart);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        orgAuthCSID = extractId(res);
+	        orgAuthRefName = OrgAuthorityClientUtils.getAuthorityRefName(orgAuthCSID, null);
+        } finally {
+        	res.close();
+        }
     }
 
     /**

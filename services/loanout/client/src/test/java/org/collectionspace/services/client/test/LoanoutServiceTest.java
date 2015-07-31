@@ -98,27 +98,32 @@ public class LoanoutServiceTest extends AbstractPoxServiceTestImpl<AbstractCommo
         LoanoutClient client = new LoanoutClient();
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createLoanoutInstance(identifier);
-        ClientResponse<Response> res = client.create(multipart);
-
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        // Specifically:
-        // Does it fall within the set of valid status codes?
-        // Does it exactly match the expected status code?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        String newId = null;
+        Response res = client.create(multipart);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        //
+	        // Specifically:
+	        // Does it fall within the set of valid status codes?
+	        // Does it exactly match the expected status code?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	        newId = extractId(res);
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         // Store the ID returned from the first resource created
         // for additional tests below.
         if (knownResourceId == null) {
-            knownResourceId = extractId(res);
+            knownResourceId = newId;
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
@@ -126,7 +131,7 @@ public class LoanoutServiceTest extends AbstractPoxServiceTestImpl<AbstractCommo
 
         // Store the IDs from every resource created by tests,
         // so they can be deleted after tests have been run.
-        allResourceIdsCreated.add(extractId(res));
+        allResourceIdsCreated.add(newId);
     }
 
     /* (non-Javadoc)

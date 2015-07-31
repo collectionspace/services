@@ -156,7 +156,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     	setupCreate();
     	CollectionSpaceClient client = this.getClientInstance();
         REQUEST_TYPE payload = createInstance(client.getCommonPartName(), identifier);
-        ClientResponse<Response> res = client.create(payload);
+        Response res = client.create(payload);
     	try {
 	        int statusCode = res.getStatus();
 	        if (logger.isDebugEnabled()) {
@@ -171,7 +171,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 	        // so they can be deleted after tests have been run.
 	        allResourceIdsCreated.add(result);
     	} finally {
-    		res.releaseConnection();
+    		res.close();
     	}
     	
     	return result;
@@ -212,9 +212,14 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     public void delete(String testName) throws Exception {
         setupDelete();
     	CollectionSpaceClient client = this.getClientInstance();
-        ClientResponse<Response> res = client.delete(getKnowResourceId());
-        int statusCode = res.getStatus();
-
+        Response res = client.delete(getKnowResourceId());
+        int statusCode;
+        try {
+        	statusCode = res.getStatus();
+        } finally {
+        	res.close();
+        }
+        
         // Check the status code of the response: does it match
         // the expected response(s)?
         if (logger.isDebugEnabled()) {
@@ -257,8 +262,13 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 
         // Submit the request to the service and store the response.
     	CollectionSpaceClient client = this.getClientInstance();
-        ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
+        Response res = client.delete(NON_EXISTENT_ID);
+        int statusCode;
+        try {
+        	statusCode = res.getStatus();
+        } finally {
+        	res.close();
+        }
 
         // Check the status code of the response: does it match
         // the expected response(s)?
@@ -999,7 +1009,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 
         CollectionSpaceClient client = getClientInstance();
         REQUEST_TYPE payload = createInstance(identifier);
-        ClientResponse<Response> res = client.create(payload);
+        Response res = client.create(payload);
 
         int statusCode = res.getStatus();
         Assert.assertEquals(statusCode, STATUS_CREATED);

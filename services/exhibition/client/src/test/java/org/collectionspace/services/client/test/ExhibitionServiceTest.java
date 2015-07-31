@@ -95,7 +95,7 @@ public class ExhibitionServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createExhibitionInstance(identifier);
         String newID = null;
-        ClientResponse<Response> res = client.create(multipart);
+        Response res = client.create(multipart);
         try {
             int statusCode = res.getStatus();
 
@@ -115,7 +115,7 @@ public class ExhibitionServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
             newID = extractId(res);
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 

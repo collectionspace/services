@@ -113,7 +113,7 @@ public class PublicItemServiceTest extends
 		String identifier = createIdentifier();
 		PoxPayloadOut multipart = createPublicItemInstance(identifier);
 		String newID = null;
-		ClientResponse<Response> res = client.create(multipart);
+		Response res = client.create(multipart);
 		try {
 			int statusCode = res.getStatus();
 
@@ -133,7 +133,7 @@ public class PublicItemServiceTest extends
 			newID = extractId(res);
 		} finally {
 			if (res != null) {
-				res.releaseConnection();
+				res.close();
 			}
 		}
 

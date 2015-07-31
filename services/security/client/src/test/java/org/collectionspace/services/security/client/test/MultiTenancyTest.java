@@ -320,13 +320,13 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         //
         PoxPayloadOut multipart = DimensionFactory.createDimensionInstance(client.getCommonPartName(),
                 dimension);
-        ClientResponse<Response> res = client.create(multipart);
+        Response res = client.create(multipart);
         try {
         	assertStatusCode(res, testName);
         	result = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 

@@ -134,7 +134,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
                 insurerRefName,
                 valuerRefName);
 
-        ClientResponse<Response> res = intakeClient.create(multipart);
+        Response res = intakeClient.create(multipart);
         try {
             int statusCode = res.getStatus();
 
@@ -151,7 +151,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
-            res.releaseConnection();
+            res.close();
         }
 
         // Store the ID returned from the first resource created
@@ -175,13 +175,16 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
                 PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
-        ClientResponse<Response> res = personAuthClient.create(multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-        personAuthCSID = extractId(res);
+        Response res = personAuthClient.create(multipart);
+        try {
+	        int statusCode = res.getStatus();
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        personAuthCSID = extractId(res);
+        } finally {
+        	res.close();
+        }
 
         String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
 
@@ -220,7 +223,6 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         }
         Assert.assertNotNull(valuerRefName);
         personIdsCreated.add(csid);
-
     }
 
     protected String createPerson(String firstName, String surName, String shortId, String authRefName) {

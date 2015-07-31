@@ -559,13 +559,13 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
     	    displayName, shortId, client.getCommonPartName());
 
     	String newID = null;
-    	ClientResponse<Response> res = client.create(multipart);
+    	Response res = client.create(multipart);
         try {
             assertStatusCode(res, testName);
             newID = PersonAuthorityClientUtils.extractId(res);
     	} finally {
     		if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
     	}
         // Store the refname from the first resource created

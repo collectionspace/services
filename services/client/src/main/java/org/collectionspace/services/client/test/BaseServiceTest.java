@@ -399,6 +399,27 @@ public abstract class BaseServiceTest<CLT> {
         }
         return id;
     }
+    
+    /**
+     * Extract id.
+     *
+     * @param res the res
+     * @return the string
+     */
+    static protected String extractId(Response res) {
+        MultivaluedMap<String, Object> mvm = res.getMetadata();
+        String uri = (String) ((List<Object>) mvm.get("Location")).get(0);
+        if (logger.isDebugEnabled()) {
+            logger.debug("extractId:uri=" + uri);
+        }
+        String[] segments = uri.split("/");
+        String id = segments[segments.length - 1];
+        if (logger.isDebugEnabled()) {
+            logger.debug("id=" + id);
+        }
+        return id;
+    }
+    
  
     /**
      * Tests can override this method to customize their identifiers.
@@ -668,6 +689,18 @@ public abstract class BaseServiceTest<CLT> {
         
         return statusCode;
     }
+    
+    public int assertStatusCode(Response res, String testName) {
+        int statusCode = res.getStatus();
+        
+        // Check the status code of the response: does it match the expected response(s)?
+        logger.debug(testName + ": status = " + statusCode);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+        		invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
+        
+        return statusCode;
+    }    
 
     public static String getUTF8DataFragment() {
         return UTF8_DATA_FRAGMENT;
@@ -729,7 +762,7 @@ public abstract class BaseServiceTest<CLT> {
         //
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            client.delete(resourceId).releaseConnection();
+            client.delete(resourceId).close();
         }
     }
 	

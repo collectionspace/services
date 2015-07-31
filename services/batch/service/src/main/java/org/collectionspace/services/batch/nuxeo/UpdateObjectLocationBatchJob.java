@@ -9,9 +9,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriInfo;
+
 import org.collectionspace.services.batch.AbstractBatchInvocable;
+import org.collectionspace.services.batch.UriInfoImpl;
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.IQueryManager;
@@ -25,7 +28,7 @@ import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.dom4j.DocumentException;
-import org.jboss.resteasy.specimpl.UriInfoImpl;
+//import org.jboss.resteasy.specimpl.UriInfoImpl;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -391,7 +394,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         return createUriInfo("");
     }
 
-    protected UriInfo createUriInfo(String queryString) throws URISyntaxException {
+    private UriInfo createUriInfo(String queryString) throws URISyntaxException {
         URI absolutePath = new URI("");
         URI baseUri = new URI("");
         return new UriInfoImpl(absolutePath, baseUri, "", queryString, Collections.<PathSegment>emptyList());

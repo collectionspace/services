@@ -91,15 +91,15 @@ public class I1591Multiple extends CollectionSpacePerformanceTest {
         commonPart.setLabel(collectionObjectClient.getCommonPartName());
 
         // Make a create call with that payload and check the response.
-        ClientResponse<Response> response = collectionObjectClient.create(multipart);
+        Response response = collectionObjectClient.create(multipart);
         try {
             Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
             resourceId = extractId(response);
-        // Since failed Asserts can throw an Exception, ensure
-        // that the underlying HTTP connection is explicitly closed
-        // under all circumstances.
+	        // Since failed Asserts can throw an Exception, ensure
+	        // that the underlying HTTP connection is explicitly closed
+	        // under all circumstances.
         } finally {
-            response.releaseConnection();
+            response.close();
         }
 
         // Return the ID of the newly-created CollectionObject resource.

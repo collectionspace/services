@@ -77,7 +77,7 @@ public class PublicItemResource extends NuxeoBasedResource {
 
 	@Override
 	public boolean allowAnonymousAccess(HttpRequest request,
-			Method method) {
+			Class<?> resourceClass) {
 		return true;
 	}
 	

@@ -14,7 +14,7 @@ public abstract class AbstractPoxServiceClientImpl<CLT extends AbstractCommonLis
 	implements CollectionSpacePoxClient<CLT, P> {
 	
     @Override
-    public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
+	public Response create(PoxPayloadOut xmlPayload) {
         return getProxy().create(xmlPayload.getBytes());
     }
 		

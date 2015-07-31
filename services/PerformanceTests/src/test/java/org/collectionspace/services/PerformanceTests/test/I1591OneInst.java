@@ -92,7 +92,7 @@ public class I1591OneInst extends CollectionSpacePerformanceTest {
             commonPart.setLabel(collectionObjectClient.getCommonPartName());
 
             // Make a create call with that payload and check the response.
-            ClientResponse<Response> response = collectionObjectClient.create(multipart);
+            Response response = collectionObjectClient.create(multipart);
             try {
                 Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
                 coList[i] = extractId(response);
@@ -107,7 +107,7 @@ public class I1591OneInst extends CollectionSpacePerformanceTest {
             // that the underlying HTTP connection is explicitly closed
             // under all circumstances.
             } finally {
-                response.releaseConnection();
+                response.close();
             }
 
             if (logger.isDebugEnabled() == true) {

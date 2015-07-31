@@ -151,13 +151,13 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
                 displayName, shortId, client.getCommonPartName());
 
         String newID = null;
-        ClientResponse<Response> res = client.create(multipart);
+        Response res = client.create(multipart);
         try {
         	assertStatusCode(res, testName);
             newID = extractId(res);
         } finally {
         	if (res != null) {
-        		res.releaseConnection();
+        		res.close();
         	}
         }
         // Save values for additional tests
@@ -399,7 +399,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
                 displayName, shortId, client.getCommonPartName());
 
         // Submit the request to the service and store the response.
-        ClientResponse<Response> res = client.create(multipart);
+        Response res = client.create(multipart);
 
         // Check the status code of the response: does it match
         // the expected response(s)?
@@ -407,7 +407,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-        		res.releaseConnection();
+        		res.close();
         	}
         }
     }

@@ -109,7 +109,7 @@ public class MediaAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         //    references, and will refer to Person resources by their refNames.
         MediaClient mediaClient = new MediaClient();
         PoxPayloadOut multipart = createMediaInstance(depositorRefName, "media.title-" + identifier);
-        ClientResponse<Response> res = mediaClient.create(multipart);
+        Response res = mediaClient.create(multipart);
         try {
 	        assertStatusCode(res, testName);
 	        if (knownResourceId == null) {// Store the ID returned from the first resource created for additional tests below.
@@ -118,7 +118,7 @@ public class MediaAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 	        mediaIdsCreated.add(extractId(res));// Store the IDs from every resource created; delete on cleanup
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -128,13 +128,13 @@ public class MediaAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         // Create a temporary PersonAuthority resource, and its corresponding refName by which it can be identified.
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
         		PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
-        ClientResponse<Response> res = personAuthClient.create(multipart);
+        Response res = personAuthClient.create(multipart);
         try {
 	        assertStatusCode(res, "createPersonRefs (not a surefire test)");
 	        personAuthCSID = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);

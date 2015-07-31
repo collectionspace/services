@@ -103,16 +103,19 @@ public class RelationServiceTest extends AbstractPoxServiceTestImpl<RelationsCom
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
                 PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
-        ClientResponse<Response> res = personAuthClient.create(multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-        personAuthCSID = extractId(res);
-
+        Response res = personAuthClient.create(multipart);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        personAuthCSID = extractId(res);
+        } finally {
+        	res.close();
+        }
+        
         String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
-
         String csid = createPerson("Sam", "Subject", "samSubject", authRefName);
         Assert.assertNotNull(csid);
         samSubjectPersonCSID = csid;
@@ -166,9 +169,14 @@ public class RelationServiceTest extends AbstractPoxServiceTestImpl<RelationsCom
         // Make the subject ID equal to the object ID
         relationsCommon.setSubjectCsid(relationsCommon.getObjectCsid());
         PoxPayloadOut multipart = createRelationInstance(relationsCommon);
-        ClientResponse<Response> res = client.create(multipart);
-        int statusCode = res.getStatus();
-
+        Response res = client.create(multipart);
+        int statusCode;
+        try {
+        	statusCode = res.getStatus();
+        } finally {
+        	res.close();
+        }
+        
         // Check the status code of the response: does it match
         // the expected response(s)?
         //

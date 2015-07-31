@@ -110,7 +110,7 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         //    references, and will refer to Person resources by their refNames.
         BlobClient blobClient = new BlobClient();
         PoxPayloadOut multipart = createBlobInstance(depositorRefName);
-        ClientResponse<Response> res = blobClient.create(multipart);
+        Response res = blobClient.create(multipart);
         try {
 	        assertStatusCode(res, testName);
 	        if (knownResourceId == null) {// Store the ID returned from the first resource created for additional tests below.
@@ -119,7 +119,7 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 	        blobIdsCreated.add(extractId(res));// Store the IDs from every resource created; delete on cleanup
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -128,7 +128,7 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding refName by which it can be identified.
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
-        ClientResponse<Response> res = personAuthClient.create(multipart);
+        Response res = personAuthClient.create(multipart);
         try {
 	        assertStatusCode(res, "createPersonRefs (not a surefire test)");
 	        personAuthCSID = extractId(res);
@@ -145,7 +145,7 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 	        depositorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }

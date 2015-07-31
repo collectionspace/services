@@ -178,7 +178,7 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * Common proxied service calls
      */
 
-	public ClientResponse<Response> create(REQUEST_TYPE payload);
+	public Response create(REQUEST_TYPE payload);
 	
 	public ClientResponse<RESPONSE_TYPE> read(String csid);
 
@@ -234,5 +234,5 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * @param csid the csid
      * @return the client response
      */
-    public ClientResponse<Response> delete(String csid);
+    public Response delete(String csid);
 }

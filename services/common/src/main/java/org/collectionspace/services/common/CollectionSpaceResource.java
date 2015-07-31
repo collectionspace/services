@@ -97,6 +97,6 @@ public interface CollectionSpaceResource<IT, OT> {
      */
 //			<sec:filter-chain pattern="/publicitems/*/*/content"
 //                              filters="none"/>
-	public boolean allowAnonymousAccess(HttpRequest request, Method method);
+	public boolean allowAnonymousAccess(HttpRequest request, Class<?> resourceClass);
     
 }

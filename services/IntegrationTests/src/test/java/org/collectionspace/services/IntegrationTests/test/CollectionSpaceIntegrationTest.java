@@ -157,6 +157,19 @@ public abstract class CollectionSpaceIntegrationTest {
 		
 		return result;
 	}
+	
+	String extractId(Response res) {
+		String result = null;
+		
+		MultivaluedMap mvm = res.getMetadata();
+		String uri = (String) ((ArrayList) mvm.get("Location")).get(0);
+		verbose("extractId:uri=" + uri);
+		String[] segments = uri.split("/");
+		result = segments[segments.length - 1];
+		verbose("id=" + result);
+		
+		return result;
+	}	
 
 	/**
 	 * Extract part.

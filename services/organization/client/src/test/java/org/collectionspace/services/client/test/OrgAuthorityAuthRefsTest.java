@@ -148,7 +148,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
             			displayName, shortId, orgAuthClient.getCommonPartName());
 
         // Submit the request to the service and store the response.
-        ClientResponse<Response> res = orgAuthClient.create(multipart);
+        Response res = orgAuthClient.create(multipart);
         try {
 	        int statusCode = res.getStatus();
 	        // Check the status code of the response: does it match
@@ -168,11 +168,11 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
 	        // so they can be deleted after tests have been run.
 	        String newId = extractId(res);
 	        if (knownResourceId == null){
-	        	setKnownResource( newId, null ); //baseRefName );
+	        	setKnownResource(newId, null ); //baseRefName );
 	        }
 	        allResourceIdsCreated.add(newId);
         } finally {
-            res.releaseConnection();
+            res.close();
         }        
 
         // Create all the person refs and entities
@@ -217,7 +217,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
     	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         
-    	ClientResponse<Response> res = personAuthClient.create(multipart);
+    	Response res = personAuthClient.create(multipart);
         try {
             int statusCode = res.getStatus();
             Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
@@ -225,7 +225,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
             Assert.assertEquals(statusCode, STATUS_CREATED);
             personAuthCSID = extractId(res);
         } finally {
-            res.releaseConnection();
+            res.close();
         }
 
         //String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);

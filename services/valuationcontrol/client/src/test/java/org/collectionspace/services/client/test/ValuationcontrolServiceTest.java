@@ -95,7 +95,7 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createValuationcontrolInstance(identifier);
         String newID = null;
-        ClientResponse<Response> res = client.create(multipart);
+        Response res = client.create(multipart);
         try {
             int statusCode = res.getStatus();
 
@@ -115,7 +115,7 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
             newID = extractId(res);
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 

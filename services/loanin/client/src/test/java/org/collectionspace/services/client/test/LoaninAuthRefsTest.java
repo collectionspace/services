@@ -127,9 +127,10 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
                 lendersContactRefName,
                 borrowersContactRefName,
                 borrowersAuthorizerRefName);
-        ClientResponse<Response> response = loaninClient.create(multipart);
-        int statusCode = response.getStatus();
+        String newId = null;
+        Response response = loaninClient.create(multipart);
         try {
+            int statusCode = response.getStatus();
 	        // Check the status code of the response: does it match
 	        // the expected response(s)?
 	        //
@@ -142,22 +143,23 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
 	                invalidStatusCodeMessage(testRequestType, statusCode));
 	        Assert.assertEquals(statusCode, testExpectedStatusCode);
-	
-	        // Store the ID returned from the first resource created
-	        // for additional tests below.
-	        if (knownResourceId == null){
-	            knownResourceId = extractId(response);
-	            if (logger.isDebugEnabled()) {
-	                logger.debug(testName + ": knownResourceId=" + knownResourceId);
-	            }
-	        }
-	        
-	        // Store the IDs from every resource created by tests,
-	        // so they can be deleted after tests have been run.
-	        loaninIdsCreated.add(extractId(response));
+	        newId = extractId(response);
         } finally {
-        	response.releaseConnection();
+        	response.close();
         }
+	
+        // Store the ID returned from the first resource created
+        // for additional tests below.
+        if (knownResourceId == null){
+            knownResourceId = newId;
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": knownResourceId=" + knownResourceId);
+            }
+        }
+        
+        // Store the IDs from every resource created by tests,
+        // so they can be deleted after tests have been run.
+        loaninIdsCreated.add(newId);
     }
     
     protected void createPersonRefs(){
@@ -167,13 +169,17 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         // refName by which it can be identified.
     	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
-        ClientResponse<Response> res = personAuthClient.create(multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-        personAuthCSID = extractId(res);
+        Response res = personAuthClient.create(multipart);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	            invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        personAuthCSID = extractId(res);
+        } finally {
+        	res.close();
+        }
 
         String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
         

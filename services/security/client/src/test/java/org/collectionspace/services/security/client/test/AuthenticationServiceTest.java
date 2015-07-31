@@ -197,19 +197,22 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        if (logger.isDebugEnabled()) {
-            logger.debug("create: status = " + res.getStatus());
+        Response res = collectionObjectClient.create(multipart);
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug("create: status = " + res.getStatus());
+	        }
+	        //so it does not have any permissions out-of-the-box to create a
+	        //collection object
+	        Assert.assertEquals(res.getStatus(),
+	                Response.Status.FORBIDDEN.getStatusCode(), "expected "
+	                + Response.Status.FORBIDDEN.getStatusCode());
+	
+	        // Store the ID returned from this create operation for additional tests
+	        // below.
+        } finally {
+        	res.close();
         }
-        //so it does not have any permissions out-of-the-box to create a
-        //collection object
-        Assert.assertEquals(res.getStatus(),
-                Response.Status.FORBIDDEN.getStatusCode(), "expected "
-                + Response.Status.FORBIDDEN.getStatusCode());
-
-        // Store the ID returned from this create operation for additional tests
-        // below.
-        res.releaseConnection();
 
     }
 
@@ -225,15 +228,17 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        if (logger.isDebugEnabled()) {
-            logger.debug("create: status = " + res.getStatus());
+        Response res = collectionObjectClient.create(multipart);
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug("create: status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(),
+	                Response.Status.UNAUTHORIZED.getStatusCode(), "expected "
+	                + Response.Status.UNAUTHORIZED.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(),
-                Response.Status.UNAUTHORIZED.getStatusCode(), "expected "
-                + Response.Status.UNAUTHORIZED.getStatusCode());
-        res.releaseConnection();
-
     }
 
     @Test(dataProvider = "testName",
@@ -245,14 +250,17 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
 
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + res.getStatus());
+        Response res = collectionObjectClient.create(multipart);
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(),
+	                Response.Status.FORBIDDEN.getStatusCode(), "expected "
+	                + Response.Status.FORBIDDEN.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(),
-                Response.Status.FORBIDDEN.getStatusCode(), "expected "
-                + Response.Status.FORBIDDEN.getStatusCode());
-        res.releaseConnection();
     }
 
     /**
@@ -267,12 +275,15 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + res.getStatus());
+        Response res = collectionObjectClient.create(multipart);
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
-        res.releaseConnection();
     }
 
     /**
@@ -286,12 +297,15 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + res.getStatus());
+        Response res = collectionObjectClient.create(multipart);
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
-        res.releaseConnection();
     }
 
     /**
@@ -306,12 +320,15 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + res.getStatus());
+        Response res = collectionObjectClient.create(multipart);
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
-        res.releaseConnection();
     }
 
     /**
@@ -324,13 +341,15 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = "
-                    + res.getStatus());
+        Response res = collectionObjectClient.create(multipart);
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
-        res.releaseConnection();
     }
 
     /**
@@ -343,13 +362,15 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = "
-                    + res.getStatus());
+        Response res = collectionObjectClient.create(multipart);
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
-        res.releaseConnection();
     }
 
     @Test(dataProvider = "testName",

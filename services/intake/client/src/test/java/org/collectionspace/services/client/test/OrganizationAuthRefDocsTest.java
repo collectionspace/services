@@ -134,7 +134,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
                 insurerRefName,
                 valuerRefName );
 
-        ClientResponse<Response> res = intakeClient.create(multipart);
+        Response res = intakeClient.create(multipart);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -151,7 +151,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
 	                invalidStatusCodeMessage(testRequestType, statusCode));
 	        Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
-        	res.releaseConnection();
+        	res.close();
         }
 
         // Store the ID returned from the first resource created
@@ -177,7 +177,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
     	//	OrgAuthorityClientUtils.createOrgAuthRefName(ORGANIZATION_AUTHORITY_NAME, null);
         PoxPayloadOut multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
     			ORGANIZATION_AUTHORITY_NAME, ORGANIZATION_AUTHORITY_NAME, orgAuthClient.getCommonPartName());
-        ClientResponse<Response> res = orgAuthClient.create(multipart);
+        Response res = orgAuthClient.create(multipart);
         int statusCode = res.getStatus();
 
         Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),

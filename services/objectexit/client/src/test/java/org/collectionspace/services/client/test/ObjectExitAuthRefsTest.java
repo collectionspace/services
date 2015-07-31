@@ -124,7 +124,7 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
         ObjectExitClient objectexitClient = new ObjectExitClient();
         PoxPayloadOut multipart = createObjectExitInstance(depositorRefName,
                 "exitNumber-" + identifier, CURRENT_DATE_UTC);
-        ClientResponse<Response> res = objectexitClient.create(multipart);
+        Response res = objectexitClient.create(multipart);
         try {
 	        assertStatusCode(res, testName);
 	        if (knownResourceId == null) {// Store the ID returned from the first resource created for additional tests below.
@@ -132,7 +132,7 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
 	        }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         objectexitIdsCreated.add(extractId(res));// Store the IDs from every resource created; delete on cleanup
@@ -142,13 +142,13 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding refName by which it can be identified.
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
-        ClientResponse<Response> res = personAuthClient.create(multipart);
+        Response res = personAuthClient.create(multipart);
         try {
 	        assertStatusCode(res, "createPersonRefs (not a surefire test)");
 	        personAuthCSID = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);

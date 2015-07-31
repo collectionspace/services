@@ -88,7 +88,7 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
     	
         PoxPayloadOut poxPayloadOut = new PoxPayloadOut(AcquisitionClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = poxPayloadOut.addPart(acquisitionClient.getCommonPartName(), acquisitionsCommon);
-        ClientResponse<Response> res = acquisitionClient.create(poxPayloadOut);
+        Response res = acquisitionClient.create(poxPayloadOut);
     	try {
             setupCreate();
 	        int statusCode = res.getStatus();
@@ -104,7 +104,7 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
 	        // so they can be deleted after tests have been run.
 	        allResourceIdsCreated.add(result);
     	} finally {
-    		res.releaseConnection();
+    		res.close();
     	}
     	
     	return result;

@@ -121,7 +121,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 				acquisitionSourcesRefNames);
 
 		AcquisitionClient acquisitionClient = new AcquisitionClient();
-		ClientResponse<Response> res = acquisitionClient.create(multipart);
+		Response res = acquisitionClient.create(multipart);
 
 		int statusCode = res.getStatus();
 
@@ -156,7 +156,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 		PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
 		PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
 				PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
-		ClientResponse<Response> res = personAuthClient.create(multipart);
+		Response res = personAuthClient.create(multipart);
 		int statusCode = res.getStatus();
 
 		Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),

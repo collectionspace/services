@@ -369,6 +369,21 @@ public class PersonAuthorityClientUtils {
      * @param res the res
      * @return the string
      */
+    public static String extractId(Response res) {
+        MultivaluedMap<String, Object> mvm = res.getMetadata();
+        // FIXME: This may throw an NPE if the Location: header isn't present
+        String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
+        if(logger.isDebugEnabled()){
+        	logger.debug("extractId:uri=" + uri);
+        }
+        String[] segments = uri.split("/");
+        String id = segments[segments.length - 1];
+        if(logger.isDebugEnabled()){
+        	logger.debug("id=" + id);
+        }
+        return id;
+    }
+    
     public static String extractId(ClientResponse<Response> res) {
         MultivaluedMap<String, Object> mvm = res.getMetadata();
         // FIXME: This may throw an NPE if the Location: header isn't present
@@ -383,6 +398,7 @@ public class PersonAuthorityClientUtils {
         }
         return id;
     }
+    
     
     /**
      * Returns an error message indicating that the status code returned by a

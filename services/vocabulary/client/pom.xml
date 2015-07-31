@@ -28,6 +28,12 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.vocabulary.jaxb</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+            	<exclusion>
+            		<artifactId>jsr311-api</artifactId>
+            		<groupId>javax.ws.rs</groupId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>

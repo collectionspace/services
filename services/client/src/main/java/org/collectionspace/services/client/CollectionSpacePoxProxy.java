@@ -18,7 +18,7 @@ public interface CollectionSpacePoxProxy<LT extends AbstractCommonList> extends
 
 	// (C)reate
 	@POST
-	ClientResponse<Response> create(byte[] payload);
+	Response create(byte[] payload);
 
 	// (R)ead
 	@GET

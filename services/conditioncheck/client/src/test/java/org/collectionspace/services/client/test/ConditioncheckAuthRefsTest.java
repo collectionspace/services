@@ -113,7 +113,7 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
         PoxPayloadOut multipart = createConditioncheckInstance(
                 "conditionCheckRefNumber-" + identifier,
                 conditionCheckerRefName);
-        ClientResponse<Response> response = conditioncheckClient.create(multipart);
+        Response response = conditioncheckClient.create(multipart);
         int statusCode = response.getStatus();
         try {
             // Check the status code of the response: does it match
@@ -142,27 +142,28 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
             // so they can be deleted after tests have been run.
             conditioncheckIdsCreated.add(extractId(response));
         } finally {
-            response.releaseConnection();
+            response.close();
         }
     }
     
     protected void createPersonRefs(){
-
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding
         // refName by which it can be identified.
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
             PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
-        ClientResponse<Response> res = personAuthClient.create(multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-        personAuthCSID = extractId(res);
+        Response res = personAuthClient.create(multipart);
+        try {
+        	int statusCode = res.getStatus();
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	            invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        personAuthCSID = extractId(res);
+        } finally {
+        	res.close();
+        }
 
         String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
-        
         // Create temporary Person resources, and their corresponding refNames
         // by which they can be identified.
         String csid = createPerson("Carrie", "ConditionChecker1", "carrieConditionChecker", authRefName);

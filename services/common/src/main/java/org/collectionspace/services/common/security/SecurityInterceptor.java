@@ -89,13 +89,13 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
     private static final String ERROR_NUXEO_LOGOUT = "Attempt to logout when Nuxeo login context was null";
     private static final String ERROR_UNBALANCED_LOGINS = "The number of Logins vs Logouts to the Nuxeo framework was unbalanced.";    
 	    
-    private boolean isAnonymousRequest(HttpRequest request, Method resourceMethod) {
+    private boolean isAnonymousRequest(HttpRequest request, ResourceMethodInvoker resourceMethodInvoker) {
     	boolean result = false;
     	
-		Class<?> resourceClass = resourceMethod.getClass();
+		Class<?> resourceClass = resourceMethodInvoker.getResourceClass();
 		try {
 			CollectionSpaceResource resourceInstance = (CollectionSpaceResource)resourceClass.newInstance();
-			result = resourceInstance.allowAnonymousAccess(request, resourceMethod);
+			result = resourceInstance.allowAnonymousAccess(request, resourceClass);
 		} catch (InstantiationException e) {
 			logger.error("isAnonymousRequest: ", e);
 		} catch (IllegalAccessException e) {
@@ -104,7 +104,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 
     	return result;
     }
-    
+        
 	/* (non-Javadoc)
 	 * @see org.jboss.resteasy.spi.interception.PreProcessInterceptor#preProcess(org.jboss.resteasy.spi.HttpRequest, org.jboss.resteasy.core.ResourceMethod)
 	 */
@@ -115,10 +115,10 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 		Method resourceMethod = resourceMethodInvoker.getMethod();
 		
 		try {
-			if (isAnonymousRequest(request, resourceMethod) == true) {
+			if (isAnonymousRequest(request, resourceMethodInvoker) == true) {
 				// We don't need to check credentials for anonymous requests.  Just login to Nuxeo and
 				// exit
-				nuxeoPreProcess(request, resourceMethod);
+				nuxeoPreProcess(request, resourceMethodInvoker);
 	
 				return result;
 			}
@@ -184,7 +184,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 				//
 				// Login to Nuxeo
 				//
-				nuxeoPreProcess(request, resourceMethod);
+				nuxeoPreProcess(request, resourceMethodInvoker);
 				
 				//
 				// We've passed all the checks.  Now just log the results
@@ -269,7 +269,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 	//
 	// Nuxeo login support
 	//
-	public ServerResponse nuxeoPreProcess(HttpRequest request, Method resourceMethod)
+	public ServerResponse nuxeoPreProcess(HttpRequest request, ResourceMethodInvoker resourceMethodInvoker)
 			throws Failure, CSWebApplicationException {
 		try {
 			nuxeoLogin();

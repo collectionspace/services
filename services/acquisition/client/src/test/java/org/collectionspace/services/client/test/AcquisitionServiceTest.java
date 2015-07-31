@@ -103,7 +103,7 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
 
         AcquisitionClient client = new AcquisitionClient();
         PoxPayloadOut multipart = createAcquisitionInstance(identifier);
-        ClientResponse<Response> res = client.create(multipart);
+        Response res = client.create(multipart);
 
         int statusCode = res.getStatus();
 
@@ -791,7 +791,7 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
             multipart = createAcquisitionInstanceFromRawXml(testName,
                     client.getCommonPartName(), fileName);
         }
-        ClientResponse<Response> res = client.create(multipart);
+        Response res = client.create(multipart);
         int statusCode = res.getStatus();
 
         if (logger.isDebugEnabled()) {

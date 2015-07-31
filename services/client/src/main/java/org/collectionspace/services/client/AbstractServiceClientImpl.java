@@ -23,13 +23,19 @@
  */
 package org.collectionspace.services.client;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.Properties;
 
 import javax.ws.rs.PathParam;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.ClientRequestContext;
+import javax.ws.rs.client.ClientRequestFilter;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -40,11 +46,47 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse; //import org.collectionspace.services.common.context.ServiceContext;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 //import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+/**
+ * Private class for JAX-RS authentication
+ */
+class Authenticator implements ClientRequestFilter {
+
+    private final String user;
+    private final String password;
+
+    public Authenticator(String user, String password) {
+        this.user = user;
+        this.password = password;
+    }
+
+    @Override
+    public void filter(ClientRequestContext requestContext) throws IOException {
+        MultivaluedMap<String, Object> headers = requestContext.getHeaders();
+        final String basicAuthentication = getBasicAuthentication();
+        headers.add("Authorization", basicAuthentication);
+
+    }
+
+    private String getBasicAuthentication() {
+    	String result = null;
+        String token = this.user + ":" + this.password;
+        try {
+            result = "Basic " + DatatypeConverter.printBase64Binary(token.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException ex) {
+            throw new IllegalStateException("Cannot encode with UTF-8", ex);
+        }
+        
+        return result;
+    }
+}
+
 
 /**
  * BaseServiceClient is an abstract base client of all service clients FIXME:
@@ -405,6 +447,26 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      */
     @Override
 	public void setProxy() {
+    	ResteasyClient client = null;
+        String urlString = url.toString();
+    	Class<P> proxyClass = this.getProxyClass();
+    	
+        if (useAuth()) {
+            String user = properties.getProperty(USER_PROPERTY);
+            String password = properties.getProperty(PASSWORD_PROPERTY);
+        	client = (ResteasyClient)ClientBuilder.newClient().register(new Authenticator(user, password));
+        } else {
+        	client = (ResteasyClient)ClientBuilder.newClient();
+        }
+        
+        proxy = client.target(urlString).proxy(proxyClass);
+    }
+    
+    /**
+     * allow to reset proxy as per security needs
+     */
+    @Deprecated
+	public void _setProxy() {
     	Class<P> proxyClass = this.getProxyClass();
         if (useAuth()) {
             proxy = ProxyFactory.create(proxyClass,

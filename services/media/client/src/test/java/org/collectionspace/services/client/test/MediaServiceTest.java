@@ -116,14 +116,14 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 		//
 		MediaClient client = new MediaClient();
 		PoxPayloadOut multipart = createMediaInstance(createIdentifier());
-		ClientResponse<Response> mediaRes = client.create(multipart);
+		Response mediaRes = client.create(multipart);
 		String mediaCsid = null;
 		try {
 			assertStatusCode(mediaRes, testName);
 			mediaCsid = extractId(mediaRes);
 		} finally {
 			if (mediaRes != null) {
-				mediaRes.releaseConnection();
+				mediaRes.close();
 			}
 		}
 		//

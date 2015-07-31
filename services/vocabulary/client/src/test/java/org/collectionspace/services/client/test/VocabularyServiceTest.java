@@ -92,12 +92,12 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
         VocabularyClient client = new VocabularyClient();
         PoxPayloadOut multipart = VocabularyClientUtils.createEnumerationInstance(
                 "Vocab with Bad Short Id", "Bad Short Id!", client.getCommonPartName());
-        ClientResponse<Response> res = client.create(multipart);
+        Response res = client.create(multipart);
         try {
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }

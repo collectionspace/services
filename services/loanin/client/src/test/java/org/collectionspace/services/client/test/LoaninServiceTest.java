@@ -105,7 +105,7 @@ public class LoaninServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createLoaninInstance(identifier);
         String newID = null;
-        ClientResponse<Response> res = client.create(multipart);
+        Response res = client.create(multipart);
         try {
             int statusCode = res.getStatus();
 
@@ -125,7 +125,7 @@ public class LoaninServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
             newID = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 

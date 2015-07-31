@@ -174,7 +174,7 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
             PoxPayloadOut multipart) {
         String result = null;
         // Make the create call and check the response
-        ClientResponse<Response> response = collectionObjectClient.create(multipart);
+        Response response = collectionObjectClient.create(multipart);
         try {
             int responseStatus = response.getStatus();
             if (logger.isDebugEnabled() == true) {
@@ -187,7 +187,7 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
             Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
             result = extractId(response);
         } finally {
-            response.releaseConnection();
+            response.close();
         }
 
         return result;

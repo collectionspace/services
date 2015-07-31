@@ -244,6 +244,7 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
 
     @Test(dataProvider = "testName")
     public void create(String testName) throws Exception {
+        int statusCode;
         setupCreate();
 
         // Submit the request to the service and store the response.
@@ -257,33 +258,38 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
         dimension.setValueDate(new Date().toString());
         PoxPayloadOut multipart = DimensionFactory.createDimensionInstance(client.getCommonPartName(),
                 dimension);
-        ClientResponse<Response> res = client.create(multipart);
-
-        int statusCode = res.getStatus();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.create(multipart);
+        try {
+	        statusCode = res.getStatus();
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, Response.Status.CREATED.getStatusCode());
+	        knownResourceId = extractId(res);
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": knownResourceId=" + knownResourceId);
+	        }
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.CREATED.getStatusCode());
-        knownResourceId = extractId(res);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": knownResourceId=" + knownResourceId);
-        }
-        
+                
         // Now verify that elmo cannot create
         client = new DimensionClient();
         client.setAuth(true, "elmo2010", true, "elmo2010", true);
         res = client.create(multipart);
-
-        statusCode = res.getStatus();
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + " (verify not allowed): status = " + statusCode);
+        try {
+	        statusCode = res.getStatus();
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + " (verify not allowed): status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, Response.Status.FORBIDDEN.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.FORBIDDEN.getStatusCode());
         
         //Finally, verify that elmo has no access to Intakes
         // Submit the request to the service and store the response.
@@ -294,13 +300,16 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
                 "entryDate-" + identifier,
                 "depositor-" + identifier);
         res = iclient.create(multipart);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + " (verify create intake not allowed): status = " + statusCode);
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + " (verify create intake not allowed): status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, Response.Status.FORBIDDEN.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.FORBIDDEN.getStatusCode());
-        
     }
     
     /**
@@ -320,8 +329,7 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
         intake.setDepositor(depositor);
 
         PoxPayloadOut multipart = new PoxPayloadOut(IntakeClient.SERVICE_PAYLOAD_NAME);
-        PayloadOutputPart commonPart =
-            multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
+        PayloadOutputPart commonPart = multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(new IntakeClient().getCommonPartName());
 
         if(logger.isDebugEnabled()){
@@ -335,6 +343,7 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
     @Test(dataProvider = "testName",
     	    dependsOnMethods = {"delete"})
     public void verifyCreateWithFlippedRoles(String testName) throws Exception {
+    	int statusCode;
         setupCreate();
 
         // Submit the request to the service and store the response.
@@ -352,32 +361,39 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
         dimension.setValueDate(new Date().toString());
         PoxPayloadOut multipart = DimensionFactory.createDimensionInstance(client.getCommonPartName(),
                 dimension);
-        ClientResponse<Response> res = client.create(multipart);
-
-        int statusCode = res.getStatus();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.CREATED.getStatusCode());
-        knownResourceId = extractId(res);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": knownResourceId=" + knownResourceId);
+        Response res = client.create(multipart);
+        try {
+	        statusCode = res.getStatus();
+	
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, Response.Status.CREATED.getStatusCode());
+	        knownResourceId = extractId(res);
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": knownResourceId=" + knownResourceId);
+	        }
+        } finally {
+        	res.close();
         }
         
         //bigbird no longer allowed to create
         client.setAuth(true, "bigbird2010", true, "bigbird2010", true);
         res = client.create(multipart);
-
-        statusCode = res.getStatus();
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + " (verify not allowed): status = " + statusCode);
+        try {
+	        statusCode = res.getStatus();
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + " (verify not allowed): status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, Response.Status.FORBIDDEN.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.FORBIDDEN.getStatusCode());
+        
         restoreInitialAccountRoles();
     }
 

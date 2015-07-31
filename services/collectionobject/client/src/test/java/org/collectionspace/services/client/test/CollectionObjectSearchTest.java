@@ -461,7 +461,7 @@ public class CollectionObjectSearchTest extends BaseServiceTest<AbstractCommonLi
 		for (long i = 0; i < numToCreate; i++) {
 			PoxPayloadOut multipart = createCollectionObjectInstance(i,
 					keywords, keywordsInSameField);
-			ClientResponse<Response> res = client.create(multipart);
+			Response res = client.create(multipart);
 			try {
 				int statusCode = res.getStatus();
 				Assert.assertEquals(statusCode, testExpectedStatusCode);
@@ -472,7 +472,7 @@ public class CollectionObjectSearchTest extends BaseServiceTest<AbstractCommonLi
 							+ id);
 				}
 			} finally {
-				res.releaseConnection();
+				res.close();
 			}
 		}
 	}

@@ -609,7 +609,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
         PoxPayloadOut multipart = createMovementInstance(createIdentifier(),
                 movementNote, locationDate);
         MovementClient client = new MovementClient();
-        ClientResponse<Response> res = client.create(multipart);
+        Response res = client.create(multipart);
         try {
         	assertStatusCode(res, testName);
             // Store the IDs from every resource created by tests,
@@ -617,7 +617,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
         	result = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
