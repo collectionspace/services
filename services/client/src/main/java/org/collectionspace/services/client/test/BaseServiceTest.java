@@ -754,7 +754,7 @@ public abstract class BaseServiceTest<CLT> {
                 String itemResourceId = entry.getKey();
                 String authorityResourceId = entry.getValue();
                 // Note: Any non-success responses are ignored and not reported.
-                authorityClient.deleteItem(authorityResourceId, itemResourceId).releaseConnection();
+                authorityClient.deleteItem(authorityResourceId, itemResourceId).close();
             }
         }
         //

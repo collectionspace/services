@@ -447,12 +447,12 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         // Submit the request to the service and store the response.
         DimensionClient client = new DimensionClient();
         client.setAuth(true, userName, true, userName, true);
-        ClientResponse<Response> res = client.delete(id);
+        Response res = client.delete(id);
         try {
         	result = assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -473,7 +473,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         DimensionClient client = new DimensionClient();
         //TENANT_2_USER of TENANT_2 is not allowed to delete the resource of TENANT_1
         client.setAuth(true, TENANT_2_USER, true, TENANT_2_USER, true);
-        ClientResponse<Response> res = client.delete(TENANT_RESOURCE_1);
+        Response res = client.delete(TENANT_RESOURCE_1);
         try {
 	        int statusCode = res.getStatus();
 	        // Check the status code of the response: does it match
@@ -488,7 +488,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
 	        Assert.assertEquals(statusCode, Response.Status.NOT_FOUND.getStatusCode());
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -590,12 +590,12 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         PermissionClient permClient = new PermissionClient();
         UserInfo ui = tenantAdminUsers.get(tenantId);
         permClient.setAuth(true, ui.userName, true, ui.password, true);
-        ClientResponse<Response> res = permClient.delete(permId);
+        Response res = permClient.delete(permId);
         try {
         	assertStatusCode(res, "DeletePermission");
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -617,7 +617,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         	result = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -629,12 +629,12 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         RoleClient roleClient = new RoleClient();
         UserInfo ui = tenantAdminUsers.get(tenantId);
         roleClient.setAuth(true, ui.userName, true, ui.password, true);
-        ClientResponse<Response> res = roleClient.delete(roleId);
+        Response res = roleClient.delete(roleId);
         try {
         	assertStatusCode(res, "DeleteRole");
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -655,7 +655,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         	result = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -667,12 +667,12 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         AccountClient accClient = new AccountClient();
         UserInfo ui = tenantAdminUsers.get(tenantId);
         accClient.setAuth(true, ui.userName, true, ui.password, true);
-        ClientResponse<Response> res = accClient.delete(accId);
+        Response res = accClient.delete(accId);
         try {
         	assertStatusCode(res, "DeleteAccount");
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -694,7 +694,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         	result = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -712,12 +712,12 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         client.setAuth(true, ui.userName, true, ui.password, true);
         AccountRole accRole = AccountRoleFactory.createAccountRoleInstance(
                 av, rvs, true, true);
-        ClientResponse<Response> res = client.delete(av.getAccountId());
+        Response res = client.delete(av.getAccountId());
         try {
         	assertStatusCode(res, "DeleteAccountRole");
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -740,7 +740,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         	result = extractId(res);
         }  finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -757,12 +757,12 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         client.setAuth(true, ui.userName, true, ui.password, true);
         PermissionRole permRole = PermissionRoleFactory.createPermissionRoleInstance(
                 pv, rvls, true, true);
-        ClientResponse<Response> res = client.delete(pv.getPermissionId());
+        Response res = client.delete(pv.getPermissionId());
         try {
         	assertStatusCode(res, "DeletePermissionRole");
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }

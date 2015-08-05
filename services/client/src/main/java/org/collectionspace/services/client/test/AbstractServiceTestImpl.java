@@ -185,26 +185,30 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 
         // Submit the request to the service and store the response.
     	CollectionSpaceClient client = this.getClientInstance();
-        ClientResponse<RESPONSE_TYPE> res = client.read(getKnowResourceId());
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.read(getKnowResourceId());
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        RESPONSE_TYPE output = (RESPONSE_TYPE) res.getEntity();
+	        Assert.assertNotNull(output);
+	        
+	        //
+	        // Now compare with the expected field values
+	        //
+	        REQUEST_TYPE expectedResult = createInstance("read_test");
+	        compareReadInstances(extractCommonPartValue(expectedResult), extractCommonPartValue(res));
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        RESPONSE_TYPE output = (RESPONSE_TYPE) res.getEntity();
-        Assert.assertNotNull(output);
-        
-        //
-        // Now compare with the expected field values
-        //
-        REQUEST_TYPE expectedResult = createInstance("read_test");
-        compareReadInstances(extractCommonPartValue(expectedResult), extractCommonPartValue(res));
     }
     
     @Override
@@ -238,7 +242,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 
         // Submit the request to the service and store the response.
     	CollectionSpaceClient client = this.getClientInstance();
-        ClientResponse<RESPONSE_TYPE> res = client.read(NON_EXISTENT_ID);
+        Response res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
         try {
             // Check the status code of the response: does it match
@@ -250,7 +254,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
-            res.releaseConnection();
+            res.close();
         }
     }
 
@@ -288,7 +292,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     
 //    protected abstract Class<CPT> getCommonPartTypeClass();
     
-    public CPT extractCommonPartValue(ClientResponse<RESPONSE_TYPE> res) throws Exception {
+    public CPT extractCommonPartValue(Response res) throws Exception {
     	CPT result = null;
     	result = (CPT) res.getEntity();
     	return result;
@@ -322,18 +326,24 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 
         // Retrieve the contents of a resource to update.
     	CollectionSpaceClient client = this.getClientInstance();
-        ClientResponse<RESPONSE_TYPE> res = client.read(getKnowResourceId());
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": read status = " + res.getStatus());
+        Response res = client.read(getKnowResourceId());
+        CPT commonPartObject = null;
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": read status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
+	
+	        if (logger.isDebugEnabled()) {
+	            logger.debug("Got object to update with CSID= " + getKnowResourceId());
+	        }
+	
+	        commonPartObject = this.extractCommonPartValue(res);
+	        Assert.assertNotNull(commonPartObject);
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Got object to update with CSID= " + getKnowResourceId());
-        }
-
-        CPT commonPartObject = this.extractCommonPartValue(res);
-        Assert.assertNotNull(commonPartObject);
+        
         CPT theUpdate = updateInstance(commonPartObject);
         if (logger.isDebugEnabled()) {
             logger.debug("\n\nTo be updated fields: CSID = "  + getKnowResourceId() + "\n"
@@ -343,17 +353,22 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         // Submit the request to the service and store the response.
         REQUEST_TYPE output = this.createRequestTypeInstance(theUpdate);
         res = client.update(getKnowResourceId(), output);
-        int statusCode = res.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        CPT updatedCommonPartObject = null;
+        try {
+	        int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        updatedCommonPartObject = this.extractCommonPartValue(res);
+	        Assert.assertNotNull(updatedCommonPartObject);
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        CPT updatedCommonPartObject = this.extractCommonPartValue(res);
-        Assert.assertNotNull(updatedCommonPartObject);
 
         compareUpdatedInstances(theUpdate, updatedCommonPartObject);
     }
@@ -1049,13 +1064,16 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         AuthorityClient client = (AuthorityClient) getClientInstance();
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createItemInstance(parentCsid, identifier);
-        ClientResponse<Response> res = client.createItem(parentCsid, multipart);
-
-        int statusCode = res.getStatus();
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-
-        result = extractId(res);
-        allResourceItemIdsCreated.put(result, parentCsid);
+        Response res = client.createItem(parentCsid, multipart);
+        try {
+	        int statusCode = res.getStatus();
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	
+	        result = extractId(res);
+	        allResourceItemIdsCreated.put(result, parentCsid);
+        } finally {
+        	res.close();
+        }
 
         return result;
     }

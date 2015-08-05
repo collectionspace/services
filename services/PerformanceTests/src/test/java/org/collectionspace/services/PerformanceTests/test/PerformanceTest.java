@@ -321,8 +321,7 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
      */
     private void deleteCollectionObject(CollectionObjectClient collectionObjectClient,
             String resourceId) {
-        ClientResponse<Response> res = collectionObjectClient.delete(resourceId);
-        res.releaseConnection();
+    	collectionObjectClient.delete(resourceId).close();
     }
 
     /**

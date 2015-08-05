@@ -47,7 +47,7 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
     //(D)elete Item
     @DELETE
     @Path("/{vcsid}/items/{csid}")
-    ClientResponse<Response> deleteItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
+    Response deleteItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
     
     /**
      * Get a list of objects that reference a given authority term.

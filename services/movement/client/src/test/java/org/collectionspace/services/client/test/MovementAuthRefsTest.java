@@ -222,12 +222,12 @@ public class MovementAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
         // Submit the request to the service and store the response.
         MovementClient movementClient = new MovementClient();
-        ClientResponse<String> res = movementClient.read(knownResourceId);
+        Response res = movementClient.read(knownResourceId);
         MovementsCommon movementCommon = null;
         try {
 	        assertStatusCode(res, testName);
 	        // Extract and return the common part of the record.
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
 	        PayloadInputPart payloadInputPart = input.getPart(movementClient.getCommonPartName());
 	        if (payloadInputPart != null) {
 	        	movementCommon = (MovementsCommon) payloadInputPart.getBody();
@@ -238,7 +238,7 @@ public class MovementAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 	        }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         // Check a couple of fields
@@ -246,14 +246,14 @@ public class MovementAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         Assert.assertEquals(movementCommon.getMovementContact(), movementContactRefName);
         
         // Get the auth refs and check them
-        ClientResponse<AuthorityRefList> res2 = movementClient.getAuthorityRefs(knownResourceId);
+        Response res2 = movementClient.getAuthorityRefs(knownResourceId);
         AuthorityRefList list = null;
         try {
             assertStatusCode(res2, testName);
-        	list = res2.getEntity();
+        	list = (AuthorityRefList)res2.getEntity();
         } finally {
         	if (res2 != null) {
-        		res2.releaseConnection();
+        		res2.close();
             }
         }
         

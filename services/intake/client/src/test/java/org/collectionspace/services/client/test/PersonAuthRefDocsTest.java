@@ -226,6 +226,8 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
     }
 
     protected String createPerson(String firstName, String surName, String shortId, String authRefName) {
+    	String result = null;
+    	
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         Map<String, String> personInfo = new HashMap<String, String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
@@ -240,13 +242,19 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         PoxPayloadOut multipart =
                 PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
                 authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
-        ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-        return extractId(res);
+        Response res = personAuthClient.createItem(personAuthCSID, multipart);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        result = extractId(res);
+        } finally {
+        	res.close();
+        }
+        
+        return result;
     }
 
     // Success outcomes
@@ -266,7 +274,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
 	        list = res.getEntity();
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -417,17 +425,15 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         IntakeClient intakeClient = new IntakeClient();
         // Note: Any non-success responses are ignored and not reported.
         for (String resourceId : intakeIdsCreated) {
-            ClientResponse<Response> res = intakeClient.delete(resourceId);
-            res.releaseConnection();
+            intakeClient.delete(resourceId).close();
         }
         // Delete persons before PersonAuth
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         for (String resourceId : personIdsCreated) {
-            ClientResponse<Response> res = personAuthClient.deleteItem(personAuthCSID, resourceId);
-            res.releaseConnection();
+            personAuthClient.deleteItem(personAuthCSID, resourceId).close();
         }
         if (personAuthCSID != null) {
-            personAuthClient.delete(personAuthCSID).releaseConnection();
+            personAuthClient.delete(personAuthCSID).close();
         }
     }
 

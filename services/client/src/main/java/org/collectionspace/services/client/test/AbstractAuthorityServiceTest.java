@@ -313,8 +313,13 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 
         // Submit the request to the service and store the response.
         AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client = (AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)this.getClientInstance();
-        ClientResponse<Response> res = client.deleteItem(knownResourceId, knownItemResourceId);
-        int statusCode = res.getStatus();
+        Response res = client.deleteItem(knownResourceId, knownItemResourceId);
+        int statusCode;
+        try {
+        	statusCode = res.getStatus();
+        } finally {
+        	res.close();
+        }
 
         // Check the status code of the response: does it match
         // the expected response(s)?
@@ -386,8 +391,13 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 
         // Submit the request to the service and store the response.
         AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client = (AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)this.getClientInstance();
-        ClientResponse<Response> res = client.deleteItem(knownResourceId, NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
+        Response res = client.deleteItem(knownResourceId, NON_EXISTENT_ID);
+        int statusCode;
+        try {
+        	statusCode = res.getStatus();
+        } finally {
+        	res.close();
+        }
 
         // Check the status code of the response: does it match
         // the expected response(s)?

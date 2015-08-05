@@ -513,7 +513,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#delete(java.lang.String)
      */
     @Override
-	public ClientResponse<Response> delete(String csid) {
+	public Response delete(String csid) {
         return getProxy().delete(csid);
     }
 
@@ -523,7 +523,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      * @see org.collectionspace.services.client.BlobProxy#getAuthorityRefs(java.lang.String)
      */
     @Override
-	public ClientResponse<AuthorityRefList> getAuthorityRefs(String csid) {
+	public Response getAuthorityRefs(String csid) { // Response.getEntity returns AuthorityRefList type
         return getProxy().getAuthorityRefs(csid);
     }
     

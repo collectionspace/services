@@ -381,22 +381,31 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         AccountClient accountClient = new AccountClient();
         // accountClient.setAuth(true, "test", true, "test", true);
         // Submit the request to the service and store the response.
-        ClientResponse<Response> res = accountClient.delete(barneyAccountId);
-        int statusCode = res.getStatus();
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": barney status = " + statusCode);
+        
+        Response res = accountClient.delete(barneyAccountId);
+        int statusCode;
+        try {
+        	statusCode = res.getStatus();
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": barney status = " + statusCode);
+            }
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-
+        
         res = accountClient.delete(georgeAccountId);
-        statusCode = res.getStatus();
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": george status = " + statusCode);
+        try {
+        	statusCode = res.getStatus();
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": george status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        res.releaseConnection();
     }
     
     // ---------------------------------------------------------------

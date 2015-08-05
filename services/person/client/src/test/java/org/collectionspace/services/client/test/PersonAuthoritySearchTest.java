@@ -518,14 +518,13 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
             parentResourceId = entry.getValue();
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            ClientResponse<Response> res =
-                client.deleteItem(parentResourceId, itemResourceId);
-            res.releaseConnection();
+            Response res = client.deleteItem(parentResourceId, itemResourceId);
+            res.close();
         }
         // Clean up authority resources.
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            client.delete(resourceId).releaseConnection();
+            client.delete(resourceId).close();
         }
     }
 
@@ -651,12 +650,12 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
                 partialTermPersonMap, partialTerms, partialTermRepeatablesMap, client.getItemCommonPartName() );
 
         String newID = null;
-        ClientResponse<Response> res = client.createItem(authorityCsid, multipart);
+        Response res = client.createItem(authorityCsid, multipart);
         try {
             newID = PersonAuthorityClientUtils.extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 

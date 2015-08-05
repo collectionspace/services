@@ -952,9 +952,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             parentResourceId = entry.getValue();
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            ClientResponse<Response> res =
-                    client.deleteItem(parentResourceId, itemResourceId);
-            res.releaseConnection();
+            client.deleteItem(parentResourceId, itemResourceId).close();
         }
         // Clean up parent resources.
         super.cleanUp();

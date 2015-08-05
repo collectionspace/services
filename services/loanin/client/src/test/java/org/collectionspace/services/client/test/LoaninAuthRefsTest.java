@@ -210,6 +210,8 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     }
     
     protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
+    	String result = null;
+    	
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
@@ -224,13 +226,19 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     	PoxPayloadOut multipart =
     		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
     				authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
-        ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-    	return extractId(res);
+        Response res = personAuthClient.createItem(personAuthCSID, multipart);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        result = extractId(res);
+        } finally {
+        	res.close();
+        }
+        
+    	return result; 
     }
 
     // Success outcomes
@@ -242,12 +250,12 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
         // Submit the request to the service and store the response.
         LoaninClient loaninClient = new LoaninClient();
-        ClientResponse<String> res = loaninClient.read(knownResourceId);
+        Response res = loaninClient.read(knownResourceId);
         LoansinCommon loaninCommon = null;
         try {
 	        assertStatusCode(res, testName);
 	        // Extract the common part from the response.
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
 	        loaninCommon = (LoansinCommon) extractPart(input,
 	            loaninClient.getCommonPartName(), LoansinCommon.class);
 	        Assert.assertNotNull(loaninCommon);
@@ -256,7 +264,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 	        }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         //
@@ -269,15 +277,15 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         Assert.assertEquals(loaninCommon.getBorrowersAuthorizer(), borrowersAuthorizerRefName);
         
         // Get the auth refs and check them
-        ClientResponse<AuthorityRefList> res2 = loaninClient.getAuthorityRefs(knownResourceId);
+        Response res2 = loaninClient.getAuthorityRefs(knownResourceId);
         AuthorityRefList list = null;
         try {
 	        assertStatusCode(res2, testName);
-	        list = res2.getEntity();
+	        list = (AuthorityRefList)res2.getEntity();
 	        Assert.assertNotNull(list);
         } finally {
         	if (res2 != null) {
-        		res2.releaseConnection();
+        		res2.close();
             }
         }
         
@@ -341,9 +349,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-        	ClientResponse<Response> response = 
-        		personAuthClient.deleteItem(personAuthCSID, resourceId); // alternative to personAuthClient.deleteItem().releaseConnection();
-        	response.releaseConnection();
+       		personAuthClient.deleteItem(personAuthCSID, resourceId).close();
         }
         
         // Delete PersonAuthority resource(s).
@@ -352,11 +358,9 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         	personAuthClient.delete(personAuthCSID);
 	        // Delete Loans In resource(s).
         	LoaninClient loaninClient = new LoaninClient();
-        	ClientResponse<Response> response = null;
 	        for (String resourceId : loaninIdsCreated) {
 	            // Note: Any non-success responses are ignored and not reported.
-	            response = loaninClient.delete(resourceId); // alternative to loaninClient.delete(resourceId).releaseConnection();
-	            response.releaseConnection();
+	            loaninClient.delete(resourceId).close();
 	        }
         }
     }

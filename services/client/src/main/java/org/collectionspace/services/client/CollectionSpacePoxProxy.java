@@ -23,7 +23,7 @@ public interface CollectionSpacePoxProxy<LT extends AbstractCommonList> extends
 	// (R)ead
 	@GET
 	@Path("/{csid}")
-	ClientResponse<String> read(@PathParam("csid") String csid);
+	Response read(@PathParam("csid") String csid); // Returned entity type in response is String
 
 	// (R)ead
 	@GET

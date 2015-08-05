@@ -219,13 +219,13 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
             		personMap, terms, personRepeatablesMap, client.getItemCommonPartName() );
 
         String newID = null;
-        ClientResponse<Response> res = client.createItem(authId, multipart);
+        Response res = client.createItem(authId, multipart);
         try {
             assertStatusCode(res, "createItem");
             newID = PersonAuthorityClientUtils.extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -348,9 +348,9 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
         PersonAuthorityClient client = new PersonAuthorityClient();
         // Clean up item resources.
         for (String itemId : allItemIdsCreated) {
-            client.deleteItem(authId, itemId).releaseConnection();
+            client.deleteItem(authId, itemId).close();
         }
-        client.delete(authId).releaseConnection();
+        client.delete(authId).close();
     }
 
 

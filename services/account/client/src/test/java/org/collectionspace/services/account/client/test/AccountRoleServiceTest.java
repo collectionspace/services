@@ -362,14 +362,14 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
         }
 
         setupDelete();        
-        res = client.delete(toDelete.getAccount().get(0).getAccountId()); // delete form #2
+        Response deleteRes = client.delete(toDelete.getAccount().get(0).getAccountId()); // delete form #2
         try {
-            int statusCode = res.getStatus();
+            int statusCode = deleteRes.getStatus();
             Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
-            res.releaseConnection();
+        	deleteRes.close();
         }
     }
 
@@ -384,7 +384,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
         testSetup(testExpectedStatusCode, testRequestType);
 
     	AccountRoleClient client = new AccountRoleClient();
-    	ClientResponse<Response> res = client.delete(prebuiltAdminCSID);
+    	Response res = client.delete(prebuiltAdminCSID);
     	try {
     		int statusCode = res.getStatus();
     		Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
@@ -392,7 +392,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
     		Assert.assertEquals(statusCode, testExpectedStatusCode);
     	} finally {
     		if (res != null) {
-    			res.releaseConnection();
+    			res.close();
     		}
     	}
     }
@@ -537,12 +537,12 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
     private void deleteAccount(String accId) {
         AccountClient accClient = new AccountClient();
         setupDelete();
-        ClientResponse<Response> res = accClient.delete(accId);
+        Response res = accClient.delete(accId);
         try {
         	assertStatusCode(res, "DeleteAccount");
         } finally {
         	if (res != null) {
-        		res.releaseConnection();
+        		res.close();
         	}
         }
     }
@@ -582,12 +582,12 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
     private void deleteRole(String roleId) {
         setupDelete();
         RoleClient roleClient = new RoleClient();
-        ClientResponse<Response> res = roleClient.delete(roleId);
+        Response res = roleClient.delete(roleId);
         try {
         	assertStatusCode(res, "DeleteRole");
         } finally {
         	if (res != null) {
-        		res.releaseConnection();
+        		res.close();
         	}
         }
     }

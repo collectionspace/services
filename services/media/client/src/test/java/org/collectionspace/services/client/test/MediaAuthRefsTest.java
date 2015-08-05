@@ -166,13 +166,13 @@ public class MediaAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         personTerms.add(term);
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonInstance(
         		personAuthCSID, authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
-        ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
+        Response res = personAuthClient.createItem(personAuthCSID, multipart);
         try {
 	        assertStatusCode(res, "createPerson (not a surefire test)");
 	        result = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -191,18 +191,18 @@ public class MediaAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         testSetup(STATUS_OK, ServiceRequestType.READ);
 
         MediaClient mediaClient = new MediaClient();
-        ClientResponse<String> res = mediaClient.read(knownResourceId);
+        Response res = mediaClient.read(knownResourceId);
         PoxPayloadIn input = null;
         MediaCommon media = null;
         try {
 	        assertStatusCode(res, testName);
-	        input = new PoxPayloadIn(res.getEntity());
+	        input = new PoxPayloadIn((String)res.getEntity());
 	        media = (MediaCommon) extractPart(input, mediaClient.getCommonPartName(), MediaCommon.class);
 	        Assert.assertNotNull(media);
 	        logger.debug(objectAsXmlString(media, MediaCommon.class));
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -210,14 +210,14 @@ public class MediaAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         Assert.assertEquals(media.getTitle(), title);
 
         // Get the auth refs and check them
-        ClientResponse<AuthorityRefList> res2 = mediaClient.getAuthorityRefs(knownResourceId);
+        Response res2 = mediaClient.getAuthorityRefs(knownResourceId);
         AuthorityRefList list = null;
         try {
 	        assertStatusCode(res2, testName);
-	        list = res2.getEntity();
+	        list = (AuthorityRefList)res2.getEntity();
         } finally {
         	if (res2 != null) {
-        		res2.releaseConnection();
+        		res2.close();
             }
         }
         

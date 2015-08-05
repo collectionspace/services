@@ -471,14 +471,14 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
         	readResponse.releaseConnection();
         }
 
-        res = client.delete(toDelete.getPermission().get(0).getPermissionId());
+        Response deleteRes = client.delete(toDelete.getPermission().get(0).getPermissionId());
         try {
-            int statusCode = res.getStatus();
+            int statusCode = deleteRes.getStatus();
             Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
-            res.releaseConnection();
+        	deleteRes.close();
         }
         
     }
@@ -612,9 +612,8 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
         }
         setupDelete();
         PermissionClient permClient = new PermissionClient();
-        ClientResponse<Response> res = null;
+        Response res = permClient.delete(permId);
         try {
-            res = permClient.delete(permId);
             int statusCode = res.getStatus();
             if (logger.isDebugEnabled()) {
                 logger.debug("deletePermission: delete permission id="
@@ -624,7 +623,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
-            res.releaseConnection();
+            res.close();
         }
 
     }
@@ -676,9 +675,8 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
         }
         setupDelete();
         RoleClient roleClient = new RoleClient();
-        ClientResponse<Response> res = null;
+        Response res = roleClient.delete(roleId);
         try {
-            res = roleClient.delete(roleId);
             int statusCode = res.getStatus();
             if (logger.isDebugEnabled()) {
                 logger.debug("deleteRole: delete role id=" + roleId
@@ -688,7 +686,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
-            res.releaseConnection();
+            res.close();
         }
     }
 

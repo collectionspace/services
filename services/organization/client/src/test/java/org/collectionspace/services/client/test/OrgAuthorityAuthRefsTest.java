@@ -269,7 +269,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
     	    		null, personInfo, personTerms, personAuthClient.getItemCommonPartName());
         
     	String result = null;
-    	ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
+    	Response res = personAuthClient.createItem(personAuthCSID, multipart);
     	try {
 	        int statusCode = res.getStatus();
 	
@@ -278,7 +278,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
 	        Assert.assertEquals(statusCode, STATUS_CREATED);
 	    	result = extractId(res);
     	} finally {
-    		res.releaseConnection();
+    		res.close();
     	}
     	
     	return result;
@@ -392,12 +392,12 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
         // Delete Person resource(s) (before PersonAuthority resources).
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            personAuthClient.deleteItem(personAuthCSID, resourceId).releaseConnection();
+            personAuthClient.deleteItem(personAuthCSID, resourceId).close();
         }
         // Delete PersonAuthority resource(s).
         // Note: Any non-success response is ignored and not reported.
         if(personAuthCSID!=null) {
-        	personAuthClient.delete(personAuthCSID).releaseConnection();
+        	personAuthClient.delete(personAuthCSID).close();
         }
         
         String parentResourceId;
@@ -409,14 +409,14 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
             parentResourceId = entry.getValue();
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            client.deleteItem(parentResourceId, itemResourceId).releaseConnection();
+            client.deleteItem(parentResourceId, itemResourceId).close();
         }
         
         // Clean up parent resources.
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            client.delete(resourceId).releaseConnection();
+            client.delete(resourceId).close();
         }
     }
 }

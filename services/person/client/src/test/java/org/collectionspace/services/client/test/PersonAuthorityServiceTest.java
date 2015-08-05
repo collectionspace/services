@@ -286,14 +286,14 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
                 PersonAuthorityClientUtils.createPersonInstance(vcsid, null /*authRefName*/, itemFieldProperties,
                 terms, itemRepeatableFieldProperties, client.getItemCommonPartName());
         setupCreate();
-        ClientResponse<Response> res = client.createItem(vcsid, multipart);
+        Response res = client.createItem(vcsid, multipart);
         String newID = null;
         try {
         	assertStatusCode(res, testName);
             newID = PersonAuthorityClientUtils.extractId(res);
         } finally {
         	if (res != null) {
-        		res.releaseConnection();
+        		res.close();
         	}
         }
 
@@ -444,14 +444,14 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
                 NULL_REPEATABLE_FIELD_PROPERTIES, client.getItemCommonPartName());
 
         // Send the request and receive a response
-        ClientResponse<Response> res = client.createItem(knownResourceId, multipart);
+        Response res = client.createItem(knownResourceId, multipart);
         // Check the status code of the response: does it match
         // the expected response(s)?
         try {
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-        		res.releaseConnection();
+        		res.close();
         	}
         }
     }
@@ -517,7 +517,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     protected void readInternal(String testName, String CSID, String shortId) {
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<String> res = null;
+        Response res = null;
         setupRead();
         if (CSID != null) {
             res = client.read(CSID);
@@ -530,7 +530,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
             assertStatusCode(res, testName);
             //FIXME: remove the following try catch once Aron fixes signatures
             try {
-                PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+                PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
                 PersonauthoritiesCommon personAuthority = (PersonauthoritiesCommon) extractPart(input,
                         client.getCommonPartName(), PersonauthoritiesCommon.class);
                 Assert.assertNotNull(personAuthority);
@@ -539,7 +539,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
             }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -593,7 +593,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
         setupRead();
-        ClientResponse<String> res = null;
+        Response res = null;
         if (authCSID != null) {
             if (itemCSID != null) {
                 res = client.readItem(authCSID, itemCSID);
@@ -613,10 +613,11 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         } else {
             Assert.fail("readInternal: Internal error. One of authCSID or authShortId must be non-null");
         }
+
         try {
             assertStatusCode(res, testName);
             // Check whether we've received a person.
-            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+            PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
             PersonsCommon person = (PersonsCommon) extractPart(input,
                     client.getItemCommonPartName(), PersonsCommon.class);
             Assert.assertNotNull(person);
@@ -636,7 +637,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
             Assert.assertNotNull(groups.get(0));
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -658,14 +659,14 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
+        Response res = client.readItem(knownResourceId, knownItemResourceId);
         PoxPayloadIn input = null;
         try {
             assertStatusCode(res, testName);
-            input = new PoxPayloadIn(res.getEntity());
+            input = new PoxPayloadIn((String)res.getEntity());
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         //
@@ -692,7 +693,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
             assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -918,16 +919,16 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         PersonAuthorityClient client = new PersonAuthorityClient();
         PoxPayloadIn input = null;
         setupRead();
-        ClientResponse<String> res = client.read(knownResourceId);
+        Response res = client.read(knownResourceId);
         try {
             assertStatusCode(res, testName);
             if (logger.isDebugEnabled()) {
                 logger.debug("got PersonAuthority to update with ID: " + knownResourceId);
             }
-            input = new PoxPayloadIn(res.getEntity());
+            input = new PoxPayloadIn((String)res.getEntity());
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -951,10 +952,10 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         try {
             assertStatusCode(res, testName);
             // Retrieve the updated resource and verify that its contents exist.
-            input = new PoxPayloadIn(res.getEntity());
+            input = new PoxPayloadIn((String)res.getEntity());
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -983,8 +984,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         PersonAuthorityClient client = new PersonAuthorityClient();
         PoxPayloadIn input = null;
         setupRead();
-        ClientResponse<String> res =
-                client.readItem(knownResourceId, knownItemResourceId);
+        Response res = client.readItem(knownResourceId, knownItemResourceId);
         try {
             assertStatusCode(res, testName);
             if (logger.isDebugEnabled()) {
@@ -992,10 +992,10 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
                         + knownItemResourceId
                         + " in PersonAuthority: " + knownResourceId);
             }
-            input = new PoxPayloadIn(res.getEntity());
+            input = new PoxPayloadIn((String)res.getEntity());
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -1032,10 +1032,10 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         try {
             assertStatusCode(res, testName);
             // Retrieve the updated resource and verify that its contents exist.
-            input = new PoxPayloadIn(res.getEntity());
+            input = new PoxPayloadIn((String)res.getEntity());
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -1087,7 +1087,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
             input = new PoxPayloadIn(res.getEntity());
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -1124,7 +1124,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
             input = new PoxPayloadIn(res.getEntity());;
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         ContactsCommon updatedContact = (ContactsCommon) extractPart(input,
@@ -1179,7 +1179,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-        		res.releaseConnection();
+        		res.close();
         	}
         }
     }
@@ -1223,7 +1223,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-        		res.releaseConnection();
+        		res.close();
         	}
         }
     }
@@ -1291,7 +1291,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
             // below are ignored and not reported.
             ClientResponse<Response> res =
                     client.deleteContact(parentResourceId, itemResourceId, contactResourceId);
-            res.releaseConnection();
+            res.close();
         }
         // Clean up item resources.
         for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
@@ -1299,9 +1299,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
             parentResourceId = entry.getValue();
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            ClientResponse<Response> res =
-                    client.deleteItem(parentResourceId, itemResourceId);
-            res.releaseConnection();
+            client.deleteItem(parentResourceId, itemResourceId).close();
         }
         // Clean up parent resources.
         super.cleanUp();

@@ -513,12 +513,12 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
         //
         // Try to make a DELETE request
         //
-        ClientResponse<Response> res = client.delete(knownResourceId);
+        Response res = client.delete(knownResourceId);
         try {
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -532,12 +532,12 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
         // Submit the request to the service and store the response.
         DimensionClient client = new DimensionClient();
 
-        ClientResponse<Response> res = client.delete(knownResourceId);
+        Response res = client.delete(knownResourceId);
         try {
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -675,12 +675,12 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
     private void deletePermission(String permId) {
         setupDelete();
         PermissionClient permClient = new PermissionClient();
-        ClientResponse<Response> res = permClient.delete(permId);
+        Response res = permClient.delete(permId);
         try {
         	assertStatusCode(res, "DeletePermission");
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -699,7 +699,7 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
         	result = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -709,12 +709,12 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
     private void deleteRole(String roleId) {
         setupDelete();
         RoleClient roleClient = new RoleClient();
-        ClientResponse<Response> res = roleClient.delete(roleId);
+        Response res = roleClient.delete(roleId);
         try {
         	assertStatusCode(res, "DeleteRole");
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -733,7 +733,7 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
         	result = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -743,12 +743,12 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
     private void deleteAccount(String accId) {
         setupDelete();
         AccountClient accClient = new AccountClient();
-        ClientResponse<Response> res = accClient.delete(accId);
+        Response res = accClient.delete(accId);
         try {
         	assertStatusCode(res, "DeleteAccount");
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -768,7 +768,7 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
         	result = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -784,12 +784,12 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
         AccountRoleClient client = new AccountRoleClient();
         AccountRole accRole = AccountRoleFactory.createAccountRoleInstance(
                 av, rvs, true, true);
-        ClientResponse<Response> res = client.delete(av.getAccountId());
+        Response res = client.delete(av.getAccountId());
         try {
         	assertStatusCode(res, "DeleteAccountRole");
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -809,7 +809,7 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
         	result = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -828,12 +828,12 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
         PermissionRoleClient client = new PermissionRoleClient();
         PermissionRole permRole = PermissionRoleFactory.createPermissionRoleInstance(
                 pv, rvls, true, true);
-        ClientResponse<Response> res = client.delete(pv.getPermissionId());
+        Response res = client.delete(pv.getPermissionId());
         try {
         	assertStatusCode(res, "DeletePermissionRole");
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }

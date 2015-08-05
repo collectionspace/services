@@ -469,7 +469,7 @@ public class PublicItemServiceTest extends
 
 		// Submit the request to the service and store the response.
 		PublicItemClient client = new PublicItemClient();
-		ClientResponse<Response> res = client.delete(knownResourceId);
+		Response res = client.delete(knownResourceId);
 		try {
 			int statusCode = res.getStatus();
 
@@ -483,7 +483,7 @@ public class PublicItemServiceTest extends
 			Assert.assertEquals(statusCode, testExpectedStatusCode);
 		} finally {
 			if (res != null) {
-				res.releaseConnection();
+				res.close();
 			}
 		}
 	}
@@ -506,7 +506,7 @@ public class PublicItemServiceTest extends
 
 		// Submit the request to the service and store the response.
 		PublicItemClient client = new PublicItemClient();
-		ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
+		Response res = client.delete(NON_EXISTENT_ID);
 		try {
 			int statusCode = res.getStatus();
 
@@ -520,7 +520,7 @@ public class PublicItemServiceTest extends
 			Assert.assertEquals(statusCode, testExpectedStatusCode);
 		} finally {
 			if (res != null) {
-				res.releaseConnection();
+				res.close();
 			}
 		}
 	}

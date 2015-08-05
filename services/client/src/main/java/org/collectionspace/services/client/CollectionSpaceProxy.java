@@ -50,7 +50,7 @@ public interface CollectionSpaceProxy<CLT> {
     //(D)elete
     @DELETE
     @Path("/{csid}")
-    ClientResponse<Response> delete(@PathParam("csid") String csid);
+    Response delete(@PathParam("csid") String csid);
 	
     // List Authority References
     @GET

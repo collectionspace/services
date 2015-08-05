@@ -637,8 +637,13 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
 
         // Submit the request to the service and store the response.
         AcquisitionClient client = new AcquisitionClient();
-        ClientResponse<Response> res = client.delete(knownResourceId);
-        int statusCode = res.getStatus();
+        Response res = client.delete(knownResourceId);
+        int statusCode;
+        try {
+        	statusCode = res.getStatus();
+        } finally {
+        	res.close();
+        }
 
         // Check the status code of the response: does it match
         // the expected response(s)?
@@ -663,8 +668,13 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
 
         // Submit the request to the service and store the response.
         AcquisitionClient client = new AcquisitionClient();
-        ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
+        Response res = client.delete(NON_EXISTENT_ID);
+        int statusCode;
+        try {
+        	statusCode = res.getStatus();
+        } finally {
+        	res.close();
+        }
 
         // Check the status code of the response: does it match
         // the expected response(s)?

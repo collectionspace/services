@@ -59,7 +59,7 @@ public class OrgAuthorityClientUtils {
     public static String getAuthorityRefName(String csid, OrgAuthorityClient client){
     	if(client==null)
     		client = new OrgAuthorityClient();
-        ClientResponse<String> res = client.read(csid);
+        Response res = client.read(csid);
         try {
 	        int statusCode = res.getStatus();
 	        if(!READ_REQ.isValidStatusCode(statusCode)
@@ -68,7 +68,7 @@ public class OrgAuthorityClientUtils {
 	        }
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	            PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
 	            OrgauthoritiesCommon orgAuthority = 
 	            	(OrgauthoritiesCommon) CollectionSpaceClientUtils.extractPart(input,
 	                    client.getCommonPartName(), OrgauthoritiesCommon.class);
@@ -80,7 +80,7 @@ public class OrgAuthorityClientUtils {
 	            throw new RuntimeException(e);
 	        }
         } finally {
-        	res.releaseConnection();
+        	res.close();
         }
     }
 
@@ -176,7 +176,7 @@ public class OrgAuthorityClientUtils {
     		createOrganizationInstance(orgAuthorityRefName, 
     				orgInfo, terms, orgRepeatablesInfo, client.getItemCommonPartName());
 
-    	ClientResponse<Response> res = client.createItem(inAuthority, multipart);
+    	Response res = client.createItem(inAuthority, multipart);
     	String result;
     	try {	
 	    	int statusCode = res.getStatus();
@@ -193,7 +193,7 @@ public class OrgAuthorityClientUtils {
 	
 	    	result = extractId(res);
     	} finally {
-    		res.releaseConnection();
+    		res.close();
     	}
     	
     	return result;
@@ -319,7 +319,7 @@ public class OrgAuthorityClientUtils {
      * @param res the res
      * @return the string
      */
-    public static String extractId(ClientResponse<Response> res) {
+    public static String extractId(Response res) {
         MultivaluedMap<String, Object> mvm = res.getMetadata();
         String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
         if(logger.isDebugEnabled()){

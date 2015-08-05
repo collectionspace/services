@@ -644,17 +644,21 @@ public class LoanoutServiceTest extends AbstractPoxServiceTestImpl<AbstractCommo
 
         // Submit the request to the service and store the response.
         LoanoutClient client = new LoanoutClient();
-        ClientResponse<Response> res = client.delete(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.delete(knownResourceId);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // Failure outcomes
@@ -670,17 +674,21 @@ public class LoanoutServiceTest extends AbstractPoxServiceTestImpl<AbstractCommo
 
         // Submit the request to the service and store the response.
         LoanoutClient client = new LoanoutClient();
-        ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.delete(NON_EXISTENT_ID);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // ---------------------------------------------------------------

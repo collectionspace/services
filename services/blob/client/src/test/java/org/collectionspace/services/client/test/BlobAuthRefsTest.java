@@ -166,13 +166,13 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         personTerms.add(term);
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
         		authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
-        ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
+        Response res = personAuthClient.createItem(personAuthCSID, multipart);
         try {
         	assertStatusCode(res, "createPerson (not a surefire test)");
         	result = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -189,17 +189,17 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     public void readAndCheckAuthRefs(String testName) throws Exception {
         testSetup(STATUS_OK, ServiceRequestType.READ);
         BlobClient blobClient = new BlobClient();
-        ClientResponse<String> res = blobClient.read(knownResourceId);
+        Response res = blobClient.read(knownResourceId);
         BlobsCommon blob = null;
         try {
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
 	        blob = (BlobsCommon) extractPart(input, blobClient.getCommonPartName(), BlobsCommon.class);
 	        Assert.assertNotNull(blob);
 	        logger.debug(objectAsXmlString(blob, BlobsCommon.class));
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -207,10 +207,10 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         Assert.assertEquals(blob.getName(), blobName);
 
         // Get the auth refs and check them
-        ClientResponse<AuthorityRefList> res2 = blobClient.getAuthorityRefs(knownResourceId);
+        res = blobClient.getAuthorityRefs(knownResourceId);
         try {
-	        assertStatusCode(res2, testName);
-	        AuthorityRefList list = res2.getEntity();
+	        assertStatusCode(res, testName);
+	        AuthorityRefList list = (AuthorityRefList)res.getEntity();
 	        List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
 	        int numAuthRefsFound = items.size();
 	        logger.debug("Authority references, found " + numAuthRefsFound);
@@ -227,8 +227,8 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 	            }
 	        }
         } finally {
-        	if (res2 != null) {
-        		res2.releaseConnection();
+        	if (res != null) {
+        		res.close();
             }
         }
     }

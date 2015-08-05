@@ -124,11 +124,10 @@ public class I1591OneInstOneClose extends CollectionSpacePerformanceTest {
 
         for (int i = 0; i < coList.length; i++) {
             resourceId = coList[i];
-            ClientResponse<Response> res = collectionObjectClient.delete(resourceId);
+            collectionObjectClient.delete(resourceId).close();
             if (logger.isDebugEnabled() == true) {
                 logger.debug("Deleted CollectionObject #: " + i);
             }
-            res.releaseConnection();
         }
 
         if (logger.isDebugEnabled()) {

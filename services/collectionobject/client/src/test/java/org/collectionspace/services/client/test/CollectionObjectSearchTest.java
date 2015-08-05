@@ -165,22 +165,26 @@ public class CollectionObjectSearchTest extends BaseServiceTest<AbstractCommonLi
 			CollectionObjectJAXBSchema.DISTINGUISHING_FEATURES;
 		String propertyValue = theKeyword;
 		ClientResponse<AbstractCommonList> res = doAdvancedSearch(propertyName, propertyValue, "=");
-		int statusCode = res.getStatus();
-
-		// Check the status code of the response: does it match
-		// the expected response(s)?
-		if (logger.isDebugEnabled()) {
-			logger.debug(testName + ": status = " + statusCode);
+		try {
+			int statusCode = res.getStatus();
+	
+			// Check the status code of the response: does it match
+			// the expected response(s)?
+			if (logger.isDebugEnabled()) {
+				logger.debug(testName + ": status = " + statusCode);
+			}
+			Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+					invalidStatusCodeMessage(testRequestType, statusCode));
+			Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+			// Verify that the number of resources matched by the search
+			// is identical to the expected result
+			long NUM_MATCHES_EXPECTED = numKeywordRetrievableResources;
+			long numMatched = getNumMatched(res, NUM_MATCHES_EXPECTED, testName);
+			Assert.assertEquals(numMatched, NUM_MATCHES_EXPECTED);
+		} finally {
+			res.close();
 		}
-		Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-				invalidStatusCodeMessage(testRequestType, statusCode));
-		Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-		// Verify that the number of resources matched by the search
-		// is identical to the expected result
-		long NUM_MATCHES_EXPECTED = numKeywordRetrievableResources;
-		long numMatched = getNumMatched(res, NUM_MATCHES_EXPECTED, testName);
-		Assert.assertEquals(numMatched, NUM_MATCHES_EXPECTED);
 	}
 
 	@Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, groups = { "oneKeyword" })
@@ -199,22 +203,26 @@ public class CollectionObjectSearchTest extends BaseServiceTest<AbstractCommonLi
 
 		// Send the search request and receive a response
 		ClientResponse<AbstractCommonList> res = doSearch(KEYWORD);
-		int statusCode = res.getStatus();
-
-		// Check the status code of the response: does it match
-		// the expected response(s)?
-		if (logger.isDebugEnabled()) {
-			logger.debug(testName + ": status = " + statusCode);
+		try {
+			int statusCode = res.getStatus();
+	
+			// Check the status code of the response: does it match
+			// the expected response(s)?
+			if (logger.isDebugEnabled()) {
+				logger.debug(testName + ": status = " + statusCode);
+			}
+			Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+					invalidStatusCodeMessage(testRequestType, statusCode));
+			Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+			// Verify that the number of resources matched by the search
+			// is identical to the expected result
+			long NUM_MATCHES_EXPECTED = numKeywordRetrievableResources;
+			long numMatched = getNumMatched(res, NUM_MATCHES_EXPECTED, testName);
+			Assert.assertEquals(numMatched, NUM_MATCHES_EXPECTED);
+		} finally {
+			res.close();
 		}
-		Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-				invalidStatusCodeMessage(testRequestType, statusCode));
-		Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-		// Verify that the number of resources matched by the search
-		// is identical to the expected result
-		long NUM_MATCHES_EXPECTED = numKeywordRetrievableResources;
-		long numMatched = getNumMatched(res, NUM_MATCHES_EXPECTED, testName);
-		Assert.assertEquals(numMatched, NUM_MATCHES_EXPECTED);
 	}
 
 	@Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
@@ -238,44 +246,51 @@ public class CollectionObjectSearchTest extends BaseServiceTest<AbstractCommonLi
 
 		// Send the search request and receive a response
 		ClientResponse<AbstractCommonList> res = doSearch(TWO_KEYWORDS);
-		int statusCode = res.getStatus();
-
-		// Check the status code of the response: does it match
-		// the expected response(s)?
-		if (logger.isDebugEnabled()) {
-			logger.debug(testName + ": status = " + statusCode);
+		try {
+			int statusCode = res.getStatus();
+	
+			// Check the status code of the response: does it match
+			// the expected response(s)?
+			if (logger.isDebugEnabled()) {
+				logger.debug(testName + ": status = " + statusCode);
+			}
+			Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+					invalidStatusCodeMessage(testRequestType, statusCode));
+			Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+			// Verify that the number of resources matched by the search
+			// is identical to the expected result
+			long NUM_MATCHES_EXPECTED = numKeywordRetrievableResources;
+			long numMatched = getNumMatched(res, NUM_MATCHES_EXPECTED, testName);
+			Assert.assertEquals(numMatched, NUM_MATCHES_EXPECTED);
+		} finally {
+			res.close();
 		}
-		Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-				invalidStatusCodeMessage(testRequestType, statusCode));
-		Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-		// Verify that the number of resources matched by the search
-		// is identical to the expected result
-		long NUM_MATCHES_EXPECTED = numKeywordRetrievableResources;
-		long numMatched = getNumMatched(res, NUM_MATCHES_EXPECTED, testName);
-		Assert.assertEquals(numMatched, NUM_MATCHES_EXPECTED);
 
 		// Search using a single term
 
 		// Send the search request and receive a response
 		res = doSearch(TWO_KEYWORDS.get(0));
-		statusCode = res.getStatus();
-
-		// Check the status code of the response: does it match
-		// the expected response(s)?
-		if (logger.isDebugEnabled()) {
-			logger.debug(testName + ": status = " + statusCode);
+		try {
+			int statusCode = res.getStatus();
+	
+			// Check the status code of the response: does it match
+			// the expected response(s)?
+			if (logger.isDebugEnabled()) {
+				logger.debug(testName + ": status = " + statusCode);
+			}
+			Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+					invalidStatusCodeMessage(testRequestType, statusCode));
+			Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+			// Verify that the number of resources matched by the search
+			// is identical to the expected result
+			long NUM_MATCHES_EXPECTED = numKeywordRetrievableResources;
+			long numMatched = getNumMatched(res, NUM_MATCHES_EXPECTED, testName);
+			Assert.assertEquals(numMatched, NUM_MATCHES_EXPECTED);
+		} finally {
+			res.close();
 		}
-		Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-				invalidStatusCodeMessage(testRequestType, statusCode));
-		Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-		// Verify that the number of resources matched by the search
-		// is identical to the expected result
-		NUM_MATCHES_EXPECTED = numKeywordRetrievableResources;
-		numMatched = getNumMatched(res, NUM_MATCHES_EXPECTED, testName);
-		Assert.assertEquals(numMatched, NUM_MATCHES_EXPECTED);
-
 	}
 
 	@Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
@@ -394,23 +409,27 @@ public class CollectionObjectSearchTest extends BaseServiceTest<AbstractCommonLi
 
 		// Send the search request and receive a response
 		ClientResponse<AbstractCommonList> res = doSearch(NON_EXISTENT_KEYWORD);
-		int statusCode = res.getStatus();
+		int statusCode;
+		try {
+			statusCode = res.getStatus();
 
-		// Check the status code of the response: does it match
-		// the expected response(s)?
-		if (logger.isDebugEnabled()) {
-			logger.debug(testName + ": status = " + statusCode);
+			// Check the status code of the response: does it match
+			// the expected response(s)?
+			if (logger.isDebugEnabled()) {
+				logger.debug(testName + ": status = " + statusCode);
+			}
+			Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+					invalidStatusCodeMessage(testRequestType, statusCode));
+			Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+			// Verify that the number of resources matched by the search
+			// is identical to the expected result
+			long NUM_MATCHES_EXPECTED = 0;
+			long numMatched = getNumMatched(res, NUM_MATCHES_EXPECTED, testName);
+			Assert.assertEquals(numMatched, NUM_MATCHES_EXPECTED);
+		} finally {
+			res.close();
 		}
-		Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-				invalidStatusCodeMessage(testRequestType, statusCode));
-		Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-		// Verify that the number of resources matched by the search
-		// is identical to the expected result
-		long NUM_MATCHES_EXPECTED = 0;
-		long numMatched = getNumMatched(res, NUM_MATCHES_EXPECTED, testName);
-		Assert.assertEquals(numMatched, NUM_MATCHES_EXPECTED);
-
 	}
 
 	// ---------------------------------------------------------------
@@ -440,7 +459,7 @@ public class CollectionObjectSearchTest extends BaseServiceTest<AbstractCommonLi
 		CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
 		for (String resourceId : allResourceIdsCreated) {
 			// Note: Any non-success responses are ignored and not reported.
-			collectionObjectClient.delete(resourceId).releaseConnection();
+			collectionObjectClient.delete(resourceId).close();
 		}
 	}
 
@@ -496,9 +515,9 @@ public class CollectionObjectSearchTest extends BaseServiceTest<AbstractCommonLi
 		}
 		PoxPayloadOut multipart = new PoxPayloadOut(
 				CollectionObjectClient.SERVICE_PAYLOAD_NAME);
-		PayloadOutputPart commonPart = multipart.addPart(collectionObject,
-				MediaType.APPLICATION_XML_TYPE);
+		PayloadOutputPart commonPart = multipart.addPart(collectionObject, MediaType.APPLICATION_XML_TYPE);
 		commonPart.setLabel(new CollectionObjectClient().getCommonPartName());
+		
 		return multipart;
 	}
 
@@ -528,8 +547,8 @@ public class CollectionObjectSearchTest extends BaseServiceTest<AbstractCommonLi
 		String whereClause = propertyName + operator +
 			"'" + propertyValue + "'";
 		CollectionObjectClient client = new CollectionObjectClient();
-		ClientResponse<AbstractCommonList> res = client
-				.advancedSearchIncludeDeleted(whereClause, false); // NOT_INCLUDING_DELETED_RESOURCES
+		ClientResponse<AbstractCommonList> res = client.advancedSearchIncludeDeleted(whereClause, false); // NOT_INCLUDING_DELETED_RESOURCES
+	
 		return res;
 	}
 

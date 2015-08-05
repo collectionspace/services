@@ -352,13 +352,13 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
             parentResourceId = entry.getValue();
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            client.deleteItem(parentResourceId, itemResourceId).releaseConnection();
+            client.deleteItem(parentResourceId, itemResourceId).close();
         }
         // Clean up parent resources.
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-        client.delete(resourceId).releaseConnection();
+        client.delete(resourceId).close();
         }
     }
 

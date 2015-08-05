@@ -19,7 +19,7 @@ public abstract class AbstractPoxServiceClientImpl<CLT extends AbstractCommonLis
     }
 		
     @Override
-	public ClientResponse<String> read(String csid) {
+	public Response read(String csid) {
         return getProxy().read(csid);
     }
     

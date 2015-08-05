@@ -68,7 +68,7 @@ public class PersonAuthorityClientUtils {
     	if (client == null) {
     		client = new PersonAuthorityClient();
     	}
-        ClientResponse<String> res = client.read(csid);
+        Response res = client.read(csid);
         try {
 	        int statusCode = res.getStatus();
 	        if(!READ_REQ.isValidStatusCode(statusCode)
@@ -77,7 +77,7 @@ public class PersonAuthorityClientUtils {
 	        }
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	            PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
 	            PersonauthoritiesCommon personAuthority = 
 	            	(PersonauthoritiesCommon) CollectionSpaceClientUtils.extractPart(input,
 	                    client.getCommonPartName(), PersonauthoritiesCommon.class);
@@ -89,7 +89,7 @@ public class PersonAuthorityClientUtils {
 	            throw new RuntimeException(e);
 	        }
         } finally {
-        	res.releaseConnection();
+        	res.close();
         }
     }
 
@@ -102,7 +102,7 @@ public class PersonAuthorityClientUtils {
     	if ( client == null) {
     		client = new PersonAuthorityClient();
     	}
-        ClientResponse<String> res = client.readItem(inAuthority, csid);
+        Response res = client.readItem(inAuthority, csid);
         try {
 	        int statusCode = res.getStatus();
 	        if(!READ_REQ.isValidStatusCode(statusCode)
@@ -111,7 +111,7 @@ public class PersonAuthorityClientUtils {
 	        }
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	            PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
 	            PersonsCommon person = 
 	            	(PersonsCommon) CollectionSpaceClientUtils.extractPart(input,
 	                    client.getItemCommonPartName(), PersonsCommon.class);
@@ -123,7 +123,7 @@ public class PersonAuthorityClientUtils {
 	            throw new RuntimeException(e);
 	        }
         } finally {
-        	res.releaseConnection();
+        	res.close();
         }
     }
 
@@ -306,7 +306,7 @@ public class PersonAuthorityClientUtils {
     			personMap, terms, personRepeatablesMap, client.getItemCommonPartName());
     	
     	String result = null;
-    	ClientResponse<Response> res = client.createItem(vcsid, multipart);
+    	Response res = client.createItem(vcsid, multipart);
     	try {
 	    	int statusCode = res.getStatus();
 	
@@ -322,7 +322,7 @@ public class PersonAuthorityClientUtils {
 	
 	    	result = extractId(res);
     	} finally {
-    		res.releaseConnection();
+    		res.close();
     	}
     	
     	return result;

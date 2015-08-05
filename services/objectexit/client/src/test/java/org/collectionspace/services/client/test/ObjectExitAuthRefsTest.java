@@ -181,13 +181,13 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
         PoxPayloadOut multipart =
                 PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
                     authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
-        ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
+        Response res = personAuthClient.createItem(personAuthCSID, multipart);
         try {
 	        assertStatusCode(res, "createPerson (not a surefire test)");
 	        result = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -199,17 +199,17 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
     public void readAndCheckAuthRefs(String testName) throws Exception {
         testSetup(STATUS_OK, ServiceRequestType.READ);
         ObjectExitClient objectexitClient = new ObjectExitClient();
-        ClientResponse<String> res = objectexitClient.read(knownResourceId);
+        Response res = objectexitClient.read(knownResourceId);
         ObjectexitCommon objectexit = null;
         try {
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
 	        objectexit = (ObjectexitCommon) extractPart(input, objectexitClient.getCommonPartName(), ObjectexitCommon.class);
 	        Assert.assertNotNull(objectexit);
 	        logger.debug(objectAsXmlString(objectexit, ObjectexitCommon.class));
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -218,14 +218,14 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
         Assert.assertEquals(objectexit.getExitNumber(), exitNumber);
 
         // Get the auth refs and check them
-        ClientResponse<AuthorityRefList> res2 = objectexitClient.getAuthorityRefs(knownResourceId);
+        Response res2 = objectexitClient.getAuthorityRefs(knownResourceId);
         AuthorityRefList list = null;
         try {
 	        assertStatusCode(res2, testName);
-	        list = res2.getEntity();
+	        list = (AuthorityRefList)res2.getEntity();
         } finally {
         	if (res2 != null) {
-        		res2.releaseConnection();
+        		res2.close();
             }
         }
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();

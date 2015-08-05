@@ -226,7 +226,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
                 OrgAuthorityClientUtils.createOrganizationInstance(null, //orgAuthRefName
                 orgInfo, orgTerms, orgAuthClient.getItemCommonPartName());
 
-        ClientResponse<Response> res = orgAuthClient.createItem(orgAuthCSID, multipart);
+        Response res = orgAuthClient.createItem(orgAuthCSID, multipart);
         int statusCode = res.getStatus();
 
         Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
@@ -244,16 +244,15 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         
         // Get the auth ref docs and check them
        OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
-       ClientResponse<AuthorityRefDocList> refDocListResp =
-        	orgAuthClient.getReferencingObjects(orgAuthCSID, currentOwnerOrgCSID);
+       Response refDocListResp = orgAuthClient.getReferencingObjects(orgAuthCSID, currentOwnerOrgCSID);
        AuthorityRefDocList list = null;
        try {
     	   assertStatusCode(refDocListResp, testName);
-    	   list = refDocListResp.getEntity();
+    	   list = (AuthorityRefDocList)refDocListResp.getEntity();
     	   Assert.assertNotNull(list);
        } finally {
     	   if (refDocListResp != null) {
-    		   refDocListResp.releaseConnection();
+    		   refDocListResp.close();
            }
        }
 
@@ -310,17 +309,15 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         IntakeClient intakeClient = new IntakeClient();
         // Note: Any non-success responses are ignored and not reported.
         for (String resourceId : intakeIdsCreated) {
-            ClientResponse<Response> res = intakeClient.delete(resourceId);
-            res.releaseConnection();
+            intakeClient.delete(resourceId).close();
         }
         // Delete persons before PersonAuth
         OrgAuthorityClient personAuthClient = new OrgAuthorityClient();
         for (String resourceId : orgIdsCreated) {
-            ClientResponse<Response> res = personAuthClient.deleteItem(orgAuthCSID, resourceId);
-            res.releaseConnection();
+            personAuthClient.deleteItem(orgAuthCSID, resourceId).close();
         }
         if (orgAuthCSID != null) {
-        	personAuthClient.delete(orgAuthCSID).releaseConnection();
+        	personAuthClient.delete(orgAuthCSID).close();
         }
     }
 

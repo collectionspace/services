@@ -101,30 +101,33 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
 
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
-        Role role = createRoleInstance(knownRoleName,
-                "all users are required to be in this role",
+        Role role = createRoleInstance(knownRoleName, "All users are required to be in this role",
                 true);
         ClientResponse<Response> res = client.create(role);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        // Specifically:
-        // Does it fall within the set of valid status codes?
-        // Does it exactly match the expected status code?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        // Store the ID returned from this create operation
-        // for additional tests below.
-        knownResourceId = extractId(res);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": knownResourceId=" + knownResourceId);
+        try {
+	        int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        //
+	        // Specifically:
+	        // Does it fall within the set of valid status codes?
+	        // Does it exactly match the expected status code?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        // Store the ID returned from this create operation
+	        // for additional tests below.
+	        knownResourceId = extractId(res);
+	        //allResourceIdsCreated.add(knownResourceId);
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": knownResourceId=" + knownResourceId);
+	        }
+        } finally {
+        	res.close();
         }
     }
     
@@ -381,26 +384,30 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
         ClientResponse<Role> res = client.read(verifyResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	        
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        Role output = (Role) res.getEntity();
+	        Assert.assertNotNull(output);
+	
+	        //FIXME: Tenant ID of "1" should not be hard coded
+	        String roleNameToVerify = "ROLE_" +
+	        	"1_" +
+	        	verifyRoleName.toUpperCase();
+	        Assert.assertEquals(output.getRoleName(), roleNameToVerify,
+	                "RoleName fix did not work!");
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        Role output = (Role) res.getEntity();
-        Assert.assertNotNull(output);
-
-        //FIXME: Tenant ID of "1" should not be hard coded
-        String roleNameToVerify = "ROLE_" +
-        	"1_" +
-        	verifyRoleName.toUpperCase();
-        Assert.assertEquals(output.getRoleName(), roleNameToVerify,
-                "RoleName fix did not work!");
     }
     // Failure outcomes
     /* (non-Javadoc)
@@ -417,16 +424,19 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
         ClientResponse<Role> res = client.read(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+            int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // ---------------------------------------------------------------
@@ -458,7 +468,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
 	        }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -494,7 +504,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
 	        }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -531,71 +541,84 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
         RoleClient client = new RoleClient();
         // Submit the request to the service and store the response.
         ClientResponse<Role> res = client.update(knownResourceId, roleToUpdate);
-        int statusCode = res.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        // Check the status code of the response: does it match the expected response(s)?
+            int statusCode = res.getStatus();
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	
+	        Role roleUpdated = (Role) res.getEntity();
+	        Assert.assertNotNull(roleUpdated);
+	
+	        Assert.assertEquals(roleUpdated.getDescription(),
+	                roleToUpdate.getDescription(),
+	                "Data in updated object did not match submitted data.");
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-
-        Role roleUpdated = (Role) res.getEntity();
-        Assert.assertNotNull(roleUpdated);
-
-        Assert.assertEquals(roleUpdated.getDescription(),
-                roleToUpdate.getDescription(),
-                "Data in updated object did not match submitted data.");
     }
     
     @Test(dataProvider = "testName",
     		dependsOnMethods = {"CRUDTests"})
 	public void verifyProtectionReadOnly(String testName) throws Exception {
-
+    	// Setup to create a new role
     	setupCreate();
-
-        // Submit the request to the service and store the response.
-        RoleClient client = new RoleClient();
-        Role role = createRoleInstance(knownRoleName+"_PT", "Just a temp", true);
+    	Role role = createRoleInstance(knownRoleName+"_PT", "Just a temp", true);
         role.setMetadataProtection(RoleClient.IMMUTABLE);
         role.setPermsProtection(RoleClient.IMMUTABLE);
+        //
+        // Submit the create request to the service and store the response.
+        //
+        RoleClient client = new RoleClient();        
         ClientResponse<Response> res = client.create(role);
-        int statusCode = res.getStatus();
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        // Store the ID returned from this create operation
-        // for additional tests below.
-        String testResourceId = extractId(res);
-        allResourceIdsCreated.add(testResourceId);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": testResourceId=" + testResourceId);
+        String testResourceId = null;
+        try {
+            int statusCode = res.getStatus();
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	        // Store the ID returned from this create operation
+	        // for additional tests below.
+	        testResourceId = extractId(res);
+	        allResourceIdsCreated.add(testResourceId);
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": testResourceId=" + testResourceId);
+	        }
+        } finally {
+        	res.close();
         }
+        
+        // Next, read back the role we just created.
         setupRead();
-
         // Submit the request to the service and store the response.
         ClientResponse<Role> roleRes = client.read(testResourceId);
-        statusCode = roleRes.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        Role roleRead = (Role) roleRes.getEntity();
-        Assert.assertNotNull(roleRead);
-        String mdProtection = roleRead.getMetadataProtection();
-        String permsProtection = roleRead.getPermsProtection();
-        if (logger.isTraceEnabled()) {
-            logger.trace(testName + ": metadataProtection=" + mdProtection);
-            logger.trace(testName + ": permsProtection=" + permsProtection);
+        try {
+            int statusCode = roleRes.getStatus();
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        Role roleRead = (Role) roleRes.getEntity();
+	        Assert.assertNotNull(roleRead);
+	        String mdProtection = roleRead.getMetadataProtection();
+	        String permsProtection = roleRead.getPermsProtection();
+	        if (logger.isTraceEnabled()) {
+	            logger.trace(testName + ": metadataProtection=" + mdProtection);
+	            logger.trace(testName + ": permsProtection=" + permsProtection);
+	        }
+	    	Assert.assertFalse(role.getMetadataProtection().equals(mdProtection),
+	    			"Role allowed create to set the metadata protection flag.");
+	    	Assert.assertFalse(role.getPermsProtection().equals(permsProtection),
+	    			"Role allowed create to set the perms protection flag.");
+        } finally {
+        	res.close();
         }
-    	Assert.assertFalse(role.getMetadataProtection().equals(mdProtection),
-    			"Role allowed create to set the metadata protection flag.");
-    	Assert.assertFalse(role.getPermsProtection().equals(permsProtection),
-    			"Role allowed create to set the perms protection flag.");
-        
+        // Finally, update the role with changes and verify
     	setupUpdate();
 
     	Role roleToUpdate = createRoleInstance(knownRoleName+"_PT", "Just a temp", true);
@@ -604,31 +627,33 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
 
     	// Submit the request to the service and store the response.
     	roleRes = client.update(testResourceId, roleToUpdate);
-    	statusCode = roleRes.getStatus();
-    	// Check the status code of the response: does it match the expected response(s)?
-    	if (logger.isDebugEnabled()) {
-    		logger.debug(testName + ": status = " + statusCode);
+    	try {
+	    	// Check the status code of the response: does it match the expected response(s)?
+        	int statusCode = roleRes.getStatus();
+	    	if (logger.isDebugEnabled()) {
+	    		logger.debug(testName + ": status = " + statusCode);
+	    	}
+	    	Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	    			invalidStatusCodeMessage(testRequestType, statusCode));
+	    	Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	
+	    	Role roleUpdated = (Role) roleRes.getEntity();
+	    	Assert.assertNotNull(roleUpdated);
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + "Updated role: ");
+	            org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();            
+	            logger.debug(objectAsXmlString(objectFactory.createRole(roleUpdated),
+	                    Role.class));            
+	        }
+	
+	    	Assert.assertFalse(RoleClient.IMMUTABLE.equalsIgnoreCase(roleUpdated.getMetadataProtection()),
+	    			"Role allowed update of the metadata protection flag.");
+	    	Assert.assertFalse(RoleClient.IMMUTABLE.equalsIgnoreCase(roleUpdated.getPermsProtection()),
+	    			"Role allowed update of the perms protection flag.");
+    	} finally {
+    		res.close();
     	}
-    	Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-    			invalidStatusCodeMessage(testRequestType, statusCode));
-    	Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-
-    	Role roleUpdated = (Role) roleRes.getEntity();
-    	Assert.assertNotNull(roleUpdated);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + "Updated role: ");
-            org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();            
-            logger.debug(objectAsXmlString(objectFactory.createRole(roleUpdated),
-                    Role.class));            
-        }
-
-    	Assert.assertFalse(
-    			RoleClient.IMMUTABLE.equalsIgnoreCase(roleUpdated.getMetadataProtection()),
-    			"Role allowed update of the metadata protection flag.");
-    	Assert.assertFalse(
-    			RoleClient.IMMUTABLE.equalsIgnoreCase(roleUpdated.getPermsProtection()),
-    			"Role allowed update of the perms protection flag.");
     }
 
 	@Test(dataProvider = "testName",
@@ -652,15 +677,18 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
         RoleClient client = new RoleClient();
         // Submit the request to the service and store the response.
         ClientResponse<Role> res = client.update(knownResourceId, roleToUpdate);
-        int statusCode = res.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
-
     }
 
     // Failure outcomes
@@ -711,16 +739,20 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
                 true);
         ClientResponse<Role> res =
                 client.update(NON_EXISTENT_ID, role);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // ---------------------------------------------------------------
@@ -756,17 +788,21 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
 
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
-        ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.delete(NON_EXISTENT_ID);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
     
     // ---------------------------------------------------------------

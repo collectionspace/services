@@ -516,7 +516,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
         MovementClient movementClient = new MovementClient();
         for (String resourceId : movementIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            movementClient.delete(resourceId).releaseConnection();
+            movementClient.delete(resourceId).close();
         }
     }
 

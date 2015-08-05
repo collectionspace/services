@@ -180,7 +180,7 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
 
 	public Response create(REQUEST_TYPE payload);
 	
-	public ClientResponse<RESPONSE_TYPE> read(String csid);
+	public Response read(String csid);
 
     public ClientResponse<RESPONSE_TYPE> update(String csid, REQUEST_TYPE payload);
 	
@@ -226,7 +226,7 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * @param csid the csid
      * @return the authority refs
      */
-    public ClientResponse<AuthorityRefList> getAuthorityRefs(String csid);
+    public Response getAuthorityRefs(String csid); // Response.getEntity returns AuthorityRefList type
     
     /**
      * Delete.

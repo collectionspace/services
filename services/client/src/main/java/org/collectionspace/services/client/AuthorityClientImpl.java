@@ -21,13 +21,13 @@ public abstract class AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P extends Authori
 
 	//(C)reate Item
 	@Override
-    public ClientResponse<Response> createItem(String vcsid, PoxPayloadOut poxPayloadOut) {
+    public Response createItem(String vcsid, PoxPayloadOut poxPayloadOut) {
     	return getProxy().createItem(vcsid, poxPayloadOut.getBytes());
     }
 
     //(R)ead Item
     @Override
-	public ClientResponse<String> readItem(String vcsid, String csid) {
+	public Response readItem(String vcsid, String csid) {
     	return getProxy().readItem(vcsid, csid, INCLUDE_DELETE_TRUE);
     }
     
@@ -44,7 +44,7 @@ public abstract class AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P extends Authori
 
     //(D)elete Item
     @Override
-	public ClientResponse<Response> deleteItem(String vcsid, String csid) {
+	public Response deleteItem(String vcsid, String csid) {
     	return getProxy().deleteItem(vcsid, csid);
     }
     

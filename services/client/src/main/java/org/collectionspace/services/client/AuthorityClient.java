@@ -31,10 +31,10 @@ public interface AuthorityClient<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
     void setInAuthority(AUTHORITY_ITEM_TYPE item, String inAuthorityCsid);
 	
     //(C)reate Item
-    ClientResponse<Response> createItem(String vcsid, PoxPayloadOut poxPayloadOut);
+    Response createItem(String vcsid, PoxPayloadOut poxPayloadOut);
 
     //(R)ead Item
-    ClientResponse<String> readItem(String vcsid, String csid);
+    Response readItem(String vcsid, String csid);
     
     //(R)ead Item
     ClientResponse<String> readItem(String vcsid, String csid, Boolean includeDeleted);    
@@ -43,7 +43,7 @@ public interface AuthorityClient<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
     ClientResponse<String> updateItem(String vcsid, String csid, PoxPayloadOut poxPayloadOut);
 
     //(D)elete Item
-    ClientResponse<Response> deleteItem(String vcsid, String csid);
+    Response deleteItem(String vcsid, String csid);
     
     // Get a list of objects that
     ClientResponse<AuthorityRefDocList> getReferencingObjects(

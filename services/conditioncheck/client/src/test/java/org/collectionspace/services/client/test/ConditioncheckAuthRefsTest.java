@@ -172,6 +172,8 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
     }
     
     protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
+    	String result = null;
+    	
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
@@ -183,16 +185,21 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
         term.setTermDisplayName(termName);
         term.setTermName(termName);
         personTerms.add(term);
-        PoxPayloadOut multipart =
-            PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
+        PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
                     authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
-        ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
-        int statusCode = res.getStatus();
+      
+        Response res = personAuthClient.createItem(personAuthCSID, multipart);
+        try {
+	        int statusCode = res.getStatus();
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        result = extractId(res);
+        } finally {
+        	res.close();
+        }
 
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-        return extractId(res);
+        return result;
     }
 
     // Success outcomes
@@ -204,12 +211,12 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
 
         // Submit the request to the service and store the response.
         ConditioncheckClient conditioncheckClient = new ConditioncheckClient();
-        ClientResponse<String> res = conditioncheckClient.read(knownResourceId);
+        Response res = conditioncheckClient.read(knownResourceId);
         ConditionchecksCommon conditioncheckCommon = null;
         try {
             assertStatusCode(res, testName);
             // Extract the common part from the response.
-            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+            PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
             conditioncheckCommon = (ConditionchecksCommon) extractPart(input,
                 conditioncheckClient.getCommonPartName(), ConditionchecksCommon.class);
             Assert.assertNotNull(conditioncheckCommon);
@@ -218,7 +225,7 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
             }
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         //
@@ -226,15 +233,15 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
         Assert.assertEquals(conditioncheckCommon.getConditionChecker(), conditionCheckerRefName);
         
         // Get the auth refs and check them
-        ClientResponse<AuthorityRefList> res2 = conditioncheckClient.getAuthorityRefs(knownResourceId);
+        Response res2 = conditioncheckClient.getAuthorityRefs(knownResourceId);
         AuthorityRefList list = null;
         try {
             assertStatusCode(res2, testName);
-            list = res2.getEntity();
+            list = (AuthorityRefList)res2.getEntity();
             Assert.assertNotNull(list);
         } finally {
             if (res2 != null) {
-                res2.releaseConnection();
+                res2.close();
             }
         }
         
@@ -298,9 +305,7 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
         
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            ClientResponse<Response> response = 
-                personAuthClient.deleteItem(personAuthCSID, resourceId); // alternative to personAuthClient.deleteItem().releaseConnection();
-            response.releaseConnection();
+        	personAuthClient.deleteItem(personAuthCSID, resourceId).close();
         }
         
         // Delete PersonAuthority resource(s).
@@ -309,11 +314,9 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
             personAuthClient.delete(personAuthCSID);
             // Delete Condition Checks resource(s).
             ConditioncheckClient conditioncheckClient = new ConditioncheckClient();
-            ClientResponse<Response> response = null;
             for (String resourceId : conditioncheckIdsCreated) {
                 // Note: Any non-success responses are ignored and not reported.
-                response = conditioncheckClient.delete(resourceId); // alternative to conditioncheckClient.delete(resourceId).releaseConnection();
-                response.releaseConnection();
+                conditioncheckClient.delete(resourceId).close(); 
             }
         }
     }
