@@ -8,7 +8,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
+//import org.jboss.resteasy.client.ClientResponse;
 
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -28,7 +28,7 @@ public interface CollectionSpacePoxProxy<LT extends AbstractCommonList> extends
 	// (R)ead
 	@GET
 	@Path("/{csid}")
-	ClientResponse<String> readIncludeDeleted(
+	Response readIncludeDeleted(
 			@PathParam("csid") String csid,
 			@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
 
@@ -53,13 +53,13 @@ public interface CollectionSpacePoxProxy<LT extends AbstractCommonList> extends
 	 */
 	@GET
 	@Produces({ "application/xml" })
-	ClientResponse<LT> keywordSearchIncludeDeleted(
+	Response keywordSearchIncludeDeleted(
 			@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
 			@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
 
 	@GET
 	@Produces({ "application/xml" })
-	ClientResponse<LT> advancedSearchIncludeDeleted(
+	Response advancedSearchIncludeDeleted(
 			@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_AS) String whereClause,
 			@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
 

@@ -3,7 +3,7 @@ package org.collectionspace.services.client;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.jboss.resteasy.client.ClientResponse;
+//import org.jboss.resteasy.client.ClientResponse;
 
 /*
  * <LT> = List type
@@ -23,7 +23,7 @@ public interface CollectionSpacePoxClient<LT extends AbstractCommonList, P exten
      */
     public Response readIncludeDeleted(Boolean includeDeleted);
 
-    public ClientResponse<LT> keywordSearchIncludeDeleted(String keywords, Boolean includeDeleted);
+    public Response keywordSearchIncludeDeleted(String keywords, Boolean includeDeleted);
     
-    public ClientResponse<LT> advancedSearchIncludeDeleted(String whereClause, Boolean includeDeleted);
+    public Response advancedSearchIncludeDeleted(String whereClause, Boolean includeDeleted);
 }

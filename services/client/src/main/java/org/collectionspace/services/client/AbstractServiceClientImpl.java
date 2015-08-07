@@ -528,12 +528,12 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
     }
     
     @Override
-	public ClientResponse<String> getWorkflow(String csid) {
+	public Response getWorkflow(String csid) {
     	return getProxy().getWorkflow(csid);
     }
     
     @Override
-	public ClientResponse<String> updateWorkflowWithTransition(String csid, String workflowTransition) {
+	public Response updateWorkflowWithTransition(String csid, String workflowTransition) {
     	return getProxy().updateWorkflowWithTransition(csid, workflowTransition);
     }        
     

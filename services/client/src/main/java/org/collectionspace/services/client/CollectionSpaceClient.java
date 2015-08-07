@@ -216,9 +216,9 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * @param csid the csid of the entity
      * @return the workflow
      */
-    public ClientResponse<String> getWorkflow(String csid);
+    public Response getWorkflow(String csid);
     
-	public ClientResponse<String> updateWorkflowWithTransition(String csid, String workflowTransition);
+	public Response updateWorkflowWithTransition(String csid, String workflowTransition);
     
     /**
      * Gets the authority refs.

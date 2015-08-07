@@ -35,7 +35,7 @@ public abstract class AbstractPoxServiceClientImpl<CLT extends AbstractCommonLis
     }
     
     @Override
-	public ClientResponse<String> readIncludeDeleted(String csid, Boolean includeDeleted) {
+	public Response readIncludeDeleted(String csid, Boolean includeDeleted) {
         return getProxy().readIncludeDeleted(csid, includeDeleted.toString());
     }
 
@@ -46,13 +46,13 @@ public abstract class AbstractPoxServiceClientImpl<CLT extends AbstractCommonLis
     
 
     @Override
-    public ClientResponse<CLT> keywordSearchIncludeDeleted(String keywords, Boolean includeDeleted) {
+    public Response keywordSearchIncludeDeleted(String keywords, Boolean includeDeleted) {
         CollectionSpacePoxProxy<CLT> proxy = getProxy();
         return proxy.keywordSearchIncludeDeleted(keywords, includeDeleted.toString());
     }
 
     @Override
-    public ClientResponse<CLT> advancedSearchIncludeDeleted(String whereClause, Boolean includeDeleted) {
+    public Response advancedSearchIncludeDeleted(String whereClause, Boolean includeDeleted) {
         CollectionSpacePoxProxy<CLT> proxy = getProxy();
         return proxy.advancedSearchIncludeDeleted(whereClause, includeDeleted.toString());
     }

@@ -671,26 +671,35 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
             // Search for the newly-created records, excluding the soft deleted record.
             //
             // Send the search request and receive a response
-            ClientResponse<AbstractCommonList> res = client.keywordSearchIncludeDeleted(KEYWORD, Boolean.FALSE);
-            int result = res.getStatus();
-            Assert.assertEquals(result, STATUS_OK);
-
-            AbstractCommonList list = res.getEntity();
-            long itemsMatchedBySearch = list.getTotalItems();
-            Assert.assertEquals(itemsMatchedBySearch, OBJECTS_TO_CREATE - 1,
-                    "The number of items marked for delete is not correct.");
+            Response res = client.keywordSearchIncludeDeleted(KEYWORD, Boolean.FALSE);
+            try {
+	            int result = res.getStatus();
+	            Assert.assertEquals(result, STATUS_OK);
+	
+	            CLT list = res.readEntity(getCommonListType());
+	            long itemsMatchedBySearch = this.getSizeOfList(list); //list.getTotalItems();
+	            Assert.assertEquals(itemsMatchedBySearch, OBJECTS_TO_CREATE - 1,
+	                    "The number of items marked for delete is not correct.");
+            } finally {
+            	res.close();
+            }
+            
             //
             // Search for the newly-created records, including the soft deleted record.
             //
             // Send the search request and receive a response
             res = client.keywordSearchIncludeDeleted(KEYWORD, Boolean.TRUE);
-            result = res.getStatus();
-            Assert.assertEquals(result, STATUS_OK);
-
-            list = res.getEntity();
-            itemsMatchedBySearch = list.getTotalItems();
-            Assert.assertEquals(itemsMatchedBySearch, OBJECTS_TO_CREATE,
-                    "Deleted item was not returned in list results, even though it was requested to be included.");
+            try {
+	            int result = res.getStatus();
+	            Assert.assertEquals(result, STATUS_OK);
+	
+	            CLT list = res.readEntity(getCommonListType());
+	            long itemsMatchedBySearch = this.getSizeOfList(list); //list.getTotalItems();
+	            Assert.assertEquals(itemsMatchedBySearch, OBJECTS_TO_CREATE,
+	                    "Deleted item was not returned in list results, even though it was requested to be included.");
+            } finally {
+            	res.close();
+            }
 
         } catch (UnsupportedOperationException e) {
             logger.warn(this.getClass().getName() + " did not implement createWorkflowTarget() method.  No workflow tests performed.");
@@ -881,17 +890,17 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         // Read the existing object
         //
         CollectionSpaceClient client = this.getClientInstance();
-        ClientResponse<String> res = client.getWorkflow(resourceId);
+        Response res = client.getWorkflow(resourceId);
         WorkflowCommon workflowCommons = null;
         try {
 	        assertStatusCode(res, testName);
 	        logger.debug("Got object to update life cycle state with ID: " + resourceId);
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(String.class));
 	        workflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
 	        Assert.assertNotNull(workflowCommons);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         //
@@ -908,12 +917,12 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         res = client.updateWorkflowWithTransition(resourceId, workflowTransition);
         try {
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(String.class));
 	        updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
 	        Assert.assertNotNull(updatedWorkflowCommons);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         //
@@ -925,7 +934,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 	        try {
 		        assertStatusCode(res, testName);
 		        logger.debug("Got workflow state of updated object with ID: " + resourceId);
-		        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+		        PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(String.class));
 		        updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
 		        Assert.assertNotNull(workflowCommons);
 		        String currentWorkflowState = updatedWorkflowCommons.getCurrentLifeCycleState();
@@ -935,7 +944,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 		        }
 	        } finally {
 	        	if (res != null) {
-                    res.releaseConnection();
+                    res.close();
                 }
 	        }
 	        trials++;
@@ -1017,7 +1026,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 	        result = list.getTotalItems();
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -1037,12 +1046,15 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         CollectionSpaceClient client = getClientInstance();
         REQUEST_TYPE payload = createInstance(identifier);
         Response res = client.create(payload);
-
-        int statusCode = res.getStatus();
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-
-        result = extractId(res);
-        allResourceIdsCreated.add(result);
+        try {
+	        int statusCode = res.getStatus();
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	
+	        result = extractId(res);
+	        allResourceIdsCreated.add(result);
+        } finally {
+        	res.close();
+        }
 
         return result;
     }
@@ -1135,9 +1147,12 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
                 //
                 AuthorityClient client = (AuthorityClient) this.getClientInstance();
                 ClientResponse<String> res = client.readItem(parentCsid, csid, Boolean.FALSE);
-
-                int result = res.getStatus();
-                Assert.assertEquals(result, STATUS_NOT_FOUND);
+                try {
+	                int result = res.getStatus();
+	                Assert.assertEquals(result, STATUS_NOT_FOUND);
+                } finally {
+                	res.close();
+                }
 
             } catch (UnsupportedOperationException e) {
                 logger.warn(this.getClass().getName() + " did not implement createWorkflowTarget() method.  No workflow tests performed.");
@@ -1179,7 +1194,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         WorkflowCommon updatedWorkflowCommons = null;
         try {
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
 	        Assert.assertNotNull(updatedWorkflowCommons);
         } finally {

@@ -187,7 +187,8 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    // Now lock the dimension record.
 	    
 		@SuppressWarnings("unused")
-		ClientResponse<String> workflowResponse = dimensionClient.updateWorkflowWithTransition(dimensionCsid1, WorkflowClient.WORKFLOWTRANSITION_LOCK);
+		Response workflowResponse = dimensionClient.updateWorkflowWithTransition(
+				dimensionCsid1, WorkflowClient.WORKFLOWTRANSITION_LOCK);
 	    System.out.println("Locked dimension record with CSID=" + dimensionCsid1);
 	    
 	    // Finally, try to delete the relationship
@@ -367,7 +368,9 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    }
 	    
 	    @SuppressWarnings("unused")
-		ClientResponse<String> workflowResponse = dimensionClient.updateWorkflowWithTransition(dimensionCsid, WorkflowClient.WORKFLOWTRANSITION_LOCK);
+	    Response workflowResponse = dimensionClient.updateWorkflowWithTransition(dimensionCsid, 
+				WorkflowClient.WORKFLOWTRANSITION_LOCK);
+	    workflowResponse.close();
 	    System.out.println("Locked dimension record with CSID=" + dimensionCsid);
 	    
 	    // Lastly, relate the two entities, by creating a new relation object

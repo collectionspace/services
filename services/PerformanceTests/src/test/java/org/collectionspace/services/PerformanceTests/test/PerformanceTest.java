@@ -116,7 +116,7 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
     private void searchCollectionObjects(int numberOfObjects) {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         Random randomGenerator = new Random(System.currentTimeMillis());
-        ClientResponse<AbstractCommonList> searchResults;
+        Response searchResultsResponse;
 
         long totalTime = 0;
         long totalSearchResults = 0;
@@ -129,15 +129,16 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
             for (int i = 0; i < MAX_SEARCHES; i++) {
                 //sandwich the call with timestamps
                 Date startTime = new Date();
-                searchResults = collectionObjectClient.keywordSearchIncludeDeleted(keywords, NOT_INCLUDING_DELETED_RESOURCES);
+                searchResultsResponse = collectionObjectClient.keywordSearchIncludeDeleted(keywords, 
+                		NOT_INCLUDING_DELETED_RESOURCES);
                 Date stopTime = new Date();
 
                 //extract the result list and release the ClientResponse
                 AbstractCommonList coListItem = null;
                 try {
-                    coListItem = searchResults.getEntity();
+                    coListItem = searchResultsResponse.readEntity(AbstractCommonList.class);
                 } finally {
-                    searchResults.close();
+                	searchResultsResponse.close();
                 }
 
                 long time = stopTime.getTime() - startTime.getTime();
@@ -146,6 +147,7 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
                 totalSearchResults = totalSearchResults
                         + coListItem.getListItem().size();
             }
+            
             if (logger.isDebugEnabled()) {
                 System.out.println("------------------------------------------------------------------------------");
                 System.out.println("Searched Objects: " + numberOfObjects);
