@@ -23,13 +23,13 @@ public abstract class AbstractPoxServiceClientImpl<CLT extends AbstractCommonLis
         return getProxy().read(csid);
     }
     
-    public ClientResponse<CLT> readList() {
+    public Response readList() {
     	CollectionSpaceProxy<CLT> proxy = (CollectionSpaceProxy<CLT>)getProxy();
     	return proxy.readList();
     }    
     
     @Override
-    public ClientResponse<CLT> readIncludeDeleted(Boolean includeDeleted) {
+    public Response readIncludeDeleted(Boolean includeDeleted) {
     	CollectionSpacePoxProxy<CLT> proxy = getProxy();
     	return proxy.readIncludeDeleted(includeDeleted.toString());
     }
@@ -40,7 +40,7 @@ public abstract class AbstractPoxServiceClientImpl<CLT extends AbstractCommonLis
     }
 
     @Override
-    public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload) {
+    public Response update(String csid, PoxPayloadOut xmlPayload) {
         return getProxy().update(csid, xmlPayload.getBytes());
     }
     

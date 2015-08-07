@@ -119,8 +119,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getCommonList(
-			ClientResponse<AbstractCommonList> response) {
+	protected AbstractCommonList getCommonList(Response response) {
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
@@ -299,11 +298,11 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
-        ClientResponse<String> res = orgAuthClient.readItem(knownResourceId, knownItemResourceId);
+        Response res = orgAuthClient.readItem(knownResourceId, knownItemResourceId);
         OrganizationsCommon organization = null;
         try {
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
 	        organization = (OrganizationsCommon) extractPart(input,
 	            orgAuthClient.getItemCommonPartName(), OrganizationsCommon.class);
 	        Assert.assertNotNull(organization);
@@ -312,9 +311,10 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
 	        }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
+        
         // Check one or more of the authority fields in the Organization item
         Assert.assertEquals(organization.getContactNames().getContactName().get(0),
                 organizationContactPersonRefName1);
@@ -333,7 +333,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
 	        list = res2.getEntity();
         } finally {
         	if (res2 != null) {
-        		res2.releaseConnection();
+        		res2.close();
             }
         }
         

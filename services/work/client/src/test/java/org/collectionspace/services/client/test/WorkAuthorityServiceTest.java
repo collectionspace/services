@@ -26,6 +26,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.ws.rs.core.Response;
+
 import org.collectionspace.services.WorkJAXBSchema;
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.AuthorityClient;
@@ -168,52 +171,54 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
      * @throws Exception the exception
      */
     @Test(dataProvider="testName")
-    public void verifyIllegalItemDisplayName(String testName) throws Exception {
-        // Perform setup for read.
-        setupRead();
+	public void verifyIllegalItemDisplayName(String testName) throws Exception {
+		// Perform setup for read.
+		setupRead();
 
-        // Submit the request to the service and store the response.
-        WorkAuthorityClient client = new WorkAuthorityClient();
-        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
-        WorksCommon work = null;
-        try {
-            assertStatusCode(res, testName);        
-            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-            work = (WorksCommon) extractPart(input,
-                    client.getItemCommonPartName(), WorksCommon.class);
-            Assert.assertNotNull(work);
-        } finally {
-                if (res != null) {
-                res.releaseConnection();
-        }
-        }
+		// Submit the request to the service and store the response.
+		WorkAuthorityClient client = new WorkAuthorityClient();
+		Response res = client.readItem(knownResourceId, knownItemResourceId);
+		WorksCommon work = null;
+		try {
+			assertStatusCode(res, testName);
+			PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+			work = (WorksCommon) extractPart(input,
+					client.getItemCommonPartName(), WorksCommon.class);
+			Assert.assertNotNull(work);
+		} finally {
+			if (res != null) {
+				res.close();
+			}
+		}
 
-        //
-        // Make an invalid UPDATE request, without a display name
-        //
-        WorkTermGroupList termList = work.getWorkTermGroupList();
-        Assert.assertNotNull(termList);
-        List<WorkTermGroup> terms = termList.getWorkTermGroup();
-        Assert.assertNotNull(terms);
-        Assert.assertTrue(terms.size() > 0);
-        terms.get(0).setTermDisplayName(null);
-        terms.get(0).setTermName(null);
-        
-        setupUpdateWithInvalidBody(); // we expect a failure
-        
-        // Submit the updated resource to the service and store the response.
-        PoxPayloadOut output = new PoxPayloadOut(WorkAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(client.getItemCommonPartName(), work);
-        setupUpdateWithInvalidBody(); // we expected a failure here.
-        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        try {
-            assertStatusCode(res, testName);
-        } finally {
-            if (res != null) {
-                res.releaseConnection();
-            }
-        }
-    }
+		//
+		// Make an invalid UPDATE request, without a display name
+		//
+		WorkTermGroupList termList = work.getWorkTermGroupList();
+		Assert.assertNotNull(termList);
+		List<WorkTermGroup> terms = termList.getWorkTermGroup();
+		Assert.assertNotNull(terms);
+		Assert.assertTrue(terms.size() > 0);
+		terms.get(0).setTermDisplayName(null);
+		terms.get(0).setTermName(null);
+
+		setupUpdateWithInvalidBody(); // we expect a failure
+
+		// Submit the updated resource to the service and store the response.
+		PoxPayloadOut output = new PoxPayloadOut(
+				WorkAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
+		PayloadOutputPart commonPart = output.addPart(
+				client.getItemCommonPartName(), work);
+		setupUpdateWithInvalidBody(); // we expected a failure here.
+		res = client.updateItem(knownResourceId, knownItemResourceId, output);
+		try {
+			assertStatusCode(res, testName);
+		} finally {
+			if (res != null) {
+				res.close();
+			}
+		}
+	}
 
     /**
      * Read item list.
@@ -264,7 +269,7 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
             list = res.getEntity();
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         

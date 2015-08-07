@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.Response;
+
 import org.collectionspace.services.LocationJAXBSchema;
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.AuthorityClient;
@@ -42,12 +44,9 @@ import org.collectionspace.services.location.LocTermGroup;
 import org.collectionspace.services.location.LocTermGroupList;
 import org.collectionspace.services.location.LocationauthoritiesCommon;
 import org.collectionspace.services.location.LocationsCommon;
-
 import org.jboss.resteasy.client.ClientResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -169,17 +168,17 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
-        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
+        Response res = client.readItem(knownResourceId, knownItemResourceId);
         LocationsCommon location = null;
         try {
             assertStatusCode(res, testName);        
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
 	        location = (LocationsCommon) extractPart(input,
 	                client.getItemCommonPartName(), LocationsCommon.class);
 	        Assert.assertNotNull(location);
 	    } finally {
 	    	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
 	    }
 	        
@@ -205,7 +204,7 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
 	    	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -259,7 +258,7 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
 			list = res.getEntity();
 		} finally {
 			if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
 		}
 		

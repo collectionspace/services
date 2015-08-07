@@ -96,6 +96,13 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
     }
 
     /**
+     * The entity type expected from the JAX-RS Response object
+     */
+    public Class<PermissionRole> getEntityResponseType() {
+    	return PermissionRole.class;
+    }
+    
+    /**
      * Seed data.
      */
     @BeforeClass(alwaysRun = true)
@@ -707,6 +714,12 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
     	return roleValues.get(getRoleName()).getRoleId();
     }
 	
+	@Override
+	protected long getSizeOfList(PermissionRole permRole) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Method getSizeOfList() is not implemented because this service does not support lists.");
+	}
+    
     /*
      * For convenience and terseness, this test method is the base of the test execution dependency chain.  Other test methods may
      * refer to this method in their @Test annotation declarations.

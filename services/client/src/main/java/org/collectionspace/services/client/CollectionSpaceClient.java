@@ -182,7 +182,7 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
 	
 	public Response read(String csid);
 
-    public ClientResponse<RESPONSE_TYPE> update(String csid, REQUEST_TYPE payload);
+    public Response update(String csid, REQUEST_TYPE payload);
 	
     /**
      * Read list.
@@ -191,11 +191,11 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * @param pageNumber the page number
      * @return the client response
      */
-    public ClientResponse<CLT> readList(
+    public Response readList(
     		Long pageSize,
     		Long pageNumber);
     
-    public ClientResponse<CLT> readList();
+    public Response readList(); // Formally, ClientResponse<CLT>
 
     /**
      * Read list.
@@ -205,7 +205,7 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * @param pageNumber the page number
      * @return the client response
      */
-    public ClientResponse<CLT> readList(
+    public Response readList(
             String sortBy,
             Long pageSize,
             Long pageNumber);

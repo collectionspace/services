@@ -139,6 +139,8 @@ public class RelationServiceTest extends AbstractPoxServiceTestImpl<RelationsCom
     }
 
     private String createPerson(String firstName, String surName, String shortId, String authRefName) {
+    	String result = null;
+    	
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         Map<String, String> personInfo = new HashMap<String, String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
@@ -147,13 +149,19 @@ public class RelationServiceTest extends AbstractPoxServiceTestImpl<RelationsCom
         PoxPayloadOut multipart =
                 PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
                 authRefName, personInfo, null, personAuthClient.getItemCommonPartName());
-        ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-        return extractId(res);
+        Response res = personAuthClient.createItem(personAuthCSID, multipart);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        result = extractId(res);
+        } finally {
+        	res.close();
+        }
+        
+        return result;
     }    
     
     @Test(dataProvider="testName",

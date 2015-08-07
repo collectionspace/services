@@ -534,10 +534,10 @@ public class CollectionObjectServiceTest extends AbstractPoxServiceTestImpl<Abst
      * @param id the id
      * @return the client response
      */
-    private ClientResponse<String> updateRetrieve(String testName, String id) {
+    private Response updateRetrieve(String testName, String id) {
         setupRead();
         CollectionObjectClient client = new CollectionObjectClient();
-        ClientResponse<String> res = client.read(knownResourceId);
+        Response res = client.read(knownResourceId);
         int statusCode = res.getStatus();
         // Check the status code of the response: does it match
         // the expected response(s)?
@@ -561,14 +561,15 @@ public class CollectionObjectServiceTest extends AbstractPoxServiceTestImpl<Abst
      * @param id the id
      * @return the client response
      */
-    private ClientResponse<String> updateSend(String testName, String id,
+    private Response updateSend(String testName, String id,
             CollectionobjectsCommon collectionObjectCommon) {
         setupUpdate();
         PoxPayloadOut output = new PoxPayloadOut(CollectionObjectClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = output.addPart(collectionObjectCommon, MediaType.APPLICATION_XML_TYPE);
         CollectionObjectClient client = new CollectionObjectClient();
         commonPart.setLabel(client.getCommonPartName());
-        ClientResponse<String> res = client.update(knownResourceId, output);
+        
+        Response res = client.update(knownResourceId, output);
         int statusCode = res.getStatus();
         // Check the status code of the response: does it match
         // the expected response(s)?
@@ -578,7 +579,8 @@ public class CollectionObjectServiceTest extends AbstractPoxServiceTestImpl<Abst
         Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, testExpectedStatusCode);
-        return res;
+        
+        return res; // Calling needs to make sure they call res.close();
     }
 
     // Failure outcomes
@@ -720,17 +722,20 @@ public class CollectionObjectServiceTest extends AbstractPoxServiceTestImpl<Abst
         CollectionObjectClient client = new CollectionObjectClient();
         PoxPayloadOut multipart =
                 createInstance(client.getCommonPartName(), NON_EXISTENT_ID);
-        ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.update(NON_EXISTENT_ID, multipart);
+        try {
+	        int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
    /**
@@ -751,7 +756,7 @@ public class CollectionObjectServiceTest extends AbstractPoxServiceTestImpl<Abst
     		dependsOnMethods = {"CRUDTests"})
     public void updateWithRequiredValuesNullOrEmpty(String testName) throws Exception {
         // Read an existing record for updating.
-        ClientResponse<String> res = updateRetrieve(testName, knownResourceId);
+        Response res = updateRetrieve(testName, knownResourceId);
         CollectionobjectsCommon collectionObjectCommon = null;
         try {
 	        // Extract its common part.
@@ -1150,7 +1155,7 @@ public class CollectionObjectServiceTest extends AbstractPoxServiceTestImpl<Abst
 
         // Submit the request to the service and store the response.
         CollectionObjectClient client = new CollectionObjectClient();
-        ClientResponse<String> res = client.read(csid);
+        Response res = client.read(csid);
         CollectionobjectsCommon collectionObject = null;
         try {
 	        int statusCode = res.getStatus();

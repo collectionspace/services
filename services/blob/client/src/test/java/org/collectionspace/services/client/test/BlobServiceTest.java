@@ -89,8 +89,8 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
     }
 
     @Override
-    protected AbstractCommonList getCommonList(ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(AbstractCommonList.class);
+    protected AbstractCommonList getCommonList(Response response) {
+        return response.readEntity(AbstractCommonList.class);
     }
 
     /**
@@ -157,7 +157,7 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
 				            }
 		        		} finally {
 		        			if (res != null) {
-		                        res.releaseConnection();
+		                        res.close();
 		                    }
 		        		}
 	        		}
@@ -198,14 +198,14 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
 	        }
 		} finally {
 			if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
 		}
         //
 		// Read the blob back to get the new dimension data
 		//
         setupRead();
-        ClientResponse<String> readResponse = client.read(blobCsid);
+        Response readResponse = client.read(blobCsid);
         BlobsCommon blobsCommon = null;
         try {
         	assertStatusCode(readResponse, testName);
@@ -213,7 +213,7 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
             Assert.assertNotNull(blobsCommon);
         } finally {
         	if (readResponse != null) {
-        		readResponse.releaseConnection();
+        		readResponse.close();
             }
         }
         

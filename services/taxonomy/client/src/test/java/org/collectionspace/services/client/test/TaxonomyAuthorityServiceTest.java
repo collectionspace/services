@@ -198,12 +198,12 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
         //
         setupRead();
         TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
-        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
+        Response res = client.readItem(knownResourceId, knownItemResourceId);
         TaxonCommon taxon = null;
         try {
             assertStatusCode(res, testName);
             // Check whether Taxonomy has expected displayName.
-            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+            PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
             taxon = (TaxonCommon) extractPart(input,
                     client.getItemCommonPartName(), TaxonCommon.class);
             Assert.assertNotNull(taxon);

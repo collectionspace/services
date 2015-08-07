@@ -84,7 +84,7 @@ public class MediaAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     }
 
     @Override
-    protected AbstractCommonList getCommonList(ClientResponse<AbstractCommonList> response) {
+    protected AbstractCommonList getCommonList(Response response) {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 

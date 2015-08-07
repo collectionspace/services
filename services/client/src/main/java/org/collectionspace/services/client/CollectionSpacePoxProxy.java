@@ -35,12 +35,12 @@ public interface CollectionSpacePoxProxy<LT extends AbstractCommonList> extends
 	// (U)pdate
 	@PUT
 	@Path("/{csid}")
-	ClientResponse<String> update(@PathParam("csid") String csid, byte[] payload);
+	Response update(@PathParam("csid") String csid, byte[] payload);
 
 	// (L)ist non-deleted items
 	@GET
 	@Produces({ "application/xml" })
-	ClientResponse<LT> readIncludeDeleted(
+	Response readIncludeDeleted(
 			@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
 
 	/**

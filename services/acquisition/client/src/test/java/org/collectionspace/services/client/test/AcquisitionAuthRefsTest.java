@@ -93,8 +93,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 	 * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
 	 */
 	@Override
-	protected AbstractCommonList getCommonList(
-			ClientResponse<AbstractCommonList> response) {
+	protected AbstractCommonList getCommonList(Response response) {
 		throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
 	}
 

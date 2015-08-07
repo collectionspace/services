@@ -90,8 +90,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected AbstractCommonList getCommonList(
-            ClientResponse<AbstractCommonList> response) {
+    protected AbstractCommonList getCommonList(Response response) {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
@@ -632,19 +631,19 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
 
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
-        ClientResponse<String> res = client.read(csid);
+        Response res = client.read(csid);
         MovementsCommon movementCommon = null;
         try {
         	assertStatusCode(res, testName);
 	        // Extract and return the common part of the record.
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
 	        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
 	        if (payloadInputPart != null) {
 	        	movementCommon = (MovementsCommon) payloadInputPart.getBody();
 	        }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -685,7 +684,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
         	list = res.getEntity();
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }        
 

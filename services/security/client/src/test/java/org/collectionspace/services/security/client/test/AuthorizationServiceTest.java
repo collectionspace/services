@@ -411,16 +411,16 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
         DimensionClient client = new DimensionClient();
         //elmo allowed to read
         client.setAuth(true, "elmo2010", true, "elmo2010", true);
-        ClientResponse<String> res = client.read(knownResourceId);
+        Response res = client.read(knownResourceId);
         try {
         	assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
 	        DimensionsCommon dimension = (DimensionsCommon) extractPart(input,
 	                client.getCommonPartName(), DimensionsCommon.class);
 	        Assert.assertNotNull(dimension);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -435,12 +435,12 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
         DimensionClient client = new DimensionClient();
         //lockedOut allowed to read
         client.setAuth(true, "lockedOut", true, "lockedOut", true);
-        ClientResponse<String> res = client.read(knownResourceId);
+        Response res = client.read(knownResourceId);
         try {
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -467,12 +467,12 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
         //
         PoxPayloadOut output = new PoxPayloadOut(DimensionClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = output.addPart(client.getCommonPartName(), dimension);
-        ClientResponse<String> res = client.update(knownResourceId, output);
+        Response res = client.update(knownResourceId, output);
         try {
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         //
@@ -489,7 +489,7 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -665,7 +665,7 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
         	result = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 

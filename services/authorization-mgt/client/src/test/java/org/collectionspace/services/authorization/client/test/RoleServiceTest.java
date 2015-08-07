@@ -71,6 +71,13 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
         return new RoleClient().getServicePathComponent();
     }
 
+    /**
+     * The entity type expected from the JAX-RS Response object
+     */
+    public Class<Role> getEntityResponseType() {
+    	return Role.class;
+    }
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
@@ -902,5 +909,10 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
         		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
     public void CRUDTests(String testName) {
     	// Do nothing.  Simply here to for a TestNG execution order for our tests
-    }	
+    }
+
+	@Override
+	protected long getSizeOfList(RolesList list) {
+		return list.getRole().size();
+	}	
 }

@@ -93,7 +93,7 @@ public class OrgAuthorityClientUtils {
     public static String getOrgRefName(String inAuthority, String csid, OrgAuthorityClient client){
     	if(client==null)
     		client = new OrgAuthorityClient();
-        ClientResponse<String> res = client.readItem(inAuthority, csid);
+        Response res = client.readItem(inAuthority, csid);
         try {
 	        int statusCode = res.getStatus();
 	        if(!READ_REQ.isValidStatusCode(statusCode)
@@ -102,7 +102,7 @@ public class OrgAuthorityClientUtils {
 	        }
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	            PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
 	            OrganizationsCommon org = 
 	            	(OrganizationsCommon) CollectionSpaceClientUtils.extractPart(input,
 	                    client.getItemCommonPartName(), OrganizationsCommon.class);
@@ -114,7 +114,7 @@ public class OrgAuthorityClientUtils {
 	            throw new RuntimeException(e);
 	        }
         } finally {
-        	res.releaseConnection();
+        	res.close();
         }
     }
 

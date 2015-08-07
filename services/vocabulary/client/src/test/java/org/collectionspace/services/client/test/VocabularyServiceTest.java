@@ -115,7 +115,7 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
         PoxPayloadOut multipart =
                 VocabularyClientUtils.createVocabularyItemInstance(null, //knownResourceRefName,
                 itemInfo, client.getItemCommonPartName());
-        ClientResponse<Response> res = client.createItem(knownResourceId, multipart);
+        Response res = client.createItem(knownResourceId, multipart);
         try {
         	int statusCode = res.getStatus();
 
@@ -130,7 +130,7 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
             }
        } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -144,18 +144,18 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
         
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
-        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
+        Response res = client.readItem(knownResourceId, knownItemResourceId);
         VocabularyitemsCommon vitem = null;
         try {
         	assertStatusCode(res, testName);
 	        // Check whether Person has expected displayName.
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
 	        vitem = (VocabularyitemsCommon) extractPart(input,
 	                client.getItemCommonPartName(), VocabularyitemsCommon.class);
 	        Assert.assertNotNull(vitem);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         //
@@ -171,7 +171,7 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         //
@@ -187,7 +187,7 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }

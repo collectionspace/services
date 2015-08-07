@@ -1,5 +1,7 @@
 package org.collectionspace.services.client;
 
+import javax.ws.rs.core.Response;
+
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -14,12 +16,12 @@ public interface CollectionSpacePoxClient<LT extends AbstractCommonList, P exten
 	 * Common service calls
 	 */
     
-    public ClientResponse<String> readIncludeDeleted(String csid, Boolean includeDeleted);    
+    public Response readIncludeDeleted(String csid, Boolean includeDeleted);    
 
     /*
      * GET list with workflow 'deleted' state
      */
-    public ClientResponse<LT> readIncludeDeleted(Boolean includeDeleted);
+    public Response readIncludeDeleted(Boolean includeDeleted);
 
     public ClientResponse<LT> keywordSearchIncludeDeleted(String keywords, Boolean includeDeleted);
     

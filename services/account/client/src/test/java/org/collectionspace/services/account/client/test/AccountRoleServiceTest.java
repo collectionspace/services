@@ -25,6 +25,7 @@ package org.collectionspace.services.account.client.test;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
+import java.lang.UnsupportedOperationException;
 
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
@@ -44,13 +45,12 @@ import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.client.test.ServiceRequestType;
 
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 
+import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,6 +84,13 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
     @Override
     protected String getServicePathComponent() {
         return new AccountRoleClient().getServicePathComponent();
+    }
+    
+    /**
+     * The entity type expected from the JAX-RS Response object
+     */
+    public Class<AccountRole> getEntityResponseType() {
+    	return AccountRole.class;
     }
 
     /**
@@ -635,5 +642,11 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
 	@Override
 	protected Class<AccountRole> getCommonListType() {
 		return AccountRole.class;
+	}
+
+	@Override
+	protected long getSizeOfList(AccountRole list) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Method getSizeOfList() is not implemented because this service does not support lists.");
 	}
 }

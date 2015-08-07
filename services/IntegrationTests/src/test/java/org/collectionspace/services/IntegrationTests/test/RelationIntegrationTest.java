@@ -484,12 +484,12 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
         for(RelationsCommonList.RelationListItem listItem : relationListItems){
         	
         	String foundCsid = listItem.getCsid();
-        	ClientResponse<String> multiPartResponse = null;
+        	Response multiPartResponse = null;
         	try {
         		multiPartResponse = relationClient.read(foundCsid);
         		int responseStatus = multiPartResponse.getStatus();
         		Assert.assertEquals(responseStatus, Response.Status.OK.getStatusCode());
-        		PoxPayloadIn input = new PoxPayloadIn(multiPartResponse.getEntity());
+        		PoxPayloadIn input = new PoxPayloadIn((String)multiPartResponse.getEntity());
 	        	resultRelation = (RelationsCommon) extractPart(input,
 	        			relationClient.getCommonPartName(),
 	        			RelationsCommon.class);
@@ -613,12 +613,12 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	        RelationsCommon resultRelation = null;
 	        for(RelationsCommonList.RelationListItem listItem : relationListItems){
 	        	String foundCsid = listItem.getCsid();
-	        	ClientResponse<String> multiPartResponse = null;
+	        	Response multiPartResponse = null;
 	        	try {
 	        		multiPartResponse = relationClient.read(foundCsid);
 	        		int responseStatus = multiPartResponse.getStatus();
 	        		Assert.assertEquals(responseStatus, Response.Status.OK.getStatusCode());
-	        		PoxPayloadIn input = new PoxPayloadIn(multiPartResponse.getEntity());
+	        		PoxPayloadIn input = new PoxPayloadIn((String)multiPartResponse.getEntity());
 	        		resultRelation = (RelationsCommon) extractPart(input,
 	        				relationClient.getCommonPartName(),
 	        				RelationsCommon.class);

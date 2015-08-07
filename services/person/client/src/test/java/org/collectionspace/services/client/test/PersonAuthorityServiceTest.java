@@ -1074,8 +1074,8 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         PersonAuthorityClient client = new PersonAuthorityClient();
         PoxPayloadIn input = null;
         setupRead();
-        ClientResponse<String> res =
-                client.readContact(knownResourceId, knownItemResourceId, knownContactResourceId);
+        ClientResponse<String> res = client.readContact(knownResourceId, knownItemResourceId,
+        		knownContactResourceId);
         try {
             assertStatusCode(res, testName);
             if (logger.isDebugEnabled()) {

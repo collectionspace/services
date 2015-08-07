@@ -26,6 +26,8 @@
  */
 package org.collectionspace.services.client;
 
+import javax.ws.rs.core.Response;
+
 import org.collectionspace.services.dimension.DimensionsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -60,7 +62,7 @@ public class DimensionClient extends AbstractPoxServiceClientImpl<DimensionsComm
 	 * Proxied service calls
 	 */
 	
-    public ClientResponse<DimensionsCommonList> readList() {
+    public Response readList() {
     	DimensionProxy proxy = (DimensionProxy)getProxy();
     	return proxy.readList();
     }	

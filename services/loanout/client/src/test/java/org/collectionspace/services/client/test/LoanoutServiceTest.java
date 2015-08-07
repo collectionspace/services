@@ -74,9 +74,8 @@ public class LoanoutServiceTest extends AbstractPoxServiceTestImpl<AbstractCommo
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected AbstractCommonList getCommonList(
-            ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(AbstractCommonList.class);
+    protected AbstractCommonList getCommonList(Response response) {
+        return response.readEntity(AbstractCommonList.class);
     }
 
     // ---------------------------------------------------------------
@@ -277,12 +276,12 @@ public class LoanoutServiceTest extends AbstractPoxServiceTestImpl<AbstractCommo
 
         // Submit the request to the service and store the response.
         LoanoutClient client = new LoanoutClient();
-        ClientResponse<String> res = client.read(knownResourceId);
+        Response res = client.read(knownResourceId);
         LoansoutCommon loanoutCommon = null;
         try {
 	        assertStatusCode(res, testName);
 	        // Get the common part of the response and verify that it is not null.
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
 	        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
 	        if (payloadInputPart != null) {
 	            loanoutCommon = (LoansoutCommon) payloadInputPart.getBody();
@@ -290,7 +289,7 @@ public class LoanoutServiceTest extends AbstractPoxServiceTestImpl<AbstractCommo
 	        Assert.assertNotNull(loanoutCommon);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -329,17 +328,21 @@ public class LoanoutServiceTest extends AbstractPoxServiceTestImpl<AbstractCommo
 
         // Submit the request to the service and store the response.
         LoanoutClient client = new LoanoutClient();
-        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.read(NON_EXISTENT_ID);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // ---------------------------------------------------------------
@@ -358,14 +361,14 @@ public class LoanoutServiceTest extends AbstractPoxServiceTestImpl<AbstractCommo
 
         // Submit the request to the service and store the response.
         LoanoutClient client = new LoanoutClient();
-        ClientResponse<AbstractCommonList> res = client.readList();
+        Response res = client.readList();
         AbstractCommonList list = null;
         try {
 	        assertStatusCode(res, testName);
-	        list = res.getEntity();
+	        list = res.readEntity(getCommonListType());
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         // Optionally output additional data about list members for debugging.
@@ -394,12 +397,12 @@ public class LoanoutServiceTest extends AbstractPoxServiceTestImpl<AbstractCommo
 
         // Retrieve the contents of a resource to update.
         LoanoutClient client = new LoanoutClient();
-        ClientResponse<String> res = client.read(knownResourceId);
+        Response res = client.read(knownResourceId);
         LoansoutCommon loanoutCommon = null;
         try {
 	        assertStatusCode(res, testName);
 	        // Extract the common part from the response.
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
 	        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
 	        if (payloadInputPart != null) {
 	            loanoutCommon = (LoansoutCommon) payloadInputPart.getBody();
@@ -407,7 +410,7 @@ public class LoanoutServiceTest extends AbstractPoxServiceTestImpl<AbstractCommo
 	        Assert.assertNotNull(loanoutCommon);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -442,7 +445,7 @@ public class LoanoutServiceTest extends AbstractPoxServiceTestImpl<AbstractCommo
         try {
 	        assertStatusCode(res, testName);
 	        // Extract the updated common part from the response.
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
 	        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
 	        if (payloadInputPart != null) {
 	            updatedLoanoutCommon = (LoansoutCommon) payloadInputPart.getBody();
@@ -450,7 +453,7 @@ public class LoanoutServiceTest extends AbstractPoxServiceTestImpl<AbstractCommo
 	        Assert.assertNotNull(updatedLoanoutCommon);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -615,17 +618,21 @@ public class LoanoutServiceTest extends AbstractPoxServiceTestImpl<AbstractCommo
         // The only relevant ID may be the one used in update(), below.
         LoanoutClient client = new LoanoutClient();
         PoxPayloadOut multipart = createLoanoutInstance(NON_EXISTENT_ID);
-        ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.update(NON_EXISTENT_ID, multipart);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // ---------------------------------------------------------------

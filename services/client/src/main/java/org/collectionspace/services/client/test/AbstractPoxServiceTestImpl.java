@@ -39,6 +39,18 @@ public abstract class AbstractPoxServiceTestImpl<CLT extends AbstractCommonList,
         	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, getLogger(), testName);
         }
     }
+    
+    @Override
+    protected long getSizeOfList(CLT list) {
+    	return list.getTotalItems();    	
+    }
+    
+    /**
+     * The entity type expected from the JAX-RS Response object
+     */
+    public Class<String> getEntityResponseType() {
+    	return String.class;
+    }
 	
 	@Override
     public CPT extractCommonPartValue(PoxPayloadOut payloadOut) throws Exception {
@@ -53,8 +65,8 @@ public abstract class AbstractPoxServiceTestImpl<CLT extends AbstractCommonList,
                 "Part or body of part " + client.getCommonPartName() + " was unexpectedly null.");
         
     	return result;
-    }	
-	
+    }
+		
 	@Override
 	public PoxPayloadOut createRequestTypeInstance(CPT commonPartTypeInstance) {
 		PoxPayloadOut result = null;
@@ -72,7 +84,7 @@ public abstract class AbstractPoxServiceTestImpl<CLT extends AbstractCommonList,
             if (getLogger().isDebugEnabled()) {
             	getLogger().debug("Reading part " + partLabel + " ...");
             }
-            PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+            PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(getEntityResponseType()));
             PayloadInputPart payloadInputPart = input.getPart(partLabel);
             Assert.assertNotNull(payloadInputPart,
                     "Part " + partLabel + " was unexpectedly null.");

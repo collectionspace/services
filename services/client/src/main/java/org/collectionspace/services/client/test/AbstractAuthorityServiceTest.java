@@ -134,48 +134,58 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     	// Submit the request to the service and store the response.
         AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client = 
         		(AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)this.getClientInstance();
-    	ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
-    	int statusCode = res.getStatus();
+    	Response res = client.readItem(knownResourceId, knownItemResourceId);
+    	AUTHORITY_ITEM_TYPE vitem = null;
+    	try {
+	    	int statusCode = res.getStatus();
+	
+	    	// Check the status code of the response: does it match
+	    	// the expected response(s)?
+	    	if (logger.isDebugEnabled()) {
+	    		logger.debug(testName + " read authority:" + knownResourceId + "/Item:"
+	    				+ knownItemResourceId + " status = " + statusCode);
+	    	}
+	    	Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	    			invalidStatusCodeMessage(testRequestType, statusCode));
+	    	Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
+	
+	        vitem = extractItemCommonPartValue(res);
+	    	Assert.assertNotNull(vitem);
+	    	// Try to Update with new parent vocab (use self, for test).
+	    	Assert.assertEquals(client.getInAuthority(vitem), knownResourceId,
+	    			"VocabularyItem inAuthority does not match knownResourceId.");
+	    	client.setInAuthority(vitem, knownItemResourceId);
 
-    	// Check the status code of the response: does it match
-    	// the expected response(s)?
-    	if (logger.isDebugEnabled()) {
-    		logger.debug(testName + " read authority:" + knownResourceId + "/Item:"
-    				+ knownItemResourceId + " status = " + statusCode);
+    	} finally {
+    		res.close();
     	}
-    	Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-    			invalidStatusCodeMessage(testRequestType, statusCode));
-    	Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
-
-        AUTHORITY_ITEM_TYPE vitem = extractItemCommonPartValue(res);
-    	Assert.assertNotNull(vitem);
-    	// Try to Update with new parent vocab (use self, for test).
-    	Assert.assertEquals(client.getInAuthority(vitem), knownResourceId,
-    			"VocabularyItem inAuthority does not match knownResourceId.");
-    	client.setInAuthority(vitem, knownItemResourceId);
-
+    	
     	// Submit the updated resource to the service and store the response.
         PoxPayloadOut output = this.createItemRequestTypeInstance(vitem);
     	res = client.updateItem(knownResourceId, knownItemResourceId, output);
-    	statusCode = res.getStatus();
-
-    	// Check the status code of the response: does it match the expected response(s)?
-    	if (logger.isDebugEnabled()) {
-    		logger.debug(testName + ": status = " + statusCode);
+    	try {
+	    	int statusCode = res.getStatus();
+	
+	    	// Check the status code of the response: does it match the expected response(s)?
+	    	if (logger.isDebugEnabled()) {
+	    		logger.debug(testName + ": status = " + statusCode);
+	    	}
+	    	Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	    			invalidStatusCodeMessage(testRequestType, statusCode));
+	    	Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	    	// Retrieve the updated resource and verify that the parent did not change
+	    	res = client.readItem(knownResourceId, knownItemResourceId);
+	        AUTHORITY_ITEM_TYPE updatedVocabularyItem = extractItemCommonPartValue(res);
+	    	Assert.assertNotNull(updatedVocabularyItem);
+	
+	    	// Verify that the updated resource received the correct data.
+	    	Assert.assertEquals(client.getInAuthority(updatedVocabularyItem),
+	    			knownResourceId,
+	    			"VocabularyItem allowed update to the parent (inAuthority).");
+    	} finally {
+    		res.close();
     	}
-    	Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-    			invalidStatusCodeMessage(testRequestType, statusCode));
-    	Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-    	// Retrieve the updated resource and verify that the parent did not change
-    	res = client.readItem(knownResourceId, knownItemResourceId);
-        AUTHORITY_ITEM_TYPE updatedVocabularyItem = extractItemCommonPartValue(res);
-    	Assert.assertNotNull(updatedVocabularyItem);
-
-    	// Verify that the updated resource received the correct data.
-    	Assert.assertEquals(client.getInAuthority(updatedVocabularyItem),
-    			knownResourceId,
-    			"VocabularyItem allowed update to the parent (inAuthority).");
     }
     
     @Test(dataProvider = "testName",
@@ -220,19 +230,23 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         // Submit the request to the service and store the response.
         AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client = (AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)this.getClientInstance();
         ClientResponse<String> res = client.readByName(getKnowResourceIdentifier());
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	        
+	        AUTHORITY_COMMON_TYPE commonPart = extractCommonPartValue(res);
+	        Assert.assertNotNull(commonPart);
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-        
-        AUTHORITY_COMMON_TYPE commonPart = extractCommonPartValue(res);
-        Assert.assertNotNull(commonPart);
     }
     
     /**
@@ -242,10 +256,11 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
      * @return
      * @throws Exception
      */
-	public AUTHORITY_ITEM_TYPE extractItemCommonPartValue(ClientResponse<String> res) throws Exception {
+	public AUTHORITY_ITEM_TYPE extractItemCommonPartValue(Response res) throws Exception {
 		AUTHORITY_ITEM_TYPE result = null;
 		
-        AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client = (AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)this.getClientInstance();
+        AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client = (AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)
+        		this.getClientInstance();
 		PayloadInputPart payloadInputPart = extractPart(res, client.getItemCommonPartName());
 		if (payloadInputPart != null) {
 			result = (AUTHORITY_ITEM_TYPE) payloadInputPart.getBody();
@@ -263,18 +278,23 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         setupReadNonExistent();
 
         // Submit the request to the service and store the response.
-        AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client = (AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)this.getClientInstance();
-        ClientResponse<String> res = client.readItem(knownResourceId, NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client = (AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)
+        		this.getClientInstance();
+        Response res = client.readItem(knownResourceId, NON_EXISTENT_ID);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 	
     @Test(dataProvider = "testName",
@@ -285,22 +305,26 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 
         // Submit the request to the service and store the response.
         AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client = (AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)this.getClientInstance();
-        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.readItem(knownResourceId, knownItemResourceId);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        AUTHORITY_ITEM_TYPE itemCommonPart = extractItemCommonPartValue(res);
+	        Assert.assertNotNull(itemCommonPart);
+	        Assert.assertEquals(client.getInAuthority(itemCommonPart), knownResourceId);
+	        verifyReadItemInstance(itemCommonPart);
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        AUTHORITY_ITEM_TYPE itemCommonPart = extractItemCommonPartValue(res);
-        Assert.assertNotNull(itemCommonPart);
-        Assert.assertEquals(client.getInAuthority(itemCommonPart), knownResourceId);
-        verifyReadItemInstance(itemCommonPart);
     }
     
     protected abstract void verifyReadItemInstance(AUTHORITY_ITEM_TYPE item) throws Exception;
@@ -312,7 +336,8 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         setupDelete();
 
         // Submit the request to the service and store the response.
-        AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client = (AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)this.getClientInstance();
+        AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client = (AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)
+        		this.getClientInstance();
         Response res = client.deleteItem(knownResourceId, knownItemResourceId);
         int statusCode;
         try {
@@ -440,8 +465,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         // Retrieve the contents of a resource to update.
         AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client =
         		(AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)this.getClientInstance();
-        ClientResponse<String> res =
-                client.readItem(knownResourceId, knownItemResourceId);
+        Response res = client.readItem(knownResourceId, knownItemResourceId);
         try {
 	        if (logger.isDebugEnabled()) {
 	            logger.debug(testName + ": read status = " + res.getStatus());
@@ -463,7 +487,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 	            		+ objectAsXmlString(theUpdate));
 	        }
         } finally {
-        	res.releaseConnection();
+        	res.close();
         }
 
         // Submit the updated resource to the service and store the response.
@@ -486,7 +510,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 
 	        compareUpdatedItemInstances(theUpdate, updatedVocabularyItem);
         } finally {
-        	res.releaseConnection();
+        	res.close();
         }
     }
     

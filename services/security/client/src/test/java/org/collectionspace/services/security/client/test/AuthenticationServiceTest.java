@@ -91,8 +91,7 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected AbstractCommonList getCommonList(
-            ClientResponse<AbstractCommonList> response) {
+    protected AbstractCommonList getCommonList(Response response) {
         throw new UnsupportedOperationException(); //Since this test does not support lists, this method is not needed.
     }
 
@@ -112,22 +111,25 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
                 createAccountInstance("barney", "barney08", "barney@dinoland.com",
                 accountClient.getTenantId(), false);
         ClientResponse<Response> res = accountClient.create(account);
-        int statusCode = res.getStatus();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": barney status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": barney status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        // Store the ID returned from this create operation
+	        // for additional tests below.
+	        barneyAccountId = extractId(res);
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": barneyAccountId=" + barneyAccountId);
+	        }
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        // Store the ID returned from this create operation
-        // for additional tests below.
-        barneyAccountId = extractId(res);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": barneyAccountId=" + barneyAccountId);
-        }
-        res.releaseConnection();
 
     }
 

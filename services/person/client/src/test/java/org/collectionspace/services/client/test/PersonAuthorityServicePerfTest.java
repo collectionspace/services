@@ -115,9 +115,8 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getCommonList(
-			ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(AbstractCommonList.class);
+	protected AbstractCommonList getCommonList(Response response) {
+        return response.readEntity(AbstractCommonList.class);
     }
  
     @BeforeClass

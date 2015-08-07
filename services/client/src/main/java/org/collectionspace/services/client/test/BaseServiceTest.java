@@ -190,9 +190,8 @@ public abstract class BaseServiceTest<CLT> {
     	return (Class<CLT>)AbstractCommonList.class;
     }
 
-    protected CLT getCommonList(
-            ClientResponse<CLT> response) {
-        return response.getEntity(getCommonListType());
+    protected CLT getCommonList(Response response) {
+        return response.readEntity(getCommonListType());
     }
     
     /**

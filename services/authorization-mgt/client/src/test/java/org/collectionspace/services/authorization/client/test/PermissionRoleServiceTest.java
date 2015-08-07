@@ -95,7 +95,14 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
 	protected String getServiceName() {
     	return PermissionClient.SERVICE_NAME; //Since we're a sub-resource of permission service return its name?
 	}
-
+	
+    /**
+     * The entity type expected from the JAX-RS Response object
+     */
+    public Class<PermissionRole> getEntityResponseType() {
+    	return PermissionRole.class;
+    }
+	
     /**
      * Seed data.
      */
@@ -149,8 +156,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected PermissionRole getCommonList(
-            ClientResponse<PermissionRole> response) {
+    protected PermissionRole getCommonList(Response response) {
         //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
         throw new UnsupportedOperationException();
     }
@@ -201,7 +207,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
             }
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -725,5 +731,11 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
         		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
     public void CRUDTests(String testName) {
     	// Do nothing.  Simply here to for a TestNG execution order for our tests
-    }	
+    }
+    
+	@Override
+	protected long getSizeOfList(PermissionRole list) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Method getSizeOfList() is not implemented because this service does not support lists.");
+	}
 }

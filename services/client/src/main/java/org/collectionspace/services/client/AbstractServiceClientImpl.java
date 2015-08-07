@@ -552,7 +552,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      * .lang.String, java.lang.String)
      */
     @Override
-    public ClientResponse<CLT> readList(Long pageSize,
+    public Response readList(Long pageSize,
     		Long pageNumber) {
         return getProxy().readList(pageSize, pageNumber);
     }
@@ -565,7 +565,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      * .lang.String, java.lang.String)
      */
     @Override
-    public ClientResponse<CLT> readList(String sortBy, Long pageSize,
+    public Response readList(String sortBy, Long pageSize,
             Long pageNumber) {
         return getProxy().readList(sortBy, pageSize, pageNumber);
     }

@@ -24,6 +24,8 @@
 package org.collectionspace.services.client.test;
 
 import java.io.File;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.TypeVariable;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.workflow.WorkflowCommon;
@@ -35,13 +37,12 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.jboss.resteasy.client.ClientResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
 /**
@@ -177,7 +178,10 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     	return result;
     }
     
-    @Override
+	abstract public Class<RESPONSE_TYPE> getEntityResponseType();
+    
+    @SuppressWarnings("unchecked")
+	@Override
     @Test(dataProvider = "testName", dependsOnMethods = {"create"})    
     public void read(String testName) throws Exception {
         // Perform setup.
@@ -197,9 +201,6 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
 	                invalidStatusCodeMessage(testRequestType, statusCode));
 	        Assert.assertEquals(statusCode, testExpectedStatusCode);
-	
-	        RESPONSE_TYPE output = (RESPONSE_TYPE) res.getEntity();
-	        Assert.assertNotNull(output);
 	        
 	        //
 	        // Now compare with the expected field values
@@ -294,7 +295,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     
     public CPT extractCommonPartValue(Response res) throws Exception {
     	CPT result = null;
-    	result = (CPT) res.getEntity();
+    	result = (CPT) res.readEntity(getEntityResponseType());
     	return result;
     }
     
@@ -444,8 +445,8 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 
         // Submit the request to the service and store the response.
         CollectionSpaceClient client = this.getClientInstance();
-        ClientResponse<CLT> res = client.readList();
-        CLT list = res.getEntity();
+        Response res = client.readList();
+        CLT list = res.readEntity(this.getCommonListType());
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -569,7 +570,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
             int result = 0;
             while (trials < 30) {
 	            CollectionSpacePoxClient client = this.assertPoxClient();
-	            ClientResponse<String> res = client.readIncludeDeleted(csid, Boolean.FALSE);
+	            Response res = client.readIncludeDeleted(csid, Boolean.FALSE);
 	            result = res.getStatus();
 	            if (result == STATUS_NOT_FOUND) {
 	            	logger.info("Workflow transition to 'deleted' is complete");
@@ -609,8 +610,9 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
             result = 0;
             while (trials < 30) {
 	            CollectionSpacePoxClient client = this.assertPoxClient();
-	            ClientResponse<String> res = client.readIncludeDeleted(csid, Boolean.FALSE);
+	            Response res = client.readIncludeDeleted(csid, Boolean.FALSE);
 	            result = res.getStatus();
+	            res.close();
 	            if (result == STATUS_OK) {
 	            	logger.info("Workflow transition to 'project' is complete");
 	            	break;
@@ -755,18 +757,21 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     	// The only relevant ID may be the one used in update(), below.
         CollectionSpaceClient client = this.getClientInstance();
     	REQUEST_TYPE multipart = createNonExistenceInstance(client.getCommonPartName(), NON_EXISTENT_ID);
-    	ClientResponse<String> res =
-    			client.update(NON_EXISTENT_ID, multipart);
-    	int statusCode = res.getStatus();
-
-    	// Check the status code of the response: does it match
-    	// the expected response(s)?
-    	if (logger.isDebugEnabled()) {
-    		logger.debug(testName + ": status = " + statusCode);
+    	Response res = client.update(NON_EXISTENT_ID, multipart);
+    	try {
+	    	int statusCode = res.getStatus();
+	
+	    	// Check the status code of the response: does it match
+	    	// the expected response(s)?
+	    	if (logger.isDebugEnabled()) {
+	    		logger.debug(testName + ": status = " + statusCode);
+	    	}
+	    	Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	    			invalidStatusCodeMessage(testRequestType, statusCode));
+	    	Assert.assertEquals(statusCode, testExpectedStatusCode);
+    	} finally {
+    		res.close();
     	}
-    	Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-    			invalidStatusCodeMessage(testRequestType, statusCode));
-    	Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
     
     // ---------------------------------------------------------------
@@ -812,8 +817,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
             long pageSize,
             long pageNumber,
             int expectedStatus) throws Exception {
-        ClientResponse<CLT> response =
-                client.readList(sortBy, pageSize, pageNumber);
+        Response response = client.readList(sortBy, pageSize, pageNumber);
         CLT result = null;
         try {
             int statusCode = response.getStatus();
@@ -827,7 +831,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 
             result = this.getCommonList(response);
         } finally {
-            response.releaseConnection();
+            response.close();
         }
 
         return result;
@@ -956,7 +960,15 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         }
         return (CollectionSpacePoxClient) clientCandidate;
     }
+    
+    /*
+     * Must be overridden for CTL param
+     */
+    abstract protected long getSizeOfList(CLT list);
 
+    /*
+     * Return the number of items including those soft-deleted.
+     */
     protected long readIncludeDeleted(String testName, Boolean includeDeleted) {
     	long result = 0;
     	// Perform setup.
@@ -966,21 +978,21 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     	// Ask for a list of all resources filtered by the incoming 'includeDeleted' workflow param
     	//
     	CollectionSpacePoxClient client = assertPoxClient();
-    	ClientResponse<AbstractCommonList> res = client.readIncludeDeleted(includeDeleted);
+    	Response res = client.readIncludeDeleted(includeDeleted);
     	try {
 	    	//
 	    	// Check the status code of the response: does it match
 	    	// the expected response(s)?
 	    	//
 	    	assertStatusCode(res, testName);
-	    	AbstractCommonList list = res.getEntity();
+	    	CLT list = res.readEntity(getCommonListType());
 	    	//
 	    	// Now check that list size is correct
 	    	//
-	    	result = list.getTotalItems();
+	    	result = getSizeOfList(list); //list.getTotalItems();
     	} finally {
     		if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
     	}
 

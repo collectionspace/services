@@ -303,7 +303,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<String> res = null;
+        Response res = null;
         if (CSID != null) {
             res = client.read(CSID);
         } else if (shortId != null) {
@@ -315,7 +315,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             assertStatusCode(res, testName);        	
             //FIXME: remove the following try catch once Aron fixes signatures
             try {
-                PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+                PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
                 OrgauthoritiesCommon orgAuthority = (OrgauthoritiesCommon) extractPart(input,
                         new OrgAuthorityClient().getCommonPartName(), OrgauthoritiesCommon.class);
                 if (logger.isDebugEnabled()) {
@@ -327,7 +327,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -391,7 +391,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<String> res = null;
+        Response res = null;
         if (authCSID != null) {
             if (itemCSID != null) {
                 res = client.readItem(authCSID, itemCSID);
@@ -414,7 +414,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         try {
             assertStatusCode(res, testName);
             // Check whether we've received a organization.
-            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+            PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
             OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
                     client.getItemCommonPartName(), OrganizationsCommon.class);
             Assert.assertNotNull(organization);
@@ -435,7 +435,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -461,18 +461,18 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         // First read our known resource.
         //
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
+        Response res = client.readItem(knownResourceId, knownItemResourceId);
         OrganizationsCommon organization = null;
         try {
             assertStatusCode(res, testName);        	
             // Check whether organization has expected displayName.
-            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+            PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
             organization = (OrganizationsCommon) extractPart(input,
                     client.getItemCommonPartName(), OrganizationsCommon.class);
             Assert.assertNotNull(organization);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -497,7 +497,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -535,7 +535,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             Assert.assertEquals(contact.getInItem(), knownItemResourceId);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -568,7 +568,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -621,7 +621,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             list = res.getEntity();
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -680,7 +680,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             list = res.getEntity();
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -738,7 +738,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             Assert.assertNotNull(contact);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -781,7 +781,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 	                "Data in updated object did not match submitted data.");
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -830,7 +830,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -876,7 +876,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -942,9 +942,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             itemResourceId = entry.getValue();
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            ClientResponse<Response> res =
-                    client.deleteContact(parentResourceId, itemResourceId, contactResourceId);
-            res.releaseConnection();
+            client.deleteContact(parentResourceId, itemResourceId, contactResourceId).close();
         }
         // Clean up item resources.
         for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {

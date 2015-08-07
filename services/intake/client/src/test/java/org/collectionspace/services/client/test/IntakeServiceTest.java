@@ -23,10 +23,11 @@
 package org.collectionspace.services.client.test;
 
 import java.util.List;
+
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.dom4j.Element;
-
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IntakeClient;
 import org.collectionspace.services.client.PayloadInputPart;
@@ -40,11 +41,9 @@ import org.collectionspace.services.intake.CurrentLocationGroup;
 import org.collectionspace.services.intake.CurrentLocationGroupList;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-
 import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -264,13 +263,19 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
 
         // Retrieve the contents of a resource to update.
         IntakeClient client = new IntakeClient();
-        ClientResponse<String> res = client.read(knownResourceId);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": read status = " + res.getStatus());
+        PoxPayloadIn input = null;
+        Response res = client.read(knownResourceId);
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": read status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
+	
+	        input = new PoxPayloadIn((String)res.getEntity());
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
-
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        
         PayloadInputPart payloadInputPart = input.getPart(COLLECTIONSPACE_CORE_SCHEMA);
         Element coreAsElement = null;
         if (payloadInputPart != null) {
@@ -307,21 +312,25 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
 
         // Create an output payload to send to the service, and add the common part
         PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
-        PayloadOutputPart corePart = output.addPart(
-        					COLLECTIONSPACE_CORE_SCHEMA, coreAsElement);
+        PayloadOutputPart corePart = output.addPart(COLLECTIONSPACE_CORE_SCHEMA, coreAsElement);
         
         // Submit the request to the service and store the response.
         res = client.update(knownResourceId, output);
-        int statusCode = res.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        input = new PoxPayloadIn(res.getEntity());
+	    try {
+	        int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        input = new PoxPayloadIn((String)res.getEntity());
+	    } finally {
+	    	res.close();
+	    }
+	        
         PayloadInputPart updatedCorePart = input.getPart(COLLECTIONSPACE_CORE_SCHEMA);
         Element updatedCoreAsElement = null;
         if (updatedCorePart != null) {

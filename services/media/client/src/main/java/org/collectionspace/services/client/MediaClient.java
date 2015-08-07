@@ -87,7 +87,7 @@ public class MediaClient extends AbstractCommonListPoxServiceClientImpl<MediaPro
      * @param media
      * @return
      */
-    public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload, String URI) {
+    public Response update(String csid, PoxPayloadOut xmlPayload, String URI) {
         return getProxy().update(csid, xmlPayload.getBytes());
 
     }

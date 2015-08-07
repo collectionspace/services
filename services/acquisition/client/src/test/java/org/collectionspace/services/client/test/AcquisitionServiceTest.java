@@ -288,27 +288,32 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
         AcquisitionClient client = new AcquisitionClient();
 
         // Submit the request to the service and store the response.
-        ClientResponse<String> res = client.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.read(knownResourceId);
+        PoxPayloadIn input = null;
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        input = new PoxPayloadIn((String)res.getEntity());
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        
         AcquisitionsCommon acquisitionObject = (AcquisitionsCommon) extractPart(input,
                 client.getCommonPartName(), AcquisitionsCommon.class);
         Assert.assertNotNull(acquisitionObject);
 
         // Verify the number and contents of values in repeatable fields,
         // as created in the instance record used for testing.
-        List<String> acqSources =
-                acquisitionObject.getAcquisitionSources().getAcquisitionSource();
+        List<String> acqSources = acquisitionObject.getAcquisitionSources().getAcquisitionSource();
         Assert.assertTrue(acqSources.size() > 0);
         Assert.assertNotNull(acqSources.get(0));
 
@@ -335,7 +340,7 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
 
         // Submit the request to the service and store the response.
         AcquisitionClient client = new AcquisitionClient();
-        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
+        Response res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -364,12 +369,12 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
 
         // Submit the request to the service and store the response.
         AcquisitionClient client = new AcquisitionClient();
-        ClientResponse<AbstractCommonList> res = client.readList();
+        Response res = client.readList();
         try {
 	        // Check the status code of the response: does it match
 	        // the expected response(s)?
 	        assertStatusCode(res, testName);
-	        AbstractCommonList list = res.getEntity();
+	        AbstractCommonList list = res.readEntity(this.getCommonListType());
 	
 	        // Optionally output additional data about list members for debugging.
 	        if (logger.isTraceEnabled() == true){
@@ -377,7 +382,7 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
 	        }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -402,13 +407,18 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
 
         // Retrieve the contents of a resource to update.
         AcquisitionClient client = new AcquisitionClient();
-        ClientResponse<String> res = client.read(knownResourceId);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": read status = " + res.getStatus());
+        Response res = client.read(knownResourceId);
+        PoxPayloadIn input = null;
+        try {
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": read status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
+	
+	        input = new PoxPayloadIn((String)res.getEntity());
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
-
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 
         AcquisitionsCommon acquisition = (AcquisitionsCommon) extractPart(input,
                 client.getCommonPartName(), AcquisitionsCommon.class);
@@ -426,24 +436,28 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
         commonPart.setLabel(client.getCommonPartName());
 
         res = client.update(knownResourceId, output);
-        int statusCode = res.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        input = new PoxPayloadIn((String)res.getEntity());
+	        AcquisitionsCommon updatedAcquisition =
+	                (AcquisitionsCommon) extractPart(input,
+	                        client.getCommonPartName(), AcquisitionsCommon.class);
+	        Assert.assertNotNull(updatedAcquisition);
+	
+	        Assert.assertEquals(updatedAcquisition.getAcquisitionReferenceNumber(),
+	                acquisition.getAcquisitionReferenceNumber(),
+	                "Data in updated object did not match submitted data.");
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        input = new PoxPayloadIn(res.getEntity());
-        AcquisitionsCommon updatedAcquisition =
-                (AcquisitionsCommon) extractPart(input,
-                        client.getCommonPartName(), AcquisitionsCommon.class);
-        Assert.assertNotNull(updatedAcquisition);
-
-        Assert.assertEquals(updatedAcquisition.getAcquisitionReferenceNumber(),
-                acquisition.getAcquisitionReferenceNumber(),
-                "Data in updated object did not match submitted data.");
 
     }
 
@@ -607,18 +621,21 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
         // The only relevant ID may be the one used in update(), below.
         AcquisitionClient client = new AcquisitionClient();
         PoxPayloadOut multipart = createAcquisitionInstance(NON_EXISTENT_ID);
-        ClientResponse<String> res =
-            client.update(NON_EXISTENT_ID, multipart);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.update(NON_EXISTENT_ID, multipart);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // ---------------------------------------------------------------
@@ -851,13 +868,13 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
 
         // Submit the request to the service and store the response.
         AcquisitionClient client = new AcquisitionClient();
-        ClientResponse<String> res = client.read(csid);
+        Response res = client.read(csid);
         AcquisitionsCommon acquisition = null;
         try {
 	        // Check the status code of the response: does it match
 	        // the expected response(s)?
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
 	
 	        if (logger.isDebugEnabled()) {
 	            logger.debug(testName + ": Reading Common part ...");
@@ -867,7 +884,7 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
 	        Assert.assertNotNull(acquisition);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 

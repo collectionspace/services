@@ -68,9 +68,8 @@ public class ExhibitionServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected AbstractCommonList getCommonList(
-            ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(AbstractCommonList.class);
+    protected AbstractCommonList getCommonList(Response response) {
+        return response.readEntity(AbstractCommonList.class);
     }
 
     // ---------------------------------------------------------------
@@ -253,14 +252,14 @@ public class ExhibitionServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
 
         // Submit the request to the service and store the response.
         ExhibitionClient client = new ExhibitionClient();
-        ClientResponse<String> res = client.read(knownResourceId);
+        Response res = client.read(knownResourceId);
         PoxPayloadIn input = null;
         try {
             assertStatusCode(res, testName);
-            input = new PoxPayloadIn(res.getEntity());
+            input = new PoxPayloadIn((String)res.getEntity());
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -301,7 +300,7 @@ public class ExhibitionServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
 
         // Submit the request to the service and store the response.
         ExhibitionClient client = new ExhibitionClient();
-        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
+        Response res = client.read(NON_EXISTENT_ID);
         try {
             int statusCode = res.getStatus();
 
@@ -315,7 +314,7 @@ public class ExhibitionServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -339,7 +338,7 @@ public class ExhibitionServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
         // Submit the request to the service and store the response.
         AbstractCommonList list = null;
         ExhibitionClient client = new ExhibitionClient();
-        ClientResponse<AbstractCommonList> res = client.readList();
+        Response res = client.readList();
         assertStatusCode(res, testName);
         try {
             int statusCode = res.getStatus();
@@ -353,10 +352,10 @@ public class ExhibitionServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
 
-            list = res.getEntity();
+            list = res.readEntity(getCommonListType());
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -389,17 +388,17 @@ public class ExhibitionServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
 
         // Retrieve the contents of a resource to update.
         ExhibitionClient client = new ExhibitionClient();
-        ClientResponse<String> res = client.read(knownResourceId);
+        Response res = client.read(knownResourceId);
         PoxPayloadIn input = null;
         try {
             assertStatusCode(res, testName);
-            input = new PoxPayloadIn(res.getEntity());
+            input = new PoxPayloadIn((String)res.getEntity());
             if (logger.isDebugEnabled()) {
                 logger.debug("got object to update with ID: " + knownResourceId);
             }
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -439,10 +438,10 @@ public class ExhibitionServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
             Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
-            input = new PoxPayloadIn(res.getEntity());
+            input = new PoxPayloadIn((String)res.getEntity());
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -487,7 +486,7 @@ public class ExhibitionServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
         // The only relevant ID may be the one used in update(), below.
         ExhibitionClient client = new ExhibitionClient();
         PoxPayloadOut multipart = createExhibitionInstance(NON_EXISTENT_ID);
-        ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
+        Response res = client.update(NON_EXISTENT_ID, multipart);
         try {
             int statusCode = res.getStatus();
 
@@ -501,7 +500,7 @@ public class ExhibitionServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }

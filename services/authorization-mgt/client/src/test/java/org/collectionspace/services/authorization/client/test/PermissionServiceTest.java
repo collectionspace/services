@@ -82,6 +82,13 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
         return new PermissionClient();
     }
 
+    /**
+     * The entity type expected from the JAX-RS Response object
+     */
+    public Class<Permission> getEntityResponseType() {
+    	return Permission.class;
+    }
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readPaginatedList(java.lang.String)
      */
@@ -427,5 +434,11 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
 	public void updateWithWrongXmlSchema(String testName) throws Exception {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	protected long getSizeOfList(PermissionsList list) {
+		// TODO Auto-generated method stub
+		return list.getPermission().size();
 	}
 }

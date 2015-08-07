@@ -267,8 +267,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected AbstractCommonList getCommonList(
-            ClientResponse<AbstractCommonList> response) {
+    protected AbstractCommonList getCommonList(Response response) {
         //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
         throw new UnsupportedOperationException();
     }
@@ -369,15 +368,15 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         // Submit the request to the service and store the response.
         DimensionClient client = new DimensionClient();
         client.setAuth(true, userName, true, userName, true);
-        ClientResponse<String> res = client.read(id);
+        Response res = client.read(id);
         try {
         	assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
 	        result = (DimensionsCommon) extractPart(input,
 	                client.getCommonPartName(), DimensionsCommon.class);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -412,12 +411,12 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         //
         PoxPayloadOut output = new PoxPayloadOut(DimensionClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = output.addPart(client.getCommonPartName(), dimension);
-        ClientResponse<String> res = client.update(TENANT_RESOURCE_2, output);
+        Response res = client.update(TENANT_RESOURCE_2, output);
         try {
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -578,7 +577,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         	result = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         

@@ -76,7 +76,7 @@ public interface CollectionSpaceProxy<CLT> {
     
     @GET
     @Produces({"application/xml"})
-    ClientResponse<CLT> readList();
+    Response readList();
     
     /**
      * Read list.
@@ -87,7 +87,7 @@ public interface CollectionSpaceProxy<CLT> {
      */
     @GET
     @Produces({"application/xml"})
-    ClientResponse<CLT> readList(
+    Response readList(
             @QueryParam(IClientQueryParams.PAGE_SIZE_PARAM) Long pageSize,
     	    @QueryParam(IClientQueryParams.START_PAGE_PARAM) Long pageNumber);
         
@@ -101,7 +101,7 @@ public interface CollectionSpaceProxy<CLT> {
      */
     @GET
     @Produces({"application/xml"})
-    ClientResponse<CLT> readList(
+    Response readList(
             @QueryParam(IClientQueryParams.ORDER_BY_PARAM) String sortBy,
             @QueryParam(IClientQueryParams.PAGE_SIZE_PARAM) Long pageSize,
     	    @QueryParam(IClientQueryParams.START_PAGE_PARAM) Long pageNumber);    
