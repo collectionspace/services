@@ -63,7 +63,7 @@ month:                 monthYear
 |                      invMonthYear
 ;
 
-yearSpanningWinter:    WINTER numYear SLASH numYear era ;
+yearSpanningWinter:    WINTER COMMA? numYear SLASH numYear era ;
 
 partialYear:           partOf numYear era ;
 
