@@ -1016,13 +1016,13 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         // Ask for a list of all resources filtered by the incoming 'includeDeleted' workflow param
         //
         AuthorityClient client = (AuthorityClient) this.getClientInstance();
-        ClientResponse<AbstractCommonList> res = client.readItemList(parentCsid,
+        Response res = client.readItemList(parentCsid,
                 null, /* partial terms */
                 null, /* keywords */
                 includeDeleted);
         try {
 	        assertStatusCode(res, testName);
-	        AbstractCommonList list = res.getEntity();
+	        AbstractCommonList list = res.readEntity(AbstractCommonList.class);
 	        result = list.getTotalItems();
         } finally {
         	if (res != null) {
@@ -1146,7 +1146,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
                 // Next, test that a GET with WorkflowClient.WORKFLOWSTATE_DELETED query param set to 'false' returns a 404
                 //
                 AuthorityClient client = (AuthorityClient) this.getClientInstance();
-                ClientResponse<String> res = client.readItem(parentCsid, csid, Boolean.FALSE);
+                Response res = client.readItem(parentCsid, csid, Boolean.FALSE);
                 try {
 	                int result = res.getStatus();
 	                Assert.assertEquals(result, STATUS_NOT_FOUND);
@@ -1167,18 +1167,18 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         // Read the existing object
         //
         AuthorityClient client = (AuthorityClient) this.getClientInstance();
-        ClientResponse<String> res = client.readItemWorkflow(parentCsid, itemCsid);
+        Response res = client.readItemWorkflow(parentCsid, itemCsid);
         WorkflowCommon workflowCommons = null;
         try {
 	        assertStatusCode(res, testName);
 	        logger.debug("Got object to update life cycle state with ID: " + itemCsid);
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        workflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
 	        Assert.assertNotNull(workflowCommons);
 	        logger.debug("Current workflow state:" + objectAsXmlString(workflowCommons, WorkflowCommon.class));
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         //
@@ -1199,7 +1199,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 	        Assert.assertNotNull(updatedWorkflowCommons);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -1214,7 +1214,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 		        assertStatusCode(res, testName);
 		        logger.debug(
 		                "Got workflow state of updated object with ID: " + itemCsid);
-		        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+		        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 		        updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
 		        Assert.assertNotNull(workflowCommons);
 		        String currentState = updatedWorkflowCommons.getCurrentLifeCycleState();
@@ -1226,7 +1226,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 		        		currentState);
 	        } finally {
 	        	if (res != null) {
-                    res.releaseConnection();
+                    res.close();
                 }
 	        }
 	        trials++;

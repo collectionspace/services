@@ -57,18 +57,19 @@ public class OrgAuthorityClientUtils {
      * @return
      */
     public static String getAuthorityRefName(String csid, OrgAuthorityClient client){
-    	if(client==null)
+    	if (client==null) {
     		client = new OrgAuthorityClient();
+    	}
+    	
         Response res = client.read(csid);
         try {
 	        int statusCode = res.getStatus();
-	        if(!READ_REQ.isValidStatusCode(statusCode)
-	        	||(statusCode != CollectionSpaceClientUtils.STATUS_OK)) {
+	        if (!READ_REQ.isValidStatusCode(statusCode) || statusCode != CollectionSpaceClientUtils.STATUS_OK) {
 	    		throw new RuntimeException("Invalid status code returned: "+statusCode);
 	        }
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	            OrgauthoritiesCommon orgAuthority = 
 	            	(OrgauthoritiesCommon) CollectionSpaceClientUtils.extractPart(input,
 	                    client.getCommonPartName(), OrgauthoritiesCommon.class);
@@ -102,7 +103,7 @@ public class OrgAuthorityClientUtils {
 	        }
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	            OrganizationsCommon org = 
 	            	(OrganizationsCommon) CollectionSpaceClientUtils.extractPart(input,
 	                    client.getItemCommonPartName(), OrganizationsCommon.class);

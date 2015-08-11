@@ -266,7 +266,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
 
         // Submit the request to the service and store the response.
         TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
-        ClientResponse<AbstractCommonList> res = null;
+        Response res = null;
         if (vcsid != null) {
             res = client.readItemList(vcsid, null, null);
         } else if (shortId != null) {
@@ -276,7 +276,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
         }
         try {
             assertStatusCode(res, testName);
-            AbstractCommonList list = res.getEntity();
+            AbstractCommonList list = res.readEntity(AbstractCommonList.class);
             int statusCode = res.getStatus();
 
             // Check the status code of the response: does it match

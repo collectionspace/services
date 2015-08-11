@@ -37,16 +37,16 @@ public interface AuthorityClient<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
     Response readItem(String vcsid, String csid);
     
     //(R)ead Item
-    ClientResponse<String> readItem(String vcsid, String csid, Boolean includeDeleted);    
+    Response readItem(String vcsid, String csid, Boolean includeDeleted);    
 
     //(U)pdate Item
-    ClientResponse<String> updateItem(String vcsid, String csid, PoxPayloadOut poxPayloadOut);
+    Response updateItem(String vcsid, String csid, PoxPayloadOut poxPayloadOut);
 
     //(D)elete Item
     Response deleteItem(String vcsid, String csid);
     
     // Get a list of objects that
-    ClientResponse<AuthorityRefDocList> getReferencingObjects(
+    Response getReferencingObjects(
             String parentcsid,
             String itemcsid);
     /**
@@ -58,15 +58,15 @@ public interface AuthorityClient<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
      * @return
      * @see org.collectionspace.services.client.IntakeProxy#getAuthorityRefs(java.lang.String)
      */
-    public ClientResponse<AuthorityRefList> getItemAuthorityRefs(String parentcsid, String itemcsid);    
+    public Response getItemAuthorityRefs(String parentcsid, String itemcsid);    
     
     /*
      * 
      */
     
-    ClientResponse<String> readByName(String name);
+    Response readByName(String name);
     
-    ClientResponse<String> readByName(String name, Boolean includeDeleted);
+    Response readByName(String name, Boolean includeDeleted);
     
     /*
      * Item subresource methods
@@ -79,9 +79,9 @@ public interface AuthorityClient<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
      * @param shortId the shortIdentifier
      * @return the client response
      */
-    public ClientResponse<String> readNamedItem(String vcsid, String shortId);
+    public Response readNamedItem(String vcsid, String shortId);
 
-    public ClientResponse<String> readNamedItem(String vcsid, String shortId, Boolean includeDeleted);
+    public Response readNamedItem(String vcsid, String shortId, Boolean includeDeleted);
 
     /**
      * Read item in Named Authority.
@@ -90,9 +90,9 @@ public interface AuthorityClient<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
      * @param csid the csid
      * @return the client response
      */
-    public ClientResponse<String> readItemInNamedAuthority(String authShortId, String csid);
+    public Response readItemInNamedAuthority(String authShortId, String csid);
 
-    public ClientResponse<String> readItemInNamedAuthority(String authShortId, String csid, Boolean includeDeleted);
+    public Response readItemInNamedAuthority(String authShortId, String csid, Boolean includeDeleted);
 
     /**
      * Read named item in Named Authority.
@@ -101,9 +101,9 @@ public interface AuthorityClient<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
      * @param itemShortId the shortIdentifier for the item
      * @return the client response
      */
-    public ClientResponse<String> readNamedItemInNamedAuthority(String authShortId, String itemShortId);
+    public Response readNamedItemInNamedAuthority(String authShortId, String itemShortId);
     
-    public ClientResponse<String> readNamedItemInNamedAuthority(String authShortId, String itemShortId, Boolean includeDeleted);
+    public Response readNamedItemInNamedAuthority(String authShortId, String itemShortId, Boolean includeDeleted);
     
     /**
      * Read item list, filtering by partial term match, or keywords. Only one of
@@ -117,9 +117,9 @@ public interface AuthorityClient<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
      *     which will filter list results to return only matched resources.
      * @return the client response
      */
-    public ClientResponse<AbstractCommonList> readItemList(String inAuthority, String partialTerm, String keywords);
+    public Response readItemList(String inAuthority, String partialTerm, String keywords);
     
-    public ClientResponse<AbstractCommonList> readItemList(String inAuthority, String partialTerm, String keywords, Boolean includeDeleted);
+    public Response readItemList(String inAuthority, String partialTerm, String keywords, Boolean includeDeleted);
     
     /**
      * Read item list for named vocabulary, filtering by partial term match, or keywords. Only one of
@@ -133,10 +133,10 @@ public interface AuthorityClient<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
      *     which will filter list results to return only matched resources.
      * @return the client response
      */
-    public ClientResponse<AbstractCommonList> readItemListForNamedAuthority(String specifier, 
+    public Response readItemListForNamedAuthority(String specifier, 
     		String partialTerm, String keywords);
     
-    public ClientResponse<AbstractCommonList> readItemListForNamedAuthority(String specifier, 
+    public Response readItemListForNamedAuthority(String specifier, 
     		String partialTerm, 
     		String keywords,
     		Boolean includeDeleted);
@@ -145,7 +145,7 @@ public interface AuthorityClient<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
      * Workflow related methods
      */
     
-    public ClientResponse<String> readItemWorkflow(String vcsid, String csid);
+    public Response readItemWorkflow(String vcsid, String csid);
     
-    public ClientResponse<String> updateItemWorkflowWithTransition(String vcsid, String csid, String workflowTransition);
+    public Response updateItemWorkflowWithTransition(String vcsid, String csid, String workflowTransition);
 }

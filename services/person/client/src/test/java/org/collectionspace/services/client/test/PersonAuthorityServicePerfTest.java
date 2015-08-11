@@ -303,7 +303,7 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<AbstractCommonList> res = null;
+        Response res = null;
         if (authorityCsid != null) {
         	res = client.readItemList(authorityCsid, partialTerm, keywords);
         } else {
@@ -312,10 +312,10 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
         AbstractCommonList list = null;
         try {
             assertStatusCode(res, testName);
-            list = res.getEntity();
+            list = res.readEntity(AbstractCommonList.class);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 

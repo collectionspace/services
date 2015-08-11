@@ -265,12 +265,11 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         // Get the auth ref docs and check them
 
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-        ClientResponse<AuthorityRefDocList> res =
-                personAuthClient.getReferencingObjects(personAuthCSID, currentOwnerPersonCSID);
+        Response res = personAuthClient.getReferencingObjects(personAuthCSID, currentOwnerPersonCSID);
         AuthorityRefDocList list = null;
         try {
 	        assertStatusCode(res, testName);
-	        list = res.getEntity();
+	        list = res.readEntity(AuthorityRefDocList.class);
         } finally {
         	if (res != null) {
                 res.close();
@@ -309,10 +308,10 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         res = personAuthClient.getReferencingObjects(personAuthCSID, depositorPersonCSID);
         try {
 	        assertStatusCode(res, testName);
-	        list = res.getEntity();
+	        list = res.readEntity(AuthorityRefDocList.class);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -357,15 +356,14 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
 
         // Single scalar field
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-        ClientResponse<AuthorityRefDocList> res =
-                personAuthClient.getReferencingObjects(personAuthCSID, insurerPersonCSID);
+        Response res = personAuthClient.getReferencingObjects(personAuthCSID, insurerPersonCSID);
         AuthorityRefDocList list = null;
         try {
 	        assertStatusCode(res, testName);
-	        list = res.getEntity();
+	        list = res.readEntity(AuthorityRefDocList.class);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         

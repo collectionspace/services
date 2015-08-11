@@ -325,12 +325,11 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
         // Get the auth refs and check them
         // FIXME - need to create this method in the client
         // and get the ID for the organization item
-        ClientResponse<AuthorityRefList> res2 =
-           orgAuthClient.getItemAuthorityRefs(knownResourceId, knownItemResourceId);
+        Response res2 = orgAuthClient.getItemAuthorityRefs(knownResourceId, knownItemResourceId);
         AuthorityRefList list = null;
         try {
 	        assertStatusCode(res2, testName);
-	        list = res2.getEntity();
+	        list = res2.readEntity(AuthorityRefList.class);
         } finally {
         	if (res2 != null) {
         		res2.close();

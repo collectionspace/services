@@ -56,7 +56,7 @@ public interface CollectionSpaceProxy<CLT> {
     @GET
     @Produces({"application/xml"})
     @Path("/{csid}/authorityrefs/")
-    ClientResponse<AuthorityRefList> getAuthorityRefs(@PathParam("csid") String csid);
+    Response getAuthorityRefs(@PathParam("csid") String csid); //ClientResponse<AuthorityRefList>
     
     @GET
     @Produces({"application/xml"})

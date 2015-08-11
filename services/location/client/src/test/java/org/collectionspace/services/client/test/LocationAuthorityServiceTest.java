@@ -243,7 +243,7 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
 
 		// Submit the request to the service and store the response.
 		LocationAuthorityClient client = new LocationAuthorityClient();
-		ClientResponse<AbstractCommonList> res = null;
+		Response res = null;
 		if (vcsid != null) {
 			res = client.readItemList(vcsid, null, null);
 		} else if (shortId != null) {
@@ -255,7 +255,7 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
 		AbstractCommonList list = null;
 		try {
 			assertStatusCode(res, testName);
-			list = res.getEntity();
+			list = res.readEntity(AbstractCommonList.class);
 		} finally {
 			if (res != null) {
                 res.close();

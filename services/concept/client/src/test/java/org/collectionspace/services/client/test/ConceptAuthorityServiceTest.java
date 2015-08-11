@@ -24,6 +24,9 @@ package org.collectionspace.services.client.test;
 
 import java.util.List;
 import java.util.Map;
+
+import javax.ws.rs.core.Response;
+
 import org.collectionspace.services.ConceptJAXBSchema;
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.AuthorityClient;
@@ -172,7 +175,7 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
         
         // Submit the request to the service and store the response.
         ConceptAuthorityClient client = new ConceptAuthorityClient();
-        ClientResponse<AbstractCommonList> res = null;
+        Response res = null;
         if(vcsid!= null) {
 	        res = client.readItemList(vcsid, null, null);
         } else if(shortId!= null) {
@@ -183,9 +186,9 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
 		AbstractCommonList list = null;
         try {
             assertStatusCode(res, testName);
-        	list = res.getEntity();
+        	list = res.readEntity(AbstractCommonList.class);
 	    } finally {
-	    	res.releaseConnection();
+	    	res.close();
 	    }
         List<AbstractCommonList.ListItem> items =
             list.getListItem();

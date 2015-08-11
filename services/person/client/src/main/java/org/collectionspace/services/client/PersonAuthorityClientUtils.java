@@ -77,7 +77,7 @@ public class PersonAuthorityClientUtils {
 	        }
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	            PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(String.class));
 	            PersonauthoritiesCommon personAuthority = 
 	            	(PersonauthoritiesCommon) CollectionSpaceClientUtils.extractPart(input,
 	                    client.getCommonPartName(), PersonauthoritiesCommon.class);
@@ -111,7 +111,7 @@ public class PersonAuthorityClientUtils {
 	        }
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	            PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(String.class));
 	            PersonsCommon person = 
 	            	(PersonsCommon) CollectionSpaceClientUtils.extractPart(input,
 	                    client.getItemCommonPartName(), PersonsCommon.class);

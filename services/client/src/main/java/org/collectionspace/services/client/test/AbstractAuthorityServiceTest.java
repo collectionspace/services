@@ -228,8 +228,9 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         setupRead();
 
         // Submit the request to the service and store the response.
-        AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client = (AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)this.getClientInstance();
-        ClientResponse<String> res = client.readByName(getKnowResourceIdentifier());
+        AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client =
+        		(AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)this.getClientInstance();
+        Response res = client.readByName(getKnowResourceIdentifier());
         try {
 	        int statusCode = res.getStatus();
 	
@@ -362,7 +363,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 
         // Submit the request to the service and store the response.
         AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client = (AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)this.getClientInstance();
-        ClientResponse<AbstractCommonList> res = null;
+        Response res = null;
         if (vcsid != null) {
             res = client.readItemList(vcsid, null, null);
         } else if (shortId != null) {
@@ -370,29 +371,33 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         } else {
             Assert.fail("Internal Error: readItemList both vcsid and shortId are null!");
         }
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug("  " + testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        AbstractCommonList list = res.getEntity();
-        List<AbstractCommonList.ListItem> items = list.getListItem();
-        int nItemsReturned = items.size();
-        long nItemsTotal = list.getTotalItems();
-        if (logger.isDebugEnabled()) {
-            logger.debug("  " + testName + ": Expected "
-                    + nItemsToCreateInList + " items; got: " + nItemsReturned + " of: " + nItemsTotal);
-        }
-        Assert.assertEquals(nItemsTotal, nItemsToCreateInList);
-
-        if(logger.isTraceEnabled()){
-        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug("  " + testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        AbstractCommonList list = res.readEntity(AbstractCommonList.class);
+	        List<AbstractCommonList.ListItem> items = list.getListItem();
+	        int nItemsReturned = items.size();
+	        long nItemsTotal = list.getTotalItems();
+	        if (logger.isDebugEnabled()) {
+	            logger.debug("  " + testName + ": Expected "
+	                    + nItemsToCreateInList + " items; got: " + nItemsReturned + " of: " + nItemsTotal);
+	        }
+	        Assert.assertEquals(nItemsTotal, nItemsToCreateInList);
+	
+	        if(logger.isTraceEnabled()){
+	        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
+	        }
+        } finally {
+        	res.close();
         }
     }
     
@@ -531,8 +536,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client =
         		(AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)this.getClientInstance();
     	PoxPayloadOut multipart = createNonExistenceItemInstance(client.getItemCommonPartName(), NON_EXISTENT_ID);
-    	ClientResponse<String> res =
-    			client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
+    	Response res = client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
     	try {
 	    	int statusCode = res.getStatus();
 	
@@ -545,7 +549,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 	    			invalidStatusCodeMessage(testRequestType, statusCode));
 	    	Assert.assertEquals(statusCode, testExpectedStatusCode);
     	} finally {
-    		res.releaseConnection();
+    		res.close();
     	}
     }
         

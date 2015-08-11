@@ -435,7 +435,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
         CollectionobjectsCommon collectionObject = null;
         try {
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(String.class));
 	        collectionObject = (CollectionobjectsCommon) extractPart(input,
 	        		collectionObjectClient.getCommonPartName(), CollectionobjectsCommon.class);
 	        Assert.assertNotNull(collectionObject);
@@ -451,7 +451,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
         AuthorityRefList list = null;
         try {
 	        assertStatusCode(res, testName);        
-	        list = (AuthorityRefList)res.getEntity();
+	        list = (AuthorityRefList)res.readEntity(AuthorityRefList.class);
         } finally {
         	if (res != null) {
         		res.close();
