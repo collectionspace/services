@@ -133,7 +133,7 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
 	        if (children != null && children.length > 0) {
 	        	for (File child : children) {
 	        		if (isBlobbable(child) == true) {
-	        			ClientResponse<Response> res = null;
+	        			Response res = null;
 		        		String mimeType = this.getMimeType(child);
 		        		logger.debug("Processing file URI: " + child.getAbsolutePath());
 		        		logger.debug("MIME type is: " + mimeType);
@@ -187,7 +187,7 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
         // Create the blob
         //
         BlobClient client = new BlobClient();
-		ClientResponse<Response> res = null;
+		Response res = null;
 		res = client.createBlobFromURI(uri);
 		String blobCsid = null;
 		try {

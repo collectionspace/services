@@ -279,7 +279,7 @@ public class ContactServiceTest extends AbstractPoxServiceTestImpl<AbstractCommo
         Response res = client.read(knownResourceId);
         try {
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        ContactsCommon contact = (ContactsCommon) extractPart(input,
 	                client.getCommonPartName(), ContactsCommon.class);
 	        Assert.assertNotNull(contact);
@@ -344,7 +344,7 @@ public class ContactServiceTest extends AbstractPoxServiceTestImpl<AbstractCommo
 	        if (logger.isDebugEnabled()) {
 	            logger.debug("got object to update with ID: " + knownResourceId);
 	        }
-	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        contact = (ContactsCommon) extractPart(input,
 	                client.getCommonPartName(), ContactsCommon.class);
 	        Assert.assertNotNull(contact);
@@ -400,7 +400,7 @@ public class ContactServiceTest extends AbstractPoxServiceTestImpl<AbstractCommo
         ContactsCommon updatedContact = null;
         try {
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        updatedContact = (ContactsCommon) extractPart(input,
 	                client.getCommonPartName(), ContactsCommon.class);
 	        Assert.assertNotNull(updatedContact);

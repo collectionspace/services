@@ -9,8 +9,8 @@ import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 
-import org.jboss.resteasy.client.ClientResponse;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
 /**
  * @version $Revision:$
@@ -22,24 +22,24 @@ public interface RelationProxy extends CollectionSpacePoxProxy<RelationsCommonLi
 
     @GET
     @Produces({"application/xml"})
-    ClientResponse<RelationsCommonList> readList();
+    Response readList();
     
     @Override
 	@GET
     @Produces({"application/xml"})
-    ClientResponse<RelationsCommonList> readIncludeDeleted(
+    Response readIncludeDeleted(
             @QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);        
     
     @Override
     @GET
     @Produces({"application/xml"})
-    ClientResponse<RelationsCommonList> keywordSearchIncludeDeleted(
+    Response keywordSearchIncludeDeleted(
     		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
             @QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
 
     @GET
     @Produces({"application/xml"})
-    ClientResponse<RelationsCommonList> readList(
+    Response readList(
     		@QueryParam(IRelationsManager.SUBJECT_QP) String subjectCsid,
     		@QueryParam(IRelationsManager.SUBJECT_TYPE_QP) String subjectType,
     		@QueryParam(IRelationsManager.PREDICATE_QP) String predicate,
@@ -48,7 +48,7 @@ public interface RelationProxy extends CollectionSpacePoxProxy<RelationsCommonLi
 
     @GET
     @Produces({"application/xml"})
-    ClientResponse<RelationsCommonList> readList(
+    Response readList(
     		@QueryParam(IRelationsManager.SUBJECT_QP) String subjectCsid,
     		@QueryParam(IRelationsManager.SUBJECT_TYPE_QP) String subjectType,
     		@QueryParam(IRelationsManager.PREDICATE_QP) String predicate,

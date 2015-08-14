@@ -16,20 +16,20 @@ public interface CollectionSpaceCommonListPoxProxy extends CollectionSpacePoxPro
     @Override
 	@GET
     @Produces({"application/xml"})
-    ClientResponse<AbstractCommonList> readIncludeDeleted(
+    Response readIncludeDeleted(
             @QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
 
     @Override
     @GET
     @Produces({"application/xml"})
-    ClientResponse<AbstractCommonList> keywordSearchIncludeDeleted(
+    Response keywordSearchIncludeDeleted(
     	    @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
             @QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
 
     @Override
 	@GET
 	@Produces({ "application/xml" })
-	ClientResponse<AbstractCommonList> advancedSearchIncludeDeleted(
+	Response advancedSearchIncludeDeleted(
 			@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_AS) String whereClause,
 			@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
 }

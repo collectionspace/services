@@ -17,10 +17,7 @@
 package org.collectionspace.services.client.workflow;
 
 import javax.ws.rs.core.Response;
-
-import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.client.AbstractCommonListPoxServiceClientImpl;
-import org.jboss.resteasy.client.ClientResponse;
 
 /**
  * WorkflowClient.java
@@ -84,7 +81,7 @@ public class WorkflowClient extends AbstractCommonListPoxServiceClientImpl<Workf
 	 */
 	
 	@Override
-	public ClientResponse<AbstractCommonList> readList() {
+	public Response readList() {
         throw new UnsupportedOperationException();
 	}
 	
@@ -92,7 +89,7 @@ public class WorkflowClient extends AbstractCommonListPoxServiceClientImpl<Workf
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#delete(java.lang.String)
      */
     @Override
-	public ClientResponse<Response> delete(String csid) {
+	public Response delete(String csid) {
         throw new UnsupportedOperationException();
     }
 	

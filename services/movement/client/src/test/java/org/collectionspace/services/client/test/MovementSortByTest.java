@@ -430,13 +430,12 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
         final String EMPTY_SORT_FIELD_NAME = "";
-        ClientResponse<AbstractCommonList> res =
-                client.readListSortedBy(EMPTY_SORT_FIELD_NAME);
+        Response res = client.readListSortedBy(EMPTY_SORT_FIELD_NAME);
         try {
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -454,13 +453,12 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
 
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
-        ClientResponse<AbstractCommonList> res =
-                client.readListSortedBy(MovementJAXBSchema.LOCATION_DATE);
+        Response res = client.readListSortedBy(MovementJAXBSchema.LOCATION_DATE);
         try {
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -476,14 +474,13 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
         final String INVALID_SORT_ORDER_IDENTIFIER = "NO_DIRECTION";
-        ClientResponse<AbstractCommonList> res =
-                client.readListSortedBy(MovementJAXBSchema.LOCATION_DATE
+        Response res = client.readListSortedBy(MovementJAXBSchema.LOCATION_DATE
                 + " " + INVALID_SORT_ORDER_IDENTIFIER);
         try {
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -636,7 +633,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
         try {
         	assertStatusCode(res, testName);
 	        // Extract and return the common part of the record.
-	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
 	        if (payloadInputPart != null) {
 	        	movementCommon = (MovementsCommon) payloadInputPart.getBody();
@@ -677,11 +674,11 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
 
-        ClientResponse<AbstractCommonList> res = client.readListSortedBy(sortFieldName);
+        Response res = client.readListSortedBy(sortFieldName);
         AbstractCommonList list = null;
         try {
         	assertStatusCode(res, testName);
-        	list = res.getEntity();
+        	list = res.readEntity(AbstractCommonList.class);
         } finally {
         	if (res != null) {
                 res.close();
@@ -702,15 +699,14 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
 
-        ClientResponse<AbstractCommonList> res =
-                client.keywordSearchSortedBy(keywords, sortFieldName);
+        Response res = client.keywordSearchSortedBy(keywords, sortFieldName);
         AbstractCommonList list = null;
         try {
 	        assertStatusCode(res, testName);
-	        list = res.getEntity();
+	        list = res.readEntity(AbstractCommonList.class);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 

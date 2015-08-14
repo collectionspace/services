@@ -95,7 +95,7 @@ public class ServiceGroupServiceTest extends BaseServiceTest<AbstractCommonList>
             if (getLogger().isDebugEnabled()) {
             	getLogger().debug("Reading part " + partLabel + " ...");
             }
-            PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
             PayloadInputPart payloadInputPart = input.getPart(partLabel);
             Assert.assertNotNull(payloadInputPart,
                     "Part " + partLabel + " was unexpectedly null.");

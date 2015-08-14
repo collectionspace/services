@@ -302,7 +302,7 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
 	                invalidStatusCodeMessage(testRequestType, statusCode));
 	        Assert.assertEquals(statusCode, testExpectedStatusCode);
 	
-	        input = new PoxPayloadIn((String)res.getEntity());
+	        input = new PoxPayloadIn(res.readEntity(String.class));
         } finally {
         	res.close();
         }
@@ -415,7 +415,7 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
 	        }
 	        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
 	
-	        input = new PoxPayloadIn((String)res.getEntity());
+	        input = new PoxPayloadIn(res.readEntity(String.class));
         } finally {
         	res.close();
         }
@@ -446,7 +446,7 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
 	                invalidStatusCodeMessage(testRequestType, statusCode));
 	        Assert.assertEquals(statusCode, testExpectedStatusCode);
 	
-	        input = new PoxPayloadIn((String)res.getEntity());
+	        input = new PoxPayloadIn(res.readEntity(String.class));
 	        AcquisitionsCommon updatedAcquisition =
 	                (AcquisitionsCommon) extractPart(input,
 	                        client.getCommonPartName(), AcquisitionsCommon.class);
@@ -874,7 +874,7 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
 	        // Check the status code of the response: does it match
 	        // the expected response(s)?
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	
 	        if (logger.isDebugEnabled()) {
 	            logger.debug(testName + ": Reading Common part ...");

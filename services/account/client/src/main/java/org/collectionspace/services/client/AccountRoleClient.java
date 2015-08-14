@@ -27,7 +27,6 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -68,7 +67,7 @@ public class AccountRoleClient extends AbstractServiceClientImpl<AbstractCommonL
      * @return
      * @see 
      */
-    public ClientResponse<AccountRole> read(String csid, String arcsid) {
+    public Response read(String csid, String arcsid) {
         return getProxy().read(csid, arcsid);
     }
 
@@ -79,7 +78,7 @@ public class AccountRoleClient extends AbstractServiceClientImpl<AbstractCommonL
      * @param arcsid the arcsid
      * @return the client response
      */
-    public ClientResponse<AccountRole> read(String csid) {
+    public Response read(String csid) {
         return getProxy().read(csid);
     }
 
@@ -89,7 +88,7 @@ public class AccountRoleClient extends AbstractServiceClientImpl<AbstractCommonL
      * @return
      * @see 
      */
-    public ClientResponse<Response> create(String csid, AccountRole accRole) {
+    public Response create(String csid, AccountRole accRole) {
         return getProxy().create(csid, accRole);
     }
     
@@ -99,7 +98,7 @@ public class AccountRoleClient extends AbstractServiceClientImpl<AbstractCommonL
      * 
      */
 	@Override
-	public ClientResponse<AccountRole> update(String csid, AccountRole payload) {
+	public Response update(String csid, AccountRole payload) {
 		throw new RuntimeException("You cannot update an AccountRole object.  You must delete and recreate it instead.");
 	}
 
@@ -109,7 +108,7 @@ public class AccountRoleClient extends AbstractServiceClientImpl<AbstractCommonL
      * @return
      * @see 
      */
-    public ClientResponse<Response> delete(String csid, AccountRole accRole) {
+    public Response delete(String csid, AccountRole accRole) {
         return getProxy().delete(csid, "delete", accRole);
     }
 
@@ -117,13 +116,13 @@ public class AccountRoleClient extends AbstractServiceClientImpl<AbstractCommonL
      * Not supported.
      */
 	@Override
-	public ClientResponse<Response> create(AccountRole payload) {
+	public Response create(AccountRole payload) {
 		// Use the create(String csid, AccountRole accRole) method instead
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public ClientResponse<AbstractCommonList> readList() {
+	public Response readList() {
 		throw new UnsupportedOperationException();
 	}
 }

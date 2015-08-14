@@ -38,7 +38,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.FileUtils;
-import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.slf4j.Logger;
@@ -70,17 +69,6 @@ public class CollectionSpaceClientUtils {
         Response.Status.NOT_FOUND.getStatusCode();
     protected static final int STATUS_OK =
         Response.Status.OK.getStatusCode();
-
-    /**
-     * Extract id.
-     *
-     * @param res the res
-     * @return the string
-     */
-    static public String extractId(ClientResponse<Response> res) {
-        MultivaluedMap<String, Object> mvm = res.getMetadata();
-        return extractIdFromResponseMetadata(mvm);
-    }
  
     /**
      * Extract id.

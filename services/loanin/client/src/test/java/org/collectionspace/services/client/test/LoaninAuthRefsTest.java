@@ -254,7 +254,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         try {
 	        assertStatusCode(res, testName);
 	        // Extract the common part from the response.
-	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        loaninCommon = (LoansinCommon) extractPart(input,
 	            loaninClient.getCommonPartName(), LoansinCommon.class);
 	        Assert.assertNotNull(loaninCommon);
@@ -280,7 +280,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         AuthorityRefList list = null;
         try {
 	        assertStatusCode(res2, testName);
-	        list = (AuthorityRefList)res2.getEntity();
+	        list = res2.readEntity(AuthorityRefList.class);
 	        Assert.assertNotNull(list);
         } finally {
         	if (res2 != null) {

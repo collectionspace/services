@@ -314,7 +314,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             assertStatusCode(res, testName);        	
             //FIXME: remove the following try catch once Aron fixes signatures
             try {
-                PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+                PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
                 OrgauthoritiesCommon orgAuthority = (OrgauthoritiesCommon) extractPart(input,
                         new OrgAuthorityClient().getCommonPartName(), OrgauthoritiesCommon.class);
                 if (logger.isDebugEnabled()) {
@@ -413,7 +413,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         try {
             assertStatusCode(res, testName);
             // Check whether we've received a organization.
-            PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
             OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
                     client.getItemCommonPartName(), OrganizationsCommon.class);
             Assert.assertNotNull(organization);
@@ -465,7 +465,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         try {
             assertStatusCode(res, testName);        	
             // Check whether organization has expected displayName.
-            PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
             organization = (OrganizationsCommon) extractPart(input,
                     client.getItemCommonPartName(), OrganizationsCommon.class);
             Assert.assertNotNull(organization);

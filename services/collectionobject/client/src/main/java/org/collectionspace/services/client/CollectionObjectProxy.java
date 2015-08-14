@@ -32,7 +32,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 
 // FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
 
@@ -56,7 +55,7 @@ public interface CollectionObjectProxy extends CollectionSpaceCommonListPoxProxy
     @GET
     @Path("/{ms}/roundtrip")
     @Produces({"application/xml"})
-    ClientResponse<Response> roundtrip(@PathParam("ms") int ms);
+    Response roundtrip(@PathParam("ms") int ms);
     
     /**
      * Keyword search.

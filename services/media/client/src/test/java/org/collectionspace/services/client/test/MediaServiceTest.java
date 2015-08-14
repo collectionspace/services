@@ -154,20 +154,18 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 				//
 				if (blobFile != null) {
 					client = new MediaClient();
-					ClientResponse<Response> res = null;
+					Response res = null;
 					String mimeType = this.getMimeType(blobFile);
 					logger.debug("Processing file URI: " + blobFile.getAbsolutePath());
 					logger.debug("MIME type is: " + mimeType);
 					if (fromUri == true) {
 						URL childUrl = blobFile.toURI().toURL();
-						res = client.createBlobFromUri(mediaCsid,
-								childUrl.toString());
+						res = client.createBlobFromUri(mediaCsid, childUrl.toString());
 					} else {
 						MultipartFormDataOutput formData = new MultipartFormDataOutput();
 						OutputPart outputPart = formData.addFormData("file",
 								blobFile, MediaType.valueOf(mimeType));
-						res = client
-								.createBlobFromFormData(mediaCsid, formData);
+						res = client.createBlobFromFormData(mediaCsid, formData);
 					}
 					try {
 						assertStatusCode(res, testName);
@@ -178,7 +176,7 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 						}
 					} finally {
 						if (res != null) {
-							res.releaseConnection();
+							res.close();
 						}
 					}
 				} else {
@@ -206,7 +204,7 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
     public void createMediaAndBlobWithUri(String testName) throws Exception {
 		MediaClient client = new MediaClient();
 		PoxPayloadOut multipart = createMediaInstance(createIdentifier());
-		ClientResponse<Response> mediaRes = client.createMediaAndBlobWithUri(multipart, PUBLIC_URL_DECK, true); // purge the original
+		Response mediaRes = client.createMediaAndBlobWithUri(multipart, PUBLIC_URL_DECK, true); // purge the original
 		String mediaCsid = null;
 		try {
 			assertStatusCode(mediaRes, testName);
@@ -214,7 +212,7 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 //			allResourceIdsCreated.add(mediaCsid); // Re-enable this and also add code to delete the associated blob
 		} finally {
 			if (mediaRes != null) {
-				mediaRes.releaseConnection();
+				mediaRes.close();
 			}
 		}
     }
@@ -232,7 +230,7 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 //        setupCreate();
 //        MediaClient client = new MediaClient();
 //        PoxPayloadOut multipart = createMediaInstance(createIdentifier());
-//        ClientResponse<Response> res = client.create(multipart);
+//        Response res = client.create(multipart);
 //        assertStatusCode(res, testName);
 //        String csid = extractId(res);
 //        

@@ -26,17 +26,12 @@
  */
 package org.collectionspace.services.client;
 
-import javax.ws.rs.core.Response;
-
-import org.collectionspace.services.dimension.DimensionsCommonList;
-import org.jboss.resteasy.client.ClientResponse;
-
 /**
  * A DimensionClient.
 
  * @version $Revision:$
  */
-public class DimensionClient extends AbstractPoxServiceClientImpl<DimensionsCommonList, DimensionProxy> {
+public class DimensionClient extends AbstractCommonListPoxServiceClientImpl<DimensionProxy> {
 	public static final String SERVICE_NAME = "dimensions";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -56,14 +51,5 @@ public class DimensionClient extends AbstractPoxServiceClientImpl<DimensionsComm
 	@Override
 	public Class<DimensionProxy> getProxyClass() {
 		return DimensionProxy.class;
-	}
-	
-	/*
-	 * Proxied service calls
-	 */
-	
-    public Response readList() {
-    	DimensionProxy proxy = (DimensionProxy)getProxy();
-    	return proxy.readList();
-    }	
+	}	
 }

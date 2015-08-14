@@ -196,7 +196,7 @@ public class MediaAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         MediaCommon media = null;
         try {
 	        assertStatusCode(res, testName);
-	        input = new PoxPayloadIn((String)res.getEntity());
+	        input = new PoxPayloadIn(res.readEntity(String.class));
 	        media = (MediaCommon) extractPart(input, mediaClient.getCommonPartName(), MediaCommon.class);
 	        Assert.assertNotNull(media);
 	        logger.debug(objectAsXmlString(media, MediaCommon.class));
@@ -214,7 +214,7 @@ public class MediaAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         AuthorityRefList list = null;
         try {
 	        assertStatusCode(res2, testName);
-	        list = (AuthorityRefList)res2.getEntity();
+	        list = res2.readEntity(AuthorityRefList.class);
         } finally {
         	if (res2 != null) {
         		res2.close();
@@ -258,7 +258,7 @@ public class MediaAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         // Delete Person resource(s) (before PersonAuthority resources).
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            personAuthClient.deleteItem(personAuthCSID, resourceId);
+            personAuthClient.deleteItem(personAuthCSID, resourceId).close();
         }
         // Delete PersonAuthority resource(s).
         // Note: Any non-success response is ignored and not reported.

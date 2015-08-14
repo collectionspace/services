@@ -226,7 +226,7 @@ public class MovementAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         try {
 	        assertStatusCode(res, testName);
 	        // Extract and return the common part of the record.
-	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        PayloadInputPart payloadInputPart = input.getPart(movementClient.getCommonPartName());
 	        if (payloadInputPart != null) {
 	        	movementCommon = (MovementsCommon) payloadInputPart.getBody();
@@ -249,7 +249,7 @@ public class MovementAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         AuthorityRefList list = null;
         try {
             assertStatusCode(res2, testName);
-        	list = (AuthorityRefList)res2.getEntity();
+        	list = res2.readEntity(AuthorityRefList.class);
         } finally {
         	if (res2 != null) {
         		res2.close();
@@ -313,18 +313,18 @@ public class MovementAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         // Delete Person resource(s) (before PersonAuthority resources).
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            personAuthClient.deleteItem(personAuthCSID, resourceId);
+            personAuthClient.deleteItem(personAuthCSID, resourceId).close();
         }
         // Delete PersonAuthority resource(s).
         // Note: Any non-success response is ignored and not reported.
         if (personAuthCSID != null) {
-	        personAuthClient.delete(personAuthCSID);
+	        personAuthClient.delete(personAuthCSID).close();
         }
         // Delete Movement resource(s).
         MovementClient movementClient = new MovementClient();
         for (String resourceId : movementIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            movementClient.delete(resourceId);
+            movementClient.delete(resourceId).close();
         }
     }
 

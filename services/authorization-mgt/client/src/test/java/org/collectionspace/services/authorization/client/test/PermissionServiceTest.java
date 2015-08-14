@@ -36,7 +36,6 @@ import org.collectionspace.services.authorization.perms.PermissionsList;
 import org.collectionspace.services.client.PermissionFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.client.test.ServiceRequestType;
-import org.jboss.resteasy.client.ClientResponse;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -124,15 +123,19 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
                 true,
                 true);
         PermissionClient client = new PermissionClient();
-        ClientResponse<Response> res = client.create(permission);
-        int statusCode = res.getStatus();
-        // Does it exactly match the expected status code?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.create(permission);
+        try {
+	        int statusCode = res.getStatus();
+	        // Does it exactly match the expected status code?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     /**
@@ -149,10 +152,10 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
 
         // Submit the request to the service and store the response.
         PermissionClient client = new PermissionClient();
-        ClientResponse<PermissionsList> res = client.readSearchList("acquisition");
+        Response res = client.readSearchList("acquisition");
         try {
 	        assertStatusCode(res, testName);
-	        PermissionsList list = res.getEntity(PermissionsList.class);
+	        PermissionsList list = res.readEntity(PermissionsList.class);
 	        int EXPECTED_ITEMS = 2 + 4; //2 seeded base resource permissions and 4 workflow-related permissions
 	        int actual = list.getPermission().size();
 	        if (logger.isDebugEnabled()) {
@@ -168,7 +171,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
 	        Assert.assertEquals(list.getPermission().size(), EXPECTED_ITEMS);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -203,7 +206,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
         }
         PermissionClient client = new PermissionClient();
         // Submit the request to the service and store the response.
-        ClientResponse<Permission> res = client.update(knownResourceId, permToUpdate);
+        Response res = client.update(knownResourceId, permToUpdate);
         int statusCode = res.getStatus();
         // Check the status code of the response: does it match the expected response(s)?
         if (logger.isDebugEnabled()) {
@@ -247,7 +250,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
         }
         PermissionClient client = new PermissionClient();
         // Submit the request to the service and store the response.
-        ClientResponse<Permission> res = client.update(knownResourceId, permToUpdate);
+        Response res = client.update(knownResourceId, permToUpdate);
         int statusCode = res.getStatus();
         // Check the status code of the response: does it match the expected response(s)?
         if (logger.isDebugEnabled()) {
@@ -257,7 +260,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
                 invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, testExpectedStatusCode);
 
-        Permission permUpdated = (Permission) res.getEntity();
+        Permission permUpdated = res.readEntity(Permission.class);
         Assert.assertNotNull(permUpdated);
         int updated_actions = permToUpdate.getAction().size();
         if (logger.isDebugEnabled()) {
@@ -292,18 +295,21 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
                 true,
                 true,
                 true);
-        ClientResponse<Permission> res =
-                client.update(NON_EXISTENT_ID, permission);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.update(NON_EXISTENT_ID, permission);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
     
     // ---------------------------------------------------------------
@@ -345,6 +351,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
             logger.debug("to be created, permission");
             logger.debug(objectAsXmlString(permission, Permission.class));
         }
+        
         return permission;
     }
 

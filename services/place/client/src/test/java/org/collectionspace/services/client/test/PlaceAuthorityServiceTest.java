@@ -177,7 +177,7 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
         PlacesCommon place= null;
         try {
             assertStatusCode(res, testName);        
-	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        place = (PlacesCommon) extractPart(input,
 	                client.getItemCommonPartName(), PlacesCommon.class);
 	        Assert.assertNotNull(place);

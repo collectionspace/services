@@ -241,7 +241,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 	 		// Check the status code of the response: does it match
 			// the expected response(s)?
 			assertStatusCode(res, testName);
-			PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+			PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 			acquisition = (AcquisitionsCommon) extractPart(input,
 					acquisitionClient.getCommonPartName(), AcquisitionsCommon.class);
 			Assert.assertNotNull(acquisition);
@@ -282,11 +282,11 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 		//
 		// Get the auth refs and check them
 		//
-		res =	acquisitionClient.getAuthorityRefs(knownResourceId);
+		res = acquisitionClient.getAuthorityRefs(knownResourceId);
 		AuthorityRefList list = null;
 		try {
 			assertStatusCode(res, testName);
-			list = (AuthorityRefList)res.getEntity();
+			list = res.readEntity(AuthorityRefList.class);
 			Assert.assertNotNull(list);
 		} finally {
 			if (res != null) {

@@ -46,7 +46,6 @@ import org.collectionspace.services.client.test.ServiceRequestType;
 
 import javax.ws.rs.core.Response;
 
-import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.annotations.AfterClass;
@@ -167,7 +166,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
         AccountRole accRole = createAccountRoleInstance(av,
                 roleValues.values(), true, true);
         AccountRoleClient client = new AccountRoleClient();
-        ClientResponse<Response> res = client.create(av.getAccountId(), accRole);
+        Response res = client.create(av.getAccountId(), accRole);
         try {
         	assertStatusCode(res, testName);
             knownResourceId = av.getAccountId();
@@ -177,7 +176,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
             }
         } finally {
         	if (res != null) {
-        		res.releaseConnection();
+        		res.close();
         	}
         }
 	}
@@ -194,13 +193,13 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
 
         // Submit the request to the service and store the response.
         AccountRoleClient client = new AccountRoleClient();
-        ClientResponse<AccountRole> res = client.read(
+        Response res = client.read(
                 accValues.get("acc-role-user2").getAccountId());
         try {
             // Check the status code of the response: does it match
             // the expected response(s)?
             assertStatusCode(res, testName);
-            AccountRole output = res.getEntity();
+            AccountRole output = res.readEntity(AccountRole.class);
             if(logger.isDebugEnabled()) {
             	org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();
             	String sOutput = objectAsXmlString(objectFactory.createAccountRole(output), AccountRole.class);
@@ -208,7 +207,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
             }
         } finally {
         	if (res != null) {
-        		res.releaseConnection();
+        		res.close();
         	}
         }
     }
@@ -232,12 +231,12 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
 	                roleValues.values(), true, true);
 	        AccountRoleClient client = new AccountRoleClient();
 	        setupCreate();	        
-	        ClientResponse<Response> res = client.create(av.getAccountId(), accRole);
+	        Response res = client.create(av.getAccountId(), accRole);
 	        try {
 	        	assertStatusCode(res, testName);
 	        } finally {
 	        	if (res != null) {
-	        		res.releaseConnection();
+	        		res.close();
 	        	}
 	        }
         }
@@ -250,13 +249,13 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
         
         // Submit the request to the service and store the response.
         setupRead();        
-        ClientResponse<AccountRole> res = roleClient.readRoleAccounts(
+        Response res = roleClient.readRoleAccounts(
         		roleValues.get("ROLE_CO1").getRoleId());
         try {
             // Check the status code of the response: does it match
             // the expected response(s)?
             assertStatusCode(res, testName);
-            AccountRole output = res.getEntity();
+            AccountRole output = res.readEntity(AccountRole.class);
             
             // Now verify that the role has 2 accounts associate to it.
             Assert.assertEquals(output.getAccount().size(), 1);
@@ -266,7 +265,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
             }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }    
@@ -325,27 +324,27 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
         //
         AccountRoleClient client = new AccountRoleClient();
         setupRead();        
-        ClientResponse<AccountRole> readResponse = client.read(
+        Response readResponse = client.read(
                 accValues.get("acc-role-user1").getAccountId());
         AccountRole toDelete = null;
         try {
         	assertStatusCode(readResponse, testName);
-        	toDelete = readResponse.getEntity();
+        	toDelete = readResponse.readEntity(AccountRole.class);
         	Assert.assertNotNull(toDelete);
         } finally {
         	if (readResponse != null) {
-        		readResponse.releaseConnection();
+        		readResponse.close();
         	}
         }
 
         setupDelete();                
-        ClientResponse<Response> res = client.delete(
+        Response res = client.delete(
                 toDelete.getAccount().get(0).getAccountId(), toDelete); // delete form #1
         try {
         	assertStatusCode(readResponse, testName);
         } finally {
         	if (res != null) {
-        		res.releaseConnection();
+        		res.close();
         	}
         }
         //
@@ -361,10 +360,10 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
         		accValues.get("acc-role-user1").getAccountId());
         toDelete = null;
         try {
-        	toDelete = readResponse.getEntity();
+        	toDelete = readResponse.readEntity(AccountRole.class);
         } finally {
         	if (readResponse != null) {
-        		readResponse.releaseConnection();
+        		readResponse.close();
         	}
         }
 
@@ -498,13 +497,13 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
         String result = null;
         
         setupCreate();
-        ClientResponse<Response> res = accClient.create(account);
+        Response res = accClient.create(account);
         try {
         	assertStatusCode(res, "CreateAccount");
         	result = extractId(res);
         } finally {
         	if (res != null) {
-        		res.releaseConnection();
+        		res.close();
         	}
         }
 
@@ -516,11 +515,10 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
     	if (prebuiltAdminCSID == null) {
             setupReadList();
             AccountClient client = new AccountClient();
-            ClientResponse<AccountsCommonList> res =
-                    client.readSearchList(null, this.prebuiltAdminUserId, null);
+            Response res = client.readSearchList(null, this.prebuiltAdminUserId, null);
             try {
 	            assertStatusCode(res, "findPrebuiltAdminAccount");
-	            AccountsCommonList list = res.getEntity();
+	            AccountsCommonList list = res.readEntity(AccountsCommonList.class);
 	            List<AccountListItem> items = list.getAccountListItem();
 	            Assert.assertEquals(1, items.size(), "Found more than one Admin account!");
 	            AccountListItem item = items.get(0);
@@ -530,7 +528,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
 	            }
             } finally {
                 if (res != null) {
-                    res.releaseConnection();
+                    res.close();
                 }            	
             }
     	}
@@ -568,13 +566,13 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
         		roleName, //the display name
                 "role for " + roleName, true);
         setupCreate();
-        ClientResponse<Response> res = roleClient.create(role);
+        Response res = roleClient.create(role);
         try {
         	assertStatusCode(res, "CreateRole");
         	result = extractId(res);
         } finally {
         	if (res != null) {
-        		res.releaseConnection();
+        		res.close();
         	}
         }
         

@@ -35,7 +35,6 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.authorization.AccountRole;
@@ -414,7 +413,7 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
         Response res = client.read(knownResourceId);
         try {
         	assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        DimensionsCommon dimension = (DimensionsCommon) extractPart(input,
 	                client.getCommonPartName(), DimensionsCommon.class);
 	        Assert.assertNotNull(dimension);
@@ -659,7 +658,7 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
         PermissionClient permClient = new PermissionClient();
         Permission permission = PermissionFactory.createPermissionInstance(resName,
                 "default permissions for " + resName, actions, effect, true, true, true);
-        ClientResponse<Response> res = permClient.create(permission);
+        Response res = permClient.create(permission);
         try {
         	assertStatusCode(res, "CreatePermission");
         	result = extractId(res);
@@ -693,7 +692,7 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
         Role role = RoleFactory.createRoleInstance(roleName,
         		roleName, //the display name
                 "role for " + roleName, true);
-        ClientResponse<Response> res = roleClient.create(role);
+        Response res = roleClient.create(role);
         try {
         	assertStatusCode(res, "CreateRole");
         	result = extractId(res);
@@ -727,7 +726,7 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
         AccountsCommon account = AccountFactory.createAccountInstance(
                 userName, userName, userName, email, accountClient.getTenantId(),
                 true, false, true, true);
-        ClientResponse<Response> res = accountClient.create(account);
+        Response res = accountClient.create(account);
         try {
         	assertStatusCode(res, "CreateAccount");
         	result = extractId(res);
@@ -762,7 +761,7 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
         AccountRole accRole = AccountRoleFactory.createAccountRoleInstance(
                 av, rvs, true, true);
         AccountRoleClient client = new AccountRoleClient();
-        ClientResponse<Response> res = client.create(av.getAccountId(), accRole);
+        Response res = client.create(av.getAccountId(), accRole);
         try {
         	assertStatusCode(res, "CreateAccountRole");
         	result = extractId(res);
@@ -803,7 +802,7 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
         PermissionRole permRole = PermissionRoleFactory.createPermissionRoleInstance(
                 pv, rvls, true, true);
         PermissionRoleClient client = new PermissionRoleClient();
-        ClientResponse<Response> res = client.create(pv.getPermissionId(), permRole);
+        Response res = client.create(pv.getPermissionId(), permRole);
         try {
         	assertStatusCode(res, "CreatePermissionRole");
         	result = extractId(res);

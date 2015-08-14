@@ -26,7 +26,8 @@
  */
 package org.collectionspace.services.client;
 
-import org.jboss.resteasy.client.ClientResponse;
+import javax.ws.rs.core.Response;
+
 import org.collectionspace.services.relation.RelationsCommonList;
 
 /**
@@ -66,7 +67,7 @@ public class RelationClient extends AbstractPoxServiceClientImpl<RelationsCommon
 	 *
 	 * @return the client response
 	 */
-	public ClientResponse<RelationsCommonList> readList() {
+	public Response readList() {
 		return getProxy().readList();
 	}
 
@@ -80,7 +81,7 @@ public class RelationClient extends AbstractPoxServiceClientImpl<RelationsCommon
 	 * @param objectType 
 	 * @return the client response
 	 */
-	public ClientResponse<RelationsCommonList> readList(String subjectCsid,
+	public Response readList(String subjectCsid,
 			String subjectType,
 			String predicate,
 			String objectCsid,
@@ -88,7 +89,7 @@ public class RelationClient extends AbstractPoxServiceClientImpl<RelationsCommon
 		return getProxy().readList(subjectCsid, subjectType, predicate, objectCsid, objectType);
 	}
 
-    public ClientResponse<RelationsCommonList> readList(String subjectCsid,
+    public Response readList(String subjectCsid,
             String subjectType,
             String predicate,
             String objectCsid,

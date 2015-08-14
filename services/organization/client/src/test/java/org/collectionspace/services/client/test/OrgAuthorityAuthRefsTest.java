@@ -302,7 +302,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
         OrganizationsCommon organization = null;
         try {
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        organization = (OrganizationsCommon) extractPart(input,
 	            orgAuthClient.getItemCommonPartName(), OrganizationsCommon.class);
 	        Assert.assertNotNull(organization);

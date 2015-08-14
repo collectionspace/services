@@ -181,7 +181,7 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
 		WorksCommon work = null;
 		try {
 			assertStatusCode(res, testName);
-			PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+			PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 			work = (WorksCommon) extractPart(input,
 					client.getItemCommonPartName(), WorksCommon.class);
 			Assert.assertNotNull(work);

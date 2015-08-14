@@ -27,7 +27,6 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
@@ -74,11 +73,11 @@ public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList,
      * @return response
      * @see org.collectionspace.hello.client.AccountProxy#readList()
      */
-    public ClientResponse<AccountsCommonList> readList() {
+    public Response readList() {
         return getProxy().readList();
     }
 
-    public ClientResponse<AccountsCommonList> readSearchList(String screenName, String uid, String email) {
+    public Response readSearchList(String screenName, String uid, String email) {
         return getProxy().readSearchList(screenName, uid, email);
     }
 
@@ -87,7 +86,7 @@ public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList,
      * @return response
      * @see org.collectionspace.hello.client.AccountProxy#getAccount(java.lang.String)
      */
-    public ClientResponse<AccountsCommon> read(String csid) {
+    public Response read(String csid) {
         return getProxy().read(csid);
     }
 
@@ -97,7 +96,7 @@ public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList,
      * @return response
      * @see org.collectionspace.hello.client.AccountProxy#create(org.collectionspace.services.account.AccountsCommon)
      */
-    public ClientResponse<Response> create(AccountsCommon multipart) {
+    public Response create(AccountsCommon multipart) {
         return getProxy().create(multipart);
     }
 
@@ -108,7 +107,7 @@ public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList,
      * @return response
      * @see org.collectionspace.hello.client.AccountProxy#updateAccount(java.lang.Long, org.collectionspace.services.account.AccountsCommon)
      */
-    public ClientResponse<AccountsCommon> update(String csid, AccountsCommon multipart) {
+    public Response update(String csid, AccountsCommon multipart) {
         return getProxy().update(csid, multipart);
     }
 }

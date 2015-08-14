@@ -38,8 +38,6 @@ import org.testng.annotations.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.DimensionClient;
 import org.collectionspace.services.client.DimensionFactory;
@@ -190,6 +188,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 		Response workflowResponse = dimensionClient.updateWorkflowWithTransition(
 				dimensionCsid1, WorkflowClient.WORKFLOWTRANSITION_LOCK);
 	    System.out.println("Locked dimension record with CSID=" + dimensionCsid1);
+	    workflowResponse.close();
 	    
 	    // Finally, try to delete the relationship
 	    
@@ -204,6 +203,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    // Also, try to soft-delete.  This should also fail.
 		workflowResponse = dimensionClient.updateWorkflowWithTransition(dimensionCsid1, WorkflowClient.WORKFLOWTRANSITION_DELETE);
 	    System.out.println("Locked dimension record with CSID=" + dimensionCsid1);
+	    workflowResponse.close();
 	}
 	
 	@Test void createCollectionObjectRelationshipToManyDimensions() {
@@ -461,7 +461,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    // Now try to retrieve the Intake record of the CollectionObject.
 	    //
 	    String predicate = RelationshipType.COLLECTIONOBJECT_INTAKE.toString();
-	    ClientResponse<RelationsCommonList> resultResponse = relationClient.readList(
+	    Response resultResponse = relationClient.readList(
 	    		collectionObjectCsid,
 	    		null, //CollectionobjectsCommon.class.getSimpleName(),
 	    		predicate,
@@ -470,7 +470,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
         RelationsCommonList relationList = null;
 	    try {
 	    	Assert.assertEquals(resultResponse.getStatus(), Response.Status.OK.getStatusCode());
-	        relationList = resultResponse.getEntity();
+	        relationList = resultResponse.readEntity(RelationsCommonList.class);
 	    } finally {
 	    	resultResponse.close();
 	    }
@@ -492,7 +492,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
         		multiPartResponse = relationClient.read(foundCsid);
         		int responseStatus = multiPartResponse.getStatus();
         		Assert.assertEquals(responseStatus, Response.Status.OK.getStatusCode());
-        		PoxPayloadIn input = new PoxPayloadIn((String)multiPartResponse.getEntity());
+        		PoxPayloadIn input = new PoxPayloadIn(multiPartResponse.readEntity(String.class));
 	        	resultRelation = (RelationsCommon) extractPart(input,
 	        			relationClient.getCommonPartName(),
 	        			RelationsCommon.class);
@@ -591,7 +591,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    String predicate = RelationshipType.COLLECTIONOBJECT_INTAKE.toString();
 		RelationsCommonList relationList = null;
 	    for (String collectionObjectCsid : collectionObjectIDList) {
-		    ClientResponse<RelationsCommonList> resultResponse = relationClient.readList(
+		    Response resultResponse = relationClient.readList(
 		    		intakeCsid,
 		    		null, //IntakesCommon.class.getSimpleName(), //subject
 		    		predicate,
@@ -600,7 +600,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 
 		    try {
 		    	Assert.assertEquals(resultResponse.getStatus(), Response.Status.OK.getStatusCode());
-		        relationList = resultResponse.getEntity();
+		        relationList = resultResponse.readEntity(RelationsCommonList.class);
 		    } finally {
 		    	resultResponse.close();
 		    }
@@ -621,7 +621,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	        		multiPartResponse = relationClient.read(foundCsid);
 	        		int responseStatus = multiPartResponse.getStatus();
 	        		Assert.assertEquals(responseStatus, Response.Status.OK.getStatusCode());
-	        		PoxPayloadIn input = new PoxPayloadIn((String)multiPartResponse.getEntity());
+	        		PoxPayloadIn input = new PoxPayloadIn(multiPartResponse.readEntity(String.class));
 	        		resultRelation = (RelationsCommon) extractPart(input,
 	        				relationClient.getCommonPartName(),
 	        				RelationsCommon.class);

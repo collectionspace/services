@@ -173,9 +173,13 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 	    	Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
 	    			invalidStatusCodeMessage(testRequestType, statusCode));
 	    	Assert.assertEquals(statusCode, testExpectedStatusCode);
+    	} finally {
+    		res.close();
+    	}
 	
+    	res = client.readItem(knownResourceId, knownItemResourceId);
+    	try {
 	    	// Retrieve the updated resource and verify that the parent did not change
-	    	res = client.readItem(knownResourceId, knownItemResourceId);
 	        AUTHORITY_ITEM_TYPE updatedVocabularyItem = extractItemCommonPartValue(res);
 	    	Assert.assertNotNull(updatedVocabularyItem);
 	

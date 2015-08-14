@@ -51,7 +51,6 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.io.FileUtils;
 
-import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -385,26 +384,6 @@ public abstract class BaseServiceTest<CLT> {
      * @param res the res
      * @return the string
      */
-    static protected String extractId(ClientResponse<Response> res) {
-        MultivaluedMap<String, Object> mvm = res.getMetadata();
-        String uri = (String) ((List<Object>) mvm.get("Location")).get(0);
-        if (logger.isDebugEnabled()) {
-            logger.debug("extractId:uri=" + uri);
-        }
-        String[] segments = uri.split("/");
-        String id = segments[segments.length - 1];
-        if (logger.isDebugEnabled()) {
-            logger.debug("id=" + id);
-        }
-        return id;
-    }
-    
-    /**
-     * Extract id.
-     *
-     * @param res the res
-     * @return the string
-     */
     static protected String extractId(Response res) {
         MultivaluedMap<String, Object> mvm = res.getMetadata();
         String uri = (String) ((List<Object>) mvm.get("Location")).get(0);
@@ -675,18 +654,6 @@ public abstract class BaseServiceTest<CLT> {
             className = className.substring(pos);
         }
         return className;
-    }
-
-    public int assertStatusCode(ClientResponse<?> res, String testName) {
-        int statusCode = res.getStatus();
-        
-        // Check the status code of the response: does it match the expected response(s)?
-        logger.debug(testName + ": status = " + statusCode);
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-        		invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-        
-        return statusCode;
     }
     
     public int assertStatusCode(Response res, String testName) {

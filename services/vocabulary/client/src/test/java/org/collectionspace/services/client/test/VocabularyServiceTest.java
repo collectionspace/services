@@ -149,7 +149,7 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
         try {
         	assertStatusCode(res, testName);
 	        // Check whether Person has expected displayName.
-	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        vitem = (VocabularyitemsCommon) extractPart(input,
 	                client.getItemCommonPartName(), VocabularyitemsCommon.class);
 	        Assert.assertNotNull(vitem);

@@ -92,8 +92,10 @@ public class OrgAuthorityClientUtils {
      * @return
      */
     public static String getOrgRefName(String inAuthority, String csid, OrgAuthorityClient client){
-    	if(client==null)
+    	if (client == null) {
     		client = new OrgAuthorityClient();
+    	}
+    	
         Response res = client.readItem(inAuthority, csid);
         try {
 	        int statusCode = res.getStatus();

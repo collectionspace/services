@@ -43,8 +43,6 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanout.LoansoutCommon;
 import org.collectionspace.services.person.PersonTermGroup;
 
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -145,6 +143,7 @@ public class LoanoutAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 	                invalidStatusCodeMessage(testRequestType, statusCode));
 	        Assert.assertEquals(statusCode, testExpectedStatusCode);
 	        newId = extractId(res);
+	        Assert.assertNotNull(newId, "Could not create a new LoanOut record.");
         } finally {
         	res.close();
         }
@@ -249,7 +248,7 @@ public class LoanoutAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         try {
 	        assertStatusCode(res, testName);
 	        // Extract the common part from the response.
-	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        loanoutCommon = (LoansoutCommon) extractPart(input,
 	            loanoutClient.getCommonPartName(), LoansoutCommon.class);
 	        Assert.assertNotNull(loanoutCommon);
@@ -273,7 +272,7 @@ public class LoanoutAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         AuthorityRefList list = null;
         try {
 	        assertStatusCode(res2, testName);
-	        list = (AuthorityRefList)res2.getEntity();
+	        list = res2.readEntity(AuthorityRefList.class);
         } finally {
         	if (res2 != null) {
         		res2.close();
@@ -337,17 +336,17 @@ public class LoanoutAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         // Delete Person resource(s) (before PersonAuthority resources).
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            personAuthClient.deleteItem(personAuthCSID, resourceId);
+            personAuthClient.deleteItem(personAuthCSID, resourceId).close();
         }
         // Delete PersonAuthority resource(s).
         // Note: Any non-success response is ignored and not reported.
         if (personAuthCSID != null) {
-	        personAuthClient.delete(personAuthCSID);
+	        personAuthClient.delete(personAuthCSID).close();
 	        // Delete Loans In resource(s).
 	        LoanoutClient loanoutClient = new LoanoutClient();
 	        for (String resourceId : loanoutIdsCreated) {
 	            // Note: Any non-success responses are ignored and not reported.
-	            loanoutClient.delete(resourceId);
+	            loanoutClient.delete(resourceId).close();
 	        }
         }
     }

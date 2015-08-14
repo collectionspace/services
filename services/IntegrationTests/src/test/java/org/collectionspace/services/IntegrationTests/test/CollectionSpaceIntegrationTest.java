@@ -42,7 +42,6 @@ import org.collectionspace.services.collectionobject.TitleGroupList;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.relation.RelationsCommon;
-import org.jboss.resteasy.client.ClientResponse;
 
 /**
  * The Class CollectionSpaceIntegrationTest.
@@ -138,26 +137,6 @@ public abstract class CollectionSpaceIntegrationTest {
 		return Long.toString(identifier);
 	}
 
-	/**
-	 * Extract id.
-	 * 
-	 * @param res the res
-	 * 
-	 * @return the string
-	 */
-	String extractId(ClientResponse<Response> res) {
-		String result = null;
-		
-		MultivaluedMap mvm = res.getMetadata();
-		String uri = (String) ((ArrayList) mvm.get("Location")).get(0);
-		verbose("extractId:uri=" + uri);
-		String[] segments = uri.split("/");
-		result = segments[segments.length - 1];
-		verbose("id=" + result);
-		
-		return result;
-	}
-	
 	String extractId(Response res) {
 		String result = null;
 		

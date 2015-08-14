@@ -45,8 +45,6 @@ import org.collectionspace.services.objectexit.StructuredDateGroup;
 import org.collectionspace.services.objectexit.ObjectexitCommon;
 import org.collectionspace.services.person.PersonTermGroup;
 
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -125,23 +123,28 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
         PoxPayloadOut multipart = createObjectExitInstance(depositorRefName,
                 "exitNumber-" + identifier, CURRENT_DATE_UTC);
         Response res = objectexitClient.create(multipart);
+        String newId = null;
         try {
 	        assertStatusCode(res, testName);
+	        newId = extractId(res);
+	        Assert.assertNotNull(newId, "Could not create a new ObjectExit record.");
 	        if (knownResourceId == null) {// Store the ID returned from the first resource created for additional tests below.
-	            knownResourceId = extractId(res);
+	            knownResourceId = newId;
 	        }
         } finally {
         	if (res != null) {
                 res.close();
             }
         }
-        objectexitIdsCreated.add(extractId(res));// Store the IDs from every resource created; delete on cleanup
+        
+       	objectexitIdsCreated.add(newId);// Store the IDs from every resource created; delete on cleanup
     }
 
     protected void createPersonRefs() {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding refName by which it can be identified.
-        PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
+        PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
+        		PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         Response res = personAuthClient.create(multipart);
         try {
 	        assertStatusCode(res, "createPersonRefs (not a surefire test)");
@@ -203,7 +206,7 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
         ObjectexitCommon objectexit = null;
         try {
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        objectexit = (ObjectexitCommon) extractPart(input, objectexitClient.getCommonPartName(), ObjectexitCommon.class);
 	        Assert.assertNotNull(objectexit);
 	        logger.debug(objectAsXmlString(objectexit, ObjectexitCommon.class));
@@ -222,7 +225,7 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
         AuthorityRefList list = null;
         try {
 	        assertStatusCode(res2, testName);
-	        list = (AuthorityRefList)res2.getEntity();
+	        list = res2.readEntity(AuthorityRefList.class);
         } finally {
         	if (res2 != null) {
         		res2.close();
@@ -265,17 +268,17 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
         // Delete Person resource(s) (before PersonAuthority resources).
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            personAuthClient.deleteItem(personAuthCSID, resourceId);
+            personAuthClient.deleteItem(personAuthCSID, resourceId).close();
         }
         // Delete PersonAuthority resource(s).
         // Note: Any non-success response is ignored and not reported.
         if (personAuthCSID != null) {
-            personAuthClient.delete(personAuthCSID);
+            personAuthClient.delete(personAuthCSID).close();
             // Delete Loans In resource(s).
             ObjectExitClient objectexitClient = new ObjectExitClient();
             for (String resourceId : objectexitIdsCreated) {
                 // Note: Any non-success responses are ignored and not reported.
-                objectexitClient.delete(resourceId);
+                objectexitClient.delete(resourceId).close();
             }
         }
     }

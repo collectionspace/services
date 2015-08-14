@@ -47,8 +47,6 @@ import org.collectionspace.services.client.RoleFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.client.test.ServiceRequestType;
 
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -189,9 +187,9 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
         PermissionRole permRole = createPermissionRoleInstance(pv,
                 roleValues.values(), true, true);
         PermissionRoleClient client = new PermissionRoleClient();
-        ClientResponse<Response> res = null;
+        
+        Response res = client.create(pv.getPermissionId(), permRole);
         try {
-            res = client.create(pv.getPermissionId(), permRole);
             int statusCode = res.getStatus();
 
             if (logger.isDebugEnabled()) {
@@ -266,10 +264,9 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
 
         // Submit the request to the service and store the response.
         PermissionRoleClient client = new PermissionRoleClient();
-        ClientResponse<PermissionRole> res = null;
+        Response res = client.read(
+                permValues.get(TEST_SERVICE_NAME + TEST_MARKER).getPermissionId());
         try {
-            res = client.read(
-                    permValues.get(TEST_SERVICE_NAME + TEST_MARKER).getPermissionId());
             int statusCode = res.getStatus();
 
             // Check the status code of the response: does it match
@@ -281,11 +278,11 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
 
-            PermissionRole output = (PermissionRole) res.getEntity();
+            PermissionRole output = res.readEntity(PermissionRole.class);
             Assert.assertNotNull(output);
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -303,7 +300,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
 
         // Submit the request to the service and store the response.
         PermissionRoleClient client = new PermissionRoleClient();
-        ClientResponse<PermissionRole> res = null;
+        Response res = null;
         try {
             res = client.read(NON_EXISTENT_ID);
             int statusCode = res.getStatus();
@@ -318,7 +315,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -331,14 +328,14 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
 
         // Submit the request to the service and store the response.
         PermissionRoleClient client = new PermissionRoleClient();
-        ClientResponse<PermissionRole> res = null;
+        Response res = null;
         try {
             res = client.read(
                     permValues.get(TEST_SERVICE_NAME + TEST_MARKER + NO_REL_SUFFIX).getPermissionId());
             // Check the status code of the response: does it match
             // the expected response(s)?
             assertStatusCode(res, testName);
-            PermissionRole output = (PermissionRole) res.getEntity();
+            PermissionRole output = res.readEntity(PermissionRole.class);
 
             String sOutput = objectAsXmlString(output, PermissionRole.class);
             if (logger.isDebugEnabled()) {
@@ -346,7 +343,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
             }
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -437,16 +434,16 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
         //
         //
         PermissionRoleClient client = new PermissionRoleClient();
-        ClientResponse<PermissionRole> readResponse = client.read(
+        Response readResponse = client.read(
         		permValues.get(TEST_SERVICE_NAME + TEST_MARKER).getPermissionId());
         PermissionRole toDelete = null;
         try {
-        	toDelete = readResponse.getEntity();
+        	toDelete = readResponse.readEntity(PermissionRole.class);
         } finally {
-        	readResponse.releaseConnection();
+        	readResponse.close();
         }        
 
-        ClientResponse<Response> res = client.delete(
+        Response res = client.delete(
         		toDelete.getPermission().get(0).getPermissionId(), toDelete);
         try {
             int statusCode = res.getStatus();
@@ -455,7 +452,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -472,9 +469,9 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
         		permValues.get(TEST_SERVICE_NAME + TEST_MARKER).getPermissionId());
         toDelete = null;
         try {
-        	toDelete = readResponse.getEntity();
+        	toDelete = readResponse.readEntity(PermissionRole.class);
         } finally {
-        	readResponse.releaseConnection();
+        	readResponse.close();
         }
 
         Response deleteRes = client.delete(toDelete.getPermission().get(0).getPermissionId());
@@ -586,10 +583,8 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
                 "default permissions for " + resName,
                 actions, effect, true, true, true);
         String id = null;
-        ClientResponse<Response> res = null;
+        Response res = permClient.create(permission);
         try {
-            res = permClient.create(permission);
-
             int statusCode = res.getStatus();
             if (logger.isDebugEnabled()) {
                 logger.debug("createPermission: resName=" + resName
@@ -601,7 +596,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
             id = extractId(res);
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         return id;
@@ -650,7 +645,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
         Role role = RoleFactory.createRoleInstance(roleName,
         		roleName, //the display name
                 "role for " + roleName, true);
-        ClientResponse<Response> res = null;
+        Response res = null;
         String id = null;
         try {
             res = roleClient.create(role);
@@ -665,7 +660,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
 
             id = extractId(res);
         } finally {
-            res.releaseConnection();
+            res.close();
         }
         return id;
     }

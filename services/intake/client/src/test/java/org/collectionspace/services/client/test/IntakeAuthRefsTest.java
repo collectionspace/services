@@ -250,7 +250,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         Response res = intakeClient.read(knownResourceId);
         try {
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        IntakesCommon intake = (IntakesCommon) extractPart(input,
 	        		intakeClient.getCommonPartName(), IntakesCommon.class);
 	        Assert.assertNotNull(intake);
@@ -269,7 +269,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         AuthorityRefList list = null;
         try {
 	        assertStatusCode(res, testName);
-	        list = (AuthorityRefList)res.getEntity();
+	        list = res.readEntity(AuthorityRefList.class);
         } finally {
         	if (res != null) {
         		res.close();

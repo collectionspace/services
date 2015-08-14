@@ -37,30 +37,30 @@ public class IdClient extends AbstractServiceClientImpl<String, String, String, 
     
     // Operations on ID Generators
     
-    public ClientResponse<Response> create(String xmlPayload) {
+    public Response create(String xmlPayload) {
         return getProxy().create(xmlPayload);
     }
 
-    public ClientResponse<String> read(String csid) {
+    public Response read(String csid) {
         return getProxy().read(csid);
     }
     
-    public ClientResponse<String> readList() {
+    public Response readList() {
         return getProxy().readList();
     }
     
     @Override
-    public ClientResponse<Response> delete(String csid) {
+    public Response delete(String csid) {
         return getProxy().delete(csid);
     }
     
     // Operations on IDs
 
-    public ClientResponse<String> createId(String csid) {
+    public Response createId(String csid) {
         return getProxy().createId(csid);
     }
 
 	@Override
-	public ClientResponse<String> update(String csid, String payload) {
+	public Response update(String csid, String payload) {
 		throw new UnsupportedOperationException("ID client does not support an update operation.");	}
 }

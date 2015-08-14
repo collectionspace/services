@@ -19,7 +19,6 @@ import org.collectionspace.services.client.BlobClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
@@ -84,10 +83,14 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
         Thread.sleep(3000); // sleep for 3 seconds
         
         for (int i = 0; i < allGeneratedImages.size(); i++) {
-	        ClientResponse<Response> res = client.getDerivativeContent(allGeneratedImages.get(i), "Thumbnail");
-	        assertStatusCode(res, testName);
-	        logger.debug(String.format("Performed GET operation on Thumbnail derivative of image blob ID = '%s'.", 
-	        		allGeneratedImages.get(i)));
+	        Response res = client.getDerivativeContent(allGeneratedImages.get(i), "Thumbnail");
+	        try {
+		        assertStatusCode(res, testName);
+		        logger.debug(String.format("Performed GET operation on Thumbnail derivative of image blob ID = '%s'.", 
+		        		allGeneratedImages.get(i)));
+	        } finally {
+	        	res.close();
+	        }
         }        
 	}
 	
@@ -104,7 +107,7 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 			URL url = jpegFile.toURI().toURL();
 			
 	    	profiler.start();
-			ClientResponse<Response> res = client.createBlobFromURI("http://farm6.static.flickr.com/5289/5688023100_15e00cde47_o.jpg");//url.toString());
+			Response res = client.createBlobFromURI("http://farm6.static.flickr.com/5289/5688023100_15e00cde47_o.jpg");//url.toString());
 			try {
 				profiler.stop();
 		        assertStatusCode(res, testName);
@@ -123,7 +126,7 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 		        allGeneratedImages.add(csid);
 			} finally {
 				if (res != null) {
-                    res.releaseConnection();
+                    res.close();
                 }
 			}
         }

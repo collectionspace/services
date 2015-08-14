@@ -529,7 +529,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
             assertStatusCode(res, testName);
             //FIXME: remove the following try catch once Aron fixes signatures
             try {
-                PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+                PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
                 PersonauthoritiesCommon personAuthority = (PersonauthoritiesCommon) extractPart(input,
                         client.getCommonPartName(), PersonauthoritiesCommon.class);
                 Assert.assertNotNull(personAuthority);
@@ -616,7 +616,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         try {
             assertStatusCode(res, testName);
             // Check whether we've received a person.
-            PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
             PersonsCommon person = (PersonsCommon) extractPart(input,
                     client.getItemCommonPartName(), PersonsCommon.class);
             Assert.assertNotNull(person);
@@ -662,7 +662,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         PoxPayloadIn input = null;
         try {
             assertStatusCode(res, testName);
-            input = new PoxPayloadIn((String)res.getEntity());
+            input = new PoxPayloadIn(res.readEntity(String.class));
         } finally {
         	if (res != null) {
                 res.close();
@@ -922,7 +922,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
             if (logger.isDebugEnabled()) {
                 logger.debug("got PersonAuthority to update with ID: " + knownResourceId);
             }
-            input = new PoxPayloadIn((String)res.getEntity());
+            input = new PoxPayloadIn(res.readEntity(String.class));
         } finally {
         	if (res != null) {
                 res.close();
@@ -949,7 +949,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         try {
             assertStatusCode(res, testName);
             // Retrieve the updated resource and verify that its contents exist.
-            input = new PoxPayloadIn((String)res.getEntity());
+            input = new PoxPayloadIn(res.readEntity(String.class));
         } finally {
         	if (res != null) {
                 res.close();
@@ -989,7 +989,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
                         + knownItemResourceId
                         + " in PersonAuthority: " + knownResourceId);
             }
-            input = new PoxPayloadIn((String)res.getEntity());
+            input = new PoxPayloadIn(res.readEntity(String.class));
         } finally {
         	if (res != null) {
                 res.close();
@@ -1029,7 +1029,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         try {
             assertStatusCode(res, testName);
             // Retrieve the updated resource and verify that its contents exist.
-            input = new PoxPayloadIn((String)res.getEntity());
+            input = new PoxPayloadIn(res.readEntity(String.class));
         } finally {
         	if (res != null) {
                 res.close();

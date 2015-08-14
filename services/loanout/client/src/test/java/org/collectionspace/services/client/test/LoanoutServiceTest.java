@@ -281,7 +281,7 @@ public class LoanoutServiceTest extends AbstractPoxServiceTestImpl<AbstractCommo
         try {
 	        assertStatusCode(res, testName);
 	        // Get the common part of the response and verify that it is not null.
-	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
 	        if (payloadInputPart != null) {
 	            loanoutCommon = (LoansoutCommon) payloadInputPart.getBody();
@@ -402,7 +402,7 @@ public class LoanoutServiceTest extends AbstractPoxServiceTestImpl<AbstractCommo
         try {
 	        assertStatusCode(res, testName);
 	        // Extract the common part from the response.
-	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
 	        if (payloadInputPart != null) {
 	            loanoutCommon = (LoansoutCommon) payloadInputPart.getBody();
@@ -445,7 +445,7 @@ public class LoanoutServiceTest extends AbstractPoxServiceTestImpl<AbstractCommo
         try {
 	        assertStatusCode(res, testName);
 	        // Extract the updated common part from the response.
-	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
 	        if (payloadInputPart != null) {
 	            updatedLoanoutCommon = (LoansoutCommon) payloadInputPart.getBody();

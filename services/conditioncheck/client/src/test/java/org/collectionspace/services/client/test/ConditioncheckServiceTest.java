@@ -266,7 +266,7 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
         PoxPayloadIn input = null;
         try {
             assertStatusCode(res, testName);
-            input = new PoxPayloadIn((String)res.getEntity());
+            input = new PoxPayloadIn(res.readEntity(String.class));
         } finally {
             if (res != null) {
                 res.close();
@@ -414,7 +414,7 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
         PoxPayloadIn input = null;
         try {
             assertStatusCode(res, testName);
-            input = new PoxPayloadIn((String)res.getEntity());
+            input = new PoxPayloadIn(res.readEntity(String.class));
             if (logger.isDebugEnabled()) {
                 logger.debug("got object to update with ID: " + knownResourceId);
             }
@@ -460,7 +460,7 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
             Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
-            input = new PoxPayloadIn((String)res.getEntity());
+            input = new PoxPayloadIn(res.readEntity(String.class));
         } finally {
             if (res != null) {
                 res.close();

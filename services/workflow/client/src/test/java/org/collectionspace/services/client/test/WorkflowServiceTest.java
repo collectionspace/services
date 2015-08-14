@@ -83,7 +83,7 @@ public class WorkflowServiceTest extends AbstractPoxServiceTestImpl<AbstractComm
         Response res = client.getWorkflow(knownResourceId);
         try {
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        WorkflowCommon workflowsCommon = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
 	        if (logger.isDebugEnabled() == true) {
 	        	logger.debug("Workflow payload is: " + input.getXmlPayload());

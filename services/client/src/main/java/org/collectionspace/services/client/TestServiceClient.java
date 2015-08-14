@@ -24,7 +24,6 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
-import org.jboss.resteasy.client.ClientResponse;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /**
@@ -58,22 +57,22 @@ public final class TestServiceClient extends AbstractServiceClientImpl<AbstractC
 	}
 
 	@Override
-	public ClientResponse<Response> create(Object payload) {
+	public Response create(Object payload) {
         throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public ClientResponse<Object> update(String csid, Object payload) {
+	public Response update(String csid, Object payload) {
         throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public ClientResponse<Object> read(String csid) {
+	public Response read(String csid) {
         throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public ClientResponse<AbstractCommonList> readList() {
+	public Response readList() {
         throw new UnsupportedOperationException();
 	} 
 }

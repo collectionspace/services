@@ -43,11 +43,10 @@ import org.collectionspace.services.person.PersonTermGroupList;
 import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.SchoolOrStyleList;
-import org.jboss.resteasy.client.ClientResponse;
-//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
+import org.collectionspace.services.person.StructuredDateGroup;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.collectionspace.services.person.StructuredDateGroup;
 
 /**
  * The Class PersonAuthorityClientUtils.
@@ -77,7 +76,7 @@ public class PersonAuthorityClientUtils {
 	        }
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(String.class));
+	            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	            PersonauthoritiesCommon personAuthority = 
 	            	(PersonauthoritiesCommon) CollectionSpaceClientUtils.extractPart(input,
 	                    client.getCommonPartName(), PersonauthoritiesCommon.class);
@@ -111,7 +110,7 @@ public class PersonAuthorityClientUtils {
 	        }
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(String.class));
+	            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	            PersonsCommon person = 
 	            	(PersonsCommon) CollectionSpaceClientUtils.extractPart(input,
 	                    client.getItemCommonPartName(), PersonsCommon.class);
@@ -382,23 +381,7 @@ public class PersonAuthorityClientUtils {
         	logger.debug("id=" + id);
         }
         return id;
-    }
-    
-    public static String extractId(ClientResponse<Response> res) {
-        MultivaluedMap<String, Object> mvm = res.getMetadata();
-        // FIXME: This may throw an NPE if the Location: header isn't present
-        String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
-        if(logger.isDebugEnabled()){
-        	logger.debug("extractId:uri=" + uri);
-        }
-        String[] segments = uri.split("/");
-        String id = segments[segments.length - 1];
-        if(logger.isDebugEnabled()){
-        	logger.debug("id=" + id);
-        }
-        return id;
-    }
-    
+    }    
     
     /**
      * Returns an error message indicating that the status code returned by a

@@ -215,7 +215,7 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
         try {
             assertStatusCode(res, testName);
             // Extract the common part from the response.
-            PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
             conditioncheckCommon = (ConditionchecksCommon) extractPart(input,
                 conditioncheckClient.getCommonPartName(), ConditionchecksCommon.class);
             Assert.assertNotNull(conditioncheckCommon);
@@ -236,7 +236,7 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
         AuthorityRefList list = null;
         try {
             assertStatusCode(res2, testName);
-            list = (AuthorityRefList)res2.getEntity();
+            list = res2.readEntity(AuthorityRefList.class);
             Assert.assertNotNull(list);
         } finally {
             if (res2 != null) {

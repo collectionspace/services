@@ -33,6 +33,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import javax.ws.rs.core.Response;
+
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.AccountValue;
@@ -64,7 +65,6 @@ import org.collectionspace.services.client.RoleFactory;
 import org.collectionspace.services.client.test.BaseServiceTest;
 import org.collectionspace.services.dimension.DimensionsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.jboss.resteasy.client.ClientResponse;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -371,7 +371,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         Response res = client.read(id);
         try {
         	assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        result = (DimensionsCommon) extractPart(input,
 	                client.getCommonPartName(), DimensionsCommon.class);
         } finally {
@@ -571,7 +571,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
                 "default permissions for " + resName,
                 actions, effect, true, true, true);
         permission.setTenantId(tenantId);
-        ClientResponse<Response> res = permClient.create(permission);
+        Response res = permClient.create(permission);
         try {
         	assertStatusCode(res, "CreatePermission");
         	result = extractId(res);
@@ -610,7 +610,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         		roleName, //the display name
                 "role for " + roleName, true);
         role.setTenantId(tenantId);
-        ClientResponse<Response> res = roleClient.create(role);
+        Response res = roleClient.create(role);
         try {
         	assertStatusCode(res, "CreateRole");
         	result = extractId(res);
@@ -648,7 +648,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         AccountsCommon account = AccountFactory.createAccountInstance(
                 userName, userName, userName, email, tenantId,
                 true, false, true, true);
-        ClientResponse<Response> res = accountClient.create(account);
+        Response res = accountClient.create(account);
         try {
         	assertStatusCode(res, "CreateAccount");
         	result = extractId(res);
@@ -687,7 +687,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         AccountRoleClient client = new AccountRoleClient();
         UserInfo ui = tenantAdminUsers.get(tenantId);
         client.setAuth(true, ui.userName, true, ui.password, true);
-        ClientResponse<Response> res = client.create(av.getAccountId(), accRole);
+        Response res = client.create(av.getAccountId(), accRole);
         try {
         	assertStatusCode(res, "CreateAccountRole");
         	result = extractId(res);
@@ -733,7 +733,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         PermissionRoleClient client = new PermissionRoleClient();
         UserInfo ui = tenantAdminUsers.get(tenantId);
         client.setAuth(true, ui.userName, true, ui.password, true);
-        ClientResponse<Response> res = client.create(pv.getPermissionId(), permRole);
+        Response res = client.create(pv.getPermissionId(), permRole);
         try {
         	assertStatusCode(res, "createPermissionRole");
         	result = extractId(res);

@@ -27,7 +27,6 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionsList;
@@ -68,12 +67,12 @@ public class PermissionClient extends AbstractServiceClientImpl<PermissionsList,
      * @return
      * @see org.collectionspace.hello.client.PermissionProxy#readList()
      */
-    public ClientResponse<PermissionsList> readList() {
+    public Response readList() {
         return getProxy().readList();
 
     }
 
-    public ClientResponse<PermissionsList> readSearchList(String resourceName) {
+    public Response readSearchList(String resourceName) {
         return getProxy().readSearchList(resourceName);
 
     }
@@ -83,7 +82,7 @@ public class PermissionClient extends AbstractServiceClientImpl<PermissionsList,
      * @return
      * @see org.collectionspace.hello.client.PermissionProxy#getAccount(java.lang.String)
      */
-    public ClientResponse<Permission> read(String csid) {
+    public Response read(String csid) {
         return getProxy().read(csid);
     }
 
@@ -92,7 +91,7 @@ public class PermissionClient extends AbstractServiceClientImpl<PermissionsList,
      * @return
      * @see org.collectionspace.hello.client.PermissionProxy#create(org.collectionspace.services.permission.Permission)
      */
-    public ClientResponse<Response> create(Permission permission) {
+    public Response create(Permission permission) {
         return getProxy().create(permission);
     }
 
@@ -102,7 +101,7 @@ public class PermissionClient extends AbstractServiceClientImpl<PermissionsList,
      * @return
      * @see org.collectionspace.hello.client.PermissionProxy#updateAccount(java.lang.Long, org.collectionspace.services.permission.Permission)
      */
-    public ClientResponse<Permission> update(String csid, Permission permission) {
+    public Response update(String csid, Permission permission) {
         return getProxy().update(csid, permission);
     }
 }

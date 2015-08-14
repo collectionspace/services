@@ -193,7 +193,7 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         BlobsCommon blob = null;
         try {
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        blob = (BlobsCommon) extractPart(input, blobClient.getCommonPartName(), BlobsCommon.class);
 	        Assert.assertNotNull(blob);
 	        logger.debug(objectAsXmlString(blob, BlobsCommon.class));
@@ -210,7 +210,7 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         res = blobClient.getAuthorityRefs(knownResourceId);
         try {
 	        assertStatusCode(res, testName);
-	        AuthorityRefList list = (AuthorityRefList)res.getEntity();
+	        AuthorityRefList list = res.readEntity(AuthorityRefList.class);
 	        List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
 	        int numAuthRefsFound = items.size();
 	        logger.debug("Authority references, found " + numAuthRefsFound);
@@ -253,7 +253,7 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         // Delete Person resource(s) (before PersonAuthority resources).
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            personAuthClient.deleteItem(personAuthCSID, resourceId);
+            personAuthClient.deleteItem(personAuthCSID, resourceId).close();
         }
         // Delete PersonAuthority resource(s).
         // Note: Any non-success response is ignored and not reported.
@@ -263,7 +263,7 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
             BlobClient blobClient = new BlobClient();
             for (String resourceId : blobIdsCreated) {
                 // Note: Any non-success responses are ignored and not reported.
-                blobClient.delete(resourceId);
+                blobClient.delete(resourceId).close();
             }
         }
     }

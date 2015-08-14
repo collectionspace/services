@@ -128,21 +128,25 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
     	invocationContext.setMode("single");
     	invocationContext.setSingleCSID(acquisitionCsid);
     	
-        ClientResponse<Response> res = client.publishReport(reportCsid, invocationContext);
-        int statusCode = res.getStatus();
-        setupCreate();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.publishReport(reportCsid, invocationContext);
+        try {
+	        int statusCode = res.getStatus();
+	        setupCreate();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        String publicItemCsid = extractId(res);
+	        Assert.assertNotNull(publicItemCsid);
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        String publicItemCsid = extractId(res);
-        Assert.assertNotNull(publicItemCsid);
     }
     
     /* (non-Javadoc)
@@ -161,16 +165,17 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
 
     	// Submit the request to the service and store the response.
     	ReportClient client = new ReportClient();
-    	ClientResponse<AbstractCommonList> res = client.readListFiltered(testDocType, "single");
+    	Response res = client.readListFiltered(testDocType, "single");
     	AbstractCommonList list = null;
     	try {
     		assertStatusCode(res, testName);
-    		list = res.getEntity();
+    		list = res.readEntity(AbstractCommonList.class);
     	} finally {
     		if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
     	}
+    	
     	List<AbstractCommonList.ListItem> items = list.getListItem();
     	// We must find the basic one we created
     	boolean fFoundBaseItem = false;
@@ -181,7 +186,8 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
 				break;
 			}
 		}
-		if(!fFoundBaseItem) {
+		
+		if (!fFoundBaseItem) {
 			Assert.fail("readListFiltered failed to return base item");
 		}
 		
@@ -189,10 +195,10 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
     	res = client.readListFiltered("Intake", "single");
     	try {
 	        assertStatusCode(res, testName);
-	    	list = res.getEntity();
+	    	list = res.readEntity(AbstractCommonList.class);
     	} finally {
     		if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
     	}
 
@@ -207,10 +213,10 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
     	res = client.readListFiltered(testDocType, "group");
     	try {
 	        assertStatusCode(res, testName);
-	    	list = res.getEntity();
+	    	list = res.readEntity(AbstractCommonList.class);
     	} finally {
     		if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
     	}
 

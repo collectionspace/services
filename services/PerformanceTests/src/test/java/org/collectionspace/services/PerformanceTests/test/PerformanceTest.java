@@ -28,13 +28,13 @@ import java.util.Random;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.jboss.resteasy.util.HttpResponseCodes;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.util.HttpResponseCodes;
+
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.PayloadOutputPart;
@@ -86,7 +86,7 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
 
         long totalTime = 0;
-        ClientResponse<Response> response;
+        Response response;
         for (int i = 0; i < numOfCalls; i++) {
             Date startTime = new Date();
             response = collectionObjectClient.roundtrip(0);

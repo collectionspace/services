@@ -41,7 +41,7 @@ import org.collectionspace.services.intake.CurrentLocationGroup;
 import org.collectionspace.services.intake.CurrentLocationGroupList;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.jboss.resteasy.client.ClientResponse;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.slf4j.Logger;
@@ -271,7 +271,7 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
 	        }
 	        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
 	
-	        input = new PoxPayloadIn((String)res.getEntity());
+	        input = new PoxPayloadIn(res.readEntity(String.class));
         } finally {
         	res.close();
         }
@@ -326,7 +326,7 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
 	                invalidStatusCodeMessage(testRequestType, statusCode));
 	        Assert.assertEquals(statusCode, testExpectedStatusCode);
 	
-	        input = new PoxPayloadIn((String)res.getEntity());
+	        input = new PoxPayloadIn(res.readEntity(String.class));
 	    } finally {
 	    	res.close();
 	    }

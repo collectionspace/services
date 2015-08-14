@@ -123,7 +123,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         createOrgRefs();
 
         IntakeClient intakeClient = new IntakeClient();
-        PoxPayloadOut multipart = createIntakeInstance(
+        PoxPayloadOut intakePayload = createIntakeInstance(
                 "entryNumber-" + identifier,
                 CURRENT_DATE_UTC,
                 currentOwnerRefName,
@@ -133,7 +133,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
                 insurerRefName,
                 valuerRefName );
 
-        Response res = intakeClient.create(multipart);
+        Response res = intakeClient.create(intakePayload);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -149,22 +149,25 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
 	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
 	                invalidStatusCodeMessage(testRequestType, statusCode));
 	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	        String newIntakeId = extractId(res);
+            Assert.assertNotNull(newIntakeId, "Could not create a new Intake record.");
+
+	        // Store the ID returned from the first resource created
+	        // for additional tests below.            
+	        if (knownIntakeId == null) {
+	            knownIntakeId = newIntakeId;
+	            if (logger.isDebugEnabled()) {
+	                logger.debug(testName + ": knownIntakeId=" + knownIntakeId);
+	            }
+	        }
+	        
+	        // Store the IDs from every resource created by tests,
+	        // so they can be deleted after tests have been run.
+	        intakeIdsCreated.add(newIntakeId);
         } finally {
         	res.close();
         }
 
-        // Store the ID returned from the first resource created
-        // for additional tests below.
-        if (knownIntakeId == null){
-            knownIntakeId = extractId(res);
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": knownIntakeId=" + knownIntakeId);
-            }
-        }
-        
-        // Store the IDs from every resource created by tests,
-        // so they can be deleted after tests have been run.
-        intakeIdsCreated.add(extractId(res));
     }
     
     /**
@@ -177,12 +180,16 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         PoxPayloadOut multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
     			ORGANIZATION_AUTHORITY_NAME, ORGANIZATION_AUTHORITY_NAME, orgAuthClient.getCommonPartName());
         Response res = orgAuthClient.create(multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-        orgAuthCSID = extractId(res);
+        try {
+	        int statusCode = res.getStatus();
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        orgAuthCSID = extractId(res);
+	        Assert.assertNotNull(orgAuthCSID, "Could not create a new Organization authority record.");
+        } finally {
+        	res.close();
+        }
         
 		currentOwnerOrgCSID = createOrganization("olivierOwnerCompany", "Olivier Owner Company", "Olivier Owner Company");
         orgIdsCreated.add(currentOwnerOrgCSID);
@@ -211,6 +218,8 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
     }
 
     protected String createOrganization(String shortId, String shortName, String longName) {
+    	String result = null;
+    	
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
         Map<String, String> orgInfo = new HashMap<String,String>();
         orgInfo.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
@@ -226,12 +235,18 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
                 orgInfo, orgTerms, orgAuthClient.getItemCommonPartName());
 
         Response res = orgAuthClient.createItem(orgAuthCSID, multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-    	return extractId(res);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	    	result = extractId(res);
+        } finally {
+        	res.close();
+        }
+        
+        return result;
     }
 
     // Success outcomes
@@ -247,7 +262,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
        AuthorityRefDocList list = null;
        try {
     	   assertStatusCode(refDocListResp, testName);
-    	   list = (AuthorityRefDocList)refDocListResp.getEntity();
+    	   list = refDocListResp.readEntity(AuthorityRefDocList.class);
     	   Assert.assertNotNull(list);
        } finally {
     	   if (refDocListResp != null) {

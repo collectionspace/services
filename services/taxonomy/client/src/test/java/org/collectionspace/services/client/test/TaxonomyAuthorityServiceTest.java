@@ -203,7 +203,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
         try {
             assertStatusCode(res, testName);
             // Check whether Taxonomy has expected displayName.
-            PoxPayloadIn input = new PoxPayloadIn((String)res.getEntity());
+            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
             taxon = (TaxonCommon) extractPart(input,
                     client.getItemCommonPartName(), TaxonCommon.class);
             Assert.assertNotNull(taxon);

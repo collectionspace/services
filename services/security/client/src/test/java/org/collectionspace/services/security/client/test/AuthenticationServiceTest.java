@@ -110,7 +110,7 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         AccountsCommon account =
                 createAccountInstance("barney", "barney08", "barney@dinoland.com",
                 accountClient.getTenantId(), false);
-        ClientResponse<Response> res = accountClient.create(account);
+        Response res = accountClient.create(account);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -146,23 +146,26 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         AccountsCommon account =
                 createAccountInstance("george", "george08", "george@curiousland.com",
                 accountClient.getTenantId(), false);
-        ClientResponse<Response> res = accountClient.create(account);
-        int statusCode = res.getStatus();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": george status = " + statusCode);
+        Response res = accountClient.create(account);
+        try {
+	        int statusCode = res.getStatus();
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": george status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        // Store the ID returned from this create operation
+	        // for additional tests below.
+	        georgeAccountId = extractId(res);
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": georgeAccountId=" + georgeAccountId);
+	        }
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        // Store the ID returned from this create operation
-        // for additional tests below.
-        georgeAccountId = extractId(res);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": georgeAccountId=" + georgeAccountId);
-        }
-        res.releaseConnection();
+        
         //deactivate
         setupUpdate();
         account.setStatus(Status.INACTIVE);
@@ -173,16 +176,19 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         }
 
         // Submit the request to the service and store the response.
-        ClientResponse<AccountsCommon> res1 = accountClient.update(georgeAccountId, account);
-        statusCode = res1.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res1 = accountClient.update(georgeAccountId, account);
+        try {
+	        int statusCode = res1.getStatus();
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+        	res1.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-        res1.releaseConnection();
     }
 
 
