@@ -429,7 +429,7 @@ public class NuxeoBlobUtils {
 			Blob nuxeoBlob, Boolean getContentFlag) {
 		BlobsCommon result = new BlobsCommon();
 
-		if (documentModel != null) {
+		if (documentModel != null && nuxeoBlob != null) {
 			result.setMimeType(nuxeoBlob.getMimeType());
 			result.setName(nuxeoBlob.getFilename());
 			result.setLength(Long.toString(nuxeoBlob.getLength()));
@@ -982,6 +982,14 @@ public class NuxeoBlobUtils {
 					docBlob = docBlobHolder.getBlob();
 					if (derivativeTerm != null) { // If its a derivative request on a non-image blob, then return just a document image thumnail
 						isNonImageDerivative = true;
+					}
+				}
+				
+				if (logger.isDebugEnabled()) {
+					if (docBlob == null) {
+						String msg = String.format("Could not retrieve document blob for Nuxeo document ID = '%s' CSID = '%s'",
+								repositoryId, NuxeoUtils.getCsid(documentModel));
+						logger.warn(msg);
 					}
 				}
 
