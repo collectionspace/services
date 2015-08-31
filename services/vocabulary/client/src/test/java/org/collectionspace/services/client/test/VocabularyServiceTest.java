@@ -100,8 +100,9 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
         }
     }
     
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    		dependsOnMethods = {"createItem"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    		dependsOnMethods = {"createItem"})
+    @Override
     public void createItemList(String testName) throws Exception {
     	knownAuthorityWithItems = createResource(testName, READITEMS_SHORT_IDENTIFIER);
         for (int j = 0; j < nItemsToCreateInList; j++) {
