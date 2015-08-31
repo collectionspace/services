@@ -69,7 +69,7 @@ public class MovementAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     final String SERVICE_PATH_COMPONENT = "movements";
 
     // Instance variables specific to this test.
-    final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
+    final String PERSON_AUTHORITY_NAME = "TestPersonAuthForMovementTest";
     private List<String> movementIdsCreated = new ArrayList<String>();
     private List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;

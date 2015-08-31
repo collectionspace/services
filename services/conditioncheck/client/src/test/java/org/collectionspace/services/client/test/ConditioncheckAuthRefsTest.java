@@ -64,7 +64,7 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
     // Instance variables specific to this test.
     final String SERVICE_NAME = "conditionchecks";
     final String SERVICE_PATH_COMPONENT = "conditionchecks";
-    final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
+    final String PERSON_AUTHORITY_NAME = "TestPersonAuthForConditionCheck";
     private String knownResourceId = null;
     private List<String> conditioncheckIdsCreated = new ArrayList<String>();
     private List<String> personIdsCreated = new ArrayList<String>();

@@ -50,7 +50,16 @@ public interface StorageClient {
      * @throws DocumentException
      */
     void delete(ServiceContext ctx, String id) throws DocumentNotFoundException, DocumentException;
-
+    
+    /**
+     * Delete with an NXQL 'WHERE' clause.  If multiple documents match the clause, this method delete just
+     * the first document it finds.
+     * @param ctx
+     * @param specifier
+     * @throws DocumentNotFoundException
+     * @throws DocumentException
+     */
+    void deleteWithWhereClause(ServiceContext ctx, String whereClause, DocumentHandler handler) throws DocumentNotFoundException, DocumentException;
 
     /**
      * delete a entity from the persistence store

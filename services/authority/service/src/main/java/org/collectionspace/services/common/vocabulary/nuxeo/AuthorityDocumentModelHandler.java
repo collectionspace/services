@@ -31,6 +31,8 @@ import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.RefName.Authority;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.config.service.ObjectPartType;
@@ -86,18 +88,58 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         handleDisplayNameAsShortIdentifier(wrapDoc.getWrappedObject(), authorityCommonSchemaName);
         updateRefnameForAuthority(wrapDoc, authorityCommonSchemaName);//CSPACE-3178
     }
+    
+    protected String buildWhereForShortId(String name) {
+        return authorityCommonSchemaName
+                + ":" + AuthorityJAXBSchema.SHORT_IDENTIFIER
+                + "='" + name + "'";
+    }
+    
+    private boolean isUnique(DocumentModel docModel, String schemaName) throws DocumentException {
+    	boolean result = true;
+    	
+    	ServiceContext ctx = this.getServiceContext();
+        String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER);
+    	String nxqlWhereClause = buildWhereForShortId(shortIdentifier);
+    	try {
+			DocumentWrapper<DocumentModel> searchResultWrapper = getRepositoryClient(ctx).findDoc(ctx, nxqlWhereClause);
+			if (searchResultWrapper != null) {
+				result = false;
+				if (logger.isInfoEnabled() == true) {
+					DocumentModel searchResult = searchResultWrapper.getWrappedObject();
+					String debugMsg = String.format("Could not create a new authority with a short identifier of '%s', because one already exists with the same short identifer: CSID = '%s'",
+							shortIdentifier, searchResult.getName());
+					logger.trace(debugMsg);
+				}
+			}
+		} catch (DocumentNotFoundException e) {
+			// Not a problem, just means we couldn't find another authority with that short ID
+		}
+    	
+    	return result;
+    }
 
     /**
      * If no short identifier was provided in the input payload,
-     * generate a short identifier from the display name.
+     * generate a short identifier from the display name. Either way though,
+     * the short identifier needs to be unique.
      */
     private void handleDisplayNameAsShortIdentifier(DocumentModel docModel, String schemaName) throws Exception {
         String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER);
         String displayName = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.DISPLAY_NAME);
         String shortDisplayName = "";
+        String generateShortIdentifier = null;
         if (Tools.isEmpty(shortIdentifier)) {
-            String generatedShortIdentifier = AuthorityIdentifierUtils.generateShortIdentifierFromDisplayName(displayName, shortDisplayName);
-            docModel.setProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER, generatedShortIdentifier);
+        	generateShortIdentifier = AuthorityIdentifierUtils.generateShortIdentifierFromDisplayName(displayName, shortDisplayName);
+            docModel.setProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER, shortIdentifier);
+        }
+        
+        if (isUnique(docModel, schemaName) == false) {
+        	String shortId = generateShortIdentifier == null ? shortIdentifier : generateShortIdentifier;
+        	String errMsgVerb = generateShortIdentifier == null ? "supplied" : "generated";
+        	String errMsg = String.format("The %s short identifier '%s' was not unique, so the new authority could not be created.",
+        			errMsgVerb, shortId);
+        	throw new DocumentException(errMsg);
         }
     }
  

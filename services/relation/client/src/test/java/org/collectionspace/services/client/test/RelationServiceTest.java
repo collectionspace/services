@@ -61,7 +61,7 @@ public class RelationServiceTest extends AbstractPoxServiceTestImpl<RelationsCom
 
    /** The logger. */
     private final String CLASS_NAME = RelationServiceTest.class.getName();
-    private final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
+    private final String PERSON_AUTHORITY_NAME = "TestPersonAuthForRelationTest";
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     private List<String> personIdsCreated = new ArrayList<String>();
     

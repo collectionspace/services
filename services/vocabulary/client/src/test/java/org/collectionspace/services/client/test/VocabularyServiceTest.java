@@ -23,7 +23,6 @@
 package org.collectionspace.services.client.test;
 
 import java.util.HashMap;
-import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
@@ -34,13 +33,12 @@ import org.collectionspace.services.client.VocabularyClient;
 import org.collectionspace.services.client.VocabularyClientUtils;
 import org.collectionspace.services.vocabulary.VocabulariesCommon;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommon;
-
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import javax.ws.rs.core.Response;
 
 /**
  * VocabularyServiceTest, carries out tests against a
@@ -101,6 +99,55 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
             }
         }
     }
+    
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    		dependsOnMethods = {"createItem"})
+    public void createItemList(String testName) throws Exception {
+    	knownAuthorityWithItems = createResource(testName, READITEMS_SHORT_IDENTIFIER);
+        for (int j = 0; j < nItemsToCreateInList; j++) {
+        	createItemInAuthority(knownAuthorityWithItems);
+        }
+    }    
+    
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    		dependsOnMethods = {"CRUDTests"})
+    public void createWithNonuniqueShortId(String testName) throws Exception {
+        testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
+
+        // Create a new vocabulary
+        VocabularyClient client = new VocabularyClient();
+        PoxPayloadOut multipart = VocabularyClientUtils.createEnumerationInstance(
+                "Vocab with non-unique Short Id", "nonunique", client.getCommonPartName());
+        Response res = client.create(multipart);
+        try {
+        	assertStatusCode(res, testName);
+        	String newId = extractId(res);
+        	allResourceIdsCreated.add(newId); // save this so we can cleanup after ourselves
+        } finally {
+        	if (res != null) {
+                res.close();
+            }
+        }
+        
+        //
+        // Now try to create a duplicate, we should fail because we're using a non-unique short id
+        // 
+        res = client.create(multipart);
+        try {
+        	Assert.assertTrue(res.getStatus() != STATUS_CREATED, "Expect create to fail because of non unique short identifier.");
+        } catch (AssertionError ae) {
+        	// We expected a failure, but we didn't get it.  Therefore, we need to cleanup
+        	// the vocabulary we just created.
+        	String newId = extractId(res);
+        	allResourceIdsCreated.add(newId); // save this so we can cleanup after ourselves.
+        	throw ae; // rethrow the exception
+        } finally {
+        	if (res != null) {
+                res.close();
+            }
+        }
+    }
+    
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     		dependsOnMethods = {"authorityTests"})

@@ -70,7 +70,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 
 	// Instance variables specific to this test.
 	//    final String SERVICE_PATH_COMPONENT = AcquisitionClient.SERVICE_PATH_COMPONENT;//"acquisitions";
-	final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
+	final String PERSON_AUTHORITY_NAME = "TestPersonAuthForAquisitionTest";
 	private String knownResourceId = null;
 	private List<String> acquisitionIdsCreated = new ArrayList<String>();
 	private List<String> personIdsCreated = new ArrayList<String>();

@@ -50,7 +50,6 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.io.FileUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -58,7 +57,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.w3c.dom.Document;
-
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadInputPart;
@@ -155,6 +153,29 @@ public abstract class BaseServiceTest<CLT> {
             Response.Status.OK.getStatusCode();
     protected static final int STATUS_FORBIDDEN =
             Response.Status.FORBIDDEN.getStatusCode();
+    
+    //
+    // "Global flag to cancel cleanup() method
+    //
+    private static boolean cancelCleanup = false;
+    
+    //
+    // Decide if cleanup should happen
+    //
+    protected boolean cleanupCancelled() {
+    	if (cancelCleanup == false) {
+	        String noTestCleanup = System.getProperty(NO_TEST_CLEANUP);
+	        if (Boolean.TRUE.toString().equalsIgnoreCase(noTestCleanup)) {
+	            cancelCleanup = true;
+	        }
+    	}
+        
+        return cancelCleanup;
+    }
+    
+    protected void cancelCleanup() {
+    	cancelCleanup = true;
+    }
 
     /**
      * Instantiates a new base service test.
@@ -252,6 +273,22 @@ public abstract class BaseServiceTest<CLT> {
         clearSetup();
         testExpectedStatusCode = expectedStatusCode;
         testRequestType = reqType;
+    }
+    
+    protected long randomPause(Random randomGenerator, long maxPauseMillis) {
+    	long result = 0;
+    	
+    	if (maxPauseMillis != 0) {	    	
+	    	try {
+				Thread.sleep(result = randomGenerator.nextInt(500));
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				result = -1;
+			}
+    	}
+    	
+    	return result;
     }
 
     /**
@@ -700,13 +737,13 @@ public abstract class BaseServiceTest<CLT> {
      */
     @AfterClass(alwaysRun = true)
     public void cleanUp() {
-        String noTestCleanup = System.getProperty(NO_TEST_CLEANUP);
-        if (Boolean.TRUE.toString().equalsIgnoreCase(noTestCleanup)) {
+        if (cleanupCancelled() == true) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Skipping Cleanup phase ...");
             }
             return;
         }
+        
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }

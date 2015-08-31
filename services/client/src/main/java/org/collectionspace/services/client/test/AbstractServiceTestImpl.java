@@ -1117,7 +1117,8 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
                 //
                 // Get the total count of non-deleted existing records
                 //
-                String parentCsid = this.createTestObject("REM_" + testName);
+            	String identifier = String.format("Test_Workflow_%d", System.currentTimeMillis());
+                String parentCsid = this.createTestObject(identifier);
 
                 //
                 // Create 3 new items

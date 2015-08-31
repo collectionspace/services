@@ -26,6 +26,7 @@
 			<binaryStore path=""/> <!-- Default value will be repository/database name.  Can be partial or full system path.  Partial path is relative to Nuxeo's data dir -->
 			<xa-datasource>@XA_DATASOURCE@</xa-datasource> <!-- The transactional datasource for Nuxeo -->
 			<noDDL>false</noDDL>
+			<sqlInitFile>vcsconfig.sql.txt</sqlInitFile> <!-- see https://doc.nuxeo.com/display/ADMINDOC/VCS+Configuration#VCSConfiguration-DatabaseCreationOption -->		
 			<aclOptimizations enabled="true"/>
 			<pathOptimizations enabled="true"/>
 			<idType>varchar</idType>

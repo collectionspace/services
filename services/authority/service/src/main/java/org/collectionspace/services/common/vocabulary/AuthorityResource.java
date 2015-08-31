@@ -347,20 +347,29 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     }
 
 
-    @POST													//FIXME: REM - 5/1/2012 - We can probably remove this method.
-    public Response createAuthority(String xmlPayload) { 	//REM - This method is never reached by the JAX-RS client -instead the "create" method in ResourceBase.java is getting called.
-        try {
-            PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
-            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
-            String csid = getRepositoryClient(ctx).create(ctx, handler);
-            UriBuilder path = UriBuilder.fromResource(resourceClass);
-            path.path("" + csid);
-            Response response = Response.created(path.build()).build();
-            return response;
-        } catch (Exception e) {
-            throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
-        }
+    @POST
+    public Response createAuthority(String xmlPayload) {
+    	//
+    	// Requests to create new authorities come in on new threads. Unfortunately, we need to synchronize those threads on this block because, as of 8/27/2015, we can't seem to get Nuxeo
+    	// transaction code to deal with a database level UNIQUE constraint violations on the 'shortidentifier' column of the vocabularies_common table.
+    	// Therefore, to prevent having multiple authorities with the same shortid, we need to synchronize
+    	// the code that creates new authorities.  The authority document model handler will first check for authorities with the same short id before
+    	// trying to create a new authority.
+    	//
+    	synchronized(AuthorityResource.class) {
+	        try {
+	            PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
+	            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
+	            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
+	            String csid = getRepositoryClient(ctx).create(ctx, handler);
+	            UriBuilder path = UriBuilder.fromResource(resourceClass);
+	            path.path("" + csid);
+	            Response response = Response.created(path.build()).build();
+	            return response;
+	        } catch (Exception e) {
+	            throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
+	        }
+    	}
     }
 
     protected String buildWhereForAuthByName(String name) {
@@ -504,9 +513,10 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * 
      * @return the response
      */
-    @DELETE
+    @Deprecated
+//    @DELETE
     @Path("{csid}")
-    public Response deleteAuthority(@PathParam("csid") String csid) {
+    public Response old_deleteAuthority(@PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("deleteAuthority with csid=" + csid);
         }
@@ -520,6 +530,49 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, csid);
         }
     }
+    
+    /**
+     * Delete authority
+     * 
+     * @param csid the csid or a URN specifier form -e.g., urn:cspace:name(OurMuseumPersonAuthority)
+     * 
+     * @return the response
+     */
+    @DELETE
+    @Path("{csid}")
+    public Response deleteAuthority(
+            @Context Request request,
+            @Context UriInfo ui,
+            @PathParam("csid") String specifier) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("deleteAuthority with specifier=" + specifier);
+        }
+        
+        try {
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
+            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
+
+            Specifier spec = getSpecifier(specifier, "getAuthority", "GET");
+            if (spec.form == SpecifierForm.CSID) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("deleteAuthority with csid=" + spec.value);
+                }
+                ensureCSID(spec.value, ServiceMessages.DELETE_FAILED, "Authority.csid");
+                getRepositoryClient(ctx).delete(ctx, spec.value, handler);
+            } else {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("deleteAuthority with specifier=" + spec.value);
+                }            	
+                String whereClause = buildWhereForAuthByName(spec.value);
+                getRepositoryClient(ctx).deleteWithWhereClause(ctx, whereClause, handler);
+            }
+            
+            return Response.status(HttpResponseCodes.SC_OK).build();
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.DELETE_FAILED, specifier);
+        }
+    }
+    
 
     /*************************************************************************
      * Create an AuthorityItem - this is a sub-resource of Authority

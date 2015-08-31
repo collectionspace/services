@@ -2,6 +2,7 @@ package org.collectionspace.services.nuxeo.client.java;
 
 import java.security.Principal;
 
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -12,10 +13,30 @@ import org.nuxeo.ecm.core.api.NoRollbackOnException;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.api.impl.LifeCycleFilter;
 import org.nuxeo.ecm.core.api.CoreSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CoreSessionWrapper implements CoreSessionInterface {
 
 	private CoreSession repoSession;
+	
+    /** The logger. */
+    private static Logger logger = LoggerFactory.getLogger(CoreSessionWrapper.class);
+    
+    private void logQuery(String query) {
+    	logger.debug(String.format("NXQL: %s", query));
+    }
+    
+    private void logQuery(String query, String queryType) {
+    	logger.debug(String.format("Query Type: '%s' NXQL: %s", queryType, query));
+    }
+    
+    private void logQuery(String query, Filter filter, long limit,
+    		long offset, boolean countTotal) {
+    	logger.debug(String.format("Filter: '%s', Limit: '%d', Offset: '%d', Count Total?: %b, NXQL: %s",
+    			filter != null ? filter.toString() : "none", limit, offset, countTotal, query));
+    }
+    
 	
 	public CoreSessionWrapper(CoreSession repoSession) {
 		this.repoSession = repoSession;
@@ -71,22 +92,26 @@ public class CoreSessionWrapper implements CoreSessionInterface {
 	@Override
 	public IterableQueryResult queryAndFetch(String query, String queryType,
             Object... params) throws ClientException {
+		logQuery(query, queryType);
 		return repoSession.queryAndFetch(query, queryType, params);
 	}
 
 	@Override
 	public DocumentModelList query(String query, Filter filter, long limit,
             long offset, boolean countTotal) throws ClientException {
+		logQuery(query, filter, limit, offset, countTotal);
 		return repoSession.query(query, filter, limit, offset, countTotal);
 	}
 
 	@Override
     public DocumentModelList query(String query, int max) throws ClientException {
+		logQuery(query);
     	return repoSession.query(query, max);
     }
     
 	@Override
 	public DocumentModelList query(String query) throws ClientException {
+		logQuery(query);
 		return repoSession.query(query);
 	}
 	

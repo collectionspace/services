@@ -19,7 +19,9 @@ package org.collectionspace.services.common.storage.jpa;
 
 import java.util.Date;
 import java.util.List;
+
 import javax.persistence.RollbackException;
+
 import java.sql.BatchUpdateException;
 
 import javax.persistence.EntityManager;
@@ -35,13 +37,11 @@ import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.document.JaxbUtils;
-
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.context.ServiceContextProperties;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.lifecycle.TransitionDef;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -585,5 +585,12 @@ public class JpaStorageClientImpl implements StorageClient {
 			throws BadRequestException, DocumentNotFoundException,
 			DocumentException {
 		// Do nothing.  JPA services do not support workflow.
+	}
+
+	@Override
+	public void deleteWithWhereClause(ServiceContext ctx, String whereClause,
+			DocumentHandler handler) throws DocumentNotFoundException,
+			DocumentException {
+        throw new UnsupportedOperationException();
 	}
 }

@@ -67,7 +67,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     // Instance variables specific to this test.
-    final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
+    final String PERSON_AUTHORITY_NAME = "TestPersonAuthForOrgTest";
     final String ORG_AUTHORITY_NAME = "TestOrgAuth";
     
 	@Override

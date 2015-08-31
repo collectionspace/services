@@ -58,6 +58,8 @@ public final class NuxeoClientEmbedded {
     private RepositoryManager repositoryMgr;
 
     private static final NuxeoClientEmbedded instance = new NuxeoClientEmbedded();
+
+	private static final int MAX_CREATE_TRANSACTION_ATTEMPTS = 5;
         
     /**
      * Constructs a new NuxeoClient. NOTE: Using {@link #getInstance()} instead
@@ -128,7 +130,54 @@ public final class NuxeoClientEmbedded {
      */
     public CoreSessionInterface openRepository(String repoName) throws Exception {
         return openRepository(repoName, ServiceContext.DEFAULT_TX_TIMEOUT);
-    }    
+    }
+    
+    private boolean startTransaction() {
+    	boolean startedTransaction = false;
+    	int attempts = 0;
+    	
+    	if (TransactionHelper.isTransactionActive() == false) {
+        	while (startedTransaction == false && attempts <= MAX_CREATE_TRANSACTION_ATTEMPTS) {        		
+        		try {
+        			startedTransaction = TransactionHelper.startTransaction();
+        		} catch (Exception e) {
+        			String traceMsg = String.format("Could not start a new transaction on thread '%d'", Thread.currentThread().getId());
+        			logger.trace(traceMsg);
+        			boolean txState = TransactionHelper.isTransactionActive();
+        			txState = TransactionHelper.isNoTransaction();
+        			txState = TransactionHelper.isTransactionActiveOrMarkedRollback();
+        			txState = TransactionHelper.isTransactionMarkedRollback();
+        		}
+        		
+    	    	if (startedTransaction == false) {
+    	    		long currentThreadId = Thread.currentThread().getId();
+        			boolean txState = TransactionHelper.isTransactionActive();
+        			txState = TransactionHelper.isNoTransaction();
+        			txState = TransactionHelper.isTransactionActiveOrMarkedRollback();
+        			txState = TransactionHelper.isTransactionMarkedRollback();
+        			
+        			if (TransactionHelper.isTransactionActiveOrMarkedRollback() == true) {
+        				try {
+        					TransactionHelper.commitOrRollbackTransaction();
+        				} catch (Exception e) {
+        					logger.error("Could not commit or rollback transaction.", e);
+        				}
+        			}
+    	    	}
+    			attempts++;
+        	}
+    	} else {
+    		logger.warn("A request to start a new transaction was made, but a transaction is already open.");
+    		startedTransaction = true;
+    	}
+    		
+		if (startedTransaction == false) {
+			String errMsg = String.format("Attempted %d time(s) to start a new transaction, but failed.", attempts);
+    		logger.error(errMsg);
+        }
+
+		return startedTransaction;
+    }
 
     public CoreSessionInterface openRepository(String repoName, int timeoutSeconds) throws Exception {
     	CoreSessionInterface result = null;
@@ -157,9 +206,10 @@ public final class NuxeoClientEmbedded {
     	//
     	boolean startedTransaction = false;
     	if (TransactionHelper.isTransactionActive() == false) {
-	    	startedTransaction = TransactionHelper.startTransaction();
+    		startedTransaction = startTransaction();
 	    	if (startedTransaction == false) {
-	    		String errMsg = "Could not start a Nuxeo transaction with the TransactionHelper class.";
+	    		String errMsg = String.format("Could not start a Nuxeo transaction with the TransactionHelper class on thread '%d'.",
+	    				Thread.currentThread().getId());
 	    		logger.error(errMsg);
 	    		throw new Exception(errMsg);
 	    	}
@@ -190,12 +240,17 @@ public final class NuxeoClientEmbedded {
         	logger.trace(String.format("Added a new repository instance to our repo list.  Current count is now: %d",
         			repositoryInstances.size()));
         } else {
+        	//
+        	// If we couldn't open a repo session, we need to close the transaction we started.
+        	//
+        	if (startedTransaction == true) {
+        		TransactionHelper.commitOrRollbackTransaction();
+        	}
         	String errMsg = String.format("Could not open a session to the Nuxeo repository='%s'", repoName);
         	logger.error(errMsg);
         	throw new Exception(errMsg);
         }    	
     	
-        
         return result;
     }
     
@@ -259,15 +314,18 @@ public final class NuxeoClientEmbedded {
     	String key = repoSession.getSessionId();
     	String name = repoSession.getRepositoryName();
 
+    	//
+    	// The caller should have already called the .save() method, but just in
+    	// case they didn't, let's try calling it again.
+    	//
         try {
         	repoSession.save();
-        	repoSession.close();
         } catch (Exception e) {
-        	String errMsg = String.format("Possible data loss.  Could not save and/or close the Nuxeo repository name = '%s'.",
-        			name);
-        	logger.error(errMsg, e);
+        	String errMsg = String.format("Possible data loss.  Could not save and/or close the Nuxeo repository name = '%s'.", name);
+        	logger.trace(errMsg, e);
         	throw e;
         } finally {
+        	repoSession.close();
         	CoreSessionInterface wasRemoved = repositoryInstances.remove(key);
             if (logger.isTraceEnabled()) {
             	if (wasRemoved != null) {
@@ -283,9 +341,11 @@ public final class NuxeoClientEmbedded {
             //
             if (TransactionHelper.isTransactionActiveOrMarkedRollback() == true) {
             	TransactionHelper.commitOrRollbackTransaction();
-            	UserTransaction ut = TransactionHelper.lookupUserTransaction();
-            	TransactionManager tm = TransactionHelper.lookupTransactionManager();            	
             	logger.trace(String.format("Transaction closed on thread '%d'", Thread.currentThread().getId()));
+            } else {
+            	String warnMsg = String.format("Closed a Nuxeo repository session on thread '%d' without closing the containing transaction.",
+            			Thread.currentThread().getId());
+            	logger.warn(warnMsg);
             }
         }
     }    
