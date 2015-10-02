@@ -15,8 +15,6 @@ public class StructuredDate {
 	// to true.
 	public static final boolean DEFAULT_SCALAR_VALUES_COMPUTED = true;
 	
-	private static final StructuredDateEvaluator evaluator = new ANTLRStructuredDateEvaluator();
-	
 	private String displayDate;
 	private String note;
 	private String association;
@@ -160,6 +158,8 @@ public class StructuredDate {
 	}
 	
 	public static StructuredDate parse(String displayDate) throws StructuredDateFormatException {
+		StructuredDateEvaluator evaluator = new ANTLRStructuredDateEvaluator();
+		
 		return evaluator.evaluate(displayDate);
 	}
 
