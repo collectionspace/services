@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.concept</artifactId>
-        <version>4.1.1</version>
+        <version>4.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -32,8 +32,7 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
             <optional>true</optional>
-            <version>${project.version}</version>
-        </dependency>        
+            </dependency>        
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.concept.jaxb</artifactId>

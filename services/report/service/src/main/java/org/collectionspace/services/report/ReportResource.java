@@ -33,7 +33,7 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.ReportClient;
 import org.collectionspace.services.common.CSWebApplicationException;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -65,7 +65,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 @Consumes("application/xml")
 @Produces("application/xml")
 //@Produces("application/xml;charset=UTF-8")
-public class ReportResource extends ResourceBase {
+public class ReportResource extends NuxeoBasedResource {
     private static String REPOSITORY_NAME = JDBCTools.NUXEO_DATASOURCE_NAME;
     private static String REPORTS_FOLDER = "reports";
     private static String CSID_LIST_SEPARATOR = ",";

@@ -24,10 +24,10 @@
 package org.collectionspace.services.valuationcontrol.nuxeo;
 
 import org.collectionspace.services.valuationcontrol.ValuationcontrolsCommon;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 
 /** ValuationcontrolDocumentModelHandler
  */
 public class ValuationcontrolDocumentModelHandler
-        extends DocHandlerBase<ValuationcontrolsCommon> {
+        extends NuxeoDocumentModelHandler<ValuationcontrolsCommon> {
 }

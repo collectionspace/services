@@ -34,6 +34,7 @@
     For example java:comp/env/jdbc/nxsqldirectory This means you need to update corresponding
     JNDI bindings in nuxeo data source definitions in the config directory -->
 
+<!-- 
     <ResourceLink name="jdbc/nxsqldirectory" global="jdbc/nuxeo" type="javax.sql.DataSource"/>
     <ResourceLink name="jdbc/nxrelations-default-jena" global="jdbc/nuxeo" type="javax.sql.DataSource"/>
     <ResourceLink name="jdbc/comment-relations" global="jdbc/nuxeo" type="javax.sql.DataSource"/>
@@ -42,7 +43,11 @@
     <ResourceLink name="jdbc/placeful_service_ds" global="jdbc/nuxeo" type="javax.sql.DataSource"/>
     <ResourceLink name="jdbc/nxwebwidgets" global="jdbc/nuxeo" type="javax.sql.DataSource"/>
     <ResourceLink name="jdbc/nxuidsequencer" global="jdbc/nuxeo" type="javax.sql.DataSource"/>
+ -->
 
+  <Listener className="org.nuxeo.runtime.tomcat.ContextSecurityGrabber" />
+
+<!-- 
     <Resource name="TransactionManager" auth="Container" type="javax.transaction.TransactionManager"
         factory="org.nuxeo.runtime.jtajca.NuxeoTransactionManagerFactory"
         transactionTimeoutSeconds="86400"/>
@@ -58,6 +63,12 @@
         mail.transport.protocol="smtp" mail.smtp.host="localhost" mail.smtp.port="25"
         mail.smtp.starttls.enable="false" mail.smtp.auth="false" mail.smtp.user="anonymous"
         password="password" mail.from="noreply@nuxeo.com" mail.debug="false"/>
+-->
+
+  <Resource name="TransactionManager" auth="Container"
+    type="javax.transaction.TransactionManager" factory="org.nuxeo.runtime.jtajca.NuxeoTransactionManagerFactory"
+    transactionTimeoutSeconds="300" />
+  <Transaction factory="org.nuxeo.runtime.jtajca.NuxeoUserTransactionFactory" />
 
     <!-- 
 		For CollectionSpace services
@@ -76,7 +87,7 @@
 		validationQuery="SELECT 1"
 		logAbandoned="true"/>
 		
-	<Resource name="jdbc/NuxeoDS"
+	<Resource name="jdbc/NuxeoDS_CS"
 		auth="Container"
 		type="javax.sql.DataSource"
 		username="${db.nuxeo.user}"

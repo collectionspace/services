@@ -85,7 +85,7 @@ public class CitationAuthorityClientUtils {
     	PoxPayloadOut multipart = 
     		createCitationInstance(commonPartXML, client.getItemCommonPartName());
     	String newID = null;
-    	ClientResponse<Response> res = client.createItem(vcsid, multipart);
+    	Response res = client.createItem(vcsid, multipart);
         try {
 	    	int statusCode = res.getStatus();
 	
@@ -100,7 +100,7 @@ public class CitationAuthorityClientUtils {
 	    	}
 	        newID = extractId(res);
         } finally {
-        	res.releaseConnection();
+        	res.close();
         }
 
     	return newID;
@@ -120,7 +120,7 @@ public class CitationAuthorityClientUtils {
     	return createItemInAuthority(vcsid, commonPartXML, client );
     }    
 
-    public static String extractId(ClientResponse<Response> res) {
+    public static String extractId(Response res) {
         MultivaluedMap<String, Object> mvm = res.getMetadata();
         String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
         if(logger.isDebugEnabled()){

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>org.collectionspace.services.main</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>4.1.1</version>
+        <version>4.3-SNAPSHOT</version>
     </parent>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.common-test</artifactId>
     <name>services.common-test</name>
     <url>http://maven.apache.org</url>

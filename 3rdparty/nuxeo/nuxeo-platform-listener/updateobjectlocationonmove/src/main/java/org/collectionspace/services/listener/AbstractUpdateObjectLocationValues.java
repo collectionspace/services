@@ -3,16 +3,21 @@ package org.collectionspace.services.listener;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+
 import org.nuxeo.ecm.core.api.ClientException;
-import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.EventListener;
@@ -49,7 +54,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
     private final static String ACTIVE_DOCUMENT_WHERE_CLAUSE_FRAGMENT =
             "AND (ecm:currentLifeCycleState <> 'deleted') "
             + NONVERSIONED_NONPROXY_DOCUMENT_WHERE_CLAUSE_FRAGMENT;
-
+    
     public enum EventNotificationDocumentType {
         // Document type about which we've received a notification
 
@@ -58,6 +63,10 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
 
     @Override
     public void handleEvent(Event event) throws ClientException {
+    
+        boolean isAboutToBeRemovedEvent = false;
+        String movementCsidToFilter = "";
+        String eventType = "";
 
         logger.trace("In handleEvent in UpdateObjectLocationOnMove ...");
 
@@ -72,6 +81,14 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
         DocumentEventContext docEventContext = (DocumentEventContext) eventContext;
         DocumentModel docModel = docEventContext.getSourceDocument();
 
+        eventType = event.getName();
+        if (logger.isTraceEnabled()) {
+            logger.trace("A(n) " + eventType + " event was received by UpdateObjectLocationOnMove ...");
+        }
+        if (eventType.equals(DocumentEventTypes.ABOUT_TO_REMOVE)) {
+            isAboutToBeRemovedEvent = true;
+        }
+
         // If this document event involves a Relation record, does this pertain to
         // a relationship between a Movement record and a CollectionObject record?
         //
@@ -81,20 +98,30 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
 
         //
         // (The rest of the code flow below is then identical to that which
-        // is followed when this document event involves a Movement record.
+        // is followed when this document event involves a Movement record.)
         String movementCsid = "";
-        Enum notificationDocumentType;
+        Enum<EventNotificationDocumentType> notificationDocumentType;
         if (documentMatchesType(docModel, RELATION_DOCTYPE)) {
             if (logger.isTraceEnabled()) {
                 logger.trace("An event involving a Relation document was received by UpdateObjectLocationOnMove ...");
             }
-            // Get a Movement CSID from the Relation record. (If we can't
-            // get it, then we don't have a pertinent relation record.)
+            // Get a Movement CSID from the Relation record.
+            //
+            // If we can't get it - if this Relation doesn't involve a
+            // Movement - then we don't have a pertinent relation record
+            // that can be processed by this event listener / handler.)
             movementCsid = getCsidForDesiredDocTypeFromRelation(docModel, MOVEMENT_DOCTYPE, COLLECTIONOBJECT_DOCTYPE);
             if (Tools.isBlank(movementCsid)) {
                 logger.warn("Could not obtain CSID for Movement record from document event.");
                 logger.warn(NO_FURTHER_PROCESSING_MESSAGE);
                 return;
+            }
+            // If this Relation record is about to be (hard) deleted, set aside
+            // the CSID for the Movement record to which it pertains, so it can
+            // be filtered out in all subsequent processing of the pertinent
+            // Cataloging record's computed current location.
+            if (isAboutToBeRemovedEvent) {
+                movementCsidToFilter = movementCsid;
             }
             notificationDocumentType = EventNotificationDocumentType.RELATION;
         } else if (documentMatchesType(docModel, MOVEMENT_DOCTYPE)) {
@@ -111,6 +138,12 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
                 logger.warn("Could not obtain CSID for Movement record from document event.");
                 logger.warn(NO_FURTHER_PROCESSING_MESSAGE);
                 return;
+            }
+            // If this Movement record is about to be (hard) deleted, set aside
+            // its CSID so it can be filtered out in all subsequent processing
+            // of the pertinent Cataloging record's computed current location.
+            if (isAboutToBeRemovedEvent) {
+                movementCsidToFilter = movementCsid;
             }
             notificationDocumentType = EventNotificationDocumentType.MOVEMENT;
         } else {
@@ -141,7 +174,9 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
             logger.trace("Notification document type=" + notificationDocumentType.name());
         }
 
-        CoreSession coreSession = docEventContext.getCoreSession();
+        // All Nuxeo sessions that get passed around to CollectionSpace code need to be
+        // wrapped inside of a CoreSessionWrapper
+        CoreSessionInterface coreSession = new CoreSessionWrapper(docEventContext.getCoreSession());
         Set<String> collectionObjectCsids = new HashSet<>();
 
         if (notificationDocumentType == EventNotificationDocumentType.RELATION) {
@@ -160,7 +195,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
             return;
         } else {
             if (logger.isTraceEnabled()) {
-                logger.trace("Found " + collectionObjectCsids.size() + " CSIDs of related CollectionObject records.");
+                logger.trace("Found " + collectionObjectCsids.size() + " CSID(s) of related CollectionObject records.");
             }
         }
         // Iterate through the list of CollectionObject CSIDs found.
@@ -188,13 +223,20 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
                 continue;
             }
             // Get the CollectionObject's most recent, related Movement.
-            mostRecentMovementDocModel = getMostRecentMovement(coreSession, collectionObjectCsid);
+            mostRecentMovementDocModel = getMostRecentMovement(coreSession, collectionObjectCsid,
+                    isAboutToBeRemovedEvent, movementCsidToFilter);
             if (mostRecentMovementDocModel == null) {
                 continue;
             }
             // Update the CollectionObject with values from that Movement.
             collectionObjectDocModel =
                     updateCollectionObjectValuesFromMovement(collectionObjectDocModel, mostRecentMovementDocModel);
+            if (logger.isTraceEnabled()) {
+                String computedCurrentLocationRefName =
+                        (String) collectionObjectDocModel.getProperty(COLLECTIONOBJECTS_COMMON_SCHEMA,
+                        COMPUTED_CURRENT_LOCATION_PROPERTY);
+                logger.trace("computedCurrentLocation refName after value update=" + computedCurrentLocationRefName);
+            }
             coreSession.saveDocument(collectionObjectDocModel);
         }
     }
@@ -210,7 +252,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
      * related to the Movement record.
      */
     private Set<String> getCollectionObjectCsidsRelatedToMovement(String movementCsid,
-            CoreSession coreSession) throws ClientException {
+            CoreSessionInterface coreSession) throws ClientException {
 
         Set<String> csids = new HashSet<>();
 
@@ -314,7 +356,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
      * @return a document model for the document identified by the supplied
      * CSID.
      */
-    protected static DocumentModel getCurrentDocModelFromCsid(CoreSession session, String collectionObjectCsid) {
+    protected static DocumentModel getCurrentDocModelFromCsid(CoreSessionInterface session, String collectionObjectCsid) {
         DocumentModelList collectionObjectDocModels = null;
         try {
             final String query = "SELECT * FROM "
@@ -361,11 +403,18 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
      *
      * @param session a repository session.
      * @param collectionObjectCsid a CollectionObject identifier (CSID)
+     * @param isAboutToBeRemovedEvent whether the current event involves a
+     * record that is slated for removal (hard deletion)
+     * @param movementCsidToFilter the CSID of a Movement record slated for
+     * deletion, or of a Movement record referenced by a Relation record slated
+     * for deletion. This record should be filtered out, prior to returning the
+     * most recent Movement record.
      * @throws ClientException
      * @return the most recent Movement record related to the CollectionObject
      * identified by the supplied CSID.
      */
-    protected static DocumentModel getMostRecentMovement(CoreSession session, String collectionObjectCsid)
+    protected static DocumentModel getMostRecentMovement(CoreSessionInterface session, String collectionObjectCsid,
+            boolean isAboutToBeRemovedEvent, String aboutToBeRemovedMovementCsidToFilter)
             throws ClientException {
         DocumentModel mostRecentMovementDocModel = null;
         // Get Relation records for Movements related to this CollectionObject.
@@ -429,6 +478,17 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
             }
             if (logger.isTraceEnabled()) {
                 logger.trace("Related movement CSID=" + relatedMovementCsid);
+            }
+            // If our event involves a Movement record that is about to be
+            // (hard) deleted, or a Movement record referenced by a Relation
+            // record that is about to be (hard) deleted, filter out that record.
+            if (isAboutToBeRemovedEvent && Tools.notBlank(aboutToBeRemovedMovementCsidToFilter)) {
+                if (relatedMovementCsid.equals(aboutToBeRemovedMovementCsidToFilter)) {
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("Skipping about-to-be-deleted Movement record or referenced, related Movement record ...");
+                    }
+                    continue;
+                }
             }
             movementDocModel = getCurrentDocModelFromCsid(session, relatedMovementCsid);
             if (movementDocModel == null) {

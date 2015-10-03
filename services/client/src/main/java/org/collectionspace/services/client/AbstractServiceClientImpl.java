@@ -23,29 +23,70 @@
  */
 package org.collectionspace.services.client;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.Properties;
 
 import javax.ws.rs.PathParam;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.ClientRequestContext;
+import javax.ws.rs.client.ClientRequestFilter;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope; //import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
-
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-
 import org.jboss.resteasy.client.ClientResponse; //import org.collectionspace.services.common.context.ServiceContext;
 import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
+import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+//import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+/**
+ * Private class for JAX-RS authentication
+ */
+class Authenticator implements ClientRequestFilter {
+
+    private final String user;
+    private final String password;
+
+    public Authenticator(String user, String password) {
+        this.user = user;
+        this.password = password;
+    }
+
+    @Override
+    public void filter(ClientRequestContext requestContext) throws IOException {
+        MultivaluedMap<String, Object> headers = requestContext.getHeaders();
+        final String basicAuthentication = getBasicAuthentication();
+        headers.add("Authorization", basicAuthentication);
+
+    }
+
+    private String getBasicAuthentication() {
+    	String result = null;
+        String token = this.user + ":" + this.password;
+        try {
+            result = "Basic " + DatatypeConverter.printBase64Binary(token.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException ex) {
+            throw new IllegalStateException("Cannot encode with UTF-8", ex);
+        }
+        
+        return result;
+    }
+}
+
 
 /**
  * BaseServiceClient is an abstract base client of all service clients FIXME:
@@ -75,6 +116,8 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
     private URL url;
     /** The http client. */
     private HttpClient httpClient;
+    private org.apache.http.client.HttpClient httpClient4;
+
     /** The RESTEasy proxy */
     private P proxy;
 
@@ -147,6 +190,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
     protected AbstractServiceClientImpl() {
         readProperties();
         setupHttpClient();
+        setupHttpClient4(); // temp fix for CSPACE-6281
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         RegisterBuiltin.register(factory);
         setProxy();        
@@ -221,6 +265,10 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
         return httpClient;
     }
 
+    public org.apache.http.client.HttpClient getHttpClient4() {
+        return httpClient4;
+    }
+    
     /*
      * (non-Javadoc)
      *
@@ -342,6 +390,40 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
     		e.printStackTrace();
     	}
     }
+    
+    /*
+     * This is a temp fix for RESTEasy upgrade in CSPACE-6281.  The long-term solution will be to use
+     * the non-deprecated approach per the RESTEasy documentation.
+     */
+    public void setupHttpClient4() {
+    	try {
+	        this.httpClient4 = new DefaultHttpClient();
+	        if (useAuth()) {
+	            String user = properties.getProperty(USER_PROPERTY);
+	            String password = properties.getProperty(PASSWORD_PROPERTY);
+	            if (logger.isDebugEnabled()) {
+	                logger.debug("setupHttpClient() using url=" + url + " user="
+	                        + user + " password=" + password);
+	            }
+	
+	            httpClient.getState().setCredentials(
+	                    new AuthScope(url.getHost(), url.getPort(),
+	                    AuthScope.ANY_REALM),
+	                    new UsernamePasswordCredentials(user, password));
+	            // JAXRS client library requires HTTP preemptive authentication
+	            httpClient.getParams().setAuthenticationPreemptive(true);
+	            if (logger.isDebugEnabled()) {
+	                logger.debug("setupHttpClient: set preemptive authentication");
+	            }
+	        } else {
+	            if (logger.isDebugEnabled()) {
+	                logger.debug("setupHttpClient() : no auth mode!");
+	            }
+	        }
+    	} catch (Throwable e) {
+    		e.printStackTrace();
+    	}
+    }    
 
     /*
      * (non-Javadoc)
@@ -365,10 +447,30 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      */
     @Override
 	public void setProxy() {
+    	ResteasyClient client = null;
+        String urlString = url.toString();
+    	Class<P> proxyClass = this.getProxyClass();
+    	
+        if (useAuth()) {
+            String user = properties.getProperty(USER_PROPERTY);
+            String password = properties.getProperty(PASSWORD_PROPERTY);
+        	client = (ResteasyClient)ClientBuilder.newClient().register(new Authenticator(user, password));
+        } else {
+        	client = (ResteasyClient)ClientBuilder.newClient();
+        }
+        
+        proxy = client.target(urlString).proxy(proxyClass);
+    }
+    
+    /**
+     * allow to reset proxy as per security needs
+     */
+    @Deprecated
+	public void _setProxy() {
     	Class<P> proxyClass = this.getProxyClass();
         if (useAuth()) {
             proxy = ProxyFactory.create(proxyClass,
-                    getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));
+                    getBaseURL(), new ApacheHttpClient4Executor(getHttpClient4()));
         } else {
         	proxy = ProxyFactory.create(proxyClass,
                     getBaseURL());
@@ -397,6 +499,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
             removeProperty(CollectionSpaceClient.AUTH_PROPERTY);
         }
         setupHttpClient();
+        setupHttpClient(); // temp fix for CSPACE-6281
         setProxy();
     }
     
@@ -410,7 +513,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#delete(java.lang.String)
      */
     @Override
-	public ClientResponse<Response> delete(String csid) {
+	public Response delete(String csid) {
         return getProxy().delete(csid);
     }
 
@@ -420,17 +523,17 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      * @see org.collectionspace.services.client.BlobProxy#getAuthorityRefs(java.lang.String)
      */
     @Override
-	public ClientResponse<AuthorityRefList> getAuthorityRefs(String csid) {
+	public Response getAuthorityRefs(String csid) { // Response.getEntity returns AuthorityRefList type
         return getProxy().getAuthorityRefs(csid);
     }
     
     @Override
-	public ClientResponse<String> getWorkflow(String csid) {
+	public Response getWorkflow(String csid) {
     	return getProxy().getWorkflow(csid);
     }
     
     @Override
-	public ClientResponse<String> updateWorkflowWithTransition(String csid, String workflowTransition) {
+	public Response updateWorkflowWithTransition(String csid, String workflowTransition) {
     	return getProxy().updateWorkflowWithTransition(csid, workflowTransition);
     }        
     
@@ -449,7 +552,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      * .lang.String, java.lang.String)
      */
     @Override
-    public ClientResponse<CLT> readList(Long pageSize,
+    public Response readList(Long pageSize,
     		Long pageNumber) {
         return getProxy().readList(pageSize, pageNumber);
     }
@@ -462,7 +565,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      * .lang.String, java.lang.String)
      */
     @Override
-    public ClientResponse<CLT> readList(String sortBy, Long pageSize,
+    public Response readList(String sortBy, Long pageSize,
             Long pageNumber) {
         return getProxy().readList(sortBy, pageSize, pageNumber);
     }

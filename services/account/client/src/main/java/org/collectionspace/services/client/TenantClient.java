@@ -27,7 +27,6 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 
 import org.collectionspace.services.account.Tenant;
 import org.collectionspace.services.account.TenantsList;
@@ -69,11 +68,11 @@ public class TenantClient extends AbstractServiceClientImpl<TenantsList, Tenant,
      * @return response
      * @see org.collectionspace.hello.client.TenantProxy#readList()
      */
-    public ClientResponse<TenantsList> readList() {
+    public Response readList() {
         return getProxy().readList();
     }
 
-    public ClientResponse<TenantsList> readSearchList(String name, String disabled) {
+    public Response readSearchList(String name, String disabled) {
         return getProxy().readSearchList(name, disabled);
     }
 
@@ -82,7 +81,7 @@ public class TenantClient extends AbstractServiceClientImpl<TenantsList, Tenant,
      * @return response
      * @see org.collectionspace.hello.client.TenantProxy#getTenant(java.lang.String)
      */
-    public ClientResponse<Tenant> read(String id) {
+    public Response read(String id) {
         return getProxy().read(id);
     }
 
@@ -92,7 +91,7 @@ public class TenantClient extends AbstractServiceClientImpl<TenantsList, Tenant,
      * @return response
      * @see org.collectionspace.hello.client.TenantProxy#create(org.collectionspace.services.account.Tenant)
      */
-    public ClientResponse<Response> create(Tenant multipart) {
+    public Response create(Tenant multipart) {
         return getProxy().create(multipart);
     }
 
@@ -103,7 +102,7 @@ public class TenantClient extends AbstractServiceClientImpl<TenantsList, Tenant,
      * @return response
      * @see org.collectionspace.hello.client.TenantProxy#updateTenant(java.lang.Long, org.collectionspace.services.account.Tenant)
      */
-    public ClientResponse<Tenant> update(String id, Tenant multipart) {
+    public Response update(String id, Tenant multipart) {
         return getProxy().update(id, multipart);
     }
 }

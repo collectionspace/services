@@ -23,7 +23,6 @@
 package org.collectionspace.services.client.test;
 
 import java.util.HashMap;
-import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
@@ -34,13 +33,12 @@ import org.collectionspace.services.client.VocabularyClient;
 import org.collectionspace.services.client.VocabularyClientUtils;
 import org.collectionspace.services.vocabulary.VocabulariesCommon;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommon;
-
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import javax.ws.rs.core.Response;
 
 /**
  * VocabularyServiceTest, carries out tests against a
@@ -92,15 +90,65 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
         VocabularyClient client = new VocabularyClient();
         PoxPayloadOut multipart = VocabularyClientUtils.createEnumerationInstance(
                 "Vocab with Bad Short Id", "Bad Short Id!", client.getCommonPartName());
-        ClientResponse<Response> res = client.create(multipart);
+        Response res = client.create(multipart);
         try {
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
+    
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    		dependsOnMethods = {"createItem"})
+    @Override
+    public void createItemList(String testName) throws Exception {
+    	knownAuthorityWithItems = createResource(testName, READITEMS_SHORT_IDENTIFIER);
+        for (int j = 0; j < nItemsToCreateInList; j++) {
+        	createItemInAuthority(knownAuthorityWithItems);
+        }
+    }    
+    
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    		dependsOnMethods = {"CRUDTests"})
+    public void createWithNonuniqueShortId(String testName) throws Exception {
+        testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
+
+        // Create a new vocabulary
+        VocabularyClient client = new VocabularyClient();
+        PoxPayloadOut multipart = VocabularyClientUtils.createEnumerationInstance(
+                "Vocab with non-unique Short Id", "nonunique", client.getCommonPartName());
+        Response res = client.create(multipart);
+        try {
+        	assertStatusCode(res, testName);
+        	String newId = extractId(res);
+        	allResourceIdsCreated.add(newId); // save this so we can cleanup after ourselves
+        } finally {
+        	if (res != null) {
+                res.close();
+            }
+        }
+        
+        //
+        // Now try to create a duplicate, we should fail because we're using a non-unique short id
+        // 
+        res = client.create(multipart);
+        try {
+        	Assert.assertTrue(res.getStatus() != STATUS_CREATED, "Expect create to fail because of non unique short identifier.");
+        } catch (AssertionError ae) {
+        	// We expected a failure, but we didn't get it.  Therefore, we need to cleanup
+        	// the vocabulary we just created.
+        	String newId = extractId(res);
+        	allResourceIdsCreated.add(newId); // save this so we can cleanup after ourselves.
+        	throw ae; // rethrow the exception
+        } finally {
+        	if (res != null) {
+                res.close();
+            }
+        }
+    }
+    
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     		dependsOnMethods = {"authorityTests"})
@@ -115,7 +163,7 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
         PoxPayloadOut multipart =
                 VocabularyClientUtils.createVocabularyItemInstance(null, //knownResourceRefName,
                 itemInfo, client.getItemCommonPartName());
-        ClientResponse<Response> res = client.createItem(knownResourceId, multipart);
+        Response res = client.createItem(knownResourceId, multipart);
         try {
         	int statusCode = res.getStatus();
 
@@ -130,7 +178,7 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
             }
        } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -144,18 +192,18 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
         
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
-        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
+        Response res = client.readItem(knownResourceId, knownItemResourceId);
         VocabularyitemsCommon vitem = null;
         try {
         	assertStatusCode(res, testName);
 	        // Check whether Person has expected displayName.
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        vitem = (VocabularyitemsCommon) extractPart(input,
 	                client.getItemCommonPartName(), VocabularyitemsCommon.class);
 	        Assert.assertNotNull(vitem);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         //
@@ -171,7 +219,7 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         //
@@ -187,7 +235,7 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }

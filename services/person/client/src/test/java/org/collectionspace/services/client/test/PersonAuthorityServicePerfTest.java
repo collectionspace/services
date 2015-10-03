@@ -115,9 +115,8 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getCommonList(
-			ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(AbstractCommonList.class);
+	protected AbstractCommonList getCommonList(Response response) {
+        return response.readEntity(AbstractCommonList.class);
     }
  
     @BeforeClass
@@ -162,14 +161,14 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
     	    displayName, shortId, client.getCommonPartName());
 
     	String newID = null;
-    	ClientResponse<Response> res = client.create(multipart);
+    	Response res = client.create(multipart);
         try {
             assertStatusCode(res, testName);
             newID = PersonAuthorityClientUtils.extractId(res);
             logger.info("{}: succeeded.", testName);
     	} finally {
     		if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
     	}
         // Store the refname from the first resource created
@@ -219,13 +218,13 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
             		personMap, terms, personRepeatablesMap, client.getItemCommonPartName() );
 
         String newID = null;
-        ClientResponse<Response> res = client.createItem(authId, multipart);
+        Response res = client.createItem(authId, multipart);
         try {
             assertStatusCode(res, "createItem");
             newID = PersonAuthorityClientUtils.extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -304,7 +303,7 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<AbstractCommonList> res = null;
+        Response res = null;
         if (authorityCsid != null) {
         	res = client.readItemList(authorityCsid, partialTerm, keywords);
         } else {
@@ -313,10 +312,10 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
         AbstractCommonList list = null;
         try {
             assertStatusCode(res, testName);
-            list = res.getEntity();
+            list = res.readEntity(AbstractCommonList.class);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -348,9 +347,9 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
         PersonAuthorityClient client = new PersonAuthorityClient();
         // Clean up item resources.
         for (String itemId : allItemIdsCreated) {
-            client.deleteItem(authId, itemId).releaseConnection();
+            client.deleteItem(authId, itemId).close();
         }
-        client.delete(authId).releaseConnection();
+        client.delete(authId).close();
     }
 
 

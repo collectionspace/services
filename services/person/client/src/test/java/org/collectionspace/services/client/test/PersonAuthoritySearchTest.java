@@ -156,9 +156,8 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected AbstractCommonList getCommonList(
-                    ClientResponse<AbstractCommonList> response) {
-    return response.getEntity(AbstractCommonList.class);
+    protected AbstractCommonList getCommonList(Response response) {
+    	return response.readEntity(AbstractCommonList.class);
     }
 
     private String getPartialTermCommon() {
@@ -462,7 +461,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<AbstractCommonList> res = null;
+        Response res = null;
         if (authorityCsid != null) {
         	res = client.readItemList(authorityCsid, partialTerm, keywords);
         } else {
@@ -471,10 +470,10 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
         AbstractCommonList list = null;
         try {
             assertStatusCode(res, testName);
-            list = res.getEntity();
+            list = res.readEntity(AbstractCommonList.class);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -518,14 +517,13 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
             parentResourceId = entry.getValue();
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            ClientResponse<Response> res =
-                client.deleteItem(parentResourceId, itemResourceId);
-            res.releaseConnection();
+            Response res = client.deleteItem(parentResourceId, itemResourceId);
+            res.close();
         }
         // Clean up authority resources.
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            client.delete(resourceId).releaseConnection();
+            client.delete(resourceId).close();
         }
     }
 
@@ -559,13 +557,13 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
     	    displayName, shortId, client.getCommonPartName());
 
     	String newID = null;
-    	ClientResponse<Response> res = client.create(multipart);
+    	Response res = client.create(multipart);
         try {
             assertStatusCode(res, testName);
             newID = PersonAuthorityClientUtils.extractId(res);
     	} finally {
     		if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
     	}
         // Store the refname from the first resource created
@@ -651,12 +649,12 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
                 partialTermPersonMap, partialTerms, partialTermRepeatablesMap, client.getItemCommonPartName() );
 
         String newID = null;
-        ClientResponse<Response> res = client.createItem(authorityCsid, multipart);
+        Response res = client.createItem(authorityCsid, multipart);
         try {
             newID = PersonAuthorityClientUtils.extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 

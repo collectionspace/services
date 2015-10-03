@@ -71,8 +71,8 @@ public class GroupServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
     }
 
     @Override
-    protected AbstractCommonList getCommonList(ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(AbstractCommonList.class);
+    protected AbstractCommonList getCommonList(Response response) {
+        return response.readEntity(AbstractCommonList.class);
     }
 
     // ---------------------------------------------------------------

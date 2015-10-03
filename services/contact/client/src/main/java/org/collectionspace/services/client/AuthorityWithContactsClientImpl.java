@@ -15,7 +15,7 @@ public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P ext
 	implements AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P> {
 	
 	@Override
-    public ClientResponse<Response> createContact(String parentcsid,
+    public Response createContact(String parentcsid,
             String itemcsid, PoxPayloadOut xmlPayload) {
         return getProxy().createContact(parentcsid, itemcsid, xmlPayload.getBytes());
     }
@@ -29,7 +29,7 @@ public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P ext
      * @return the client response
      */
     @Override
-	public ClientResponse<Response> createContactForNamedItem(
+	public Response createContactForNamedItem(
     		String parentcsid,
     		String itemspecifier,
     		PoxPayloadOut xmlPayload) {
@@ -44,7 +44,7 @@ public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P ext
      * @return the client response
      */
     @Override
-	public ClientResponse<Response> createContactForItemInNamedAuthority(
+	public Response createContactForItemInNamedAuthority(
     		String parentspecifier,
     		String itemcsid,
     		PoxPayloadOut xmlPayload) {
@@ -60,7 +60,7 @@ public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P ext
      * @return the client response
      */
     @Override
-	public ClientResponse<Response> createContactForNamedItemInNamedAuthority(
+	public Response createContactForNamedItemInNamedAuthority(
     		String parentspecifier,
     		String itemspecifier,
     		PoxPayloadOut xmlPayload) {
@@ -77,7 +77,7 @@ public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P ext
      * @return the client response
      */
     @Override
-	public ClientResponse<String> readContact(String parentcsid,
+	public Response readContact(String parentcsid,
             String itemcsid, String csid) {
         return getProxy().readContact(parentcsid, itemcsid, csid);
     }
@@ -91,7 +91,7 @@ public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P ext
      * @return the client response
      */
     @Override
-	public ClientResponse<String> readContactForNamedItem(
+	public Response readContactForNamedItem(
     		String parentcsid,
     		String itemspecifier,
     		String csid){
@@ -107,7 +107,7 @@ public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P ext
      * @return the client response
      */
     @Override
-	public ClientResponse<String> readContactInNamedAuthority(
+	public Response readContactInNamedAuthority(
     		String parentspecifier,
     		String itemcsid,
     		String csid){
@@ -123,7 +123,7 @@ public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P ext
      * @return the client response
      */
     @Override
-	public ClientResponse<String> readContactForNamedItemInNamedAuthority(
+	public Response readContactForNamedItemInNamedAuthority(
     		String parentspecifier,
     		String itemspecifier,
     		String csid){
@@ -139,7 +139,7 @@ public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P ext
      * @return the client response
      */
     @Override
-	public ClientResponse<AbstractCommonList> readContactList(String parentcsid,
+	public Response readContactList(String parentcsid,
             String itemcsid) {
         return getProxy().readContactList(parentcsid, itemcsid);
     }
@@ -152,7 +152,7 @@ public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P ext
      * @return the client response
      */
     @Override
-	public ClientResponse<AbstractCommonList> readContactListForNamedItem(
+	public Response readContactListForNamedItem(
     		String parentcsid,
     		String itemspecifier){
     	return getProxy().readContactList(parentcsid, itemspecifier);
@@ -166,7 +166,7 @@ public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P ext
      * @return the client response
      */
     @Override
-	public ClientResponse<AbstractCommonList> readContactListForItemInNamedAuthority(
+	public Response readContactListForItemInNamedAuthority(
     		String parentspecifier,
     		String itemcsid){
     	return getProxy().readContactList(parentspecifier, itemcsid);
@@ -180,7 +180,7 @@ public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P ext
      * @return the client response
      */
     @Override
-	public ClientResponse<AbstractCommonList> readContactListForNamedItemInNamedAuthority(
+	public Response readContactListForNamedItemInNamedAuthority(
     		String parentspecifier,
     		String itemspecifier){
     	return getProxy().readContactList(parentspecifier, itemspecifier);
@@ -196,7 +196,7 @@ public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P ext
      * @return the client response
      */
     @Override
-	public ClientResponse<String> updateContact(String parentcsid,
+	public Response updateContact(String parentcsid,
             String itemcsid, String csid, PoxPayloadOut xmlPayload) {
         return getProxy().updateContact(parentcsid, itemcsid, csid, xmlPayload.getBytes());
     }
@@ -211,7 +211,7 @@ public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P ext
      * @return the client response
      */
     @Override
-	public ClientResponse<String> updateContactForNamedItem(
+	public Response updateContactForNamedItem(
     		String parentcsid,
     		String itemspecifier,
     		String csid,
@@ -229,7 +229,7 @@ public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P ext
      * @return the client response
      */
     @Override
-	public ClientResponse<String> updateContactInNamedAuthority(
+	public Response updateContactInNamedAuthority(
     		String parentspecifier,
     		String itemcsid,
     		String csid,
@@ -247,7 +247,7 @@ public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P ext
      * @return the client response
      */
     @Override
-	public ClientResponse<String> updateContactForNamedItemInNamedAuthority(
+	public Response updateContactForNamedItemInNamedAuthority(
     		String parentspecifier,
     		String itemspecifier,
     		String csid,
@@ -265,7 +265,7 @@ public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P ext
      * @return the client response
      */
     @Override
-	public ClientResponse<Response> deleteContact(String parentcsid,
+	public Response deleteContact(String parentcsid,
         String itemcsid, String csid) {
         return getProxy().deleteContact(parentcsid,
             itemcsid, csid);
@@ -280,7 +280,7 @@ public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P ext
      * @return the client response
      */
     @Override
-	public ClientResponse<Response> deleteContactForNamedItem(
+	public Response deleteContactForNamedItem(
     		String parentcsid,
     		String itemspecifier,
     		String csid) {
@@ -297,7 +297,7 @@ public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P ext
      * @return the client response
      */
     @Override
-	public ClientResponse<Response> deleteContactInNamedAuthority(
+	public Response deleteContactInNamedAuthority(
     		String parentspecifier,
     		String itemcsid,
     		String csid) {
@@ -314,7 +314,7 @@ public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P ext
      * @return the client response
      */
     @Override
-	public ClientResponse<Response> deleteContactForNamedItemInNamedAuthority(
+	public Response deleteContactForNamedItemInNamedAuthority(
     		String parentspecifier,
     		String itemspecifier,
     		String csid) {

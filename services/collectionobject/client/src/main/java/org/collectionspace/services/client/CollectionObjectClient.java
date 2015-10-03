@@ -26,7 +26,6 @@
  */
 package org.collectionspace.services.client;
 
-import org.jboss.resteasy.client.ClientResponse;
 import javax.ws.rs.core.Response;
 
 // FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
@@ -70,9 +69,9 @@ public class CollectionObjectClient extends AbstractCommonListPoxServiceClientIm
      * @see org.collectionspace.services.client.CollectionObjectProxy#roundtrip()
      * @return the client response< response>
      */
-    public ClientResponse<Response> roundtrip(int ms) {
+    public Response roundtrip(int ms) {
         getLogger().debug(">>>>Roundtrip start.");
-        ClientResponse<Response> result = getProxy().roundtrip(ms);
+        Response result = getProxy().roundtrip(ms);
         getLogger().debug("<<<<Roundtrip stop.");
         return result;
     }

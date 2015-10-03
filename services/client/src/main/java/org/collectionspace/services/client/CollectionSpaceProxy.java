@@ -50,25 +50,25 @@ public interface CollectionSpaceProxy<CLT> {
     //(D)elete
     @DELETE
     @Path("/{csid}")
-    ClientResponse<Response> delete(@PathParam("csid") String csid);
+    Response delete(@PathParam("csid") String csid);
 	
     // List Authority References
     @GET
     @Produces({"application/xml"})
     @Path("/{csid}/authorityrefs/")
-    ClientResponse<AuthorityRefList> getAuthorityRefs(@PathParam("csid") String csid);
+    Response getAuthorityRefs(@PathParam("csid") String csid); //ClientResponse<AuthorityRefList>
     
     @GET
     @Produces({"application/xml"})
     @Consumes({"application/xml"})    
     @Path("{csid}" + WorkflowClient.SERVICE_PATH)
-    ClientResponse<String> getWorkflow(@PathParam("csid") String csid);
+    Response getWorkflow(@PathParam("csid") String csid);
     
     @PUT
     @Produces({"application/xml"})
     @Consumes({"application/xml"})    
     @Path("{csid}" + WorkflowClient.SERVICE_PATH + "/" + "{transition}")
-    ClientResponse<String> updateWorkflowWithTransition(@PathParam("csid") String csid, @PathParam("transition") String transition);
+    Response updateWorkflowWithTransition(@PathParam("csid") String csid, @PathParam("transition") String transition);
     
     /*
      * (R)read List operations
@@ -76,7 +76,7 @@ public interface CollectionSpaceProxy<CLT> {
     
     @GET
     @Produces({"application/xml"})
-    ClientResponse<CLT> readList();
+    Response readList();
     
     /**
      * Read list.
@@ -87,7 +87,7 @@ public interface CollectionSpaceProxy<CLT> {
      */
     @GET
     @Produces({"application/xml"})
-    ClientResponse<CLT> readList(
+    Response readList(
             @QueryParam(IClientQueryParams.PAGE_SIZE_PARAM) Long pageSize,
     	    @QueryParam(IClientQueryParams.START_PAGE_PARAM) Long pageNumber);
         
@@ -101,7 +101,7 @@ public interface CollectionSpaceProxy<CLT> {
      */
     @GET
     @Produces({"application/xml"})
-    ClientResponse<CLT> readList(
+    Response readList(
             @QueryParam(IClientQueryParams.ORDER_BY_PARAM) String sortBy,
             @QueryParam(IClientQueryParams.PAGE_SIZE_PARAM) Long pageSize,
     	    @QueryParam(IClientQueryParams.START_PAGE_PARAM) Long pageNumber);    

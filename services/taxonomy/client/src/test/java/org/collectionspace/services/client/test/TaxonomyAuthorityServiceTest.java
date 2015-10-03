@@ -198,18 +198,18 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
         //
         setupRead();
         TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
-        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
+        Response res = client.readItem(knownResourceId, knownItemResourceId);
         TaxonCommon taxon = null;
         try {
             assertStatusCode(res, testName);
             // Check whether Taxonomy has expected displayName.
-            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
             taxon = (TaxonCommon) extractPart(input,
                     client.getItemCommonPartName(), TaxonCommon.class);
             Assert.assertNotNull(taxon);
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         //
@@ -230,7 +230,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
         try {
             assertStatusCode(res, testName);
         } finally {
-            res.releaseConnection();
+            res.close();
         }
     }
 
@@ -266,7 +266,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
 
         // Submit the request to the service and store the response.
         TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
-        ClientResponse<AbstractCommonList> res = null;
+        Response res = null;
         if (vcsid != null) {
             res = client.readItemList(vcsid, null, null);
         } else if (shortId != null) {
@@ -276,7 +276,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
         }
         try {
             assertStatusCode(res, testName);
-            AbstractCommonList list = res.getEntity();
+            AbstractCommonList list = res.readEntity(AbstractCommonList.class);
             int statusCode = res.getStatus();
 
             // Check the status code of the response: does it match
@@ -288,8 +288,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
 
-            List<AbstractCommonList.ListItem> items =
-                    list.getListItem();
+            List<AbstractCommonList.ListItem> items = list.getListItem();
             int nItemsReturned = items.size();
             // There will be 'nItemsToCreateInList'
             // items created by the createItemList test,
@@ -313,7 +312,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
                 AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
             }
         } finally {
-            res.releaseConnection();
+            res.close();
         }
     }
 
@@ -373,16 +372,14 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
             parentResourceId = entry.getValue();
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            ClientResponse<Response> res =
-                    client.deleteItem(parentResourceId, itemResourceId);
-            res.releaseConnection();
+            client.deleteItem(parentResourceId, itemResourceId).close();
         }
+        
         // Clean up parent resources.
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            ClientResponse<Response> res = client.delete(resourceId);
-            res.releaseConnection();
+            client.delete(resourceId).close();
         }
     }
 
@@ -438,10 +435,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
             String identifier) {
         String shortId = identifier;
         String displayName = "displayName-" + shortId;
-        String baseRefName =
-                TaxonomyAuthorityClientUtils.createTaxonomyAuthRefName(shortId, null);
-        PoxPayloadOut multipart =
-                TaxonomyAuthorityClientUtils.createTaxonomyAuthorityInstance(
+        String baseRefName = TaxonomyAuthorityClientUtils.createTaxonomyAuthRefName(shortId, null);
+        PoxPayloadOut multipart = TaxonomyAuthorityClientUtils.createTaxonomyAuthorityInstance(
                 displayName, shortId, commonPartName);
         return multipart;
     }

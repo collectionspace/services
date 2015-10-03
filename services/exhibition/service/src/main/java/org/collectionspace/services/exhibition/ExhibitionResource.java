@@ -24,7 +24,7 @@
 package org.collectionspace.services.exhibition;
 
 import org.collectionspace.services.client.ExhibitionClient;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ import javax.ws.rs.Produces;
 @Path(ExhibitionClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class ExhibitionResource extends ResourceBase {
+public class ExhibitionResource extends NuxeoBasedResource {
 
     final Logger logger = LoggerFactory.getLogger(ExhibitionResource.class);
 

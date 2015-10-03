@@ -26,6 +26,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.ws.rs.core.Response;
+
 import org.collectionspace.services.PlaceJAXBSchema;
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.AuthorityClient;
@@ -170,17 +173,17 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
 
         // Submit the request to the service and store the response.
         PlaceAuthorityClient client = new PlaceAuthorityClient();
-        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
+        Response res = client.readItem(knownResourceId, knownItemResourceId);
         PlacesCommon place= null;
         try {
             assertStatusCode(res, testName);        
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        place = (PlacesCommon) extractPart(input,
 	                client.getItemCommonPartName(), PlacesCommon.class);
 	        Assert.assertNotNull(place);
 	    } finally {
                 if (res != null) {
-                res.releaseConnection();
+                res.close();
 	    }
         }
 
@@ -206,7 +209,7 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
 	    	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -245,7 +248,7 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
 
 		// Submit the request to the service and store the response.
 		PlaceAuthorityClient client = new PlaceAuthorityClient();
-		ClientResponse<AbstractCommonList> res = null;
+		Response res = null;
 		if (vcsid != null) {
 			res = client.readItemList(vcsid, null, null);
 		} else if (shortId != null) {
@@ -257,10 +260,10 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
 		AbstractCommonList list = null;
 		try {
 			assertStatusCode(res, testName);
-			list = res.getEntity();
+			list = res.readEntity(AbstractCommonList.class);
 		} finally {
 			if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
 		}
 		
@@ -348,13 +351,13 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
             parentResourceId = entry.getValue();
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            client.deleteItem(parentResourceId, itemResourceId).releaseConnection();
+            client.deleteItem(parentResourceId, itemResourceId).close();
         }
         // Clean up parent resources.
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-	    client.delete(resourceId).releaseConnection();
+	    client.delete(resourceId).close();
         }
     }
 

@@ -5,11 +5,10 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.work</artifactId>
-        <version>4.1.1</version>
+        <version>4.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.work.jaxb</artifactId>
     <name>services.work.jaxb</name>
 
@@ -17,7 +16,6 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>

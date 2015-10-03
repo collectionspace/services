@@ -67,6 +67,8 @@ public class VocabularyClientUtils {
     public static String createItemInVocabulary(String vcsid, 
     		String vocabularyRefName, Map<String,String> itemMap,
     		VocabularyClient client ) {
+    	String result = null;
+    	
     	// Expected status code: 201 Created
     	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
     	// Type of service request being tested
@@ -78,21 +80,26 @@ public class VocabularyClientUtils {
     	}
     	PoxPayloadOut multipart = createVocabularyItemInstance(null, //vocabularyRefName,
     				itemMap, client.getItemCommonPartName());
-    	ClientResponse<Response> res = client.createItem(vcsid, multipart);
+    	Response res = client.createItem(vcsid, multipart);
 
-    	int statusCode = res.getStatus();
-
-    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-    		throw new RuntimeException("Could not create Item: \"" + itemMap.get(AuthorityItemJAXBSchema.DISPLAY_NAME)
-    				+ "\" in personAuthority: \"" + vcsid //vocabularyRefName
-    				+ "\" " + invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    	try {
+	    	int statusCode = res.getStatus();
+	
+	    	if (!REQUEST_TYPE.isValidStatusCode(statusCode)) {
+	    		throw new RuntimeException("Could not create Item: \"" + itemMap.get(AuthorityItemJAXBSchema.DISPLAY_NAME)
+	    				+ "\" in personAuthority: \"" + vcsid //vocabularyRefName
+	    				+ "\" " + invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	    	}
+	    	if (statusCode != EXPECTED_STATUS_CODE) {
+	    		throw new RuntimeException("Unexpected Status when creating Item: \""+itemMap.get(AuthorityItemJAXBSchema.DISPLAY_NAME)
+	    				+ "\" in vocabularyAuthority: \"" + vcsid /*vocabularyRefName*/ + "\", Status:" + statusCode);
+	    	}
+	    	result = extractId(res);
+    	} finally {
+    		res.close();
     	}
-    	if(statusCode != EXPECTED_STATUS_CODE) {
-    		throw new RuntimeException("Unexpected Status when creating Item: \""+itemMap.get(AuthorityItemJAXBSchema.DISPLAY_NAME)
-    				+ "\" in vocabularyAuthority: \"" + vcsid /*vocabularyRefName*/ + "\", Status:" + statusCode);
-    	}
 
-    	return extractId(res);
+    	return result;
     }
 
     /**
@@ -112,7 +119,7 @@ public class VocabularyClientUtils {
                 requestType.validStatusCodesAsString();
     }
 
-    public static String extractId(ClientResponse<Response> res) {
+    public static String extractId(Response res) {
         MultivaluedMap<String, Object> mvm = res.getMetadata();
         String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
         if(logger.isDebugEnabled()){

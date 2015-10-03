@@ -5,11 +5,10 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.place</artifactId>
-        <version>4.1.1</version>
+        <version>4.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.place.client</artifactId>
     <name>services.place.client</name>
     
@@ -33,8 +32,7 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
             <optional>true</optional>
-            <version>${project.version}</version>
-        </dependency>        
+            </dependency>        
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.place.jaxb</artifactId>
@@ -78,8 +76,7 @@
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
-        </dependency>
+            </dependency>
     </dependencies>
     
     <build>

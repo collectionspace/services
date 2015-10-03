@@ -169,6 +169,7 @@ public class ServiceBindingUtils {
     		String logicalFieldName, DocumentModel docModel ) {
     	// Now we have to get the number, which is configured as some field
     	// on each docType
+    	
     	/* If we go to qualified field names, we'll need this
     	String[] strings = qPropName.split(":");
     	if(strings.length!=2) {
@@ -177,28 +178,37 @@ public class ServiceBindingUtils {
     				+logicalFieldName+" field for: "+docModel.getDocumentType().getName());
     	}
     	*/
+    	
     	String propName = getPropertyValue(sb, logicalFieldName);
-    	if(Tools.isBlank(propName)) {
+    	if (Tools.isBlank(propName)) {
                 logger.warn("Property name is empty for property " + logicalFieldName + " in service " + sb.getName());
                 logger.warn("This may be due to an improperly configured or missing "
                         + "generic property (objectNameProperty, objectNumberProperty ...) in tenant bindings configuration");
     		return "";
         }
-    	try {
-            Object obj = docModel.getPropertyValue(propName);
-            return DocumentUtils.propertyValueAsString(obj, docModel, propName);
-    	} catch(IndexOutOfBoundsException ioobe) {
-				// Should not happen, but may with certain array forms
-				if(logger.isTraceEnabled()) {
-					logger.trace("SBUtils.getMappedField caught OOB exc, for Prop: "+propName
-						+ " in: " + docModel.getDocumentType().getName()
-						+ " csid: " + NuxeoUtils.getCsid(docModel));
-				}
-				return null;
-    	} catch(ClientException ce) {
-    		throw new RuntimeException(
-    				"getMappedFieldInDoc: Problem fetching: "+propName+" logicalfieldName: "+logicalFieldName+" docModel: "+docModel, ce);
-    	}
+    	//
+    	// Try to get a value from the Nuxeo document for the property name.
+    	//
+    	String result = null;
+		try {
+			Object obj = NuxeoUtils.getProperyValue(docModel, propName);
+			result = DocumentUtils.propertyValueAsString(obj, docModel, propName);
+		} catch (IndexOutOfBoundsException ioobe) {
+			// Should not happen, but may with certain array forms
+			logger.trace("SBUtils.getMappedField caught OOB exc, for Prop: "
+					+ propName + " in: " + docModel.getDocumentType().getName()
+					+ " csid: " + NuxeoUtils.getCsid(docModel));
+		} catch (ClientException ce) {
+			throw new RuntimeException(
+					"getMappedFieldInDoc: Problem fetching: " + propName
+							+ " logicalfieldName: " + logicalFieldName
+							+ " docModel CSID: " + docModel.getName(), ce);
+		} catch (Exception e) {
+			logger.warn(String.format("Could not get a value for the property '%s' in Nuxeo document with CSID '%s'.",
+					propName, docModel.getName()));
+		}
+    	
+    	return result;
     } 
     
     private static ArrayList<String> commonProcedureServiceTypes = null;

@@ -61,6 +61,20 @@ public interface ServiceContext<IT, OT> {
     /** Used to qualify document types **/
 	public static final String TENANT_SUFFIX = "Tenant";    
 
+    /** 
+     * Tells the TransactionManager to use the default value.  The default value can
+     * be set in this file:
+     * 		services/JaxRsServiceProvider/src/main/webapp/META-INF/context.xml
+     * at this section:
+     * 		<Resource name="TransactionManager" auth="Container" type="javax.transaction.TransactionManager"
+     *			factory="org.nuxeo.runtime.jtajca.NuxeoTransactionManagerFactory"
+     *			transactionTimeoutSeconds="300"/>
+     * See the following documentation page for more details:
+     * 		http://docs.oracle.com/javaee/7/api/javax/transaction/TransactionManager.html#setTransactionTimeout(int)
+     * 
+     */
+	public static final int DEFAULT_TX_TIMEOUT = 0;
+	
 	/* 
 	 * Sets the current/open repository session
 	 */
@@ -81,6 +95,11 @@ public interface ServiceContext<IT, OT> {
      */
     public SecurityContext getSecurityContext();
 
+    /**
+     * getTimeoutSecs();
+     */
+    public int getTimeoutSecs();
+    
     /**
      * getUserId get authenticated user's userId
      */

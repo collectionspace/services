@@ -9,6 +9,8 @@ import org.collectionspace.services.contact.AddressGroupList;
 import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.contact.EmailGroup;
 import org.collectionspace.services.contact.EmailGroupList;
+import org.collectionspace.services.contact.TelephoneNumberGroup;
+import org.collectionspace.services.contact.TelephoneNumberGroupList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +50,14 @@ public class ContactClientUtils {
         
         contact.setInAuthority(inAuthority);
         contact.setInItem(inItem);
+        
+        TelephoneNumberGroupList telephoneNumberGroupList = new TelephoneNumberGroupList();
+        List<TelephoneNumberGroup> telephoneGroups = telephoneNumberGroupList.getTelephoneNumberGroup();
+        TelephoneNumberGroup telephoneNumberGroup = new TelephoneNumberGroup();
+        telephoneNumberGroup.setTelephoneNumber("510-555-1212");
+        telephoneNumberGroup.setTelephoneNumberType("local");
+        telephoneGroups.add(telephoneNumberGroup);
+        //contact.setTelephoneNumberGroupList(telephoneNumberGroupList);
         
         EmailGroupList emailGroupList = new EmailGroupList();
         List<EmailGroup> emailGroups = emailGroupList.getEmailGroup();

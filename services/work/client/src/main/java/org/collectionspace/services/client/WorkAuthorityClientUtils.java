@@ -113,7 +113,7 @@ public class WorkAuthorityClientUtils {
             createWorkInstance( workAuthorityRefName,
                 workMap, terms, client.getItemCommonPartName() );
         String newID = null;
-        ClientResponse<Response> res = client.createItem(vcsid, multipart);
+        Response res = client.createItem(vcsid, multipart);
         try {
             int statusCode = res.getStatus();
     
@@ -130,7 +130,7 @@ public class WorkAuthorityClientUtils {
             }
             newID = extractId(res);
         } finally {
-            res.releaseConnection();
+            res.close();
         }
 
         return newID;
@@ -161,7 +161,7 @@ public class WorkAuthorityClientUtils {
         PoxPayloadOut multipart = 
             createWorkInstance(commonPartXML, client.getItemCommonPartName());
         String newID = null;
-        ClientResponse<Response> res = client.createItem(vcsid, multipart);
+        Response res = client.createItem(vcsid, multipart);
         try {
             int statusCode = res.getStatus();
     
@@ -176,7 +176,7 @@ public class WorkAuthorityClientUtils {
             }
             newID = extractId(res);
         } finally {
-            res.releaseConnection();
+            res.close();
         }
 
         return newID;
@@ -227,7 +227,7 @@ public class WorkAuthorityClientUtils {
         return refName;
     }
 
-    public static String extractId(ClientResponse<Response> res) {
+    public static String extractId(Response res) {
         MultivaluedMap<String, Object> mvm = res.getMetadata();
         String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
         if(logger.isDebugEnabled()){

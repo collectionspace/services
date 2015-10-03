@@ -228,14 +228,13 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
                 itemcsid, identifier, new ContactClient().getCommonPartName());
 
         String newID = null;
-        ClientResponse<Response> res =
-                client.createContact(parentcsid, itemcsid, multipart);
+        Response res = client.createContact(parentcsid, itemcsid, multipart);
         try {
             assertStatusCode(res, testName);
             newID = OrgAuthorityClientUtils.extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -303,7 +302,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<String> res = null;
+        Response res = null;
         if (CSID != null) {
             res = client.read(CSID);
         } else if (shortId != null) {
@@ -315,7 +314,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             assertStatusCode(res, testName);        	
             //FIXME: remove the following try catch once Aron fixes signatures
             try {
-                PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+                PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
                 OrgauthoritiesCommon orgAuthority = (OrgauthoritiesCommon) extractPart(input,
                         new OrgAuthorityClient().getCommonPartName(), OrgauthoritiesCommon.class);
                 if (logger.isDebugEnabled()) {
@@ -327,7 +326,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -391,7 +390,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<String> res = null;
+        Response res = null;
         if (authCSID != null) {
             if (itemCSID != null) {
                 res = client.readItem(authCSID, itemCSID);
@@ -414,7 +413,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         try {
             assertStatusCode(res, testName);
             // Check whether we've received a organization.
-            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
             OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
                     client.getItemCommonPartName(), OrganizationsCommon.class);
             Assert.assertNotNull(organization);
@@ -435,7 +434,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -461,18 +460,18 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         // First read our known resource.
         //
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
+        Response res = client.readItem(knownResourceId, knownItemResourceId);
         OrganizationsCommon organization = null;
         try {
             assertStatusCode(res, testName);        	
             // Check whether organization has expected displayName.
-            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
             organization = (OrganizationsCommon) extractPart(input,
                     client.getItemCommonPartName(), OrganizationsCommon.class);
             Assert.assertNotNull(organization);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -497,7 +496,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -516,13 +515,12 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<String> res =
-                client.readContact(knownResourceId, knownItemResourceId,
+        Response res =client.readContact(knownResourceId, knownItemResourceId,
                 knownContactResourceId);
         try {
             assertStatusCode(res, testName);        	
             // Check whether we've received a contact.
-            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
             ContactsCommon contact = (ContactsCommon) extractPart(input,
                     new ContactClient().getCommonPartName(), ContactsCommon.class);
             Assert.assertNotNull(contact);
@@ -535,7 +533,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             Assert.assertEquals(contact.getInItem(), knownItemResourceId);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -553,8 +551,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<String> res =
-                client.readContact(knownResourceId, knownItemResourceId, NON_EXISTENT_ID);
+        Response res = client.readContact(knownResourceId, knownItemResourceId, NON_EXISTENT_ID);
         try {
             int statusCode = res.getStatus();
 
@@ -568,7 +565,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -606,7 +603,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<AbstractCommonList> res = null;
+        Response res = null;
         if (vcsid != null) {
             res = client.readItemList(vcsid, null, null);
         } else if (name != null) {
@@ -618,10 +615,10 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         AbstractCommonList list = null;
         try {
             assertStatusCode(res, testName);        	
-            list = res.getEntity();
+            list = res.readEntity(AbstractCommonList.class);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -672,15 +669,14 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<AbstractCommonList> res =
-                client.readContactList(parentcsid, itemcsid);
+        Response res = client.readContactList(parentcsid, itemcsid);
         AbstractCommonList list = null;
         try {
             assertStatusCode(res, testName);
-            list = res.getEntity();
+            list = res.readEntity(AbstractCommonList.class);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -721,8 +717,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
         // Retrieve the contents of a resource to update.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<String> res =
-                client.readContact(knownResourceId, knownItemResourceId, knownContactResourceId);
+        Response res = client.readContact(knownResourceId, knownItemResourceId, knownContactResourceId);
         ContactsCommon contact = null;
         try {
             assertStatusCode(res, testName);        	
@@ -732,13 +727,13 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
                         + " in item: " + knownItemResourceId
                         + " in parent: " + knownResourceId);
             }
-            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
             contact = (ContactsCommon) extractPart(input,
                     new ContactClient().getCommonPartName(), ContactsCommon.class);
             Assert.assertNotNull(contact);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -769,7 +764,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         try {
 	        assertStatusCode(res, testName);
 	        // Retrieve the updated resource and verify that its contents exist.
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        ContactsCommon updatedContact =
 	                (ContactsCommon) extractPart(input,
 	                new ContactClient().getCommonPartName(), ContactsCommon.class);
@@ -781,7 +776,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 	                "Data in updated object did not match submitted data.");
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -824,13 +819,12 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<Response> res =
-                client.deleteContact(knownResourceId, knownItemResourceId, knownContactResourceId);
+        Response res = client.deleteContact(knownResourceId, knownItemResourceId, knownContactResourceId);
         try {
             assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -870,13 +864,12 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<Response> res =
-                client.deleteContact(knownResourceId, knownItemResourceId, NON_EXISTENT_ID);
+        Response res = client.deleteContact(knownResourceId, knownItemResourceId, NON_EXISTENT_ID);
         try {
             assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -942,9 +935,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             itemResourceId = entry.getValue();
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            ClientResponse<Response> res =
-                    client.deleteContact(parentResourceId, itemResourceId, contactResourceId);
-            res.releaseConnection();
+            client.deleteContact(parentResourceId, itemResourceId, contactResourceId).close();
         }
         // Clean up item resources.
         for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
@@ -952,9 +943,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             parentResourceId = entry.getValue();
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            ClientResponse<Response> res =
-                    client.deleteItem(parentResourceId, itemResourceId);
-            res.releaseConnection();
+            client.deleteItem(parentResourceId, itemResourceId).close();
         }
         // Clean up parent resources.
         super.cleanUp();

@@ -5,11 +5,10 @@
     <parent>
         <artifactId>org.collectionspace.services.objectexit</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>4.1.1</version>
+        <version>4.3-SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.objectexit.jaxb</artifactId>
     <name>services.objectexit.jaxb</name>
     

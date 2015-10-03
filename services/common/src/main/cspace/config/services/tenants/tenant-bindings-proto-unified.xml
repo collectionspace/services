@@ -480,6 +480,16 @@
 			<service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
 			<service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.dimension.nuxeo.DimensionDocumentModelHandler
 			</service:documentHandler>
+			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+				<service:params>
+				  <service:ListResultsFields>
+					<service:ListResultField>
+					  <service:element>dimension</service:element>
+					  <service:xpath>dimension</service:xpath>
+					</service:ListResultField>
+				  </service:ListResultsFields>
+				</service:params>
+			</service:DocHandlerParams>
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" name="Dimension"
 				version="1.0">
 				<service:part id="0" control_group="Managed" versionable="true" auditable="false" label="dimensions-system"

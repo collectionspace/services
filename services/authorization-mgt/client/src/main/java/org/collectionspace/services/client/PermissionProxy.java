@@ -38,7 +38,6 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionsList;
-import org.jboss.resteasy.client.ClientResponse;
 
 /**
  * @version $Revision:$
@@ -50,22 +49,22 @@ public interface PermissionProxy extends CollectionSpaceProxy<PermissionsList> {
 
     @GET
     @Produces({"application/xml"})
-    ClientResponse<PermissionsList> readList();
+    Response readList();
 
     @GET
-    ClientResponse<PermissionsList> readSearchList(@QueryParam("res") String resourceName);
+    Response readSearchList(@QueryParam("res") String resourceName);
 
     //(C)reate
     @POST
-    ClientResponse<Response> create(Permission permission);
+    Response create(Permission permission);
 
     //(R)ead
     @GET
     @Path("/{csid}")
-    ClientResponse<Permission> read(@PathParam("csid") String csid);
+    Response read(@PathParam("csid") String csid);
 
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<Permission> update(@PathParam("csid") String csid, Permission permission);
+    Response update(@PathParam("csid") String csid, Permission permission);
 }

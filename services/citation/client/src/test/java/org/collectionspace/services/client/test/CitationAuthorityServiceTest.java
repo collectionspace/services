@@ -23,6 +23,9 @@ package org.collectionspace.services.client.test;
 
 import java.util.List;
 import java.util.Map;
+
+import javax.ws.rs.core.Response;
+
 import org.collectionspace.services.CitationJAXBSchema;
 import org.collectionspace.services.citation.CitationTermGroup;
 import org.collectionspace.services.citation.CitationTermGroupList;
@@ -168,7 +171,7 @@ public class CitationAuthorityServiceTest extends AbstractAuthorityServiceTest<C
 
         // Submit the request to the service and store the response.
         CitationAuthorityClient client = new CitationAuthorityClient();
-        ClientResponse<AbstractCommonList> res = null;
+        Response res = null;
         if (vcsid != null) {
             res = client.readItemList(vcsid, null, null);
         } else if (shortId != null) {
@@ -179,9 +182,9 @@ public class CitationAuthorityServiceTest extends AbstractAuthorityServiceTest<C
         AbstractCommonList list = null;
         try {
             assertStatusCode(res, testName);
-            list = res.getEntity();
+            list = res.readEntity(AbstractCommonList.class);
         } finally {
-            res.releaseConnection();
+            res.close();
         }
         List<AbstractCommonList.ListItem> items =
                 list.getListItem();
@@ -265,13 +268,13 @@ public class CitationAuthorityServiceTest extends AbstractAuthorityServiceTest<C
             parentResourceId = entry.getValue();
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            client.deleteItem(parentResourceId, itemResourceId).releaseConnection();
+            client.deleteItem(parentResourceId, itemResourceId).close();
         }
         // Clean up parent resources.
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            client.delete(resourceId).releaseConnection();
+            client.delete(resourceId).close();
         }
     }
 

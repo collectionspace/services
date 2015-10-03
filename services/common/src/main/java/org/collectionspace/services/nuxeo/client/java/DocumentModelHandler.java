@@ -35,6 +35,7 @@ import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.api.CommonAPI;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.RefName.RefNameInterface;
@@ -63,7 +64,6 @@ import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.lifecycle.LifeCycleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +79,7 @@ public abstract class DocumentModelHandler<T, TL>
         extends AbstractMultipartDocumentHandlerImpl<T, TL, DocumentModel, DocumentModelList> {
 
     private final Logger logger = LoggerFactory.getLogger(DocumentModelHandler.class);
-    private RepositoryInstanceInterface repositorySession;
+    private CoreSessionInterface repositorySession;
 
     protected String oldRefNameOnUpdate = null;  // FIXME: REM - We should have setters and getters for these
     protected String newRefNameOnUpdate = null;  // FIXME: two fields.
@@ -205,7 +205,8 @@ public abstract class DocumentModelHandler<T, TL>
     }
         
     public RepositoryClient<PoxPayloadIn, PoxPayloadOut> getRepositoryClient(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
-        RepositoryClient<PoxPayloadIn, PoxPayloadOut> repositoryClient = RepositoryClientFactory.getInstance().getClient(ctx.getRepositoryClientName());
+        RepositoryClient<PoxPayloadIn, PoxPayloadOut> repositoryClient = 
+        		(RepositoryClient<PoxPayloadIn, PoxPayloadOut>) RepositoryClientFactory.getInstance().getClient(ctx.getRepositoryClientName());
         return repositoryClient;
     }
 
@@ -213,7 +214,7 @@ public abstract class DocumentModelHandler<T, TL>
      * getRepositorySession returns Nuxeo Repository Session
      * @return
      */
-    public RepositoryInstanceInterface getRepositorySession() {
+    public CoreSessionInterface getRepositorySession() {
     	
         return repositorySession;
     }
@@ -222,7 +223,7 @@ public abstract class DocumentModelHandler<T, TL>
      * setRepositorySession sets repository session
      * @param repoSession
      */
-    public void setRepositorySession(RepositoryInstanceInterface repoSession) {
+    public void setRepositorySession(CoreSessionInterface repoSession) {
         this.repositorySession = repoSession;
     }
 
@@ -355,7 +356,7 @@ public abstract class DocumentModelHandler<T, TL>
         	// Nuxeo webapp.
         	//
         	try {
-    	        documentModel.setProperty("dublincore", "title",
+    	        documentModel.setProperty(CommonAPI.NUXEO_DUBLINCORE_SCHEMANAME, CommonAPI.NUXEO_DUBLINCORE_TITLE,
     	                documentModel.getName());
         	} catch (Exception x) {
         		if (logger.isWarnEnabled() == true) {
@@ -410,7 +411,7 @@ public abstract class DocumentModelHandler<T, TL>
     	return result;
     }
     
-    protected void handleRefNameChanges(ServiceContext ctx, DocumentModel docModel) throws ClientException {
+    protected void handleRefNameChanges(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, DocumentModel docModel) throws ClientException {
     	// First get the old refName
     	this.oldRefNameOnUpdate = (String)docModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
             		CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME);

@@ -178,11 +178,11 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * Common proxied service calls
      */
 
-	public ClientResponse<Response> create(REQUEST_TYPE payload);
+	public Response create(REQUEST_TYPE payload);
 	
-	public ClientResponse<RESPONSE_TYPE> read(String csid);
+	public Response read(String csid);
 
-    public ClientResponse<RESPONSE_TYPE> update(String csid, REQUEST_TYPE payload);
+    public Response update(String csid, REQUEST_TYPE payload);
 	
     /**
      * Read list.
@@ -191,11 +191,11 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * @param pageNumber the page number
      * @return the client response
      */
-    public ClientResponse<CLT> readList(
+    public Response readList(
     		Long pageSize,
     		Long pageNumber);
     
-    public ClientResponse<CLT> readList();
+    public Response readList(); // Formally, ClientResponse<CLT>
 
     /**
      * Read list.
@@ -205,7 +205,7 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * @param pageNumber the page number
      * @return the client response
      */
-    public ClientResponse<CLT> readList(
+    public Response readList(
             String sortBy,
             Long pageSize,
             Long pageNumber);
@@ -216,9 +216,9 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * @param csid the csid of the entity
      * @return the workflow
      */
-    public ClientResponse<String> getWorkflow(String csid);
+    public Response getWorkflow(String csid);
     
-	public ClientResponse<String> updateWorkflowWithTransition(String csid, String workflowTransition);
+	public Response updateWorkflowWithTransition(String csid, String workflowTransition);
     
     /**
      * Gets the authority refs.
@@ -226,7 +226,7 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * @param csid the csid
      * @return the authority refs
      */
-    public ClientResponse<AuthorityRefList> getAuthorityRefs(String csid);
+    public Response getAuthorityRefs(String csid); // Response.getEntity returns AuthorityRefList type
     
     /**
      * Delete.
@@ -234,5 +234,5 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * @param csid the csid
      * @return the client response
      */
-    public ClientResponse<Response> delete(String csid);
+    public Response delete(String csid);
 }

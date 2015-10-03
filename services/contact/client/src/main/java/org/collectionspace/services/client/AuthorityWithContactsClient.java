@@ -20,7 +20,7 @@ public interface AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P extends Auth
      * @param multipart the multipart
      * @return the client response
      */
-    public ClientResponse<Response> createContact(String parentcsid,
+    public Response createContact(String parentcsid,
             String itemcsid, PoxPayloadOut xmlPayload);
     
     /**
@@ -31,7 +31,7 @@ public interface AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P extends Auth
      * @param multipart
      * @return the client response
      */
-    public ClientResponse<Response> createContactForNamedItem(
+    public Response createContactForNamedItem(
     		String parentcsid,
     		String itemspecifier,
     		PoxPayloadOut xmlPayload);
@@ -44,7 +44,7 @@ public interface AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P extends Auth
      * @param multipart
      * @return the client response
      */
-    public ClientResponse<Response> createContactForItemInNamedAuthority(
+    public Response createContactForItemInNamedAuthority(
     		String parentspecifier,
     		String itemcsid,
     		PoxPayloadOut xmlPayload);
@@ -57,7 +57,7 @@ public interface AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P extends Auth
      * @param multipart
      * @return the client response
      */
-    public ClientResponse<Response> createContactForNamedItemInNamedAuthority(
+    public Response createContactForNamedItemInNamedAuthority(
     		String parentspecifier,
     		String itemspecifier,
     		PoxPayloadOut xmlPayload);
@@ -70,7 +70,7 @@ public interface AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P extends Auth
      * @param csid the csid
      * @return the client response
      */
-    public ClientResponse<String> readContact(String parentcsid,
+    public Response readContact(String parentcsid,
             String itemcsid, String csid);
     
     /**
@@ -81,7 +81,7 @@ public interface AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P extends Auth
      * @param csid
      * @return the client response
      */
-    public ClientResponse<String> readContactForNamedItem(
+    public Response readContactForNamedItem(
     		String parentcsid,
     		String itemspecifier,
     		String csid);
@@ -94,7 +94,7 @@ public interface AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P extends Auth
      * @param csid
      * @return the client response
      */
-    public ClientResponse<String> readContactInNamedAuthority(
+    public Response readContactInNamedAuthority(
     		String parentspecifier,
     		String itemcsid,
     		String csid);
@@ -107,7 +107,7 @@ public interface AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P extends Auth
      * @param csid
      * @return the client response
      */
-    public ClientResponse<String> readContactForNamedItemInNamedAuthority(
+    public Response readContactForNamedItemInNamedAuthority(
     		String parentspecifier,
     		String itemspecifier,
     		String csid);
@@ -120,7 +120,7 @@ public interface AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P extends Auth
      * @param itemcsid the itemcsid
      * @return the client response
      */
-    public ClientResponse<AbstractCommonList> readContactList(String parentcsid,
+    public Response readContactList(String parentcsid,
             String itemcsid);
     
     /**
@@ -130,7 +130,7 @@ public interface AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P extends Auth
      * @param itemspecifier (shortIdentifier)
      * @return the client response
      */
-    public ClientResponse<AbstractCommonList> readContactListForNamedItem(
+    public Response readContactListForNamedItem(
     		String parentcsid,
     		String itemspecifier);
 
@@ -141,7 +141,7 @@ public interface AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P extends Auth
      * @param itemcsid
      * @return the client response
      */
-    public ClientResponse<AbstractCommonList> readContactListForItemInNamedAuthority(
+    public Response readContactListForItemInNamedAuthority(
     		String parentspecifier,
     		String itemcsid);
 
@@ -152,7 +152,7 @@ public interface AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P extends Auth
      * @param itemspecifier (shortIdentifier)
      * @return the client response
      */
-    public ClientResponse<AbstractCommonList> readContactListForNamedItemInNamedAuthority(
+    public Response readContactListForNamedItemInNamedAuthority(
     		String parentspecifier,
     		String itemspecifier);
 
@@ -165,7 +165,7 @@ public interface AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P extends Auth
      * @param multipart the multipart
      * @return the client response
      */
-    public ClientResponse<String> updateContact(String parentcsid,
+    public Response updateContact(String parentcsid,
             String itemcsid, String csid, PoxPayloadOut xmlPayload);
     
     /**
@@ -177,7 +177,7 @@ public interface AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P extends Auth
      * @param multipart the multipart
      * @return the client response
      */
-    public ClientResponse<String> updateContactForNamedItem(
+    public Response updateContactForNamedItem(
     		String parentcsid,
     		String itemspecifier,
     		String csid,
@@ -192,7 +192,7 @@ public interface AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P extends Auth
      * @param multipart the multipart
      * @return the client response
      */
-    public ClientResponse<String> updateContactInNamedAuthority(
+    public Response updateContactInNamedAuthority(
     		String parentspecifier,
     		String itemcsid,
     		String csid,
@@ -207,7 +207,7 @@ public interface AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P extends Auth
      * @param multipart the multipart
      * @return the client response
      */
-    public ClientResponse<String> updateContactForNamedItemInNamedAuthority(
+    public Response updateContactForNamedItemInNamedAuthority(
     		String parentspecifier,
     		String itemspecifier,
     		String csid,
@@ -221,7 +221,7 @@ public interface AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P extends Auth
      * @param csid the csid
      * @return the client response
      */
-    public ClientResponse<Response> deleteContact(String parentcsid,
+    public Response deleteContact(String parentcsid,
         String itemcsid, String csid);
     
     /**
@@ -232,7 +232,7 @@ public interface AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P extends Auth
      * @param csid the csid
      * @return the client response
      */
-    public ClientResponse<Response> deleteContactForNamedItem(
+    public Response deleteContactForNamedItem(
     		String parentcsid,
     		String itemspecifier,
     		String csid);
@@ -245,7 +245,7 @@ public interface AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P extends Auth
      * @param csid the csid
      * @return the client response
      */
-    public ClientResponse<Response> deleteContactInNamedAuthority(
+    public Response deleteContactInNamedAuthority(
     		String parentspecifier,
     		String itemcsid,
     		String csid);
@@ -258,7 +258,7 @@ public interface AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P extends Auth
      * @param csid the csid
      * @return the client response
      */
-    public ClientResponse<Response> deleteContactForNamedItemInNamedAuthority(
+    public Response deleteContactForNamedItemInNamedAuthority(
     		String parentspecifier,
     		String itemspecifier,
     		String csid);

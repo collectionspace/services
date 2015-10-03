@@ -23,13 +23,16 @@
  */
 package org.collectionspace.services.common;
 
+import java.lang.reflect.Method;
+
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.storage.StorageClient;
-import org.jboss.resteasy.core.ResourceMethod;
+//import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.spi.HttpRequest;
+import org.jboss.resteasy.spi.metadata.ResourceMethod;
 
 /**
  * The Interface CollectionSpaceResource.
@@ -94,6 +97,6 @@ public interface CollectionSpaceResource<IT, OT> {
      */
 //			<sec:filter-chain pattern="/publicitems/*/*/content"
 //                              filters="none"/>
-	public boolean allowAnonymousAccess(HttpRequest request, ResourceMethod method);
+	public boolean allowAnonymousAccess(HttpRequest request, Class<?> resourceClass);
     
 }

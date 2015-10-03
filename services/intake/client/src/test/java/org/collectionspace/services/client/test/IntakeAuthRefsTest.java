@@ -102,8 +102,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getCommonList(
-			ClientResponse<AbstractCommonList> response) {
+	protected AbstractCommonList getCommonList(Response response) {
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
@@ -131,27 +130,32 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
                 conditionCheckerOrAssessorRefName,
                 insurerRefName,
                 valuerRefName );
-        ClientResponse<Response> res = intakeClient.create(multipart);
 
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        // Specifically:
-        // Does it fall within the set of valid status codes?
-        // Does it exactly match the expected status code?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        String newId = null;
+        Response res = intakeClient.create(multipart);
+        try {
+	        int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        //
+	        // Specifically:
+	        // Does it fall within the set of valid status codes?
+	        // Does it exactly match the expected status code?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	        newId = extractId(res);
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         // Store the ID returned from the first resource created
         // for additional tests below.
         if (knownResourceId == null){
-            knownResourceId = extractId(res);
+            knownResourceId = newId;
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
@@ -159,23 +163,28 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         
         // Store the IDs from every resource created by tests,
         // so they can be deleted after tests have been run.
-        intakeIdsCreated.add(extractId(res));
+        intakeIdsCreated.add(newId);
     }
     
-    protected void createPersonRefs(){
+    protected void createPersonRefs() {
+    	//
+    	// First, create a new person authority
+    	//
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     			PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
-        ClientResponse<Response> res = personAuthClient.create(multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-        personAuthCSID = extractId(res);
+        Response res = personAuthClient.create(multipart);
+        try {
+	        int statusCode = res.getStatus();
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        personAuthCSID = extractId(res);
+        } finally {
+        	res.close();
+        }
         
         String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
-        
         String csid = createPerson("Olivier", "Owner", "olivierOwner", authRefName);
         currentOwnerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         personIdsCreated.add(csid);
@@ -198,6 +207,8 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     }
     
     protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
+    	String result = null;
+    	
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
@@ -212,13 +223,19 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         PoxPayloadOut multipart = 
     		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
     				authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
-        ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-    	return extractId(res);
+        
+        Response res = personAuthClient.createItem(personAuthCSID, multipart);
+        try {
+        	int statusCode = res.getStatus();
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        result = extractId(res);
+        } finally {
+        	res.close();
+        }
+        
+    	return result;
     }
 
     // Success outcomes
@@ -230,10 +247,10 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
         // Submit the request to the service and store the response.
         IntakeClient intakeClient = new IntakeClient();
-        ClientResponse<String> res = intakeClient.read(knownResourceId);
+        Response res = intakeClient.read(knownResourceId);
         try {
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        IntakesCommon intake = (IntakesCommon) extractPart(input,
 	        		intakeClient.getCommonPartName(), IntakesCommon.class);
 	        Assert.assertNotNull(intake);
@@ -243,19 +260,19 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 	        Assert.assertEquals(intake.getInsurers().getInsurer().get(0), insurerRefName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
         // Get the auth refs and check them
-        ClientResponse<AuthorityRefList> res2 = intakeClient.getAuthorityRefs(knownResourceId);
+        res = intakeClient.getAuthorityRefs(knownResourceId);
         AuthorityRefList list = null;
         try {
-	        assertStatusCode(res2, testName);
-	        list = res2.getEntity();
+	        assertStatusCode(res, testName);
+	        list = res.readEntity(AuthorityRefList.class);
         } finally {
-        	if (res2 != null) {
-        		res2.releaseConnection();
+        	if (res != null) {
+        		res.close();
             }
         }
         
@@ -315,14 +332,14 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         IntakeClient intakeClient = new IntakeClient();
         // Note: Any non-success responses are ignored and not reported.
         for (String resourceId : intakeIdsCreated) {
-            intakeClient.delete(resourceId).releaseConnection();
+            intakeClient.delete(resourceId).close();
         }
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Delete persons before PersonAuth
         for (String resourceId : personIdsCreated) {
-            personAuthClient.deleteItem(personAuthCSID, resourceId).releaseConnection();
+            personAuthClient.deleteItem(personAuthCSID, resourceId).close();
         }
-        personAuthClient.delete(personAuthCSID).releaseConnection();
+        personAuthClient.delete(personAuthCSID).close();
     }
 
     // ---------------------------------------------------------------

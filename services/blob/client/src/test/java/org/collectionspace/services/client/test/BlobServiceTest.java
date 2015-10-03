@@ -89,8 +89,8 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
     }
 
     @Override
-    protected AbstractCommonList getCommonList(ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(AbstractCommonList.class);
+    protected AbstractCommonList getCommonList(Response response) {
+        return response.readEntity(AbstractCommonList.class);
     }
 
     /**
@@ -100,7 +100,7 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
 	protected void setupCreate() {
         super.setupCreate();
         String noBlobCleanup = System.getProperty(NO_BLOB_CLEANUP);
-    	if(Boolean.TRUE.toString().equalsIgnoreCase(noBlobCleanup)) {
+    	if (Boolean.TRUE.toString().equalsIgnoreCase(noBlobCleanup)) {
     		//
     		// Don't delete the blobs that we created during the test cycle
     		//
@@ -133,14 +133,14 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
 	        if (children != null && children.length > 0) {
 	        	for (File child : children) {
 	        		if (isBlobbable(child) == true) {
-	        			ClientResponse<Response> res = null;
+	        			Response res = null;
 		        		String mimeType = this.getMimeType(child);
 		        		logger.debug("Processing file URI: " + child.getAbsolutePath());
 		        		logger.debug("MIME type is: " + mimeType);
 		        		if (fromUri == true) {
 		        			if (uri != null) {
 			        			res = client.createBlobFromURI(uri);
-			        			break;
+			        			//break;
 		        			} else {
 			        			URL childUrl = child.toURI().toURL();
 			        			res = client.createBlobFromURI(childUrl.toString());
@@ -157,7 +157,7 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
 				            }
 		        		} finally {
 		        			if (res != null) {
-		                        res.releaseConnection();
+		                        res.close();
 		                    }
 		        		}
 	        		}
@@ -187,7 +187,7 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
         // Create the blob
         //
         BlobClient client = new BlobClient();
-		ClientResponse<Response> res = null;
+		Response res = null;
 		res = client.createBlobFromURI(uri);
 		String blobCsid = null;
 		try {
@@ -198,14 +198,14 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
 	        }
 		} finally {
 			if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
 		}
         //
 		// Read the blob back to get the new dimension data
 		//
         setupRead();
-        ClientResponse<String> readResponse = client.read(blobCsid);
+        Response readResponse = client.read(blobCsid);
         BlobsCommon blobsCommon = null;
         try {
         	assertStatusCode(readResponse, testName);
@@ -213,7 +213,7 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
             Assert.assertNotNull(blobsCommon);
         } finally {
         	if (readResponse != null) {
-        		readResponse.releaseConnection();
+        		readResponse.close();
             }
         }
         

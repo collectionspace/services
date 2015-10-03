@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -50,7 +49,7 @@ import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.CSWebApplicationException;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.context.JaxRsContext;
@@ -80,11 +79,13 @@ import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsDocListItem;
 import org.collectionspace.services.relation.RelationshipType;
+
 import org.dom4j.Element;
+
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,7 +125,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     	
 	private String getRefnameDisplayName(DocumentModel docModel) { // Look in the tenant bindings to see what field should be our display name for our refname value
 		String result = null;
-		ServiceContext ctx = this.getServiceContext();
+		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
 		
     	DocHandlerParams.Params params = null;
     	try {
@@ -152,7 +153,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     	
     	DocHandlerParams.Params params = null;
     	try {
-        	ServiceContext ctx = this.getServiceContext();
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
 			params = ServiceConfigUtils.getDocHandlerParams(ctx);
 			Boolean bool = params.isSupportsHierarchy();
 			if (bool != null) {
@@ -175,7 +176,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     	
     	DocHandlerParams.Params params = null;
     	try {
-        	ServiceContext ctx = this.getServiceContext();
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
 			params = ServiceConfigUtils.getDocHandlerParams(ctx);
 			Boolean bool = params.isSupportsVersioning();
 			if (bool != null) {
@@ -619,7 +620,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         	boolean releaseRepoSession = false;
         	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
         	RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
-        	RepositoryInstanceInterface repoSession = this.getRepositorySession();
+        	CoreSessionInterface repoSession = this.getRepositorySession();
         	if (repoSession == null) {
         		repoSession = repoClient.getRepositorySession(ctx);
         		releaseRepoSession = true;
@@ -755,7 +756,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     protected String getSimpleStringProperty(DocumentModel docModel, String schema, String propName) {
     	String xpath = "/"+schema+":"+propName;
     	try {
-	    	return (String)docModel.getPropertyValue(xpath);
+	    	return (String) NuxeoUtils.getProperyValue(docModel, xpath); //docModel.getPropertyValue(xpath);
     	} catch(PropertyException pe) {
     		throw new RuntimeException("Problem retrieving property {"+xpath+"}. Not a simple String property?"
     				+pe.getLocalizedMessage());
@@ -776,27 +777,27 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
      * @param listName The name of the scalar list property
      * @return first value in list, as a String, or empty string if the list is empty
      */
-    protected String getFirstRepeatingStringProperty(
-    		DocumentModel docModel, String schema, String listName) {
-    	String xpath = "/"+schema+":"+listName+"/[0]";
-    	try {
-	    	return (String)docModel.getPropertyValue(xpath);
-    	} catch(PropertyException pe) {
-    		throw new RuntimeException("Problem retrieving property {"+xpath+"}. Not a repeating scalar?"
-    				+pe.getLocalizedMessage());
-    	} catch(IndexOutOfBoundsException ioobe) {
-    		// Nuxeo sometimes handles missing sub, and sometimes does not. Odd.
-    		return "";	// gracefully handle missing elements
-    	} catch(ClassCastException cce) {
-    		throw new RuntimeException("Problem retrieving property {"+xpath+"} as String. Not a repeating String property?"
-    				+cce.getLocalizedMessage());
-    	} catch(Exception e) {
-    		throw new RuntimeException("Unknown problem retrieving property {"+xpath+"}."
-    				+e.getLocalizedMessage());
-    	}
-    }
+	protected String getFirstRepeatingStringProperty(DocumentModel docModel,
+			String schema, String listName) {
+		String xpath = "/" + schema + ":" + listName + "/[0]";
+		try {
+			return (String) NuxeoUtils.getProperyValue(docModel, xpath); // docModel.getPropertyValue(xpath);
+		} catch (PropertyException pe) {
+			throw new RuntimeException("Problem retrieving property {" + xpath
+					+ "}. Not a repeating scalar?" + pe.getLocalizedMessage());
+		} catch (IndexOutOfBoundsException ioobe) {
+			// Nuxeo sometimes handles missing sub, and sometimes does not. Odd.
+			return ""; // gracefully handle missing elements
+		} catch (ClassCastException cce) {
+			throw new RuntimeException("Problem retrieving property {" + xpath
+					+ "} as String. Not a repeating String property?"
+					+ cce.getLocalizedMessage());
+		} catch (Exception e) {
+			throw new RuntimeException("Unknown problem retrieving property {"
+					+ xpath + "}." + e.getLocalizedMessage());
+		}
+	}
    
-
     /**
      * Gets first of a repeating list of scalar values, as a String, from the document.
      *
@@ -811,7 +812,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     	
     	String xpath = "/" + NuxeoUtils.getPrimaryXPathPropertyName(schema, complexPropertyName, fieldName);
     	try {
-	    	result = (String)docModel.getPropertyValue(xpath);
+	    	result = (String) NuxeoUtils.getProperyValue(docModel, xpath); //docModel.getPropertyValue(xpath);
     	} catch(PropertyException pe) {
     		throw new RuntimeException("Problem retrieving property {"+xpath+"}. Bad propertyNames?"
     				+pe.getLocalizedMessage());
@@ -821,6 +822,10 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     	} catch(ClassCastException cce) {
     		throw new RuntimeException("Problem retrieving property {"+xpath+"} as String. Not a String property?"
     				+cce.getLocalizedMessage());
+    	} catch(NullPointerException npe) {
+    		// Getting here because of a bug in Nuxeo when value in repository is unknown/empty/null
+    		logger.warn(String.format("Nuxeo repo unexpectedly returned an Null Pointer Exception when asked for the value of {%s}.",
+    				xpath));
     	} catch(Exception e) {
     		throw new RuntimeException("Unknown problem retrieving property {"+xpath+"}."
     				+e.getLocalizedMessage());
@@ -1265,7 +1270,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
                             	logger.trace("Fetching CSID for child with only refname: "+newChildRefName);
                             }
                         	DocumentModel newChildDocModel = 
-                        		ResourceBase.getDocModelForRefName(this.getRepositorySession(), 
+                        		NuxeoBasedResource.getDocModelForRefName(this.getRepositorySession(), 
                         				newChildRefName, getServiceContext().getResourceMap());
                         	newChildCsid = getCsid(newChildDocModel);
             			}
@@ -1318,7 +1323,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
      *   and sets URI correctly for related items.
      *   Operates directly on the items in the list.  Does not change the list ordering, does not add or remove any items.
      */
-    protected void fixupInboundListItems(ServiceContext ctx,
+    protected void fixupInboundListItems(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             List<RelationsCommonList.RelationListItem> inboundList,
             DocumentModel docModel,
             String itemCSID) throws Exception {
@@ -1405,8 +1410,8 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     // since a save on Create might fail, and we would not want to create relations for something
     // that may not be created...
     private void handleRelationsPayload(DocumentWrapper<DocumentModel> wrapDoc, boolean fUpdate) throws Exception {
-        ServiceContext ctx = getServiceContext();
-        PoxPayloadIn input = (PoxPayloadIn) ctx.getInput();
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
+        PoxPayloadIn input = ctx.getInput();
         DocumentModel documentModel = (wrapDoc.getWrappedObject());
         String itemCsid = documentModel.getName();
 
@@ -1419,7 +1424,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         //now we add part for relations list
         //ServiceContext ctx = getServiceContext();
         //PayloadOutputPart foo = (PayloadOutputPart) ctx.getProperty(RelationClient.SERVICE_COMMON_LIST_NAME);
-        ((PoxPayloadOut) ctx.getOutput()).addPart(payloadOutputPart);
+        ctx.getOutput().addPart(payloadOutputPart);
     }
 
     /**
@@ -1431,7 +1436,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         if (hasRefNameUpdate() == true) {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient = getRepositoryClient(ctx);
-            RepositoryInstanceInterface repoSession = this.getRepositorySession();
+            CoreSessionInterface repoSession = this.getRepositorySession();
             
             // Update all the relationship records that referred to the old refName
             RefNameServiceUtils.updateRefNamesInRelations(ctx, repoClient, repoSession,

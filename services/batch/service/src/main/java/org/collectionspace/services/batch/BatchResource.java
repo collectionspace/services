@@ -32,7 +32,7 @@ import org.collectionspace.services.client.BatchClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -69,7 +69,7 @@ import javax.ws.rs.core.UriInfo;
 @Path(BatchClient.SERVICE_PATH)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public class BatchResource extends ResourceBase {
+public class BatchResource extends NuxeoBasedResource {
 	
 	protected final String COMMON_SCHEMA = "batch_common";
 

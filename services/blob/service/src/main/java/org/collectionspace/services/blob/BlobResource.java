@@ -25,12 +25,11 @@ package org.collectionspace.services.blob;
 
 import org.collectionspace.services.publicitem.PublicitemsCommon;
 import org.collectionspace.services.client.BlobClient;
-import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PayloadPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.FileUtils;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.blob.BlobInput;
@@ -47,32 +46,27 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 //FIXME: REM - We should not have Nuxeo dependencies in our resource classes.
 
 @Path(BlobClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class BlobResource extends ResourceBase {
+public class BlobResource extends NuxeoBasedResource {
 
 	@Override
     public String getServiceName(){
@@ -121,7 +115,7 @@ public class BlobResource extends ResourceBase {
     	return result;
     }
     
-    private InputStream getBlobContent(ServiceContext ctx,
+    private InputStream getBlobContent(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
     		String csid, 
     		String derivativeTerm, 
     		StringBuffer outMimeType) throws CSWebApplicationException {
@@ -151,9 +145,10 @@ public class BlobResource extends ResourceBase {
     	}
     	
     	if (result == null) {
+    		String errMsg = String.format("Index failed. Could not get the contents for the Blob with CSID = '%s'.",
+    				csid);
 	        Response response = Response.status(
-	                Response.Status.INTERNAL_SERVER_ERROR).entity(
-	                		"Index failed. Could not get the contents for the Blob.").type("text/plain").build();
+	                Response.Status.INTERNAL_SERVER_ERROR).entity(errMsg).type("text/plain").build();
 	        throw new CSWebApplicationException(response);
     	}
     	

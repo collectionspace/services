@@ -170,6 +170,8 @@
         <ant antfile="imports/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="loanin/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="loanout/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="claim/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="exhibition/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="conditioncheck/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="valuationcontrol/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="objectexit/build.xml" target="deploy" inheritAll="false"/>
@@ -189,8 +191,6 @@
         <ant antfile="acquisition/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="dimension/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="contact/build.xml" target="deploy" inheritAll="false"/>
-        <ant antfile="claim/build.xml" target="deploy" inheritAll="false"/>
-        <ant antfile="exhibition/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="publicitem/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="JaxRsServiceProvider/build.xml" target="deploy" inheritAll="false"/>
     </target>
@@ -214,6 +214,8 @@
         <ant antfile="location/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="objectexit/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="valuationcontrol/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="claim/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="exhibition/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="conditioncheck/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="batch/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="report/build.xml" target="undeploy" inheritAll="false"/>
@@ -239,8 +241,6 @@
         <ant antfile="authority/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="authorization/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="authentication/build.xml" target="undeploy" inheritAll="false"/>
-        <ant antfile="claim/build.xml" target="undeploy" inheritAll="false"/>
-        <ant antfile="exhibition/build.xml" target="undeploy" inheritAll="false"/>
     </target>
 
     <target name="hotdeploy" depends="install"
@@ -271,6 +271,8 @@
         <ant antfile="work/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="concept/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="taxonomy/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="claim/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="exhibition/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="conditioncheck/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="valuationcontrol/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="objectexit/build.xml" target="dist" inheritAll="false"/>
@@ -283,8 +285,6 @@
         <ant antfile="person/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="citation/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="acquisition/build.xml" target="dist" inheritAll="false"/>
-        <ant antfile="claim/build.xml" target="dist" inheritAll="false"/>
-        <ant antfile="exhibition/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="JaxRsServiceProvider/build.xml" target="dist" inheritAll="false"/>
         <copy file="${basedir}/target/${javadoc.jar}"
               todir="${services.trunk}/${dist.server.cspace}/cspace/services/docs"/>

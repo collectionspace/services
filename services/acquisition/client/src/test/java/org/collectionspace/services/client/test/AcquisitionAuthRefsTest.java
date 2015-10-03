@@ -70,7 +70,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 
 	// Instance variables specific to this test.
 	//    final String SERVICE_PATH_COMPONENT = AcquisitionClient.SERVICE_PATH_COMPONENT;//"acquisitions";
-	final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
+	final String PERSON_AUTHORITY_NAME = "TestPersonAuthForAquisitionTest";
 	private String knownResourceId = null;
 	private List<String> acquisitionIdsCreated = new ArrayList<String>();
 	private List<String> personIdsCreated = new ArrayList<String>();
@@ -93,8 +93,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 	 * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
 	 */
 	@Override
-	protected AbstractCommonList getCommonList(
-			ClientResponse<AbstractCommonList> response) {
+	protected AbstractCommonList getCommonList(Response response) {
 		throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
 	}
 
@@ -121,7 +120,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 				acquisitionSourcesRefNames);
 
 		AcquisitionClient acquisitionClient = new AcquisitionClient();
-		ClientResponse<Response> res = acquisitionClient.create(multipart);
+		Response res = acquisitionClient.create(multipart);
 
 		int statusCode = res.getStatus();
 
@@ -156,7 +155,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 		PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
 		PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
 				PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
-		ClientResponse<Response> res = personAuthClient.create(multipart);
+		Response res = personAuthClient.create(multipart);
 		int statusCode = res.getStatus();
 
 		Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
@@ -208,17 +207,23 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
                 term.setTermDisplayName(termName);
                 term.setTermName(termName);
                 personTerms.add(term);
+        String result = null;
+        
 		PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-		PoxPayloadOut multipart = 
-			PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
+		PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
 					authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
-		ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
-		int statusCode = res.getStatus();
-
-		Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-				invalidStatusCodeMessage(testRequestType, statusCode));
-		Assert.assertEquals(statusCode, STATUS_CREATED);
-		return extractId(res);
+		Response res = personAuthClient.createItem(personAuthCSID, multipart);
+		try {
+			int statusCode = res.getStatus();
+			Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+					invalidStatusCodeMessage(testRequestType, statusCode));
+			Assert.assertEquals(statusCode, STATUS_CREATED);
+			result = extractId(res);
+		} finally {
+			res.close();
+		}
+		
+		return result;
 	}
 
 	// Success outcomes
@@ -230,19 +235,19 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 
 		// Submit the request to the service and store the response.
 		AcquisitionClient acquisitionClient = new AcquisitionClient();
-		ClientResponse<String> res = acquisitionClient.read(knownResourceId);
+		Response res = acquisitionClient.read(knownResourceId);
 		AcquisitionsCommon acquisition = null;
 		try {
 	 		// Check the status code of the response: does it match
 			// the expected response(s)?
 			assertStatusCode(res, testName);
-			PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+			PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 			acquisition = (AcquisitionsCommon) extractPart(input,
 					acquisitionClient.getCommonPartName(), AcquisitionsCommon.class);
 			Assert.assertNotNull(acquisition);
 		} finally {
 			if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
 		}
 
@@ -277,21 +282,21 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 		//
 		// Get the auth refs and check them
 		//
-		ClientResponse<AuthorityRefList> res2 =	acquisitionClient.getAuthorityRefs(knownResourceId);
+		res = acquisitionClient.getAuthorityRefs(knownResourceId);
 		AuthorityRefList list = null;
 		try {
-			assertStatusCode(res2, testName);
-			list = res2.getEntity();
+			assertStatusCode(res, testName);
+			list = res.readEntity(AuthorityRefList.class);
 			Assert.assertNotNull(list);
 		} finally {
-			if (res2 != null) {
-				res2.releaseConnection();
+			if (res != null) {
+				res.close();
             }
 		}
 
 		List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
 		int numAuthRefsFound = items.size();
-		if (logger.isDebugEnabled()){
+		if (logger.isDebugEnabled()) {
 			logger.debug("Expected " + NUM_AUTH_REFS_EXPECTED +
 					" authority references, found " + numAuthRefsFound);
 		}
@@ -345,19 +350,16 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 		AcquisitionClient acquisitionClient = new AcquisitionClient();
 		for (String resourceId : acquisitionIdsCreated) {
 			// Note: Any non-success responses are ignored and not reported.
-			ClientResponse<Response> res = acquisitionClient.delete(resourceId);
-			res.releaseConnection();
+			acquisitionClient.delete(resourceId).close();
 		}
 		PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
 		// Delete persons before PersonAuth
 		for (String resourceId : personIdsCreated) {
 			// Note: Any non-success responses are ignored and not reported.
-			ClientResponse<Response> res = personAuthClient.deleteItem(personAuthCSID, resourceId);
-			res.releaseConnection();
+			personAuthClient.deleteItem(personAuthCSID, resourceId).close();
 		}
 		// Note: Any non-success response is ignored and not reported.
-		ClientResponse<Response> res = personAuthClient.delete(personAuthCSID);
-		res.releaseConnection();
+		personAuthClient.delete(personAuthCSID).close();
 	}
 
 	// ---------------------------------------------------------------

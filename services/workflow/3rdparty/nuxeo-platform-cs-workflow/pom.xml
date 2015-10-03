@@ -5,10 +5,9 @@
 	<parent>
 		<groupId>org.collectionspace.services</groupId>
 		<artifactId>org.collectionspace.services.workflow.3rdparty</artifactId>
-		<version>4.1.1</version>
+		<version>4.3-SNAPSHOT</version>
 	</parent>
     
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.workflow.3rdparty.nuxeo</artifactId>
     <name>services.workflow.3rdparty.nuxeo</name>
     <packaging>jar</packaging>

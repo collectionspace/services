@@ -50,8 +50,6 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.io.FileUtils;
-
-import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -59,7 +57,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.w3c.dom.Document;
-
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadInputPart;
@@ -156,6 +153,29 @@ public abstract class BaseServiceTest<CLT> {
             Response.Status.OK.getStatusCode();
     protected static final int STATUS_FORBIDDEN =
             Response.Status.FORBIDDEN.getStatusCode();
+    
+    //
+    // "Global flag to cancel cleanup() method
+    //
+    private static boolean cancelCleanup = false;
+    
+    //
+    // Decide if cleanup should happen
+    //
+    protected boolean cleanupCancelled() {
+    	if (cancelCleanup == false) {
+	        String noTestCleanup = System.getProperty(NO_TEST_CLEANUP);
+	        if (Boolean.TRUE.toString().equalsIgnoreCase(noTestCleanup)) {
+	            cancelCleanup = true;
+	        }
+    	}
+        
+        return cancelCleanup;
+    }
+    
+    protected void cancelCleanup() {
+    	cancelCleanup = true;
+    }
 
     /**
      * Instantiates a new base service test.
@@ -190,9 +210,8 @@ public abstract class BaseServiceTest<CLT> {
     	return (Class<CLT>)AbstractCommonList.class;
     }
 
-    protected CLT getCommonList(
-            ClientResponse<CLT> response) {
-        return response.getEntity(getCommonListType());
+    protected CLT getCommonList(Response response) {
+        return response.readEntity(getCommonListType());
     }
     
     /**
@@ -254,6 +273,22 @@ public abstract class BaseServiceTest<CLT> {
         clearSetup();
         testExpectedStatusCode = expectedStatusCode;
         testRequestType = reqType;
+    }
+    
+    protected long randomPause(Random randomGenerator, long maxPauseMillis) {
+    	long result = 0;
+    	
+    	if (maxPauseMillis != 0) {	    	
+	    	try {
+				Thread.sleep(result = randomGenerator.nextInt(500));
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				result = -1;
+			}
+    	}
+    	
+    	return result;
     }
 
     /**
@@ -386,7 +421,7 @@ public abstract class BaseServiceTest<CLT> {
      * @param res the res
      * @return the string
      */
-    static protected String extractId(ClientResponse<Response> res) {
+    static protected String extractId(Response res) {
         MultivaluedMap<String, Object> mvm = res.getMetadata();
         String uri = (String) ((List<Object>) mvm.get("Location")).get(0);
         if (logger.isDebugEnabled()) {
@@ -399,6 +434,7 @@ public abstract class BaseServiceTest<CLT> {
         }
         return id;
     }
+    
  
     /**
      * Tests can override this method to customize their identifiers.
@@ -656,8 +692,8 @@ public abstract class BaseServiceTest<CLT> {
         }
         return className;
     }
-
-    public int assertStatusCode(ClientResponse<?> res, String testName) {
+    
+    public int assertStatusCode(Response res, String testName) {
         int statusCode = res.getStatus();
         
         // Check the status code of the response: does it match the expected response(s)?
@@ -667,7 +703,7 @@ public abstract class BaseServiceTest<CLT> {
         Assert.assertEquals(statusCode, testExpectedStatusCode);
         
         return statusCode;
-    }
+    }    
 
     public static String getUTF8DataFragment() {
         return UTF8_DATA_FRAGMENT;
@@ -701,13 +737,13 @@ public abstract class BaseServiceTest<CLT> {
      */
     @AfterClass(alwaysRun = true)
     public void cleanUp() {
-        String noTestCleanup = System.getProperty(NO_TEST_CLEANUP);
-        if (Boolean.TRUE.toString().equalsIgnoreCase(noTestCleanup)) {
+        if (cleanupCancelled() == true) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Skipping Cleanup phase ...");
             }
             return;
         }
+        
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
@@ -721,7 +757,7 @@ public abstract class BaseServiceTest<CLT> {
                 String itemResourceId = entry.getKey();
                 String authorityResourceId = entry.getValue();
                 // Note: Any non-success responses are ignored and not reported.
-                authorityClient.deleteItem(authorityResourceId, itemResourceId).releaseConnection();
+                authorityClient.deleteItem(authorityResourceId, itemResourceId).close();
             }
         }
         //
@@ -729,7 +765,7 @@ public abstract class BaseServiceTest<CLT> {
         //
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            client.delete(resourceId).releaseConnection();
+            client.delete(resourceId).close();
         }
     }
 	

@@ -27,7 +27,6 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 import org.collectionspace.services.authorization.PermissionRole;
 
 /**
@@ -66,7 +65,7 @@ public class PermissionRoleClient extends AbstractServiceClientImpl<PermissionRo
      * @return the client response
      * @see
      */
-    public ClientResponse<PermissionRole> read(String csid, String prcsid) {
+    public Response read(String csid, String prcsid) {
         return getProxy().read(csid, prcsid);
     }
 
@@ -78,7 +77,7 @@ public class PermissionRoleClient extends AbstractServiceClientImpl<PermissionRo
      * @return the client response
      * @see
      */
-    public ClientResponse<PermissionRole> read(String csid) {
+    public Response read(String csid) {
         return getProxy().read(csid);
     }
 
@@ -90,7 +89,7 @@ public class PermissionRoleClient extends AbstractServiceClientImpl<PermissionRo
      * @return the client response
      * @see
      */
-    public ClientResponse<Response> create(String csid, PermissionRole permRole) {
+    public Response create(String csid, PermissionRole permRole) {
         return getProxy().create(csid, permRole);
     }
     
@@ -101,23 +100,23 @@ public class PermissionRoleClient extends AbstractServiceClientImpl<PermissionRo
      * @param permRole the perm role
      * @return the client response
      */
-    public ClientResponse<Response> delete(String csid, PermissionRole permRole) {
+    public Response delete(String csid, PermissionRole permRole) {
     	return getProxy().delete(csid, "delete", permRole);
     }
 
 	@Override
-	public ClientResponse<Response> create(PermissionRole payload) {
+	public Response create(PermissionRole payload) {
 		throw new UnsupportedOperationException(); //method not supported nor needed
 	}
 
 	@Override
-	public ClientResponse<PermissionRole> update(String csid,
+	public Response update(String csid,
 			PermissionRole payload) {
 		throw new UnsupportedOperationException(); //method not supported nor needed
 	}
 
 	@Override
-	public ClientResponse<PermissionRole> readList() {
+	public Response readList() {
 		throw new UnsupportedOperationException(); //method not supported nor needed
 	}
 }

@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.3rdparty</artifactId>
-        <version>4.1.1</version>
+        <version>4.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -16,8 +16,10 @@
     <modules>
 		<module>nuxeo-platform-collectionspace</module>
 		<module>nuxeo-platform-listener</module>
+		<!-- disabled in v4.2 build do to test failures during upgrade to Nuxeo 6 
 		<module>nuxeo-platform-quote-api</module>
 		<module>nuxeo-platform-quote</module>
+		-->
 		<module>nuxeo-platform-thumbnail</module>
 	</modules>
 

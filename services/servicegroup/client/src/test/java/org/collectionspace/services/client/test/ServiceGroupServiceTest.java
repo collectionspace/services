@@ -72,12 +72,12 @@ public class ServiceGroupServiceTest extends BaseServiceTest<AbstractCommonList>
     }
 
     @Override
-    protected AbstractCommonList getCommonList(ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(AbstractCommonList.class);
+    protected AbstractCommonList getCommonList(Response response) {
+        return response.readEntity(AbstractCommonList.class);
     }
     
 	public ServicegroupsCommon extractCommonPartValue(CollectionSpaceClient client,
-			ClientResponse<String> res) throws Exception {
+			Response res) throws Exception {
 		
 		ServicegroupsCommon result = null;
 		PayloadInputPart payloadInputPart = extractPart(res, client.getCommonPartName());
@@ -90,12 +90,12 @@ public class ServiceGroupServiceTest extends BaseServiceTest<AbstractCommonList>
 		return result;
 	}
 
-    protected PayloadInputPart extractPart(ClientResponse<String> res, String partLabel)
+    protected PayloadInputPart extractPart(Response res, String partLabel)
             throws Exception {
             if (getLogger().isDebugEnabled()) {
             	getLogger().debug("Reading part " + partLabel + " ...");
             }
-            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
             PayloadInputPart payloadInputPart = input.getPart(partLabel);
             Assert.assertNotNull(payloadInputPart,
                     "Part " + partLabel + " was unexpectedly null.");
@@ -110,7 +110,7 @@ public class ServiceGroupServiceTest extends BaseServiceTest<AbstractCommonList>
 
         // Submit the request to the service and store the response.
     	CollectionSpaceClient client = this.getClientInstance();
-        ClientResponse<String> res = client.read(readGroupName);
+        Response res = client.read(readGroupName);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -140,9 +140,15 @@ public class ServiceGroupServiceTest extends BaseServiceTest<AbstractCommonList>
 
         // Submit the request to the service and store the response.
         CollectionSpaceClient client = this.getClientInstance();
-        ClientResponse<AbstractCommonList> res = client.readList();
-        AbstractCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
+        Response res = client.readList();
+        AbstractCommonList list = res.readEntity(getCommonListType());
+        int statusCode;
+        try {
+        	statusCode = res.getStatus();
+        } finally {
+        	res.close();
+        }
+        
 
         // Check the status code of the response: does it match
         // the expected response(s)?
@@ -159,6 +165,4 @@ public class ServiceGroupServiceTest extends BaseServiceTest<AbstractCommonList>
         	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, getLogger(), testName);
         }
     }
-    
-    
 }

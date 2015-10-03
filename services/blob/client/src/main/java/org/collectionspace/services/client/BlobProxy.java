@@ -9,7 +9,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 
 
@@ -22,21 +21,21 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 public interface BlobProxy extends CollectionSpaceCommonListPoxProxy {
     //(C)reate
     @POST
-    ClientResponse<Response> createBlobFromURI(byte[] xmlPayload, 
+    Response createBlobFromURI(byte[] xmlPayload, 
     		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri);
 
     //(C)reate
     @POST
     @Consumes("multipart/form-data")
-    ClientResponse<Response> createBlobFromFormData(MultipartFormDataOutput formDataOutput);
+    Response createBlobFromFormData(MultipartFormDataOutput formDataOutput);
 
     @GET
     @Path("{csid}/content")
-    ClientResponse<Response> getBlobContent(@PathParam("csid") String csid);
+    Response getBlobContent(@PathParam("csid") String csid);
     
     @GET
     @Path("{csid}/derivatives/{derivativeTerm}/content")
-    public ClientResponse<Response> getDerivativeContent(
+    public Response getDerivativeContent(
     		@PathParam("csid") String csid,
     		@PathParam("derivativeTerm") String derivativeTerm);    
 }

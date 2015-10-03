@@ -35,7 +35,7 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.workflow.jaxb.WorkflowJAXBSchema;
 import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.lifecycle.TransitionDef;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.workflow.WorkflowCommon;
 import org.nuxeo.ecm.core.api.ClientException;
@@ -44,7 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WorkflowDocumentModelHandler
-        extends DocHandlerBase<WorkflowCommon> {
+        extends NuxeoDocumentModelHandler<WorkflowCommon> {
 
     /** The logger. */
     private static final Logger logger = LoggerFactory.getLogger(WorkflowDocumentModelHandler.class);

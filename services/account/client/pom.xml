@@ -5,11 +5,10 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.account</artifactId>
-        <version>4.1.1</version>
+        <version>4.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.account.client</artifactId>
     <name>services.account.client</name>
 
@@ -92,7 +91,6 @@
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
         </dependency>
     </dependencies>
 
@@ -118,6 +116,16 @@
                 </executions>
             </plugin>
         </plugins>
+		<filters>
+			<filter>../../../build.properties</filter>
+		</filters>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		
     </build>
 
 </project>

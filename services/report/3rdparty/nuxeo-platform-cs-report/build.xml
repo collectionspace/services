@@ -120,14 +120,15 @@
 
     <target name="deploy" depends="install"
         description="deploy report doctype in ${jee.server.nuxeo}">
-        <!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
-        leaving this only for backwards compatibility reasons. -->  
+        <!-- This target is obsolete. The Nuxeo artifacts are now created
+        and deployed using the "csmake" tool, leaving this legacy call
+        only for backwards compatibility reasons. -->  
         <copy file="${basedir}/target/${nuxeo.report.legacy.jar}"
             todir="${jee.deploy.nuxeo.plugins}"/>
     </target>
 
     <target name="undeploy"
-        description="undeploy report doctype from ${jee.server.nuxeo}">
+        description="undeploy report doctypes from ${jee.server.nuxeo}">
         <delete>
             <!-- Undeploy doctype and schema artifacts -->
             <fileset dir="${jee.deploy.nuxeo.plugins}">

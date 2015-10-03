@@ -4,7 +4,11 @@
     <parent>
         <artifactId>org.collectionspace.services.main</artifactId>
         <groupId>org.collectionspace.services</groupId>
+<<<<<<< HEAD
         <version>4.1.1</version>
+=======
+        <version>4.3-SNAPSHOT</version>
+>>>>>>> collectionspace/master
     </parent>
 
     <artifactId>org.collectionspace.services.authorization-mgt</artifactId>

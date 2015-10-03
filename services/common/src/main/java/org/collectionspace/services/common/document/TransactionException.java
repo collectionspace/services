@@ -85,7 +85,7 @@ public class TransactionException extends DocumentException {
      *         unknown.)
      * @since  1.4
      */
-    public TransactionException(Throwable cause) {
+    public TransactionException(Throwable cause) {    	
         super(TRANSACTION_FAILED_MSG, cause);
         setErrorCode(HTTP_CODE);
     }

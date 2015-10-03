@@ -78,10 +78,8 @@ public class I1591OneInstOneClose extends CollectionSpacePerformanceTest {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         long identifier = 0;
         int i = 0;
-        ClientResponse<Response> response = null;
 
         try {
-
             for (i = 0; i <= numberOfObjects; i++) {
 
                 // Create a CollectionObject instance.
@@ -95,31 +93,23 @@ public class I1591OneInstOneClose extends CollectionSpacePerformanceTest {
                 commonPart.setLabel(collectionObjectClient.getCommonPartName());
 
                 // Make a create call with that payload and check the response.
-                response = collectionObjectClient.create(multipart);
-
-                Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
-                coList[i] = extractId(response);
-
-                if (logger.isDebugEnabled() == true) {
-                    logger.debug("Created CollectionObject #: " + i);
+                Response response = collectionObjectClient.create(multipart);
+                try {
+	                Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
+	                coList[i] = extractId(response);
+	                if (logger.isDebugEnabled() == true) {
+	                    logger.debug("Created CollectionObject #: " + i);
+	                }
+                } finally {
+                	response.close();
                 }
-
             }
-
         } catch (AssertionError e) {
             if (logger.isDebugEnabled() == true) {
-                logger.debug("FAILURE: Created " + i +
-                    " of " + numberOfObjects +
-                    " before failing.");
+                logger.debug("FAILURE: Created " + i + " of " + numberOfObjects + " before failing.");
             }
             Assert.assertTrue(false);
-        // Since failed Asserts can throw an Exception, ensure
-        // that the underlying HTTP connection is explicitly closed
-        // under all circumstances.
-        } finally {
-            response.releaseConnection();
         }
-        
     }
 
     @AfterClass(alwaysRun=true)
@@ -134,11 +124,10 @@ public class I1591OneInstOneClose extends CollectionSpacePerformanceTest {
 
         for (int i = 0; i < coList.length; i++) {
             resourceId = coList[i];
-            ClientResponse<Response> res = collectionObjectClient.delete(resourceId);
+            collectionObjectClient.delete(resourceId).close();
             if (logger.isDebugEnabled() == true) {
                 logger.debug("Deleted CollectionObject #: " + i);
             }
-            res.releaseConnection();
         }
 
         if (logger.isDebugEnabled()) {

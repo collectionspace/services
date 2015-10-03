@@ -37,7 +37,6 @@ import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 import javax.naming.NamingException;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import net.sf.jasperreports.engine.JRException;
@@ -45,7 +44,6 @@ import net.sf.jasperreports.engine.JRExporter;
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JRParameter;
 import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.export.JRCsvExporter;
@@ -57,7 +55,6 @@ import net.sf.jasperreports.engine.export.ooxml.JRDocxExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRPptxExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 
-import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.collectionspace.services.ReportJAXBSchema;
 import org.collectionspace.services.report.ReportsCommon;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -68,7 +65,6 @@ import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
-import org.collectionspace.services.common.config.ConfigReader;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
@@ -77,13 +73,13 @@ import org.collectionspace.services.common.invocable.Invocable;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.jaxb.InvocableJAXBSchema;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
-import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.jfree.util.Log;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.PropertyException;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,7 +89,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
+public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<ReportsCommon> {
     private final Logger logger = LoggerFactory.getLogger(ReportDocumentModelHandler.class);
     private static String REPORTS_FOLDER = "reports";
     private static String CSID_LIST_SEPARATOR = ",";
@@ -109,7 +105,7 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 			InvocationContext invContext,
 			StringBuffer outMimeType,
 			StringBuffer outReportFileName) throws Exception {
-		RepositoryInstanceInterface repoSession = null;
+		CoreSessionInterface repoSession = null;
 		boolean releaseRepoSession = false;
 
 		String invocationMode = invContext.getMode();
@@ -156,7 +152,6 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
         			+invocationMode);
 		}
 		
-		
 		RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
 		repoSession = this.getRepositorySession();
 		if (repoSession == null) {
@@ -169,24 +164,23 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 		try {
 			DocumentWrapper<DocumentModel> wrapper = repoClient.getDoc(repoSession, ctx, csid);
 			DocumentModel docModel = wrapper.getWrappedObject();
-			Boolean supports = (Boolean)docModel.getPropertyValue(modeProperty);
+			Boolean supports = (Boolean) NuxeoUtils.getProperyValue(docModel, modeProperty); //docModel.getPropertyValue(modeProperty);
 			if(supports == null || !supports) {
 				throw new BadRequestException(
 						"ReportResource: This Report does not support Invocation Mode: "
 	        			+invocationMode);
 			}
-	    	if(checkDocType) {
+	    	if (checkDocType) {
 	    		List<String> forDocTypeList = 
-	    			(List<String>)docModel.getPropertyValue(InvocableJAXBSchema.FOR_DOC_TYPES);
-	    		if(forDocTypeList==null
-	    				|| !forDocTypeList.contains(invContext.getDocType())) {
+	    			(List<String>) NuxeoUtils.getProperyValue(docModel, InvocableJAXBSchema.FOR_DOC_TYPES); //docModel.getPropertyValue(InvocableJAXBSchema.FOR_DOC_TYPES);
+	    		if (forDocTypeList==null || !forDocTypeList.contains(invContext.getDocType())) {
 	        		throw new BadRequestException(
 	        				"ReportResource: Invoked with unsupported document type: "
 	        				+invContext.getDocType());
 	        	}
 	    	}
-	    	reportFileNameProperty = ((String)docModel.getPropertyValue(ReportJAXBSchema.FILENAME)); // Set the outgoing param with the report file name
-			String reportOutputMime = (String)docModel.getPropertyValue(ReportJAXBSchema.OUTPUT_MIME);
+	    	reportFileNameProperty = (String) NuxeoUtils.getProperyValue(docModel, ReportJAXBSchema.FILENAME); //docModel.getPropertyValue(ReportJAXBSchema.FILENAME)); // Set the outgoing param with the report file name
+			String reportOutputMime = (String) NuxeoUtils.getProperyValue(docModel, ReportJAXBSchema.OUTPUT_MIME); //docModel.getPropertyValue(ReportJAXBSchema.OUTPUT_MIME);
 			if(!Tools.isEmpty(reportOutputMime)) {
 				outMimeType.append(reportOutputMime);
 			} else {
@@ -400,7 +394,7 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
     private Connection getConnection() throws NamingException, SQLException {
     	Connection result = null;
     	
-    	ServiceContext ctx = this.getServiceContext();
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
     	try {
     		String repositoryName = ctx.getRepositoryName();
 	    	if (repositoryName != null && repositoryName.trim().isEmpty() == false) {

@@ -35,7 +35,7 @@ import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
 import org.nuxeo.ecm.core.api.model.impl.primitives.StringProperty;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.nuxeo.ecm.core.api.CoreSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,8 +66,8 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.relation.RelationUtils;
 import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
-import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.config.service.ServiceBindingType;
@@ -216,7 +216,7 @@ public class RefNameServiceUtils {
     public static void updateRefNamesInRelations(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
-            RepositoryInstanceInterface repoSession,
+            CoreSessionInterface repoSession,
             String oldRefName,
             String newRefName) throws Exception {
     	//
@@ -230,20 +230,19 @@ public class RefNameServiceUtils {
     	RelationUtils.updateRefNamesInRelations(ctx, repoClient, repoSession, IRelationsManager.OBJECT_REFNAME, oldRefName, newRefName);
     }
     
-    public static List<AuthRefConfigInfo> getConfiguredAuthorityRefs(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
-        List<String> authRefFields =
-                ((AbstractServiceContextImpl) ctx).getAllPartsPropertyValues(
-                ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
-        ArrayList<AuthRefConfigInfo> authRefsInfo = new ArrayList<AuthRefConfigInfo>(authRefFields.size());
-        for (String spec : authRefFields) {
-            AuthRefConfigInfo arci = new AuthRefConfigInfo(spec);
-            authRefsInfo.add(arci);
-        }
-        return authRefsInfo;
-    }
+	public static List<AuthRefConfigInfo> getConfiguredAuthorityRefs(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
+		List<String> authRefFields = ((AbstractServiceContextImpl) ctx).getAllPartsPropertyValues(
+				ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
+		ArrayList<AuthRefConfigInfo> authRefsInfo = new ArrayList<AuthRefConfigInfo>(authRefFields.size());
+		for (String spec : authRefFields) {
+			AuthRefConfigInfo arci = new AuthRefConfigInfo(spec);
+			authRefsInfo.add(arci);
+		}
+		return authRefsInfo;
+	}
 
     public static AuthorityRefDocList getAuthorityRefDocs(
-    		RepositoryInstanceInterface repoSession,
+    		CoreSessionInterface repoSession,
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             UriTemplateRegistry uriTemplateRegistry,
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
@@ -405,7 +404,7 @@ public class RefNameServiceUtils {
     public static int updateAuthorityRefDocs(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
-            RepositoryInstanceInterface repoSession,
+            CoreSessionInterface repoSession,
             String oldRefName,
             String newRefName,
             String refPropName) throws Exception {
@@ -479,7 +478,7 @@ public class RefNameServiceUtils {
     private static DocumentModelList findAllAuthorityRefDocs(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
-            RepositoryInstanceInterface repoSession, List<String> serviceTypes,
+            CoreSessionInterface repoSession, List<String> serviceTypes,
             String refName,
             String refPropName,
             Map<String, ServiceBindingType> queriedServiceBindings,
@@ -497,7 +496,7 @@ public class RefNameServiceUtils {
     protected static DocumentModelList findAuthorityRefDocs(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
-            RepositoryInstanceInterface repoSession, List<String> serviceTypes,
+            CoreSessionInterface repoSession, List<String> serviceTypes,
             String refName,
             String refPropName,
             Map<String, ServiceBindingType> queriedServiceBindings,
@@ -705,7 +704,7 @@ public class RefNameServiceUtils {
                         uri = template.buildUri(additionalValues);
                     } else if (template.getUriTemplateType() == UriTemplateFactory.ITEM) {
                         try {
-                            String inAuthorityCsid = (String) docModel.getPropertyValue("inAuthority"); // AuthorityItemJAXBSchema.IN_AUTHORITY
+                            String inAuthorityCsid = (String) NuxeoUtils.getProperyValue(docModel, "inAuthority"); //docModel.getPropertyValue("inAuthority"); // AuthorityItemJAXBSchema.IN_AUTHORITY
                             additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, inAuthorityCsid);
                             additionalValues.put(UriTemplateFactory.ITEM_IDENTIFIER_VAR, csid);
                             uri = template.buildUri(additionalValues);
@@ -728,7 +727,7 @@ public class RefNameServiceUtils {
                 ilistItem.setUri(uri);
                 try {
                     ilistItem.setWorkflowState(docModel.getCurrentLifeCycleState());
-                    ilistItem.setUpdatedAt(DocHandlerBase.getUpdatedAtAsString(docModel));
+                    ilistItem.setUpdatedAt(NuxeoDocumentModelHandler.getUpdatedAtAsString(docModel));
                 } catch (Exception e) {
                     logger.error("Error getting core values for doc [" + csid + "]: " + e.getLocalizedMessage());
                 }

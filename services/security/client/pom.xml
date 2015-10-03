@@ -5,11 +5,10 @@
     <parent>
         <artifactId>org.collectionspace.services.security</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>4.1.1</version>
+        <version>4.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.security.client</artifactId>
     <name>services.security.client</name>
 
@@ -82,9 +81,14 @@
             <artifactId>resteasy-multipart-provider</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.authority.jaxb</artifactId>
+            <optional>true</optional>
+            <version>${project.version}</version>
+        </dependency>        
+        <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
         </dependency>
     </dependencies>
 

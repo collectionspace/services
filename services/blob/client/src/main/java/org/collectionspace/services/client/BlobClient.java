@@ -19,7 +19,6 @@ package org.collectionspace.services.client;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
-import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 
 /**
@@ -65,19 +64,19 @@ public class BlobClient extends AbstractCommonListPoxServiceClientImpl<BlobProxy
 	 * Blob proxied service calls
 	 */
 	
-    public ClientResponse<Response> createBlobFromFormData(MultipartFormDataOutput formDataOutput) {
+    public Response createBlobFromFormData(MultipartFormDataOutput formDataOutput) {
         return getProxy().createBlobFromFormData(formDataOutput);
     }
     
-    public ClientResponse<Response> createBlobFromURI(String blobUri) {
+    public Response createBlobFromURI(String blobUri) {
         return getProxy().createBlobFromURI("".getBytes(), blobUri);
     }
     
-    public ClientResponse<Response> getBlobContent(String csid) {
+    public Response getBlobContent(String csid) {
     	return getProxy().getBlobContent(csid);
     }
     
-    public ClientResponse<Response> getDerivativeContent(
+    public Response getDerivativeContent(
     		@PathParam("csid") String csid,
     		@PathParam("derivativeTerm") String derivativeTerm) {
     	return getProxy().getDerivativeContent(csid, derivativeTerm);

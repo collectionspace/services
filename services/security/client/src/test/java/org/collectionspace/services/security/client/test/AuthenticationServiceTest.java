@@ -91,8 +91,7 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected AbstractCommonList getCommonList(
-            ClientResponse<AbstractCommonList> response) {
+    protected AbstractCommonList getCommonList(Response response) {
         throw new UnsupportedOperationException(); //Since this test does not support lists, this method is not needed.
     }
 
@@ -111,23 +110,26 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         AccountsCommon account =
                 createAccountInstance("barney", "barney08", "barney@dinoland.com",
                 accountClient.getTenantId(), false);
-        ClientResponse<Response> res = accountClient.create(account);
-        int statusCode = res.getStatus();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": barney status = " + statusCode);
+        Response res = accountClient.create(account);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": barney status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        // Store the ID returned from this create operation
+	        // for additional tests below.
+	        barneyAccountId = extractId(res);
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": barneyAccountId=" + barneyAccountId);
+	        }
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        // Store the ID returned from this create operation
-        // for additional tests below.
-        barneyAccountId = extractId(res);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": barneyAccountId=" + barneyAccountId);
-        }
-        res.releaseConnection();
 
     }
 
@@ -144,23 +146,26 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         AccountsCommon account =
                 createAccountInstance("george", "george08", "george@curiousland.com",
                 accountClient.getTenantId(), false);
-        ClientResponse<Response> res = accountClient.create(account);
-        int statusCode = res.getStatus();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": george status = " + statusCode);
+        Response res = accountClient.create(account);
+        try {
+	        int statusCode = res.getStatus();
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": george status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        // Store the ID returned from this create operation
+	        // for additional tests below.
+	        georgeAccountId = extractId(res);
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": georgeAccountId=" + georgeAccountId);
+	        }
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        // Store the ID returned from this create operation
-        // for additional tests below.
-        georgeAccountId = extractId(res);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": georgeAccountId=" + georgeAccountId);
-        }
-        res.releaseConnection();
+        
         //deactivate
         setupUpdate();
         account.setStatus(Status.INACTIVE);
@@ -171,16 +176,19 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         }
 
         // Submit the request to the service and store the response.
-        ClientResponse<AccountsCommon> res1 = accountClient.update(georgeAccountId, account);
-        statusCode = res1.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res1 = accountClient.update(georgeAccountId, account);
+        try {
+	        int statusCode = res1.getStatus();
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+        	res1.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-        res1.releaseConnection();
     }
 
 
@@ -197,19 +205,22 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        if (logger.isDebugEnabled()) {
-            logger.debug("create: status = " + res.getStatus());
+        Response res = collectionObjectClient.create(multipart);
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug("create: status = " + res.getStatus());
+	        }
+	        //so it does not have any permissions out-of-the-box to create a
+	        //collection object
+	        Assert.assertEquals(res.getStatus(),
+	                Response.Status.FORBIDDEN.getStatusCode(), "expected "
+	                + Response.Status.FORBIDDEN.getStatusCode());
+	
+	        // Store the ID returned from this create operation for additional tests
+	        // below.
+        } finally {
+        	res.close();
         }
-        //so it does not have any permissions out-of-the-box to create a
-        //collection object
-        Assert.assertEquals(res.getStatus(),
-                Response.Status.FORBIDDEN.getStatusCode(), "expected "
-                + Response.Status.FORBIDDEN.getStatusCode());
-
-        // Store the ID returned from this create operation for additional tests
-        // below.
-        res.releaseConnection();
 
     }
 
@@ -225,15 +236,17 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        if (logger.isDebugEnabled()) {
-            logger.debug("create: status = " + res.getStatus());
+        Response res = collectionObjectClient.create(multipart);
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug("create: status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(),
+	                Response.Status.UNAUTHORIZED.getStatusCode(), "expected "
+	                + Response.Status.UNAUTHORIZED.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(),
-                Response.Status.UNAUTHORIZED.getStatusCode(), "expected "
-                + Response.Status.UNAUTHORIZED.getStatusCode());
-        res.releaseConnection();
-
     }
 
     @Test(dataProvider = "testName",
@@ -245,14 +258,17 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
 
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + res.getStatus());
+        Response res = collectionObjectClient.create(multipart);
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(),
+	                Response.Status.FORBIDDEN.getStatusCode(), "expected "
+	                + Response.Status.FORBIDDEN.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(),
-                Response.Status.FORBIDDEN.getStatusCode(), "expected "
-                + Response.Status.FORBIDDEN.getStatusCode());
-        res.releaseConnection();
     }
 
     /**
@@ -267,12 +283,15 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + res.getStatus());
+        Response res = collectionObjectClient.create(multipart);
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
-        res.releaseConnection();
     }
 
     /**
@@ -286,12 +305,15 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + res.getStatus());
+        Response res = collectionObjectClient.create(multipart);
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
-        res.releaseConnection();
     }
 
     /**
@@ -306,12 +328,15 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + res.getStatus());
+        Response res = collectionObjectClient.create(multipart);
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
-        res.releaseConnection();
     }
 
     /**
@@ -324,13 +349,15 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = "
-                    + res.getStatus());
+        Response res = collectionObjectClient.create(multipart);
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
-        res.releaseConnection();
     }
 
     /**
@@ -343,13 +370,15 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = "
-                    + res.getStatus());
+        Response res = collectionObjectClient.create(multipart);
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
-        res.releaseConnection();
     }
 
     @Test(dataProvider = "testName",
@@ -360,22 +389,31 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         AccountClient accountClient = new AccountClient();
         // accountClient.setAuth(true, "test", true, "test", true);
         // Submit the request to the service and store the response.
-        ClientResponse<Response> res = accountClient.delete(barneyAccountId);
-        int statusCode = res.getStatus();
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": barney status = " + statusCode);
+        
+        Response res = accountClient.delete(barneyAccountId);
+        int statusCode;
+        try {
+        	statusCode = res.getStatus();
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": barney status = " + statusCode);
+            }
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-
+        
         res = accountClient.delete(georgeAccountId);
-        statusCode = res.getStatus();
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": george status = " + statusCode);
+        try {
+        	statusCode = res.getStatus();
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": george status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        res.releaseConnection();
     }
     
     // ---------------------------------------------------------------

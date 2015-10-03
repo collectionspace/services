@@ -17,8 +17,7 @@
 
 package org.collectionspace.services.client;
 
-import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.jboss.resteasy.client.ClientResponse;
+import javax.ws.rs.core.Response;
 
 /**
  * MovementClient.java
@@ -55,7 +54,7 @@ public class MovementClient extends AbstractCommonListPoxServiceClientImpl<Movem
      * @return
      * @see org.collectionspace.services.client.MovementProxy#readList(java.lang.String)
      */
-    public ClientResponse<AbstractCommonList> readListSortedBy(String sortFieldName) {
+    public Response readListSortedBy(String sortFieldName) {
         return getProxy().readListSortedBy(sortFieldName);
     }
 
@@ -65,7 +64,7 @@ public class MovementClient extends AbstractCommonListPoxServiceClientImpl<Movem
      * @return
      * @see org.collectionspace.services.client.MovementProxy#keywordSearchSortedBy(java.lang.String, java.lang.String)
      */
-    public ClientResponse<AbstractCommonList> keywordSearchSortedBy(String keywords, String sortFieldName) {
+    public Response keywordSearchSortedBy(String keywords, String sortFieldName) {
         return getProxy().keywordSearchSortedBy(keywords, sortFieldName);
     }    
 }

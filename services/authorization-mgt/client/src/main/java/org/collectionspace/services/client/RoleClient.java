@@ -32,7 +32,6 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RolesList;
-import org.jboss.resteasy.client.ClientResponse;
 
 /**
  * A RoleClient.
@@ -59,21 +58,21 @@ public class RoleClient extends AbstractServiceClientImpl<RolesList, Role, Role,
         return SERVICE_PATH_COMPONENT;
     }
 
-    public ClientResponse<RolesList> readList() {
+    public Response readList() {
         return getProxy().readList();
 
     }
 
-    public ClientResponse<RolesList> readSearchList(String roleName) {
+    public Response readSearchList(String roleName) {
         return getProxy().readSearchList(roleName);
 
     }
 
-    public ClientResponse<Role> read(String csid) {
+    public Response read(String csid) {
         return getProxy().read(csid);
     }
     
-    public ClientResponse<AccountRole> readRoleAccounts(String csid) {
+    public Response readRoleAccounts(String csid) {
     	return getProxy().readRoleAccounts(csid);
     }
 
@@ -83,7 +82,7 @@ public class RoleClient extends AbstractServiceClientImpl<RolesList, Role, Role,
      * @param role the role
      * @return the client response
      */
-    public ClientResponse<Response> create(Role role) {
+    public Response create(Role role) {
         return getProxy().create(role);
     }
 
@@ -92,7 +91,7 @@ public class RoleClient extends AbstractServiceClientImpl<RolesList, Role, Role,
      * @param role
      * @return
      */
-    public ClientResponse<Role> update(String csid, Role role) {
+    public Response update(String csid, Role role) {
         return getProxy().update(csid, role);
     }
 

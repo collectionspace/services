@@ -33,7 +33,7 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
 
-import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 //
 // All of these Nuxeo specific classes should not be here.  This is supposed to be
 // a repository-neutral interface.
@@ -132,7 +132,7 @@ public interface RepositoryClient<IT, OT> extends StorageClient {
      * @param where NXQL where clause to get the document
      * @throws DocumentException
      */
-    public String findDocCSID(RepositoryInstanceInterface repoSession, 
+    public String findDocCSID(CoreSessionInterface repoSession, 
             ServiceContext<IT, OT> ctx, String where)
             throws DocumentNotFoundException, DocumentException;
 

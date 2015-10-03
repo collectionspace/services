@@ -29,14 +29,12 @@ package org.collectionspace;
 
 import java.io.PrintStream;
 
-import net.sf.ehcache.CacheException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.collectionspace.services.authorization.driver.AuthorizationSeedDriver;
-import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

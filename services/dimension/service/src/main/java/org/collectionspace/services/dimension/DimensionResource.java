@@ -24,7 +24,7 @@
 package org.collectionspace.services.dimension;
 
 import org.collectionspace.services.client.DimensionClient;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ import javax.ws.rs.Produces;
 @Path(DimensionClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class DimensionResource extends ResourceBase {
+public class DimensionResource extends NuxeoBasedResource {
 
     final Logger logger = LoggerFactory.getLogger(DimensionResource.class);
 

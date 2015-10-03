@@ -30,24 +30,24 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
     //(C)reate Item
     @POST
     @Path("/{vcsid}/items/")
-    ClientResponse<Response> createItem(@PathParam("vcsid") String vcsid, byte[] xmlPayload);
+    Response createItem(@PathParam("vcsid") String vcsid, byte[] xmlPayload);
 
     //(R)ead Item
     @GET
     @Path("/{vcsid}/items/{csid}")
-    ClientResponse<String> readItem(@PathParam("vcsid") String vcsid,
+    Response readItem(@PathParam("vcsid") String vcsid,
     		@PathParam("csid") String csid,
     		@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
     
     //(U)pdate Item
     @PUT
     @Path("/{vcsid}/items/{csid}")
-    ClientResponse<String> updateItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid, byte[] xmlPayload);
+    Response updateItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid, byte[] xmlPayload);
 
     //(D)elete Item
     @DELETE
     @Path("/{vcsid}/items/{csid}")
-    ClientResponse<Response> deleteItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
+    Response deleteItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
     
     /**
      * Get a list of objects that reference a given authority term.
@@ -61,7 +61,7 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
     @GET
     @Path("{csid}/items/{itemcsid}/refObjs")
     @Produces("application/xml")
-    ClientResponse<AuthorityRefDocList> getReferencingObjects(
+    Response getReferencingObjects( // ClientResponse<AuthorityRefDocList>
             @PathParam("csid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
             @QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
@@ -70,7 +70,7 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
     @GET
     @Produces({"application/xml"})
     @Path("/{parentcsid}/items/{itemcsid}/authorityrefs/")
-    public ClientResponse<AuthorityRefList> getItemAuthorityRefs(
+    public Response getItemAuthorityRefs( // public ClientResponse<AuthorityRefList>
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid);
     
@@ -81,7 +81,7 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
     //(R)ead by name
     @GET
     @Path("/urn:cspace:name({name})")
-    ClientResponse<String> readByName(@PathParam("name") String name,
+    Response readByName(@PathParam("name") String name,
     		@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
     
     /*
@@ -91,21 +91,21 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
     //(R)ead Named Item
     @GET
     @Path("/{vcsid}/items/urn:cspace:name({specifier})")
-    ClientResponse<String> readNamedItem(@PathParam("vcsid") String vcsid,
+    Response readNamedItem(@PathParam("vcsid") String vcsid,
     		@PathParam("specifier") String specifier,
     		@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
 
     //(R)ead Item In Named Authority
     @GET
     @Path("/urn:cspace:name({specifier})/items/{csid}")
-    ClientResponse<String> readItemInNamedAuthority(@PathParam("specifier") String specifier,
+    Response readItemInNamedAuthority(@PathParam("specifier") String specifier,
     		@PathParam("csid") String csid,
     		@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
 
     //(R)ead Named Item In Named Authority
     @GET
     @Path("/urn:cspace:name({specifier})/items/urn:cspace:name({itemspecifier})")
-    ClientResponse<String> readNamedItemInNamedAuthority(@PathParam("specifier") String specifier, 
+    Response readNamedItemInNamedAuthority(@PathParam("specifier") String specifier, 
     		@PathParam("itemspecifier") String itemspecifier,
     		@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
     
@@ -117,7 +117,7 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
     @GET
     @Produces({"application/xml"})
     @Path("/{csid}/items/")
-    ClientResponse<AbstractCommonList> readItemList(
+    Response readItemList(
     		@PathParam("csid") String vcsid,
             @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
@@ -127,7 +127,7 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
     @GET
     @Produces({"application/xml"})
     @Path("/urn:cspace:name({specifier})/items/")
-    ClientResponse<AbstractCommonList> readItemListForNamedAuthority(
+    Response readItemListForNamedAuthority( // ClientResponse<AbstractCommonList>
     		@PathParam("specifier") String specifier,
             @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
@@ -143,13 +143,13 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
     @Produces({"application/xml"})
     @Consumes({"application/xml"})    
     @Path("/{vcsid}/items/{csid}" + WorkflowClient.SERVICE_PATH)
-    ClientResponse<String> readItemWorkflow(@PathParam("vcsid") String vcsid,
+    Response readItemWorkflow(@PathParam("vcsid") String vcsid,
     		@PathParam("csid") String csid);
             
     //(U)pdate Item workflow
     @PUT
     @Path("/{vcsid}/items/{csid}" + WorkflowClient.SERVICE_PATH + "/{transition}")
-    ClientResponse<String> updateItemWorkflowWithTransition(
+    Response updateItemWorkflowWithTransition(
     		@PathParam("vcsid") String vcsid,
     		@PathParam("csid") String csid,
     		@PathParam("transition") String transition);

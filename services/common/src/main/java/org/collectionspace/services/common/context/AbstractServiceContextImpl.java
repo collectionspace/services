@@ -27,10 +27,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.authentication.spi.AuthNContext;
+import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ServiceMain;
@@ -77,6 +79,7 @@ public abstract class AbstractServiceContextImpl<IT, OT>
 
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(AbstractServiceContextImpl.class);
+    
     /** The properties. */
     Map<String, Object> properties = new HashMap<String, Object>();
     /** The object part map. */
@@ -101,7 +104,7 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     private Object currentRepositorySession;
     /** A reference count for the current repository session */
     private int currentRepoSesssionRefCount = 0;
-
+        
     /**
      * Instantiates a new abstract service context impl.
      */
@@ -164,6 +167,30 @@ public abstract class AbstractServiceContextImpl<IT, OT>
 	            }
 	        }
         }
+    }
+    
+    public int getTimeoutParam(UriInfo ui) {
+		int result = DEFAULT_TX_TIMEOUT;
+
+		MultivaluedMap<String, String> queryParams = (ui == null) ? null : ui.getQueryParameters();
+		if (queryParams != null) {
+			String timeoutString = queryParams.getFirst(IClientQueryParams.IMPORT_TIMEOUT_PARAM);
+			if (timeoutString != null)
+				try {
+					result = Integer.parseInt(timeoutString);
+				} catch (NumberFormatException e) {
+					logger.warn("Transaction timeout period parameter could not be parsed.  The characters in the parameter string must all be decimal digits.  The Import service will use the default timeout period instead.",
+							e);
+				}
+		}
+
+		return result;
+	}
+    
+    @Override
+    public int getTimeoutSecs() {
+    	UriInfo uriInfo = this.getUriInfo();
+    	return this.getTimeoutParam(uriInfo);
     }
 
     /* (non-Javadoc)

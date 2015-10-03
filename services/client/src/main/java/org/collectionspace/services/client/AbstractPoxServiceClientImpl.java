@@ -14,45 +14,45 @@ public abstract class AbstractPoxServiceClientImpl<CLT extends AbstractCommonLis
 	implements CollectionSpacePoxClient<CLT, P> {
 	
     @Override
-    public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
+	public Response create(PoxPayloadOut xmlPayload) {
         return getProxy().create(xmlPayload.getBytes());
     }
 		
     @Override
-	public ClientResponse<String> read(String csid) {
+	public Response read(String csid) {
         return getProxy().read(csid);
     }
     
-    public ClientResponse<CLT> readList() {
+    public Response readList() {
     	CollectionSpaceProxy<CLT> proxy = (CollectionSpaceProxy<CLT>)getProxy();
     	return proxy.readList();
     }    
     
     @Override
-    public ClientResponse<CLT> readIncludeDeleted(Boolean includeDeleted) {
+    public Response readIncludeDeleted(Boolean includeDeleted) {
     	CollectionSpacePoxProxy<CLT> proxy = getProxy();
     	return proxy.readIncludeDeleted(includeDeleted.toString());
     }
     
     @Override
-	public ClientResponse<String> readIncludeDeleted(String csid, Boolean includeDeleted) {
+	public Response readIncludeDeleted(String csid, Boolean includeDeleted) {
         return getProxy().readIncludeDeleted(csid, includeDeleted.toString());
     }
 
     @Override
-    public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload) {
+    public Response update(String csid, PoxPayloadOut xmlPayload) {
         return getProxy().update(csid, xmlPayload.getBytes());
     }
     
 
     @Override
-    public ClientResponse<CLT> keywordSearchIncludeDeleted(String keywords, Boolean includeDeleted) {
+    public Response keywordSearchIncludeDeleted(String keywords, Boolean includeDeleted) {
         CollectionSpacePoxProxy<CLT> proxy = getProxy();
         return proxy.keywordSearchIncludeDeleted(keywords, includeDeleted.toString());
     }
 
     @Override
-    public ClientResponse<CLT> advancedSearchIncludeDeleted(String whereClause, Boolean includeDeleted) {
+    public Response advancedSearchIncludeDeleted(String whereClause, Boolean includeDeleted) {
         CollectionSpacePoxProxy<CLT> proxy = getProxy();
         return proxy.advancedSearchIncludeDeleted(whereClause, includeDeleted.toString());
     }

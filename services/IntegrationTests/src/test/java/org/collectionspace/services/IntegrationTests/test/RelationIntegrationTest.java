@@ -38,8 +38,6 @@ import org.testng.annotations.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.DimensionClient;
 import org.collectionspace.services.client.DimensionFactory;
@@ -144,14 +142,14 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 		PayloadOutputPart commonPart = multipart.addPart(collectionObjectClient.getCommonPartName(), co);
 		
 		// Make the "create" call and check the response
-		ClientResponse<Response> response = collectionObjectClient.create(multipart);
+		Response response = collectionObjectClient.create(multipart);
 		String collectionObjectCsid = null;
 		try {
 			Assert.assertEquals(response.getStatus(), Response.Status.CREATED
 					.getStatusCode());
 			collectionObjectCsid = extractId(response);
 		} finally {
-			response.releaseConnection();
+			response.close();
 		}
 		
 		// Create a new dimension record
@@ -163,7 +161,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    dimensionCsid1 = extractId(response);
 	    } finally {
-	    	response.releaseConnection();
+	    	response.close();
 	    }
 	    
 	    // Relate the entities, by creating a new relation object
@@ -181,14 +179,16 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    relationCsid1 = extractId(response);
 	    } finally {
-	    	response.releaseConnection();
+	    	response.close();
 	    }	    
 	    
 	    // Now lock the dimension record.
 	    
 		@SuppressWarnings("unused")
-		ClientResponse<String> workflowResponse = dimensionClient.updateWorkflowWithTransition(dimensionCsid1, WorkflowClient.WORKFLOWTRANSITION_LOCK);
+		Response workflowResponse = dimensionClient.updateWorkflowWithTransition(
+				dimensionCsid1, WorkflowClient.WORKFLOWTRANSITION_LOCK);
 	    System.out.println("Locked dimension record with CSID=" + dimensionCsid1);
+	    workflowResponse.close();
 	    
 	    // Finally, try to delete the relationship
 	    
@@ -197,12 +197,13 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    try {
 		    Assert.assertEquals(response.getStatus(), Response.Status.BAD_REQUEST.getStatusCode());
 	    } finally {
-	    	response.releaseConnection();
+	    	response.close();
 	    }
 	    
 	    // Also, try to soft-delete.  This should also fail.
 		workflowResponse = dimensionClient.updateWorkflowWithTransition(dimensionCsid1, WorkflowClient.WORKFLOWTRANSITION_DELETE);
 	    System.out.println("Locked dimension record with CSID=" + dimensionCsid1);
+	    workflowResponse.close();
 	}
 	
 	@Test void createCollectionObjectRelationshipToManyDimensions() {
@@ -215,14 +216,14 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 		PayloadOutputPart commonPart = multipart.addPart(collectionObjectClient.getCommonPartName(), co);
 		
 		// Make the create call and check the response
-		ClientResponse<Response> response = collectionObjectClient.create(multipart);
+		Response response = collectionObjectClient.create(multipart);
 		String collectionObjectCsid = null;
 		try {
 			Assert.assertEquals(response.getStatus(), Response.Status.CREATED
 					.getStatusCode());
 			collectionObjectCsid = extractId(response);
 		} finally {
-			response.releaseConnection();
+			response.close();
 		}
 		
 		//Next, create the first of three Dimension records to relate the collection object record
@@ -234,7 +235,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    dimensionCsid1 = extractId(response);
 	    } finally {
-	    	response.releaseConnection();
+	    	response.close();
 	    }
 	    
 		//Next, create a the second Dimension record
@@ -246,7 +247,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    dimensionCsid2 = extractId(response);
 	    } finally {
-	    	response.releaseConnection();
+	    	response.close();
 	    }
 	    
 		//Next, create a the 3rd Dimension record
@@ -258,7 +259,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    dimensionCsid3 = extractId(response);
 	    } finally {
-	    	response.releaseConnection();
+	    	response.close();
 	    }
 	    
 	    // Relate the entities, by creating a new relation object
@@ -277,7 +278,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    relationCsid1 = extractId(response);
 	    } finally {
-	    	response.releaseConnection();
+	    	response.close();
 	    }
 	    // Wait 1 second and create the second relationship
 	    try {
@@ -302,7 +303,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    relationCsid2 = extractId(response);
 	    } finally {
-	    	response.releaseConnection();
+	    	response.close();
 	    }
 	    // Wait 1 second and create the 3rd relationship
 	    try {
@@ -327,7 +328,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    relationCsid3 = extractId(response);
 	    } finally {
-	    	response.releaseConnection();
+	    	response.close();
 	    }	    	    
 	}    
 	
@@ -344,14 +345,14 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 		commonPart.setLabel(collectionObjectClient.getCommonPartName());
 		
 		// Make the create call and check the response
-		ClientResponse<Response> response = collectionObjectClient.create(multipart);
+		Response response = collectionObjectClient.create(multipart);
 		String collectionObjectCsid = null;
 		try {
 			Assert.assertEquals(response.getStatus(), Response.Status.CREATED
 					.getStatusCode());
 			collectionObjectCsid = extractId(response);
 		} finally {
-			response.releaseConnection();
+			response.close();
 		}
 		
 		//Next, create a Dimension record to relate the collection object to
@@ -363,11 +364,13 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    dimensionCsid = extractId(response);
 	    } finally {
-	    	response.releaseConnection();
+	    	response.close();
 	    }
 	    
 	    @SuppressWarnings("unused")
-		ClientResponse<String> workflowResponse = dimensionClient.updateWorkflowWithTransition(dimensionCsid, WorkflowClient.WORKFLOWTRANSITION_LOCK);
+	    Response workflowResponse = dimensionClient.updateWorkflowWithTransition(dimensionCsid, 
+				WorkflowClient.WORKFLOWTRANSITION_LOCK);
+	    workflowResponse.close();
 	    System.out.println("Locked dimension record with CSID=" + dimensionCsid);
 	    
 	    // Lastly, relate the two entities, by creating a new relation object
@@ -381,16 +384,14 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    commonPart.setLabel(relationClient.getCommonPartName());
 
 	    // Make the call to crate
-	    ClientResponse<Response> relationresponse = relationClient.create(multipart);
-	    @SuppressWarnings("unused")
+	    Response relationresponse = relationClient.create(multipart);
 		String relationCsid = null;
 	    try {
 		    Assert.assertEquals(relationresponse.getStatus(), Response.Status.BAD_REQUEST.getStatusCode());
 		    relationCsid = extractId(response);
 	    } finally {
-	    	relationresponse.releaseConnection();
+	    	relationresponse.close();
 	    }
-	    
 	}
 	
 	@Test
@@ -407,14 +408,14 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 		commonPart.setLabel(collectionObjectClient.getCommonPartName());
 		
 		// Make the create call and check the response
-		ClientResponse<Response> response = collectionObjectClient.create(multipart);
+		Response response = collectionObjectClient.create(multipart);
 		String collectionObjectCsid = null;
 		try {
 			Assert.assertEquals(response.getStatus(), Response.Status.CREATED
 					.getStatusCode());
 			collectionObjectCsid = extractId(response);
 		} finally {
-			response.releaseConnection();
+			response.close();
 		}
 	    
 	    
@@ -433,7 +434,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    intakeCsid = extractId(response);
 	    } finally {
-	    	response.releaseConnection();
+	    	response.close();
 	    }
 	    
 	    // Lastly, relate the two entities, by creating a new relation object
@@ -453,14 +454,14 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    relationCsid = extractId(response);
 	    } finally {
-	    	response.releaseConnection();
+	    	response.close();
 	    }
 	    
 	    //
 	    // Now try to retrieve the Intake record of the CollectionObject.
 	    //
 	    String predicate = RelationshipType.COLLECTIONOBJECT_INTAKE.toString();
-	    ClientResponse<RelationsCommonList> resultResponse = relationClient.readList(
+	    Response resultResponse = relationClient.readList(
 	    		collectionObjectCsid,
 	    		null, //CollectionobjectsCommon.class.getSimpleName(),
 	    		predicate,
@@ -469,9 +470,9 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
         RelationsCommonList relationList = null;
 	    try {
 	    	Assert.assertEquals(resultResponse.getStatus(), Response.Status.OK.getStatusCode());
-	        relationList = resultResponse.getEntity();
+	        relationList = resultResponse.readEntity(RelationsCommonList.class);
 	    } finally {
-	    	resultResponse.releaseConnection();
+	    	resultResponse.close();
 	    }
 	    
 	    //
@@ -486,19 +487,19 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
         for(RelationsCommonList.RelationListItem listItem : relationListItems){
         	
         	String foundCsid = listItem.getCsid();
-        	ClientResponse<String> multiPartResponse = null;
+        	Response multiPartResponse = null;
         	try {
         		multiPartResponse = relationClient.read(foundCsid);
         		int responseStatus = multiPartResponse.getStatus();
         		Assert.assertEquals(responseStatus, Response.Status.OK.getStatusCode());
-        		PoxPayloadIn input = new PoxPayloadIn(multiPartResponse.getEntity());
+        		PoxPayloadIn input = new PoxPayloadIn(multiPartResponse.readEntity(String.class));
 	        	resultRelation = (RelationsCommon) extractPart(input,
 	        			relationClient.getCommonPartName(),
 	        			RelationsCommon.class);
         	} catch (Exception e) {
         		e.printStackTrace();
         	} finally {
-        		multiPartResponse.releaseConnection();
+        		multiPartResponse.close();
         	}
         	
         	Assert.assertEquals(resultRelation.getSubjectCsid(), collectionObjectCsid);
@@ -530,7 +531,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 			commonPart.setLabel(collectionObjectClient.getCommonPartName());
 			
 			// Make the create call and check the response
-			ClientResponse<Response> response = collectionObjectClient.create(multipart);
+			Response response = collectionObjectClient.create(multipart);
 			String collectionObjectCsid = null;
 			try {
 				Assert.assertEquals(response.getStatus(), Response.Status.CREATED
@@ -538,7 +539,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 				collectionObjectCsid = extractId(response);
 				collectionObjectIDList.add(collectionObjectCsid);
 			} finally {
-				response.releaseConnection();
+				response.close();
 			}
 		}
 	    
@@ -552,13 +553,13 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    commonPart.setLabel(intakeClient.getCommonPartName());
 
 	    // Make the call to create and check the response
-	    ClientResponse<Response> response = intakeClient.create(multipart);
+	    Response response = intakeClient.create(multipart);
 	    String intakeCsid = null;
 	    try {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    intakeCsid = extractId(response);
 	    } finally {
-	    	response.releaseConnection();
+	    	response.close();
 	    }
 	    
 	    // Lastly, relate the two entities, by creating a new relation object
@@ -580,7 +581,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 			    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 			    relationCsid = extractId(response);
 		    } finally {
-		    	response.releaseConnection();
+		    	response.close();
 		    }
 	    }
 	    
@@ -590,7 +591,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    String predicate = RelationshipType.COLLECTIONOBJECT_INTAKE.toString();
 		RelationsCommonList relationList = null;
 	    for (String collectionObjectCsid : collectionObjectIDList) {
-		    ClientResponse<RelationsCommonList> resultResponse = relationClient.readList(
+		    Response resultResponse = relationClient.readList(
 		    		intakeCsid,
 		    		null, //IntakesCommon.class.getSimpleName(), //subject
 		    		predicate,
@@ -599,9 +600,9 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 
 		    try {
 		    	Assert.assertEquals(resultResponse.getStatus(), Response.Status.OK.getStatusCode());
-		        relationList = resultResponse.getEntity();
+		        relationList = resultResponse.readEntity(RelationsCommonList.class);
 		    } finally {
-		    	resultResponse.releaseConnection();
+		    	resultResponse.close();
 		    }
 	    
 		    //
@@ -615,19 +616,19 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	        RelationsCommon resultRelation = null;
 	        for(RelationsCommonList.RelationListItem listItem : relationListItems){
 	        	String foundCsid = listItem.getCsid();
-	        	ClientResponse<String> multiPartResponse = null;
+	        	Response multiPartResponse = null;
 	        	try {
 	        		multiPartResponse = relationClient.read(foundCsid);
 	        		int responseStatus = multiPartResponse.getStatus();
 	        		Assert.assertEquals(responseStatus, Response.Status.OK.getStatusCode());
-	        		PoxPayloadIn input = new PoxPayloadIn(multiPartResponse.getEntity());
+	        		PoxPayloadIn input = new PoxPayloadIn(multiPartResponse.readEntity(String.class));
 	        		resultRelation = (RelationsCommon) extractPart(input,
 	        				relationClient.getCommonPartName(),
 	        				RelationsCommon.class);
 	        	} catch (Exception e) {
 	        		e.printStackTrace();
 	        	} finally {
-	        		multiPartResponse.releaseConnection();
+	        		multiPartResponse.close();
 	        	}
 	
 	        	Assert.assertEquals(resultRelation.getSubjectCsid(), intakeCsid);
