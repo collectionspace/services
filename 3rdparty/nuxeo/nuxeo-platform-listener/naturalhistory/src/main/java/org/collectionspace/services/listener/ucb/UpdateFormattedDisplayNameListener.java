@@ -10,6 +10,8 @@ import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.TaxonFormatter;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonConstants;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -55,7 +57,8 @@ public class UpdateFormattedDisplayNameListener implements EventListener {
 				if (!parentShortId.equals(TaxonConstants.COMMON_VOCABULARY_SHORTID)) {
 					if (event.getName().equals(DocumentEventTypes.DOCUMENT_CREATED)) {
 						// Save the document, to get the BEFORE_DOC_UPDATE branch to run.
-						doc.getCoreSession().saveDocument(doc);
+						CoreSessionInterface session = new CoreSessionWrapper(doc.getCoreSession());
+						session.saveDocument(doc);
 					}
 					else if (event.getName().equals(DocumentEventTypes.BEFORE_DOC_UPDATE)) {
 						DocumentModel previousDoc = (DocumentModel) context.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);	            	
