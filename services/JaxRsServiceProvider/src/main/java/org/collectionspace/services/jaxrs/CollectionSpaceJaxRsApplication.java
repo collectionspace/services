@@ -128,7 +128,6 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new BlobResource());
         addResourceToMapAndSingletons(new MovementResource());
         addResourceToMapAndSingletons(new ClaimResource());
-        addResourceToMapAndSingletons(new ExhibitionResource());
         addResourceToMapAndSingletons(new ReportResource());
         addResourceToMapAndSingletons(new PublicItemResource());
 
