@@ -24,7 +24,7 @@
 package org.collectionspace.services.claim.nuxeo;
 
 import org.collectionspace.services.claim.ClaimsCommon;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 
 /**
  * The Class ClaimDocumentModelHandler.
@@ -33,7 +33,7 @@ import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
  * $LastChangedDate: 2011-07-22 12:44:36 -0700 (Fri, 22 Jul 2011) $
  */
 public class ClaimDocumentModelHandler
-        extends DocHandlerBase<ClaimsCommon> {
+        extends NuxeoDocumentModelHandler<ClaimsCommon> {
 
 }
 

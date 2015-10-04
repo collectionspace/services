@@ -71,7 +71,7 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     final String SERVICE_PATH_COMPONENT = "claims";
 
     // Instance variables specific to this test.
-    final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
+    final String PERSON_AUTHORITY_NAME = "TestPersonAuthForClaim";
     private String knownResourceId = null;
     private List<String> claimIdsCreated = new ArrayList<String>();
     private List<String> personIdsCreated = new ArrayList<String>();
@@ -93,8 +93,7 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getCommonList(
-			ClientResponse<AbstractCommonList> response) {
+	protected AbstractCommonList getCommonList(Response response) {
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
@@ -121,7 +120,7 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
                 "claimNumber-" + identifier,
                 claimFilerRefName,
                 claimOnBehalfOfRefName);
-        ClientResponse<Response> res = claimClient.create(multipart);
+        Response res = claimClient.create(multipart);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -158,14 +157,16 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         // refName by which it can be identified.
     	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
-        ClientResponse<Response> res = personAuthClient.create(multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-        personAuthCSID = extractId(res);
-
+        Response res = personAuthClient.create(multipart);
+        try {
+            int statusCode = res.getStatus();
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, STATUS_CREATED);
+            personAuthCSID = extractId(res);
+        } finally {
+            res.close();
+        }
         String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
         
         // Create temporary Person resources, and their corresponding refNames
@@ -180,6 +181,8 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     }
     
     protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
+        String result = null;
+        
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
@@ -191,16 +194,21 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         term.setTermDisplayName(termName);
         term.setTermName(termName);
         personTerms.add(term);
-    	PoxPayloadOut multipart =
-    		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
+    	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
     				authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
-        ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
-        int statusCode = res.getStatus();
+        Response res = personAuthClient.createItem(personAuthCSID, multipart);
+        try {
+            int statusCode = res.getStatus();
 
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-    	return extractId(res);
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, STATUS_CREATED);
+            result = extractId(res);
+        } finally {
+            res.close();
+        }
+        
+        return result;
     }
 
     // Success outcomes
@@ -212,7 +220,7 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
         // Submit the request to the service and store the response.
         ClaimClient claimClient = new ClaimClient();
-        ClientResponse<String> res = claimClient.read(knownResourceId);
+        Response res = claimClient.read(knownResourceId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -225,7 +233,7 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         // Extract and return the common part of the record.
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
         PayloadInputPart payloadInputPart = input.getPart(claimClient.getCommonPartName());
         ClaimsCommon claimCommon = null;
         if (payloadInputPart != null) {
@@ -240,8 +248,7 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         Assert.assertEquals(claimCommon.getClaimClaimantGroupList().getClaimClaimantGroup().get(0).getFiledOnBehalfOf(), claimOnBehalfOfRefName);
         
         // Get the auth refs and check them
-        ClientResponse<AuthorityRefList> res2 =
-           claimClient.getAuthorityRefs(knownResourceId);
+        Response res2 = claimClient.getAuthorityRefs(knownResourceId);
         statusCode = res2.getStatus();
         if(logger.isDebugEnabled()){
             logger.debug(testName + ".getAuthorityRefs: status = " + statusCode);
@@ -249,7 +256,7 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, testExpectedStatusCode);
-        AuthorityRefList list = res2.getEntity();
+        AuthorityRefList list = res2.readEntity(AuthorityRefList.class);
         
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
         int numAuthRefsFound = items.size();
@@ -308,7 +315,7 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         // Delete Person resource(s) (before PersonAuthority resources).
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            personAuthClient.deleteItem(personAuthCSID, resourceId);
+            personAuthClient.deleteItem(personAuthCSID, resourceId).close();
         }
         // Delete PersonAuthority resource(s).
         // Note: Any non-success response is ignored and not reported.
@@ -319,7 +326,7 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         ClaimClient claimClient = new ClaimClient();
         for (String resourceId : claimIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            claimClient.delete(resourceId);
+            claimClient.delete(resourceId).close();
         }
     }
 

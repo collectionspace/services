@@ -88,9 +88,8 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected AbstractCommonList getCommonList(
-            ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(AbstractCommonList.class);
+    protected AbstractCommonList getCommonList(Response response) {
+        return response.readEntity(AbstractCommonList.class);
     }
     
     // ---------------------------------------------------------------
@@ -112,7 +111,7 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
         ClaimClient client = new ClaimClient();
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createClaimInstance(identifier);
-        ClientResponse<Response> res = client.create(multipart);
+        Response res = client.create(multipart);
 
         int statusCode = res.getStatus();
 
@@ -287,7 +286,7 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 
         // Submit the request to the service and store the response.
         ClaimClient client = new ClaimClient();
-        ClientResponse<String> res = client.read(knownResourceId);
+        Response res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -300,7 +299,7 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
         Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         // Get the common part of the response and verify that it is not null.
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
         PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
         ClaimsCommon claimCommon = null;
         if (payloadInputPart != null) {
@@ -345,7 +344,7 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 
         // Submit the request to the service and store the response.
         ClaimClient client = new ClaimClient();
-        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
+        Response res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -374,8 +373,8 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 
         // Submit the request to the service and store the response.
         ClaimClient client = new ClaimClient();
-        ClientResponse<AbstractCommonList> res = client.readList();
-        AbstractCommonList list = res.getEntity();
+        Response res = client.readList();
+        AbstractCommonList list = res.readEntity(getCommonListType());
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -411,7 +410,7 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 
         // Retrieve the contents of a resource to update.
         ClaimClient client = new ClaimClient();
-        ClientResponse<String> res = client.read(knownResourceId);
+        Response res = client.read(knownResourceId);
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": read status = " + res.getStatus());
         }
@@ -421,7 +420,7 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
         }
 
         // Extract the common part from the response.
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
         PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
         ClaimsCommon claimCommon = null;
         if (payloadInputPart != null) {
@@ -462,7 +461,7 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
         Assert.assertEquals(statusCode, testExpectedStatusCode);
 
        // Extract the updated common part from the response.
-        input = new PoxPayloadIn(res.getEntity());
+        input = new PoxPayloadIn(res.readEntity(String.class));
         payloadInputPart = input.getPart(client.getCommonPartName());
         ClaimsCommon updatedClaimCommon = null;
         if (payloadInputPart != null) {
@@ -645,7 +644,7 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
         // The only relevant ID may be the one used in update(), below.
         ClaimClient client = new ClaimClient();
         PoxPayloadOut multipart = createClaimInstance(NON_EXISTENT_ID);
-        ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
+        Response res = client.update(NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -705,7 +704,7 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 
         // Submit the request to the service and store the response.
         ClaimClient client = new ClaimClient();
-        ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
+        Response res = client.delete(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
