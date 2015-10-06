@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.StoredValuesUriTemplate;
 import org.collectionspace.services.common.UriTemplateFactory;
 import org.collectionspace.services.common.UriTemplateRegistryKey;
@@ -76,7 +76,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 	private Session session;
 	private ModelFulltext fulltextInfo;
 	
-	private Map<String, ResourceBase> resourcesByDocType;
+	private Map<String, NuxeoBasedResource> resourcesByDocType;
 
 	public ReindexFullTextBatchJob() {
 		setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_NO_CONTEXT, INVOCATION_MODE_SINGLE, INVOCATION_MODE_LIST));
@@ -217,9 +217,9 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 	}
 	
 	private void initResourceMap() {
-		resourcesByDocType = new HashMap<String, ResourceBase>();
+		resourcesByDocType = new HashMap<String, NuxeoBasedResource>();
 
-		for (ResourceBase resource : getResourceMap().values()) {
+		for (NuxeoBasedResource resource : getResourceMap().values()) {
 			Map<UriTemplateRegistryKey, StoredValuesUriTemplate> entries = resource.getUriRegistryEntries();
 			
 			for (UriTemplateRegistryKey key : entries.keySet()) {
@@ -230,8 +230,8 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 					if (resourcesByDocType.containsKey(docType)) {
 						log.warn("multiple resources found for docType " + docType);
 						
-						ResourceBase currentResource = resourcesByDocType.get(docType);
-						ResourceBase candidateResource = resource;
+						NuxeoBasedResource currentResource = resourcesByDocType.get(docType);
+						NuxeoBasedResource candidateResource = resource;
 						
 						// Favor the resource that isn't an AuthorityResource. This
 						// is really just to deal with Contacts, which are handled
@@ -286,7 +286,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		
 		log.debug("reindexing docType " + docType);
 		
-		ResourceBase resource = resourcesByDocType.get(docType);
+		NuxeoBasedResource resource = resourcesByDocType.get(docType);
 		
 		if (resource == null) {
 			log.warn("no resource found for docType " + docType);

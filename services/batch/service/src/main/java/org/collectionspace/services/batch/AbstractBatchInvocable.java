@@ -6,7 +6,7 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
-import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +36,7 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
     private List<String> invocationModes;
     private ResourceMap resourceMap;
     private InvocationContext context;
-    private RepositoryInstanceInterface repoSession;
+    private CoreSessionInterface repoSession;
     private String tenantId;
     private int completionStatus;
     private InvocationResults results;
@@ -84,11 +84,11 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
     }
     
     @Override
-    public void setRepoSession(RepositoryInstanceInterface repoSession) {
+    public void setRepoSession(CoreSessionInterface repoSession) {
         this.repoSession = repoSession;
     }
     
-    public RepositoryInstanceInterface getRepoSession() {
+    public CoreSessionInterface getRepoSession() {
         return repoSession;
     }
     

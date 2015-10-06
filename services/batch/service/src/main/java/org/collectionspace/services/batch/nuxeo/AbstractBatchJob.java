@@ -14,6 +14,7 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.collectionspace.services.batch.AbstractBatchInvocable;
+import org.collectionspace.services.batch.UriInfoImpl;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.CollectionSpaceClientUtils;
@@ -26,7 +27,7 @@ import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.UriTemplateRegistry;
 import org.collectionspace.services.common.api.RefName;
@@ -42,7 +43,6 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.jboss.resteasy.specimpl.PathSegmentImpl;
-import org.jboss.resteasy.specimpl.UriInfoImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +90,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 				"</ns2:relations_common>" +
 			"</document>";
 
-		ResourceBase resource = getResourceMap().get(RelationClient.SERVICE_NAME);
+		NuxeoBasedResource resource = getResourceMap().get(RelationClient.SERVICE_NAME);
 		Response response = resource.create(getResourceMap(), null, createRelationPayload);
 
 		if (response.getStatus() == CREATED_STATUS) {
@@ -193,7 +193,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	}
 
 	protected PoxPayloadOut findByCsid(String serviceName, String csid) throws URISyntaxException, DocumentException {
-		ResourceBase resource = getResourceMap().get(serviceName);
+		NuxeoBasedResource resource = getResourceMap().get(serviceName);
 		byte[] response = resource.get(null, createUriInfo(), csid);
 
 		PoxPayloadOut payload = new PoxPayloadOut(response);
@@ -214,12 +214,12 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	}
 	
 	protected List<String> findAll(String serviceName, int pageSize, int pageNum, String sortBy) throws URISyntaxException, DocumentException {
-		ResourceBase resource = getResourceMap().get(serviceName);	
+		NuxeoBasedResource resource = getResourceMap().get(serviceName);	
 
 		return findAll(resource, pageSize, pageNum, null);
 	}
 	
-	protected List<String> findAll(ResourceBase resource, int pageSize, int pageNum, String sortBy) throws URISyntaxException, DocumentException {
+	protected List<String> findAll(NuxeoBasedResource resource, int pageSize, int pageNum, String sortBy) throws URISyntaxException, DocumentException {
 		AbstractCommonList list = resource.getList(createPagedListUriInfo(resource.getServiceName(), pageNum, pageSize, sortBy));
 		List<String> csids = new ArrayList<String>();
 
