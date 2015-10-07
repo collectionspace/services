@@ -18,7 +18,7 @@
 		<dependency>
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports</artifactId>
-			<version>5.0.1</version>
+			<version>6.1.1</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>itext</artifactId>

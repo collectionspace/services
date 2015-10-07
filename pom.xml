@@ -110,7 +110,7 @@
 			</snapshots>
 		</repository>
 
-		<!--
+		<!-- codehaus was shutdown in May 2015
 		<repository>
 			<id>codehaus repo</id>
 			<name>codehaus repo</name>
@@ -216,6 +216,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</pluginRepository>
+		<!-- Codehaus repo was shutdown in May 2015
 		<pluginRepository>
 			<id>Codehaus Repository</id>
 			<url>http://repository.codehaus.org/</url>
@@ -226,6 +227,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</pluginRepository>
+		-->
 	</pluginRepositories>
 
 	<build>
