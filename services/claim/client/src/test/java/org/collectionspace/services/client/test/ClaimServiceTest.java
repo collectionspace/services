@@ -111,27 +111,35 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
         ClaimClient client = new ClaimClient();
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createClaimInstance(identifier);
+        String newID = null;
         Response res = client.create(multipart);
+        try {
+            int statusCode = res.getStatus();
 
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        // Specifically:
-        // Does it fall within the set of valid status codes?
-        // Does it exactly match the expected status code?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            //
+            // Specifically:
+            // Does it fall within the set of valid status codes?
+            // Does it exactly match the expected status code?
+            if(logger.isDebugEnabled()){
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
+        
+            newID = extractId(res);
+        } finally {
+            if (res != null) {
+                res.close();
+            }
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
+        
         // Store the ID returned from the first resource created
         // for additional tests below.
         if (knownResourceId == null){
-            knownResourceId = extractId(res);
+            knownResourceId = newID;
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
@@ -287,19 +295,17 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
         // Submit the request to the service and store the response.
         ClaimClient client = new ClaimClient();
         Response res = client.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        PoxPayloadIn input = null;
+        try {
+            assertStatusCode(res, testName);
+            input = new PoxPayloadIn(res.readEntity(String.class));
+        } finally {
+            if (res != null) {
+                res.close();
+            }
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
+        
         // Get the common part of the response and verify that it is not null.
-        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
         PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
         ClaimsCommon claimCommon = null;
         if (payloadInputPart != null) {
@@ -345,16 +351,22 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
         // Submit the request to the service and store the response.
         ClaimClient client = new ClaimClient();
         Response res = client.read(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
+        try {
+            int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            if(logger.isDebugEnabled()){
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+            if (res != null) {
+                res.close();
+            }
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // ---------------------------------------------------------------
@@ -372,23 +384,34 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
         setupReadList();
 
         // Submit the request to the service and store the response.
+        AbstractCommonList list = null;
         ClaimClient client = new ClaimClient();
         Response res = client.readList();
-        AbstractCommonList list = res.readEntity(getCommonListType());
-        int statusCode = res.getStatus();
+        assertStatusCode(res, testName);
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+            int statusCode = res.getStatus();
+
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            if(logger.isDebugEnabled()){
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
+
+            list = res.readEntity(getCommonListType());
+        } finally {
+            if (res != null) {
+                res.close();
+            }
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         // Optionally output additional data about list members for debugging.
-        if(logger.isTraceEnabled()){
-        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
+        boolean iterateThroughList = true;
+        if(iterateThroughList && logger.isDebugEnabled()){
+            AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
         }
     }
 
@@ -406,29 +429,33 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
     //    dependsOnMethods = {"read"})
     public void update(String testName) throws Exception {
         // Perform setup.
-        setupUpdate();
+        setupRead();
 
         // Retrieve the contents of a resource to update.
         ClaimClient client = new ClaimClient();
         Response res = client.read(knownResourceId);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": read status = " + res.getStatus());
+        PoxPayloadIn input = null;
+        try {
+            assertStatusCode(res, testName);
+            input = new PoxPayloadIn(res.readEntity(String.class));
+            if (logger.isDebugEnabled()) {
+                logger.debug("got object to update with ID: " + knownResourceId);
+            }
+        } finally {
+            if (res != null) {
+                res.close();
+            }
         }
-        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
-        if(logger.isDebugEnabled()){
-            logger.debug("got object to update with ID: " + knownResourceId);
-        }
-
+        
         // Extract the common part from the response.
-        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
         PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
         ClaimsCommon claimCommon = null;
         if (payloadInputPart != null) {
             claimCommon = (ClaimsCommon) payloadInputPart.getBody();
         }
         Assert.assertNotNull(claimCommon);
-
-        // Update its content.
+        
+        // Update the content of this resource.
         claimCommon.setClaimNumber(""); // Test deletion of existing string value
 
         String claimNote = claimCommon.getClaimClaimantGroupList().getClaimClaimantGroup().get(0).getClaimantNote();
@@ -439,39 +466,43 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
         String currentTimestamp = GregorianCalendarDateTimeUtils.timestampUTC();
         claimCommon.getClaimReceivedGroupList().getClaimReceivedGroup().get(0).setClaimReceivedDate(currentTimestamp);
         claimCommon.getClaimReceivedGroupList().getClaimReceivedGroup().get(0).setClaimReceivedNote(""); 
-
-        if(logger.isDebugEnabled()){
+        
+        if (logger.isDebugEnabled()) {
             logger.debug("to be updated object");
             logger.debug(objectAsXmlString(claimCommon, ClaimsCommon.class));
         }
+        
+        setupUpdate();
 
-        // Submit the request to the service and store the response.
+        // Submit the updated common part in an update request to the service
+        // and store the response.
         PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
-        PayloadOutputPart commonPart = output.addPart(claimCommon, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(client.getCommonPartName());
+        PayloadOutputPart commonPart = output.addPart(client.getCommonPartName(), claimCommon);
         res = client.update(knownResourceId, output);
-
-        // Check the status code of the response: does it match the expected response(s)?
-        int statusCode = res.getStatus();
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+            assertStatusCode(res, testName);
+            int statusCode = res.getStatus();
+            // Check the status code of the response: does it match the expected response(s)?
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
+            input = new PoxPayloadIn(res.readEntity(String.class));
+        } finally {
+            if (res != null) {
+                res.close();
+            }
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
-       // Extract the updated common part from the response.
-        input = new PoxPayloadIn(res.readEntity(String.class));
+        // Extract the updated common part from the response.
         payloadInputPart = input.getPart(client.getCommonPartName());
         ClaimsCommon updatedClaimCommon = null;
         if (payloadInputPart != null) {
             updatedClaimCommon = (ClaimsCommon) payloadInputPart.getBody();
         }
-        Assert.assertNotNull(claimCommon);
-        if(logger.isDebugEnabled()){
-            logger.debug("updated object");
-            logger.debug(objectAsXmlString(updatedClaimCommon, ClaimsCommon.class));
-        }
+        Assert.assertNotNull(updatedClaimCommon);
 
         // Check selected fields in the updated common part.
         // By submitting an empty string in the update payload, the value of this field
@@ -645,16 +676,22 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
         ClaimClient client = new ClaimClient();
         PoxPayloadOut multipart = createClaimInstance(NON_EXISTENT_ID);
         Response res = client.update(NON_EXISTENT_ID, multipart);
-        int statusCode = res.getStatus();
+        try {
+            int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            if(logger.isDebugEnabled()){
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+            if (res != null) {
+                res.close();
+            }
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // ---------------------------------------------------------------
@@ -669,27 +706,29 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
     //@Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
     //    dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
     public void delete(String testName) throws Exception {
-        /*
         // Perform setup.
         setupDelete();
 
         // Submit the request to the service and store the response.
         ClaimClient client = new ClaimClient();
-        ClientResponse<Response> res = client.delete(knownResourceId);
-        int statusCode = res.getStatus();
+        Response res = client.delete(knownResourceId);
+        try {
+            int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            if(logger.isDebugEnabled()){
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+            if (res != null) {
+                res.close();
+            }
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-     *
-     */
     }
-
 
     // Failure outcomes
     /* (non-Javadoc)
@@ -705,16 +744,22 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
         // Submit the request to the service and store the response.
         ClaimClient client = new ClaimClient();
         Response res = client.delete(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
+        try {
+            int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            if(logger.isDebugEnabled()){
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+            if (res != null) {
+                res.close();
+            }
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // ---------------------------------------------------------------

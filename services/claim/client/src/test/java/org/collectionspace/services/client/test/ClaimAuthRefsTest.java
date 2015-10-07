@@ -122,36 +122,38 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
                 claimOnBehalfOfRefName);
         Response res = claimClient.create(multipart);
         int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        // Specifically:
-        // Does it fall within the set of valid status codes?
-        // Does it exactly match the expected status code?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        // Store the ID returned from the first resource created
-        // for additional tests below.
-        if (knownResourceId == null){
-            knownResourceId = extractId(res);
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": knownResourceId=" + knownResourceId);
+        try {
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            //
+            // Specifically:
+            // Does it fall within the set of valid status codes?
+            // Does it exactly match the expected status code?
+            if(logger.isDebugEnabled()){
+                logger.debug(testName + ": status = " + statusCode);
             }
-        }
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
+
+            // Store the ID returned from the first resource created
+            // for additional tests below.
+            if (knownResourceId == null){
+                knownResourceId = extractId(res);
+                if (logger.isDebugEnabled()) {
+                    logger.debug(testName + ": knownResourceId=" + knownResourceId);
+                }
+            }
         
-        // Store the IDs from every resource created by tests,
-        // so they can be deleted after tests have been run.
-        claimIdsCreated.add(extractId(res));
+            // Store the IDs from every resource created by tests,
+            // so they can be deleted after tests have been run.
+            claimIdsCreated.add(extractId(res));
+        } finally {
+            res.close();
+        }
     }
 
     protected void createPersonRefs(){
-
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding
         // refName by which it can be identified.
@@ -199,7 +201,6 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         Response res = personAuthClient.createItem(personAuthCSID, multipart);
         try {
             int statusCode = res.getStatus();
-
             Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, STATUS_CREATED);
@@ -221,27 +222,22 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         // Submit the request to the service and store the response.
         ClaimClient claimClient = new ClaimClient();
         Response res = claimClient.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ".read: status = " + statusCode);
-        }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        // Extract and return the common part of the record.
-        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
-        PayloadInputPart payloadInputPart = input.getPart(claimClient.getCommonPartName());
         ClaimsCommon claimCommon = null;
-        if (payloadInputPart != null) {
-        	claimCommon = (ClaimsCommon) payloadInputPart.getBody();
-        }
-        Assert.assertNotNull(claimCommon);
-        if(logger.isDebugEnabled()){
-            logger.debug(objectAsXmlString(claimCommon, ClaimsCommon.class));
+        // Extract and return the common part of the record.
+        try {
+            assertStatusCode(res, testName);
+            // Extract the common part from the response.
+            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
+            claimCommon = (ClaimsCommon) extractPart(input,
+                claimClient.getCommonPartName(), ClaimsCommon.class);
+            Assert.assertNotNull(claimCommon);
+            if(logger.isDebugEnabled()){
+                logger.debug(objectAsXmlString(claimCommon, ClaimsCommon.class));
+            }
+        } finally {
+            if (res != null) {
+                res.close();
+            }
         }
         // Check a couple of fields
         Assert.assertEquals(claimCommon.getClaimClaimantGroupList().getClaimClaimantGroup().get(0).getFiledBy(), claimFilerRefName);
@@ -249,14 +245,16 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         
         // Get the auth refs and check them
         Response res2 = claimClient.getAuthorityRefs(knownResourceId);
-        statusCode = res2.getStatus();
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ".getAuthorityRefs: status = " + statusCode);
+        AuthorityRefList list = null;
+        try {
+            assertStatusCode(res2, testName);
+            list = res2.readEntity(AuthorityRefList.class);
+            Assert.assertNotNull(list);
+        } finally {
+            if (res2 != null) {
+                res2.close();
+            }
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-        AuthorityRefList list = res2.readEntity(AuthorityRefList.class);
         
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
         int numAuthRefsFound = items.size();
@@ -264,9 +262,6 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
             logger.debug("Expected " + NUM_AUTH_REFS_EXPECTED +
                 " authority references, found " + numAuthRefsFound);
         }
-        Assert.assertEquals(numAuthRefsFound, NUM_AUTH_REFS_EXPECTED,
-            "Did not find all expected authority references! " +
-            "Expected " + NUM_AUTH_REFS_EXPECTED + ", found " + numAuthRefsFound);
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
@@ -284,6 +279,11 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
                 i++;
             }
         }
+        
+        Assert.assertEquals(numAuthRefsFound, NUM_AUTH_REFS_EXPECTED,
+            "Did not find all expected authority references! " +
+            "Expected " + NUM_AUTH_REFS_EXPECTED + ", found " + numAuthRefsFound);
+
     }
 
 
