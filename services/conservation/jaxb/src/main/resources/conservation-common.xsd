@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Conservation schema (XSD)
+    
+    Entity  : Conservation
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+
+    $LastChangedRevision$
+    $LastChangedDate$
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns:ns="http://collectionspace.org/services/conservation"
+  xmlns="http://collectionspace.org/services/conservation"
+  targetNamespace="http://collectionspace.org/services/conservation"
+  version="0.1"
+>
+
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+<!-- See http://wiki.collectionspace.org/display/collectionspace/Conservation+Schema --> 
+    
+    <!--  Conservation Information Group -->
+    <xs:element name="conservation_common">
+        <xs:complexType>
+            <xs:sequence> 
+                <xs:element name="conservationNumber" type="xs:string"/>
+                <xs:element name="conservationStatusGroupList" type="conservationStatusGroupList"/>
+                <xs:element name="treatmentPurpose" type="xs:string"/>
+                <xs:element name="conservators" type="conservatorsList"/>
+                <xs:element name="otherPartyGroupList" type="otherPartyGroupList"/>
+                <xs:element name="examinationGroupList" type="examinationGroupList"/>
+                <xs:element name="fabricationNote" type="xs:string"/>
+                <xs:element name="proposedTreatment" type="xs:string"/>
+                <xs:element name="approvedBy" type="xs:string"/>
+                <xs:element name="approvedDate" type="xs:date"/>
+                <xs:element name="treatmentStartDate" type="xs:date"/>
+                <xs:element name="treatmentEndDate" type="xs:date"/>
+                <xs:element name="treatmentSummary" type="xs:string"/>
+                <xs:element name="researcher" type="xs:string"/>
+                <xs:element name="proposedAnalysis" type="xs:string"/>
+                <xs:element name="proposedAnalysisDate" type="xs:date"/>
+                <xs:element name="destAnalysisGroupList" type="destAnalysisGroupList"/>
+                <xs:element name="analysisMethod" type="xs:string"/>
+                <xs:element name="analysisResults" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:complexType name="conservatorsList">
+        <xs:sequence>
+            <xs:element name="conservator" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="conservationStatusGroupList">
+        <xs:sequence>
+            <xs:element name="conservationStatusGroup" type="conservationStatusGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="conservationStatusGroup">
+        <xs:sequence>
+            <xs:element name="status" type="xs:string"/>
+            <xs:element name="statusDate" type="xs:date"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="otherPartyGroupList">
+        <xs:sequence>
+            <xs:element name="otherPartyGroup" type="otherPartyGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="otherPartyGroup">
+        <xs:sequence>
+            <xs:element name="otherParty" type="xs:string"/>
+            <xs:element name="otherPartyRole" type="xs:string"/>
+            <xs:element name="otherPartyNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="examinationGroupList">
+        <xs:sequence>
+            <xs:element name="examinationGroup" type="examinationGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="examinationGroup">
+        <xs:sequence>
+            <xs:element name="examinationStaff" type="xs:string"/>
+            <xs:element name="examinationPhase" type="xs:string"/>
+            <xs:element name="examinationDate" type="xs:date"/>
+            <xs:element name="examinationNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="destAnalysisGroupList">
+        <xs:sequence>
+            <xs:element name="destAnalysisGroup" type="destAnalysisGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="destAnalysisGroup">
+        <xs:sequence>
+            <xs:element name="destAnalysisApprovedDate" type="xs:date"/>
+            <xs:element name="destAnalysisApprovalNote" type="xs:string"/>
+            <xs:element name="sampleBy" type="xs:string"/>
+            <xs:element name="sampleDate" type="xs:date"/>
+            <xs:element name="sampleDescription" type="xs:string"/>
+            <xs:element name="sampleReturned" type="xs:boolean"/>
+            <xs:element name="sampleReturnedLocation" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
+
