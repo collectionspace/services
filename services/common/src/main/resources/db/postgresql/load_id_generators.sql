@@ -852,8 +852,8 @@ INSERT INTO id_generators
 '<org.collectionspace.services.id.SettableIDGenerator>
   <parts>
     <org.collectionspace.services.id.StringIDGeneratorPart>
-      <initialValue>CONS</initialValue>
-      <currentValue>CONS</currentValue>
+      <initialValue>CT</initialValue>
+      <currentValue>CT</currentValue>
     </org.collectionspace.services.id.StringIDGeneratorPart>
     <org.collectionspace.services.id.YearIDGeneratorPart>
       <currentValue></currentValue>
