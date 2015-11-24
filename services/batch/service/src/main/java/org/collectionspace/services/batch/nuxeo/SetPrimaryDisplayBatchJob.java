@@ -48,6 +48,7 @@ public class SetPrimaryDisplayBatchJob extends AbstractBatchJob {
 				InvocationResults results = new InvocationResults();
 				results.setNumAffected(numAffected);
 				results.setUserNote(numAffected + " media records updated");
+				results.setPrimaryURICreated("media.html?csid=" + mediaCsid);
 				
 				setResults(results);
 			}
