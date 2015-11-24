@@ -18,6 +18,7 @@ import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.CollectionSpaceClientUtils;
 import org.collectionspace.services.client.IRelationsManager;
+import org.collectionspace.services.client.MediaClient;
 import org.collectionspace.services.client.MovementClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PlaceAuthorityClient;
@@ -35,6 +36,7 @@ import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.relation.RelationResource;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.media.nuxeo.MediaConstants;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
@@ -150,6 +152,10 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		return findRelatedObjects(subjectCsid, null, "affects", null, MovementConstants.NUXEO_DOCTYPE);
 	}
 
+	protected List<String> findRelatedMedia(String subjectCsid) throws URISyntaxException {
+		return findRelatedObjects(subjectCsid, null, "affects", null, MediaConstants.NUXEO_DOCTYPE);
+	}
+	
 	protected String findBroader(String subjectCsid) throws URISyntaxException {
 		List<String> relatedObjects = findRelatedObjects(subjectCsid, null, "hasBroader", null, null);
 
@@ -207,6 +213,10 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 
 	protected PoxPayloadOut findMovementByCsid(String csid) throws URISyntaxException, DocumentException {
 		return findByCsid(MovementClient.SERVICE_NAME, csid);
+	}
+
+	protected PoxPayloadOut findMediaByCsid(String csid) throws URISyntaxException, DocumentException {
+		return findByCsid(MediaClient.SERVICE_NAME, csid);
 	}
 	
 	protected List<String> findAll(String serviceName, int pageSize, int pageNum) throws URISyntaxException, DocumentException {
