@@ -111,7 +111,7 @@ public class RefNameUtils {
         
         public String getRelativeUri() {
         	StringBuilder uri = new StringBuilder();
-        	// FIXME This should not be hard-coded.
+        	// FIXME This should not be hard-coded -see https://issues.collectionspace.org/browse/CSPACE-5987
         	if(resource.equals("vocabulary")) {
         		uri.append("/vocabularies/");
         	} else if(resource.equals("personauthority")) {
@@ -124,7 +124,7 @@ public class RefNameUtils {
         			|| resource.equals("locationauthorities")
         			|| resource.equals("placeauthorities")
         			|| resource.equals("vocabularies"))) {	
-        			logger.error("Unrecognized Authority Type: " + resource);
+        			logger.warn("Unrecognized Authority Type: " + resource);
         		}
         		uri.append("/"+resource+"/");
         	}

@@ -235,11 +235,15 @@ public final class NuxeoClientEmbedded {
         //
         if (repository != null) {
             result = getCoreSessionWrapper(repository);
-        	logger.trace(String.format("A new transaction was started on thread '%d' : %s.",
-        			Thread.currentThread().getId(), startedTransaction ? "true" : "false"));
-        	logger.trace(String.format("Added a new repository instance to our repo list.  Current count is now: %d",
-        			repositoryInstances.size()));
-        } else {
+            if (result != null) {
+	        	logger.trace(String.format("A new transaction was started on thread '%d' : %s.",
+	        			Thread.currentThread().getId(), startedTransaction ? "true" : "false"));
+	        	logger.trace(String.format("Added a new repository instance to our repo list.  Current count is now: %d",
+	        			repositoryInstances.size()));
+            }
+        }
+        
+        if (repository == null || result == null) {
         	//
         	// If we couldn't open a repo session, we need to close the transaction we started.
         	//
@@ -285,10 +289,16 @@ public final class NuxeoClientEmbedded {
      * Nuxeo repository and check for network related failures.  We will retry all calls to the Nuxeo repo that fail because
      * of network erros.
      */
-    private CoreSessionInterface getCoreSessionWrapper(Repository repository) throws Exception {
+    private CoreSessionInterface getCoreSessionWrapper(Repository repository) {
     	CoreSessionInterface result = null;
     	    	
-    	CoreSession coreSession  = CoreInstance.openCoreSession(repository.getName(), getSystemPrincipal());  // A Nuxeo repo instance handler proxy
+    	CoreSession coreSession = null;
+    	try {
+    		coreSession = CoreInstance.openCoreSession(repository.getName(), getSystemPrincipal());  // A Nuxeo repo instance handler proxy
+    	} catch (Exception e) {
+    		logger.warn(String.format("Could not open a session to the '%s' repository.  The current request to the CollectionSpace services API will fail.",
+    				repository != null ? repository.getName() : "not specified"), e);
+    	}
     	
         if (coreSession != null) {
         	result = this.getAOPProxy(coreSession);  // This is our AOP proxy
@@ -296,15 +306,14 @@ public final class NuxeoClientEmbedded {
 		    	String key = result.getSessionId();
 		        repositoryInstances.put(key, result);
         	} else {
+        		//
+        		// Since we couldn't get an AOP proxy, we need to close the core session.
+        		//
+        		CoreInstance.closeCoreSession(coreSession);
         		String errMsg = String.format("Could not instantiate a Spring AOP proxy for class '%s'.",
         				CoreSessionWrapper.class.getName());
         		logger.error(errMsg);
-        		throw new Exception(errMsg);
         	}
-        } else {
-        	String errMsg = String.format("Could not create a new repository instance for '%s' repository.", repository.getName());
-        	logger.error(errMsg);
-        	throw new Exception(errMsg);
         }
     	
     	return result;

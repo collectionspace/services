@@ -75,7 +75,8 @@ public class RelationServiceTest extends AbstractPoxServiceTestImpl<RelationsCom
     private String oliveObjectRefName = UNINITIALIZED_REFNAME;
     
     private String personAuthCSID = null;
-    private String personShortId = PERSON_AUTHORITY_NAME;
+    private String personAuthShortId = PERSON_AUTHORITY_NAME + System.currentTimeMillis();
+    private String personAuthDisplayName = personAuthShortId;
     
 
     /** The SERVICE path component. */
@@ -102,7 +103,7 @@ public class RelationServiceTest extends AbstractPoxServiceTestImpl<RelationsCom
 
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
-                PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
+        		personAuthDisplayName, personAuthShortId, personAuthClient.getCommonPartName());
         Response res = personAuthClient.create(multipart);
         try {
 	        int statusCode = res.getStatus();

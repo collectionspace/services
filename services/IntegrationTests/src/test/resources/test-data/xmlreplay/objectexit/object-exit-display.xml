@@ -1,53 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xmlReplay>
-    <auths>
-        <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
-        <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
-        <auth ID="testAdministator">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
-    </auths>
+	<auths>
+		<!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
+		<auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+		<auth ID="testAdministator">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
+	</auths>
 
-    <!-- 
+	<!-- 
     ========================================================
             testGroup :: refNameDisplayNameOnly
               Creates a record using only displayName and not shortIdentifier. 
     ======================================================== 
     -->
-    
-    <testGroup ID="refNameDisplayNameOnly" autoDeletePOSTS="false">
-        <test ID="oePersonauthority">  
-             <method>POST</method>
-             <uri>/cspace-services/personauthorities/</uri>
-             <filename>objectexit/oePersonauthority.xml</filename>
-        </test>
-        <test ID="oePerson">
-             <method>POST</method>
-             <uri>/cspace-services/personauthorities/${oePersonauthority.CSID}/items/</uri>
-             <filename>objectexit/oePersonDisplayOnly.xml</filename>
-             <vars>
-                <var ID="displayName">Finbar the DisplayName</var>
-                <var ID="shortIdentifier">Finbar_the_shortIdentifier</var>
-             </vars>
-        </test>
-        <test ID="oePersonGET">
-            <method>GET</method>
-            <uri>/cspace-services/personauthorities/${oePersonauthority.CSID}/items/${oePerson.CSID}</uri>
-            <response>
-                <expected level="ADDOK" /><!--server adds the csid -->
-                <label>persons_common</label>
-                <filename>objectexit/res/oePersonDisplayGET.res.xml</filename>
-                <vars>
-                    <!-- TODO: .got is not namespace aware yet, so you must make the xpath work around it for now.-->
-                    <var ID="csidGot">${oePersonGET.got("//csid")}</var>                      
-                    <var ID="inAuthority">${oePersonauthority.CSID}</var>
-                    <var ID="inAuthorityShortIdentifier">${oePersonauthority.sent("//shortIdentifier")}</var>
-                	<var ID="displayName">${oePerson.sent("//displayName")}</var>
-                	<var ID="shortIdentifier">${oePerson.sent("//shortIdentifier")}</var>
-                    <var ID="refName">urn:cspace:core.collectionspace.org:personauthorities:name(${inAuthorityShortIdentifier}):item:name(${shortIdentifier})'${displayName}'</var>
-                </vars>
-             </response>
-        </test>
-    </testGroup>
+
+	<testGroup ID="refNameDisplayNameOnly" autoDeletePOSTS="false">
+		<test ID="oePersonauthority">
+			<method>POST</method>
+			<uri>/cspace-services/personauthorities/</uri>
+			<filename>objectexit/oePersonauthority.xml</filename>
+		</test>
+		<test ID="oePerson">
+			<method>POST</method>
+			<uri>/cspace-services/personauthorities/${oePersonauthority.CSID}/items/</uri>
+			<filename>objectexit/oePersonDisplayOnly.xml</filename>
+			<vars>
+				<var ID="displayName">Finbar the DisplayName</var>
+				<var ID="shortIdentifier">Finbar_the_shortIdentifier</var>
+			</vars>
+		</test>
+		<test ID="oePersonGET">
+			<method>GET</method>
+			<uri>/cspace-services/personauthorities/${oePersonauthority.CSID}/items/${oePerson.CSID}</uri>
+			<response>
+				<expected level="ADDOK"></expected>
+				<!--server adds the csid -->
+				<label>persons_common</label>
+				<filename>objectexit/res/oePersonDisplayGET.res.xml</filename>
+				<vars>
+					<!-- TODO: .got is not namespace aware yet, so you must make the xpath work around it for now.-->
+					<var ID="csidGot">${oePersonGET.got("//csid")}</var>
+					<var ID="inAuthority">${oePersonauthority.CSID}</var>
+					<var ID="inAuthorityShortIdentifier">${oePersonauthority.sent("//shortIdentifier")}</var>
+					<var ID="displayName">${oePerson.sent("//displayName")}</var>
+					<var ID="shortIdentifier">${oePerson.sent("//shortIdentifier")}</var>
+					<var ID="refName">urn:cspace:core.collectionspace.org:personauthorities:name(${inAuthorityShortIdentifier}):item:name(${shortIdentifier})'${displayName}'</var>
+				</vars>
+			</response>
+		</test>
+		<test ID="delete-oePerson">
+			<method>DELETE</method>
+			<uri>/cspace-services/personauthorities/${oePersonauthority.CSID}/items/${oePerson.CSID}</uri>
+		</test>
+		<test ID="delete-oePersonauthority">
+			<method>DELETE</method>
+			<uri>/cspace-services/personauthorities/${oePersonauthority.CSID}</uri>
+		</test>
+	</testGroup>
 
 </xmlReplay>
-        
-        
