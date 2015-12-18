@@ -661,6 +661,8 @@ public class JpaStorageUtils {
         for (EntityManagerFactory emf : entityManagerFactoryCache.values()) {
             emf.close();
         }
+        
+        entityManagerFactoryCache.clear();
     }
 }
 
