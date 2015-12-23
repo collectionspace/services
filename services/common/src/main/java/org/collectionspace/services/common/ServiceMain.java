@@ -41,6 +41,8 @@ import org.collectionspace.services.config.types.PropertyItemType;
 import org.collectionspace.services.config.types.PropertyType;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 import org.collectionspace.services.nuxeo.client.java.TenantRepository;
+
+import org.apache.commons.io.FileUtils;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.dom4j.Document;
 import org.slf4j.Logger;
@@ -70,11 +72,7 @@ public class ServiceMain {
     private ServicesConfigReaderImpl servicesConfigReader;
     private TenantBindingConfigReaderImpl tenantBindingConfigReader;
     private UriTemplateRegistry uriTemplateRegistry = new UriTemplateRegistry();
-    
-    private static final String COMPONENT_EXTENSION_XPATH = "/component/extension[@point='%s']";
-    private static final String DATASOURCE_EXTENSION_POINT_XPATH = String.format(COMPONENT_EXTENSION_XPATH, "datasources");
-    private static final String REPOSITORY_EXTENSION_POINT_XPATH = String.format(COMPONENT_EXTENSION_XPATH, "repository");
-    
+        
     private static final String DROP_DATABASE_SQL_CMD = "DROP DATABASE";
     private static final String DROP_DATABASE_IF_EXISTS_SQL_CMD = DROP_DATABASE_SQL_CMD + " IF EXISTS %s;";
     private static final String DROP_USER_SQL_CMD = "DROP USER";
@@ -163,6 +161,7 @@ public class ServiceMain {
         // Create or update Nuxeo's per-repository configuration files.
         createOrUpdateNuxeoDatasourceConfigFiles();
         createOrUpdateNuxeoRepositoryConfigFiles();
+        createOrUpdateNuxeoElasticsearchConfigFiles();
         
         // Create the Nuxeo-managed databases, along with the requisite
         // access rights to each.
@@ -417,13 +416,21 @@ public class ServiceMain {
     }
     
     private String getNuxeoProtoConfigFilename() {
-        return JEEServerDeployment.NUXEO_PROTOTYPE_CONFIG_FILENAME;
+        return JEEServerDeployment.NUXEO_PROTOTYPE_REPO_CONFIG_FILENAME;
     }
     
     private String getNuxeoProtoDatasourceFilename() {
         return JEEServerDeployment.NUXEO_PROTOTYPE_DATASOURCE_FILENAME;
-    }    
+    }
     
+    private String getNuxeoProtoElasticsearchConfigFilename() {
+        return JEEServerDeployment.NUXEO_PROTO_ELASTICSEARCH_CONFIG_FILENAME;
+    }    
+
+    private String getNuxeoProtoElasticsearchExtensionFilename() {
+        return JEEServerDeployment.NUXEO_PROTO_ELASTICSEARCH_EXTENSION_FILENAME;
+    }    
+
     private String getDatabaseScriptsPath() {
         DatabaseProductType dbType;
         String databaseProductName;
@@ -842,6 +849,104 @@ public class ServiceMain {
 			}
 		}
 	}
+	
+	private File getProtoElasticsearchConfigFile() throws Exception {
+		File result = new File(getCspaceServicesConfigDir() + File.separator
+				+ getNuxeoProtoElasticsearchConfigFilename());
+		// FIXME: Consider checking for the presence of existing configuration
+		// files, rather than always failing outright if the prototype file for
+		// creating new or updated files can't be located.
+		if (result.canRead() == false) {
+			String msg = String
+					.format("Could not find and/or read the prototype Elasticsearch config file '%s'. "
+							+ "Please redeploy this file by running 'ant deploy' from the Services layer source code's '3rdparty/nuxeo' module.",
+							result.getCanonicalPath());
+			throw new RuntimeException(msg);
+		}
+
+		if (logger.isInfoEnabled()) {
+			logger.info("Found and can read the prototype Elasticsearch configuration file at path '%s'.",
+					result.getAbsolutePath());
+		}
+
+		return result;
+	}
+	
+	private File getProtoElasticsearchExtensionFile() throws Exception {
+		File result = new File(getCspaceServicesConfigDir() + File.separator
+				+ getNuxeoProtoElasticsearchExtensionFilename());
+		// FIXME: Consider checking for the presence of existing configuration
+		// files, rather than always failing outright if the prototype file for
+		// creating new or updated files can't be located.
+		if (result.canRead() == false) {
+			String msg = String
+					.format("Could not find and/or read the prototype Elasticsearch extension file '%s'. "
+							+ "Please redeploy this file by running 'ant deploy' from the Services layer source code's '3rdparty/nuxeo' module.",
+							result.getCanonicalPath());
+			throw new RuntimeException(msg);
+		}
+
+		if (logger.isInfoEnabled()) {
+			logger.info("Found and can read the prototype Elasticsearch extension file at path %s",
+					result.getAbsolutePath());
+		}
+
+		return result;
+	}	
+	
+	private void createOrUpdateNuxeoElasticsearchConfigFiles() throws Exception {
+		//
+		// Get the prototype copy of the Nuxeo Elasticsearch extension element and
+		// fill it in for each tenant
+		//
+		File protoElasticsearchExtensionFile = getProtoElasticsearchExtensionFile();
+		StringBuffer extensionList = new StringBuffer();
+		Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
+		for (TenantBindingType tbt : tenantBindingTypeMap.values()) {
+			List<String> repositoryNameList = ConfigUtils.getRepositoryNameList(tbt);
+			logger.debug("Getting repository name(s) for tenant " + tbt.getName());
+
+			if (repositoryNameList == null || repositoryNameList.isEmpty() == true) {
+				logger.error(String.format("Could not get repository name(s) for tenant %s", tbt.getName()));
+				continue; // break out of loop and go to the next tenant binding
+			} else {
+				for (String repositoryName : repositoryNameList) {
+					if (Tools.isBlank(repositoryName)) {
+						logger.error(String.format("Repository name(s) for tenant %s was empty.", tbt.getName()));
+					} else {
+						logger.debug(String.format("Repository name is %s", repositoryName));
+						Document protoElasticsearchExtensionDoc = XmlTools.fileToXMLDocument(protoElasticsearchExtensionFile);
+						
+						protoElasticsearchExtensionDoc = updateElasticSearchExtensionDoc(protoElasticsearchExtensionDoc, repositoryName, this.getCspaceInstanceId());
+						if (logger.isDebugEnabled()) {
+							String extension = protoElasticsearchExtensionDoc.asXML();
+							logger.trace(String.format("Updated Elasticsearch extension for '%s' repository: contents=\n", repositoryName, extension));
+						}
+						//extensionList.append(protoElasticsearchExtensionDoc.asXML() + '\n');	
+						extensionList.append(XmlTools.asXML(protoElasticsearchExtensionDoc, true) + '\n');	
+					}
+				}
+			}
+		}
+		
+		//
+		// Create the final Nuxeo Elasticsearch configuration file and deploy it to the Nuxeo server.
+		//
+		if (extensionList.length() > 0) {
+			// Get the prototype copy of the Nuxeo Elasticsearch config file.
+			String str = FileUtils.readFileToString(getProtoElasticsearchConfigFile());
+			str = str.replace(ConfigUtils.ELASTICSEARCH_EXTENSIONS_EXPANDER_STR, extensionList);
+
+			//
+			// Create the final xml Elasticsearch config and fill in the correct values.
+			//
+			File elasticSearchConfigFile = new File(getNuxeoConfigDir() + File.separator
+					+ JEEServerDeployment.NUXEO_ELASTICSEARCH_CONFIG_FILENAME);
+			FileUtilities.StringToFile(str, elasticSearchConfigFile);
+		} else {
+			logger.error("Could not create Elasticsearch configuration files.  Check that the prototype configuration files are properly formatted and in the correct location.");
+		}	
+	}
     
    /**
     * Ensure that Nuxeo repository configuration files exist for each repository
@@ -928,24 +1033,24 @@ public class ServiceMain {
         
         // Text substitutions within first extension point, "repository"
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository", "name",
+        		ConfigUtils.REPOSITORY_EXTENSION_POINT_XPATH + "/repository", "name",
                 repositoryName);
         
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository", "name",
+        		ConfigUtils.REPOSITORY_EXTENSION_POINT_XPATH + "/repository", "name",
                 repositoryName);
         
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/binaryStore", "path",
+        		ConfigUtils.REPOSITORY_EXTENSION_POINT_XPATH + "/repository/binaryStore", "path",
                 Tools.isBlank(binaryStorePath) ? repositoryName : binaryStorePath);  // Can be either partial or full path.  Partial path will be relative to Nuxeo's data directory
 
         /* Create the JDBC url options if any exist */
         String jdbcOptions = XmlTools.getElementValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/property[@name='JDBCOptions']");
+        		ConfigUtils.REPOSITORY_EXTENSION_POINT_XPATH + "/repository/property[@name='JDBCOptions']");
         jdbcOptions = Tools.isBlank(jdbcOptions) ? "" : "?" + jdbcOptions;
         
         repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/property[@name='DatabaseName']",
+        		ConfigUtils.REPOSITORY_EXTENSION_POINT_XPATH + "/repository/property[@name='DatabaseName']",
                 databaseName + jdbcOptions);
                 
         return repoConfigDoc;
@@ -964,50 +1069,79 @@ public class ServiceMain {
         // Set the <datasource> element's  name attribute
         String datasoureName = "jdbc/" + repositoryName;
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                DATASOURCE_EXTENSION_POINT_XPATH + "/datasource", "name", datasoureName);
+        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/datasource", "name", datasoureName);
         
         // Get the DB server name
         String serverName = XmlTools.getElementValue(repoConfigDoc,
-        		DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='ServerName']");
+        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='ServerName']");
         // Get the JDBC options
         String jdbcOptions = XmlTools.getElementValue(repoConfigDoc,
-        		DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='JDBCOptions']");
+        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='JDBCOptions']");
         jdbcOptions = Tools.isBlank(jdbcOptions) ? "" : "?" + jdbcOptions;
         // Get the DB port nubmer
         String portNumber = XmlTools.getElementValue(repoConfigDoc,
-        		DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='PortNumber']");
+        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='PortNumber']");
         // Build the JDBC URL from the parts
         String jdbcUrl = String.format("jdbc:postgresql://%s:%s/%s%s", //FIXME: 'postgresql' string should not be hard coded here
         		serverName, portNumber, databaseName, jdbcOptions);
         
         // Set the <datasource> element's url attribute
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                DATASOURCE_EXTENSION_POINT_XPATH + "/datasource", "url", jdbcUrl);
+        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/datasource", "url", jdbcUrl);
         logger.debug(String.format("Built up the following JDBC url: %s", jdbcUrl));
         
         // Get the DB username
         String username = XmlTools.getElementValue(repoConfigDoc,
-        		DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='User']");
+        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='User']");
         // Set the <datasource> element's user attribute
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                DATASOURCE_EXTENSION_POINT_XPATH + "/datasource", "username", username);
+        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/datasource", "username", username);
         
         // Get the DB password
         String password = XmlTools.getElementValue(repoConfigDoc,
-        		DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='Password']");
+        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='Password']");
         // Set the <datasource> element's password attribute
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                DATASOURCE_EXTENSION_POINT_XPATH + "/datasource", "password", password);
+        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/datasource", "password", password);
         
         // Set the <link> element's name attribute
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                DATASOURCE_EXTENSION_POINT_XPATH + "/link", "name", "jdbc/repository_" + repositoryName);
+        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/link", "name", "jdbc/repository_" + repositoryName);
         // Set the <link> element's global attribute
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                DATASOURCE_EXTENSION_POINT_XPATH + "/link", "global", datasoureName);
+        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/link", "global", datasoureName);
         
         return repoConfigDoc;
-    }    
+    }
+    
+    private String getElasticsearchIndexName(Document repoConfigDoc, String repositoryName,
+    		String cspaceInstanceId) {
+    	String result = ConfigUtils.DEFAULT_ELASTICSEARCH_INDEX_NAME;
+    	
+    	if (repositoryName.equalsIgnoreCase(ConfigUtils.DEFAULT_NUXEO_REPOSITORY_NAME) == false) {
+    		return repositoryName;
+    	}
+    	
+    	return result;
+    }
+    
+    /*
+     * This method is filling out the elasticsearch-config.xml file with tenant specific repository information.
+     */
+    private Document updateElasticSearchExtensionDoc(Document elasticsearchConfigDoc, String repositoryName,
+    		String cspaceInstanceId) {
+        
+        // Set the <elasticSearchIndex> element's  name attribute
+        String indexName = getElasticsearchIndexName(elasticsearchConfigDoc, repositoryName, cspaceInstanceId);
+        elasticsearchConfigDoc = XmlTools.setAttributeValue(elasticsearchConfigDoc,
+        		ConfigUtils.ELASTICSEARCH_INDEX_EXTENSION_XPATH + "/elasticSearchIndex", "name", indexName);
+        
+        // Set the <elasticSearchIndex> element's repository attribute
+        elasticsearchConfigDoc = XmlTools.setAttributeValue(elasticsearchConfigDoc,
+        		ConfigUtils.ELASTICSEARCH_INDEX_EXTENSION_XPATH + "/elasticSearchIndex", "repository", repositoryName);
+        
+        return elasticsearchConfigDoc;
+    }
 
     /**
      * Update the current copy of the Nuxeo databases initialization script file by

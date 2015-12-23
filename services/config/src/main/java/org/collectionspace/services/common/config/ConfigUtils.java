@@ -11,10 +11,20 @@ import org.slf4j.LoggerFactory;
 public class ConfigUtils {
     final static Logger logger = LoggerFactory.getLogger(ConfigUtils.class);
     
+    public static final String EXTENSION_XPATH = "/extension[@point='%s']";
+    public static final String COMPONENT_EXTENSION_XPATH = "/component" + EXTENSION_XPATH;
+    public static final String DATASOURCE_EXTENSION_POINT_XPATH = String.format(COMPONENT_EXTENSION_XPATH, "datasources");
+    public static final String REPOSITORY_EXTENSION_POINT_XPATH = String.format(COMPONENT_EXTENSION_XPATH, "repository");
+    public static final String ELASTICSEARCH_INDEX_EXTENSION_XPATH = String.format(EXTENSION_XPATH, "elasticSearchIndex");
+    public static final String ELASTICSEARCH_EXTENSIONS_EXPANDER_STR = "%elasticSearchIndex_extensions%";
+    
+    
     // Default database names
-//    public static String DEFAULT_CSPACE_DATABASE_NAME = "cspace";
+    
+    // public static String DEFAULT_CSPACE_DATABASE_NAME = "cspace";
     public static String DEFAULT_NUXEO_REPOSITORY_NAME = "default";
     public static String DEFAULT_NUXEO_DATABASE_NAME = "nuxeo";
+    public static String DEFAULT_ELASTICSEARCH_INDEX_NAME = "nuxeo";
     
     /*
      * Returns the list of repository/DB names defined by a tenant bindings file

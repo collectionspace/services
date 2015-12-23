@@ -66,7 +66,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.io.IOUtils;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.FileUtils;
+import org.collectionspace.services.common.FileUtilities;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -699,7 +699,7 @@ public class NuxeoBlobUtils {
 			//
 			String sanitizedName = NuxeoBlobUtils.getSanizitedFilename(originalFile);
 			if (sanitizedName.equals(originalFile.getName()) == false) {
-				targetFile = FileUtils.createTmpFile(originalFile, sanitizedName);
+				targetFile = FileUtilities.createTmpFile(originalFile, sanitizedName);
 				if (logger.isDebugEnabled() == true) {
 					logger.debug(String.format("The file '%s''s name has characters that Nuxeo can't deal with.  Rather than renaming the file, we created a new temp file at '%s'",
 							originalFile.getName(), targetFile.getAbsolutePath()));

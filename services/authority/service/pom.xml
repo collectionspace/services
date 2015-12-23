@@ -37,6 +37,16 @@
 		<dependency>
 			<groupId>org.collectionspace.services</groupId>
 			<artifactId>org.collectionspace.services.common</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>nuxeo-automation-io</artifactId>
+					<groupId>org.nuxeo.ecm.automation</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>nuxeo-automation-server</artifactId>
+					<groupId>org.nuxeo.ecm.automation</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.collectionspace.services</groupId>

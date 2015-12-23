@@ -13,7 +13,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<cspace.services.version>4.3-SNAPSHOT</cspace.services.version>
 		<cspace.services.client.version>4.3-SNAPSHOT</cspace.services.client.version>
-		<nuxeo.general.release>6.0</nuxeo.general.release>
+		<nuxeo.general.release>6.0-HF21</nuxeo.general.release>
 		<nuxeo.shell.version>${nuxeo.general.release}</nuxeo.shell.version>
 		<nuxeo.platform.version>${nuxeo.general.release}</nuxeo.platform.version>
 		<nuxeo.core.version>${nuxeo.general.release}</nuxeo.core.version>

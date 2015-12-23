@@ -71,6 +71,7 @@ import org.apache.chemistry.opencmis.commons.enums.CmisVersion;
 import org.apache.chemistry.opencmis.commons.server.CallContext;
 import org.apache.chemistry.opencmis.server.impl.CallContextImpl;
 import org.apache.chemistry.opencmis.server.shared.ThresholdOutputStreamFactory;
+
 import org.nuxeo.common.utils.IdUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -84,6 +85,7 @@ import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.runtime.transaction.TransactionRuntimeException;
 import org.nuxeo.ecm.core.opencmis.bindings.NuxeoCmisServiceFactory;
 import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoCmisService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -210,7 +212,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         } catch (BadRequestException bre) {
             throw bre;
         } catch (Exception e) {
-            logger.error("Caught exception ", e);
             throw new NuxeoDocumentException(e);
         } finally {
             if (repoSession != null) {
@@ -1385,9 +1386,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         } catch (CSWebApplicationException wae) {
             throw wae;
         } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception ", e);
-            }
             throw new NuxeoDocumentException(e);
         } finally {
             if (repoSession != null) {

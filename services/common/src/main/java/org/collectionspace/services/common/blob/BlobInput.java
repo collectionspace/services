@@ -175,7 +175,7 @@ public class BlobInput {
 	// are we also receiving the blobUri?
 	//
 	public void createBlobFile(HttpServletRequest req, String blobUri) throws Exception {
-    	File tmpFile = org.collectionspace.services.common.FileUtils.createTmpFile(req);
+    	File tmpFile = org.collectionspace.services.common.FileUtilities.createTmpFile(req);
     	this.setBlobFile(tmpFile);
     	this.setBlobUri(blobUri);
 	}

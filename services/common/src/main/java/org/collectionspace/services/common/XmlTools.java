@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
+
 import org.collectionspace.services.common.api.Tools;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -26,6 +27,7 @@ public class XmlTools {
 
     // Output format for XML pretty printing.
     public final static OutputFormat PRETTY_PRINT_OUTPUT_FORMAT =  defaultPrettyPrintOutputFormat();
+    public final static String UTF8_ENCODING = "UTF-8";
 
 
     /**
@@ -106,6 +108,25 @@ public class XmlTools {
         }
         return doc;
     }
+    
+    
+	public static String asXML(Document doc, boolean suppressDeclaration) {
+		OutputFormat format = new OutputFormat();
+		format.setSuppressDeclaration(suppressDeclaration);
+		format.setEncoding(UTF8_ENCODING);
+
+		try {
+			StringWriter out = new StringWriter();
+			XMLWriter writer = new XMLWriter(out, format);
+			writer.write(doc);
+			writer.flush();
+
+			return out.toString();
+		} catch (IOException e) {
+			throw new RuntimeException("IOException while generating textual "
+					+ "representation: " + e.getMessage());
+		}
+	}
     
     /**
      * Returns a dom4j XML document, when provided with a file

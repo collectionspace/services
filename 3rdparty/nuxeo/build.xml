@@ -112,6 +112,7 @@
         <copy todir="${jee.server.cspace}/nuxeo-server">
             <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}">
                 <exclude name="**/config/proto-*-config.xml"/>
+                <exclude name="**/config/proto-*-extension.xml"/>
             </fileset>
         </copy>
         <echo message="Copying Nuxeo prototype repo config file ..."/>
@@ -140,6 +141,12 @@
                 <filter token="NUXEO_PW" value="${db.nuxeo.user.password}"/>
             </filterset>
         </copy>
+        <copy todir="${jee.server.cspace}/cspace/config/services" overwrite="true">
+            <fileset file="${basedir}/nuxeo-server/${nuxeo.release}/config/proto-elasticsearch-config.xml"/>
+        </copy>
+        <copy todir="${jee.server.cspace}/cspace/config/services" overwrite="true">
+            <fileset file="${basedir}/nuxeo-server/${nuxeo.release}/config/proto-elasticsearch-extension.xml"/>
+        </copy>    	
 		
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-listener/build.xml" target="deploy" inheritall="false"/>

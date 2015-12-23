@@ -331,7 +331,7 @@ public final class NuxeoClientEmbedded {
         	repoSession.save();
         } catch (Exception e) {
         	String errMsg = String.format("Possible data loss.  Could not save and/or close the Nuxeo repository name = '%s'.", name);
-        	logger.trace(errMsg, e);
+        	logger.warn(errMsg, e);
         	throw e;
         } finally {
         	repoSession.close();

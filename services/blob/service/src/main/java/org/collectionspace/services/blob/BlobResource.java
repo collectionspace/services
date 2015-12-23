@@ -28,7 +28,7 @@ import org.collectionspace.services.client.BlobClient;
 import org.collectionspace.services.client.PayloadPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.FileUtils;
+import org.collectionspace.services.common.FileUtilities;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
@@ -182,7 +182,7 @@ public class BlobResource extends NuxeoBasedResource {
     			String mediaType = part.getMediaType().toString();
     			System.out.println("Media type is:" + mediaType);
     			fileStream = part.getBody(InputStream.class, null);
-    			FileUtils.createTmpFile(fileStream, getServiceName() + "_");
+    			FileUtilities.createTmpFile(fileStream, getServiceName() + "_");
     		}
     		
 	    	ResponseBuilder rb = Response.ok();

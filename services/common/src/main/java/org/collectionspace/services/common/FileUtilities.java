@@ -40,6 +40,8 @@ import java.util.UUID;
 //import javax.servlet.ServletException;
 //import javax.servlet.http.HttpServlet;
 
+
+
 import net.sf.jmimemagic.Magic;
 import net.sf.jmimemagic.MagicException;
 import net.sf.jmimemagic.MagicMatch;
@@ -50,7 +52,7 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-
+import org.dom4j.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,9 +60,9 @@ import org.slf4j.LoggerFactory;
 /**
  * The Class FileUtils.
  */
-public class FileUtils {
+public class FileUtilities {
 	/** The Constant logger. */
-	private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
+	private static final Logger logger = LoggerFactory.getLogger(FileUtilities.class);
 	
 	/** The Constant TMP_FILE_PREFIX. */
 	public static final String TMP_BLOB_PREFIX = "cspace_blob_";
@@ -89,7 +91,7 @@ public class FileUtils {
 	 * Creates a copy of the srcFile to a temp file
 	 */
 	static public File createTmpFile(File srcFile, String prefix) throws Exception {
-		String fileExtension = FileUtils.getExtension(srcFile);
+		String fileExtension = FileUtilities.getExtension(srcFile);
 		File result = createTmpFile(new FileInputStream(srcFile), prefix, fileExtension);
 		return result;
 	}
@@ -236,4 +238,40 @@ public class FileUtils {
 		return result;
 	}
 
+    /**
+     * Attempt to close a resource, swallowing any Exceptions thrown.
+     * This method should only be called from within the 'finally' portion
+     * of a 'catch/try/finally' block.
+     * See http://stackoverflow.com/questions/2699209/java-io-ugly-try-finally-block
+     * and http://stackoverflow.com/questions/341971/what-is-the-execute-around-idiom
+     * @param c A closeable resource.
+     */
+    public static void closeQuietly(Closeable c) {
+        if (c != null) try {
+            c.close();
+        } catch(Exception e) {
+        	logger.trace("Failed to close filewriter.", e);
+            // Do nothing here
+        }
+    }	
+    public static void StringToFile(String doc, File file) throws Exception {
+        if (doc == null) {
+            System.err.println("Document is null");
+            return;
+        }
+        FileWriter filewriter = null;
+        try {
+            filewriter = new FileWriter(file);
+            // asXML() appears to output an adequate serialization, thus
+            // obviating the need to use an XML-aware writer here.
+            filewriter.write(doc);
+            filewriter.flush();
+            filewriter.close();
+        } catch (Exception e) {
+            System.err.println(e.getStackTrace());
+            throw e;
+        } finally {
+            closeQuietly(filewriter);
+       }
+    }	
 }

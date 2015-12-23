@@ -141,6 +141,22 @@
 					<artifactId>lucene-analyzers-common</artifactId>
 					<groupId>org.apache.lucene</groupId>
 				</exclusion>
+				<exclusion>
+					<artifactId>nuxeo-automation-server</artifactId>
+					<groupId>org.nuxeo.ecm.automation</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>nuxeo-automation-io</artifactId>
+					<groupId>org.nuxeo.ecm.automation</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jsp-api-2.1</artifactId>
+					<groupId>org.mortbay.jetty</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jsp-2.1</artifactId>
+					<groupId>org.mortbay.jetty</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>        
         <dependency>
@@ -644,6 +660,10 @@
 				<exclusion>
 					<artifactId>jsf-impl</artifactId>
 					<groupId>com.sun.faces</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>el-api</artifactId>
+					<groupId>javax.el</groupId>
 				</exclusion>
 			</exclusions>
         </dependency>

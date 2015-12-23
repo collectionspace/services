@@ -96,6 +96,10 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     }
     
     private boolean isUnique(DocumentModel docModel, String schemaName) throws DocumentException {
+    	return true;
+    }
+    
+    private boolean temp_isUnique(DocumentModel docModel, String schemaName) throws DocumentException {
     	boolean result = true;
     	
     	ServiceContext ctx = this.getServiceContext();
