@@ -33,7 +33,7 @@ public interface JEEServerDeployment {
 	// The file name parts for Nuxeo's Elasticsearch configuration
 	public final static String NUXEO_ELASTICSEARCH_CONFIG_FILENAME = "elasticsearch-config.xml";	
 	public final static String NUXEO_PROTO_ELASTICSEARCH_CONFIG_FILENAME = "proto-" + NUXEO_ELASTICSEARCH_CONFIG_FILENAME;
-	public final static String NUXEO_PROTO_ELASTICSEARCH_EXTENSION_FILENAME = "proto-elasticsearch-extension.XML";
+	public final static String NUXEO_PROTO_ELASTICSEARCH_EXTENSION_FILENAME = "proto-elasticsearch-extension.xml";
 			
 	public final static String NUXEO_PLUGINS_DIR = "plugins";
 	public final static String NUXEO_SERVER_PLUGINS_DIR = NUXEO_SERVER_DIR + File.separator + NUXEO_PLUGINS_DIR;
