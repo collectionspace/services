@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <persistence version="1.0" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd
-             http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_1_0.xsd" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:orm="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <persistence-unit name="org.collectionspace.services">
+	http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_1_0.xsd"
+	xmlns="http://java.sun.com/xml/ns/persistence" 
+	xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<persistence-unit name="org.collectionspace.services">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<!-- Until our JNDI issue with Nuxeo is resolved, we can't use this datasource element
         <non-jta-data-source>CspaceDS</non-jta-data-source> -->
@@ -9,7 +12,7 @@
         <class>org.collectionspace.services.account.AccountsCommon</class>
         <class>org.collectionspace.services.account.Tenant</class>
         <class>org.collectionspace.services.account.AccountTenant</class>
-        <class>org.collectionspace.services.account.Status</class>
+        <class>org.collectionspace.services.account.Status</class>        
         <class>org.collectionspace.services.authentication.User</class>
         <class>org.collectionspace.services.authorization.perms.Permission</class>
         <class>org.collectionspace.services.authorization.perms.PermissionAction</class>
@@ -26,6 +29,9 @@
 			<property name="hibernate.connection.password" value="${db.cspace.user.password}"/>
 			<property name="hibernate.connection.url" value="${db.jdbc.cspace.url.encoded}"/>
             <!--property name="hibernate.hbm2ddl.auto" value="create-drop"/-->
+
+            <property name="hibernate.connection.provider_class" value="org.hibernate.connection.C3P0ConnectionProvider"/>
+            <property name="hibernate.c3p0.max_size" value="8"/>
         </properties>
 
     </persistence-unit>
