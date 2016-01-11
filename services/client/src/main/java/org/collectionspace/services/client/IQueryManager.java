@@ -75,7 +75,8 @@ public interface IQueryManager {
 	final static String CMIS_NUXEO_ID = CMIS_OBJECT_ID;
 	final static String CMIS_NUXEO_NAME = CMIS_NUXEO_PATHSEGMENT;
 	final static String CMIS_NUXEO_TITLE = "dc:title";
-	final static String CMIS_CS_UPDATED_AT = CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA + ":" + CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_AT;
+	final static String CMIS_CS_UPDATED_AT = CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA + ":" +
+			CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_AT;
 	
 	// CollectionSpace CMIS property mapping constants
 	final static String CMIS_TARGET_PREFIX = "DOC";
@@ -85,8 +86,9 @@ public interface IQueryManager {
 	
 	final static String CMIS_JOIN_NUXEO_IS_VERSION_FILTER = 
 			IQueryManager.CMIS_TARGET_PREFIX + "." + IQueryManager.NUXEO_CMIS_IS_VERSION_FILTER;
+	final static String CMIS_JOIN_TENANT_ID_FILTER =
+			IQueryManager.CMIS_RELATIONS_PREFIX + "." + CollectionSpaceClient.CORE_TENANTID;
 
-	
 	final static String CMIS_TARGET_NUXEO_ID = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_ID;
 	final static String CMIS_TARGET_CSID = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_NAME;
 	final static String CMIS_TARGET_TITLE = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_TITLE;

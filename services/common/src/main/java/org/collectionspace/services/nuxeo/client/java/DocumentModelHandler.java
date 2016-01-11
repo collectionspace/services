@@ -486,10 +486,8 @@ public abstract class DocumentModelHandler<T, TL>
 	    	String matchObjDocTypes = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_MATCH_OBJ_DOCTYPES);
 	    	String selectDocType = (String)queryParams.getFirst(IQueryManager.SELECT_DOC_TYPE_FIELD);
 
-	    	//String docType = this.getServiceContext().getDocumentType();
-	    	// If this type in this tenant has been extended, be sure to use that so extension schema is visible.
-	    	String docType = NuxeoUtils.getTenantQualifiedDocType(this.getServiceContext());
-	    	if (selectDocType != null && !selectDocType.isEmpty()) {  
+	    	String docType = this.getServiceContext().getDocumentType();
+	    	if (selectDocType != null && !selectDocType.isEmpty()) {
 	    		docType = selectDocType;
 	    	}
 	    	String selectFields = IQueryManager.CMIS_TARGET_CSID + ", "
@@ -502,6 +500,7 @@ public abstract class DocumentModelHandler<T, TL>
 	    	String relObjectCsidCol = IRelationsManager.CMIS_CSPACE_RELATIONS_OBJECT_ID;
 	    	String relSubjectCsidCol = IRelationsManager.CMIS_CSPACE_RELATIONS_SUBJECT_ID;
 	    	String targetCsidCol = IQueryManager.CMIS_TARGET_CSID;
+	    	String tenantID = this.getServiceContext().getTenantId();
 
 	    	//
 	    	// Create the "ON" and "WHERE" query clauses based on the params passed into the HTTP request.  
@@ -533,6 +532,9 @@ public abstract class DocumentModelHandler<T, TL>
 	    							+ " IN " + matchObjDocTypes + ")";
 	    	}
 	    	
+	    	// Qualify the query with the current tenant ID.
+    		theWhereClause += IQueryManager.SEARCH_QUALIFIER_AND + IQueryManager.CMIS_JOIN_TENANT_ID_FILTER + " = '" + tenantID + "'";
+    		
 	    	// This could later be in control of a queryParam, to omit if we want to see versions, or to
 	    	// only see old versions.
     		theWhereClause += IQueryManager.SEARCH_QUALIFIER_AND + IQueryManager.CMIS_JOIN_NUXEO_IS_VERSION_FILTER;
