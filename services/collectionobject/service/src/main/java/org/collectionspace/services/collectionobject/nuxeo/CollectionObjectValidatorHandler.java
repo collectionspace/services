@@ -96,7 +96,7 @@ public class CollectionObjectValidatorHandler extends ValidatorHandlerImpl<PoxPa
 			throws InvalidDocumentException {
     	try {
             CollectionobjectsCommon co = (CollectionobjectsCommon) getCommonPart();
-            validateCollectionobjectsCommon(co);                        
+            //validateCollectionobjectsCommon(co);   REM - Commented out this validation on UPDATE, see CSPACE-6705                     
     	} catch (AssertionError e) {
     		if (logger.isErrorEnabled() == true) {
     			logger.error(e.getMessage(), e);
@@ -131,7 +131,7 @@ public class CollectionObjectValidatorHandler extends ValidatorHandlerImpl<PoxPa
     private void validateCollectionobjectsCommon(CollectionobjectsCommon co) throws AssertionError {
     	CS_ASSERT(co != null);
         String objectNumber = co.getObjectNumber();
-        CS_ASSERT(objectNumber != null);
+        CS_ASSERT(objectNumber != null, OBJECTNUMBER_NULL_ERROR);
         CS_ASSERT(objectNumber.isEmpty() == false, OBJECTNUMBER_NULL_ERROR);
 
     }
