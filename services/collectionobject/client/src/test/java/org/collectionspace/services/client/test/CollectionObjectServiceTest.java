@@ -752,8 +752,7 @@ public class CollectionObjectServiceTest extends AbstractPoxServiceTestImpl<Abst
     *     a base class.
     * @throws Exception 
     */
-    @Test(dataProvider = "testName",
-    		dependsOnMethods = {"CRUDTests"})
+    // @Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests"}) // REM - Disabled this test because of issues raised in CSPACE-6705
     public void updateWithRequiredValuesNullOrEmpty(String testName) throws Exception {
         // Read an existing record for updating.
         Response res = updateRetrieve(testName, knownResourceId);
