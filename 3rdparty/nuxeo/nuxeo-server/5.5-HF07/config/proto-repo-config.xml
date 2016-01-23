@@ -37,6 +37,10 @@
                 <property name="PortNumber">@DB_PORT@</property>
                 <property name="User">@NUXEO_USER@</property>
                 <property name="Password">@NUXEO_PW@</property>
+
+                <indexing>
+                    <fulltext analyzer="unaccent_english"/>
+                </indexing>
             </repository>
         </repository>
     </extension>
