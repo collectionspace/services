@@ -164,7 +164,8 @@ public class SecurityUtils {
 			uriPath = uriPath.replace(hjidValue, "*");
 		}
 		
-		uriPath = uriPath.replace("//", "/");
+		uriPath = uriPath.replace("//", "/"); // replace duplicate '/' characters
+		uriPath = uriPath.startsWith("/") ? uriPath.substring(1) : uriPath; // if present, strip the leading '/' character
 		return uriPath;
 	}
     

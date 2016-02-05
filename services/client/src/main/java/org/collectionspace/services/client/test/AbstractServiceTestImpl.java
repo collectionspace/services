@@ -656,7 +656,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
             final int OBJECTS_TO_CREATE = 3;
             final String KEYWORD = NON_EXISTENT_KEYWORD + createIdentifier();
             for (int i = 0; i < OBJECTS_TO_CREATE; i++) {
-                this.createWorkflowTarget(testName, KEYWORD);
+                this.createWorkflowTarget(testName, KEYWORD + " " + i);
             }
 
             //
