@@ -5,14 +5,14 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.collectionspace.services</groupId>
 	<artifactId>org.collectionspace.services</artifactId>
-	<version>4.3-SNAPSHOT</version>
+	<version>4.3</version>
 	<packaging>pom</packaging>
 	<name>services</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<cspace.services.version>4.3-SNAPSHOT</cspace.services.version>
-		<cspace.services.client.version>4.3-SNAPSHOT</cspace.services.client.version>
+		<cspace.services.version>4.3</cspace.services.version>
+		<cspace.services.client.version>4.3</cspace.services.client.version>
 		<nuxeo.general.release>6.0-HF21</nuxeo.general.release>
 		<nuxeo.shell.version>${nuxeo.general.release}</nuxeo.shell.version>
 		<nuxeo.platform.version>${nuxeo.general.release}</nuxeo.platform.version>
