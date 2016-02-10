@@ -15,3 +15,14 @@ SELECT constraint_name FROM information_schema.constraint_column_usage WHERE tab
 
 #IF: emptyResult
 ALTER TABLE vocabularies_common add CONSTRAINT shortid_unique UNIQUE (shortidentifier);
+
+#
+# Add a unique constraint to the report 'name' column of the reports_common table.
+#
+LOG.INFO Adding a unique constraint to the report 'name' column of the reports_common table
+
+#TEST:
+SELECT constraint_name FROM information_schema.constraint_column_usage WHERE table_name = 'reports_common' AND constraint_name = 'reportname_unique';
+
+#IF: emptyResult
+ALTER TABLE reports_common add CONSTRAINT reportname_unique UNIQUE (name);

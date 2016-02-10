@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.1.1.final using JasperReports Library version 6.1.1  -->
+<!-- 2015-12-16T15:07:40 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Acquistion Basic List" pageWidth="1224" pageHeight="792" orientation="Landscape" columnWidth="1184" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="a1f690a3-5977-4467-85f8-6b0bcd5b7210">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<style name="Title" fontName="Arial" fontSize="26" isBold="true"/>
+	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="Arial" fontSize="12"/>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["101"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="csid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["1bb1202c-c2c8-4455-9ef9"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select ac.acquisitionreferencenumber accessionNumber,
+						coc.objectnumber,
+						objectname,
+						tg.title title,
+						cocbd.item description,
+						otg.termdisplayname oporg,
+						objectproductionorganizationrole,
+						objectproductionpersonrole,
+						ptg.termdisplayname opperson,
+						objectproductionpeople,
+						datedisplaydate,
+						numberofobjects,
+						dimensionsummary,
+						computedcurrentlocation
+	FROM acquisitions_common ac
+	JOIN hierarchy h1 ON (ac.id=h1.id)
+	JOIN relations_common rc1 ON (h1.name=rc1.subjectcsid)
+	JOIN hierarchy h2 ON (rc1.objectcsid=h2.name)
+	JOIN collectionobjects_common coc ON (h2.id=coc.id)
+	left join collectionobjects_common_briefdescriptions cocbd on (coc.id = cocbd.id)
+	LEFT OUTER JOIN hierarchy h3 ON (coc.id = h3.parentid AND h3.primarytype='objectNameGroup' AND h3.pos=0)
+	LEFT OUTER JOIN objectnamegroup ong ON (ong.id=h3.id)
+	LEFT OUTER JOIN hierarchy h4 ON (coc.id = h4.parentid AND h4.primarytype='titleGroup' AND h4.pos=0)
+	LEFT OUTER JOIN titlegroup tg ON (tg.id = h4.id)
+	LEFT OUTER JOIN hierarchy h5 ON (coc.id = h5.parentid AND h5.primarytype='objectProductionPersonGroup' AND h5.pos=0)
+	LEFT OUTER JOIN objectproductionpersongroup oppg ON (oppg.id = h5.id)
+	LEFT OUTER JOIN hierarchy h6 ON (coc.id = h6.parentid AND h6.primarytype='objectProductionPeopleGroup' AND h6.pos=0)
+	LEFT OUTER JOIN objectproductionpeoplegroup opplg ON (opplg.id = h6.id)
+	LEFT OUTER JOIN persons_common pc ON (oppg.objectproductionperson = pc.refname)
+	LEFT OUTER JOIN hierarchy h7 ON (pc.id = h7.parentid AND h7.primarytype='personTermGroup' AND h7.pos=0)
+	LEFT OUTER JOIN persontermgroup ptg ON (ptg.id = h7.id)
+	LEFT OUTER JOIN hierarchy h8 ON (coc.id = h8.parentid AND h8.primarytype='objectProductionOrganizationGroup' AND h8.pos=0)
+	LEFT OUTER JOIN objectproductionorganizationgroup opog ON (opog.id = h8.id)
+	LEFT OUTER JOIN organizations_common oc ON (opog.objectproductionorganization = oc.refname)
+	LEFT OUTER JOIN hierarchy h11 ON (oc.id = h11.parentid AND h11.primarytype='orgTermGroup' AND h11.pos=0)
+	LEFT OUTER JOIN orgtermgroup otg ON (otg.id = h11.id)
+	LEFT OUTER JOIN hierarchy h9 ON (coc.id = h9.parentid AND h9.name='collectionobjects_common:objectProductionDateGroupList' AND h9.pos=0)
+	LEFT OUTER JOIN structureddategroup sdg ON (sdg.id = h9.id)
+	LEFT OUTER JOIN hierarchy h10 ON (coc.id = h10.parentid AND h10.primarytype='measuredPartGroup' AND h10.pos=0)
+	LEFT OUTER JOIN measuredpartgroup mpg ON (mpg.id = h10.id)
+	LEFT OUTER JOIN hierarchy ON (coc.id = hierarchy.id)
+	LEFT OUTER JOIN collectionspace_core core ON coc.id = core.id
+	LEFT OUTER JOIN misc misc ON misc.id = hierarchy.id
+	WHERE core.tenantid = $P{tenantid} AND misc.lifecyclestate != 'deleted'
+	AND h1.name = $P{csid}]]>
+	</queryString>
+	<field name="objectnumber" class="java.lang.String"/>
+	<field name="objectname" class="java.lang.String"/>
+	<field name="title" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="oporg" class="java.lang.String"/>
+	<field name="objectproductionorganizationrole" class="java.lang.String"/>
+	<field name="objectproductionpersonrole" class="java.lang.String"/>
+	<field name="opperson" class="java.lang.String"/>
+	<field name="objectproductionpeople" class="java.lang.String"/>
+	<field name="datedisplaydate" class="java.lang.String"/>
+	<field name="numberofobjects" class="java.lang.Long"/>
+	<field name="dimensionsummary" class="java.lang.String"/>
+	<field name="computedcurrentlocation" class="java.lang.String"/>
+	<background>
+		<band height="7" splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="70" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.HorizontalRowLayout"/>
+			<staticText>
+				<reportElement style="Column header" x="0" y="0" width="92" height="70" uuid="12439e1c-c771-4fd3-aa02-549cc70ff7c3"/>
+				<text><![CDATA[Object ID Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="92" y="0" width="91" height="70" uuid="5a0747d2-475e-4e7e-9b77-17f698a71044"/>
+				<text><![CDATA[Title]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="183" y="0" width="91" height="70" uuid="1b422491-b2ee-4c2d-8776-4e94e8abffda"/>
+				<text><![CDATA[Object Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="274" y="0" width="91" height="70" uuid="412ffaf7-3c55-4310-8466-ac6aa0607f25"/>
+				<text><![CDATA[Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="365" y="0" width="91" height="70" uuid="8eecf6ce-1042-46b3-9f49-6911fa6f548c"/>
+				<text><![CDATA[Production Organization]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="456" y="0" width="91" height="70" uuid="13868288-46e3-4680-93fa-14a465fcfa55"/>
+				<text><![CDATA[Production Organization Role]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="547" y="0" width="91" height="70" uuid="82cd3dd1-acdd-4f54-9157-8e75a1e146a6"/>
+				<text><![CDATA[Production Person]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="638" y="0" width="91" height="70" uuid="93649d14-c40b-4609-b046-09595ea1fa42"/>
+				<text><![CDATA[Production Person Role]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="729" y="0" width="91" height="70" uuid="f4ff61db-98b8-47df-a319-4a88682a8501"/>
+				<text><![CDATA[Production People]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="820" y="0" width="91" height="70" uuid="3924b676-d044-465e-a2b6-330ef321abad"/>
+				<text><![CDATA[Production Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" stretchType="RelativeToTallestObject" x="911" y="0" width="91" height="70" uuid="687d278e-794e-4221-9052-894cecdb2c0f">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<text><![CDATA[Dimensions]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" stretchType="RelativeToTallestObject" x="1002" y="0" width="91" height="70" uuid="6c1c0e43-03d3-4164-8893-76ef9d85ca26"/>
+				<text><![CDATA[Number of Objects]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" stretchType="RelativeToTallestObject" x="1093" y="0" width="91" height="70" uuid="0e255747-7bd3-4e8a-a7f6-96d79b2e44e4"/>
+				<text><![CDATA[Current Location]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="51" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.HorizontalRowLayout"/>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="0" y="0" width="92" height="51" uuid="020a8318-9170-4d22-a0ad-31192ed44b9a"/>
+				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="92" y="0" width="91" height="51" uuid="c7a74edc-c985-466f-9d1a-1a053b057c40"/>
+				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="183" y="0" width="91" height="51" uuid="967aa94c-4d64-47fc-9234-4c4eccfd8de5"/>
+				<textFieldExpression><![CDATA[$F{objectname}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="274" y="0" width="91" height="51" uuid="955d1530-7a02-4fff-bcbf-a77fdf7106a2"/>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="365" y="0" width="91" height="51" uuid="cd2614be-d303-42ec-b1ae-17986df423dd"/>
+				<textFieldExpression><![CDATA[$F{oporg}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="456" y="0" width="91" height="51" uuid="f9b9b475-9f9e-48a7-8016-330cbcfb0fae"/>
+				<textFieldExpression><![CDATA[$F{objectproductionorganizationrole}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="547" y="0" width="91" height="51" uuid="2c3a2c4b-9124-43c8-8be3-69c482f4e5ad"/>
+				<textFieldExpression><![CDATA[$F{opperson}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="638" y="0" width="91" height="51" uuid="baa2cb50-03d1-45e0-9e32-dac575891da9"/>
+				<textFieldExpression><![CDATA[$F{objectproductionpersonrole}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="729" y="0" width="91" height="51" uuid="00f2e1c6-6a9d-445a-9bb0-8792754d5f66"/>
+				<textFieldExpression><![CDATA[$F{objectproductionpeople}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="820" y="0" width="91" height="51" uuid="f28c35cd-bc86-49a7-95ff-cebf40b6434f"/>
+				<textFieldExpression><![CDATA[$F{datedisplaydate}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="911" y="0" width="91" height="51" uuid="274ac7cc-d075-46bd-9597-39892c40d201"/>
+				<textFieldExpression><![CDATA[$F{dimensionsummary}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="1002" y="0" width="91" height="51" uuid="b9726228-b679-47da-b31d-456cd589b566"/>
+				<textFieldExpression><![CDATA[$F{numberofobjects}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="1093" y="0" width="91" height="51" uuid="569e8c92-bc33-49c8-bad7-a80b144d5406">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{computedcurrentlocation}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>
