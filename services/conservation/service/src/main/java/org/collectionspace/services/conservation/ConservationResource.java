@@ -24,7 +24,7 @@
 package org.collectionspace.services.conservation;
 
 import org.collectionspace.services.client.ConservationClient;
-import org.collectionspace.services.common.NuxeoBasedResource;
+import org.collectionspace.services.common.ResourceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ import javax.ws.rs.Produces;
 @Path(ConservationClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class ConservationResource extends NuxeoBasedResource {
+public class ConservationResource extends ResourceBase {
 
     final Logger logger = LoggerFactory.getLogger(ConservationResource.class);
 
