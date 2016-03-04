@@ -141,7 +141,9 @@
     <target name="deploy_tenantconfig"
             description="deploy tenant configuration">
         <copy todir="${jee.server.cspace}/cspace/config/services">
-            <fileset dir="${basedir}/src/main/cspace/config/services"/>
+            <fileset dir="${basedir}/src/main/cspace/config/services">
+				<exclude name="resources/"/>
+			</fileset>
 			<filterset>
 				<filter token="CSPACE_INSTANCE_ID" value="${cspace.instance.id}" />
 				<filter token="DB_CSADMIN_NAME" value="${db.csadmin.name}" />
@@ -149,6 +151,13 @@
 				<filter token="DB_CSPACE_NAME" value="${db.cspace.name}" />
 			</filterset>
         </copy>
+		<!--
+			We need to copy the binaries that are in the "resources" folder
+			without the <filterset> in place because it seems to corrupt them.
+		-->
+        <copy todir="${jee.server.cspace}/cspace/config/services/resources">
+            <fileset dir="${basedir}/src/main/cspace/config/services/resources"/>
+        </copy>		
     </target>
 
     <target name="deploy" depends="install"

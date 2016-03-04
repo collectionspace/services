@@ -56,6 +56,7 @@ import org.collectionspace.services.citation.CitationAuthorityResource;
 import org.collectionspace.services.claim.ClaimResource;
 import org.collectionspace.services.exhibition.ExhibitionResource;
 import org.collectionspace.services.conditioncheck.ConditioncheckResource;
+import org.collectionspace.services.conservation.ConservationResource;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Application;
@@ -122,6 +123,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new LoaninResource());
         addResourceToMapAndSingletons(new LoanoutResource());
         addResourceToMapAndSingletons(new ConditioncheckResource());
+        addResourceToMapAndSingletons(new ConservationResource());
         addResourceToMapAndSingletons(new ValuationcontrolResource());
         addResourceToMapAndSingletons(new ObjectExitResource());
         addResourceToMapAndSingletons(new BatchResource());
