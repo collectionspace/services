@@ -72,6 +72,7 @@
         <module>location</module>
         <module>place</module>
         <module>work</module>
+        <module>material</module>
         <module>concept</module>
         <module>taxonomy</module>
         <module>movement</module>
