@@ -77,7 +77,7 @@ public class CitationAuthorityValidatorHandler implements ValidatorHandler {
 	                // a display name or supplied in another manner.
 	                if ((shortId != null) && (shortIdBadPattern.matcher(shortId).find())) {
 	                    invalid = true;
-	                    msg += "shortIdentifier must only contain standard word characters";
+	                    msg += String.format("shortIdentifier '%s' must only contain standard word characters", shortId);
 	                }
 	            } else if (action.equals(Action.UPDATE)) {
 	            }
