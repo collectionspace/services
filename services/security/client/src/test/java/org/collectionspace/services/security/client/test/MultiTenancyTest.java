@@ -100,7 +100,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
     private final String CLASS_NAME = MultiTenancyTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     private final static String TENANT_1_ADMIN_USER = "admin@core.collectionspace.org";
-    private final static String TENANT_2_ADMIN_USER = "admin@lifesci.collectionspace.org";
+    private final static String TENANT_2_ADMIN_USER = "admin@testsci.collectionspace.org";
     private final static String TENANT_ADMIN_PASS = "Administrator";
     private final static String TENANT_1_USER = "user1@museum1.org";
     private final static String TENANT_2_USER = "user2@museum2.org";

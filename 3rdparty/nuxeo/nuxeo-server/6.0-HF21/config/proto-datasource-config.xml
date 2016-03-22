@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
-<component name="org.nuxeo.runtime.datasource.lifesci.contrib">
+<component name="org.nuxeo.runtime.datasource.testsci.contrib">
 	
   <extension target="org.nuxeo.runtime.datasource" point="datasources">
-	<datasource name="jdbc/lifesci_domain" driverClassName="org.postgresql.Driver"
+	<datasource name="jdbc/testsci_domain" driverClassName="org.postgresql.Driver"
       maxPoolSize="100" minPoolSize="5" blockingTimeoutMillis="10000"
-      url="jdbc:postgresql://localhost:5432/lifesci_domain" validationQuery=""
+      url="jdbc:postgresql://localhost:5432/testsci_domain" validationQuery=""
       username="nuxeo6" password="nuxeo6"
       accessToUnderlyingConnectionAllowed="true" >
     </datasource>
-    <link name="jdbc/repository_lifesci_domain" global="jdbc/lifesci_domain" type="javax.sql.DataSource" />
+    <link name="jdbc/repository_testsci_domain" global="jdbc/testsci_domain" type="javax.sql.DataSource" />
 
 	<!--
 		These links need to be moved into the context.xml file and become <Resource> instead of <link>

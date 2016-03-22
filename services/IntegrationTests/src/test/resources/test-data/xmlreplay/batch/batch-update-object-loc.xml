@@ -3,7 +3,7 @@
     <auths>
         <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
         <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
-        <auth ID="admin@lifesci.collectionspace.org">YWRtaW5AbGlmZXNjaS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+        <auth ID="admin@testsci.collectionspace.org">YWRtaW5AdGVzdHNjaS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
     </auths>
         
     <!-- This tests the UpdateObjectLocationBatchJob -->
@@ -801,21 +801,21 @@
     <!-- records are configured to be versioned. See CSPACE-6188 for more details. -->    
     <testGroup ID="invocationModeSingleInVersioningEnabledTenant" autoDeletePOSTS="true">
         
-        <test ID="createBatchRecordInVersioningTenant" auth="admin@lifesci.collectionspace.org">
+        <test ID="createBatchRecordInVersioningTenant" auth="admin@testsci.collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/batch</uri>
             <filename>batch/batch-create-updateobjloc.xml</filename>
             <expectedCodes>201</expectedCodes>
         </test>
 
-        <test ID="createCollectionObjectInVersioningTenant" auth="admin@lifesci.collectionspace.org">
+        <test ID="createCollectionObjectInVersioningTenant" auth="admin@testsci.collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/collectionobjects</uri>
             <filename>batch/collObj1.xml</filename>
             <expectedCodes>201</expectedCodes>
         </test>
         
-        <test ID="createMovementInVersioningTenant" auth="admin@lifesci.collectionspace.org">
+        <test ID="createMovementInVersioningTenant" auth="admin@testsci.collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/movements</uri>
             <filename>batch/movement.xml</filename>
@@ -826,7 +826,7 @@
             <expectedCodes>201</expectedCodes>
         </test>
         
-        <test ID="relateCollectionObjectToMovementInVersioningTenant" auth="admin@lifesci.collectionspace.org">
+        <test ID="relateCollectionObjectToMovementInVersioningTenant" auth="admin@testsci.collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/relations</uri>
             <filename>batch/relation.xml</filename>
@@ -841,7 +841,7 @@
         
         <!-- Posts of batch job invocation requests don't create new records, -->
         <!-- so we need to exclude them from the post-run auto-deletion of records. -->
-        <test ID="invokeBatchAfterRelatingMovementInVersioningTenant" auth="admin@lifesci.collectionspace.org" autoDeletePOSTS="false">
+        <test ID="invokeBatchAfterRelatingMovementInVersioningTenant" auth="admin@testsci.collectionspace.org" autoDeletePOSTS="false">
             <method>POST</method>
             <uri>/cspace-services/batch/${createBatchRecordInVersioningTenant.CSID}</uri>
             <filename>batch/batch-invoke-updateobjloc-single.xml</filename>
@@ -851,7 +851,7 @@
             <expectedCodes>200</expectedCodes>
         </test>
         
-        <test ID="readCollectionObjectAfterRelatingToMovementInVersioningTenant" auth="admin@lifesci.collectionspace.org">
+        <test ID="readCollectionObjectAfterRelatingToMovementInVersioningTenant" auth="admin@testsci.collectionspace.org">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${createCollectionObjectInVersioningTenant.CSID}</uri>
             <response>
@@ -864,7 +864,7 @@
             <expectedCodes>200</expectedCodes>
         </test>
         
-        <test ID="modifyMovementInVersioningTenant" auth="admin@lifesci.collectionspace.org">
+        <test ID="modifyMovementInVersioningTenant" auth="admin@testsci.collectionspace.org">
             <method>PUT</method>
             <uri>/cspace-services/movements/${createMovementInVersioningTenant.CSID}</uri>
             <filename>batch/movement.xml</filename>
@@ -875,7 +875,7 @@
             <expectedCodes>200</expectedCodes>
         </test>
         
-        <test ID="invokeBatchAfterModifyingMovementInVersioningTenant" auth="admin@lifesci.collectionspace.org" autoDeletePOSTS="false">
+        <test ID="invokeBatchAfterModifyingMovementInVersioningTenant" auth="admin@testsci.collectionspace.org" autoDeletePOSTS="false">
             <method>POST</method>
             <uri>/cspace-services/batch/${createBatchRecordInVersioningTenant.CSID}</uri>
             <filename>batch/batch-invoke-updateobjloc-single.xml</filename>
@@ -885,7 +885,7 @@
             <expectedCodes>200</expectedCodes>
         </test>
         
-        <test ID="readCollectionObjectAfterModifyingMovementInVersioningTenant" auth="admin@lifesci.collectionspace.org">
+        <test ID="readCollectionObjectAfterModifyingMovementInVersioningTenant" auth="admin@testsci.collectionspace.org">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${createCollectionObjectInVersioningTenant.CSID}</uri>
             <response>

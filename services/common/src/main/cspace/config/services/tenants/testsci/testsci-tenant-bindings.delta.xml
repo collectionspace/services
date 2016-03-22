@@ -3,7 +3,7 @@
 
     <!-- Add your changes, if any, within the following tag pair. -->
     <!-- The value of the 'id' attribute, below, should match the corresponding -->
-    <!-- value in cspace/config/services/tenants/lifesci-tenant-bindings-proto.xml -->
+    <!-- value in cspace/config/services/tenants/testsci-tenant-bindings-proto.xml -->
     <!--
     <tenant:tenantBinding id="2">
     </tenant:tenantBinding>

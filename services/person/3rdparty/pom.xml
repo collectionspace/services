@@ -19,7 +19,7 @@
     <modules>
     <!-- These modules are obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <module>nuxeo-platform-cs-person</module>
-        <module>nuxeo-platform-person-lifesci</module>
+        <module>nuxeo-platform-person-testsci</module>
         -->
     </modules>
 </project>

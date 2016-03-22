@@ -4,7 +4,7 @@
     <totalItems>1</totalItems>
     <!-- 
     This file represents the expected response from test case
-    	lifesciperson.xml :: 
+    	testsciperson.xml :: 
     These are the vars that are available from the time Person1 is created.
     Person1.CSID       ${Person1.CSID}
     Person2.CSID     ${Person2.CSID}

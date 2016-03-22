@@ -112,7 +112,7 @@
     description="deploy person in ${jee.server.nuxeo}">
     	<!-- These targets are obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <ant antfile="nuxeo-platform-cs-person/build.xml" target="deploy" inheritall="false"/>
-        <ant antfile="nuxeo-platform-person-lifesci/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-person-testsci/build.xml" target="deploy" inheritall="false"/>
         -->
     </target>
 
@@ -121,19 +121,19 @@
     	<!-- These targets are obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
     	leaving this only for backwards compatibility reasons. -->
         <ant antfile="nuxeo-platform-cs-person/build.xml" target="undeploy" inheritall="false"/>
-        <ant antfile="nuxeo-platform-person-lifesci/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-person-testsci/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist"
     description="generate distribution for person" depends="package">
         <ant antfile="nuxeo-platform-cs-person/build.xml" target="dist" inheritall="false"/>
-        <ant antfile="nuxeo-platform-person-lifesci/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="nuxeo-platform-person-testsci/build.xml" target="dist" inheritall="false"/>
     </target>
     
     <target name="dist_installer"
     description="generate distribution for collectionobject" depends="package">
         <ant antfile="nuxeo-platform-cs-person/build.xml" target="dist_installer" inheritall="false"/>
-        <ant antfile="nuxeo-platform-person-lifesci/build.xml" target="dist_installer" inheritall="false"/>
+        <ant antfile="nuxeo-platform-person-testsci/build.xml" target="dist_installer" inheritall="false"/>
     </target>
 
 </project>

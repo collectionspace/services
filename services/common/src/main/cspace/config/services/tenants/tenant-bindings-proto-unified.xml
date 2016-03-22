@@ -8,7 +8,7 @@
 				within a term. If this value is set to 'false', searches will only find terms which begin with your search expression. However, 
 				even with a setting of 'false', you can manually add an asterisk (*) as a wildcard at the beginning of any search; e.g. "*atrick" 
 				(without quotes) will match the string "atrick" anywhere, not just at the beginning of a term. See the tenant-bindings.delta.xml 
-				file for the 'lifesci' tenant, for examples of how to override this value, and other, similar values below, in your own tenant. -->
+				file for the 'testsci' tenant, for examples of how to override this value, and other, similar values below, in your own tenant. -->
 			<types:item id="ptstartingwildcard" merge:matcher="skip" merge:action="insert" xmlns:types="http://collectionspace.org/services/config/types">
 				<types:key>ptStartingWildcard</types:key>
 				<types:value>true</types:value>

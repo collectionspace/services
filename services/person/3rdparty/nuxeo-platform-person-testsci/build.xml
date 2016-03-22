@@ -1,7 +1,7 @@
 
-<project name="nuxeo-platform-person-lifesci" default="package" basedir=".">
+<project name="nuxeo-platform-person-testsci" default="package" basedir=".">
     <description>
-        Person nuxeo document type for the lifesci tenant
+        Person nuxeo document type for the testsci tenant
     </description>
     <!-- set global properties for this build -->
     <property name="services.trunk" value="../../../.."/>
@@ -16,10 +16,10 @@
     <!-- Both doctype and schema JAR(s) are removed via the 'undeploy' target -->
     <!-- in another Ant buildfile, in a peer module to this module -->
     <!-- Legacy JAR files used by CollectionSpace 3.3 and earlier -->
-    <property name="nuxeo.person.lifesci.legacy.jars.all"
-        value="org.collectionspace.services.person.3rdparty.lifesci.nuxeo-*.jar"/>
-    <property name="nuxeo.person.lifesci.legacy.jar"
-        value="org.collectionspace.services.person.3rdparty.lifesci.nuxeo-${cspace.release}.jar"/>
+    <property name="nuxeo.person.testsci.legacy.jars.all"
+        value="org.collectionspace.services.person.3rdparty.testsci.nuxeo-*.jar"/>
+    <property name="nuxeo.person.testsci.legacy.jar"
+        value="org.collectionspace.services.person.3rdparty.testsci.nuxeo-${cspace.release}.jar"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -124,7 +124,7 @@
         description="deploy person doctype in ${jee.server.nuxeo}">
         <!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         leaving this only for backwards compatibility reasons. -->  
-        <copy file="${basedir}/target/${nuxeo.person.lifesci.legacy.jar}"
+        <copy file="${basedir}/target/${nuxeo.person.testsci.legacy.jar}"
             todir="${jee.deploy.nuxeo.plugins}"/>
     </target>
 
@@ -137,13 +137,13 @@
             <!-- Additional legacy JAR(s) are removed via the 'undeploy' target in the -->
             <!-- Ant buildfile for the common schema -->
             <fileset dir="${jee.deploy.nuxeo.plugins}">
-                <include name="${nuxeo.person.lifesci.legacy.jars.all}"/>
+                <include name="${nuxeo.person.testsci.legacy.jars.all}"/>
             </fileset>
         </delete>
         <!-- Undeploy legacy artifacts from old deployment location through release 0.6 -->
         <delete quiet="true">
             <fileset dir="${jee.deploy.nuxeo.system}">
-                <include name="${nuxeo.person.lifesci.legacy.jars.all}"/>
+                <include name="${nuxeo.person.testsci.legacy.jars.all}"/>
             </fileset>
         </delete>
     </target>

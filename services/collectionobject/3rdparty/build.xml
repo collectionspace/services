@@ -9,7 +9,7 @@
     <property environment="env" />
     <property file="${services.trunk}/build.properties" />
 	<property name="nuxeo-platform-collectionobject" value="nuxeo-platform-cs-collectionobject"/>
-	<property name="nuxeo-platform-collectionobject-lifesci" value="nuxeo-platform-collectionobject-lifesci"/>
+	<property name="nuxeo-platform-collectionobject-testsci" value="nuxeo-platform-collectionobject-testsci"/>
     <property name="mvn.opts" value="-V" />
     <property name="src" location="src"/>
     <property name="build" location="build"/>
@@ -116,7 +116,7 @@
     description="deploy collectionobject in ${jee.server.nuxeo}">
     	<!-- These targets are obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool    	
         <ant antfile="${nuxeo-platform-collectionobject}/build.xml" target="deploy" inheritall="false"/>
-        <ant antfile="${nuxeo-platform-collectionobject-lifesci}/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="${nuxeo-platform-collectionobject-testsci}/build.xml" target="deploy" inheritall="false"/>
         -->
     </target>
 
@@ -125,19 +125,19 @@
     	<!-- These targets are obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
     	leaving this only for backwards compatibility reasons. -->    	
         <ant antfile="${nuxeo-platform-collectionobject}/build.xml" target="undeploy" inheritall="false"/>
-        <ant antfile="${nuxeo-platform-collectionobject-lifesci}/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="${nuxeo-platform-collectionobject-testsci}/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist"
     description="generate distribution for collectionobject" depends="package">
         <ant antfile="${nuxeo-platform-collectionobject}/build.xml" target="dist" inheritall="false"/>
-        <ant antfile="${nuxeo-platform-collectionobject-lifesci}/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="${nuxeo-platform-collectionobject-testsci}/build.xml" target="dist" inheritall="false"/>
     </target>
 
     <target name="dist_installer"
     description="generate distribution for collectionobject" depends="package">
         <ant antfile="${nuxeo-platform-collectionobject}/build.xml" target="dist_installer" inheritall="false"/>
-        <ant antfile="${nuxeo-platform-collectionobject-lifesci}/build.xml" target="dist_installer" inheritall="false"/>
+        <ant antfile="${nuxeo-platform-collectionobject-testsci}/build.xml" target="dist_installer" inheritall="false"/>
     </target>
 
 </project>

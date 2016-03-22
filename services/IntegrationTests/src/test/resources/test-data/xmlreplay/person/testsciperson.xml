@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xmlReplay>
-  <!-- Authenticate into the lifesci tenant for extension testing -->
-  <auths default="admin@lifesci.collectionspace.org">
-    <auth ID="admin@lifesci.collectionspace.org"
-      >YWRtaW5AbGlmZXNjaS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+  <!-- Authenticate into the testsci tenant for extension testing -->
+  <auths default="admin@testsci.collectionspace.org">
+    <auth ID="admin@testsci.collectionspace.org"
+      >YWRtaW5AdGVzdHNjaS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
   </auths>
 
   <!-- 
@@ -11,7 +11,7 @@
     For now, use ID="updatePerson"
   -->
   <testGroup ID="person" autoDeletePOSTS="true">
-    <test ID="PersonAuth1" auth="admin@lifesci.collectionspace.org">
+    <test ID="PersonAuth1" auth="admin@testsci.collectionspace.org">
       <method>POST</method>
       <uri>/cspace-services/personauthorities/</uri>
       <filename>person/personauthorities_common.xml</filename>
@@ -22,7 +22,7 @@
     <test ID="Person1">
       <method>POST</method>
       <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/</uri>
-      <filename>person/persons_common_and_lifesci.xml</filename>
+      <filename>person/persons_common_and_testsci.xml</filename>
       <vars>
         <var ID="shortIdentifier">johnWayneActor1</var>
         <var ID="foreName">John</var>
@@ -33,7 +33,7 @@
     <test ID="Person2">
       <method>POST</method>
       <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/</uri>
-      <filename>person/persons_common_and_lifesci.xml</filename>
+      <filename>person/persons_common_and_testsci.xml</filename>
       <vars>
         <var ID="shortIdentifier">billyBob1</var>
         <var ID="foreName">Billy-Bob</var>
@@ -65,7 +65,7 @@
     <test ID="UpdatePerson2WithRelations">
       <method>PUT</method>
       <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person2.CSID}</uri>
-      <filename>person/persons_common_and_lifesci_set_broader.xml</filename>
+      <filename>person/persons_common_and_testsci_set_broader.xml</filename>
       <vars>
         <var ID="shortIdentifier">billyBob1</var>
         <var ID="foreName">Billy-Bob</var>
@@ -82,8 +82,8 @@
       <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person1.CSID}?showAllRelations=true</uri>
       <response>
         <expected level="ADDOK"/>
-        <filename>person/res/lifesciPersonWithRelns.res.xml</filename>
-        <!-- NOTE: vars are referenced in lifesciPersonWithRelns.res.xml
+        <filename>person/res/testsciPersonWithRelns.res.xml</filename>
+        <!-- NOTE: vars are referenced in testsciPersonWithRelns.res.xml
           from tests in this test group, e.g. 
           PersonParent.CSID :: ${PersonParent.CSID} 
           These vars are all in the expression context while this group is active,
@@ -99,8 +99,8 @@
       <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person2.CSID}?showAllRelations=true</uri>
       <response>
         <expected level="ADDOK"/>
-        <filename>person/res/lifesciPersonWithRelns.res.xml</filename>
-        <!-- NOTE: vars are referenced in lifesciPersonWithRelns.res.xml
+        <filename>person/res/testsciPersonWithRelns.res.xml</filename>
+        <!-- NOTE: vars are referenced in testsciPersonWithRelns.res.xml
           from tests in this test group, e.g. 
           PersonParent.CSID :: ${PersonParent.CSID} 
           These vars are all in the expression context while this group is active,

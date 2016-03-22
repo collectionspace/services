@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="nuxeo-platform-collectionobject-lifesci" default="package" basedir=".">
+<project name="nuxeo-platform-collectionobject-testsci" default="package" basedir=".">
     <description>
-        Collectionobject nuxeo document type for the lifesci tenant
+        Collectionobject nuxeo document type for the testsci tenant
     </description>
     <!-- set global properties for this build -->
     <property name="services.trunk" value="../../../.."/>
@@ -18,10 +18,10 @@
     <!-- Legacy JAR files used by CollectionSpace 3.3 and earlier --> 
     <!-- Additional legacy JAR(s) are removed via the 'undeploy' target in the -->
     <!-- Ant buildfile for the common schema -->
-    <property name="nuxeo.collectionobject.lifesci.legacy.jars.all"
-        value="org.collectionspace.services.collectionobject.3rdparty.lifesci.nuxeo-*.jar"/>
-    <property name="nuxeo.collectionobject.lifesci.legacy.jar"
-        value="org.collectionspace.services.collectionobject.3rdparty.lifesci.nuxeo-${cspace.release}.jar"/>
+    <property name="nuxeo.collectionobject.testsci.legacy.jars.all"
+        value="org.collectionspace.services.collectionobject.3rdparty.testsci.nuxeo-*.jar"/>
+    <property name="nuxeo.collectionobject.testsci.legacy.jar"
+        value="org.collectionspace.services.collectionobject.3rdparty.testsci.nuxeo-${cspace.release}.jar"/>
     
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -126,7 +126,7 @@
         description="deploy collectionobject doctype in ${jee.server.nuxeo}">
         <!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         leaving this only for backwards compatibility reasons. -->  
-        <copy file="${basedir}/target/${nuxeo.collectionobject.lifesci.legacy.jar}"
+        <copy file="${basedir}/target/${nuxeo.collectionobject.testsci.legacy.jar}"
             todir="${jee.deploy.nuxeo.plugins}"/>
     </target>
 
@@ -139,13 +139,13 @@
             <!-- Additional legacy JAR(s) are removed via the 'undeploy' target in the -->
             <!-- Ant buildfile for the common schema -->
             <fileset dir="${jee.deploy.nuxeo.plugins}">
-                <include name="${nuxeo.collectionobject.lifesci.legacy.jars.all}"/>
+                <include name="${nuxeo.collectionobject.testsci.legacy.jars.all}"/>
             </fileset>
         </delete>
         <!-- Undeploy legacy artifacts from old deployment location through release 0.6 -->
         <delete quiet="true">
             <fileset dir="${jee.deploy.nuxeo.system}">
-                <include name="${nuxeo.collectionobject.lifesci.legacy.jars.all}"/>
+                <include name="${nuxeo.collectionobject.testsci.legacy.jars.all}"/>
             </fileset>
         </delete>
     </target>
@@ -153,14 +153,14 @@
     <target name="dist"
     	description="generate distribution for collectionobject doctype" depends="package">
         <copy todir="${services.trunk}/${dist.deploy.nuxeo.plugins}">
-            <fileset file="${basedir}/target/${nuxeo.collectionobject.lifesci.legacy.jar}"/>
+            <fileset file="${basedir}/target/${nuxeo.collectionobject.testsci.legacy.jar}"/>
         </copy>
     </target>
 
     <target name="dist_installer"
     	description="Creates an installer distribution for CollectionObject doctype" depends="package">
         <copy todir="${services.trunk}/${dist.installer.services}/collectionobject/nuxeo">
-            <fileset file="${basedir}/target/${nuxeo.collectionobject.lifesci.legacy.jar}"/>
+            <fileset file="${basedir}/target/${nuxeo.collectionobject.testsci.legacy.jar}"/>
         </copy>
     </target>
 </project>

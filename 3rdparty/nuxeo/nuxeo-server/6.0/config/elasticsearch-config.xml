@@ -190,7 +190,7 @@
 
     <extension target="org.nuxeo.elasticsearch.ElasticSearchComponent"
     point="elasticSearchIndex">
-    <elasticSearchIndex name="lifesci_domain" type="doc" repository="lifesci_domain">
+    <elasticSearchIndex name="testsci_domain" type="doc" repository="testsci_domain">
       <fetchFromSource>
         <include>ecm:*</include>
         <include>dc:*</include>
