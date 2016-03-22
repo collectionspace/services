@@ -64,6 +64,7 @@
         <module>loanout</module>
         <module>exhibition</module>
         <module>conditioncheck</module>
+        <module>conservation</module>
         <module>valuationcontrol</module>
         <module>objectexit</module>
         <module>batch</module>

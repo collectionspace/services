@@ -830,3 +830,39 @@ INSERT INTO id_generators
         SELECT  csid
         FROM    id_generators
         );
+
+-- CONSERVATION_TREATMENT_REFERENCE_NUMBER
+
+INSERT INTO id_generators
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
+  SELECT
+     'aad54202-404d-4f19-ada9-8b1e378ad1b2',
+     'Conservation Treatment Reference Number',
+     'Identifies a conservation treatment.',
+     '9',
+     '',
+'<org.collectionspace.services.id.SettableIDGenerator>
+  <parts>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>CT</initialValue>
+      <currentValue>CT</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.YearIDGeneratorPart>
+      <currentValue></currentValue>
+    </org.collectionspace.services.id.YearIDGeneratorPart>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>.</initialValue>
+      <currentValue>.</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.NumericIDGeneratorPart>
+      <maxLength>6</maxLength>
+      <initialValue>1</initialValue>
+      <currentValue>-1</currentValue>
+    </org.collectionspace.services.id.NumericIDGeneratorPart>
+  </parts>
+</org.collectionspace.services.id.SettableIDGenerator>'
+  WHERE 'aad54202-404d-4f19-ada9-8b1e378ad1b2' NOT IN
+        (
+        SELECT  csid
+        FROM    id_generators
+        );
