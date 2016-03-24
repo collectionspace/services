@@ -29,7 +29,7 @@
         <user>Administrator</user>
         <password>Administrator</password>
         <client-type>java</client-type>
-        <client-class>org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl</client-class>
+        <client-class>org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl</client-class>
         <properties>
             <types:item><types:key>pageSizeDefault</types:key><types:value>40</types:value></types:item> <!-- Use 'pgSz' query param to override this on a per request bassis. -->
             <types:item><types:key>pageSizeMax</types:key><types:value>2500</types:value></types:item> <!-- No list result page size can be greater than this amount -->

@@ -34,7 +34,7 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
-import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
+import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.client.IQueryManager;
@@ -85,7 +85,7 @@ public class ServiceGroupDocumentModelHandler
     	boolean releaseRepoSession = false;
         
     	try { 
-    		RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
+    		RepositoryClientImpl repoClient = (RepositoryClientImpl)this.getRepositoryClient(ctx);
     		repoSession = this.getRepositorySession();
     		if (repoSession == null) {
     			repoSession = repoClient.getRepositorySession(ctx);
@@ -100,7 +100,7 @@ public class ServiceGroupDocumentModelHandler
 
     		try {
     	        Map<String, ServiceBindingType> queriedServiceBindings = new HashMap<String, ServiceBindingType>();
-    	        RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl)repoClient;
+    	        RepositoryClientImpl nuxeoRepoClient = (RepositoryClientImpl)repoClient;
     	        // Get the service bindings for this tenant
     	        TenantBindingConfigReaderImpl tReader =
     	                ServiceMain.getInstance().getTenantBindingConfigReader();

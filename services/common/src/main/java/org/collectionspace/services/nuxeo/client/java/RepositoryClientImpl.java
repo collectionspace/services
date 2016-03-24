@@ -71,7 +71,6 @@ import org.apache.chemistry.opencmis.commons.enums.CmisVersion;
 import org.apache.chemistry.opencmis.commons.server.CallContext;
 import org.apache.chemistry.opencmis.server.impl.CallContextImpl;
 import org.apache.chemistry.opencmis.server.shared.ThresholdOutputStreamFactory;
-
 import org.nuxeo.common.utils.IdUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -85,24 +84,23 @@ import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.runtime.transaction.TransactionRuntimeException;
 import org.nuxeo.ecm.core.opencmis.bindings.NuxeoCmisServiceFactory;
 import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoCmisService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * RepositoryJavaClient is used to perform CRUD operations on documents in Nuxeo
+ * RepositoryClientImpl is used to perform CRUD operations on documents in Nuxeo
  * repository using Remote Java APIs. It uses
  *
  * @see DocumentHandler as IOHandler with the client.
  *
  * $LastChangedRevision: $ $LastChangedDate: $
  */
-public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, PoxPayloadOut> {
+public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxPayloadOut> {
 	
     /**
      * The logger.
      */
-    private final Logger logger = LoggerFactory.getLogger(RepositoryJavaClientImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(RepositoryClientImpl.class);
 //    private final Logger profilerLogger = LoggerFactory.getLogger("remperf");
 //    private String foo = Profiler.createLogger();
     public static final String NUXEO_CORE_TYPE_DOMAIN = "Domain";
@@ -120,7 +118,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     /**
      * Instantiates a new repository java client impl.
      */
-    public RepositoryJavaClientImpl() {
+    public RepositoryClientImpl() {
         //Empty constructor
     }
 
@@ -220,7 +218,45 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         }
 
     }
+    
 
+    @Override
+    public boolean reindex(DocumentHandler handler, String csid, String indexid) throws DocumentNotFoundException, DocumentException
+    {
+    	boolean result = true;
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = handler.getServiceContext();
+    	return result;
+    }
+    
+    @Override
+    public boolean reindex(DocumentHandler handler, String indexid) throws DocumentNotFoundException, DocumentException
+    {
+    	boolean result = true;
+        CoreSessionInterface repoSession = null;
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = handler.getServiceContext();
+        
+        try {
+            repoSession = getRepositorySession(ctx);
+            try {
+            } catch (ClientException ce) {
+            }
+            //
+            // Set repository session to handle the document
+            //
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            throw new NuxeoDocumentException(e);
+        } finally {
+            if (repoSession != null) {
+                releaseRepositorySession(ctx, repoSession);
+            }
+        }
+        
+    	return result;
+    }
+    
     /**
      * get document from the Nuxeo repository
      *
@@ -963,7 +999,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 
         // FIXME: Get all of the following values from appropriate external constants.
         //
-        // At present, the two constants below are duplicated in both RepositoryJavaClientImpl
+        // At present, the two constants below are duplicated in both RepositoryClientImpl
         // and in AuthorityItemDocumentModelHandler.
         final String TERM_GROUP_LIST_NAME = "TERM_GROUP_LIST_NAME";
         final String TERM_GROUP_TABLE_NAME_PARAM = "TERM_GROUP_TABLE_NAME";

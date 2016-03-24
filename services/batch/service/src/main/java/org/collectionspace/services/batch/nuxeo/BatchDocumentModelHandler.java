@@ -31,7 +31,7 @@ import org.collectionspace.services.BatchJAXBSchema;
 import org.collectionspace.services.jaxb.InvocableJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
-import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
+import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.batch.BatchCommon;
 import org.collectionspace.services.batch.BatchInvocable;
@@ -79,7 +79,7 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 			throw new BadRequestException("BatchResource: unknown Invocation Mode: " + invocationMode);
 		}
 
-		RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl) this.getRepositoryClient(ctx);
+		RepositoryClientImpl repoClient = (RepositoryClientImpl) this.getRepositoryClient(ctx);
 		repoSession = this.getRepositorySession();
 		if (repoSession == null) {
 			repoSession = repoClient.getRepositorySession(ctx);

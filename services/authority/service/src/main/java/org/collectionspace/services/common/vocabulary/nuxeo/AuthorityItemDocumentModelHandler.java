@@ -45,7 +45,7 @@ import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
-import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
+import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.vocabulary.VocabularyItemJAXBSchema;
@@ -474,7 +474,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	boolean releaseRepoSession = false;
         
     	try {
-    		RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
+    		RepositoryClientImpl repoClient = (RepositoryClientImpl)this.getRepositoryClient(ctx);
     		repoSession = this.getRepositorySession();
     		if (repoSession == null) {
     			repoSession = repoClient.getRepositorySession(ctx);
@@ -605,8 +605,8 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         String filteredTerm;
         StringBuilder filteredTermBuilder = new StringBuilder(term);
         // Term contains no anchor or wildcard characters.
-        if ( (! term.contains(RepositoryJavaClientImpl.USER_SUPPLIED_ANCHOR_CHAR))
-                && (! term.contains(RepositoryJavaClientImpl.USER_SUPPLIED_WILDCARD)) ) {
+        if ( (! term.contains(RepositoryClientImpl.USER_SUPPLIED_ANCHOR_CHAR))
+                && (! term.contains(RepositoryClientImpl.USER_SUPPLIED_WILDCARD)) ) {
             filteredTerm = term;
         } else {
             // Term contains at least one such character.
@@ -614,10 +614,10 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
                 // Filter the starting anchor or wildcard character, if any.
                 String firstChar = filteredTermBuilder.substring(0,1);
                 switch (firstChar) {
-                    case RepositoryJavaClientImpl.USER_SUPPLIED_ANCHOR_CHAR:
+                    case RepositoryClientImpl.USER_SUPPLIED_ANCHOR_CHAR:
                         anchorAtStart = true;
                         break;
-                    case RepositoryJavaClientImpl.USER_SUPPLIED_WILDCARD:
+                    case RepositoryClientImpl.USER_SUPPLIED_WILDCARD:
                         filteredTermBuilder.deleteCharAt(0);
                         break;
                 }
@@ -628,12 +628,12 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
                 int lastPos = filteredTermBuilder.length() - 1;
                 String lastChar = filteredTermBuilder.substring(lastPos);
                 switch (lastChar) {
-                    case RepositoryJavaClientImpl.USER_SUPPLIED_ANCHOR_CHAR:
+                    case RepositoryClientImpl.USER_SUPPLIED_ANCHOR_CHAR:
                         filteredTermBuilder.deleteCharAt(lastPos);
-                        filteredTermBuilder.insert(filteredTermBuilder.length(), RepositoryJavaClientImpl.ENDING_ANCHOR_CHAR);
+                        filteredTermBuilder.insert(filteredTermBuilder.length(), RepositoryClientImpl.ENDING_ANCHOR_CHAR);
                         anchorAtEnd = true;
                         break;
-                    case RepositoryJavaClientImpl.USER_SUPPLIED_WILDCARD:
+                    case RepositoryClientImpl.USER_SUPPLIED_WILDCARD:
                         filteredTermBuilder.deleteCharAt(lastPos);
                         break;
                 }
@@ -642,7 +642,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
                 }
                 filteredTerm = filteredTermBuilder.toString();
                 // Filter all other wildcards, if any.
-                filteredTerm = filteredTerm.replaceAll(RepositoryJavaClientImpl.USER_SUPPLIED_WILDCARD_REGEX, ZERO_OR_MORE_ANY_CHAR_REGEX);
+                filteredTerm = filteredTerm.replaceAll(RepositoryClientImpl.USER_SUPPLIED_WILDCARD_REGEX, ZERO_OR_MORE_ANY_CHAR_REGEX);
                 if (logger.isTraceEnabled()) {
                     logger.trace(String.format("After replacing user wildcards = %s", filteredTerm));
                 }
@@ -835,7 +835,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     @Override
     public Map<String,String> getJDBCQueryParams() {
         // FIXME: Get all of the following values from appropriate external constants.
-        // At present, these are duplicated in both RepositoryJavaClientImpl
+        // At present, these are duplicated in both RepositoryClientImpl
         // and in AuthorityItemDocumentModelHandler.
         final String TERM_GROUP_LIST_NAME = "TERM_GROUP_LIST_NAME";
         final String TERM_GROUP_TABLE_NAME_PARAM = "TERM_GROUP_TABLE_NAME";

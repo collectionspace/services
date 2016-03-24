@@ -32,6 +32,7 @@ import java.security.Principal;
 import java.util.HashMap;
 import java.util.Set;
 
+
 //import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
@@ -53,6 +54,7 @@ import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.URIResourceImpl;
+import org.collectionspace.services.client.index.IndexClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.CollectionSpaceResource;
@@ -167,7 +169,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 				} else {
 					//
 					// They passed the first round of security checks, so now let's check to see if they're trying
-					// to perform a workflow state change and make sure they are allowed to to this.
+					// to perform a workflow state change or fulltext reindex and make sure they are allowed to to this.
 					//
 					if (uriPath.contains(WorkflowClient.SERVICE_PATH) == true) {
 						String workflowProxyResource = SecurityUtils.getWorkflowResourceName(request);
@@ -179,7 +181,18 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 									Response.Status.FORBIDDEN).entity(uriPath + " " + httpMethod).type("text/plain").build();
 							throw new CSWebApplicationException(response);
 						}
+					} else 	if (uriPath.contains(IndexClient.SERVICE_PATH) == true) {
+						String indexProxyResource = SecurityUtils.getIndexResourceName(request);
+						res = new URIResourceImpl(AuthN.get().getCurrentTenantId(), indexProxyResource, httpMethod);
+						if (authZ.isAccessAllowed(res) == false) {
+							logger.error("Access to " + resName + ":" + res.getId() + " is NOT allowed to "
+									+ " user=" + AuthN.get().getUserId());
+							Response response = Response.status(
+									Response.Status.FORBIDDEN).entity(uriPath + " " + httpMethod).type("text/plain").build();
+							throw new CSWebApplicationException(response);
+						}
 					}
+
 				}
 				//
 				// Login to Nuxeo

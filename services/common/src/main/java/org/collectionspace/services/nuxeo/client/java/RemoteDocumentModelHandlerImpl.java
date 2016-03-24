@@ -547,7 +547,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     	String returnValue = null;
 
     	try{ 
-    		RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
+    		RepositoryClientImpl repoClient = (RepositoryClientImpl)this.getRepositoryClient(ctx);
     		repoSession = this.getRepositorySession();
     		if (repoSession == null) {
     			repoSession = repoClient.getRepositorySession();
@@ -619,7 +619,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         	
         	boolean releaseRepoSession = false;
         	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
-        	RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
+        	RepositoryClientImpl repoClient = (RepositoryClientImpl)this.getRepositoryClient(ctx);
         	CoreSessionInterface repoSession = this.getRepositorySession();
         	if (repoSession == null) {
         		repoSession = repoClient.getRepositorySession(ctx);

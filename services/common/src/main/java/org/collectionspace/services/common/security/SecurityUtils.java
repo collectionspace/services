@@ -32,6 +32,7 @@ import java.util.StringTokenizer;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.URIResourceImpl;
+import org.collectionspace.services.client.index.IndexClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.config.service.ServiceBindingType;
 
@@ -42,7 +43,6 @@ import org.collectionspace.authentication.AuthN;
 import org.collectionspace.authentication.spi.AuthNContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.jboss.crypto.digest.DigestCallback;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.security.Base64Encoder;
@@ -120,6 +120,37 @@ public class SecurityUtils {
     	return result;
     }
     
+    public static String getIndexResourceName(HttpRequest request) {
+    	String result = null;
+    			
+    	UriInfo uriInfo = request.getUri();
+    	String indexSubResName = SecurityUtils.getResourceName(uriInfo);
+    	String resEntity = SecurityUtils.getResourceEntity(indexSubResName);
+    	
+		MultivaluedMap<String, String> pathParams = uriInfo.getPathParameters();
+		String indexId = pathParams.getFirst(IndexClient.INDEX_ID_PARAM);
+		if (indexId != null  && pathParams.containsKey("csid")) {
+			// e.g., intakes/*/index/fulltext
+	    	result = resEntity + "/*/" + IndexClient.SERVICE_NAME + "/" + indexId;
+		} else if (indexId != null) {
+			// e.g., intakes/index/fulltext
+	    	result = resEntity + IndexClient.SERVICE_NAME + "/" + indexId;			
+		} else {
+			// e.g., intakes
+			result = resEntity;
+		}
+		
+		//
+		// Overriding the result from above.
+		//
+		// Until we build out more permissions for the index resource,
+		// we're just going to return the index resource name.
+		//
+		result = IndexClient.SERVICE_NAME;
+    	
+    	return result;
+    }    
+    
 	/**
 	 * Gets the resource name.
 	 *
@@ -154,7 +185,7 @@ public class SecurityUtils {
 		}
 		
 		// FIXME: REM
-		// Since the hjid (HyperJaxb3 generated IDs are not unique strings in URIs that also have a CSID,
+		// Since the hjid (HyperJaxb3 generated IDs) are not unique strings in URIs that also have a CSID,
 		// we need to replace hjid last.  We can fix this by having HyperJaxb3 generate UUID.
 		// Assumption : path param name for csid is lowercase
 		//

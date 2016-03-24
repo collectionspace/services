@@ -1,0 +1,42 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.collectionspace.services</groupId>
+		<artifactId>org.collectionspace.services.index.3rdparty</artifactId>
+		<version>4.4-SNAPSHOT</version>
+	</parent>
+    
+    <artifactId>org.collectionspace.services.index.3rdparty.nuxeo</artifactId>
+    <name>services.index.3rdparty.nuxeo</name>
+    <packaging>jar</packaging>
+    <description>
+        Index Nuxeo Document Type
+    </description>
+
+    <build>
+		<resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+		</resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestFile> src/main/resources/META-INF/MANIFEST.MF </manifestFile>
+                        <manifestEntries>
+                            <Bundle-Version>${eclipseVersion}</Bundle-Version>
+                            <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

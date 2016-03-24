@@ -182,7 +182,7 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 		CommonList commonList = new CommonList();
 		String markRtSbj = null;
 		CoreSessionInterface repoSession = null;
-		RepositoryJavaClientImpl repoClient = null;
+		RepositoryClientImpl repoClient = null;
 		boolean releaseRepoSession = false;
 
 		AbstractServiceContextImpl ctx = (AbstractServiceContextImpl) getServiceContext();
@@ -193,8 +193,8 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 
 		try {
 			if (markRtSbj != null) {
-				repoClient = (RepositoryJavaClientImpl) this.getRepositoryClient(ctx);
-				RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl) repoClient;
+				repoClient = (RepositoryClientImpl) this.getRepositoryClient(ctx);
+				RepositoryClientImpl nuxeoRepoClient = (RepositoryClientImpl) repoClient;
 				repoSession = this.getRepositorySession();
 				if (repoSession == null) {
 					repoSession = repoClient.getRepositorySession(ctx);

@@ -80,6 +80,7 @@
         <module>dimension</module>
         <module>contact</module>
         <module>workflow</module>
+        <module>index</module>
         <module>media</module>
         <module>publicitem</module>        
         <!--module>sdk</module-->

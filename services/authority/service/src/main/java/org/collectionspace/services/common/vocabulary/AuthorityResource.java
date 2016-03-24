@@ -80,7 +80,7 @@ import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentFilter;
-import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
+import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.workflow.WorkflowCommon;
 import org.jboss.resteasy.util.HttpResponseCodes;
@@ -336,7 +336,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(item.inAuthority.resource);
         
         // HACK - this really must be moved to the doc handler, not here. No Nuxeo specific stuff here!
-        RepositoryJavaClientImpl client = (RepositoryJavaClientImpl)getRepositoryClient(ctx);
+        RepositoryClientImpl client = (RepositoryClientImpl)getRepositoryClient(ctx);
         String parentcsid = client.findDocCSID(repoSession, ctx, whereClause);
 
         String itemWhereClause = buildWhereForAuthItemByName(item.getShortIdentifier(), parentcsid);

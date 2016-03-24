@@ -337,6 +337,34 @@
 			</service:object>
 		</tenant:serviceBindings>
 		<!-- end Workflow service meta-data -->
+		
+		<!-- begin Index service meta-data -->
+		<tenant:serviceBindings id="Index" merge:matcher="id" name="Index" type="utility"
+			version="1.0">
+			<service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+			<service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.common.index.service.nuxeo.WorkflowDocumentModelHandler
+			</service:documentHandler>
+			<service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.index.nuxeo.WorkflowValidatorHandler
+			</service:validatorHandler>
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" name="Index"
+				version="1.0">
+				<service:part id="0" control_group="Managed" versionable="true" auditable="false" label="index-system"
+					updated="" order="0">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/config/system"
+							schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+					</service:content>
+				</service:part>
+				<service:part id="1" control_group="Managed" versionable="true" auditable="false" label="index_common"
+					updated="" order="1">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/index"
+							schemaLocation="http://collectionspace.org/services/index http://services.collectionspace.org/movement/index_common.xsd" />
+					</service:content>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+		<!-- end Index service meta-data -->		
 
 		<!-- begin report service meta-data -->
 		<tenant:serviceBindings id="Reports" merge:matcher="id" name="Reports" type="utility" version="1.0">

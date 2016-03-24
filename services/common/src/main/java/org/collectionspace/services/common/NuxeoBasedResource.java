@@ -41,6 +41,7 @@ import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
@@ -55,10 +56,8 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
-
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.util.HttpResponseCodes;
-
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 
@@ -93,6 +92,65 @@ public abstract class NuxeoBasedResource
             System.out.println("Static initializer failed in ResourceBase because not running from deployment.  OK to use Resource classes statically for tests.");
         }
     }
+    
+    //======================= REINDEX ====================================================
+    @GET
+    @Path("{csid}/index/{indexid}")
+    public Response reindex(
+            @Context Request request,    		
+            @Context UriInfo uriInfo,
+            @PathParam("csid") String csid,
+            @PathParam("indexid") String indexid) {
+       	Response result = Response.noContent().build();
+       	boolean success = false;
+       	
+        ensureCSID(csid, READ);
+        try {
+            RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(uriInfo);
+            DocumentHandler handler = createDocumentHandler(ctx);
+            success = getRepositoryClient(ctx).reindex(handler, csid);
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.REINDEX_FAILED, csid);
+        }
+        
+        if (success == false) {
+            Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.REINDEX_FAILED + ServiceMessages.resourceNotReindexedMsg(csid)).type("text/plain").build();
+            throw new CSWebApplicationException(response);
+        }
+       	
+       	return result;
+    }
+    
+    //======================= REINDEX ====================================================
+    @GET
+    @Path("index/{indexid}")
+    public Response reindex(
+            @Context Request request,
+            @Context UriInfo uriInfo,
+            @PathParam("indexid") String indexid) {
+       	Response result = Response.noContent().build();;
+       	boolean success = false;
+       	String docType = null;
+       	
+        try {
+            RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(uriInfo);
+            docType = ctx.getTenantQualifiedDoctype(); // this will used in the error message if an error occurs
+            DocumentHandler handler = createDocumentHandler(ctx);
+            success = getRepositoryClient(ctx).reindex(handler, indexid);
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.REINDEX_FAILED);
+        }
+        
+        if (success == false) {
+            Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.REINDEX_FAILED + ServiceMessages.resourceNotReindexedMsg(docType)).type("text/plain").build();
+            throw new CSWebApplicationException(response);
+        }
+       	
+       	return result;
+    }
+    
     
     //======================= CREATE ====================================================
     
