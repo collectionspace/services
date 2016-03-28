@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
 
 //import org.nuxeo.ecm.core.client.NuxeoClient;
 
+
 import org.collectionspace.services.jaxb.InvocableJAXBSchema;
 //import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
 //import org.collectionspace.services.nuxeo.client.java.NxConnect;
@@ -64,6 +65,9 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	private static Pattern kwdSearchProblemChars = Pattern.compile("[\\:\\(\\)\\*\\%\\.]");
 	private static Pattern kwdSearchHyphen = Pattern.compile(" - ");
 	private static Pattern advSearchSqlWildcard = Pattern.compile(".*?[I]*LIKE\\s*\\\"\\%\\\".*?");
+	// Base Nuxeo document type for all CollectionSpace documents/resources
+	public static String COLLECTIONSPACE_DOCUMENT_TYPE = "CollectionSpaceDocument";
+	public static final String NUXEO_DOCUMENT_TYPE = "Document";
 
 
 	private static String getLikeForm(String dataSourceName, String repositoryName, String cspaceInstanceId) {

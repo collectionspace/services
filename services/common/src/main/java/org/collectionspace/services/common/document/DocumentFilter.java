@@ -36,11 +36,14 @@ public abstract class DocumentFilter {
     /** The Constant DEFAULT_PAGE_SIZE_INIT. */
     public static final int DEFAULT_PAGE_SIZE_INIT = 40; 		// Default page size if one is specified in the service-config.xml
     public static final int DEFAULT_PAGE_SIZE_MAX_INIT = 1000;	// Default page size max if one is specified in the service-config.xml
+    public static final String DEFAULT_SELECT_CLAUSE = "SELECT * FROM ";
     
     /** The Constant PAGE_SIZE_DEFAULT_PROPERTY. */
     public static final String PAGE_SIZE_DEFAULT_PROPERTY = "pageSizeDefault";
     public static final String PAGE_SIZE_MAX_PROPERTY = "pageSizeMax";
     
+    /** The select clause. */
+    protected String selectClause;
     /** The where clause. */
     protected String whereClause;	// Filtering clause. Omit the "WHERE".
     /** The order by clause. */
@@ -157,7 +160,7 @@ public abstract class DocumentFilter {
      * @param thePageSize the page size
      */
     public DocumentFilter(String theWhereClause, int theStartPage, int thePageSize) {
-        this(theWhereClause, EMPTY_ORDER_BY_CLAUSE, theStartPage, thePageSize);
+        this(DEFAULT_SELECT_CLAUSE, theWhereClause, EMPTY_ORDER_BY_CLAUSE, theStartPage, thePageSize);
     }
 
     /**
@@ -168,7 +171,8 @@ public abstract class DocumentFilter {
      * @param theStartPage the start page
      * @param thePageSize the page size
      */
-    public DocumentFilter(String theWhereClause, String theOrderByClause, int theStartPage, int thePageSize) {
+    public DocumentFilter(String theSelectClause, String theWhereClause, String theOrderByClause, int theStartPage, int thePageSize) {
+    	this.selectClause = theSelectClause;
         this.whereClause = theWhereClause;
         this.orderByClause = theOrderByClause;
         this.startPage = (theStartPage > 0) ? theStartPage : 0;
@@ -226,12 +230,30 @@ public abstract class DocumentFilter {
     }
 
     /**
+     * Gets the select clause.
+     *
+     * @return the select clause
+     */
+    public String getSelectClause() {
+        return selectClause != null ? selectClause : DEFAULT_SELECT_CLAUSE;
+    }
+    
+    /**
      * Gets the where clause.
      *
      * @return the where clause
      */
     public String getWhereClause() {
         return whereClause;
+    }
+
+    /**
+     * Sets the select clause.
+     *
+     * @param theSelectClause the new select clause
+     */
+    public void setSelectClause(String theSelectClause) {
+        this.selectClause = theSelectClause;
     }
 
     /**

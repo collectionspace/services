@@ -134,7 +134,7 @@ public class SecurityUtils {
 	    	result = resEntity + "/*/" + IndexClient.SERVICE_NAME + "/" + indexId;
 		} else if (indexId != null) {
 			// e.g., intakes/index/fulltext
-	    	result = resEntity + IndexClient.SERVICE_NAME + "/" + indexId;			
+	    	result = resEntity + "/" + IndexClient.SERVICE_NAME + "/" + indexId;			
 		} else {
 			// e.g., intakes
 			result = resEntity;
@@ -170,7 +170,7 @@ public class SecurityUtils {
 				uriPath = uriPath.replace(pathParamValue, "*");
 			}
 			if ((pathParamName.toLowerCase().indexOf("predicate") > -1)) {
-				//replace csids with wildcard
+				//replace predicates with wildcard
 				uriPath = uriPath.replace(pathParamValue, "*");
 			}
 			if (pathParamName.toLowerCase().indexOf("specifier") > -1) {
@@ -179,9 +179,13 @@ public class SecurityUtils {
 						+ ")", "*");
 			}
 			if ((pathParamName.toLowerCase().indexOf("ms") > -1)) {
-				//replace csids with wildcard
+				//replace ms with wildcard
 				uriPath = uriPath.replace(pathParamValue, "*");
 			}
+			if ((pathParamName.toLowerCase().indexOf("indexid") > -1)) {
+				//replace indexid with wildcard
+				uriPath = uriPath.replace(pathParamValue, "*");
+			}			
 		}
 		
 		// FIXME: REM
@@ -233,9 +237,9 @@ public class SecurityUtils {
 	    String pathSegment = null;
 	    while (strTok.hasMoreTokens() == true) {
 	    	pathSegment = strTok.nextToken();
-	    	if (pathSegment.equals("*") == true) {
+	    	if (pathSegment.equals("*") == true || pathSegment.equals("index") == true) {
 	    		//
-	    		// leave the loop if we hit a wildcard character
+	    		// leave the loop if we hit a wildcard character or the "index" subresource
 	    		//
 	    		break;
 	    	}

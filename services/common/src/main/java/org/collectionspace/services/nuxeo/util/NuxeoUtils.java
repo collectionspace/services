@@ -556,7 +556,7 @@ public class NuxeoUtils {
      * @throws Exception if supplied values in the query are invalid.
      */
     static public final String buildNXQLQuery(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, QueryContext queryContext) throws Exception {
-        StringBuilder query = new StringBuilder("SELECT * FROM ");
+        StringBuilder query = new StringBuilder(queryContext.getSelectClause());
         // Since we have a tenant qualification in the WHERE clause, we do not need 
         // tenant-specific doc types
         // query.append(NuxeoUtils.getTenantQualifiedDocType(queryContext)); // Nuxeo doctype must be tenant qualified.
@@ -589,7 +589,7 @@ public class NuxeoUtils {
      * @return an NXQL query
      */
     static public final String buildNXQLQuery(List<String> docTypes, QueryContext queryContext) throws Exception {
-        StringBuilder query = new StringBuilder("SELECT * FROM "); 
+        StringBuilder query = new StringBuilder(queryContext.getSelectClause()); 
         boolean fFirst = true;
         for (String docType : docTypes) {
             if (fFirst) {

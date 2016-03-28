@@ -125,7 +125,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 				return result;
 			}
 			
-			final String servicesResource = "/cspace-services/"; // HACK - this is configured in war
+			final String servicesResource = "/cspace-services/"; // HACK - this is configured in war, get this from tomcat instead
 			final int servicesResourceLen = servicesResource.length();
 			String httpMethod = request.getHttpMethod();
 			String uriPath = request.getUri().getPath();

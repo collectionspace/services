@@ -429,6 +429,16 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
         tkz.nextToken(); //skip
         return tkz.nextToken();
     }
+    
+    /**
+     * Should return
+     * @throws Exception 
+     * @throws DocumentException 
+     */
+    @Override
+    public String getDocumentsToIndexQuery(String indexId, String csid) throws DocumentException, Exception {
+    	return null;
+    }
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#getServiceContextPath()

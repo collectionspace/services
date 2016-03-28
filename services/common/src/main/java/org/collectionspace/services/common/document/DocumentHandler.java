@@ -18,6 +18,7 @@
 package org.collectionspace.services.common.document;
 
 import java.util.Map;
+
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.lifecycle.Lifecycle;
@@ -330,6 +331,13 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * @return unqualified property
      */
     public String getUnQProperty(String qProp);
+    
+    /**
+     * get a query string that will be used to return a set of documents that should be indexed/re-index
+     * @throws Exception 
+     * @throws DocumentException 
+     */
+    public String getDocumentsToIndexQuery(String indexId, String csid) throws DocumentException, Exception;
     
     /**
      * Creates the CMIS query from the service context.  Each document handler is responsible for returning a valid CMIS query using the

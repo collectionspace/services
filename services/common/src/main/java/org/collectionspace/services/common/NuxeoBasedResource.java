@@ -101,14 +101,14 @@ public abstract class NuxeoBasedResource
             @Context UriInfo uriInfo,
             @PathParam("csid") String csid,
             @PathParam("indexid") String indexid) {
-       	Response result = Response.noContent().build();
+       	Response result = Response.status(Response.Status.OK).entity("Reindex complete.").type("text/plain").build();
        	boolean success = false;
        	
         ensureCSID(csid, READ);
         try {
             RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(uriInfo);
             DocumentHandler handler = createDocumentHandler(ctx);
-            success = getRepositoryClient(ctx).reindex(handler, csid);
+            success = getRepositoryClient(ctx).reindex(handler, csid, indexid);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.REINDEX_FAILED, csid);
         }
@@ -129,7 +129,7 @@ public abstract class NuxeoBasedResource
             @Context Request request,
             @Context UriInfo uriInfo,
             @PathParam("indexid") String indexid) {
-       	Response result = Response.noContent().build();;
+       	Response result = Response.noContent().build();
        	boolean success = false;
        	String docType = null;
        	

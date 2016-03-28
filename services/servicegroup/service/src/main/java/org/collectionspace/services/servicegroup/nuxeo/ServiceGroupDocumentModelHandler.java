@@ -55,6 +55,7 @@ import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.security.SecurityUtils;
+import org.collectionspace.services.common.query.nuxeo.QueryManagerNuxeoImpl;
 
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.service.ServiceObjectType;
@@ -126,11 +127,11 @@ public class ServiceGroupDocumentModelHandler
             	}
             	
             	// This should be "Document" but CMIS is gagging on that right now.
-            	ctx.getQueryParams().add(IQueryManager.SELECT_DOC_TYPE_FIELD, "CollectionSpaceDocument");
+            	ctx.getQueryParams().add(IQueryManager.SELECT_DOC_TYPE_FIELD, QueryManagerNuxeoImpl.COLLECTIONSPACE_DOCUMENT_TYPE);
     	        
     	        // Now we have to issue the search
-            	// findDocs qill build a QueryContext, which wants to see a docType for our context
-            	ctx.setDocumentType("Document");
+            	// findDocs will build a QueryContext, which wants to see a docType for our context
+            	ctx.setDocumentType(QueryManagerNuxeoImpl.NUXEO_DOCUMENT_TYPE);
     	        DocumentWrapper<DocumentModelList> docListWrapper = 
     	        		nuxeoRepoClient.findDocs(ctx, this, repoSession, docTypes );
     	        // Now we gather the info for each document into the list and return

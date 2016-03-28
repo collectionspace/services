@@ -29,7 +29,6 @@ import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.lang.StringUtils;
-
 import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
@@ -60,14 +59,12 @@ import org.collectionspace.services.lifecycle.StateList;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.lifecycle.TransitionDefList;
 import org.collectionspace.services.lifecycle.TransitionList;
-
 import org.nuxeo.ecm.core.NXCore;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.lifecycle.LifeCycleService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -455,6 +452,40 @@ public abstract class DocumentModelHandler<T, TL>
     		result = true;
     	}
     	
+    	return result;
+    }
+    
+    @Override
+    public String getDocumentsToIndexQuery(String indexId, String csid) throws DocumentException, Exception {
+    	String result = null;
+    	
+    	ServiceContext<PoxPayloadIn,PoxPayloadOut> ctx = this.getServiceContext();
+    	String selectClause = "SELECT ecm:uuid, ecm:primaryType FROM ";
+    	String docFilterWhereClause = this.getDocumentFilter().getWhereClause();
+    	//
+    	// The where clause could be a combination of the document filter's where clause plus a CSID qualifier
+    	//
+    	String whereClause = (csid == null) ? null : String.format("ecm:name = '%s'", csid); // AND ecm:currentLifeCycleState <> 'deleted'"
+        if (whereClause != null && !whereClause.trim().isEmpty()) {
+            // Due to an apparent bug/issue in how Nuxeo translates the NXQL query string
+            // into SQL, we need to parenthesize our 'where' clause
+        	if (docFilterWhereClause != null && !docFilterWhereClause.trim().isEmpty()) {
+        		whereClause = whereClause + IQueryManager.SEARCH_QUALIFIER_AND + "(" + docFilterWhereClause + ")";
+        	}
+        } else {
+        	whereClause = docFilterWhereClause;
+        }
+    	String orderByClause = "ecm:uuid";
+    	
+    	try {
+    		QueryContext queryContext = new QueryContext(ctx, selectClause, whereClause, orderByClause);
+    		result = NuxeoUtils.buildNXQLQuery(ctx, queryContext);
+    	} catch (DocumentException de) {
+    		throw de;
+    	} catch (Exception x) {
+    		throw x;
+    	}
+
     	return result;
     }
     

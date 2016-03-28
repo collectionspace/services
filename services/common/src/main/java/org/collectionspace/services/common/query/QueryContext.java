@@ -18,6 +18,8 @@ public class QueryContext {
     String docType;
     /** The doc filter. */
     DocumentFilter docFilter;
+    /** The Select clause. */
+    String selectClause;
     /** The where clause. */
     String whereClause;
     /** The order by clause. */
@@ -81,6 +83,14 @@ public class QueryContext {
         whereClause = theWhereClause;
         orderByClause = theOrderByClause;
     }
+    
+    public QueryContext(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+            String theSelectClause, String theWhereClause, String theOrderByClause) throws DocumentNotFoundException, DocumentException {
+        this(ctx);
+        selectClause = theSelectClause;
+        whereClause = theWhereClause;
+        orderByClause = theOrderByClause;
+    }    
 
     /**
      * Instantiates a new query context.
@@ -94,14 +104,13 @@ public class QueryContext {
             DocumentHandler handler) throws DocumentNotFoundException, DocumentException {
         this(ctx);
         if (handler == null) {
-            throw new IllegalArgumentException(
-                    "Document handler is missing.");
+            throw new IllegalArgumentException("Document handler is missing.");
         }
         docFilter = handler.getDocumentFilter();
         if (docFilter == null) {
-            throw new IllegalArgumentException(
-                    "Document handler has no Filter specified.");
+            throw new IllegalArgumentException("Document handler has no Filter specified.");
         }
+        selectClause = docFilter.getSelectClause();
         whereClause = docFilter.getWhereClause();
         orderByClause = docFilter.getOrderByClause();
     }
@@ -113,6 +122,24 @@ public class QueryContext {
      */
     public DocumentFilter getDocFilter() {
     	return docFilter;
+    }
+    
+    /**
+     * Sets/changes the select clause
+     * 
+     * @param newSelectClause
+     */
+    public void setSelectClause(String newSelectClause) {
+    	this.selectClause = newSelectClause;
+    }
+    
+    /**
+     * Gets the select clause.
+     *
+     * @return the select clause
+     */
+    public String getSelectClause() {
+    	return selectClause;
     }
     
     /**

@@ -101,7 +101,7 @@ public class ReindexFulltextRoot {
     @GET
     public String get(@QueryParam("batchSize") int batchSize, @QueryParam("batch") int batch) throws StorageException {
         coreSession = SessionFactory.getSession(request);
-        return reindexFulltext(batchSize, batch);
+        return reindexFulltext(batchSize, batch, null);
     }
 
     /**
@@ -113,7 +113,7 @@ public class ReindexFulltextRoot {
      * @return when done, ok + the total number of docs
      * @throws StorageException 
      */
-    public String reindexFulltext(int batchSize, int batch) throws StorageException {
+    public String reindexFulltext(int batchSize, int batch, String query) throws StorageException {
         Principal principal = coreSession.getPrincipal();
         if (!(principal instanceof NuxeoPrincipal)) {
             return "unauthorized";
@@ -127,7 +127,18 @@ public class ReindexFulltextRoot {
         if (batchSize <= 0) {
             batchSize = DEFAULT_BATCH_SIZE;
         }
-        List<ReindexInfo> infos = getInfos();
+        
+        //
+        // A default query that gets ALL the documents
+        //
+        if (query == null) {
+	        query = "SELECT ecm:uuid, ecm:primaryType FROM Document"
+	                + " WHERE ecm:isProxy = 0"
+	                + " AND ecm:currentLifeCycleState <> 'deleted'"
+	                + " ORDER BY ecm:uuid";
+        }
+
+        List<ReindexInfo> infos = getInfos(query);
         int size = infos.size();
         int numBatches = (size + batchSize - 1) / batchSize;
         if (batch < 0 || batch > numBatches) {
@@ -196,13 +207,9 @@ public class ReindexFulltextRoot {
         }
     }
 
-    protected List<ReindexInfo> getInfos() throws StorageException {
+    protected List<ReindexInfo> getInfos(String query) throws StorageException {
         getLowLevelSession();
         List<ReindexInfo> infos = new ArrayList<ReindexInfo>();
-        String query = "SELECT ecm:uuid, ecm:primaryType FROM Document"
-                + " WHERE ecm:isProxy = 0"
-                + " AND ecm:currentLifeCycleState <> 'deleted'"
-                + " ORDER BY ecm:uuid";
         IterableQueryResult it = session.queryAndFetch(query, NXQL.NXQL,
                 QueryFilter.EMPTY);
         try {

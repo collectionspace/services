@@ -33,6 +33,7 @@ import javax.sql.rowset.CachedRowSet;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.collectionspace.services.lifecycle.TransitionDef;
+import org.collectionspace.services.nuxeo.util.CSReindexFulltextRoot;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
@@ -221,25 +222,23 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
     
 
     @Override
-    public boolean reindex(DocumentHandler handler, String csid, String indexid) throws DocumentNotFoundException, DocumentException
+    public boolean reindex(DocumentHandler handler, String indexid) throws DocumentNotFoundException, DocumentException
     {
-    	boolean result = true;
-    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = handler.getServiceContext();
-    	return result;
+    	return reindex(handler, null, indexid);
     }
     
     @Override
-    public boolean reindex(DocumentHandler handler, String indexid) throws DocumentNotFoundException, DocumentException
+    public boolean reindex(DocumentHandler handler, String csid, String indexid) throws DocumentNotFoundException, DocumentException
     {
     	boolean result = true;
         CoreSessionInterface repoSession = null;
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = handler.getServiceContext();
         
         try {
+            String queryString = handler.getDocumentsToIndexQuery(indexid, csid);
             repoSession = getRepositorySession(ctx);
-            try {
-            } catch (ClientException ce) {
-            }
+            CSReindexFulltextRoot indexer = new CSReindexFulltextRoot(repoSession);
+            indexer.reindexFulltext(0, 0, queryString);
             //
             // Set repository session to handle the document
             //
