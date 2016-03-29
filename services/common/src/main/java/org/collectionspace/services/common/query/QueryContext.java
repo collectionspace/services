@@ -1,5 +1,6 @@
 package org.collectionspace.services.common.query;
 
+import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -52,6 +53,7 @@ public class QueryContext {
             throw new IllegalArgumentException(
                     "Service context has no Tenant ID specified.");
         }
+        selectClause = IQueryManager.DEFAULT_SELECT_CLAUSE;
     }
 
     /**
@@ -137,8 +139,12 @@ public class QueryContext {
      * Gets the select clause.
      *
      * @return the select clause
+     * @throws Exception 
      */
-    public String getSelectClause() {
+    public String getSelectClause() throws Exception {
+    	if (selectClause == null) {
+    		throw new Exception("Select clause for query context was null.");
+    	}
     	return selectClause;
     }
     

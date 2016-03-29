@@ -42,6 +42,8 @@ public interface IQueryManager {
     final static String SEARCH_TYPE_INVOCATION = "inv";
 	final static String SEARCH_QUALIFIER_AND = SEARCH_TERM_SEPARATOR + "AND" + SEARCH_TERM_SEPARATOR;
 	final static String SEARCH_QUALIFIER_OR = SEARCH_TERM_SEPARATOR + "OR" + SEARCH_TERM_SEPARATOR;
+    final static String DEFAULT_SELECT_CLAUSE = "SELECT * FROM ";
+	
 
 	//
 	// Nuxeo pseudo-values (and filters) for special document properties.
