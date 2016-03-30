@@ -7,8 +7,6 @@
     Part    : Common
     Used for: JAXB binding between XML and Java objects
     
-    $LastChangedRevision$
-    $LastChangedDate$
 -->
 
 <xs:schema 
@@ -18,7 +16,8 @@
     xmlns:ns="http://collectionspace.org/services/organization"
     xmlns="http://collectionspace.org/services/organization"
     targetNamespace="http://collectionspace.org/services/organization"
-    version="0.1">
+    version="0.2"
+	>
     
     <!--
         Avoid XmlRootElement nightmare:
@@ -34,12 +33,14 @@
                 <xs:element name="csid" type="xs:string" />
                 
                 <!--  OrgAuthority Information Group -->
-								<xs:element name="shortIdentifier" type="xs:string"/>
                 <xs:element name="displayName" type="xs:string"/>
+				<xs:element name="shortIdentifier" type="xs:string"/>
                 <xs:element name="refName" type="xs:string"/>
                 <xs:element name="vocabType" type="xs:string"/>                
                 <xs:element name="source" type="xs:string"/>
                 <xs:element name="description" type="xs:string"/>
+				<!-- Internal fields -->
+				<xs:element name="rev" type="xs:integer"/> <!-- The revision number of the authority.  Increments with each change including changes to its terms. -->
             </xs:sequence>
         </xs:complexType>
     </xs:element>

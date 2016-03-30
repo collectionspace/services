@@ -7,8 +7,6 @@
     Part    : Common
     Used for: JAXB binding between XML and Java objects
     
-    $LastChangedRevision: 1055 $
-    $LastChangedDate: 2009-12-09 12:25:15 -0800 (Wed, 09 Dec 2009) $
 -->
 
 <xs:schema 
@@ -18,7 +16,7 @@
     xmlns:ns="http://collectionspace.org/services/concept"
     xmlns="http://collectionspace.org/services/concept"
     targetNamespace="http://collectionspace.org/services/concept"
-    version="0.1"
+    version="0.2"
     >
     
     <!--
@@ -36,11 +34,13 @@
                 
                 <!--  ConceptAuthority Information Group -->
                 <xs:element name="displayName" type="xs:string"/>
-								<xs:element name="shortIdentifier" type="xs:string"/>
+				<xs:element name="shortIdentifier" type="xs:string"/>
                 <xs:element name="refName" type="xs:string"/>
                 <xs:element name="vocabType" type="xs:string"/>
                 <xs:element name="source" type="xs:string"/>
                 <xs:element name="description" type="xs:string"/>
+				<!-- Internal fields -->
+				<xs:element name="rev" type="xs:integer"/> <!-- The revision number of the authority.  Increments with each change including changes to its terms. -->
             </xs:sequence>
         </xs:complexType>
     </xs:element>

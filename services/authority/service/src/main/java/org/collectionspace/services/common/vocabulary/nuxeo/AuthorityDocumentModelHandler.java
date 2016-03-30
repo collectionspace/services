@@ -34,6 +34,8 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
@@ -78,6 +80,22 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 
         return unQObjectProperties;
     }
+    
+    public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {
+    	super.fillAllParts(wrapDoc, action);
+    	//
+    	// Update the record's revision number on both CREATE and UPDATE actions
+    	//
+    	DocumentModel documentModel = wrapDoc.getWrappedObject();
+    	Integer rev = (Integer)documentModel.getProperty(authorityCommonSchemaName, AuthorityItemJAXBSchema.REV);
+    	if (rev == null) {
+    		rev = 0;
+    	} else {
+    		rev++;
+    	}
+    	documentModel.setProperty(authorityCommonSchemaName, AuthorityItemJAXBSchema.REV, rev);
+    }
+    
 
     @Override
     public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {

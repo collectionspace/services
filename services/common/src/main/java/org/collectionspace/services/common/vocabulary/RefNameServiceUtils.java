@@ -521,7 +521,7 @@ public class RefNameServiceUtils {
 
         ArrayList<String> docTypes = new ArrayList<String>();
 
-        String query = computeWhereClauseForAuthorityRefDocs(refName, refPropName, docTypes, servicebindings, // REM - Side effect that docTypes array gets set.  Any others?
+        String query = computeWhereClauseForAuthorityRefDocs(refName, refPropName, docTypes, servicebindings, // REM - Side effect that docTypes, authRefFieldsByService, and queriedServiceBindings get set/change.  Any others?
                 queriedServiceBindings, authRefFieldsByService);
         if (query == null) { // found no authRef fields - nothing to query
             return null;
@@ -584,7 +584,7 @@ public class RefNameServiceUtils {
                 + " AND " + (authTermInfo.inAuthority.name != null
                 ? authTermInfo.inAuthority.name : authTermInfo.inAuthority.csid)
                 + " AND " + (authTermInfo.name != null
-                ? authTermInfo.name : authTermInfo.csid);
+                ? authTermInfo.name : authTermInfo.csid); // REM - This seems likely to cause trouble.  We should consider searching for the full refname -excluding the display name suffix
 
         String whereClauseStr = QueryManager.createWhereClauseFromKeywords(keywords);
 
@@ -882,7 +882,7 @@ public class RefNameServiceUtils {
         }
 
         if (prop instanceof StringProperty) {    // scalar string
-            addARIifMatches(refNameToMatch, matchBaseOnly, arci, prop, foundProps);
+            addARIifMatches(refNameToMatch, matchBaseOnly, arci, prop, foundProps); // REM - Side effect that foundProps gets changed/updated
         } else if (prop instanceof List) {
             List<Property> propList = (List<Property>) prop;
             // run through list. Must either be list of Strings, or Complex

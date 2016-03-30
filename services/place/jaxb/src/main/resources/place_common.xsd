@@ -18,6 +18,7 @@
             <xs:sequence>
               <!--  Common identifier -->
                 <xs:element name="csid" type="xs:string" />
+				<xs:element name="rev" type="xs:integer" /> <!-- Revision number -->
                 
                     <!--  Place Information Group -->
                     <!--  inAuthority is the csid of the owning PlaceAuthority -->

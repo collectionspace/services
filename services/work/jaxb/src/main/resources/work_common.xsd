@@ -17,6 +17,7 @@
             <xs:sequence>
                 <!--  Common identifier -->
                 <xs:element name="csid" type="xs:string" />
+				<xs:element name="rev" type="xs:integer" /> <!-- Revision number -->
 
                 <!--  Common Authority Information Group -->
                 <!--  inAuthority is the csid of the owning WorkAuthority -->
