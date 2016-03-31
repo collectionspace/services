@@ -38,7 +38,7 @@ public class TaxonomyAuthorityDocumentModelHandler
     /**
      * Common part schema label
      */
-    private static final String COMMON_PART_LABEL = "taxonomyauthority_common";   
+    static final String COMMON_PART_LABEL = "taxonomyauthority_common";   
     
     public TaxonomyAuthorityDocumentModelHandler() {
     	super(COMMON_PART_LABEL);

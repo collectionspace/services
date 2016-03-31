@@ -114,5 +114,11 @@ public class TaxonDocumentModelHandler
     public String getQProperty(String prop) {
         return TaxonConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
+
+	@Override
+	public String getParentCommonSchemaName() {
+		// TODO Auto-generated method stub
+		return TaxonomyAuthorityDocumentModelHandler.COMMON_PART_LABEL;
+	}
 }
 

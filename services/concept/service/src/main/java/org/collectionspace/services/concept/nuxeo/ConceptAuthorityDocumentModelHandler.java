@@ -38,7 +38,7 @@ public class ConceptAuthorityDocumentModelHandler
     /**
      * Common part schema label
      */
-    private static final String COMMON_PART_LABEL = "conceptauthorities_common";   
+    static final String COMMON_PART_LABEL = "conceptauthorities_common";   
     
     public ConceptAuthorityDocumentModelHandler() {
     	super(COMMON_PART_LABEL);

@@ -70,5 +70,11 @@ public class CitationDocumentModelHandler
     public String getQProperty(String prop) {
         return CitationConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
+
+	@Override
+	public String getParentCommonSchemaName() {
+		// TODO Auto-generated method stub
+		return CitationAuthorityDocumentModelHandler.COMMON_PART_LABEL;
+	}
 }
 

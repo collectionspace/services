@@ -116,5 +116,11 @@ public class PlaceDocumentModelHandler
     public String getQProperty(String prop) {
         return PlaceConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
+
+	@Override
+	public String getParentCommonSchemaName() {
+		// TODO Auto-generated method stub
+		return PlaceAuthorityDocumentModelHandler.COMMON_PART_LABEL;
+	}
 }
 

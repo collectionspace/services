@@ -38,7 +38,7 @@ public class PlaceAuthorityDocumentModelHandler
     /**
      * Common part schema label
      */
-    private static final String COMMON_PART_LABEL = "placeauthorities_common";   
+    static final String COMMON_PART_LABEL = "placeauthorities_common";   
     
     public PlaceAuthorityDocumentModelHandler() {
     	super(COMMON_PART_LABEL);

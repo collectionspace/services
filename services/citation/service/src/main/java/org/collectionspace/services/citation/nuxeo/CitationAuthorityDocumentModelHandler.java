@@ -38,7 +38,7 @@ public class CitationAuthorityDocumentModelHandler
     /**
      * Common part schema label
      */
-    private static final String COMMON_PART_LABEL = "citationauthorities_common";   
+    static final String COMMON_PART_LABEL = "citationauthorities_common";   
     
     public CitationAuthorityDocumentModelHandler() {
     	super(COMMON_PART_LABEL);

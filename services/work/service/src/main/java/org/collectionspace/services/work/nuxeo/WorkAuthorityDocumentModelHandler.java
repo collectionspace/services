@@ -36,7 +36,7 @@ public class WorkAuthorityDocumentModelHandler
     /**
      * Common part schema label
      */
-    private static final String COMMON_PART_LABEL = "workauthorities_common";   
+    static final String COMMON_PART_LABEL = "workauthorities_common";   
     
     public WorkAuthorityDocumentModelHandler() {
         super(COMMON_PART_LABEL);

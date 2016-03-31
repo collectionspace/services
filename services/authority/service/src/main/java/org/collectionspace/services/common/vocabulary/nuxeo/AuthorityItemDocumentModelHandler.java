@@ -36,6 +36,7 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
@@ -93,6 +94,8 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     public AuthorityItemDocumentModelHandler(String authorityItemCommonSchemaName) {
         this.authorityItemCommonSchemaName = authorityItemCommonSchemaName;
     }
+    
+    abstract public String getParentCommonSchemaName();
 
     @Override
     protected String getRefnameDisplayName(DocumentWrapper<DocumentModel> docWrapper) {
@@ -394,6 +397,33 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             docModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.REF_NAME, this.newRefNameOnUpdate); // This field is deprecated since it is now a duplicate of what is in the collectionspace_core:refName field        	
         }
     }
+    
+    public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {
+    	super.fillAllParts(wrapDoc, action);
+    	//
+    	// Update the record's revision number on both CREATE and UPDATE actions
+    	//
+    	updateRevNumbers(wrapDoc);
+    }
+    
+    protected void updateRevNumbers(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	DocumentModel documentModel = wrapDoc.getWrappedObject();
+    	Long rev = (Long)documentModel.getProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.REV);
+    	if (rev == null) {
+    		rev = (long)0;
+    	} else {
+    		rev++;
+    	}
+    	documentModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.REV, rev);
+    	//
+    	// Next, update the inAuthority (the parent's) rev number
+    	//
+    	DocumentModel inAuthorityDocModel = NuxeoUtils.getDocFromCsid(getServiceContext(), getRepositorySession(), getInAuthority());
+    	Long parentRev = (Long)inAuthorityDocModel.getProperty(getParentCommonSchemaName(), AuthorityJAXBSchema.REV);
+   		parentRev++;
+   		inAuthorityDocModel.setProperty(getParentCommonSchemaName(), AuthorityJAXBSchema.REV, parentRev);
+   		getRepositorySession().saveDocument(inAuthorityDocModel);
+    }    
     
     /**
      * If no short identifier was provided in the input payload, generate a
@@ -730,15 +760,6 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     public void extractAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
         super.extractAllParts(wrapDoc);
-    }
-
-    @Override
-    public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {
-    	//
-    	// We currently don't override this method with any AuthorityItemDocumentModelHandler specific functionality, so
-    	// we could remove this method.
-    	//
-        super.fillAllParts(wrapDoc, action);
     }
 
     protected List<RelationsCommonList.RelationListItem> cloneList(List<RelationsCommonList.RelationListItem> inboundList) {

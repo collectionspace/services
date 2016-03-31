@@ -36,7 +36,7 @@ public class MaterialAuthorityDocumentModelHandler
     /**
      * Common part schema label
      */
-    private static final String COMMON_PART_LABEL = "materialauthorities_common";   
+    static final String COMMON_PART_LABEL = "materialauthorities_common";   
     
     public MaterialAuthorityDocumentModelHandler() {
         super(COMMON_PART_LABEL);

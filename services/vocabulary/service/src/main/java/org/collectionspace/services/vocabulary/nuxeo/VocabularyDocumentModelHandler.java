@@ -38,7 +38,7 @@ public class VocabularyDocumentModelHandler
     /**
      * Common part schema label
      */
-    private static final String COMMON_PART_LABEL = "vocabularies_common";   
+    static final String COMMON_PART_LABEL = "vocabularies_common";   
     
     public VocabularyDocumentModelHandler() {
     	super(COMMON_PART_LABEL);

@@ -62,5 +62,12 @@ public class ConceptDocumentModelHandler
     public String getQProperty(String prop) {
         return ConceptConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
+    
+	@Override
+	public String getParentCommonSchemaName() {
+		// TODO Auto-generated method stub
+		return ConceptAuthorityDocumentModelHandler.COMMON_PART_LABEL;
+	}
+    
 }
 

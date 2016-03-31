@@ -134,5 +134,11 @@ public class OrganizationDocumentModelHandler
         return OrganizationConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
 
+	@Override
+	public String getParentCommonSchemaName() {
+		// TODO Auto-generated method stub
+		return OrgAuthorityDocumentModelHandler.COMMON_PART_LABEL;
+	}
+    
 }
 

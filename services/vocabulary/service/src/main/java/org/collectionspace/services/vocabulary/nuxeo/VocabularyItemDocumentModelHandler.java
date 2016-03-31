@@ -108,6 +108,12 @@ public class VocabularyItemDocumentModelHandler
 
 		return result;
     }    
+
+	@Override
+	public String getParentCommonSchemaName() {
+		// TODO Auto-generated method stub
+		return VocabularyDocumentModelHandler.COMMON_PART_LABEL;
+	}
     
 }
 

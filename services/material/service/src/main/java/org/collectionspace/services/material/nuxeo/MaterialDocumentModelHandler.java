@@ -110,5 +110,12 @@ public class MaterialDocumentModelHandler
     public String getQProperty(String prop) {
         return MaterialConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
+    
+	@Override
+	public String getParentCommonSchemaName() {
+		// TODO Auto-generated method stub
+		return MaterialAuthorityDocumentModelHandler.COMMON_PART_LABEL;
+	}
+    
 }
 

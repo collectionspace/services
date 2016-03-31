@@ -38,7 +38,7 @@ public class PersonAuthorityDocumentModelHandler
     /**
      * Common part schema label
      */
-    private static final String COMMON_PART_LABEL = "personauthorities_common";   
+    static final String COMMON_PART_LABEL = "personauthorities_common";   
     
     public PersonAuthorityDocumentModelHandler() {
     	super(COMMON_PART_LABEL);

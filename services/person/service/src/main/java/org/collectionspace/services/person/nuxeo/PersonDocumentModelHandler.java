@@ -175,5 +175,12 @@ public class PersonDocumentModelHandler
     public String getQProperty(String prop) {
         return PersonConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
+    
+	@Override
+	public String getParentCommonSchemaName() {
+		// TODO Auto-generated method stub
+		return PersonAuthorityDocumentModelHandler.COMMON_PART_LABEL;
+	}
+    
 }
 

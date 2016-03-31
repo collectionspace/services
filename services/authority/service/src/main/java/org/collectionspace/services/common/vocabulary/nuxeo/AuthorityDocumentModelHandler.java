@@ -86,17 +86,20 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     	//
     	// Update the record's revision number on both CREATE and UPDATE actions
     	//
+    	updateRevNumbers(wrapDoc);
+    }
+    
+    protected void updateRevNumbers(DocumentWrapper<DocumentModel> wrapDoc) {
     	DocumentModel documentModel = wrapDoc.getWrappedObject();
-    	Integer rev = (Integer)documentModel.getProperty(authorityCommonSchemaName, AuthorityItemJAXBSchema.REV);
+    	Long rev = (Long)documentModel.getProperty(authorityCommonSchemaName, AuthorityJAXBSchema.REV);
     	if (rev == null) {
-    		rev = 0;
+    		rev = (long)0;
     	} else {
     		rev++;
     	}
-    	documentModel.setProperty(authorityCommonSchemaName, AuthorityItemJAXBSchema.REV, rev);
+    	documentModel.setProperty(authorityCommonSchemaName, AuthorityJAXBSchema.REV, rev);
     }
     
-
     @Override
     public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         super.handleCreate(wrapDoc);

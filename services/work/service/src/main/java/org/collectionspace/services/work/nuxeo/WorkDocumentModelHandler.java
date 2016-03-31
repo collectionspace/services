@@ -110,5 +110,11 @@ public class WorkDocumentModelHandler
     public String getQProperty(String prop) {
         return WorkConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
+
+	@Override
+	public String getParentCommonSchemaName() {
+		// TODO Auto-generated method stub
+		return WorkAuthorityDocumentModelHandler.COMMON_PART_LABEL;
+	}
 }
 

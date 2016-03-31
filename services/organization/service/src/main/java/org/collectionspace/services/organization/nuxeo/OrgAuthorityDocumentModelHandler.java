@@ -38,7 +38,7 @@ public class OrgAuthorityDocumentModelHandler
     /**
      * Common part schema label
      */
-    private static final String COMMON_PART_LABEL = "orgauthorities_common";   
+    static final String COMMON_PART_LABEL = "orgauthorities_common";   
     
     public OrgAuthorityDocumentModelHandler() {
     	super(COMMON_PART_LABEL);
