@@ -32,12 +32,17 @@ import org.collectionspace.services.common.api.RefName.Authority;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
+import org.collectionspace.services.common.vocabulary.AuthorityResource.Specifier;
+import org.collectionspace.services.common.vocabulary.AuthorityResource.SpecifierForm;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.config.service.ObjectPartType;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentFilter;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
@@ -56,10 +61,34 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         extends NuxeoDocumentModelHandler<AuthCommon> {
 
     private final Logger logger = LoggerFactory.getLogger(AuthorityDocumentModelHandler.class);	
-    private String authorityCommonSchemaName;
+    protected String authorityCommonSchemaName;
+    protected String authorityItemCommonSchemaName;
 
-    public AuthorityDocumentModelHandler(String authorityCommonSchemaName) {
+    public AuthorityDocumentModelHandler(String authorityCommonSchemaName, String authorityItemCommonSchemaName) {
         this.authorityCommonSchemaName = authorityCommonSchemaName;
+        this.authorityItemCommonSchemaName = authorityItemCommonSchemaName;
+    }
+    
+    
+    public boolean synchronize(Specifier specifier) throws DocumentNotFoundException, DocumentException {
+    	boolean result = true;
+    	
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
+        if (specifier.form == SpecifierForm.CSID) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Synchronize Authority with csid=" + specifier.value);
+            }
+            getRepositoryClient(ctx).get(getServiceContext(), specifier.value, this);
+        } else {
+            String whereClause = RefNameServiceUtils.buildWhereForAuthByName(authorityCommonSchemaName, specifier.value);
+            DocumentFilter myFilter = new NuxeoDocumentFilter(whereClause, 0, 1);
+            this.setDocumentFilter(myFilter);
+            getRepositoryClient(ctx).get(ctx, this);
+        }
+        
+        PoxPayloadOut output = ctx.getOutput();
+        
+        return result;
     }
 
     /*

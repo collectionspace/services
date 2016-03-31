@@ -267,7 +267,6 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     }
 
     public static class CsidAndShortIdentifier {
-
         String CSID;
         String shortIdentifier;
     }
@@ -298,7 +297,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             parentShortIdentifier = FETCH_SHORT_ID;
         } else {
             parentShortIdentifier = parentSpec.value;
-            String whereClause = buildWhereForAuthByName(parentSpec.value);
+            String whereClause = RefNameServiceUtils.buildWhereForAuthByName(authorityCommonSchemaName, parentSpec.value);
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getServiceName(), uriInfo);
             parentcsid = getRepositoryClient(ctx).findDocCSID(null, ctx, whereClause); //FIXME: REM - If the parent has been soft-deleted, should we be looking for the item?
         }
@@ -314,7 +313,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         if (itemSpec.form == SpecifierForm.CSID) {
             itemcsid = itemSpec.value;
         } else {
-            String itemWhereClause = buildWhereForAuthItemByName(itemSpec.value, parentcsid);
+            String itemWhereClause = RefNameServiceUtils.buildWhereForAuthItemByName(authorityItemCommonSchemaName, itemSpec.value, parentcsid);
             itemcsid = getRepositoryClient(ctx).findDocCSID(null, ctx, itemWhereClause); //FIXME: REM - Should we be looking for the 'wf_deleted' query param and filtering on it?
         }
         return itemcsid;
@@ -331,7 +330,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     	if(item == null) {
     		return null;
     	}
-        String whereClause = buildWhereForAuthByName(item.getParentShortIdentifier());
+        String whereClause = RefNameServiceUtils.buildWhereForAuthByName(authorityCommonSchemaName, item.getParentShortIdentifier());
         // Ensure we have the right context.
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(item.inAuthority.resource);
         
@@ -339,7 +338,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         RepositoryClientImpl client = (RepositoryClientImpl)getRepositoryClient(ctx);
         String parentcsid = client.findDocCSID(repoSession, ctx, whereClause);
 
-        String itemWhereClause = buildWhereForAuthItemByName(item.getShortIdentifier(), parentcsid);
+        String itemWhereClause = RefNameServiceUtils.buildWhereForAuthItemByName(authorityItemCommonSchemaName, item.getShortIdentifier(), parentcsid);
         ctx = createServiceContext(getItemServiceName());
         DocumentWrapper<DocumentModel> docWrapper = client.findDoc(repoSession, ctx, itemWhereClause);
         DocumentModel docModel = docWrapper.getWrappedObject();
@@ -372,21 +371,44 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     	}
     }
 
-    protected String buildWhereForAuthByName(String name) {
-        return authorityCommonSchemaName
-                + ":" + AuthorityJAXBSchema.SHORT_IDENTIFIER
-                + "='" + name + "'";
-    }
 
-    protected String buildWhereForAuthItemByName(String name, String parentcsid) {
-        return authorityItemCommonSchemaName
-                + ":" + AuthorityItemJAXBSchema.SHORT_IDENTIFIER
-                + "='" + name + "' AND "
-                + authorityItemCommonSchemaName + ":"
-                + AuthorityItemJAXBSchema.IN_AUTHORITY + "="
-                + "'" + parentcsid + "'";
-    }
+    /**
+     * Synchronizes the authority and its terms with a Shared Authority Server.
+     * 
+     * @param specifier either a CSID or one of the urn forms
+     * 
+     * @return the authority
+     */
+    @GET
+    @Path("{csid}/sync")
+    public Response synchronize(
+            @Context Request request,
+            @Context UriInfo ui,
+            @PathParam("csid") String csid) {
+        boolean result = false;
+        Specifier specifier;
+        
+        try {
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
+            AuthorityDocumentModelHandler handler = (AuthorityDocumentModelHandler)createDocumentHandler(ctx);
+            specifier = getSpecifier(csid, "getAuthority", "GET");
+            result = handler.synchronize(specifier);       
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.SYNC_FAILED, csid);
+        }
 
+        if (result == false) {
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Get failed, the requested Authority specifier:" + specifier + ": was not found.").type(
+                    "text/plain").build();
+            throw new CSWebApplicationException(response);
+        }
+
+        return Response.status(Response.Status.OK).entity(
+                "Synchronization completed, the requested Authority specifier:" + specifier.value + ": was synchronized.").type(
+                "text/plain").build();
+    }
+    
     /**
      * Gets the authority.
      * 
@@ -413,7 +435,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
                 }
                 getRepositoryClient(ctx).get(ctx, spec.value, handler);
             } else {
-                String whereClause = buildWhereForAuthByName(spec.value);
+                String whereClause = RefNameServiceUtils.buildWhereForAuthByName(authorityCommonSchemaName, spec.value);
                 DocumentFilter myFilter = new NuxeoDocumentFilter(whereClause, 0, 1);
                 handler.setDocumentFilter(myFilter);
                 getRepositoryClient(ctx).get(ctx, handler);
@@ -495,7 +517,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             if (spec.form == SpecifierForm.CSID) {
                 csid = spec.value;
             } else {
-                String whereClause = buildWhereForAuthByName(spec.value);
+                String whereClause = RefNameServiceUtils.buildWhereForAuthByName(authorityCommonSchemaName, spec.value);
                 csid = getRepositoryClient(ctx).findDocCSID(null, ctx, whereClause);
             }
             getRepositoryClient(ctx).update(ctx, csid, handler);
@@ -563,7 +585,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
                 if (logger.isDebugEnabled()) {
                     logger.debug("deleteAuthority with specifier=" + spec.value);
                 }            	
-                String whereClause = buildWhereForAuthByName(spec.value);
+                String whereClause = RefNameServiceUtils.buildWhereForAuthByName(authorityCommonSchemaName, spec.value);
                 getRepositoryClient(ctx).deleteWithWhereClause(ctx, whereClause, handler);
             }
             
@@ -703,7 +725,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
                 getRepositoryClient(ctx).get(ctx, itemSpec.value, handler);
             } else {
                 String itemWhereClause =
-                        buildWhereForAuthItemByName(itemSpec.value, parentcsid);
+                		RefNameServiceUtils.buildWhereForAuthItemByName(authorityItemCommonSchemaName, itemSpec.value, parentcsid);
                 DocumentFilter myFilter = new NuxeoDocumentFilter(itemWhereClause, 0, 1); // start at page 0 and get 1 item
                 handler.setDocumentFilter(myFilter);
                 getRepositoryClient(ctx).get(ctx, handler);

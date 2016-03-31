@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.material.nuxeo;
 
+import org.collectionspace.services.client.MaterialAuthorityClient;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.material.MaterialauthoritiesCommon;
 
@@ -32,14 +33,9 @@ import org.collectionspace.services.material.MaterialauthoritiesCommon;
  */
 public class MaterialAuthorityDocumentModelHandler
         extends AuthorityDocumentModelHandler<MaterialauthoritiesCommon> {
-
-    /**
-     * Common part schema label
-     */
-    static final String COMMON_PART_LABEL = "materialauthorities_common";   
     
     public MaterialAuthorityDocumentModelHandler() {
-        super(COMMON_PART_LABEL);
+        super(MaterialAuthorityClient.SERVICE_COMMON_PART_NAME, MaterialAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
     
     /**

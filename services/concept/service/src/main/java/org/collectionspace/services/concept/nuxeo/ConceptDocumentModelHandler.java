@@ -30,12 +30,6 @@ import org.collectionspace.services.concept.ConceptsCommon;
 /**
  * ConceptDocumentModelHandler
  *
- * $LastChangedRevision: $
- * $LastChangedDate: $
- */
-/**
- * @author pschmitz
- *
  */
 public class ConceptDocumentModelHandler
         extends AuthorityItemDocumentModelHandler<ConceptsCommon> {
@@ -50,10 +44,6 @@ public class ConceptDocumentModelHandler
     }
 	
     /**
-     * Note that Concept has no displayName computation support.
-     */
-	
-    /**
      * getQProperty converts the given property to qualified schema property
      * @param prop
      * @return
@@ -66,8 +56,7 @@ public class ConceptDocumentModelHandler
 	@Override
 	public String getParentCommonSchemaName() {
 		// TODO Auto-generated method stub
-		return ConceptAuthorityDocumentModelHandler.COMMON_PART_LABEL;
+		return ConceptAuthorityClient.SERVICE_COMMON_PART_NAME;
 	}
-    
 }
 

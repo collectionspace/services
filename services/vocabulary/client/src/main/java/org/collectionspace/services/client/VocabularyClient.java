@@ -43,6 +43,12 @@ public class VocabularyClient extends AuthorityClientImpl<VocabularyitemsCommon,
 	public static final String SERVICE_ITEM_NAME = "vocabularyitems";
 	public static final String SERVICE_ITEM_PAYLOAD_NAME = SERVICE_ITEM_NAME;
 	
+    public static final String SERVICE_COMMON_PART_NAME = SERVICE_NAME
+            + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
+    public static final String SERVICE_ITEM_COMMON_PART_NAME = SERVICE_ITEM_NAME
+            + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
+	
+	
 	@Override
 	public String getServiceName() {
 		return SERVICE_NAME;

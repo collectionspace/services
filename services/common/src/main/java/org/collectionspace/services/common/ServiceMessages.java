@@ -60,6 +60,7 @@ public class ServiceMessages {
     public static final String VALIDATION_FAILURE = "Validation failure ";
     public static final String MISSING_CSID = "missing csid";
     public static final String MISSING_INVALID_CSID = "missing/invalid csid=";
+	public static final String SYNC_FAILED = "Synchonization failed.";
 
     public static String resourceNotFoundMsg(String csid) {
         return String.format("The resource identified by CSID '%s' was not found.", csid);

@@ -36,10 +36,8 @@ import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
 import org.nuxeo.ecm.core.api.model.impl.primitives.StringProperty;
 import org.nuxeo.ecm.core.api.CoreSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.IRelationsManager;
@@ -954,6 +952,21 @@ public class RefNameServiceUtils {
             logger.debug("PropertyException on: " + prop.getPath() + pe.getLocalizedMessage());
         }
     }
+    
+    public static String buildWhereForAuthByName(String authorityCommonSchemaName, String name) {
+        return authorityCommonSchemaName
+                + ":" + AuthorityJAXBSchema.SHORT_IDENTIFIER
+                + "='" + name + "'";
+    }
+
+    public static String buildWhereForAuthItemByName(String authorityItemCommonSchemaName, String name, String parentcsid) {
+        return authorityItemCommonSchemaName
+                + ":" + AuthorityItemJAXBSchema.SHORT_IDENTIFIER
+                + "='" + name + "' AND "
+                + authorityItemCommonSchemaName + ":"
+                + AuthorityItemJAXBSchema.IN_AUTHORITY + "="
+                + "'" + parentcsid + "'";
+    }    
 
     /*
      * Identifies whether the refName was found in the supplied field. If passed
