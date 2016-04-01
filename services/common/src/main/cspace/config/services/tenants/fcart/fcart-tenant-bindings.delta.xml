@@ -10,5 +10,4 @@
     <tenant:tenantBinding id="1000">
     </tenant:tenantBinding>
 
-
 </tenant:TenantBindingConfig>
