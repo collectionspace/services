@@ -24,6 +24,8 @@ import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.TransactionException;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.lifecycle.TransitionDef;
 
 /**
@@ -141,5 +143,12 @@ public interface StorageClient {
      */
     void doWorkflowTransition(ServiceContext ctx, String id, DocumentHandler handler, TransitionDef transitionDef) 
     		throws BadRequestException, DocumentNotFoundException, DocumentException;
+
+    /*
+     * Ask a resource to synchronize itself with a shared server resource
+     */
+	void synchronize(ServiceContext ctx, Specifier specifier, DocumentHandler handler)
+			throws DocumentNotFoundException, TransactionException,
+			DocumentException;
 
 }

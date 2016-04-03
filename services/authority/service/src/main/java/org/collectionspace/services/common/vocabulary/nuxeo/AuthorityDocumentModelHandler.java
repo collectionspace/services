@@ -25,31 +25,38 @@ package org.collectionspace.services.common.vocabulary.nuxeo;
 
 import java.util.Map;
 
+import javax.ws.rs.core.Response;
+
+import org.collectionspace.services.client.AuthorityClient;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.VocabularyClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.RefName.Authority;
+import org.collectionspace.services.common.api.RefNameUtils;
+import org.collectionspace.services.common.api.RefNameUtils.AuthorityInfo;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
-import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
-import org.collectionspace.services.common.vocabulary.AuthorityResource.Specifier;
-import org.collectionspace.services.common.vocabulary.AuthorityResource.SpecifierForm;
-import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
 import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentFilter;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 
 /**
  * AuthorityDocumentModelHandler
@@ -69,26 +76,69 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         this.authorityItemCommonSchemaName = authorityItemCommonSchemaName;
     }
     
+    /**
+     * The entity type expected from the JAX-RS Response object
+     */
+    public Class<String> getEntityResponseType() {
+    	return String.class;
+    }
     
-    public boolean synchronize(Specifier specifier) throws DocumentNotFoundException, DocumentException {
-    	boolean result = true;
+    protected PayloadInputPart extractPart(Response res, String partLabel)
+            throws Exception {
+            PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(getEntityResponseType()));
+            PayloadInputPart payloadInputPart = input.getPart(partLabel);
+            Assert.assertNotNull(payloadInputPart,
+                    "Part " + partLabel + " was unexpectedly null.");
+            return payloadInputPart;
+    }
+    
+    @Override
+    public void handleSync(DocumentWrapper<Specifier> wrapDoc) throws Exception {
     	
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
-        if (specifier.form == SpecifierForm.CSID) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Synchronize Authority with csid=" + specifier.value);
-            }
-            getRepositoryClient(ctx).get(getServiceContext(), specifier.value, this);
-        } else {
-            String whereClause = RefNameServiceUtils.buildWhereForAuthByName(authorityCommonSchemaName, specifier.value);
-            DocumentFilter myFilter = new NuxeoDocumentFilter(whereClause, 0, 1);
-            this.setDocumentFilter(myFilter);
-            getRepositoryClient(ctx).get(ctx, this);
+        Specifier specifier = wrapDoc.getWrappedObject();
+        //
+        // Get the rev number of the authority so we can compare with rev number of shared authority
+        //
+        DocumentModel docModel = NuxeoUtils.getDocFromSpecifier(ctx, getRepositorySession(), authorityCommonSchemaName, specifier);
+        Long rev = (Long) NuxeoUtils.getProperyValue(docModel, AuthorityItemJAXBSchema.REV);
+        String shortId = (String) NuxeoUtils.getProperyValue(docModel, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
+        String refName = (String) NuxeoUtils.getProperyValue(docModel, AuthorityItemJAXBSchema.REF_NAME);
+        AuthorityInfo authorityInfo = RefNameUtils.parseAuthorityInfo(refName);
+        //
+        // Using the short ID of the local authority, created a URN specifier to retrieve the SAS authority
+        //
+        Specifier sasSpecifier = new Specifier(SpecifierForm.URN_NAME, RefNameUtils.createShortIdRefName(shortId));
+        Long sasRev = getRevFromSASInstance(sasSpecifier);
+        
+        AuthorityClient client = ctx.getAuthorityClient();
+        Response res = client.read(sasSpecifier.value);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(client.getClass().getCanonicalName() + ": status = " + statusCode);
+	        }
+	        
+			PayloadInputPart payloadInputPart = extractPart(res, client.getCommonPartName());
+			if (payloadInputPart != null) {
+				result = (CPT) payloadInputPart.getBody();
+			}
+        } finally {
+        	res.close();
         }
         
-        PoxPayloadOut output = ctx.getOutput();
-        
-        return result;
+    }
+    
+    private Long getRevFromSASInstance(Specifier specifier) {
+    	Long result = null;
+    	
+    	VocabularyClient client = new VocabularyClient();
+    	String uri = getUri(specifier);
+    	
+    	return result;
     }
 
     /*

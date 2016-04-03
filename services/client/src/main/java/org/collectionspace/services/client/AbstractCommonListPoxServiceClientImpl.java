@@ -10,8 +10,8 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
  * 
  * @param <P>
  */
-public abstract class AbstractCommonListPoxServiceClientImpl<P extends CollectionSpaceCommonListPoxProxy>
-	extends	AbstractPoxServiceClientImpl<AbstractCommonList, P> {
+public abstract class AbstractCommonListPoxServiceClientImpl<P extends CollectionSpaceCommonListPoxProxy, CPT>
+	extends	AbstractPoxServiceClientImpl<AbstractCommonList, P, CPT> {
 	//
 	// All clients returning AbstractCommonList types should extend this class.
 	//

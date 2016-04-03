@@ -16,6 +16,8 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.batch.BatchCommon;
+
 /**
  * BatchClient.java
  *
@@ -23,7 +25,7 @@ package org.collectionspace.services.client;
  * $LastChangedDate: 2010-05-17 18:25:37 -0700 (Mon, 17 May 2010) $
  *
  */
-public class BatchClient extends AbstractCommonListPoxServiceClientImpl<BatchProxy> {
+public class BatchClient extends AbstractCommonListPoxServiceClientImpl<BatchProxy, BatchCommon> {
 	public static final String SERVICE_NAME = "batch";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;

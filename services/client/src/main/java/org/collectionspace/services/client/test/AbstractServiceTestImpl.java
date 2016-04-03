@@ -29,6 +29,7 @@ import java.lang.reflect.TypeVariable;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.workflow.WorkflowCommon;
+import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.CollectionSpacePoxClient;
@@ -435,6 +436,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     protected void printList(String testName, CLT list) {
     	// By default, do nothing.  Tests can override this method to produce additional
     	// output after the "readList" test has run.
+    	AbstractCommonListUtils.ListItemsInAbstractCommonList((AbstractCommonList)list, logger, testName);
     }
         
     @Override
@@ -460,7 +462,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
-        if (iterateThroughList && logger.isDebugEnabled()) {
+        if (iterateThroughList && logger.isTraceEnabled()) {
             printList(testName, list);
         }
     }

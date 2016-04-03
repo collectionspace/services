@@ -35,7 +35,7 @@ public abstract class AbstractPoxServiceTestImpl<CLT extends AbstractCommonList,
 	}
 	
     protected void printList(String testName, CLT list) {
-        if (getLogger().isTraceEnabled()){
+        if (getLogger().isDebugEnabled()){
         	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, getLogger(), testName);
         }
     }

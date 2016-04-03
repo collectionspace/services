@@ -16,6 +16,8 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.contact.ContactsCommon;
+
 /**
  * ContactClient.java
  *
@@ -23,7 +25,7 @@ package org.collectionspace.services.client;
  * $LastChangedDate: $
  * 
  */
-public class ContactClient extends AbstractCommonListPoxServiceClientImpl<ContactProxy> {
+public class ContactClient extends AbstractCommonListPoxServiceClientImpl<ContactProxy, ContactsCommon> {
 
     public static final String SERVICE_NAME = "contacts";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;

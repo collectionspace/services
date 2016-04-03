@@ -16,10 +16,12 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.exhibition.ExhibitionsCommon;
+
 /**
  * ExhibitionClient.java
  */
-public class ExhibitionClient extends AbstractCommonListPoxServiceClientImpl<ExhibitionProxy> {
+public class ExhibitionClient extends AbstractCommonListPoxServiceClientImpl<ExhibitionProxy, ExhibitionsCommon> {
 
     public static final String SERVICE_NAME = "exhibitions";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;

@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.QueryContext;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.lifecycle.Lifecycle;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -46,7 +47,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 public interface DocumentHandler<T, TL, WT, WTL> {
 
     public enum Action {
-        CREATE, GET, GET_ALL, UPDATE, DELETE, WORKFLOW
+        CREATE, GET, GET_ALL, UPDATE, DELETE, WORKFLOW, SYNC
     }
     
     public Lifecycle getLifecycle();
@@ -362,5 +363,25 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * @return a set of zero or more parameter values relevant to this handler
      */
     public Map<String,String> getJDBCQueryParams();
+
+    /**
+     * 
+     * @throws Exception
+     */
+	void prepareSync() throws Exception;
+
+	/**
+	 * 
+	 * @param wrapDoc
+	 * @throws Exception
+	 */
+	void handleSync(DocumentWrapper<Specifier> wrapDoc) throws Exception;
+
+	/**
+	 * 
+	 * @param wrapDoc
+	 * @throws Exception
+	 */
+	void completeSync(DocumentWrapper<Specifier> wrapDoc) throws Exception;
 
 }

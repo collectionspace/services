@@ -11,10 +11,19 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
  * P - Proxy type
  */
 public abstract class AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
-	extends AbstractPoxServiceClientImpl<AbstractCommonList, P>
+	extends AbstractPoxServiceClientImpl<AbstractCommonList, P, AUTHORITY_ITEM_TYPE>
 	implements AuthorityClient<AUTHORITY_ITEM_TYPE, P> {
 
 	private static final String INCLUDE_DELETE_TRUE = Boolean.TRUE.toString();
+	
+	@Override
+    protected void readClientProperties() {
+		super.readClientProperties();
+		//
+		// Override with Shared Authority Server properties from tenant bindings
+		//
+    }
+    
 	/*
 	 * Basic CRUD proxied methods
 	 */

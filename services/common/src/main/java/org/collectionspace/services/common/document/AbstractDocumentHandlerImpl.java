@@ -33,6 +33,8 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.QueryContext;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -162,6 +164,10 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
                 prepareDelete();
                 break;
                 
+            case SYNC:
+                prepareSync();
+                break;
+                
 			case WORKFLOW:
 				logger.error("Should never get to this code path.  If you did, there is a bug in the code.");
 				Thread.dumpStack();
@@ -210,6 +216,14 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     }
 
     /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#prepareDelete()
+     */
+    @Override
+    public void prepareSync() throws Exception {
+    	// Do nothing. Subclasses can override if they want/need to.
+    }
+
+    /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#handle(org.collectionspace.services.common.document.DocumentHandler.Action, org.collectionspace.services.common.document.DocumentWrapper)
      */
     @Override
@@ -234,6 +248,10 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
             case DELETE:
                 handleDelete((DocumentWrapper<WT>) wrapDoc);
                 break;
+                
+            case SYNC:
+                handleSync((DocumentWrapper<Specifier>) wrapDoc);
+                break;                
                 
 			case WORKFLOW:
 				logger.error("Should never get to this code path.  If you did, there is a bug in the code.");
@@ -276,8 +294,17 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
      */
     @Override
     public void handleDelete(DocumentWrapper<WT> wrapDoc) throws Exception {
-        
+        // Do nothing. Subclasses can override if they want/need to.
     }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#handleDelete(org.collectionspace.services.common.document.DocumentWrapper)
+     */
+    @Override
+    public void handleSync(DocumentWrapper<Specifier> wrapDoc) throws Exception {
+    	// Do nothing. Subclasses can override if they want/need to.
+    }
+    
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#complete(org.collectionspace.services.common.document.DocumentHandler.Action, org.collectionspace.services.common.document.DocumentWrapper)
@@ -303,6 +330,10 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
 
             case DELETE:
                 completeDelete((DocumentWrapper<WT>) wrapDoc);
+                break;
+                
+            case SYNC:
+                completeSync((DocumentWrapper<Specifier>) wrapDoc);
                 break;
                 
 			case WORKFLOW:
@@ -352,6 +383,13 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     @Override
     public void completeDelete(DocumentWrapper<WT> wrapDoc) throws Exception {
     }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#completeDelete(org.collectionspace.services.common.document.DocumentWrapper)
+     */
+    @Override
+    public void completeSync(DocumentWrapper<Specifier> wrapDoc) throws Exception {
+    }    
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#extractCommonPart(org.collectionspace.services.common.document.DocumentWrapper)

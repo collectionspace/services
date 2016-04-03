@@ -40,8 +40,12 @@ import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.query.QueryContext;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentException;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentFilter;
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
 import org.mortbay.log.Log;
@@ -640,7 +644,42 @@ public class NuxeoUtils {
         }
 
         return result;
-    }    
+    }
+    
+    static public DocumentModel getDocFromSpecifier(
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    		CoreSessionInterface repoSession,
+    		String schemaName,
+    		Specifier specifier) throws Exception {
+	    DocumentModel result = null;
+	
+        if (specifier.form == SpecifierForm.CSID) {
+            result = getDocFromCsid(ctx, repoSession, specifier.value);
+        } else {
+            String whereClause = RefNameServiceUtils.buildWhereForAuthByName(schemaName, specifier.value);
+	        QueryContext queryContext = new QueryContext(ctx, whereClause);
+	        //
+	        // Set of query context using the current service context, but change the document type
+	        // to be the base Nuxeo document type so we can look for the document across service workspaces
+	        //
+	        queryContext.setDocType(NuxeoUtils.BASE_DOCUMENT_TYPE);
+	    
+		    DocumentModelList docModelList = null;
+	        //
+	        // Since we're doing a query, we get back a list so we need to make sure there is only
+	        // a single result since CSID values are supposed to be unique.
+	        String query = buildNXQLQuery(ctx, queryContext);
+	        docModelList = repoSession.query(query);
+	        long resultSize = docModelList.totalSize();
+	        if (resultSize == 1) {
+	        	result = docModelList.get(0);
+	        } else if (resultSize > 1) {
+	        	throw new DocumentException("Found more than 1 document with CSID = " + specifier.value);
+	        }
+        }
+
+        return result;
+    }     
 
     /*
     public static void printDocumentModel(DocumentModel docModel) throws Exception {

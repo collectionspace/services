@@ -32,6 +32,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.authentication.spi.AuthNContext;
+import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.workflow.WorkflowClient;
@@ -94,6 +95,8 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     private String overrideDocumentType = null;
     /** The val handlers. */
     private List<ValidatorHandler<IT, OT>> valHandlers = null;
+    /** The authority client -use for shared authority server */
+    private AuthorityClient authorityClient = null;
     /** The doc handler. */
     private DocumentHandler docHandler = null;
     /** security context */
@@ -622,6 +625,32 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         valHandlers = handlers;
         return valHandlers;
     }
+    
+    @Override
+    public AuthorityClient getAuthorityClient() throws Exception {
+    	AuthorityClient result = authorityClient;
+    	
+        if (authorityClient == null) {
+	        String authorityClientClazz = getServiceBinding().getClientHandler();
+	        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+	        authorityClientClazz = authorityClientClazz.trim();
+	        try {
+	            Class<?> c = tccl.loadClass(authorityClientClazz);
+	            if (AuthorityClient.class.isAssignableFrom(c)) {
+	            	result = authorityClient = ((AuthorityClient) c.newInstance());
+	            } else {
+	            	logger.error(String.format("The service binding clientHandler class '%s' for '%s' service was not of type AuthorityClient.",
+	            			authorityClientClazz, this.getServiceName()));
+	            }
+	        } catch (ClassNotFoundException e) {
+	        	String msg = String.format("Missing document validation handler: '%s'.", authorityClientClazz);
+	        	logger.warn(msg);
+	        	logger.trace(msg, e);
+	        }
+        }
+        
+        return result;
+    }    
     
     @Override
     public void addValidatorHandler(ValidatorHandler<IT, OT> validator) throws Exception {

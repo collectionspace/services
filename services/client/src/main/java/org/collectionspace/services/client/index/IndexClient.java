@@ -19,6 +19,7 @@ package org.collectionspace.services.client.index;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.AbstractCommonListPoxServiceClientImpl;
+import org.collectionspace.services.index.IndexesCommon;
 
 /**
  * IndexClient.java
@@ -27,7 +28,7 @@ import org.collectionspace.services.client.AbstractCommonListPoxServiceClientImp
  * $LastChangedDate: 2010-05-17 18:25:37 -0700 (Mon, 17 May 2010) $
  *
  */
-public class IndexClient extends AbstractCommonListPoxServiceClientImpl<IndexProxy> {
+public class IndexClient extends AbstractCommonListPoxServiceClientImpl<IndexProxy, IndexesCommon> {
 	public static final String SERVICE_NAME = "index";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;

@@ -28,12 +28,13 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 
 /**
  * The Class RelationClient.
  */
-public class RelationClient extends AbstractPoxServiceClientImpl<RelationsCommonList, RelationProxy> {
+public class RelationClient extends AbstractPoxServiceClientImpl<RelationsCommonList, RelationProxy, RelationsCommon> {
 	public static final String SERVICE_DOC_TYPE = IRelationsManager.DOC_TYPE; // Used for CMIS queries only -should be the same as what's in the tenant bindings
 	public static final String SERVICE_NAME = IRelationsManager.SERVICE_NAME;
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	

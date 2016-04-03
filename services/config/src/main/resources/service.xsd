@@ -44,6 +44,7 @@
             <!-- validator handler(s) to be used to validate the content (need to be in classpath) -->
             <!-- validator handler is called for create (POST) and update (PUT) requests only -->
             <xs:element name="validatorHandler" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="clientHandler" type="xs:string" minOccurs="0" maxOccurs="1"/>
             <xs:element name="disableAsserts" type="xs:boolean" minOccurs="0" maxOccurs="1"/>
             <!-- initHandler is a post-init task after the Nuxeo repository is available. -->
             <!-- worked: <xs:element name="initHandler" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>-->

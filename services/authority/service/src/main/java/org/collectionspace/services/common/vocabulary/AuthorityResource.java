@@ -83,6 +83,10 @@ import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentFilter;
 import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.workflow.WorkflowCommon;
+
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
+
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -126,22 +130,6 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     public final static String PARENT_WILDCARD = "_ALL_";
 	
     final Logger logger = LoggerFactory.getLogger(AuthorityResource.class);
-
-    public enum SpecifierForm {
-
-        CSID, URN_NAME
-    };
-
-    public class Specifier {
-
-        public SpecifierForm form;
-        public String value;
-
-        Specifier(SpecifierForm form, String value) {
-            this.form = form;
-            this.value = value;
-        }
-    }
 
     protected Specifier getSpecifier(String specifierIn, String method, String op) throws CSWebApplicationException {
         if (logger.isDebugEnabled()) {
@@ -385,19 +373,22 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             @Context Request request,
             @Context UriInfo ui,
             @PathParam("csid") String csid) {
-        boolean result = false;
+        PoxPayloadOut result = null;
         Specifier specifier;
         
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
             AuthorityDocumentModelHandler handler = (AuthorityDocumentModelHandler)createDocumentHandler(ctx);
             specifier = getSpecifier(csid, "getAuthority", "GET");
-            result = handler.synchronize(specifier);       
+            
+            getRepositoryClient(ctx).synchronize(ctx, specifier, handler);
+            result = ctx.getOutput();
+
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.SYNC_FAILED, csid);
         }
 
-        if (result == false) {
+        if (result == null) {
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Get failed, the requested Authority specifier:" + specifier + ": was not found.").type(
                     "text/plain").build();

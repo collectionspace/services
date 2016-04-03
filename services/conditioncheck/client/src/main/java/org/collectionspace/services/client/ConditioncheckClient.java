@@ -16,10 +16,12 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.conditioncheck.ConditionchecksCommon;
+
 /**
  * ConditioncheckClient.java
  */
-public class ConditioncheckClient extends AbstractCommonListPoxServiceClientImpl<ConditioncheckProxy> {
+public class ConditioncheckClient extends AbstractCommonListPoxServiceClientImpl<ConditioncheckProxy, ConditionchecksCommon> {
 
     public static final String SERVICE_NAME = "conditionchecks";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;

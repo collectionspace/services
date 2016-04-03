@@ -16,6 +16,8 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.conservation.ConservationCommon;
+
 /**
  * ConservationClient.java
  *
@@ -23,7 +25,7 @@ package org.collectionspace.services.client;
  * $LastChangedDate$
  *
  */
-public class ConservationClient extends AbstractCommonListPoxServiceClientImpl<ConservationProxy> {
+public class ConservationClient extends AbstractCommonListPoxServiceClientImpl<ConservationProxy, ConservationCommon> {
 
     public static final String SERVICE_NAME = "conservation";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;

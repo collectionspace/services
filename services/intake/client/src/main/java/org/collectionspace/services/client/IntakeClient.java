@@ -22,13 +22,15 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.intake.IntakesCommon;
+
 /**
  * IntakeClient
  * 
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public class IntakeClient extends AbstractCommonListPoxServiceClientImpl<IntakeProxy> {
+public class IntakeClient extends AbstractCommonListPoxServiceClientImpl<IntakeProxy, IntakesCommon> {
 
     public static final String SERVICE_NAME = "intakes";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;

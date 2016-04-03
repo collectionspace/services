@@ -37,7 +37,9 @@ import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.document.JaxbUtils;
+import org.collectionspace.services.common.document.TransactionException;
 import org.collectionspace.services.common.storage.StorageClient;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.common.context.ServiceContextProperties;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.QueryContext;
@@ -592,5 +594,13 @@ public class JpaStorageClientImpl implements StorageClient {
 			DocumentHandler handler) throws DocumentNotFoundException,
 			DocumentException {
         throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void synchronize(ServiceContext ctx, Specifier specifier,
+			DocumentHandler handler) throws DocumentNotFoundException,
+			TransactionException, DocumentException {
+		// TODO Auto-generated method stub
+		// Do nothing. Subclasses can override if they want/need to.
 	}
 }

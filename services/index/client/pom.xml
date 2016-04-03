@@ -42,7 +42,7 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.dimension.client</artifactId> <!-- Dimension instances are used as a unit-tests targets -->
+            <artifactId>org.collectionspace.services.index.jaxb</artifactId>
             <version>${project.version}</version>
         </dependency>
 <!-- External dependencies -->        

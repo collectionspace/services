@@ -62,6 +62,7 @@ import org.collectionspace.services.common.config.ConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingUtils;
 import org.collectionspace.services.common.storage.PreparedStatementBuilder;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
 
@@ -254,6 +255,39 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
         }
         
     	return result;
+    }
+    
+    @Override
+    public void synchronize(ServiceContext ctx, Specifier specifier, DocumentHandler handler)
+            throws DocumentNotFoundException, TransactionException, DocumentException {
+
+        if (handler == null) {
+            throw new IllegalArgumentException(
+                    "RepositoryJavaClient.get: handler is missing");
+        }
+
+        CoreSessionInterface repoSession = null;
+        try {
+            handler.prepare(Action.SYNC);
+            repoSession = getRepositorySession(ctx);
+            ((DocumentModelHandler) handler).setRepositorySession(repoSession);
+            DocumentWrapper<Specifier> wrapDoc = new DocumentWrapperImpl<Specifier>(specifier);
+            handler.handle(Action.SYNC, wrapDoc);
+            handler.complete(Action.SYNC, wrapDoc);
+        } catch (IllegalArgumentException iae) {
+            throw iae;
+        } catch (DocumentException de) {
+            throw de;
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            throw new NuxeoDocumentException(e);
+        } finally {
+            if (repoSession != null) {
+                releaseRepositorySession(ctx, repoSession);
+            }
+        }
     }
     
     /**

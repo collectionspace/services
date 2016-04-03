@@ -29,5 +29,6 @@ public interface AuthorityItemListItemJAXBSchema {
 	final static String REF_NAME = "refName";
 	final static String SHORT_IDENTIFIER = "shortIdentifier";
 	final static String CSID = "csid";
+    final static String REV = "rev";	
 	final static String URI = "url";
 }

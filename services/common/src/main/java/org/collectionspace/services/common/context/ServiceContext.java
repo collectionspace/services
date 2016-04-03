@@ -29,6 +29,7 @@ import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.ValidatorHandler;
@@ -351,6 +352,8 @@ public interface ServiceContext<IT, OT> {
 	public RepositoryDomainType getRepositoryDomain();
 
 	public void setRepositoryDomain(RepositoryDomainType repositoryDomain);
+
+	public AuthorityClient getAuthorityClient() throws Exception;
 }
 
 

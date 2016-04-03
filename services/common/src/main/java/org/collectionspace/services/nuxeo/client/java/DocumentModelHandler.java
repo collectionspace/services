@@ -53,6 +53,7 @@ import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.lifecycle.Lifecycle;
 import org.collectionspace.services.lifecycle.State;
 import org.collectionspace.services.lifecycle.StateList;
@@ -203,6 +204,11 @@ public abstract class DocumentModelHandler<T, TL>
     public String getUri(DocumentModel docModel) {
         return getServiceContextPath()+getCsid(docModel);
     }
+    
+    public String getUri(Specifier specifier) {
+        return getServiceContextPath() + specifier.value;
+    }
+    
         
     public RepositoryClient<PoxPayloadIn, PoxPayloadOut> getRepositoryClient(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
         RepositoryClient<PoxPayloadIn, PoxPayloadOut> repositoryClient = 

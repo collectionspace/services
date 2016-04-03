@@ -188,7 +188,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      * Instantiates a new abstract service client impl.
      */
     protected AbstractServiceClientImpl() {
-        readProperties();
+        readClientProperties();
         setupHttpClient();
         setupHttpClient4(); // temp fix for CSPACE-6281
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
@@ -297,7 +297,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      *
      * @exception RuntimeException
      */
-    private void readProperties() {
+    protected void readClientProperties() {
 
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         InputStream is = null;

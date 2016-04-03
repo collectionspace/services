@@ -26,12 +26,14 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.dimension.DimensionsCommon;
+
 /**
  * A DimensionClient.
 
  * @version $Revision:$
  */
-public class DimensionClient extends AbstractCommonListPoxServiceClientImpl<DimensionProxy> {
+public class DimensionClient extends AbstractCommonListPoxServiceClientImpl<DimensionProxy, DimensionsCommon> {
 	public static final String SERVICE_NAME = "dimensions";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;

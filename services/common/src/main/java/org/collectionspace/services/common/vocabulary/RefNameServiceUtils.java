@@ -35,9 +35,10 @@ import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
 import org.nuxeo.ecm.core.api.model.impl.primitives.StringProperty;
-import org.nuxeo.ecm.core.api.CoreSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.IRelationsManager;
@@ -79,6 +80,20 @@ import org.collectionspace.services.nuxeo.util.NuxeoUtils;
  * $LastChangedRevision: $ $LastChangedDate: $
  */
 public class RefNameServiceUtils {
+
+    public static enum SpecifierForm {
+        CSID, URN_NAME
+    };
+
+    public static class Specifier {
+        public SpecifierForm form;
+        public String value;
+
+        public Specifier(SpecifierForm form, String value) {
+            this.form = form;
+            this.value = value;
+        }
+    }
 
     public static class AuthRefConfigInfo {
 

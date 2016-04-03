@@ -1,11 +1,13 @@
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.acquisition.AcquisitionsCommon;
+
 /**
  * An AcquisitionClient.
 
  * @version $Revision:$
  */
-public class AcquisitionClient extends AbstractCommonListPoxServiceClientImpl<AcquisitionProxy> {
+public class AcquisitionClient extends AbstractCommonListPoxServiceClientImpl<AcquisitionProxy, AcquisitionsCommon> {
 	public static final String SERVICE_NAME = "acquisitions";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
