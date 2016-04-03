@@ -16,13 +16,15 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.loanout.LoansoutCommon;
+
 /**
  * LoanoutClient.java
  *
  * $LastChangedRevision$
  * $LastChangedDate$
  */
-public class LoanoutClient extends AbstractCommonListPoxServiceClientImpl<LoanoutProxy> {
+public class LoanoutClient extends AbstractCommonListPoxServiceClientImpl<LoanoutProxy, LoansoutCommon> {
 
     public static final String SERVICE_NAME = "loansout";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;

@@ -17,7 +17,9 @@
 package org.collectionspace.services.client.workflow;
 
 import javax.ws.rs.core.Response;
+
 import org.collectionspace.services.client.AbstractCommonListPoxServiceClientImpl;
+import org.collectionspace.services.workflow.WorkflowCommon;
 
 /**
  * WorkflowClient.java
@@ -26,7 +28,7 @@ import org.collectionspace.services.client.AbstractCommonListPoxServiceClientImp
  * $LastChangedDate: 2010-05-17 18:25:37 -0700 (Mon, 17 May 2010) $
  *
  */
-public class WorkflowClient extends AbstractCommonListPoxServiceClientImpl<WorkflowProxy> {
+public class WorkflowClient extends AbstractCommonListPoxServiceClientImpl<WorkflowProxy, WorkflowCommon> {
 	public static final String SERVICE_NAME = "workflow";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;

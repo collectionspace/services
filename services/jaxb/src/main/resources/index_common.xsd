@@ -1,36 +1,34 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 <!--
-    Index schema (XSD)
+    Loan Out schema (XSD)
     
     Entity  : Index
     Part    : Common
     Used for: JAXB binding between XML and Java objects
 
-    $LastChangedRevision: 860 $
-    $LastChangedDate: 2009-10-14 14:48:05 -0700 (Wed, 14 Oct 2009) $
+    $LastChangedRevision: 2316 $
+    $LastChangedDate: 2010-06-02 16:03:51 -0700 (Wed, 02 Jun 2010) $
 -->
 
 <xs:schema 
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0"
-  elementFormDefault="unqualified"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
   xmlns:ns="http://collectionspace.org/services/index"
   xmlns="http://collectionspace.org/services/index"
   targetNamespace="http://collectionspace.org/services/index"
   version="0.1">
-
 <!--
     Avoid XmlRootElement nightmare:
     See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
--->
-<!-- See http://wiki.collectionspace.org/display/collectionspace/Index+Schema -->    
-    
-    <!-- index  -->
-    <xs:element name="indexes_common">
+-->    
+    <!-- index -->
+    <xs:element name="index_common">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="csid" type="xs:string" />
+                <!--  Index Information Group -->
+                <xs:element name="indexInfo" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>    

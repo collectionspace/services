@@ -122,9 +122,11 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 	            logger.debug(client.getClass().getCanonicalName() + ": status = " + statusCode);
 	        }
 	        
+            PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(getEntityResponseType())); // Get the entire response!
+	        
 			PayloadInputPart payloadInputPart = extractPart(res, client.getCommonPartName());
 			if (payloadInputPart != null) {
-				result = (CPT) payloadInputPart.getBody();
+//				result = (client.getc) payloadInputPart.getBody();
 			}
         } finally {
         	res.close();

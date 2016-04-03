@@ -16,6 +16,8 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.publicitem.PublicitemsCommon;
+
 /**
  * PublicItemClient.java
  *
@@ -23,7 +25,7 @@ package org.collectionspace.services.client;
  * $LastChangedDate$
  *
  */
-public class PublicItemClient extends AbstractCommonListPoxServiceClientImpl<PublicItemProxy> {
+public class PublicItemClient extends AbstractCommonListPoxServiceClientImpl<PublicItemProxy, PublicitemsCommon> {
 
     public static final String SERVICE_NAME = "publicitems";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;

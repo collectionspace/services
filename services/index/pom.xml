@@ -13,7 +13,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>jaxb</module>
         <module>3rdparty</module>
         <module>client</module>
         <module>service</module>
