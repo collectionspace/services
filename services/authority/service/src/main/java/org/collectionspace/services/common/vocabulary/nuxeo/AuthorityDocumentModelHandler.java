@@ -28,6 +28,7 @@ import java.util.Map;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.AuthorityClient;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.VocabularyClient;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -50,11 +51,13 @@ import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-
+import org.dom4j.Document;
+import org.dom4j.Element;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 
 /**
  * AuthorityDocumentModelHandler
@@ -80,7 +83,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     public Class<String> getEntityResponseType() {
     	return String.class;
     }
-    
+        
     protected PayloadInputPart extractPart(Response res, String partLabel)
             throws Exception {
             PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(getEntityResponseType()));
@@ -127,6 +130,9 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 			if (payloadInputPart != null) {
 //				result = (client.getc) payloadInputPart.getBody();
 			}
+			Document document = input.getDOMDocument();
+			Element rootElement = document.getRootElement();
+
         } finally {
         	res.close();
         }
