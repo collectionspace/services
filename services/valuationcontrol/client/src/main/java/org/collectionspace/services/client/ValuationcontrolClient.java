@@ -16,10 +16,12 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.valuationcontrol.ValuationcontrolsCommon;
+
 /**
  * ValuationcontrolClient.java
  */
-public class ValuationcontrolClient extends AbstractCommonListPoxServiceClientImpl<ValuationcontrolProxy> {
+public class ValuationcontrolClient extends AbstractCommonListPoxServiceClientImpl<ValuationcontrolProxy, ValuationcontrolsCommon> {
 
     public static final String SERVICE_NAME = "valuationcontrols";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;

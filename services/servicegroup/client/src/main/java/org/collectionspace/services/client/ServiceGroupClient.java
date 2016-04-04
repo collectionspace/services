@@ -16,6 +16,8 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.servicegroup.ServicegroupsCommon;
+
 /**
  * ServiceGroupClient.java
  *
@@ -23,7 +25,7 @@ package org.collectionspace.services.client;
  * $LastChangedDate: 2010-05-17 18:25:37 -0700 (Mon, 17 May 2010) $
  *
  */
-public class ServiceGroupClient extends AbstractCommonListPoxServiceClientImpl<ServiceGroupProxy> {
+public class ServiceGroupClient extends AbstractCommonListPoxServiceClientImpl<ServiceGroupProxy, ServicegroupsCommon> {
 	
 	public static final String SERVICE_NAME = "servicegroups";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	

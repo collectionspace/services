@@ -41,22 +41,20 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
 import org.collectionspace.services.config.service.ObjectPartType;
-import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentFilter;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.Assert;
 
 /**
  * AuthorityDocumentModelHandler
@@ -87,8 +85,9 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
             throws Exception {
             PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(getEntityResponseType()));
             PayloadInputPart payloadInputPart = input.getPart(partLabel);
-            Assert.assertNotNull(payloadInputPart,
-                    "Part " + partLabel + " was unexpectedly null.");
+            if (payloadInputPart == null) {
+            	logger.error("Part " + partLabel + " was unexpectedly null.");
+            }
             return payloadInputPart;
     }
     
