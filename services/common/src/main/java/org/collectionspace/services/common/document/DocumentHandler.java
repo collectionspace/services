@@ -125,7 +125,7 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * @param doc wrapped doc
      * @throws Exception
      */
-    public void handle(Action action, DocumentWrapper<?> docWrap) throws Exception;
+    public boolean handle(Action action, DocumentWrapper<?> docWrap) throws Exception;
 
     /**
      * handleCreate processes documents before creating document in repository
@@ -375,13 +375,13 @@ public interface DocumentHandler<T, TL, WT, WTL> {
 	 * @param wrapDoc
 	 * @throws Exception
 	 */
-	void handleSync(DocumentWrapper<Specifier> wrapDoc) throws Exception;
+	boolean handleSync(DocumentWrapper<Object> wrapDoc) throws Exception;
 
 	/**
 	 * 
 	 * @param wrapDoc
 	 * @throws Exception
 	 */
-	void completeSync(DocumentWrapper<Specifier> wrapDoc) throws Exception;
+	void completeSync(DocumentWrapper<Object> wrapDoc) throws Exception;
 
 }

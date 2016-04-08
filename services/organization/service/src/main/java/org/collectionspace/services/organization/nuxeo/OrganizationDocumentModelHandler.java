@@ -35,7 +35,7 @@ public class OrganizationDocumentModelHandler
 		extends AuthorityItemDocumentModelHandler<OrganizationsCommon> {
 
     public OrganizationDocumentModelHandler() {
-    	super(OrgAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
+    	super(OrgAuthorityClient.SERVICE_COMMON_PART_NAME, OrgAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 
     @Override

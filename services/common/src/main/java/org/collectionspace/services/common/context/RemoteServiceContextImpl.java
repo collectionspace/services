@@ -177,7 +177,13 @@ public class RemoteServiceContextImpl<IT, OT>
      * @return the map of service names to resource classes.
      */
     public ResourceMap getResourceMap() {
-    	return resourceMap;
+    	ResourceMap result = resourceMap;
+    	
+    	if (result == null) {
+    		result = ServiceMain.getInstance().getJaxRSResourceMap();
+    	}
+    	
+    	return result;
     }
 
     /**

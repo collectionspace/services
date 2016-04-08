@@ -38,6 +38,7 @@ import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ReflectionMapper;
+import org.collectionspace.services.common.XmlTools;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.ServiceConfigUtils;
@@ -53,10 +54,9 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-
+import org.dom4j.Document;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,6 +106,24 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 	public void setCommonPart(T commonPart) {
 		this.commonPart = commonPart;
 	}
+
+    /**
+     * The entity type expected from the JAX-RS Response object.  By default it is of type String.  Child classes
+     * can override this if they need to.
+     */
+    protected Class<String> getEntityResponseType() {
+    	return String.class;
+    }
+    
+    protected Long getRevision(PoxPayloadIn payloadIn) {
+    	Long result = null;
+    	
+		Document document = payloadIn.getDOMDocument();
+		String xmlRev = XmlTools.getElementValue(document, "//rev");
+		result = Long.valueOf(xmlRev);
+		
+		return result;
+    }
 
 	/**
 	 * Subclass DocHandlers may override this method to control exact creation of the common list.

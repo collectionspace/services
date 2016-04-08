@@ -35,7 +35,7 @@ public class TaxonDocumentModelHandler
         extends AuthorityItemDocumentModelHandler<TaxonCommon> {
 
     public TaxonDocumentModelHandler() {
-        super(TaxonomyAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
+        super(TaxonomyAuthorityClient.SERVICE_COMMON_PART_NAME, TaxonomyAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
     
     @Override

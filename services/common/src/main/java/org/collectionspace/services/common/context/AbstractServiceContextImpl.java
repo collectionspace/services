@@ -627,7 +627,7 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     }
     
     @Override
-    public AuthorityClient getAuthorityClient() throws Exception {
+    public AuthorityClient getClient() throws Exception {
     	AuthorityClient result = authorityClient;
     	
         if (authorityClient == null) {

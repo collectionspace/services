@@ -35,7 +35,7 @@ public class MaterialDocumentModelHandler
         extends AuthorityItemDocumentModelHandler<MaterialsCommon> {
 
     public MaterialDocumentModelHandler() {
-        super(MaterialAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
+        super(MaterialAuthorityClient.SERVICE_COMMON_PART_NAME, MaterialAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 
     @Override

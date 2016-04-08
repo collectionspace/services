@@ -62,6 +62,7 @@ import org.collectionspace.services.common.config.ConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingUtils;
 import org.collectionspace.services.common.storage.PreparedStatementBuilder;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
@@ -258,9 +259,10 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
     }
     
     @Override
-    public void synchronize(ServiceContext ctx, Specifier specifier, DocumentHandler handler)
+    public boolean synchronize(ServiceContext ctx, Object specifier, DocumentHandler handler)
             throws DocumentNotFoundException, TransactionException, DocumentException {
-
+    	boolean result = false;
+    	
         if (handler == null) {
             throw new IllegalArgumentException(
                     "RepositoryJavaClient.get: handler is missing");
@@ -271,8 +273,8 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
             handler.prepare(Action.SYNC);
             repoSession = getRepositorySession(ctx);
             ((DocumentModelHandler) handler).setRepositorySession(repoSession);
-            DocumentWrapper<Specifier> wrapDoc = new DocumentWrapperImpl<Specifier>(specifier);
-            handler.handle(Action.SYNC, wrapDoc);
+            DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(specifier);
+            result = handler.handle(Action.SYNC, wrapDoc);
             handler.complete(Action.SYNC, wrapDoc);
         } catch (IllegalArgumentException iae) {
             throw iae;
@@ -288,6 +290,44 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
                 releaseRepositorySession(ctx, repoSession);
             }
         }
+        
+        return result;
+    }
+    
+    @Override
+    public boolean synchronizeItem(ServiceContext ctx, AuthorityItemSpecifier itemSpecifier, DocumentHandler handler)
+            throws DocumentNotFoundException, TransactionException, DocumentException {
+    	boolean result = false;
+    	
+        if (handler == null) {
+            throw new IllegalArgumentException(
+                    "RepositoryJavaClient.get: handler is missing");
+        }
+
+        CoreSessionInterface repoSession = null;
+        try {
+            handler.prepare(Action.SYNC);
+            repoSession = getRepositorySession(ctx);
+            ((DocumentModelHandler) handler).setRepositorySession(repoSession);
+            DocumentWrapper<AuthorityItemSpecifier> wrapDoc = new DocumentWrapperImpl<AuthorityItemSpecifier>(itemSpecifier);
+            result = handler.handle(Action.SYNC, wrapDoc);
+            handler.complete(Action.SYNC, wrapDoc);
+        } catch (IllegalArgumentException iae) {
+            throw iae;
+        } catch (DocumentException de) {
+            throw de;
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            throw new NuxeoDocumentException(e);
+        } finally {
+            if (repoSession != null) {
+                releaseRepositorySession(ctx, repoSession);
+            }
+        }
+        
+        return result;
     }
     
     /**
@@ -1834,8 +1874,10 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
         // To get a connection to the Nuxeo repo, we need either a valid ServiceContext instance or a repository name
         //
         if (ctx != null) {
-            repoName = ctx.getRepositoryName(); // Notice we are overriding the passed in 'repoName' since we have a valid service context passed in to us
-            repoSession = (CoreSessionInterface) ctx.getCurrentRepositorySession(); // Look to see if one exists in the context before creating one
+        	repoSession = (CoreSessionInterface) ctx.getCurrentRepositorySession(); // First see if the context already has a repo session
+        	if (repoSession == null) {
+	            repoName = ctx.getRepositoryName(); // Notice we are overriding the passed in 'repoName' since we have a valid service context passed in to us
+        	}
         } else if (repoName == null || repoName.trim().isEmpty()) {
             String errMsg = String.format("We can't get a connection to the Nuxeo repo because the service context passed in was null and no repository name was passed in either.");
             logger.error(errMsg);

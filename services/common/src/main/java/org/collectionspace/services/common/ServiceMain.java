@@ -754,6 +754,14 @@ public class ServiceMain {
         return tenantBindingConfigReader;
     }
     
+    public ResourceMap getJaxRSResourceMap() {
+        ResourceMap result;
+        
+        result = ResteasyProviderFactory.getContextData(ResourceMap.class);
+        
+        return result;
+    }
+    
     /**
      *  Populate a registry of URI templates by querying each resource
      *  for its own entries in the registry.
@@ -764,7 +772,7 @@ public class ServiceMain {
     private synchronized void populateUriTemplateRegistry() {
        if (uriTemplateRegistry.isEmpty()) {
             NuxeoBasedResource resource = null;
-            ResourceMap resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
+            ResourceMap resourceMap = getJaxRSResourceMap();
             for (Map.Entry<String, NuxeoBasedResource> entry : resourceMap.entrySet()) {
                 resource = entry.getValue();
                 Map<UriTemplateRegistryKey, StoredValuesUriTemplate> entries =

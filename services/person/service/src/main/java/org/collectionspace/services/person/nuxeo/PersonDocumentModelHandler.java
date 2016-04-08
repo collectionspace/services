@@ -35,7 +35,7 @@ public class PersonDocumentModelHandler
 	extends AuthorityItemDocumentModelHandler<PersonsCommon> {
 
     public PersonDocumentModelHandler() {
-    	super(PersonAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
+    	super(PersonAuthorityClient.SERVICE_COMMON_PART_NAME, PersonAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 
     @Override

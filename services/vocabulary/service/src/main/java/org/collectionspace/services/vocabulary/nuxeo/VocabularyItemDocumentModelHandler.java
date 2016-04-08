@@ -40,7 +40,7 @@ public class VocabularyItemDocumentModelHandler
 		extends AuthorityItemDocumentModelHandler<VocabularyitemsCommon> {
 
     public VocabularyItemDocumentModelHandler() {
-    	super(VocabularyClient.SERVICE_ITEM_COMMON_PART_NAME);
+    	super(VocabularyClient.SERVICE_COMMON_PART_NAME, VocabularyClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 
     @Override

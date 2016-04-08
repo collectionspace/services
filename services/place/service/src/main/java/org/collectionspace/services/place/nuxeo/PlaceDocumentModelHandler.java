@@ -35,7 +35,7 @@ public class PlaceDocumentModelHandler
         extends AuthorityItemDocumentModelHandler<PlacesCommon> {
 
     public PlaceDocumentModelHandler() {
-    	super(PlaceAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
+    	super(PlaceAuthorityClient.SERVICE_COMMON_PART_NAME, PlaceAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 
     @Override

@@ -39,6 +39,7 @@ import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.document.TransactionException;
 import org.collectionspace.services.common.storage.StorageClient;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.common.context.ServiceContextProperties;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -597,10 +598,21 @@ public class JpaStorageClientImpl implements StorageClient {
 	}
 
 	@Override
-	public void synchronize(ServiceContext ctx, Specifier specifier,
+	public boolean synchronize(ServiceContext ctx, Object specifier,
 			DocumentHandler handler) throws DocumentNotFoundException,
 			TransactionException, DocumentException {
 		// TODO Auto-generated method stub
 		// Do nothing. Subclasses can override if they want/need to.
+		return true;
 	}
+	
+	@Override
+	public boolean synchronizeItem(ServiceContext ctx, AuthorityItemSpecifier itemSpecifier,
+			DocumentHandler handler) throws DocumentNotFoundException,
+			TransactionException, DocumentException {
+		// TODO Auto-generated method stub
+		// Do nothing. Subclasses can override if they want/need to.
+		return true;
+	}
+
 }

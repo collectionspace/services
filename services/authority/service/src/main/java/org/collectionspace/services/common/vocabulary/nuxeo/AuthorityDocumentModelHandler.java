@@ -33,6 +33,8 @@ import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.VocabularyClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.ResourceMap;
+import org.collectionspace.services.common.XmlTools;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.RefName.Authority;
 import org.collectionspace.services.common.api.RefNameUtils;
@@ -44,6 +46,8 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
+import org.collectionspace.services.common.vocabulary.AuthorityResource;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
 import org.collectionspace.services.config.service.ObjectPartType;
@@ -57,7 +61,6 @@ import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.Assert;
 
 /**
  * AuthorityDocumentModelHandler
@@ -95,26 +98,43 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     }
     
     @Override
-    public void handleSync(DocumentWrapper<Specifier> wrapDoc) throws Exception {
-    	
-    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
-        Specifier specifier = wrapDoc.getWrappedObject();
+    public boolean handleSync(DocumentWrapper<Object> wrapDoc) throws Exception {
+    	boolean result = false;
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
+        Specifier specifier = (Specifier) wrapDoc.getWrappedObject();
         //
         // Get the rev number of the authority so we can compare with rev number of shared authority
         //
         DocumentModel docModel = NuxeoUtils.getDocFromSpecifier(ctx, getRepositorySession(), authorityCommonSchemaName, specifier);
-        Long rev = (Long) NuxeoUtils.getProperyValue(docModel, AuthorityItemJAXBSchema.REV);
-        String shortId = (String) NuxeoUtils.getProperyValue(docModel, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
-        String refName = (String) NuxeoUtils.getProperyValue(docModel, AuthorityItemJAXBSchema.REF_NAME);
-        AuthorityInfo authorityInfo = RefNameUtils.parseAuthorityInfo(refName);
+        Long rev = (Long) NuxeoUtils.getProperyValue(docModel, AuthorityJAXBSchema.REV);
+        String shortId = (String) NuxeoUtils.getProperyValue(docModel, AuthorityJAXBSchema.SHORT_IDENTIFIER);
+        String refName = (String) NuxeoUtils.getProperyValue(docModel, AuthorityJAXBSchema.REF_NAME);
         //
         // Using the short ID of the local authority, created a URN specifier to retrieve the SAS authority
         //
         Specifier sasSpecifier = new Specifier(SpecifierForm.URN_NAME, RefNameUtils.createShortIdRefName(shortId));
-        Long sasRev = getRevFromSASInstance(sasSpecifier);
+        PoxPayloadIn sasPayloadIn = getPayloadIn(ctx, sasSpecifier);
+
+        Long sasRev = getRevision(sasPayloadIn);
+        if (sasRev > rev) {
+        	ResourceMap resourceMap = ctx.getResourceMap();
+        	String resourceName = ctx.getClient().getServiceName();
+        	AuthorityResource authorityResource = (AuthorityResource) resourceMap.get(resourceName);
+        	PoxPayloadOut payloadOut = authorityResource.update(ctx, resourceMap, null, docModel.getName(), sasPayloadIn);
+        	if (payloadOut != null) {
+        		ctx.setOutput(payloadOut);
+        		result = true;
+        	}
+        }
         
-        AuthorityClient client = ctx.getAuthorityClient();
-        Response res = client.read(sasSpecifier.value);
+        return result;
+    }
+        
+    private PoxPayloadIn getPayloadIn(ServiceContext ctx, Specifier specifier) throws Exception {
+    	PoxPayloadIn result = null;
+    	
+        AuthorityClient client = (AuthorityClient) ctx.getClient();
+        Response res = client.read(specifier.value);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -124,26 +144,10 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 	            logger.debug(client.getClass().getCanonicalName() + ": status = " + statusCode);
 	        }
 	        
-            PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(getEntityResponseType())); // Get the entire response!
-	        
-			PayloadInputPart payloadInputPart = extractPart(res, client.getCommonPartName());
-			if (payloadInputPart != null) {
-//				result = (client.getc) payloadInputPart.getBody();
-			}
-			Document document = input.getDOMDocument();
-			Element rootElement = document.getRootElement();
-
+            result = new PoxPayloadIn((String)res.readEntity(getEntityResponseType())); // Get the entire response!	        
         } finally {
         	res.close();
         }
-        
-    }
-    
-    private Long getRevFromSASInstance(Specifier specifier) {
-    	Long result = null;
-    	
-    	VocabularyClient client = new VocabularyClient();
-    	String uri = getUri(specifier);
     	
     	return result;
     }
@@ -315,6 +319,9 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         	repoSession = nuxeoRepoClient.getRepositorySession(ctx);
             DocumentWrapper<DocumentModel> wrapDoc = nuxeoRepoClient.getDocFromCsid(ctx, repoSession, authCSID);
             DocumentModel docModel = wrapDoc.getWrappedObject();
+            if (docModel == null) {
+            	throw new DocumentNotFoundException(String.format("Could not find authority resource with CSID='%s'.", authCSID));
+            }
             shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER);
         } catch (ClientException ce) {
             throw new RuntimeException("AuthorityDocHandler Internal Error: cannot get shortId!", ce);

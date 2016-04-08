@@ -55,6 +55,13 @@ public class MultipartServiceContextImpl
     final Logger logger = LoggerFactory.getLogger(MultipartServiceContextImpl.class);
 	private String repositoryWorkspaceName;
 
+	
+    public MultipartServiceContextImpl(String serviceName)
+    		throws DocumentException, UnauthorizedException {
+    	super(serviceName, null);
+    	setOutput(new PoxPayloadOut(serviceName));
+    }
+
     /**
      * Instantiates a new multipart service context impl.
      * 

@@ -25,6 +25,7 @@ import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.TransactionException;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.lifecycle.TransitionDef;
 
@@ -145,9 +146,16 @@ public interface StorageClient {
     		throws BadRequestException, DocumentNotFoundException, DocumentException;
 
     /*
-     * Ask a resource to synchronize itself with a shared server resource
+     * Ask a resource to synchronize itself with a shared server resource.  Returns "TRUE" if sync was needed.
      */
-	void synchronize(ServiceContext ctx, Specifier specifier, DocumentHandler handler)
+	boolean synchronize(ServiceContext ctx, Object specifier, DocumentHandler handler)
+			throws DocumentNotFoundException, TransactionException,
+			DocumentException;
+
+    /*
+     * Ask an item resource (e.g., an Authority or Vocabulary items) to synchronize itself with a shared server resource.  Returns "TRUE" if sync was needed.
+     */
+	boolean synchronizeItem(ServiceContext ctx, AuthorityItemSpecifier itemSpecifier, DocumentHandler handler)
 			throws DocumentNotFoundException, TransactionException,
 			DocumentException;
 

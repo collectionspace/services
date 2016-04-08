@@ -35,7 +35,7 @@ public class LocationDocumentModelHandler
         extends AuthorityItemDocumentModelHandler<LocationsCommon> {
     
     public LocationDocumentModelHandler() {
-    	super(LocationAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
+    	super(LocationAuthorityClient.SERVICE_COMMON_PART_NAME, LocationAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 
     @Override

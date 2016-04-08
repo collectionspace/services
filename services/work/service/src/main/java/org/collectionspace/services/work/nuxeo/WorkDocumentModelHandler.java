@@ -35,7 +35,7 @@ public class WorkDocumentModelHandler
         extends AuthorityItemDocumentModelHandler<WorksCommon> {
 
     public WorkDocumentModelHandler() {
-        super(WorkAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
+        super(WorkAuthorityClient.SERVICE_COMMON_PART_NAME, WorkAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 
     @Override

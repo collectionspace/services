@@ -465,7 +465,7 @@ public class NuxeoUtils {
         //
         query.append(/*IQueryManager.SEARCH_QUALIFIER_AND +*/ " WHERE " + CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA + ":"
                 + CollectionSpaceClient.COLLECTIONSPACE_CORE_TENANTID
-                + " = " + queryContext.getTenantId());
+                + " = " + "'" + queryContext.getTenantId() + "'");
         //
         // Finally, append the incoming where clause
         //

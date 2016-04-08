@@ -94,6 +94,24 @@ public class RefNameServiceUtils {
             this.value = value;
         }
     }
+    
+    public static class AuthorityItemSpecifier {
+    	private Specifier parentSpecifier;
+    	private Specifier itemSpecifier;
+    	
+    	public AuthorityItemSpecifier(Specifier parentSpecifier, Specifier itemSpecifier) {
+    		this.parentSpecifier = parentSpecifier;
+    		this.itemSpecifier = itemSpecifier;
+    	}
+    	
+    	public Specifier getParentSpecifier() {
+    		return this.parentSpecifier;
+    	}
+    	
+    	public Specifier getItemSpecifier() {
+    		return this.itemSpecifier;
+    	}
+    }
 
     public static class AuthRefConfigInfo {
 

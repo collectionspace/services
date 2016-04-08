@@ -227,7 +227,9 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
      * @see org.collectionspace.services.common.document.DocumentHandler#handle(org.collectionspace.services.common.document.DocumentHandler.Action, org.collectionspace.services.common.document.DocumentWrapper)
      */
     @Override
-    final public void handle(Action action, DocumentWrapper<?> wrapDoc) throws Exception {
+    final public boolean handle(Action action, DocumentWrapper<?> wrapDoc) throws Exception {
+    	boolean result = true;
+    	
         switch (action) {
             case CREATE:
                 handleCreate((DocumentWrapper<WT>) wrapDoc);
@@ -250,7 +252,7 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
                 break;
                 
             case SYNC:
-                handleSync((DocumentWrapper<Specifier>) wrapDoc);
+                result = handleSync((DocumentWrapper<Object>) wrapDoc);
                 break;                
                 
 			case WORKFLOW:
@@ -263,6 +265,8 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
 				Thread.dumpStack();
 				break;
         }
+        
+        return result;
     }
 
     /* (non-Javadoc)
@@ -301,8 +305,9 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
      * @see org.collectionspace.services.common.document.DocumentHandler#handleDelete(org.collectionspace.services.common.document.DocumentWrapper)
      */
     @Override
-    public void handleSync(DocumentWrapper<Specifier> wrapDoc) throws Exception {
+    public boolean handleSync(DocumentWrapper<Object> wrapDoc) throws Exception {
     	// Do nothing. Subclasses can override if they want/need to.
+    	return true;
     }
     
 
@@ -333,7 +338,7 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
                 break;
                 
             case SYNC:
-                completeSync((DocumentWrapper<Specifier>) wrapDoc);
+                completeSync((DocumentWrapper<Object>) wrapDoc);
                 break;
                 
 			case WORKFLOW:
@@ -388,7 +393,7 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
      * @see org.collectionspace.services.common.document.DocumentHandler#completeDelete(org.collectionspace.services.common.document.DocumentWrapper)
      */
     @Override
-    public void completeSync(DocumentWrapper<Specifier> wrapDoc) throws Exception {
+    public void completeSync(DocumentWrapper<Object> wrapDoc) throws Exception {
     }    
 
     /* (non-Javadoc)

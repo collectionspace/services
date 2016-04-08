@@ -221,24 +221,49 @@ public abstract class NuxeoBasedResource
     		@PathParam("csid") String csid,
     		String xmlPayload) {
         PoxPayloadOut result = null;
+        
         ensureCSID(csid, UPDATE);
         try {
             PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate, uriInfo);
-            ctx.setResourceMap(resourceMap);
-            if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
-            	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
-            }            
-            result = update(csid, theUpdate, ctx); //==> CALL implementation method, which subclasses may override.
+            result = update(parentCtx, resourceMap, uriInfo, csid, theUpdate);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED, csid);
         }
+        
         return result.getBytes();
+    }
+    
+    /**
+     * This method is used to synchronize data with the SAS (Shared Authority Server).
+     * 
+     * @param parentCtx
+     * @param resourceMap
+     * @param uriInfo
+     * @param csid
+     * @param theUpdate
+     * @return
+     * @throws Exception
+     */
+    public PoxPayloadOut update(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, // REM: 4/6/2016 - Some sub-classes will override this method -e.g., MediaResource does.
+    		ResourceMap resourceMap,
+    		UriInfo uriInfo,
+    		String csid,
+    		PoxPayloadIn theUpdate) throws Exception {
+    	PoxPayloadOut result = null;
+    	
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate, uriInfo);
+        ctx.setResourceMap(resourceMap);
+        if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
+        	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
+        }            
+        result = update(csid, theUpdate, ctx); //==> CALL implementation method, which subclasses may override.
+    	
+    	return result;
     }
 
     /** Subclasses may override this overload, which gets called from #udpate(String,MultipartInput)   */
     protected PoxPayloadOut update(String csid,
-            PoxPayloadIn theUpdate,
+            PoxPayloadIn theUpdate, // not used in this method, but could be used by an overriding method
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
             throws Exception {
         DocumentHandler handler = createDocumentHandler(ctx);

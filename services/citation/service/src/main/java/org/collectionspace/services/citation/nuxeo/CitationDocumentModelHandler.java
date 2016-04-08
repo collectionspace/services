@@ -35,7 +35,7 @@ public class CitationDocumentModelHandler
 		extends AuthorityItemDocumentModelHandler<CitationsCommon> {
     
     public CitationDocumentModelHandler() {
-    	super(CitationAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
+    	super(CitationAuthorityClient.SERVICE_COMMON_PART_NAME, CitationAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 
     @Override

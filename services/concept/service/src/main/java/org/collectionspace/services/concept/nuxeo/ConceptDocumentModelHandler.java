@@ -35,7 +35,7 @@ public class ConceptDocumentModelHandler
         extends AuthorityItemDocumentModelHandler<ConceptsCommon> {
 
     public ConceptDocumentModelHandler() {
-    	super(ConceptAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
+    	super(ConceptAuthorityClient.SERVICE_COMMON_PART_NAME, ConceptAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 
     @Override

@@ -83,10 +83,9 @@ import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentFilter;
 import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.workflow.WorkflowCommon;
-
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
-
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -261,19 +260,20 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 
 	protected String lookupParentCSID(String parentspecifier, String method,
 			String op, UriInfo uriInfo) throws Exception {
-		CsidAndShortIdentifier tempResult = lookupParentCSIDAndShortIdentifer(
+		CsidAndShortIdentifier tempResult = lookupParentCSIDAndShortIdentifer(null,
 				parentspecifier, method, op, uriInfo);
 		return tempResult.CSID;
 	}
 
     private CsidAndShortIdentifier lookupParentCSIDAndShortIdentifer(
-    		String parentspecifier,
+    		ServiceContext itemServiceCtx,
+    		String parentSpecifier,
     		String method,
     		String op,
     		UriInfo uriInfo)
             throws Exception {
         CsidAndShortIdentifier result = new CsidAndShortIdentifier();
-        Specifier parentSpec = getSpecifier(parentspecifier, method, op);
+        Specifier parentSpec = getSpecifier(parentSpecifier, method, op);
         // Note that we have to create the service context for the Items, not the main service
         String parentcsid;
         String parentShortIdentifier;
@@ -287,8 +287,13 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             parentShortIdentifier = parentSpec.value;
             String whereClause = RefNameServiceUtils.buildWhereForAuthByName(authorityCommonSchemaName, parentSpec.value);
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getServiceName(), uriInfo);
-            parentcsid = getRepositoryClient(ctx).findDocCSID(null, ctx, whereClause); //FIXME: REM - If the parent has been soft-deleted, should we be looking for the item?
+            CoreSessionInterface repoSession = null;
+            if (itemServiceCtx != null) {
+            	 repoSession = (CoreSessionInterface) itemServiceCtx.getCurrentRepositorySession();  // We want to use the thread's current repo session
+            }
+            parentcsid = getRepositoryClient(ctx).findDocCSID(repoSession, ctx, whereClause); //FIXME: REM - If the parent has been soft-deleted, should we be looking for the item?
         }
+        
         result.CSID = parentcsid;
         result.shortIdentifier = parentShortIdentifier;
         return result;
@@ -369,35 +374,38 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      */
     @GET
     @Path("{csid}/sync")
-    public Response synchronize(
+    public byte[] synchronize(
             @Context Request request,
             @Context UriInfo ui,
             @PathParam("csid") String csid) {
-        PoxPayloadOut result = null;
+    	byte[] result;
+    	boolean neededSync = false;
+        PoxPayloadOut payloadOut = null;
         Specifier specifier;
         
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
             AuthorityDocumentModelHandler handler = (AuthorityDocumentModelHandler)createDocumentHandler(ctx);
             specifier = getSpecifier(csid, "getAuthority", "GET");
-            
-            getRepositoryClient(ctx).synchronize(ctx, specifier, handler);
-            result = ctx.getOutput();
-
+            neededSync = getRepositoryClient(ctx).synchronize(ctx, specifier, handler);
+            payloadOut = ctx.getOutput();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.SYNC_FAILED, csid);
         }
 
-        if (result == null) {
-            Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Get failed, the requested Authority specifier:" + specifier + ": was not found.").type(
-                    "text/plain").build();
+        //
+        // If a sync was needed and was successful, return a copy of the updated resource.  Acts like an UPDATE.
+        //
+        if (neededSync == true) {
+        	result = payloadOut.getBytes();
+        } else {
+	        result = String.format("Authority resource '%s' was already in sync with shared authority server.",
+	        		specifier.value).getBytes();
+	        Response response = Response.status(Response.Status.NOT_MODIFIED).entity(result).type("text/plain").build();
             throw new CSWebApplicationException(response);
         }
-
-        return Response.status(Response.Status.OK).entity(
-                "Synchronization completed, the requested Authority specifier:" + specifier.value + ": was synchronized.").type(
-                "text/plain").build();
+        
+        return result;
     }
     
     /**
@@ -606,7 +614,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), input, resourceMap, uriInfo);
 
             // Note: must have the parentShortId, to do the create.
-            CsidAndShortIdentifier parent = lookupParentCSIDAndShortIdentifer(parentspecifier, "createAuthorityItem", "CREATE_ITEM", null);
+            CsidAndShortIdentifier parent = lookupParentCSIDAndShortIdentifer(null, parentspecifier, "createAuthorityItem", "CREATE_ITEM", null);
             DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = 
             	createItemDocumentHandler(ctx, parent.CSID, parent.shortIdentifier);
             String itemcsid = getRepositoryClient(ctx).create(ctx, handler);
@@ -705,7 +713,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = 
             	(RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(getItemServiceName(), resourceMap, uriInfo);
             
-            JaxRsContext jaxRsContext = new JaxRsContext(request, uriInfo); // REM - Why are we setting this?  Who is using the getter?
+            JaxRsContext jaxRsContext = new JaxRsContext(request, uriInfo); // Needed for getting account permissions part of the payload
             ctx.setJaxRsContext(jaxRsContext);
 
             // We omit the parentShortId, only needed when doing a create...
@@ -921,6 +929,56 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     }
 
     /**
+     * Synchronizes the authority and its terms with a Shared Authority Server (SAS).
+     * 
+     * @param specifier either CSIDs and/or one of the urn forms
+     * 
+     * @return the authority item if it was synchronized with SAS
+     */
+    @GET
+    @Path("{csid}/items/{itemcsid}/sync")
+    public byte[] synchronizeItem(
+    		@Context ResourceMap resourceMap,
+            @Context Request request,
+            @Context UriInfo uriInfo,
+            @PathParam("csid") String parentIdentifier,
+            @PathParam("itemcsid") String itemIdentifier
+            ) {
+    	byte[] result;
+    	boolean neededSync = false;
+        PoxPayloadOut payloadOut = null;
+        AuthorityItemSpecifier specifier;
+        CsidAndShortIdentifier parent;
+        
+        try {
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), null, resourceMap, uriInfo);
+            parent = lookupParentCSIDAndShortIdentifer(null, parentIdentifier, "syncAuthorityItem(parent)", "SYNC_ITEM", null);
+            AuthorityItemDocumentModelHandler handler = (AuthorityItemDocumentModelHandler)createItemDocumentHandler(ctx, parent.CSID, parent.shortIdentifier);
+            Specifier parentSpecifier = getSpecifier(parent.CSID, "getAuthority", "GET");
+            Specifier itemSpecifier = getSpecifier(itemIdentifier, "getAuthorityItem", "GET");
+            specifier = new AuthorityItemSpecifier(parentSpecifier, itemSpecifier);
+            neededSync = getRepositoryClient(ctx).synchronize(ctx, specifier, handler);
+            payloadOut = ctx.getOutput();
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.SYNC_FAILED, itemIdentifier);
+        }
+
+        //
+        // If a sync was needed and was successful, return a copy of the updated resource.  Acts like an UPDATE.
+        //
+        if (neededSync == true) {
+        	result = payloadOut.getBytes();
+        } else {
+	        result = String.format("Authority item resource '%s' was already in sync with shared authority server.",
+	        		itemIdentifier).getBytes();
+	        Response response = Response.status(Response.Status.NOT_MODIFIED).entity(result).type("text/plain").build();
+            throw new CSWebApplicationException(response);
+        }
+        
+        return result;
+    }
+    
+    /**
      * Update authorityItem.
      * 
      * @param parentspecifier either a CSID or one of the urn forms
@@ -933,30 +991,50 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     public byte[] updateAuthorityItem(
     		@Context ResourceMap resourceMap, 
             @Context UriInfo uriInfo,
-            @PathParam("csid") String parentspecifier,
-            @PathParam("itemcsid") String itemspecifier,
+            @PathParam("csid") String parentSpecifier,
+            @PathParam("itemcsid") String itemSpecifier,
             String xmlPayload) {
         PoxPayloadOut result = null;
+        
         try {
             PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
-            // Note that we have to create the service context for the Items, not the main service
-            // Laramie CSPACE-3175.  passing null for queryParams, because prior to this refactor, the code moved to lookupParentCSID in this instance called the version of getServiceContext() that passes null
-            CsidAndShortIdentifier csidAndShortId = lookupParentCSIDAndShortIdentifer(parentspecifier, "updateAuthorityItem(parent)", "UPDATE_ITEM", null);
-            String parentcsid = csidAndShortId.CSID;
-            String parentShortId = csidAndShortId.shortIdentifier;
-
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), theUpdate, resourceMap, uriInfo);
-            String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "updateAuthorityItem(item)", "UPDATE_ITEM", ctx);
-
-            // We omit the parentShortId, only needed when doing a create...
-            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createItemDocumentHandler(ctx, parentcsid, parentShortId);
-            getRepositoryClient(ctx).update(ctx, itemcsid, handler);
-            result = ctx.getOutput();
-
+            result = updateAuthorityItem(null, resourceMap, uriInfo, parentSpecifier, itemSpecifier, theUpdate, true); // passing TRUE so parent authority rev num increases
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED);
         }
+        
         return result.getBytes();
+    }
+    
+    public PoxPayloadOut updateAuthorityItem(
+    		ServiceContext itemServiceCtx, // Ok to be null
+    		ResourceMap resourceMap, 
+            UriInfo uriInfo,
+            String parentspecifier,
+            String itemspecifier,
+            PoxPayloadIn theUpdate,
+            boolean shouldUpdateParentRev) throws Exception {
+        PoxPayloadOut result = null;
+        
+        CsidAndShortIdentifier csidAndShortId = lookupParentCSIDAndShortIdentifer(itemServiceCtx, parentspecifier, "updateAuthorityItem(parent)", "UPDATE_ITEM", null);
+        String parentcsid = csidAndShortId.CSID;
+        String parentShortId = csidAndShortId.shortIdentifier;
+        //
+        // If the itemServiceCtx context is not null, use it.  Otherwise, create a new context
+        //
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = itemServiceCtx;
+        if (ctx == null) {
+        	ctx = createServiceContext(getItemServiceName(), theUpdate, resourceMap, uriInfo);
+        }
+        String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "updateAuthorityItem(item)", "UPDATE_ITEM", ctx); //use itemServiceCtx if it is not null
+
+        // We omit the parentShortId, only needed when doing a create...
+        AuthorityItemDocumentModelHandler handler = (AuthorityItemDocumentModelHandler)createItemDocumentHandler(ctx, parentcsid, parentShortId);
+        handler.setShouldUpdateParentRevNumber(shouldUpdateParentRev);
+        getRepositoryClient(ctx).update(ctx, itemcsid, handler);
+        result = ctx.getOutput();
+
+        return result;
     }
 
     /**
