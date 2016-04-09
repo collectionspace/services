@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.common.vocabulary.nuxeo;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Response;
@@ -39,6 +40,7 @@ import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.RefName.Authority;
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.RefNameUtils.AuthorityInfo;
+import org.collectionspace.services.common.api.RefNameUtils.AuthorityTermInfo;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
@@ -110,13 +112,14 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         String shortId = (String) NuxeoUtils.getProperyValue(docModel, AuthorityJAXBSchema.SHORT_IDENTIFIER);
         String refName = (String) NuxeoUtils.getProperyValue(docModel, AuthorityJAXBSchema.REF_NAME);
         //
-        // Using the short ID of the local authority, created a URN specifier to retrieve the SAS authority
+        // Using the short ID of the local authority, create a URN specifier to retrieve the SAS authority
         //
         Specifier sasSpecifier = new Specifier(SpecifierForm.URN_NAME, RefNameUtils.createShortIdRefName(shortId));
         PoxPayloadIn sasPayloadIn = getPayloadIn(ctx, sasSpecifier);
 
         Long sasRev = getRevision(sasPayloadIn);
         if (sasRev > rev) {
+        	syncAllItems(ctx, sasSpecifier);
         	ResourceMap resourceMap = ctx.getResourceMap();
         	String resourceName = ctx.getClient().getServiceName();
         	AuthorityResource authorityResource = (AuthorityResource) resourceMap.get(resourceName);
@@ -129,7 +132,139 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         
         return result;
     }
+    
+    /*
+     * Get the list of authority items from the remote shared authority server (SAS) and try
+     * to synchronize them with the local items.  If items exist on the remote but not the local, we'll create them.
+     */
+    protected int syncAllItems(ServiceContext ctx, Specifier sasSpecifier) throws Exception {
+    	int result = -1;
+    	int created = 0;
+    	int synched = 0;
+    	int alreadySynched = 0;
+    	int totalItemsProcessed = 0;
+    	
+        PoxPayloadIn sasPayloadInItemList = getPayloadInItemList(ctx, sasSpecifier);
+        List<Element> itemList = getItemList(sasPayloadInItemList);
+        if (itemList != null) {
+        	for (Element e:itemList) {
+        		String remoteRefName = XmlTools.getElementValue(e, "//refName");
+        		long status = syncRemoteItemWithLocalItem(ctx, remoteRefName);
+        		if (status == 1) {
+        			created++;
+        		} else if (status == 0) {
+        			synched++;
+        		} else {
+        			alreadySynched++;
+        		}
+        		totalItemsProcessed++;
+        	}
+        }
         
+        logger.info(String.format("Total number of items processed during sync: %d", totalItemsProcessed));
+        logger.info(String.format("Number of items synchronized: %d", synched));
+        logger.info(String.format("Number of items created during sync: %d", created));
+        logger.info(String.format("Number not needing synchronization: %d", alreadySynched));
+
+        return result;
+    }
+    
+    /**
+     * 
+     * @param ctx
+     * @param parentIdentifier - Must be in short-id-refname form -i.e., urn:cspace:name(shortid)
+     * @param itemIdentifier   - Must be in short-id-refname form -i.e., urn:cspace:name(shortid)
+     * @throws Exception 
+     */
+    protected void createLocalItem(ServiceContext ctx, String parentIdentifier, String itemIdentifier) throws Exception {
+    	//
+    	// Create a URN short ID specifier for the getting to the remote item payload
+        Specifier authoritySpecifier = new Specifier(SpecifierForm.URN_NAME, parentIdentifier);
+        Specifier itemSpecifier = new Specifier(SpecifierForm.URN_NAME, itemIdentifier);
+        AuthorityItemSpecifier sasAuthorityItemSpecifier = new AuthorityItemSpecifier(authoritySpecifier, itemSpecifier);
+        //
+        // Get the remote payload
+        //
+        PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.getPayloadIn(sasAuthorityItemSpecifier, 
+        		ctx.getServiceName(), getEntityResponseType());
+        //
+        // Using the payload from the remote server, create a local copy of the item
+        //
+    	ResourceMap resourceMap = ctx.getResourceMap();
+    	String resourceName = ctx.getClient().getServiceName();
+    	AuthorityResource authorityResource = (AuthorityResource) resourceMap.get(resourceName);
+    	Response response = authorityResource.createAuthorityItemWithParentContext(ctx, authoritySpecifier.value, sasPayloadIn);
+    	if (response.getStatus() != Response.Status.CREATED.getStatusCode()) {
+    		throw new DocumentException(String.format("Could not create new authority item '%s' during synchronization of the '%s' authority.",
+    				itemIdentifier, parentIdentifier));
+    	}
+    }
+    
+    /**
+     * Try to synchronize a remote item (using its refName) with a local item.  If the local doesn't yet
+     * exist, we'll create it.
+     * Result values:
+     * 	-1 = sync not needed; i.e., already in sync
+     *   0 = sync succeeded
+     *   1 = local item was missing so we created it
+     * @param ctx
+     * @param refName
+     * @return
+     * @throws Exception
+     */
+    protected long syncRemoteItemWithLocalItem(ServiceContext ctx, String remoteRefName) throws Exception {
+    	long result = -1;
+    	
+    	AuthorityTermInfo authorityTermInfo = RefNameUtils.parseAuthorityTermInfo(remoteRefName);
+    	String parentIdentifier = RefNameUtils.createShortIdRefName(authorityTermInfo.inAuthority.name);
+    	String itemIdentifier = RefNameUtils.createShortIdRefName(authorityTermInfo.name);
+
+    	ResourceMap resourceMap = ctx.getResourceMap();
+    	String resourceName = ctx.getClient().getServiceName();
+    	AuthorityResource authorityResource = (AuthorityResource) resourceMap.get(resourceName);
+    	
+    	PoxPayloadOut localItemPayloadOut;
+    	try {
+    		localItemPayloadOut = authorityResource.getAuthorityItemWithParentContext(ctx, parentIdentifier, itemIdentifier);
+    	} catch (DocumentNotFoundException dnf) {
+    		logger.info(String.format("Remote item with refname='%s' doesn't exist locally, so we'll create it.", remoteRefName));
+    		createLocalItem(ctx, parentIdentifier, itemIdentifier);
+    		return 1; // exit with status of 1 means we created a new authority item
+    	}
+    	//
+    	// If we get here, we know the item exists both locally and remotely, so we need to synchronize them
+    	//
+    	authorityResource.synchronizeItemWithParentContext(ctx, parentIdentifier, itemIdentifier);
+    	result = 0;
+    	
+    	return result;
+    }
+        
+    private PoxPayloadIn getPayloadInItemList(ServiceContext ctx, Specifier specifier) throws Exception {
+    	PoxPayloadIn result = null;
+    	
+        AuthorityClient client = (AuthorityClient) ctx.getClient();
+        Response res = client.readItemList(specifier.value,
+        		null,	// partial term string
+        		null	// keyword string
+        		);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(client.getClass().getCanonicalName() + ": status = " + statusCode);
+	        }
+	        
+            result = new PoxPayloadIn((String)res.readEntity(getEntityResponseType())); // Get the entire response!	        
+        } finally {
+        	res.close();
+        }
+    	
+    	return result;
+    }
+    
     private PoxPayloadIn getPayloadIn(ServiceContext ctx, Specifier specifier) throws Exception {
     	PoxPayloadIn result = null;
     	

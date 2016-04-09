@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.List;
 
 import org.collectionspace.services.common.api.Tools;
 import org.dom4j.Document;
@@ -16,9 +17,12 @@ import org.dom4j.io.HTMLWriter;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class XmlTools {
 
+    static final Logger logger = LoggerFactory.getLogger(XmlTools.class);
 
     // @TODO Refactoring opportunity: the utility methods below
     // could potentially be moved into the 'common' module,
@@ -212,6 +216,44 @@ public class XmlTools {
         } finally {
             return elementValue;
         }
+    }
+    
+    public static String getElementValue(Element doc, String xpathExpr) {
+        String elementValue = "";
+        if (Tools.isBlank(xpathExpr)) {
+            return elementValue;
+        }
+        try {
+            Node node = doc.selectSingleNode(xpathExpr);
+            if ((node == null) || (node.getNodeType() != Node.ELEMENT_NODE)) {
+                return elementValue;
+            }
+            Element element = (Element) node;
+            elementValue = element.getText();
+        } catch (Exception e) {
+            System.err.println(e.getStackTrace());
+        } finally {
+            return elementValue;
+        }
+    }
+    
+    /**
+     * Returns the (text node) value of a specified element in a dom4j XML document.
+     * @param   doc  A dom4j XML document.
+     * @param   xpathExpr  An XPath expression intended to match a single element
+     * in the XML document, in the default namespace.
+     * @return  The (text node) value of the matched element, if any.
+     */
+    public static List getElementNodes(Document doc, String xpathExpr) {
+        List result = null;
+
+        try {
+            result = doc.selectNodes(xpathExpr);
+        } catch (Exception e) {
+            logger.debug("No list-item nodes exist.");
+        }
+        
+        return result;
     }
     
     /**

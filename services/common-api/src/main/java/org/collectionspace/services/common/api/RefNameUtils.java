@@ -72,7 +72,7 @@ public class RefNameUtils {
         public String domain;
         public String resource;
         public String csid;
-        public String name;
+        public String name; // Is this the short ID?
         public String displayName;
         
         public AuthorityInfo(String refNameTokens[]) throws IllegalArgumentException {

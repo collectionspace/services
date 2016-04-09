@@ -35,6 +35,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.IRelationsManager;
+import org.collectionspace.services.client.PoxPayload;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ReflectionMapper;
@@ -115,12 +116,21 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
     	return String.class;
     }
     
-    protected Long getRevision(PoxPayloadIn payloadIn) {
+    protected Long getRevision(PoxPayload payload) {
     	Long result = null;
     	
-		Document document = payloadIn.getDOMDocument();
+		Document document = payload.getDOMDocument();
 		String xmlRev = XmlTools.getElementValue(document, "//rev");
 		result = Long.valueOf(xmlRev);
+		
+		return result;
+    }
+    
+    protected List getItemList(PoxPayloadIn payloadIn) {
+    	List result = null;
+    	
+		Document document = payloadIn.getDOMDocument();
+		result = XmlTools.getElementNodes(document, "//list-item");
 		
 		return result;
     }

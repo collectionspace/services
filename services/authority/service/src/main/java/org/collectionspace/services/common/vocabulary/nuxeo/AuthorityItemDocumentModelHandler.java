@@ -344,28 +344,28 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         return list;
     }
     
-    private PoxPayloadIn getPayloadIn(AuthorityItemSpecifier specifier) throws Exception {
-    	PoxPayloadIn result = null;
-    	
-    	ServiceContext parentCtx = new MultipartServiceContextImpl(this.getAuthorityServicePath());
-        AuthorityClient client = (AuthorityClient) parentCtx.getClient();
-        Response res = client.readItem(specifier.getParentSpecifier().value, specifier.getItemSpecifier().value);
-        try {
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if (logger.isDebugEnabled()) {
-	            logger.debug(client.getClass().getCanonicalName() + ": status = " + statusCode);
-	        }
-	        
-            result = new PoxPayloadIn((String)res.readEntity(getEntityResponseType())); // Get the entire response!	        
-        } finally {
-        	res.close();
-        }
-    	
-    	return result;
-    }
+//    private PoxPayloadIn getPayloadIn(AuthorityItemSpecifier specifier) throws Exception {
+//    	PoxPayloadIn result = null;
+//    	
+//    	ServiceContext parentCtx = new MultipartServiceContextImpl(this.getAuthorityServicePath());
+//        AuthorityClient client = (AuthorityClient) parentCtx.getClient();
+//        Response res = client.readItem(specifier.getParentSpecifier().value, specifier.getItemSpecifier().value);
+//        try {
+//	        int statusCode = res.getStatus();
+//	
+//	        // Check the status code of the response: does it match
+//	        // the expected response(s)?
+//	        if (logger.isDebugEnabled()) {
+//	            logger.debug(client.getClass().getCanonicalName() + ": status = " + statusCode);
+//	        }
+//	        
+//            result = new PoxPayloadIn((String)res.readEntity(getEntityResponseType())); // Get the entire response!	        
+//        } finally {
+//        	res.close();
+//        }
+//    	
+//    	return result;
+//    }
 
     @Override
     public boolean handleSync(DocumentWrapper<Object> wrapDoc) throws Exception {
@@ -400,7 +400,8 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         Specifier sasItemSpecifier = new Specifier(SpecifierForm.URN_NAME, RefNameUtils.createShortIdRefName(itemShortId));
         AuthorityItemSpecifier sasAuthorityItemSpecifier = new AuthorityItemSpecifier(sasAuthoritySpecifier, sasItemSpecifier);
         // Get the shared authority server's copy
-        PoxPayloadIn sasPayloadIn = getPayloadIn(sasAuthorityItemSpecifier);
+        PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.getPayloadIn(sasAuthorityItemSpecifier, 
+        		getAuthorityServicePath(), getEntityResponseType());
 
         Long sasRev = getRevision(sasPayloadIn);
         if (sasRev > itemRev) {
@@ -521,6 +522,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	if (this.shouldUpdateParentRevNumber == true) {
 	    	DocumentModel inAuthorityDocModel = NuxeoUtils.getDocFromCsid(getServiceContext(), getRepositorySession(), getInAuthority());
 	    	Long parentRev = (Long)inAuthorityDocModel.getProperty(getParentCommonSchemaName(), AuthorityJAXBSchema.REV);
+	    	if (parentRev == null) {
+	    		parentRev = new Long(0);
+	    	}
 	   		parentRev++;
 	   		inAuthorityDocModel.setProperty(getParentCommonSchemaName(), AuthorityJAXBSchema.REV, parentRev);
 	   		getRepositorySession().saveDocument(inAuthorityDocModel);
