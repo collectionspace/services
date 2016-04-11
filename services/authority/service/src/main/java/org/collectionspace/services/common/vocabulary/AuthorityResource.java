@@ -73,6 +73,7 @@ import org.collectionspace.services.common.document.Hierarchy;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
+import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityServiceUtils;
 import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -264,9 +265,17 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 				parentspecifier, method, op, uriInfo);
 		return tempResult.CSID;
 	}
+	
+	protected String lookupParentCSID(ServiceContext ctx, String parentspecifier, String method,
+			String op, UriInfo uriInfo) throws Exception {
+		CsidAndShortIdentifier tempResult = lookupParentCSIDAndShortIdentifer(ctx,
+				parentspecifier, method, op, uriInfo);
+		return tempResult.CSID;
+	}
+
 
     private CsidAndShortIdentifier lookupParentCSIDAndShortIdentifer(
-    		ServiceContext itemServiceCtx,
+    		ServiceContext itemServiceCtx, // Ok to be null
     		String parentSpecifier,
     		String method,
     		String op,
@@ -404,8 +413,43 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 	        Response response = Response.status(Response.Status.NOT_MODIFIED).entity(result).type("text/plain").build();
             throw new CSWebApplicationException(response);
         }
-        
-        return result;
+                return result;
+    }
+
+    /**
+     * We override the base method, so we can decide if we need to update the rev number.  We won't
+     * if we are performing a synchronization with the SAS.
+     * @param csid
+     * @param theUpdate
+     * @param ctx
+     * @return
+     * @throws Exception
+     */
+    @Override
+    protected PoxPayloadOut update(String csid,
+            PoxPayloadIn theUpdate, // not used in this method, but could be used by an overriding method
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
+            throws Exception {
+        AuthorityDocumentModelHandler handler = (AuthorityDocumentModelHandler) createDocumentHandler(ctx);
+        handler.setShouldUpdateRevNumber(this.shouldUpdateRevNumber(ctx));
+        getRepositoryClient(ctx).update(ctx, csid, handler);
+        return ctx.getOutput();
+    }
+    
+    /**
+     * Look for a property in the current context to determine if we're handling a sync request.
+     * @param ctx
+     * @return
+     */
+    private boolean shouldUpdateRevNumber(ServiceContext ctx) {
+    	boolean result = true;
+    	
+    	Boolean flag = (Boolean) ctx.getProperty(AuthorityServiceUtils.SHOULD_UPDATE_REV_PROPERTY);
+    	if (flag != null) {
+    		result = flag.booleanValue();
+    	}
+    	
+    	return result;
     }
     
     /**
@@ -594,13 +638,14 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         }
     }
     
-    protected Response createAuthorityItem(ServiceContext ctx, String parentspecifier) throws Exception {
+    protected Response createAuthorityItem(ServiceContext ctx, String parentspecifier, boolean shouldUpdateRevNumber) throws Exception {
     	Response result = null;
     	
         // Note: must have the parentShortId, to do the create.
-        CsidAndShortIdentifier parent = lookupParentCSIDAndShortIdentifer(null, parentspecifier, "createAuthorityItem", "CREATE_ITEM", null);
-        DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = 
-        	createItemDocumentHandler(ctx, parent.CSID, parent.shortIdentifier);
+        CsidAndShortIdentifier parent = lookupParentCSIDAndShortIdentifer(ctx, parentspecifier, "createAuthorityItem", "CREATE_ITEM", null);
+        AuthorityItemDocumentModelHandler handler = 
+        	(AuthorityItemDocumentModelHandler) createItemDocumentHandler(ctx, parent.CSID, parent.shortIdentifier);
+        handler.setShouldUpdateRevNumber(shouldUpdateRevNumber);
         String itemcsid = getRepositoryClient(ctx).create(ctx, handler);
         UriBuilder path = UriBuilder.fromResource(resourceClass);
         path.path(parent.CSID + "/items/" + itemcsid);
@@ -619,7 +664,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      */
     public Response createAuthorityItemWithParentContext(ServiceContext parentCtx,
     		String parentspecifier,
-    		PoxPayloadIn input) throws Exception {
+    		PoxPayloadIn input,
+    		boolean shouldUpdateRevNumber) throws Exception {
     	Response result = null;
     	
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), input,
@@ -627,7 +673,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         if (parentCtx.getCurrentRepositorySession() != null) {
         	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession());
         }
-        result = this.createAuthorityItem(ctx, parentspecifier);
+        result = this.createAuthorityItem(ctx, parentspecifier, shouldUpdateRevNumber);
 
     	return result;
     }
@@ -649,7 +695,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         try {
             PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), input, resourceMap, uriInfo);
-            result = this.createAuthorityItem(ctx, parentspecifier);
+            result = this.createAuthorityItem(ctx, parentspecifier, AuthorityServiceUtils.UPDATE_REV);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
         }
@@ -680,7 +726,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     }
 
     //FIXME: This method is almost identical to the method org.collectionspace.services.common.updateWorkflowWithTransition() so
-    // they should be consolidated -be DRY (don't repeat yourself).
+    // they should be consolidated -be DRY (D)on't (R)epeat (Y)ourself.
     @PUT
     @Path("{csid}/items/{itemcsid}" + WorkflowClient.SERVICE_PATH + "/{transition}")
     public byte[] updateItemWorkflowWithTransition(
@@ -725,7 +771,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             String itemIdentifier) throws Exception {
     	PoxPayloadOut result = null;
     	
-        String parentcsid = lookupParentCSID(parentIdentifier, "getAuthorityItem(parent)", "GET_ITEM", null);
+        String parentcsid = lookupParentCSID(ctx, parentIdentifier, "getAuthorityItem(parent)", "GET_ITEM", null);
         // We omit the parentShortId, only needed when doing a create...
         DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createItemDocumentHandler(ctx, parentcsid, null);
 
@@ -994,7 +1040,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         CsidAndShortIdentifier parent;
     	boolean neededSync = false;
 
-        parent = lookupParentCSIDAndShortIdentifer(null, parentIdentifier, "syncAuthorityItem(parent)", "SYNC_ITEM", null);
+        parent = lookupParentCSIDAndShortIdentifer(ctx, parentIdentifier, "syncAuthorityItem(parent)", "SYNC_ITEM", null);
         AuthorityItemDocumentModelHandler handler = (AuthorityItemDocumentModelHandler)createItemDocumentHandler(ctx, parent.CSID, parent.shortIdentifier);
         Specifier parentSpecifier = getSpecifier(parent.CSID, "getAuthority", "GET");
         Specifier itemSpecifier = getSpecifier(itemIdentifier, "getAuthorityItem", "GET");
@@ -1099,7 +1145,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         
         try {
             PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
-            result = updateAuthorityItem(null, resourceMap, uriInfo, parentSpecifier, itemSpecifier, theUpdate, true); // passing TRUE so parent authority rev num increases
+            result = updateAuthorityItem(null, resourceMap, uriInfo, parentSpecifier, itemSpecifier, theUpdate,
+            		AuthorityServiceUtils.UPDATE_REV); // passing TRUE so rev num increases
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED);
         }
@@ -1108,13 +1155,13 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     }
     
     public PoxPayloadOut updateAuthorityItem(
-    		ServiceContext itemServiceCtx, // Ok to be null
+    		ServiceContext itemServiceCtx, // Ok to be null.  Will be null on PUT calls, but not on sync calls
     		ResourceMap resourceMap, 
             UriInfo uriInfo,
             String parentspecifier,
             String itemspecifier,
             PoxPayloadIn theUpdate,
-            boolean shouldUpdateParentRev) throws Exception {
+            boolean shouldUpdateRevNumber) throws Exception {
         PoxPayloadOut result = null;
         
         CsidAndShortIdentifier csidAndShortId = lookupParentCSIDAndShortIdentifer(itemServiceCtx, parentspecifier, "updateAuthorityItem(parent)", "UPDATE_ITEM", null);
@@ -1131,7 +1178,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 
         // We omit the parentShortId, only needed when doing a create...
         AuthorityItemDocumentModelHandler handler = (AuthorityItemDocumentModelHandler)createItemDocumentHandler(ctx, parentcsid, parentShortId);
-        handler.setShouldUpdateParentRevNumber(shouldUpdateParentRev);
+        handler.setShouldUpdateRevNumber(shouldUpdateRevNumber);
         getRepositoryClient(ctx).update(ctx, itemcsid, handler);
         result = ctx.getOutput();
 

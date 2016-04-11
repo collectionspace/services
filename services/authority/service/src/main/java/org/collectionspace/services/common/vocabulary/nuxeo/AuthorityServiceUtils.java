@@ -13,6 +13,10 @@ import org.slf4j.LoggerFactory;
 public class AuthorityServiceUtils {
     private static final Logger logger = LoggerFactory.getLogger(AuthorityIdentifierUtils.class);
 
+    public static final String SHOULD_UPDATE_REV_PROPERTY = "SHOULD_UPDATE_REV_PROPERTY";
+    public static final boolean DONT_UPDATE_REV = false;
+    public static final boolean UPDATE_REV = true;
+
     static public PoxPayloadIn getPayloadIn(AuthorityItemSpecifier specifier, String serviceName, Class responseType) throws Exception {
     	PoxPayloadIn result = null;
     	

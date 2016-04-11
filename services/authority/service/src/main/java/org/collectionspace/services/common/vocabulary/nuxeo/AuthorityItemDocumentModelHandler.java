@@ -92,7 +92,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     protected String authorityCommonSchemaName;
     protected String authorityItemCommonSchemaName;
     private String authorityItemTermGroupXPathBase;
-    private boolean shouldUpdateParentRevNumber = true;
+    private boolean shouldUpdateRevNumber = true;
     /**
      * inVocabulary is the parent Authority for this context
      */
@@ -110,12 +110,12 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     
     abstract public String getParentCommonSchemaName();
     
-    public boolean getShouldUpdateParentRevNumber() {
-    	return this.shouldUpdateParentRevNumber;
+    public boolean getShouldUpdateRevNumber() {
+    	return this.shouldUpdateRevNumber;
     }
     
-    public void setShouldUpdateParentRevNumber(boolean flag) {
-    	this.shouldUpdateParentRevNumber = flag;
+    public void setShouldUpdateRevNumber(boolean flag) {
+    	this.shouldUpdateRevNumber = flag;
     }
 
     @Override
@@ -376,7 +376,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         // Get the rev number of the authority item so we can compare with rev number of shared authority
         //
         DocumentModel itemDocModel = NuxeoUtils.getDocFromSpecifier(ctx, getRepositorySession(), getAuthorityItemCommonSchemaName(), 
-        		authorityItemSpecifier.getItemSpecifier());
+        		authorityItemSpecifier);
         if (itemDocModel == null) {
         	throw new DocumentNotFoundException(String.format("Could not find authority item resource with CSID='%s'",
         			authorityItemSpecifier.getItemSpecifier().value));
@@ -410,7 +410,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         	AuthorityResource authorityResource = (AuthorityResource) resourceMap.get(resourceName);
         	PoxPayloadOut payloadOut = authorityResource.updateAuthorityItem(ctx, 
         			resourceMap, 					
-        			null, 
+        			ctx.getUriInfo(),
         			authorityDocModel.getName(), 	// parent's CSID
         			itemDocModel.getName(), 		// item's CSID
         			sasPayloadIn,					// the payload from the SAS
@@ -504,9 +504,16 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	//
     	// Update the record's revision number on both CREATE and UPDATE actions
     	//
-    	updateRevNumbers(wrapDoc);
+    	if (this.getShouldUpdateRevNumber() == true) { // We won't update rev numbers on synchronization with SAS
+    		updateRevNumbers(wrapDoc);
+    	}
     }
     
+    /**
+     * Update the revision number of both the item and the item's parent.
+     * @param wrapDoc
+     * @throws Exception
+     */
     protected void updateRevNumbers(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
     	DocumentModel documentModel = wrapDoc.getWrappedObject();
     	Long rev = (Long)documentModel.getProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.REV);
@@ -519,16 +526,14 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	//
     	// Next, update the inAuthority (the parent's) rev number
     	//
-    	if (this.shouldUpdateParentRevNumber == true) {
-	    	DocumentModel inAuthorityDocModel = NuxeoUtils.getDocFromCsid(getServiceContext(), getRepositorySession(), getInAuthority());
-	    	Long parentRev = (Long)inAuthorityDocModel.getProperty(getParentCommonSchemaName(), AuthorityJAXBSchema.REV);
-	    	if (parentRev == null) {
-	    		parentRev = new Long(0);
-	    	}
-	   		parentRev++;
-	   		inAuthorityDocModel.setProperty(getParentCommonSchemaName(), AuthorityJAXBSchema.REV, parentRev);
-	   		getRepositorySession().saveDocument(inAuthorityDocModel);
+    	DocumentModel inAuthorityDocModel = NuxeoUtils.getDocFromCsid(getServiceContext(), getRepositorySession(), getInAuthority());
+    	Long parentRev = (Long)inAuthorityDocModel.getProperty(getParentCommonSchemaName(), AuthorityJAXBSchema.REV);
+    	if (parentRev == null) {
+    		parentRev = new Long(0);
     	}
+   		parentRev++;
+   		inAuthorityDocModel.setProperty(getParentCommonSchemaName(), AuthorityJAXBSchema.REV, parentRev);
+   		getRepositorySession().saveDocument(inAuthorityDocModel);
     }    
     
     /**

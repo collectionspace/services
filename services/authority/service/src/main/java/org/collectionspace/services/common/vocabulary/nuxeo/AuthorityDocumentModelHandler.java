@@ -72,14 +72,24 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AuthorityDocumentModelHandler<AuthCommon>
         extends NuxeoDocumentModelHandler<AuthCommon> {
-
-    private final Logger logger = LoggerFactory.getLogger(AuthorityDocumentModelHandler.class);	
-    protected String authorityCommonSchemaName;
+    
+	private final Logger logger = LoggerFactory.getLogger(AuthorityDocumentModelHandler.class);	
+    
+	protected String authorityCommonSchemaName;
     protected String authorityItemCommonSchemaName;
+    protected boolean shouldUpdateRevNumber;
 
     public AuthorityDocumentModelHandler(String authorityCommonSchemaName, String authorityItemCommonSchemaName) {
         this.authorityCommonSchemaName = authorityCommonSchemaName;
         this.authorityItemCommonSchemaName = authorityItemCommonSchemaName;
+    }
+    
+    public void setShouldUpdateRevNumber(boolean flag) {
+    	this.shouldUpdateRevNumber = flag;
+    }
+    
+    public boolean getShouldUpdateRevNumber() {
+    	return this.shouldUpdateRevNumber;
     }
     
     /**
@@ -119,11 +129,20 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 
         Long sasRev = getRevision(sasPayloadIn);
         if (sasRev > rev) {
+        	//
+        	// First, sync all the authority items
+        	//
         	syncAllItems(ctx, sasSpecifier);
+        	//
+        	// Next, sync the authority resource/record itself
+        	//
         	ResourceMap resourceMap = ctx.getResourceMap();
         	String resourceName = ctx.getClient().getServiceName();
         	AuthorityResource authorityResource = (AuthorityResource) resourceMap.get(resourceName);
-        	PoxPayloadOut payloadOut = authorityResource.update(ctx, resourceMap, null, docModel.getName(), sasPayloadIn);
+        	ctx.setProperty(AuthorityServiceUtils.SHOULD_UPDATE_REV_PROPERTY, // Since it is a sync, don't update the rev.  Instead use the rev from the SAS
+        			new Boolean(AuthorityServiceUtils.DONT_UPDATE_REV));
+        	PoxPayloadOut payloadOut = authorityResource.update(ctx, resourceMap, ctx.getUriInfo(), docModel.getName(), 
+        			sasPayloadIn);
         	if (payloadOut != null) {
         		ctx.setOutput(payloadOut);
         		result = true;
@@ -148,7 +167,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         List<Element> itemList = getItemList(sasPayloadInItemList);
         if (itemList != null) {
         	for (Element e:itemList) {
-        		String remoteRefName = XmlTools.getElementValue(e, "//refName");
+        		String remoteRefName = XmlTools.getElementValue(e, "refName");
         		long status = syncRemoteItemWithLocalItem(ctx, remoteRefName);
         		if (status == 1) {
         			created++;
@@ -193,7 +212,8 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     	ResourceMap resourceMap = ctx.getResourceMap();
     	String resourceName = ctx.getClient().getServiceName();
     	AuthorityResource authorityResource = (AuthorityResource) resourceMap.get(resourceName);
-    	Response response = authorityResource.createAuthorityItemWithParentContext(ctx, authoritySpecifier.value, sasPayloadIn);
+    	Response response = authorityResource.createAuthorityItemWithParentContext(ctx, authoritySpecifier.value,
+    			sasPayloadIn, AuthorityServiceUtils.DONT_UPDATE_REV);
     	if (response.getStatus() != Response.Status.CREATED.getStatusCode()) {
     		throw new DocumentException(String.format("Could not create new authority item '%s' during synchronization of the '%s' authority.",
     				itemIdentifier, parentIdentifier));
@@ -234,10 +254,14 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     	//
     	// If we get here, we know the item exists both locally and remotely, so we need to synchronize them
     	//
-    	authorityResource.synchronizeItemWithParentContext(ctx, parentIdentifier, itemIdentifier);
-    	result = 0;
+    	PoxPayloadOut theUpdate = authorityResource.synchronizeItemWithParentContext(ctx, parentIdentifier, itemIdentifier);
+    	if (theUpdate != null) {
+    		result = 0; // mean we neeed to sync this item with SAS
+    		logger.debug(String.format("Sync'd authority item parent='%s' id='%s with SAS.  Updated payload is: \n%s",
+    				parentIdentifier, itemIdentifier, theUpdate.getXmlPayload()));
+    	}
     	
-    	return result;
+    	return result; // -1 = no sync needed, 0 = sync'd, 1 = created new item
     }
         
     private PoxPayloadIn getPayloadInItemList(ServiceContext ctx, Specifier specifier) throws Exception {
@@ -309,9 +333,11 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {
     	super.fillAllParts(wrapDoc, action);
     	//
-    	// Update the record's revision number on both CREATE and UPDATE actions
+    	// Update the record's revision number on both CREATE and UPDATE actions, but not on SYNC
     	//
-    	updateRevNumbers(wrapDoc);
+    	if (this.getShouldUpdateRevNumber() == true) { // We won't update rev numbers on synchronization with SAS
+    		updateRevNumbers(wrapDoc);
+    	}
     }
     
     protected void updateRevNumbers(DocumentWrapper<DocumentModel> wrapDoc) {
@@ -447,6 +473,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     public String getShortIdentifier(String authCSID, String schemaName) throws Exception {
         String shortIdentifier = null;
         CoreSessionInterface repoSession = null;
+        boolean releaseSession = false;
 
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
     	RepositoryClientImpl nuxeoRepoClient = (RepositoryClientImpl)this.getRepositoryClient(ctx);

@@ -41,6 +41,7 @@ import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentException;
@@ -645,6 +646,52 @@ public class NuxeoUtils {
 
         return result;
     }
+    
+    static public DocumentModel getDocFromSpecifier(
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    		CoreSessionInterface repoSession,
+    		String schemaName,
+    		AuthorityItemSpecifier specifier) throws Exception {
+	    DocumentModel result = null;
+	
+        if (specifier.getItemSpecifier().form == SpecifierForm.CSID) {
+            result = getDocFromCsid(ctx, repoSession, specifier.getItemSpecifier().value);
+        } else {
+        	//
+        	// The parent part of the specifier must be a CSID form.
+        	//
+        	if (specifier.getParentSpecifier().form != SpecifierForm.CSID) {
+        		throw new DocumentException(String.format("Specifier for item parent must be of CSID form but was '%s'",
+        				specifier.getParentSpecifier().value));
+        	}
+        	//
+        	// Build the query to get the authority item.  Parent value must be a CSID.
+        	//
+            String whereClause = RefNameServiceUtils.buildWhereForAuthItemByName(schemaName,
+            		specifier.getItemSpecifier().value, specifier.getParentSpecifier().value);  // parent value must be a CSID
+	        QueryContext queryContext = new QueryContext(ctx, whereClause);
+	        //
+	        // Set of query context using the current service context, but change the document type
+	        // to be the base Nuxeo document type so we can look for the document across service workspaces
+	        //
+	        queryContext.setDocType(NuxeoUtils.BASE_DOCUMENT_TYPE);
+	    
+		    DocumentModelList docModelList = null;
+	        //
+	        // Since we're doing a query, we get back a list so we need to make sure there is only
+	        // a single result since CSID values are supposed to be unique.
+	        String query = buildNXQLQuery(ctx, queryContext);
+	        docModelList = repoSession.query(query);
+	        long resultSize = docModelList.totalSize();
+	        if (resultSize == 1) {
+	        	result = docModelList.get(0);
+	        } else if (resultSize > 1) {
+	        	throw new DocumentException("Found more than 1 document with specifier ID = " + specifier.getItemSpecifier().value);
+	        }
+        }
+
+        return result;
+    } 
     
     static public DocumentModel getDocFromSpecifier(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,

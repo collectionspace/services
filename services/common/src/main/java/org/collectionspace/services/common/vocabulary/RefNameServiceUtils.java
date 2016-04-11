@@ -997,7 +997,7 @@ public class RefNameServiceUtils {
                 + ":" + AuthorityItemJAXBSchema.SHORT_IDENTIFIER
                 + "='" + name + "' AND "
                 + authorityItemCommonSchemaName + ":"
-                + AuthorityItemJAXBSchema.IN_AUTHORITY + "="
+                + AuthorityItemJAXBSchema.IN_AUTHORITY + "="	// parent value must be a CSID, not a URN short ID form
                 + "'" + parentcsid + "'";
     }    
 

@@ -255,6 +255,7 @@ public abstract class NuxeoBasedResource
         ctx.setResourceMap(resourceMap);
         if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
         	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
+        	ctx.setProperties(parentCtx.getProperties()); // transfer all the parent properties to the current context
         }            
         result = update(csid, theUpdate, ctx); //==> CALL implementation method, which subclasses may override.
     	
