@@ -200,50 +200,6 @@ extends NuxeoDocumentModelHandler<BlobsCommon> {
 		super.extractAllParts(wrapDoc);
 	}
 
-	@Deprecated
-	public void xfillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {
-		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
-		BlobInput blobInput = BlobUtil.getBlobInput(ctx); // The blobInput should have been put into the context by the Blob or Media resource
-		if (blobInput != null && blobInput.getBlobFile() != null) {    		
-			boolean purgeOriginal = false;
-			MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
-			String purgeOriginalStr = queryParams.getFirst(BlobClient.BLOB_PURGE_ORIGINAL);
-			if (purgeOriginalStr != null && purgeOriginalStr.isEmpty() == false) { // Find our if the caller wants us to purge/delete the original
-				purgeOriginal = true;
-			}
-			//
-			// If blobInput has a file then we just received a multipart/form-data file post or a URI query parameter
-			//
-			DocumentModel documentModel = wrapDoc.getWrappedObject();
-			CoreSessionInterface repoSession = this.getRepositorySession();
-	        
-			BlobsCommon blobsCommon = NuxeoBlobUtils.createBlobInRepository(ctx, repoSession, blobInput, purgeOriginal, true);
-			blobInput.setBlobCsid(documentModel.getName()); //Assumption here is that the documentModel "name" field is storing a CSID
-
-	        PoxPayloadIn input = ctx.getInput();
-	        //
-	        // If the input payload is null, then we're creating a new blob from a post or a uri.  This means there
-	        // is no "input" payload for our framework to process.  Therefore we need to synthesize a payload from
-	        // the BlobsCommon instance we just filled out.
-	        //
-	        if (input == null) {
-	        	PoxPayloadOut output = new PoxPayloadOut(BlobClient.SERVICE_PAYLOAD_NAME);
-		        PayloadOutputPart commonPart = new PayloadOutputPart(BlobClient.SERVICE_COMMON_PART_NAME, blobsCommon);
-		        output.addPart(commonPart);
-		        input = new PoxPayloadIn(output.toXML());
-		        ctx.setInput(input);
-	        } else {
-	        	// At this point, we've created a blob document in the Nuxeo repository.  Usually, we use the blob to create and instance of BlobsCommon and use
-	        	// that to populate the resource record.  However, since the "input" var is not null the requester provided their own resource record data
-	        	// so we'll use it rather than deriving one from the blob.
-	        	logger.warn("A resource record payload was provided along with the actually blob binary file.  This payload is usually derived from the blob binary.  Since a payload was provided, we're creating the resource record from the payload and not from the corresponding blob binary." +
-	        			" The data in blob resource record fields may not correspond completely with the persisted blob binary file.");
-	        }	        
-		}
-
-		super.fillAllParts(wrapDoc, action);
-	}
-
 	@Override
 	public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {
 		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();

@@ -1175,8 +1175,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = itemServiceCtx;
         if (ctx == null) {
         	ctx = createServiceContext(getItemServiceName(), theUpdate, resourceMap, uriInfo);
+        } else {
+        	ctx.setInput(theUpdate); // the update payload
         }
-        ctx.setInput(theUpdate);
         
         String itemcsid = lookupItemCSID(ctx, itemspecifier, parentcsid, "updateAuthorityItem(item)", "UPDATE_ITEM"); //use itemServiceCtx if it is not null
 

@@ -150,7 +150,7 @@ public class RemoteServiceContextImpl<IT, OT>
     public void setInput(IT input) {
         //for security reasons, do not allow to set input again (from handlers)
         if (this.input != null) {
-            String msg = "Non-null input cannot be set!";
+            String msg = "Resetting or changing an context's input is not allowed.";
             logger.error(msg);
             throw new IllegalStateException(msg);
         }
