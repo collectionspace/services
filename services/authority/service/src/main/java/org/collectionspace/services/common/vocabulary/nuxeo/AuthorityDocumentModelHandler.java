@@ -470,12 +470,11 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     	return result;
     }    
     
-    public String getShortIdentifier(String authCSID, String schemaName) throws Exception {
+    public String getShortIdentifier(ServiceContext ctx, String authCSID, String schemaName) throws Exception {
         String shortIdentifier = null;
         CoreSessionInterface repoSession = null;
         boolean releaseSession = false;
 
-        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
     	RepositoryClientImpl nuxeoRepoClient = (RepositoryClientImpl)this.getRepositoryClient(ctx);
         try {
         	repoSession = nuxeoRepoClient.getRepositorySession(ctx);

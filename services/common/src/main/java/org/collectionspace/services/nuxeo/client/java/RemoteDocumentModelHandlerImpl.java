@@ -393,8 +393,8 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         DocumentModel docModel = wrapDoc.getWrappedObject();
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
         PoxPayloadIn input = ctx.getInput();
-        if (input.getParts().isEmpty()) {
-            String msg = "No payload found!";
+        if (input == null || input.getParts().isEmpty()) {
+            String msg = String.format("No payload found for '%s' action.", action);
             logger.error(msg + "Ctx=" + getServiceContext().toString());
             throw new BadRequestException(msg);
         }
@@ -418,8 +418,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
                 continue;
             }
             fillPart(part, docModel, partMeta, action, ctx);
-        }//rof
-
+        }
     }
 
     /**

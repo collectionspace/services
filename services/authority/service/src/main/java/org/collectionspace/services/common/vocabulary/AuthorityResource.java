@@ -207,9 +207,11 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         if (parentShortIdentifier == null) {
             authorityRefNameBase = null;
         } else {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx =
-                    createServiceContext(getServiceName());
-            if (parentShortIdentifier.equals(FETCH_SHORT_ID)) {
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext(getServiceName());
+            if (parentShortIdentifier.equals(FETCH_SHORT_ID)) { // We need to fetch this from the repo
+                if (ctx.getCurrentRepositorySession() != null) {
+                	parentCtx.setCurrentRepositorySession(ctx.getCurrentRepositorySession()); // We need to use the current repo session if one exists
+                }
                 // Get from parent document
                 parentShortIdentifier = getAuthShortIdentifier(parentCtx, inAuthority);
             }
@@ -228,20 +230,20 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         return docHandler;
     }
 
-    public String getAuthShortIdentifier(
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String authCSID)
+    public String getAuthShortIdentifier(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String authCSID)
             throws DocumentNotFoundException, DocumentException {
         String shortIdentifier = null;
+        
         try {
-            AuthorityDocumentModelHandler<?> handler =
-                    (AuthorityDocumentModelHandler<?>) createDocumentHandler(ctx);
-            shortIdentifier = handler.getShortIdentifier(authCSID, authorityCommonSchemaName);
+            AuthorityDocumentModelHandler<?> handler = (AuthorityDocumentModelHandler<?>) createDocumentHandler(ctx);
+            shortIdentifier = handler.getShortIdentifier(ctx, authCSID, authorityCommonSchemaName);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
             throw new DocumentException(e);
         }
+        
         return shortIdentifier;
     }
 
@@ -308,7 +310,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         return result;
     }
 
-    public String lookupItemCSID(String itemspecifier, String parentcsid, String method, String op, ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
+    public String lookupItemCSID(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String itemspecifier, String parentcsid, String method, String op)
             throws DocumentException {
         String itemcsid;
         Specifier itemSpec = getSpecifier(itemspecifier, method, op);
@@ -962,7 +964,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
 
             String parentcsid = lookupParentCSID(parentspecifier, "getReferencingObjects(parent)", "GET_ITEM_REF_OBJS", uriInfo);
-            String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "getReferencingObjects(item)", "GET_ITEM_REF_OBJS", ctx);
+            String itemcsid = lookupItemCSID(ctx, itemspecifier, parentcsid, "getReferencingObjects(item)", "GET_ITEM_REF_OBJS");
 
             List<String> serviceTypes = queryParams.remove(ServiceBindingUtils.SERVICE_TYPE_PROP);
             if(serviceTypes == null || serviceTypes.isEmpty()) {
@@ -1013,7 +1015,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             DocumentModelHandler<?, AbstractCommonList> handler =
                     (DocumentModelHandler<?, AbstractCommonList>)createItemDocumentHandler(ctx, parentcsid, null /*no parent short ID*/);
 
-            String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "getAuthorityItemAuthRefs(item)", "GET_ITEM_AUTH_REFS", ctx);
+            String itemcsid = lookupItemCSID(ctx, itemspecifier, parentcsid, "getAuthorityItemAuthRefs(item)", "GET_ITEM_AUTH_REFS");
 
             List<RefNameServiceUtils.AuthRefConfigInfo> authRefsInfo = RefNameServiceUtils.getConfiguredAuthorityRefs(ctx);
             authRefList = handler.getAuthorityRefs(itemcsid, authRefsInfo);
@@ -1174,7 +1176,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         if (ctx == null) {
         	ctx = createServiceContext(getItemServiceName(), theUpdate, resourceMap, uriInfo);
         }
-        String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "updateAuthorityItem(item)", "UPDATE_ITEM", ctx); //use itemServiceCtx if it is not null
+        ctx.setInput(theUpdate);
+        
+        String itemcsid = lookupItemCSID(ctx, itemspecifier, parentcsid, "updateAuthorityItem(item)", "UPDATE_ITEM"); //use itemServiceCtx if it is not null
 
         // We omit the parentShortId, only needed when doing a create...
         AuthorityItemDocumentModelHandler handler = (AuthorityItemDocumentModelHandler)createItemDocumentHandler(ctx, parentcsid, parentShortId);
