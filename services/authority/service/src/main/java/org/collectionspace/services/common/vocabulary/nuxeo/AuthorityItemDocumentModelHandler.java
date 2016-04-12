@@ -31,22 +31,20 @@ import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.UriTemplateRegistry;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.RefNameUtils;
-import org.collectionspace.services.common.api.RefNameUtils.AuthorityTermInfo;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.api.RefNameUtils.AuthorityInfo;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.context.MultipartServiceContext;
-import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
+import org.collectionspace.services.common.vocabulary.AuthorityServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
@@ -59,14 +57,14 @@ import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.vocabulary.VocabularyItemJAXBSchema;
+
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.PropertyException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -92,7 +90,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     protected String authorityCommonSchemaName;
     protected String authorityItemCommonSchemaName;
     private String authorityItemTermGroupXPathBase;
-    private boolean shouldUpdateRevNumber = true;
+    private boolean shouldUpdateRevNumber = true; // by default we should update the revision number -not true on synchronization with SAS
     /**
      * inVocabulary is the parent Authority for this context
      */
@@ -116,6 +114,11 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     
     public void setShouldUpdateRevNumber(boolean flag) {
     	this.shouldUpdateRevNumber = flag;
+    }
+
+    @Override
+    public void prepareSync() throws Exception {
+    	this.setShouldUpdateRevNumber(AuthorityServiceUtils.DONT_UPDATE_REV);  // Never update rev nums on sync operations
     }
 
     @Override
@@ -336,7 +339,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         	        }
                         
         		}
-        		
+     
         		setListItemArrayExtended(true);
         	} // end of synchronized block
         }
@@ -344,55 +347,31 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         return list;
     }
     
-//    private PoxPayloadIn getPayloadIn(AuthorityItemSpecifier specifier) throws Exception {
-//    	PoxPayloadIn result = null;
-//    	
-//    	ServiceContext parentCtx = new MultipartServiceContextImpl(this.getAuthorityServicePath());
-//        AuthorityClient client = (AuthorityClient) parentCtx.getClient();
-//        Response res = client.readItem(specifier.getParentSpecifier().value, specifier.getItemSpecifier().value);
-//        try {
-//	        int statusCode = res.getStatus();
-//	
-//	        // Check the status code of the response: does it match
-//	        // the expected response(s)?
-//	        if (logger.isDebugEnabled()) {
-//	            logger.debug(client.getClass().getCanonicalName() + ": status = " + statusCode);
-//	        }
-//	        
-//            result = new PoxPayloadIn((String)res.readEntity(getEntityResponseType())); // Get the entire response!	        
-//        } finally {
-//        	res.close();
-//        }
-//    	
-//    	return result;
-//    }
-
+    /**
+     * This method synchronizes/updates a single authority item resource.
+     */
     @Override
     public boolean handleSync(DocumentWrapper<Object> wrapDoc) throws Exception {
     	boolean result = false;
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
+        //
+        // Get the rev number of the local authority item so we can compare with rev number of shared authority
+        //
     	AuthorityItemSpecifier authorityItemSpecifier = (AuthorityItemSpecifier) wrapDoc.getWrappedObject();
-        //
-        // Get the rev number of the authority item so we can compare with rev number of shared authority
-        //
         DocumentModel itemDocModel = NuxeoUtils.getDocFromSpecifier(ctx, getRepositorySession(), getAuthorityItemCommonSchemaName(), 
         		authorityItemSpecifier);
         if (itemDocModel == null) {
         	throw new DocumentNotFoundException(String.format("Could not find authority item resource with CSID='%s'",
         			authorityItemSpecifier.getItemSpecifier().value));
         }
-        Long itemRev = (Long) NuxeoUtils.getProperyValue(itemDocModel, AuthorityItemJAXBSchema.REV);
+        Long localItemRev = (Long) NuxeoUtils.getProperyValue(itemDocModel, AuthorityItemJAXBSchema.REV);
         String itemShortId = (String) NuxeoUtils.getProperyValue(itemDocModel, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
-        String itemRefName = (String) NuxeoUtils.getProperyValue(itemDocModel, AuthorityItemJAXBSchema.REF_NAME);
         //
         // Now get the Authority (the parent) information
         //
         DocumentModel authorityDocModel = NuxeoUtils.getDocFromSpecifier(ctx, getRepositorySession(), authorityCommonSchemaName,
         		authorityItemSpecifier.getParentSpecifier());
-        Long authorityRev = (Long) NuxeoUtils.getProperyValue(authorityDocModel, AuthorityJAXBSchema.REV);
         String authorityShortId = (String) NuxeoUtils.getProperyValue(authorityDocModel, AuthorityJAXBSchema.SHORT_IDENTIFIER);
-        String authorityRefName = (String) NuxeoUtils.getProperyValue(authorityDocModel, AuthorityJAXBSchema.REF_NAME);
-        AuthorityInfo authorityInfo = RefNameUtils.parseAuthorityInfo(authorityRefName);
         //
         // Using the short IDs of the local authority and item, create URN specifiers to retrieve the SAS authority item
         //
@@ -400,11 +379,13 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         Specifier sasItemSpecifier = new Specifier(SpecifierForm.URN_NAME, RefNameUtils.createShortIdRefName(itemShortId));
         AuthorityItemSpecifier sasAuthorityItemSpecifier = new AuthorityItemSpecifier(sasAuthoritySpecifier, sasItemSpecifier);
         // Get the shared authority server's copy
-        PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.getPayloadIn(sasAuthorityItemSpecifier, 
+        PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.requestPayloadIn(sasAuthorityItemSpecifier, 
         		getAuthorityServicePath(), getEntityResponseType());
-
         Long sasRev = getRevision(sasPayloadIn);
-        if (sasRev > itemRev) {
+        //
+        // If the shared authority item is newer, update our local copy
+        //
+        if (sasRev > localItemRev) {
         	ResourceMap resourceMap = ctx.getResourceMap();
         	String resourceName = this.getAuthorityServicePath();
         	AuthorityResource authorityResource = (AuthorityResource) resourceMap.get(resourceName);
@@ -414,7 +395,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         			authorityDocModel.getName(), 	// parent's CSID
         			itemDocModel.getName(), 		// item's CSID
         			sasPayloadIn,					// the payload from the SAS
-        			false);							// don't update the parent's revision number
+        			AuthorityServiceUtils.DONT_UPDATE_REV);	// don't update the parent's revision number
         	if (payloadOut != null) {
         		ctx.setOutput(payloadOut);
         		result = true;

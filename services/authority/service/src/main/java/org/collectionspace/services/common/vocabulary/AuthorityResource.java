@@ -73,7 +73,6 @@ import org.collectionspace.services.common.document.Hierarchy;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
-import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityServiceUtils;
 import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -364,6 +363,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 	            PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
 	            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
 	            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
+	            
 	            String csid = getRepositoryClient(ctx).create(ctx, handler);
 	            UriBuilder path = UriBuilder.fromResource(resourceClass);
 	            path.path("" + csid);
@@ -417,43 +417,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         }
                 return result;
     }
-
-    /**
-     * We override the base method, so we can decide if we need to update the rev number.  We won't
-     * if we are performing a synchronization with the SAS.
-     * @param csid
-     * @param theUpdate
-     * @param ctx
-     * @return
-     * @throws Exception
-     */
-    @Override
-    protected PoxPayloadOut update(String csid,
-            PoxPayloadIn theUpdate, // not used in this method, but could be used by an overriding method
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
-            throws Exception {
-        AuthorityDocumentModelHandler handler = (AuthorityDocumentModelHandler) createDocumentHandler(ctx);
-        handler.setShouldUpdateRevNumber(this.shouldUpdateRevNumber(ctx));
-        getRepositoryClient(ctx).update(ctx, csid, handler);
-        return ctx.getOutput();
-    }
-    
-    /**
-     * Look for a property in the current context to determine if we're handling a sync request.
-     * @param ctx
-     * @return
-     */
-    private boolean shouldUpdateRevNumber(ServiceContext ctx) {
-    	boolean result = true;
-    	
-    	Boolean flag = (Boolean) ctx.getProperty(AuthorityServiceUtils.SHOULD_UPDATE_REV_PROPERTY);
-    	if (flag != null) {
-    		result = flag.booleanValue();
-    	}
-    	
-    	return result;
-    }
-    
+        
     /**
      * Gets the authority.
      * 
@@ -538,6 +502,24 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         }
         
         return result;
+    }
+    
+    /**
+     * Overriding this methods to see if we should update the revision number during the update.  We don't
+     * want to update the rev number of synchronization operations.
+     */
+    @Override
+    protected PoxPayloadOut update(String csid,
+            PoxPayloadIn theUpdate, // not used in this method, but could be used by an overriding method
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
+            throws Exception {
+        AuthorityDocumentModelHandler handler = (AuthorityDocumentModelHandler) createDocumentHandler(ctx);
+        Boolean shouldUpdateRev = (Boolean) ctx.getProperty(AuthorityServiceUtils.SHOULD_UPDATE_REV_PROPERTY);
+        if (shouldUpdateRev != null && shouldUpdateRev == true) {
+        	handler.setShouldUpdateRevNumber(true);
+        }
+        getRepositoryClient(ctx).update(ctx, csid, handler);
+        return ctx.getOutput();
     }
     
     /**

@@ -215,6 +215,15 @@ public abstract class NuxeoBasedResource
         return this.update(null, resourceMap, uriInfo, csid, xmlPayload); 
     }
 
+    /**
+     * 
+     * @param parentCtx
+     * @param resourceMap
+     * @param uriInfo
+     * @param csid
+     * @param xmlPayload
+     * @return
+     */
     public byte[] update(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, // REM: 8/13/2012 - Some sub-classes will override this method -e.g., MediaResource does.
     		@Context ResourceMap resourceMap,
     		@Context UriInfo uriInfo,
