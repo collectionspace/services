@@ -65,6 +65,7 @@ import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
+import org.nuxeo.ecm.core.lifecycle.LifeCycle;
 import org.nuxeo.ecm.core.lifecycle.LifeCycleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,7 +169,6 @@ public abstract class DocumentModelHandler<T, TL>
      */
     @Override
     public Lifecycle getLifecycle(String docTypeName) {
-    	org.nuxeo.ecm.core.lifecycle.LifeCycle nuxeoLifecyle;
     	Lifecycle result = null;
     	
     	try {
@@ -179,12 +179,10 @@ public abstract class DocumentModelHandler<T, TL>
 				e.printStackTrace();
 			}
 			
-	    	String lifeCycleName; 
-	    	lifeCycleName = lifeCycleService.getLifeCycleNameFor(docTypeName);
-	    	nuxeoLifecyle = lifeCycleService.getLifeCycleByName(lifeCycleName);
+	    	String lifeCycleName = lifeCycleService.getLifeCycleNameFor(docTypeName);
+	    	org.nuxeo.ecm.core.lifecycle.LifeCycle nuxeoLifecyle = lifeCycleService.getLifeCycleByName(lifeCycleName);
 	    	
 	    	result = createCollectionSpaceLifecycle(nuxeoLifecyle);	
-//			result = (Lifecycle)FileTools.getJaxbObjectFromFile(Lifecycle.class, "default-lifecycle.xml");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			logger.error("Could not retreive life cycle information for Nuxeo doctype: " + docTypeName, e);

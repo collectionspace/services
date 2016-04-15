@@ -102,6 +102,11 @@
           <description>Soft-delete the document from the project state</description>
         </transition>
 
+		<!--
+			Notice the convention used in the transition names below.  {transition-verb)_{lifecycle-state} -e.g., delete_locked
+			This convention is critical to the code here: org.collectionspace.services.client.AuthorityClient.AuthorityItemDocumentModelHandler
+		-->
+		
 		<!-- Transitions TO "locked_deleted" state -->
         <transition name="delete_locked" destinationState="locked_deleted">
           <description>Delete the locked document from the "locked" state</description>

@@ -68,6 +68,7 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.core.MultivaluedMap;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -180,7 +181,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         this.inAuthority = inAuthority;
     }
     
-   public String getInAuthority() {
+   public String getInAuthorityCsid() {
         return this.inAuthority;
     }
 
@@ -350,15 +351,16 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     
     /**
      * We consider workflow state changes as a change that should bump the revision number.
+     * Warning: This method might change the transitionDef's transtionName value
      */
     @Override
     public void handleWorkflowTransition(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef) throws Exception {
-    	// Update the revision number
+    	// Decide whether or not to update the revision number
     	if (this.getShouldUpdateRevNumber() == true) { // We don't update the rev number of synchronization requests
     		updateRevNumbers(wrapDoc);
     	}
     }
-    
+        
     /**
      * This method synchronizes/updates a single authority item resource.
      */
@@ -549,8 +551,12 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	//
     	// Next, update the inAuthority (the parent's) rev number
     	//
-    	String inAuthority = (String)documentModel.getProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.IN_AUTHORITY);
-    	DocumentModel inAuthorityDocModel = NuxeoUtils.getDocFromCsid(getServiceContext(), getRepositorySession(), inAuthority);
+    	String inAuthorityCsid = this.getInAuthorityCsid();
+    	if (inAuthorityCsid == null) {
+    		// When inAuthorityCsid is null, it usually means we're performing and update or synch with the SAS
+    		inAuthorityCsid = (String)documentModel.getProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.IN_AUTHORITY);
+    	}
+    	DocumentModel inAuthorityDocModel = NuxeoUtils.getDocFromCsid(getServiceContext(), getRepositorySession(), inAuthorityCsid);
     	Long parentRev = (Long)inAuthorityDocModel.getProperty(getParentCommonSchemaName(), AuthorityJAXBSchema.REV);
     	if (parentRev == null) {
     		parentRev = new Long(0);
@@ -980,7 +986,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     }
     
     protected String getInAuthorityValue() {
-        String inAuthorityValue = getInAuthority();
+        String inAuthorityValue = getInAuthorityCsid();
         if (Tools.notBlank(inAuthorityValue)) {
             return inAuthorityValue;
         } else {

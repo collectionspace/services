@@ -215,7 +215,7 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
     	
     	return result;
     }
-    
+        
     private PoxPayloadIn synthEmptyWorkflowInput() {
     	PoxPayloadIn result = null;
     	

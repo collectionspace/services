@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.common.workflow.service.nuxeo;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -154,6 +155,31 @@ public class WorkflowDocumentModelHandler
     }
     
     /*
+     * Maps the transition name to handle existing states like "locked" and "deleted".  This allows us to do things like lock "deleted"
+     * records, delete "locked" records, etc.  For example, this code maps the transition name "delete" to "delete_locked" on records in the "locked" state.
+     * As another example, it would map "undelete" to "undelete_locked" for locked records and just "undelete" for records in any other state.
+     * 
+     * Essentially, this mapping allows REST API clients to use the "delete", "undelete", "lock", "unlock", etc transitions on records no matter what
+     * their current state.  Without this mapping, REST API clients would need to calculate this on their own and use the longer forms like:
+     * "delete_locked", "undelete_locked", "lock_deleted", "unlocked_deleted", etc. 
+     */
+    String getQualifiedTransitionName(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef) {
+    	String result = null;
+    	
+    	String currentTransitionName = result = transitionDef.getName(); // begin with result set to the current name
+    	DocumentModel docModel = wrapDoc.getWrappedObject();
+    	Collection<String> allowedTransitionList = docModel.getAllowedStateTransitions();
+    	for (String allowedTransitionName:allowedTransitionList) {
+    		if (allowedTransitionName.startsWith(currentTransitionName)) {
+    			result = allowedTransitionName;
+    			break; // we found a mapping
+    		}
+    	}
+
+    	return result;
+    }
+    
+    /*
      * Handle Update (PUT)
      */
 
@@ -166,7 +192,7 @@ public class WorkflowDocumentModelHandler
     	
     	try {
     		TransitionDef transitionDef = (TransitionDef)this.getServiceContext().getProperty(WorkflowClient.TRANSITION_ID);
-    		transitionToFollow = transitionDef.getName();
+    		transitionToFollow = getQualifiedTransitionName(wrapDoc, transitionDef);
 	        docModel.followTransition(transitionToFollow);
     	} catch (Exception e) {
     		String msg = "Unable to follow workflow transition to state = "
