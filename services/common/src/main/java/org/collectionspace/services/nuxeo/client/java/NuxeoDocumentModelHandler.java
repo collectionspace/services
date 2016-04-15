@@ -38,6 +38,7 @@ import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.PoxPayload;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ReflectionMapper;
 import org.collectionspace.services.common.XmlTools;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
@@ -114,6 +115,15 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
      */
     protected Class<String> getEntityResponseType() {
     	return String.class;
+    }
+    
+    protected String getWorkflowState(PoxPayload payload) {
+    	String result = null;
+    	
+		Document document = payload.getDOMDocument();
+		result = XmlTools.getElementValue(document, "//" + WorkflowClient.WORKFLOWSTATE_XML_ELEMENT_NAME);
+		
+		return result;
     }
     
     protected Long getRevision(PoxPayload payload) {

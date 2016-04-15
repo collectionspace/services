@@ -337,7 +337,7 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
     protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) {
     	String headerLabel = new VocabularyClient().getItemCommonPartName();
         HashMap<String, String> vocabItemInfo = new HashMap<String, String>();
-        String shortId = createIdentifier();
+        String shortId = identifier;
         vocabItemInfo.put(AuthorityItemJAXBSchema.SHORT_IDENTIFIER, shortId);
         vocabItemInfo.put(AuthorityItemJAXBSchema.DISPLAY_NAME, "display-" + shortId);
 

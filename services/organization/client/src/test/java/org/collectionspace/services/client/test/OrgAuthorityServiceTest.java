@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -48,9 +49,7 @@ import org.collectionspace.services.organization.OrgauthoritiesCommon;
 import org.collectionspace.services.organization.OrganizationsCommon;
 import org.collectionspace.services.organization.OrgTermGroup;
 import org.collectionspace.services.organization.OrgTermGroupList;
-
 import org.jboss.resteasy.client.ClientResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -121,7 +120,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
     protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) {
         String headerLabel = new OrgAuthorityClient().getItemCommonPartName();
         
-        String shortId = TEST_SHORT_ID;
+        String shortId = TEST_SHORT_ID + identifier;
         Map<String, String> testOrgMap = new HashMap<String, String>();
         testOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
         testOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, TEST_ORG_FOUNDING_DATE);
@@ -154,7 +153,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
         
-        String shortId = TEST_SHORT_ID;
+        String shortId = TEST_SHORT_ID + System.currentTimeMillis();
         Map<String, String> testOrgMap = new HashMap<String, String>();
         testOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
         testOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, TEST_ORG_FOUNDING_DATE);

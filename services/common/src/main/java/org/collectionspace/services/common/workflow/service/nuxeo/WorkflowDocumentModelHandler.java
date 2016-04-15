@@ -67,9 +67,10 @@ public class WorkflowDocumentModelHandler
     	// the super/parent handleUpdate() method.
     	//
     	ServiceContext ctx = this.getServiceContext();
-    	DocumentModelHandler docHandler = (DocumentModelHandler)ctx.getProperty(WorkflowClient.PARENT_DOCHANDLER);
+    	DocumentModelHandler targetDocHandler = (DocumentModelHandler)ctx.getProperty(WorkflowClient.TARGET_DOCHANDLER);
+    	targetDocHandler.setRepositorySession(this.getRepositorySession()); // Make sure the target doc handler has a repository session to work with
     	TransitionDef transitionDef =  (TransitionDef)ctx.getProperty(WorkflowClient.TRANSITION_ID);
-    	docHandler.handleWorkflowTransition(wrapDoc, transitionDef);
+    	targetDocHandler.handleWorkflowTransition(wrapDoc, transitionDef);  // Call the parent resouce's handler first
     	//
     	// If no exception occurred, then call the super's method
     	//

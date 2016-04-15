@@ -55,6 +55,7 @@ import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Author
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
 import org.collectionspace.services.config.service.ObjectPartType;
+import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
@@ -229,6 +230,9 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     	if (response.getStatus() != Response.Status.CREATED.getStatusCode()) {
     		throw new DocumentException(String.format("Could not create new authority item '%s' during synchronization of the '%s' authority.",
     				itemIdentifier, parentIdentifier));
+    	//
+    	// Handle the workflow state
+    	//
     	}
     }
     
@@ -347,6 +351,17 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     		rev++;
     	}
     	documentModel.setProperty(authorityCommonSchemaName, AuthorityJAXBSchema.REV, rev);
+    }
+    
+    /*
+     * We consider workflow state changes as changes that should bump the revision number
+     * (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#handleWorkflowTransition(org.collectionspace.services.common.document.DocumentWrapper, org.collectionspace.services.lifecycle.TransitionDef)
+     */
+    @Override
+    public void handleWorkflowTransition(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef) throws Exception {
+    	// Update the revision number
+    	updateRevNumbers(wrapDoc);
     }
     
     @Override

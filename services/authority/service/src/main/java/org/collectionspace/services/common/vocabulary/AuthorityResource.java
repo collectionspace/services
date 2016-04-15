@@ -719,24 +719,54 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             @PathParam("transition") String transition) {
         PoxPayloadOut result = null;
         
+        try {            
+            result = updateItemWorkflowWithTransition(null, // Ok to send null
+            		csid, itemcsid, transition, AuthorityServiceUtils.UPDATE_REV);
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, csid);
+        }
+        
+        return result.getBytes();
+    }
+    
+    /**
+     * Update an authority item's workflow state.
+     * @param existingContext
+     * @param csid
+     * @param itemcsid
+     * @param transition
+     * @return
+     */
+    public PoxPayloadOut updateItemWorkflowWithTransition(ServiceContext existingContext,
+            String csid,
+            String itemcsid,
+            String transition,
+            boolean updateRevNumber) {
+    	PoxPayloadOut result = null;
+    	
         try {
         	//
         	// Create an empty workflow_commons input part and set it into a new "workflow" sub-resource context
+        	//
         	PoxPayloadIn input = new PoxPayloadIn(WorkflowClient.SERVICE_PAYLOAD_NAME, new WorkflowCommon(), 
         			WorkflowClient.SERVICE_COMMONPART_NAME);
             MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME, input);
+            if (existingContext != null && existingContext.getCurrentRepositorySession() != null) {
+            	ctx.setCurrentRepositorySession(existingContext.getCurrentRepositorySession()); // If a repo session is already open, we need to use it and not create a new one
+            }
 
-            // Create a service context and document handler for the parent resource.
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext(getItemServiceName());
-            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> parentDocHandler = this.createDocumentHandler(parentCtx);
-            ctx.setProperty(WorkflowClient.PARENT_DOCHANDLER, parentDocHandler); //added as a context param for the workflow document handler -it will call the parent's dochandler "prepareForWorkflowTranstion" method
+            // Create a service context and document handler for the target resource -not the workflow resource itself.
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> targetCtx = createServiceContext(getItemServiceName());
+            AuthorityItemDocumentModelHandler parentDocHandler = (AuthorityItemDocumentModelHandler) this.createDocumentHandler(targetCtx);
+            parentDocHandler.setShouldUpdateRevNumber(updateRevNumber);
+            ctx.setProperty(WorkflowClient.TARGET_DOCHANDLER, parentDocHandler); //added as a context param for the workflow document handler -it will call the parent's dochandler "prepareForWorkflowTranstion" method
 
-            // When looking for the document, we need to use the parent's workspace name -not the "workflow" workspace name
-            String parentWorkspaceName = parentCtx.getRepositoryWorkspaceName();
+            // When looking for the document, we need to use the parent resource's workspace name -not the "workflow" workspace name
+            String parentWorkspaceName = targetCtx.getRepositoryWorkspaceName();
             ctx.setRespositoryWorkspaceName(parentWorkspaceName); //find the document in the parent's workspace
             
         	// Get the type of transition we're being asked to make and store it as a context parameter -used by the workflow document handler
-            TransitionDef transitionDef = getTransitionDef(parentCtx, transition);
+            TransitionDef transitionDef = getTransitionDef(targetCtx, transition);
             ctx.setProperty(WorkflowClient.TRANSITION_ID, transitionDef);
             
             WorkflowDocumentModelHandler handler = createWorkflowDocumentHandler(ctx);
@@ -745,8 +775,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, csid);
         }
-        
-        return result.getBytes();
+    	
+    	return result;
     }
     
     private PoxPayloadOut getAuthorityItem(

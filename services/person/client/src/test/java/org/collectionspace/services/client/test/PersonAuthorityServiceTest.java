@@ -186,7 +186,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         String headerLabel = new PersonAuthorityClient().getItemCommonPartName();
         
         HashMap<String, String> personInfo = new HashMap<String, String>();
-        String shortId = "MarkTwainAuthor";
+        String shortId = "MarkTwainAuthor" + identifier;
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
         
         List<PersonTermGroup> terms = new ArrayList<PersonTermGroup>();
@@ -232,7 +232,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         //
         // Fill the property map
         //
-        String shortId = "johnWayneActor";
+        String shortId = "johnWayneActor" + System.currentTimeMillis(); // short ID needs to be unique
         johnWayneMap.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
         johnWayneMap.put(PersonJAXBSchema.GENDER, "male");
         johnWayneMap.put(PersonJAXBSchema.BIRTH_DATE, TEST_BIRTH_DATE);

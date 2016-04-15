@@ -24,6 +24,7 @@
 package org.collectionspace.services.common.vocabulary.nuxeo;
 
 import org.collectionspace.services.client.AuthorityClient;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -51,19 +52,19 @@ import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specif
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
 import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ObjectPartType;
+import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.vocabulary.VocabularyItemJAXBSchema;
-
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.PropertyException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import javax.ws.rs.core.MultivaluedMap;
 
 import java.util.ArrayList;
@@ -348,14 +349,26 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     }
     
     /**
+     * We consider workflow state changes as a change that should bump the revision number.
+     */
+    @Override
+    public void handleWorkflowTransition(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef) throws Exception {
+    	// Update the revision number
+    	if (this.getShouldUpdateRevNumber() == true) { // We don't update the rev number of synchronization requests
+    		updateRevNumbers(wrapDoc);
+    	}
+    }
+    
+    /**
      * This method synchronizes/updates a single authority item resource.
      */
     @Override
     public boolean handleSync(DocumentWrapper<Object> wrapDoc) throws Exception {
     	boolean result = false;
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
+    	
         //
-        // Get the rev number of the local authority item so we can compare with rev number of shared authority
+        // Get information about the local authority item so we can compare with corresponding item on the shared authority server
         //
     	AuthorityItemSpecifier authorityItemSpecifier = (AuthorityItemSpecifier) wrapDoc.getWrappedObject();
         DocumentModel itemDocModel = NuxeoUtils.getDocFromSpecifier(ctx, getRepositorySession(), getAuthorityItemCommonSchemaName(), 
@@ -365,13 +378,17 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         			authorityItemSpecifier.getItemSpecifier().value));
         }
         Long localItemRev = (Long) NuxeoUtils.getProperyValue(itemDocModel, AuthorityItemJAXBSchema.REV);
+        String localItemCsid = itemDocModel.getName();
+        String localItemWorkflowState = (String) NuxeoUtils.getProperyValue(itemDocModel, CollectionSpaceClient.CORE_WORKFLOWSTATE);
         String itemShortId = (String) NuxeoUtils.getProperyValue(itemDocModel, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
+        
         //
-        // Now get the Authority (the parent) information
+        // Now get the item's Authority (the parent) information
         //
         DocumentModel authorityDocModel = NuxeoUtils.getDocFromSpecifier(ctx, getRepositorySession(), authorityCommonSchemaName,
         		authorityItemSpecifier.getParentSpecifier());
         String authorityShortId = (String) NuxeoUtils.getProperyValue(authorityDocModel, AuthorityJAXBSchema.SHORT_IDENTIFIER);
+        String localParentCsid = authorityDocModel.getName();
         //
         // Using the short IDs of the local authority and item, create URN specifiers to retrieve the SAS authority item
         //
@@ -382,6 +399,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.requestPayloadIn(sasAuthorityItemSpecifier, 
         		getAuthorityServicePath(), getEntityResponseType());
         Long sasRev = getRevision(sasPayloadIn);
+        String sasWorkflowState = getWorkflowState(sasPayloadIn);
         //
         // If the shared authority item is newer, update our local copy
         //
@@ -392,14 +410,23 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         	PoxPayloadOut payloadOut = authorityResource.updateAuthorityItem(ctx, 
         			resourceMap, 					
         			ctx.getUriInfo(),
-        			authorityDocModel.getName(), 	// parent's CSID
-        			itemDocModel.getName(), 		// item's CSID
-        			sasPayloadIn,					// the payload from the SAS
+        			localParentCsid,			 	// parent's CSID
+        			localItemCsid, 					// item's CSID
+        			sasPayloadIn,					// the payload from the remote SAS
         			AuthorityServiceUtils.DONT_UPDATE_REV);	// don't update the parent's revision number
         	if (payloadOut != null) {
         		ctx.setOutput(payloadOut);
         		result = true;
         	}
+        }
+        //
+        // If the workflow states are different, we need to update the local's to reflects the remote's
+        //
+        if (localItemWorkflowState.equalsIgnoreCase(sasWorkflowState) == false) {
+        	ResourceMap resourceMap = ctx.getResourceMap();
+        	String resourceName = this.getAuthorityServicePath();
+        	AuthorityResource authorityResource = (AuthorityResource) resourceMap.get(resourceName);
+        	authorityResource.updateItemWorkflowWithTransition(ctx, localParentCsid, localItemCsid, transition, AuthorityServiceUtils.DONT_UPDATE_REV)
         }
         
         return result;

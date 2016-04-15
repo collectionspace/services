@@ -256,12 +256,12 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
         	
             // Create a service context and document handler for the parent resource.
             ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext(uriInfo);
-            DocumentHandler parentDocHandler = this.createDocumentHandler(parentCtx);      
-            ctx.setProperty(WorkflowClient.PARENT_DOCHANDLER, parentDocHandler); //added as a context param for the workflow document handler -it will call the parent's dochandler "prepareForWorkflowTranstion" method
+            DocumentHandler targetDocHandler = this.createDocumentHandler(parentCtx);      
+            ctx.setProperty(WorkflowClient.TARGET_DOCHANDLER, targetDocHandler); //added as a context param for the workflow document handler -it will call the parent's dochandler "prepareForWorkflowTranstion" method
 
             // When looking for the document, we need to use the parent's workspace name -not the "workflow" workspace name
-            String parentWorkspaceName = parentCtx.getRepositoryWorkspaceName();
-            ctx.setRespositoryWorkspaceName(parentWorkspaceName); //find the document in the parent's workspace
+            String targetWorkspaceName = parentCtx.getRepositoryWorkspaceName();
+            ctx.setRespositoryWorkspaceName(targetWorkspaceName); //find the document in the parent's workspace
             
         	// Get the type of transition we're being asked to make and store it as a context parameter -used by the workflow document handler
             TransitionDef transitionDef = getTransitionDef(parentCtx, transition);

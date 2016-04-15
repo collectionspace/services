@@ -16,6 +16,8 @@
  */
 package org.collectionspace.services.client.workflow;
 
+import java.util.HashMap;
+
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.AbstractCommonListPoxServiceClientImpl;
@@ -38,17 +40,18 @@ public class WorkflowClient extends AbstractCommonListPoxServiceClientImpl<Workf
 	//
 	// Workflow states
 	//
+	public static final String WORKFLOWSTATE_XML_ELEMENT_NAME = COLLECTIONSPACE_CORE_WORKFLOWSTATE;
 	public static final String WORKFLOWTRANSITION_UNDELETE = "undelete";
 	public static final String WORKFLOWTRANSITION_DELETE = "delete";
 	public static final String WORKFLOWSTATE_DELETED = "deleted";
 	
-	public static final String WORKFLOWSTATE_ACTIVE = "active";
+	public static final String WORKFLOWSTATE_ACTIVE = "active"; // Is this a used state?
 	public static final String WORKFLOWSTATE_PROJECT = "project";
 	
 	public static final String WORKFLOWTRANSITION_LOCK = "lock";
 	public static final String WORKFLOWSTATE_LOCKED = "locked";
         
-        public static final String WORKFLOWTRANSITION_TO = "to";
+    public static final String WORKFLOWTRANSITION_TO = "to";
 	//
 	// DocumentHandler passed properties
 	//
@@ -59,7 +62,19 @@ public class WorkflowClient extends AbstractCommonListPoxServiceClientImpl<Workf
 	//
 	public static final String WORKFLOW_QUERY_NONDELETED = "wf_deleted";
 	public static final String WORKFLOWSTATE_QUERY = "wf_deleted";
-	public static final String PARENT_DOCHANDLER = "wf_dochandler";
+	public static final String TARGET_DOCHANDLER = "wf_dochandler";
+	
+	//
+	// A mapping of state to the transition verbs that will get you there.  For more details,
+	// see default-life-cycle-contrib.xml in the Nuxeo server configuration
+	//
+	private static final HashMap<String, String> statesMappedToTransitions;
+    static
+    {
+    	statesMappedToTransitions = new HashMap<String, String>();
+    	statesMappedToTransitions.put(WORKFLOWSTATE_DELETED, WORKFLOWTRANSITION_DELETE);
+    	statesMappedToTransitions.put("c", "d");
+    }
 
 	
 	@Override

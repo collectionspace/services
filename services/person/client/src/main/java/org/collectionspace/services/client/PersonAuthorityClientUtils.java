@@ -44,7 +44,6 @@ import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.SchoolOrStyleList;
 import org.collectionspace.services.person.StructuredDateGroup;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +56,7 @@ public class PersonAuthorityClientUtils {
     private static final Logger logger =
         LoggerFactory.getLogger(PersonAuthorityClientUtils.class);
 	private static final ServiceRequestType READ_REQ = ServiceRequestType.READ;
+    static private final Random random = new Random(System.currentTimeMillis());
 
     /**
      * @param csid the id of the PersonAuthority
@@ -467,7 +467,12 @@ public class PersonAuthorityClientUtils {
     }
     
     private static String getGeneratedIdentifier() {
-        return "id" + new Date().getTime(); 
+        return "id" + createIdentifier();
    }
+    
+    private static String createIdentifier() {
+        long identifier = System.currentTimeMillis() + random.nextInt();
+        return Long.toString(identifier);
+    }    
 
 }

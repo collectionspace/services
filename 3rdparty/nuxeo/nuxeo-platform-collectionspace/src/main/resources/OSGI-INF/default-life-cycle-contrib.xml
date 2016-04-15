@@ -70,4 +70,81 @@
       </states>
     </lifecycle>
   </extension>
+  
+    <!-- The definition of the CollectionSpace SAS lifecycle name "cs_sas"  for Shared authority resources --> 
+	<!--
+		We have four states: "project", "locked", "deleted", and "locked_deleted".
+		
+		We can move from Project <-> (Locked, Delete) <-> LockedAndDeleted
+		
+		Project <-> (Locked, Delete) uses these transitions: lock, unlock, delete, undelete
+		LockedAndDeleted <-> (Locked, Deleted) uses these transitions: lock_deleted, unlock_deleted, delete_locked, undelete_locked
+	-->
+
+  <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService"
+  		point="lifecycle">
+    <documentation>CollectionSpace "SAS" life cycle definition.</documentation>
+    <lifecycle name="cs_sas" defaultInitial="project">
+      <transitions>
+		<!-- Transitions TO the "project" state -->
+        <transition name="unlock" destinationState="project">
+          <description>Unlock the document back to project state.</description>
+        </transition>        		
+        <transition name="undelete" destinationState="project">
+          <description>Undelete the document to the project state.</description>
+        </transition>
+		
+		<!-- Transitions FROM "project" state TO the "locked" and the "deleted" states -->
+		<transition name="lock" destinationState="locked">
+          <description>Lock a document from the project state</description>
+        </transition>
+        <transition name="delete" destinationState="deleted">
+          <description>Soft-delete the document from the project state</description>
+        </transition>
+
+		<!-- Transitions TO "locked_deleted" state -->
+        <transition name="delete_locked" destinationState="locked_deleted">
+          <description>Delete the locked document from the "locked" state</description>
+        </transition>
+        <transition name="lock_deleted" destinationState="locked_deleted">
+          <description>Lock the deleted document from the "deleted" state.</description>
+        </transition>
+        
+		<!-- Transitions FROM "locked_deleted" state -->
+        <transition name="undelete_locked" destinationState="locked">
+          <description>Undelete the locked document from locked_deleted state</description>
+        </transition>
+        <transition name="unlock_deleted" destinationState="deleted">
+          <description>Unlock the deleted document.</description>
+        </transition>
+		
+      </transitions>
+	  
+      <states>
+        <state name="project" description="Default state" initial="true">
+          <transitions>
+            <transition>delete</transition>			<!-- To "deleted" state -->
+            <transition>lock</transition>			<!-- To "locked" state -->
+          </transitions>
+        </state>
+        <state name="locked" description="Locked state">
+            <transition>unlock</transition> 		<!-- To "project" state -->
+			<transition>delete_locked</transition>	<!-- To "locked_deleted" state -->
+        </state>
+        <state name="deleted" description="Document is deleted">
+          <transitions>
+            <transition>undelete</transition>		<!-- To "project" state -->
+			<transition>lock_deleted</transition>	<!-- To "locked_deleted" state -->
+          </transitions>
+        </state>
+		<state name="locked_deleted" description="Document is locked and deleted">
+          <transitions>
+            <transition>unlock_deleted</transition>	<!-- To "deleted" state -->
+			<transition>undelete_locked</transition><!-- To "locked" state -->
+          </transitions>
+        </state>
+      </states>
+    </lifecycle>
+  </extension>
+  
 </component>
