@@ -426,10 +426,25 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         	ResourceMap resourceMap = ctx.getResourceMap();
         	String resourceName = this.getAuthorityServicePath();
         	AuthorityResource authorityResource = (AuthorityResource) resourceMap.get(resourceName);
-        	authorityResource.updateItemWorkflowWithTransition(ctx, localParentCsid, localItemCsid, transition, AuthorityServiceUtils.DONT_UPDATE_REV)
+        	//
+        	// We need to move the local item to the SAS workflow state.  This might involve multiple transitions.
+        	//
+        	List<String> transitionList = getTransitionList(sasWorkflowState, localItemWorkflowState);
+        	for (String transition:transitionList) {
+        		authorityResource.updateItemWorkflowWithTransition(ctx, localParentCsid, localItemCsid, transition, AuthorityServiceUtils.DONT_UPDATE_REV);
+        	}
         }
         
         return result;
+    }
+    
+    /**
+     * We need to move the local item to the SAS workflow state.  This might involve multiple transitions.
+     */
+    private List<String> getTransitionList(String sasWorkflowState, String localItemWorkflowState) {
+    	List<String> result = new ArrayList<String>();
+    	// TO BE COMPLETELED
+    	return result;
     }
     
     /* (non-Javadoc)
@@ -534,7 +549,8 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	//
     	// Next, update the inAuthority (the parent's) rev number
     	//
-    	DocumentModel inAuthorityDocModel = NuxeoUtils.getDocFromCsid(getServiceContext(), getRepositorySession(), getInAuthority());
+    	String inAuthority = (String)documentModel.getProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.IN_AUTHORITY);
+    	DocumentModel inAuthorityDocModel = NuxeoUtils.getDocFromCsid(getServiceContext(), getRepositorySession(), inAuthority);
     	Long parentRev = (Long)inAuthorityDocModel.getProperty(getParentCommonSchemaName(), AuthorityJAXBSchema.REV);
     	if (parentRev == null) {
     		parentRev = new Long(0);

@@ -754,16 +754,18 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             if (existingContext != null && existingContext.getCurrentRepositorySession() != null) {
             	ctx.setCurrentRepositorySession(existingContext.getCurrentRepositorySession()); // If a repo session is already open, we need to use it and not create a new one
             }
-
+            //
             // Create a service context and document handler for the target resource -not the workflow resource itself.
+            //
             ServiceContext<PoxPayloadIn, PoxPayloadOut> targetCtx = createServiceContext(getItemServiceName());
-            AuthorityItemDocumentModelHandler parentDocHandler = (AuthorityItemDocumentModelHandler) this.createDocumentHandler(targetCtx);
-            parentDocHandler.setShouldUpdateRevNumber(updateRevNumber);
-            ctx.setProperty(WorkflowClient.TARGET_DOCHANDLER, parentDocHandler); //added as a context param for the workflow document handler -it will call the parent's dochandler "prepareForWorkflowTranstion" method
-
-            // When looking for the document, we need to use the parent resource's workspace name -not the "workflow" workspace name
-            String parentWorkspaceName = targetCtx.getRepositoryWorkspaceName();
-            ctx.setRespositoryWorkspaceName(parentWorkspaceName); //find the document in the parent's workspace
+            AuthorityItemDocumentModelHandler targetDocHandler = (AuthorityItemDocumentModelHandler) this.createDocumentHandler(targetCtx);
+            targetDocHandler.setShouldUpdateRevNumber(updateRevNumber);
+            ctx.setProperty(WorkflowClient.TARGET_DOCHANDLER, targetDocHandler); //added as a context param for the workflow document handler -it will call the parent's dochandler "prepareForWorkflowTranstion" method
+            //
+            // When looking for the document, we need to use the parent/target resource's workspace name -not the "workflow" workspace name
+            //
+            String targetWorkspaceName = targetCtx.getRepositoryWorkspaceName();
+            ctx.setRespositoryWorkspaceName(targetWorkspaceName); //find the document in the parent's workspace
             
         	// Get the type of transition we're being asked to make and store it as a context parameter -used by the workflow document handler
             TransitionDef transitionDef = getTransitionDef(targetCtx, transition);
