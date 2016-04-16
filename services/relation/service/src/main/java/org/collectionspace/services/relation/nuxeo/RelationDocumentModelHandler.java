@@ -116,11 +116,10 @@ public class RelationDocumentModelHandler
 	 * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#handleWorkflowTransition(org.collectionspace.services.common.document.DocumentWrapper, org.collectionspace.services.lifecycle.TransitionDef)
 	 */
 	public void handleWorkflowTransition(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)
-			throws Exception {
-		String workflowState = transitionDef.getDestinationState();
-		if (subjectOrObjectInWorkflowState(wrapDoc, workflowState) == true) {
+			throws Exception {		
+		if (subjectOrObjectInWorkflowState(wrapDoc, WorkflowClient.WORKFLOWSTATE_LOCKED) == true) {
     		throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
-                    "Cannot change a relationship if either end of it is in the workflow state: " + workflowState);
+                    "Cannot change a relationship if either end of it is in the workflow state: " + WorkflowClient.WORKFLOWSTATE_LOCKED);
 		}
 	}
 
@@ -132,7 +131,7 @@ public class RelationDocumentModelHandler
         // And take care of ensuring all the values for the relation info are correct 
         populateSubjectAndObjectValues(wrapDoc);
     	
-        // both subject and object cannot be locked
+        // Neither the subject nor the object can be locked
     	String workflowState = WorkflowClient.WORKFLOWSTATE_LOCKED;
     	if (subjectOrObjectInWorkflowState(wrapDoc, workflowState) == true) {
     		throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
@@ -152,7 +151,7 @@ public class RelationDocumentModelHandler
     @Override
     public void handleDelete(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
     	String workflowState = WorkflowClient.WORKFLOWSTATE_LOCKED;
-    	// both subject and object cannot be locked
+    	// Neither the subject nor the object can be locked
     	if (subjectOrObjectInWorkflowState(wrapDoc, workflowState) == false) {
     		super.handleDelete(wrapDoc);
     	} else {

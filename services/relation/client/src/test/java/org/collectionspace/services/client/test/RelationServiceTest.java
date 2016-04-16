@@ -134,9 +134,33 @@ public class RelationServiceTest extends AbstractPoxServiceTestImpl<RelationsCom
     
     @AfterSuite
     private void deletePersonRefs() {
-    	//
-    	// Delete all the persons we created for the tests
-    	//
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        for (String csid:personIdsCreated) {
+	        Response res = personAuthClient.deleteItem(personAuthCSID, csid);
+	        try {
+		        int statusCode = res.getStatus();
+		
+		        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+		                invalidStatusCodeMessage(testRequestType, statusCode));
+		        Assert.assertEquals(statusCode, this.STATUS_OK);
+	        } finally {
+	        	res.close();
+	        }
+        }
+        //
+        // Now delete the container (the parent)
+        //
+        Response res = personAuthClient.delete(personAuthCSID);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, this.STATUS_OK);
+        } finally {
+        	res.close();
+        }
+        
     }
 
     private String createPerson(String firstName, String surName, String shortId, String authRefName) {
