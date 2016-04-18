@@ -65,7 +65,7 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
+    protected final ServiceContext<IT, OT> NULL_CONTEXT = null;
     // Fields for default client factory and client
     /** The repository client factory. */
     private RepositoryClientFactory<IT, OT> repositoryClientFactory;

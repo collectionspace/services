@@ -71,7 +71,7 @@ public class WorkflowDocumentModelHandler
     	DocumentModelHandler targetDocHandler = (DocumentModelHandler)ctx.getProperty(WorkflowClient.TARGET_DOCHANDLER);
     	targetDocHandler.setRepositorySession(this.getRepositorySession()); // Make sure the target doc handler has a repository session to work with
     	TransitionDef transitionDef =  (TransitionDef)ctx.getProperty(WorkflowClient.TRANSITION_ID);
-    	targetDocHandler.handleWorkflowTransition(wrapDoc, transitionDef);  // Call the parent resouce's handler first
+    	targetDocHandler.handleWorkflowTransition(wrapDoc, transitionDef);  // Call the target resouce's handler first
     	//
     	// If no exception occurred, then call the super's method
     	//

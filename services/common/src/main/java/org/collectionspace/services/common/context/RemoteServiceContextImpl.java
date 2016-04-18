@@ -24,8 +24,10 @@
 package org.collectionspace.services.common.context;
 
 import java.lang.reflect.Constructor;
+
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.common.CollectionSpaceResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.config.ConfigUtils;
@@ -33,7 +35,6 @@ import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.tenant.TenantBindingType;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -173,6 +174,23 @@ public class RemoteServiceContextImpl<IT, OT>
         this.output = output;
     }
 
+    /**
+     * Return the JAX-RS resource for the current context.
+     * 
+     * @param ctx
+     * @return
+     * @throws Exception 
+     */
+    public CollectionSpaceResource<IT, OT> getResource(ServiceContext ctx) throws Exception {
+    	CollectionSpaceResource<IT, OT> result = null;
+    	
+    	ResourceMap resourceMap = ctx.getResourceMap();
+    	String resourceName = ctx.getClient().getServiceName();
+    	result = resourceMap.get(resourceName);
+    	
+    	return result;
+    }
+    
     /**
      * @return the map of service names to resource classes.
      */
