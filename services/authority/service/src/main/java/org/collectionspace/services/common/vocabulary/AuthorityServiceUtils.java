@@ -14,11 +14,16 @@ import org.slf4j.LoggerFactory;
 
 public class AuthorityServiceUtils {
     private static final Logger logger = LoggerFactory.getLogger(AuthorityIdentifierUtils.class);
-
+    //
+    // Revision property statics
+    //
     public static final String SHOULD_UPDATE_REV_PROPERTY = "SHOULD_UPDATE_REV_PROPERTY";
     public static final boolean DONT_UPDATE_REV = false;
     public static final boolean UPDATE_REV = true;
 
+    //
+    // Makes a call to the SAS server for a authority payload
+    //
     static public PoxPayloadIn requestPayloadIn(ServiceContext ctx, Specifier specifier, Class responseType) throws Exception {
     	PoxPayloadIn result = null;
     	
@@ -41,12 +46,15 @@ public class AuthorityServiceUtils {
     	return result;
     }
     
+    //
+    // Makes a call to the SAS server for a authority item payload
+    //    
     static public PoxPayloadIn requestPayloadIn(AuthorityItemSpecifier specifier, String serviceName, Class responseType) throws Exception {
     	PoxPayloadIn result = null;
     	
     	ServiceContext parentCtx = new MultipartServiceContextImpl(serviceName);
         AuthorityClient client = (AuthorityClient) parentCtx.getClient();
-        Response res = client.readItem(specifier.getParentSpecifier().value, specifier.getItemSpecifier().value);
+        Response res = client.readItem(specifier.getParentSpecifier().getURNValue(), specifier.getItemSpecifier().getURNValue());
         try {
 	        int statusCode = res.getStatus();
 	

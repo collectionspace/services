@@ -131,7 +131,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         //
         // Using the short ID of the local authority, create a URN specifier to retrieve the SAS authority
         //
-        Specifier sasSpecifier = new Specifier(SpecifierForm.URN_NAME, RefNameUtils.createShortIdRefName(shortId));
+        Specifier sasSpecifier = new Specifier(SpecifierForm.URN_NAME, Specifier.createShortIdURNValue(shortId));
         PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.requestPayloadIn(ctx, sasSpecifier, getEntityResponseType());
         //
         // If the authority on the SAS is newer, synch all the items and then the authority record as well
@@ -145,10 +145,8 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         	//
         	// Next, sync the authority resource/record itself
         	//
-        	ResourceMap resourceMap = ctx.getResourceMap();
-        	String resourceName = ctx.getClient().getServiceName();
-        	AuthorityResource authorityResource = (AuthorityResource) resourceMap.get(resourceName);
-        	PoxPayloadOut payloadOut = authorityResource.update(ctx, resourceMap, ctx.getUriInfo(), docModel.getName(), 
+        	AuthorityResource authorityResource = (AuthorityResource) ctx.getResource();
+        	PoxPayloadOut payloadOut = authorityResource.update(ctx, ctx.getResourceMap(), ctx.getUriInfo(), docModel.getName(), 
         			sasPayloadIn);
         	if (payloadOut != null) {
         		ctx.setOutput(payloadOut);
@@ -163,7 +161,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
      * Get the list of authority items from the remote shared authority server (SAS) and try
      * to synchronize them with the local items.  If items exist on the remote but not the local, we'll create them.
      */
-    protected int syncAllItems(ServiceContext ctx, Specifier sasSpecifier) throws Exception {
+    protected int syncAllItems(ServiceContext ctx, Specifier sasAuthoritySpecifier) throws Exception {
     	int result = -1;
     	int created = 0;
     	int synched = 0;
@@ -172,12 +170,12 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     	//
     	// Iterate over the list of items/terms in the remote authority
     	//
-        PoxPayloadIn sasPayloadInItemList = getPayloadInItemList(ctx, sasSpecifier);
+        PoxPayloadIn sasPayloadInItemList = getPayloadInItemList(ctx, sasAuthoritySpecifier);
         List<Element> itemList = getItemList(sasPayloadInItemList);
         if (itemList != null) {
         	for (Element e:itemList) {
-        		String remoteRefName = XmlTools.getElementValue(e, "refName");
-        		long status = syncRemoteItemWithLocalItem(ctx, remoteRefName);
+        		String itemRefName = XmlTools.getElementValue(e, AuthorityItemJAXBSchema.REF_NAME);
+        		long status = syncRemoteItemWithLocalItem(ctx, itemRefName);
         		if (status == 1) {
         			created++;
         		} else if (status == 0) {
@@ -208,8 +206,8 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     	//
     	// Create a URN short ID specifier for the getting a copy of the remote authority item
     	//
-        Specifier authoritySpecifier = new Specifier(SpecifierForm.URN_NAME, parentIdentifier);
-        Specifier itemSpecifier = new Specifier(SpecifierForm.URN_NAME, itemIdentifier);
+        Specifier authoritySpecifier = Specifier.getSpecifier(parentIdentifier);
+        Specifier itemSpecifier = Specifier.getSpecifier(itemIdentifier);
         AuthorityItemSpecifier sasAuthorityItemSpecifier = new AuthorityItemSpecifier(authoritySpecifier, itemSpecifier);
         //
         // Get the remote payload
@@ -219,10 +217,8 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         //
         // Using the payload from the remote server, create a local copy of the item
         //
-    	ResourceMap resourceMap = ctx.getResourceMap();
-    	String resourceName = ctx.getClient().getServiceName();
-    	AuthorityResource authorityResource = (AuthorityResource) resourceMap.get(resourceName);
-    	Response response = authorityResource.createAuthorityItemWithParentContext(ctx, authoritySpecifier.value,
+    	AuthorityResource authorityResource = (AuthorityResource) ctx.getResource();
+    	Response response = authorityResource.createAuthorityItemWithParentContext(ctx, authoritySpecifier.getURNValue(),
     			sasPayloadIn, AuthorityServiceUtils.DONT_UPDATE_REV);
     	//
     	// Check the response for successful POST result
@@ -248,29 +244,26 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
      * @return
      * @throws Exception
      */
-    protected long syncRemoteItemWithLocalItem(ServiceContext ctx, String remoteRefName) throws Exception {
+    protected long syncRemoteItemWithLocalItem(ServiceContext ctx, String itemRefName) throws Exception {
     	long result = -1;
     	//
-    	// Using the remote refname, create specifiers that we'll use to find the local versions
+    	// Using the item refname (with no local CSID), create specifiers that we'll use to find the local versions
     	//
-    	AuthorityTermInfo authorityTermInfo = RefNameUtils.parseAuthorityTermInfo(remoteRefName);
-    	String parentIdentifier = RefNameUtils.createShortIdRefName(authorityTermInfo.inAuthority.name);
-    	String itemIdentifier = RefNameUtils.createShortIdRefName(authorityTermInfo.name);
+    	AuthorityTermInfo authorityTermInfo = RefNameUtils.parseAuthorityTermInfo(itemRefName);
+    	String parentIdentifier = Specifier.createShortIdURNValue(authorityTermInfo.inAuthority.name);
+    	String itemIdentifier = Specifier.createShortIdURNValue(authorityTermInfo.name);
     	//
     	// We'll use the Authority JAX-RS resource to peform sync operations (creates and updates)
     	//
-    	ResourceMap resourceMap = ctx.getResourceMap();
-    	String resourceName = ctx.getClient().getServiceName();
-    	AuthorityResource authorityResource = (AuthorityResource) resourceMap.get(resourceName);
-    	
+    	AuthorityResource authorityResource = (AuthorityResource) ctx.getResource();    	
     	PoxPayloadOut localItemPayloadOut;
     	try {
-    		localItemPayloadOut = authorityResource.getAuthorityItemWithParentContext(ctx, parentIdentifier, itemIdentifier);
+    		localItemPayloadOut = authorityResource.getAuthorityItemWithExistingContext(ctx, parentIdentifier, itemIdentifier);
     	} catch (DocumentNotFoundException dnf) {
     		//
     		// Document not found, means we need to create an item/term that exists only on the SAS
     		//
-    		logger.info(String.format("Remote item with refname='%s' doesn't exist locally, so we'll create it.", remoteRefName));
+    		logger.info(String.format("Remote item with refname='%s' doesn't exist locally, so we'll create it.", itemRefName));
     		createLocalItem(ctx, parentIdentifier, itemIdentifier);
     		return 1; // exit with status of 1 means we created a new authority item
     	}
@@ -279,7 +272,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     	//
     	PoxPayloadOut theUpdate = authorityResource.synchronizeItemWithParentContext(ctx, parentIdentifier, itemIdentifier);
     	if (theUpdate != null) {
-    		result = 0; // mean we neeed to sync this item with SAS
+    		result = 0; // means we needed to sync this item with SAS
     		logger.debug(String.format("Sync'd authority item parent='%s' id='%s with SAS.  Updated payload is: \n%s",
     				parentIdentifier, itemIdentifier, theUpdate.getXmlPayload()));
     	}

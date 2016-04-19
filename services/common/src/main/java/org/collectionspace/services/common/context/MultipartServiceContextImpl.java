@@ -27,17 +27,18 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
+
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.CollectionSpaceResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -177,6 +178,17 @@ public class MultipartServiceContextImpl
 	    	logger.trace("Adding part:" + part.getLabel() +
 	    			" to " + getOutput().getName() + " document.");
 	    }
+    }
+
+    @Override
+    public CollectionSpaceResource<PoxPayloadIn, PoxPayloadOut> getResource() throws Exception {
+    	CollectionSpaceResource<PoxPayloadIn, PoxPayloadOut> result = null;
+    	
+    	ResourceMap resourceMap = getResourceMap();
+    	String resourceName = getClient().getServiceName();
+    	result = (CollectionSpaceResource<PoxPayloadIn, PoxPayloadOut>) resourceMap.get(resourceName);
+    	
+    	return result;
     }
 
     /* (non-Javadoc)

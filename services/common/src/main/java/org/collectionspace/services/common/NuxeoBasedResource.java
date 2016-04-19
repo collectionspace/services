@@ -601,13 +601,13 @@ public abstract class NuxeoBasedResource
    			throws Exception, DocumentNotFoundException {
     	RefName.AuthorityItem item = RefName.AuthorityItem.parse(refName);
     	if(item != null) {
-        	NuxeoBasedResource resource = resourceMap.get(item.inAuthority.resource);
+        	NuxeoBasedResource resource = (NuxeoBasedResource) resourceMap.get(item.inAuthority.resource);
         	return resource.getDocModelForAuthorityItem(repoSession, item);
     	}
     	RefName.Authority authority = RefName.Authority.parse(refName);
     	// Handle case of objects refNames, which must be csid based.
     	if(authority != null && !Tools.isEmpty(authority.csid)) {
-        	NuxeoBasedResource resource = resourceMap.get(authority.resource);
+        	NuxeoBasedResource resource = (NuxeoBasedResource) resourceMap.get(authority.resource);
             // Ensure we have the right context.
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = 
             		resource.createServiceContext(authority.resource);

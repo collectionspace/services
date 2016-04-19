@@ -1,0 +1,545 @@
+Buildfile: C:\dev\src\cspace\services\services\JaxRsServiceProvider\build.xml
+
+package-unix:
+
+package-windows:
+     [exec] Apache Maven 3.1.1 (0728685237757ffbf44136acec0402957f723d9a; 2013-09-17 08:22:22-0700)
+     [exec] Maven home: C:\dev\tools\apache-maven-3.1.1
+     [exec] Java version: 1.7.0_67, vendor: Oracle Corporation
+     [exec] Java home: C:\dev\tools\jdk1.7.0_67\jre
+     [exec] Default locale: en_US, platform encoding: Cp1252
+     [exec] OS name: "windows 7", version: "6.1", arch: "amd64", family: "windows"
+     [exec] [INFO] Scanning for projects...
+     [exec] [INFO]                                                                         
+     [exec] [INFO] ------------------------------------------------------------------------
+     [exec] [INFO] Building services.jaxrs.provider 4.4-SNAPSHOT
+     [exec] [INFO] ------------------------------------------------------------------------
+     [exec] [WARNING] The artifact wutka-dtdparser:dtdparser121:jar:1.2.1 has been relocated to com.wutka:dtdparser:jar:1.21
+     [exec] [WARNING] The artifact apache-xerces:xml-apis:jar:2.9.1 has been relocated to xml-apis:xml-apis:jar:1.3.04
+     [exec] [INFO] 
+     [exec] [INFO] --- maven-antrun-plugin:1.7:run (check-environment-vars) @ org.collectionspace.services.jaxrs.provider ---
+     [exec] [WARNING] Parameter tasks is deprecated, use target instead
+     [exec] [INFO] Executing tasks
+     [exec] 
+     [exec] main:
+     [exec] [INFO] Executed tasks
+     [exec] [INFO] 
+     [exec] [INFO] --- properties-maven-plugin:1.0-alpha-2:read-project-properties (default) @ org.collectionspace.services.jaxrs.provider ---
+     [exec] [INFO] 
+     [exec] [INFO] --- maven-resources-plugin:2.5:resources (default-resources) @ org.collectionspace.services.jaxrs.provider ---
+     [exec] [debug] execute contextualize
+     [exec] [INFO] Using 'UTF-8' encoding to copy filtered resources.
+     [exec] [INFO] Copying 3 resources
+     [exec] [INFO] Copying 1 resource
+     [exec] [INFO] 
+     [exec] [INFO] --- maven-resources-plugin:2.5:resources (default) @ org.collectionspace.services.jaxrs.provider ---
+     [exec] [debug] execute contextualize
+     [exec] [INFO] Using 'UTF-8' encoding to copy filtered resources.
+     [exec] [INFO] Copying 3 resources
+     [exec] [INFO] Copying 1 resource
+     [exec] [INFO] 
+     [exec] [INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ org.collectionspace.services.jaxrs.provider ---
+     [exec] [INFO] Nothing to compile - all classes are up to date
+     [exec] [INFO] 
+     [exec] [INFO] --- maven-resources-plugin:2.5:testResources (default-testResources) @ org.collectionspace.services.jaxrs.provider ---
+     [exec] [debug] execute contextualize
+     [exec] [INFO] Using 'UTF-8' encoding to copy filtered resources.
+     [exec] [INFO] skip non existing resourceDirectory C:\dev\src\cspace\services\services\JaxRsServiceProvider\src\test\resources
+     [exec] [INFO] 
+     [exec] [INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ org.collectionspace.services.jaxrs.provider ---
+     [exec] [INFO] Not compiling test sources
+     [exec] [INFO] 
+     [exec] [INFO] --- maven-surefire-plugin:2.7.1:test (default-test) @ org.collectionspace.services.jaxrs.provider ---
+     [exec] [INFO] Tests are skipped.
+     [exec] [INFO] 
+     [exec] [INFO] --- maven-war-plugin:2.1.1:war (default-war) @ org.collectionspace.services.jaxrs.provider ---
+     [exec] [INFO] Packaging webapp
+     [exec] [INFO] Assembling webapp [org.collectionspace.services.jaxrs.provider] in [C:\dev\src\cspace\services\services\JaxRsServiceProvider\target\cspace-services]
+     [exec] [INFO] Processing war project
+     [exec] [INFO] Copying webapp webResources [C:\dev\src\cspace\services\services\JaxRsServiceProvider\src/main/webapp] to [C:\dev\src\cspace\services\services\JaxRsServiceProvider\target\cspace-services]
+     [exec] [INFO] Copying webapp resources [C:\dev\src\cspace\services\services\JaxRsServiceProvider\src\main\webapp]
+     [exec] [INFO] Webapp assembled in [7487 msecs]
+     [exec] [INFO] Building war: C:\dev\src\cspace\services\services\JaxRsServiceProvider\target\cspace-services.war
+     [exec] [WARNING] Warning: selected war files include a WEB-INF/web.xml which will be ignored 
+     [exec] (webxml attribute is missing from war task, or ignoreWebxml attribute is specified as 'true')
+     [exec] [INFO] ------------------------------------------------------------------------
+     [exec] [INFO] BUILD SUCCESS
+     [exec] [INFO] ------------------------------------------------------------------------
+     [exec] [INFO] Total time: 16.903s
+     [exec] [INFO] Finished at: Mon Apr 18 11:35:30 PDT 2016
+     [exec] [INFO] Final Memory: 55M/875M
+     [exec] [INFO] ------------------------------------------------------------------------
+
+package:
+
+deploy_services_artifacts:
+     [exec] 2016-04-18 11:35:33,317 WARN  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:412] Source file for "Include" tag could not be found: local-core-settings.xml
+     [exec] 2016-04-18 11:35:33,353 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-settings.xml_local-core-settings.xml-.xml
+     [exec] 2016-04-18 11:35:35,159 WARN  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:412] Source file for "Include" tag could not be found: local-core-settings.xml
+     [exec] 2016-04-18 11:35:35,165 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-settings.xml_local-core-settings.xml-.xml
+     [exec] 2016-04-18 11:35:35,602 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'userperm'
+     [exec] 2016-04-18 11:35:35,602 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'core.collectionspace.org.userperm' does not require a service binding.
+     [exec] 2016-04-18 11:35:35,602 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'accountroles'
+     [exec] 2016-04-18 11:35:35,602 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'core.collectionspace.org.accountroles' does not require a service binding.
+     [exec] 2016-04-18 11:35:35,603 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'users'
+     [exec] 2016-04-18 11:35:35,604 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='users' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.users.bindings.xml
+     [exec] 2016-04-18 11:35:35,605 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'concept'
+     [exec] 2016-04-18 11:35:35,610 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='concept' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.concept.bindings.xml
+     [exec] 2016-04-18 11:35:35,612 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Conceptauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.Conceptauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:35,612 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'person'
+     [exec] 2016-04-18 11:35:35,614 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='person' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.person.bindings.xml
+     [exec] 2016-04-18 11:35:35,616 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Personauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.Personauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:35,617 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'location'
+     [exec] 2016-04-18 11:35:35,620 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='location' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.location.bindings.xml
+     [exec] 2016-04-18 11:35:35,621 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Locationauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.Locationauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:35,621 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'userrole'
+     [exec] 2016-04-18 11:35:35,622 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'core.collectionspace.org.userrole' does not require a service binding.
+     [exec] 2016-04-18 11:35:35,622 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'loanin'
+     [exec] 2016-04-18 11:35:35,624 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='loanin' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.loanin.bindings.xml
+     [exec] 2016-04-18 11:35:35,624 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'loanout'
+     [exec] 2016-04-18 11:35:35,628 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='loanout' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.loanout.bindings.xml
+     [exec] 2016-04-18 11:35:35,629 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'contact'
+     [exec] 2016-04-18 11:35:35,629 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'core.collectionspace.org.contact' does not require a service binding.
+     [exec] 2016-04-18 11:35:35,629 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredWork'
+     [exec] 2016-04-18 11:35:35,629 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'core.collectionspace.org.preferredWork' does not require a service binding.
+     [exec] 2016-04-18 11:35:35,629 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'id'
+     [exec] 2016-04-18 11:35:35,629 WARN  [main] [org.collectionspace.chain.installation.Services:213] Record 'core.collectionspace.org.id' is of an unknown type so we could not create a service binding for it.
+     [exec] 2016-04-18 11:35:35,629 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredCA'
+     [exec] 2016-04-18 11:35:35,629 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'core.collectionspace.org.preferredCA' does not require a service binding.
+     [exec] 2016-04-18 11:35:35,630 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'acquisition'
+     [exec] 2016-04-18 11:35:35,632 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='acquisition' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.acquisition.bindings.xml
+     [exec] 2016-04-18 11:35:35,632 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'organization'
+     [exec] 2016-04-18 11:35:35,634 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='organization' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.organization.bindings.xml
+     [exec] 2016-04-18 11:35:35,636 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Orgauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.Orgauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:35,716 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredPA'
+     [exec] 2016-04-18 11:35:35,716 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'core.collectionspace.org.preferredPA' does not require a service binding.
+     [exec] 2016-04-18 11:35:35,716 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'collection-object'
+     [exec] 2016-04-18 11:35:35,723 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='collection-object' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.collection-object.bindings.xml
+     [exec] 2016-04-18 11:35:35,723 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'termlist'
+     [exec] 2016-04-18 11:35:35,725 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='termlist' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.termlist.bindings.xml
+     [exec] 2016-04-18 11:35:35,725 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredPlace'
+     [exec] 2016-04-18 11:35:35,725 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'core.collectionspace.org.preferredPlace' does not require a service binding.
+     [exec] 2016-04-18 11:35:35,725 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'conservation'
+     [exec] 2016-04-18 11:35:35,727 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='conservation' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.conservation.bindings.xml
+     [exec] 2016-04-18 11:35:35,727 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'movement'
+     [exec] 2016-04-18 11:35:35,729 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='movement' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.movement.bindings.xml
+     [exec] 2016-04-18 11:35:35,729 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'role'
+     [exec] 2016-04-18 11:35:35,729 DEBUG [main] [org.collectionspace.chain.installation.Services:209] Ignoring record 'core.collectionspace.org:role' at the moment as it is of type 'authorizationdata' and so non-standard
+     [exec] 2016-04-18 11:35:35,730 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'termlistitem'
+     [exec] 2016-04-18 11:35:35,731 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='termlistitem' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.termlistitem.bindings.xml
+     [exec] 2016-04-18 11:35:35,731 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'hierarchy'
+     [exec] 2016-04-18 11:35:35,731 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'core.collectionspace.org.hierarchy' does not require a service binding.
+     [exec] 2016-04-18 11:35:35,731 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'exhibition'
+     [exec] 2016-04-18 11:35:35,736 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='exhibition' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.exhibition.bindings.xml
+     [exec] 2016-04-18 11:35:35,736 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'place'
+     [exec] 2016-04-18 11:35:35,739 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='place' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.place.bindings.xml
+     [exec] 2016-04-18 11:35:35,740 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Placeauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.Placeauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:35,740 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'all'
+     [exec] 2016-04-18 11:35:35,741 WARN  [main] [org.collectionspace.chain.installation.Services:213] Record 'core.collectionspace.org.all' is of an unknown type so we could not create a service binding for it.
+     [exec] 2016-04-18 11:35:35,821 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'objectexit'
+     [exec] 2016-04-18 11:35:35,827 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='objectexit' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.objectexit.bindings.xml
+     [exec] 2016-04-18 11:35:35,827 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'work'
+     [exec] 2016-04-18 11:35:35,829 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='work' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.work.bindings.xml
+     [exec] 2016-04-18 11:35:35,833 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Workauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.Workauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:35,833 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'reports'
+     [exec] 2016-04-18 11:35:35,833 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'core.collectionspace.org.reports' does not require a service binding.
+     [exec] 2016-04-18 11:35:35,833 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'citation'
+     [exec] 2016-04-18 11:35:35,835 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='citation' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.citation.bindings.xml
+     [exec] 2016-04-18 11:35:35,837 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Citationauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.Citationauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:35,837 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'intake'
+     [exec] 2016-04-18 11:35:35,839 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='intake' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.intake.bindings.xml
+     [exec] 2016-04-18 11:35:35,839 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'permrole'
+     [exec] 2016-04-18 11:35:35,839 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'core.collectionspace.org.permrole' does not require a service binding.
+     [exec] 2016-04-18 11:35:35,839 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredSLA'
+     [exec] 2016-04-18 11:35:35,839 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'core.collectionspace.org.preferredSLA' does not require a service binding.
+     [exec] 2016-04-18 11:35:35,839 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'permission'
+     [exec] 2016-04-18 11:35:35,839 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'core.collectionspace.org.permission' does not require a service binding.
+     [exec] 2016-04-18 11:35:35,840 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredCI'
+     [exec] 2016-04-18 11:35:35,840 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'core.collectionspace.org.preferredCI' does not require a service binding.
+     [exec] 2016-04-18 11:35:35,840 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'baseAuthority'
+     [exec] 2016-04-18 11:35:35,840 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'core.collectionspace.org.baseAuthority' does not require a service binding.
+     [exec] 2016-04-18 11:35:35,840 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredOA'
+     [exec] 2016-04-18 11:35:35,840 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'core.collectionspace.org.preferredOA' does not require a service binding.
+     [exec] 2016-04-18 11:35:35,840 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'dimension'
+     [exec] 2016-04-18 11:35:35,923 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'core.collectionspace.org.dimension' does not require a service binding.
+     [exec] 2016-04-18 11:35:35,923 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'conditioncheck'
+     [exec] 2016-04-18 11:35:35,925 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='conditioncheck' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.conditioncheck.bindings.xml
+     [exec] 2016-04-18 11:35:35,925 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'structureddate'
+     [exec] 2016-04-18 11:35:35,926 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'core.collectionspace.org.structureddate' does not require a service binding.
+     [exec] 2016-04-18 11:35:35,926 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'output'
+     [exec] 2016-04-18 11:35:35,926 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'core.collectionspace.org.output' does not require a service binding.
+     [exec] 2016-04-18 11:35:35,926 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'vocab'
+     [exec] 2016-04-18 11:35:35,926 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'core.collectionspace.org.vocab' does not require a service binding.
+     [exec] 2016-04-18 11:35:35,926 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'group'
+     [exec] 2016-04-18 11:35:35,928 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='group' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.group.bindings.xml
+     [exec] 2016-04-18 11:35:35,928 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'blobs'
+     [exec] 2016-04-18 11:35:35,928 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'core.collectionspace.org.blobs' does not require a service binding.
+     [exec] 2016-04-18 11:35:35,928 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'valuationcontrol'
+     [exec] 2016-04-18 11:35:35,929 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='valuationcontrol' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.valuationcontrol.bindings.xml
+     [exec] 2016-04-18 11:35:35,929 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'media'
+     [exec] 2016-04-18 11:35:35,930 WARN  [main] [org.collectionspace.chain.installation.Services:952] Potential internal error.  The Services tag 'languageList' does not match the field name 'languages' for Repeat field 'media:languages.'
+     [exec] 2016-04-18 11:35:35,934 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='media' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2256368988874745156\core.collectionspace.org.media.bindings.xml
+     [exec] 2016-04-18 11:35:36,093 WARN  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:412] Source file for "Include" tag could not be found: local-fcart-settings.xml
+     [exec] 2016-04-18 11:35:36,099 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-settings.xml_local-fcart-settings.xml-.xml
+     [exec] 2016-04-18 11:35:36,594 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-collectionobject.xml_extensions\variablemedia-collectionobject.xml_extensions\fineart-collectionobject.xml_extensions\fcart-profile-collectionobject.xml-.xml
+     [exec] 2016-04-18 11:35:36,637 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-procedure-conditioncheck.xml_extensions\variablemedia-procedure-conditioncheck.xml-.xml
+     [exec] 2016-04-18 11:35:36,699 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-procedure-media.xml_extensions\fcart-profile-procedure-media.xml-.xml
+     [exec] 2016-04-18 11:35:36,814 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-authority-concept.xml_extensions\fineart-authority-concept.xml-.xml
+     [exec] 2016-04-18 11:35:36,895 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-other-dimension.xml_extensions\fcart-profile-other-dimension.xml-.xml
+     [exec] 2016-04-18 11:35:38,068 WARN  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:412] Source file for "Include" tag could not be found: local-fcart-settings.xml
+     [exec] 2016-04-18 11:35:38,074 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-settings.xml_local-fcart-settings.xml-.xml
+     [exec] 2016-04-18 11:35:38,356 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-collectionobject.xml_extensions\variablemedia-collectionobject.xml_extensions\fineart-collectionobject.xml_extensions\fcart-profile-collectionobject.xml-.xml
+     [exec] 2016-04-18 11:35:38,390 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-procedure-conditioncheck.xml_extensions\variablemedia-procedure-conditioncheck.xml-.xml
+     [exec] 2016-04-18 11:35:38,438 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-procedure-media.xml_extensions\fcart-profile-procedure-media.xml-.xml
+     [exec] 2016-04-18 11:35:38,534 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-authority-concept.xml_extensions\fineart-authority-concept.xml-.xml
+     [exec] 2016-04-18 11:35:38,603 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-other-dimension.xml_extensions\fcart-profile-other-dimension.xml-.xml
+     [exec] 2016-04-18 11:35:38,693 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'userperm'
+     [exec] 2016-04-18 11:35:38,693 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'fcart.collectionspace.org.userperm' does not require a service binding.
+     [exec] 2016-04-18 11:35:38,693 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'accountroles'
+     [exec] 2016-04-18 11:35:38,694 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'fcart.collectionspace.org.accountroles' does not require a service binding.
+     [exec] 2016-04-18 11:35:38,694 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'users'
+     [exec] 2016-04-18 11:35:38,695 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='users' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.users.bindings.xml
+     [exec] 2016-04-18 11:35:38,695 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'concept'
+     [exec] 2016-04-18 11:35:38,697 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='concept' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.concept.bindings.xml
+     [exec] 2016-04-18 11:35:38,701 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Conceptauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.Conceptauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:38,701 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'person'
+     [exec] 2016-04-18 11:35:38,703 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='person' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.person.bindings.xml
+     [exec] 2016-04-18 11:35:38,704 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Personauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.Personauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:38,704 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'location'
+     [exec] 2016-04-18 11:35:38,706 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='location' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.location.bindings.xml
+     [exec] 2016-04-18 11:35:38,707 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Locationauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.Locationauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:38,707 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'userrole'
+     [exec] 2016-04-18 11:35:38,707 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'fcart.collectionspace.org.userrole' does not require a service binding.
+     [exec] 2016-04-18 11:35:38,707 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'loanin'
+     [exec] 2016-04-18 11:35:38,709 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='loanin' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.loanin.bindings.xml
+     [exec] 2016-04-18 11:35:38,709 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'loanout'
+     [exec] 2016-04-18 11:35:38,710 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='loanout' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.loanout.bindings.xml
+     [exec] 2016-04-18 11:35:38,711 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'contact'
+     [exec] 2016-04-18 11:35:38,726 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'fcart.collectionspace.org.contact' does not require a service binding.
+     [exec] 2016-04-18 11:35:38,726 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredWork'
+     [exec] 2016-04-18 11:35:38,726 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'fcart.collectionspace.org.preferredWork' does not require a service binding.
+     [exec] 2016-04-18 11:35:38,727 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'id'
+     [exec] 2016-04-18 11:35:38,727 WARN  [main] [org.collectionspace.chain.installation.Services:213] Record 'fcart.collectionspace.org.id' is of an unknown type so we could not create a service binding for it.
+     [exec] 2016-04-18 11:35:38,727 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredCA'
+     [exec] 2016-04-18 11:35:38,727 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'fcart.collectionspace.org.preferredCA' does not require a service binding.
+     [exec] 2016-04-18 11:35:38,727 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'acquisition'
+     [exec] 2016-04-18 11:35:38,729 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='acquisition' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.acquisition.bindings.xml
+     [exec] 2016-04-18 11:35:38,729 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'organization'
+     [exec] 2016-04-18 11:35:38,731 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='organization' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.organization.bindings.xml
+     [exec] 2016-04-18 11:35:38,732 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Orgauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.Orgauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:38,732 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredPA'
+     [exec] 2016-04-18 11:35:38,732 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'fcart.collectionspace.org.preferredPA' does not require a service binding.
+     [exec] 2016-04-18 11:35:38,732 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'collection-object'
+     [exec] 2016-04-18 11:35:38,739 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='collection-object' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.collection-object.bindings.xml
+     [exec] 2016-04-18 11:35:38,739 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'termlist'
+     [exec] 2016-04-18 11:35:38,744 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='termlist' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.termlist.bindings.xml
+     [exec] 2016-04-18 11:35:38,744 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredPlace'
+     [exec] 2016-04-18 11:35:38,744 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'fcart.collectionspace.org.preferredPlace' does not require a service binding.
+     [exec] 2016-04-18 11:35:38,745 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'conservation'
+     [exec] 2016-04-18 11:35:38,746 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='conservation' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.conservation.bindings.xml
+     [exec] 2016-04-18 11:35:38,747 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'movement'
+     [exec] 2016-04-18 11:35:38,748 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='movement' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.movement.bindings.xml
+     [exec] 2016-04-18 11:35:38,748 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'role'
+     [exec] 2016-04-18 11:35:38,748 DEBUG [main] [org.collectionspace.chain.installation.Services:209] Ignoring record 'fcart.collectionspace.org:role' at the moment as it is of type 'authorizationdata' and so non-standard
+     [exec] 2016-04-18 11:35:38,749 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'termlistitem'
+     [exec] 2016-04-18 11:35:38,750 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='termlistitem' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.termlistitem.bindings.xml
+     [exec] 2016-04-18 11:35:38,750 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'hierarchy'
+     [exec] 2016-04-18 11:35:38,750 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'fcart.collectionspace.org.hierarchy' does not require a service binding.
+     [exec] 2016-04-18 11:35:38,750 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'exhibition'
+     [exec] 2016-04-18 11:35:38,752 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='exhibition' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.exhibition.bindings.xml
+     [exec] 2016-04-18 11:35:38,830 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'place'
+     [exec] 2016-04-18 11:35:38,832 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='place' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.place.bindings.xml
+     [exec] 2016-04-18 11:35:38,833 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Placeauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.Placeauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:38,833 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'all'
+     [exec] 2016-04-18 11:35:38,834 WARN  [main] [org.collectionspace.chain.installation.Services:213] Record 'fcart.collectionspace.org.all' is of an unknown type so we could not create a service binding for it.
+     [exec] 2016-04-18 11:35:38,834 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'objectexit'
+     [exec] 2016-04-18 11:35:38,839 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='objectexit' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.objectexit.bindings.xml
+     [exec] 2016-04-18 11:35:38,839 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'work'
+     [exec] 2016-04-18 11:35:38,840 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='work' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.work.bindings.xml
+     [exec] 2016-04-18 11:35:38,842 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Workauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.Workauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:38,842 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'reports'
+     [exec] 2016-04-18 11:35:38,842 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'fcart.collectionspace.org.reports' does not require a service binding.
+     [exec] 2016-04-18 11:35:38,842 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'citation'
+     [exec] 2016-04-18 11:35:38,844 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='citation' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.citation.bindings.xml
+     [exec] 2016-04-18 11:35:38,846 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Citationauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.Citationauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:38,846 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'intake'
+     [exec] 2016-04-18 11:35:38,848 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='intake' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.intake.bindings.xml
+     [exec] 2016-04-18 11:35:38,848 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'permrole'
+     [exec] 2016-04-18 11:35:38,848 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'fcart.collectionspace.org.permrole' does not require a service binding.
+     [exec] 2016-04-18 11:35:38,848 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredSLA'
+     [exec] 2016-04-18 11:35:38,848 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'fcart.collectionspace.org.preferredSLA' does not require a service binding.
+     [exec] 2016-04-18 11:35:38,849 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'permission'
+     [exec] 2016-04-18 11:35:38,849 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'fcart.collectionspace.org.permission' does not require a service binding.
+     [exec] 2016-04-18 11:35:38,849 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredCI'
+     [exec] 2016-04-18 11:35:38,849 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'fcart.collectionspace.org.preferredCI' does not require a service binding.
+     [exec] 2016-04-18 11:35:38,849 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'baseAuthority'
+     [exec] 2016-04-18 11:35:38,849 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'fcart.collectionspace.org.baseAuthority' does not require a service binding.
+     [exec] 2016-04-18 11:35:38,934 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredOA'
+     [exec] 2016-04-18 11:35:38,934 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'fcart.collectionspace.org.preferredOA' does not require a service binding.
+     [exec] 2016-04-18 11:35:38,934 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'dimension'
+     [exec] 2016-04-18 11:35:38,935 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'fcart.collectionspace.org.dimension' does not require a service binding.
+     [exec] 2016-04-18 11:35:38,935 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'conditioncheck'
+     [exec] 2016-04-18 11:35:38,937 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='conditioncheck' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.conditioncheck.bindings.xml
+     [exec] 2016-04-18 11:35:38,937 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'structureddate'
+     [exec] 2016-04-18 11:35:38,937 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'fcart.collectionspace.org.structureddate' does not require a service binding.
+     [exec] 2016-04-18 11:35:38,937 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'output'
+     [exec] 2016-04-18 11:35:38,937 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'fcart.collectionspace.org.output' does not require a service binding.
+     [exec] 2016-04-18 11:35:38,937 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'vocab'
+     [exec] 2016-04-18 11:35:38,938 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'fcart.collectionspace.org.vocab' does not require a service binding.
+     [exec] 2016-04-18 11:35:38,938 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'group'
+     [exec] 2016-04-18 11:35:38,939 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='group' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.group.bindings.xml
+     [exec] 2016-04-18 11:35:38,939 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'blobs'
+     [exec] 2016-04-18 11:35:38,939 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'fcart.collectionspace.org.blobs' does not require a service binding.
+     [exec] 2016-04-18 11:35:38,939 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'valuationcontrol'
+     [exec] 2016-04-18 11:35:38,941 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='valuationcontrol' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.valuationcontrol.bindings.xml
+     [exec] 2016-04-18 11:35:38,941 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'media'
+     [exec] 2016-04-18 11:35:38,941 WARN  [main] [org.collectionspace.chain.installation.Services:952] Potential internal error.  The Services tag 'languageList' does not match the field name 'languages' for Repeat field 'media:languages.'
+     [exec] 2016-04-18 11:35:38,942 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='media' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-4044341360782321492\fcart.collectionspace.org.media.bindings.xml
+     [exec] 2016-04-18 11:35:39,002 WARN  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:412] Source file for "Include" tag could not be found: local-materials-settings.xml
+     [exec] 2016-04-18 11:35:39,006 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-settings.xml_local-materials-settings.xml-.xml
+     [exec] 2016-04-18 11:35:39,016 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-relations.xml_materials-relations.xml-.xml
+     [exec] 2016-04-18 11:35:39,055 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-collectionobject.xml_materials-collectionobject.xml-.xml
+     [exec] 2016-04-18 11:35:39,216 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-authority-concept.xml_materials-authority-concept.xml-.xml
+     [exec] 2016-04-18 11:35:40,294 WARN  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:412] Source file for "Include" tag could not be found: local-materials-settings.xml
+     [exec] 2016-04-18 11:35:40,300 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-settings.xml_local-materials-settings.xml-.xml
+     [exec] 2016-04-18 11:35:40,310 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-relations.xml_materials-relations.xml-.xml
+     [exec] 2016-04-18 11:35:40,343 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-collectionobject.xml_materials-collectionobject.xml-.xml
+     [exec] 2016-04-18 11:35:40,531 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-authority-concept.xml_materials-authority-concept.xml-.xml
+     [exec] 2016-04-18 11:35:40,683 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'userperm'
+     [exec] 2016-04-18 11:35:40,683 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'materials.collectionspace.org.userperm' does not require a service binding.
+     [exec] 2016-04-18 11:35:40,683 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'accountroles'
+     [exec] 2016-04-18 11:35:40,684 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'materials.collectionspace.org.accountroles' does not require a service binding.
+     [exec] 2016-04-18 11:35:40,684 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'users'
+     [exec] 2016-04-18 11:35:40,685 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='users' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.users.bindings.xml
+     [exec] 2016-04-18 11:35:40,685 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'concept'
+     [exec] 2016-04-18 11:35:40,687 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='concept' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.concept.bindings.xml
+     [exec] 2016-04-18 11:35:40,688 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Conceptauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.Conceptauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:40,688 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'person'
+     [exec] 2016-04-18 11:35:40,690 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='person' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.person.bindings.xml
+     [exec] 2016-04-18 11:35:40,691 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Personauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.Personauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:40,691 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'location'
+     [exec] 2016-04-18 11:35:40,692 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='location' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.location.bindings.xml
+     [exec] 2016-04-18 11:35:40,694 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Locationauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.Locationauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:40,694 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'userrole'
+     [exec] 2016-04-18 11:35:40,694 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'materials.collectionspace.org.userrole' does not require a service binding.
+     [exec] 2016-04-18 11:35:40,694 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'loanin'
+     [exec] 2016-04-18 11:35:40,695 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='loanin' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.loanin.bindings.xml
+     [exec] 2016-04-18 11:35:40,695 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'loanout'
+     [exec] 2016-04-18 11:35:40,697 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='loanout' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.loanout.bindings.xml
+     [exec] 2016-04-18 11:35:40,697 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'contact'
+     [exec] 2016-04-18 11:35:40,740 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'materials.collectionspace.org.contact' does not require a service binding.
+     [exec] 2016-04-18 11:35:40,740 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredWork'
+     [exec] 2016-04-18 11:35:40,740 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'materials.collectionspace.org.preferredWork' does not require a service binding.
+     [exec] 2016-04-18 11:35:40,741 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'id'
+     [exec] 2016-04-18 11:35:40,741 WARN  [main] [org.collectionspace.chain.installation.Services:213] Record 'materials.collectionspace.org.id' is of an unknown type so we could not create a service binding for it.
+     [exec] 2016-04-18 11:35:40,741 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredCA'
+     [exec] 2016-04-18 11:35:40,741 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'materials.collectionspace.org.preferredCA' does not require a service binding.
+     [exec] 2016-04-18 11:35:40,741 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'acquisition'
+     [exec] 2016-04-18 11:35:40,743 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='acquisition' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.acquisition.bindings.xml
+     [exec] 2016-04-18 11:35:40,743 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'organization'
+     [exec] 2016-04-18 11:35:40,744 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='organization' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.organization.bindings.xml
+     [exec] 2016-04-18 11:35:40,746 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Orgauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.Orgauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:40,746 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredPA'
+     [exec] 2016-04-18 11:35:40,746 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'materials.collectionspace.org.preferredPA' does not require a service binding.
+     [exec] 2016-04-18 11:35:40,746 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'collection-object'
+     [exec] 2016-04-18 11:35:40,751 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='collection-object' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.collection-object.bindings.xml
+     [exec] 2016-04-18 11:35:40,751 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'termlist'
+     [exec] 2016-04-18 11:35:40,753 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='termlist' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.termlist.bindings.xml
+     [exec] 2016-04-18 11:35:40,753 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredPlace'
+     [exec] 2016-04-18 11:35:40,753 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'materials.collectionspace.org.preferredPlace' does not require a service binding.
+     [exec] 2016-04-18 11:35:40,753 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'movement'
+     [exec] 2016-04-18 11:35:40,756 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='movement' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.movement.bindings.xml
+     [exec] 2016-04-18 11:35:40,757 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'role'
+     [exec] 2016-04-18 11:35:40,757 DEBUG [main] [org.collectionspace.chain.installation.Services:209] Ignoring record 'materials.collectionspace.org:role' at the moment as it is of type 'authorizationdata' and so non-standard
+     [exec] 2016-04-18 11:35:40,757 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'termlistitem'
+     [exec] 2016-04-18 11:35:40,758 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='termlistitem' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.termlistitem.bindings.xml
+     [exec] 2016-04-18 11:35:40,758 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'hierarchy'
+     [exec] 2016-04-18 11:35:40,758 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'materials.collectionspace.org.hierarchy' does not require a service binding.
+     [exec] 2016-04-18 11:35:40,758 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'exhibition'
+     [exec] 2016-04-18 11:35:40,760 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='exhibition' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.exhibition.bindings.xml
+     [exec] 2016-04-18 11:35:40,760 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'place'
+     [exec] 2016-04-18 11:35:40,761 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='place' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.place.bindings.xml
+     [exec] 2016-04-18 11:35:40,845 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Placeauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.Placeauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:40,845 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'all'
+     [exec] 2016-04-18 11:35:40,845 WARN  [main] [org.collectionspace.chain.installation.Services:213] Record 'materials.collectionspace.org.all' is of an unknown type so we could not create a service binding for it.
+     [exec] 2016-04-18 11:35:40,845 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'objectexit'
+     [exec] 2016-04-18 11:35:40,846 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='objectexit' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.objectexit.bindings.xml
+     [exec] 2016-04-18 11:35:40,846 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredMaterial'
+     [exec] 2016-04-18 11:35:40,846 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'materials.collectionspace.org.preferredMaterial' does not require a service binding.
+     [exec] 2016-04-18 11:35:40,846 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'work'
+     [exec] 2016-04-18 11:35:40,848 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='work' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.work.bindings.xml
+     [exec] 2016-04-18 11:35:40,849 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Workauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.Workauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:40,849 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'reports'
+     [exec] 2016-04-18 11:35:40,849 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'materials.collectionspace.org.reports' does not require a service binding.
+     [exec] 2016-04-18 11:35:40,849 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'citation'
+     [exec] 2016-04-18 11:35:40,851 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='citation' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.citation.bindings.xml
+     [exec] 2016-04-18 11:35:40,852 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Citationauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.Citationauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:40,852 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'intake'
+     [exec] 2016-04-18 11:35:40,855 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='intake' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.intake.bindings.xml
+     [exec] 2016-04-18 11:35:40,855 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'permrole'
+     [exec] 2016-04-18 11:35:40,855 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'materials.collectionspace.org.permrole' does not require a service binding.
+     [exec] 2016-04-18 11:35:40,855 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredSLA'
+     [exec] 2016-04-18 11:35:40,855 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'materials.collectionspace.org.preferredSLA' does not require a service binding.
+     [exec] 2016-04-18 11:35:40,855 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'permission'
+     [exec] 2016-04-18 11:35:40,855 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'materials.collectionspace.org.permission' does not require a service binding.
+     [exec] 2016-04-18 11:35:40,855 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredCI'
+     [exec] 2016-04-18 11:35:40,855 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'materials.collectionspace.org.preferredCI' does not require a service binding.
+     [exec] 2016-04-18 11:35:40,855 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'baseAuthority'
+     [exec] 2016-04-18 11:35:40,855 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'materials.collectionspace.org.baseAuthority' does not require a service binding.
+     [exec] 2016-04-18 11:35:40,945 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'material'
+     [exec] 2016-04-18 11:35:40,950 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='material' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.material.bindings.xml
+     [exec] 2016-04-18 11:35:40,952 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Materialauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.Materialauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:40,952 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredOA'
+     [exec] 2016-04-18 11:35:40,952 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'materials.collectionspace.org.preferredOA' does not require a service binding.
+     [exec] 2016-04-18 11:35:40,952 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'dimension'
+     [exec] 2016-04-18 11:35:40,952 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'materials.collectionspace.org.dimension' does not require a service binding.
+     [exec] 2016-04-18 11:35:40,952 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'conditioncheck'
+     [exec] 2016-04-18 11:35:40,954 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='conditioncheck' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.conditioncheck.bindings.xml
+     [exec] 2016-04-18 11:35:40,954 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'structureddate'
+     [exec] 2016-04-18 11:35:40,954 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'materials.collectionspace.org.structureddate' does not require a service binding.
+     [exec] 2016-04-18 11:35:40,954 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'output'
+     [exec] 2016-04-18 11:35:40,954 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'materials.collectionspace.org.output' does not require a service binding.
+     [exec] 2016-04-18 11:35:40,954 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'vocab'
+     [exec] 2016-04-18 11:35:40,954 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'materials.collectionspace.org.vocab' does not require a service binding.
+     [exec] 2016-04-18 11:35:40,954 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'group'
+     [exec] 2016-04-18 11:35:40,955 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='group' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.group.bindings.xml
+     [exec] 2016-04-18 11:35:40,956 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'blobs'
+     [exec] 2016-04-18 11:35:40,956 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'materials.collectionspace.org.blobs' does not require a service binding.
+     [exec] 2016-04-18 11:35:40,956 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'valuationcontrol'
+     [exec] 2016-04-18 11:35:40,957 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='valuationcontrol' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.valuationcontrol.bindings.xml
+     [exec] 2016-04-18 11:35:40,957 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'media'
+     [exec] 2016-04-18 11:35:40,958 WARN  [main] [org.collectionspace.chain.installation.Services:952] Potential internal error.  The Services tag 'languageList' does not match the field name 'languages' for Repeat field 'media:languages.'
+     [exec] 2016-04-18 11:35:40,959 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='media' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-2206169284082057418\materials.collectionspace.org.media.bindings.xml
+     [exec] 2016-04-18 11:35:41,097 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-settings.xml_local-testsci-settings.xml-.xml
+     [exec] 2016-04-18 11:35:41,199 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-collectionobject.xml_naturalhistory-collectionobject.xml-.xml
+     [exec] 2016-04-18 11:35:41,291 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-procedure-movement.xml_testsci-procedure-movement.xml-.xml
+     [exec] 2016-04-18 11:35:41,333 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-authority-location.xml_testsci-authority-location.xml-.xml
+     [exec] 2016-04-18 11:35:41,354 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-authority-organization.xml_testsci-authority-organization.xml-.xml
+     [exec] 2016-04-18 11:35:41,391 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-authority-person.xml_testsci-authority-person.xml-.xml
+     [exec] 2016-04-18 11:35:41,413 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-authority-citation.xml_testsci-authority-citation.xml-.xml
+     [exec] 2016-04-18 11:35:41,441 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-authority-place.xml_testsci-authority-place.xml-.xml
+     [exec] 2016-04-18 11:35:41,464 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-authority-taxon.xml_testsci-authority-taxon.xml-.xml
+     [exec] 2016-04-18 11:35:41,488 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-authority-concept.xml_testsci-authority-concept.xml-.xml
+     [exec] 2016-04-18 11:35:42,498 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-settings.xml_local-testsci-settings.xml-.xml
+     [exec] 2016-04-18 11:35:42,551 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-collectionobject.xml_naturalhistory-collectionobject.xml-.xml
+     [exec] 2016-04-18 11:35:42,628 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-procedure-movement.xml_testsci-procedure-movement.xml-.xml
+     [exec] 2016-04-18 11:35:42,662 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-authority-location.xml_testsci-authority-location.xml-.xml
+     [exec] 2016-04-18 11:35:42,676 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-authority-organization.xml_testsci-authority-organization.xml-.xml
+     [exec] 2016-04-18 11:35:42,693 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-authority-person.xml_testsci-authority-person.xml-.xml
+     [exec] 2016-04-18 11:35:42,707 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-authority-citation.xml_testsci-authority-citation.xml-.xml
+     [exec] 2016-04-18 11:35:42,725 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-authority-place.xml_testsci-authority-place.xml-.xml
+     [exec] 2016-04-18 11:35:42,739 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-authority-taxon.xml_testsci-authority-taxon.xml-.xml
+     [exec] 2016-04-18 11:35:42,754 INFO  [main] [org.collectionspace.chain.csp.config.impl.parser.AssemblingContentHandler:172] XMLMerge results were written to file: C:\Users\remillet\AppData\Local\Temp\merged-app-config-4119874658557429596\merged-base-authority-concept.xml_testsci-authority-concept.xml-.xml
+     [exec] 2016-04-18 11:35:42,919 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'person'
+     [exec] 2016-04-18 11:35:42,920 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='person' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.person.bindings.xml
+     [exec] 2016-04-18 11:35:42,922 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Personauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.Personauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:42,922 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'users'
+     [exec] 2016-04-18 11:35:42,923 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='users' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.users.bindings.xml
+     [exec] 2016-04-18 11:35:42,923 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'location'
+     [exec] 2016-04-18 11:35:42,927 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='location' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.location.bindings.xml
+     [exec] 2016-04-18 11:35:42,929 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Locationauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.Locationauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:42,929 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredTA'
+     [exec] 2016-04-18 11:35:42,929 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'testsci.collectionspace.org.preferredTA' does not require a service binding.
+     [exec] 2016-04-18 11:35:42,929 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'loanin'
+     [exec] 2016-04-18 11:35:42,931 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='loanin' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.loanin.bindings.xml
+     [exec] 2016-04-18 11:35:42,931 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'loanout'
+     [exec] 2016-04-18 11:35:42,932 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='loanout' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.loanout.bindings.xml
+     [exec] 2016-04-18 11:35:42,932 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredWork'
+     [exec] 2016-04-18 11:35:42,932 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'testsci.collectionspace.org.preferredWork' does not require a service binding.
+     [exec] 2016-04-18 11:35:42,932 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredCA'
+     [exec] 2016-04-18 11:35:42,932 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'testsci.collectionspace.org.preferredCA' does not require a service binding.
+     [exec] 2016-04-18 11:35:42,933 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredPA'
+     [exec] 2016-04-18 11:35:42,933 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'testsci.collectionspace.org.preferredPA' does not require a service binding.
+     [exec] 2016-04-18 11:35:42,933 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'collection-object'
+     [exec] 2016-04-18 11:35:42,939 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='collection-object' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.collection-object.bindings.xml
+     [exec] 2016-04-18 11:35:42,951 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'movement'
+     [exec] 2016-04-18 11:35:42,956 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='movement' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.movement.bindings.xml
+     [exec] 2016-04-18 11:35:42,957 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'role'
+     [exec] 2016-04-18 11:35:42,957 DEBUG [main] [org.collectionspace.chain.installation.Services:209] Ignoring record 'testsci.collectionspace.org:role' at the moment as it is of type 'authorizationdata' and so non-standard
+     [exec] 2016-04-18 11:35:42,957 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'place'
+     [exec] 2016-04-18 11:35:42,958 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='place' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.place.bindings.xml
+     [exec] 2016-04-18 11:35:42,962 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Placeauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.Placeauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:42,962 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'taxon'
+     [exec] 2016-04-18 11:35:42,966 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='taxon' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.taxon.bindings.xml
+     [exec] 2016-04-18 11:35:42,969 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Taxonomyauthority' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.Taxonomyauthority.bindings.xml
+     [exec] 2016-04-18 11:35:42,969 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'objectexit'
+     [exec] 2016-04-18 11:35:42,971 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='objectexit' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.objectexit.bindings.xml
+     [exec] 2016-04-18 11:35:42,971 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'work'
+     [exec] 2016-04-18 11:35:42,972 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='work' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.work.bindings.xml
+     [exec] 2016-04-18 11:35:42,974 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Workauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.Workauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:42,974 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'citation'
+     [exec] 2016-04-18 11:35:42,975 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='citation' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.citation.bindings.xml
+     [exec] 2016-04-18 11:35:42,976 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Citationauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.Citationauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:42,977 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'reports'
+     [exec] 2016-04-18 11:35:42,977 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'testsci.collectionspace.org.reports' does not require a service binding.
+     [exec] 2016-04-18 11:35:42,977 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'permrole'
+     [exec] 2016-04-18 11:35:42,977 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'testsci.collectionspace.org.permrole' does not require a service binding.
+     [exec] 2016-04-18 11:35:43,052 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredSLA'
+     [exec] 2016-04-18 11:35:43,052 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'testsci.collectionspace.org.preferredSLA' does not require a service binding.
+     [exec] 2016-04-18 11:35:43,052 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredCI'
+     [exec] 2016-04-18 11:35:43,053 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'testsci.collectionspace.org.preferredCI' does not require a service binding.
+     [exec] 2016-04-18 11:35:43,053 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'permission'
+     [exec] 2016-04-18 11:35:43,053 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'testsci.collectionspace.org.permission' does not require a service binding.
+     [exec] 2016-04-18 11:35:43,053 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredOA'
+     [exec] 2016-04-18 11:35:43,053 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'testsci.collectionspace.org.preferredOA' does not require a service binding.
+     [exec] 2016-04-18 11:35:43,053 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'conditioncheck'
+     [exec] 2016-04-18 11:35:43,057 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='conditioncheck' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.conditioncheck.bindings.xml
+     [exec] 2016-04-18 11:35:43,057 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'blobs'
+     [exec] 2016-04-18 11:35:43,058 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'testsci.collectionspace.org.blobs' does not require a service binding.
+     [exec] 2016-04-18 11:35:43,058 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'output'
+     [exec] 2016-04-18 11:35:43,058 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'testsci.collectionspace.org.output' does not require a service binding.
+     [exec] 2016-04-18 11:35:43,058 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'media'
+     [exec] 2016-04-18 11:35:43,059 WARN  [main] [org.collectionspace.chain.installation.Services:952] Potential internal error.  The Services tag 'languageList' does not match the field name 'languages' for Repeat field 'media:languages.'
+     [exec] 2016-04-18 11:35:43,062 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='media' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.media.bindings.xml
+     [exec] 2016-04-18 11:35:43,062 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'valuationcontrol'
+     [exec] 2016-04-18 11:35:43,064 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='valuationcontrol' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.valuationcontrol.bindings.xml
+     [exec] 2016-04-18 11:35:43,064 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'accountroles'
+     [exec] 2016-04-18 11:35:43,064 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'testsci.collectionspace.org.accountroles' does not require a service binding.
+     [exec] 2016-04-18 11:35:43,064 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'userperm'
+     [exec] 2016-04-18 11:35:43,064 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'testsci.collectionspace.org.userperm' does not require a service binding.
+     [exec] 2016-04-18 11:35:43,064 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'concept'
+     [exec] 2016-04-18 11:35:43,066 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='concept' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.concept.bindings.xml
+     [exec] 2016-04-18 11:35:43,067 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Conceptauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.Conceptauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:43,067 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'userrole'
+     [exec] 2016-04-18 11:35:43,067 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'testsci.collectionspace.org.userrole' does not require a service binding.
+     [exec] 2016-04-18 11:35:43,068 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'contact'
+     [exec] 2016-04-18 11:35:43,068 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'testsci.collectionspace.org.contact' does not require a service binding.
+     [exec] 2016-04-18 11:35:43,068 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'id'
+     [exec] 2016-04-18 11:35:43,068 WARN  [main] [org.collectionspace.chain.installation.Services:213] Record 'testsci.collectionspace.org.id' is of an unknown type so we could not create a service binding for it.
+     [exec] 2016-04-18 11:35:43,068 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'acquisition'
+     [exec] 2016-04-18 11:35:43,157 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='acquisition' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.acquisition.bindings.xml
+     [exec] 2016-04-18 11:35:43,157 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'organization'
+     [exec] 2016-04-18 11:35:43,161 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='organization' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.organization.bindings.xml
+     [exec] 2016-04-18 11:35:43,164 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='Orgauthorities' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.Orgauthorities.bindings.xml
+     [exec] 2016-04-18 11:35:43,165 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'conservation'
+     [exec] 2016-04-18 11:35:43,166 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='conservation' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.conservation.bindings.xml
+     [exec] 2016-04-18 11:35:43,166 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'preferredPlace'
+     [exec] 2016-04-18 11:35:43,167 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'testsci.collectionspace.org.preferredPlace' does not require a service binding.
+     [exec] 2016-04-18 11:35:43,167 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'termlist'
+     [exec] 2016-04-18 11:35:43,168 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='termlist' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.termlist.bindings.xml
+     [exec] 2016-04-18 11:35:43,168 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'termlistitem'
+     [exec] 2016-04-18 11:35:43,169 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='termlistitem' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.termlistitem.bindings.xml
+     [exec] 2016-04-18 11:35:43,169 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'exhibition'
+     [exec] 2016-04-18 11:35:43,171 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='exhibition' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.exhibition.bindings.xml
+     [exec] 2016-04-18 11:35:43,171 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'hierarchy'
+     [exec] 2016-04-18 11:35:43,171 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'testsci.collectionspace.org.hierarchy' does not require a service binding.
+     [exec] 2016-04-18 11:35:43,171 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'all'
+     [exec] 2016-04-18 11:35:43,171 WARN  [main] [org.collectionspace.chain.installation.Services:213] Record 'testsci.collectionspace.org.all' is of an unknown type so we could not create a service binding for it.
+     [exec] 2016-04-18 11:35:43,171 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'intake'
+     [exec] 2016-04-18 11:35:43,173 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='intake' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.intake.bindings.xml
+     [exec] 2016-04-18 11:35:43,173 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'baseAuthority'
+     [exec] 2016-04-18 11:35:43,173 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'testsci.collectionspace.org.baseAuthority' does not require a service binding.
+     [exec] 2016-04-18 11:35:43,173 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'dimension'
+     [exec] 2016-04-18 11:35:43,173 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'testsci.collectionspace.org.dimension' does not require a service binding.
+     [exec] 2016-04-18 11:35:43,173 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'structureddate'
+     [exec] 2016-04-18 11:35:43,258 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'testsci.collectionspace.org.structureddate' does not require a service binding.
+     [exec] 2016-04-18 11:35:43,258 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'group'
+     [exec] 2016-04-18 11:35:43,260 DEBUG [main] [org.collectionspace.chain.installation.Services:255] Wrote Service bindings for record='group' to file: C:\Users\remillet\AppData\Local\Temp\cspace-bindings-961535416183709636\testsci.collectionspace.org.group.bindings.xml
+     [exec] 2016-04-18 11:35:43,260 DEBUG [main] [org.collectionspace.chain.installation.Services:182] Processing App record 'vocab'
+     [exec] 2016-04-18 11:35:43,260 DEBUG [main] [org.collectionspace.chain.installation.Services:226] 'testsci.collectionspace.org.vocab' does not require a service binding.
+
+deploy:
+     [copy] Copying 1 file to C:\dev\tools\apache-tomcat-7.0.57\webapps
+
+BUILD SUCCESSFUL
+Total time: 30 seconds

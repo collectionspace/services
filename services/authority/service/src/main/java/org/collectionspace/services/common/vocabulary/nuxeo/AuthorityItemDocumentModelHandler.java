@@ -381,7 +381,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         }
         Long localItemRev = (Long) NuxeoUtils.getProperyValue(itemDocModel, AuthorityItemJAXBSchema.REV);
         String localItemCsid = itemDocModel.getName();
-        String localItemWorkflowState = (String) NuxeoUtils.getProperyValue(itemDocModel, CollectionSpaceClient.CORE_WORKFLOWSTATE);
+        String localItemWorkflowState = itemDocModel.getCurrentLifeCycleState();
         String itemShortId = (String) NuxeoUtils.getProperyValue(itemDocModel, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
         
         //
@@ -394,9 +394,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         //
         // Using the short IDs of the local authority and item, create URN specifiers to retrieve the SAS authority item
         //
-        Specifier sasAuthoritySpecifier = new Specifier(SpecifierForm.URN_NAME, RefNameUtils.createShortIdRefName(authorityShortId));
-        Specifier sasItemSpecifier = new Specifier(SpecifierForm.URN_NAME, RefNameUtils.createShortIdRefName(itemShortId));
-        AuthorityItemSpecifier sasAuthorityItemSpecifier = new AuthorityItemSpecifier(sasAuthoritySpecifier, sasItemSpecifier);
+        AuthorityItemSpecifier sasAuthorityItemSpecifier = new AuthorityItemSpecifier(SpecifierForm.URN_NAME, authorityShortId, itemShortId);
         // Get the shared authority server's copy
         PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.requestPayloadIn(sasAuthorityItemSpecifier, 
         		getAuthorityServicePath(), getEntityResponseType());
@@ -406,11 +404,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         // If the shared authority item is newer, update our local copy
         //
         if (sasRev > localItemRev) {
-        	ResourceMap resourceMap = ctx.getResourceMap();
-        	String resourceName = this.getAuthorityServicePath();
-        	AuthorityResource authorityResource = (AuthorityResource) resourceMap.get(resourceName);
+        	AuthorityResource authorityResource = (AuthorityResource) ctx.getResource();
         	PoxPayloadOut payloadOut = authorityResource.updateAuthorityItem(ctx, 
-        			resourceMap, 					
+        			ctx.getResourceMap(), 					
         			ctx.getUriInfo(),
         			localParentCsid,			 	// parent's CSID
         			localItemCsid, 					// item's CSID
@@ -425,9 +421,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         // If the workflow states are different, we need to update the local's to reflects the remote's
         //
         if (localItemWorkflowState.equalsIgnoreCase(sasWorkflowState) == false) {
-        	ResourceMap resourceMap = ctx.getResourceMap();
-        	String resourceName = this.getAuthorityServicePath();
-        	AuthorityResource authorityResource = (AuthorityResource) resourceMap.get(resourceName);
+        	AuthorityResource authorityResource = (AuthorityResource) ctx.getResource();
         	//
         	// We need to move the local item to the SAS workflow state.  This might involve multiple transitions.
         	//
@@ -435,6 +429,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         	for (String transition:transitionList) {
         		authorityResource.updateItemWorkflowWithTransition(ctx, localParentCsid, localItemCsid, transition, AuthorityServiceUtils.DONT_UPDATE_REV);
         	}
+        	result = true;
         }
         
         return result;
