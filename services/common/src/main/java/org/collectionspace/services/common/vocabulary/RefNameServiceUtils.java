@@ -83,7 +83,7 @@ import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 public class RefNameServiceUtils {
 
     public static enum SpecifierForm {
-        CSID, URN_NAME
+        CSID, URN_NAME // Either a CSID or a short ID
     };
 
     public static class Specifier {
@@ -99,7 +99,6 @@ public class RefNameServiceUtils {
     	
         public SpecifierForm form;
         public String value;
-        public String urnValue;
 
         public Specifier(SpecifierForm form, String value) {
             this.form = form;

@@ -175,6 +175,23 @@ public class RemoteServiceContextImpl<IT, OT>
     }
 
     /**
+     * Return the JAX-RS resource for the current context.
+     * 
+     * @param ctx
+     * @return
+     * @throws Exception 
+     */
+    public CollectionSpaceResource<IT, OT> getResource(ServiceContext ctx) throws Exception {
+    	CollectionSpaceResource<IT, OT> result = null;
+    	
+    	ResourceMap resourceMap = ctx.getResourceMap();
+    	String resourceName = ctx.getClient().getServiceName();
+    	result = resourceMap.get(resourceName);
+    	
+    	return result;
+    }
+    
+    /**
      * @return the map of service names to resource classes.
      */
     @Override
@@ -216,6 +233,13 @@ public class RemoteServiceContextImpl<IT, OT>
 
 	@Override
 	public CollectionSpaceResource<IT, OT> getResource() throws Exception {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("Unimplemented method.");
+	}
+
+	@Override
+	public CollectionSpaceResource<IT, OT> getResource(String serviceName)
+			throws Exception {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("Unimplemented method.");
 	}

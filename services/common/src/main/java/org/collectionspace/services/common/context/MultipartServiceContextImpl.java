@@ -190,6 +190,17 @@ public class MultipartServiceContextImpl
     	
     	return result;
     }
+    
+    @Override
+    public CollectionSpaceResource<PoxPayloadIn, PoxPayloadOut> getResource(String serviceName) throws Exception {
+    	CollectionSpaceResource<PoxPayloadIn, PoxPayloadOut> result = null;
+    	
+    	ResourceMap resourceMap = getResourceMap();
+    	String resourceName = serviceName;
+    	result = (CollectionSpaceResource<PoxPayloadIn, PoxPayloadOut>) resourceMap.get(resourceName);
+    	
+    	return result;
+    }    
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.context.RemoteServiceContextImpl#getLocalContext(java.lang.String)

@@ -134,7 +134,7 @@ public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 
 		// First, create the Loanout
 		// We fetch the resource class by service name
-		NuxeoBasedResource resource = resourceMap.get( LoanoutClient.SERVICE_NAME); 
+		NuxeoBasedResource resource = (NuxeoBasedResource) resourceMap.get( LoanoutClient.SERVICE_NAME); 
 		Response response = resource.create(resourceMap, null, loanoutPayload);
 		if(response.getStatus() != CREATED_STATUS) {
 			completionStatus = STATUS_ERROR;
@@ -160,7 +160,7 @@ public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 			+   "<relationshipType>"+RELATION_TYPE+"</relationshipType>"
 			+   "<predicateDisplayName>"+RELATION_PREDICATE_DISP+"</predicateDisplayName>"
 			+ "</ns2:relations_common></document>";
-		NuxeoBasedResource resource = resourceMap.get(RelationClient.SERVICE_NAME);
+		NuxeoBasedResource resource = (NuxeoBasedResource) resourceMap.get(RelationClient.SERVICE_NAME);
 		Response response = resource.create(resourceMap, null, relationPayload);
 		if(response.getStatus() != CREATED_STATUS) {
 			completionStatus = STATUS_ERROR;

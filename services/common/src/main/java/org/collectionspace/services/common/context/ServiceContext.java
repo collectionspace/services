@@ -30,6 +30,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.CollectionSpaceResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.document.DocumentHandler;
@@ -237,12 +239,6 @@ public interface ServiceContext<IT, OT> {
     public void setOutput(OT output);
 
     /**
-     * @return the JAX-RS resource of service for the current context.
-     * @throws Exception 
-     */
-    public CollectionSpaceResource<IT, OT> getResource() throws Exception;
-
-    /**
      * @return the map of service names to resource classes.
      */
     public ResourceMap getResourceMap();
@@ -361,6 +357,19 @@ public interface ServiceContext<IT, OT> {
 	public void setRepositoryDomain(RepositoryDomainType repositoryDomain);
 
 	public CollectionSpaceClient getClient() throws Exception;
+
+    /**
+     * @return the JAX-RS resource of service for the current context.
+     * @throws Exception 
+     */
+    public CollectionSpaceResource<IT, OT> getResource() throws Exception;
+
+    /**
+     * @return the JAX-RS resource of service for the current context.
+     * @throws Exception 
+     */
+	public CollectionSpaceResource<IT, OT> getResource(
+			String serviceName) throws Exception;
 }
 
 

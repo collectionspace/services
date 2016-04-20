@@ -28,7 +28,9 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ResourceMap;
+import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.UriTemplateRegistry;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.RefNameUtils;
@@ -40,6 +42,7 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.DocumentReferenceException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
@@ -92,6 +95,8 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     protected String authorityCommonSchemaName;
     protected String authorityItemCommonSchemaName;
     private String authorityItemTermGroupXPathBase;
+    
+    private boolean isProposed = false; // used by local authority to propose a new shared item. Allows local deployments to use new terms until they become official
     private boolean shouldUpdateRevNumber = true; // by default we should update the revision number -not true on synchronization with SAS
     /**
      * inVocabulary is the parent Authority for this context
@@ -110,6 +115,20 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     
     abstract public String getParentCommonSchemaName();
     
+    //
+    // Getter and Setter for 'proposed'
+    //
+    public boolean getIsProposed() {
+    	return this.isProposed;
+    }
+    
+    public void setIsProposed(boolean flag) {
+    	this.isProposed = flag;
+    }
+    
+    //
+    // Getter and Setter for 'shouldUpdateRevNumber'
+    //
     public boolean getShouldUpdateRevNumber() {
     	return this.shouldUpdateRevNumber;
     }
@@ -359,10 +378,16 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	if (this.getShouldUpdateRevNumber() == true) { // We don't update the rev number of synchronization requests
     		updateRevNumbers(wrapDoc);
     	}
+    	
+    	DocumentModel docModel = wrapDoc.getWrappedObject();
+    	if (this.hasReferencingObjects(this.getServiceContext(), docModel) == true) {
+    		
+    	}
     }
         
     /**
      * This method synchronizes/updates a single authority item resource.
+     * for the handleSync method, the wrapDoc argument contains a authority item specifier.
      */
     @Override
     public boolean handleSync(DocumentWrapper<Object> wrapDoc) throws Exception {
@@ -380,6 +405,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         			authorityItemSpecifier.getItemSpecifier().value));
         }
         Long localItemRev = (Long) NuxeoUtils.getProperyValue(itemDocModel, AuthorityItemJAXBSchema.REV);
+        Boolean localIsProposed = (Boolean) NuxeoUtils.getProperyValue(itemDocModel, AuthorityItemJAXBSchema.PROPOSED);
         String localItemCsid = itemDocModel.getName();
         String localItemWorkflowState = itemDocModel.getCurrentLifeCycleState();
         String itemShortId = (String) NuxeoUtils.getProperyValue(itemDocModel, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
@@ -403,15 +429,16 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         //
         // If the shared authority item is newer, update our local copy
         //
-        if (sasRev > localItemRev) {
-        	AuthorityResource authorityResource = (AuthorityResource) ctx.getResource();
+        if (sasRev > localItemRev || localIsProposed) {
+        	AuthorityResource authorityResource = (AuthorityResource) ctx.getResource(getAuthorityServicePath());
         	PoxPayloadOut payloadOut = authorityResource.updateAuthorityItem(ctx, 
         			ctx.getResourceMap(), 					
         			ctx.getUriInfo(),
         			localParentCsid,			 	// parent's CSID
         			localItemCsid, 					// item's CSID
         			sasPayloadIn,					// the payload from the remote SAS
-        			AuthorityServiceUtils.DONT_UPDATE_REV);	// don't update the parent's revision number
+        			AuthorityServiceUtils.DONT_UPDATE_REV,	// don't update the parent's revision number
+        			AuthorityServiceUtils.NOT_PROPOSED);	// The items is not proposed, make it a real SAS item now
         	if (payloadOut != null) {
         		ctx.setOutput(payloadOut);
         		result = true;
@@ -421,12 +448,18 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         // If the workflow states are different, we need to update the local's to reflects the remote's
         //
         if (localItemWorkflowState.equalsIgnoreCase(sasWorkflowState) == false) {
-        	AuthorityResource authorityResource = (AuthorityResource) ctx.getResource();
+        	AuthorityResource authorityResource = (AuthorityResource) ctx.getResource(getAuthorityServicePath()); // Get the authority (parent) client not the item client
         	//
         	// We need to move the local item to the SAS workflow state.  This might involve multiple transitions.
         	//
         	List<String> transitionList = getTransitionList(sasWorkflowState, localItemWorkflowState);
         	for (String transition:transitionList) {
+        		if (transition.equalsIgnoreCase(WorkflowClient.WORKFLOWTRANSITION_DELETE) == true) {
+        			if (hasReferencingObjects(ctx, itemDocModel)) {
+        				throw new DocumentReferenceException(String.format("Cannot soft-delete authority item '%s' because it still has records in the system that are referencing it.  See the service layer log file for details.",
+        						itemDocModel.getName()));
+        			}
+        		}
         		authorityResource.updateItemWorkflowWithTransition(ctx, localParentCsid, localItemCsid, transition, AuthorityServiceUtils.DONT_UPDATE_REV);
         	}
         	result = true;
@@ -440,7 +473,23 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
      */
     private List<String> getTransitionList(String sasWorkflowState, String localItemWorkflowState) {
     	List<String> result = new ArrayList<String>();
-    	// TO BE COMPLETELED
+    	
+    	//
+    	// If the SAS authority items is soft-deleted, we need to mark the local item as soft-deleted
+    	//
+    	if (sasWorkflowState.contains(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_DELETE);
+    	} else if (sasWorkflowState.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_PROJECT)) {
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_UNDELETE);
+    	}
+    	
+    	//
+    	// Ensure the local item is always in a "locked" state.  Items sync'd with a SAS should always be locked
+    	//
+    	if (localItemWorkflowState.contains(WorkflowClient.WORKFLOWSTATE_LOCKED) != true) { // REM - This may be a bad assumption to make.
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_LOCK);
+    	}
+
     	return result;
     }
     
@@ -453,6 +502,64 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         super.handleCreate(wrapDoc);
         // Ensure we have required fields set properly
         handleInAuthority(wrapDoc.getWrappedObject());        
+    }
+
+    /*
+     * This method gets called after the primary update to an authority item has happened.  If the authority item's refName
+     * has changed, then we need to updated all the records that use that refname with the new/updated version
+     * 
+     * (non-Javadoc)
+     */
+    @Override
+    public void handleDelete(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	ServiceContext ctx = getServiceContext();
+    	DocumentModel docModel = wrapDoc.getWrappedObject();
+    	
+    	if (hasReferencingObjects(ctx, docModel) == true) {
+    		throw new DocumentReferenceException(String.format("Cannot delete authority item '%s' because it still has records in the system that are referencing it.  See the service layer log file for details.",
+    				docModel.getName()));
+    	}
+    }
+    
+    /**
+     * Checks to see if an authority item has referencing objects.
+     * 
+     * @param ctx
+     * @param docModel
+     * @return
+     * @throws Exception
+     */
+    private boolean hasReferencingObjects(ServiceContext ctx, DocumentModel docModel) throws Exception {
+    	boolean result = false;
+    	
+    	String inAuthorityCsid = (String) docModel.getProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.IN_AUTHORITY);
+    	AuthorityResource authorityResource = (AuthorityResource)ctx.getResource(getAuthorityServicePath());
+    	String itemCsid = docModel.getName();
+        UriTemplateRegistry uriTemplateRegistry = ServiceMain.getInstance().getUriTemplateRegistry();
+    	AuthorityRefDocList refObjs = authorityResource.getReferencingObjects(ctx, inAuthorityCsid, itemCsid, 
+    			uriTemplateRegistry, ctx.getUriInfo());
+    	
+    	if (refObjs.getTotalItems() > 0) {
+    		result = true;
+    		logger.error(String.format("Cannot delete authority item '%s' because it still has %d records in the system that are referencing it.",
+    				itemCsid, refObjs.getTotalItems()));
+    		logReferencingObjects(docModel, refObjs);
+    	}
+    	
+    	return result;
+    }
+    
+    private void logReferencingObjects(DocumentModel docModel, AuthorityRefDocList refObjs) {
+    	List<AuthorityRefDocList.AuthorityRefDocItem> items = refObjs.getAuthorityRefDocItem();
+    	int i = 0;
+    	for (AuthorityRefDocList.AuthorityRefDocItem item : items) {
+            logger.debug(docModel.getName() + ": list-item[" + i + "] "
+                    + item.getDocType() + "("
+                    + item.getDocId() + ") Name:["
+                    + item.getDocName() + "] Number:["
+                    + item.getDocNumber() + "] in field:["
+                    + item.getSourceField() + "]");
+        }
     }
 
     /*
@@ -519,6 +626,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         }
     }
     
+    //
+    // Handles both update calls (PUTS) AND create calls (POSTS)
+    //
     public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {
     	super.fillAllParts(wrapDoc, action);
     	//
@@ -527,6 +637,12 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	if (this.getShouldUpdateRevNumber() == true) { // We won't update rev numbers on synchronization with SAS
     		updateRevNumbers(wrapDoc);
     	}
+    	//
+    	// If this is a proposed item (not part of the SAS), mark it as such
+    	//
+        DocumentModel documentModel = wrapDoc.getWrappedObject();
+        documentModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.PROPOSED,
+        		new Boolean(this.getIsProposed()));
     }
     
     /**
@@ -629,6 +745,17 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
                 AuthorityItemJAXBSchema.IN_AUTHORITY, inAuthority);
     }
     
+    /**
+     * Returns a list of records that reference this authority item
+     * 
+     * @param ctx
+     * @param uriTemplateRegistry
+     * @param serviceTypes
+     * @param propertyName
+     * @param itemcsid
+     * @return
+     * @throws Exception
+     */
     public AuthorityRefDocList getReferencingObjects(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
                 UriTemplateRegistry uriTemplateRegistry, 

@@ -771,15 +771,15 @@ public class ServiceMain {
      */
     private synchronized void populateUriTemplateRegistry() {
        if (uriTemplateRegistry.isEmpty()) {
-            NuxeoBasedResource resource = null;
+    	   CollectionSpaceResource resource = null;
             ResourceMap resourceMap = getJaxRSResourceMap();
-            for (Map.Entry<String, NuxeoBasedResource> entry : resourceMap.entrySet()) {
+            Set<Map.Entry<String, CollectionSpaceResource>> entrySet = resourceMap.entrySet();
+            for (Map.Entry<String, CollectionSpaceResource> entry : entrySet) {
                 resource = entry.getValue();
                 Map<UriTemplateRegistryKey, StoredValuesUriTemplate> entries =
                         resource.getUriRegistryEntries();
                 uriTemplateRegistry.putAll(entries);
             }
-
             // FIXME: Contacts itself should not have an entry in the URI template registry;
             // there should be a Contacts entry in that registry only for use in
             // building URIs for resources that have contacts as a sub-resource

@@ -24,7 +24,9 @@
 package org.collectionspace.services.common;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.document.DocumentHandler;
@@ -98,5 +100,45 @@ public interface CollectionSpaceResource<IT, OT> {
 //			<sec:filter-chain pattern="/publicitems/*/*/content"
 //                              filters="none"/>
 	public boolean allowAnonymousAccess(HttpRequest request, Class<?> resourceClass);
+	
+    /**
+     * Returns a UriRegistry entry: a map of tenant-qualified URI templates
+     * for the current resource, for all tenants
+     * 
+     * @return a map of URI templates for the current resource, for all tenants
+     */
+    public Map<UriTemplateRegistryKey,StoredValuesUriTemplate> getUriRegistryEntries();
     
+    /**
+     * Returns a UriRegistry entry: a map of tenant-qualified URI templates
+     * for the current resource, for a specified tenants
+     * 
+     * @return a map of URI templates for the current resource, for a specified tenant
+     */
+    public Map<UriTemplateRegistryKey,StoredValuesUriTemplate> getUriRegistryEntries(String tenantId,
+            String docType, UriTemplateFactory.UriTemplateType type);
+    
+    /**
+     * Returns a URI template of the appropriate type, populated with the
+     * current service name as one of its stored values.
+     *      * 
+     * @param type a URI template type
+     * @return a URI template of the appropriate type.
+     */
+    public StoredValuesUriTemplate getUriTemplate(UriTemplateFactory.UriTemplateType type);
+
+    /**
+     * Returns a reader for reading values from tenant bindings configuration
+     * 
+     * @return a tenant bindings configuration reader
+     */
+    public TenantBindingConfigReaderImpl getTenantBindingsReader();
+
+    /**
+     * Returns the document type of the resource based on the tenant bindings.
+     * 
+     * @param tenantId
+     * @return
+     */
+	public String getDocType(String tenantId);
 }

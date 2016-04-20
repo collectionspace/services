@@ -3,6 +3,7 @@ package org.collectionspace.services.client;
 import java.util.List;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
+
 import org.slf4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -28,19 +29,20 @@ public class AbstractCommonListUtils {
     public static String ListItemGetCSID(AbstractCommonList.ListItem item) {
 		return ListItemGetElementValue(item, "csid");
 	}
-
+    
     public static String ListItemGetElementValue(AbstractCommonList.ListItem item,
     		String elName) {
+    	String result = null;
+    	
 		List<Element> elList = item.getAny();
-		for(Element el : elList) {
-			if(elName.equalsIgnoreCase(el.getNodeName())) {
+		for (Element el : elList) {
+			if (elName.equalsIgnoreCase(el.getNodeName())) {
     			Node textEl = el.getFirstChild();
-    			return textEl.getNodeValue();
+    			result = textEl.getNodeValue();
+    			break;
 			}
-		}
-		return null;
+		} 
+		
+		return result;
 	}
-
-
-
 }

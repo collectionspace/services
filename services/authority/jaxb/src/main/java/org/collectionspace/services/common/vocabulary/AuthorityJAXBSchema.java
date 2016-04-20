@@ -30,6 +30,7 @@ public interface AuthorityJAXBSchema {
 	final static String VOCAB_TYPE = "vocabType";
 	final static String CSID = "csid";
     final static String REV = "rev";
+    final static String SAS = "sas"; // boolean flag indicating if authority is a shared authority
 }
 
 
