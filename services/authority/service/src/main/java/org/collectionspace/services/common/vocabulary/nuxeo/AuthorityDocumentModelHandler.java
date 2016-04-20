@@ -49,6 +49,7 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.DocumentReferenceException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
@@ -196,6 +197,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         		totalItemsProcessed++;
         	}
         }
+        //
         // Now see if we need to deprecate or delete items that have been hard-deleted from the SAS but still exist
         // locally.  Subtract (remove) the list of remote items from the list of local items to determine which
         // of the remote items have been hard deleted.
@@ -206,7 +208,10 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         	//
         	// We now need to either hard-deleted or deprecate the remaining authorities
         	//
-    		deleteOrDeprecateItems(ctx, remainingItems);
+    		long processed = deleteOrDeprecateItems(ctx, remainingItems);
+    		if (processed != remainingItems.size()) {
+    			throw new Exception("Encountered unexpected exception trying to delete or deprecated authority items during synchronization.");
+    		}
     	}
 
         
@@ -235,8 +240,8 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     		try {
     			authorityResource.deleteAuthorityItem(ctx, itemInfo.inAuthority.csid, itemInfo.csid);
     			result++;
-    		} catch (DocumentException de) {
-    			logger.info(String.format("Hit document exception trying to delete or deprecate '%s' during sync",
+    		} catch (DocumentReferenceException de) {
+    			logger.info(String.format("Authority item '%s' has existing references and cannot be removed during sync.",
     					refName), de);
     			boolean marked = markAuthorityItemAsDeprecated(ctx, itemInfo);
     			if (marked == true) {
@@ -244,6 +249,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     			}
     		} catch (Exception e) {
     			logger.warn(String.format("Unable to delete authority item '%s'", refName), e);
+    			throw e;
     		}
     	}
 
@@ -277,6 +283,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 	    	result = true;
     	} catch (Exception e) {
     		logger.warn(String.format("Could not mark item '%s' as deprecated.", itemInfo.name), e);
+    		throw e;
     	}
     	
     	return result;
@@ -401,7 +408,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     		return 1; // exit with status of 1 means we created a new authority item
     	}
     	//
-    	// If we get here, we know the item exists both locally and remotely, so we need to synchronize them
+    	// If we get here, we know the item exists both locally and remotely, so we need to synchronize them.
     	//
     	//
     	try {
@@ -411,11 +418,13 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 	    		logger.debug(String.format("Sync'd authority item parent='%s' id='%s with SAS.  Updated payload is: \n%s",
 	    				parentIdentifier, itemIdentifier, theUpdate.getXmlPayload()));
 	    	}
-    	} catch (DocumentException de) {
-    		cow();
+    	} catch (DocumentReferenceException de) { // Exception for items that still have records/resource referencing them.
+    		result = -1;
+    		logger.error(String.format("Could not sync authority item = '%s' because it has existing records referencing it.",
+    				itemIdentifier));
     	}
     	
-    	return result; // -1 = no sync needed, 0 = sync'd, 1 = created new item
+    	return result; // -1 = no sync needed/possible, 0 = sync'd, 1 = created new item
     }
         
     private PoxPayloadIn requestPayloadInItemList(ServiceContext ctx, Specifier specifier) throws Exception {

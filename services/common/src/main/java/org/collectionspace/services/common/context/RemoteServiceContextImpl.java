@@ -184,9 +184,9 @@ public class RemoteServiceContextImpl<IT, OT>
     public CollectionSpaceResource<IT, OT> getResource(ServiceContext ctx) throws Exception {
     	CollectionSpaceResource<IT, OT> result = null;
     	
-    	ResourceMap resourceMap = ctx.getResourceMap();
+    	ResourceMap<IT, OT> resourceMap = ctx.getResourceMap();
     	String resourceName = ctx.getClient().getServiceName();
-    	result = resourceMap.get(resourceName);
+    	result = (CollectionSpaceResource<IT, OT>) resourceMap.get(resourceName);
     	
     	return result;
     }
