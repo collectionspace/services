@@ -694,7 +694,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         PoxPayloadOut result = null;
         
         try {            
-            result = updateItemWorkflowWithTransition(null, // Ok to send null
+            result = updateItemWorkflowWithTransition(NULL_CONTEXT, // Ok to send null
             		csid, itemcsid, transition, AuthorityServiceUtils.UPDATE_REV);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, csid);
