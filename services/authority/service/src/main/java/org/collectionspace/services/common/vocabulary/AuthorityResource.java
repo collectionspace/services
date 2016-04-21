@@ -69,6 +69,7 @@ import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.DocumentReferenceException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.Hierarchy;
 import org.collectionspace.services.common.query.QueryManager;
@@ -231,7 +232,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 
 
     private CsidAndShortIdentifier lookupParentCSIDAndShortIdentifer(
-    		ServiceContext itemServiceCtx, // Ok to be null
+    		ServiceContext existingCtx, // Ok to be null
     		String parentIdentifier,
     		String method,
     		String op,
@@ -253,8 +254,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             String whereClause = RefNameServiceUtils.buildWhereForAuthByName(authorityCommonSchemaName, parentShortIdentifier);
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getServiceName(), uriInfo);
             CoreSessionInterface repoSession = null;
-            if (itemServiceCtx != null) {
-            	repoSession = (CoreSessionInterface) itemServiceCtx.getCurrentRepositorySession();  // We want to use the thread's current repo session
+            if (existingCtx != null) {
+            	repoSession = (CoreSessionInterface) existingCtx.getCurrentRepositorySession();  // We want to use the thread's current repo session
             }
             parentcsid = getRepositoryClient(ctx).findDocCSID(repoSession, ctx, whereClause); //FIXME: REM - If the parent has been soft-deleted, should we be looking for the item?
         }
@@ -265,15 +266,20 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         return result;
     }
 
-    public String lookupItemCSID(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String itemspecifier, String parentcsid, String method, String op)
-            throws DocumentException {
+    public String lookupItemCSID(ServiceContext<PoxPayloadIn, PoxPayloadOut> existingContext, String itemspecifier, String parentcsid, String method, String op)
+            throws Exception {
         String itemcsid;
         Specifier itemSpec = Specifier.getSpecifier(itemspecifier, method, op);
         if (itemSpec.form == SpecifierForm.CSID) {
             itemcsid = itemSpec.value;
         } else {
             String itemWhereClause = RefNameServiceUtils.buildWhereForAuthItemByName(authorityItemCommonSchemaName, itemSpec.value, parentcsid);
-            itemcsid = getRepositoryClient(ctx).findDocCSID(null, ctx, itemWhereClause); //FIXME: REM - Should we be looking for the 'wf_deleted' query param and filtering on it?
+        	MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(getItemServiceName());
+            CoreSessionInterface repoSession = null;
+            if (existingContext != null) {
+            	repoSession = (CoreSessionInterface) existingContext.getCurrentRepositorySession();  // We want to use the thread's current repo session
+            }
+            itemcsid = getRepositoryClient(ctx).findDocCSID(repoSession, ctx, itemWhereClause); //FIXME: REM - Should we be looking for the 'wf_deleted' query param and filtering on it?
         }
         return itemcsid;
     }
@@ -688,16 +694,16 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @PUT
     @Path("{csid}/items/{itemcsid}" + WorkflowClient.SERVICE_PATH + "/{transition}")
     public byte[] updateItemWorkflowWithTransition(
-            @PathParam("csid") String csid,
-            @PathParam("itemcsid") String itemcsid,
+            @PathParam("csid") String parentIdentifier,
+            @PathParam("itemcsid") String itemIdentifier,
             @PathParam("transition") String transition) {
         PoxPayloadOut result = null;
         
         try {            
-            result = updateItemWorkflowWithTransition(NULL_CONTEXT, // Ok to send null
-            		csid, itemcsid, transition, AuthorityServiceUtils.UPDATE_REV);
+            result = updateItemWorkflowWithTransition(NULL_CONTEXT, 
+            		parentIdentifier, itemIdentifier, transition, AuthorityServiceUtils.UPDATE_REV);
         } catch (Exception e) {
-            throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, csid);
+            throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, parentIdentifier);
         }
         
         return result.getBytes();
@@ -710,16 +716,23 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * @param itemcsid
      * @param transition
      * @return
+     * @throws DocumentReferenceException 
      */
     public PoxPayloadOut updateItemWorkflowWithTransition(ServiceContext existingContext,
-            String parentCsid,
-            String itemCsid,
+            String parentIdentifier,
+            String itemIdentifier,
             String transition,
-            boolean updateRevNumber) {
+            boolean updateRevNumber) throws DocumentReferenceException {
     	PoxPayloadOut result = null;
     	
         try {
         	//
+        	// We need CSIDs for both the parent authority and the authority item
+        	//
+            CsidAndShortIdentifier csidAndShortId = lookupParentCSIDAndShortIdentifer(existingContext, parentIdentifier, "updateItemWorkflowWithTransition(parent)", "UPDATE_ITEM", null);
+            String itemCsid = lookupItemCSID(existingContext, itemIdentifier, csidAndShortId.CSID, "updateAuthorityItem(item)", "UPDATE_ITEM");
+
+            //
         	// Create an empty workflow_commons input part and set it into a new "workflow" sub-resource context
         	//
         	PoxPayloadIn input = new PoxPayloadIn(WorkflowClient.SERVICE_PAYLOAD_NAME, new WorkflowCommon(), 
@@ -748,8 +761,10 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             WorkflowDocumentModelHandler handler = createWorkflowDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, itemCsid, handler);
             result = ctx.getOutput();
+        } catch (DocumentReferenceException de) {
+        	throw de;
         } catch (Exception e) {
-            throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, itemCsid);
+            throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, itemIdentifier);
         }
     	
     	return result;
@@ -786,7 +801,6 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         	}
         }
         
-
     	return result;
     }
 
@@ -1003,10 +1017,10 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             UriTemplateRegistry uriTemplateRegistry,
             UriInfo uriInfo) throws Exception {
     	AuthorityRefDocList authRefDocList = null;
-    	
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), uriInfo);
-            MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
-
+ 
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), uriInfo);
+        MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
+        //
         // Merge parts of existing context with our new context
         //
         if (existingContext != null && existingContext.getCurrentRepositorySession() != null) {
@@ -1014,16 +1028,14 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         	ctx.setProperties(existingContext.getProperties());
         }
 
-            String parentcsid = lookupParentCSID(parentspecifier, "getReferencingObjects(parent)", "GET_ITEM_REF_OBJS", uriInfo);
-            String itemcsid = lookupItemCSID(ctx, itemspecifier, parentcsid, "getReferencingObjects(item)", "GET_ITEM_REF_OBJS");
+        String parentcsid = lookupParentCSID(parentspecifier, "getReferencingObjects(parent)", "GET_ITEM_REF_OBJS", uriInfo);
+        String itemcsid = lookupItemCSID(ctx, itemspecifier, parentcsid, "getReferencingObjects(item)", "GET_ITEM_REF_OBJS");
 
-            List<String> serviceTypes = queryParams.remove(ServiceBindingUtils.SERVICE_TYPE_PROP);
-            if(serviceTypes == null || serviceTypes.isEmpty()) {
-            	serviceTypes = ServiceBindingUtils.getCommonServiceTypes(true); //CSPACE-5359: Should now include objects, procedures, and authorities
-            }
+        List<String> serviceTypes = queryParams.remove(ServiceBindingUtils.SERVICE_TYPE_PROP);
+        if (serviceTypes == null || serviceTypes.isEmpty()) {
+        	serviceTypes = ServiceBindingUtils.getCommonServiceTypes(true); //CSPACE-5359: Should now include objects, procedures, and authorities
+        }
             
-            // Note that we have to create the service context for the Items, not the main service
-            // We omit the parentShortId, only needed when doing a create...
         AuthorityItemDocumentModelHandler handler = (AuthorityItemDocumentModelHandler)createItemDocumentHandler(ctx, parentcsid, null);
         authRefDocList = handler.getReferencingObjects(ctx, uriTemplateRegistry, serviceTypes, getRefPropName(), itemcsid);
 

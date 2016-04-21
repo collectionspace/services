@@ -243,7 +243,8 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     		} catch (DocumentReferenceException de) {
     			logger.info(String.format("Authority item '%s' has existing references and cannot be removed during sync.",
     					refName), de);
-    			boolean marked = markAuthorityItemAsDeprecated(ctx, itemInfo);
+    			boolean marked = AuthorityServiceUtils.markAuthorityItemAsDeprecated(ctx, authorityItemCommonSchemaName,
+    					itemInfo.csid);
     			if (marked == true) {
     				result++;
     			}
@@ -258,32 +259,6 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     			logger.warn(String.format("Unable to delete or deprecate some authority items during synchronization with SAS.  Deleted or deprecated %d of %d.  See the services log file for details.",
     					result, refNameList.size()));
     		}
-    	}
-    	
-    	return result;
-    }
-    
-    /**
-     * Mark the authority item as deprecated.
-     * 
-     * @param ctx
-     * @param itemInfo
-     * @throws Exception
-     */
-    private boolean markAuthorityItemAsDeprecated(ServiceContext ctx, AuthorityTermInfo itemInfo) throws Exception {
-    	boolean result = false;
-    	
-    	try {
-	    	String itemCsid = itemInfo.csid;
-	    	DocumentModel docModel = NuxeoUtils.getDocFromCsid(ctx, (CoreSessionInterface)ctx.getCurrentRepositorySession(), itemCsid);
-	    	docModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.DEPRECATED,
-	    			new Boolean(AuthorityServiceUtils.DEPRECATED));
-	    	CoreSessionInterface session = (CoreSessionInterface) ctx.getCurrentRepositorySession();
-	    	session.saveDocument(docModel);
-	    	result = true;
-    	} catch (Exception e) {
-    		logger.warn(String.format("Could not mark item '%s' as deprecated.", itemInfo.name), e);
-    		throw e;
     	}
     	
     	return result;
@@ -366,7 +341,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     				itemIdentifier, parentIdentifier));
     	}
     	//
-    	// Handle the workflow state
+    	// Since we're creating an item that was sourced from the SAS, we need to lock it.
     	//
     	authorityResource.updateItemWorkflowWithTransition(ctx, parentIdentifier, itemIdentifier, 
     			WorkflowClient.WORKFLOWTRANSITION_LOCK, AuthorityServiceUtils.DONT_UPDATE_REV);
@@ -499,7 +474,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
      * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#handleWorkflowTransition(org.collectionspace.services.common.document.DocumentWrapper, org.collectionspace.services.lifecycle.TransitionDef)
      */
     @Override
-    public void handleWorkflowTransition(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef) throws Exception {
+    public void handleWorkflowTransition(ServiceContext ctx, DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef) throws Exception {
     	// Update the revision number
     	updateRevNumbers(wrapDoc);
     }

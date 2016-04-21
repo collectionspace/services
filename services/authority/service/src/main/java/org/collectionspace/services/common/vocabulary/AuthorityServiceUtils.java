@@ -4,11 +4,15 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.common.api.RefNameUtils.AuthorityTermInfo;
 import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityIdentifierUtils;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +79,39 @@ public class AuthorityServiceUtils {
         } finally {
         	res.close();
         }
+    	
+    	return result;
+    }
+    
+    static public boolean setAuthorityItemDeprecated(DocumentModel docModel, String authorityItemCommonSchemaName, Boolean flag) throws Exception {
+    	boolean result = false;
+    	
+    	docModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.DEPRECATED,
+    			new Boolean(flag));
+    	CoreSessionInterface session = (CoreSessionInterface) docModel.getCoreSession();
+    	session.saveDocument(docModel);
+    	result = true;
+    	
+    	return result;
+    }
+    
+    /**
+     * Mark the authority item as deprecated.
+     * 
+     * @param ctx
+     * @param itemInfo
+     * @throws Exception
+     */
+    static public boolean markAuthorityItemAsDeprecated(ServiceContext ctx, String authorityItemCommonSchemaName, String itemCsid) throws Exception {
+    	boolean result = false;
+    	
+    	try {
+	    	DocumentModel docModel = NuxeoUtils.getDocFromCsid(ctx, (CoreSessionInterface)ctx.getCurrentRepositorySession(), itemCsid);
+	    	result = setAuthorityItemDeprecated(docModel, authorityItemCommonSchemaName, AuthorityServiceUtils.DEPRECATED);
+    	} catch (Exception e) {
+    		logger.warn(String.format("Could not mark item '%s' as deprecated.", itemCsid), e);
+    		throw e;
+    	}
     	
     	return result;
     }

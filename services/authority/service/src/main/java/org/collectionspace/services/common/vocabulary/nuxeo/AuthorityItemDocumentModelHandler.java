@@ -373,15 +373,20 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
      * Warning: This method might change the transitionDef's transtionName value
      */
     @Override
-    public void handleWorkflowTransition(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef) throws Exception {
+    public void handleWorkflowTransition(ServiceContext ctx, DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef) throws Exception {
     	// Decide whether or not to update the revision number
     	if (this.getShouldUpdateRevNumber() == true) { // We don't update the rev number of synchronization requests
     		updateRevNumbers(wrapDoc);
     	}
-    	
+    	//
+    	// We can't delete an authority item that has referencing records.
+    	//
     	DocumentModel docModel = wrapDoc.getWrappedObject();
-    	if (this.hasReferencingObjects(this.getServiceContext(), docModel) == true) {
-    		
+    	if (transitionDef.getName().equalsIgnoreCase(WorkflowClient.WORKFLOWTRANSITION_DELETE)) {
+			if (hasReferencingObjects(this.getServiceContext(), docModel) == true) {
+	    		throw new DocumentReferenceException(String.format("Cannot delete authority item '%s' because it still has records in the system that are referencing it.  See the service layer log file for details.",
+	    				docModel.getName()));
+			}
     	}
     }
         
@@ -447,20 +452,23 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         //
         // If the workflow states are different, we need to update the local's to reflects the remote's
         //
-        if (localItemWorkflowState.equalsIgnoreCase(sasWorkflowState) == false) {
+    	List<String> transitionList = getTransitionList(sasWorkflowState, localItemWorkflowState);
+        if (transitionList.isEmpty() == false) {
         	AuthorityResource authorityResource = (AuthorityResource) ctx.getResource(getAuthorityServicePath()); // Get the authority (parent) client not the item client
         	//
         	// We need to move the local item to the SAS workflow state.  This might involve multiple transitions.
         	//
-        	List<String> transitionList = getTransitionList(sasWorkflowState, localItemWorkflowState);
         	for (String transition:transitionList) {
-        		if (transition.equalsIgnoreCase(WorkflowClient.WORKFLOWTRANSITION_DELETE) == true) {
-        			if (hasReferencingObjects(ctx, itemDocModel)) {
-        				throw new DocumentReferenceException(String.format("Cannot soft-delete authority item '%s' because it still has records in the system that are referencing it.  See the service layer log file for details.",
-        						itemDocModel.getName()));
-        			}
+        		try {
+        			authorityResource.updateItemWorkflowWithTransition(ctx, localParentCsid, localItemCsid, transition, AuthorityServiceUtils.DONT_UPDATE_REV);
+        		} catch (DocumentReferenceException de) {
+        			//
+        			// This exception means we tried unsuccessfully to soft-delete (workflow transition 'delete') an item that still has references to it from other records.
+        			//
+        			AuthorityServiceUtils.setAuthorityItemDeprecated(itemDocModel, authorityItemCommonSchemaName, AuthorityServiceUtils.DEPRECATED);  // Since we can't sof-delete it, we need to mark it as deprecated since it is soft-deleted on the SAS
+        			logger.warn(String.format("Could not transition item CSID='%s' from workflow state '%s' to '%s'.  Check the services log file for details.",
+        					localItemCsid, localItemWorkflowState, sasWorkflowState));
         		}
-        		authorityResource.updateItemWorkflowWithTransition(ctx, localParentCsid, localItemCsid, transition, AuthorityServiceUtils.DONT_UPDATE_REV);
         	}
         	result = true;
         }
@@ -470,26 +478,66 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     
     /**
      * We need to move the local item to the SAS workflow state.  This might involve multiple transitions.
+     * See table at https://wiki.collectionspace.org/pages/viewpage.action?pageId=162496556
+     * @throws DocumentException 
      */
-    private List<String> getTransitionList(String sasWorkflowState, String localItemWorkflowState) {
-    	List<String> result = new ArrayList<String>();
-    	
+    private List<String> getTransitionList(String sasWorkflowState, String localItemWorkflowState) throws DocumentException {
+    	List<String> result = new ArrayList<String>();    	
     	//
-    	// If the SAS authority items is soft-deleted, we need to mark the local item as soft-deleted
+    	// The first set of conditions maps a SAS "project" state to a local state of "locked"
     	//
-    	if (sasWorkflowState.contains(WorkflowClient.WORKFLOWSTATE_DELETED)) {
-    		result.add(WorkflowClient.WORKFLOWTRANSITION_DELETE);
-    	} else if (sasWorkflowState.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_PROJECT)) {
-    		result.add(WorkflowClient.WORKFLOWTRANSITION_UNDELETE);
-    	}
-    	
-    	//
-    	// Ensure the local item is always in a "locked" state.  Items sync'd with a SAS should always be locked
-    	//
-    	if (localItemWorkflowState.contains(WorkflowClient.WORKFLOWSTATE_LOCKED) != true) { // REM - This may be a bad assumption to make.
+    	if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT)) {
     		result.add(WorkflowClient.WORKFLOWTRANSITION_LOCK);
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_UNDELETE);
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_LOCK);
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED)) {
+    		// Do nothing.  We're good with this state
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED)) {
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_UNDELETE);
+    	//
+    	// The second set of conditions maps a SAS "deleted" state to a local state of "deleted"
+    	//
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT)) {
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_LOCK);
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_DELETE);
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_LOCK);
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED)) {
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_DELETE);
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED)) {
+    		// Do nothing.  We're good with this state
+    	//
+    	// The third set of conditions maps a SAS "locked" state to a local state of "locked"
+    	//
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT)) {
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_LOCK);
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_UNDELETE);
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_LOCK);
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED)) {
+    		// Do nothing.  We're good with this state
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED)) {
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_UNDELETE);
+		//
+    	// The last set of conditions maps a SAS "locked_deleted" state to a local state of "deleted"
+    	//
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT)) {
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_LOCK);
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_DELETE);
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_LOCK);
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED)) {
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_DELETE);
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED)) {
+    		// Do nothing.  We're good with this state    		
+    	} else {
+    		//
+    		// If we get here, we've encountered a SAS workflow state that we don't recognize.
+    		//
+    		throw new DocumentException(String.format("Encountered an invalid workflow state of '%s' on a SAS authority item.", sasWorkflowState));
     	}
-
+    	
     	return result;
     }
     
@@ -543,7 +591,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     		result = true;
     		logger.error(String.format("Cannot delete authority item '%s' because it still has %d records in the system that are referencing it.",
     				itemCsid, refObjs.getTotalItems()));
-    		logReferencingObjects(docModel, refObjs);
+    		if (logger.isWarnEnabled() == true) {
+    			logReferencingObjects(docModel, refObjs);
+    		}
     	}
     	
     	return result;
@@ -552,8 +602,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     private void logReferencingObjects(DocumentModel docModel, AuthorityRefDocList refObjs) {
     	List<AuthorityRefDocList.AuthorityRefDocItem> items = refObjs.getAuthorityRefDocItem();
     	int i = 0;
+    	logger.warn(String.format("The authority item '%s' has the following references:", docModel.getName()));
     	for (AuthorityRefDocList.AuthorityRefDocItem item : items) {
-            logger.debug(docModel.getName() + ": list-item[" + i + "] "
+            logger.warn(docModel.getName() + " referenced by : list-item[" + i + "] "
                     + item.getDocType() + "("
                     + item.getDocId() + ") Name:["
                     + item.getDocName() + "] Number:["
@@ -763,7 +814,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     		String propertyName,
             String itemcsid) throws Exception {
         AuthorityRefDocList authRefDocList = null;
-        CoreSessionInterface repoSession = null;
+        CoreSessionInterface repoSession = (CoreSessionInterface) ctx.getCurrentRepositorySession();
     	boolean releaseRepoSession = false;
         
     	try {

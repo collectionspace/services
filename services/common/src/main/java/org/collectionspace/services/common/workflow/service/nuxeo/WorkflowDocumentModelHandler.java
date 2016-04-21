@@ -69,9 +69,13 @@ public class WorkflowDocumentModelHandler
     	//
     	ServiceContext ctx = this.getServiceContext();
     	DocumentModelHandler targetDocHandler = (DocumentModelHandler)ctx.getProperty(WorkflowClient.TARGET_DOCHANDLER);
+    	
+    	// We need to make sure the repo session is available to the handler and its service context
     	targetDocHandler.setRepositorySession(this.getRepositorySession()); // Make sure the target doc handler has a repository session to work with
+    	targetDocHandler.getServiceContext().setCurrentRepositorySession(this.getRepositorySession());
+    	
     	TransitionDef transitionDef =  (TransitionDef)ctx.getProperty(WorkflowClient.TRANSITION_ID);
-    	targetDocHandler.handleWorkflowTransition(wrapDoc, transitionDef);  // Call the target resouce's handler first
+    	targetDocHandler.handleWorkflowTransition(ctx, wrapDoc, transitionDef);  // Call the target resouce's handler first
     	//
     	// If no exception occurred, then call the super's method
     	//
@@ -201,6 +205,6 @@ public class WorkflowDocumentModelHandler
     		ClientException ce = new ClientException("Unable to follow workflow transition: " + transitionToFollow);
     		throw ce;
     	}
-    }    
+    }
 }
 

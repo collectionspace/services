@@ -115,7 +115,7 @@ public class RelationDocumentModelHandler
 	 * 
 	 * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#handleWorkflowTransition(org.collectionspace.services.common.document.DocumentWrapper, org.collectionspace.services.lifecycle.TransitionDef)
 	 */
-	public void handleWorkflowTransition(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)
+	public void handleWorkflowTransition(ServiceContext ctx, DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)
 			throws Exception {		
 		if (subjectOrObjectInWorkflowState(wrapDoc, WorkflowClient.WORKFLOWSTATE_LOCKED) == true) {
     		throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,

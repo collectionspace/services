@@ -84,7 +84,7 @@ public interface DocumentHandler<T, TL, WT, WTL> {
     /**
      * updateWorkflowTransition - prepare for a workflow transition
      */
-    public void handleWorkflowTransition(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef) throws Exception;
+    public void handleWorkflowTransition(ServiceContext ctx, DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef) throws Exception;
     
     /**
      * prepareCreate processes documents before creating document in repository
