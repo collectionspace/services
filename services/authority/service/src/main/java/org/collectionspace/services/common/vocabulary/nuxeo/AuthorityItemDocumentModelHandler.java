@@ -465,7 +465,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         			//
         			// This exception means we tried unsuccessfully to soft-delete (workflow transition 'delete') an item that still has references to it from other records.
         			//
-        			AuthorityServiceUtils.setAuthorityItemDeprecated(itemDocModel, authorityItemCommonSchemaName, AuthorityServiceUtils.DEPRECATED);  // Since we can't sof-delete it, we need to mark it as deprecated since it is soft-deleted on the SAS
+        			AuthorityServiceUtils.setAuthorityItemDeprecated(ctx, itemDocModel, authorityItemCommonSchemaName, AuthorityServiceUtils.DEPRECATED);  // Since we can't sof-delete it, we need to mark it as deprecated since it is soft-deleted on the SAS
         			logger.warn(String.format("Could not transition item CSID='%s' from workflow state '%s' to '%s'.  Check the services log file for details.",
         					localItemCsid, localItemWorkflowState, sasWorkflowState));
         		}

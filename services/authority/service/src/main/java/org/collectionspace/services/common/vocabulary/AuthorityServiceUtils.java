@@ -83,13 +83,14 @@ public class AuthorityServiceUtils {
     	return result;
     }
     
-    static public boolean setAuthorityItemDeprecated(DocumentModel docModel, String authorityItemCommonSchemaName, Boolean flag) throws Exception {
+    static public boolean setAuthorityItemDeprecated(ServiceContext ctx,
+    		DocumentModel docModel, String authorityItemCommonSchemaName, Boolean flag) throws Exception {
     	boolean result = false;
     	
     	docModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.DEPRECATED,
     			new Boolean(flag));
-    	CoreSessionInterface session = (CoreSessionInterface) docModel.getCoreSession();
-    	session.saveDocument(docModel);
+    	CoreSessionInterface repoSession = (CoreSessionInterface) ctx.getCurrentRepositorySession();
+    	repoSession.saveDocument(docModel);
     	result = true;
     	
     	return result;
@@ -107,7 +108,7 @@ public class AuthorityServiceUtils {
     	
     	try {
 	    	DocumentModel docModel = NuxeoUtils.getDocFromCsid(ctx, (CoreSessionInterface)ctx.getCurrentRepositorySession(), itemCsid);
-	    	result = setAuthorityItemDeprecated(docModel, authorityItemCommonSchemaName, AuthorityServiceUtils.DEPRECATED);
+	    	result = setAuthorityItemDeprecated(ctx, docModel, authorityItemCommonSchemaName, AuthorityServiceUtils.DEPRECATED);
     	} catch (Exception e) {
     		logger.warn(String.format("Could not mark item '%s' as deprecated.", itemCsid), e);
     		throw e;
