@@ -696,13 +696,15 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @PUT
     @Path("{csid}/items/{itemcsid}" + WorkflowClient.SERVICE_PATH + "/{transition}")
     public byte[] updateItemWorkflowWithTransition(
+            @Context UriInfo uriInfo,
             @PathParam("csid") String parentIdentifier,
             @PathParam("itemcsid") String itemIdentifier,
             @PathParam("transition") String transition) {
         PoxPayloadOut result = null;
         
-        try {            
-            result = updateItemWorkflowWithTransition(NULL_CONTEXT, 
+        try {
+            ServiceContext ctx = createServiceContext(getItemServiceName(), uriInfo);
+            result = updateItemWorkflowWithTransition(ctx, 
             		parentIdentifier, itemIdentifier, transition, AuthorityServiceUtils.UPDATE_REV);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, parentIdentifier);
@@ -1262,6 +1264,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @DELETE
     @Path("{csid}/items/{itemcsid}")
     public Response deleteAuthorityItem(
+            @Context UriInfo uriInfo,
             @PathParam("csid") String parentIdentifier,
             @PathParam("itemcsid") String itemIdentifier) {
     	Response result = null;
@@ -1273,7 +1276,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         }
         
         try {
-            deleteAuthorityItem(null, parentIdentifier, itemIdentifier);
+            ServiceContext ctx = createServiceContext(getItemServiceName(), uriInfo);
+            deleteAuthorityItem(ctx, parentIdentifier, itemIdentifier);
             result = Response.status(HttpResponseCodes.SC_OK).build();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED + "  itemcsid: " + itemIdentifier + " parentcsid:" + parentIdentifier);
@@ -1294,7 +1298,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             String itemIdentifier) throws Exception {
     	Response result = null;
     	
-        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName());
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), existingCtx.getUriInfo());
         String parentcsid = lookupParentCSID(ctx, parentIdentifier, "deleteAuthorityItem(parent)", "DELETE_ITEM", null);
         String itemCsid = lookupItemCSID(ctx, itemIdentifier, parentcsid, "deleteAuthorityItem(item)", "DELETE_ITEM"); //use itemServiceCtx if it is not null
 

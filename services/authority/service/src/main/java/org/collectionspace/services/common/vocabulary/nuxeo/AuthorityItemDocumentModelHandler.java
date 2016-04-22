@@ -384,10 +384,18 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	//
     	DocumentModel docModel = wrapDoc.getWrappedObject();
     	if (transitionDef.getName().equalsIgnoreCase(WorkflowClient.WORKFLOWTRANSITION_DELETE)) {
-			if (hasReferencingObjects(this.getServiceContext(), docModel, false) == true) {
-	    		throw new DocumentReferenceException(String.format("Cannot delete authority item '%s' because it still has records in the system that are referencing it.  See the service layer log file for details.",
-	    				docModel.getName()));
-			}
+        	long refsToAllObjects = hasReferencingObjects(ctx, docModel, false);
+        	long refsToSoftDeletedObjects = hasReferencingObjects(ctx, docModel, true);
+        	if (refsToAllObjects > 0) {
+    	    	if (refsToAllObjects > refsToSoftDeletedObjects) {
+    	    		//
+    	    		// If the number of refs to active objects is greater than the number of refs to
+    	    		// soft deleted objects then we can't delete the item.
+    	    		//
+    	    		throw new DocumentReferenceException(String.format("Cannot delete authority item '%s' because it still has records in the system that are referencing it.  See the service layer log file for details.",
+    	    				docModel.getName()));
+    	    	}
+        	}
     	}
     }
         
@@ -561,17 +569,37 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
      * (non-Javadoc)
      */
     @Override
-    public void handleDelete(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    public boolean handleDelete(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	boolean result = true;
+    	
     	ServiceContext ctx = getServiceContext();
     	DocumentModel docModel = wrapDoc.getWrappedObject();
     	
-    	long refsToObjects = hasReferencingObjects(ctx, docModel, false);
+    	long refsToAllObjects = hasReferencingObjects(ctx, docModel, false);
     	long refsToSoftDeletedObjects = hasReferencingObjects(ctx, docModel, true);
-    	
-    	if (refsToObjects > refsToSoftDeletedObjects) {
-    		throw new DocumentReferenceException(String.format("Cannot delete authority item '%s' because it still has records in the system that are referencing it.  See the service layer log file for details.",
-    				docModel.getName()));
+    	if (refsToAllObjects > 0) {
+	    	if (refsToAllObjects > refsToSoftDeletedObjects) {
+	    		//
+	    		// If the number of refs to active objects is greater than the number of refs to
+	    		// soft deleted objects then we can't delete the item.
+	    		//
+	    		throw new DocumentReferenceException(String.format("Cannot delete authority item '%s' because it still has records in the system that are referencing it.  See the service layer log file for details.",
+	    				docModel.getName()));
+	    	} else {
+	    		//
+	    		// If all the refs are to soft-deleted objects, we should soft-delete this authority item instead of hard-deleting it and instead of failing.
+	    		//
+	    		Boolean shouldUpdateRev = (Boolean) ctx.getProperty(AuthorityServiceUtils.SHOULD_UPDATE_REV_PROPERTY);
+	    		String parentCsid = (String) NuxeoUtils.getProperyValue(docModel, AuthorityItemJAXBSchema.IN_AUTHORITY);
+	    		String itemCsid = docModel.getName();
+	    		AuthorityResource authorityResource = (AuthorityResource) ctx.getResource(getAuthorityServicePath());
+	    		authorityResource.updateItemWorkflowWithTransition(ctx, parentCsid, itemCsid, WorkflowClient.WORKFLOWTRANSITION_DELETE, 
+	    				shouldUpdateRev != null ? shouldUpdateRev : true);
+	    		result = false; // Don't delete since we just soft-deleted it.
+	    	}
     	}
+    	
+    	return result;
     }
     
     /**
@@ -589,7 +617,13 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	AuthorityResource authorityResource = (AuthorityResource)ctx.getResource(getAuthorityServicePath());
     	String itemCsid = docModel.getName();
         UriTemplateRegistry uriTemplateRegistry = ServiceMain.getInstance().getUriTemplateRegistry();
-        ctx.getUriInfo().getQueryParameters().add(WorkflowClient.WORKFLOW_QUERY_ONLY_DELETED, Boolean.toString(onlyRefsToDeletedObjects));  // Add the wf_deleted query param to the resource call
+        if (ctx.getUriInfo() == null) {
+        	//
+        	// We need a UriInfo object so we can pass "query" params to the AuthorityResource's getReferencingObjects() method
+        	//
+        	ctx.setUriInfo(this.getServiceContext().getUriInfo()); // try to get a UriInfo instance from the handler's context
+        }
+        ctx.getUriInfo().getQueryParameters().addFirst(WorkflowClient.WORKFLOW_QUERY_ONLY_DELETED, Boolean.toString(onlyRefsToDeletedObjects));  // Add the wf_deleted query param to the resource call
     	AuthorityRefDocList refObjs = authorityResource.getReferencingObjects(ctx, inAuthorityCsid, itemCsid, 
     			uriTemplateRegistry, ctx.getUriInfo());
      	

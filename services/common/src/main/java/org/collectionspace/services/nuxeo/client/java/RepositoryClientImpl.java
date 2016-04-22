@@ -1618,8 +1618,9 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
                 DocumentRef docRef = NuxeoUtils.createPathRef(ctx, id);
                 wrapDoc = new DocumentWrapperImpl<DocumentModel>(repoSession.getDocument(docRef));
                 ((DocumentModelHandler) handler).setRepositorySession(repoSession);
-                handler.handle(Action.DELETE, wrapDoc);
-                repoSession.removeDocument(docRef);
+                if (handler.handle(Action.DELETE, wrapDoc)) {
+                	repoSession.removeDocument(docRef);
+                }
             } catch (ClientException ce) {
                 String msg = logException(ce, "Could not find document to delete with CSID=" + id);
                 throw new DocumentNotFoundException(msg, ce);

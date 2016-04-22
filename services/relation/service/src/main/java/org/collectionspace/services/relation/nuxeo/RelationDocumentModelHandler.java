@@ -149,7 +149,9 @@ public class RelationDocumentModelHandler
     }
     
     @Override
-    public void handleDelete(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    public boolean handleDelete(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	boolean result = true;
+    	
     	String workflowState = WorkflowClient.WORKFLOWSTATE_LOCKED;
     	// Neither the subject nor the object can be locked
     	if (subjectOrObjectInWorkflowState(wrapDoc, workflowState) == false) {
@@ -158,6 +160,8 @@ public class RelationDocumentModelHandler
     		throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
                     "Cannot delete a relationship if either end is in the workflow state: " + workflowState);
     	}
+    	
+    	return result;
     }
     
     private void populateSubjectAndObjectValues(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {

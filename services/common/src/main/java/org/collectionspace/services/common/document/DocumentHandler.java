@@ -160,7 +160,7 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * @param wrapDoc
      * @throws Exception
      */
-    public void handleDelete(DocumentWrapper<WT> wrapDoc) throws Exception;
+    public boolean handleDelete(DocumentWrapper<WT> wrapDoc) throws Exception;
 
     /**
      * complete is called by the client to provide an opportunity to the handler

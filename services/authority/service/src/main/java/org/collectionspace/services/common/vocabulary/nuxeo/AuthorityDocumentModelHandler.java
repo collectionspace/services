@@ -234,6 +234,8 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     	long result = 0;
     	
     	ArrayList<String> failureList = new ArrayList<String>();
+        ctx.setProperty(AuthorityServiceUtils.SHOULD_UPDATE_REV_PROPERTY, false);
+
     	for (String refName:refNameList) {
     		AuthorityTermInfo itemInfo = RefNameUtils.parseAuthorityTermInfo(refName);
     		AuthorityResource authorityResource = (AuthorityResource) ctx.getResource();
