@@ -269,6 +269,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     public String lookupItemCSID(ServiceContext<PoxPayloadIn, PoxPayloadOut> existingContext, String itemspecifier, String parentcsid, String method, String op)
             throws Exception {
         String itemcsid;
+        
         Specifier itemSpec = Specifier.getSpecifier(itemspecifier, method, op);
         if (itemSpec.form == SpecifierForm.CSID) {
             itemcsid = itemSpec.value;
@@ -281,6 +282,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             }
             itemcsid = getRepositoryClient(ctx).findDocCSID(repoSession, ctx, itemWhereClause); //FIXME: REM - Should we be looking for the 'wf_deleted' query param and filtering on it?
         }
+        
         return itemcsid;
     }
 
@@ -739,12 +741,12 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         			WorkflowClient.SERVICE_COMMONPART_NAME);
             MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME, input);
             if (existingContext != null && existingContext.getCurrentRepositorySession() != null) {
-            	ctx.setCurrentRepositorySession(existingContext.getCurrentRepositorySession()); // If a repo session is already open, we need to use it and not create a new one
+            	ctx.setCurrentRepositorySession(existingContext.getCurrentRepositorySession());// If a repo session is already open, we need to use it and not create a new one
             }
             //
             // Create a service context and document handler for the target resource -not the workflow resource itself.
             //
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> targetCtx = createServiceContext(getItemServiceName());
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> targetCtx = createServiceContext(getItemServiceName(), existingContext.getUriInfo());
             AuthorityItemDocumentModelHandler targetDocHandler = (AuthorityItemDocumentModelHandler) this.createDocumentHandler(targetCtx);
             targetDocHandler.setShouldUpdateRevNumber(updateRevNumber);
             ctx.setProperty(WorkflowClient.TARGET_DOCHANDLER, targetDocHandler); //added as a context param for the workflow document handler -it will call the parent's dochandler "prepareForWorkflowTranstion" method
@@ -1252,72 +1254,97 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     /**
      * Delete authorityItem.
      * 
-     * @param parentcsid the parentcsid
-     * @param itemcsid the itemcsid
+     * @param parentIdentifier the parentcsid
+     * @param itemIdentifier the itemcsid
      * 
      * @return the response
      */
     @DELETE
     @Path("{csid}/items/{itemcsid}")
     public Response deleteAuthorityItem(
-            @PathParam("csid") String parentcsid,
-            @PathParam("itemcsid") String itemcsid) {
+            @PathParam("csid") String parentIdentifier,
+            @PathParam("itemcsid") String itemIdentifier) {
     	Response result = null;
-        //try{
+
+        ensureCSID(parentIdentifier, ServiceMessages.DELETE_FAILED, "AuthorityItem.parentcsid");
+        ensureCSID(itemIdentifier, ServiceMessages.DELETE_FAILED, "AuthorityItem.itemcsid");
         if (logger.isDebugEnabled()) {
-            logger.debug("deleteAuthorityItem with parentcsid=" + parentcsid + " and itemcsid=" + itemcsid);
+            logger.debug("deleteAuthorityItem with parentcsid=" + parentIdentifier + " and itemcsid=" + itemIdentifier);
         }
         
         try {
-            deleteAuthorityItem(null, parentcsid, itemcsid);
+            deleteAuthorityItem(null, parentIdentifier, itemIdentifier);
             result = Response.status(HttpResponseCodes.SC_OK).build();
         } catch (Exception e) {
-            throw bigReThrow(e, ServiceMessages.DELETE_FAILED + "  itemcsid: " + itemcsid + " parentcsid:" + parentcsid);
+            throw bigReThrow(e, ServiceMessages.DELETE_FAILED + "  itemcsid: " + itemIdentifier + " parentcsid:" + parentIdentifier);
         }
-            //Laramie, removing this catch, since it will surely fail below, since itemcsid or parentcsid will be null.
+
         return result;
     }
-            // }catch (Throwable t){
+
+    /**
+     * 
+     * @param existingCtx
+     * @param parentIdentifier
+     * @param itemIdentifier
+     * @throws Exception
+     */
     public void deleteAuthorityItem(ServiceContext existingCtx,
-            String parentcsid,
-            String itemcsid) throws Exception {
+            String parentIdentifier,
+            String itemIdentifier) throws Exception {
     	Response result = null;
-            //    System.out.println("ERROR in setting up DELETE: "+t);
-        ensureCSID(parentcsid, ServiceMessages.DELETE_FAILED, "AuthorityItem.parentcsid");
-        ensureCSID(itemcsid, ServiceMessages.DELETE_FAILED, "AuthorityItem.itemcsid");
-            // }
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName());
+    	
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName());
+        String parentcsid = lookupParentCSID(ctx, parentIdentifier, "deleteAuthorityItem(parent)", "DELETE_ITEM", null);
+        String itemCsid = lookupItemCSID(ctx, itemIdentifier, parentcsid, "deleteAuthorityItem(item)", "DELETE_ITEM"); //use itemServiceCtx if it is not null
+
         if (existingCtx != null && existingCtx.getCurrentRepositorySession() != null) {
         	ctx.setCurrentRepositorySession(existingCtx.getCurrentRepositorySession()); // Use existing repo session if one exists
         	ctx.setProperties(existingCtx.getProperties());
         }
-            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
-            getRepositoryClient(ctx).delete(ctx, itemcsid, handler);
-        }
+        
+        DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
+        getRepositoryClient(ctx).delete(ctx, itemCsid, handler);
+    }
 
     @GET
     @Path("{csid}/items/{itemcsid}/" + hierarchy)
     @Produces("application/xml")
-    public String getHierarchy(@PathParam("csid") String csid,
-            @PathParam("itemcsid") String itemcsid,
-            @Context UriInfo ui) throws Exception {
+    public String getHierarchy(
+    		@PathParam("csid") String parentIdentifier,
+            @PathParam("itemcsid") String itemIdentifier,
+            @Context UriInfo uriInfo) throws Exception {
+    	String result = null;
+
         try {
+        	//
             // All items in dive can look at their child uri's to get uri.  So we calculate the very first one.  We could also do a GET and look at the common part uri field, but why...?
-            String calledUri = ui.getPath();
+        	//
+            String calledUri = uriInfo.getPath();
             String uri = "/" + calledUri.substring(0, (calledUri.length() - ("/" + hierarchy).length()));
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), ui);
-            ctx.setUriInfo(ui);
-            String direction = ui.getQueryParameters().getFirst(Hierarchy.directionQP);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), uriInfo);
+            
+            String parentcsid = lookupParentCSID(ctx, parentIdentifier, "deleteAuthorityItem(parent)", "DELETE_ITEM", null);
+            String itemcsid = lookupItemCSID(ctx, itemIdentifier, parentcsid, "deleteAuthorityItem(item)", "DELETE_ITEM"); //use itemServiceCtx if it is not null
+            
+            String direction = uriInfo.getQueryParameters().getFirst(Hierarchy.directionQP);
             if (Tools.notBlank(direction) && Hierarchy.direction_parents.equals(direction)) {
-                return Hierarchy.surface(ctx, itemcsid, uri);
+                result = Hierarchy.surface(ctx, itemcsid, uri);
             } else {
-                return Hierarchy.dive(ctx, itemcsid, uri);
-            }
+                result = Hierarchy.dive(ctx, itemcsid, uri);
+            }            
         } catch (Exception e) {
-            throw bigReThrow(e, "Error showing hierarchy", itemcsid);
+            throw bigReThrow(e, "Error showing hierarchy for authority item: ", itemIdentifier);
         }
+        
+        return result;
     }
     
+    /**
+     * 
+     * @param tenantId
+     * @return
+     */
     protected String getItemDocType(String tenantId) {
         return getDocType(tenantId, getItemServiceName());
     }

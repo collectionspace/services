@@ -69,6 +69,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -383,7 +384,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	//
     	DocumentModel docModel = wrapDoc.getWrappedObject();
     	if (transitionDef.getName().equalsIgnoreCase(WorkflowClient.WORKFLOWTRANSITION_DELETE)) {
-			if (hasReferencingObjects(this.getServiceContext(), docModel) == true) {
+			if (hasReferencingObjects(this.getServiceContext(), docModel, false) == true) {
 	    		throw new DocumentReferenceException(String.format("Cannot delete authority item '%s' because it still has records in the system that are referencing it.  See the service layer log file for details.",
 	    				docModel.getName()));
 			}
@@ -435,6 +436,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         // If the shared authority item is newer, update our local copy
         //
         if (sasRev > localItemRev || localIsProposed) {
+        	sasPayloadIn = AuthorityServiceUtils.filterRefnameDomains(ctx, sasPayloadIn); // We need to filter the domain name part of any and all refnames in the payload
         	AuthorityResource authorityResource = (AuthorityResource) ctx.getResource(getAuthorityServicePath());
         	PoxPayloadOut payloadOut = authorityResource.updateAuthorityItem(ctx, 
         			ctx.getResourceMap(), 					
@@ -563,7 +565,10 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	ServiceContext ctx = getServiceContext();
     	DocumentModel docModel = wrapDoc.getWrappedObject();
     	
-    	if (hasReferencingObjects(ctx, docModel) == true) {
+    	long refsToObjects = hasReferencingObjects(ctx, docModel, false);
+    	long refsToSoftDeletedObjects = hasReferencingObjects(ctx, docModel, true);
+    	
+    	if (refsToObjects > refsToSoftDeletedObjects) {
     		throw new DocumentReferenceException(String.format("Cannot delete authority item '%s' because it still has records in the system that are referencing it.  See the service layer log file for details.",
     				docModel.getName()));
     	}
@@ -577,18 +582,19 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
      * @return
      * @throws Exception
      */
-    private boolean hasReferencingObjects(ServiceContext ctx, DocumentModel docModel) throws Exception {
-    	boolean result = false;
+    private long hasReferencingObjects(ServiceContext ctx, DocumentModel docModel, boolean onlyRefsToDeletedObjects) throws Exception {
+    	long result = 0;
     	
     	String inAuthorityCsid = (String) docModel.getProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.IN_AUTHORITY);
     	AuthorityResource authorityResource = (AuthorityResource)ctx.getResource(getAuthorityServicePath());
     	String itemCsid = docModel.getName();
         UriTemplateRegistry uriTemplateRegistry = ServiceMain.getInstance().getUriTemplateRegistry();
+        ctx.getUriInfo().getQueryParameters().add(WorkflowClient.WORKFLOW_QUERY_ONLY_DELETED, Boolean.toString(onlyRefsToDeletedObjects));  // Add the wf_deleted query param to the resource call
     	AuthorityRefDocList refObjs = authorityResource.getReferencingObjects(ctx, inAuthorityCsid, itemCsid, 
     			uriTemplateRegistry, ctx.getUriInfo());
-    	
-    	if (refObjs.getTotalItems() > 0) {
-    		result = true;
+     	
+    	result = refObjs.getTotalItems();
+    	if (result > 0) {
     		logger.error(String.format("Cannot delete authority item '%s' because it still has %d records in the system that are referencing it.",
     				itemCsid, refObjs.getTotalItems()));
     		if (logger.isWarnEnabled() == true) {

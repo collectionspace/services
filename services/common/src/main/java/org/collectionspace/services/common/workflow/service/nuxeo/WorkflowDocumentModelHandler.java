@@ -127,36 +127,6 @@ public class WorkflowDocumentModelHandler
             addOutputPart(unQObjectProperties, schema, partMeta);
         }
     }
-
-    /**
-     * Get the identifier for the transition that sets a document to
-     * the supplied, destination workflow state.
-     *
-     * @param state a destination workflow state.
-     * @return an identifier for the transition required to
-     * place the document in that workflow state.
-     */
-    @Deprecated 
-    private String getTransitionFromState(String state) {
-        String result = TRANSITION_UNKNOWN;
-
-        // FIXME We may wish to add calls, such as those in
-        // org.nuxeo.ecm.core.lifecycle.impl.LifeCycleImpl, to validate incoming
-        // destination workflow state and the set of allowable state transitions.
-
-        if (state.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_DELETED)) {
-            result = WorkflowClient.WORKFLOWTRANSITION_DELETE;
-        } else if (state.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_ACTIVE)) {
-            result = WorkflowClient.WORKFLOWTRANSITION_UNDELETE; //FIXME, could also be transition WORKFLOWTRANSITION_UNLOCK
-        } else if (state.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_LOCKED)) {
-            result = WorkflowClient.WORKFLOWTRANSITION_LOCK;
-        } else {
-        	logger.warn("An attempt was made to transition a document to an unknown workflow state = "
-        			+ state);
-        }        
-        
-        return result;
-    }
     
     /*
      * Maps the transition name to handle existing states like "locked" and "deleted".  This allows us to do things like lock "deleted"

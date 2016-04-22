@@ -61,6 +61,7 @@ public class WorkflowClient extends AbstractCommonListPoxServiceClientImpl<Workf
 	//
 	// Service Query Params
 	//
+	public static final String WORKFLOW_QUERY_ONLY_DELETED = "wf_only_deleted";
 	public static final String WORKFLOW_QUERY_NONDELETED = "wf_deleted";
 	public static final String WORKFLOWSTATE_QUERY = "wf_deleted";
 	public static final String TARGET_DOCHANDLER = "wf_dochandler";
@@ -70,13 +71,11 @@ public class WorkflowClient extends AbstractCommonListPoxServiceClientImpl<Workf
 	// see default-life-cycle-contrib.xml in the Nuxeo server configuration
 	//
 	private static final HashMap<String, String> statesMappedToTransitions;
-    static
-    {
+    static {
     	statesMappedToTransitions = new HashMap<String, String>();
     	statesMappedToTransitions.put(WORKFLOWSTATE_DELETED, WORKFLOWTRANSITION_DELETE);
     	statesMappedToTransitions.put("c", "d");
     }
-
 	
 	@Override
 	public String getServiceName() {

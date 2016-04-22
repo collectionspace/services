@@ -438,16 +438,18 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
     private boolean isRecordDeleted(NuxeoBasedResource resource, String collectionObjectCsid)
             throws URISyntaxException, DocumentException {
         boolean isDeleted = false;
+        
         byte[] workflowResponse = resource.getWorkflow(createUriInfo(), collectionObjectCsid);
         if (workflowResponse != null) {
             PoxPayloadOut payloadOut = new PoxPayloadOut(workflowResponse);
             String workflowState =
                     getFieldElementValue(payloadOut, WORKFLOW_COMMON_SCHEMA_NAME,
                     WORKFLOW_COMMON_NAMESPACE, LIFECYCLE_STATE_ELEMENT_NAME);
-            if (Tools.notBlank(workflowState) && workflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+            if (Tools.notBlank(workflowState) && workflowState.contains(WorkflowClient.WORKFLOWSTATE_DELETED)) {
                 isDeleted = true;
             }
         }
+        
         return isDeleted;
     }
 

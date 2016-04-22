@@ -1,5 +1,8 @@
 package org.collectionspace.services.common.vocabulary;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.AuthorityClient;
@@ -12,6 +15,7 @@ import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specif
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityIdentifierUtils;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.dom4j.DocumentException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,6 +99,36 @@ public class AuthorityServiceUtils {
     	
     	return result;
     }
+    
+    /*
+     * The domain name part of refnames on SAS may not match that of local refnames, so we need to update all the payload's
+     * refnames with the correct domain name
+     */
+	static public PoxPayloadIn filterRefnameDomains(ServiceContext ctx,
+			PoxPayloadIn payload) throws DocumentException {
+		PoxPayloadIn result = null;
+
+		
+		String payloadStr = payload.getXmlPayload();
+		Pattern p = Pattern.compile("(urn:cspace:)(([a-z]{1,}\\.?)*)"); // matches the domain name part of a RefName.  For example, matches "core.collectionspace.org" of RefName urn:cspace:core.collectionspace.org:personauthorities:name(person):item:name(BigBird1461101206103)'Big Bird'
+		Matcher m = p.matcher(payloadStr);
+
+		StringBuffer filteredPayloadStr = new StringBuffer();
+		while (m.find() == true) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Replacing: " + m.group(2));
+			}
+			m.appendReplacement(filteredPayloadStr, m.group(1) + ctx.getTenantName());
+		}
+		m.appendTail(filteredPayloadStr);
+		result = new PoxPayloadIn(filteredPayloadStr.toString());
+
+		if (logger.isDebugEnabled()) {
+			logger.debug(String.format("", filteredPayloadStr));
+		}
+
+		return result;
+	}
     
     /**
      * Mark the authority item as deprecated.

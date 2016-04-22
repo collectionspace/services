@@ -335,7 +335,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
         }
         boolean isActiveDocument = false;
         try {
-            if (!docModel.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+            if (!docModel.getCurrentLifeCycleState().contains(WorkflowClient.WORKFLOWSTATE_DELETED)) {
                 isActiveDocument = true;
             }
         } catch (ClientException ce) {

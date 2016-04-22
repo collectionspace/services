@@ -138,9 +138,9 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
             boolean includeDeleted = includeDeletedStr == null ? true : Boolean.parseBoolean(includeDeletedStr);
             if (includeDeleted == false) {
                 //
-                // We don't wanted soft-deleted object, so throw an exception if this one is soft-deleted.
+                // We don't wanted soft-deleted objects, so throw an exception if this one is soft-deleted.
                 //
-                if (currentState.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+                if (currentState.contains(WorkflowClient.WORKFLOWSTATE_DELETED)) {
                     String msg = "The GET assertion that docModel not be in 'deleted' workflow state failed.";
                     logger.debug(msg);
                     throw new DocumentNotFoundException(msg);
@@ -1204,7 +1204,8 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
         String includeDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_NONDELETED);
         if (includeDeleted != null && includeDeleted.equalsIgnoreCase(Boolean.FALSE.toString())) {
             whereClause = whereClause
-                + "  AND (misc.lifecyclestate <> '" + WorkflowClient.WORKFLOWSTATE_DELETED + "')";
+                    + "  AND (misc.lifecyclestate <> '" + WorkflowClient.WORKFLOWSTATE_DELETED + "')"
+            		+ "  AND (misc.lifecyclestate <> '" + WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED + "')";
         }
 
         // If a particular authority is specified, restrict the query further

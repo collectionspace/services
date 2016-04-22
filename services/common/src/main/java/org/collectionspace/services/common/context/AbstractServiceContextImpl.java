@@ -512,8 +512,14 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     	String result = null;
     	
         String includeDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_NONDELETED);
+        String includeOnlyDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_ONLY_DELETED);
+
     	if (includeDeleted != null && includeDeleted.equalsIgnoreCase(Boolean.FALSE.toString())) {    	
-    		result = "ecm:currentLifeCycleState <> 'deleted'";
+    		result = String.format("(ecm:currentLifeCycleState <> '%s' AND ecm:currentLifeCycleState <> '%s')",
+    				WorkflowClient.WORKFLOWSTATE_DELETED, WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED);
+    	} else if (includeOnlyDeleted != null && includeOnlyDeleted.equalsIgnoreCase(Boolean.TRUE.toString())) {
+    		result = String.format("(ecm:currentLifeCycleState <> '%s' AND ecm:currentLifeCycleState <> '%s')",
+    				WorkflowClient.WORKFLOWSTATE_PROJECT, WorkflowClient.WORKFLOWSTATE_LOCKED);
     	}
     	
     	return result;
@@ -538,10 +544,11 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         // reflect the values of those parameters in the document filter
         // to specify sort ordering, pagination, etc.
         //
-        if (this.getQueryParams() != null) {
-          docFilter.setSortOrder(this.getQueryParams());
-          docFilter.setPagination(this.getQueryParams());
-          String workflowWhereClause = buildWorkflowWhereClause(queryParams);
+        MultivaluedMap<String, String> queryParameters = this.getQueryParams();
+        if (queryParameters != null) {
+          docFilter.setSortOrder(queryParameters);
+          docFilter.setPagination(queryParameters);
+          String workflowWhereClause = buildWorkflowWhereClause(queryParameters);
           if (workflowWhereClause != null) {
         	  docFilter.appendWhereClause(workflowWhereClause, IQueryManager.SEARCH_QUALIFIER_AND);			
           }            
