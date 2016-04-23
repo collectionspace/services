@@ -98,6 +98,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     private String authorityItemTermGroupXPathBase;
     
     private boolean isProposed = false; // used by local authority to propose a new shared item. Allows local deployments to use new terms until they become official
+    private boolean isSAS = false; // used to indicate if the authority item originated as a SAS item
     private boolean shouldUpdateRevNumber = true; // by default we should update the revision number -not true on synchronization with SAS
     /**
      * inVocabulary is the parent Authority for this context
@@ -125,6 +126,17 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     
     public void setIsProposed(boolean flag) {
     	this.isProposed = flag;
+    }
+    
+    //
+    // Getter and Setter for 'isSAS'
+    //
+    public boolean getIsSASItem() {
+    	return this.isSAS;
+    }
+
+    public void setIsSASItem(boolean flag) {
+    	this.isSAS = flag;
     }
     
     //
@@ -449,12 +461,13 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         	PoxPayloadOut payloadOut = authorityResource.updateAuthorityItem(ctx, 
         			ctx.getResourceMap(), 					
         			ctx.getUriInfo(),
-        			localParentCsid,			 	// parent's CSID
-        			localItemCsid, 					// item's CSID
-        			sasPayloadIn,					// the payload from the remote SAS
+        			localParentCsid,			 			// parent's CSID
+        			localItemCsid, 							// item's CSID
+        			sasPayloadIn,							// the payload from the remote SAS
         			AuthorityServiceUtils.DONT_UPDATE_REV,	// don't update the parent's revision number
-        			AuthorityServiceUtils.NOT_PROPOSED);	// The items is not proposed, make it a real SAS item now
-        	if (payloadOut != null) {
+        			AuthorityServiceUtils.NOT_PROPOSED,		// The items is not proposed, make it a real SAS item now
+        			AuthorityServiceUtils.SAS_ITEM);		// Since we're sync'ing, this must be a SAS item
+        	if (payloadOut != null) {	
         		ctx.setOutput(payloadOut);
         		result = true;
         	}
@@ -482,6 +495,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         	}
         	result = true;
         }
+        //
+        // We need to synchronize the hierarchy relationships here.
+        //
         
         return result;
     }
@@ -623,9 +639,10 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         	//
         	ctx.setUriInfo(this.getServiceContext().getUriInfo()); // try to get a UriInfo instance from the handler's context
         }
-        ctx.getUriInfo().getQueryParameters().addFirst(WorkflowClient.WORKFLOW_QUERY_ONLY_DELETED, Boolean.toString(onlyRefsToDeletedObjects));  // Add the wf_deleted query param to the resource call
+        ctx.getUriInfo().getQueryParameters().addFirst(WorkflowClient.WORKFLOW_QUERY_ONLY_DELETED, Boolean.toString(onlyRefsToDeletedObjects));  // Add the wf_only_deleted query param to the resource call
     	AuthorityRefDocList refObjs = authorityResource.getReferencingObjects(ctx, inAuthorityCsid, itemCsid, 
     			uriTemplateRegistry, ctx.getUriInfo());
+    	ctx.getUriInfo().getQueryParameters().remove(WorkflowClient.WORKFLOW_QUERY_ONLY_DELETED);  // Need to clear wf_only_deleted values to prevent unexpected side effects
      	
     	result = refObjs.getTotalItems();
     	if (result > 0) {
@@ -722,18 +739,26 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     //
     public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {
     	super.fillAllParts(wrapDoc, action);
+        DocumentModel documentModel = wrapDoc.getWrappedObject();
+
     	//
-    	// Update the record's revision number on both CREATE and UPDATE actions
+    	// Update the record's revision number on both CREATE and UPDATE actions (as long as it is NOT a SAS authority item)
     	//
-    	if (this.getShouldUpdateRevNumber() == true) { // We won't update rev numbers on synchronization with SAS
+        Boolean propertyValue = (Boolean) documentModel.getProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.SAS);
+        boolean isMarkedAsSASItem = propertyValue != null ? propertyValue : false;
+    	if (this.getShouldUpdateRevNumber() == true && !isMarkedAsSASItem) { // We won't update rev numbers on synchronization with SAS items and on local changes to SAS items
     		updateRevNumbers(wrapDoc);
     	}
     	//
     	// If this is a proposed item (not part of the SAS), mark it as such
     	//
-        DocumentModel documentModel = wrapDoc.getWrappedObject();
         documentModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.PROPOSED,
         		new Boolean(this.getIsProposed()));
+        //
+        // If it is a SAS authority item, mark it as such
+        //
+        documentModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.SAS,
+        		new Boolean(this.getIsSASItem()));
     }
     
     /**

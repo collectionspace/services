@@ -12,6 +12,7 @@ import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityIdentifierUtils;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
@@ -37,6 +38,9 @@ public class AuthorityServiceUtils {
     public static final String IS_PROPOSED_PROPERTY = "IS_PROPOSED";
     public static final Boolean PROPOSED = true;
     public static final Boolean NOT_PROPOSED = !PROPOSED;
+    public static final Boolean SAS_ITEM = true;
+    public static final Boolean NOT_SAS_ITEM = !SAS_ITEM;
+
     public static final Boolean NO_CHANGE = null;
 
     static public PoxPayloadIn requestPayloadIn(ServiceContext ctx, Specifier specifier, Class responseType) throws Exception {
@@ -137,14 +141,15 @@ public class AuthorityServiceUtils {
      * @param itemInfo
      * @throws Exception
      */
-    static public boolean markAuthorityItemAsDeprecated(ServiceContext ctx, String authorityItemCommonSchemaName, String itemCsid) throws Exception {
+    static public boolean markAuthorityItemAsDeprecated(ServiceContext ctx, String authorityItemCommonSchemaName, AuthorityItemSpecifier authorityItemSpecifier) throws Exception {
     	boolean result = false;
     	
     	try {
-	    	DocumentModel docModel = NuxeoUtils.getDocFromCsid(ctx, (CoreSessionInterface)ctx.getCurrentRepositorySession(), itemCsid);
+	    	DocumentModel docModel = NuxeoUtils.getDocFromSpecifier(ctx, (CoreSessionInterface)ctx.getCurrentRepositorySession(),
+	    			authorityItemCommonSchemaName, authorityItemSpecifier);
 	    	result = setAuthorityItemDeprecated(ctx, docModel, authorityItemCommonSchemaName, AuthorityServiceUtils.DEPRECATED);
     	} catch (Exception e) {
-    		logger.warn(String.format("Could not mark item '%s' as deprecated.", itemCsid), e);
+    		logger.warn(String.format("Could not mark item '%s' as deprecated.", authorityItemSpecifier.getItemSpecifier().getURNValue()), e);
     		throw e;
     	}
     	

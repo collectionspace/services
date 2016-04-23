@@ -184,8 +184,8 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         List<Element> itemList = getItemList(sasPayloadInItemList);
         if (itemList != null) {
         	for (Element e:itemList) {
-        		String remoteRefName = XmlTools.getElementValue(e, "refName");
-        		itemsInRemoteAuthority.add(remoteRefName);
+        		String remoteRefName = XmlTools.getElementValue(e, AuthorityItemJAXBSchema.REF_NAME);
+        		itemsInRemoteAuthority.add(XmlTools.getElementValue(e, AuthorityItemJAXBSchema.SHORT_IDENTIFIER));
         		long status = syncRemoteItemWithLocalItem(ctx, remoteRefName);
         		if (status == 1) {
         			created++;
@@ -203,8 +203,9 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         // of the remote items have been hard deleted.
         //
     	ArrayList<String> itemsInLocalAuthority = getItemsInLocalAuthority(ctx, sasAuthoritySpecifier);
-    	if (itemsInLocalAuthority.removeAll(itemsInRemoteAuthority) == true) {
-    		ArrayList<String> remainingItems = itemsInLocalAuthority; // now a subset of local items
+    	itemsInLocalAuthority.removeAll(itemsInRemoteAuthority);
+    	if (itemsInLocalAuthority.size() > 0) {
+    		ArrayList<String> remainingItems = itemsInLocalAuthority; // now a subset of local items that no longer exist on the SAS, so we need to try to delete them (or mark them as deprecated if they still have records referencing them)
         	//
         	// We now need to either hard-deleted or deprecate the remaining authorities
         	//
@@ -213,8 +214,26 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     			throw new Exception("Encountered unexpected exception trying to delete or deprecated authority items during synchronization.");
     		}
     	}
-
-        
+    	//
+    	// We need to synchronize the hierarchy relationships
+    	//
+        itemList = getItemList(sasPayloadInItemList); // Really need to re-request the sasPayload?  I don't think so.
+        if (itemList != null) {
+        	for (Element e:itemList) {
+        		String remoteRefName = XmlTools.getElementValue(e, "refName");
+        		itemsInRemoteAuthority.add(remoteRefName);
+        		long status = syncRemoteItemRelationshipsWithLocalItem(ctx, remoteRefName);
+        		if (status == 1) {
+        			created++;
+        		} else if (status == 0) {
+        			synched++;
+        		} else {
+        			alreadySynched++;
+        		}
+        		totalItemsProcessed++;
+        	}
+        }    	
+    	
         logger.info(String.format("Total number of items processed during sync: %d", totalItemsProcessed));
         logger.info(String.format("Number of items synchronized: %d", synched));
         logger.info(String.format("Number of items created during sync: %d", created));
@@ -224,7 +243,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     }
 
     /**
-     * 
+     * This method should only be used as part of a SAS synch operation.
      * @param ctx
      * @param refNameList
      * @return
@@ -233,25 +252,29 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     private long deleteOrDeprecateItems(ServiceContext ctx, ArrayList<String> refNameList) throws Exception {
     	long result = 0;
     	
-    	ArrayList<String> failureList = new ArrayList<String>();
-        ctx.setProperty(AuthorityServiceUtils.SHOULD_UPDATE_REV_PROPERTY, false);
-
-    	for (String refName:refNameList) {
-    		AuthorityTermInfo itemInfo = RefNameUtils.parseAuthorityTermInfo(refName);
+        ctx.setProperty(AuthorityServiceUtils.SHOULD_UPDATE_REV_PROPERTY, false); // Don't update the revision number when we delete or deprecate the item
+    	for (String itemRefName:refNameList) {
+        	AuthorityTermInfo authorityTermInfo = RefNameUtils.parseAuthorityTermInfo(itemRefName);
+            AuthorityItemSpecifier authorityItemSpecificer = new AuthorityItemSpecifier(SpecifierForm.URN_NAME, authorityTermInfo.inAuthority.name,
+            		authorityTermInfo.name);
+                    	
     		AuthorityResource authorityResource = (AuthorityResource) ctx.getResource();
     		try {
-    			authorityResource.deleteAuthorityItem(ctx, itemInfo.inAuthority.csid, itemInfo.csid);
+    			authorityResource.deleteAuthorityItem(ctx,
+    					Specifier.createShortIdURNValue(authorityTermInfo.inAuthority.name),
+    					Specifier.createShortIdURNValue(authorityTermInfo.name),
+    					AuthorityServiceUtils.DONT_UPDATE_REV); // Since we're sync'ing, we shouldn't update the revision number (obviously this only applies to soft-deletes since hard-deletes destroy the record)
     			result++;
     		} catch (DocumentReferenceException de) {
     			logger.info(String.format("Authority item '%s' has existing references and cannot be removed during sync.",
-    					refName), de);
+    					itemRefName), de);
     			boolean marked = AuthorityServiceUtils.markAuthorityItemAsDeprecated(ctx, authorityItemCommonSchemaName,
-    					itemInfo.csid);
+    					authorityItemSpecificer);
     			if (marked == true) {
     				result++;
     			}
     		} catch (Exception e) {
-    			logger.warn(String.format("Unable to delete authority item '%s'", refName), e);
+    			logger.warn(String.format("Unable to delete authority item '%s'", itemRefName), e);
     			throw e;
     		}
     	}
@@ -273,22 +296,23 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
      * We need to add pagination support to this call!!!
      * 
      * @param ctx
-     * @param specifier
+     * @param authoritySpecifier
      * @return
      * @throws Exception
      */
-    private ArrayList<String> getItemsInLocalAuthority(ServiceContext ctx, Specifier specifier) throws Exception {
+    private ArrayList<String> getItemsInLocalAuthority(ServiceContext ctx, Specifier authoritySpecifier) throws Exception {
     	ArrayList<String> result = new ArrayList<String>();
     	
     	ResourceMap resourceMap = ctx.getResourceMap();
     	String resourceName = ctx.getClient().getServiceName();
     	AuthorityResource authorityResource = (AuthorityResource) resourceMap.get(resourceName);
-    	AbstractCommonList acl = authorityResource.getAuthorityItemList(ctx, specifier.value, ctx.getUriInfo());
+    	AbstractCommonList acl = authorityResource.getAuthorityItemList(ctx, authoritySpecifier.getURNValue(), ctx.getUriInfo());
+    	
     	List<ListItem> listItemList = acl.getListItem();
     	for (ListItem listItem:listItemList) {
     		Boolean proposed = getBooleanValue(listItem, AuthorityItemJAXBSchema.PROPOSED);
     		if (proposed == false) { // exclude "proposed" (i.e., local-only items)
-    			result.add(AbstractCommonListUtils.ListItemGetElementValue(listItem, AuthorityItemJAXBSchema.REF_NAME));
+    			result.add(AbstractCommonListUtils.ListItemGetElementValue(listItem, AuthorityItemJAXBSchema.SHORT_IDENTIFIER));
     		}
     	}
     	
@@ -311,7 +335,8 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     }
     
     /**
-     * This is a sync method.
+     * This method should only be used during a SAS synchronization request.
+     * 
      * @param ctx
      * @param parentIdentifier - Must be in short-id-refname form -i.e., urn:cspace:name(shortid)
      * @param itemIdentifier   - Must be in short-id-refname form -i.e., urn:cspace:name(shortid)
@@ -335,7 +360,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         //
     	AuthorityResource authorityResource = (AuthorityResource) ctx.getResource();
     	Response response = authorityResource.createAuthorityItemWithParentContext(ctx, authoritySpecifier.getURNValue(),
-    			sasPayloadIn, AuthorityServiceUtils.DONT_UPDATE_REV, AuthorityServiceUtils.NOT_PROPOSED);
+    			sasPayloadIn, AuthorityServiceUtils.DONT_UPDATE_REV, AuthorityServiceUtils.NOT_PROPOSED, AuthorityServiceUtils.SAS_ITEM);
     	//
     	// Check the response for successful POST result
     	//
@@ -404,6 +429,66 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     	
     	return result; // -1 = no sync needed/possible, 0 = sync'd, 1 = created new item
     }
+    
+    /**
+     * Ensure the local items relationships look the same as the remote items' by synchronizing the hierarchy relationship records
+     * of the SAS item with the local item.
+     * 
+     * @param ctx
+     * @param refName
+     * @return
+     * @throws Exception
+     */
+    protected long syncRemoteItemRelationshipsWithLocalItem(ServiceContext ctx, String itemRefName) throws Exception {
+    	long result = -1;
+    	//
+    	// WARNING: THIS CODE IS NOT IMPLEMENTED YET
+    	//
+    	return result;
+    	//
+    	// Using the item refname (with no local CSID), create specifiers that we'll use to find the local versions
+    	//
+    	
+    	/*
+    	AuthorityTermInfo authorityTermInfo = RefNameUtils.parseAuthorityTermInfo(itemRefName);
+    	String parentIdentifier = Specifier.createShortIdURNValue(authorityTermInfo.inAuthority.name);
+    	String itemIdentifier = Specifier.createShortIdURNValue(authorityTermInfo.name);
+    	//
+    	// We'll use the Authority JAX-RS resource to peform sync operations (creates and updates)
+    	//
+    	AuthorityResource authorityResource = (AuthorityResource) ctx.getResource();    	
+    	PoxPayloadOut localItemPayloadOut;
+    	try {
+    		localItemPayloadOut = authorityResource.getAuthorityItemWithExistingContext(ctx, parentIdentifier, itemIdentifier);
+    	} catch (DocumentNotFoundException dnf) {
+    		//
+    		// Document not found, means we need to create an item/term that exists only on the SAS
+    		//
+    		logger.info(String.format("Remote item with refname='%s' doesn't exist locally, so we'll create it.", itemRefName));
+    		createLocalItem(ctx, parentIdentifier, itemIdentifier);
+    		return 1; // exit with status of 1 means we created a new authority item
+    	}
+    	//
+    	// If we get here, we know the item exists both locally and remotely, so we need to synchronize them.
+    	//
+    	//
+    	try {
+	    	PoxPayloadOut theUpdate = authorityResource.synchronizeItemWithExistingContext(ctx, parentIdentifier, itemIdentifier);
+	    	if (theUpdate != null) {
+	    		result = 0; // means we needed to sync this item with SAS
+	    		logger.debug(String.format("Sync'd authority item parent='%s' id='%s with SAS.  Updated payload is: \n%s",
+	    				parentIdentifier, itemIdentifier, theUpdate.getXmlPayload()));
+	    	}
+    	} catch (DocumentReferenceException de) { // Exception for items that still have records/resource referencing them.
+    		result = -1;
+    		logger.error(String.format("Could not sync authority item = '%s' because it has existing records referencing it.",
+    				itemIdentifier));
+    	}
+    	
+    	return result; // -1 = no sync needed/possible, 0 = sync'd, 1 = created new item
+    	*/
+    	
+    }    
         
     private PoxPayloadIn requestPayloadInItemList(ServiceContext ctx, Specifier specifier) throws Exception {
     	PoxPayloadIn result = null;
