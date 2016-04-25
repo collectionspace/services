@@ -24,6 +24,7 @@ package org.collectionspace.services.client.test;
 
 //import java.util.ArrayList;
 import java.util.List;
+
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.AbstractCommonListUtils;
@@ -39,9 +40,7 @@ import org.collectionspace.services.loanin.LenderGroup;
 import org.collectionspace.services.loanin.LenderGroupList;
 import org.collectionspace.services.loanin.LoansinCommon;
 
-import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +72,11 @@ public class LoaninServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
     protected CollectionSpaceClient getClientInstance() {
         return new LoaninClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new LoaninClient(clientPropertiesFilename);
+	}
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)

@@ -25,6 +25,7 @@ package org.collectionspace.services.client.test;
 import java.util.HashMap;
 
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
+import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -65,17 +66,21 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
         return new VocabularyClient();
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new VocabularyClient(clientPropertiesFilename);
+	}
+    
     @Override
-    protected String createItemInAuthority(String authorityId) {
+    protected String createItemInAuthority(AuthorityClient client, String authorityId) {
     	String result = null;
     	
-        VocabularyClient client = new VocabularyClient();
         HashMap<String, String> itemInfo = new HashMap<String, String>();
         String shortId = createIdentifier();
         itemInfo.put(AuthorityItemJAXBSchema.SHORT_IDENTIFIER, shortId);
         itemInfo.put(AuthorityItemJAXBSchema.DISPLAY_NAME, "display-" + shortId);
         result = VocabularyClientUtils.createItemInVocabulary(authorityId,
-                null /*knownResourceRefName*/, itemInfo, client);
+                null /*knownResourceRefName*/, itemInfo, (VocabularyClient) client);
         allResourceItemIdsCreated.put(result, authorityId);
         
         return result;
@@ -100,13 +105,11 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
         }
     }
     
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-//    		dependsOnMethods = {"createItem"})
     @Override
     public void createItemList(String testName) throws Exception {
     	knownAuthorityWithItems = createResource(testName, READITEMS_SHORT_IDENTIFIER);
         for (int j = 0; j < nItemsToCreateInList; j++) {
-        	createItemInAuthority(knownAuthorityWithItems);
+        	createItemInAuthority((AuthorityClient) getClientInstance(), knownAuthorityWithItems);
         }
     }    
     
@@ -379,5 +382,4 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
                 itemInfo, commonPartName);
 		return result;
 	}
-    
 }

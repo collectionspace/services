@@ -39,6 +39,14 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 public class AccountRoleClient extends AbstractServiceClientImpl<AbstractCommonList, AccountRole, AccountRole, AccountRoleProxy> {
 	public static final String SERVICE_NAME = "accountroles";
 
+	public AccountRoleClient() {
+		super();
+	}
+	
+	public AccountRoleClient(String clientPropertiesFilename) {
+		super(clientPropertiesFilename);
+	}
+
 	@Override
 	public String getServiceName() {
 		return AccountRoleClient.SERVICE_NAME;

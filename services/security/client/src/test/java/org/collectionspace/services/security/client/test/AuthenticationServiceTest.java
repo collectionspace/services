@@ -23,8 +23,8 @@
 package org.collectionspace.services.security.client.test;
 
 import java.util.List;
+
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -86,6 +86,11 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
     protected CollectionSpaceClient getClientInstance() {
         return new AccountClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new AccountClient(clientPropertiesFilename);
+	}	
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
@@ -494,5 +499,5 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
 	protected Class<AbstractCommonList> getCommonListType() {
 		// TODO Auto-generated method stub
 		return null;
-	}	
+	}
 }

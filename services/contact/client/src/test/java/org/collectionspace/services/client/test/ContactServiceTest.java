@@ -22,10 +22,6 @@
  */
 package org.collectionspace.services.client.test;
 
-import java.util.List;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ContactClient;
@@ -40,10 +36,9 @@ import org.collectionspace.services.contact.EmailGroup;
 import org.collectionspace.services.contact.EmailGroupList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
-import org.jboss.resteasy.client.ClientResponse;
-
+import java.util.List;
+import javax.ws.rs.core.Response;
 import org.testng.Assert;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +74,11 @@ public class ContactServiceTest extends AbstractPoxServiceTestImpl<AbstractCommo
         return new ContactClient();
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new ContactClient(clientPropertiesFilename);
+	}
+	
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */

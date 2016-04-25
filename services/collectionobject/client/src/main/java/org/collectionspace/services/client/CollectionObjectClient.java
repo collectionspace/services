@@ -47,7 +47,15 @@ public class CollectionObjectClient extends AbstractCommonListPoxServiceClientIm
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
     public static final String SERVICE_COMMON_PART_NAME = SERVICE_NAME + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
 
-    @Override
+    public CollectionObjectClient() {
+		super();
+	}
+
+    public CollectionObjectClient(String clientPropertiesFilename) {
+		super(clientPropertiesFilename);
+	}
+
+	@Override
     public String getServiceName() {
         return SERVICE_NAME;
     }

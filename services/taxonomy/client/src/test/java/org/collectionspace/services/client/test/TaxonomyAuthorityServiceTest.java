@@ -44,12 +44,11 @@ import org.collectionspace.services.taxonomy.TaxonomyauthorityCommon;
 import org.collectionspace.services.taxonomy.TaxonCommon;
 
 import javax.ws.rs.core.Response;
+
 import org.collectionspace.services.taxonomy.*;
 import org.jboss.resteasy.client.ClientResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -111,6 +110,11 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
         return new TaxonomyAuthorityClient();
     }
 
+	@Override
+	protected CollectionSpaceClient<AbstractCommonList, PoxPayloadOut, String, TaxonomyAuthorityProxy> getClientInstance(String clientPropertiesFilename) {
+        return new TaxonomyAuthorityClient(clientPropertiesFilename);
+	}
+	
     /**
      * Creates the item in authority.
      *
@@ -118,7 +122,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
      * @param authRefName the auth ref name
      * @return the string
      */
-    private String createItemInAuthority(String vcsid, String authRefName) {
+    private String createItemInAuthority(AuthorityClient client, String vcsid, String authRefName) {
 
         final String testName = "createItemInAuthority(" + vcsid + "," + authRefName + ")";
         if (logger.isDebugEnabled()) {
@@ -126,7 +130,6 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
         }
 
         // Submit the request to the service and store the response.
-        TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
         Map<String, String> taxonMap = new HashMap<String, String>();
 
         // Fields present in all authority records.
@@ -166,7 +169,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
 
         String newID = TaxonomyAuthorityClientUtils.createItemInAuthority(vcsid,
                 authRefName, taxonMap, NULL_TAXON_TERMS_LIST, taxonAuthorGroupList,
-                taxonCitationList, commonNameGroupList, client);
+                taxonCitationList, commonNameGroupList, (TaxonomyAuthorityClient)client);
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
@@ -473,10 +476,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
     // Authority item specific overrides
     //
     @Override
-    protected String createItemInAuthority(String authorityId) {
-        return createItemInAuthority(authorityId, null /*
-                 * refname
-                 */);
+    protected String createItemInAuthority(AuthorityClient client, String authorityId) {
+        return createItemInAuthority(client, authorityId, null /** refname */);
     }
 
     @Override

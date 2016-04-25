@@ -203,6 +203,13 @@ public abstract class BaseServiceTest<CLT> {
      */
     abstract protected CollectionSpaceClient getClientInstance();
 
+    /**
+     * Gets the client.
+     *
+     * @return the client
+     */
+    abstract protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename);
+
     /*
      * Subclasses can override this method to return their AbstractCommonList subclass
      */

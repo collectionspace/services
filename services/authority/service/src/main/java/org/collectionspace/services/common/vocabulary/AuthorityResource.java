@@ -1313,7 +1313,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     	Response result = null;
     	
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), existingCtx.getUriInfo());
-        if (existingCtx != null) {
+        if (existingCtx != null && existingCtx.getCurrentRepositorySession() != null) {
         	ctx.setCurrentRepositorySession(existingCtx.getCurrentRepositorySession());
         	ctx.setProperties(existingCtx.getProperties());
         }

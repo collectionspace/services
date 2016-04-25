@@ -68,12 +68,10 @@ import org.collectionspace.services.client.test.BaseServiceTest;
 import org.collectionspace.services.dimension.DimensionsCommon;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -235,6 +233,12 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
     	// This method is meaningless to this test.
         return null;
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests

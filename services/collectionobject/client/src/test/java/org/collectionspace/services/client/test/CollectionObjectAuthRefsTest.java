@@ -56,12 +56,9 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.organization.OrgTermGroup;
 import org.collectionspace.services.person.PersonTermGroup;
 
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,6 +75,11 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
     protected CollectionSpaceClient getClientInstance() {
     	throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    	throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498
+	}
     
 	@Override
 	protected String getServiceName() {
@@ -642,5 +644,4 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
 
         return multipart;
     }
-
 }

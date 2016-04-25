@@ -1,8 +1,8 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 
+import org.jboss.resteasy.client.ClientResponse;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -16,17 +16,17 @@ public abstract class AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P extends Authori
 
 	private static final String INCLUDE_DELETE_TRUE = Boolean.TRUE.toString();
 	
-	@Override
-    protected void readClientProperties() {
-		super.readClientProperties();
-		//
-		// Override with Shared Authority Server properties from tenant bindings
-		//
-    }
-    
 	/*
 	 * Basic CRUD proxied methods
 	 */
+
+	public AuthorityClientImpl(String clientPropertiesFilename) {
+		super(clientPropertiesFilename);
+	}
+
+	public AuthorityClientImpl() {
+		super();
+	}
 
 	//(C)reate Item
 	@Override

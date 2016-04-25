@@ -45,6 +45,11 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 	}
 
 	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new BlobClient(clientPropertiesFilename);
+	}
+
+	@Override
 	protected String getServicePathComponent() {
 		return BlobClient.SERVICE_PATH_COMPONENT;
 	}
@@ -173,6 +178,4 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 	public int random(int min, int max) {
 		return min + (int)(generator.nextFloat() * ((max - min) + 1));
 	}
-	
-
 }

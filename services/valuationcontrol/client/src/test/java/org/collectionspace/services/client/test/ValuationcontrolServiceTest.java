@@ -22,10 +22,6 @@
  */
 package org.collectionspace.services.client.test;
 
-//import java.util.ArrayList;
-import java.util.List;
-import javax.ws.rs.core.Response;
-
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ValuationcontrolClient;
@@ -36,9 +32,8 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.valuationcontrol.ValuationcontrolsCommon;
 
-import org.jboss.resteasy.client.ClientResponse;
+import javax.ws.rs.core.Response;
 import org.testng.Assert;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,14 +51,16 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
     final String SERVICE_NAME = "valuationcontrols";
     final String SERVICE_PATH_COMPONENT = "valuationcontrols";
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
-     */
     @Override
     protected CollectionSpaceClient getClientInstance() {
         return new ValuationcontrolClient();
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new ValuationcontrolClient(clientPropertiesFilename);
+	}
+	
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */

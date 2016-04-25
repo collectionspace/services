@@ -473,7 +473,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         	}
         }
         //
-        // If the workflow states are different, we need to update the local's to reflects the remote's
+        // Check to see if we need to update the local items's workflow state to reflect that of the remote's
         //
     	List<String> transitionList = getTransitionList(sasWorkflowState, localItemWorkflowState);
         if (transitionList.isEmpty() == false) {
@@ -504,8 +504,10 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     
     /**
      * We need to move the local item to the SAS workflow state.  This might involve multiple transitions.
-     * See table at https://wiki.collectionspace.org/pages/viewpage.action?pageId=162496556
-     * @throws DocumentException 
+     * 
+     * WIKI:
+     * See table at https://wiki.collectionspace.org/pages/viewpage.action?pageId=162496564
+     * 
      */
     private List<String> getTransitionList(String sasWorkflowState, String localItemWorkflowState) throws DocumentException {
     	List<String> result = new ArrayList<String>();    	

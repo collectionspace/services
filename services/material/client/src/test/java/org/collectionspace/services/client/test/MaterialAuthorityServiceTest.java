@@ -22,7 +22,6 @@
  */
 package org.collectionspace.services.client.test;
 
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +43,7 @@ import org.collectionspace.services.material.MaterialTermGroup;
 import org.collectionspace.services.material.MaterialTermGroupList;
 import org.collectionspace.services.material.MaterialauthoritiesCommon;
 import org.collectionspace.services.material.MaterialsCommon;
-import org.jboss.resteasy.client.ClientResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -100,6 +99,11 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
     protected CollectionSpaceClient getClientInstance() {
         return new MaterialAuthorityClient();
     }
+    
+    @Override
+    protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new MaterialAuthorityClient(clientPropertiesFilename);
+    }
 
     /**
      * Creates the item in authority.
@@ -108,11 +112,10 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
      * @param authRefName the auth ref name
      * @return the string
      */
-    private String createItemInAuthority(String vcsid, String authRefName) {
+    private String createItemInAuthority(AuthorityClient client, String vcsid, String authRefName) {
         final String testName = "createItemInAuthority("+vcsid+","+authRefName+")"; 
     
         // Submit the request to the service and store the response.
-        MaterialAuthorityClient client = new MaterialAuthorityClient();
         Map<String, String> materialMap = new HashMap<String,String>();
         // TODO Make material type and status be controlled vocabs.
         materialMap.put(MaterialJAXBSchema.SHORT_IDENTIFIER, TEST_MATERIAL_SHORT_IDENTIFIER);
@@ -128,7 +131,7 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
         terms.add(term);
         
         String newID = MaterialAuthorityClientUtils.createItemInAuthority(vcsid,
-                authRefName, materialMap, terms, client );    
+                authRefName, materialMap, terms, (MaterialAuthorityClient) client);    
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
@@ -450,8 +453,8 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
     //
     
     @Override
-    protected String createItemInAuthority(String authorityId) {
-        return createItemInAuthority(authorityId, null /*refname*/);
+    protected String createItemInAuthority(AuthorityClient client, String authorityId) {
+        return createItemInAuthority(client, authorityId, null /*refname*/);
     }
 
     @Override

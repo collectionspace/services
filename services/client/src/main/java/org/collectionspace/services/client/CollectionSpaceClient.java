@@ -63,6 +63,8 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
     public final static String COLLECTIONSPACE_CORE_WORKFLOWSTATE = "workflowState";
     public final static String CORE_WORKFLOWSTATE = COLLECTIONSPACE_CORE_SCHEMA + ":" + COLLECTIONSPACE_CORE_WORKFLOWSTATE;
     
+    public static final String DEFAULT_CLIENT_PROPERTIES_FILENAME = "collectionspace-client.properties";
+    public static final String SAS_CLIENT_PROPERTIES_FILENAME = "sas-collectionspace-client.properties";
     public static final String AUTH_PROPERTY = "cspace.auth";
     public static final String PASSWORD_PROPERTY = "cspace.password";
     public static final String SSL_PROPERTY = "cspace.ssl";

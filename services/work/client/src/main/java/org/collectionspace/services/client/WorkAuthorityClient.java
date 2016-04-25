@@ -40,6 +40,17 @@ public class WorkAuthorityClient extends AuthorityClientImpl<WorksCommon, WorkAu
     public static final String SERVICE_ITEM_COMMON_PART_NAME = SERVICE_ITEM_NAME
             + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
 
+    //
+    // Constructors
+    //
+    public WorkAuthorityClient() {
+    	super();
+    }
+    
+    public WorkAuthorityClient(String clientPropertiesFilename) {
+		super(clientPropertiesFilename);
+	}
+    
     @Override
     public String getServiceName() {
         return SERVICE_NAME;

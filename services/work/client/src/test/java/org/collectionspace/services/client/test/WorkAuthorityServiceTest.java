@@ -43,7 +43,7 @@ import org.collectionspace.services.work.WorkTermGroup;
 import org.collectionspace.services.work.WorkTermGroupList;
 import org.collectionspace.services.work.WorkauthoritiesCommon;
 import org.collectionspace.services.work.WorksCommon;
-import org.jboss.resteasy.client.ClientResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -117,6 +117,11 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
         return new WorkAuthorityClient();
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new WorkAuthorityClient(clientPropertiesFilename);
+	}
+
     /**
      * Creates the item in authority.
      *
@@ -124,11 +129,10 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
      * @param authRefName the auth ref name
      * @return the string
      */
-    private String createItemInAuthority(String vcsid, String authRefName) {
+    private String createItemInAuthority(AuthorityClient client, String vcsid, String authRefName) {
         final String testName = "createItemInAuthority("+vcsid+","+authRefName+")"; 
     
         // Submit the request to the service and store the response.
-        WorkAuthorityClient client = new WorkAuthorityClient();
         Map<String, String> workMap = new HashMap<String,String>();
         // TODO Make work type and status be controlled vocabs.
         workMap.put(WorkJAXBSchema.SHORT_IDENTIFIER, TEST_WORK_SHORT_IDENTIFIER);
@@ -145,7 +149,7 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
         terms.add(term);
         
         String newID = WorkAuthorityClientUtils.createItemInAuthority(vcsid,
-                authRefName, workMap, terms, client );    
+                authRefName, workMap, terms, (WorkAuthorityClient)client);    
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
@@ -467,8 +471,8 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
     //
     
     @Override
-    protected String createItemInAuthority(String authorityId) {
-        return createItemInAuthority(authorityId, null /*refname*/);
+    protected String createItemInAuthority(AuthorityClient client, String authorityId) {
+        return createItemInAuthority(client, authorityId, null /*refname*/);
     }
 
     @Override

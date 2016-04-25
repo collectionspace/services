@@ -41,11 +41,9 @@ import org.collectionspace.services.blob.MeasuredPartGroup;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 
@@ -87,6 +85,11 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
     protected CollectionSpaceClient getClientInstance() {
         return new BlobClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new BlobClient(clientPropertiesFilename);
+	}
 
     @Override
     protected AbstractCommonList getCommonList(Response response) {

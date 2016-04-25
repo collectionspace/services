@@ -31,6 +31,14 @@ public class BatchClient extends AbstractCommonListPoxServiceClientImpl<BatchPro
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;	
 
+	public BatchClient() {
+		super();
+	}
+
+	public BatchClient(String clientPropertiesFilename) {
+		super(clientPropertiesFilename);
+	}
+
 	@Override
 	public String getServiceName() {
 		return SERVICE_NAME;

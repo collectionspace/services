@@ -25,11 +25,12 @@ package org.collectionspace.services.client.test;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+
 //import org.collectionspace.services.client.AbstractServiceClientImpl;
-import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionObjectFactory;
 import org.collectionspace.services.client.CollectionSpaceClient;
@@ -49,14 +50,10 @@ import org.collectionspace.services.collectionobject.OtherNumber;
 import org.collectionspace.services.collectionobject.ResponsibleDepartmentList;
 import org.collectionspace.services.collectionobject.TitleGroup;
 import org.collectionspace.services.collectionobject.TitleGroupList;
-import org.collectionspace.services.collectionobject.TitleTranslationSubGroup;
-import org.collectionspace.services.collectionobject.TitleTranslationSubGroupList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
-import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,6 +99,11 @@ public class CollectionObjectServiceTest extends AbstractPoxServiceTestImpl<Abst
     protected CollectionSpaceClient getClientInstance() {
     	return new CollectionObjectClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    	return new CollectionObjectClient(clientPropertiesFilename);
+	}
      
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
+
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.authorization.perms.EffectType;
@@ -35,7 +36,6 @@ import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RoleValue;
-
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PermissionClient;
 import org.collectionspace.services.client.PermissionFactory;
@@ -43,13 +43,10 @@ import org.collectionspace.services.client.PermissionRoleClient;
 import org.collectionspace.services.client.PermissionRoleFactory;
 import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.client.RoleFactory;
-
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
-import org.collectionspace.services.client.test.ServiceRequestType;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
@@ -149,6 +146,11 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
     protected CollectionSpaceClient getClientInstance() {
         return new PermissionRoleClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new PermissionRoleClient(clientPropertiesFilename);
+	}
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)

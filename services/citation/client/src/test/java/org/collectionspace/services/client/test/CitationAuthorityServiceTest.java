@@ -91,6 +91,12 @@ public class CitationAuthorityServiceTest extends AbstractAuthorityServiceTest<C
     protected CollectionSpaceClient getClientInstance() {
         return new CitationAuthorityClient();
     }
+    
+    @Override
+    protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new CitationAuthorityClient(clientPropertiesFilename);
+    }
+
 
     /**
      * Creates an item in an authority.
@@ -99,22 +105,19 @@ public class CitationAuthorityServiceTest extends AbstractAuthorityServiceTest<C
      * @return the string
      */
     @Override
-    protected String createItemInAuthority(String authorityId) {
+    protected String createItemInAuthority(AuthorityClient client, String authorityId) {
 
         final String testName = "createItemInAuthority(" + authorityId + ")";
         if (logger.isDebugEnabled()) {
             logger.debug(testName);
         }
 
-        // Submit the request to the service and store the response.
-        CitationAuthorityClient client = new CitationAuthorityClient();
-
         String commonPartXML = createCommonPartXMLForItem(TEST_SHORTID, TEST_NAME);
 
         String newID;
         try {
             newID = CitationAuthorityClientUtils.createItemInAuthority(authorityId,
-                    commonPartXML, client);
+                    commonPartXML, (CitationAuthorityClient) client);
         } catch (Exception e) {
             logger.error("Problem creating item from XML: " + e.getLocalizedMessage());
             logger.debug("commonPartXML: " + commonPartXML);

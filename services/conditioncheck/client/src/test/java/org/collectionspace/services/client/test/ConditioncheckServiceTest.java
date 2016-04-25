@@ -24,6 +24,7 @@ package org.collectionspace.services.client.test;
 
 //import java.util.ArrayList;
 import java.util.List;
+
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.AbstractCommonListUtils;
@@ -39,9 +40,7 @@ import org.collectionspace.services.conditioncheck.ConditionchecksCommon;
 import org.collectionspace.services.conditioncheck.HazardGroupList;
 import org.collectionspace.services.conditioncheck.HazardGroup;
 
-import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +72,11 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
     protected CollectionSpaceClient getClientInstance() {
         return new ConditioncheckClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new ConditioncheckClient(clientPropertiesFilename);
+	}
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)

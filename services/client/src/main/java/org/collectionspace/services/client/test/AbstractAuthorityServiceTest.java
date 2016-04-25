@@ -3,12 +3,12 @@ package org.collectionspace.services.client.test;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.AuthorityClientImpl;
 import org.collectionspace.services.client.AuthorityProxy;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -44,7 +44,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     protected int nItemsToCreateInList = 5;
 		
 	public abstract void authorityTests(String testName);
-    protected abstract String createItemInAuthority(String authorityId);
+    protected abstract String createItemInAuthority(AuthorityClient client, String authorityId);
  
     protected abstract AUTHORITY_ITEM_TYPE updateItemInstance(final AUTHORITY_ITEM_TYPE authorityItem);    
     protected abstract void compareUpdatedItemInstances(AUTHORITY_ITEM_TYPE original, AUTHORITY_ITEM_TYPE updated) throws Exception;
@@ -59,6 +59,15 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         knownResourceId = id;
         knownResourceShortIdentifer = shortIdentifer;
         knownResourceRefName = refName;
+    }
+
+    /**
+     * Gets a client to the SAS (Shared Authority Server)
+     *
+     * @return the client
+     */
+    protected AuthorityClient getSASClientInstance() {
+    	return (AuthorityClient) this.getClientInstance(CollectionSpaceClient.SAS_CLIENT_PROPERTIES_FILENAME);
     }
 
     /**
@@ -198,7 +207,29 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         // Perform setup.
         setupCreate();
 
-        String newID = createItemInAuthority(knownResourceId);
+        String newID = createItemInAuthority((AuthorityClient) getClientInstance(), knownResourceId);
+
+        // Store the ID returned from the first item resource created
+        // for additional tests below.
+        if (knownItemResourceId == null) {
+            knownItemResourceId = newID;
+            if (null != testName && logger.isDebugEnabled()) {
+                logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);
+            }
+        }
+    }
+    
+    /**
+     * SAS - Create an item on the SAS server.
+     * @param testName
+     */
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"CRUDTests"})
+    public void createSASItem(String testName) {
+        // Perform setup.
+        setupCreate();
+
+        String newID = createItemInAuthority(getSASClientInstance(), knownResourceId);
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
@@ -215,7 +246,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     public void createItemList(String testName) throws Exception {
     	knownAuthorityWithItems = createResource(testName, READITEMS_SHORT_IDENTIFIER);
         for (int j = 0; j < nItemsToCreateInList; j++) {
-        	createItemInAuthority(knownAuthorityWithItems);
+        	createItemInAuthority((AuthorityClient) getClientInstance(), knownAuthorityWithItems);
         }
     }
 

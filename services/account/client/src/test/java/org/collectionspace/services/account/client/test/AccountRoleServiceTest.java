@@ -136,6 +136,11 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
         return new AccountRoleClient();
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new AccountRoleClient(clientPropertiesFilename);
+	}
+
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------

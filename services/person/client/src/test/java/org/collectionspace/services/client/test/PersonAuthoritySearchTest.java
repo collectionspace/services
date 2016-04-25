@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
@@ -37,7 +38,7 @@ import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.person.PersonTermGroup;
-import org.jboss.resteasy.client.ClientResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -151,7 +152,12 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
     protected CollectionSpaceClient getClientInstance() {
     	return new PersonAuthorityClient();
     }
-    
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    	return new PersonAuthorityClient(clientPropertiesFilename);
+	}
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
@@ -672,5 +678,4 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
         // can be deleted after all tests have been run.
         allItemResourceIdsCreated.put(newID, authorityCsid);
     }
-
 }

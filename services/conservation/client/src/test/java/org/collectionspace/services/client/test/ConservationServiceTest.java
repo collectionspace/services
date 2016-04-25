@@ -24,12 +24,12 @@ package org.collectionspace.services.client.test;
 
 //import java.util.ArrayList;
 import java.util.List;
+
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ConservationClient;
-
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -40,9 +40,7 @@ import org.collectionspace.services.conservation.ConservatorsList;
 import org.collectionspace.services.conservation.ConservationStatusGroup;
 import org.collectionspace.services.conservation.ConservationStatusGroupList;
 
-import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +71,11 @@ public class ConservationServiceTest extends AbstractPoxServiceTestImpl<Abstract
     protected CollectionSpaceClient getClientInstance() {
         return new ConservationClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new ConservationClient(clientPropertiesFilename);
+	}
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)

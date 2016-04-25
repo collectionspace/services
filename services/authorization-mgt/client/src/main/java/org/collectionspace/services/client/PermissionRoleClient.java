@@ -27,6 +27,7 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
+
 import org.collectionspace.services.authorization.PermissionRole;
 
 /**
@@ -35,6 +36,15 @@ import org.collectionspace.services.authorization.PermissionRole;
  * @version $Revision:$
  */
 public class PermissionRoleClient extends AbstractServiceClientImpl<PermissionRole, PermissionRole, PermissionRole, PermissionRoleProxy> {
+	
+	public PermissionRoleClient() {
+		super();
+	}
+
+	public PermissionRoleClient(String clientPropertiesFilename) {
+		super(clientPropertiesFilename);
+	}
+
 	@Override
 	public String getServiceName() {
 		throw new UnsupportedOperationException(); //FIXME: REM - http://issues.collectionspace.org/browse/CSPACE-3497

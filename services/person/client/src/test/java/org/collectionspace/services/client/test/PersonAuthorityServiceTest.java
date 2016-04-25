@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.AbstractCommonListUtils;
@@ -34,13 +35,11 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-
 import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.ContactClientUtils;
 import org.collectionspace.services.contact.AddressGroup;
 import org.collectionspace.services.contact.AddressGroupList;
 import org.collectionspace.services.contact.ContactsCommon;
-
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -50,7 +49,6 @@ import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.PersonTermGroup;
 import org.collectionspace.services.person.PersonTermGroupList;
 import org.collectionspace.services.person.PersonsCommon;
-
 import org.jboss.resteasy.client.ClientResponse;
 //import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
@@ -124,17 +122,20 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     protected CollectionSpaceClient getClientInstance() {
         return new PersonAuthorityClient();
     }
+    
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new PersonAuthorityClient(clientPropertiesFilename);
+	}
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
-    // Success outcomes
-    /* (non-Javadoc)
+
+	/* (non-Javadoc)
      * @see org.collectionspace.services.client.test.ServiceTest#create(java.lang.String)
      */
     @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-//    groups = {"create"})
     public void create(String testName) throws Exception {
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
@@ -221,7 +222,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * @return the string
      */
     @Override
-    protected String createItemInAuthority(String vcsid) {
+    protected String createItemInAuthority(AuthorityClient client, String vcsid) {
 
         final String testName = "createItemInAuthority";
         if (logger.isDebugEnabled()) {
@@ -259,7 +260,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         johnWayneGroups.add("Scottish");
         johnWayneRepeatablesMap.put(PersonJAXBSchema.GROUPS, johnWayneGroups);
 
-        return createItemInAuthority(vcsid, null /*authRefName*/, shortId, johnWayneMap, johnWayneTerms, johnWayneRepeatablesMap);
+        return createItemInAuthority(client, vcsid, null /*authRefName*/, shortId, johnWayneMap, johnWayneTerms, johnWayneRepeatablesMap);
 
     }
 
@@ -272,7 +273,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * @param itemRepeatableFieldProperties a set of properties specifying the values of repeatable fields.
      * @return the string
      */
-    private String createItemInAuthority(String vcsid, String authRefName, String shortId,
+    private String createItemInAuthority(AuthorityClient client, String vcsid, String authRefName, String shortId,
             Map itemFieldProperties, List<PersonTermGroup> terms, Map itemRepeatableFieldProperties) {
 
         final String testName = "createItemInAuthority";
@@ -281,7 +282,9 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         }
 
         // Submit the request to the service and store the response.
-        PersonAuthorityClient client = new PersonAuthorityClient();
+        if (client == null) {
+        	client = new PersonAuthorityClient();
+        }
         PoxPayloadOut multipart =
                 PersonAuthorityClientUtils.createPersonInstance(vcsid, null /*authRefName*/, itemFieldProperties,
                 terms, itemRepeatableFieldProperties, client.getItemCommonPartName());
@@ -399,9 +402,9 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 
         // Submit the request to the service and store the response.
         Response res = client.create(multipart);
-
+        String newID = null;
         // Check the status code of the response: does it match
-        // the expected response(s)?
+        // the expected response(s)?  We expect failure here.
         try {
         	assertStatusCode(res, testName);
         } finally {
@@ -444,15 +447,17 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 
         // Send the request and receive a response
         Response res = client.createItem(knownResourceId, multipart);
+        String newID = null;
         // Check the status code of the response: does it match
-        // the expected response(s)?
+        // the expected response(s)?  We expect failure here, so there will be no
+        // new ID to keep track of for later cleanup.
         try {
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
         		res.close();
         	}
-        }
+        }        
     }
 
     // ---------------------------------------------------------------
@@ -742,8 +747,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      *
      * @param testName the test name
      */
-    @Test(dataProvider = "testName", groups = {"readItem"},
-    		dependsOnMethods = {"readContact"})
+    @Test(dataProvider = "testName", groups = {"readItem"}, dependsOnMethods = {"readContact"})
     public void readContactNonExistent(String testName) {
         // Perform setup.
         setupReadNonExistent();
@@ -766,11 +770,9 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     // ---------------------------------------------------------------
 
     /**
-     * Read item list.
+     * Read item list override -see immediate superclass.
      */
     @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-//    groups = {"readList"}, dependsOnMethods = {"readList"})
     public void readItemList(String testName) {
         readItemList(knownAuthorityWithItems, null, testName);
     }
@@ -779,8 +781,6 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * Read item list by authority name.
      */
     @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-//    groups = {"readList"}, dependsOnMethods = {"readItemList"})
     public void readItemListByName(String testName) {
         readItemList(null, READITEMS_SHORT_IDENTIFIER, testName);
     }
@@ -968,14 +968,12 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     }
 
     /**
-     * Update item.
+     * Update item override -see immediate superclass.
      *
      * @param testName the test name
      * @throws Exception the exception
      */
     @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-//    groups = {"update"}, dependsOnMethods = {"update"})
     public void updateItem(String testName) throws Exception {
         // Retrieve the contents of a resource to update.
         PersonAuthorityClient client = new PersonAuthorityClient();
@@ -1295,9 +1293,29 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
             parentResourceId = entry.getValue();
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
+            Response response = client.deleteItem(parentResourceId, itemResourceId);
+            try {
+            	int status = response.getStatus();
+            	if (status != Response.Status.OK.getStatusCode()) {
+            		logger.debug(String.format("Could not deleted authority item '%s' in authority '%s'.",
+            				itemResourceId, parentResourceId));
+            	}
+            } finally {
+            	response.close();
+            }
+        }
+        // Clean up item using the SAS client resources.
+        client = (PersonAuthorityClient) this.getSASClientInstance();
+        for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
+            itemResourceId = entry.getKey();
+            parentResourceId = entry.getValue();
+            // Note: Any non-success responses from the delete operation
+            // below are ignored and not reported.
             client.deleteItem(parentResourceId, itemResourceId).close();
         }
-        // Clean up parent resources.
+        //
+        // Finally, clean up parent resources.
+        //
         super.cleanUp();
     }
 
@@ -1491,6 +1509,5 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 	protected void verifyReadItemInstance(PersonsCommon item) throws Exception {
 		// Do nothing for now.  Add more 'read' validation checks here if applicable.
 	}
-        
         
 }

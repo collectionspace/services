@@ -107,6 +107,11 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         return new OrgAuthorityClient();
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new OrgAuthorityClient(clientPropertiesFilename);
+	}
+
     @Override
     protected PoxPayloadOut createInstance(String identifier) {
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -143,15 +148,12 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      * @param authRefName the auth ref name
      * @return the string
      */
-    private String createItemInAuthority(String vcsid, String authRefName) {
+    private String createItemInAuthority(AuthorityClient client, String vcsid, String authRefName) {
 
         final String testName = "createItemInAuthority";
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ":...");
         }
-
-        // Submit the request to the service and store the response.
-        OrgAuthorityClient client = new OrgAuthorityClient();
         
         String shortId = TEST_SHORT_ID + System.currentTimeMillis();
         Map<String, String> testOrgMap = new HashMap<String, String>();
@@ -173,7 +175,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         testOrgRepeatablesMap.put(OrganizationJAXBSchema.CONTACT_NAMES, testOrgContactNames);
 
         String newID = OrgAuthorityClientUtils.createItemInAuthority(
-                vcsid, authRefName, testOrgMap, terms, testOrgRepeatablesMap, client);
+                vcsid, authRefName, testOrgMap, terms, testOrgRepeatablesMap, (OrgAuthorityClient) client);
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
@@ -1052,8 +1054,8 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 	}
 
 	@Override
-	protected String createItemInAuthority(String authorityId) {
-		return createItemInAuthority(authorityId, null /*refname*/);
+	protected String createItemInAuthority(AuthorityClient client, String authorityId) {
+		return createItemInAuthority(client, authorityId, null /*refname*/);
 	}
 
 	@Override
@@ -1143,5 +1145,4 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         		original.getDisplayName(),
                 "Display name in updated object did not match submitted data.");
 	}
-
 }

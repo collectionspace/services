@@ -44,7 +44,6 @@ import org.collectionspace.services.location.LocTermGroup;
 import org.collectionspace.services.location.LocTermGroupList;
 import org.collectionspace.services.location.LocationauthoritiesCommon;
 import org.collectionspace.services.location.LocationsCommon;
-import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -105,6 +104,11 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
     	return new LocationAuthorityClient();
     }
     
+    @Override
+    protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    	return new LocationAuthorityClient(clientPropertiesFilename);
+    }
+    
     /**
      * Creates the item in authority.
      *
@@ -112,11 +116,10 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
      * @param authRefName the auth ref name
      * @return the string
      */
-    private String createItemInAuthority(String vcsid, String authRefName) {
+    private String createItemInAuthority(AuthorityClient client, String vcsid, String authRefName) {
         final String testName = "createItemInAuthority("+vcsid+","+authRefName+")";
 
         // Submit the request to the service and store the response.
-        LocationAuthorityClient client = new LocationAuthorityClient();
         Map<String, String> shelf1Map = new HashMap<String,String>();
         // TODO Make loc type and status be controlled vocabs.
         shelf1Map.put(LocationJAXBSchema.SHORT_IDENTIFIER, TEST_SHORTID);
@@ -136,7 +139,7 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
                 shelf1Map.put(LocationJAXBSchema.TERM_STATUS, TEST_STATUS);
 
         String newID = LocationAuthorityClientUtils.createItemInAuthority(vcsid,
-        		authRefName, shelf1Map, shelf1Terms, client );
+        		authRefName, shelf1Map, shelf1Terms, (LocationAuthorityClient) client);
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
@@ -456,8 +459,8 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
 	//
 	
 	@Override
-	protected String createItemInAuthority(String authorityId) {
-		return createItemInAuthority(authorityId, null /*refname*/);
+	protected String createItemInAuthority(AuthorityClient client, String authorityId) {
+		return createItemInAuthority(client, authorityId, null /*refname*/);
 	}
 
 	@Override

@@ -29,6 +29,7 @@ package org.collectionspace.services.client;
 import javax.ws.rs.core.Response;
 
 
+
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RolesList;
@@ -45,7 +46,15 @@ public class RoleClient extends AbstractServiceClientImpl<RolesList, Role, Role,
 	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
 	public final static String IMMUTABLE = "immutable";
 
-    @Override
+    public RoleClient() {
+		super();
+	}
+
+    public RoleClient(String clientPropertiesFilename) {
+		super(clientPropertiesFilename);
+	}
+
+	@Override
     public String getServiceName() { 
     	throw new UnsupportedOperationException(); //FIXME: REM - http://issues.collectionspace.org/browse/CSPACE-3498 }
     }

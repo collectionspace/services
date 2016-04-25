@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.acquisition.AcquisitionSourceList;
@@ -42,11 +41,8 @@ import org.collectionspace.services.report.ReportsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.client.AcquisitionClient;
 
-import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
-//import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -156,6 +152,11 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
     protected CollectionSpaceClient getClientInstance() {
         return new ReportClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new ReportClient(clientPropertiesFilename);
+	}
     
     @Test(dataProvider = "testName",
     		dependsOnMethods = {"CRUDTests"})

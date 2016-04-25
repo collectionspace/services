@@ -43,7 +43,7 @@ import org.collectionspace.services.place.PlaceTermGroup;
 import org.collectionspace.services.place.PlaceTermGroupList;
 import org.collectionspace.services.place.PlaceauthoritiesCommon;
 import org.collectionspace.services.place.PlacesCommon;
-import org.jboss.resteasy.client.ClientResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -102,7 +102,6 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
     /** The known resource id. */
     private String knownResourceShortIdentifer = null;
     private String knownResourceRefName = null;
-    
     private String knownPlaceTypeRefName = null;
     
     /* (non-Javadoc)
@@ -113,18 +112,22 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
         return new PlaceAuthorityClient();
     }
 
-    /**
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new PlaceAuthorityClient(clientPropertiesFilename);
+	}
+	
+	/**
      * Creates the item in authority.
      *
      * @param vcsid the vcsid
      * @param authRefName the auth ref name
      * @return the string
      */
-    private String createItemInAuthority(String vcsid, String authRefName) {
+    private String createItemInAuthority(AuthorityClient client, String vcsid, String authRefName) {
         final String testName = "createItemInAuthority("+vcsid+","+authRefName+")"; 
     
         // Submit the request to the service and store the response.
-        PlaceAuthorityClient client = new PlaceAuthorityClient();
         Map<String, String> sanjoseMap = new HashMap<String,String>();
         // TODO Make place type and status be controlled vocabs.
         sanjoseMap.put(PlaceJAXBSchema.SHORT_IDENTIFIER, TEST_SHORTID);
@@ -141,7 +144,7 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
         terms.add(term);
         
         String newID = PlaceAuthorityClientUtils.createItemInAuthority(vcsid,
-        		authRefName, sanjoseMap, terms, client );    
+        		authRefName, sanjoseMap, terms, (PlaceAuthorityClient) client);    
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
@@ -461,8 +464,8 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
 	//
 	
 	@Override
-	protected String createItemInAuthority(String authorityId) {
-		return createItemInAuthority(authorityId, null /*refname*/);
+	protected String createItemInAuthority(AuthorityClient client, String authorityId) {
+		return createItemInAuthority(client, authorityId, null /*refname*/);
 	}
 
 	@Override
@@ -521,4 +524,5 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
     			nonexMap, PlaceAuthorityClientUtils.getTermGroupInstance(TEST_NAME), commonPartName);
 		return result;
 	}
+
 }

@@ -23,6 +23,7 @@
 package org.collectionspace.services.client.test;
 
 import java.util.List;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -34,17 +35,14 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
 import org.collectionspace.services.acquisition.AcquisitionDateGroupList;
 import org.collectionspace.services.acquisition.AcquisitionSourceList;
 import org.collectionspace.services.acquisition.OwnerList;
-import org.jboss.resteasy.client.ClientResponse;
 import org.collectionspace.services.acquisition.StructuredDateGroup;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,6 +80,11 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
     protected CollectionSpaceClient getClientInstance() {
     	return new AcquisitionClient();
     }
+    
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    	return new AcquisitionClient(clientPropertiesFilename);
+	}
     
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
@@ -923,6 +926,6 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
         		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
     public void CRUDTests(String testName) {
     	// Do nothing.  Simply here to for a TestNG execution order for our tests
-    }	
+    }
 }
 

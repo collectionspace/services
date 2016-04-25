@@ -94,6 +94,11 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
     protected CollectionSpaceClient getClientInstance() {
     	return new ConceptAuthorityClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    	return new ConceptAuthorityClient(clientPropertiesFilename);
+	}
     
     /**
      * Creates the item in authority.
@@ -103,22 +108,19 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
      * @return the string
      */
 	@Override
-	protected String createItemInAuthority(String authorityId) {
+	protected String createItemInAuthority(AuthorityClient client, String authorityId) {
 
         final String testName = "createItemInAuthority("+authorityId+")";
         if(logger.isDebugEnabled()){
             logger.debug(testName);
         }
 
-        // Submit the request to the service and store the response.
-        ConceptAuthorityClient client = new ConceptAuthorityClient();
-        
         String commonPartXML = createCommonPartXMLForItem(TEST_SHORTID, TEST_NAME);
 
         String newID = null;
         try {
         	newID = ConceptAuthorityClientUtils.createItemInAuthority(authorityId,
-        		commonPartXML, client );
+        		commonPartXML, (ConceptAuthorityClient) client);
         } catch( Exception e ) {
             logger.error("Problem creating item from XML: "+e.getLocalizedMessage());
             logger.debug("commonPartXML: "+commonPartXML);
@@ -462,5 +464,4 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
         }
         return null;
 	}
-
 }

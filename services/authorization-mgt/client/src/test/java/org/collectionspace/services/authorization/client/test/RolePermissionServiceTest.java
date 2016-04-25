@@ -27,9 +27,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
-import javax.ws.rs.core.Response;
-import org.collectionspace.services.authorization.perms.EffectType;
 
+import javax.ws.rs.core.Response;
+
+import org.collectionspace.services.authorization.perms.EffectType;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionAction;
 import org.collectionspace.services.authorization.PermissionRole;
@@ -48,7 +49,6 @@ import org.collectionspace.services.client.test.ServiceRequestType;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
@@ -143,6 +143,11 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
     protected CollectionSpaceClient getClientInstance() {
         return new RolePermissionClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new RolePermissionClient(clientPropertiesFilename);
+	}	
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readPaginatedList(java.lang.String)
@@ -725,5 +730,5 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
         		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
     public void CRUDTests(String testName) {
     	// Do nothing.  Simply here to for a TestNG execution order for our tests
-    }	
+    }
 }
