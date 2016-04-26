@@ -938,14 +938,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             // below are ignored and not reported.
             client.deleteContact(parentResourceId, itemResourceId, contactResourceId).close();
         }
-        // Clean up item resources.
-        for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
-            itemResourceId = entry.getKey();
-            parentResourceId = entry.getValue();
-            // Note: Any non-success responses from the delete operation
-            // below are ignored and not reported.
-            client.deleteItem(parentResourceId, itemResourceId).close();
-        }
+
         // Clean up parent resources.
         super.cleanUp();
 

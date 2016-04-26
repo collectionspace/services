@@ -13,7 +13,6 @@ import org.collectionspace.services.client.AuthorityProxy;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.slf4j.Logger;
@@ -299,7 +298,6 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         }
     }
 
-    
     /**
      * SAS - Create an item in the SAS authority on the SAS server.
      * @param testName
@@ -309,7 +307,8 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         // Perform setup.
         setupCreate();
 
-        String newID = createItemInAuthority(getSASClientInstance(), knownSASAuthorityResourceId);
+        String shortId = "SassyActor" + System.currentTimeMillis() + random.nextInt();; // short ID needs to be unique
+        String newID = createItemInAuthority(getSASClientInstance(), knownSASAuthorityResourceId, shortId);
 
 		// Store the ID returned from the first item resource created
         // for additional tests below.
@@ -319,6 +318,12 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
                 logger.debug(testName + ": knownSASItemResourceId=" + knownSASItemResourceId);
             }
         }
+        //
+        // Keep track of the SAS authority items we create, so we can delete them from
+        // the *local* authority after we perform a sync operation.  We need to keep track
+        // of the URN (not the CSID) since the CSIDs will differ on the SAS vs local.
+        //
+        this.allSASResourceItemIdsCreated.put(this.getUrnIdentifier(shortId), getUrnIdentifier(getSASAuthorityIdentifier()));
     }
     
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
@@ -720,10 +725,11 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
             }
         }
         //
-        // Clean up authority items using the SAS client.
+        // Clean up authority items that were the result of a sync with the SAS
+        // all the IDs are URN (not CSIDs).  The URNs work for the local items as well
+        // as the SAS items.
         //
-        client = (AuthorityClient) this.getSASClientInstance();
-        for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
+        for (Map.Entry<String, String> entry : allSASResourceItemIdsCreated.entrySet()) {
             itemResourceId = entry.getKey();
             parentResourceId = entry.getValue();
             // Note: Any non-success responses from the delete operation
@@ -731,12 +737,23 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
             client.deleteItem(parentResourceId, itemResourceId).close();
         }
         //
-        // Call out superclass's cleanUp method to delete the SAS authorities
+        // Clean up authority items on the SAS using the SAS client.
         //
-        super.cleanUp(client);
+        client = (AuthorityClient) this.getSASClientInstance();
+        for (Map.Entry<String, String> entry : allSASResourceItemIdsCreated.entrySet()) {
+            itemResourceId = entry.getKey();
+            parentResourceId = entry.getValue();
+            client.deleteItem(parentResourceId, itemResourceId).close();
+        }
         //
         // Finally, call out superclass's cleanUp method to deleted the local authorities
         //
         super.cleanUp();
+        //
+        // Call out superclass's cleanUp method to delete the SAS authorities
+        //
+        super.cleanUp(client);        
     }
+    
+	abstract protected String createItemInAuthority(AuthorityClient client, String vcsid, String shortId);
 }

@@ -212,6 +212,12 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         return PersonAuthorityClientUtils.createPersonInstance(parentCsid, identifier, personInfo, terms, headerLabel);
     }
 
+    @Override
+    protected String createItemInAuthority(AuthorityClient client, String vcsid) {
+        String shortId = "johnWayneActor" + System.currentTimeMillis() + random.nextInt();; // short ID needs to be unique
+        return this.createItemInAuthority(client, vcsid, shortId);
+    }
+    
     /**
      * Creates an item in an authority, using test data.
      *
@@ -220,7 +226,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * @return the string
      */
     @Override
-    protected String createItemInAuthority(AuthorityClient client, String vcsid) {
+    protected String createItemInAuthority(AuthorityClient client, String vcsid, String shortId) {
 
         final String testName = "createItemInAuthority";
         if (logger.isDebugEnabled()) {
@@ -231,7 +237,6 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         //
         // Fill the property map
         //
-        String shortId = "johnWayneActor" + System.currentTimeMillis(); // short ID needs to be unique
         johnWayneMap.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
         johnWayneMap.put(PersonJAXBSchema.GENDER, "male");
         johnWayneMap.put(PersonJAXBSchema.BIRTH_DATE, TEST_BIRTH_DATE);
@@ -306,6 +311,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
                 logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);
             }
         }
+        
         if (logger.isDebugEnabled()) {
             logger.debug(testName + " (created):" + vcsid + "/(" + newID + "," + shortId + ")");
         }

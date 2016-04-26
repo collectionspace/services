@@ -99,7 +99,7 @@ public abstract class BaseServiceTest<CLT> {
     /* A runtime/command-line parameter to indicate if we should delete all the test related resource objects */
     static private final String NO_TEST_CLEANUP = "noTestCleanup";
     /* A random number generator */
-    static private final Random random = new Random(System.currentTimeMillis());
+    protected static final Random random = new Random(System.currentTimeMillis());
     
     
     /** The non-existent id. */
