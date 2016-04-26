@@ -750,26 +750,10 @@ public abstract class BaseServiceTest<CLT> {
             }
             return;
         }
-        
-        if (logger.isDebugEnabled()) {
-            logger.debug("Cleaning up temporary resources created for testing ...");
-        }
-        CollectionSpaceClient client = this.getClientInstance();
-        //
-        // First, check to see if we need to cleanup any authority items
-        //
-        if (this.isAuthorityClient(client) == true) {
-            AuthorityClient authorityClient = (AuthorityClient) client;
-            for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
-                String itemResourceId = entry.getKey();
-                String authorityResourceId = entry.getValue();
-                // Note: Any non-success responses are ignored and not reported.
-                authorityClient.deleteItem(authorityResourceId, itemResourceId).close();
-            }
-        }
-        //
-        // Next, delete all other entities include possible authorities.
-        //
+        cleanUp(this.getClientInstance());
+    }
+    
+    public void cleanUp(CollectionSpaceClient client) {
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
             client.delete(resourceId).close();

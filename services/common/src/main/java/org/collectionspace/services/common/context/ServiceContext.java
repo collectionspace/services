@@ -357,6 +357,8 @@ public interface ServiceContext<IT, OT> {
 	public void setRepositoryDomain(RepositoryDomainType repositoryDomain);
 
 	public CollectionSpaceClient getClient() throws Exception;
+	
+	public CollectionSpaceClient getClient(String clientProperitesFilename) throws Exception;
 
     /**
      * @return the JAX-RS resource of service for the current context.

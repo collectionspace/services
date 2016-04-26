@@ -1,5 +1,6 @@
 package org.collectionspace.services.client;
 
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -76,6 +77,13 @@ public abstract class AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P extends Authori
         return getProxy().getItemAuthorityRefs(parentcsid, csid);
     }
     
+    /*
+     * Synchronization method
+     */
+    public Response syncByName(String name) {
+    	return getProxy().syncByName(name);
+    }
+
     /*
      * 
      */

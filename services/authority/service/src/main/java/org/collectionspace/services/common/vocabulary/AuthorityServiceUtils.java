@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.AuthorityClient;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.common.api.RefNameUtils.AuthorityTermInfo;
 import org.collectionspace.services.common.context.MultipartServiceContextImpl;
@@ -43,10 +44,19 @@ public class AuthorityServiceUtils {
 
     public static final Boolean NO_CHANGE = null;
 
+    /**
+     * Make a request to the SAS Server for an authority payload.
+     * 
+     * @param ctx
+     * @param specifier
+     * @param responseType
+     * @return
+     * @throws Exception
+     */
     static public PoxPayloadIn requestPayloadIn(ServiceContext ctx, Specifier specifier, Class responseType) throws Exception {
     	PoxPayloadIn result = null;
     	
-        AuthorityClient client = (AuthorityClient) ctx.getClient();
+        AuthorityClient client = (AuthorityClient) ctx.getClient(CollectionSpaceClient.SAS_CLIENT_PROPERTIES_FILENAME);
         Response res = client.read(specifier.getURNValue());
         try {
 	        int statusCode = res.getStatus();
@@ -72,7 +82,7 @@ public class AuthorityServiceUtils {
     	PoxPayloadIn result = null;
     	
     	ServiceContext parentCtx = new MultipartServiceContextImpl(serviceName);
-        AuthorityClient client = (AuthorityClient) parentCtx.getClient();
+        AuthorityClient client = (AuthorityClient) parentCtx.getClient(CollectionSpaceClient.SAS_CLIENT_PROPERTIES_FILENAME);
         Response res = client.readItem(specifier.getParentSpecifier().getURNValue(), specifier.getItemSpecifier().getURNValue());
         try {
 	        int statusCode = res.getStatus();

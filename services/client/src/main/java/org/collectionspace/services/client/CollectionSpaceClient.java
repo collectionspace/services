@@ -24,6 +24,7 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.jboss.resteasy.client.ClientResponse;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
@@ -134,8 +135,9 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * PASSWORD_PROPERTY
      * AUTH_PROPERTY
      * SSL_PROPERTY
+     * @throws Exception 
      */
-    void setupHttpClient();
+    void setupHttpClient() throws Exception;
 
     /**
      * setProxy for the client
@@ -237,4 +239,11 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * @return the client response
      */
     public Response delete(String csid);
+
+    /**
+     * Uses a properties files to set the url and credentials for an HTTP connection.
+     * 
+     * @param clientPropertiesFilename
+     */
+	public void setClientProperties(String clientPropertiesFilename);
 }

@@ -144,8 +144,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      * @throws Exception 
      */
     public AbstractServiceClientImpl(String propertiesFileName) {
-        readClientProperties(propertiesFileName);
-        init();
+        setClientProperties(propertiesFileName);
     }
     
     /**
@@ -154,7 +153,6 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      */
     public AbstractServiceClientImpl(Properties properties) {
         setClientProperties(properties);
-        init();
     }
     
     /**
@@ -165,8 +163,14 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
     	if (this.properties.isEmpty() == true) {
     		throw new RuntimeException("Client connection properties are empty.  Cannot proceed.");
     	}
-        setupHttpClient();
-        setupHttpClient4(); // temp fix for CSPACE-6281
+    	
+    	try {
+	        setupHttpClient();
+	        setupHttpClient4(); // temp fix for CSPACE-6281
+    	} catch (Exception e) {
+    		throw new RuntimeException(e.getMessage());
+    	}
+    	
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         RegisterBuiltin.register(factory);
         setProxy();        
@@ -332,7 +336,8 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      *
      * @exception RuntimeException
      */
-    protected void readClientProperties(String clientPropertiesFilename) {
+    @Override
+    public void setClientProperties(String clientPropertiesFilename) {
     	Properties inProperties = new Properties();
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         InputStream is = null;
@@ -364,7 +369,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      * @throws Exception 
      */
     protected void setClientProperties(Properties inProperties) {
-        properties.putAll(inProperties);
+        properties = inProperties;
         
         if (logger.isDebugEnabled()) {
         	System.getenv();
@@ -411,15 +416,21 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
         if (logger.isDebugEnabled()) {
             printProperties();
         }
+        //
+        // How use the properties to initialize the HTTP client
+        //
+        init();
     }    
 
     /**
      * setupHttpClient sets up HTTP client for the service client the setup
      * process relies on the following properties URL_PROPERTY USER_PROPERTY
      * PASSWORD_PROPERTY AUTH_PROPERTY SSL_PROPERTY
+     * 
+     * @throws Exception 
      */
     @Override
-    public void setupHttpClient() {
+    public void setupHttpClient() throws Exception {
     	try {
 	        this.httpClient = new HttpClient();
 	        if (useAuth()) {
@@ -445,7 +456,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
 	            }
 	        }
     	} catch (Throwable e) {
-    		e.printStackTrace();
+    		throw new Exception("Could not setup an HTTP client as requested with ", e);
     	}
     }
     
@@ -453,7 +464,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      * This is a temp fix for RESTEasy upgrade in CSPACE-6281.  The long-term solution will be to use
      * the non-deprecated approach per the RESTEasy documentation.
      */
-    public void setupHttpClient4() {
+    public void setupHttpClient4() throws Exception {
     	try {
 	        this.httpClient4 = new DefaultHttpClient();
 	        if (useAuth()) {
@@ -479,7 +490,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
 	            }
 	        }
     	} catch (Throwable e) {
-    		e.printStackTrace();
+    		throw new Exception("Could not setup an HTTP client as requested with ", e);
     	}
     }    
 
@@ -556,8 +567,14 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
         } else {
             removeProperty(CollectionSpaceClient.AUTH_PROPERTY);
         }
-        setupHttpClient();
-        setupHttpClient(); // temp fix for CSPACE-6281
+        
+        try {
+	        setupHttpClient();
+	        setupHttpClient(); // temp fix for CSPACE-6281
+        } catch (Exception e) {
+    		throw new RuntimeException(e.getMessage());
+        }
+        
         setProxy();
     }
     

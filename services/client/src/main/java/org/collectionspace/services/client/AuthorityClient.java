@@ -1,8 +1,9 @@
 package org.collectionspace.services.client;
 
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 
+import org.jboss.resteasy.client.ClientResponse;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -61,7 +62,13 @@ public interface AuthorityClient<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
     public Response getItemAuthorityRefs(String parentcsid, String itemcsid);    
     
     /*
-     * 
+     * Synchronization methods
+     */
+    Response syncByName(String name);
+
+    
+    /*
+     * READ/GET by name method
      */
     
     Response readByName(String name);

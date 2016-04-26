@@ -155,8 +155,16 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     protected String createResource(String testName, String identifier) throws Exception {
         String result = null;
         
-    	setupCreate();
     	CollectionSpaceClient client = this.getClientInstance();
+        result = createResource(client, testName, identifier);
+    	
+    	return result;
+    }
+    
+    protected String createResource(CollectionSpaceClient client, String testName, String identifier) throws Exception {
+        String result = null;
+        
+    	setupCreate();
         REQUEST_TYPE payload = createInstance(client.getCommonPartName(), identifier);
         Response res = client.create(payload);
     	try {
@@ -177,7 +185,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     	}
     	
     	return result;
-    }
+    }    
     
 	abstract public Class<RESPONSE_TYPE> getEntityResponseType();
     

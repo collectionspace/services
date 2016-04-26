@@ -489,7 +489,15 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     	*/
     	
     }    
-        
+    
+    /**
+     * Request an authority item list payload from the SAS server.
+     * 
+     * @param ctx
+     * @param specifier
+     * @return
+     * @throws Exception
+     */
     private PoxPayloadIn requestPayloadInItemList(ServiceContext ctx, Specifier specifier) throws Exception {
     	PoxPayloadIn result = null;
     	

@@ -49,8 +49,6 @@ import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.PersonTermGroup;
 import org.collectionspace.services.person.PersonTermGroupList;
 import org.collectionspace.services.person.PersonsCommon;
-import org.jboss.resteasy.client.ClientResponse;
-//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -1269,9 +1267,11 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
             }
             return;
         }
+        
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
+        
         String parentResourceId;
         String itemResourceId;
         String contactResourceId;
@@ -1287,34 +1287,8 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
             		contactResourceId);
             res.close();
         }
-        // Clean up item resources.
-        for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
-            itemResourceId = entry.getKey();
-            parentResourceId = entry.getValue();
-            // Note: Any non-success responses from the delete operation
-            // below are ignored and not reported.
-            Response response = client.deleteItem(parentResourceId, itemResourceId);
-            try {
-            	int status = response.getStatus();
-            	if (status != Response.Status.OK.getStatusCode()) {
-            		logger.debug(String.format("Could not deleted authority item '%s' in authority '%s'.",
-            				itemResourceId, parentResourceId));
-            	}
-            } finally {
-            	response.close();
-            }
-        }
-        // Clean up item using the SAS client resources.
-        client = (PersonAuthorityClient) this.getSASClientInstance();
-        for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
-            itemResourceId = entry.getKey();
-            parentResourceId = entry.getValue();
-            // Note: Any non-success responses from the delete operation
-            // below are ignored and not reported.
-            client.deleteItem(parentResourceId, itemResourceId).close();
-        }
         //
-        // Finally, clean up parent resources.
+        // Finally, clean call our superclass' cleanUp method.
         //
         super.cleanUp();
     }
@@ -1486,7 +1460,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         return result;
     }
 	        
-        @Override
+    @Override
 	protected PersonauthoritiesCommon updateInstance(PersonauthoritiesCommon personauthoritiesCommon) {
 		PersonauthoritiesCommon result = new PersonauthoritiesCommon();
 		
@@ -1508,6 +1482,5 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 	@Override
 	protected void verifyReadItemInstance(PersonsCommon item) throws Exception {
 		// Do nothing for now.  Add more 'read' validation checks here if applicable.
-	}
-        
+	}        
 }

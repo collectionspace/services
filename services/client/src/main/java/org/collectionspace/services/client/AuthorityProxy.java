@@ -75,7 +75,16 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
             @PathParam("itemcsid") String itemcsid);
     
     /*
-     * 
+     * Synchronization methods
+     */
+    
+    // Sync by name
+    @GET
+    @Path("/urn:cspace:name({name})/sync")
+    Response syncByName(@PathParam("name") String name);
+    
+    /*
+     * READ/GET Methods
      */
     
     //(R)ead by name
