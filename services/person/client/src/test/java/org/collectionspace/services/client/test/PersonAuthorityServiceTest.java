@@ -32,7 +32,6 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.ContactClient;
@@ -49,6 +48,7 @@ import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.PersonTermGroup;
 import org.collectionspace.services.person.PersonTermGroupList;
 import org.collectionspace.services.person.PersonsCommon;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -67,6 +67,19 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     /** The logger. */
     private final String CLASS_NAME = PersonAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    
+    /**
+     * Default constructor.  Used to set the short ID for all tests authority items
+     */
+    public PersonAuthorityServiceTest() {
+    	super();
+    	TEST_SHORTID = "johnWayneActor";
+    }
+    
+    @Override
+	protected String getTestAuthorityItemShortId() {
+		return getTestAuthorityItemShortId(true); // The short ID of every person item we create should be unique
+	}
 
     @Override
     public String getServicePathComponent() {
@@ -81,6 +94,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     public String getItemServicePathComponent() {
         return AuthorityClient.ITEMS;
     }
+    
     /** The test forename. */
     final String TEST_FORE_NAME = "John";
     /** The test middle name. */
@@ -93,14 +107,13 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     final String TEST_DEATH_DATE = "June 11, 1979";
     //private String knownResourceRefName = null;
     private String knownItemResourceShortIdentifer = null;
-    // The resource ID of an item resource used for partial term matching tests.
-    private String knownItemPartialTermResourceId = null;
     /** The known contact resource id. */
     private String knownContactResourceId = null;
     /** The all contact resource ids created. */
     private Map<String, String> allContactResourceIdsCreated =
             new HashMap<String, String>();
 
+    
     protected void setKnownResource(String id, String shortIdentifer,
             String refName) {
         knownResourceId = id;
@@ -212,11 +225,6 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         return PersonAuthorityClientUtils.createPersonInstance(parentCsid, identifier, personInfo, terms, headerLabel);
     }
 
-    @Override
-    protected String createItemInAuthority(AuthorityClient client, String vcsid) {
-        String shortId = "johnWayneActor" + System.currentTimeMillis() + random.nextInt();; // short ID needs to be unique
-        return this.createItemInAuthority(client, vcsid, shortId);
-    }
     
     /**
      * Creates an item in an authority, using test data.
@@ -277,7 +285,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * @return the string
      */
     private String createItemInAuthority(AuthorityClient client, String vcsid, String authRefName, String shortId,
-            Map itemFieldProperties, List<PersonTermGroup> terms, Map itemRepeatableFieldProperties) {
+            Map<String, String> itemFieldProperties, List<PersonTermGroup> terms, Map<String, List<String>> itemRepeatableFieldProperties) {
 
         final String testName = "createItemInAuthority";
         if (logger.isDebugEnabled()) {
@@ -333,7 +341,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     		dependsOnMethods = {"createItem"})
     public void createContact(String testName) {
         setupCreate();
-        String newID = createContactInItem(knownResourceId, knownItemResourceId);
+        createContactInItem(knownResourceId, knownItemResourceId);
     }
 
     /**
@@ -406,7 +414,6 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 
         // Submit the request to the service and store the response.
         Response res = client.create(multipart);
-        String newID = null;
         // Check the status code of the response: does it match
         // the expected response(s)?  We expect failure here.
         try {
@@ -443,7 +450,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         term.setTermName(shortId);
         terms.add(term);
         
-        final Map NULL_REPEATABLE_FIELD_PROPERTIES = null;
+        final Map<String, List<String>> NULL_REPEATABLE_FIELD_PROPERTIES = null;
         PoxPayloadOut multipart =
                 PersonAuthorityClientUtils.createPersonInstance(knownResourceId,
                 null /*knownResourceRefName*/, fieldProperties, terms,
@@ -451,7 +458,6 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 
         // Send the request and receive a response
         Response res = client.createItem(knownResourceId, multipart);
-        String newID = null;
         // Check the status code of the response: does it match
         // the expected response(s)?  We expect failure here, so there will be no
         // new ID to keep track of for later cleanup.
@@ -694,7 +700,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 
         // Submit the updated resource to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(PersonAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(client.getItemCommonPartName(), person);
+        output.addPart(client.getItemCommonPartName(), person);
         setupUpdateWithInvalidBody();
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
         try {
@@ -947,7 +953,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 
         // Submit the updated resource to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(PersonAuthorityClient.SERVICE_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(client.getCommonPartName(), personAuthority);
+        output.addPart(client.getCommonPartName(), personAuthority);
         setupUpdate();
         res = client.update(knownResourceId, output);
         try {
@@ -1025,7 +1031,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 
         // Submit the updated resource to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(PersonAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(client.getItemCommonPartName(), person);
+        output.addPart(client.getItemCommonPartName(), person);
         setupUpdate();
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
         try {
@@ -1114,7 +1120,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 
         // Submit the updated resource to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(ContactClient.SERVICE_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(contactsCommonLabel, contact);
+        output.addPart(contactsCommonLabel, contact);
         setupUpdate();
         res = client.updateContact(knownResourceId, knownItemResourceId, knownContactResourceId, output);
         try {
@@ -1283,7 +1289,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         String contactResourceId;
         // Clean up contact resources.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        parentResourceId = knownResourceId;
+        parentResourceId = this.getKnowResourceId();
         for (Map.Entry<String, String> entry : allContactResourceIdsCreated.entrySet()) {
             contactResourceId = entry.getKey();
             itemResourceId = entry.getValue();

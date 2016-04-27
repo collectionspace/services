@@ -34,6 +34,7 @@ import org.collectionspace.services.client.VocabularyClient;
 import org.collectionspace.services.client.VocabularyClientUtils;
 import org.collectionspace.services.vocabulary.VocabulariesCommon;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommon;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -50,14 +51,26 @@ import javax.ws.rs.core.Response;
  */
 public class VocabularyServiceTest extends AbstractAuthorityServiceTest<VocabulariesCommon, VocabularyitemsCommon> {
 
-    private final String CLASS_NAME = VocabularyServiceTest.class.getName();
-    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+	// The class for logging
+    private final Logger logger = LoggerFactory.getLogger(VocabularyServiceTest.class);
+    
     // Instance variables specific to this test.
     final String SERVICE_PATH_COMPONENT = VocabularyClient.SERVICE_PATH_COMPONENT;//"vocabularies";
     final String SERVICE_PAYLOAD_NAME = VocabularyClient.SERVICE_PAYLOAD_NAME;
     final String SERVICE_ITEM_PAYLOAD_NAME = VocabularyClient.SERVICE_ITEM_PAYLOAD_NAME;
 
+    /**
+     * Default constructor.  Used to set the short ID for all tests authority items
+     */
+    VocabularyServiceTest() {
+        TEST_SHORTID = "vocabTest";
+    }
 
+    @Override
+	protected String getTestAuthorityItemShortId() {
+		return getTestAuthorityItemShortId(true); // The short ID of every person item we create should be unique
+	}
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
@@ -72,11 +85,10 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
 	}
     
     @Override
-    protected String createItemInAuthority(AuthorityClient client, String authorityId) {
+    protected String createItemInAuthority(AuthorityClient client, String authorityId, String shortId) {
     	String result = null;
     	
         HashMap<String, String> itemInfo = new HashMap<String, String>();
-        String shortId = createIdentifier();
         itemInfo.put(AuthorityItemJAXBSchema.SHORT_IDENTIFIER, shortId);
         itemInfo.put(AuthorityItemJAXBSchema.DISPLAY_NAME, "display-" + shortId);
         result = VocabularyClientUtils.createItemInVocabulary(authorityId,
@@ -109,7 +121,7 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
     public void createItemList(String testName) throws Exception {
     	knownAuthorityWithItems = createResource(testName, READITEMS_SHORT_IDENTIFIER);
         for (int j = 0; j < nItemsToCreateInList; j++) {
-        	createItemInAuthority((AuthorityClient) getClientInstance(), knownAuthorityWithItems);
+        	createItemInAuthority((AuthorityClient) getClientInstance(), knownAuthorityWithItems, getTestAuthorityItemShortId(true));
         }
     }    
     

@@ -60,11 +60,16 @@ import org.testng.annotations.Test;
 public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<LocationauthoritiesCommon, LocationsCommon> {
 
     /** The logger. */
-    private final String CLASS_NAME = LocationAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(LocationAuthorityServiceTest.class);
-    private final static String CURRENT_DATE_UTC =
-        GregorianCalendarDateTimeUtils.currentDateUTC();
+    private final static String CURRENT_DATE_UTC = GregorianCalendarDateTimeUtils.currentDateUTC();
 
+    /**
+     * Default constructor.  Used to set the short ID for all tests authority items
+     */
+    LocationAuthorityServiceTest() {
+        TEST_SHORTID = "shelf1";
+    }
+    
 	@Override
 	public String getServicePathComponent() {
 		return LocationAuthorityClient.SERVICE_PATH_COMPONENT;
@@ -82,7 +87,6 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
     // Instance variables specific to this test.
     
     final String TEST_NAME = "Shelf 1";
-    final String TEST_SHORTID = "shelf1";
     final String TEST_CONDITION_NOTE = "Basically clean";
     final String TEST_CONDITION_NOTE_DATE = CURRENT_DATE_UTC;
     final String TEST_SECURITY_NOTE = "Kind of safe";
@@ -95,7 +99,7 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
     
     /** The known resource id. */
     private String knownLocationTypeRefName = null;
-        
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
@@ -109,6 +113,11 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
     	return new LocationAuthorityClient(clientPropertiesFilename);
     }
     
+	@Override
+	protected String createItemInAuthority(AuthorityClient client, String vcsid, String shortId) {
+		return createItemInAuthority(client, vcsid, shortId, null/*refname*/);
+	}	
+    
     /**
      * Creates the item in authority.
      *
@@ -116,13 +125,13 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
      * @param authRefName the auth ref name
      * @return the string
      */
-    private String createItemInAuthority(AuthorityClient client, String vcsid, String authRefName) {
+    private String createItemInAuthority(AuthorityClient client, String vcsid, String shortId, String authRefName) {
         final String testName = "createItemInAuthority("+vcsid+","+authRefName+")";
 
         // Submit the request to the service and store the response.
         Map<String, String> shelf1Map = new HashMap<String,String>();
         // TODO Make loc type and status be controlled vocabs.
-        shelf1Map.put(LocationJAXBSchema.SHORT_IDENTIFIER, TEST_SHORTID);
+        shelf1Map.put(LocationJAXBSchema.SHORT_IDENTIFIER, shortId);
         shelf1Map.put(LocationJAXBSchema.CONDITION_NOTE, TEST_CONDITION_NOTE);
         shelf1Map.put(LocationJAXBSchema.CONDITION_NOTE_DATE, TEST_CONDITION_NOTE_DATE);
         shelf1Map.put(LocationJAXBSchema.SECURITY_NOTE, TEST_SECURITY_NOTE);
@@ -144,7 +153,7 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
         // Store the ID returned from the first item resource created
         // for additional tests below.
         if (knownItemResourceId == null){
-        	setKnownItemResource(newID, TEST_SHORTID);
+        	setKnownItemResource(newID, shortId);
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownItemResourceId=" + newID);
             }
@@ -457,11 +466,6 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
 	//
 	// Authority item specific overrides
 	//
-	
-	@Override
-	protected String createItemInAuthority(AuthorityClient client, String authorityId) {
-		return createItemInAuthority(client, authorityId, null /*refname*/);
-	}
 
 	@Override
 	protected LocationsCommon updateItemInstance(LocationsCommon locationsCommon) {

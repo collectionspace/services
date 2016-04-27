@@ -58,9 +58,15 @@ import org.testng.annotations.Test;
 public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<WorkauthoritiesCommon, WorksCommon> {
 
     /** The logger. */
-    private final String CLASS_NAME = WorkAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(WorkAuthorityServiceTest.class);
 
+    /**
+     * Default constructor.  Used to set the short ID for all tests authority items
+     */
+    WorkAuthorityServiceTest() {
+        TEST_SHORTID = "muppetstakemanhattan";
+    }
+    
     @Override
     public String getServicePathComponent() {
         return WorkAuthorityClient.SERVICE_PATH_COMPONENT;
@@ -77,13 +83,6 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
     
     // Instance variables specific to this test.
     
-//    /** The SERVICE path component. */
-//    final String SERVICE_PATH_COMPONENT = "workauthorities";
-//    
-//    /** The ITEM service path component. */
-//    final String ITEM_SERVICE_PATH_COMPONENT = "items";
-//    
-
     final String TEST_WORK_TERM_DISPLAY_NAME = "Muppets Take Manhattan (1984)";
     final String TEST_WORK_TERM_NAME = "Muppets Take Manhattan";
     final String TEST_WORK_TERM_TYPE = "";
@@ -101,14 +100,8 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
     final String TEST_WORK_CREATOR_GROUP_CREATOR_TYPE = "director";
     final String TEST_WORK_PUBLISHER_GROUP_PUBLISHER = "TriStar Pictures";
     final String TEST_WORK_PUBLISHER_GROUP_PUBLISHER_TYPE = "Distributor";
-    final String TEST_WORK_SHORT_IDENTIFIER = "muppetstakemanhattan";
     final String TEST_WORK_REFNAME = "refname";
-    
-    /** The known resource id. */
-    private String knownResourceShortIdentifer = null;
-    private String knownResourceRefName = null;
-    private String knownWorkTypeRefName = null;
-    
+        
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
@@ -122,6 +115,11 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
         return new WorkAuthorityClient(clientPropertiesFilename);
 	}
 
+    @Override
+    protected String createItemInAuthority(AuthorityClient client, String authorityId, String shortId) {
+        return createItemInAuthority(client, authorityId, shortId, null /*refname*/);
+    }
+	
     /**
      * Creates the item in authority.
      *
@@ -129,13 +127,13 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
      * @param authRefName the auth ref name
      * @return the string
      */
-    private String createItemInAuthority(AuthorityClient client, String vcsid, String authRefName) {
+    private String createItemInAuthority(AuthorityClient client, String vcsid, String shortId, String authRefName) {
         final String testName = "createItemInAuthority("+vcsid+","+authRefName+")"; 
     
         // Submit the request to the service and store the response.
         Map<String, String> workMap = new HashMap<String,String>();
         // TODO Make work type and status be controlled vocabs.
-        workMap.put(WorkJAXBSchema.SHORT_IDENTIFIER, TEST_WORK_SHORT_IDENTIFIER);
+        workMap.put(WorkJAXBSchema.SHORT_IDENTIFIER, shortId);
         workMap.put(WorkJAXBSchema.WORK_TYPE, TEST_WORK_TYPE);
         workMap.put(WorkJAXBSchema.WORK_HISTORY_NOTE, TEST_WORK_HISTORY_NOTE);
         
@@ -154,7 +152,7 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
         // Store the ID returned from the first item resource created
         // for additional tests below.
         if (knownItemResourceId == null){
-            setKnownItemResource(newID, TEST_WORK_SHORT_IDENTIFIER);
+            setKnownItemResource(newID, shortId);
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownItemResourceId=" + newID);
             }
@@ -211,8 +209,7 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
 		// Submit the updated resource to the service and store the response.
 		PoxPayloadOut output = new PoxPayloadOut(
 				WorkAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-		PayloadOutputPart commonPart = output.addPart(
-				client.getItemCommonPartName(), work);
+		output.addPart(client.getItemCommonPartName(), work);
 		setupUpdateWithInvalidBody(); // we expected a failure here.
 		res = client.updateItem(knownResourceId, knownItemResourceId, output);
 		try {
@@ -470,11 +467,6 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
     // Authority item specific overrides
     //
     
-    @Override
-    protected String createItemInAuthority(AuthorityClient client, String authorityId) {
-        return createItemInAuthority(client, authorityId, null /*refname*/);
-    }
-
     @Override
     protected WorksCommon updateItemInstance(WorksCommon worksCommon) {
                             

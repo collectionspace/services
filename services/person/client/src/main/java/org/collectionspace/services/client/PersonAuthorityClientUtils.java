@@ -44,6 +44,7 @@ import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.SchoolOrStyleList;
 import org.collectionspace.services.person.StructuredDateGroup;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

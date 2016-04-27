@@ -447,7 +447,7 @@ public abstract class BaseServiceTest<CLT> {
      * Tests can override this method to customize their identifiers.
      */
     protected String createIdentifier() {
-        long identifier = System.currentTimeMillis() + random.nextInt();
+        long identifier = System.currentTimeMillis() + Math.abs(random.nextInt());
         return Long.toString(identifier);
     }
     

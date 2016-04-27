@@ -49,7 +49,7 @@ import org.collectionspace.services.organization.OrgauthoritiesCommon;
 import org.collectionspace.services.organization.OrganizationsCommon;
 import org.collectionspace.services.organization.OrgTermGroup;
 import org.collectionspace.services.organization.OrgTermGroupList;
-import org.jboss.resteasy.client.ClientResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -69,6 +69,14 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
     private final String CLASS_NAME = OrgAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
+    /**
+     * Default constructor.  Used to set the short ID for all tests authority items
+     */
+    public OrgAuthorityServiceTest() {
+    	super();
+        TEST_SHORTID = "TestOrg";
+    }
+    
     @Override
     public String getServicePathComponent() {
         return OrgAuthorityClient.SERVICE_PATH_COMPONENT;
@@ -78,22 +86,24 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
     protected String getServiceName() {
         return OrgAuthorityClient.SERVICE_NAME;
     }
-    private final String TEST_SHORT_ID = "TestOrg";
+    
     private final String TEST_ORG_NAME = "Test Org";
     private final String TEST_ORG_MAIN_BODY_NAME = "The real official test organization";
     private final String TEST_ORG_FOUNDING_PLACE = "Anytown, USA";
-    // FIXME: Change this to a structured date once this field changes in the schema.
     private final String TEST_ORG_FOUNDING_DATE = "May 26, 1907";
     
+    /** The known item resource short ID. */
     private String knownItemResourceShortIdentifer = null;
     
     /** The known contact resource id. */
     private String knownContactResourceId = null;
     
     /** The all contact resource ids created. */
-    private Map<String, String> allContactResourceIdsCreated =
-            new HashMap<String, String>();
+    private Map<String, String> allContactResourceIdsCreated = new HashMap<String, String>();
 
+    /**
+     * 
+     */
     protected void setKnownItemResource(String id, String shortIdentifer) {
         knownItemResourceId = id;
         knownItemResourceShortIdentifer = shortIdentifer;
@@ -125,7 +135,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
     protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) {
         String headerLabel = new OrgAuthorityClient().getItemCommonPartName();
         
-        String shortId = TEST_SHORT_ID + identifier;
+        String shortId = TEST_SHORTID + identifier;
         Map<String, String> testOrgMap = new HashMap<String, String>();
         testOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
         testOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, TEST_ORG_FOUNDING_DATE);
@@ -141,6 +151,11 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         return OrgAuthorityClientUtils.createOrganizationInstance(identifier, testOrgMap, terms, headerLabel);
     }
 
+	@Override
+	protected String createItemInAuthority(AuthorityClient client, String authorityId, String shortId) {
+		return createItemInAuthority(client, authorityId, shortId, null /*refname*/);
+	}
+    
     /**
      * Creates the item in authority.
      *
@@ -148,14 +163,13 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      * @param authRefName the auth ref name
      * @return the string
      */
-    private String createItemInAuthority(AuthorityClient client, String vcsid, String authRefName) {
+    private String createItemInAuthority(AuthorityClient client, String vcsid, String shortId, String authRefName) {
 
         final String testName = "createItemInAuthority";
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ":...");
         }
         
-        String shortId = TEST_SHORT_ID + System.currentTimeMillis();
         Map<String, String> testOrgMap = new HashMap<String, String>();
         testOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
         testOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, TEST_ORG_FOUNDING_DATE);
@@ -1044,11 +1058,6 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 	public void authorityTests(String testName) {
 		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	protected String createItemInAuthority(AuthorityClient client, String authorityId) {
-		return createItemInAuthority(client, authorityId, null /*refname*/);
 	}
 
 	@Override

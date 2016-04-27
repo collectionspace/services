@@ -60,9 +60,15 @@ import org.testng.annotations.Test;
 public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<PlaceauthoritiesCommon, PlacesCommon> {
 
     /** The logger. */
-    private final String CLASS_NAME = PlaceAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(PlaceAuthorityServiceTest.class);
 
+    /**
+     * Default constructor.  Used to set the short ID for all tests authority items
+     */
+    PlaceAuthorityServiceTest() {
+        TEST_SHORTID = "sanjose";
+    }
+    
 	@Override
 	public String getServicePathComponent() {
 		return PlaceAuthorityClient.SERVICE_PATH_COMPONENT;
@@ -78,17 +84,9 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
     }	
     
     // Instance variables specific to this test.
-    
-//    /** The SERVICE path component. */
-//    final String SERVICE_PATH_COMPONENT = "placeauthorities";
-//    
-//    /** The ITEM service path component. */
-//    final String ITEM_SERVICE_PATH_COMPONENT = "items";
-//    
-    
+        
     final String TEST_DNAME = "San Jose, CA";
     final String TEST_NAME = "San Jose";
-    final String TEST_SHORTID = "sanjose";
     // TODO Make place type be a controlled vocab term.
     final String TEST_PLACE_TYPE = "City";
     // TODO Make status type be a controlled vocab term.
@@ -98,12 +96,7 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
     final String TEST_SOURCE_PAGE = "p.21";
     final String TEST_DISPLAY_DATE = "This year";
     final String TEST_EARLIEST_SINGLE_YEAR = "2012";
-    
-    /** The known resource id. */
-    private String knownResourceShortIdentifer = null;
-    private String knownResourceRefName = null;
-    private String knownPlaceTypeRefName = null;
-    
+        
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
@@ -117,6 +110,12 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
         return new PlaceAuthorityClient(clientPropertiesFilename);
 	}
 	
+	@Override
+	protected String createItemInAuthority(AuthorityClient client, String authorityId, String shortId) {
+		return createItemInAuthority(client, authorityId, shortId, null /*refname*/);
+	}
+
+	
 	/**
      * Creates the item in authority.
      *
@@ -124,13 +123,13 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
      * @param authRefName the auth ref name
      * @return the string
      */
-    private String createItemInAuthority(AuthorityClient client, String vcsid, String authRefName) {
+    private String createItemInAuthority(AuthorityClient client, String vcsid, String shortId, String authRefName) {
         final String testName = "createItemInAuthority("+vcsid+","+authRefName+")"; 
     
         // Submit the request to the service and store the response.
         Map<String, String> sanjoseMap = new HashMap<String,String>();
         // TODO Make place type and status be controlled vocabs.
-        sanjoseMap.put(PlaceJAXBSchema.SHORT_IDENTIFIER, TEST_SHORTID);
+        sanjoseMap.put(PlaceJAXBSchema.SHORT_IDENTIFIER, shortId);
         sanjoseMap.put(PlaceJAXBSchema.PLACE_TYPE, TEST_PLACE_TYPE);
         sanjoseMap.put(PlaceJAXBSchema.NOTE, TEST_NOTE);
         
@@ -149,7 +148,7 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
         // Store the ID returned from the first item resource created
         // for additional tests below.
         if (knownItemResourceId == null){
-        	setKnownItemResource(newID, TEST_SHORTID);
+        	setKnownItemResource(newID, shortId);
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownItemResourceId=" + newID);
             }
@@ -205,7 +204,6 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
         
         // Submit the updated resource to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(PlaceAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(client.getItemCommonPartName(), place);
         setupUpdateWithInvalidBody(); // we expected a failure here.
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
         try {
@@ -463,11 +461,6 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
 	// Authority item specific overrides
 	//
 	
-	@Override
-	protected String createItemInAuthority(AuthorityClient client, String authorityId) {
-		return createItemInAuthority(client, authorityId, null /*refname*/);
-	}
-
 	@Override
 	protected PlacesCommon updateItemInstance(PlacesCommon placesCommon) {
                             

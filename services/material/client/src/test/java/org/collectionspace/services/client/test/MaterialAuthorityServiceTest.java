@@ -58,9 +58,15 @@ import org.testng.annotations.Test;
 public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<MaterialauthoritiesCommon, MaterialsCommon> {
 
     /** The logger. */
-    private final String CLASS_NAME = MaterialAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(MaterialAuthorityServiceTest.class);
 
+    /**
+     * Default constructor.  Used to set the short ID for all tests authority items
+     */
+    MaterialAuthorityServiceTest() {
+    	TEST_SHORTID = "superglass";
+    }
+    
     @Override
     public String getServicePathComponent() {
         return MaterialAuthorityClient.SERVICE_PATH_COMPONENT;
@@ -75,22 +81,12 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
         return AuthorityClient.ITEMS;
     }   
     
-    // Instance variables specific to this test.
-    
-//    /** The SERVICE path component. */
-//    final String SERVICE_PATH_COMPONENT = "materialauthorities";
-//    
-//    /** The ITEM service path component. */
-//    final String ITEM_SERVICE_PATH_COMPONENT = "items";
-//    
-
     final String TEST_MATERIAL_TERM_DISPLAY_NAME = "SuperGlass 2";
     final String TEST_MATERIAL_TERM_NAME = "SuperGlass";
     final String TEST_MATERIAL_TERM_STATUS = "accepted";
     final String TEST_MATERIAL_TERM_SOURCE = "source";
     final String TEST_MATERIAL_TERM_SOURCE_DETAIL = "internal";
     final String TEST_MATERIAL_DESCRIPTION = "Really strong glass";
-    final String TEST_MATERIAL_SHORT_IDENTIFIER = "superglass";
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -105,6 +101,11 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
         return new MaterialAuthorityClient(clientPropertiesFilename);
     }
 
+    @Override
+    protected String createItemInAuthority(AuthorityClient client, String authorityId, String shortId) {
+        return createItemInAuthority(client, authorityId, shortId, null /*refname*/);
+    }
+    
     /**
      * Creates the item in authority.
      *
@@ -112,13 +113,13 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
      * @param authRefName the auth ref name
      * @return the string
      */
-    private String createItemInAuthority(AuthorityClient client, String vcsid, String authRefName) {
+    private String createItemInAuthority(AuthorityClient client, String vcsid, String shortId, String authRefName) {
         final String testName = "createItemInAuthority("+vcsid+","+authRefName+")"; 
     
         // Submit the request to the service and store the response.
         Map<String, String> materialMap = new HashMap<String,String>();
         // TODO Make material type and status be controlled vocabs.
-        materialMap.put(MaterialJAXBSchema.SHORT_IDENTIFIER, TEST_MATERIAL_SHORT_IDENTIFIER);
+        materialMap.put(MaterialJAXBSchema.SHORT_IDENTIFIER, shortId);
         materialMap.put(MaterialJAXBSchema.MATERIAL_DESCRIPTION, TEST_MATERIAL_DESCRIPTION);
         
         List<MaterialTermGroup> terms = new ArrayList<MaterialTermGroup>();
@@ -136,7 +137,7 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
         // Store the ID returned from the first item resource created
         // for additional tests below.
         if (knownItemResourceId == null){
-            setKnownItemResource(newID, TEST_MATERIAL_SHORT_IDENTIFIER);
+            setKnownItemResource(newID, shortId);
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownItemResourceId=" + newID);
             }
@@ -452,11 +453,6 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
     // Authority item specific overrides
     //
     
-    @Override
-    protected String createItemInAuthority(AuthorityClient client, String authorityId) {
-        return createItemInAuthority(client, authorityId, null /*refname*/);
-    }
-
     @Override
     protected MaterialsCommon updateItemInstance(MaterialsCommon materialsCommon) {
                             

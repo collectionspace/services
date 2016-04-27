@@ -37,10 +37,9 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.CitationAuthorityClient;
 import org.collectionspace.services.client.CitationAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+
 import org.dom4j.DocumentException;
-import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -59,16 +58,19 @@ public class CitationAuthorityServiceTest extends AbstractAuthorityServiceTest<C
     /**
      * The logger.
      */
-    private final String CLASS_NAME = CitationAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CitationAuthorityServiceTest.class);
-    private final static String CURRENT_DATE_UTC =
-            GregorianCalendarDateTimeUtils.currentDateUTC();
+    
     // Instance variables specific to this test.
     final String TEST_NAME = "Citation 1";
-    final String TEST_SHORTID = "citation1";
     final String TEST_SCOPE_NOTE = "A representative citation";
-    // TODO Make status type be a controlled vocab term.
     final String TEST_STATUS = "Approved";
+    
+    /**
+     * Default constructor.  Used to set the short ID for all tests authority items
+     */
+    CitationAuthorityServiceTest() {
+    	TEST_SHORTID = "citation1";
+    }
 
     @Override
     public String getServicePathComponent() {
@@ -105,14 +107,14 @@ public class CitationAuthorityServiceTest extends AbstractAuthorityServiceTest<C
      * @return the string
      */
     @Override
-    protected String createItemInAuthority(AuthorityClient client, String authorityId) {
+    protected String createItemInAuthority(AuthorityClient client, String authorityId, String shortId) {
 
         final String testName = "createItemInAuthority(" + authorityId + ")";
         if (logger.isDebugEnabled()) {
             logger.debug(testName);
         }
 
-        String commonPartXML = createCommonPartXMLForItem(TEST_SHORTID, TEST_NAME);
+        String commonPartXML = createCommonPartXMLForItem(shortId, TEST_NAME);
 
         String newID;
         try {
@@ -127,7 +129,7 @@ public class CitationAuthorityServiceTest extends AbstractAuthorityServiceTest<C
         // Store the ID returned from the first item resource created
         // for additional tests below.
         if (knownItemResourceId == null) {
-            setKnownItemResource(newID, TEST_SHORTID);
+            setKnownItemResource(newID, shortId);
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownItemResourceId=" + newID);
             }

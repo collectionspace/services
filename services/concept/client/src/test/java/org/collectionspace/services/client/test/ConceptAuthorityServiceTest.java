@@ -34,14 +34,13 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ConceptAuthorityClient;
 import org.collectionspace.services.client.ConceptAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.concept.ConceptTermGroup;
 import org.collectionspace.services.concept.ConceptTermGroupList;
 import org.collectionspace.services.concept.ConceptauthoritiesCommon;
 import org.collectionspace.services.concept.ConceptsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.dom4j.DocumentException;
-import org.jboss.resteasy.client.ClientResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -58,11 +57,15 @@ import org.testng.annotations.Test;
 public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<ConceptauthoritiesCommon, ConceptsCommon> {
 
 	/** The logger. */
-    private final String CLASS_NAME = ConceptAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(ConceptAuthorityServiceTest.class);
-    private final static String CURRENT_DATE_UTC =
-        GregorianCalendarDateTimeUtils.currentDateUTC();
 
+    /**
+     * Default constructor.  Used to set the short ID for all tests authority items
+     */
+    ConceptAuthorityServiceTest() {
+        TEST_SHORTID = "concept1";
+    }
+    
 	@Override
 	public String getServicePathComponent() {
 		return ConceptAuthorityClient.SERVICE_PATH_COMPONENT;
@@ -80,7 +83,6 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
     // Instance variables specific to this test.
     
     final String TEST_NAME = "Concept 1";
-    final String TEST_SHORTID = "concept1";
     final String TEST_SCOPE_NOTE = "Covers quite a bit";
     // TODO Make status type be a controlled vocab term.
     final String TEST_STATUS = "Approved";
@@ -108,14 +110,14 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
      * @return the string
      */
 	@Override
-	protected String createItemInAuthority(AuthorityClient client, String authorityId) {
+	protected String createItemInAuthority(AuthorityClient client, String authorityId, String shortId) {
 
         final String testName = "createItemInAuthority("+authorityId+")";
         if(logger.isDebugEnabled()){
             logger.debug(testName);
         }
 
-        String commonPartXML = createCommonPartXMLForItem(TEST_SHORTID, TEST_NAME);
+        String commonPartXML = createCommonPartXMLForItem(shortId, TEST_NAME);
 
         String newID = null;
         try {
@@ -130,7 +132,7 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
         // Store the ID returned from the first item resource created
         // for additional tests below.
         if (knownItemResourceId == null){
-        	setKnownItemResource(newID, TEST_SHORTID);
+        	setKnownItemResource(newID, shortId);
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownItemResourceId=" + newID);
             }
