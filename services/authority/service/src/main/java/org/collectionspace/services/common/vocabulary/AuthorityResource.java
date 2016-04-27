@@ -778,6 +778,10 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             
         	// Get the type of transition we're being asked to make and store it as a context parameter -used by the workflow document handler
             TransitionDef transitionDef = getTransitionDef(targetCtx, transition);
+            if (transitionDef == null) {
+            	throw new DocumentException(String.format("The document with ID='%s' does not support the workflow transition '%s'.",
+            			itemIdentifier, transition));
+            }
             ctx.setProperty(WorkflowClient.TRANSITION_ID, transitionDef);
             
             WorkflowDocumentModelHandler handler = createWorkflowDocumentHandler(ctx);
