@@ -78,12 +78,32 @@ public abstract class AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P extends Authori
     }
     
     /*
-     * Synchronization method
+     * Synchronization methods
      */
+    
+    @Override
     public Response syncByName(String name) {
     	return getProxy().syncByName(name);
     }
-
+    
+    @Override
+    public Response sync(String identifier) {
+    	return getProxy().sync(identifier);
+    }
+    
+    @Override
+    public boolean supportsSync() {
+    	boolean result = true;
+    	
+    	Response response = getProxy().sync("-1"); // Check to see if the Authority (in general) supports sync for any of its instances
+    	int status = response.getStatus();
+    	if (status == Response.Status.FORBIDDEN.getStatusCode()) {
+    		result = false;
+    	}
+    	
+    	return result;
+    }
+    
     /*
      * 
      */

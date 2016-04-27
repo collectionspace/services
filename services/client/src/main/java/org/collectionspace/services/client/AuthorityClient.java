@@ -64,8 +64,12 @@ public interface AuthorityClient<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
     /*
      * Synchronization methods
      */
-    Response syncByName(String name);
-
+    
+    public Response syncByName(String name);
+    
+    public Response sync(String identifier);
+    
+    public boolean supportsSync();
     
     /*
      * READ/GET by name method

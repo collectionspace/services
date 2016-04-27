@@ -77,6 +77,7 @@ import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentMod
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
 import org.collectionspace.services.config.ClientType;
+import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
@@ -339,6 +340,14 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     	}
     }
 
+    protected boolean supportsSync(String tenantId, String serviceName) {
+    	boolean result = false;
+    	
+        ServiceBindingType sb = getTenantBindingsReader().getServiceBinding(tenantId, getServiceName());
+        result = sb.isSupportsSynchronization();
+        
+        return result;
+    }
 
     /**
      * Synchronizes the authority and its terms with a Shared Authority Server.
@@ -352,7 +361,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     public byte[] synchronize(
             @Context Request request,
             @Context UriInfo ui,
-            @PathParam("csid") String csid) {
+            @PathParam("csid") String identifier) {
     	byte[] result;
     	boolean neededSync = false;
         PoxPayloadOut payloadOut = null;
@@ -360,13 +369,19 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
+            /*
+             * Make sure this authority service supports synchronization
+             */
+            if (supportsSync(ctx.getTenantId(), ctx.getServiceName()) == false) {
+            	throw new DocumentException(Response.Status.FORBIDDEN.getStatusCode());
+            }
             AuthorityDocumentModelHandler handler = (AuthorityDocumentModelHandler)createDocumentHandler(ctx);
-            specifier = Specifier.getSpecifier(csid, "getAuthority", "GET");
+            specifier = Specifier.getSpecifier(identifier, "getAuthority", "GET");
             handler.setShouldUpdateRevNumber(AuthorityServiceUtils.DONT_UPDATE_REV); // Never update rev number on sync calls
             neededSync = getRepositoryClient(ctx).synchronize(ctx, specifier, handler);
             payloadOut = ctx.getOutput();
         } catch (Exception e) {
-            throw bigReThrow(e, ServiceMessages.SYNC_FAILED, csid);
+            throw bigReThrow(e, ServiceMessages.SYNC_FAILED, identifier);
         }
 
         //

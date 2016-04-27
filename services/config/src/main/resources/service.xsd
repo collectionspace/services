@@ -60,6 +60,7 @@
         <xs:attribute name="name" type="xs:string" use="required"/>
         <xs:attribute name="type" type="xs:string" use="optional"/>
         <xs:attribute name="version" type="types:VersionType" use="required"/>
+        <xs:attribute name="supportsSynchronization" type="xs:boolean" default="false"/>
     </xs:complexType>
 
     <!--
