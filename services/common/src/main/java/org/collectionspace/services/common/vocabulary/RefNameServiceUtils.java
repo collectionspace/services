@@ -1091,13 +1091,27 @@ public class RefNameServiceUtils {
                 + "='" + name + "'";
     }
 
-    public static String buildWhereForAuthItemByName(String authorityItemCommonSchemaName, String name, String parentcsid) {
-        return authorityItemCommonSchemaName
-                + ":" + AuthorityItemJAXBSchema.SHORT_IDENTIFIER
-                + "='" + name + "' AND "
-                + authorityItemCommonSchemaName + ":"
-                + AuthorityItemJAXBSchema.IN_AUTHORITY + "="	// parent value must be a CSID, not a URN short ID form
-                + "'" + parentcsid + "'";
+    /**
+     * Build an NXQL query for finding an item by its short ID
+     * 
+     * @param authorityItemCommonSchemaName
+     * @param shortId
+     * @param parentcsid
+     * @return
+     */
+    public static String buildWhereForAuthItemByName(String authorityItemCommonSchemaName, String shortId, String parentcsid) {
+    	String result = null;
+    	
+        result = String.format("%s:%s='%s'", authorityItemCommonSchemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER, shortId);
+        //
+        // Technically, we don't need the parent CSID since the short ID is unique so it can be null
+        //
+        if (parentcsid != null) {
+        	result = String.format("%s AND %s:%s='%s'",
+        			result, authorityItemCommonSchemaName, AuthorityItemJAXBSchema.IN_AUTHORITY, parentcsid);
+        }
+        
+        return result;
     }    
 
     /*

@@ -62,7 +62,8 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
     /**
      * Default constructor.  Used to set the short ID for all tests authority items
      */
-    ConceptAuthorityServiceTest() {
+    public ConceptAuthorityServiceTest() {
+    	super();
         TEST_SHORTID = "concept1";
     }
     

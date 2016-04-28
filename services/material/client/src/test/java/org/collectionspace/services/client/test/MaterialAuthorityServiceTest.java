@@ -63,7 +63,8 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
     /**
      * Default constructor.  Used to set the short ID for all tests authority items
      */
-    MaterialAuthorityServiceTest() {
+    public MaterialAuthorityServiceTest() {
+    	super();
     	TEST_SHORTID = "superglass";
     }
     

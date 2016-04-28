@@ -86,7 +86,7 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
     // Sync by name or CSID
     @GET
     @Path("/{identifier}/sync")
-    public Response sync(String identifier);
+    public Response sync(@PathParam("identifier") String identifier);
     
     /*
      * READ/GET Methods

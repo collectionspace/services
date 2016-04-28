@@ -28,6 +28,8 @@ public class XmlReplay {
     public static final String DEFAULT_CONTROL = "xml-replay-control.xml";
     public static final String DEFAULT_MASTER_CONTROL = "xml-replay-master.xml";
     public static final String DEFAULT_DEV_MASTER_CONTROL = "dev-master.xml";
+	private static final int MAX_REATTEMPTS = 10;
+	private static final String REATTEMPT_KEY = "REATTEMPT_KEY";
 
     private String reportsDir = "";
     public String getReportsDir(){
@@ -228,7 +230,7 @@ public class XmlReplay {
     }
 
     public List<ServiceResult>  autoDelete(String logName){
-        return autoDelete(this.serviceResultsMap, logName);
+        return autoDelete(this.serviceResultsMap, logName, 0);
     }
 
     /** Use this method to clean up resources created on the server that returned CSIDs, if you have
@@ -236,12 +238,17 @@ public class XmlReplay {
      * @param serviceResultsMap a Map of ServiceResult objects, which will contain ServiceResult.deleteURL.
      * @return a List<String> of debug info about which URLs could not be deleted.
      */
-    public static List<ServiceResult> autoDelete(Map<String, ServiceResult> serviceResultsMap, String logName){
+    private static List<ServiceResult> autoDelete(Map<String, ServiceResult> serviceResultsMap, String logName, int reattempt) {
         List<ServiceResult> results = new ArrayList<ServiceResult>();
-        for (ServiceResult pr : serviceResultsMap.values()){
+        HashMap<String, ServiceResult> reattemptList = new HashMap<String, ServiceResult>();
+        int deleteFailures = 0;
+        for (ServiceResult pr : serviceResultsMap.values()) {
             try {
                 if (Tools.notEmpty(pr.deleteURL)){
                     ServiceResult deleteResult = XmlReplayTransport.doDELETE(pr.deleteURL, pr.auth, pr.testID, "[autodelete:"+logName+"]");
+                    if (deleteResult.gotExpectedResult() == false || deleteResult.responseCode != 200) {
+                    	reattemptList.put(REATTEMPT_KEY + deleteFailures++, pr); // We need to try again after our dependents have been deleted. cow()
+                    }
                     results.add(deleteResult);
                 } else {
                     ServiceResult errorResult = new ServiceResult();
@@ -263,6 +270,15 @@ public class XmlReplay {
                 results.add(errorResult);
             }
         }
+        //
+        // If there were things we had trouble deleting, it might have been because they had dependents that
+        // needed to be deleted first.  Therefore, we're going to try again and again (recursively) up until we reach
+        // our MAX_REATTEMPTS limit.
+        //
+        if (reattemptList.size() > 0 && reattempt < MAX_REATTEMPTS) {
+        	return autoDelete(reattemptList, logName, ++reattempt); // recursive call
+        }
+        
         return results;
     }
 
@@ -716,8 +732,8 @@ public class XmlReplay {
                     results.add(serviceResult);
                 }
             }
-            if (Tools.isTrue(autoDeletePOSTS)&&param_autoDeletePOSTS){
-                autoDelete(serviceResultsMap, "default");
+            if (Tools.isTrue(autoDeletePOSTS) && param_autoDeletePOSTS){
+                autoDelete(serviceResultsMap, "default", 0);
             }
         }
 

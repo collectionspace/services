@@ -63,7 +63,8 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
     /**
      * Default constructor.  Used to set the short ID for all tests authority items
      */
-    WorkAuthorityServiceTest() {
+    public WorkAuthorityServiceTest() {
+    	super();
         TEST_SHORTID = "muppetstakemanhattan";
     }
     

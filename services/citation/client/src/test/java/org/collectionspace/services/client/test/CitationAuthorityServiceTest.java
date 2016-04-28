@@ -68,7 +68,8 @@ public class CitationAuthorityServiceTest extends AbstractAuthorityServiceTest<C
     /**
      * Default constructor.  Used to set the short ID for all tests authority items
      */
-    CitationAuthorityServiceTest() {
+    public CitationAuthorityServiceTest() {
+    	super();
     	TEST_SHORTID = "citation1";
     }
 

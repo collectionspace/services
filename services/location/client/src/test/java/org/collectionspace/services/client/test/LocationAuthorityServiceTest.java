@@ -66,7 +66,8 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
     /**
      * Default constructor.  Used to set the short ID for all tests authority items
      */
-    LocationAuthorityServiceTest() {
+    public LocationAuthorityServiceTest() {
+    	super();
         TEST_SHORTID = "shelf1";
     }
     

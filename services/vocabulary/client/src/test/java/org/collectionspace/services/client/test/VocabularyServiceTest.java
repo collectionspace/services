@@ -62,7 +62,8 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
     /**
      * Default constructor.  Used to set the short ID for all tests authority items
      */
-    VocabularyServiceTest() {
+    public VocabularyServiceTest() {
+    	super();
         TEST_SHORTID = "vocabTest";
     }
 
@@ -131,9 +132,10 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
 
         // Create a new vocabulary
+        String shortId = "nonunique" + random.nextInt(1000); // Prevent collisions with past test sessions that never cleaned up properly
         VocabularyClient client = new VocabularyClient();
         PoxPayloadOut multipart = VocabularyClientUtils.createEnumerationInstance(
-                "Vocab with non-unique Short Id", "nonunique", client.getCommonPartName());
+                "Vocab with non-unique Short Id", shortId, client.getCommonPartName());
         Response res = client.create(multipart);
         try {
         	assertStatusCode(res, testName);

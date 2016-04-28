@@ -213,7 +213,7 @@ public class LoanoutAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
-        personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
+        personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId + random.nextInt(1000)); // avoid short ID conflicts with pass test session records that never got cleaned up
         List<PersonTermGroup> personTerms = new ArrayList<PersonTermGroup>();
         PersonTermGroup term = new PersonTermGroup();
         String termName = firstName + " " + surName;

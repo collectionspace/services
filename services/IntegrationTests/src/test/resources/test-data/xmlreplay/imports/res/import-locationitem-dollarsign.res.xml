@@ -15,7 +15,8 @@
         <!-- Note: This test may fail if the identifier for the core tenant changes. -->
         <tenantId>1</tenantId>
         <uri>${uriValue}</uri>
-        <refName>urn:cspace:core.collectionspace.org:locationauthorities:name(${shortIdentifierValue})'${termDisplayNameValue}'</refName>
+		<refName>urn:cspace:core.collectionspace.org:locationauthorities:name(${importLocationAuthorityWithVarExpansion.shortIdentifierValue}):item:name(${importLocationItemWithDollarSignInRefName.shortIdentifierValue})'${termDisplayNameValue}'</refName>		
+
     </ns2:collectionspace_core>
 </document>
 

@@ -139,7 +139,7 @@ public class PersonAuthorityClientUtils {
     		String displayName, String shortIdentifier, String headerLabel ) {
         PersonauthoritiesCommon personAuthority = new PersonauthoritiesCommon();
         personAuthority.setDisplayName(displayName);
-        personAuthority.setShortIdentifier(shortIdentifier);
+        personAuthority.setShortIdentifier(shortIdentifier + random.nextInt(10000));
         //String refName = createPersonAuthRefName(shortIdentifier, displayName);
         //personAuthority.setRefName(refName);
         personAuthority.setVocabType("PersonAuthority");

@@ -65,7 +65,8 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
     /**
      * Default constructor.  Used to set the short ID for all tests authority items
      */
-    PlaceAuthorityServiceTest() {
+    public PlaceAuthorityServiceTest() {
+    	super();
         TEST_SHORTID = "sanjose";
     }
     

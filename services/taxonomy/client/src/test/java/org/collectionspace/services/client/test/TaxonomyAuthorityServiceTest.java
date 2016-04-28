@@ -66,7 +66,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
     /**
      * Default constructor.  Used to set the short ID for all tests authority items
      */
-	TaxonomyAuthorityServiceTest() {
+	public TaxonomyAuthorityServiceTest() {
+		super();
 	    TEST_SHORTID = "CentauruspleurexanthemusGreen1832";		
 	}
 	

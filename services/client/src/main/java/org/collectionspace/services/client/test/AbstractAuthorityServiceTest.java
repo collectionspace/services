@@ -36,7 +36,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     private final Logger logger = LoggerFactory.getLogger(AbstractAuthorityServiceTest.class);
 	
     protected String knownResourceShortIdentifer = null;
-	protected static final String READITEMS_SHORT_IDENTIFIER = "resourceWithItems"; 
+	protected static final String READITEMS_SHORT_IDENTIFIER = "resourceWithItems" + random.nextInt(1000); 
 	protected String knownAuthorityWithItems = null;
 	
 	protected static final String SAS_IDENTIFIER = "SAS"; 
@@ -113,7 +113,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
      */
 	protected String getSASAuthorityIdentifier() {
 		// TODO Auto-generated method stub
-		return this.getKnowResourceIdentifier() + this.SAS_IDENTIFIER;
+		return this.getKnowResourceIdentifier() + SAS_IDENTIFIER;
 	}
     
 	/**
@@ -297,10 +297,17 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     @Test(dataProvider = "testName", dependsOnMethods = {"createSASItem", "CRUDTests"})
     public void syncWithSAS(String testName) {
         //
-        // First create an empty instance of the authority, so we can sync items with it.  We're
-    	// using the short ID of the SAS authority.  The short ID of the local and the SAS will (must) be the same.
+        // First check to see if the authority supports synchronization.
         //
     	AuthorityClient client = (AuthorityClient) this.getClientInstance();
+    	if (client.supportsSync() == false) {
+    		return; // Exit the test since this authority doesn't support synchronization
+    	}
+    	
+        //
+        // Create an empty instance of the authority, so we can sync items with it.  We're
+    	// using the short ID of the SAS authority.  The short ID of the local and the SAS will (must) be the same.
+        //
     	String localAuthorityId = null;
         try {
 			localAuthorityId = createResource(client, testName, getSASAuthorityIdentifier());
@@ -332,6 +339,14 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
      */    
     @Test(dataProvider = "testName", dependsOnMethods = {"createItem", "CRUDTests"})
     public void createSASAuthority(String testName) {
+        //
+        // First check to see if the authority supports synchronization.
+        //
+    	AuthorityClient client = (AuthorityClient) this.getClientInstance();
+    	if (client.supportsSync() == false) {
+    		return; // Exit the test since this authority doesn't support synchronization
+    	}
+    	
         // Perform setup.
         setupCreate();
 
@@ -352,6 +367,14 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
      */
     @Test(dataProvider = "testName", dependsOnMethods = {"createSASAuthority", "CRUDTests"})
     public void createSASItem(String testName) {
+        //
+        // First check to see if the authority supports synchronization.
+        //
+    	AuthorityClient client = (AuthorityClient) this.getClientInstance();
+    	if (client.supportsSync() == false) {
+    		return; // Exit the test since this authority doesn't support synchronization
+    	}
+    	
         // Perform setup.
         setupCreate();
 

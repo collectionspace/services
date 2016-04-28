@@ -1324,7 +1324,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * @param itemIdentifier
      * @throws Exception
      */
-    public void deleteAuthorityItem(ServiceContext existingCtx,
+    @SuppressWarnings("rawtypes")
+	public void deleteAuthorityItem(ServiceContext existingCtx,
             String parentIdentifier,
             String itemIdentifier,
             boolean shouldUpdateRevNumber
@@ -1337,7 +1338,13 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         	ctx.setProperties(existingCtx.getProperties());
         }
         
-        String parentcsid = lookupParentCSID(ctx, parentIdentifier, "deleteAuthorityItem(parent)", "DELETE_ITEM", null);
+        String parentcsid = null;
+        try {
+        	parentcsid = lookupParentCSID(ctx, parentIdentifier, "deleteAuthorityItem(parent)", "DELETE_ITEM", null);
+        } catch (DocumentNotFoundException de) {
+        	logger.warn(String.format("Could not find parent with ID='%s' when trying to delete item ID='%s'",
+        			parentIdentifier, itemIdentifier));
+        }
         String itemCsid = lookupItemCSID(ctx, itemIdentifier, parentcsid, "deleteAuthorityItem(item)", "DELETE_ITEM"); //use itemServiceCtx if it is not null
         
         DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
