@@ -24,6 +24,7 @@ package org.collectionspace.services.id;
 
 import java.util.Map;
 import java.util.UUID;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -39,22 +40,20 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.XmlTools;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 // May at some point instead use
 // org.jboss.resteasy.spi.NotFoundException
-import org.collectionspace.services.common.XmlTools;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.client.IdClient;
-
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Namespace;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

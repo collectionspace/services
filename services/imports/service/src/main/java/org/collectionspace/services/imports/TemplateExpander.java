@@ -27,9 +27,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
+
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+
+import org.collectionspace.services.client.XmlTools;
 import org.collectionspace.services.common.IFragmentHandler;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.StoredValuesUriTemplate;
@@ -37,7 +40,6 @@ import org.collectionspace.services.common.UriTemplateFactory;
 import org.collectionspace.services.common.UriTemplateRegistry;
 import org.collectionspace.services.common.UriTemplateRegistryKey;
 import org.collectionspace.services.common.XmlSaxFragmenter;
-import org.collectionspace.services.common.XmlTools;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.api.RefName;

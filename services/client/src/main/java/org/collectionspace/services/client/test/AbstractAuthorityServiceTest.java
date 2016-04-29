@@ -13,8 +13,12 @@ import org.collectionspace.services.client.AuthorityProxy;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.XmlTools;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+
+import org.dom4j.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -38,6 +42,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     protected String knownResourceShortIdentifer = null;
 	protected static final String READITEMS_SHORT_IDENTIFIER = "resourceWithItems" + random.nextInt(1000); 
 	protected String knownAuthorityWithItems = null;
+	protected String knownAuthorityWithItemsIdentifier = null;
 	
 	protected static final String SAS_IDENTIFIER = "SAS"; 
 	protected String knownSASAuthorityResourceId = null;
@@ -290,7 +295,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
             }
         }
     }
-    
+        
     /**
      * Sync the local with the SAS
      */
@@ -401,9 +406,26 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     		dependsOnMethods = {"createItem"})
     public void createItemList(String testName) throws Exception {
     	knownAuthorityWithItems = createResource(testName, READITEMS_SHORT_IDENTIFIER);
+    	knownAuthorityWithItemsIdentifier = getShortId(knownAuthorityWithItems);
         for (int j = 0; j < nItemsToCreateInList; j++) {
         	createItemInAuthority((AuthorityClient) getClientInstance(), knownAuthorityWithItems, this.getTestAuthorityItemShortId(true));
         }
+    }
+    
+    private String getShortId(String authorityCsid) throws Exception {
+    	String result = null;
+    	
+        // Submit the request to the service and store the response.
+        AuthorityClient client = (AuthorityClient) getClientInstance();
+        Response res = client.read(authorityCsid);
+        try {
+	        int statusCode = res.getStatus();
+	        result = this.extractAuthorityShortId(res);
+        } finally {
+        	res.close();
+        }
+        
+        return result;
     }
 
     /**
@@ -460,6 +482,24 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 		
 		return result;
 	}
+	
+    /**
+     * Extracts the short ID from a service request payload
+     * 
+     * @param res
+     * @return
+     * @throws Exception
+     */
+	public String extractAuthorityShortId(Response res) throws Exception {
+		String result = null;
+		
+        PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(getEntityResponseType()));	    	
+		Document document = input.getDOMDocument();
+		result = XmlTools.getElementValue(document, "//" + AuthorityClient.SHORT_IDENTIFIER);
+
+		return result;
+	}
+	
     
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     		dependsOnMethods = {"readItem"})
@@ -580,6 +620,18 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 	        }
 	        Assert.assertEquals(nItemsTotal, nItemsToCreateInList);
 	
+			for (AbstractCommonList.ListItem item : items) {
+				String refName = AbstractCommonListUtils.ListItemGetElementValue(
+						item, AuthorityClient.REF_NAME);
+				Assert.assertTrue((refName != null), "Item refName is null or not set in the item list!");
+				String termDisplayName = AbstractCommonListUtils.ListItemGetElementValue(item,
+						AuthorityClient.TERM_DISPLAY_NAME);
+				String vocabDisplayName = AbstractCommonListUtils.ListItemGetElementValue(item,
+						AuthorityClient.VOCAB_DISPLAY_NAME);
+				// One of these names needs to be set.
+				Assert.assertTrue(!(termDisplayName == null && vocabDisplayName == null), "The item's display name is null or not set in the item list!");
+			}
+	        
 	        if(logger.isTraceEnabled()){
 	        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
 	        }
@@ -588,16 +640,14 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         }
     }
     
-    @Test(dataProvider = "testName",
-    		dependsOnMethods = {"createItemList"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"createItemList"})
     public void readItemList(String testName) {
         readItemListInt(knownAuthorityWithItems, null, testName);
     }
 
-    @Test(dataProvider = "testName",
-    		dependsOnMethods = {"readItem"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"readItemList"})
     public void readItemListByName(String testName) {
-        readItemListInt(null, READITEMS_SHORT_IDENTIFIER, testName);
+        readItemListInt(null, knownAuthorityWithItemsIdentifier, testName);
     }
 
     @Test(dataProvider = "testName",

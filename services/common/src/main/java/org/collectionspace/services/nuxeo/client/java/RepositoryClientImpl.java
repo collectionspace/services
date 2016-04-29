@@ -1885,16 +1885,16 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
             logger.error(errMsg);
             throw new Exception(errMsg);
         }
-        //
-        // If we couldn't find a repoSession from the service context (or the context was null) then we need to create a new one using
-        // just the repo name
-        //
         if (repoSession == null) {
+            //
+            // If we couldn't find a repoSession from the service context (or the context was null) then we need to create a new one using
+            // just the repository name.
+            //
             NuxeoClientEmbedded client = NuxeoConnectorEmbedded.getInstance().getClient();
             repoSession = client.openRepository(repoName, timeoutSeconds);
         } else {
-            if (logger.isDebugEnabled() == true) {
-                logger.warn("Reusing the current context's repository session.");
+            if (logger.isTraceEnabled() == true) {
+                logger.trace("Reusing the current context's repository session.");
             }
         }
 

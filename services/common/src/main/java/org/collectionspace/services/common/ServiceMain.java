@@ -18,6 +18,7 @@ import javax.sql.DataSource;
 
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.collectionspace.authentication.AuthN;
+import org.collectionspace.services.client.XmlTools;
 import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
@@ -41,7 +42,6 @@ import org.collectionspace.services.config.types.PropertyItemType;
 import org.collectionspace.services.config.types.PropertyType;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 import org.collectionspace.services.nuxeo.client.java.TenantRepository;
-
 import org.apache.commons.io.FileUtils;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.dom4j.Document;

@@ -18,6 +18,10 @@ public interface AuthorityClient<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
 
     /** The uri path element for items in an authority */
     public static String ITEMS = "items";    //used to construct uri's in service paths for authorities.
+    public static final String SHORT_IDENTIFIER = "shortIdentifier";
+    public static final String TERM_DISPLAY_NAME = "termDisplayName";
+    public static final String VOCAB_DISPLAY_NAME = "displayName";
+    public static final String REF_NAME = "refName";
 
 	/*
 	 * Basic CRUD operations

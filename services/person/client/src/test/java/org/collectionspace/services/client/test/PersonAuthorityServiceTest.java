@@ -43,7 +43,6 @@ import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.PersonJAXBSchema;
-import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.PersonTermGroup;
 import org.collectionspace.services.person.PersonTermGroupList;
@@ -161,6 +160,10 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         PoxPayloadOut multipart =
                 PersonAuthorityClientUtils.createPersonAuthorityInstance(
                 displayName, shortId, client.getCommonPartName());
+        // Extract the short ID since it might have been randomized by the createPersonAuthRefName() method
+        PersonauthoritiesCommon personAuthority = (PersonauthoritiesCommon) extractPart(multipart,
+                client.getCommonPartName(), PersonauthoritiesCommon.class);
+        shortId = personAuthority.getShortIdentifier();
 
         String newID = null;
         Response res = client.create(multipart);
@@ -778,79 +781,6 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     // ---------------------------------------------------------------
     // CRUD tests : READ_LIST tests
     // ---------------------------------------------------------------
-
-    /**
-     * Read item list override -see immediate superclass.
-     */
-    @Override
-    public void readItemList(String testName) {
-        readItemList(knownAuthorityWithItems, null, testName);
-    }
-
-    /**
-     * Read item list by authority name.
-     */
-    @Override
-    public void readItemListByName(String testName) {
-        readItemList(null, READITEMS_SHORT_IDENTIFIER, testName);
-    }
-
-    /**
-     * Read item list.
-     *
-     * @param vcsid the vcsid
-     * @param name the name
-     */
-    private void readItemList(String vcsid, String name, String testName) {
-        setupReadList();
-        // Submit the request to the service and store the response.
-        PersonAuthorityClient client = new PersonAuthorityClient();
-        Response res = null;
-        if (vcsid != null) {
-            res = client.readItemList(vcsid, null, null);
-        } else if (name != null) {
-            res = client.readItemListForNamedAuthority(name, null, null);
-        } else {
-            Assert.fail("readItemList passed null csid and name!");
-        }
-        AbstractCommonList list = null;
-        try {
-            assertStatusCode(res, testName);
-            list = res.readEntity(AbstractCommonList.class);
-        } finally {
-        	if (res != null) {
-                res.close();
-            }
-        }
-
-        List<AbstractCommonList.ListItem> items = list.getListItem();
-        int nItemsReturned = items.size();
-        // There will be 'nItemsToCreateInList'
-        // items created by the createItemList test,
-        // all associated with the same parent resource.
-        int nExpectedItems = nItemsToCreateInList;
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": Expected "
-                    + nExpectedItems + " items; got: " + nItemsReturned);
-        }
-        Assert.assertEquals(nItemsReturned, nExpectedItems);
-
-        for (AbstractCommonList.ListItem item : items) {
-            String value =
-                    AbstractCommonListUtils.ListItemGetElementValue(item, AuthorityItemJAXBSchema.REF_NAME);
-            Assert.assertTrue((null != value), "Item refName is null!");
-            
-            // Per CSPACE-5132, lists items still return a field named displayName,
-            // not termDisplayName, for backward compatibility.
-            // (The format of list items will change significantly in CSPACE-5134.)
-            value =
-                    AbstractCommonListUtils.ListItemGetElementValue(item, AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
-            Assert.assertTrue((null != value), "Item termDisplayName is null!");
-        }
-        if (logger.isTraceEnabled()) {
-            AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
-        }
-    }
 
     /**
      * Read contact list.

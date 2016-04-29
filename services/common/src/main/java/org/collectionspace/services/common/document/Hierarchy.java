@@ -27,7 +27,7 @@ package org.collectionspace.services.common.document;
 import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.XmlTools;
+import org.collectionspace.services.client.XmlTools;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.relation.RelationResource;
@@ -36,6 +36,7 @@ import org.collectionspace.services.relation.RelationsDocListItem;
 import org.collectionspace.services.relation.RelationshipType;
 
 import javax.ws.rs.core.MultivaluedMap;
+
 import java.util.List;
 
 /**

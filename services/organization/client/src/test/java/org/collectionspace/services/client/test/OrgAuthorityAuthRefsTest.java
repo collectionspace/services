@@ -233,13 +233,13 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
         
         // Create temporary Person resources, and their corresponding refNames
         // by which they can be identified.
-       	String csid = createPerson(personAuthCSID, "Charlie", "Orgcontact", "charlieOrgcontact", null ); // authRefName);
+       	String csid = createPerson(personAuthCSID, "Charlie", "Orgcontact", "charlieOrgcontact" + System.currentTimeMillis(), null ); // authRefName);
         personIdsCreated.add(csid);
         organizationContactPersonRefName1 = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
 
         // Create temporary Person resources, and their corresponding refNames
         // by which they can be identified.
-       	csid = createPerson(personAuthCSID, "Chelsie", "Contact", "chelsieContact", null ); // authRefName);
+       	csid = createPerson(personAuthCSID, "Chelsie", "Contact", "chelsieContact" + System.currentTimeMillis(), null ); // authRefName);
         personIdsCreated.add(csid);
         organizationContactPersonRefName2 = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
     }
@@ -380,27 +380,17 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
     @AfterClass(alwaysRun=true)
     public void cleanUp() {
         String noTest = System.getProperty("noTestCleanup");
-    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+    	if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Skipping Cleanup phase ...");
             }
             return;
     	}
+    	
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-        // Delete Person resource(s) (before PersonAuthority resources).
-        for (String resourceId : personIdsCreated) {
-            // Note: Any non-success responses are ignored and not reported.
-            personAuthClient.deleteItem(personAuthCSID, resourceId).close();
-        }
-        // Delete PersonAuthority resource(s).
-        // Note: Any non-success response is ignored and not reported.
-        if(personAuthCSID!=null) {
-        	personAuthClient.delete(personAuthCSID).close();
-        }
-        
+                
         String parentResourceId;
         String itemResourceId;
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -412,6 +402,24 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
             // below are ignored and not reported.
             client.deleteItem(parentResourceId, itemResourceId).close();
         }
+        
+        //
+        // Delete the person authority items we created for the authRefs.  Note
+        // that we needed to delete the objects/records referencing these authority items first since
+        // we can't delete authority items that still have records referencing them
+        //
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        // Delete Person resource(s) (before PersonAuthority resources).
+        for (String resourceId : personIdsCreated) {
+            // Note: Any non-success responses are ignored and not reported.
+            personAuthClient.deleteItem(personAuthCSID, resourceId).close();
+        }
+        
+        // Delete PersonAuthority resource(s).
+        // Note: Any non-success response is ignored and not reported.
+        if (personAuthCSID != null) {
+        	personAuthClient.delete(personAuthCSID).close();
+        }        
         
         // Clean up parent resources.
         for (String resourceId : allResourceIdsCreated) {

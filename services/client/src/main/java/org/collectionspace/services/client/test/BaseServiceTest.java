@@ -60,7 +60,9 @@ import org.w3c.dom.Document;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.TestServiceClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.common.api.FileTools;
@@ -487,18 +489,32 @@ public abstract class BaseServiceTest<CLT> {
      * @return the object
      * @throws Exception the exception
      */
-    static protected Object extractPart(PoxPayloadIn input, String label, Class<?> clazz)
-            throws Exception {
-    	Object result = null;
-    	PayloadInputPart payloadInputPart = input.getPart(label);
-        if (payloadInputPart != null) {
-        	result = payloadInputPart.getBody();
-        } else if (logger.isWarnEnabled() == true) {
-        	logger.warn("Payload part: " + label +
-        			" is missing from payload: " + input.getName());
-        }
-        return result;
-            }
+	static protected Object extractPart(PoxPayloadIn input, String label, Class<?> clazz) throws Exception {
+		Object result = null;
+		
+		PayloadInputPart payloadInputPart = input.getPart(label);
+		if (payloadInputPart != null) {
+			result = payloadInputPart.getBody();
+		} else if (logger.isWarnEnabled() == true) {
+			logger.warn("Payload part: " + label + " is missing from payload: " + input.getName());
+		}
+		
+		return result;
+	}
+	
+	static protected Object extractPart(PoxPayloadOut output, String label, Class<?> clazz) throws Exception {
+		Object result = null;
+		
+		PayloadOutputPart payloadOutPart = output.getPart(label);
+		if (payloadOutPart != null) {
+			result = payloadOutPart.getBody();
+		} else if (logger.isWarnEnabled() == true) {
+			logger.warn("Payload part: " + label + " is missing from payload: " + output.getName());
+		}
+		
+		return result;
+	}
+	
 
     /**
      * Gets the part object.

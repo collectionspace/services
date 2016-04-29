@@ -34,10 +34,10 @@ import org.collectionspace.services.client.VocabularyClient;
 import org.collectionspace.services.client.VocabularyClientUtils;
 import org.collectionspace.services.vocabulary.VocabulariesCommon;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommon;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.core.Response;
@@ -117,15 +117,7 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
             }
         }
     }
-    
-    @Override
-    public void createItemList(String testName) throws Exception {
-    	knownAuthorityWithItems = createResource(testName, READITEMS_SHORT_IDENTIFIER);
-        for (int j = 0; j < nItemsToCreateInList; j++) {
-        	createItemInAuthority((AuthorityClient) getClientInstance(), knownAuthorityWithItems, getTestAuthorityItemShortId(true));
-        }
-    }    
-    
+        
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     		dependsOnMethods = {"CRUDTests"})
     public void createWithNonuniqueShortId(String testName) throws Exception {
@@ -396,4 +388,10 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
                 itemInfo, commonPartName);
 		return result;
 	}
+	
+    @AfterClass(alwaysRun = true)
+    @Override
+    public void cleanUp() {
+    	super.cleanUp();
+    }	
 }

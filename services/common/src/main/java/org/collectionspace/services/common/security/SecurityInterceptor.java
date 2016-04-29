@@ -80,6 +80,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 	/** The Constant logger. */
 	private static final Logger logger = LoggerFactory.getLogger(SecurityInterceptor.class);
 	private static final String ACCOUNT_PERMISSIONS = "accounts/*/accountperms";
+	private static final String NUXEO_ADMIN = null;
     //
     // Use this thread specific member instance to hold our login context with Nuxeo
     //
@@ -88,7 +89,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
     //
     // Error messages
     //
-    private static final String ERROR_NUXEO_LOGOUT = "Attempt to logout when Nuxeo login context was null";
+    private static final String ERROR_NUXEO_LOGOUT = "Attempt to logout when Nuxeo login context was null.";
     private static final String ERROR_UNBALANCED_LOGINS = "The number of Logins vs Logouts to the Nuxeo framework was unbalanced.";    
 	    
     private boolean isAnonymousRequest(HttpRequest request, ResourceMethodInvoker resourceMethodInvoker) {
@@ -285,7 +286,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 	public ServerResponse nuxeoPreProcess(HttpRequest request, ResourceMethodInvoker resourceMethodInvoker)
 			throws Failure, CSWebApplicationException {
 		try {
-			nuxeoLogin();
+			nuxeoLogin(NUXEO_ADMIN);
 		} catch (LoginException e) {
 			String msg = "Unable to login to the Nuxeo framework";
 			logger.error(msg, e);
@@ -305,13 +306,6 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 			logger.error(msg, e);
 		}
 	}	
-
-    private synchronized void nuxeoLogin() throws LoginException {
-    	//
-    	// Login as the Nuxeo system/admin user
-    	//
-    	nuxeoLogin(null);
-    }
     
     private void logLoginContext(LoginContext loginContext) {
 		logger.trace("CollectionSpace services now logged in to Nuxeo with LoginContext: "
@@ -324,6 +318,22 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 		}
     }
     
+    private void logLogoutContext(LoginContext loginContext) {
+    	if (loginContext != null) {
+			logger.trace("CollectionSpace services now logging out of Nuxeo with LoginContext: "
+					+ loginContext);
+			Subject subject = loginContext.getSubject();
+			Set<Principal> principals = subject.getPrincipals();
+			logger.debug("Nuxeo logout performed with principals: ");
+			for (Principal principal : principals) {
+				logger.debug("[" + principal.getName() + "]");
+			}
+    	} else {
+    		logger.trace("Logged out.");
+    	}
+    }
+    
+    
     /*
      * Login to Nuxeo and save the LoginContext instance in a thread local variable
      */
@@ -334,10 +344,8 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
     	if (threadLocalLoginContext == null) {
     		threadLocalLoginContext = new ThreadLocal<LoginContext>();
     		if (logger.isTraceEnabled() == true) {
-    			logger.trace("Created ThreadLocal instance: "
-    				+ threadLocalLoginContext.getClass().getCanonicalName()
-    				+ " - "
-    				+ threadLocalLoginContext.get());
+    			logger.trace(String.format("Thread ID %s: Created new ThreadLocal instance: %s)",
+    					Thread.currentThread(), threadLocalLoginContext));
     		}
     	}
     	
@@ -348,10 +356,8 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
     		frameworkLogins++;
     		threadLocalLoginContext.set(loginContext);
     		if (logger.isTraceEnabled() == true) {
-	    		logger.trace("Setting ThreadLocal instance: "
-	    				+ threadLocalLoginContext.getClass().getCanonicalName()
-	    				+ " - "
-	    				+ threadLocalLoginContext.get());
+	        	logger.trace(String.format("Thread ID %s: Logged in with ThreadLocal instance %s - %s ",
+	        			Thread.currentThread(), threadLocalLoginContext, threadLocalLoginContext.get()));
     		}
         	//
         	// Debug message
@@ -359,19 +365,42 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
     		if (logger.isDebugEnabled() == true) {
     			logLoginContext(loginContext);
     		}
+    	} else {
+    		//
+    		// We're already logged in somehow?  This is probably not good.  It seems to mean that the LoginContext last
+    		// used on this thread is still active -which is a *potential* security vulnerability.  However, as of 4/2016, we
+    		// use the Nuxeo default "system admin" context for ever request, regardless of the CollectionSpace user making
+    		// the request.  In short, there's no real security vulnerability here -just bad bookkeeping of logins.
+    		//
+    		logger.warn(String.format(String.format("Thread ID %s: Alreadyed logged in with ThreadLocal instance %s - %s ",
+	        			Thread.currentThread(), threadLocalLoginContext, threadLocalLoginContext.get())));
+    		frameworkLogins++;
     	}
     }
     
-    public synchronized void nuxeoLogout() throws LoginException {
+    private synchronized void nuxeoLogout() throws LoginException {
     	LoginContext loginContext = threadLocalLoginContext != null ? threadLocalLoginContext.get() : null; 
         if (loginContext != null) {
+    		if (logger.isDebugEnabled() == true) {
+    			logLogoutContext(loginContext);
+    		}        	
             loginContext.logout();
+            threadLocalLoginContext.set(null); // We need to clear the login context from this thread, so the next request on this thread has to login again.
+            logLogoutContext(null);
             frameworkLogins--;
-
+            if (logger.isDebugEnabled()) {
+            	String.format("Framework logins: ", frameworkLogins);
+            }
         } else {
         	logger.warn(ERROR_NUXEO_LOGOUT);
         }
         
-        threadLocalLoginContext = null; //Clear the ThreadLocal to void Tomcat warnings associated with thread pools.
+        if (frameworkLogins == 0) {
+        	if (threadLocalLoginContext != null) {
+	        	logger.trace(String.format("Thread ID %s: Clearing ThreadLocal instance %s - %s ",
+	        			Thread.currentThread(), threadLocalLoginContext, threadLocalLoginContext.get()));
+        	}
+        	threadLocalLoginContext = null; //Clear the ThreadLocal to void Tomcat warnings associated with thread pools.
+        }
     }	
 }
