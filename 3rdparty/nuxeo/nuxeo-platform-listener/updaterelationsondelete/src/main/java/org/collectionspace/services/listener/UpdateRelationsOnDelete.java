@@ -73,6 +73,8 @@ public class UpdateRelationsOnDelete implements EventListener {
             workflowStatesToFilter.add(WorkflowClient.WORKFLOWSTATE_DELETED);
             workflowStatesToFilter.add(WorkflowClient.WORKFLOWSTATE_LOCKED);
             workflowStatesToFilter.add(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED);
+            workflowStatesToFilter.add(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED);
+            
             LifeCycleFilter workflowStateFilter = new LifeCycleFilter(null, workflowStatesToFilter);
             
             // Perform the filtered query

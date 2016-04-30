@@ -156,15 +156,20 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         String result = null;
         
     	CollectionSpaceClient client = this.getClientInstance();
-        result = createResource(client, testName, identifier);
+        result = createResource(client, testName, identifier, false);
     	
     	return result;
     }
     
-    protected String createResource(CollectionSpaceClient client, String testName, String identifier) throws Exception {
+    protected String createResource(CollectionSpaceClient client, String testName, String identifier, boolean makeUnique) throws Exception {
         String result = null;
         
     	setupCreate();
+    	
+    	if (makeUnique == true) {
+    		identifier = identifier + Math.abs(random.nextInt());
+    	}
+    	
         REQUEST_TYPE payload = createInstance(client.getCommonPartName(), identifier);
         Response res = client.create(payload);
     	try {

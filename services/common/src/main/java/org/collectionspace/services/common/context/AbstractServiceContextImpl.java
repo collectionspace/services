@@ -509,6 +509,12 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         }
     }
 
+    /**
+     * Helps to filter for queries that either want to include or exclude documents in deleted workflow states.
+     * 
+     * @param queryParams
+     * @return
+     */
     private static String buildWorkflowWhereClause(MultivaluedMap<String, String> queryParams) {
     	String result = null;
     	
@@ -516,11 +522,11 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         String includeOnlyDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_ONLY_DELETED);
 
     	if (includeDeleted != null && includeDeleted.equalsIgnoreCase(Boolean.FALSE.toString())) {    	
-    		result = String.format("(ecm:currentLifeCycleState <> '%s' AND ecm:currentLifeCycleState <> '%s')",
-    				WorkflowClient.WORKFLOWSTATE_DELETED, WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED);
+    		result = String.format("(ecm:currentLifeCycleState <> '%s' AND ecm:currentLifeCycleState <> '%s' AND ecm:currentLifeCycleState <> '%s')",
+    				WorkflowClient.WORKFLOWSTATE_DELETED, WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED, WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED);
     	} else if (includeOnlyDeleted != null && includeOnlyDeleted.equalsIgnoreCase(Boolean.TRUE.toString())) {
-    		result = String.format("(ecm:currentLifeCycleState <> '%s' AND ecm:currentLifeCycleState <> '%s')",
-    				WorkflowClient.WORKFLOWSTATE_PROJECT, WorkflowClient.WORKFLOWSTATE_LOCKED);
+    		result = String.format("(ecm:currentLifeCycleState <> '%s' AND ecm:currentLifeCycleState <> '%s' AND ecm:currentLifeCycleState <> '%s')",
+    				WorkflowClient.WORKFLOWSTATE_PROJECT, WorkflowClient.WORKFLOWSTATE_LOCKED, WorkflowClient.WORKFLOWSTATE_REPLICATED);
     	}
     	
     	return result;

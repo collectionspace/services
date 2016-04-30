@@ -17,7 +17,6 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.XmlTools;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-
 import org.dom4j.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +45,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 	
 	protected static final String SAS_IDENTIFIER = "SAS"; 
 	protected String knownSASAuthorityResourceId = null;
+	protected String knownSASAuthorityResourceIdentifier = null;
 	protected String knownSASItemResourceId = null;
 	protected HashMap<String, String> allSASResourceItemIdsCreated = new HashMap<String, String>(); /* itemURN, parentURN */;
 
@@ -315,7 +315,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         //
     	String localAuthorityId = null;
         try {
-			localAuthorityId = createResource(client, testName, getSASAuthorityIdentifier());
+			localAuthorityId = createResource(client, testName, knownSASAuthorityResourceIdentifier, false);
 		} catch (Exception e) {
 			Assert.assertNotNull(localAuthorityId);
 		}
@@ -324,7 +324,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     	// Now we can try to sync the SAS authority with the local one we just created.
     	//
         setupSync();
-    	Response response = client.syncByName(getSASAuthorityIdentifier()); // Notice we're using the Short ID (short ID is the same on the local and SAS)
+    	Response response = client.syncByName(knownSASAuthorityResourceIdentifier); // Notice we're using the Short ID (short ID is the same on the local and SAS)
         try {
 	        int statusCode = response.getStatus();
 	        if (logger.isDebugEnabled()) {
@@ -337,7 +337,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         	response.close();
         }
     }
-    
+        
     /**
      * SAS - Create a new authority on the SAS server.
      * @param testName
@@ -356,8 +356,9 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         setupCreate();
 
         try {
-        	String newID = createResource(getSASClientInstance(), testName, getSASAuthorityIdentifier());
+        	String newID = createResource(getSASClientInstance(), testName, getSASAuthorityIdentifier(), true);
         	knownSASAuthorityResourceId = newID;
+        	knownSASAuthorityResourceIdentifier = getShortId(getSASClientInstance(), knownSASAuthorityResourceId);
             if (logger.isDebugEnabled()) {
             	String.format("Created SAS authority '%s' with CSID=%s.", getSASAuthorityIdentifier(), newID);
             }
@@ -412,11 +413,10 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         }
     }
     
-    private String getShortId(String authorityCsid) throws Exception {
+    private String getShortId(AuthorityClient client, String authorityCsid) throws Exception {
     	String result = null;
     	
         // Submit the request to the service and store the response.
-        AuthorityClient client = (AuthorityClient) getClientInstance();
         Response res = client.read(authorityCsid);
         try {
 	        int statusCode = res.getStatus();
@@ -426,6 +426,11 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         }
         
         return result;
+    }
+    
+    private String getShortId(String authorityCsid) throws Exception {
+        AuthorityClient client = (AuthorityClient) getClientInstance();
+        return getShortId(client, authorityCsid);
     }
 
     /**

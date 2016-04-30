@@ -24,18 +24,14 @@
 package org.collectionspace.services.common.vocabulary.nuxeo;
 
 import org.collectionspace.services.client.AuthorityClient;
-import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.UriTemplateRegistry;
 import org.collectionspace.services.common.api.RefName;
-import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
-import org.collectionspace.services.common.api.RefNameUtils.AuthorityInfo;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -51,7 +47,6 @@ import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.common.vocabulary.AuthorityServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
-import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
 import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ObjectPartType;
@@ -62,6 +57,7 @@ import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.vocabulary.VocabularyItemJAXBSchema;
+
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.PropertyException;
@@ -69,10 +65,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriInfo;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -503,61 +496,62 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     }
     
     /**
-     * We need to move the local item to the SAS workflow state.  This might involve multiple transitions.
+     * We need to change the local item's state to one that maps to the replication server's workflow
+     * state.  This might involve making multiple transitions.
      * 
      * WIKI:
-     * See table at https://wiki.collectionspace.org/pages/viewpage.action?pageId=162496564
+     * 	See table at https://wiki.collectionspace.org/pages/viewpage.action?pageId=162496564
      * 
      */
     private List<String> getTransitionList(String sasWorkflowState, String localItemWorkflowState) throws DocumentException {
     	List<String> result = new ArrayList<String>();    	
     	//
-    	// The first set of conditions maps a SAS "project" state to a local state of "locked"
+    	// The first set of conditions maps a replication-server "project" state to a local client state of "replicated"
     	//
     	if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT)) {
-    		result.add(WorkflowClient.WORKFLOWTRANSITION_LOCK);
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
     	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
     		result.add(WorkflowClient.WORKFLOWTRANSITION_UNDELETE);
-    		result.add(WorkflowClient.WORKFLOWTRANSITION_LOCK);
-    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED)) {
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED)) {
     		// Do nothing.  We're good with this state
-    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED)) {
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED)) {
     		result.add(WorkflowClient.WORKFLOWTRANSITION_UNDELETE);
     	//
-    	// The second set of conditions maps a SAS "deleted" state to a local state of "deleted"
+    	// The second set of conditions maps a replication-server "deleted" state to a local client state of "deleted"
     	//
     	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT)) {
-    		result.add(WorkflowClient.WORKFLOWTRANSITION_LOCK);
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
     		result.add(WorkflowClient.WORKFLOWTRANSITION_DELETE);
     	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
-    		result.add(WorkflowClient.WORKFLOWTRANSITION_LOCK);
-    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED)) {
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED)) {
     		result.add(WorkflowClient.WORKFLOWTRANSITION_DELETE);
-    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED)) {
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED)) {
     		// Do nothing.  We're good with this state
     	//
-    	// The third set of conditions maps a SAS "locked" state to a local state of "locked"
+    	// The third set of conditions maps a replication-server "replicated" state to a local state of "replicated"
     	//
-    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT)) {
-    		result.add(WorkflowClient.WORKFLOWTRANSITION_LOCK);
-    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT)) {
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
     		result.add(WorkflowClient.WORKFLOWTRANSITION_UNDELETE);
-    		result.add(WorkflowClient.WORKFLOWTRANSITION_LOCK);
-    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED)) {
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED)) {
     		// Do nothing.  We're good with this state
-    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED)) {
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED)) {
     		result.add(WorkflowClient.WORKFLOWTRANSITION_UNDELETE);
 		//
-    	// The last set of conditions maps a SAS "locked_deleted" state to a local state of "deleted"
+    	// The last set of conditions maps a replication-server "replicated_deleted" state to a local client state of "deleted"
     	//
-    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT)) {
-    		result.add(WorkflowClient.WORKFLOWTRANSITION_LOCK);
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT)) {
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
     		result.add(WorkflowClient.WORKFLOWTRANSITION_DELETE);
-    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
-    		result.add(WorkflowClient.WORKFLOWTRANSITION_LOCK);
-    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED)) {
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+    		result.add(WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED)) {
     		result.add(WorkflowClient.WORKFLOWTRANSITION_DELETE);
-    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED)) {
+    	} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED)) {
     		// Do nothing.  We're good with this state    		
     	} else {
     		//

@@ -129,13 +129,13 @@ public class WorkflowDocumentModelHandler
     }
     
     /*
-     * Maps the transition name to handle existing states like "locked" and "deleted".  This allows us to do things like lock "deleted"
-     * records, delete "locked" records, etc.  For example, this code maps the transition name "delete" to "delete_locked" on records in the "locked" state.
-     * As another example, it would map "undelete" to "undelete_locked" for locked records and just "undelete" for records in any other state.
+     * Maps the transition name to handle existing states like "replicated" and "deleted".  This allows us to do things like replicate "deleted"
+     * records, delete "replicated" records, etc.  For example, this code maps the transition name "delete" to "delete_replicated" on records in the "replicated" state.
+     * As another example, it would map "undelete" to "undelete_replicated" for replicated records and just "undelete" for records in any other state.
      * 
-     * Essentially, this mapping allows REST API clients to use the "delete", "undelete", "lock", "unlock", etc transitions on records no matter what
+     * Essentially, this mapping allows REST API clients to use the "delete", "undelete", "replicate", "unreplicate", etc transitions on records no matter what
      * their current state.  Without this mapping, REST API clients would need to calculate this on their own and use the longer forms like:
-     * "delete_locked", "undelete_locked", "lock_deleted", "unlocked_deleted", etc. 
+     * "delete_replicated", "undelete_replicated", "lock_deleted", "unlock_deleted", etc. 
      */
     String getQualifiedTransitionName(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef) {
     	String result = null;

@@ -121,7 +121,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 			if (isAnonymousRequest(request, resourceMethodInvoker) == true) {
 				// We don't need to check credentials for anonymous requests.  Just login to Nuxeo and
 				// exit
-				nuxeoPreProcess(request, resourceMethodInvoker);
+				nuxeoPreProcess(request, resourceMethodInvoker); // We login to Nuxeo only after we've checked authorization
 	
 				return result;
 			}
@@ -198,7 +198,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 				//
 				// Login to Nuxeo
 				//
-				nuxeoPreProcess(request, resourceMethodInvoker);
+				nuxeoPreProcess(request, resourceMethodInvoker); // We login to Nuxeo only after we've checked authorization
 				
 				//
 				// We've passed all the checks.  Now just log the results
@@ -392,7 +392,9 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
             	String.format("Framework logins: ", frameworkLogins);
             }
         } else {
-        	logger.warn(ERROR_NUXEO_LOGOUT);
+        	if (frameworkLogins > 0) {
+        		logger.warn(ERROR_NUXEO_LOGOUT);  // If we get here, it means our login/logout bookkeeping has failed.
+        	}
         }
         
         if (frameworkLogins == 0) {

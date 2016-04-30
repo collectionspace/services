@@ -135,11 +135,10 @@ public class PersonAuthorityClientUtils {
      * @param headerLabel the header label
      * @return the multipart output
      */
-    public static PoxPayloadOut createPersonAuthorityInstance(
-    		String displayName, String shortIdentifier, String headerLabel ) {
+    public static PoxPayloadOut createPersonAuthorityInstance(String displayName, String shortIdentifier, String headerLabel ) {
         PersonauthoritiesCommon personAuthority = new PersonauthoritiesCommon();
         personAuthority.setDisplayName(displayName);
-        personAuthority.setShortIdentifier(shortIdentifier + random.nextInt(10000));
+        personAuthority.setShortIdentifier(shortIdentifier);
         //String refName = createPersonAuthRefName(shortIdentifier, displayName);
         //personAuthority.setRefName(refName);
         personAuthority.setVocabType("PersonAuthority");
@@ -147,8 +146,8 @@ public class PersonAuthorityClientUtils {
         PayloadOutputPart commonPart = multipart.addPart(personAuthority, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(headerLabel);
 
-        if(logger.isDebugEnabled()){
-        	logger.debug("to be created, personAuthority common ", 
+        if (logger.isDebugEnabled()) {
+        	logger.debug("To be created, personAuthority common: ", 
         				personAuthority, PersonauthoritiesCommon.class);
         }
 
@@ -167,7 +166,7 @@ public class PersonAuthorityClientUtils {
     public static PoxPayloadOut createPersonInstance(String inAuthority,
     		String personAuthRefName,
     		Map<String, String> personInfo,
-                List<PersonTermGroup> terms,
+            List<PersonTermGroup> terms,
     		String headerLabel){
         if (terms == null || terms.isEmpty()) {
             terms = getTermGroupInstance(getGeneratedIdentifier());
@@ -190,9 +189,11 @@ public class PersonAuthorityClientUtils {
      * @return the multipart output
      */
     public static PoxPayloadOut createPersonInstance(String inAuthority, 
-    		String personAuthRefName, Map<String, String> personInfo,
-                List<PersonTermGroup> terms,
-                Map<String, List<String>> personRepeatablesInfo, String headerLabel){
+    		String personAuthRefName,
+    		Map<String, String> personInfo,
+            List<PersonTermGroup> terms,
+            Map<String, List<String>> personRepeatablesInfo,
+            String headerLabel){
         PersonsCommon person = new PersonsCommon();
         person.setInAuthority(inAuthority);
     	String shortId = personInfo.get(PersonJAXBSchema.SHORT_IDENTIFIER);

@@ -47,7 +47,6 @@ import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.PersonTermGroup;
 import org.collectionspace.services.person.PersonTermGroupList;
 import org.collectionspace.services.person.PersonsCommon;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -190,9 +189,11 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     @Override
     protected PoxPayloadOut createInstance(String identifier) {
         PersonAuthorityClient client = new PersonAuthorityClient();
+        
         String displayName = "displayName-" + identifier;
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
                 displayName, identifier, client.getCommonPartName());
+        
         return multipart;
     }
 
@@ -335,6 +336,22 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         return newID;
     }
 
+    /*
+     * This override asks for a unique identifier (short ID in the case of authority tests).
+     * 
+     * (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createResource(java.lang.String, java.lang.String)
+     */
+    @Override
+    protected String createResource(String testName, String identifier) throws Exception {
+        String result = null;
+        
+    	CollectionSpaceClient client = this.getClientInstance();
+        result = createResource(client, testName, identifier, true);
+    	
+    	return result;
+    }
+    
     /**
      * Creates the contact.
      *

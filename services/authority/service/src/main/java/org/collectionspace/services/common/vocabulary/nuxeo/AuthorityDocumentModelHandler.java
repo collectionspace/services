@@ -369,10 +369,10 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     				itemIdentifier, parentIdentifier));
     	}
     	//
-    	// Since we're creating an item that was sourced from the SAS, we need to lock it.
+    	// Since we're creating an item that was sourced from the replication server, we need to replicate it locally.
     	//
     	authorityResource.updateItemWorkflowWithTransition(ctx, parentIdentifier, itemIdentifier, 
-    			WorkflowClient.WORKFLOWTRANSITION_LOCK, AuthorityServiceUtils.DONT_UPDATE_REV);
+    			WorkflowClient.WORKFLOWTRANSITION_REPLICATE, AuthorityServiceUtils.DONT_UPDATE_REV); // don't update the rev number of the new replicated item (use the rev number of the sourced item)
     	}
     
     /**

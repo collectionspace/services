@@ -340,11 +340,11 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     	}
     }
 
-    protected boolean supportsSync(String tenantId, String serviceName) {
+    protected boolean supportsReplicating(String tenantId, String serviceName) {
     	boolean result = false;
     	
         ServiceBindingType sb = getTenantBindingsReader().getServiceBinding(tenantId, getServiceName());
-        result = sb.isSupportsSynchronization();
+        result = sb.isSupportsReplicating();
         
         return result;
     }
@@ -372,7 +372,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             /*
              * Make sure this authority service supports synchronization
              */
-            if (supportsSync(ctx.getTenantId(), ctx.getServiceName()) == false) {
+            if (supportsReplicating(ctx.getTenantId(), ctx.getServiceName()) == false) {
             	throw new DocumentException(Response.Status.FORBIDDEN.getStatusCode());
             }
             AuthorityDocumentModelHandler handler = (AuthorityDocumentModelHandler)createDocumentHandler(ctx);

@@ -100,6 +100,7 @@ public abstract class AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P extends Authori
     	if (status == Response.Status.FORBIDDEN.getStatusCode()) {
     		result = false;
     	}
+    	response.close();
     	
     	return result;
     }

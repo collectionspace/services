@@ -92,19 +92,17 @@ public class ServiceGroupDocumentModelHandler
     			repoSession = repoClient.getRepositorySession(ctx);
     			releaseRepoSession = true;
     		}
+    		
             DocumentFilter myFilter = getDocumentFilter();
-	        // Make sure we pick up workflow state, etc. 
 	        int pageSize = myFilter.getPageSize();
 	        int pageNum = myFilter.getStartPage();
 	        list.setPageNum(pageNum);
 	        list.setPageSize(pageSize);
-
     		try {
     	        Map<String, ServiceBindingType> queriedServiceBindings = new HashMap<String, ServiceBindingType>();
     	        RepositoryClientImpl nuxeoRepoClient = (RepositoryClientImpl)repoClient;
     	        // Get the service bindings for this tenant
-    	        TenantBindingConfigReaderImpl tReader =
-    	                ServiceMain.getInstance().getTenantBindingConfigReader();
+    	        TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
     	        // We need to get all the procedures, authorities, and objects.
     	        List<ServiceBindingType> servicebindings = 
     	        		tReader.getServiceBindingsByType(ctx.getTenantId(), serviceGroupNames);
@@ -114,6 +112,7 @@ public class ServiceGroupDocumentModelHandler
                             ServiceMessages.resourceNotFoundMsg(implode(serviceGroupNames, ","))).type("text/plain").build();
                     throw new CSWebApplicationException(response);
     	        }
+    	        
     	        servicebindings = SecurityUtils.getReadableServiceBindingsForCurrentUser(servicebindings);
     	        // Build the list of docTypes for allowed serviceBindings
     	        ArrayList<String> docTypes = new ArrayList<String>();
@@ -126,17 +125,16 @@ public class ServiceGroupDocumentModelHandler
             		}
             	}
             	
-            	// This should be "Document" but CMIS is gagging on that right now.
+            	// This should be type "Document" but CMIS is gagging on that right now.
             	ctx.getQueryParams().add(IQueryManager.SELECT_DOC_TYPE_FIELD, QueryManagerNuxeoImpl.COLLECTIONSPACE_DOCUMENT_TYPE);
     	        
     	        // Now we have to issue the search
-            	// findDocs will build a QueryContext, which wants to see a docType for our context
+            	// The findDocs() method will build a QueryContext, which wants to see a docType for our context
             	ctx.setDocumentType(QueryManagerNuxeoImpl.NUXEO_DOCUMENT_TYPE);
     	        DocumentWrapper<DocumentModelList> docListWrapper = 
     	        		nuxeoRepoClient.findDocs(ctx, this, repoSession, docTypes );
     	        // Now we gather the info for each document into the list and return
     	        DocumentModelList docList = docListWrapper.getWrappedObject();
-    	        
     	        if (docList == null) { // found no authRef fields - nothing to process
     	            return list;
     	        }
@@ -168,8 +166,9 @@ public class ServiceGroupDocumentModelHandler
     // Move this to a Utils class!
     public static String implode(List<String> stringList, String sep) {
     	StringBuilder sb = new StringBuilder();
+    	
     	boolean fFirst = false;
-    	for(String name:stringList) {
+    	for (String name:stringList) {
     		if(fFirst) {
     			fFirst = false;
     		} else {
@@ -177,6 +176,7 @@ public class ServiceGroupDocumentModelHandler
     		}
     		sb.append(name);
     	}
+    	
     	return sb.toString();
     }
     
@@ -184,13 +184,11 @@ public class ServiceGroupDocumentModelHandler
         return "/" + sb.getName().toLowerCase() + "/" + csid;
     }
     
-    private void processDocList(
-                String tenantId,
-		DocumentModelList docList,
-		Map<String, ServiceBindingType> queriedServiceBindings,
-		CommonList list ) {
-        int nFields = NUM_META_FIELDS+NUM_STANDARD_LIST_RESULT_FIELDS;
-        String fields[] = new String[nFields];
+    private void processDocList(String tenantId,
+			DocumentModelList docList,
+			Map<String, ServiceBindingType> queriedServiceBindings,
+			CommonList list) {
+        String fields[] = new String[NUM_META_FIELDS + NUM_STANDARD_LIST_RESULT_FIELDS];
         fields[0] = STANDARD_LIST_CSID_FIELD;
         fields[1] = STANDARD_LIST_URI_FIELD;
         fields[2] = STANDARD_LIST_UPDATED_AT_FIELD;
@@ -200,6 +198,7 @@ public class ServiceGroupDocumentModelHandler
         fields[6] = DOC_NUMBER_FIELD;
         fields[7] = DOC_TYPE_FIELD;
         list.setFieldsReturned(fields);
+        
         Iterator<DocumentModel> iter = docList.iterator();
 		HashMap<String, Object> item = new HashMap<String, Object>();
         while (iter.hasNext()) {
@@ -211,13 +210,14 @@ public class ServiceGroupDocumentModelHandler
                 throw new RuntimeException(
                         "processDocList: No Service Binding for docType: " + docType);
             }
+            
             String csid = NuxeoUtils.getCsid(docModel);
             item.put(STANDARD_LIST_CSID_FIELD, csid);
                         
             UriTemplateRegistry uriTemplateRegistry = ServiceMain.getInstance().getUriTemplateRegistry();            
             StoredValuesUriTemplate storedValuesResourceTemplate = uriTemplateRegistry.get(new UriTemplateRegistryKey(tenantId, docType));
- 	    Map<String, String> additionalValues = new HashMap<String, String>();
- 	    if (storedValuesResourceTemplate.getUriTemplateType() == UriTemplateFactory.ITEM) {
+	 	    Map<String, String> additionalValues = new HashMap<String, String>();
+	 	    if (storedValuesResourceTemplate.getUriTemplateType() == UriTemplateFactory.ITEM) {
                 try {
                     String inAuthorityCsid = (String) NuxeoUtils.getProperyValue(docModel, "inAuthority"); //docModel.getPropertyValue("inAuthority"); // AuthorityItemJAXBSchema.IN_AUTHORITY
                     additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, inAuthorityCsid);
@@ -226,12 +226,12 @@ public class ServiceGroupDocumentModelHandler
                 	String msg = String.format("Could not extract inAuthority property from authority item with CSID = ", docModel.getName());
                     logger.warn(msg, e);
                 }
- 	    } else {
+	 	    } else {
                 additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, csid);
             }
+	 	    
             String uriStr = storedValuesResourceTemplate.buildUri(additionalValues);
             item.put(STANDARD_LIST_URI_FIELD, uriStr);
-            
             try {
             	item.put(STANDARD_LIST_UPDATED_AT_FIELD, getUpdatedAtAsString(docModel));
                 item.put(STANDARD_LIST_WORKFLOW_FIELD, docModel.getCurrentLifeCycleState());
@@ -240,14 +240,12 @@ public class ServiceGroupDocumentModelHandler
             	logger.error("Error getting core values for doc ["+csid+"]: "+e.getLocalizedMessage());
             }
 
-            String value = ServiceBindingUtils.getMappedFieldInDoc(sb, 
-            						ServiceBindingUtils.OBJ_NUMBER_PROP, docModel);
+            String value = ServiceBindingUtils.getMappedFieldInDoc(sb, ServiceBindingUtils.OBJ_NUMBER_PROP, docModel);
             if (value != null) {
             	item.put(DOC_NUMBER_FIELD, value);
             }
             
-            value = ServiceBindingUtils.getMappedFieldInDoc(sb, 
-            						ServiceBindingUtils.OBJ_NAME_PROP, docModel);
+            value = ServiceBindingUtils.getMappedFieldInDoc(sb, ServiceBindingUtils.OBJ_NAME_PROP, docModel);
             if (value != null) {
             	item.put(DOC_NAME_FIELD, value);
             }
@@ -257,9 +255,6 @@ public class ServiceGroupDocumentModelHandler
             list.addItem(item);
             item.clear();
         }
-
     }
-    
-
 }
 
