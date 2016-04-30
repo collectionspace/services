@@ -84,7 +84,7 @@ public interface DocumentHandler<T, TL, WT, WTL> {
     /**
      * updateWorkflowTransition - prepare for a workflow transition
      */
-    public void handleWorkflowTransition(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef) throws Exception;
+    public void handleWorkflowTransition(ServiceContext ctx, DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef) throws Exception;
     
     /**
      * prepareCreate processes documents before creating document in repository
@@ -160,7 +160,7 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * @param wrapDoc
      * @throws Exception
      */
-    public void handleDelete(DocumentWrapper<WT> wrapDoc) throws Exception;
+    public boolean handleDelete(DocumentWrapper<WT> wrapDoc) throws Exception;
 
     /**
      * complete is called by the client to provide an opportunity to the handler

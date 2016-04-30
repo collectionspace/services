@@ -1,8 +1,8 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 
+import org.jboss.resteasy.client.ClientResponse;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /*
@@ -14,6 +14,14 @@ public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P ext
 	extends AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P>
 	implements AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P> {
 	
+	public AuthorityWithContactsClientImpl(String clientPropertiesFilename) {
+		super(clientPropertiesFilename);
+	}
+
+	public AuthorityWithContactsClientImpl() {
+		super();
+	}
+
 	@Override
     public Response createContact(String parentcsid,
             String itemcsid, PoxPayloadOut xmlPayload) {

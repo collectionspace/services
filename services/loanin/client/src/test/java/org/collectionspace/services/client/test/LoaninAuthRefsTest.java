@@ -45,12 +45,9 @@ import org.collectionspace.services.loanin.LenderGroupList;
 import org.collectionspace.services.loanin.LoansinCommon;
 import org.collectionspace.services.person.PersonTermGroup;
 
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +87,12 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     protected CollectionSpaceClient getClientInstance() {
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
-    
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+	}
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */

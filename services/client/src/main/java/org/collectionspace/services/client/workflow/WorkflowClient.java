@@ -37,29 +37,43 @@ public class WorkflowClient extends AbstractCommonListPoxServiceClientImpl<Workf
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 	public static final String SERVICE_COMMONPART_NAME = SERVICE_NAME + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
 	public static final String SERVICE_AUTHZ_SUFFIX = "/*/" + SERVICE_PATH_COMPONENT + "/";
-	//
-	// Workflow states
-	//
+	
+	/*
+	 * Nuxeu document workflow states
+	 */
+	
 	public static final String WORKFLOWSTATE_XML_ELEMENT_NAME = COLLECTIONSPACE_CORE_WORKFLOWSTATE;
-	public static final String WORKFLOWTRANSITION_UNDELETE = "undelete";
-	public static final String WORKFLOWTRANSITION_DELETE = "delete";
-	public static final String WORKFLOWSTATE_DELETED = "deleted";
-	
-	public static final String WORKFLOWSTATE_ACTIVE = "active"; // Is this a used state?
+	// common to all Nuxeo document lifecycle policies
 	public static final String WORKFLOWSTATE_PROJECT = "project";
-	
-	public static final String WORKFLOWTRANSITION_LOCK = "lock";
+	public static final String WORKFLOWSTATE_DELETED = "deleted";
+	// part of the "cs_replicating" Nuxeo document lifecycle policy
+	public static final String WORKFLOWSTATE_REPLICATED = "replicated";
+	public static final String WORKFLOWSTATE_REPLICATED_DELETED = "replicated_deleted";
+	// part of the "cs_locking" Nuxeo document lifecycle policy
 	public static final String WORKFLOWSTATE_LOCKED = "locked";
+	public static final String WORKFLOWSTATE_LOCKED_DELETED = "locked_deleted";
+	
+	/*
+	 * Nuxeo document workflow transition verbs
+	 */
+	public static final String WORKFLOWTRANSITION_DELETE = "delete";	
+	public static final String WORKFLOWTRANSITION_UNDELETE = "undelete";
+	public static final String WORKFLOWTRANSITION_LOCK = "lock";
+	public static final String WORKFLOWTRANSITION_UNLOCK = "unlock";
+	public static final String WORKFLOWTRANSITION_REPLICATE = "replicate";
+	public static final String WORKFLOWTRANSITION_UNREPLICATE = "unreplicate";
         
     public static final String WORKFLOWTRANSITION_TO = "to";
 	//
-	// DocumentHandler passed properties
+	// DocumentHandler workflow-related passed in context properties
 	//
 	public static final String TRANSITION_ID = "transition_id";
 	public static final String TRANSITION_PARAM_JAXRS = "transition";
+
 	//
 	// Service Query Params
 	//
+	public static final String WORKFLOW_QUERY_ONLY_DELETED = "wf_only_deleted";
 	public static final String WORKFLOW_QUERY_NONDELETED = "wf_deleted";
 	public static final String WORKFLOWSTATE_QUERY = "wf_deleted";
 	public static final String TARGET_DOCHANDLER = "wf_dochandler";
@@ -69,13 +83,11 @@ public class WorkflowClient extends AbstractCommonListPoxServiceClientImpl<Workf
 	// see default-life-cycle-contrib.xml in the Nuxeo server configuration
 	//
 	private static final HashMap<String, String> statesMappedToTransitions;
-    static
-    {
+    static {
     	statesMappedToTransitions = new HashMap<String, String>();
     	statesMappedToTransitions.put(WORKFLOWSTATE_DELETED, WORKFLOWTRANSITION_DELETE);
     	statesMappedToTransitions.put("c", "d");
     }
-
 	
 	@Override
 	public String getServiceName() {

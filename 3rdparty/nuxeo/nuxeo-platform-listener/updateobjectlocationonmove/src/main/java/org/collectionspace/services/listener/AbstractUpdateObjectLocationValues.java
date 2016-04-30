@@ -324,7 +324,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
 
     /**
      * Identifies whether a document is an active document; currently, whether
-     * it is not in the 'deleted' workflow state.
+     * it is not in a 'deleted' workflow state.
      *
      * @param docModel
      * @return true if the document is an active document; false if it is not.
@@ -335,7 +335,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
         }
         boolean isActiveDocument = false;
         try {
-            if (!docModel.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+            if (!docModel.getCurrentLifeCycleState().contains(WorkflowClient.WORKFLOWSTATE_DELETED)) {
                 isActiveDocument = true;
             }
         } catch (ClientException ce) {

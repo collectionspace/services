@@ -152,6 +152,9 @@ public class ReindexFulltextRoot {
             log("Reindexing limited to batch: %s", batch + 1);
         }
 
+        //
+        // Commit and close the transaction that was started by our standard request lifecycle.
+        //
         boolean tx = TransactionHelper.isTransactionActive();
         if (tx) {
             TransactionHelper.commitOrRollbackTransaction();
@@ -181,6 +184,9 @@ public class ReindexFulltextRoot {
         }
 
         log("Reindexing done");
+        //
+        // Start a new transaction so our standard request lifecycle can complete.
+        //
         if (tx) {
             TransactionHelper.startTransaction();
         }

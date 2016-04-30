@@ -68,6 +68,11 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
         return new IntakeClient();
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new IntakeClient(clientPropertiesFilename);
+	}
+
     @Override
     protected String getServiceName() {
         return IntakeClient.SERVICE_NAME;

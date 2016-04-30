@@ -278,5 +278,4 @@ public class AccountResource extends SecurityResourceBase {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, accCsid);
         }
     }
-    
 }

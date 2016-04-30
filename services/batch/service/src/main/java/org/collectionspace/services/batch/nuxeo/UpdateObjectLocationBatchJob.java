@@ -133,8 +133,8 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
 
     private InvocationResults updateComputedCurrentLocations(List<String> csids) {
         ResourceMap resourcemap = getResourceMap();
-        NuxeoBasedResource collectionObjectResource = resourcemap.get(CollectionObjectClient.SERVICE_NAME);
-        NuxeoBasedResource movementResource = resourcemap.get(MovementClient.SERVICE_NAME);
+        NuxeoBasedResource collectionObjectResource = (NuxeoBasedResource) resourcemap.get(CollectionObjectClient.SERVICE_NAME);
+        NuxeoBasedResource movementResource = (NuxeoBasedResource) resourcemap.get(MovementClient.SERVICE_NAME);
         String computedCurrentLocation;
         int numUpdated = 0;
 
@@ -380,7 +380,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
     // UC Berkeley Botanical Garden v2.4 implementation.
     // #################################################################
     protected PoxPayloadOut findByCsid(String serviceName, String csid) throws URISyntaxException, DocumentException {
-        NuxeoBasedResource resource = getResourceMap().get(serviceName);
+        NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(serviceName);
         return findByCsid(resource, csid);
     }
 
@@ -438,16 +438,18 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
     private boolean isRecordDeleted(NuxeoBasedResource resource, String collectionObjectCsid)
             throws URISyntaxException, DocumentException {
         boolean isDeleted = false;
+        
         byte[] workflowResponse = resource.getWorkflow(createUriInfo(), collectionObjectCsid);
         if (workflowResponse != null) {
             PoxPayloadOut payloadOut = new PoxPayloadOut(workflowResponse);
             String workflowState =
                     getFieldElementValue(payloadOut, WORKFLOW_COMMON_SCHEMA_NAME,
                     WORKFLOW_COMMON_NAMESPACE, LIFECYCLE_STATE_ELEMENT_NAME);
-            if (Tools.notBlank(workflowState) && workflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+            if (Tools.notBlank(workflowState) && workflowState.contains(WorkflowClient.WORKFLOWSTATE_DELETED)) {
                 isDeleted = true;
             }
         }
+        
         return isDeleted;
     }
 
@@ -539,7 +541,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
 
     private List<String> getMemberCsidsFromGroup(String serviceName, String groupCsid) throws URISyntaxException, DocumentException {
         ResourceMap resourcemap = getResourceMap();
-        NuxeoBasedResource resource = resourcemap.get(serviceName);
+        NuxeoBasedResource resource = (NuxeoBasedResource) resourcemap.get(serviceName);
         return getMemberCsidsFromGroup(resource, groupCsid);
     }
 
@@ -554,7 +556,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
 
     private List<String> getNoContextCsids() throws URISyntaxException {
         ResourceMap resourcemap = getResourceMap();
-        NuxeoBasedResource collectionObjectResource = resourcemap.get(CollectionObjectClient.SERVICE_NAME);
+        NuxeoBasedResource collectionObjectResource = (NuxeoBasedResource) resourcemap.get(CollectionObjectClient.SERVICE_NAME);
         UriInfo uriInfo = createUriInfo();
         uriInfo = addFilterToExcludeSoftDeletedRecords(uriInfo);
         AbstractCommonList collectionObjects = collectionObjectResource.getList(uriInfo);

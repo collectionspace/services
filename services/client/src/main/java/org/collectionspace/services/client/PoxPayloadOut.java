@@ -69,12 +69,34 @@ public class PoxPayloadOut extends PoxPayload<PayloadOutputPart> {
 	}
 	
 	/**
+	 * A synonym for the toXML() method.
+	 * @return
+	 */
+	public String asXML() {
+		return toXML();
+	}
+	
+	/**
 	 * Creates and returns an XML string representation of ourself.
 	 *
 	 * @return the string
 	 */
 	public String toXML() {
 		String result = null;
+        Document document = createDOMFromParts();
+
+        result = document.asXML();
+		
+		if (logger.isTraceEnabled() == true) {
+			logger.trace("\n\n<<<< Payload Out : BEGIN <<<<\n" + result + "\n<<<< Payload Out : END   <<<<\n");
+		}
+		
+		return result;
+	}
+	
+	private Document createDOMFromParts() {
+		Document result = null;
+		
         Document document = DocumentHelper.createDocument();
         document.setXMLEncoding("UTF-8");
         document.setName(getName());
@@ -91,17 +113,25 @@ public class PoxPayloadOut extends PoxPayload<PayloadOutputPart> {
 				//Add if (logger.isTraceEnabled() == true) logger.trace("Output part: " + outPart.getLabel() + " was empty.");
 			}
 		}
-		result = document.asXML();
-		
-		if (logger.isTraceEnabled() == true) {
-			logger.trace("\n\n<<<< Payload Out : BEGIN <<<<\n" +
-					result +
-					"\n<<<< Payload Out : END   <<<<\n");
-		}
-		
+		result = document;
+				
 		return result;
 	}
 		
+	/**
+	 * Gets the DOM object that we created at init time.  This should never be null;
+	 *
+	 * @return the dOM document
+	 */
+	@Override
+	public Document getDOMDocument() {
+		if (domDocument == null) {
+			domDocument = createDOMFromParts();
+		}
+		
+		return this.domDocument;
+	}
+	
 	/**
 	 * Adds the part.
 	 *

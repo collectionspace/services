@@ -109,6 +109,7 @@ public enum ServiceRequestType {
             return javax.ws.rs.HttpMethod.GET;
         }
     },
+    
     READ_LIST {
 
         @Override
@@ -143,6 +144,7 @@ public enum ServiceRequestType {
             return javax.ws.rs.HttpMethod.GET;
         }
     },
+    
     UPDATE {
 
         @Override
@@ -178,6 +180,7 @@ public enum ServiceRequestType {
             return javax.ws.rs.HttpMethod.PUT;
         }
     },
+    
     DELETE {
 
         @Override
@@ -212,6 +215,7 @@ public enum ServiceRequestType {
             return javax.ws.rs.HttpMethod.DELETE;
         }
     },
+    
     SEARCH {
 
         @Override
@@ -243,6 +247,42 @@ public enum ServiceRequestType {
         @Override
         public String httpMethodName() {
             return javax.ws.rs.HttpMethod.GET;
+        }
+    },
+    
+    SYNC {
+
+        @Override
+        public int[] validStatusCodes() {
+            final int[] STATUS_CODES = {
+                Response.Status.OK.getStatusCode(),
+                Response.Status.BAD_REQUEST.getStatusCode(),
+                Response.Status.UNAUTHORIZED.getStatusCode(),
+                Response.Status.FORBIDDEN.getStatusCode(),
+                Response.Status.NOT_FOUND.getStatusCode(),
+                Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()
+            };
+            Arrays.sort(STATUS_CODES);
+            return STATUS_CODES;
+        }
+
+        @Override
+        public boolean isValidStatusCode(int statusCode) {
+            if (Arrays.binarySearch(SYNC.validStatusCodes(), statusCode) >= 0) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public String validStatusCodesAsString() {
+            return Arrays.toString(SYNC.validStatusCodes());
+        }
+
+        @Override
+        public String httpMethodName() {
+            return javax.ws.rs.HttpMethod.GET; // Should be POST
         }
     },
     // Used by guard code.

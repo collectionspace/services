@@ -28,6 +28,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.Response;
+
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -35,15 +37,14 @@ import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
 import org.nuxeo.ecm.core.api.model.impl.primitives.StringProperty;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.StoredValuesUriTemplate;
 import org.collectionspace.services.common.UriTemplateFactory;
@@ -82,16 +83,109 @@ import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 public class RefNameServiceUtils {
 
     public static enum SpecifierForm {
-        CSID, URN_NAME
+        CSID, URN_NAME // Either a CSID or a short ID
     };
 
     public static class Specifier {
+        //
+        // URN statics for things like urn:cspace:name(grover)
+        //
+        final static String URN_PREFIX = "urn:cspace:";
+        final static int URN_PREFIX_LEN = URN_PREFIX.length();
+        final static String URN_PREFIX_NAME = "name(";
+        final static int URN_NAME_PREFIX_LEN = URN_PREFIX_LEN + URN_PREFIX_NAME.length();
+        final static String URN_PREFIX_ID = "id(";
+        final static int URN_ID_PREFIX_LEN = URN_PREFIX_LEN + URN_PREFIX_ID.length();
+    	
         public SpecifierForm form;
         public String value;
 
         public Specifier(SpecifierForm form, String value) {
             this.form = form;
             this.value = value;
+        }
+        
+        /*
+         *  identifier can be a CSID form like a8ad38ec-1d7d-4bf2-bd31 or a URN form like urn:cspace:name(shortid) or urn:cspace:id(a8ad38ec-1d7d-4bf2-bd31)
+         *
+         */
+        public static Specifier getSpecifier(String identifier) throws CSWebApplicationException {
+        	return getSpecifier(identifier, "NO-OP", "NO-OP");
+        }
+
+        /*
+         *  identifier can be a CSID form like a8ad38ec-1d7d-4bf2-bd31 or a URN form like urn:cspace:name(shortid) or urn:cspace:id(a8ad38ec-1d7d-4bf2-bd31)
+         *
+         */
+        public static Specifier getSpecifier(String identifier, String method, String op) throws CSWebApplicationException {
+        	Specifier result = null;
+
+        	if (identifier != null) {
+                if (!identifier.startsWith(URN_PREFIX)) {
+                    // We'll assume it is a CSID and complain if it does not match
+                    result = new Specifier(SpecifierForm.CSID, identifier);
+                } else {
+                    if (identifier.startsWith(URN_PREFIX_NAME, URN_PREFIX_LEN)) {
+                        int closeParen = identifier.indexOf(')', URN_NAME_PREFIX_LEN);
+                        if (closeParen >= 0) {
+                            result = new Specifier(SpecifierForm.URN_NAME,
+                                    identifier.substring(URN_NAME_PREFIX_LEN, closeParen));
+                        }
+                    } else if (identifier.startsWith(URN_PREFIX_ID, URN_PREFIX_LEN)) {
+                        int closeParen = identifier.indexOf(')', URN_ID_PREFIX_LEN);
+                        if (closeParen >= 0) {
+                            result = new Specifier(SpecifierForm.CSID,
+                                    identifier.substring(URN_ID_PREFIX_LEN, closeParen));
+                        }
+                    } else {
+                        logger.error(method + ": bad or missing specifier!");
+                        Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                                op + " failed on bad or missing Authority specifier").type(
+                                "text/plain").build();
+                        throw new CSWebApplicationException(response);
+                    }
+                }
+            }
+            
+            return result;
+        }
+        
+        /**
+         * Creates a refName in the name / shortIdentifier form.
+         *
+         * @param shortId a shortIdentifier for an authority or one of its terms
+         * @return a refName for that authority or term, in the name / shortIdentifier form.
+         *         If the provided shortIdentifier is null or empty, returns
+         *         the empty string.
+         */
+        public static String createShortIdURNValue(String shortId) {
+        	String result = null;
+        	
+            if (shortId != null || !shortId.trim().isEmpty()) {
+                result = String.format("urn:cspace:name(%s)", shortId);
+            }
+            
+            return result;
+        }        
+        
+        /**
+         * Returns a URN string identifier -e.g., urn:cspace:name(patrick) or urn:cspace:id(579d18a6-b464-4b11-ba3a)
+         * 
+         * @return
+         * @throws Exception
+         */
+        public String getURNValue() throws Exception {
+        	String result = null;
+        	
+        	if (form == SpecifierForm.CSID) {
+        		result = String.format("urn:cspace:id(%s)", value);
+        	} else if (form == SpecifierForm.URN_NAME) {
+        		result = String.format("urn:cspace:name(%s)", value);
+        	} else {
+        		throw new Exception(String.format("Unknown specifier form '%s'.", form));
+        	}
+        	
+        	return result;
         }
     }
     
@@ -103,6 +197,11 @@ public class RefNameServiceUtils {
     		this.parentSpecifier = parentSpecifier;
     		this.itemSpecifier = itemSpecifier;
     	}
+    	
+    	public AuthorityItemSpecifier(SpecifierForm form, String parentCsidOrShortId, String itemCsidOrShortId) {
+    		this.parentSpecifier = new Specifier(form, parentCsidOrShortId);
+    		this.itemSpecifier = new Specifier(form, itemCsidOrShortId);
+    	}    	
     	
     	public Specifier getParentSpecifier() {
     		return this.parentSpecifier;
@@ -992,13 +1091,27 @@ public class RefNameServiceUtils {
                 + "='" + name + "'";
     }
 
-    public static String buildWhereForAuthItemByName(String authorityItemCommonSchemaName, String name, String parentcsid) {
-        return authorityItemCommonSchemaName
-                + ":" + AuthorityItemJAXBSchema.SHORT_IDENTIFIER
-                + "='" + name + "' AND "
-                + authorityItemCommonSchemaName + ":"
-                + AuthorityItemJAXBSchema.IN_AUTHORITY + "="	// parent value must be a CSID, not a URN short ID form
-                + "'" + parentcsid + "'";
+    /**
+     * Build an NXQL query for finding an item by its short ID
+     * 
+     * @param authorityItemCommonSchemaName
+     * @param shortId
+     * @param parentcsid
+     * @return
+     */
+    public static String buildWhereForAuthItemByName(String authorityItemCommonSchemaName, String shortId, String parentcsid) {
+    	String result = null;
+    	
+        result = String.format("%s:%s='%s'", authorityItemCommonSchemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER, shortId);
+        //
+        // Technically, we don't need the parent CSID since the short ID is unique so it can be null
+        //
+        if (parentcsid != null) {
+        	result = String.format("%s AND %s:%s='%s'",
+        			result, authorityItemCommonSchemaName, AuthorityItemJAXBSchema.IN_AUTHORITY, parentcsid);
+        }
+        
+        return result;
     }    
 
     /*

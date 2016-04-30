@@ -22,7 +22,6 @@
  */
 package org.collectionspace.services.client.test;
 
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +43,7 @@ import org.collectionspace.services.material.MaterialTermGroup;
 import org.collectionspace.services.material.MaterialTermGroupList;
 import org.collectionspace.services.material.MaterialauthoritiesCommon;
 import org.collectionspace.services.material.MaterialsCommon;
-import org.jboss.resteasy.client.ClientResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -59,9 +58,16 @@ import org.testng.annotations.Test;
 public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<MaterialauthoritiesCommon, MaterialsCommon> {
 
     /** The logger. */
-    private final String CLASS_NAME = MaterialAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(MaterialAuthorityServiceTest.class);
 
+    /**
+     * Default constructor.  Used to set the short ID for all tests authority items
+     */
+    public MaterialAuthorityServiceTest() {
+    	super();
+    	TEST_SHORTID = "superglass";
+    }
+    
     @Override
     public String getServicePathComponent() {
         return MaterialAuthorityClient.SERVICE_PATH_COMPONENT;
@@ -76,22 +82,12 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
         return AuthorityClient.ITEMS;
     }   
     
-    // Instance variables specific to this test.
-    
-//    /** The SERVICE path component. */
-//    final String SERVICE_PATH_COMPONENT = "materialauthorities";
-//    
-//    /** The ITEM service path component. */
-//    final String ITEM_SERVICE_PATH_COMPONENT = "items";
-//    
-
     final String TEST_MATERIAL_TERM_DISPLAY_NAME = "SuperGlass 2";
     final String TEST_MATERIAL_TERM_NAME = "SuperGlass";
     final String TEST_MATERIAL_TERM_STATUS = "accepted";
     final String TEST_MATERIAL_TERM_SOURCE = "source";
     final String TEST_MATERIAL_TERM_SOURCE_DETAIL = "internal";
     final String TEST_MATERIAL_DESCRIPTION = "Really strong glass";
-    final String TEST_MATERIAL_SHORT_IDENTIFIER = "superglass";
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -100,7 +96,17 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
     protected CollectionSpaceClient getClientInstance() {
         return new MaterialAuthorityClient();
     }
+    
+    @Override
+    protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new MaterialAuthorityClient(clientPropertiesFilename);
+    }
 
+    @Override
+    protected String createItemInAuthority(AuthorityClient client, String authorityId, String shortId) {
+        return createItemInAuthority(client, authorityId, shortId, null /*refname*/);
+    }
+    
     /**
      * Creates the item in authority.
      *
@@ -108,14 +114,13 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
      * @param authRefName the auth ref name
      * @return the string
      */
-    private String createItemInAuthority(String vcsid, String authRefName) {
+    private String createItemInAuthority(AuthorityClient client, String vcsid, String shortId, String authRefName) {
         final String testName = "createItemInAuthority("+vcsid+","+authRefName+")"; 
     
         // Submit the request to the service and store the response.
-        MaterialAuthorityClient client = new MaterialAuthorityClient();
         Map<String, String> materialMap = new HashMap<String,String>();
         // TODO Make material type and status be controlled vocabs.
-        materialMap.put(MaterialJAXBSchema.SHORT_IDENTIFIER, TEST_MATERIAL_SHORT_IDENTIFIER);
+        materialMap.put(MaterialJAXBSchema.SHORT_IDENTIFIER, shortId);
         materialMap.put(MaterialJAXBSchema.MATERIAL_DESCRIPTION, TEST_MATERIAL_DESCRIPTION);
         
         List<MaterialTermGroup> terms = new ArrayList<MaterialTermGroup>();
@@ -128,12 +133,12 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
         terms.add(term);
         
         String newID = MaterialAuthorityClientUtils.createItemInAuthority(vcsid,
-                authRefName, materialMap, terms, client );    
+                authRefName, materialMap, terms, (MaterialAuthorityClient) client);    
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
         if (knownItemResourceId == null){
-            setKnownItemResource(newID, TEST_MATERIAL_SHORT_IDENTIFIER);
+            setKnownItemResource(newID, shortId);
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownItemResourceId=" + newID);
             }
@@ -202,85 +207,6 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
 			}
 		}
 	}
-
-    /**
-     * Read item list.
-     */
-    @Test(dataProvider = "testName", groups = {"readList"},
-               dependsOnMethods = {"readList"})
-    public void readItemList(String testName) {
-        readItemList(knownAuthorityWithItems, null);
-    }
-
-    /**
-     * Read item list by authority name.
-     */
-    @Test(dataProvider = "testName", groups = {"readList"},
-            dependsOnMethods = {"readItemList"})
-    public void readItemListByAuthorityName(String testName) {
-        readItemList(null, READITEMS_SHORT_IDENTIFIER);
-    }
-    
-    /**
-     * Read item list.
-     * 
-     * @param vcsid
-     *            the vcsid
-     * @param name
-     *            the name
-     */
-    private void readItemList(String vcsid, String shortId) {
-        String testName = "readItemList";
-
-        // Perform setup.
-        setupReadList();
-
-        // Submit the request to the service and store the response.
-        MaterialAuthorityClient client = new MaterialAuthorityClient();
-        Response res = null;
-        if (vcsid != null) {
-            res = client.readItemList(vcsid, null, null);
-        } else if (shortId != null) {
-            res = client.readItemListForNamedAuthority(shortId, null, null);
-        } else {
-            Assert.fail("readItemList passed null csid and name!");
-        }
-        
-        AbstractCommonList list = null;
-        try {
-            assertStatusCode(res, testName);
-            list = res.readEntity(AbstractCommonList.class);
-        } finally {
-            if (res != null) {
-                res.close();
-            }
-        }
-        
-        List<AbstractCommonList.ListItem> items = list.getListItem();
-        int nItemsReturned = items.size();
-        // There will be 'nItemsToCreateInList'
-        // items created by the createItemList test,
-        // all associated with the same parent resource.
-        int nExpectedItems = nItemsToCreateInList;
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": Expected " + nExpectedItems
-                    + " items; got: " + nItemsReturned);
-        }
-        Assert.assertEquals(nItemsReturned, nExpectedItems);
-
-        for (AbstractCommonList.ListItem item : items) {
-            String value = AbstractCommonListUtils.ListItemGetElementValue(
-                    item, MaterialJAXBSchema.REF_NAME);
-            Assert.assertTrue((null != value), "Item refName is null!");
-            value = AbstractCommonListUtils.ListItemGetElementValue(item,
-                    MaterialJAXBSchema.MATERIAL_TERM_DISPLAY_NAME);
-            Assert.assertTrue((null != value), "Item termDisplayName is null!");
-        }
-        if (logger.isTraceEnabled()) {
-            AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger,
-                    testName);
-        }
-    }
 
     @Override
     public void delete(String testName) throws Exception {
@@ -449,11 +375,6 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
     // Authority item specific overrides
     //
     
-    @Override
-    protected String createItemInAuthority(String authorityId) {
-        return createItemInAuthority(authorityId, null /*refname*/);
-    }
-
     @Override
     protected MaterialsCommon updateItemInstance(MaterialsCommon materialsCommon) {
                             

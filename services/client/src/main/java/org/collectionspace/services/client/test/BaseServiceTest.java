@@ -60,7 +60,9 @@ import org.w3c.dom.Document;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.TestServiceClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.common.api.FileTools;
@@ -99,7 +101,7 @@ public abstract class BaseServiceTest<CLT> {
     /* A runtime/command-line parameter to indicate if we should delete all the test related resource objects */
     static private final String NO_TEST_CLEANUP = "noTestCleanup";
     /* A random number generator */
-    static private final Random random = new Random(System.currentTimeMillis());
+    protected static final Random random = new Random(System.currentTimeMillis());
     
     
     /** The non-existent id. */
@@ -202,6 +204,13 @@ public abstract class BaseServiceTest<CLT> {
      * @return the client
      */
     abstract protected CollectionSpaceClient getClientInstance();
+
+    /**
+     * Gets the client.
+     *
+     * @return the client
+     */
+    abstract protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename);
 
     /*
      * Subclasses can override this method to return their AbstractCommonList subclass
@@ -440,7 +449,7 @@ public abstract class BaseServiceTest<CLT> {
      * Tests can override this method to customize their identifiers.
      */
     protected String createIdentifier() {
-        long identifier = System.currentTimeMillis() + random.nextInt();
+        long identifier = System.currentTimeMillis() + Math.abs(random.nextInt());
         return Long.toString(identifier);
     }
     
@@ -480,18 +489,32 @@ public abstract class BaseServiceTest<CLT> {
      * @return the object
      * @throws Exception the exception
      */
-    static protected Object extractPart(PoxPayloadIn input, String label, Class<?> clazz)
-            throws Exception {
-    	Object result = null;
-    	PayloadInputPart payloadInputPart = input.getPart(label);
-        if (payloadInputPart != null) {
-        	result = payloadInputPart.getBody();
-        } else if (logger.isWarnEnabled() == true) {
-        	logger.warn("Payload part: " + label +
-        			" is missing from payload: " + input.getName());
-        }
-        return result;
-            }
+	static protected Object extractPart(PoxPayloadIn input, String label, Class<?> clazz) throws Exception {
+		Object result = null;
+		
+		PayloadInputPart payloadInputPart = input.getPart(label);
+		if (payloadInputPart != null) {
+			result = payloadInputPart.getBody();
+		} else if (logger.isWarnEnabled() == true) {
+			logger.warn("Payload part: " + label + " is missing from payload: " + input.getName());
+		}
+		
+		return result;
+	}
+	
+	static protected Object extractPart(PoxPayloadOut output, String label, Class<?> clazz) throws Exception {
+		Object result = null;
+		
+		PayloadOutputPart payloadOutPart = output.getPart(label);
+		if (payloadOutPart != null) {
+			result = payloadOutPart.getBody();
+		} else if (logger.isWarnEnabled() == true) {
+			logger.warn("Payload part: " + label + " is missing from payload: " + output.getName());
+		}
+		
+		return result;
+	}
+	
 
     /**
      * Gets the part object.
@@ -743,26 +766,10 @@ public abstract class BaseServiceTest<CLT> {
             }
             return;
         }
-        
-        if (logger.isDebugEnabled()) {
-            logger.debug("Cleaning up temporary resources created for testing ...");
-        }
-        CollectionSpaceClient client = this.getClientInstance();
-        //
-        // First, check to see if we need to cleanup any authority items
-        //
-        if (this.isAuthorityClient(client) == true) {
-            AuthorityClient authorityClient = (AuthorityClient) client;
-            for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
-                String itemResourceId = entry.getKey();
-                String authorityResourceId = entry.getValue();
-                // Note: Any non-success responses are ignored and not reported.
-                authorityClient.deleteItem(authorityResourceId, itemResourceId).close();
-            }
-        }
-        //
-        // Next, delete all other entities include possible authorities.
-        //
+        cleanUp(this.getClientInstance());
+    }
+    
+    public void cleanUp(CollectionSpaceClient client) {
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
             client.delete(resourceId).close();

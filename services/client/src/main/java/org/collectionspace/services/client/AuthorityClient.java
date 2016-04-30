@@ -1,8 +1,9 @@
 package org.collectionspace.services.client;
 
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 
+import org.jboss.resteasy.client.ClientResponse;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -17,6 +18,10 @@ public interface AuthorityClient<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
 
     /** The uri path element for items in an authority */
     public static String ITEMS = "items";    //used to construct uri's in service paths for authorities.
+    public static final String SHORT_IDENTIFIER = "shortIdentifier";
+    public static final String TERM_DISPLAY_NAME = "termDisplayName";
+    public static final String VOCAB_DISPLAY_NAME = "displayName";
+    public static final String REF_NAME = "refName";
 
 	/*
 	 * Basic CRUD operations
@@ -61,7 +66,17 @@ public interface AuthorityClient<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
     public Response getItemAuthorityRefs(String parentcsid, String itemcsid);    
     
     /*
-     * 
+     * Synchronization methods
+     */
+    
+    public Response syncByName(String name);
+    
+    public Response sync(String identifier);
+    
+    public boolean supportsSync();
+    
+    /*
+     * READ/GET by name method
      */
     
     Response readByName(String name);

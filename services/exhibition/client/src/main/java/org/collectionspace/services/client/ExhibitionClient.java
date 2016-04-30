@@ -29,7 +29,15 @@ public class ExhibitionClient extends AbstractCommonListPoxServiceClientImpl<Exh
     public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    /* (non-Javadoc)
+    public ExhibitionClient() {
+		super();
+	}
+
+    public ExhibitionClient(String clientPropertiesFilename) {
+		super(clientPropertiesFilename);
+	}
+
+	/* (non-Javadoc)
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
      */
     @Override

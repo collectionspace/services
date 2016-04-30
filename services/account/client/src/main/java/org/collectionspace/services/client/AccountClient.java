@@ -43,6 +43,14 @@ public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList,
     public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
     public final static String IMMUTABLE = "immutable";
 
+	public AccountClient() {
+		super();
+	}
+
+	public AccountClient(String clientPropertiesFilename) {
+		super(clientPropertiesFilename);
+	}
+
 	@Override
 	public String getServiceName() {
 		return SERVICE_NAME;

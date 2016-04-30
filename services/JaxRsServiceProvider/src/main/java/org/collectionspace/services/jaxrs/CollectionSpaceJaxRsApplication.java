@@ -25,6 +25,8 @@ package org.collectionspace.services.jaxrs;
 import org.collectionspace.services.account.AccountResource;
 import org.collectionspace.services.account.TenantResource;
 import org.collectionspace.services.blob.BlobResource;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.id.IDResource;
 import org.collectionspace.services.media.MediaResource;
@@ -62,6 +64,8 @@ import javax.ws.rs.core.Application;
 import java.util.HashSet;
 import java.util.Set;
 
+
+
 //import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.authorization.PermissionResource;
 import org.collectionspace.services.authorization.RoleResource;
@@ -86,7 +90,7 @@ public class CollectionSpaceJaxRsApplication extends Application
 
     private Set<Object> singletons = new HashSet<Object>();
     private Set<Class<?>> empty = new HashSet<Class<?>>();    
-    private ResourceMap resourceMap = new ResourceMapImpl();
+    private ResourceMap<PoxPayloadIn, PoxPayloadOut> resourceMap = new ResourceMapImpl();
     private ServletContext servletContext = null;
 
     public CollectionSpaceJaxRsApplication() {    	

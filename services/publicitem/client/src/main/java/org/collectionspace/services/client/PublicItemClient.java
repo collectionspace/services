@@ -36,7 +36,15 @@ public class PublicItemClient extends AbstractCommonListPoxServiceClientImpl<Pub
     
     public static final String PUBLICITEMS_CONTENT_SUFFIX = "content";
 
-    /* (non-Javadoc)
+    public PublicItemClient() {
+		super();
+	}
+
+    public PublicItemClient(String clientPropertiesFilename) {
+    	super(clientPropertiesFilename);
+	}
+
+	/* (non-Javadoc)
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
      */
     @Override

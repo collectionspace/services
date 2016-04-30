@@ -14,7 +14,6 @@ import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.location.*;
 import org.dom4j.DocumentException;
-import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,15 +116,13 @@ public class LocationAuthorityClientUtils {
      * @return the CSID of the new item
      */
     public static String createItemInAuthority(String vcsid, 
-    		String locationAuthorityRefName, Map<String,String> locationMap,
-    		List<LocTermGroup> terms, LocationAuthorityClient client ) {
-    	// Expected status code: 201 Created
-    	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
-    	// Type of service request being tested
-    	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
+		String locationAuthorityRefName,
+		Map<String,String> locationMap,
+		List<LocTermGroup> terms,
+		LocationAuthorityClient client ) {
         
         String displayName = "";
-        if ((terms !=null) && (! terms.isEmpty())) {
+        if (terms !=null && !terms.isEmpty()) {
             displayName = terms.get(0).getTermDisplayName();
         }
     	
@@ -134,21 +131,22 @@ public class LocationAuthorityClientUtils {
     				+"\" in locationAuthority: \"" + vcsid +"\"");
     	}
         
-    	PoxPayloadOut multipart = 
-    		createLocationInstance( locationAuthorityRefName,
+    	PoxPayloadOut multipart = createLocationInstance( locationAuthorityRefName,
     			locationMap, terms, client.getItemCommonPartName() );
     	String newID = null;
     	Response res = client.createItem(vcsid, multipart);
         try {
+        	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
+        	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
 	    	int statusCode = res.getStatus();
 	
-	    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
+	    	if (!REQUEST_TYPE.isValidStatusCode(statusCode)) {
 	    		throw new RuntimeException("Could not create Item: \""
 	    				+locationMap.get(LocationJAXBSchema.SHORT_IDENTIFIER)
 	    				+"\" in locationAuthority: \"" + locationAuthorityRefName
 	    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
 	    	}
-	    	if(statusCode != EXPECTED_STATUS_CODE) {
+	    	if (statusCode != EXPECTED_STATUS_CODE) {
 	    		throw new RuntimeException("Unexpected Status when creating Item: \""
 	    				+locationMap.get(LocationJAXBSchema.SHORT_IDENTIFIER)
 	    				+"\" in locationAuthority: \"" + locationAuthorityRefName +"\", Status:"+ statusCode);

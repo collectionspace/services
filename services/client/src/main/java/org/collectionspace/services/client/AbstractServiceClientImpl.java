@@ -26,6 +26,7 @@ package org.collectionspace.services.client;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 
@@ -130,6 +131,55 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
     	return logger;
     }
     
+    /**
+     * Instantiates a new abstract service client impl.
+     * @throws Exception 
+     */
+    public AbstractServiceClientImpl() {
+    	this(CollectionSpaceClient.DEFAULT_CLIENT_PROPERTIES_FILENAME);
+    }
+    
+    /**
+     * Instantiates a new abstract service client impl.
+     * @throws Exception 
+     */
+    public AbstractServiceClientImpl(String propertiesFileName) {
+        setClientProperties(propertiesFileName);
+    }
+    
+    /**
+     * Instantiates a new abstract service client impl.
+     * @throws Exception 
+     */
+    public AbstractServiceClientImpl(Properties properties) {
+        setClientProperties(properties);
+    }
+    
+    /**
+     * Helps initialize a new abstract service client impl instance.
+     * @throws Exception 
+     */
+    private void init() {
+    	if (this.properties.isEmpty() == true) {
+    		throw new RuntimeException("Client connection properties are empty.  Cannot proceed.");
+    	}
+    	
+    	try {
+	        setupHttpClient();
+	        setupHttpClient4(); // temp fix for CSPACE-6281
+    	} catch (Exception e) {
+    		throw new RuntimeException(e.getMessage());
+    	}
+    	
+        ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
+        RegisterBuiltin.register(factory);
+        setProxy();        
+    }
+
+    /**
+     * 
+     * @return
+     */
     abstract public String getServicePathComponent();
     
     /**
@@ -184,17 +234,6 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
 //     */
 //    abstract public String getServicePathComponent();
 
-    /**
-     * Instantiates a new abstract service client impl.
-     */
-    protected AbstractServiceClientImpl() {
-        readClientProperties();
-        setupHttpClient();
-        setupHttpClient4(); // temp fix for CSPACE-6281
-        ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
-        RegisterBuiltin.register(factory);
-        setProxy();        
-    }
 
     /*
      * (non-Javadoc)
@@ -238,8 +277,8 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
     public void printProperties() {
         for (Object kobj : properties.keySet()) {
             String key = (String) kobj;
-            logger.trace("begin property name=" + key + " value="
-                    + properties.get(key));
+            String value = (String) properties.get(key);
+            logger.debug("begin property name=" + key + " value=" + value );
         }
     }
 
@@ -297,48 +336,15 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      *
      * @exception RuntimeException
      */
-    protected void readClientProperties() {
-
+    @Override
+    public void setClientProperties(String clientPropertiesFilename) {
+    	Properties inProperties = new Properties();
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         InputStream is = null;
         try {
-            is = cl.getResourceAsStream("collectionspace-client.properties");
-            properties.load(is);
-            if (logger.isDebugEnabled()) {
-                printProperties();
-            }
-            String spec = System.getProperty(URL_PROPERTY);
-            if (spec != null && !"".equals(spec)) {
-                properties.setProperty(URL_PROPERTY, spec);
-            }
-
-            spec = properties.getProperty(URL_PROPERTY);
-            url = new URL(spec);
-            logger.debug("readProperties() using url=" + url);
-
-            String auth = System.getProperty(AUTH_PROPERTY);
-            if (auth != null && !"".equals(auth)) {
-                properties.setProperty(AUTH_PROPERTY, auth);
-            }
-            String ssl = System.getProperty(SSL_PROPERTY);
-            if (ssl != null && !"".equals(ssl)) {
-                properties.setProperty(AUTH_PROPERTY, ssl);
-            }
-            String user = System.getProperty(USER_PROPERTY);
-            if (user != null && !"".equals(user)) {
-                properties.setProperty(USER_PROPERTY, user);
-            }
-            String password = System.getProperty(PASSWORD_PROPERTY);
-            if (password != null && !"".equals(password)) {
-                properties.setProperty(PASSWORD_PROPERTY, password);
-            }
-            String tenant = System.getProperty(TENANT_PROPERTY);
-            if (tenant != null && !"".equals(tenant)) {
-                properties.setProperty(TENANT_PROPERTY, tenant);
-            }
-            if (logger.isDebugEnabled()) {
-                printProperties();
-            }
+            is = cl.getResourceAsStream(clientPropertiesFilename);
+            inProperties.load(is);
+            setClientProperties(inProperties);
         } catch (Exception e) {
             logger.debug("Caught exception while reading properties", e);
             throw new RuntimeException(e);
@@ -354,14 +360,77 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
             }
         }
     }
+    
+    /**
+     * Set our instance's properties to the in coming value.  But only if the values don't already
+     * existing as System properties.
+     * 
+     * @param inProperties
+     * @throws Exception 
+     */
+    protected void setClientProperties(Properties inProperties) {
+        properties = inProperties;
+        
+        if (logger.isDebugEnabled()) {
+        	System.getenv();
+        	System.getenv("An environment variable name");
+            printProperties();
+        }
+        
+        String spec = System.getProperty(URL_PROPERTY);
+        if (spec != null && !"".equals(spec)) {
+            properties.setProperty(URL_PROPERTY, spec);
+        }
+
+        spec = properties.getProperty(URL_PROPERTY);
+        try {
+			url = new URL(spec);
+	        logger.debug("readProperties() using url=" + url);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new RuntimeException(e.getMessage());
+		}
+
+        String auth = System.getProperty(AUTH_PROPERTY);
+        if (auth != null && !"".equals(auth)) {
+            properties.setProperty(AUTH_PROPERTY, auth);
+        }
+        String ssl = System.getProperty(SSL_PROPERTY);
+        if (ssl != null && !"".equals(ssl)) {
+            properties.setProperty(AUTH_PROPERTY, ssl);
+        }
+        String user = System.getProperty(USER_PROPERTY);
+        if (user != null && !"".equals(user)) {
+            properties.setProperty(USER_PROPERTY, user);
+        }
+        String password = System.getProperty(PASSWORD_PROPERTY);
+        if (password != null && !"".equals(password)) {
+            properties.setProperty(PASSWORD_PROPERTY, password);
+        }
+        String tenant = System.getProperty(TENANT_PROPERTY);
+        if (tenant != null && !"".equals(tenant)) {
+            properties.setProperty(TENANT_PROPERTY, tenant);
+        }
+        
+        if (logger.isDebugEnabled()) {
+            printProperties();
+        }
+        //
+        // How use the properties to initialize the HTTP client
+        //
+        init();
+    }    
 
     /**
      * setupHttpClient sets up HTTP client for the service client the setup
      * process relies on the following properties URL_PROPERTY USER_PROPERTY
      * PASSWORD_PROPERTY AUTH_PROPERTY SSL_PROPERTY
+     * 
+     * @throws Exception 
      */
     @Override
-    public void setupHttpClient() {
+    public void setupHttpClient() throws Exception {
     	try {
 	        this.httpClient = new HttpClient();
 	        if (useAuth()) {
@@ -387,7 +456,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
 	            }
 	        }
     	} catch (Throwable e) {
-    		e.printStackTrace();
+    		throw new Exception("Could not setup an HTTP client as requested with ", e);
     	}
     }
     
@@ -395,7 +464,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      * This is a temp fix for RESTEasy upgrade in CSPACE-6281.  The long-term solution will be to use
      * the non-deprecated approach per the RESTEasy documentation.
      */
-    public void setupHttpClient4() {
+    public void setupHttpClient4() throws Exception {
     	try {
 	        this.httpClient4 = new DefaultHttpClient();
 	        if (useAuth()) {
@@ -421,7 +490,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
 	            }
 	        }
     	} catch (Throwable e) {
-    		e.printStackTrace();
+    		throw new Exception("Could not setup an HTTP client as requested with ", e);
     	}
     }    
 
@@ -498,8 +567,14 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
         } else {
             removeProperty(CollectionSpaceClient.AUTH_PROPERTY);
         }
-        setupHttpClient();
-        setupHttpClient(); // temp fix for CSPACE-6281
+        
+        try {
+	        setupHttpClient();
+	        setupHttpClient(); // temp fix for CSPACE-6281
+        } catch (Exception e) {
+    		throw new RuntimeException(e.getMessage());
+        }
+        
         setProxy();
     }
     

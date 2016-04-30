@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
@@ -43,12 +42,9 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.media.MediaCommon;
 import org.collectionspace.services.person.PersonTermGroup;
 
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,6 +78,11 @@ public class MediaAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     protected CollectionSpaceClient getClientInstance() {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
+
+    @Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+	}
 
     @Override
     protected AbstractCommonList getCommonList(Response response) {
@@ -157,7 +158,7 @@ public class MediaAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         Map<String, String> personInfo = new HashMap<String, String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
-        personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
+        personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId + random.nextInt(1000));
         List<PersonTermGroup> personTerms = new ArrayList<PersonTermGroup>();
         PersonTermGroup term = new PersonTermGroup();
         String termName = firstName + " " + surName;

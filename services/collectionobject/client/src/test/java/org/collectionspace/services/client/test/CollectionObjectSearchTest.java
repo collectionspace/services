@@ -25,6 +25,7 @@ package org.collectionspace.services.client.test;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -124,6 +125,11 @@ public class CollectionObjectSearchTest extends BaseServiceTest<AbstractCommonLi
 	@Override
 	protected CollectionSpaceClient getClientInstance() {
 		return new CollectionObjectClient();
+	}
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+		return new CollectionObjectClient(clientPropertiesFilename);
 	}
 	
 	/**

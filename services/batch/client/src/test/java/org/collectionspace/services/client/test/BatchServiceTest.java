@@ -23,26 +23,18 @@
 package org.collectionspace.services.client.test;
 
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.BatchClient;
 import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.batch.BatchCommon;
 
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-//import org.w3c.dom.Element;
-//import org.w3c.dom.Node;
 
 /**
  * BatchServiceTest, carries out tests against a deployed and running Batch Service. <p/>
@@ -69,6 +61,11 @@ public class BatchServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
     protected CollectionSpaceClient getClientInstance() {
         return new BatchClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new BatchClient(clientPropertiesFilename);
+	}	
 
     // ---------------------------------------------------------------
     // Utility methods used by tests above
@@ -129,5 +126,5 @@ public class BatchServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
         		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
     public void CRUDTests(String testName) {
     	// Do nothing.  Simply here to for a TestNG execution order for our tests
-    }	
+    }
 }

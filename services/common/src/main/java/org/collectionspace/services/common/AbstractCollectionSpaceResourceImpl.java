@@ -24,7 +24,9 @@
 package org.collectionspace.services.common;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -35,6 +37,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextProperties;
 import org.collectionspace.services.common.document.BadRequestException;
@@ -47,6 +50,7 @@ import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
+import org.collectionspace.services.config.service.ServiceBindingType;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
 //import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.spi.HttpRequest;
@@ -65,7 +69,7 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
+    protected final ServiceContext<IT, OT> NULL_CONTEXT = null;
     // Fields for default client factory and client
     /** The repository client factory. */
     private RepositoryClientFactory<IT, OT> repositoryClientFactory;
@@ -507,5 +511,103 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
 	public boolean allowAnonymousAccess(HttpRequest request,
 			Class<?> resourceClass) {
 		return false;
-	}    
+	}
+	
+    /**
+     * Returns a UriRegistry entry: a map of tenant-qualified URI templates
+     * for the current resource, for all tenants
+     * 
+     * @return a map of URI templates for the current resource, for all tenants
+     */
+    public Map<UriTemplateRegistryKey,StoredValuesUriTemplate> getUriRegistryEntries() {
+        Map<UriTemplateRegistryKey,StoredValuesUriTemplate> uriRegistryEntriesMap =
+                new HashMap<UriTemplateRegistryKey,StoredValuesUriTemplate>();
+        List<String> tenantIds = getTenantBindingsReader().getTenantIds();
+        for (String tenantId : tenantIds) {
+                uriRegistryEntriesMap.putAll(getUriRegistryEntries(tenantId, getDocType(tenantId), UriTemplateFactory.RESOURCE));
+        }
+        return uriRegistryEntriesMap;
+    }
+    
+    /**
+     * Returns a resource's document type.
+     * 
+     * @param tenantId
+     * @return
+     */
+    @Override
+    public String getDocType(String tenantId) {
+        return getDocType(tenantId, getServiceName());
+    }
+
+    /**
+     * Returns the document type associated with a specified service, within a specified tenant.
+     * 
+     * @param tenantId a tenant ID
+     * @param serviceName a service name
+     * @return the Nuxeo document type associated with that service and tenant.
+     */
+    // FIXME: This method may properly belong in a different services package or class.
+    // Also, we need to check for any existing methods that may duplicate this one.
+    protected String getDocType(String tenantId, String serviceName) {
+        String docType = "";
+        if (Tools.isBlank(tenantId)) {
+            return docType;
+        }
+        ServiceBindingType sb = getTenantBindingsReader().getServiceBinding(tenantId, serviceName);
+        if (sb == null) {
+            return docType;
+        }
+        docType = sb.getObject().getName(); // Reads the Document Type from tenant bindings configuration
+        return docType;
+    }
+
+	/**
+     * Returns a UriRegistry entry: a map of tenant-qualified URI templates
+     * for the current resource, for a specified tenants
+     * 
+     * @return a map of URI templates for the current resource, for a specified tenant
+     */
+    @Override
+    public Map<UriTemplateRegistryKey,StoredValuesUriTemplate> getUriRegistryEntries(String tenantId,
+            String docType, UriTemplateFactory.UriTemplateType type) {
+        Map<UriTemplateRegistryKey,StoredValuesUriTemplate> uriRegistryEntriesMap =
+                new HashMap<UriTemplateRegistryKey,StoredValuesUriTemplate>();
+        UriTemplateRegistryKey key;
+        if (Tools.isBlank(tenantId) || Tools.isBlank(docType)) {
+            return uriRegistryEntriesMap;
+        }
+        key = new UriTemplateRegistryKey();
+        key.setTenantId(tenantId);
+        key.setDocType(docType); 
+        uriRegistryEntriesMap.put(key, getUriTemplate(type));
+        return uriRegistryEntriesMap;
+    }
+    
+    /**
+     * Returns a URI template of the appropriate type, populated with the
+     * current service name as one of its stored values.
+     *      * 
+     * @param type a URI template type
+     * @return a URI template of the appropriate type.
+     */
+    @Override
+    public StoredValuesUriTemplate getUriTemplate(UriTemplateFactory.UriTemplateType type) {
+        Map<String,String> storedValuesMap = new HashMap<String,String>();
+        storedValuesMap.put(UriTemplateFactory.SERVICENAME_VAR, getServiceName());
+        StoredValuesUriTemplate template =
+                UriTemplateFactory.getURITemplate(type, storedValuesMap);
+        return template;
+    }
+
+    /**
+     * Returns a reader for reading values from tenant bindings configuration
+     * 
+     * @return a tenant bindings configuration reader
+     */
+    @Override
+    public TenantBindingConfigReaderImpl getTenantBindingsReader() {
+        return ServiceMain.getInstance().getTenantBindingConfigReader();
+    }
+	
 }

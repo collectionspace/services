@@ -2,6 +2,14 @@ package org.collectionspace.services.common;
 
 import java.util.HashMap;
 
-public class ResourceMapImpl extends HashMap<String, NuxeoBasedResource> implements ResourceMap {
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
+
+public class ResourceMapImpl extends HashMap<String, CollectionSpaceResource<PoxPayloadIn, PoxPayloadOut>> implements ResourceMap<PoxPayloadIn, PoxPayloadOut> {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 }

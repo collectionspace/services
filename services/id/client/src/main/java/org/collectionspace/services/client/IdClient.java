@@ -1,7 +1,6 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 
 /**
  * IDClient.
@@ -13,7 +12,15 @@ public class IdClient extends AbstractServiceClientImpl<String, String, String, 
 
     public static final String SERVICE_NAME = "idgenerators";
     
-    /* (non-Javadoc)
+    public IdClient() {
+		super();
+	}
+
+    public IdClient(String clientPropertiesFilename) {
+		super(clientPropertiesFilename);
+	}
+
+	/* (non-Javadoc)
      * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
      */
     @Override

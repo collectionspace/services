@@ -37,18 +37,14 @@ import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.conditioncheck.ConditionchecksCommon;
 import org.collectionspace.services.person.PersonTermGroup;
 
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +77,12 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
     protected CollectionSpaceClient getClientInstance() {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
-    
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+	}
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */

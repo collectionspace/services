@@ -72,6 +72,9 @@ public class UpdateRelationsOnDelete implements EventListener {
             List<String> workflowStatesToFilter = new ArrayList<String>();
             workflowStatesToFilter.add(WorkflowClient.WORKFLOWSTATE_DELETED);
             workflowStatesToFilter.add(WorkflowClient.WORKFLOWSTATE_LOCKED);
+            workflowStatesToFilter.add(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED);
+            workflowStatesToFilter.add(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED);
+            
             LifeCycleFilter workflowStateFilter = new LifeCycleFilter(null, workflowStatesToFilter);
             
             // Perform the filtered query
@@ -110,13 +113,17 @@ public class UpdateRelationsOnDelete implements EventListener {
      */
     private boolean isDocumentSoftDeletedEvent(EventContext eventContext) {
         boolean isSoftDeletedEvent = false;
+        
         if (eventContext instanceof DocumentEventContext) {
             if (eventContext.getProperties().containsKey(WorkflowClient.WORKFLOWTRANSITION_TO)
-                    && eventContext.getProperties().get(WorkflowClient.WORKFLOWTRANSITION_TO).equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+                    &&
+                (eventContext.getProperties().get(WorkflowClient.WORKFLOWTRANSITION_TO).equals(WorkflowClient.WORKFLOWSTATE_DELETED)
+                		||
+                eventContext.getProperties().get(WorkflowClient.WORKFLOWTRANSITION_TO).equals(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED))) {
                 isSoftDeletedEvent = true;
             }
         }
+        
         return isSoftDeletedEvent;
     }
-    
 }

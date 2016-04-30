@@ -1,12 +1,13 @@
 package org.collectionspace.services.IntegrationTests.xmlreplay;
 
-import org.collectionspace.services.common.XmlTools;
+import org.collectionspace.services.client.XmlTools;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 
 import javax.swing.text.Style;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;

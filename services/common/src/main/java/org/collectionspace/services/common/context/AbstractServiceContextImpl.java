@@ -33,6 +33,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.authentication.spi.AuthNContext;
 import org.collectionspace.services.client.AuthorityClient;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.workflow.WorkflowClient;
@@ -508,12 +509,24 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         }
     }
 
+    /**
+     * Helps to filter for queries that either want to include or exclude documents in deleted workflow states.
+     * 
+     * @param queryParams
+     * @return
+     */
     private static String buildWorkflowWhereClause(MultivaluedMap<String, String> queryParams) {
     	String result = null;
     	
         String includeDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_NONDELETED);
+        String includeOnlyDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_ONLY_DELETED);
+
     	if (includeDeleted != null && includeDeleted.equalsIgnoreCase(Boolean.FALSE.toString())) {    	
-    		result = "ecm:currentLifeCycleState <> 'deleted'";
+    		result = String.format("(ecm:currentLifeCycleState <> '%s' AND ecm:currentLifeCycleState <> '%s' AND ecm:currentLifeCycleState <> '%s')",
+    				WorkflowClient.WORKFLOWSTATE_DELETED, WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED, WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED);
+    	} else if (includeOnlyDeleted != null && includeOnlyDeleted.equalsIgnoreCase(Boolean.TRUE.toString())) {
+    		result = String.format("(ecm:currentLifeCycleState <> '%s' AND ecm:currentLifeCycleState <> '%s' AND ecm:currentLifeCycleState <> '%s')",
+    				WorkflowClient.WORKFLOWSTATE_PROJECT, WorkflowClient.WORKFLOWSTATE_LOCKED, WorkflowClient.WORKFLOWSTATE_REPLICATED);
     	}
     	
     	return result;
@@ -538,10 +551,11 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         // reflect the values of those parameters in the document filter
         // to specify sort ordering, pagination, etc.
         //
-        if (this.getQueryParams() != null) {
-          docFilter.setSortOrder(this.getQueryParams());
-          docFilter.setPagination(this.getQueryParams());
-          String workflowWhereClause = buildWorkflowWhereClause(queryParams);
+        MultivaluedMap<String, String> queryParameters = this.getQueryParams();
+        if (queryParameters != null) {
+          docFilter.setSortOrder(queryParameters);
+          docFilter.setPagination(queryParameters);
+          String workflowWhereClause = buildWorkflowWhereClause(queryParameters);
           if (workflowWhereClause != null) {
         	  docFilter.appendWhereClause(workflowWhereClause, IQueryManager.SEARCH_QUALIFIER_AND);			
           }            
@@ -626,27 +640,51 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         return valHandlers;
     }
     
+    /**
+     * If one doesn't already exist, use the default properties filename to load a set of properties that
+     * will be used to create an HTTP client to a CollectionSpace instance.
+     */
     @Override
     public AuthorityClient getClient() throws Exception {
     	AuthorityClient result = authorityClient;
-    	
+
         if (authorityClient == null) {
-	        String authorityClientClazz = getServiceBinding().getClientHandler();
-	        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-	        authorityClientClazz = authorityClientClazz.trim();
-	        try {
-	            Class<?> c = tccl.loadClass(authorityClientClazz);
-	            if (AuthorityClient.class.isAssignableFrom(c)) {
-	            	result = authorityClient = ((AuthorityClient) c.newInstance());
-	            } else {
-	            	logger.error(String.format("The service binding clientHandler class '%s' for '%s' service was not of type AuthorityClient.",
-	            			authorityClientClazz, this.getServiceName()));
-	            }
-	        } catch (ClassNotFoundException e) {
-	        	String msg = String.format("Missing document validation handler: '%s'.", authorityClientClazz);
-	        	logger.warn(msg);
-	        	logger.trace(msg, e);
-	        }
+        	result = authorityClient = getClient(CollectionSpaceClient.DEFAULT_CLIENT_PROPERTIES_FILENAME);
+        }
+    	
+        return result;
+    }
+    
+    /*
+     * Use the properties filename passed in to load the URL and credentials that will be used
+     * to create a new HTTP client.
+     * 
+     * Never uses or resets the this.authorityClient member.  Always creates a new HTTP client using
+     * the loaded properties.
+     * 
+     * (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getClient(java.lang.String)
+     */
+    @Override
+    public AuthorityClient getClient(String clientPropertiesFilename) throws Exception {
+    	AuthorityClient result = null;
+    	
+        String authorityClientClazz = getServiceBinding().getClientHandler();
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        authorityClientClazz = authorityClientClazz.trim();
+        try {
+            Class<?> c = tccl.loadClass(authorityClientClazz);
+            if (AuthorityClient.class.isAssignableFrom(c)) {
+            	result = authorityClient = ((AuthorityClient) c.newInstance());
+            	result.setClientProperties(clientPropertiesFilename);
+            } else {
+            	logger.error(String.format("The service binding clientHandler class '%s' for '%s' service was not of type AuthorityClient.",
+            			authorityClientClazz, this.getServiceName()));
+            }
+        } catch (ClassNotFoundException e) {
+        	String msg = String.format("Missing document validation handler: '%s'.", authorityClientClazz);
+        	logger.warn(msg);
+        	logger.trace(msg, e);
         }
         
         return result;

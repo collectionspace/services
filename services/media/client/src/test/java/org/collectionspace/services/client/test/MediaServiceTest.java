@@ -25,6 +25,7 @@ package org.collectionspace.services.client.test;
 import java.io.File;
 import java.net.URL;
 import java.util.List;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -37,13 +38,10 @@ import org.collectionspace.services.media.LanguageList;
 import org.collectionspace.services.media.MediaCommon;
 import org.collectionspace.services.media.SubjectList;
 
-import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,6 +92,11 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
     protected CollectionSpaceClient getClientInstance() {
         return new MediaClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new MediaClient(clientPropertiesFilename);
+	}
 
     @Override
     protected AbstractCommonList getCommonList(Response response) {

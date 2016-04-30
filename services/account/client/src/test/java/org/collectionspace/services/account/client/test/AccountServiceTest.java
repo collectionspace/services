@@ -32,10 +32,9 @@ import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
 import org.collectionspace.services.account.AccountListItem;
 import org.collectionspace.services.account.Status;
-import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.client.AccountFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
-import org.collectionspace.services.client.test.ServiceRequestType;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.slf4j.Logger;
@@ -93,6 +92,11 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
         return new AccountClient();
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new AccountClient(clientPropertiesFilename);
+	}
+	
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
@@ -1169,5 +1173,4 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
 	protected long getSizeOfList(AccountsCommonList list) {
 		return list.getTotalItems();
 	}
-	
 }

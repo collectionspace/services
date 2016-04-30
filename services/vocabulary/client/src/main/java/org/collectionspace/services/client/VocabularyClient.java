@@ -49,6 +49,17 @@ public class VocabularyClient extends AuthorityClientImpl<VocabularyitemsCommon,
             + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
 	
 	
+    //
+    // Constructors
+    //
+    public VocabularyClient() {
+    	super();
+    }
+    
+    public VocabularyClient(String clientPropertiesFilename) {
+		super(clientPropertiesFilename);
+	}
+    
 	@Override
 	public String getServiceName() {
 		return SERVICE_NAME;

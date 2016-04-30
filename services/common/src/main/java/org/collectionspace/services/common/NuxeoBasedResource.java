@@ -601,13 +601,13 @@ public abstract class NuxeoBasedResource
    			throws Exception, DocumentNotFoundException {
     	RefName.AuthorityItem item = RefName.AuthorityItem.parse(refName);
     	if(item != null) {
-        	NuxeoBasedResource resource = resourceMap.get(item.inAuthority.resource);
+        	NuxeoBasedResource resource = (NuxeoBasedResource) resourceMap.get(item.inAuthority.resource);
         	return resource.getDocModelForAuthorityItem(repoSession, item);
     	}
     	RefName.Authority authority = RefName.Authority.parse(refName);
     	// Handle case of objects refNames, which must be csid based.
     	if(authority != null && !Tools.isEmpty(authority.csid)) {
-        	NuxeoBasedResource resource = resourceMap.get(authority.resource);
+        	NuxeoBasedResource resource = (NuxeoBasedResource) resourceMap.get(authority.resource);
             // Ensure we have the right context.
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = 
             		resource.createServiceContext(authority.resource);
@@ -630,92 +630,4 @@ public abstract class NuxeoBasedResource
    			throws Exception, DocumentNotFoundException {
     	return getDocModelForAuthorityItem(repoSession, RefName.AuthorityItem.parse(refName));
     }
-    
-    protected String getDocType(String tenantId) {
-        return getDocType(tenantId, getServiceName());
-    }
-
-    /**
-     * Returns the Nuxeo document type associated with a specified service, within a specified tenant.
-     * 
-     * @param tenantId a tenant ID
-     * @param serviceName a service name
-     * @return the Nuxeo document type associated with that service and tenant.
-     */
-    // FIXME: This method may properly belong in a different services package or class.
-    // Also, we need to check for any existing methods that may duplicate this one.
-    protected String getDocType(String tenantId, String serviceName) {
-        String docType = "";
-        if (Tools.isBlank(tenantId)) {
-            return docType;
-        }
-        ServiceBindingType sb = getTenantBindingsReader().getServiceBinding(tenantId, serviceName);
-        if (sb == null) {
-            return docType;
-        }
-        docType = sb.getObject().getName(); // Reads the Nuxeo Document Type from tenant bindings configuration
-        return docType;
-    }
-    
-    /**
-     * Returns a UriRegistry entry: a map of tenant-qualified URI templates
-     * for the current resource, for all tenants
-     * 
-     * @return a map of URI templates for the current resource, for all tenants
-     */
-    public Map<UriTemplateRegistryKey,StoredValuesUriTemplate> getUriRegistryEntries() {
-        Map<UriTemplateRegistryKey,StoredValuesUriTemplate> uriRegistryEntriesMap =
-                new HashMap<UriTemplateRegistryKey,StoredValuesUriTemplate>();
-        List<String> tenantIds = getTenantBindingsReader().getTenantIds();
-        for (String tenantId : tenantIds) {
-                uriRegistryEntriesMap.putAll(getUriRegistryEntries(tenantId, getDocType(tenantId), UriTemplateFactory.RESOURCE));
-        }
-        return uriRegistryEntriesMap;
-    }
-    
-    /**
-     * Returns a UriRegistry entry: a map of tenant-qualified URI templates
-     * for the current resource, for a specified tenants
-     * 
-     * @return a map of URI templates for the current resource, for a specified tenant
-     */
-    protected Map<UriTemplateRegistryKey,StoredValuesUriTemplate> getUriRegistryEntries(String tenantId,
-            String docType, UriTemplateFactory.UriTemplateType type) {
-        Map<UriTemplateRegistryKey,StoredValuesUriTemplate> uriRegistryEntriesMap =
-                new HashMap<UriTemplateRegistryKey,StoredValuesUriTemplate>();
-        UriTemplateRegistryKey key;
-        if (Tools.isBlank(tenantId) || Tools.isBlank(docType)) {
-            return uriRegistryEntriesMap;
-        }
-        key = new UriTemplateRegistryKey();
-        key.setTenantId(tenantId);
-        key.setDocType(docType); 
-        uriRegistryEntriesMap.put(key, getUriTemplate(type));
-        return uriRegistryEntriesMap;
-    }
-    
-    /**
-     * Returns a URI template of the appropriate type, populated with the
-     * current service name as one of its stored values.
-     *      * 
-     * @param type a URI template type
-     * @return a URI template of the appropriate type.
-     */
-    protected StoredValuesUriTemplate getUriTemplate(UriTemplateFactory.UriTemplateType type) {
-        Map<String,String> storedValuesMap = new HashMap<String,String>();
-        storedValuesMap.put(UriTemplateFactory.SERVICENAME_VAR, getServiceName());
-        StoredValuesUriTemplate template =
-                UriTemplateFactory.getURITemplate(type, storedValuesMap);
-        return template;
-    }
-
-    /**
-     * Returns a reader for reading values from tenant bindings configuration
-     * 
-     * @return a tenant bindings configuration reader
-     */
-    protected TenantBindingConfigReaderImpl getTenantBindingsReader() {
-        return ServiceMain.getInstance().getTenantBindingConfigReader();
-    }
-    
 }

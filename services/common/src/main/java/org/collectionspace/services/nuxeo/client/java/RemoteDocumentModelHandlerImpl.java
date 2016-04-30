@@ -79,13 +79,10 @@ import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsDocListItem;
 import org.collectionspace.services.relation.RelationshipType;
-
 import org.dom4j.Element;
-
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -193,9 +190,8 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     	return result;
     }
     
-
 	@Override
-	public void handleWorkflowTransition(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)
+	public void handleWorkflowTransition(ServiceContext ctx, DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)
 			throws Exception {
 		// Do nothing by default, but children can override if they want.  The real workflow transition happens in the WorkflowDocumemtModelHandler class
 	}

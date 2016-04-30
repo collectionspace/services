@@ -33,7 +33,15 @@ public class ConservationClient extends AbstractCommonListPoxServiceClientImpl<C
     public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    /* (non-Javadoc)
+    public ConservationClient() {
+		super();
+	}
+
+    public ConservationClient(String clientPropertiesFilename) {
+		super(clientPropertiesFilename);
+	}
+
+	/* (non-Javadoc)
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
      */
     @Override

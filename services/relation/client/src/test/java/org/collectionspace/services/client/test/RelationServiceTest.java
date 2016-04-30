@@ -40,13 +40,10 @@ import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationshipType;
 
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,6 +86,11 @@ public class RelationServiceTest extends AbstractPoxServiceTestImpl<RelationsCom
     protected CollectionSpaceClient getClientInstance() {
     	return new RelationClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    	return new RelationClient(clientPropertiesFilename);
+	}
      
     protected Class<RelationsCommonList> getCommonListType() {
     	return (Class<RelationsCommonList>)RelationsCommonList.class;

@@ -46,7 +46,6 @@ import org.collectionspace.services.person.PersonTermGroup;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,6 +89,11 @@ public class LoanoutAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     protected CollectionSpaceClient getClientInstance() {
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
+
+    @Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+	}
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
@@ -209,7 +213,7 @@ public class LoanoutAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
-        personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
+        personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId + random.nextInt(1000)); // avoid short ID conflicts with pass test session records that never got cleaned up
         List<PersonTermGroup> personTerms = new ArrayList<PersonTermGroup>();
         PersonTermGroup term = new PersonTermGroup();
         String termName = firstName + " " + surName;

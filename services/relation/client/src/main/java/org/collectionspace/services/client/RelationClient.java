@@ -44,6 +44,14 @@ public class RelationClient extends AbstractPoxServiceClientImpl<RelationsCommon
 	public static final String SERVICE_COMMON_LIST_NAME = "relations-common-list";
     public static final String SERVICE_COMMONPART_NAME = IRelationsManager.SERVICE_COMMONPART_NAME;
     
+	public RelationClient() {
+		super();
+	}
+
+	public RelationClient(String clientPropertiesFilename) {
+		super(clientPropertiesFilename);
+	}
+
 	@Override
 	public String getServiceName() {
 		return SERVICE_NAME;

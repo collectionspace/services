@@ -9,7 +9,7 @@
                 </locTermGroup>
             </locTermGroupList>
             <shortIdentifier>${shortIdentifierValue}</shortIdentifier>
-            <refName>urn:cspace:core.collectionspace.org:locationauthorities:name(${shortIdentifierValue})'${termDisplayNameValue}'</refName>
+			<refName>urn:cspace:core.collectionspace.org:locationauthorities:name(${importLocationAuthorityWithVarExpansion.shortIdentifierValue}):item:name(${shortIdentifierValue})'${termDisplayNameValue}'</refName>
             <inAuthority>${inAuthorityValue}</inAuthority>
         </schema>
     </import>

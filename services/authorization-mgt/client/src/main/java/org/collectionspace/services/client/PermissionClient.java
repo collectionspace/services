@@ -41,7 +41,16 @@ public class PermissionClient extends AbstractServiceClientImpl<PermissionsList,
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
-    /* (non-Javadoc)
+    
+	public PermissionClient() {
+		super();
+	}
+
+	public PermissionClient(String clientPropertiesFilename) {
+		super(clientPropertiesFilename);
+	}
+
+	/* (non-Javadoc)
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
      */
     @Override

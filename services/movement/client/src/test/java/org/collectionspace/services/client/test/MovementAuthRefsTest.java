@@ -45,12 +45,9 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.movement.MovementsCommon;
 import org.collectionspace.services.person.PersonTermGroup;
 
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,7 +85,12 @@ public class MovementAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
     
-    /* (non-Javadoc)
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+	}
+
+	/* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
@@ -116,8 +118,7 @@ public class MovementAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         // references, and will refer to Person resources by their refNames.
         MovementClient movementClient = new MovementClient();
         PoxPayloadOut multipart = createMovementInstance(
-                "movementReferenceNumber-" + identifier,
-                GregorianCalendarDateTimeUtils.timestampUTC(),
+                "movementReferenceNumber-" + identifier, GregorianCalendarDateTimeUtils.timestampUTC(),
                 movementContactRefName);
         String newId = null;
         Response res = movementClient.create(multipart);
@@ -188,7 +189,7 @@ public class MovementAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
-        personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
+        personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId + Math.abs(random.nextInt()));
         List<PersonTermGroup> personTerms = new ArrayList<PersonTermGroup>();
         PersonTermGroup term = new PersonTermGroup();
         String termName = firstName + " " + surName;

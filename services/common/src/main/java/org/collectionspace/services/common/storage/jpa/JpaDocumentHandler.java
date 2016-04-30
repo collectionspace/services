@@ -3,6 +3,7 @@ package org.collectionspace.services.common.storage.jpa;
 import java.util.List;
 
 import org.collectionspace.services.common.api.RefName;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
@@ -65,8 +66,7 @@ public abstract class JpaDocumentHandler<T, TL, WT, WLT>
     }
     
 	@Override
-	public void handleWorkflowTransition(
-			DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)
+	public void handleWorkflowTransition(ServiceContext ctx, DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)
 			throws Exception {
 		// Do nothing.  JPA document handlers do not support workflow transitions yet.
 	}

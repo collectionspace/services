@@ -71,6 +71,11 @@ public class DimensionServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
     protected CollectionSpaceClient getClientInstance() {
         return new DimensionClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new DimensionClient(clientPropertiesFilename);
+	}	
     
     protected void compareInstances(DimensionsCommon original, DimensionsCommon updated) throws Exception {
         Assert.assertEquals(original.getValueDate(),
@@ -213,7 +218,7 @@ public class DimensionServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
         		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
     public void CRUDTests(String testName) {
     	// Do nothing.  Simply here to for a TestNG execution order for our tests
-    }	
+    }
 
     /*
     @Override

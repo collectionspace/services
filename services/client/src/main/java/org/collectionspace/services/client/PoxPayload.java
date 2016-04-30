@@ -40,7 +40,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	/** The xml text. */
 	private String xmlPayload;
 	
-	private Document domDocument;
+	protected Document domDocument;
 	
 	/** The payload name. */
 	private String payloadName;

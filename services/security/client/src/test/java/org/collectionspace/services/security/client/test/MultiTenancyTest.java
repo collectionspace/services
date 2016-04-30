@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
+
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.account.AccountsCommon;
@@ -39,7 +40,6 @@ import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.AccountValue;
 import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.perms.EffectType;
-
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionAction;
 import org.collectionspace.services.authorization.PermissionRole;
@@ -65,10 +65,8 @@ import org.collectionspace.services.client.RoleFactory;
 import org.collectionspace.services.client.test.BaseServiceTest;
 import org.collectionspace.services.dimension.DimensionsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
@@ -262,6 +260,11 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
     protected CollectionSpaceClient getClientInstance() {
         return null;
     }
+    
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+		return null;
+	}
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)

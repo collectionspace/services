@@ -64,6 +64,11 @@ public class WorkflowServiceTest extends AbstractPoxServiceTestImpl<AbstractComm
         return new DimensionClient();
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new DimensionClient(clientPropertiesFilename);
+	}
+
     //
     // Test overrides
     //
@@ -198,6 +203,5 @@ public class WorkflowServiceTest extends AbstractPoxServiceTestImpl<AbstractComm
         }
 
         return multipart;
-    }
-	
+    }	
 }

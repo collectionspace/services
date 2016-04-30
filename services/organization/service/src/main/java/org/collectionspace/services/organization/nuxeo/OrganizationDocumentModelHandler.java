@@ -24,6 +24,7 @@
 package org.collectionspace.services.organization.nuxeo;
 
 import org.collectionspace.services.client.OrgAuthorityClient;
+import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.organization.OrganizationsCommon;
 
@@ -56,7 +57,7 @@ public class OrganizationDocumentModelHandler
 	@Override
 	public String getParentCommonSchemaName() {
 		// TODO Auto-generated method stub
-		return OrgAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
-	}
+		return OrgAuthorityClient.SERVICE_COMMON_PART_NAME;
+	}	
 }
 

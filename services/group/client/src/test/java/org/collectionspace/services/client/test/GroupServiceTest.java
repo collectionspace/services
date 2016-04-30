@@ -25,21 +25,15 @@ package org.collectionspace.services.client.test;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.GroupClient;
 import org.collectionspace.services.client.GroupProxy;
 import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.group.GroupsCommon;
 
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
-import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +63,12 @@ public class GroupServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
     protected CollectionSpaceClient<AbstractCommonList, PoxPayloadOut, String, GroupProxy> getClientInstance() {
         return new GroupClient();
     }
-
+    
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new GroupClient(clientPropertiesFilename);
+	}
+    
     @Override
     protected AbstractCommonList getCommonList(Response response) {
         return response.readEntity(AbstractCommonList.class);
@@ -84,7 +83,7 @@ public class GroupServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
     	GroupClient client = new GroupClient();
     	return createInstance(client.getCommonPartName(), identifier);
     }
-    
+
 	@Override
 	protected PoxPayloadOut createInstance(String commonPartName,
 			String identifier) {

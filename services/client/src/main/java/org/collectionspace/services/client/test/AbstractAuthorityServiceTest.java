@@ -1,19 +1,23 @@
 package org.collectionspace.services.client.test;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.AuthorityClientImpl;
 import org.collectionspace.services.client.AuthorityProxy;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.XmlTools;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-
+import org.dom4j.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -35,30 +39,113 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     private final Logger logger = LoggerFactory.getLogger(AbstractAuthorityServiceTest.class);
 	
     protected String knownResourceShortIdentifer = null;
-	protected static final String READITEMS_SHORT_IDENTIFIER = "resourceWithItems"; 
+	protected static final String READITEMS_SHORT_IDENTIFIER = "resourceWithItems" + random.nextInt(1000); 
 	protected String knownAuthorityWithItems = null;
+	protected String knownAuthorityWithItemsIdentifier = null;
 	
+	protected static final String SAS_IDENTIFIER = "SAS"; 
+	protected String knownSASAuthorityResourceId = null;
+	protected String knownSASAuthorityResourceIdentifier = null;
+	protected String knownSASItemResourceId = null;
+	protected HashMap<String, String> allSASResourceItemIdsCreated = new HashMap<String, String>(); /* itemURN, parentURN */;
+
 	protected String knownResourceRefName = null;
     protected String knownItemResourceId = null;
     protected String knownItemResourceShortIdentifer = null;    
     protected int nItemsToCreateInList = 5;
-		
-	public abstract void authorityTests(String testName);
-    protected abstract String createItemInAuthority(String authorityId);
- 
+    protected String TEST_SHORTID = "johnWayneActor";
+
+    /*
+     * Abstract methods that subclasses must override/implement
+     */
+    
+    /**
+     * 
+     * @param testName
+     */
+    public abstract void authorityTests(String testName);
+	
+	/**
+	 * 
+	 * @param client
+	 * @param vcsid
+	 * @return
+	 */
+	abstract protected String createItemInAuthority(AuthorityClient client, String vcsid, String shortId);
+	
+    
+    /**
+     * 
+     * @param authorityItem
+     * @return
+     */
     protected abstract AUTHORITY_ITEM_TYPE updateItemInstance(final AUTHORITY_ITEM_TYPE authorityItem);    
+    
+    /**
+     * 
+     * @param original
+     * @param updated
+     * @throws Exception
+     */
     protected abstract void compareUpdatedItemInstances(AUTHORITY_ITEM_TYPE original, AUTHORITY_ITEM_TYPE updated) throws Exception;
     
+    /**
+     * 
+     * @param id
+     * @param shortIdentifer
+     */
     protected void setKnownItemResource(String id, String shortIdentifer ) {
     	knownItemResourceId = id;
     	knownItemResourceShortIdentifer = shortIdentifer;
     }
 
+    /**
+     * 
+     * @param id
+     * @param shortIdentifer
+     * @param refName
+     */
     protected void setKnownResource(String id, String shortIdentifer,
             String refName) {
         knownResourceId = id;
         knownResourceShortIdentifer = shortIdentifer;
         knownResourceRefName = refName;
+    }
+
+    /**
+     * 
+     * @return
+     */
+	protected String getSASAuthorityIdentifier() {
+		// TODO Auto-generated method stub
+		return this.getKnowResourceIdentifier() + SAS_IDENTIFIER;
+	}
+    
+	/**
+	 * 
+	 * @param shortId
+	 * @return
+	 */
+	protected String getUrnIdentifier(String shortId) {
+		return String.format("urn:cspace:name(%s)", shortId);
+	}
+	
+    /**
+     * Sets up create tests.
+     */
+    protected void setupSync() {
+        testExpectedStatusCode = this.STATUS_OK;
+        testRequestType = ServiceRequestType.SYNC;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }
+    
+    /**
+     * Gets a client to the SAS (Shared Authority Server)
+     *
+     * @return the client
+     */
+    protected AuthorityClient getSASClientInstance() {
+    	return (AuthorityClient) this.getClientInstance(CollectionSpaceClient.SAS_CLIENT_PROPERTIES_FILENAME);
     }
 
     /**
@@ -192,13 +279,12 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     	}
     }
     
-    @Test(dataProvider = "testName",
-    		dependsOnMethods = {"CRUDTests"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests"})
     public void createItem(String testName) {
         // Perform setup.
         setupCreate();
 
-        String newID = createItemInAuthority(knownResourceId);
+        String newID = createItemInAuthority((AuthorityClient) getClientInstance(), knownResourceId, getTestAuthorityItemShortId());
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
@@ -209,14 +295,142 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
             }
         }
     }
+        
+    /**
+     * Sync the local with the SAS
+     */
+    @Test(dataProvider = "testName", dependsOnMethods = {"createSASItem", "CRUDTests"})
+    public void syncWithSAS(String testName) {
+        //
+        // First check to see if the authority supports synchronization.
+        //
+    	AuthorityClient client = (AuthorityClient) this.getClientInstance();
+    	if (client.supportsSync() == false) {
+    		return; // Exit the test since this authority doesn't support synchronization
+    	}
+    	
+        //
+        // Create an empty instance of the authority, so we can sync items with it.  We're
+    	// using the short ID of the SAS authority.  The short ID of the local and the SAS will (must) be the same.
+        //
+    	String localAuthorityId = null;
+        try {
+			localAuthorityId = createResource(client, testName, knownSASAuthorityResourceIdentifier, false);
+		} catch (Exception e) {
+			Assert.assertNotNull(localAuthorityId);
+		}
+
+    	//
+    	// Now we can try to sync the SAS authority with the local one we just created.
+    	//
+        setupSync();
+    	Response response = client.syncByName(knownSASAuthorityResourceIdentifier); // Notice we're using the Short ID (short ID is the same on the local and SAS)
+        try {
+	        int statusCode = response.getStatus();
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": HTTP status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+        	response.close();
+        }
+    }
+        
+    /**
+     * SAS - Create a new authority on the SAS server.
+     * @param testName
+     */    
+    @Test(dataProvider = "testName", dependsOnMethods = {"createItem", "CRUDTests"})
+    public void createSASAuthority(String testName) {
+        //
+        // First check to see if the authority supports synchronization.
+        //
+    	AuthorityClient client = (AuthorityClient) this.getClientInstance();
+    	if (client.supportsSync() == false) {
+    		return; // Exit the test since this authority doesn't support synchronization
+    	}
+    	
+        // Perform setup.
+        setupCreate();
+
+        try {
+        	String newID = createResource(getSASClientInstance(), testName, getSASAuthorityIdentifier(), true);
+        	knownSASAuthorityResourceId = newID;
+        	knownSASAuthorityResourceIdentifier = getShortId(getSASClientInstance(), knownSASAuthorityResourceId);
+            if (logger.isDebugEnabled()) {
+            	String.format("Created SAS authority '%s' with CSID=%s.", getSASAuthorityIdentifier(), newID);
+            }
+        } catch (Exception e) {
+        	logger.info(String.format("Failed to create SAS authority '%s'.", getSASAuthorityIdentifier()));
+        }
+    }
+
+    /**
+     * SAS - Create an item in the SAS authority on the SAS server.
+     * @param testName
+     */
+    @Test(dataProvider = "testName", dependsOnMethods = {"createSASAuthority", "CRUDTests"})
+    public void createSASItem(String testName) {
+        //
+        // First check to see if the authority supports synchronization.
+        //
+    	AuthorityClient client = (AuthorityClient) this.getClientInstance();
+    	if (client.supportsSync() == false) {
+    		return; // Exit the test since this authority doesn't support synchronization
+    	}
+    	
+        // Perform setup.
+        setupCreate();
+
+        String shortId = "SassyActor" + System.currentTimeMillis() + Math.abs(random.nextInt()); // short ID needs to be unique
+        String newID = createItemInAuthority(getSASClientInstance(), knownSASAuthorityResourceId, shortId);
+
+		// Store the ID returned from the first item resource created
+        // for additional tests below.
+        if (knownSASItemResourceId == null) {
+        	knownSASItemResourceId = newID;
+            if (null != testName && logger.isDebugEnabled()) {
+                logger.debug(testName + ": knownSASItemResourceId=" + knownSASItemResourceId);
+            }
+        }
+        //
+        // Keep track of the SAS authority items we create, so we can delete them from
+        // the *local* authority after we perform a sync operation.  We need to keep track
+        // of the URN (not the CSID) since the CSIDs will differ on the SAS vs local.
+        //
+        this.allSASResourceItemIdsCreated.put(this.getUrnIdentifier(shortId), getUrnIdentifier(getSASAuthorityIdentifier()));
+    }
     
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     		dependsOnMethods = {"createItem"})
     public void createItemList(String testName) throws Exception {
     	knownAuthorityWithItems = createResource(testName, READITEMS_SHORT_IDENTIFIER);
+    	knownAuthorityWithItemsIdentifier = getShortId(knownAuthorityWithItems);
         for (int j = 0; j < nItemsToCreateInList; j++) {
-        	createItemInAuthority(knownAuthorityWithItems);
+        	createItemInAuthority((AuthorityClient) getClientInstance(), knownAuthorityWithItems, this.getTestAuthorityItemShortId(true));
         }
+    }
+    
+    private String getShortId(AuthorityClient client, String authorityCsid) throws Exception {
+    	String result = null;
+    	
+        // Submit the request to the service and store the response.
+        Response res = client.read(authorityCsid);
+        try {
+	        int statusCode = res.getStatus();
+	        result = this.extractAuthorityShortId(res);
+        } finally {
+        	res.close();
+        }
+        
+        return result;
+    }
+    
+    private String getShortId(String authorityCsid) throws Exception {
+        AuthorityClient client = (AuthorityClient) getClientInstance();
+        return getShortId(client, authorityCsid);
     }
 
     /**
@@ -232,8 +446,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         setupRead();
 
         // Submit the request to the service and store the response.
-        AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client =
-        		(AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)this.getClientInstance();
+        AuthorityClient client = (AuthorityClient) this.getClientInstance();
         Response res = client.readByName(getKnowResourceIdentifier());
         try {
 	        int statusCode = res.getStatus();
@@ -264,8 +477,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 	public AUTHORITY_ITEM_TYPE extractItemCommonPartValue(Response res) throws Exception {
 		AUTHORITY_ITEM_TYPE result = null;
 		
-        AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client = (AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)
-        		this.getClientInstance();
+        AuthorityClient client = (AuthorityClient) getClientInstance();
 		PayloadInputPart payloadInputPart = extractPart(res, client.getItemCommonPartName());
 		if (payloadInputPart != null) {
 			result = (AUTHORITY_ITEM_TYPE) payloadInputPart.getBody();
@@ -275,6 +487,24 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 		
 		return result;
 	}
+	
+    /**
+     * Extracts the short ID from a service request payload
+     * 
+     * @param res
+     * @return
+     * @throws Exception
+     */
+	public String extractAuthorityShortId(Response res) throws Exception {
+		String result = null;
+		
+        PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(getEntityResponseType()));	    	
+		Document document = input.getDOMDocument();
+		result = XmlTools.getElementValue(document, "//" + AuthorityClient.SHORT_IDENTIFIER);
+
+		return result;
+	}
+	
     
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     		dependsOnMethods = {"readItem"})
@@ -283,8 +513,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         setupReadNonExistent();
 
         // Submit the request to the service and store the response.
-        AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client = (AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)
-        		this.getClientInstance();
+        AuthorityClient client = (AuthorityClient) getClientInstance();
         Response res = client.readItem(knownResourceId, NON_EXISTENT_ID);
         try {
 	        int statusCode = res.getStatus();
@@ -309,7 +538,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         setupRead();
 
         // Submit the request to the service and store the response.
-        AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client = (AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)this.getClientInstance();
+        AuthorityClient client = (AuthorityClient) getClientInstance();
         Response res = client.readItem(knownResourceId, knownItemResourceId);
         try {
 	        int statusCode = res.getStatus();
@@ -341,8 +570,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         setupDelete();
 
         // Submit the request to the service and store the response.
-        AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client = (AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)
-        		this.getClientInstance();
+        AuthorityClient client = (AuthorityClient) getClientInstance();
         Response res = client.deleteItem(knownResourceId, knownItemResourceId);
         int statusCode;
         try {
@@ -366,7 +594,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         setupReadList();
 
         // Submit the request to the service and store the response.
-        AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client = (AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)this.getClientInstance();
+        AuthorityClient client = (AuthorityClient) getClientInstance();
         Response res = null;
         if (vcsid != null) {
             res = client.readItemList(vcsid, null, null);
@@ -397,6 +625,18 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 	        }
 	        Assert.assertEquals(nItemsTotal, nItemsToCreateInList);
 	
+			for (AbstractCommonList.ListItem item : items) {
+				String refName = AbstractCommonListUtils.ListItemGetElementValue(
+						item, AuthorityClient.REF_NAME);
+				Assert.assertTrue((refName != null), "Item refName is null or not set in the item list!");
+				String termDisplayName = AbstractCommonListUtils.ListItemGetElementValue(item,
+						AuthorityClient.TERM_DISPLAY_NAME);
+				String vocabDisplayName = AbstractCommonListUtils.ListItemGetElementValue(item,
+						AuthorityClient.VOCAB_DISPLAY_NAME);
+				// One of these names needs to be set.
+				Assert.assertTrue(!(termDisplayName == null && vocabDisplayName == null), "The item's display name is null or not set in the item list!");
+			}
+	        
 	        if(logger.isTraceEnabled()){
 	        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
 	        }
@@ -405,16 +645,14 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         }
     }
     
-    @Test(dataProvider = "testName",
-    		dependsOnMethods = {"createItemList"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"createItemList"})
     public void readItemList(String testName) {
         readItemListInt(knownAuthorityWithItems, null, testName);
     }
 
-    @Test(dataProvider = "testName",
-    		dependsOnMethods = {"readItem"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"readItemList"})
     public void readItemListByName(String testName) {
-        readItemListInt(null, READITEMS_SHORT_IDENTIFIER, testName);
+        readItemListInt(null, knownAuthorityWithItemsIdentifier, testName);
     }
 
     @Test(dataProvider = "testName",
@@ -424,7 +662,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         setupDeleteNonExistent();
 
         // Submit the request to the service and store the response.
-        AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client = (AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)this.getClientInstance();
+        AuthorityClient client = (AuthorityClient) getClientInstance();
         Response res = client.deleteItem(knownResourceId, NON_EXISTENT_ID);
         int statusCode;
         try {
@@ -450,7 +688,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 	public PoxPayloadOut createItemRequestTypeInstance(AUTHORITY_ITEM_TYPE itemTypeInstance) {
 		PoxPayloadOut result = null;
 		
-        AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy> client = (AuthorityClientImpl<AUTHORITY_ITEM_TYPE, AuthorityProxy>)this.getClientInstance();
+        AuthorityClient client = (AuthorityClient) getClientInstance();
         PoxPayloadOut payloadOut = new PoxPayloadOut(this.getServicePathItemsComponent());
         PayloadOutputPart part = payloadOut.addPart(client.getItemCommonPartName(), itemTypeInstance);
         result = payloadOut;
@@ -578,5 +816,79 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 	public void CRUDTests(String testName) {
 		// TODO Auto-generated method stub
 	}
+        
+    @Override
+    public void cleanUp() {
+        String noTest = System.getProperty("noTestCleanup");
+        if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Skipping Cleanup phase ...");
+            }
+            return;
+        }
+        
+        AuthorityClient client = (AuthorityClient) this.getClientInstance();
+        String parentResourceId;
+        String itemResourceId;
+        //
+        // Clean up all authority item resources.
+        //
+        for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
+            itemResourceId = entry.getKey();
+            parentResourceId = entry.getValue();
+            Response response = client.deleteItem(parentResourceId, itemResourceId);
+            try {
+            	int status = response.getStatus();
+            	if (status != Response.Status.OK.getStatusCode()) {
+            		logger.debug(String.format("Could not deleted authority item '%s' in authority '%s'.",
+            				itemResourceId, parentResourceId));
+            	}
+            } finally {
+            	response.close();
+            }
+        }
+        //
+        // Clean up authority items that were the result of a sync with the SAS
+        // all the IDs are URN (not CSIDs).  The URNs work for the local items as well
+        // as the SAS items.
+        //
+        for (Map.Entry<String, String> entry : allSASResourceItemIdsCreated.entrySet()) {
+            itemResourceId = entry.getKey();
+            parentResourceId = entry.getValue();
+            // Note: Any non-success responses from the delete operation
+            // below are ignored and not reported.
+            client.deleteItem(parentResourceId, itemResourceId).close();
+        }
+        //
+        // Clean up authority items on the SAS using the SAS client.
+        //
+        client = (AuthorityClient) this.getSASClientInstance();
+        for (Map.Entry<String, String> entry : allSASResourceItemIdsCreated.entrySet()) {
+            itemResourceId = entry.getKey();
+            parentResourceId = entry.getValue();
+            client.deleteItem(parentResourceId, itemResourceId).close();
+        }
+        //
+        // Finally, call out superclass's cleanUp method to deleted the local authorities
+        //
+        super.cleanUp();
+        //
+        // Call out superclass's cleanUp method to delete the SAS authorities
+        //
+        super.cleanUp(client);        
+    }
     
+	protected String getTestAuthorityItemShortId() {
+		return getTestAuthorityItemShortId(false);
+	}
+
+	protected String getTestAuthorityItemShortId(boolean makeUnique) {
+		String result = TEST_SHORTID;
+		
+		if (makeUnique == true) {
+			result = result + System.currentTimeMillis() + Math.abs(random.nextInt());
+		}
+		
+		return result;
+	}
 }

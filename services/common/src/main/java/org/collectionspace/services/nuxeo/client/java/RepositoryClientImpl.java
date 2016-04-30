@@ -125,8 +125,7 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
         //Empty constructor
     }
 
-    public void assertWorkflowState(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-            DocumentModel docModel) throws DocumentNotFoundException, ClientException {
+    public void assertWorkflowState(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, DocumentModel docModel) throws DocumentNotFoundException, ClientException {
         MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
         if (queryParams != null) {
             //
@@ -135,12 +134,12 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
             //
             String currentState = docModel.getCurrentLifeCycleState();
             String includeDeletedStr = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_NONDELETED);
-            boolean includeDeleted = includeDeletedStr == null ? true : Boolean.parseBoolean(includeDeletedStr);
+            boolean includeDeleted = (includeDeletedStr == null) ? true : Boolean.parseBoolean(includeDeletedStr);
             if (includeDeleted == false) {
                 //
-                // We don't wanted soft-deleted object, so throw an exception if this one is soft-deleted.
+                // We don't wanted soft-deleted objects, so throw an exception if this one is soft-deleted.
                 //
-                if (currentState.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+                if (currentState.contains(WorkflowClient.WORKFLOWSTATE_DELETED)) {
                     String msg = "The GET assertion that docModel not be in 'deleted' workflow state failed.";
                     logger.debug(msg);
                     throw new DocumentNotFoundException(msg);
@@ -1204,7 +1203,8 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
         String includeDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_NONDELETED);
         if (includeDeleted != null && includeDeleted.equalsIgnoreCase(Boolean.FALSE.toString())) {
             whereClause = whereClause
-                + "  AND (misc.lifecyclestate <> '" + WorkflowClient.WORKFLOWSTATE_DELETED + "')";
+                    + "  AND (misc.lifecyclestate <> '" + WorkflowClient.WORKFLOWSTATE_DELETED + "')"
+            		+ "  AND (misc.lifecyclestate <> '" + WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED + "')";
         }
 
         // If a particular authority is specified, restrict the query further
@@ -1617,8 +1617,9 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
                 DocumentRef docRef = NuxeoUtils.createPathRef(ctx, id);
                 wrapDoc = new DocumentWrapperImpl<DocumentModel>(repoSession.getDocument(docRef));
                 ((DocumentModelHandler) handler).setRepositorySession(repoSession);
-                handler.handle(Action.DELETE, wrapDoc);
-                repoSession.removeDocument(docRef);
+                if (handler.handle(Action.DELETE, wrapDoc)) {
+                	repoSession.removeDocument(docRef);
+                }
             } catch (ClientException ce) {
                 String msg = logException(ce, "Could not find document to delete with CSID=" + id);
                 throw new DocumentNotFoundException(msg, ce);
@@ -1883,16 +1884,16 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
             logger.error(errMsg);
             throw new Exception(errMsg);
         }
-        //
-        // If we couldn't find a repoSession from the service context (or the context was null) then we need to create a new one using
-        // just the repo name
-        //
         if (repoSession == null) {
+            //
+            // If we couldn't find a repoSession from the service context (or the context was null) then we need to create a new one using
+            // just the repository name.
+            //
             NuxeoClientEmbedded client = NuxeoConnectorEmbedded.getInstance().getClient();
             repoSession = client.openRepository(repoName, timeoutSeconds);
         } else {
-            if (logger.isDebugEnabled() == true) {
-                logger.warn("Reusing the current context's repository session.");
+            if (logger.isTraceEnabled() == true) {
+                logger.trace("Reusing the current context's repository session.");
             }
         }
 

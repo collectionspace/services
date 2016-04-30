@@ -44,7 +44,6 @@ import org.collectionspace.services.location.LocTermGroup;
 import org.collectionspace.services.location.LocTermGroupList;
 import org.collectionspace.services.location.LocationauthoritiesCommon;
 import org.collectionspace.services.location.LocationsCommon;
-import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -61,11 +60,17 @@ import org.testng.annotations.Test;
 public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<LocationauthoritiesCommon, LocationsCommon> {
 
     /** The logger. */
-    private final String CLASS_NAME = LocationAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(LocationAuthorityServiceTest.class);
-    private final static String CURRENT_DATE_UTC =
-        GregorianCalendarDateTimeUtils.currentDateUTC();
+    private final static String CURRENT_DATE_UTC = GregorianCalendarDateTimeUtils.currentDateUTC();
 
+    /**
+     * Default constructor.  Used to set the short ID for all tests authority items
+     */
+    public LocationAuthorityServiceTest() {
+    	super();
+        TEST_SHORTID = "shelf1";
+    }
+    
 	@Override
 	public String getServicePathComponent() {
 		return LocationAuthorityClient.SERVICE_PATH_COMPONENT;
@@ -83,7 +88,6 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
     // Instance variables specific to this test.
     
     final String TEST_NAME = "Shelf 1";
-    final String TEST_SHORTID = "shelf1";
     final String TEST_CONDITION_NOTE = "Basically clean";
     final String TEST_CONDITION_NOTE_DATE = CURRENT_DATE_UTC;
     final String TEST_SECURITY_NOTE = "Kind of safe";
@@ -96,7 +100,7 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
     
     /** The known resource id. */
     private String knownLocationTypeRefName = null;
-        
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
@@ -105,6 +109,16 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
     	return new LocationAuthorityClient();
     }
     
+    @Override
+    protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    	return new LocationAuthorityClient(clientPropertiesFilename);
+    }
+    
+	@Override
+	protected String createItemInAuthority(AuthorityClient client, String vcsid, String shortId) {
+		return createItemInAuthority(client, vcsid, shortId, null/*refname*/);
+	}	
+    
     /**
      * Creates the item in authority.
      *
@@ -112,14 +126,13 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
      * @param authRefName the auth ref name
      * @return the string
      */
-    private String createItemInAuthority(String vcsid, String authRefName) {
+    private String createItemInAuthority(AuthorityClient client, String vcsid, String shortId, String authRefName) {
         final String testName = "createItemInAuthority("+vcsid+","+authRefName+")";
 
         // Submit the request to the service and store the response.
-        LocationAuthorityClient client = new LocationAuthorityClient();
         Map<String, String> shelf1Map = new HashMap<String,String>();
         // TODO Make loc type and status be controlled vocabs.
-        shelf1Map.put(LocationJAXBSchema.SHORT_IDENTIFIER, TEST_SHORTID);
+        shelf1Map.put(LocationJAXBSchema.SHORT_IDENTIFIER, shortId);
         shelf1Map.put(LocationJAXBSchema.CONDITION_NOTE, TEST_CONDITION_NOTE);
         shelf1Map.put(LocationJAXBSchema.CONDITION_NOTE_DATE, TEST_CONDITION_NOTE_DATE);
         shelf1Map.put(LocationJAXBSchema.SECURITY_NOTE, TEST_SECURITY_NOTE);
@@ -136,12 +149,12 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
                 shelf1Map.put(LocationJAXBSchema.TERM_STATUS, TEST_STATUS);
 
         String newID = LocationAuthorityClientUtils.createItemInAuthority(vcsid,
-        		authRefName, shelf1Map, shelf1Terms, client );
+        		authRefName, shelf1Map, shelf1Terms, (LocationAuthorityClient) client);
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
         if (knownItemResourceId == null){
-        	setKnownItemResource(newID, TEST_SHORTID);
+        	setKnownItemResource(newID, shortId);
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownItemResourceId=" + newID);
             }
@@ -208,86 +221,7 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
             }
         }
     }
-
-    /**
-     * Read item list.
-     */
-    @Test(dataProvider = "testName", groups = {"readList"},
-    		dependsOnMethods = {"readList"})
-    public void readItemList(String testName) {
-        readItemList(knownAuthorityWithItems, null);
-    }
-
-    /**
-     * Read item list by authority name.
-     */
-    @Test(dataProvider = "testName", groups = {"readList"},
-    		dependsOnMethods = {"readItemList"})
-    public void readItemListByAuthorityName(String testName) {
-        readItemList(null, READITEMS_SHORT_IDENTIFIER);
-    }
     
-	/**
-	 * Read item list.
-	 * 
-	 * @param vcsid
-	 *            the vcsid
-	 * @param name
-	 *            the name
-	 */
-	private void readItemList(String vcsid, String shortId) {
-		String testName = "readItemList";
-
-		// Perform setup.
-		setupReadList();
-
-		// Submit the request to the service and store the response.
-		LocationAuthorityClient client = new LocationAuthorityClient();
-		Response res = null;
-		if (vcsid != null) {
-			res = client.readItemList(vcsid, null, null);
-		} else if (shortId != null) {
-			res = client.readItemListForNamedAuthority(shortId, null, null);
-		} else {
-			Assert.fail("readItemList passed null csid and name!");
-		}
-		
-		AbstractCommonList list = null;
-		try {
-			assertStatusCode(res, testName);
-			list = res.readEntity(AbstractCommonList.class);
-		} finally {
-			if (res != null) {
-                res.close();
-            }
-		}
-		
-		List<AbstractCommonList.ListItem> items = list.getListItem();
-		int nItemsReturned = items.size();
-		// There will be 'nItemsToCreateInList'
-		// items created by the createItemList test,
-		// all associated with the same parent resource.
-		int nExpectedItems = nItemsToCreateInList;
-		if (logger.isDebugEnabled()) {
-			logger.debug(testName + ": Expected " + nExpectedItems
-					+ " items; got: " + nItemsReturned);
-		}
-		Assert.assertEquals(nItemsReturned, nExpectedItems);
-
-		for (AbstractCommonList.ListItem item : items) {
-			String value = AbstractCommonListUtils.ListItemGetElementValue(
-					item, LocationJAXBSchema.REF_NAME);
-			Assert.assertTrue((null != value), "Item refName is null!");
-			value = AbstractCommonListUtils.ListItemGetElementValue(item,
-					LocationJAXBSchema.TERM_DISPLAY_NAME);
-			Assert.assertTrue((null != value), "Item termDisplayName is null!");
-		}
-		if (logger.isTraceEnabled()) {
-			AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger,
-					testName);
-		}
-	}
-
     @Override
     public void delete(String testName) throws Exception {
     	// Do nothing.  See localDelete().  This ensure proper test order.
@@ -454,11 +388,6 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
 	//
 	// Authority item specific overrides
 	//
-	
-	@Override
-	protected String createItemInAuthority(String authorityId) {
-		return createItemInAuthority(authorityId, null /*refname*/);
-	}
 
 	@Override
 	protected LocationsCommon updateItemInstance(LocationsCommon locationsCommon) {

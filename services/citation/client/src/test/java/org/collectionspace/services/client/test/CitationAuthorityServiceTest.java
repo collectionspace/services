@@ -37,10 +37,9 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.CitationAuthorityClient;
 import org.collectionspace.services.client.CitationAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+
 import org.dom4j.DocumentException;
-import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -59,16 +58,20 @@ public class CitationAuthorityServiceTest extends AbstractAuthorityServiceTest<C
     /**
      * The logger.
      */
-    private final String CLASS_NAME = CitationAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CitationAuthorityServiceTest.class);
-    private final static String CURRENT_DATE_UTC =
-            GregorianCalendarDateTimeUtils.currentDateUTC();
+    
     // Instance variables specific to this test.
     final String TEST_NAME = "Citation 1";
-    final String TEST_SHORTID = "citation1";
     final String TEST_SCOPE_NOTE = "A representative citation";
-    // TODO Make status type be a controlled vocab term.
     final String TEST_STATUS = "Approved";
+    
+    /**
+     * Default constructor.  Used to set the short ID for all tests authority items
+     */
+    public CitationAuthorityServiceTest() {
+    	super();
+    	TEST_SHORTID = "citation1";
+    }
 
     @Override
     public String getServicePathComponent() {
@@ -91,6 +94,12 @@ public class CitationAuthorityServiceTest extends AbstractAuthorityServiceTest<C
     protected CollectionSpaceClient getClientInstance() {
         return new CitationAuthorityClient();
     }
+    
+    @Override
+    protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new CitationAuthorityClient(clientPropertiesFilename);
+    }
+
 
     /**
      * Creates an item in an authority.
@@ -99,22 +108,19 @@ public class CitationAuthorityServiceTest extends AbstractAuthorityServiceTest<C
      * @return the string
      */
     @Override
-    protected String createItemInAuthority(String authorityId) {
+    protected String createItemInAuthority(AuthorityClient client, String authorityId, String shortId) {
 
         final String testName = "createItemInAuthority(" + authorityId + ")";
         if (logger.isDebugEnabled()) {
             logger.debug(testName);
         }
 
-        // Submit the request to the service and store the response.
-        CitationAuthorityClient client = new CitationAuthorityClient();
-
-        String commonPartXML = createCommonPartXMLForItem(TEST_SHORTID, TEST_NAME);
+        String commonPartXML = createCommonPartXMLForItem(shortId, TEST_NAME);
 
         String newID;
         try {
             newID = CitationAuthorityClientUtils.createItemInAuthority(authorityId,
-                    commonPartXML, client);
+                    commonPartXML, (CitationAuthorityClient) client);
         } catch (Exception e) {
             logger.error("Problem creating item from XML: " + e.getLocalizedMessage());
             logger.debug("commonPartXML: " + commonPartXML);
@@ -124,7 +130,7 @@ public class CitationAuthorityServiceTest extends AbstractAuthorityServiceTest<C
         // Store the ID returned from the first item resource created
         // for additional tests below.
         if (knownItemResourceId == null) {
-            setKnownItemResource(newID, TEST_SHORTID);
+            setKnownItemResource(newID, shortId);
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownItemResourceId=" + newID);
             }
@@ -136,24 +142,6 @@ public class CitationAuthorityServiceTest extends AbstractAuthorityServiceTest<C
         allResourceItemIdsCreated.put(newID, authorityId);
 
         return newID;
-    }
-
-    /**
-     * Read item list.
-     */
-    @Test(dataProvider = "testName", groups = {"readList"},
-            dependsOnMethods = {"readList"})
-    public void readItemList(String testName) {
-        readItemList(knownAuthorityWithItems, null);
-    }
-
-    /**
-     * Read item list by authority name.
-     */
-    @Test(dataProvider = "testName", groups = {"readList"},
-            dependsOnMethods = {"readItemList"})
-    public void readItemListByAuthorityName(String testName) {
-        readItemList(null, READITEMS_SHORT_IDENTIFIER);
     }
 
     /**

@@ -40,6 +40,17 @@ public class MaterialAuthorityClient extends AuthorityClientImpl<MaterialsCommon
     public static final String SERVICE_ITEM_COMMON_PART_NAME = SERVICE_ITEM_NAME
             + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
 
+    //
+    // Constructors
+    //
+    public MaterialAuthorityClient() {
+    	super();
+    }
+    
+    public MaterialAuthorityClient(String clientPropertiesFilename) {
+		super(clientPropertiesFilename);
+	}
+    
     @Override
     public String getServiceName() {
         return SERVICE_NAME;

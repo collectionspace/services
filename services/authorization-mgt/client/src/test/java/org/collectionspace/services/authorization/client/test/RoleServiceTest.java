@@ -88,6 +88,11 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
         return new RoleClient();
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new RoleClient(clientPropertiesFilename);
+	}	
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readPaginatedList(java.lang.String)
      */
@@ -946,5 +951,5 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
 	@Override
 	protected long getSizeOfList(RolesList list) {
 		return list.getRole().size();
-	}	
+	}
 }

@@ -22,10 +22,6 @@
  */
 package org.collectionspace.services.client.test;
 
-//import java.util.ArrayList;
-import java.util.List;
-import javax.ws.rs.core.Response;
-
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ExhibitionClient;
@@ -36,9 +32,8 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.exhibition.ExhibitionsCommon;
 
-import org.jboss.resteasy.client.ClientResponse;
+import javax.ws.rs.core.Response;
 import org.testng.Assert;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +58,11 @@ public class ExhibitionServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
     protected CollectionSpaceClient getClientInstance() {
         return new ExhibitionClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        return new ExhibitionClient(clientPropertiesFilename);
+	}
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)

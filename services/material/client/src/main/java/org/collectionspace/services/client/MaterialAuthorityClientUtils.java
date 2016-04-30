@@ -9,6 +9,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import org.apache.commons.io.FileUtils;
+
 import org.collectionspace.services.MaterialJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.common.api.Tools;
@@ -16,8 +17,8 @@ import org.collectionspace.services.material.MaterialTermGroup;
 import org.collectionspace.services.material.MaterialTermGroupList;
 import org.collectionspace.services.material.MaterialauthoritiesCommon;
 import org.collectionspace.services.material.MaterialsCommon;
+
 import org.dom4j.DocumentException;
-import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,8 +111,7 @@ public class MaterialAuthorityClientUtils {
                     +"\" in locationAuthority: \"" + vcsid +"\"");
         }
         PoxPayloadOut multipart = 
-            createMaterialInstance( materialAuthorityRefName,
-                materialMap, terms, client.getItemCommonPartName() );
+            createMaterialInstance(materialAuthorityRefName, materialMap, terms, client.getItemCommonPartName() );
         String newID = null;
         Response res = client.createItem(vcsid, multipart);
         try {

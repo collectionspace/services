@@ -248,7 +248,7 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
                 break;
 
             case DELETE:
-                handleDelete((DocumentWrapper<WT>) wrapDoc);
+                result = handleDelete((DocumentWrapper<WT>) wrapDoc);
                 break;
                 
             case SYNC:
@@ -297,8 +297,8 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
      * @see org.collectionspace.services.common.document.DocumentHandler#handleDelete(org.collectionspace.services.common.document.DocumentWrapper)
      */
     @Override
-    public void handleDelete(DocumentWrapper<WT> wrapDoc) throws Exception {
-        // Do nothing. Subclasses can override if they want/need to.
+    public boolean handleDelete(DocumentWrapper<WT> wrapDoc) throws Exception {
+        return true;
     }
     
     /* (non-Javadoc)

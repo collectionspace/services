@@ -276,23 +276,6 @@ public class RefNameUtils {
     	}
     	
     	return displayName;
-    }
-
-    /**
-     * Creates a refName in the name / shortIdentifier form.
-     *
-     * @param shortId a shortIdentifier for an authority or one of its terms
-     * @return a refName for that authority or term, in the name / shortIdentifier form.
-     *         If the provided shortIdentifier is null or empty, returns
-     *         the empty string.
-     */
-    public static String createShortIdRefName(String shortId) {
-        if (shortId == null || shortId.trim().isEmpty()) {
-            return "";
-        } else {
-            return "urn:cspace:name("+shortId+")";
-        }
-    }
-    
+    }    
 }
 

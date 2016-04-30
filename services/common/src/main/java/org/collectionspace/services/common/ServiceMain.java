@@ -18,6 +18,7 @@ import javax.sql.DataSource;
 
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.collectionspace.authentication.AuthN;
+import org.collectionspace.services.client.XmlTools;
 import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
@@ -41,7 +42,6 @@ import org.collectionspace.services.config.types.PropertyItemType;
 import org.collectionspace.services.config.types.PropertyType;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 import org.collectionspace.services.nuxeo.client.java.TenantRepository;
-
 import org.apache.commons.io.FileUtils;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.dom4j.Document;
@@ -771,15 +771,15 @@ public class ServiceMain {
      */
     private synchronized void populateUriTemplateRegistry() {
        if (uriTemplateRegistry.isEmpty()) {
-            NuxeoBasedResource resource = null;
+    	   CollectionSpaceResource resource = null;
             ResourceMap resourceMap = getJaxRSResourceMap();
-            for (Map.Entry<String, NuxeoBasedResource> entry : resourceMap.entrySet()) {
+            Set<Map.Entry<String, CollectionSpaceResource>> entrySet = resourceMap.entrySet();
+            for (Map.Entry<String, CollectionSpaceResource> entry : entrySet) {
                 resource = entry.getValue();
                 Map<UriTemplateRegistryKey, StoredValuesUriTemplate> entries =
                         resource.getUriRegistryEntries();
                 uriTemplateRegistry.putAll(entries);
             }
-
             // FIXME: Contacts itself should not have an entry in the URI template registry;
             // there should be a Contacts entry in that registry only for use in
             // building URIs for resources that have contacts as a sub-resource
