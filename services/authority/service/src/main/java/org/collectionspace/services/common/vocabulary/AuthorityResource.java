@@ -350,13 +350,13 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     }
 
     /**
-     * Synchronizes the authority and its terms with a Shared Authority Server.
+     * Synchronizes the authority and its items/terms with a Shared Authority Server.
      * 
      * @param specifier either a CSID or one of the urn forms
      * 
      * @return the authority
      */
-    @GET
+    @POST
     @Path("{csid}/sync")
     public byte[] synchronize(
             @Context Request request,
@@ -367,35 +367,41 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         PoxPayloadOut payloadOut = null;
         Specifier specifier;
         
-        try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
-            /*
-             * Make sure this authority service supports synchronization
-             */
-            if (supportsReplicating(ctx.getTenantId(), ctx.getServiceName()) == false) {
-            	throw new DocumentException(Response.Status.FORBIDDEN.getStatusCode());
-            }
-            AuthorityDocumentModelHandler handler = (AuthorityDocumentModelHandler)createDocumentHandler(ctx);
-            specifier = Specifier.getSpecifier(identifier, "getAuthority", "GET");
-            handler.setShouldUpdateRevNumber(AuthorityServiceUtils.DONT_UPDATE_REV); // Never update rev number on sync calls
-            neededSync = getRepositoryClient(ctx).synchronize(ctx, specifier, handler);
-            payloadOut = ctx.getOutput();
-        } catch (Exception e) {
-            throw bigReThrow(e, ServiceMessages.SYNC_FAILED, identifier);
-        }
-
         //
-        // If a sync was needed and was successful, return a copy of the updated resource.  Acts like an UPDATE.
+        // Prevent multiple SAS synchronizations from occurring simultaneously by synchronizing this method.
         //
-        if (neededSync == true) {
-        	result = payloadOut.getBytes();
-        } else {
-	        result = String.format("Authority resource '%s' was already in sync with shared authority server.",
-	        		specifier.value).getBytes();
-	        Response response = Response.status(Response.Status.NOT_MODIFIED).entity(result).type("text/plain").build();
-            throw new CSWebApplicationException(response);
-        }
-                return result;
+    	synchronized(AuthorityResource.class) {        
+	        try {
+	            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
+	            /*
+	             * Make sure this authority service supports synchronization
+	             */
+	            if (supportsReplicating(ctx.getTenantId(), ctx.getServiceName()) == false) {
+	            	throw new DocumentException(Response.Status.FORBIDDEN.getStatusCode());
+	            }
+	            AuthorityDocumentModelHandler handler = (AuthorityDocumentModelHandler)createDocumentHandler(ctx);
+	            specifier = Specifier.getSpecifier(identifier, "getAuthority", "GET");
+	            handler.setShouldUpdateRevNumber(AuthorityServiceUtils.DONT_UPDATE_REV); // Never update rev number on sync calls
+	            neededSync = getRepositoryClient(ctx).synchronize(ctx, specifier, handler);
+	            payloadOut = ctx.getOutput();
+	        } catch (Exception e) {
+	            throw bigReThrow(e, ServiceMessages.SYNC_FAILED, identifier);
+	        }
+	
+	        //
+	        // If a sync was needed and was successful, return a copy of the updated resource.  Acts like an UPDATE.
+	        //
+	        if (neededSync == true) {
+	        	result = payloadOut.getBytes();
+	        } else {
+		        result = String.format("Authority resource '%s' was already in sync with shared authority server.",
+		        		specifier.value).getBytes();
+		        Response response = Response.status(Response.Status.NOT_MODIFIED).entity(result).type("text/plain").build();
+	            throw new CSWebApplicationException(response);
+	        }
+    	}
+	        
+    	return result;
     }
         
     /**
@@ -1172,9 +1178,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * 
      * @param specifier either CSIDs and/or one of the urn forms
      * 
-     * @return the authority item if it was synchronized with SAS
+     * @return the authority item if it was updated/synchronized with SAS item; otherwise empty
      */
-    @GET
+    @POST
     @Path("{csid}/items/{itemcsid}/sync")
     public byte[] synchronizeItem(
     		@Context ResourceMap resourceMap,
