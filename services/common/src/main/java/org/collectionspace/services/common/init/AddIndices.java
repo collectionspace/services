@@ -26,12 +26,13 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.config.service.InitHandler.Params.Field;
 import org.collectionspace.services.config.service.InitHandler.Params.Property;
+import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.config.service.ServiceBindingType;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,6 +115,47 @@ public class AddIndices extends InitHandler implements IInitHandler {
                 rows = addOneIndex(dataSourceName, repositoryName, cspaceInstanceId, tableName, fieldName);
             }
         }
+        //
+        // Add a uniqueness constraint on the short ID field of authority and authority item tables
+        //
+        if (sbt != null && sbt.isRequiresUniqueShortId()) {
+        	ensureShortIdConstraintOnAuthority(dataSourceName,
+            		repositoryName,
+            		cspaceInstanceId,
+            		sbt);
+        }
+    }
+    
+    /**
+     * 
+     * Add a DB level uniqueness constraint on the short ID column of this service's common part table.
+     * 
+     * @param dataSourceName
+     * @param repositoryName
+     * @param cspaceInstanceId
+     * @param sbt
+     */
+    private void ensureShortIdConstraintOnAuthority(String dataSourceName,
+    		String repositoryName,
+    		String cspaceInstanceId,
+    		ServiceBindingType sbt) {
+    	
+//    	#TEST:
+//    		SELECT constraint_name FROM information_schema.constraint_column_usage WHERE table_name = 'persons_common' AND constraint_name = 'persons_shortid_unique';
+//
+// 		#IF: emptyResult
+// 			ALTER TABLE persons_common add CONSTRAINT persons_shortid_unique UNIQUE (shortidentifier);
+    	
+    	String tableName = null;
+    	
+        List<ObjectPartType> objectPartTypes = sbt.getObject().getPart();
+        for (ObjectPartType objectPartType : objectPartTypes) {
+        	if (objectPartType.getId().equalsIgnoreCase(ServiceBindingUtils.SERVICE_COMMONPART_ID) == true) {
+        		tableName = objectPartType.getLabel();
+        	}
+        }
+    	System.out.println(String.format("Added uniqueness constraint on short ID of repo:%s%s service:%s tablename:%s",
+    		repositoryName, cspaceInstanceId, sbt.getName(), tableName));
     }
 
     private int addOneIndex(String dataSourceName,
