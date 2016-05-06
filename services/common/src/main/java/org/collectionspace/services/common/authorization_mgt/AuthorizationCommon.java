@@ -1039,7 +1039,7 @@ public class AuthorizationCommon {
 		
 		if (result == null) {
 			if (serviceBinding.getType().equalsIgnoreCase(ServiceBindingUtils.SERVICE_TYPE_SECURITY) == false) {
-				logger.warn("Could not retrieve a lifecycle transition definition list from: "
+				logger.debug("Could not retrieve a lifecycle transition definition list from: "
 						+ serviceBinding.getName()
 						+ " with tenant ID = "
 						+ tenantBinding.getId());

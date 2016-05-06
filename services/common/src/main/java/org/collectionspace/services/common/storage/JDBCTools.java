@@ -63,8 +63,8 @@ public class JDBCTools {
     public static String NUXEO_USER_NAME = "nuxeo";
     public static String SQL_WILDCARD = "%";
     public static String DATABASE_SELECT_PRIVILEGE_NAME = "SELECT";
+    public static String POSTGRES_UNIQUE_VIOLATION = "23505";
 
-    
     //
     // Private constants
     //
@@ -352,7 +352,7 @@ public class JDBCTools {
         } catch (SQLException sqle) {
             SQLException tempException = sqle;
             String msg = "";
-            while (null != tempException) {       // SQLExceptions can be chained. Loop to log all.
+            while (tempException != null) {       // SQLExceptions can be chained. Loop to log all.
                 if (!msg.isEmpty()) {
                     msg = msg + "::next::";
                 }
@@ -360,7 +360,7 @@ public class JDBCTools {
                 logger.debug("SQL Exception: " + msg);
                 tempException = tempException.getNextException();
             }
-            throw new RuntimeException("SQL Exception in executeUpdate: " + msg, sqle);
+            throw sqle; // rethrow the exception
         } finally {
             try {
                 if (stmt != null) {
