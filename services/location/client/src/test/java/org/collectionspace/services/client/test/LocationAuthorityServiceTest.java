@@ -407,22 +407,25 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
 
 	@Override
 	protected void compareUpdatedItemInstances(LocationsCommon original,
-			LocationsCommon updated) throws Exception {
-            LocTermGroupList originalTermList = original.getLocTermGroupList();
-            Assert.assertNotNull(originalTermList);
-            List<LocTermGroup> originalTerms = originalTermList.getLocTermGroup();
-            Assert.assertNotNull(originalTerms);
-            Assert.assertTrue(originalTerms.size() > 0);
-            
-            LocTermGroupList updatedTermList = updated.getLocTermGroupList();
-            Assert.assertNotNull(updatedTermList);
-            List<LocTermGroup> updatedTerms = updatedTermList.getLocTermGroup();
-            Assert.assertNotNull(updatedTerms);
-            Assert.assertTrue(updatedTerms.size() > 0);
-            
-            Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(),
-                originalTerms.get(0).getTermDisplayName(),
-                "Value in updated record did not match submitted data.");
+			LocationsCommon updated,
+			boolean compareRevNumbers) throws Exception {
+		LocTermGroupList originalTermList = original.getLocTermGroupList();
+		Assert.assertNotNull(originalTermList);
+		List<LocTermGroup> originalTerms = originalTermList.getLocTermGroup();
+		Assert.assertNotNull(originalTerms);
+		Assert.assertTrue(originalTerms.size() > 0);
+
+		LocTermGroupList updatedTermList = updated.getLocTermGroupList();
+		Assert.assertNotNull(updatedTermList);
+		List<LocTermGroup> updatedTerms = updatedTermList.getLocTermGroup();
+		Assert.assertNotNull(updatedTerms);
+		Assert.assertTrue(updatedTerms.size() > 0);
+
+		Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(), originalTerms.get(0).getTermDisplayName(), "Value in updated record did not match submitted data.");
+		
+		if (compareRevNumbers == true) {
+        	Assert.assertEquals(original.getRev(), updated.getRev(), "Revision numbers should match.");
+        }
 	}
 
 	@Override

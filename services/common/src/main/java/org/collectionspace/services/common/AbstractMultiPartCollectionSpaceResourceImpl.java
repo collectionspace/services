@@ -42,6 +42,7 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
+import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.document.DocumentHandler;
@@ -50,7 +51,6 @@ import org.collectionspace.services.lifecycle.Lifecycle;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.workflow.WorkflowCommon;
 import org.dom4j.DocumentException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -234,39 +234,53 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
     }
     
     public PoxPayloadOut updateWorkflowWithTransition(ServiceContext existingContext,
+    		UriInfo uriInfo,
     		String csid,
     		String transition) {
 
         PoxPayloadOut result = null;
                 
         try {
-        	MultipartServiceContext ctx = (MultipartServiceContext)existingContext;
+        	MultipartServiceContextImpl workflowCtx = (MultipartServiceContextImpl)createServiceContext(WorkflowClient.SERVICE_NAME, uriInfo);
+        	//
+        	// Get properties out of the existing context if one was passed in
+        	//
+        	if (existingContext != null) {
+        		if (existingContext.getCurrentRepositorySession() != null) {
+        			workflowCtx.setCurrentRepositorySession(existingContext.getCurrentRepositorySession());
+        		}
+        		if (existingContext.getProperties() != null) {
+        			workflowCtx.setProperties(existingContext.getProperties());
+        		}
+        	}
+
         	//
         	// Create an empty workflow_commons input part and set it into a new "workflow" sub-resource context
+        	//
         	PoxPayloadIn input = new PoxPayloadIn(WorkflowClient.SERVICE_PAYLOAD_NAME, new WorkflowCommon(), 
         			WorkflowClient.SERVICE_COMMONPART_NAME);
-            ctx.setInput(input);
+            workflowCtx.setInput(input);
         	
-            // Create a service context and document handler for the parent resource.
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext(ctx.getUriInfo());
-            DocumentHandler targetDocHandler = createDocumentHandler(parentCtx);  
-            ctx.setProperty(WorkflowClient.TARGET_DOCHANDLER, targetDocHandler); //added as a context param for the workflow document handler -it will call the parent's dochandler "prepareForWorkflowTranstion" method
+            // Create a service context and document handler for the target resource.
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> targetCtx = createServiceContext(workflowCtx.getUriInfo());
+            DocumentHandler targetDocHandler = createDocumentHandler(targetCtx);  
+            workflowCtx.setProperty(WorkflowClient.TARGET_DOCHANDLER, targetDocHandler); //added as a context param for the workflow document handler -it will call the parent's dochandler "prepareForWorkflowTranstion" method
 
             // When looking for the document, we need to use the parent's workspace name -not the "workflow" workspace name
-            String targetWorkspaceName = parentCtx.getRepositoryWorkspaceName();
-            ctx.setRespositoryWorkspaceName(targetWorkspaceName); //find the document in the parent's workspace
+            String targetWorkspaceName = targetCtx.getRepositoryWorkspaceName();
+            workflowCtx.setRespositoryWorkspaceName(targetWorkspaceName); //find the document in the parent's workspace
             
         	// Get the type of transition we're being asked to make and store it as a context parameter -used by the workflow document handler
-            TransitionDef transitionDef = getTransitionDef(parentCtx, transition);
+            TransitionDef transitionDef = getTransitionDef(targetCtx, transition);
             if (transitionDef == null) {
             	throw new DocumentException(String.format("The document with ID='%s' does not support the workflow transition '%s'.",
             			csid, transition));
             }
-            ctx.setProperty(WorkflowClient.TRANSITION_ID, transitionDef);
+            workflowCtx.setProperty(WorkflowClient.TRANSITION_ID, transitionDef);
 
-            WorkflowDocumentModelHandler handler = createWorkflowDocumentHandler(ctx);
-            getRepositoryClient(ctx).update(ctx, csid, handler);
-            result = ctx.getOutput();
+            WorkflowDocumentModelHandler workflowHandler = createWorkflowDocumentHandler(workflowCtx);
+            getRepositoryClient(workflowCtx).update(workflowCtx, csid, workflowHandler);
+            result = workflowCtx.getOutput();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, csid);
         }
@@ -287,8 +301,7 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
         PoxPayloadOut result = null;
                 
         try {
-        	ServiceContext ctx = (ServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME, uriInfo);
-        	result = this.updateWorkflowWithTransition(ctx, csid, transition);
+        	result = this.updateWorkflowWithTransition(NULL_CONTEXT, uriInfo, csid, transition);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, csid);
         }

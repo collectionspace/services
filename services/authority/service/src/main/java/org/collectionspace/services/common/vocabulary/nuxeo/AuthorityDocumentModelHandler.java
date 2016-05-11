@@ -132,7 +132,6 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         // Get the rev number of the authority so we can compare with rev number of shared authority
         //
         DocumentModel docModel = NuxeoUtils.getDocFromSpecifier(ctx, getRepositorySession(), authorityCommonSchemaName, specifier);
-        String authorityCsid = docModel.getName();
         Long localRev = (Long) NuxeoUtils.getProperyValue(docModel, AuthorityJAXBSchema.REV);
         String shortId = (String) NuxeoUtils.getProperyValue(docModel, AuthorityJAXBSchema.SHORT_IDENTIFIER);
         //
@@ -162,9 +161,13 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         		result = true;
         	}
         	//
-        	// We need to transition the authority into a replicated state now that we've sync'd it.
+        	// We may need to transition the authority into a replicated state the first time we sync it.
         	//
-        	authorityResource.updateWorkflowWithTransition(ctx, authorityCsid, WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
+        	String workflowState = docModel.getCurrentLifeCycleState();
+        	if (workflowState.contains(WorkflowClient.WORKFLOWSTATE_REPLICATED) == false) {
+	            String authorityCsid = docModel.getName();
+	        	authorityResource.updateWorkflowWithTransition(ctx, ctx.getUriInfo(), authorityCsid, WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
+        	}
         }
         
         return result;
@@ -576,7 +579,13 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
      */
     @Override
     public void handleWorkflowTransition(ServiceContext ctx, DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef) throws Exception {
-    	if (this.getShouldUpdateRevNumber() == true) { // We don't update the rev number of synchronization requests
+    	boolean updateRevNumber = this.getShouldUpdateRevNumber();
+        Boolean contextProperty = (Boolean) ctx.getProperty(AuthorityServiceUtils.SHOULD_UPDATE_REV_PROPERTY);
+        if (contextProperty != null) {
+        	updateRevNumber = contextProperty;
+        }
+
+    	if (updateRevNumber == true) { // We don't update the rev number of synchronization requests
     		updateRevNumbers(wrapDoc);
     	}
     }

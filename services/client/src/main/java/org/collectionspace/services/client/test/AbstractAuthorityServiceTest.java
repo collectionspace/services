@@ -93,7 +93,20 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
      * @param updated
      * @throws Exception
      */
-    protected abstract void compareUpdatedItemInstances(AUTHORITY_ITEM_TYPE original, AUTHORITY_ITEM_TYPE updated) throws Exception;
+    protected abstract void compareUpdatedItemInstances(AUTHORITY_ITEM_TYPE original,
+    		AUTHORITY_ITEM_TYPE updated,
+    		boolean compareRevNumbers) throws Exception;
+    
+    /**
+     * 
+     * @param original
+     * @param updated
+     * @throws Exception
+     */
+    protected void compareUpdatedItemInstances(AUTHORITY_ITEM_TYPE original,
+    		AUTHORITY_ITEM_TYPE updated) throws Exception {
+    	compareUpdatedItemInstances(original, updated, false);
+    }
     
     /**
      * 
@@ -881,7 +894,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         // Submit the updated authority item and check the response.
         PoxPayloadOut output = this.createItemRequestTypeInstance(theUpdate);
         res = sasClient.updateNamedItemInNamedAuthority(knownSASAuthorityResourceIdentifier, knownSASItemIdentifiersList.get(0), output);
-        AUTHORITY_ITEM_TYPE updatedAuthorityItem = null;
+        AUTHORITY_ITEM_TYPE updatedSASAuthorityItem = null;
         try {
 	        int statusCode = res.getStatus();
 	
@@ -894,16 +907,16 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 	        Assert.assertEquals(statusCode, testExpectedStatusCode);
 	
 	        // Retrieve the updated authority item and verify that its contents exist.
-	        updatedAuthorityItem = extractItemCommonPartValue(res);
-	        Assert.assertNotNull(updatedAuthorityItem);
+	        updatedSASAuthorityItem = extractItemCommonPartValue(res);
+	        Assert.assertNotNull(updatedSASAuthorityItem);
 
-	        compareUpdatedItemInstances(theUpdate, updatedAuthorityItem);
+	        compareUpdatedItemInstances(theUpdate, updatedSASAuthorityItem);
         } finally {
         	res.close();
         }
         
-        // Synchronize the item's parent authority and verify the update we just made
-        // to the SAS appears locally
+        // Synchronize the local item's parent authority and verify the update we just made
+        // to the SAS item appears locally after the sync
         setupSync();
         AuthorityClient localClient = (AuthorityClient) this.getClientInstance();
     	Response response = localClient.syncByName(knownSASAuthorityResourceIdentifier); // Notice we're using the Short ID (short ID is the same on the local and SAS)
@@ -921,7 +934,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 	        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
 	        AUTHORITY_ITEM_TYPE syncedAuthorityItem = extractItemCommonPartValue(res);
 	        Assert.assertNotNull(syncedAuthorityItem);
-	        compareUpdatedItemInstances(sasAuthorityItem, updatedAuthorityItem);
+	        compareUpdatedItemInstances(syncedAuthorityItem, updatedSASAuthorityItem);
         } finally {
         	res.close();
         }

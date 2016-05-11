@@ -1359,7 +1359,8 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 
 	@Override
 	protected void compareUpdatedItemInstances(PersonsCommon original,
-			PersonsCommon updated) throws Exception {
+			PersonsCommon updated,
+			boolean compareRevNumbers) throws Exception {
             
             PersonTermGroupList originalTermList = original.getPersonTermGroupList();
             Assert.assertNotNull(originalTermList);
@@ -1376,6 +1377,10 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
             Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(),
                 originalTerms.get(0).getTermDisplayName(),
                 "Value in updated record did not match submitted data.");
+            
+            if (compareRevNumbers == true) {
+            	Assert.assertEquals(original.getRev(), updated.getRev(), "Revision numbers should match.");
+            }
 	}
 
 	@Override

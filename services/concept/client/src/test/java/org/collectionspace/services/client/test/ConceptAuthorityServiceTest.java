@@ -403,25 +403,27 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
 
 	@Override
 	protected void compareUpdatedItemInstances(ConceptsCommon original,
-			ConceptsCommon updated) throws Exception {
-            ConceptTermGroupList originalTermList = original.getConceptTermGroupList();
-            Assert.assertNotNull(originalTermList);
-            List<ConceptTermGroup> originalTerms = originalTermList.getConceptTermGroup();
-            Assert.assertNotNull(originalTerms);
-            Assert.assertTrue(originalTerms.size() > 0);
-            
-            ConceptTermGroupList updatedTermList = updated.getConceptTermGroupList();
-            Assert.assertNotNull(updatedTermList);
-            List<ConceptTermGroup> updatedTerms = updatedTermList.getConceptTermGroup();
-            Assert.assertNotNull(updatedTerms);
-            Assert.assertTrue(updatedTerms.size() > 0);
-            
-            Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(),
-                originalTerms.get(0).getTermDisplayName(),
-                "Value in updated record did not match submitted data.");
-            Assert.assertEquals(updatedTerms.get(0).getTermStatus(),
-                originalTerms.get(0).getTermDisplayName(),
-                "Value in updated record did not match submitted data.");
+			ConceptsCommon updated,
+			boolean compareRevNumbers) throws Exception {
+		ConceptTermGroupList originalTermList = original.getConceptTermGroupList();
+		Assert.assertNotNull(originalTermList);
+		List<ConceptTermGroup> originalTerms = originalTermList.getConceptTermGroup();
+		Assert.assertNotNull(originalTerms);
+		Assert.assertTrue(originalTerms.size() > 0);
+
+		ConceptTermGroupList updatedTermList = updated.getConceptTermGroupList();
+		Assert.assertNotNull(updatedTermList);
+		List<ConceptTermGroup> updatedTerms = updatedTermList.getConceptTermGroup();
+		Assert.assertNotNull(updatedTerms);
+		Assert.assertTrue(updatedTerms.size() > 0);
+
+		Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(), originalTerms.get(0).getTermDisplayName(), "Value in updated record did not match submitted data.");
+		Assert.assertEquals(updatedTerms.get(0).getTermStatus(), originalTerms.get(0).getTermDisplayName(),
+				"Value in updated record did not match submitted data.");
+		
+		if (compareRevNumbers == true) {
+        	Assert.assertEquals(original.getRev(), updated.getRev(), "Revision numbers did not match.");
+        }
 	}
 
 	@Override

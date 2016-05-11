@@ -391,7 +391,8 @@ public class CitationAuthorityServiceTest extends AbstractAuthorityServiceTest<C
 
     @Override
     protected void compareUpdatedItemInstances(CitationsCommon original,
-            CitationsCommon updated) throws Exception {
+            CitationsCommon updated,
+            boolean compareRevNumbers) throws Exception {
         CitationTermGroupList originalTermList = original.getCitationTermGroupList();
         Assert.assertNotNull(originalTermList);
         List<CitationTermGroup> originalTerms = originalTermList.getCitationTermGroup();
@@ -410,6 +411,10 @@ public class CitationAuthorityServiceTest extends AbstractAuthorityServiceTest<C
         Assert.assertEquals(updatedTerms.get(0).getTermStatus(),
                 originalTerms.get(0).getTermDisplayName(),
                 "Value in updated record did not match submitted data.");
+        
+        if (compareRevNumbers == true) {
+        	Assert.assertEquals(original.getRev(), updated.getRev(), "Revision numbers should match.");
+        }
     }
 
     @Override
