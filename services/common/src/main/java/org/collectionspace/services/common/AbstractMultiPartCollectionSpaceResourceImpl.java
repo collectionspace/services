@@ -233,30 +233,23 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
     	return result;
     }
     
-    /*
-     * We should change this code.  The RepositoryClient (from call to getRepositoryClient) should support a call doWorkflowTransition() instead.
-     */
-    //FIXME: This method is almost identical to the method org.collectionspace.services.common.vocabulary.updateWorkflowWithTransition() so
-    // they should be consolidated -be DRY (don't repeat yourself).
+    public PoxPayloadOut updateWorkflowWithTransition(ServiceContext existingContext,
+    		String csid,
+    		String transition) {
 
-    @PUT
-    @Path("{csid}" + WorkflowClient.SERVICE_PATH + "/" + "{transition}")
-    public byte[] updateWorkflowWithTransition(
-    		@Context UriInfo uriInfo,
-    		@PathParam("csid") String csid,
-    		@PathParam("transition") String transition) {
         PoxPayloadOut result = null;
                 
         try {
+        	MultipartServiceContext ctx = (MultipartServiceContext)existingContext;
         	//
         	// Create an empty workflow_commons input part and set it into a new "workflow" sub-resource context
         	PoxPayloadIn input = new PoxPayloadIn(WorkflowClient.SERVICE_PAYLOAD_NAME, new WorkflowCommon(), 
         			WorkflowClient.SERVICE_COMMONPART_NAME);
-            MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME, input, uriInfo);
+            ctx.setInput(input);
         	
             // Create a service context and document handler for the parent resource.
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext(uriInfo);
-            DocumentHandler targetDocHandler = this.createDocumentHandler(parentCtx);      
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext(ctx.getUriInfo());
+            DocumentHandler targetDocHandler = createDocumentHandler(parentCtx);  
             ctx.setProperty(WorkflowClient.TARGET_DOCHANDLER, targetDocHandler); //added as a context param for the workflow document handler -it will call the parent's dochandler "prepareForWorkflowTranstion" method
 
             // When looking for the document, we need to use the parent's workspace name -not the "workflow" workspace name
@@ -277,6 +270,29 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, csid);
         }
+        
+        return result;
+    
+    }
+    
+    /*
+     * We should consider changing this code.  The RepositoryClient (from call to getRepositoryClient) could support a call doWorkflowTransition() instead?
+     */
+    @PUT
+    @Path("{csid}" + WorkflowClient.SERVICE_PATH + "/" + "{transition}")
+    public byte[] updateWorkflowWithTransition(
+    		@Context UriInfo uriInfo,
+    		@PathParam("csid") String csid,
+    		@PathParam("transition") String transition) {
+        PoxPayloadOut result = null;
+                
+        try {
+        	ServiceContext ctx = (ServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME, uriInfo);
+        	result = this.updateWorkflowWithTransition(ctx, csid, transition);
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, csid);
+        }
+        
         return result.getBytes();
     }
     

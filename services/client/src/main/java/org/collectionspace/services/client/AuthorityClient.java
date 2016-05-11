@@ -1,11 +1,7 @@
 package org.collectionspace.services.client;
 
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
-import org.jboss.resteasy.client.ClientResponse;
-import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
-import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /*
@@ -13,12 +9,13 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
  * ILT - Authority item list type
  * P - Proxy type
  */
-public interface AuthorityClient<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy> 
+public interface AuthorityClient<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P extends AuthorityProxy> 
 	extends CollectionSpacePoxClient<AbstractCommonList, P> {
 
     /** The uri path element for items in an authority */
     public static String ITEMS = "items";    //used to construct uri's in service paths for authorities.
     public static final String SHORT_IDENTIFIER = "shortIdentifier";
+    public static final String IN_AUTHORITY = "inAuthority";
     public static final String TERM_DISPLAY_NAME = "termDisplayName";
     public static final String VOCAB_DISPLAY_NAME = "displayName";
     public static final String REF_NAME = "refName";
@@ -31,7 +28,7 @@ public interface AuthorityClient<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
     
     // Get the inAuthorityCsid (the item's parent)
     String getInAuthority(AUTHORITY_ITEM_TYPE item);
-	
+    
     // Get the inAuthorityCsid (the item's parent)
     void setInAuthority(AUTHORITY_ITEM_TYPE item, String inAuthorityCsid);
 	
@@ -46,6 +43,9 @@ public interface AuthorityClient<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
 
     //(U)pdate Item
     Response updateItem(String vcsid, String csid, PoxPayloadOut poxPayloadOut);
+    
+    //(U)pdate Item
+    Response updateNamedItemInNamedAuthority(String authShortId, String itemShortId, PoxPayloadOut poxPayloadOut);
 
     //(D)elete Item
     Response deleteItem(String vcsid, String csid);

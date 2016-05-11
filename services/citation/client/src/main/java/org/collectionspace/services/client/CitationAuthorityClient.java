@@ -17,12 +17,13 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.citation.CitationauthoritiesCommon;
 import org.collectionspace.services.citation.CitationsCommon;
 
 /**
  * The Class CitationAuthorityClient.
  */
-public class CitationAuthorityClient extends AuthorityClientImpl<CitationsCommon, CitationAuthorityProxy> {
+public class CitationAuthorityClient extends AuthorityClientImpl<CitationauthoritiesCommon, CitationsCommon, CitationAuthorityProxy> {
 
     public static final String SERVICE_NAME = "citationauthorities";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;

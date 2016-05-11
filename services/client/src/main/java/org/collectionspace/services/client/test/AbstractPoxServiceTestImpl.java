@@ -2,13 +2,17 @@ package org.collectionspace.services.client.test;
 
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.AbstractCommonListUtils;
+import org.collectionspace.services.client.XmlTools;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.dom4j.Document;
 import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
 
@@ -44,6 +48,38 @@ public abstract class AbstractPoxServiceTestImpl<CLT extends AbstractCommonList,
     protected long getSizeOfList(CLT list) {
     	return list.getTotalItems();    	
     }
+    
+    /**
+     * Extracts the workflow state of PoxPayloadIn
+     * 
+     * @param res
+     * @return
+     * @throws Exception
+     */
+	protected String extractAuthorityWorkflowState(PoxPayloadIn input) throws Exception {
+		String result = null;
+		
+		Document document = input.getDOMDocument();
+		result = XmlTools.getElementValue(document, "//" + WorkflowClient.WORKFLOWSTATE_XML_ELEMENT_NAME);
+
+		return result;
+	}
+    
+    /**
+     * Extracts the workflow state of a response payload
+     * 
+     * @param res
+     * @return
+     * @throws Exception
+     */
+	protected String extractAuthorityWorkflowState(Response res) throws Exception {
+		String result = null;
+		
+        PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(getEntityResponseType()));	    	
+        result = extractAuthorityWorkflowState(input);
+        		
+		return result;
+	}
     
     /**
      * The entity type expected from the JAX-RS Response object

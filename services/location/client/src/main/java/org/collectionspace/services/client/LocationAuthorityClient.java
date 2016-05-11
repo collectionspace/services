@@ -17,12 +17,13 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.location.LocationauthoritiesCommon;
 import org.collectionspace.services.location.LocationsCommon;
 
 /**
  * The Class LocationAuthorityClient.
  */
-public class LocationAuthorityClient extends AuthorityClientImpl<LocationsCommon, LocationAuthorityProxy> {
+public class LocationAuthorityClient extends AuthorityClientImpl<LocationauthoritiesCommon, LocationsCommon, LocationAuthorityProxy> {
 
     public static final String SERVICE_NAME = "locationauthorities";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;

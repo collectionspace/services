@@ -1416,6 +1416,5 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
                 uriRegistryEntriesMap.putAll(getUriRegistryEntries(tenantId, getItemDocType(tenantId), UriTemplateFactory.ITEM));
         }
         return uriRegistryEntriesMap;
-    }
-  
+    }  
 }

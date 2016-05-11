@@ -23,12 +23,13 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.concept.ConceptauthoritiesCommon;
 import org.collectionspace.services.concept.ConceptsCommon;
 
 /**
  * The Class ConceptAuthorityClient.
  */
-public class ConceptAuthorityClient extends AuthorityClientImpl<ConceptsCommon, ConceptAuthorityProxy> {
+public class ConceptAuthorityClient extends AuthorityClientImpl<ConceptauthoritiesCommon, ConceptsCommon, ConceptAuthorityProxy> {
 
     public static final String SERVICE_NAME = "conceptauthorities";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;

@@ -27,11 +27,12 @@
 package org.collectionspace.services.client;
 
 import org.collectionspace.services.taxonomy.TaxonCommon;
+import org.collectionspace.services.taxonomy.TaxonomyauthorityCommon;
 
 /**
  * The Class TaxonomyAuthorityClient.
  */
-public class TaxonomyAuthorityClient extends AuthorityClientImpl<TaxonCommon, TaxonomyAuthorityProxy> {
+public class TaxonomyAuthorityClient extends AuthorityClientImpl<TaxonomyauthorityCommon, TaxonCommon, TaxonomyAuthorityProxy> {
 
     public static final String SERVICE_NAME = "taxonomyauthority";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;

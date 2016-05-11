@@ -714,7 +714,7 @@ public class RefNameServiceUtils {
                 + " AND " + (authTermInfo.inAuthority.name != null
                 ? authTermInfo.inAuthority.name : authTermInfo.inAuthority.csid)
                 + " AND " + (authTermInfo.name != null
-                ? authTermInfo.name : authTermInfo.csid); // REM - This seems likely to cause trouble.  We should consider searching for the full refname -excluding the display name suffix
+                ? authTermInfo.name : authTermInfo.csid); // REM - This seems likely to cause trouble?  We should consider searching for the full refname -excluding the display name suffix?
 
         String whereClauseStr = QueryManager.createWhereClauseFromKeywords(keywords);
 

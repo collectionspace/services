@@ -17,12 +17,13 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.PersonsCommon;
 
 /**
  * The Class PersonAuthorityClient.
  */
-public class PersonAuthorityClient extends AuthorityWithContactsClientImpl<PersonsCommon, PersonAuthorityProxy> {
+public class PersonAuthorityClient extends AuthorityWithContactsClientImpl<PersonauthoritiesCommon, PersonsCommon, PersonAuthorityProxy> {
 
     public static final String SERVICE_NAME = "personauthorities";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;

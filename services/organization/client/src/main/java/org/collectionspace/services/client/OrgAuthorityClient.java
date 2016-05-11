@@ -24,11 +24,12 @@
 package org.collectionspace.services.client;
 
 import org.collectionspace.services.organization.OrganizationsCommon;
+import org.collectionspace.services.organization.OrgauthoritiesCommon;
 
 /**
  * The Class OrgAuthorityClient.
  */
-public class OrgAuthorityClient extends AuthorityWithContactsClientImpl<OrganizationsCommon, OrgAuthorityProxy> {
+public class OrgAuthorityClient extends AuthorityWithContactsClientImpl<OrgauthoritiesCommon, OrganizationsCommon, OrgAuthorityProxy> {
 
     public static final String SERVICE_NAME = "orgauthorities";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;

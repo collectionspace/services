@@ -1,7 +1,7 @@
 package org.collectionspace.services.client;
 
 public class GenericAuthorityClientImpl extends
-		AuthorityClientImpl<Object, AuthorityProxy> {
+		AuthorityClientImpl<Object, Object, AuthorityProxy> {
 
 	@Override
 	public String getItemCommonPartName() {

@@ -15,12 +15,13 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.work.WorkauthoritiesCommon;
 import org.collectionspace.services.work.WorksCommon;
 
 /**
  * The Class WorkAuthorityClient.
  */
-public class WorkAuthorityClient extends AuthorityClientImpl<WorksCommon, WorkAuthorityProxy> {
+public class WorkAuthorityClient extends AuthorityClientImpl<WorkauthoritiesCommon, WorksCommon, WorkAuthorityProxy> {
 
     public static final String SERVICE_NAME = "workauthorities";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;

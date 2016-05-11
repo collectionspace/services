@@ -1,14 +1,15 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
+
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /*
  * P - Proxy type
  */
-public abstract class AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
+public abstract class AuthorityClientImpl<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
 	extends AbstractPoxServiceClientImpl<AbstractCommonList, P, AUTHORITY_ITEM_TYPE>
-	implements AuthorityClient<AUTHORITY_ITEM_TYPE, P> {
+	implements AuthorityClient<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P> {
 
 	private static final String INCLUDE_DELETE_TRUE = Boolean.TRUE.toString();
 	
@@ -45,6 +46,11 @@ public abstract class AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P extends Authori
     @Override
 	public Response updateItem(String vcsid, String csid, PoxPayloadOut poxPayloadOut) {
     	return getProxy().updateItem(vcsid, csid, poxPayloadOut.getBytes());
+    }
+    
+    @Override
+    public Response updateNamedItemInNamedAuthority(String authShortId, String itemShortId, PoxPayloadOut poxPayloadOut) {
+    	return getProxy().updateNamedItemInNamedAuthority(authShortId, itemShortId, poxPayloadOut.getBytes());
     }
 
     //(D)elete Item

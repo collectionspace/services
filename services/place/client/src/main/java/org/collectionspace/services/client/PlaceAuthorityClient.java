@@ -15,12 +15,13 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.place.PlaceauthoritiesCommon;
 import org.collectionspace.services.place.PlacesCommon;
 
 /**
  * The Class PlaceAuthorityClient.
  */
-public class PlaceAuthorityClient extends AuthorityClientImpl<PlacesCommon, PlaceAuthorityProxy> {
+public class PlaceAuthorityClient extends AuthorityClientImpl<PlaceauthoritiesCommon, PlacesCommon, PlaceAuthorityProxy> {
 
     public static final String SERVICE_NAME = "placeauthorities";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;

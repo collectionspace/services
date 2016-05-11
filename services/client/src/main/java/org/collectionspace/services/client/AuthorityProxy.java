@@ -10,12 +10,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 
 import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
-import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /*
  * ILT = Item list type
@@ -43,6 +39,12 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
     @PUT
     @Path("/{vcsid}/items/{csid}")
     Response updateItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid, byte[] xmlPayload);
+    
+    //(U)pdate Item    
+    @PUT
+    @Path("/urn:cspace:name({specifier})/items/urn:cspace:name({itemspecifier})")
+    Response updateNamedItemInNamedAuthority(@PathParam("specifier")String specifier,
+    		@PathParam("itemspecifier")String itemspecifier, byte[] xmlPayload);
 
     //(D)elete Item
     @DELETE

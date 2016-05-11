@@ -132,6 +132,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         // Get the rev number of the authority so we can compare with rev number of shared authority
         //
         DocumentModel docModel = NuxeoUtils.getDocFromSpecifier(ctx, getRepositorySession(), authorityCommonSchemaName, specifier);
+        String authorityCsid = docModel.getName();
         Long localRev = (Long) NuxeoUtils.getProperyValue(docModel, AuthorityJAXBSchema.REV);
         String shortId = (String) NuxeoUtils.getProperyValue(docModel, AuthorityJAXBSchema.SHORT_IDENTIFIER);
         //
@@ -160,6 +161,10 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         		ctx.setOutput(payloadOut);
         		result = true;
         	}
+        	//
+        	// We need to transition the authority into a replicated state now that we've sync'd it.
+        	//
+        	authorityResource.updateWorkflowWithTransition(ctx, authorityCsid, WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
         }
         
         return result;
@@ -571,8 +576,9 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
      */
     @Override
     public void handleWorkflowTransition(ServiceContext ctx, DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef) throws Exception {
-    	// Update the revision number
-    	updateRevNumbers(wrapDoc);
+    	if (this.getShouldUpdateRevNumber() == true) { // We don't update the rev number of synchronization requests
+    		updateRevNumbers(wrapDoc);
+    	}
     }
     
     @Override

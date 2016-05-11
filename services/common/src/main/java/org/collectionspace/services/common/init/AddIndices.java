@@ -86,6 +86,10 @@ public class AddIndices extends InitHandler implements IInitHandler {
     private final static String INDEX_SEP = "_";
     private final static String INDEX_SUFFIX = INDEX_SEP + "idx";
     private final static String SHORT_ID = AuthorityClient.SHORT_IDENTIFIER.toLowerCase();
+    private final static String IN_AUTHORITY = AuthorityClient.IN_AUTHORITY.toLowerCase();
+    
+    private final static String AUTHORITY_TYPE = ServiceBindingUtils.SERVICE_TYPE_AUTHORITY;
+    private final static String VOCABULARY_TYPE = ServiceBindingUtils.SERVICE_TYPE_VOCABULARY;
 
 
     /** See the class javadoc for this class: it shows the syntax supported in the configuration params.
@@ -139,7 +143,8 @@ public class AddIndices extends InitHandler implements IInitHandler {
      * @return
      * @throws Exception
      */
-    private boolean shortIdConstraintExists(String dataSourceName,
+    private boolean shortIdConstraintExists(ServiceBindingType sbt,
+    		String dataSourceName,
     		String repositoryName,
     		String cspaceInstanceId,
     		String tableName) throws Exception {
@@ -195,7 +200,8 @@ public class AddIndices extends InitHandler implements IInitHandler {
     	return result;
     }
     
-    private boolean createShortIdConstraint(String dataSourceName,
+    private boolean createShortIdConstraint(ServiceBindingType sbt,
+    		String dataSourceName,
     		String repositoryName,
     		String cspaceInstanceId,
     		String tableName) {
@@ -207,8 +213,18 @@ public class AddIndices extends InitHandler implements IInitHandler {
 	    	DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType(dataSourceName, repositoryName);
 	        if (databaseProductType == DatabaseProductType.POSTGRESQL) {
 	        	String constraintName = String.format("%s_%s_unique", tableName, SHORT_ID);
-	        	sql = String.format("ALTER TABLE %s add CONSTRAINT %s UNIQUE (%s)",
-	        			tableName, constraintName, SHORT_ID);
+	        	//
+	        	// Check if we've got a parent or an item.  Parents need the constraint on the short id, but items
+	        	// have the constraint on the combined shortidentifier and inauthority (parent's CSID) columns
+	        	//
+	        	String serviceType = sbt.getType();
+	        	if (serviceType.equalsIgnoreCase(AUTHORITY_TYPE) || serviceType.equalsIgnoreCase(VOCABULARY_TYPE)) { 
+		        	sql = String.format("ALTER TABLE %s add CONSTRAINT %s UNIQUE (%s, %s)",		// constraint for an item
+		        			tableName, constraintName, SHORT_ID, IN_AUTHORITY);
+	        	} else {
+		        	sql = String.format("ALTER TABLE %s add CONSTRAINT %s UNIQUE (%s)",			// constraint for a parent
+		        			tableName, constraintName, SHORT_ID);     		
+	        	}
 	        } else {
 	            errorMsg = String.format("Database server type '%s' is not supported by CollectionSpace.  Could not create constraint on column '%s' of table '%s'.",
 	            		databaseProductType.getName(), SHORT_ID, tableName);
@@ -295,8 +311,8 @@ public class AddIndices extends InitHandler implements IInitHandler {
 	        //
 	        // If the constraint doesn't exist, create it.
 	        //
-	        if (shortIdConstraintExists(dataSourceName, repositoryName, cspaceInstanceId, tableName) == false) {
-	        	if (createShortIdConstraint(dataSourceName, repositoryName, cspaceInstanceId, tableName) == true) {
+	        if (shortIdConstraintExists(sbt, dataSourceName, repositoryName, cspaceInstanceId, tableName) == false) {
+	        	if (createShortIdConstraint(sbt, dataSourceName, repositoryName, cspaceInstanceId, tableName) == true) {
 	        		logger.info(String.format("Created uniqueness constraint on '%s' column of table '%s' in repository '%s'.",
 			    			SHORT_ID, tableName, repositoryName));	        	
 	        	} else {

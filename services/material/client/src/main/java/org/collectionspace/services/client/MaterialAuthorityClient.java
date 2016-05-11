@@ -15,12 +15,13 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.material.MaterialauthoritiesCommon;
 import org.collectionspace.services.material.MaterialsCommon;
 
 /**
  * The Class MaterialAuthorityClient.
  */
-public class MaterialAuthorityClient extends AuthorityClientImpl<MaterialsCommon, MaterialAuthorityProxy> {
+public class MaterialAuthorityClient extends AuthorityClientImpl<MaterialauthoritiesCommon, MaterialsCommon, MaterialAuthorityProxy> {
 
     public static final String SERVICE_NAME = "materialauthorities";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
