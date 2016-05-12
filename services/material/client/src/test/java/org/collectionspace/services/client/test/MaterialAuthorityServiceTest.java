@@ -392,7 +392,8 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
 
     @Override
     protected void compareUpdatedItemInstances(MaterialsCommon original,
-            MaterialsCommon updated) throws Exception {
+            MaterialsCommon updated,
+			boolean compareRevNumbers) throws Exception {
             
             MaterialTermGroupList originalTermList = original.getMaterialTermGroupList();
             Assert.assertNotNull(originalTermList);
@@ -409,6 +410,10 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
             Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(),
                 originalTerms.get(0).getTermDisplayName(),
                 "Value in updated record did not match submitted data.");
+            
+            if (compareRevNumbers == true) {
+            	Assert.assertEquals(original.getRev(), updated.getRev(), "Revision numbers should match.");
+            }
     }
 
     @Override

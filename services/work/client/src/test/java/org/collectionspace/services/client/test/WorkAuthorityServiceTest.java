@@ -258,37 +258,37 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
      */
 
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
-        String noTest = System.getProperty("noTestCleanup");
-        if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Skipping Cleanup phase ...");
-            }
-            return;
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Cleaning up temporary resources created for testing ...");
-        }
-        String parentResourceId;
-        String itemResourceId;
-        // Clean up contact resources.
-        WorkAuthorityClient client = new WorkAuthorityClient();
-        parentResourceId = knownResourceId;
-        // Clean up item resources.
-        for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
-            itemResourceId = entry.getKey();
-            parentResourceId = entry.getValue();
-            // Note: Any non-success responses from the delete operation
-            // below are ignored and not reported.
-            client.deleteItem(parentResourceId, itemResourceId).close();
-        }
-        // Clean up parent resources.
-        for (String resourceId : allResourceIdsCreated) {
-            // Note: Any non-success responses from the delete operation
-            // below are ignored and not reported.
-        client.delete(resourceId).close();
-        }
-    }
+	public void cleanUp() {
+		String noTest = System.getProperty("noTestCleanup");
+		if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Skipping Cleanup phase ...");
+			}
+			return;
+		}
+		if (logger.isDebugEnabled()) {
+			logger.debug("Cleaning up temporary resources created for testing ...");
+		}
+		String parentResourceId;
+		String itemResourceId;
+		// Clean up contact resources.
+		WorkAuthorityClient client = new WorkAuthorityClient();
+		parentResourceId = knownResourceId;
+		// Clean up item resources.
+		for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
+			itemResourceId = entry.getKey();
+			parentResourceId = entry.getValue();
+			// Note: Any non-success responses from the delete operation
+			// below are ignored and not reported.
+			client.deleteItem(parentResourceId, itemResourceId).close();
+		}
+		// Clean up parent resources.
+		for (String resourceId : allResourceIdsCreated) {
+			// Note: Any non-success responses from the delete operation
+			// below are ignored and not reported.
+			client.delete(resourceId).close();
+		}
+	}
 
     // ---------------------------------------------------------------
     // Utility methods used by tests above
@@ -329,10 +329,9 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
         return getItemServiceRootURL(parentResourceIdentifier) + "/" + itemResourceIdentifier;
     }
 
-        @Override
+    @Override
     public void authorityTests(String testName) {
         // TODO Auto-generated method stub
-        
     }
 
     //
@@ -389,41 +388,44 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
     // Authority item specific overrides
     //
     
-    @Override
-    protected WorksCommon updateItemInstance(WorksCommon worksCommon) {
-                            
-            WorkTermGroupList termList = worksCommon.getWorkTermGroupList();
-            Assert.assertNotNull(termList);
-            List<WorkTermGroup> terms = termList.getWorkTermGroup();
-            Assert.assertNotNull(terms);
-            Assert.assertTrue(terms.size() > 0);
-            terms.get(0).setTermDisplayName("updated-" + terms.get(0).getTermDisplayName());
-            terms.get(0).setTermName("updated-" + terms.get(0).getTermName());
-            worksCommon.setWorkTermGroupList(termList);
+	@Override
+	protected WorksCommon updateItemInstance(WorksCommon worksCommon) {
 
-            return worksCommon;
-    }
+		WorkTermGroupList termList = worksCommon.getWorkTermGroupList();
+		Assert.assertNotNull(termList);
+		List<WorkTermGroup> terms = termList.getWorkTermGroup();
+		Assert.assertNotNull(terms);
+		Assert.assertTrue(terms.size() > 0);
+		terms.get(0).setTermDisplayName("updated-" + terms.get(0).getTermDisplayName());
+		terms.get(0).setTermName("updated-" + terms.get(0).getTermName());
+		worksCommon.setWorkTermGroupList(termList);
 
-    @Override
-    protected void compareUpdatedItemInstances(WorksCommon original,
-            WorksCommon updated) throws Exception {
-            
-            WorkTermGroupList originalTermList = original.getWorkTermGroupList();
-            Assert.assertNotNull(originalTermList);
-            List<WorkTermGroup> originalTerms = originalTermList.getWorkTermGroup();
-            Assert.assertNotNull(originalTerms);
-            Assert.assertTrue(originalTerms.size() > 0);
-            
-            WorkTermGroupList updatedTermList = updated.getWorkTermGroupList();
-            Assert.assertNotNull(updatedTermList);
-            List<WorkTermGroup> updatedTerms = updatedTermList.getWorkTermGroup();
-            Assert.assertNotNull(updatedTerms);
-            Assert.assertTrue(updatedTerms.size() > 0);
-            
-            Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(),
-                originalTerms.get(0).getTermDisplayName(),
-                "Value in updated record did not match submitted data.");
-    }
+		return worksCommon;
+	}
+
+	@Override
+	protected void compareUpdatedItemInstances(WorksCommon original, WorksCommon updated, boolean compareRevNumbers)
+			throws Exception {
+
+		WorkTermGroupList originalTermList = original.getWorkTermGroupList();
+		Assert.assertNotNull(originalTermList);
+		List<WorkTermGroup> originalTerms = originalTermList.getWorkTermGroup();
+		Assert.assertNotNull(originalTerms);
+		Assert.assertTrue(originalTerms.size() > 0);
+
+		WorkTermGroupList updatedTermList = updated.getWorkTermGroupList();
+		Assert.assertNotNull(updatedTermList);
+		List<WorkTermGroup> updatedTerms = updatedTermList.getWorkTermGroup();
+		Assert.assertNotNull(updatedTerms);
+		Assert.assertTrue(updatedTerms.size() > 0);
+
+		Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(), originalTerms.get(0).getTermDisplayName(),
+				"Value in updated record did not match submitted data.");
+
+		if (compareRevNumbers == true) {
+			Assert.assertEquals(original.getRev(), updated.getRev(), "Revision numbers should match.");
+		}
+	}
 
     @Override
     protected void verifyReadItemInstance(WorksCommon item)

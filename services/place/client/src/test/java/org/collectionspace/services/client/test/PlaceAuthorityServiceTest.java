@@ -400,7 +400,8 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
 
 	@Override
 	protected void compareUpdatedItemInstances(PlacesCommon original,
-			PlacesCommon updated) throws Exception {
+			PlacesCommon updated,
+			boolean compareRevNumbers) throws Exception {
             
             PlaceTermGroupList originalTermList = original.getPlaceTermGroupList();
             Assert.assertNotNull(originalTermList);
@@ -417,6 +418,10 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
             Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(),
                 originalTerms.get(0).getTermDisplayName(),
                 "Value in updated record did not match submitted data.");
+            
+            if (compareRevNumbers == true) {
+            	Assert.assertEquals(original.getRev(), updated.getRev(), "Revision numbers should match.");
+            }
 	}
 
 	@Override

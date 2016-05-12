@@ -378,11 +378,18 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
      */
     @Test(dataProvider = "testName", dependsOnMethods = {"syncWithSAS", "CRUDTests"})
     public void veryifySyncWithSAS(String testName) {
-        // Perform setup.
+        //
+    	// First check to see if we support sync.
+    	//
+        AuthorityClient client = (AuthorityClient) getClientInstance();
+    	if (client.supportsSync() == false) {
+    		return; // Exit the test since this authority doesn't support synchronization
+    	}        
+
+    	// Perform setup.
         setupReadList();
 
         // Submit the request to the service and store the response.
-        AuthorityClient client = (AuthorityClient) getClientInstance();
         Response res = null;
         res = client.readItemListForNamedAuthority(knownSASAuthorityResourceIdentifier, null, null);
 
@@ -866,8 +873,16 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     }
     
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    		dependsOnMethods = {"readItem", "CRUDTests", "veryifySyncWithSAS"})
+    		dependsOnMethods = {"veryifySyncWithSAS", "CRUDTests"})
     public void updateLocalItemWithSync(String testName) throws Exception {
+        //
+    	// First check to see if we support sync.
+    	//
+        AuthorityClient client = (AuthorityClient) getClientInstance();
+    	if (client.supportsSync() == false) {
+    		return; // Exit the test since this authority doesn't support synchronization
+    	}        
+    	
         // Perform setup.
         setupUpdate();
         AUTHORITY_ITEM_TYPE theUpdate = null;

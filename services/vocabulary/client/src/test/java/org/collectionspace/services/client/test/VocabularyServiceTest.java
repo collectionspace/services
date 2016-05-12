@@ -363,10 +363,15 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
 
 	@Override
 	protected void compareUpdatedItemInstances(VocabularyitemsCommon original,
-			VocabularyitemsCommon updated) throws Exception {
+			VocabularyitemsCommon updated,
+			boolean compareRevNumbers) throws Exception {
         Assert.assertEquals(updated.getDisplayName(),
         		original.getDisplayName(),
                 "Display name in updated VocabularyItem did not match submitted data.");
+        
+        if (compareRevNumbers == true) {
+        	Assert.assertEquals(original.getRev(), updated.getRev(), "Revision numbers should match.");
+        }
 	}
 
 	@Override

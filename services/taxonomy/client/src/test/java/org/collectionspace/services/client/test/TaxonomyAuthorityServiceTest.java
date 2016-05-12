@@ -419,7 +419,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
 
     @Override
     protected void compareUpdatedItemInstances(TaxonCommon original,
-            TaxonCommon updated) throws Exception {
+            TaxonCommon updated,
+			boolean compareRevNumbers) throws Exception {
 
         TaxonTermGroupList originalTermList = original.getTaxonTermGroupList();
         Assert.assertNotNull(originalTermList);
@@ -436,6 +437,10 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
         Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(),
                 originalTerms.get(0).getTermDisplayName(),
                 "Value in updated record did not match submitted data.");
+        
+        if (compareRevNumbers == true) {
+        	Assert.assertEquals(original.getRev(), updated.getRev(), "Revision numbers should match.");
+        }
     }
 
     @Override

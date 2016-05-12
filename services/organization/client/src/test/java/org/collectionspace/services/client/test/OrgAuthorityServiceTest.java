@@ -1077,7 +1077,8 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
 	@Override
 	protected void compareUpdatedItemInstances(OrganizationsCommon original,
-			OrganizationsCommon updated) throws Exception {
+			OrganizationsCommon updated,
+			boolean compareRevNumbers) throws Exception {
             
             OrgTermGroupList originalTermList = original.getOrgTermGroupList();
             Assert.assertNotNull(originalTermList);
@@ -1094,6 +1095,10 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(),
                 originalTerms.get(0).getTermDisplayName(),
                 "Value in updated record did not match submitted data.");
+            
+            if (compareRevNumbers == true) {
+            	Assert.assertEquals(original.getRev(), updated.getRev(), "Revision numbers should match.");
+            }
 	}
 
 	@Override
