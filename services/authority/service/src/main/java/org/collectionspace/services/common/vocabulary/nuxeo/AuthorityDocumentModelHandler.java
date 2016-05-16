@@ -423,7 +423,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     	//
     	//
     	try {
-	    	PoxPayloadOut theUpdate = authorityResource.synchronizeItemWithExistingContext(ctx, parentIdentifier, itemIdentifier);
+	    	PoxPayloadOut theUpdate = authorityResource.synchronizeItemWithExistingContext(ctx, parentIdentifier, itemIdentifier, false);
 	    	if (theUpdate != null) {
 	    		result = 0; // means we needed to sync this item with SAS
 	    		logger.debug(String.format("Sync'd authority item parent='%s' id='%s with SAS.  Updated payload is: \n%s",
@@ -452,12 +452,12 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     	//
     	// WARNING: THIS CODE IS NOT IMPLEMENTED YET
     	//
-    	return result;
+    	if (result == -1) return result;
     	//
     	// Using the item refname (with no local CSID), create specifiers that we'll use to find the local versions
     	//
     	
-    	/*
+    	
     	AuthorityTermInfo authorityTermInfo = RefNameUtils.parseAuthorityTermInfo(itemRefName);
     	String parentIdentifier = Specifier.createShortIdURNValue(authorityTermInfo.inAuthority.name);
     	String itemIdentifier = Specifier.createShortIdURNValue(authorityTermInfo.name);
@@ -481,7 +481,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     	//
     	//
     	try {
-	    	PoxPayloadOut theUpdate = authorityResource.synchronizeItemWithExistingContext(ctx, parentIdentifier, itemIdentifier);
+	    	PoxPayloadOut theUpdate = authorityResource.synchronizeItemWithExistingContext(ctx, parentIdentifier, itemIdentifier, true);
 	    	if (theUpdate != null) {
 	    		result = 0; // means we needed to sync this item with SAS
 	    		logger.debug(String.format("Sync'd authority item parent='%s' id='%s with SAS.  Updated payload is: \n%s",
@@ -494,7 +494,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     	}
     	
     	return result; // -1 = no sync needed/possible, 0 = sync'd, 1 = created new item
-    	*/
+    	
     	
     }    
     

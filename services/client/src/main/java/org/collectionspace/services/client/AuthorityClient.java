@@ -19,6 +19,9 @@ public interface AuthorityClient<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P e
     public static final String TERM_DISPLAY_NAME = "termDisplayName";
     public static final String VOCAB_DISPLAY_NAME = "displayName";
     public static final String REF_NAME = "refName";
+    
+    public static final Boolean INCLUDE_DELETED_ITEMS = true;
+    public static final Boolean INCLUDE_RELATIONS = true;
 
 	/*
 	 * Basic CRUD operations
@@ -118,7 +121,16 @@ public interface AuthorityClient<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P e
      */
     public Response readNamedItemInNamedAuthority(String authShortId, String itemShortId);
     
-    public Response readNamedItemInNamedAuthority(String authShortId, String itemShortId, Boolean includeDeleted);
+    /**
+     * Read a named item in a named authority.
+     * 
+     * @param authShortId
+     * @param itemShortId
+     * @param includeDeleted
+     * @param includeRelations
+     * @return
+     */
+    public Response readNamedItemInNamedAuthority(String authShortId, String itemShortId, Boolean includeDeleted, Boolean includeRelations);
     
     /**
      * Read item list, filtering by partial term match, or keywords. Only one of

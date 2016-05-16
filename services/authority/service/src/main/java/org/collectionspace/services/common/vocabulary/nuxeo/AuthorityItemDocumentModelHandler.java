@@ -90,6 +90,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     protected String authorityItemCommonSchemaName;
     private String authorityItemTermGroupXPathBase;
     
+    private boolean syncHierarchicalRelationships = false;
     private boolean isProposed = false; // used by local authority to propose a new shared item. Allows local deployments to use new terms until they become official
     private boolean isSAS = false; // used to indicate if the authority item originated as a SAS item
     private boolean shouldUpdateRevNumber = true; // by default we should update the revision number -not true on synchronization with SAS
@@ -141,6 +142,17 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     
     public void setShouldUpdateRevNumber(boolean flag) {
     	this.shouldUpdateRevNumber = flag;
+    }
+
+    //
+    // Getter and Setter for deciding if we need to synch hierarchical relationships
+    //
+    public boolean getShouldSyncHierarchicalRelationships() {
+    	return this.syncHierarchicalRelationships;
+    }
+    
+    public void setShouldSyncHierarchicalRelationships(boolean flag) {
+    	this.syncHierarchicalRelationships = flag;
     }
 
     @Override
@@ -437,7 +449,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         String authorityShortId = (String) NuxeoUtils.getProperyValue(authorityDocModel, AuthorityJAXBSchema.SHORT_IDENTIFIER);
         String localParentCsid = authorityDocModel.getName();
         //
-        // Using the short IDs of the local authority and item, create URN specifiers to retrieve the SAS authority item
+        // Using the short IDs of the local authority and item, create URN specifiers and retrieve the SAS authority item
         //
         AuthorityItemSpecifier sasAuthorityItemSpecifier = new AuthorityItemSpecifier(SpecifierForm.URN_NAME, authorityShortId, itemShortId);
         // Get the shared authority server's copy

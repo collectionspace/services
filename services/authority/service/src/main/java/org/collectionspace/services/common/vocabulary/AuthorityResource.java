@@ -1123,7 +1123,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     private PoxPayloadOut synchronizeItem(
     		ServiceContext ctx,
             String parentIdentifier,
-            String itemIdentifier) throws Exception {
+            String itemIdentifier,
+            boolean syncHierarchicalRelationships) throws Exception {
     	PoxPayloadOut result = null;
         AuthorityItemSpecifier specifier;
     	boolean neededSync = false;
@@ -1132,6 +1133,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         AuthorityItemDocumentModelHandler handler = (AuthorityItemDocumentModelHandler)createItemDocumentHandler(ctx, parent.CSID, parent.shortIdentifier);
         handler.setIsProposed(AuthorityServiceUtils.NOT_PROPOSED); // In case it was formally locally proposed, clear the proposed flag
         handler.setIsSASItem(AuthorityServiceUtils.SAS_ITEM); // Since we're sync'ing, this is now a SAS controlled item
+        handler.setShouldSyncHierarchicalRelationships(syncHierarchicalRelationships);
         // Create an authority item specifier
         Specifier parentSpecifier = Specifier.getSpecifier(parent.CSID, "getAuthority", "GET");
         Specifier itemSpecifier = Specifier.getSpecifier(itemIdentifier, "getAuthorityItem", "GET");
@@ -1158,7 +1160,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     public PoxPayloadOut synchronizeItemWithExistingContext(
     		ServiceContext existingCtx,
             String parentIdentifier,
-            String itemIdentifier
+            String itemIdentifier,
+            boolean syncHierarchicalRelationships
             ) throws Exception {
     	PoxPayloadOut result = null;
     	
@@ -1168,7 +1171,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         if (existingCtx.getCurrentRepositorySession() != null) {
         	ctx.setCurrentRepositorySession(existingCtx.getCurrentRepositorySession());
         }
-        result = synchronizeItem(ctx, parentIdentifier, itemIdentifier);
+        result = synchronizeItem(ctx, parentIdentifier, itemIdentifier, syncHierarchicalRelationships);
     	
     	return result;
     }
@@ -1193,7 +1196,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), null, resourceMap, uriInfo);
-            payloadOut = this.synchronizeItem(ctx, parentIdentifier, itemIdentifier);
+            payloadOut = this.synchronizeItem(ctx, parentIdentifier, itemIdentifier, true);
             if (payloadOut != null) {
             	neededSync = true;
             }

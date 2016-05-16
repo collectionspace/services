@@ -12,6 +12,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.common.api.CommonAPI;
 
 /*
  * ILT = Item list type
@@ -123,7 +124,8 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
     @Path("/urn:cspace:name({specifier})/items/urn:cspace:name({itemspecifier})")
     Response readNamedItemInNamedAuthority(@PathParam("specifier") String specifier, 
     		@PathParam("itemspecifier") String itemspecifier,
-    		@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
+    		@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState,
+    		@QueryParam(CommonAPI.showRelations_QP) String showRelations);
     
     /*
      * Item subresource List methods

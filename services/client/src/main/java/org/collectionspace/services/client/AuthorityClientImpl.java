@@ -12,6 +12,8 @@ public abstract class AuthorityClientImpl<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_
 	implements AuthorityClient<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P> {
 
 	private static final String INCLUDE_DELETE_TRUE = Boolean.TRUE.toString();
+	private static final String INCLUDE_RELATIONS_TRUE = Boolean.TRUE.toString();
+	private static final String INCLUDE_RELATIONS_FALSE = Boolean.FALSE.toString();
 	
 	/*
 	 * Basic CRUD proxied methods
@@ -167,12 +169,12 @@ public abstract class AuthorityClientImpl<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_
      */
     @Override
 	public Response readNamedItemInNamedAuthority(String authShortId, String itemShortId) {
-        return getProxy().readNamedItemInNamedAuthority(authShortId, itemShortId, INCLUDE_DELETE_TRUE);
+        return getProxy().readNamedItemInNamedAuthority(authShortId, itemShortId, INCLUDE_DELETE_TRUE, INCLUDE_RELATIONS_FALSE);
     }
 
     @Override
-	public Response readNamedItemInNamedAuthority(String authShortId, String itemShortId, Boolean includeDeleted) {
-        return getProxy().readNamedItemInNamedAuthority(authShortId, itemShortId, includeDeleted.toString());
+	public Response readNamedItemInNamedAuthority(String authShortId, String itemShortId, Boolean includeDeleted, Boolean includeRelations) {
+        return getProxy().readNamedItemInNamedAuthority(authShortId, itemShortId, includeDeleted.toString(), includeRelations.toString());
     }
 
     /**
