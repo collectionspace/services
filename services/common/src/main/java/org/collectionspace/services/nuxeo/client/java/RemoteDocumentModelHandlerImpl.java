@@ -1196,7 +1196,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         //Do magic replacement of ${itemCSID} and fix URI's.
         fixupInboundListItems(ctx, inboundList, docModel, itemCSID);
 
-        String HAS_BROADER = RelationshipType.HAS_BROADER.value();
+        final String HAS_BROADER = RelationshipType.HAS_BROADER.value();
         UriInfo uriInfo = ctx.getUriInfo();
         MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
 
@@ -1265,7 +1265,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
             			String newChildCsid = inboundItem.getSubject().getCsid();
             			if(newChildCsid == null) {
             				String newChildRefName = inboundItem.getSubject().getRefName();
-            				if(newChildRefName==null) {
+            				if (newChildRefName == null) {
             					throw new RuntimeException("Child with no CSID or refName!");
             				}
                             if (logger.isTraceEnabled()) {

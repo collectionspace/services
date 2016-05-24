@@ -113,7 +113,7 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
      */
     @Override
     synchronized public RepositoryClient<IT, OT> getRepositoryClient(ServiceContext<IT, OT> ctx) {
-        if(repositoryClient != null){
+        if (repositoryClient != null){
             return repositoryClient;
         }
         repositoryClient = repositoryClientFactory.getClient(ctx.getRepositoryClientName());

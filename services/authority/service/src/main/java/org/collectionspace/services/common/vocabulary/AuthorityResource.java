@@ -295,7 +295,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @Override
    	public DocumentModel getDocModelForAuthorityItem(CoreSessionInterface repoSession, RefName.AuthorityItem item) 
    			throws Exception, DocumentNotFoundException {
-    	if(item == null) {
+    	if (item == null) {
     		return null;
     	}
         String whereClause = RefNameServiceUtils.buildWhereForAuthByName(authorityCommonSchemaName, item.getParentShortIdentifier());
