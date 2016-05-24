@@ -1229,6 +1229,13 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
             if (logger.isTraceEnabled()) {
                 logger.trace("AuthItemDocHndler.updateRelations for: " + itemCSID + " got existing relations.");
             }
+        } else {
+        	// For debugging purpose only.
+            if (logger.isDebugEnabled()) {
+            	String debugMsg = "AuthItemDocHndler.updateRelations for: " + itemCSID + " with an fUpdate value of FALSE.";
+                logger.debug(debugMsg);
+                throw new Exception(debugMsg);
+            }
         }
 
         for (RelationsCommonList.RelationListItem inboundItem : inboundList) {
@@ -1309,7 +1316,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         if (logger.isTraceEnabled()) {
             logger.trace("AuthItemDocHndler.updateRelations for: " + itemCSID + " done.");
         }
-        //We return all elements on the inbound list, since we have just worked to make them exist in the system
+        // We return all elements on the inbound list, since we have just worked to make them exist in the system
         // and be non-redundant, etc.  That list came from relationsCommonListBody, so it is still attached to it, just pass that back.
         return relationsCommonListBody;
     }

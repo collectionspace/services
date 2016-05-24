@@ -83,7 +83,7 @@ public class AuthorityServiceUtils {
     	
     	ServiceContext parentCtx = new MultipartServiceContextImpl(serviceName);
         AuthorityClient client = (AuthorityClient) parentCtx.getClient(CollectionSpaceClient.SAS_CLIENT_PROPERTIES_FILENAME);
-        Response res = client.readNamedItemInNamedAuthority(specifier.getParentSpecifier().getURNValue(), specifier.getItemSpecifier().getURNValue(),
+        Response res = client.readItem(specifier.getParentSpecifier().getURNValue(), specifier.getItemSpecifier().getURNValue(),
     			AuthorityClient.INCLUDE_DELETED_ITEMS, syncHierarchicalRelationships);
         
         try {

@@ -873,6 +873,59 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     }
     
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    		dependsOnMethods = {"updateLocalItemWithSync", "CRUDTests"})
+    public void deleteLocalItemWithSync(String testName) throws Exception {
+    	final int itemIndexToDelete = 1;
+        //
+    	// First check to see if we support sync.
+    	//
+        AuthorityClient client = (AuthorityClient) getClientInstance();
+    	if (client.supportsSync() == false) {
+    		return; // Exit the test since this authority doesn't support synchronization
+    	}        
+    	
+        // Perform test setup for a DELETE.
+        setupDelete();
+        AUTHORITY_ITEM_TYPE theUpdate = null;
+
+        // Delete an item from the SAS server
+        AuthorityClient sasClient = (AuthorityClient) this.getSASClientInstance();
+        Response res = sasClient.deleteNamedItemInNamedAuthority(knownSASAuthorityResourceIdentifier, knownSASItemIdentifiersList.get(itemIndexToDelete));
+        try {
+	        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);	
+        } finally {
+        	res.close();
+        }
+        
+        // Synchronize the local item's parent authority and verify the delete we just made
+        // to the SAS takes place locally after the sync -i.e., the local item should be deleted as well.
+        setupSync();
+        AuthorityClient localClient = (AuthorityClient) this.getClientInstance();
+    	Response response = localClient.syncByName(knownSASAuthorityResourceIdentifier); // Notice we're using the Short ID (short ID is the same on the local and SAS)
+        try {
+	        int statusCode = response.getStatus();
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode), invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+        	response.close();
+        }        
+        
+        // Verify that the local item has been deleted.
+        setupReadNonExistent();
+        res = localClient.readNamedItemInNamedAuthority(knownSASAuthorityResourceIdentifier, knownSASItemIdentifiersList.get(itemIndexToDelete));
+        try {
+	        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
+	        knownSASItemIdentifiersList.remove(0); // remove it from our known set now that we've deleted it
+        } finally {
+        	res.close();
+        }
+    }
+    
+    /**
+     * We create a new item on the SAS, perform a sync with the local authority, and verify the local authority contains a copy
+     * of the SAS item. 
+     */
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     		dependsOnMethods = {"veryifySyncWithSAS", "CRUDTests"})
     public void updateLocalItemWithSync(String testName) throws Exception {
         //

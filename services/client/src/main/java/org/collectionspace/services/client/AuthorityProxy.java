@@ -34,7 +34,9 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
     @Path("/{vcsid}/items/{csid}")
     Response readItem(@PathParam("vcsid") String vcsid,
     		@PathParam("csid") String csid,
-    		@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
+    		@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState,
+    		@QueryParam(CommonAPI.showRelations_QP) String showRelations);
+    
     
     //(U)pdate Item
     @PUT
@@ -44,13 +46,23 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
     //(U)pdate Item    
     @PUT
     @Path("/urn:cspace:name({specifier})/items/urn:cspace:name({itemspecifier})")
-    Response updateNamedItemInNamedAuthority(@PathParam("specifier")String specifier,
-    		@PathParam("itemspecifier")String itemspecifier, byte[] xmlPayload);
+    Response updateNamedItemInNamedAuthority(
+    		@PathParam("specifier")String specifier,
+    		@PathParam("itemspecifier")String itemspecifier, 
+    		byte[] xmlPayload);
 
     //(D)elete Item
     @DELETE
     @Path("/{vcsid}/items/{csid}")
     Response deleteItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
+    
+    //(D)elete Item
+    @DELETE
+    @Path("/urn:cspace:name({specifier})/items/urn:cspace:name({itemspecifier})")
+    public Response deleteNamedItemInNamedAuthority(
+    		@PathParam("specifier")String specifier,
+    		@PathParam("itemspecifier")String itemspecifier);
+
     
     /**
      * Get a list of objects that reference a given authority term.

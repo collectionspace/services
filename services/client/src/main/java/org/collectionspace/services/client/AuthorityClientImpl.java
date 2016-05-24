@@ -36,12 +36,17 @@ public abstract class AuthorityClientImpl<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_
     //(R)ead Item
     @Override
 	public Response readItem(String vcsid, String csid) {
-    	return getProxy().readItem(vcsid, csid, INCLUDE_DELETE_TRUE);
+    	return getProxy().readItem(vcsid, csid, INCLUDE_DELETE_TRUE, INCLUDE_RELATIONS_FALSE);
     }
     
     @Override
     public Response readItem(String vcsid, String csid, Boolean includeDeleted) {
-    	return getProxy().readItem(vcsid, csid, includeDeleted.toString());
+    	return getProxy().readItem(vcsid, csid, includeDeleted.toString(), INCLUDE_RELATIONS_FALSE);
+    }
+    
+    @Override
+    public Response readItem(String vcsid, String csid, Boolean includeDeleted, Boolean includeRelations) {
+    	return getProxy().readItem(vcsid, csid, includeDeleted.toString(), includeRelations.toString());
     }
 
     //(U)pdate Item
@@ -60,6 +65,13 @@ public abstract class AuthorityClientImpl<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_
 	public Response deleteItem(String vcsid, String csid) {
     	return getProxy().deleteItem(vcsid, csid);
     }
+    
+    //(D)elete Item
+    @Override    
+    public Response deleteNamedItemInNamedAuthority(String authShortId, String itemShortId) {
+    	return getProxy().deleteNamedItemInNamedAuthority(authShortId, itemShortId);
+    }
+    
     
     @Override
 	public Response getReferencingObjects( // ClientResponse<AuthorityRefDocList>

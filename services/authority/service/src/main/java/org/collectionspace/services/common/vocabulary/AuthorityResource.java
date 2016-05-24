@@ -1120,7 +1120,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * @return
      * @throws Exception
      */
-    private PoxPayloadOut synchronizeItem(
+    @SuppressWarnings("unchecked")
+	private PoxPayloadOut synchronizeItem(
     		ServiceContext ctx,
             String parentIdentifier,
             String itemIdentifier,
@@ -1170,6 +1171,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         		existingCtx.getUriInfo());
         if (existingCtx.getCurrentRepositorySession() != null) {
         	ctx.setCurrentRepositorySession(existingCtx.getCurrentRepositorySession());
+        	
         }
         result = synchronizeItem(ctx, parentIdentifier, itemIdentifier, syncHierarchicalRelationships);
     	
@@ -1334,12 +1336,12 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * @throws Exception
      */
     @SuppressWarnings("rawtypes")
-	public void deleteAuthorityItem(ServiceContext existingCtx,
+	public boolean deleteAuthorityItem(ServiceContext existingCtx,
             String parentIdentifier,
             String itemIdentifier,
             boolean shouldUpdateRevNumber
             ) throws Exception {
-    	Response result = null;
+    	boolean result = true;
     	
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), existingCtx.getUriInfo());
         if (existingCtx != null && existingCtx.getCurrentRepositorySession() != null) {
@@ -1356,10 +1358,11 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         }
         String itemCsid = lookupItemCSID(ctx, itemIdentifier, parentcsid, "deleteAuthorityItem(item)", "DELETE_ITEM"); //use itemServiceCtx if it is not null
         
-        DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
-		ctx.setProperty(AuthorityServiceUtils.SHOULD_UPDATE_REV_PROPERTY, shouldUpdateRevNumber);  // Sometimes we can only soft-delete, so if it is during a sync we dont' update the revision number
-
-        getRepositoryClient(ctx).delete(ctx, itemCsid, handler);
+        AuthorityItemDocumentModelHandler handler = (AuthorityItemDocumentModelHandler) createDocumentHandler(ctx);
+        handler.setShouldUpdateRevNumber(shouldUpdateRevNumber);
+        result = getRepositoryClient(ctx).delete(ctx, itemCsid, handler);
+        
+        return result;
     }
 
     @GET

@@ -15,8 +15,8 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
 import com.sun.xml.bind.api.impl.NameConverter;
-import org.apache.commons.io.FileUtils;
 
+import org.apache.commons.io.FileUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -70,6 +70,48 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 			logger.warn(this.xmlPayload);
 		}
 		parseParts();
+	}
+	
+	/**
+	 * Creates and returns an XML string representation of ourself.
+	 *
+	 * @return the string
+	 */
+	public String toXML() {
+		String result = null;
+        Document document = createDOMFromParts();
+
+        result = document.asXML();
+		
+		if (logger.isTraceEnabled() == true) {
+			logger.trace("\n\n<<<< Payload : BEGIN <<<<\n" + result + "\n<<<< Payload : END   <<<<\n");
+		}
+		
+		return result;
+	}
+	
+	protected Document createDOMFromParts() {
+		Document result = null;
+		
+        Document document = DocumentHelper.createDocument();
+        document.setXMLEncoding("UTF-8");
+        document.setName(getName());
+        Element root = document.addElement( "document" );
+        root.addAttribute("name", getName());        
+		
+		Iterator<PT> it = getParts().iterator();
+		while (it.hasNext() == true) {
+			PT outPart = it.next();
+			Element element = outPart.asElement();			
+			if (element != null) {
+				root.add(element.detach());
+			} else {
+				//Add if (logger.isTraceEnabled() == true) logger.trace("Output part: " + outPart.getLabel() + " was empty.");
+			}
+		}
+		result = document;
+				
+		return result;
 	}
 	
 	/**
@@ -197,6 +239,15 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	public List<PT> getParts() {
 		return parts;
 	}
+	
+	/**
+	 * Set a new set of parts.
+	 * 
+	 * @param newParts
+	 */
+	public void setParts(ArrayList<PT> newParts) {
+		this.parts = newParts;
+	}
 		
 	/**
 	 * Adds a POX part to the list of existing parts with the label 'label'.
@@ -219,7 +270,15 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	public PT addPart(PT entity) {
 		parts.add(entity);
 		return entity;
-	}	
+	}
+	
+	/**
+	 * Removes a POX part from our list of parts
+	 * @param entity
+	 */
+	public void removePart(PT entity) {
+		parts.remove(entity);
+	}
 		
     /**
      * Gets the Java package name from the specified namespace.  This method

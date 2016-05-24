@@ -22,6 +22,7 @@ public interface AuthorityClient<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P e
     
     public static final Boolean INCLUDE_DELETED_ITEMS = true;
     public static final Boolean INCLUDE_RELATIONS = true;
+    public static final Boolean DONT_INCLUDE_RELATIONS = !INCLUDE_RELATIONS;
 
 	/*
 	 * Basic CRUD operations
@@ -42,7 +43,10 @@ public interface AuthorityClient<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P e
     Response readItem(String vcsid, String csid);
     
     //(R)ead Item
-    Response readItem(String vcsid, String csid, Boolean includeDeleted);    
+    Response readItem(String vcsid, String csid, Boolean includeDeleted);
+
+    //(R)ead Item
+    Response readItem(String authShortId, String itemShortId, Boolean includeDeleted, Boolean includeRelations);
 
     //(U)pdate Item
     Response updateItem(String vcsid, String csid, PoxPayloadOut poxPayloadOut);
@@ -52,6 +56,10 @@ public interface AuthorityClient<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P e
 
     //(D)elete Item
     Response deleteItem(String vcsid, String csid);
+    
+    //(D)elete Item
+    Response deleteNamedItemInNamedAuthority(String authShortId, String itemShortId);
+
     
     // Get a list of objects that
     Response getReferencingObjects(
