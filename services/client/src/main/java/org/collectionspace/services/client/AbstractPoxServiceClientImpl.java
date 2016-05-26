@@ -2,8 +2,9 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
-import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
+import org.apache.http.HttpStatus;
+import org.collectionspace.services.description.ServiceDescription;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /*
@@ -22,6 +23,18 @@ public abstract class AbstractPoxServiceClientImpl<CLT extends AbstractCommonLis
 		super();
 	}
 
+	@Override
+	public ServiceDescription getServiceDescription() {
+		ServiceDescription result = null;
+		
+        Response res = getProxy().getServiceDescription();
+        if (res.getStatus() == HttpStatus.SC_OK) {
+        	result = (ServiceDescription) res.readEntity(ServiceDescription.class);
+        }
+        
+        return result;
+	}
+	
 	@Override
 	public Response create(PoxPayloadOut xmlPayload) {
         return getProxy().create(xmlPayload.getBytes());

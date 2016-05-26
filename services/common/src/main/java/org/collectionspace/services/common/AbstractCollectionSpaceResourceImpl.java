@@ -23,7 +23,6 @@
  */
 package org.collectionspace.services.common;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,13 +30,16 @@ import java.util.Map;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextProperties;
 import org.collectionspace.services.common.document.BadRequestException;
@@ -51,10 +53,8 @@ import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
 import org.collectionspace.services.config.service.ServiceBindingType;
-import org.jboss.resteasy.core.ResourceMethodInvoker;
-//import org.jboss.resteasy.core.ResourceMethod;
+import org.collectionspace.services.description.ServiceDescription;
 import org.jboss.resteasy.spi.HttpRequest;
-import org.jboss.resteasy.spi.metadata.ResourceMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -409,6 +409,41 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     	
     	return result;
     }
+    
+    /*
+     * Get the service description
+     */
+    @GET
+    @Path(CollectionSpaceClient.SERVICE_DESCRIPTION_PATH)
+    public ServiceDescription getDescription(@Context UriInfo uriInfo) {
+    	ServiceDescription result = null;
+
+    	ServiceContext  ctx = null;
+        try {
+            ctx = createServiceContext(uriInfo);
+            result = getDescription(ctx);
+        } catch (Exception e) {
+        	String errMsg = String.format("Request to get service description information for the '%s' service failed.",
+        			this.getServiceContextFactory());
+            throw bigReThrow(e, errMsg);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Each resource can override this method if they need to.
+     * 
+     * @param ctx
+     * @return
+     */
+    public ServiceDescription getDescription(ServiceContext ctx) {
+    	ServiceDescription result = new ServiceDescription();
+    	
+    	result.setDocumentType(getDocType(ctx.getTenantId()));
+    	
+    	return result;
+    }    
 
     public void checkResult(Object resultToCheck, String csid, String serviceMessage) throws CSWebApplicationException {
         if (resultToCheck == null) {

@@ -28,7 +28,9 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
+import org.apache.http.HttpStatus;
 import org.collectionspace.services.authorization.PermissionRole;
+import org.collectionspace.services.description.ServiceDescription;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -127,5 +129,17 @@ public class RolePermissionClient extends AbstractServiceClientImpl<PermissionRo
 	@Override
 	public Response readList() {
 		throw new UnsupportedOperationException(); //method not supported nor needed
+	}
+	
+	@Override
+	public ServiceDescription getServiceDescription() {
+		ServiceDescription result = null;
+		
+        Response res = getProxy().getServiceDescription();
+        if (res.getStatus() == HttpStatus.SC_OK) {
+        	result = (ServiceDescription) res.readEntity(ServiceDescription.class);
+        }
+        
+        return result;
 	}
 }

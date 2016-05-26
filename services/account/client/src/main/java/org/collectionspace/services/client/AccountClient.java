@@ -27,9 +27,11 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
+import org.apache.http.HttpStatus;
 
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
+import org.collectionspace.services.description.ServiceDescription;
 
 /**
  * A AccountClient.
@@ -81,6 +83,7 @@ public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList,
      * @return response
      * @see org.collectionspace.hello.client.AccountProxy#readList()
      */
+	@Override
     public Response readList() {
         return getProxy().readList();
     }
@@ -94,6 +97,7 @@ public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList,
      * @return response
      * @see org.collectionspace.hello.client.AccountProxy#getAccount(java.lang.String)
      */
+    @Override
     public Response read(String csid) {
         return getProxy().read(csid);
     }
@@ -104,6 +108,7 @@ public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList,
      * @return response
      * @see org.collectionspace.hello.client.AccountProxy#create(org.collectionspace.services.account.AccountsCommon)
      */
+    @Override
     public Response create(AccountsCommon multipart) {
         return getProxy().create(multipart);
     }
@@ -115,7 +120,23 @@ public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList,
      * @return response
      * @see org.collectionspace.hello.client.AccountProxy#updateAccount(java.lang.Long, org.collectionspace.services.account.AccountsCommon)
      */
+    @Override
     public Response update(String csid, AccountsCommon multipart) {
         return getProxy().update(csid, multipart);
     }
+    
+    /**
+     * 
+     */
+	@Override
+	public ServiceDescription getServiceDescription() {
+		ServiceDescription result = null;
+		
+        Response res = getProxy().getServiceDescription();
+        if (res.getStatus() == HttpStatus.SC_OK) {
+        	result = (ServiceDescription) res.readEntity(ServiceDescription.class);
+        }
+        
+        return result;
+	}
 }

@@ -27,8 +27,10 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
+import org.apache.http.HttpStatus;
 
 import org.collectionspace.services.authorization.AccountRole;
+import org.collectionspace.services.description.ServiceDescription;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /**
@@ -86,6 +88,7 @@ public class AccountRoleClient extends AbstractServiceClientImpl<AbstractCommonL
      * @param arcsid the arcsid
      * @return the client response
      */
+    @Override
     public Response read(String csid) {
         return getProxy().read(csid);
     }
@@ -119,6 +122,21 @@ public class AccountRoleClient extends AbstractServiceClientImpl<AbstractCommonL
     public Response delete(String csid, AccountRole accRole) {
         return getProxy().delete(csid, "delete", accRole);
     }
+    
+    /**
+     * 
+     */
+	@Override
+	public ServiceDescription getServiceDescription() {
+		ServiceDescription result = null;
+		
+        Response res = getProxy().getServiceDescription();
+        if (res.getStatus() == HttpStatus.SC_OK) {
+        	result = (ServiceDescription) res.readEntity(ServiceDescription.class);
+        }
+        
+        return result;
+	}
 
     /*
      * Not supported.

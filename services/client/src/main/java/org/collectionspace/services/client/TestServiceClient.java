@@ -24,6 +24,8 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
+import org.apache.http.HttpStatus;
+import org.collectionspace.services.description.ServiceDescription;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /**
@@ -74,5 +76,17 @@ public final class TestServiceClient extends AbstractServiceClientImpl<AbstractC
 	@Override
 	public Response readList() {
         throw new UnsupportedOperationException();
-	} 
+	}
+	
+	@Override
+	public ServiceDescription getServiceDescription() {
+		ServiceDescription result = null;
+		
+        Response res = getProxy().getServiceDescription();
+        if (res.getStatus() == HttpStatus.SC_OK) {
+        	result = (ServiceDescription) res.readEntity(ServiceDescription.class);
+        }
+        
+        return result;
+	}
 }

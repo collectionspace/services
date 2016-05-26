@@ -50,6 +50,7 @@ import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocume
 import org.collectionspace.services.lifecycle.Lifecycle;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.workflow.WorkflowCommon;
+
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,9 +138,11 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
 
         return docHandler;
     }
-
-    /*
-     * JAX-RS Annotated methods
+    
+    /**
+     * Get the workflow lifecycle description of a resource
+     * @param uriInfo
+     * @return
      */
     @GET
     @Path(WorkflowClient.SERVICE_PATH)
@@ -163,11 +166,7 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
         
         return result;
     }
-    
-    /*
-     * JAX-RS Annotated methods
-     */
-    
+        
     /*
      * We should change this method.  The RepositoryClient (from call to getRepositoryClient) should support a call getWorkflowTransition() instead.
      */    

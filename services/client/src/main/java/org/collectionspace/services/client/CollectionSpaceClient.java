@@ -26,8 +26,7 @@ package org.collectionspace.services.client;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.httpclient.HttpClient;
-import org.jboss.resteasy.client.ClientResponse;
-import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.description.ServiceDescription;
 
 /**
  *	LT - List Type
@@ -72,6 +71,9 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
     public static final String URL_PROPERTY = "cspace.url";
     public static final String USER_PROPERTY = "cspace.user";
     public static final String TENANT_PROPERTY = "cspace.tenant";
+    
+    // JAX-RS path for getting service description meta information
+	public static final String SERVICE_DESCRIPTION_PATH = "description";
 
     /**
      * Gets the proxy.
@@ -182,6 +184,8 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * Common proxied service calls
      */
 
+    public ServiceDescription getServiceDescription();
+    
 	public Response create(REQUEST_TYPE payload);
 	
 	public Response read(String csid);

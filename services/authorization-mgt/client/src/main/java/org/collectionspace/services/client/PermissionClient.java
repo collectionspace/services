@@ -28,8 +28,10 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
+import org.apache.http.HttpStatus;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionsList;
+import org.collectionspace.services.description.ServiceDescription;
 
 /**
  * A PermissionClient.
@@ -76,6 +78,7 @@ public class PermissionClient extends AbstractServiceClientImpl<PermissionsList,
      * @return
      * @see org.collectionspace.hello.client.PermissionProxy#readList()
      */
+	@Override
     public Response readList() {
         return getProxy().readList();
 
@@ -91,6 +94,7 @@ public class PermissionClient extends AbstractServiceClientImpl<PermissionsList,
      * @return
      * @see org.collectionspace.hello.client.PermissionProxy#getAccount(java.lang.String)
      */
+    @Override
     public Response read(String csid) {
         return getProxy().read(csid);
     }
@@ -100,6 +104,7 @@ public class PermissionClient extends AbstractServiceClientImpl<PermissionsList,
      * @return
      * @see org.collectionspace.hello.client.PermissionProxy#create(org.collectionspace.services.permission.Permission)
      */
+    @Override
     public Response create(Permission permission) {
         return getProxy().create(permission);
     }
@@ -110,7 +115,20 @@ public class PermissionClient extends AbstractServiceClientImpl<PermissionsList,
      * @return
      * @see org.collectionspace.hello.client.PermissionProxy#updateAccount(java.lang.Long, org.collectionspace.services.permission.Permission)
      */
+    @Override
     public Response update(String csid, Permission permission) {
         return getProxy().update(csid, permission);
     }
+    
+	@Override
+	public ServiceDescription getServiceDescription() {
+		ServiceDescription result = null;
+		
+        Response res = getProxy().getServiceDescription();
+        if (res.getStatus() == HttpStatus.SC_OK) {
+        	result = (ServiceDescription) res.readEntity(ServiceDescription.class);
+        }
+        
+        return result;
+	}
 }

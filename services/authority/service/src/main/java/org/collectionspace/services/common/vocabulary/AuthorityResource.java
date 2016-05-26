@@ -89,6 +89,7 @@ import org.collectionspace.services.workflow.WorkflowCommon;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
+import org.collectionspace.services.description.ServiceDescription;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -1422,5 +1423,15 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
                 uriRegistryEntriesMap.putAll(getUriRegistryEntries(tenantId, getItemDocType(tenantId), UriTemplateFactory.ITEM));
         }
         return uriRegistryEntriesMap;
-    }  
+    }
+    
+    /**
+     * 
+     */
+    public ServiceDescription getDescription(ServiceContext ctx) {
+    	ServiceDescription result = super.getDescription(ctx);
+    	result.setSubresourceDocumentType(this.getItemDocType(ctx.getTenantId()));
+    	return result;
+    }    
+    
 }
