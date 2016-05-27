@@ -7,7 +7,7 @@
     <!-- The value of the 'id' attribute, below, should match the corresponding -->
     <!-- value in cspace/config/services/tenants/herbarium-tenant-bindings-proto.xml -->
 
-    <tenant:tenantBinding id="3000">
+    <tenant:tenantBinding id="4000">
     </tenant:tenantBinding>
 
 </tenant:TenantBindingConfig>
