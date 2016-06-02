@@ -115,7 +115,7 @@ public class MultipartServiceContextImpl
     @Deprecated
     public Object getInputPart(String label, Class clazz) throws IOException {
         return getInputPart(label);
-                    }
+    }
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.context.MultipartServiceContext#getInputPart(java.lang.String, java.lang.Class)

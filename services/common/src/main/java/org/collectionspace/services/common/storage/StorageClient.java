@@ -72,7 +72,7 @@ public interface StorageClient {
      * @throws DocumentNotFoundException if entity not found
      * @throws DocumentException
      */
-    void delete(ServiceContext ctx, String id, DocumentHandler handler) throws DocumentNotFoundException, DocumentException;
+    boolean delete(ServiceContext ctx, String id, DocumentHandler handler) throws DocumentNotFoundException, DocumentException;
 
 
     /**

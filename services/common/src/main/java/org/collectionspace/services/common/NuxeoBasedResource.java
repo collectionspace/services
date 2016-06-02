@@ -23,9 +23,7 @@
  */
 package org.collectionspace.services.common;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -38,10 +36,8 @@ import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.config.ServiceConfigUtils;
-import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
@@ -51,7 +47,7 @@ import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRe
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.service.DocHandlerParams;
 import org.collectionspace.services.config.service.ListResultField;
-import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.description.ServiceDescription;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
@@ -591,6 +587,15 @@ public abstract class NuxeoBasedResource
     	
     	return result;
 	}
+    
+    @Override
+    public ServiceDescription getDescription(ServiceContext ctx) {
+    	ServiceDescription result = new ServiceDescription();
+    	
+    	result.setDocumentType(getDocType(ctx.getTenantId()));
+    	
+    	return result;
+    }
 	
     /*
      * ResourceBase create and update calls will set the resourceMap into the service context
@@ -600,7 +605,7 @@ public abstract class NuxeoBasedResource
     public static DocumentModel getDocModelForRefName(CoreSessionInterface repoSession, String refName, ResourceMap resourceMap) 
    			throws Exception, DocumentNotFoundException {
     	RefName.AuthorityItem item = RefName.AuthorityItem.parse(refName);
-    	if(item != null) {
+    	if (item != null) {
         	NuxeoBasedResource resource = (NuxeoBasedResource) resourceMap.get(item.inAuthority.resource);
         	return resource.getDocModelForAuthorityItem(repoSession, item);
     	}

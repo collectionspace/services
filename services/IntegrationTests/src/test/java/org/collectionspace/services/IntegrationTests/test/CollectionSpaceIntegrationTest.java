@@ -47,6 +47,8 @@ import org.collectionspace.services.relation.RelationsCommon;
  * The Class CollectionSpaceIntegrationTest.
  */
 public abstract class CollectionSpaceIntegrationTest {
+    protected List<String> allRelationResourceIdsCreated = new ArrayList<String>();
+    protected List<String> allResourceIdsCreated = new ArrayList<String>();
 
 	/*
 	 * Package scoped methods.

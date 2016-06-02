@@ -33,11 +33,10 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.DimensionClient;
 import org.collectionspace.services.client.DimensionFactory;
@@ -45,10 +44,8 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
-
 import org.collectionspace.services.client.IntakeClient;
 import org.collectionspace.services.intake.IntakesCommon;
-
 import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.dimension.DimensionsCommon;
@@ -76,6 +73,14 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	private static final int OBJECTS_TO_INTAKE = 1;
 	
 	
+    @AfterClass(alwaysRun = true)
+    public void cleanUp() {
+    	relationClient.cleanup();
+    	collectionObjectClient.cleanup();
+    	intakeClient.cleanup();
+    	dimensionClient.cleanup();
+    }
+    
     /**
      * Object as xml string.
      *
@@ -148,6 +153,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 			Assert.assertEquals(response.getStatus(), Response.Status.CREATED
 					.getStatusCode());
 			collectionObjectCsid = extractId(response);
+			collectionObjectClient.addToCleanup(collectionObjectCsid);
 		} finally {
 			response.close();
 		}
@@ -160,6 +166,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    try {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    dimensionCsid1 = extractId(response);
+		    dimensionClient.addToCleanup(dimensionCsid1);
 	    } finally {
 	    	response.close();
 	    }
@@ -178,17 +185,21 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    try {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    relationCsid1 = extractId(response);
+		    relationClient.addToCleanup(relationCsid1);
 	    } finally {
 	    	response.close();
 	    }	    
 	    
 	    // Now lock the dimension record.
 	    
-		@SuppressWarnings("unused")
-		Response workflowResponse = dimensionClient.updateWorkflowWithTransition(
-				dimensionCsid1, WorkflowClient.WORKFLOWTRANSITION_LOCK);
-	    System.out.println("Locked dimension record with CSID=" + dimensionCsid1);
-	    workflowResponse.close();
+	    Response workflowResponse = null;
+	    try {
+			workflowResponse = dimensionClient.updateWorkflowWithTransition(
+					dimensionCsid1, WorkflowClient.WORKFLOWTRANSITION_LOCK);
+		    System.out.println("Locked dimension record with CSID=" + dimensionCsid1);
+	    } finally {
+	    	workflowResponse.close();
+	    }
 	    
 	    // Finally, try to delete the relationship
 	    
@@ -204,6 +215,14 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 		workflowResponse = dimensionClient.updateWorkflowWithTransition(dimensionCsid1, WorkflowClient.WORKFLOWTRANSITION_DELETE);
 	    System.out.println("Locked dimension record with CSID=" + dimensionCsid1);
 	    workflowResponse.close();
+	    
+	    // Now unlock the dimension record so we can cleanup all the records after the test suite completes.
+	    try {
+			workflowResponse = dimensionClient.updateWorkflowWithTransition(
+					dimensionCsid1, WorkflowClient.WORKFLOWTRANSITION_UNLOCK);
+	    } finally {
+	    	workflowResponse.close();
+	    }
 	}
 	
 	@Test void createCollectionObjectRelationshipToManyDimensions() {
@@ -222,6 +241,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 			Assert.assertEquals(response.getStatus(), Response.Status.CREATED
 					.getStatusCode());
 			collectionObjectCsid = extractId(response);
+			collectionObjectClient.addToCleanup(collectionObjectCsid);
 		} finally {
 			response.close();
 		}
@@ -234,6 +254,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    try {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    dimensionCsid1 = extractId(response);
+		    dimensionClient.addToCleanup(dimensionCsid1);
 	    } finally {
 	    	response.close();
 	    }
@@ -246,6 +267,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    try {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    dimensionCsid2 = extractId(response);
+		    dimensionClient.addToCleanup(dimensionCsid2);
 	    } finally {
 	    	response.close();
 	    }
@@ -258,6 +280,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    try {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    dimensionCsid3 = extractId(response);
+		    dimensionClient.addToCleanup(dimensionCsid3);
 	    } finally {
 	    	response.close();
 	    }
@@ -277,6 +300,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    try {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    relationCsid1 = extractId(response);
+		    relationClient.addToCleanup(relationCsid1);
 	    } finally {
 	    	response.close();
 	    }
@@ -297,11 +321,12 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    commonPart = multipart.addPart(relationClient.getCommonPartName(), relation);
 	    // Create the relationship
 	    response = relationClient.create(multipart);
-	    @SuppressWarnings("unused")
+
 		String relationCsid2 = null;
 	    try {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    relationCsid2 = extractId(response);
+		    relationClient.addToCleanup(relationCsid2);
 	    } finally {
 	    	response.close();
 	    }
@@ -322,11 +347,12 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    commonPart = multipart.addPart(relationClient.getCommonPartName(), relation);
 	    // Create the relationship
 	    response = relationClient.create(multipart);
-	    @SuppressWarnings("unused")
+
 		String relationCsid3 = null;
 	    try {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    relationCsid3 = extractId(response);
+		    relationClient.addToCleanup(relationCsid3);
 	    } finally {
 	    	response.close();
 	    }	    	    
@@ -351,6 +377,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 			Assert.assertEquals(response.getStatus(), Response.Status.CREATED
 					.getStatusCode());
 			collectionObjectCsid = extractId(response);
+			collectionObjectClient.addToCleanup(collectionObjectCsid);
 		} finally {
 			response.close();
 		}
@@ -383,14 +410,23 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    commonPart = multipart.addPart(relation, MediaType.APPLICATION_XML_TYPE);
 	    commonPart.setLabel(relationClient.getCommonPartName());
 
-	    // Make the call to crate
+	    // Make the call to create the relationship
 	    Response relationresponse = relationClient.create(multipart);
 		String relationCsid = null;
 	    try {
 		    Assert.assertEquals(relationresponse.getStatus(), Response.Status.BAD_REQUEST.getStatusCode());
 		    relationCsid = extractId(response);
+		    relationClient.addToCleanup(relationCsid);
 	    } finally {
 	    	relationresponse.close();
+	    }
+	    
+	    // Now unlock the dimension record so we can cleanup all the records after the test suite completes.
+	    try {
+			workflowResponse = dimensionClient.updateWorkflowWithTransition(
+					dimensionCsid, WorkflowClient.WORKFLOWTRANSITION_UNLOCK);
+	    } finally {
+	    	workflowResponse.close();
 	    }
 	}
 	
@@ -414,10 +450,10 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 			Assert.assertEquals(response.getStatus(), Response.Status.CREATED
 					.getStatusCode());
 			collectionObjectCsid = extractId(response);
+			collectionObjectClient.addToCleanup(collectionObjectCsid);
 		} finally {
 			response.close();
 		}
-	    
 	    
 	    // Next, create an Intake object
 	    IntakesCommon intake = new IntakesCommon();
@@ -433,6 +469,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    try {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    intakeCsid = extractId(response);
+		    intakeClient.addToCleanup(intakeCsid);
 	    } finally {
 	    	response.close();
 	    }
@@ -453,6 +490,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    try {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    relationCsid = extractId(response);
+		    relationClient.addToCleanup(relationCsid);
 	    } finally {
 	    	response.close();
 	    }
@@ -538,6 +576,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 						.getStatusCode());
 				collectionObjectCsid = extractId(response);
 				collectionObjectIDList.add(collectionObjectCsid);
+				collectionObjectClient.addToCleanup(collectionObjectCsid);
 			} finally {
 				response.close();
 			}
@@ -558,6 +597,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    try {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    intakeCsid = extractId(response);
+		    intakeClient.addToCleanup(intakeCsid);
 	    } finally {
 	    	response.close();
 	    }
@@ -580,6 +620,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 		    try {
 			    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 			    relationCsid = extractId(response);
+			    relationClient.addToCleanup(relationCsid);
 		    } finally {
 		    	response.close();
 		    }

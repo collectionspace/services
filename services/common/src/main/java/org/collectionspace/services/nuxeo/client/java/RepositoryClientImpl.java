@@ -1595,8 +1595,10 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
      * @throws DocumentException
      */
     @Override
-    public void delete(ServiceContext ctx, String id, DocumentHandler handler) throws DocumentNotFoundException,
+    public boolean delete(ServiceContext ctx, String id, DocumentHandler handler) throws DocumentNotFoundException,
             DocumentException, TransactionException {
+    	boolean result = true;
+    	
         if (ctx == null) {
             throw new IllegalArgumentException(
                     "delete(ctx, ix, handler): ctx is missing");
@@ -1619,6 +1621,8 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
                 ((DocumentModelHandler) handler).setRepositorySession(repoSession);
                 if (handler.handle(Action.DELETE, wrapDoc)) {
                 	repoSession.removeDocument(docRef);
+                } else {
+                	result = false; // delete failed for some reason
                 }
             } catch (ClientException ce) {
                 String msg = logException(ce, "Could not find document to delete with CSID=" + id);
@@ -1638,6 +1642,8 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
                 releaseRepositorySession(ctx, repoSession);
             }
         }
+        
+        return result;
     }
 
     /* (non-Javadoc)

@@ -32,6 +32,7 @@ import java.util.StringTokenizer;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.URIResourceImpl;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.index.IndexClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.config.service.ServiceBindingType;
@@ -237,7 +238,8 @@ public class SecurityUtils {
 	    String pathSegment = null;
 	    while (strTok.hasMoreTokens() == true) {
 	    	pathSegment = strTok.nextToken();
-	    	if (pathSegment.equals("*") == true || pathSegment.equals("index") == true) {
+	    	if (pathSegment.equals("*") || 
+	    			pathSegment.equals("index") || pathSegment.equals(CollectionSpaceClient.SERVICE_DESCRIPTION_PATH)) {  // Strip off subresource paths since they inherit their parent's permissions
 	    		//
 	    		// leave the loop if we hit a wildcard character or the "index" subresource
 	    		//

@@ -30,9 +30,13 @@ import javax.ws.rs.core.Response;
 
 
 
+
+
+import org.apache.http.HttpStatus;
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RolesList;
+import org.collectionspace.services.description.ServiceDescription;
 
 /**
  * A RoleClient.
@@ -107,5 +111,17 @@ public class RoleClient extends AbstractServiceClientImpl<RolesList, Role, Role,
 	@Override
 	public Class<RoleProxy> getProxyClass() {
 		return RoleProxy.class;
+	}
+
+	@Override
+	public ServiceDescription getServiceDescription() {
+		ServiceDescription result = null;
+		
+        Response res = getProxy().getServiceDescription();
+        if (res.getStatus() == HttpStatus.SC_OK) {
+        	result = (ServiceDescription) res.readEntity(ServiceDescription.class);
+        }
+        
+        return result;
 	}
 }

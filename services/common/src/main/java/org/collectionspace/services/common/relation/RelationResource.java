@@ -104,7 +104,7 @@ public class RelationResource extends NuxeoBasedResource {
     		String objectType) throws CSWebApplicationException {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
-            if (parentCtx != null) { // If the parent context has an open repository session then use it
+            if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) { // If the parent context has a non-null and open repository session then use it
             	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession());
             }
             DocumentHandler handler = createDocumentHandler(ctx);

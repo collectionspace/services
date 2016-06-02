@@ -78,12 +78,14 @@ public class AuthorityServiceUtils {
     //
     // Makes a call to the SAS server for a authority item payload
     //    
-    static public PoxPayloadIn requestPayloadIn(AuthorityItemSpecifier specifier, String serviceName, Class responseType) throws Exception {
+    static public PoxPayloadIn requestPayloadIn(AuthorityItemSpecifier specifier, String serviceName, Class responseType, boolean syncHierarchicalRelationships) throws Exception {
     	PoxPayloadIn result = null;
     	
     	ServiceContext parentCtx = new MultipartServiceContextImpl(serviceName);
         AuthorityClient client = (AuthorityClient) parentCtx.getClient(CollectionSpaceClient.SAS_CLIENT_PROPERTIES_FILENAME);
-        Response res = client.readItem(specifier.getParentSpecifier().getURNValue(), specifier.getItemSpecifier().getURNValue());
+        Response res = client.readItem(specifier.getParentSpecifier().getURNValue(), specifier.getItemSpecifier().getURNValue(),
+    			AuthorityClient.INCLUDE_DELETED_ITEMS, syncHierarchicalRelationships);
+        
         try {
 	        int statusCode = res.getStatus();
 	

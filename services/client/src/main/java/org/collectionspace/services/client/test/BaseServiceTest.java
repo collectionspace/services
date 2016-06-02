@@ -96,6 +96,8 @@ public abstract class BaseServiceTest<CLT> {
     protected String knownResourceId = null;
     /* Use this to keep track of resources to delete */
     protected List<String> allResourceIdsCreated = new ArrayList<String>();
+    /* Use this to keep track of relationship resources to delete */
+    protected List<String> allRelationResourceIdsCreated = new ArrayList<String>();
     /* Use this to track authority items */
     protected Map<String, String> allResourceItemIdsCreated = new HashMap<String, String>(); /* itemCsid, parentCsid */
     /* A runtime/command-line parameter to indicate if we should delete all the test related resource objects */
@@ -774,6 +776,14 @@ public abstract class BaseServiceTest<CLT> {
             // Note: Any non-success responses are ignored and not reported.
             client.delete(resourceId).close();
         }
+        //
+        // Clean up relationship records we created during testing
+        //
+        for (String resourceId : allRelationResourceIdsCreated) {
+            // Note: Any non-success responses are ignored and not reported.
+            client.delete(resourceId).close();
+        }
+        
     }
 	
 	//

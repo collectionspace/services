@@ -210,6 +210,20 @@ public class RefNameServiceUtils {
     	public Specifier getItemSpecifier() {
     		return this.itemSpecifier;
     	}
+    	
+    	@Override
+    	public String toString() {
+    		String result = "%s/items/%s";
+    		
+    		try {
+				result = String.format(result, this.parentSpecifier.getURNValue(), this.itemSpecifier.getURNValue());
+			} catch (Exception e) {
+				result = "Unknown error trying to get string representation of Specifier.";
+				logger.error(result, e);
+			}
+    		
+    		return result;
+    	}
     }
 
     public static class AuthRefConfigInfo {

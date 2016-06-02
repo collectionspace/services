@@ -25,8 +25,10 @@ package org.collectionspace.services.common.vocabulary.nuxeo;
 
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.IQueryManager;
+import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.UriTemplateRegistry;
@@ -61,10 +63,12 @@ import org.collectionspace.services.vocabulary.VocabularyItemJAXBSchema;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.PropertyException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.MultivaluedMap;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -90,6 +94,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     protected String authorityItemCommonSchemaName;
     private String authorityItemTermGroupXPathBase;
     
+    private boolean syncHierarchicalRelationships = false;
     private boolean isProposed = false; // used by local authority to propose a new shared item. Allows local deployments to use new terms until they become official
     private boolean isSAS = false; // used to indicate if the authority item originated as a SAS item
     private boolean shouldUpdateRevNumber = true; // by default we should update the revision number -not true on synchronization with SAS
@@ -141,6 +146,17 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     
     public void setShouldUpdateRevNumber(boolean flag) {
     	this.shouldUpdateRevNumber = flag;
+    }
+
+    //
+    // Getter and Setter for deciding if we need to synch hierarchical relationships
+    //
+    public boolean getShouldSyncHierarchicalRelationships() {
+    	return this.syncHierarchicalRelationships;
+    }
+    
+    public void setShouldSyncHierarchicalRelationships(boolean flag) {
+    	this.syncHierarchicalRelationships = flag;
     }
 
     @Override
@@ -403,13 +419,117 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         	}
     	}
     }
-        
+    
     /**
-     * This method synchronizes/updates a single authority item resource.
-     * for the handleSync method, the wrapDoc argument contains a authority item specifier.
+     * 
+     * @param wrapDoc
+     * @return
+     * @throws Exception
      */
+    protected boolean handleRelationsSync(DocumentWrapper<Object> wrapDoc) throws Exception {
+    	boolean result = false;
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
+
+        //
+        // Get information about the local authority item so we can compare with corresponding item on the shared authority server
+        //
+    	AuthorityItemSpecifier authorityItemSpecifier = (AuthorityItemSpecifier) wrapDoc.getWrappedObject();
+        DocumentModel itemDocModel = NuxeoUtils.getDocFromSpecifier(ctx, getRepositorySession(), getAuthorityItemCommonSchemaName(), 
+        		authorityItemSpecifier);
+        if (itemDocModel == null) {
+        	throw new DocumentNotFoundException(String.format("Could not find authority item resource with CSID='%s'",
+        			authorityItemSpecifier.getItemSpecifier().value));
+        }
+        Long localItemRev = (Long) NuxeoUtils.getProperyValue(itemDocModel, AuthorityItemJAXBSchema.REV);
+        Boolean localIsProposed = (Boolean) NuxeoUtils.getProperyValue(itemDocModel, AuthorityItemJAXBSchema.PROPOSED);
+        String localItemCsid = itemDocModel.getName();
+        String localItemWorkflowState = itemDocModel.getCurrentLifeCycleState();
+        String itemShortId = (String) NuxeoUtils.getProperyValue(itemDocModel, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
+        
+        //
+        // Now get the item's Authority (the parent) information
+        //
+        DocumentModel authorityDocModel = NuxeoUtils.getDocFromSpecifier(ctx, getRepositorySession(), authorityCommonSchemaName,
+        		authorityItemSpecifier.getParentSpecifier());
+        String authorityShortId = (String) NuxeoUtils.getProperyValue(authorityDocModel, AuthorityJAXBSchema.SHORT_IDENTIFIER);
+        String localParentCsid = authorityDocModel.getName();
+        //
+        // Using the short IDs of the local authority and item, create URN specifiers and retrieve the SAS authority item
+        //
+        AuthorityItemSpecifier sasAuthorityItemSpecifier = new AuthorityItemSpecifier(SpecifierForm.URN_NAME, authorityShortId, itemShortId);
+        // Get the shared authority server's copy
+        PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.requestPayloadIn(sasAuthorityItemSpecifier, 
+        		getAuthorityServicePath(), getEntityResponseType(), AuthorityClient.INCLUDE_RELATIONS);
+        Long sasRev = getRevision(sasPayloadIn);
+        String sasWorkflowState = getWorkflowState(sasPayloadIn);
+        
+        //
+        // Get the RelationsCommonList and remove the CSIDs since they are for remote items only. We'll use
+        // the refnames in the payload instead to find the local CSIDs
+        //
+        PayloadInputPart relationsCommonListPart = sasPayloadIn.getPart(RelationClient.SERVICE_COMMON_LIST_NAME);
+        relationsCommonListPart.clearElementBody(); // clear the existing DOM element that was created from the incoming XML payload
+        RelationsCommonList rcl = (RelationsCommonList) relationsCommonListPart.getBody();  // Get the JAX-B object and clear the CSID values
+        for (RelationsCommonList.RelationListItem listItem : rcl.getRelationListItem()) {
+        	// clear the remote relation item's CSID
+        	listItem.setCsid(null);
+        	// clear the remote subject's CSID
+        	listItem.setSubjectCsid(null);
+        	listItem.getSubject().setCsid(null);
+        	listItem.getSubject().setUri(null);
+        	// clear the remote object's CSID
+        	listItem.setObjectCsid(null);
+        	listItem.getObject().setCsid(null);
+        	listItem.getObject().setUri(null);
+        }
+        
+        //
+        // Remove all the payload parts except the relations part since we only want to sync the relationships
+        //
+        ArrayList<PayloadInputPart> newPartList = new ArrayList<PayloadInputPart>();
+        newPartList.add(relationsCommonListPart); // add our CSID filtered RelationsCommonList part
+        sasPayloadIn.setParts(newPartList);
+        sasPayloadIn = new PoxPayloadIn(sasPayloadIn.toXML()); // Builds a new payload using the current set of parts -i.e., just the relations part
+        
+    	sasPayloadIn = AuthorityServiceUtils.filterRefnameDomains(ctx, sasPayloadIn); // We need to filter the domain name part of any and all refnames in the payload
+    	AuthorityResource authorityResource = (AuthorityResource) ctx.getResource(getAuthorityServicePath());
+    	PoxPayloadOut payloadOut = authorityResource.updateAuthorityItem(ctx, 
+    			ctx.getResourceMap(), 					
+    			ctx.getUriInfo(),
+    			localParentCsid,			 			// parent's CSID
+    			localItemCsid, 							// item's CSID
+    			sasPayloadIn,							// the payload from the remote SAS
+    			AuthorityServiceUtils.DONT_UPDATE_REV,	// don't update the parent's revision number
+    			AuthorityServiceUtils.NOT_PROPOSED,		// The items is not proposed, make it a real SAS item now
+    			AuthorityServiceUtils.SAS_ITEM);		// Since we're sync'ing, this must be a SAS item
+    	if (payloadOut != null) {	
+    		ctx.setOutput(payloadOut);
+    		result = true;
+    	}        
+    	
+    	return result;
+    }
+        
     @Override
     public boolean handleSync(DocumentWrapper<Object> wrapDoc) throws Exception {
+    	boolean result = false;
+
+    	if (this.getShouldSyncHierarchicalRelationships() == true) {
+    		result = handleRelationsSync(wrapDoc);
+    	} else {
+    		result = handlePayloadSync(wrapDoc);
+    	}
+    	
+    	return result;
+    }
+    
+    /**
+     * 
+     * @param wrapDoc
+     * @return
+     * @throws Exception
+     */
+    protected boolean handlePayloadSync(DocumentWrapper<Object> wrapDoc) throws Exception {
     	boolean result = false;
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
     	
@@ -437,12 +557,12 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         String authorityShortId = (String) NuxeoUtils.getProperyValue(authorityDocModel, AuthorityJAXBSchema.SHORT_IDENTIFIER);
         String localParentCsid = authorityDocModel.getName();
         //
-        // Using the short IDs of the local authority and item, create URN specifiers to retrieve the SAS authority item
+        // Using the short IDs of the local authority and item, create URN specifiers and retrieve the SAS authority item
         //
         AuthorityItemSpecifier sasAuthorityItemSpecifier = new AuthorityItemSpecifier(SpecifierForm.URN_NAME, authorityShortId, itemShortId);
         // Get the shared authority server's copy
         PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.requestPayloadIn(sasAuthorityItemSpecifier, 
-        		getAuthorityServicePath(), getEntityResponseType());
+        		getAuthorityServicePath(), getEntityResponseType(), AuthorityClient.DONT_INCLUDE_RELATIONS);
         Long sasRev = getRevision(sasPayloadIn);
         String sasWorkflowState = getWorkflowState(sasPayloadIn);
         //
@@ -488,9 +608,6 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         	}
         	result = true;
         }
-        //
-        // We need to synchronize the hierarchy relationships here.
-        //
         
         return result;
     }
@@ -601,14 +718,20 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
 	    		//
 	    		// If all the refs are to soft-deleted objects, we should soft-delete this authority item instead of hard-deleting it and instead of failing.
 	    		//
-	    		Boolean shouldUpdateRev = (Boolean) ctx.getProperty(AuthorityServiceUtils.SHOULD_UPDATE_REV_PROPERTY);
 	    		String parentCsid = (String) NuxeoUtils.getProperyValue(docModel, AuthorityItemJAXBSchema.IN_AUTHORITY);
 	    		String itemCsid = docModel.getName();
 	    		AuthorityResource authorityResource = (AuthorityResource) ctx.getResource(getAuthorityServicePath());
 	    		authorityResource.updateItemWorkflowWithTransition(ctx, parentCsid, itemCsid, WorkflowClient.WORKFLOWTRANSITION_DELETE, 
-	    				shouldUpdateRev != null ? shouldUpdateRev : true);
-	    		result = false; // Don't delete since we just soft-deleted it.
+	    				this.getShouldUpdateRevNumber());
+	    		result = false; // Don't delete since we just soft-deleted it.	    		
 	    	}
+    	}
+    	
+		//
+		// Since we've changed the state of the parent by deleting (or soft-deleting) one of its items, we might need to update the parent rev number
+		//
+    	if (getShouldUpdateRevNumber() == true) {
+    		updateRevNumbers(wrapDoc);
     	}
     	
     	return result;
@@ -780,13 +903,18 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     		inAuthorityCsid = (String)documentModel.getProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.IN_AUTHORITY);
     	}
     	DocumentModel inAuthorityDocModel = NuxeoUtils.getDocFromCsid(getServiceContext(), getRepositorySession(), inAuthorityCsid);
-    	Long parentRev = (Long)inAuthorityDocModel.getProperty(getParentCommonSchemaName(), AuthorityJAXBSchema.REV);
-    	if (parentRev == null) {
-    		parentRev = new Long(0);
+    	if (inAuthorityDocModel != null) {
+	    	Long parentRev = (Long)inAuthorityDocModel.getProperty(getParentCommonSchemaName(), AuthorityJAXBSchema.REV);
+	    	if (parentRev == null) {
+	    		parentRev = new Long(0);
+	    	}
+	   		parentRev++;
+	   		inAuthorityDocModel.setProperty(getParentCommonSchemaName(), AuthorityJAXBSchema.REV, parentRev);
+	   		getRepositorySession().saveDocument(inAuthorityDocModel);
+    	} else {
+    		logger.warn(String.format("Containing authority '%s' for item '%s' has been deleted.  Item is orphaned, so revision numbers can't be updated.",
+    				inAuthorityCsid, documentModel.getName()));
     	}
-   		parentRev++;
-   		inAuthorityDocModel.setProperty(getParentCommonSchemaName(), AuthorityJAXBSchema.REV, parentRev);
-   		getRepositorySession().saveDocument(inAuthorityDocModel);
     }    
     
     /**

@@ -89,6 +89,7 @@ import org.collectionspace.services.workflow.WorkflowCommon;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
+import org.collectionspace.services.description.ServiceDescription;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -295,7 +296,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @Override
    	public DocumentModel getDocModelForAuthorityItem(CoreSessionInterface repoSession, RefName.AuthorityItem item) 
    			throws Exception, DocumentNotFoundException {
-    	if(item == null) {
+    	if (item == null) {
     		return null;
     	}
         String whereClause = RefNameServiceUtils.buildWhereForAuthByName(authorityCommonSchemaName, item.getParentShortIdentifier());
@@ -1120,10 +1121,12 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * @return
      * @throws Exception
      */
-    private PoxPayloadOut synchronizeItem(
+    @SuppressWarnings("unchecked")
+	private PoxPayloadOut synchronizeItem(
     		ServiceContext ctx,
             String parentIdentifier,
-            String itemIdentifier) throws Exception {
+            String itemIdentifier,
+            boolean syncHierarchicalRelationships) throws Exception {
     	PoxPayloadOut result = null;
         AuthorityItemSpecifier specifier;
     	boolean neededSync = false;
@@ -1132,6 +1135,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         AuthorityItemDocumentModelHandler handler = (AuthorityItemDocumentModelHandler)createItemDocumentHandler(ctx, parent.CSID, parent.shortIdentifier);
         handler.setIsProposed(AuthorityServiceUtils.NOT_PROPOSED); // In case it was formally locally proposed, clear the proposed flag
         handler.setIsSASItem(AuthorityServiceUtils.SAS_ITEM); // Since we're sync'ing, this is now a SAS controlled item
+        handler.setShouldSyncHierarchicalRelationships(syncHierarchicalRelationships);
         // Create an authority item specifier
         Specifier parentSpecifier = Specifier.getSpecifier(parent.CSID, "getAuthority", "GET");
         Specifier itemSpecifier = Specifier.getSpecifier(itemIdentifier, "getAuthorityItem", "GET");
@@ -1158,7 +1162,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     public PoxPayloadOut synchronizeItemWithExistingContext(
     		ServiceContext existingCtx,
             String parentIdentifier,
-            String itemIdentifier
+            String itemIdentifier,
+            boolean syncHierarchicalRelationships
             ) throws Exception {
     	PoxPayloadOut result = null;
     	
@@ -1167,8 +1172,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         		existingCtx.getUriInfo());
         if (existingCtx.getCurrentRepositorySession() != null) {
         	ctx.setCurrentRepositorySession(existingCtx.getCurrentRepositorySession());
+        	
         }
-        result = synchronizeItem(ctx, parentIdentifier, itemIdentifier);
+        result = synchronizeItem(ctx, parentIdentifier, itemIdentifier, syncHierarchicalRelationships);
     	
     	return result;
     }
@@ -1193,7 +1199,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), null, resourceMap, uriInfo);
-            payloadOut = this.synchronizeItem(ctx, parentIdentifier, itemIdentifier);
+            payloadOut = this.synchronizeItem(ctx, parentIdentifier, itemIdentifier, true);
             if (payloadOut != null) {
             	neededSync = true;
             }
@@ -1331,12 +1337,12 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * @throws Exception
      */
     @SuppressWarnings("rawtypes")
-	public void deleteAuthorityItem(ServiceContext existingCtx,
+	public boolean deleteAuthorityItem(ServiceContext existingCtx,
             String parentIdentifier,
             String itemIdentifier,
             boolean shouldUpdateRevNumber
             ) throws Exception {
-    	Response result = null;
+    	boolean result = true;
     	
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), existingCtx.getUriInfo());
         if (existingCtx != null && existingCtx.getCurrentRepositorySession() != null) {
@@ -1353,10 +1359,11 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         }
         String itemCsid = lookupItemCSID(ctx, itemIdentifier, parentcsid, "deleteAuthorityItem(item)", "DELETE_ITEM"); //use itemServiceCtx if it is not null
         
-        DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
-		ctx.setProperty(AuthorityServiceUtils.SHOULD_UPDATE_REV_PROPERTY, shouldUpdateRevNumber);  // Sometimes we can only soft-delete, so if it is during a sync we dont' update the revision number
-
-        getRepositoryClient(ctx).delete(ctx, itemCsid, handler);
+        AuthorityItemDocumentModelHandler handler = (AuthorityItemDocumentModelHandler) createDocumentHandler(ctx);
+        handler.setShouldUpdateRevNumber(shouldUpdateRevNumber);
+        result = getRepositoryClient(ctx).delete(ctx, itemCsid, handler);
+        
+        return result;
     }
 
     @GET
@@ -1416,5 +1423,15 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
                 uriRegistryEntriesMap.putAll(getUriRegistryEntries(tenantId, getItemDocType(tenantId), UriTemplateFactory.ITEM));
         }
         return uriRegistryEntriesMap;
-    }  
+    }
+    
+    /**
+     * 
+     */
+    public ServiceDescription getDescription(ServiceContext ctx) {
+    	ServiceDescription result = super.getDescription(ctx);
+    	result.setSubresourceDocumentType(this.getItemDocType(ctx.getTenantId()));
+    	return result;
+    }    
+    
 }

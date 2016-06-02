@@ -1,9 +1,13 @@
 package org.collectionspace.services.client;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.ws.rs.core.Response;
 
-import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
+import org.apache.http.HttpStatus;
+import org.collectionspace.services.description.ServiceDescription;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /*
@@ -14,6 +18,8 @@ public abstract class AbstractPoxServiceClientImpl<CLT extends AbstractCommonLis
 	extends AbstractServiceClientImpl<CLT, PoxPayloadOut, String, P> 
 	implements CollectionSpacePoxClient<CLT, P> {
 	
+    protected List<String> allResourceIdsCreated = new ArrayList<String>();
+	
     public AbstractPoxServiceClientImpl(String clientPropertiesFilename) {
     	super(clientPropertiesFilename);
     }
@@ -21,7 +27,36 @@ public abstract class AbstractPoxServiceClientImpl<CLT extends AbstractCommonLis
 	public AbstractPoxServiceClientImpl() {
 		super();
 	}
-
+	
+	/**
+	 * Will delete a set of resources that were explicitly attached to the client.
+	 */
+	public void cleanup() {
+		for (String csid : this.allResourceIdsCreated) {
+			this.delete(csid).close();
+		}
+	}
+	
+	/**
+	 * Adds a CSID to the list of items that should get deleted when cleanup() is called.
+	 * @param csid
+	 */
+	public void addToCleanup(String csid) {
+		this.allResourceIdsCreated.add(csid);
+	}
+	
+	@Override
+	public ServiceDescription getServiceDescription() {
+		ServiceDescription result = null;
+		
+        Response res = getProxy().getServiceDescription();
+        if (res.getStatus() == HttpStatus.SC_OK) {
+        	result = (ServiceDescription) res.readEntity(ServiceDescription.class);
+        }
+        
+        return result;
+	}
+	
 	@Override
 	public Response create(PoxPayloadOut xmlPayload) {
         return getProxy().create(xmlPayload.getBytes());

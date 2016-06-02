@@ -2,6 +2,9 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
+import org.apache.http.HttpStatus;
+import org.collectionspace.services.description.ServiceDescription;
+
 /**
  * IDClient.
  *
@@ -44,14 +47,17 @@ public class IdClient extends AbstractServiceClientImpl<String, String, String, 
     
     // Operations on ID Generators
     
+    @Override
     public Response create(String xmlPayload) {
         return getProxy().create(xmlPayload);
     }
 
+    @Override
     public Response read(String csid) {
         return getProxy().read(csid);
     }
     
+    @Override
     public Response readList() {
         return getProxy().readList();
     }
@@ -69,5 +75,18 @@ public class IdClient extends AbstractServiceClientImpl<String, String, String, 
 
 	@Override
 	public Response update(String csid, String payload) {
-		throw new UnsupportedOperationException("ID client does not support an update operation.");	}
+		throw new UnsupportedOperationException("ID client does not support an update operation.");
+	}
+	
+	@Override
+	public ServiceDescription getServiceDescription() {
+		ServiceDescription result = null;
+		
+        Response res = getProxy().getServiceDescription();
+        if (res.getStatus() == HttpStatus.SC_OK) {
+        	result = (ServiceDescription) res.readEntity(ServiceDescription.class);
+        }
+        
+        return result;
+	}
 }

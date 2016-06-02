@@ -12,6 +12,8 @@ public abstract class AuthorityClientImpl<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_
 	implements AuthorityClient<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P> {
 
 	private static final String INCLUDE_DELETE_TRUE = Boolean.TRUE.toString();
+	private static final String INCLUDE_RELATIONS_TRUE = Boolean.TRUE.toString();
+	private static final String INCLUDE_RELATIONS_FALSE = Boolean.FALSE.toString();
 	
 	/*
 	 * Basic CRUD proxied methods
@@ -34,12 +36,17 @@ public abstract class AuthorityClientImpl<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_
     //(R)ead Item
     @Override
 	public Response readItem(String vcsid, String csid) {
-    	return getProxy().readItem(vcsid, csid, INCLUDE_DELETE_TRUE);
+    	return getProxy().readItem(vcsid, csid, INCLUDE_DELETE_TRUE, INCLUDE_RELATIONS_FALSE);
     }
     
     @Override
     public Response readItem(String vcsid, String csid, Boolean includeDeleted) {
-    	return getProxy().readItem(vcsid, csid, includeDeleted.toString());
+    	return getProxy().readItem(vcsid, csid, includeDeleted.toString(), INCLUDE_RELATIONS_FALSE);
+    }
+    
+    @Override
+    public Response readItem(String vcsid, String csid, Boolean includeDeleted, Boolean includeRelations) {
+    	return getProxy().readItem(vcsid, csid, includeDeleted.toString(), includeRelations.toString());
     }
 
     //(U)pdate Item
@@ -58,6 +65,13 @@ public abstract class AuthorityClientImpl<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_
 	public Response deleteItem(String vcsid, String csid) {
     	return getProxy().deleteItem(vcsid, csid);
     }
+    
+    //(D)elete Item
+    @Override    
+    public Response deleteNamedItemInNamedAuthority(String authShortId, String itemShortId) {
+    	return getProxy().deleteNamedItemInNamedAuthority(authShortId, itemShortId);
+    }
+    
     
     @Override
 	public Response getReferencingObjects( // ClientResponse<AuthorityRefDocList>
@@ -97,11 +111,14 @@ public abstract class AuthorityClientImpl<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_
     	boolean result = true;
     	
     	Response response = getProxy().sync("-1"); // Check to see if the Authority (in general) supports sync for any of its instances
-    	int status = response.getStatus();
-    	if (status == Response.Status.FORBIDDEN.getStatusCode()) {
-    		result = false;
+    	try {
+	    	int status = response.getStatus();
+	    	if (status == Response.Status.FORBIDDEN.getStatusCode()) {
+	    		result = false;
+	    	}
+    	} finally {
+	    	response.close();
     	}
-    	response.close();
     	
     	return result;
     }
@@ -167,12 +184,12 @@ public abstract class AuthorityClientImpl<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_
      */
     @Override
 	public Response readNamedItemInNamedAuthority(String authShortId, String itemShortId) {
-        return getProxy().readNamedItemInNamedAuthority(authShortId, itemShortId, INCLUDE_DELETE_TRUE);
+        return getProxy().readNamedItemInNamedAuthority(authShortId, itemShortId, INCLUDE_DELETE_TRUE, INCLUDE_RELATIONS_FALSE);
     }
 
     @Override
-	public Response readNamedItemInNamedAuthority(String authShortId, String itemShortId, Boolean includeDeleted) {
-        return getProxy().readNamedItemInNamedAuthority(authShortId, itemShortId, includeDeleted.toString());
+	public Response readNamedItemInNamedAuthority(String authShortId, String itemShortId, Boolean includeDeleted, Boolean includeRelations) {
+        return getProxy().readNamedItemInNamedAuthority(authShortId, itemShortId, includeDeleted.toString(), includeRelations.toString());
     }
 
     /**
