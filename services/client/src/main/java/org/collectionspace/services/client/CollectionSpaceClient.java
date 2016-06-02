@@ -39,6 +39,7 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
 	public final static String CSID_PATH_PARAM_VAR = "{csid}";
     public final static String COLLECTIONSPACE_CORE_SCHEMA = "collectionspace_core";
     
+    public final static String COLLECTIONSPACE_CORE_CSID = "csid";
     public final static String COLLECTIONSPACE_CORE_TENANTID = "tenantId";
     public final static String CORE_TENANTID = COLLECTIONSPACE_CORE_SCHEMA + ":" + COLLECTIONSPACE_CORE_TENANTID;
     
@@ -71,6 +72,7 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
     public static final String URL_PROPERTY = "cspace.url";
     public static final String USER_PROPERTY = "cspace.user";
     public static final String TENANT_PROPERTY = "cspace.tenant";
+    public static final String TENANT_NAME_PROPERTY = "cspace.tenantID";
     
     // JAX-RS path for getting service description meta information
 	public static final String SERVICE_DESCRIPTION_PATH = "description";
@@ -250,4 +252,6 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * @param clientPropertiesFilename
      */
 	public void setClientProperties(String clientPropertiesFilename);
+	
+	public String getTenantName();
 }

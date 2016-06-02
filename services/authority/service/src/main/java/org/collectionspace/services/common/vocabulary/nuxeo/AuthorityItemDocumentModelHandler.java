@@ -903,13 +903,18 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     		inAuthorityCsid = (String)documentModel.getProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.IN_AUTHORITY);
     	}
     	DocumentModel inAuthorityDocModel = NuxeoUtils.getDocFromCsid(getServiceContext(), getRepositorySession(), inAuthorityCsid);
-    	Long parentRev = (Long)inAuthorityDocModel.getProperty(getParentCommonSchemaName(), AuthorityJAXBSchema.REV);
-    	if (parentRev == null) {
-    		parentRev = new Long(0);
+    	if (inAuthorityDocModel != null) {
+	    	Long parentRev = (Long)inAuthorityDocModel.getProperty(getParentCommonSchemaName(), AuthorityJAXBSchema.REV);
+	    	if (parentRev == null) {
+	    		parentRev = new Long(0);
+	    	}
+	   		parentRev++;
+	   		inAuthorityDocModel.setProperty(getParentCommonSchemaName(), AuthorityJAXBSchema.REV, parentRev);
+	   		getRepositorySession().saveDocument(inAuthorityDocModel);
+    	} else {
+    		logger.warn(String.format("Containing authority '%s' for item '%s' has been deleted.  Item is orphaned, so revision numbers can't be updated.",
+    				inAuthorityCsid, documentModel.getName()));
     	}
-   		parentRev++;
-   		inAuthorityDocModel.setProperty(getParentCommonSchemaName(), AuthorityJAXBSchema.REV, parentRev);
-   		getRepositorySession().saveDocument(inAuthorityDocModel);
     }    
     
     /**

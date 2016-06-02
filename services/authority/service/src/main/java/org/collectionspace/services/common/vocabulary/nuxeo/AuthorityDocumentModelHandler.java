@@ -134,42 +134,49 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         // Get the rev number of the authority so we can compare with rev number of shared authority
         //
         DocumentModel docModel = NuxeoUtils.getDocFromSpecifier(ctx, getRepositorySession(), authorityCommonSchemaName, specifier);
-        Long localRev = (Long) NuxeoUtils.getProperyValue(docModel, AuthorityJAXBSchema.REV);
-        String shortId = (String) NuxeoUtils.getProperyValue(docModel, AuthorityJAXBSchema.SHORT_IDENTIFIER);
-        //
-        // Using the short ID of the local authority, create a URN specifier to retrieve the SAS authority
-        //
-        Specifier sasSpecifier = new Specifier(SpecifierForm.URN_NAME, shortId);
-        PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.requestPayloadIn(ctx, sasSpecifier, getEntityResponseType());
-        //
-        // If the authority on the SAS is newer, synch all the items and then the authority record as well
-        //
-        //
-        Long sasRev = getRevision(sasPayloadIn);
-        if (sasRev > localRev) {
-        	//
-        	// First, sync all the authority items
-        	//
-        	syncAllItems(ctx, sasSpecifier);
-        	//
-        	// Next, sync the authority resource/record itself
-        	//
-        	AuthorityResource authorityResource = (AuthorityResource) ctx.getResource();
-        	ctx.setProperty(AuthorityServiceUtils.SHOULD_UPDATE_REV_PROPERTY, AuthorityServiceUtils.DONT_UPDATE_REV); // Don't update the rev number, use the rev number for the SAS instance instead
-        	PoxPayloadOut payloadOut = authorityResource.update(ctx, ctx.getResourceMap(), ctx.getUriInfo(), docModel.getName(), 
-        			sasPayloadIn);
-        	if (payloadOut != null) {
-        		ctx.setOutput(payloadOut);
-        		result = true;
-        	}
-        	//
-        	// We may need to transition the authority into a replicated state the first time we sync it.
-        	//
-        	String workflowState = docModel.getCurrentLifeCycleState();
-        	if (workflowState.contains(WorkflowClient.WORKFLOWSTATE_REPLICATED) == false) {
-	            String authorityCsid = docModel.getName();
-	        	authorityResource.updateWorkflowWithTransition(ctx, ctx.getUriInfo(), authorityCsid, WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
-        	}
+        if (docModel != null) {
+	        Long localRev = (Long) NuxeoUtils.getProperyValue(docModel, AuthorityJAXBSchema.REV);
+	        String shortId = (String) NuxeoUtils.getProperyValue(docModel, AuthorityJAXBSchema.SHORT_IDENTIFIER);
+	        //
+	        // Using the short ID of the local authority, create a URN specifier to retrieve the SAS authority
+	        //
+	        Specifier sasSpecifier = new Specifier(SpecifierForm.URN_NAME, shortId);
+	        PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.requestPayloadIn(ctx, sasSpecifier, getEntityResponseType());
+	        //
+	        // If the authority on the SAS is newer, synch all the items and then the authority record as well
+	        //
+	        //
+	        Long sasRev = getRevision(sasPayloadIn);
+	        if (sasRev > localRev) {
+	        	//
+	        	// First, sync all the authority items
+	        	//
+	        	syncAllItems(ctx, sasSpecifier);
+	        	//
+	        	// Next, sync the authority resource/record itself
+	        	//
+	        	AuthorityResource authorityResource = (AuthorityResource) ctx.getResource();
+	        	ctx.setProperty(AuthorityServiceUtils.SHOULD_UPDATE_REV_PROPERTY, AuthorityServiceUtils.DONT_UPDATE_REV); // Don't update the rev number, use the rev number for the SAS instance instead
+	        	PoxPayloadOut payloadOut = authorityResource.update(ctx, ctx.getResourceMap(), ctx.getUriInfo(), docModel.getName(), 
+	        			sasPayloadIn);
+	        	if (payloadOut != null) {
+	        		ctx.setOutput(payloadOut);
+	        		result = true;
+	        	}
+	        	//
+	        	// We may need to transition the authority into a replicated state the first time we sync it.
+	        	//
+	        	String workflowState = docModel.getCurrentLifeCycleState();
+	        	if (workflowState.contains(WorkflowClient.WORKFLOWSTATE_REPLICATED) == false) {
+		            String authorityCsid = docModel.getName();
+		        	authorityResource.updateWorkflowWithTransition(ctx, ctx.getUriInfo(), authorityCsid, WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
+	        	}
+	        }
+        } else {
+        	String errMsg = String.format("Authority of type '%s' with identifier '%s' does not exist.",
+        			getServiceContext().getServiceName(), specifier.getURNValue());
+        	logger.debug(errMsg);
+        	throw new DocumentException(errMsg);
         }
         
         return result;

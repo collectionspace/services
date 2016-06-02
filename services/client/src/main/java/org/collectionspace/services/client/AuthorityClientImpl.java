@@ -111,11 +111,14 @@ public abstract class AuthorityClientImpl<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_
     	boolean result = true;
     	
     	Response response = getProxy().sync("-1"); // Check to see if the Authority (in general) supports sync for any of its instances
-    	int status = response.getStatus();
-    	if (status == Response.Status.FORBIDDEN.getStatusCode()) {
-    		result = false;
+    	try {
+	    	int status = response.getStatus();
+	    	if (status == Response.Status.FORBIDDEN.getStatusCode()) {
+	    		result = false;
+	    	}
+    	} finally {
+	    	response.close();
     	}
-    	response.close();
     	
     	return result;
     }

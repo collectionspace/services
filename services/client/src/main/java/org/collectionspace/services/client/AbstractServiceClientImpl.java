@@ -644,4 +644,9 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
             Long pageNumber) {
         return getProxy().readList(sortBy, pageSize, pageNumber);
     }
+    
+    @Override
+    public String getTenantName() {
+    	return this.getProperty(TENANT_NAME_PROPERTY);
+    }
 }

@@ -457,22 +457,27 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         // Submit the request to the service and store the response.
         CollectionSpaceClient client = this.getClientInstance();
         Response res = client.readList();
-        CLT list = res.readEntity(this.getCommonListType());
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = true;
-        if (iterateThroughList && logger.isTraceEnabled()) {
-            printList(testName, list);
+        
+        try {
+	        CLT list = res.readEntity(this.getCommonListType());
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        // Optionally output additional data about list members for debugging.
+	        boolean iterateThroughList = true;
+	        if (iterateThroughList && logger.isTraceEnabled()) {
+	            printList(testName, list);
+	        }
+        } finally {
+        	res.close();
         }
     }
     
