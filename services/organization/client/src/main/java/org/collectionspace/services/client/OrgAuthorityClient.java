@@ -53,11 +53,11 @@ public class OrgAuthorityClient extends AuthorityWithContactsClientImpl<Orgautho
     //
     // Constructors
     //
-    public OrgAuthorityClient() {
+    public OrgAuthorityClient() throws Exception {
     	super();
     }
     
-    public OrgAuthorityClient(String clientPropertiesFilename) {
+    public OrgAuthorityClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
     

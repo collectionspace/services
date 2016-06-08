@@ -40,6 +40,7 @@ import org.collectionspace.services.common.security.SecurityContext;
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.RemoteClientConfig;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
 
 /**
@@ -359,6 +360,8 @@ public interface ServiceContext<IT, OT> {
 	public CollectionSpaceClient getClient() throws Exception;
 	
 	public CollectionSpaceClient getClient(String clientProperitesFilename) throws Exception;
+	
+	public CollectionSpaceClient getClient(RemoteClientConfig remoteClientConfig) throws Exception;
 
     /**
      * @return the JAX-RS resource of service for the current context.

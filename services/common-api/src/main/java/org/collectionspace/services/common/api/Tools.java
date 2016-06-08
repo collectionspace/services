@@ -24,6 +24,8 @@
 package org.collectionspace.services.common.api;
 
 import java.io.File;
+import java.io.InputStream;
+import java.util.Properties;
 import  java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -255,5 +257,98 @@ public class Tools {
         return s;
     }
 
+    /**
+     * Return a set of properties from a properties file.
+     * 
+     * @param clientPropertiesFilename
+     * @return
+     */
+	static public Properties loadProperties(String clientPropertiesFilename) {
+		Properties inProperties = new Properties();
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		InputStream is = null;
 
+		try {
+			is = cl.getResourceAsStream(clientPropertiesFilename);
+			inProperties.load(is);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		} finally {
+			if (is != null) {
+				try {
+					is.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return inProperties;
+	}
+	
+	static public Properties loadProperties(String clientPropertiesFilename, boolean filterPasswords) throws Exception {
+		Properties result = loadProperties(clientPropertiesFilename);
+
+		if (filterPasswords) {
+			result = filterPasswordsWithEnvVars(result);
+		}
+		
+		return result;
+	}
+	
+	static public Properties filterPasswordsWithEnvVars(Properties inProperties) throws Exception {
+		Properties result = inProperties;
+		
+		if (inProperties != null && inProperties.size() > 0) {
+			for (String key : inProperties.stringPropertyNames()) {
+				String propertyValue = inProperties.getProperty(key);
+				String newPropertyValue = Tools.getPasswordFromEnv(propertyValue);
+				if (newPropertyValue != null) { // non-null result means the property value was the name of an environment variable
+					inProperties.setProperty(key, newPropertyValue);
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Try to find the value of a password variable in the system or JVM environment.  This code substitutes only environment variables formed
+	 * like ${cspace.password.mysecret} or ${cspace_password_mysecret_secret}.  The corresponding environment variables would
+	 * be "cspace.password.mysecret" and "cspace.password.mysecret.secret".
+	 * 
+	 * Returns null if the passed in propertyValue is not a password variable -i.e., not something of the form {$cspace.password.foo}
+	 * 
+	 * Throws an exception if the passed in propertyValue has a valid variable form but the corresponding environment variable is not
+	 * set.
+	 * 
+	 * @param propertyValue
+	 * @return
+	 * @throws Exception
+	 */
+	static private String getPasswordFromEnv(String propertyValue) throws Exception {
+		String result = null;
+		//
+		// Replace things like ${cspace.password.cow} with values from either the environment
+		// or from the JVM system properties.
+		//
+		Pattern pattern = Pattern.compile("\\$\\{([A-Za-z0-9_\\.]+)\\}");  	// For example, "${cspace.password.mysecret}" or "${password_strong_longpassword}"
+		Matcher matcher = pattern.matcher(propertyValue);
+		String key = null;	
+		if (matcher.find()) {
+			key = matcher.group(1);  // Gets the string inside the ${} enclosure.  For example, gets "cspace.password.mysecret" from "${cspace.password.mysecret}"
+			result = System.getenv(key);
+			if (result == null || result.isEmpty()) {
+				// If we couldn't find a value in the environment, check the JVM system properties
+				result = System.getProperty(key);
+			}
+
+			if (result == null || result.isEmpty()) {
+				String errMsg = String.format("Could find neither an environment variable nor a systen variable named '%s'", key);
+				throw new Exception(errMsg);
+			}
+		}
+		
+		return result;
+	}
 }

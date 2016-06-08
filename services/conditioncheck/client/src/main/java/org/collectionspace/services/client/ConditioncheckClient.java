@@ -29,11 +29,11 @@ public class ConditioncheckClient extends AbstractCommonListPoxServiceClientImpl
     public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    public ConditioncheckClient() {
+    public ConditioncheckClient() throws Exception {
 		super();
 	}
 
-    public ConditioncheckClient(String clientPropertiesFilename) {
+    public ConditioncheckClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 

@@ -2,9 +2,6 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
-import org.jboss.resteasy.client.ClientResponse;
-import org.collectionspace.services.jaxb.AbstractCommonList;
-
 /*
  * LT - List type
  * ILT - Authority item list type
@@ -14,11 +11,11 @@ public abstract class AuthorityWithContactsClientImpl<AUTHORITY_COMMON_TYPE, AUT
 	extends AuthorityClientImpl<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P>
 	implements AuthorityWithContactsClient<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P> {
 	
-	public AuthorityWithContactsClientImpl(String clientPropertiesFilename) {
+	public AuthorityWithContactsClientImpl(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 
-	public AuthorityWithContactsClientImpl() {
+	public AuthorityWithContactsClientImpl() throws Exception {
 		super();
 	}
 

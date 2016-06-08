@@ -44,7 +44,6 @@ import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.SchoolOrStyleList;
 import org.collectionspace.services.person.StructuredDateGroup;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,8 +62,9 @@ public class PersonAuthorityClientUtils {
      * @param csid the id of the PersonAuthority
      * @param client if null, creates a new client
      * @return
+     * @throws Exception 
      */
-    public static String getAuthorityRefName(String csid, PersonAuthorityClient client){
+    public static String getAuthorityRefName(String csid, PersonAuthorityClient client) throws Exception{
     	if (client == null) {
     		client = new PersonAuthorityClient();
     	}
@@ -97,8 +97,9 @@ public class PersonAuthorityClientUtils {
      * @param csid the id of the PersonAuthority
      * @param client if null, creates a new client
      * @return
+     * @throws Exception 
      */
-    public static String getPersonRefName(String inAuthority, String csid, PersonAuthorityClient client){
+    public static String getPersonRefName(String inAuthority, String csid, PersonAuthorityClient client) throws Exception{
     	if ( client == null) {
     		client = new PersonAuthorityClient();
     	}

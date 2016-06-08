@@ -451,17 +451,16 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         //
         DocumentModel authorityDocModel = NuxeoUtils.getDocFromSpecifier(ctx, getRepositorySession(), authorityCommonSchemaName,
         		authorityItemSpecifier.getParentSpecifier());
-        String authorityShortId = (String) NuxeoUtils.getProperyValue(authorityDocModel, AuthorityJAXBSchema.SHORT_IDENTIFIER);
+        String authorityShortId = (String)NuxeoUtils.getProperyValue(authorityDocModel, AuthorityJAXBSchema.SHORT_IDENTIFIER);
         String localParentCsid = authorityDocModel.getName();
+        String remoteClientConfigName = (String)NuxeoUtils.getProperyValue(authorityDocModel, AuthorityJAXBSchema.REMOTECLIENT_CONFIG_NAME);
         //
         // Using the short IDs of the local authority and item, create URN specifiers and retrieve the SAS authority item
         //
         AuthorityItemSpecifier sasAuthorityItemSpecifier = new AuthorityItemSpecifier(SpecifierForm.URN_NAME, authorityShortId, itemShortId);
         // Get the shared authority server's copy
-        PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.requestPayloadIn(sasAuthorityItemSpecifier, 
-        		getAuthorityServicePath(), getEntityResponseType(), AuthorityClient.INCLUDE_RELATIONS);
-        Long sasRev = getRevision(sasPayloadIn);
-        String sasWorkflowState = getWorkflowState(sasPayloadIn);
+        PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.requestPayloadInFromRemoteServer(sasAuthorityItemSpecifier, 
+        		remoteClientConfigName, getAuthorityServicePath(), getEntityResponseType(), AuthorityClient.INCLUDE_RELATIONS);
         
         //
         // Get the RelationsCommonList and remove the CSIDs since they are for remote items only. We'll use
@@ -556,13 +555,15 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         		authorityItemSpecifier.getParentSpecifier());
         String authorityShortId = (String) NuxeoUtils.getProperyValue(authorityDocModel, AuthorityJAXBSchema.SHORT_IDENTIFIER);
         String localParentCsid = authorityDocModel.getName();
+        String remoteClientConfigName = (String)NuxeoUtils.getProperyValue(authorityDocModel, AuthorityJAXBSchema.REMOTECLIENT_CONFIG_NAME);
+
         //
         // Using the short IDs of the local authority and item, create URN specifiers and retrieve the SAS authority item
         //
         AuthorityItemSpecifier sasAuthorityItemSpecifier = new AuthorityItemSpecifier(SpecifierForm.URN_NAME, authorityShortId, itemShortId);
         // Get the shared authority server's copy
-        PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.requestPayloadIn(sasAuthorityItemSpecifier, 
-        		getAuthorityServicePath(), getEntityResponseType(), AuthorityClient.DONT_INCLUDE_RELATIONS);
+        PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.requestPayloadInFromRemoteServer(sasAuthorityItemSpecifier, 
+        		remoteClientConfigName, getAuthorityServicePath(), getEntityResponseType(), AuthorityClient.DONT_INCLUDE_RELATIONS);
         Long sasRev = getRevision(sasPayloadIn);
         String sasWorkflowState = getWorkflowState(sasPayloadIn);
         //

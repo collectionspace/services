@@ -46,11 +46,11 @@ public class LocationAuthorityClient extends AuthorityClientImpl<Locationauthori
     //
     // Constructors
     //
-    public LocationAuthorityClient() {
+    public LocationAuthorityClient() throws Exception {
     	super();
     }
     
-    public LocationAuthorityClient(String clientPropertiesFilename) {
+    public LocationAuthorityClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 

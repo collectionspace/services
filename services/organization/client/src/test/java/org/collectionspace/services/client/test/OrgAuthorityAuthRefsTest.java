@@ -43,7 +43,6 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.organization.OrganizationsCommon;
 import org.collectionspace.services.organization.OrgTermGroup;
 import org.collectionspace.services.person.PersonTermGroup;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -210,8 +209,9 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
     
     /**
      * Creates the person refs.
+     * @throws Exception 
      */
-    protected void createPersonRefs() {
+    protected void createPersonRefs() throws Exception {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding
         // refName by which it can be identified.
@@ -252,8 +252,9 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
      * @param shortId
      * @param authRefName
      * @return the string
+     * @throws Exception 
      */
-    protected String createPerson(String personAuthCSID, String firstName, String surName, String shortId, String authRefName ) {
+    protected String createPerson(String personAuthCSID, String firstName, String surName, String shortId, String authRefName ) throws Exception {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
@@ -376,9 +377,10 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
     	if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {

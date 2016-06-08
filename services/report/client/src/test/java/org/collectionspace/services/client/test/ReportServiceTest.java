@@ -40,7 +40,6 @@ import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.report.ReportsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.client.AcquisitionClient;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.slf4j.Logger;
@@ -64,7 +63,7 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
     // Instance variables specific to this test.    
     private String testDocType = "Acquisition";
 
-    private String createAquisitionResource() {
+    private String createAquisitionResource() throws Exception {
     	String result = null;
     	
     	AcquisitionClient acquisitionClient = new AcquisitionClient();
@@ -149,12 +148,12 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new ReportClient();
     }
 
 	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
         return new ReportClient(clientPropertiesFilename);
 	}
     
@@ -271,8 +270,9 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
      *
      * @param identifier the identifier
      * @return the multipart output
+     * @throws Exception 
      */
-    private PoxPayloadOut createReportInstance(String identifier) {
+    private PoxPayloadOut createReportInstance(String identifier) throws Exception {
     	List<String> docTypes = new ArrayList<String>();
     	docTypes.add(testDocType);
         return createReportInstance(
@@ -289,13 +289,14 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
      * @param filename the relative path to the report
      * @param outputMIME the MIME type we will return for this report
      * @return the multipart output
+     * @throws Exception 
      */
     private PoxPayloadOut createReportInstance(String name,
     		List<String> forDocTypeList,
     		boolean supportsSingle, boolean supportsList, 
     		boolean supportsGroup, boolean supportsNoContext, 
             String filename,
-            String outputMIME) {
+            String outputMIME) throws Exception {
         ReportsCommon reportCommon = new ReportsCommon();
         reportCommon.setName(name);
         ReportsCommon.ForDocTypes forDocTypes = new ReportsCommon.ForDocTypes(); 
@@ -325,7 +326,7 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
 
 	@Override
 	protected PoxPayloadOut createInstance(String commonPartName,
-			String identifier) {
+			String identifier) throws Exception {
         PoxPayloadOut result = createReportInstance(identifier);
 		return result;
 	}

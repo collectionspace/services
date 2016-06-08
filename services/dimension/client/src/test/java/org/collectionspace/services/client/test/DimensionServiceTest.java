@@ -31,7 +31,6 @@ import org.collectionspace.services.client.DimensionFactory;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.dimension.DimensionsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.slf4j.Logger;
@@ -68,12 +67,12 @@ public class DimensionServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new DimensionClient();
     }
 
 	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
         return new DimensionClient(clientPropertiesFilename);
 	}	
     
@@ -106,7 +105,7 @@ public class DimensionServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
     }
 
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
     	DimensionClient client = new DimensionClient();
     	return createInstance(client.getCommonPartName(), identifier);
     }

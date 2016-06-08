@@ -39,11 +39,11 @@ import org.collectionspace.services.description.ServiceDescription;
  */
 public class PermissionRoleClient extends AbstractServiceClientImpl<PermissionRole, PermissionRole, PermissionRole, PermissionRoleProxy> {
 	
-	public PermissionRoleClient() {
+	public PermissionRoleClient() throws Exception {
 		super();
 	}
 
-	public PermissionRoleClient(String clientPropertiesFilename) {
+	public PermissionRoleClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 

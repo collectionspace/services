@@ -40,7 +40,6 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.movement.MovementsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.DataProvider;
@@ -498,9 +497,10 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun = true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
@@ -653,7 +653,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
     private PoxPayloadOut createMovementInstance(
             String movementReferenceNumber,
             String movementNote,
-            String locationDate) {
+            String locationDate) throws Exception {
         MovementsCommon movementCommon = new MovementsCommon();
         movementCommon.setMovementReferenceNumber(movementReferenceNumber);
         movementCommon.setMovementNote(movementNote);

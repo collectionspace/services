@@ -27,8 +27,8 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
-import org.apache.http.HttpStatus;
 
+import org.apache.http.HttpStatus;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
 import org.collectionspace.services.description.ServiceDescription;
@@ -45,11 +45,11 @@ public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList,
     public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
     public final static String IMMUTABLE = "immutable";
 
-	public AccountClient() {
+	public AccountClient() throws Exception {
 		super();
 	}
 
-	public AccountClient(String clientPropertiesFilename) {
+	public AccountClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 
@@ -67,7 +67,7 @@ public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList,
     }
     
     public String getTenantId() {
-        return getProperty(AccountClient.TENANT_PROPERTY);
+        return getProperty(AccountClient.TENANT_NAME_PROPERTY);
     }
 
 	@Override

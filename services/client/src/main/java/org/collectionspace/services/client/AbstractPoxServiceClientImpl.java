@@ -20,11 +20,11 @@ public abstract class AbstractPoxServiceClientImpl<CLT extends AbstractCommonLis
 	
     protected List<String> allResourceIdsCreated = new ArrayList<String>();
 	
-    public AbstractPoxServiceClientImpl(String clientPropertiesFilename) {
+    public AbstractPoxServiceClientImpl(String clientPropertiesFilename) throws Exception {
     	super(clientPropertiesFilename);
     }
 
-	public AbstractPoxServiceClientImpl() {
+	public AbstractPoxServiceClientImpl() throws Exception {
 		super();
 	}
 	

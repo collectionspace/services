@@ -39,7 +39,6 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.publicitem.PublicitemsCommon;
-
 import org.testng.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,12 +68,12 @@ public class PublicItemServiceTest extends
 	 * ()
 	 */
 	@Override
-	protected PublicItemClient getClientInstance() {
+	protected PublicItemClient getClientInstance() throws Exception {
 		return new PublicItemClient();
 	}
 
 	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
 		return new PublicItemClient(clientPropertiesFilename);
 	}
 
@@ -578,7 +577,7 @@ public class PublicItemServiceTest extends
 	}
 
 	@Override
-	protected PoxPayloadOut createInstance(String identifier) {
+	protected PoxPayloadOut createInstance(String identifier) throws Exception {
 		return createPublicItemInstance(identifier);
 	}
 
@@ -588,8 +587,9 @@ public class PublicItemServiceTest extends
 	 * @param identifier
 	 *            the identifier
 	 * @return the multipart output
+	 * @throws Exception 
 	 */
-	private PoxPayloadOut createPublicItemInstance(String identifier) {
+	private PoxPayloadOut createPublicItemInstance(String identifier) throws Exception {
 		return createPublicItemInstance("itemNumber-" + identifier,
 				"contentCreationJobId-" + identifier);
 	}
@@ -602,9 +602,10 @@ public class PublicItemServiceTest extends
 	 * @param contentCreationJobId
 	 *            the publicitem asynch job ID
 	 * @return the multipart output
+	 * @throws Exception 
 	 */
 	private PoxPayloadOut createPublicItemInstance(String itemNumber,
-			String itemJobId) {
+			String itemJobId) throws Exception {
 
 		PublicitemsCommon publicItemsCommon = new PublicitemsCommon();
 		publicItemsCommon.setItemNumber(itemNumber);
@@ -645,7 +646,7 @@ public class PublicItemServiceTest extends
 
 	@Override
 	protected PoxPayloadOut createInstance(String commonPartName,
-			String identifier) {
+			String identifier) throws Exception {
 		PoxPayloadOut result = createPublicItemInstance(identifier);
 		return result;
 	}

@@ -1,5 +1,6 @@
 package org.collectionspace.services.common.vocabulary;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -8,13 +9,17 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.common.api.RefNameUtils.AuthorityTermInfo;
+import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
-import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityIdentifierUtils;
+import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.RemoteClientConfig;
+import org.collectionspace.services.config.tenant.RemoteClientConfigurations;
+import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.dom4j.DocumentException;
@@ -22,10 +27,12 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("rawtypes")
 public class AuthorityServiceUtils {
     private static final Logger logger = LoggerFactory.getLogger(AuthorityIdentifierUtils.class);
     //
     // Used to keep track if an authority item's is deprecated
+    public static final String DEFAULT_REMOTECLIENT_CONFIG_NAME = "default";
     public static final String IS_DEPRECATED_PROPERTY = "IS_DEPRECATED_PROPERTY";
     public static final Boolean DEPRECATED = true;
     public static final Boolean NOT_DEPRECATED = !DEPRECATED;
@@ -44,6 +51,58 @@ public class AuthorityServiceUtils {
 
     public static final Boolean NO_CHANGE = null;
 
+    /*
+     * Try to find a named remote client configuration in the current tenant bindings.  If the value of the incoming param 'remoteClientConfigName' is
+     * blank or null, we'll try to find a name in the authority service's bindings.  If we can't find a name there, we'll try using the default name.
+     * 
+     * If the incoming param 'remoteClientConfigName' is not null, we'll look through all the named remote client configurations in the tenant's binding
+     * to find the configuration.  If we can't find the named configuration, we'll throw an exception.
+     * 
+     * If there are no remote client configurations in the tenant's bindings, we'll throw an exception.
+     */
+	public static final RemoteClientConfig getRemoteClientConfig(ServiceContext ctx, String remoteClientConfigName) throws Exception {
+    	RemoteClientConfig result = null;
+    	
+    	TenantBindingType tenantBinding = ServiceMain.getInstance().getTenantBindingConfigReader().getTenantBinding(ctx.getTenantId());
+    	RemoteClientConfigurations remoteClientConfigurations = tenantBinding.getRemoteClientConfigurations();
+    	if (remoteClientConfigurations != null) {
+    		if (Tools.isEmpty(remoteClientConfigName) == true) {
+    			// Since the authority instance didn't specify a remote client config name, let's see if the authority type's service bindings specifies one
+    			ServiceBindingType serviceBindingType =
+    					ServiceMain.getInstance().getTenantBindingConfigReader().getServiceBinding(ctx.getTenantId(), ctx.getServiceName());
+    			remoteClientConfigName = serviceBindingType.getRemoteClientConfigName();
+    		}
+    		//
+    		// If we still don't have a remote client config name, let's use the default value.
+    		//
+    		if (Tools.isEmpty(remoteClientConfigName) == true) {
+    			remoteClientConfigName = DEFAULT_REMOTECLIENT_CONFIG_NAME;
+    		}
+    		
+    		List<RemoteClientConfig> remoteClientConfigList = remoteClientConfigurations.getRemoteClientConfig();
+    		for (RemoteClientConfig config : remoteClientConfigList) {
+    			if (config.getName().equalsIgnoreCase(remoteClientConfigName)) {
+    				result = config;
+    				break;
+    			}
+    		}
+    	} else {
+    		String errMsg = String.format("No remote client configurations could be found in the tenant bindings for tenant named '%s'.",
+    				ctx.getTenantName());
+    		logger.error(errMsg);
+    		throw new Exception(errMsg);
+    	}
+    	
+    	if (result == null) {
+    		String errMsg = String.format("Could not find a remote client configuration named '%s' in the tenant bindings for tenant named '%s'",
+    				remoteClientConfigName, ctx.getTenantName());
+    		logger.error(errMsg);
+    		throw new Exception(errMsg);
+    	}
+    	
+    	return result;
+    }
+    
     /**
      * Make a request to the SAS Server for an authority payload.
      * 
@@ -53,10 +112,12 @@ public class AuthorityServiceUtils {
      * @return
      * @throws Exception
      */
-    static public PoxPayloadIn requestPayloadIn(ServiceContext ctx, Specifier specifier, Class responseType) throws Exception {
+    static public PoxPayloadIn requestPayloadInFromRemoteServer(ServiceContext ctx, String remoteClientConfigName, Specifier specifier, Class responseType) throws Exception {
     	PoxPayloadIn result = null;
     	
-        AuthorityClient client = (AuthorityClient) ctx.getClient(CollectionSpaceClient.SAS_CLIENT_PROPERTIES_FILENAME);
+    	RemoteClientConfig remoteClientConfig = getRemoteClientConfig(ctx, remoteClientConfigName);
+        AuthorityClient client = (AuthorityClient) ctx.getClient(remoteClientConfig);
+        
         Response res = client.read(specifier.getURNValue());
         try {
 	        int statusCode = res.getStatus();
@@ -76,13 +137,19 @@ public class AuthorityServiceUtils {
     }
     
     //
-    // Makes a call to the SAS server for a authority item payload
+    // Makes a call to the remote SAS server for a authority item payload
     //    
-    static public PoxPayloadIn requestPayloadIn(AuthorityItemSpecifier specifier, String serviceName, Class responseType, boolean syncHierarchicalRelationships) throws Exception {
+    static public PoxPayloadIn requestPayloadInFromRemoteServer(
+    		AuthorityItemSpecifier specifier, 
+    		String remoteClientConfigName, 
+    		String serviceName, 
+    		Class responseType, 
+    		boolean syncHierarchicalRelationships) throws Exception {
     	PoxPayloadIn result = null;
     	
-    	ServiceContext parentCtx = new MultipartServiceContextImpl(serviceName);
-        AuthorityClient client = (AuthorityClient) parentCtx.getClient(CollectionSpaceClient.SAS_CLIENT_PROPERTIES_FILENAME);
+    	ServiceContext authorityCtx = new MultipartServiceContextImpl(serviceName);
+    	RemoteClientConfig remoteClientConfig = getRemoteClientConfig(authorityCtx, remoteClientConfigName);
+        AuthorityClient client = (AuthorityClient) authorityCtx.getClient(remoteClientConfig);
         Response res = client.readItem(specifier.getParentSpecifier().getURNValue(), specifier.getItemSpecifier().getURNValue(),
     			AuthorityClient.INCLUDE_DELETED_ITEMS, syncHierarchicalRelationships);
         

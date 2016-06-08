@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
@@ -38,6 +39,7 @@ import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.config.PropertyItemUtils;
 import org.collectionspace.services.common.config.ServiceConfigUtils;
@@ -51,6 +53,7 @@ import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.RemoteClientConfig;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.services.config.types.PropertyItemType;
@@ -76,6 +79,7 @@ import org.slf4j.LoggerFactory;
  * @param <IT>
  * @param <OT>
  */
+@SuppressWarnings("rawtypes")
 public abstract class AbstractServiceContextImpl<IT, OT>
         implements ServiceContext<IT, OT> {
 
@@ -665,8 +669,17 @@ public abstract class AbstractServiceContextImpl<IT, OT>
      * (non-Javadoc)
      * @see org.collectionspace.services.common.context.ServiceContext#getClient(java.lang.String)
      */
-    @Override
+	@Override
     public AuthorityClient getClient(String clientPropertiesFilename) throws Exception {
+    	AuthorityClient result = null;
+    	
+        Properties inProperties = Tools.loadProperties(clientPropertiesFilename, true);
+        result = getClient(inProperties);
+        
+        return result;
+    }
+    
+    public AuthorityClient getClient(Properties inProperties) throws Exception {
     	AuthorityClient result = null;
     	
         String authorityClientClazz = getServiceBinding().getClientHandler();
@@ -676,7 +689,7 @@ public abstract class AbstractServiceContextImpl<IT, OT>
             Class<?> c = tccl.loadClass(authorityClientClazz);
             if (AuthorityClient.class.isAssignableFrom(c)) {
             	result = authorityClient = ((AuthorityClient) c.newInstance());
-            	result.setClientProperties(clientPropertiesFilename);
+            	result.setClientProperties(inProperties);
             } else {
             	logger.error(String.format("The service binding clientHandler class '%s' for '%s' service was not of type AuthorityClient.",
             			authorityClientClazz, this.getServiceName()));
@@ -688,7 +701,24 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         }
         
         return result;
-    }    
+    }
+    
+    @Override
+    public AuthorityClient getClient(RemoteClientConfig remoteClientConfig) throws Exception {
+    	AuthorityClient result = null;
+    	
+        Properties properties = new Properties();
+        properties.setProperty(AuthorityClient.URL_PROPERTY, remoteClientConfig.getUrl());
+        properties.setProperty(AuthorityClient.USER_PROPERTY, remoteClientConfig.getUser());
+        properties.setProperty(AuthorityClient.PASSWORD_PROPERTY, remoteClientConfig.getPassword());
+        properties.setProperty(AuthorityClient.SSL_PROPERTY, remoteClientConfig.getSsl());
+        properties.setProperty(AuthorityClient.AUTH_PROPERTY, remoteClientConfig.getAuth());
+        properties.setProperty(AuthorityClient.TENANT_ID_PROPERTY, remoteClientConfig.getTenantId());
+        properties.setProperty(AuthorityClient.TENANT_NAME_PROPERTY, remoteClientConfig.getTenantName());
+
+        result = getClient(properties);
+        return result;
+    }
     
     @Override
     public void addValidatorHandler(ValidatorHandler<IT, OT> validator) throws Exception {

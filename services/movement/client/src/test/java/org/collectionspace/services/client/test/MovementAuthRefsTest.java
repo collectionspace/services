@@ -44,7 +44,6 @@ import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.movement.MovementsCommon;
 import org.collectionspace.services.person.PersonTermGroup;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -155,7 +154,7 @@ public class MovementAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         movementIdsCreated.add(newId);
     }
 
-    protected void createPersonRefs(){
+    protected void createPersonRefs() throws Exception{
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding
         // refName by which it can be identified.
@@ -182,7 +181,7 @@ public class MovementAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         movementContactRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
     }
     
-    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
+    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) throws Exception {
     	String result = null;
     	
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
@@ -297,9 +296,10 @@ public class MovementAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
     	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
@@ -345,7 +345,7 @@ public class MovementAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
    private PoxPayloadOut createMovementInstance(String movementReferenceNumber,
             String locationDate,
-            String movementContact) {
+            String movementContact) throws Exception {
         MovementsCommon movementCommon = new MovementsCommon();
         movementCommon.setMovementReferenceNumber(movementReferenceNumber);
         movementCommon.setLocationDate(locationDate);

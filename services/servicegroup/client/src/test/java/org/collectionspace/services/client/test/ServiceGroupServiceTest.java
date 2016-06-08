@@ -33,6 +33,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.servicegroup.ServicegroupsCommon;
 
 import javax.ws.rs.core.Response;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.slf4j.Logger;
@@ -61,12 +62,12 @@ public class ServiceGroupServiceTest extends BaseServiceTest<AbstractCommonList>
 	}
     
     @Override
-    protected CollectionSpaceClient<AbstractCommonList, PoxPayloadOut, String, ServiceGroupProxy> getClientInstance() {
+    protected CollectionSpaceClient<AbstractCommonList, PoxPayloadOut, String, ServiceGroupProxy> getClientInstance() throws Exception {
         return new ServiceGroupClient();
     }
 
 	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
         return new ServiceGroupClient(clientPropertiesFilename);
 	}
 

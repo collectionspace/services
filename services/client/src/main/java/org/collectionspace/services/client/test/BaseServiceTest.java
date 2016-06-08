@@ -81,6 +81,7 @@ import org.collectionspace.services.common.api.FileTools;
 /*
  * <CLT> - Common list type
  */
+@SuppressWarnings("rawtypes")
 public abstract class BaseServiceTest<CLT> {
 	//A default MIME type result
     static protected final String DEFAULT_MIME = "application/octet-stream; charset=ISO-8859-1";
@@ -88,8 +89,16 @@ public abstract class BaseServiceTest<CLT> {
     protected static final String MAVEN_BASEDIR_PROPERTY = "maven.basedir";
     /** The Constant logger. */
     private static final Logger logger = LoggerFactory.getLogger(BaseServiceTest.class);
-    /** The Constant serviceClient. */
-    protected static final TestServiceClient serviceClient = new TestServiceClient();
+    
+    /** The static serviceClient for all instances */
+    protected static TestServiceClient serviceClient;
+    static {
+    	try {
+			serviceClient = new TestServiceClient();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+    }
     
     protected String knownResourceIdentifier = null;
     /** Use this to keep track of a single known resource */
@@ -145,24 +154,26 @@ public abstract class BaseServiceTest<CLT> {
     //
     // Status constants
     //
-    protected static final int STATUS_BAD_REQUEST =
-        Response.Status.BAD_REQUEST.getStatusCode();
-    protected static final int STATUS_CREATED =
-        Response.Status.CREATED.getStatusCode();
-    protected static final int STATUS_INTERNAL_SERVER_ERROR =
-        Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
-    protected static final int STATUS_NOT_FOUND =
-        Response.Status.NOT_FOUND.getStatusCode();
-    protected static final int STATUS_OK =
-            Response.Status.OK.getStatusCode();
-    protected static final int STATUS_FORBIDDEN =
-            Response.Status.FORBIDDEN.getStatusCode();
+    protected static final int STATUS_BAD_REQUEST = Response.Status.BAD_REQUEST.getStatusCode();
+    protected static final int STATUS_CREATED = Response.Status.CREATED.getStatusCode();
+    protected static final int STATUS_INTERNAL_SERVER_ERROR = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
+    protected static final int STATUS_NOT_FOUND = Response.Status.NOT_FOUND.getStatusCode();
+    protected static final int STATUS_OK = Response.Status.OK.getStatusCode();
+    protected static final int STATUS_FORBIDDEN = Response.Status.FORBIDDEN.getStatusCode();
     
     //
     // "Global flag to cancel cleanup() method
     //
     private static boolean cancelCleanup = false;
-    
+        
+    /**
+     * Instantiates a new base service test.
+     * @throws Exception 
+     */
+    public BaseServiceTest() {
+        super();
+    }
+
     //
     // Decide if cleanup should happen
     //
@@ -181,13 +192,6 @@ public abstract class BaseServiceTest<CLT> {
     	cancelCleanup = true;
     }
 
-    /**
-     * Instantiates a new base service test.
-     */
-    public BaseServiceTest() {
-        super();
-    }
-
     /*
      * A getter for retrieving the tests logger
      */
@@ -204,15 +208,17 @@ public abstract class BaseServiceTest<CLT> {
      * Gets the client.
      *
      * @return the client
+     * @throws Exception 
      */
-    abstract protected CollectionSpaceClient getClientInstance();
+	abstract protected CollectionSpaceClient getClientInstance() throws Exception;
 
     /**
      * Gets the client.
      *
      * @return the client
+     * @throws Exception 
      */
-    abstract protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename);
+    abstract protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception;
 
     /*
      * Subclasses can override this method to return their AbstractCommonList subclass
@@ -248,8 +254,9 @@ public abstract class BaseServiceTest<CLT> {
      * base path, if any.
      *
      * @return The URL path component of the service.
+     * @throws Exception 
      */
-    protected abstract String getServicePathComponent();
+    protected abstract String getServicePathComponent() throws Exception;
     
     protected abstract String getServiceName();
 
@@ -759,9 +766,10 @@ public abstract class BaseServiceTest<CLT> {
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun = true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         if (cleanupCancelled() == true) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Skipping Cleanup phase ...");

@@ -46,11 +46,11 @@ public class CitationAuthorityClient extends AuthorityClientImpl<Citationauthori
     //
     // Constructors
     //
-    public CitationAuthorityClient() {
+    public CitationAuthorityClient() throws Exception {
     	super();
     }
     
-    public CitationAuthorityClient(String clientPropertiesFilename) {
+    public CitationAuthorityClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
     

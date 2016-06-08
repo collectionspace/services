@@ -33,11 +33,11 @@ public class ContactClient extends AbstractCommonListPoxServiceClientImpl<Contac
     public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    public ContactClient() {
+    public ContactClient() throws Exception {
 		super();
 	}
 
-    public ContactClient(String clientPropertiesFilename) {
+    public ContactClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 

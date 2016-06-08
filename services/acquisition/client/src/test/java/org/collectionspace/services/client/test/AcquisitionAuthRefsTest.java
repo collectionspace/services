@@ -154,7 +154,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 		acquisitionIdsCreated.add(extractId(res));
 	}
 
-	protected void createPersonRefs(){
+	protected void createPersonRefs() throws Exception{
 		PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
 		PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
 				PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
@@ -199,7 +199,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 		personIdsCreated.add(csid);
 	}
 
-	protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
+	protected String createPerson(String firstName, String surName, String shortId, String authRefName ) throws Exception {
 		Map<String, String> personInfo = new HashMap<String,String>();
 		personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
 		personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
@@ -337,9 +337,10 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 	 * For this reason, it attempts to remove all resources created
 	 * at any point during testing, even if some of those resources
 	 * may be expected to be deleted by certain tests.
+	 * @throws Exception 
 	 */
 	@AfterClass(alwaysRun=true)
-	public void cleanUp() {
+	public void cleanUp() throws Exception {
 		String noTest = System.getProperty("noTestCleanup");
 		if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
 			if (logger.isDebugEnabled()) {
@@ -384,7 +385,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 			String acquisitionAuthorizer,
 			List<String> acquisitionFundingSources,
 			List<String> acqOwners,
-			List<String> acquisitionSources) {
+			List<String> acquisitionSources) throws Exception {
 
 		AcquisitionsCommon acquisition = new AcquisitionsCommon();
 		StructuredDateGroup accessionDateGroup = new StructuredDateGroup(); 

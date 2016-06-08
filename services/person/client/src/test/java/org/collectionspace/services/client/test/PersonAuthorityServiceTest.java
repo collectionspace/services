@@ -128,12 +128,12 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new PersonAuthorityClient();
     }
     
 	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
         return new PersonAuthorityClient(clientPropertiesFilename);
 	}
 
@@ -187,7 +187,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     }
 
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
         PersonAuthorityClient client = new PersonAuthorityClient();
         
         String displayName = "displayName-" + identifier;
@@ -198,7 +198,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     }
 
     @Override
-    protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) {
+    protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) throws Exception {
         String headerLabel = new PersonAuthorityClient().getItemCommonPartName();
         
         HashMap<String, String> personInfo = new HashMap<String, String>();
@@ -236,9 +236,10 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * @param vcsid the vcsid
      * @param authRefName the auth ref name
      * @return the string
+     * @throws Exception 
      */
     @Override
-    protected String createItemInAuthority(AuthorityClient client, String vcsid, String shortId) {
+    protected String createItemInAuthority(AuthorityClient client, String vcsid, String shortId) throws Exception {
 
         final String testName = "createItemInAuthority";
         if (logger.isDebugEnabled()) {
@@ -287,9 +288,10 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * @param itemFieldProperties a set of properties specifying the values of fields.
      * @param itemRepeatableFieldProperties a set of properties specifying the values of repeatable fields.
      * @return the string
+     * @throws Exception 
      */
     private String createItemInAuthority(AuthorityClient client, String vcsid, String authRefName, String shortId,
-            Map<String, String> itemFieldProperties, List<PersonTermGroup> terms, Map<String, List<String>> itemRepeatableFieldProperties) {
+            Map<String, String> itemFieldProperties, List<PersonTermGroup> terms, Map<String, List<String>> itemRepeatableFieldProperties) throws Exception {
 
         final String testName = "createItemInAuthority";
         if (logger.isDebugEnabled()) {
@@ -356,10 +358,10 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * Creates the contact.
      *
      * @param testName the test name
+     * @throws Exception 
      */
-    @Test(dataProvider = "testName", groups = {"create"},
-    		dependsOnMethods = {"createItem"})
-    public void createContact(String testName) {
+    @Test(dataProvider = "testName", groups = {"create"}, dependsOnMethods = {"createItem"})
+    public void createContact(String testName) throws Exception {
         setupCreate();
         createContactInItem(knownResourceId, knownItemResourceId);
     }
@@ -370,8 +372,9 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * @param parentcsid the parentcsid
      * @param itemcsid the itemcsid
      * @return the string
+     * @throws Exception 
      */
-    private String createContactInItem(String parentcsid, String itemcsid) {
+    private String createContactInItem(String parentcsid, String itemcsid) throws Exception {
 
         final String testName = "createContactInItem";
         if (logger.isDebugEnabled()) {
@@ -450,10 +453,11 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * non-word characters.
      *
      * @param testName the test name
+     * @throws Exception 
      */
     @Test(dataProvider = "testName", groups = {"create", "nonWordCharsInShortId"},
     		dependsOnMethods = {"org.collectionspace.services.client.test.AbstractServiceTestImpl.create"})
-    public void createItemWithShortIdNonWordChars(String testName) {
+    public void createItemWithShortIdNonWordChars(String testName) throws Exception {
         testExpectedStatusCode = STATUS_BAD_REQUEST;
         testRequestType = ServiceRequestType.CREATE;
         testSetup(testExpectedStatusCode, testRequestType);
@@ -548,7 +552,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         readInternal(testName, null, knownResourceShortIdentifer);
     }
 
-    protected void readInternal(String testName, String CSID, String shortId) {
+    protected void readInternal(String testName, String CSID, String shortId) throws Exception {
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
         Response res = null;
@@ -776,9 +780,10 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * Read contact non existent.
      *
      * @param testName the test name
+     * @throws Exception 
      */
     @Test(dataProvider = "testName", groups = {"readItem"}, dependsOnMethods = {"readContact"})
-    public void readContactNonExistent(String testName) {
+    public void readContactNonExistent(String testName) throws Exception {
         // Perform setup.
         setupReadNonExistent();
 
@@ -801,10 +806,11 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 
     /**
      * Read contact list.
+     * @throws Exception 
      */
     @Test(groups = {"readList"},
     		dependsOnMethods = {"org.collectionspace.services.client.test.AbstractAuthorityServiceTest.readItemList"})
-    public void readContactList() {
+    public void readContactList() throws Exception {
         readContactList(knownResourceId, knownItemResourceId);
     }
 
@@ -813,8 +819,9 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      *
      * @param parentcsid the parentcsid
      * @param itemcsid the itemcsid
+     * @throws Exception 
      */
-    private void readContactList(String parentcsid, String itemcsid) {
+    private void readContactList(String parentcsid, String itemcsid) throws Exception {
         final String testName = "readContactList";
 
         // Perform setup.
@@ -1162,10 +1169,11 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * Delete non existent contact.
      *
      * @param testName the test name
+     * @throws Exception 
      */
     @Test(dataProvider = "testName", groups = {"delete"},
     		dependsOnMethods = {"deleteContact"})
-    public void deleteNonExistentContact(String testName) {
+    public void deleteNonExistentContact(String testName) throws Exception {
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
         setupDeleteNonExistent();
@@ -1215,10 +1223,11 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun = true)
     @Override
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {

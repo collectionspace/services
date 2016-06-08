@@ -26,7 +26,6 @@ package org.collectionspace.services.media;
 import org.collectionspace.services.blob.BlobResource;
 import org.collectionspace.services.client.BlobClient;
 import org.collectionspace.services.client.CollectionSpaceClientUtils;
-import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.MediaClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -38,6 +37,7 @@ import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
+
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,8 +61,22 @@ import javax.ws.rs.core.UriInfo;
 @Consumes("application/xml")
 @Produces("application/xml")
 public class MediaResource extends NuxeoBasedResource {
-    final Logger logger = LoggerFactory.getLogger(MediaResource.class);
-    final static MediaClient mediaClient = new MediaClient();
+    final static Logger logger = LoggerFactory.getLogger(MediaResource.class);
+    final static MediaClient mediaClient = createMediaClient();
+    
+    private static MediaClient createMediaClient() {
+    	MediaClient result = null;
+    	
+    	try {
+			result = new MediaClient();
+		} catch (Exception e) {
+			String errMsg = "Could not create a new media client for the Media resource.";
+			logger.error(errMsg, e);
+			throw new RuntimeException();
+		}
+    	
+    	return result;
+    }
 
     @Override
     public String getServiceName(){

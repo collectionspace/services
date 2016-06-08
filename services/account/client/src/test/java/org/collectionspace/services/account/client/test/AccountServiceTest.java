@@ -34,7 +34,6 @@ import org.collectionspace.services.account.AccountListItem;
 import org.collectionspace.services.account.Status;
 import org.collectionspace.services.client.AccountFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.slf4j.Logger;
@@ -80,7 +79,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
      * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
      */
     @Override
-    protected String getServicePathComponent() {
+    protected String getServicePathComponent() throws Exception {
         return new AccountClient().getServicePathComponent();
     }
 
@@ -88,12 +87,12 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new AccountClient();
     }
 
 	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
         return new AccountClient(clientPropertiesFilename);
 	}
 	
@@ -706,7 +705,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
         }
     }
     
-    private void findPrebuiltAdminAccount() {
+    private void findPrebuiltAdminAccount() throws Exception {
     	// Search for the prebuilt admin user and then hold its CSID
     	if (prebuiltAdminCSID == null) {
             setupReadList();
@@ -1129,7 +1128,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
 
 	@Override
 	protected AccountsCommon createInstance(String commonPartName,
-			String identifier) {
+			String identifier) throws Exception {
 		AccountClient client = new AccountClient();
         AccountsCommon account =
                 createAccountInstance(knownUserId, knownUserId, knownUserPassword,

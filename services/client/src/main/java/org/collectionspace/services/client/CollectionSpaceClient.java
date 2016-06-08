@@ -23,6 +23,8 @@
  */
 package org.collectionspace.services.client;
 
+import java.util.Properties;
+
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -66,13 +68,14 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
     
     public static final String DEFAULT_CLIENT_PROPERTIES_FILENAME = "collectionspace-client.properties";
     public static final String SAS_CLIENT_PROPERTIES_FILENAME = "sas-collectionspace-client.properties";
-    public static final String AUTH_PROPERTY = "cspace.auth";
-    public static final String PASSWORD_PROPERTY = "cspace.password";
-    public static final String SSL_PROPERTY = "cspace.ssl";
+
     public static final String URL_PROPERTY = "cspace.url";
     public static final String USER_PROPERTY = "cspace.user";
-    public static final String TENANT_PROPERTY = "cspace.tenant";
-    public static final String TENANT_NAME_PROPERTY = "cspace.tenantID";
+    public static final String PASSWORD_PROPERTY = "cspace.password";
+    public static final String SSL_PROPERTY = "cspace.ssl";
+    public static final String AUTH_PROPERTY = "cspace.auth";
+    public static final String TENANT_NAME_PROPERTY = "cspace.tenant";
+    public static final String TENANT_ID_PROPERTY = "cspace.tenantID";
     
     // JAX-RS path for getting service description meta information
 	public static final String SERVICE_DESCRIPTION_PATH = "description";
@@ -250,8 +253,11 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * Uses a properties files to set the url and credentials for an HTTP connection.
      * 
      * @param clientPropertiesFilename
+     * @throws Exception 
      */
-	public void setClientProperties(String clientPropertiesFilename);
+	public void setClientProperties(String clientPropertiesFilename) throws Exception;
+	
+	public void setClientProperties(Properties clientProperties);
 	
 	public String getTenantName();
 }

@@ -31,7 +31,6 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.objectexit.ObjectexitCommon;
-
 import org.testng.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,12 +57,12 @@ public class ObjectExitServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
 	}
     
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new ObjectExitClient();
     }
 
 	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
         return new ObjectExitClient(clientPropertiesFilename);
 	}
 
@@ -77,12 +76,12 @@ public class ObjectExitServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
     // ---------------------------------------------------------------
     
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
     	ObjectExitClient client = new ObjectExitClient();
     	return createObjectExitInstance(identifier);
     }
     
-    private PoxPayloadOut createObjectExitInstance(String exitNumber) {
+    private PoxPayloadOut createObjectExitInstance(String exitNumber) throws Exception {
         String identifier = "objectexitNumber-" + exitNumber;
         ObjectexitCommon objectexit = new ObjectexitCommon();
         objectexit.setExitNumber(identifier);
@@ -106,7 +105,7 @@ public class ObjectExitServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
 
 	@Override
 	protected PoxPayloadOut createInstance(String commonPartName,
-			String identifier) {
+			String identifier) throws Exception {
         PoxPayloadOut result = createObjectExitInstance(createIdentifier());
 		return result;
 	}

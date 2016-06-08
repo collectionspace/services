@@ -32,11 +32,11 @@ public class LoanoutClient extends AbstractCommonListPoxServiceClientImpl<Loanou
     public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    public LoanoutClient() {
+    public LoanoutClient() throws Exception {
 		super();
 	}
 
-    public LoanoutClient(String clientPropertiesFilename) {
+    public LoanoutClient(String clientPropertiesFilename) throws Exception {
     	super(clientPropertiesFilename);
 	}
 

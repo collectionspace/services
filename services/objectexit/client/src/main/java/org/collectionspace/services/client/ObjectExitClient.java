@@ -33,11 +33,11 @@ public class ObjectExitClient extends AbstractCommonListPoxServiceClientImpl<Obj
     public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    public ObjectExitClient() {
+    public ObjectExitClient() throws Exception {
 		super();
 	}
 
-    public ObjectExitClient(String clientPropertiesFilename) {
+    public ObjectExitClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 

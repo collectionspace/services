@@ -3,6 +3,10 @@ package org.collectionspace.services.client;
 public class GenericAuthorityClientImpl extends
 		AuthorityClientImpl<Object, Object, AuthorityProxy> {
 
+	public GenericAuthorityClientImpl() throws Exception {
+		super();
+	}
+
 	@Override
 	public String getItemCommonPartName() {
 		// TODO Auto-generated method stub

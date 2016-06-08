@@ -33,11 +33,11 @@ public class ConservationClient extends AbstractCommonListPoxServiceClientImpl<C
     public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    public ConservationClient() {
+    public ConservationClient() throws Exception {
 		super();
 	}
 
-    public ConservationClient(String clientPropertiesFilename) {
+    public ConservationClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 

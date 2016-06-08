@@ -30,7 +30,6 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.batch.BatchCommon;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.slf4j.Logger;
@@ -41,6 +40,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision:  $
  * $LastChangedDate:  $
  */
+@SuppressWarnings("rawtypes")
 public class BatchServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, BatchCommon> {
 
     private final String CLASS_NAME = BatchServiceTest.class.getName();
@@ -57,13 +57,13 @@ public class BatchServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 		return BatchClient.SERVICE_NAME;
 	}
     
-    @Override
-    protected CollectionSpaceClient getClientInstance() {
+	@Override
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new BatchClient();
     }
 
 	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
         return new BatchClient(clientPropertiesFilename);
 	}	
 
@@ -72,18 +72,18 @@ public class BatchServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
     // ---------------------------------------------------------------
     
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
     	return createBatchInstance(identifier);
     }
     
 	@Override
 	protected PoxPayloadOut createInstance(String commonPartName,
-			String identifier) {
+			String identifier) throws Exception {
 		PoxPayloadOut result = createBatchInstance(identifier);
 		return result;
 	}
 
-    private PoxPayloadOut createBatchInstance(String exitNumber) {
+    private PoxPayloadOut createBatchInstance(String exitNumber) throws Exception {
         String identifier = "batchNumber-" + exitNumber;
         BatchCommon batch = new BatchCommon();
         batch.setName(identifier);

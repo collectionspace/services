@@ -44,11 +44,11 @@ public class PermissionClient extends AbstractServiceClientImpl<PermissionsList,
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
     
-	public PermissionClient() {
+	public PermissionClient() throws Exception {
 		super();
 	}
 
-	public PermissionClient(String clientPropertiesFilename) {
+	public PermissionClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 

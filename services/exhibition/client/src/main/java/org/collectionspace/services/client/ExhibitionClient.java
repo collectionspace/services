@@ -29,11 +29,11 @@ public class ExhibitionClient extends AbstractCommonListPoxServiceClientImpl<Exh
     public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    public ExhibitionClient() {
+    public ExhibitionClient() throws Exception {
 		super();
 	}
 
-    public ExhibitionClient(String clientPropertiesFilename) {
+    public ExhibitionClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 

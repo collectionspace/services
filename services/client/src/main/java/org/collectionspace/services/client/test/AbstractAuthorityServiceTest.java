@@ -95,8 +95,9 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 	 * @param client
 	 * @param vcsid
 	 * @return
+	 * @throws Exception 
 	 */
-	abstract protected String createItemInAuthority(AuthorityClient client, String vcsid, String shortId);
+	abstract protected String createItemInAuthority(AuthorityClient client, String vcsid, String shortId) throws Exception;
 	
     
     /**
@@ -209,8 +210,9 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
      * Gets a client to the SAS (Shared Authority Server)
      *
      * @return the client
+     * @throws Exception 
      */
-	protected AuthorityClient getSASClientInstance() {
+	protected AuthorityClient getSASClientInstance() throws Exception {
     	return (AuthorityClient) this.getClientInstance(CollectionSpaceClient.SAS_CLIENT_PROPERTIES_FILENAME);
     }
 
@@ -344,7 +346,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     }
     
 	@Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests"})
-    public void createItem(String testName) {
+    public void createItem(String testName) throws Exception {
         // Perform setup.
         setupCreate();
 
@@ -362,8 +364,9 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     
     /**
      * Verify that we can test synchronization with this authority.  Otherwise, we skip the test.
+     * @throws Exception 
      */
-	private void assertSupportsSync() {
+	private void assertSupportsSync() throws Exception {
     	//
     	// Test to see if the authority on our locally tenant supports sync
     	//
@@ -490,10 +493,11 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     /**
      * Check to make sure the sync with the SAS returned the correct number of items as well as items
      * with the correct short IDs.
+     * @throws Exception 
      * 
      */
 	@Test(dataProvider = "testName", dependsOnMethods = {"syncWithSAS", "CRUDTests"})
-    public void veryifySyncWithSAS(String testName) {
+    public void veryifySyncWithSAS(String testName) throws Exception {
         //
     	// First check to see if we support sync.
     	//
@@ -560,7 +564,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     }
     
 	@Test(dataProvider = "testName", dependsOnMethods = {"syncWithSASWithRelations", "CRUDTests"})
-    public void veryifySyncWithSASWithRelations(String testName) {
+    public void veryifySyncWithSASWithRelations(String testName) throws Exception {
         //
     	// First check to see if we support sync.
     	//
@@ -631,8 +635,9 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
      * @param subjectShortId
      * @param objectShortId
      * @param authorityItemDocumentType
+     * @throws Exception 
      */
-    private void verifyBroaderRelationship(AuthorityClient authorityClient, String authorityShortId, String subjectShortId, String objectShortId, String authorityItemDocumentType) {
+    private void verifyBroaderRelationship(AuthorityClient authorityClient, String authorityShortId, String subjectShortId, String objectShortId, String authorityItemDocumentType) throws Exception {
         setupReadList();
         RelationClient relationClient = new RelationClient();
         Response res = relationClient.readList(getCsidFromShortId(authorityClient, authorityShortId, subjectShortId),
@@ -665,9 +670,10 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     /**
      * SAS - Create a new authority on the SAS server.
      * @param testName
+     * @throws Exception 
      */    
 	@Test(dataProvider = "testName", dependsOnMethods = {"createItem", "CRUDTests"})
-    public void createSASAuthority(String testName) {
+    public void createSASAuthority(String testName) throws Exception {
         //
         // First check to see if the authority supports synchronization.
         //
@@ -689,7 +695,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     }
     
 	@Test(dataProvider = "testName", dependsOnMethods = {"deleteLocalItemWithSync", "CRUDTests"})
-    public void createSASAuthorityWithRelations(String testName) {
+    public void createSASAuthorityWithRelations(String testName) throws Exception {
         //
         // First check to see if the authority supports synchronization.
         //
@@ -778,9 +784,10 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     /**
      * SAS - Create an item in the SAS authority on the SAS server.
      * @param testName
+     * @throws Exception 
      */
 	@Test(dataProvider = "testName", dependsOnMethods = {"createSASAuthority", "CRUDTests"})
-    public void createSASItemList(String testName) {
+    public void createSASItemList(String testName) throws Exception {
         //
         // First check to see if the authority supports synchronization.
         //
@@ -929,7 +936,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     		dependsOnMethods = {"readItem"})
-    public void readItemNonExistent(String testName) {
+    public void readItemNonExistent(String testName) throws Exception {
         // Perform setup.
         setupReadNonExistent();
 
@@ -1010,7 +1017,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
     
-    protected void readItemListInt(String vcsid, String shortId, String testName) {
+    protected void readItemListInt(String vcsid, String shortId, String testName) throws Exception {
         // Perform setup.
         setupReadList();
 
@@ -1067,18 +1074,18 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     }
     
     @Test(dataProvider = "testName", dependsOnMethods = {"createItemList"})
-    public void readItemList(String testName) {
+    public void readItemList(String testName) throws Exception {
         readItemListInt(knownAuthorityWithItems, null, testName);
     }
 
     @Test(dataProvider = "testName", dependsOnMethods = {"readItemList"})
-    public void readItemListByName(String testName) {
+    public void readItemListByName(String testName) throws Exception {
         readItemListInt(null, knownAuthorityWithItemsIdentifier, testName);
     }
 
     @Test(dataProvider = "testName",
     		dependsOnMethods = {"deleteItem"})
-    public void deleteNonExistentItem(String testName) {
+    public void deleteNonExistentItem(String testName) throws Exception {
         // Perform setup.
         setupDeleteNonExistent();
 
@@ -1106,7 +1113,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         return AuthorityClient.ITEMS;
     }
     
-	public PoxPayloadOut createItemRequestTypeInstance(AUTHORITY_ITEM_TYPE itemTypeInstance) {
+	public PoxPayloadOut createItemRequestTypeInstance(AUTHORITY_ITEM_TYPE itemTypeInstance) throws Exception {
 		PoxPayloadOut result = null;
 		
         AuthorityClient client = (AuthorityClient) getClientInstance();
@@ -1366,7 +1373,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 	}
         
     @Override
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {

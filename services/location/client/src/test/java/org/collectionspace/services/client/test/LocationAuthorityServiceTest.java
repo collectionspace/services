@@ -30,7 +30,6 @@ import java.util.Map;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.LocationJAXBSchema;
-import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadOutputPart;
@@ -39,11 +38,11 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.LocationAuthorityClient;
 import org.collectionspace.services.client.LocationAuthorityClientUtils;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
-import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.location.LocTermGroup;
 import org.collectionspace.services.location.LocTermGroupList;
 import org.collectionspace.services.location.LocationauthoritiesCommon;
 import org.collectionspace.services.location.LocationsCommon;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -105,12 +104,12 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
     	return new LocationAuthorityClient();
     }
     
     @Override
-    protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
     	return new LocationAuthorityClient(clientPropertiesFilename);
     }
     
@@ -255,10 +254,11 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
 
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
     	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {

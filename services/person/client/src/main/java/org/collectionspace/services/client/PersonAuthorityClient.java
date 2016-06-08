@@ -46,11 +46,11 @@ public class PersonAuthorityClient extends AuthorityWithContactsClientImpl<Perso
     //
     // Constructors
     //
-    public PersonAuthorityClient() {
+    public PersonAuthorityClient() throws Exception {
     	super();
     }
     
-    public PersonAuthorityClient(String clientPropertiesFilename) {
+    public PersonAuthorityClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 

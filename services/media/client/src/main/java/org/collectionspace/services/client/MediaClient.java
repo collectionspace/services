@@ -17,6 +17,7 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
+
 import org.collectionspace.services.media.MediaCommon;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 
@@ -33,11 +34,11 @@ public class MediaClient extends AbstractCommonListPoxServiceClientImpl<MediaPro
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 	
-	public MediaClient() {
+	public MediaClient() throws Exception {
 		super();
 	}
 
-	public MediaClient(String clientPropertiesFilename) {
+	public MediaClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 

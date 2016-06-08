@@ -55,11 +55,11 @@ public class TaxonomyAuthorityClient extends AuthorityClientImpl<Taxonomyauthori
     //
     // Constructors
     //
-    public TaxonomyAuthorityClient() {
+    public TaxonomyAuthorityClient() throws Exception {
     	super();
     }
     
-    public TaxonomyAuthorityClient(String clientPropertiesFilename) {
+    public TaxonomyAuthorityClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
     

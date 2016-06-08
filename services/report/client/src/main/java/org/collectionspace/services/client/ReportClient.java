@@ -55,11 +55,11 @@ public class ReportClient extends AbstractCommonListPoxServiceClientImpl<ReportP
     public static final String COMPILED_REPORT_EXTENSION = ".jasper";
     public static final String REPORT_DECSRIPTION_EXTENSION = ".jrxml";
 
-    public ReportClient() {
+    public ReportClient() throws Exception {
 		super();
 	}
 
-    public ReportClient(String clientPropertiesFilename) {
+    public ReportClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 

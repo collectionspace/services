@@ -24,6 +24,7 @@
 package org.collectionspace.services.nuxeo.client.java;
 
 import java.util.Hashtable;
+import java.util.List;
 
 import javax.security.auth.login.LoginContext;
 
@@ -34,9 +35,13 @@ import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.RepositoryClientConfigType;
 import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.RemoteClientConfig;
+import org.collectionspace.services.config.tenant.RemoteClientConfigurations;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
 import org.collectionspace.services.config.tenant.TenantBindingType;
+
 import org.nuxeo.runtime.api.Framework;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

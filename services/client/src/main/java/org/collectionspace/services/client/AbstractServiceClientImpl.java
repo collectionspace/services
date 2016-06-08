@@ -24,13 +24,11 @@
 package org.collectionspace.services.client;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 
-import javax.ws.rs.PathParam;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
@@ -40,19 +38,22 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope; //import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.apache.commons.httpclient.auth.AuthScope;
+
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.jboss.resteasy.client.ClientResponse; //import org.collectionspace.services.common.context.ServiceContext;
-import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
+
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
-//import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
+import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+// FIXME: Deprecated classes that need to be updated
+import org.jboss.resteasy.client.ProxyFactory;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 
 /**
  * Private class for JAX-RS authentication
@@ -104,7 +105,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
 	implements CollectionSpaceClient<CLT, REQUEST_PT, RESPONSE_PT, P> {
 
     /** The logger. */
-    protected final Logger logger = LoggerFactory.getLogger(AbstractServiceClientImpl.class);
+    static protected final Logger logger = LoggerFactory.getLogger(AbstractServiceClientImpl.class);
     /**
      * The character used to separate the words in a part label
      */
@@ -135,7 +136,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      * Instantiates a new abstract service client impl.
      * @throws Exception 
      */
-    public AbstractServiceClientImpl() {
+    public AbstractServiceClientImpl() throws Exception {
     	this(CollectionSpaceClient.DEFAULT_CLIENT_PROPERTIES_FILENAME);
     }
     
@@ -143,7 +144,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      * Instantiates a new abstract service client impl.
      * @throws Exception 
      */
-    public AbstractServiceClientImpl(String propertiesFileName) {
+    public AbstractServiceClientImpl(String propertiesFileName) throws Exception {
         setClientProperties(propertiesFileName);
     }
     
@@ -152,7 +153,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      * @throws Exception 
      */
     public AbstractServiceClientImpl(Properties properties) {
-        setClientProperties(properties);
+        setClientProperties(properties, false);
     }
     
     /**
@@ -333,91 +334,76 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
     /**
      * readProperties reads properties from system class path as well as it
      * overrides properties made available using command line
+     * @throws Exception 
      *
      * @exception RuntimeException
      */
     @Override
-    public void setClientProperties(String clientPropertiesFilename) {
-    	Properties inProperties = new Properties();
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        InputStream is = null;
-        try {
-            is = cl.getResourceAsStream(clientPropertiesFilename);
-            inProperties.load(is);
-            setClientProperties(inProperties);
-        } catch (Exception e) {
-            logger.debug("Caught exception while reading properties", e);
-            throw new RuntimeException(e);
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (Exception e) {
-                    if (logger.isDebugEnabled() == true) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
+    public void setClientProperties(String clientPropertiesFilename) throws Exception {
+    	Properties inProperties = Tools.loadProperties(clientPropertiesFilename, true);
+        setClientProperties(inProperties, true);
     }
     
+    @Override
+    public void setClientProperties(Properties inProperties) {
+    	setClientProperties(inProperties, false);
+    }
+
     /**
-     * Set our instance's properties to the in coming value.  But only if the values don't already
-     * existing as System properties.
+     * Set our instance's properties to the in coming values.  But if 'overrideWithSyste' param is set to true then
+     * only use the incoming values if the values don't already exist as System properties.
      * 
      * @param inProperties
      * @throws Exception 
      */
-    protected void setClientProperties(Properties inProperties) {
+    protected void setClientProperties(Properties inProperties, boolean overrideWithSystemValues) {
         properties = inProperties;
         
-        if (logger.isDebugEnabled()) {
-        	System.getenv();
-        	System.getenv("An environment variable name");
-            printProperties();
+        if (overrideWithSystemValues == true) {
+	        String spec = System.getProperty(URL_PROPERTY);
+	        if (spec != null && !"".equals(spec)) {
+	            properties.setProperty(URL_PROPERTY, spec);
+	        }
+		
+	        String auth = System.getProperty(AUTH_PROPERTY);
+	        if (auth != null && !"".equals(auth)) {
+	            properties.setProperty(AUTH_PROPERTY, auth);
+	        }
+	        String ssl = System.getProperty(SSL_PROPERTY);
+	        if (ssl != null && !"".equals(ssl)) {
+	            properties.setProperty(AUTH_PROPERTY, ssl);
+	        }
+	        String user = System.getProperty(USER_PROPERTY);
+	        if (user != null && !"".equals(user)) {
+	            properties.setProperty(USER_PROPERTY, user);
+	        }
+	        String password = System.getProperty(PASSWORD_PROPERTY);
+	        if (password != null && !"".equals(password)) {
+	            properties.setProperty(PASSWORD_PROPERTY, password);
+	        }
+	        String tenant = System.getProperty(TENANT_NAME_PROPERTY);
+	        if (tenant != null && !"".equals(tenant)) {
+	            properties.setProperty(TENANT_NAME_PROPERTY, tenant);
+	        }
         }
-        
-        String spec = System.getProperty(URL_PROPERTY);
-        if (spec != null && !"".equals(spec)) {
-            properties.setProperty(URL_PROPERTY, spec);
-        }
-
-        spec = properties.getProperty(URL_PROPERTY);
+        //
+        // Verify the URL is well formed.
+        //
+        String urlString = properties.getProperty(URL_PROPERTY);
         try {
-			url = new URL(spec);
-	        logger.debug("readProperties() using url=" + url);
+			url = new URL(urlString);
+	        logger.debug("Client properties using url=" + url);
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(String.format("Found malformed URL property value of '%s' for client URL settings.", urlString));
 			throw new RuntimeException(e.getMessage());
 		}
-
-        String auth = System.getProperty(AUTH_PROPERTY);
-        if (auth != null && !"".equals(auth)) {
-            properties.setProperty(AUTH_PROPERTY, auth);
-        }
-        String ssl = System.getProperty(SSL_PROPERTY);
-        if (ssl != null && !"".equals(ssl)) {
-            properties.setProperty(AUTH_PROPERTY, ssl);
-        }
-        String user = System.getProperty(USER_PROPERTY);
-        if (user != null && !"".equals(user)) {
-            properties.setProperty(USER_PROPERTY, user);
-        }
-        String password = System.getProperty(PASSWORD_PROPERTY);
-        if (password != null && !"".equals(password)) {
-            properties.setProperty(PASSWORD_PROPERTY, password);
-        }
-        String tenant = System.getProperty(TENANT_PROPERTY);
-        if (tenant != null && !"".equals(tenant)) {
-            properties.setProperty(TENANT_PROPERTY, tenant);
-        }
         
         if (logger.isDebugEnabled()) {
             printProperties();
         }
         //
-        // How use the properties to initialize the HTTP client
+        // Now setup the connection.
         //
         init();
     }    
@@ -647,6 +633,6 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
     
     @Override
     public String getTenantName() {
-    	return this.getProperty(TENANT_NAME_PROPERTY);
+    	return this.getProperty(TENANT_ID_PROPERTY);
     }
 }

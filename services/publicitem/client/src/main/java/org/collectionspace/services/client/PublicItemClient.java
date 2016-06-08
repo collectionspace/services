@@ -36,11 +36,11 @@ public class PublicItemClient extends AbstractCommonListPoxServiceClientImpl<Pub
     
     public static final String PUBLICITEMS_CONTENT_SUFFIX = "content";
 
-    public PublicItemClient() {
+    public PublicItemClient() throws Exception {
 		super();
 	}
 
-    public PublicItemClient(String clientPropertiesFilename) {
+    public PublicItemClient(String clientPropertiesFilename) throws Exception {
     	super(clientPropertiesFilename);
 	}
 

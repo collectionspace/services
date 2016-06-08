@@ -104,7 +104,7 @@ public abstract class AbstractPoxServiceTestImpl<CLT extends AbstractCommonList,
     }
 		
 	@Override
-	public PoxPayloadOut createRequestTypeInstance(CPT commonPartTypeInstance) {
+	public PoxPayloadOut createRequestTypeInstance(CPT commonPartTypeInstance) throws Exception {
 		PoxPayloadOut result = null;
 		
 		CollectionSpaceClient client = this.getClientInstance();

@@ -18,13 +18,14 @@
            xmlns="http://collectionspace.org/services/config/tenant"
            xmlns:types="http://collectionspace.org/services/config/types"
            xmlns:service="http://collectionspace.org/services/config/service"
+           xmlns:remoteclientconfig="http://collectionspace.org/services/config/remoteclientconfig"
            targetNamespace="http://collectionspace.org/services/config/tenant"
            version="0.1"
            elementFormDefault="qualified">
 
     <xs:import namespace="http://collectionspace.org/services/config/types" schemaLocation="types.xsd" />
-    <xs:import namespace="http://collectionspace.org/services/config/service" schemaLocation="service.xsd" />
-
+	<xs:import namespace="http://collectionspace.org/services/config/service" schemaLocation="service.xsd" />
+	
     <xs:element name="TenantBindingConfig">
         <xs:annotation>
             <xs:documentation/>
@@ -47,6 +48,7 @@
             <xs:element name="repositoryDomain" type="RepositoryDomainType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="binaryStorePath" type="xs:string" minOccurs="0" maxOccurs="1"/>
             <xs:element name="properties" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
+        	<xs:element name="remoteClientConfigurations" type="RemoteClientConfigurations" minOccurs="0" maxOccurs="1"/>
             <xs:element name="serviceBindings" type="service:ServiceBindingType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <!-- tenant id, a UUID -->
@@ -71,5 +73,27 @@
         <xs:attribute name="repositoryName" type="xs:string" use="optional" default="default"/>        
         <xs:attribute name="repositoryClient" type="xs:string" use="optional" default="nuxeo-java"/>
     </xs:complexType>
+
+	<xs:complexType name="RemoteClientConfigurations">
+		<xs:sequence>
+			<xs:element name="remoteClientConfig" type="RemoteClientConfig" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="RemoteClientConfig">
+		<xs:annotation>
+			<xs:documentation>Connection details for a remote CollectionSpace instance.  Used for things like the Share Authority Server</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="url" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="user" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="password" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="tenantId" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="tenantName" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="ssl" type="xs:string" minOccurs="0" maxOccurs="1"/>        
+			<xs:element name="auth" type="xs:string" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
 
 </xs:schema>

@@ -28,12 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.QueryContext;
-import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

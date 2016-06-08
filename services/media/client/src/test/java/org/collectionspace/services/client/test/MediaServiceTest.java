@@ -37,7 +37,6 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.media.LanguageList;
 import org.collectionspace.services.media.MediaCommon;
 import org.collectionspace.services.media.SubjectList;
-
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
@@ -89,12 +88,12 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 	}
     
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new MediaClient();
     }
 
 	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
         return new MediaClient(clientPropertiesFilename);
 	}
 
@@ -246,14 +245,14 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
     // ---------------------------------------------------------------
 
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
     	return createMediaInstance(identifier);
     }
     
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-    private PoxPayloadOut createMediaInstance(String title) {
+    private PoxPayloadOut createMediaInstance(String title) throws Exception {
         String identifier = "media.title-" + title;
         MediaCommon media = new MediaCommon();
         media.setTitle(identifier);
@@ -284,7 +283,7 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 
 	@Override
 	protected PoxPayloadOut createInstance(String commonPartName,
-			String identifier) {
+			String identifier) throws Exception {
 		return createMediaInstance(identifier);
 	}
 

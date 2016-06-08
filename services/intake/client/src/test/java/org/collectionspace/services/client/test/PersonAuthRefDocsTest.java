@@ -43,7 +43,6 @@ import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.InsurerList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.person.PersonTermGroup;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -168,8 +167,9 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
 
     /**
      * Creates the person refs.
+     * @throws Exception 
      */
-    protected void createPersonRefs() {
+    protected void createPersonRefs() throws Exception {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
                 PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
@@ -223,7 +223,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         personIdsCreated.add(csid);
     }
 
-    protected String createPerson(String firstName, String surName, String shortId, String authRefName) {
+    protected String createPerson(String firstName, String surName, String shortId, String authRefName) throws Exception {
     	String result = null;
     	
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
@@ -405,9 +405,10 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun = true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
@@ -447,7 +448,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
             String depositor,
             String conditionCheckerAssessor,
             String insurer,
-            String Valuer) {
+            String Valuer) throws Exception {
         IntakesCommon intake = new IntakesCommon();
         intake.setEntryNumber(entryNumber);
         intake.setEntryDate(entryDate);

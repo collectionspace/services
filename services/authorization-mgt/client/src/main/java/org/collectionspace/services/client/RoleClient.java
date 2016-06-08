@@ -32,6 +32,10 @@ import javax.ws.rs.core.Response;
 
 
 
+
+
+
+
 import org.apache.http.HttpStatus;
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.Role;
@@ -50,11 +54,11 @@ public class RoleClient extends AbstractServiceClientImpl<RolesList, Role, Role,
 	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
 	public final static String IMMUTABLE = "immutable";
 
-    public RoleClient() {
+    public RoleClient() throws Exception {
 		super();
 	}
 
-    public RoleClient(String clientPropertiesFilename) {
+    public RoleClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 

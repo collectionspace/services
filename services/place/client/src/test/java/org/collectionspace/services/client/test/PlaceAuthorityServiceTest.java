@@ -43,7 +43,6 @@ import org.collectionspace.services.place.PlaceTermGroup;
 import org.collectionspace.services.place.PlaceTermGroupList;
 import org.collectionspace.services.place.PlaceauthoritiesCommon;
 import org.collectionspace.services.place.PlacesCommon;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -102,12 +101,12 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new PlaceAuthorityClient();
     }
 
 	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
         return new PlaceAuthorityClient(clientPropertiesFilename);
 	}
 	
@@ -249,10 +248,11 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
 
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
     	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {

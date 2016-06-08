@@ -27,8 +27,8 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
-import org.apache.http.HttpStatus;
 
+import org.apache.http.HttpStatus;
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.description.ServiceDescription;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -41,11 +41,11 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 public class AccountRoleClient extends AbstractServiceClientImpl<AbstractCommonList, AccountRole, AccountRole, AccountRoleProxy> {
 	public static final String SERVICE_NAME = "accountroles";
 
-	public AccountRoleClient() {
+	public AccountRoleClient() throws Exception {
 		super();
 	}
 	
-	public AccountRoleClient(String clientPropertiesFilename) {
+	public AccountRoleClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 

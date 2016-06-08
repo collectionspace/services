@@ -19,11 +19,11 @@ public abstract class AuthorityClientImpl<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_
 	 * Basic CRUD proxied methods
 	 */
 
-	public AuthorityClientImpl(String clientPropertiesFilename) {
+	public AuthorityClientImpl(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 
-	public AuthorityClientImpl() {
+	public AuthorityClientImpl() throws Exception {
 		super();
 	}
 

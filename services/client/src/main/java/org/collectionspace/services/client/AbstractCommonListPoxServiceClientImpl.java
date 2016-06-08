@@ -16,11 +16,11 @@ public abstract class AbstractCommonListPoxServiceClientImpl<P extends Collectio
 	// All clients returning AbstractCommonList types should extend this class.
 	//
 	
-	public AbstractCommonListPoxServiceClientImpl() {
+	public AbstractCommonListPoxServiceClientImpl() throws Exception {
 		super();
 	}
 	
-	public AbstractCommonListPoxServiceClientImpl(String clientPropertiesFilename) {
+	public AbstractCommonListPoxServiceClientImpl(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 }

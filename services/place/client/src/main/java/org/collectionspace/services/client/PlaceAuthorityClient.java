@@ -44,11 +44,11 @@ public class PlaceAuthorityClient extends AuthorityClientImpl<PlaceauthoritiesCo
     //
     // Constructors
     //
-    public PlaceAuthorityClient() {
+    public PlaceAuthorityClient() throws Exception {
     	super();
     }
     
-    public PlaceAuthorityClient(String clientPropertiesFilename) {
+    public PlaceAuthorityClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
     

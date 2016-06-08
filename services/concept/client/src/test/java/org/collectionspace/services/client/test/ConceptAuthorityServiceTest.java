@@ -40,7 +40,6 @@ import org.collectionspace.services.concept.ConceptauthoritiesCommon;
 import org.collectionspace.services.concept.ConceptsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.dom4j.DocumentException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -94,12 +93,12 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
     	return new ConceptAuthorityClient();
     }
 
 	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
     	return new ConceptAuthorityClient(clientPropertiesFilename);
 	}
     
@@ -152,8 +151,9 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
      *
      * @param vcsid the vcsid
      * @param name the name
+     * @throws Exception 
      */
-    private void readItemList(String vcsid, String shortId) {
+    private void readItemList(String vcsid, String shortId) throws Exception {
 
         String testName = "readItemList";
 
@@ -238,10 +238,11 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
     * For this reason, it attempts to remove all resources created
     * at any point during testing, even if some of those resources
     * may be expected to be deleted by certain tests.
+ * @throws Exception 
     */
 
    @AfterClass(alwaysRun=true)
-   public void cleanUp() {
+   public void cleanUp() throws Exception {
        String noTest = System.getProperty("noTestCleanup");
    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
            if (logger.isDebugEnabled()) {
@@ -324,7 +325,7 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
 	
     @Override
    	protected PoxPayloadOut createInstance(String commonPartName,
-    			String identifier) {
+    			String identifier) throws Exception {
     	ConceptAuthorityClient client = new ConceptAuthorityClient();
         String shortId = identifier;
     	String displayName = "displayName-" + shortId;

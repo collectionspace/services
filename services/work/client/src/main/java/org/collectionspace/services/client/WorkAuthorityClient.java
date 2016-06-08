@@ -44,11 +44,11 @@ public class WorkAuthorityClient extends AuthorityClientImpl<WorkauthoritiesComm
     //
     // Constructors
     //
-    public WorkAuthorityClient() {
+    public WorkAuthorityClient() throws Exception {
     	super();
     }
     
-    public WorkAuthorityClient(String clientPropertiesFilename) {
+    public WorkAuthorityClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
     

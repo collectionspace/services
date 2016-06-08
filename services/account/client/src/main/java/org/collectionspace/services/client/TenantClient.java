@@ -40,7 +40,12 @@ import org.collectionspace.services.description.ServiceDescription;
  */
 public class TenantClient extends AbstractServiceClientImpl<TenantsList, Tenant,
 		Tenant, TenantProxy> {
-    public static final String SERVICE_NAME = "tenants";
+	
+    public TenantClient() throws Exception {
+		super();
+	}
+
+	public static final String SERVICE_NAME = "tenants";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
     public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 

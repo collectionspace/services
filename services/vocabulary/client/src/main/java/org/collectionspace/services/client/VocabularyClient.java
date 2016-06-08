@@ -53,11 +53,11 @@ public class VocabularyClient extends AuthorityClientImpl<VocabulariesCommon, Vo
     //
     // Constructors
     //
-    public VocabularyClient() {
+    public VocabularyClient() throws Exception {
     	super();
     }
     
-    public VocabularyClient(String clientPropertiesFilename) {
+    public VocabularyClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
     

@@ -32,7 +32,6 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.group.GroupsCommon;
-
 import org.testng.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,12 +59,12 @@ public class GroupServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 	}
     
     @Override
-    protected CollectionSpaceClient<AbstractCommonList, PoxPayloadOut, String, GroupProxy> getClientInstance() {
+    protected CollectionSpaceClient<AbstractCommonList, PoxPayloadOut, String, GroupProxy> getClientInstance() throws Exception {
         return new GroupClient();
     }
     
 	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
         return new GroupClient(clientPropertiesFilename);
 	}
     
@@ -79,18 +78,18 @@ public class GroupServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
     // ---------------------------------------------------------------
     
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
     	GroupClient client = new GroupClient();
     	return createInstance(client.getCommonPartName(), identifier);
     }
 
 	@Override
 	protected PoxPayloadOut createInstance(String commonPartName,
-			String identifier) {
+			String identifier) throws Exception {
 		return createGroupInstance(identifier);
 	}
     
-    private PoxPayloadOut createGroupInstance(String uid) {
+    private PoxPayloadOut createGroupInstance(String uid) throws Exception {
         String identifier = "title-" + uid;
         GroupsCommon group = new GroupsCommon();
         group.setTitle(identifier);

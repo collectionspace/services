@@ -76,12 +76,12 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new VocabularyClient();
     }
 
 	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
         return new VocabularyClient(clientPropertiesFilename);
 	}
     
@@ -311,7 +311,7 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
 	}
     
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
     	VocabularyClient client = new VocabularyClient();
         return createInstance(client.getCommonPartName(), identifier);
     }    
@@ -343,7 +343,7 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
     //
 
     @Override
-    protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) {
+    protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) throws Exception {
     	String headerLabel = new VocabularyClient().getItemCommonPartName();
         HashMap<String, String> vocabItemInfo = new HashMap<String, String>();
         String shortId = identifier;
@@ -396,7 +396,7 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
 	
     @AfterClass(alwaysRun = true)
     @Override
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
     	super.cleanUp();
     }	
 }

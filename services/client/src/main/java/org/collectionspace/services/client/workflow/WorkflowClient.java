@@ -31,6 +31,7 @@ import org.collectionspace.services.workflow.WorkflowCommon;
  *
  */
 public class WorkflowClient extends AbstractCommonListPoxServiceClientImpl<WorkflowProxy, WorkflowCommon> {
+	
 	public static final String SERVICE_NAME = "workflow";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -88,6 +89,10 @@ public class WorkflowClient extends AbstractCommonListPoxServiceClientImpl<Workf
     	statesMappedToTransitions.put(WORKFLOWSTATE_DELETED, WORKFLOWTRANSITION_DELETE);
     	statesMappedToTransitions.put("c", "d");
     }
+    
+	public WorkflowClient() throws Exception {
+		super();
+	}
 	
 	@Override
 	public String getServiceName() {
@@ -101,7 +106,6 @@ public class WorkflowClient extends AbstractCommonListPoxServiceClientImpl<Workf
 
 	@Override
 	public Class<WorkflowProxy> getProxyClass() {
-		// TODO Auto-generated method stub
 		return WorkflowProxy.class;
 	}
 

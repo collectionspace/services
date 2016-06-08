@@ -44,11 +44,11 @@ public class MaterialAuthorityClient extends AuthorityClientImpl<Materialauthori
     //
     // Constructors
     //
-    public MaterialAuthorityClient() {
+    public MaterialAuthorityClient() throws Exception {
     	super();
     }
     
-    public MaterialAuthorityClient(String clientPropertiesFilename) {
+    public MaterialAuthorityClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
     

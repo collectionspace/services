@@ -52,11 +52,11 @@ public class ConceptAuthorityClient extends AuthorityClientImpl<Conceptauthoriti
     //
     // Constructors
     //
-    public ConceptAuthorityClient() {
+    public ConceptAuthorityClient() throws Exception {
     	super();
     }
     
-    public ConceptAuthorityClient(String clientPropertiesFilename) {
+    public ConceptAuthorityClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
     

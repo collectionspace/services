@@ -35,11 +35,11 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
 import javax.ws.rs.core.Response;
 
 /**
@@ -57,6 +57,7 @@ import javax.ws.rs.core.Response;
  * $LastChangedDate$
  */
 // FIXME: http://issues.collectionspace.org/browse/CSPACE-1685
+@SuppressWarnings("rawtypes")
 public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_TYPE>
 		extends BaseServiceTest<CLT> implements ServiceTest {
     /** The logger. */
@@ -113,17 +114,18 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     /*
      * Sub-classes can override for the workflow tests.
      */
-    protected REQUEST_TYPE createInstance(String identifier) {
+    protected REQUEST_TYPE createInstance(String identifier) throws Exception {
     	String commonPartName = getClientInstance().getCommonPartName();
         return createInstance(commonPartName, identifier);
     }
     
     /**
      * Sub-classes must override this method for the "Create" tests to work properly
+     * @throws Exception 
      */
-    protected abstract REQUEST_TYPE createInstance(String commonPartName, String identifier);
+    protected abstract REQUEST_TYPE createInstance(String commonPartName, String identifier) throws Exception;
     
-    protected REQUEST_TYPE createNonExistenceInstance(String commonPartName, String identifier) {
+    protected REQUEST_TYPE createNonExistenceInstance(String commonPartName, String identifier) throws Exception {
     	return createInstance(commonPartName, identifier);
     }
                     
@@ -190,7 +192,6 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     
 	abstract public Class<RESPONSE_TYPE> getEntityResponseType();
     
-    @SuppressWarnings("unchecked")
 	@Override
     @Test(dataProvider = "testName", dependsOnMethods = {"create"})    
     public void read(String testName) throws Exception {
@@ -313,7 +314,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     	return (CPT)req;
     }
         
-    public REQUEST_TYPE createRequestTypeInstance(CPT commonPartTypeInstance) {
+    public REQUEST_TYPE createRequestTypeInstance(CPT commonPartTypeInstance) throws Exception {
     	return (REQUEST_TYPE)commonPartTypeInstance;
     }
     
@@ -971,8 +972,8 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         Assert.assertEquals(updatedWorkflowCommons.getCurrentLifeCycleState(), lifeCycleState);
     }
 
-    private CollectionSpacePoxClient assertPoxClient() {
-        CollectionSpaceClient clientCandidate = this.getClientInstance();
+    private CollectionSpacePoxClient assertPoxClient() throws Exception {
+		CollectionSpaceClient clientCandidate = this.getClientInstance();
         if (CollectionSpacePoxClient.class.isInstance(clientCandidate) != true) {  //FIXME: REM - We should remove this check and instead make CollectionSpaceClient support the readIncludeDeleted() method.
             String clientCandidateName = "Unknown";
             if (clientCandidate != null) {
@@ -994,7 +995,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     /*
      * Return the number of items including those soft-deleted.
      */
-    protected long readIncludeDeleted(String testName, Boolean includeDeleted) {
+    protected long readIncludeDeleted(String testName, Boolean includeDeleted) throws Exception {
     	long result = 0;
     	// Perform setup.
     	setupReadList();
@@ -1024,7 +1025,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     	return result;
     }
 
-    protected long readItemsIncludeDeleted(String testName, String parentCsid, Boolean includeDeleted) {
+    protected long readItemsIncludeDeleted(String testName, String parentCsid, Boolean includeDeleted) throws Exception {
         long result = 0;
         // Perform setup.
         setupReadList();
@@ -1087,7 +1088,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         return result;
     }
 
-    protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) {
+    protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) throws Exception {
         logger.warn("Sub-class test clients should override this method");
         throw new UnsupportedOperationException();
     }
@@ -1178,8 +1179,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         }
     }
 
-    @SuppressWarnings("unchecked")
-	protected void updateItemLifeCycleState(String testName, String parentCsid, String itemCsid, String workflowTransition, String lifeCycleState) throws Exception {
+    protected void updateItemLifeCycleState(String testName, String parentCsid, String itemCsid, String workflowTransition, String lifeCycleState) throws Exception {
         //
         // Read the existing object
         //

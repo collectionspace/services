@@ -46,11 +46,11 @@ public class BlobClient extends AbstractCommonListPoxServiceClientImpl<BlobProxy
 	public static final String IMAGE_WIDTH_LABEL = "width";
 	public static final String IMAGE_HEIGHT_LABEL = "height";	
 
-	public BlobClient() {
+	public BlobClient() throws Exception {
 		super();
 	}
 
-	public BlobClient(String clientPropertiesFilename) {
+	public BlobClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 

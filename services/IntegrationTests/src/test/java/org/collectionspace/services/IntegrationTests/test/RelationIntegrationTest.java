@@ -65,13 +65,19 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	//
 	// Get clients for the CollectionSpace services
 	//
-	private CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-	private RelationClient relationClient = new RelationClient();
-	private IntakeClient intakeClient = new IntakeClient();
-	private DimensionClient dimensionClient = new DimensionClient();
+	private CollectionObjectClient collectionObjectClient;
+	private RelationClient relationClient;
+	private IntakeClient intakeClient;
+	private DimensionClient dimensionClient;
 	
 	private static final int OBJECTS_TO_INTAKE = 1;
 	
+	public RelationIntegrationTest() throws Exception {
+		collectionObjectClient = new CollectionObjectClient();
+		relationClient = new RelationClient();
+		intakeClient = new IntakeClient();
+		dimensionClient = new DimensionClient();
+	}
 	
     @AfterClass(alwaysRun = true)
     public void cleanUp() {
@@ -119,7 +125,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
         return multipart;
     }
 	
-    protected PoxPayloadOut createDimensionInstance(String identifier) {
+    protected PoxPayloadOut createDimensionInstance(String identifier) throws Exception {
     	DimensionClient client = new DimensionClient();
     	return createDimensionInstance(client.getCommonPartName(), identifier);
     }
@@ -139,7 +145,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
                 "entryDate-" + identifier);
     }
     
-	@Test void deleteCollectionObjectRelationshipToLockedDimension() {
+	@Test void deleteCollectionObjectRelationshipToLockedDimension() throws Exception {
 		// First create a CollectionObject
 		CollectionobjectsCommon co = new CollectionobjectsCommon();
 		fillCollectionObject(co, createIdentifier());		
@@ -225,7 +231,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    }
 	}
 	
-	@Test void createCollectionObjectRelationshipToManyDimensions() {
+	@Test void createCollectionObjectRelationshipToManyDimensions() throws Exception {
 		//
 		// First create a CollectionObject
 		//
@@ -358,7 +364,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    }	    	    
 	}    
 	
-	@Test void releteCollectionObjectToLockedDimension() {
+	@Test void releteCollectionObjectToLockedDimension() throws Exception {
 		//
 		// First create a CollectionObject
 		//
@@ -532,8 +538,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
         		Assert.assertEquals(responseStatus, Response.Status.OK.getStatusCode());
         		PoxPayloadIn input = new PoxPayloadIn(multiPartResponse.readEntity(String.class));
 	        	resultRelation = (RelationsCommon) extractPart(input,
-	        			relationClient.getCommonPartName(),
-	        			RelationsCommon.class);
+	        			relationClient.getCommonPartName());
         	} catch (Exception e) {
         		e.printStackTrace();
         	} finally {
@@ -663,9 +668,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	        		int responseStatus = multiPartResponse.getStatus();
 	        		Assert.assertEquals(responseStatus, Response.Status.OK.getStatusCode());
 	        		PoxPayloadIn input = new PoxPayloadIn(multiPartResponse.readEntity(String.class));
-	        		resultRelation = (RelationsCommon) extractPart(input,
-	        				relationClient.getCommonPartName(),
-	        				RelationsCommon.class);
+	        		resultRelation = (RelationsCommon) extractPart(input, relationClient.getCommonPartName());
 	        	} catch (Exception e) {
 	        		e.printStackTrace();
 	        	} finally {

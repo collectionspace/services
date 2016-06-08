@@ -24,6 +24,7 @@ package org.collectionspace.services.id;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
@@ -36,7 +37,6 @@ import org.collectionspace.services.id.IDGeneratorSerializer;
 import org.collectionspace.services.id.NumericIDGeneratorPart;
 import org.collectionspace.services.id.SettableIDGenerator;
 import org.collectionspace.services.id.StringIDGeneratorPart;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.slf4j.Logger;
@@ -62,12 +62,12 @@ public class IdServiceTest extends BaseServiceTest {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
     	return new IdClient();
     }
 
 	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
     	return new IdClient(clientPropertiesFilename);
 	}
 
@@ -283,7 +283,7 @@ public class IdServiceTest extends BaseServiceTest {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
      */
     @Override
-    public String getServicePathComponent() {
+    public String getServicePathComponent() throws Exception {
         return new IdClient().getServicePathComponent();
     }
 

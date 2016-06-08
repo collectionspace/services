@@ -47,11 +47,11 @@ public class CollectionObjectClient extends AbstractCommonListPoxServiceClientIm
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
     public static final String SERVICE_COMMON_PART_NAME = SERVICE_NAME + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
 
-    public CollectionObjectClient() {
+    public CollectionObjectClient() throws Exception {
 		super();
 	}
 
-    public CollectionObjectClient(String clientPropertiesFilename) {
+    public CollectionObjectClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 

@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
+@SuppressWarnings("rawtypes")
 public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 
     private final Logger logger = LoggerFactory.getLogger(BlobScaleTest.class);
@@ -40,12 +41,12 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 	private static Random generator = new Random(System.currentTimeMillis());
 	
 	@Override
-	protected CollectionSpaceClient getClientInstance() {
+	protected CollectionSpaceClient getClientInstance() throws Exception {
         return new BlobClient();
 	}
 
 	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
         return new BlobClient(clientPropertiesFilename);
 	}
 
@@ -79,7 +80,7 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 	}
 	
 	@Test(dataProvider = "testName", dependsOnMethods = {"scaleTest"})
-	public void scaleGETTest(String testName) throws MalformedURLException, InterruptedException {
+	public void scaleGETTest(String testName) throws Exception {
 		this.setupRead();
         BlobClient client = new BlobClient();
         
@@ -100,7 +101,7 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 	}
 	
 	@Test(dataProvider = "testName")
-	public void scaleTest(String testName) throws MalformedURLException {
+	public void scaleTest(String testName) throws Exception {
 		this.createDirectory(GENERATED_IMAGES);
 		setupCreate();
 		int imagesToCreate = getImagesToCreate();

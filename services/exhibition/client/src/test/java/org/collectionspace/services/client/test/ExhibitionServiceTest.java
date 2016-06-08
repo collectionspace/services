@@ -33,6 +33,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.exhibition.ExhibitionsCommon;
 
 import javax.ws.rs.core.Response;
+
 import org.testng.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,12 +56,12 @@ public class ExhibitionServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new ExhibitionClient();
     }
 
 	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
         return new ExhibitionClient(clientPropertiesFilename);
 	}
 
@@ -622,7 +623,7 @@ public class ExhibitionServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
     }
 
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
         return createExhibitionInstance(identifier);
     }
 
@@ -641,8 +642,9 @@ public class ExhibitionServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
      *
      * @param exhibitionNumber the exhibition number
      * @return the multipart output
+     * @throws Exception 
      */
-    private PoxPayloadOut createExhibitionInstance(String exhibitionNumber) {
+    private PoxPayloadOut createExhibitionInstance(String exhibitionNumber) throws Exception {
 
         ExhibitionsCommon exhibitionCommon = new ExhibitionsCommon();
         exhibitionCommon.setExhibitionNumber(exhibitionNumber);
@@ -668,7 +670,7 @@ public class ExhibitionServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
 
     @Override
     protected PoxPayloadOut createInstance(String commonPartName,
-            String identifier) {
+            String identifier) throws Exception {
         PoxPayloadOut result = createExhibitionInstance(identifier);
         return result;
     }

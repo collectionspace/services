@@ -40,11 +40,11 @@ public class DimensionClient extends AbstractCommonListPoxServiceClientImpl<Dime
 	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-	public DimensionClient() {
+	public DimensionClient() throws Exception {
 		super();
 	}
 
-	public DimensionClient(String clientPropertiesFilename) {
+	public DimensionClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 

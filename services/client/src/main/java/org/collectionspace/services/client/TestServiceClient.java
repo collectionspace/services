@@ -36,7 +36,11 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 
 public final class TestServiceClient extends AbstractServiceClientImpl<AbstractCommonList, Object, Object, TestServiceProxy> {
 
-    /**
+    public TestServiceClient() throws Exception {
+		super();
+	}
+
+	/**
      *
      * Returning NULL since this class is a base-level client, used (only)
      * to obtain the base service URL.

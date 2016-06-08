@@ -40,7 +40,6 @@ import org.collectionspace.services.acquisition.AcquisitionDateGroupList;
 import org.collectionspace.services.acquisition.AcquisitionSourceList;
 import org.collectionspace.services.acquisition.OwnerList;
 import org.collectionspace.services.acquisition.StructuredDateGroup;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.slf4j.Logger;
@@ -77,12 +76,12 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
     	return new AcquisitionClient();
     }
     
 	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
     	return new AcquisitionClient(clientPropertiesFilename);
 	}
     
@@ -711,7 +710,7 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
     // ---------------------------------------------------------------
 
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
     	return createAcquisitionInstance(identifier);
     }
         
@@ -720,8 +719,9 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
      *
      * @param identifier the identifier
      * @return the multipart output
+     * @throws Exception 
      */
-    private PoxPayloadOut createAcquisitionInstance(String identifier) {
+    private PoxPayloadOut createAcquisitionInstance(String identifier) throws Exception {
         AcquisitionsCommon acquisition = new AcquisitionsCommon();
         acquisition.setAcquisitionReferenceNumber("acquisitionReferenceNumber-"  + identifier);
 

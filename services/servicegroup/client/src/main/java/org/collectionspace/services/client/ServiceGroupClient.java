@@ -33,11 +33,11 @@ public class ServiceGroupClient extends AbstractCommonListPoxServiceClientImpl<S
 	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;	
 
-	public ServiceGroupClient() {
+	public ServiceGroupClient() throws Exception {
 		super();
 	}
 
-	public ServiceGroupClient(String clientPropertiesFilename) {
+	public ServiceGroupClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 

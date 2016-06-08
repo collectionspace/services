@@ -49,7 +49,6 @@ import org.collectionspace.services.organization.OrgauthoritiesCommon;
 import org.collectionspace.services.organization.OrganizationsCommon;
 import org.collectionspace.services.organization.OrgTermGroup;
 import org.collectionspace.services.organization.OrgTermGroupList;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -113,17 +112,17 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new OrgAuthorityClient();
     }
 
 	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
         return new OrgAuthorityClient(clientPropertiesFilename);
 	}
 
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
         OrgAuthorityClient client = new OrgAuthorityClient();
         String displayName = "displayName-" + identifier;
         PoxPayloadOut multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
@@ -132,7 +131,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
     }
 
     @Override
-    protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) {
+    protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) throws Exception {
         String headerLabel = new OrgAuthorityClient().getItemCommonPartName();
         
         String shortId = TEST_SHORTID + identifier;
@@ -212,10 +211,11 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      * Creates the contact.
      *
      * @param testName the test name
+     * @throws Exception 
      */
     @Test(dataProvider = "testName", groups = {"create"},
     		dependsOnMethods = {"createItem"})
-    public void createContact(String testName) {
+    public void createContact(String testName) throws Exception {
         setupCreate();
         String newID = createContactInItem(knownResourceId, knownItemResourceId);
     }
@@ -226,8 +226,9 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      * @param parentcsid the parentcsid
      * @param itemcsid the itemcsid
      * @return the string
+     * @throws Exception 
      */
-    private String createContactInItem(String parentcsid, String itemcsid) {
+    private String createContactInItem(String parentcsid, String itemcsid) throws Exception {
 
         final String testName = "createContactInItem";
         if (logger.isDebugEnabled()) {
@@ -311,7 +312,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         readInternal(testName, null, knownResourceShortIdentifer);
     }
 
-    protected void readInternal(String testName, String CSID, String shortId) {
+    protected void readInternal(String testName, String CSID, String shortId) throws Exception {
         // Perform setup.
         setupRead();
 
@@ -557,10 +558,11 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      * Read contact non existent.
      *
      * @param testName the test name
+     * @throws Exception 
      */
     @Test(dataProvider = "testName", groups = {"readItem"},
     		dependsOnMethods = {"readContact"})
-    public void readContactNonExistent(String testName) {
+    public void readContactNonExistent(String testName) throws Exception {
         // Perform setup.
         setupReadNonExistent();
 
@@ -587,20 +589,22 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
     /**
      * Read item list.
+     * @throws Exception 
      */
     @Override
 //	@Test(groups = {"readList"}, dependsOnMethods = {"readList"})
-    public void readItemList(String testName) {
+    public void readItemList(String testName) throws Exception {
         readItemList(knownAuthorityWithItems, null);
     }
 
     /**
      * Read item list by authority name.
+     * @throws Exception 
      */
     @Override
 //    @Test(dataProvider = "testName",
 //    		dependsOnMethods = {"readItem"})
-    public void readItemListByName(String testName) {
+    public void readItemListByName(String testName) throws Exception {
         readItemList(null, READITEMS_SHORT_IDENTIFIER);
     }
 
@@ -609,8 +613,9 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      *
      * @param vcsid the vcsid
      * @param name the name
+     * @throws Exception 
      */
-    private void readItemList(String vcsid, String name) {
+    private void readItemList(String vcsid, String name) throws Exception {
 
         final String testName = "readItemList";
         // Perform setup.
@@ -664,10 +669,11 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
     /**
      * Read contact list.
+     * @throws Exception 
      */
     @Test(groups = {"readList"},
     		dependsOnMethods = {"org.collectionspace.services.client.test.AbstractAuthorityServiceTest.readItemList"})
-    public void readContactList() {
+    public void readContactList() throws Exception {
         readContactList(knownResourceId, knownItemResourceId);
     }
 
@@ -676,8 +682,9 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      *
      * @param parentcsid the parentcsid
      * @param itemcsid the itemcsid
+     * @throws Exception 
      */
-    private void readContactList(String parentcsid, String itemcsid) {
+    private void readContactList(String parentcsid, String itemcsid) throws Exception {
         final String testName = "readContactList";
         // Perform setup.
         setupReadList();
@@ -870,10 +877,11 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      * Delete non existent contact.
      *
      * @param testName the test name
+     * @throws Exception 
      */
     @Test(dataProvider = "testName", groups = {"delete"},
     		dependsOnMethods = {"deleteContact"})
-    public void deleteNonExistentContact(String testName) {
+    public void deleteNonExistentContact(String testName) throws Exception {
         // Perform setup.
         setupDeleteNonExistent();
 
@@ -924,10 +932,11 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun = true)
     @Override
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {

@@ -38,7 +38,6 @@ import org.collectionspace.services.client.CitationAuthorityClient;
 import org.collectionspace.services.client.CitationAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +52,7 @@ import org.testng.annotations.Test;
  * $LastChangedRevision: 753 $ $LastChangedDate: 2009-09-23 11:03:36 -0700 (Wed,
  * 23 Sep 2009) $
  */
+@SuppressWarnings("rawtypes")
 public class CitationAuthorityServiceTest extends AbstractAuthorityServiceTest<CitationauthoritiesCommon, CitationsCommon> {
 
     /**
@@ -91,12 +91,12 @@ public class CitationAuthorityServiceTest extends AbstractAuthorityServiceTest<C
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new CitationAuthorityClient();
     }
     
     @Override
-    protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
         return new CitationAuthorityClient(clientPropertiesFilename);
     }
 
@@ -149,8 +149,9 @@ public class CitationAuthorityServiceTest extends AbstractAuthorityServiceTest<C
      *
      * @param vcsid the vcsid
      * @param name the name
+     * @throws Exception 
      */
-    private void readItemList(String vcsid, String shortId) {
+    private void readItemList(String vcsid, String shortId) throws Exception {
 
         String testName = "readItemList";
 
@@ -232,9 +233,10 @@ public class CitationAuthorityServiceTest extends AbstractAuthorityServiceTest<C
      * For this reason, it attempts to remove all resources created at any point
      * during testing, even if some of those resources may be expected to be
      * deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun = true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
@@ -314,7 +316,7 @@ public class CitationAuthorityServiceTest extends AbstractAuthorityServiceTest<C
     //
     @Override
     protected PoxPayloadOut createInstance(String commonPartName,
-            String identifier) {
+            String identifier) throws Exception {
         CitationAuthorityClient client = new CitationAuthorityClient();
         String shortId = identifier;
         String displayName = "displayName-" + shortId;

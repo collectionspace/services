@@ -39,7 +39,6 @@ import org.collectionspace.services.conservation.ConservationCommon;
 import org.collectionspace.services.conservation.ConservatorsList;
 import org.collectionspace.services.conservation.ConservationStatusGroup;
 import org.collectionspace.services.conservation.ConservationStatusGroupList;
-
 import org.testng.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,12 +67,12 @@ public class ConservationServiceTest extends AbstractPoxServiceTestImpl<Abstract
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new ConservationClient();
     }
 
 	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
         return new ConservationClient(clientPropertiesFilename);
 	}
 
@@ -637,7 +636,7 @@ public class ConservationServiceTest extends AbstractPoxServiceTestImpl<Abstract
     }
 
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
         return createConservationInstance(identifier);
     }
 
@@ -647,8 +646,9 @@ public class ConservationServiceTest extends AbstractPoxServiceTestImpl<Abstract
      * @param conservationNumber the conservation number
      * @param returnDate the return date
      * @return the multipart output
+     * @throws Exception 
      */
-    private PoxPayloadOut createConservationInstance(String identifier) {
+    private PoxPayloadOut createConservationInstance(String identifier) throws Exception {
         ConservationCommon conservationCommon = new ConservationCommon();
         conservationCommon.setConservationNumber("conservationNumber-" + identifier);
         
@@ -684,7 +684,7 @@ public class ConservationServiceTest extends AbstractPoxServiceTestImpl<Abstract
 
 	@Override
 	protected PoxPayloadOut createInstance(String commonPartName,
-			String identifier) {
+			String identifier) throws Exception {
         PoxPayloadOut result = createConservationInstance(identifier);
         return result;
 	}

@@ -15,11 +15,11 @@ public class IdClient extends AbstractServiceClientImpl<String, String, String, 
 
     public static final String SERVICE_NAME = "idgenerators";
     
-    public IdClient() {
+    public IdClient() throws Exception {
 		super();
 	}
 
-    public IdClient(String clientPropertiesFilename) {
+    public IdClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 

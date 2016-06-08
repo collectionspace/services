@@ -69,7 +69,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
     }
     
     @Override
-    protected String getServicePathComponent() {
+    protected String getServicePathComponent() throws Exception {
         return new RoleClient().getServicePathComponent();
     }
 
@@ -84,12 +84,12 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new RoleClient();
     }
 
 	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
         return new RoleClient(clientPropertiesFilename);
 	}	
     

@@ -29,6 +29,7 @@ import org.collectionspace.services.index.IndexCommon;
  *
  */
 public class IndexClient extends AbstractCommonListPoxServiceClientImpl<IndexProxy, IndexCommon> {
+
 	public static final String SERVICE_NAME = "index";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -37,6 +38,10 @@ public class IndexClient extends AbstractCommonListPoxServiceClientImpl<IndexPro
 	public static final String SERVICE_AUTHZ_SUFFIX = "/*/" + SERVICE_PATH_COMPONENT + "/";
 	public static final String INDEX_ID_PARAM = "indexid";
 	
+	public IndexClient() throws Exception {
+		super();
+	}
+
 	@Override
 	public String getServiceName() {
 		return SERVICE_NAME;

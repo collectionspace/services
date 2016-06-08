@@ -41,7 +41,6 @@ import org.collectionspace.services.intake.CurrentLocationGroup;
 import org.collectionspace.services.intake.CurrentLocationGroupList;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.slf4j.Logger;
@@ -64,12 +63,12 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
             GregorianCalendarDateTimeUtils.currentDateUTC();
 
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new IntakeClient();
     }
 
 	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
         return new IntakeClient(clientPropertiesFilename);
 	}
 
@@ -496,9 +495,10 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
      *
      * @param identifier the identifier
      * @return the multipart output
+     * @throws Exception 
      */
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
         return createIntakeInstance(
                 "entryNumber-" + identifier,
                 CURRENT_DATE_UTC,
@@ -512,10 +512,11 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
      * @param entryDate the entry date
      * @param depositor the depositor
      * @return the multipart output
+     * @throws Exception 
      */
     private PoxPayloadOut createIntakeInstance(String entryNumber,
             String entryDate,
-            String depositor) {
+            String depositor) throws Exception {
         IntakesCommon intake = new IntakesCommon();
         intake.setEntryNumber(entryNumber);
         intake.setEntryDate(entryDate);
@@ -561,7 +562,7 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
 
 	@Override
 	protected PoxPayloadOut createInstance(String commonPartName,
-			String identifier) {
+			String identifier) throws Exception {
 		return this.createInstance(identifier);
 	}
 

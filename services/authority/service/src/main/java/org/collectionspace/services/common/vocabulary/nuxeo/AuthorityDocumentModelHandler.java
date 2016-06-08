@@ -32,24 +32,19 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.AuthorityClient;
-import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadInputPart;
-import org.collectionspace.services.client.VocabularyClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.XmlTools;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ResourceMap;
-import org.collectionspace.services.common.api.CommonAPI;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.RefName.Authority;
 import org.collectionspace.services.common.api.RefNameUtils;
-import org.collectionspace.services.common.api.RefNameUtils.AuthorityInfo;
 import org.collectionspace.services.common.api.RefNameUtils.AuthorityTermInfo;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
-import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentReferenceException;
 import org.collectionspace.services.common.document.DocumentWrapper;
@@ -68,7 +63,7 @@ import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-import org.dom4j.Document;
+
 import org.dom4j.Element;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -81,6 +76,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
+@SuppressWarnings("rawtypes")
 public abstract class AuthorityDocumentModelHandler<AuthCommon>
         extends NuxeoDocumentModelHandler<AuthCommon> {
     
@@ -125,7 +121,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
             return payloadInputPart;
     }
     
-    @Override
+	@Override
     public boolean handleSync(DocumentWrapper<Object> wrapDoc) throws Exception {
     	boolean result = false;
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
@@ -137,11 +133,12 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         if (docModel != null) {
 	        Long localRev = (Long) NuxeoUtils.getProperyValue(docModel, AuthorityJAXBSchema.REV);
 	        String shortId = (String) NuxeoUtils.getProperyValue(docModel, AuthorityJAXBSchema.SHORT_IDENTIFIER);
+	        String remoteClientConfigName = (String) NuxeoUtils.getProperyValue(docModel, AuthorityJAXBSchema.REMOTECLIENT_CONFIG_NAME); // If set, contains the name of the remote client configuration (remoteClientConfigName) from the tenant bindings
 	        //
 	        // Using the short ID of the local authority, create a URN specifier to retrieve the SAS authority
 	        //
 	        Specifier sasSpecifier = new Specifier(SpecifierForm.URN_NAME, shortId);
-	        PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.requestPayloadIn(ctx, sasSpecifier, getEntityResponseType());
+	        PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.requestPayloadInFromRemoteServer(ctx, remoteClientConfigName, sasSpecifier, getEntityResponseType());
 	        //
 	        // If the authority on the SAS is newer, synch all the items and then the authority record as well
 	        //
@@ -261,7 +258,6 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
      * @return
      * @throws Exception
      */
-    @SuppressWarnings("rawtypes")
 	private long deleteOrDeprecateItems(ServiceContext ctx, Specifier authoritySpecifier, ArrayList<String> itemShortIdList) throws Exception {
     	long result = 0;
         AuthorityItemSpecifier authorityItemSpecificer = null;
@@ -362,9 +358,14 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         Specifier itemSpecifier = Specifier.getSpecifier(itemIdentifier);
         AuthorityItemSpecifier sasAuthorityItemSpecifier = new AuthorityItemSpecifier(authoritySpecifier, itemSpecifier);
         //
+        // Get the remote client configuration name
+        //
+        DocumentModel docModel = NuxeoUtils.getDocFromSpecifier(ctx, getRepositorySession(), authorityCommonSchemaName, authoritySpecifier);
+        String remoteClientConfigName = (String) NuxeoUtils.getProperyValue(docModel, AuthorityJAXBSchema.REMOTECLIENT_CONFIG_NAME); // If set, contains the name of the remote client configuration (remoteClientConfigName) from the tenant bindings
+        //
         // Get the remote payload
         //
-        PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.requestPayloadIn(sasAuthorityItemSpecifier, 
+        PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.requestPayloadInFromRemoteServer(sasAuthorityItemSpecifier, remoteClientConfigName,
         		ctx.getServiceName(), getEntityResponseType(), syncHierarchicalRelationships);
         sasPayloadIn = AuthorityServiceUtils.filterRefnameDomains(ctx, sasPayloadIn); // We need to filter domain name part of any and all refnames in the payload
         //

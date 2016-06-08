@@ -43,7 +43,6 @@ import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.InsurerList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.organization.OrgTermGroup;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -170,8 +169,9 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
     
     /**
      * Creates the organization refs.
+     * @throws Exception 
      */
-    protected void createOrgRefs(){
+    protected void createOrgRefs() throws Exception{
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
         //orgAuthRefName = 
     	//	OrgAuthorityClientUtils.createOrgAuthRefName(ORGANIZATION_AUTHORITY_NAME, null);
@@ -215,7 +215,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         orgIdsCreated.add(newOrgCSID);
     }
 
-    protected String createOrganization(String shortId, String shortName, String longName) {
+    protected String createOrganization(String shortId, String shortName, String longName) throws Exception {
     	String result = null;
     	
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
@@ -305,9 +305,10 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
     	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
@@ -347,7 +348,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
 				String depositor,
 				String conditionCheckerAssessor,
 				String insurer,
-				String Valuer ) {
+				String Valuer ) throws Exception {
         IntakesCommon intake = new IntakesCommon();
         intake.setEntryNumber(entryNumber);
         intake.setEntryDate(entryDate);

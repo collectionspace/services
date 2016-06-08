@@ -43,7 +43,6 @@ import org.collectionspace.services.material.MaterialTermGroup;
 import org.collectionspace.services.material.MaterialTermGroupList;
 import org.collectionspace.services.material.MaterialauthoritiesCommon;
 import org.collectionspace.services.material.MaterialsCommon;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -93,12 +92,12 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new MaterialAuthorityClient();
     }
     
     @Override
-    protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
         return new MaterialAuthorityClient(clientPropertiesFilename);
     }
 
@@ -241,40 +240,41 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
 
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
-        String noTest = System.getProperty("noTestCleanup");
-        if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Skipping Cleanup phase ...");
-            }
-            return;
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Cleaning up temporary resources created for testing ...");
-        }
-        String parentResourceId;
-        String itemResourceId;
-        // Clean up contact resources.
-        MaterialAuthorityClient client = new MaterialAuthorityClient();
-        parentResourceId = knownResourceId;
-        // Clean up item resources.
-        for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
-            itemResourceId = entry.getKey();
-            parentResourceId = entry.getValue();
-            // Note: Any non-success responses from the delete operation
-            // below are ignored and not reported.
-            client.deleteItem(parentResourceId, itemResourceId).close();
-        }
-        // Clean up parent resources.
-        for (String resourceId : allResourceIdsCreated) {
-            // Note: Any non-success responses from the delete operation
-            // below are ignored and not reported.
-        client.delete(resourceId).close();
-        }
-    }
+	public void cleanUp() throws Exception {
+		String noTest = System.getProperty("noTestCleanup");
+		if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Skipping Cleanup phase ...");
+			}
+			return;
+		}
+		if (logger.isDebugEnabled()) {
+			logger.debug("Cleaning up temporary resources created for testing ...");
+		}
+		String parentResourceId;
+		String itemResourceId;
+		// Clean up contact resources.
+		MaterialAuthorityClient client = new MaterialAuthorityClient();
+		parentResourceId = knownResourceId;
+		// Clean up item resources.
+		for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
+			itemResourceId = entry.getKey();
+			parentResourceId = entry.getValue();
+			// Note: Any non-success responses from the delete operation
+			// below are ignored and not reported.
+			client.deleteItem(parentResourceId, itemResourceId).close();
+		}
+		// Clean up parent resources.
+		for (String resourceId : allResourceIdsCreated) {
+			// Note: Any non-success responses from the delete operation
+			// below are ignored and not reported.
+			client.delete(resourceId).close();
+		}
+	}
 
     // ---------------------------------------------------------------
     // Utility methods used by tests above

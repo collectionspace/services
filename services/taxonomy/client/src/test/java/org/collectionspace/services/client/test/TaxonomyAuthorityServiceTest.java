@@ -36,7 +36,6 @@ import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.client.TaxonomyAuthorityClientUtils;
 import org.collectionspace.services.client.TaxonomyAuthorityProxy;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-
 import org.collectionspace.services.taxonomy.CommonNameGroup;
 import org.collectionspace.services.taxonomy.CommonNameGroupList;
 import org.collectionspace.services.taxonomy.TaxonAuthorGroup;
@@ -112,12 +111,12 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
      * org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient<AbstractCommonList, PoxPayloadOut, String, TaxonomyAuthorityProxy> getClientInstance() {
+    protected CollectionSpaceClient<AbstractCommonList, PoxPayloadOut, String, TaxonomyAuthorityProxy> getClientInstance() throws Exception {
         return new TaxonomyAuthorityClient();
     }
 
 	@Override
-	protected CollectionSpaceClient<AbstractCommonList, PoxPayloadOut, String, TaxonomyAuthorityProxy> getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient<AbstractCommonList, PoxPayloadOut, String, TaxonomyAuthorityProxy> getClientInstance(String clientPropertiesFilename) throws Exception {
         return new TaxonomyAuthorityClient(clientPropertiesFilename);
 	}
 	
@@ -280,9 +279,10 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
      * For this reason, it attempts to remove all resources created at any point
      * during testing, even if some of those resources may be expected to be
      * deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun = true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {

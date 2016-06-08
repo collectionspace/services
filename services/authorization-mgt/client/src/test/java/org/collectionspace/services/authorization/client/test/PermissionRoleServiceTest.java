@@ -44,7 +44,6 @@ import org.collectionspace.services.client.PermissionRoleFactory;
 import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.client.RoleFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.slf4j.Logger;
@@ -82,7 +81,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
      * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
      */
     @Override
-    protected String getServicePathComponent() {
+    protected String getServicePathComponent() throws Exception {
         return new PermissionRoleClient().getServicePathComponent();
     }
     
@@ -100,9 +99,10 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
 	
     /**
      * Seed data.
+     * @throws Exception 
      */
     @BeforeClass(alwaysRun = true)
-    public void seedData() {
+    public void seedData() throws Exception {
         String ra = TEST_SERVICE_NAME + TEST_MARKER;
         String accPermId = createPermission(ra, EffectType.PERMIT);
         PermissionValue pva = new PermissionValue();
@@ -143,12 +143,12 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new PermissionRoleClient();
     }
 
 	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
         return new PermissionRoleClient(clientPropertiesFilename);
 	}
 
@@ -543,10 +543,11 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
 
     /**
      * Clean up.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun = true)
     @Override
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         setupDelete();
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
@@ -573,8 +574,9 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
      * @param resName the res name
      * @param effect the effect
      * @return the string
+     * @throws Exception 
      */
-    private String createPermission(String resName, EffectType effect) {
+    private String createPermission(String resName, EffectType effect) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug(getTestBanner("createPermission"));
         }
@@ -608,8 +610,9 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
      * Delete permission.
      *
      * @param permId the perm id
+     * @throws Exception 
      */
-    private void deletePermission(String permId) {
+    private void deletePermission(String permId) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug(getTestBanner("deletePermission"));
         }
@@ -636,8 +639,9 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
      *
      * @param roleName the role name
      * @return the string
+     * @throws Exception 
      */
-    private String createRole(String roleName) {
+    private String createRole(String roleName) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug(getTestBanner("createRole"));
         }
@@ -671,8 +675,9 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
      * Delete role.
      *
      * @param roleId the role id
+     * @throws Exception 
      */
-    private void deleteRole(String roleId) {
+    private void deleteRole(String roleId) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug(getTestBanner("deleteRole"));
         }

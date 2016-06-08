@@ -38,11 +38,11 @@ public class IntakeClient extends AbstractCommonListPoxServiceClientImpl<IntakeP
     public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    public IntakeClient() {
+    public IntakeClient() throws Exception {
 		super();
 	}
 
-    public IntakeClient(String clientPropertiesFilename) {
+    public IntakeClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
 

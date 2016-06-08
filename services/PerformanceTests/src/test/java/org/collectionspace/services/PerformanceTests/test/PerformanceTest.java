@@ -28,13 +28,12 @@ import java.util.Random;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.util.HttpResponseCodes;
 
+import org.jboss.resteasy.util.HttpResponseCodes;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.PayloadOutputPart;
@@ -63,9 +62,10 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 
     /**
      * Performance test.
+     * @throws Exception 
      */
     @Test
-    public void performanceTest() {
+    public void performanceTest() throws Exception {
         roundTripOverhead(10);
         deleteCollectionObjects();
         String[] coList = this.createCollectionObjects(MAX_RECORDS);
@@ -80,8 +80,9 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
      *
      * @param numOfCalls the num of calls
      * @return the long
+     * @throws Exception 
      */
-    private long roundTripOverhead(int numOfCalls) {
+    private long roundTripOverhead(int numOfCalls) throws Exception {
         long result = 0;
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
 
@@ -112,8 +113,9 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
      * Search collection objects.
      *
      * @param numberOfObjects the number of objects
+     * @throws Exception 
      */
-    private void searchCollectionObjects(int numberOfObjects) {
+    private void searchCollectionObjects(int numberOfObjects) throws Exception {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         Random randomGenerator = new Random(System.currentTimeMillis());
         Response searchResultsResponse;
@@ -197,8 +199,9 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
      *
      * @param numberOfObjects the number of objects
      * @return the string[]
+     * @throws Exception 
      */
-    public String[] createCollectionObjects(int numberOfObjects) {
+    public String[] createCollectionObjects(int numberOfObjects) throws Exception {
         Random randomGenerator = new Random(System.currentTimeMillis());
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         String[] coList = new String[numberOfObjects];
@@ -260,8 +263,9 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
      * Delete collection objects.
      *
      * @param arrayOfObjects the array of objects
+     * @throws Exception 
      */
-    public void readCollectionObjects(String[] arrayOfObjects) {
+    public void readCollectionObjects(String[] arrayOfObjects) throws Exception {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
 
         Date startTime = new Date();
@@ -279,8 +283,9 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
     /**
      * Delete collection objects.
      * FIXME: Deletes a page at a time until there are no more CollectionObjects.
+     * @throws Exception 
      */
-    public void readCollectionObjects() {
+    public void readCollectionObjects() throws Exception {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
 
         List<AbstractCommonList.ListItem> coListItems = null;
@@ -326,8 +331,9 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
      * Delete collection objects.
      *
      * @param arrayOfObjects the array of objects
+     * @throws Exception 
      */
-    private void deleteCollectionObjects(String[] arrayOfObjects) {
+    private void deleteCollectionObjects(String[] arrayOfObjects) throws Exception {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
 
         Date startTime = new Date();
@@ -345,8 +351,9 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
     /**
      * Delete collection objects.
      * FIXME: Deletes a page at a time until there are no more CollectionObjects.
+     * @throws Exception 
      */
-    private void deleteCollectionObjects() {
+    private void deleteCollectionObjects() throws Exception {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
 
         List<AbstractCommonList.ListItem> coListItems = null;
