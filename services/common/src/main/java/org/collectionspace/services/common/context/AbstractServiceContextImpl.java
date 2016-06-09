@@ -715,8 +715,9 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         properties.setProperty(AuthorityClient.AUTH_PROPERTY, remoteClientConfig.getAuth());
         properties.setProperty(AuthorityClient.TENANT_ID_PROPERTY, remoteClientConfig.getTenantId());
         properties.setProperty(AuthorityClient.TENANT_NAME_PROPERTY, remoteClientConfig.getTenantName());
-
+        
         result = getClient(properties);
+        
         return result;
     }
     

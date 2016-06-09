@@ -39,15 +39,12 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
-
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 // FIXME: Deprecated classes that need to be updated
@@ -152,7 +149,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      * Instantiates a new abstract service client impl.
      * @throws Exception 
      */
-    public AbstractServiceClientImpl(Properties properties) {
+    public AbstractServiceClientImpl(Properties properties) throws Exception {
         setClientProperties(properties, false);
     }
     
@@ -160,9 +157,9 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      * Helps initialize a new abstract service client impl instance.
      * @throws Exception 
      */
-    private void init() {
-    	if (this.properties.isEmpty() == true) {
-    		throw new RuntimeException("Client connection properties are empty.  Cannot proceed.");
+    private void init() throws Exception {
+    	if (properties.isEmpty() == true) {
+    		throw new Exception("Client connection properties are empty.  Cannot proceed.");
     	}
     	
     	try {
@@ -345,7 +342,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
     }
     
     @Override
-    public void setClientProperties(Properties inProperties) {
+    public void setClientProperties(Properties inProperties) throws Exception {
     	setClientProperties(inProperties, false);
     }
 
@@ -356,8 +353,8 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      * @param inProperties
      * @throws Exception 
      */
-    protected void setClientProperties(Properties inProperties, boolean overrideWithSystemValues) {
-        properties = inProperties;
+    protected void setClientProperties(Properties inProperties, boolean overrideWithSystemValues) throws Exception {
+        properties = Tools.filterPropertiesWithEnvVars(inProperties); // Look for environment variables and substitute values if found
         
         if (overrideWithSystemValues == true) {
 	        String spec = System.getProperty(URL_PROPERTY);

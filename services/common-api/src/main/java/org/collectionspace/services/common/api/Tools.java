@@ -290,22 +290,38 @@ public class Tools {
 		Properties result = loadProperties(clientPropertiesFilename);
 
 		if (filterPasswords) {
-			result = filterPasswordsWithEnvVars(result);
+			result = filterPropertiesWithEnvVars(result);
 		}
 		
 		return result;
 	}
 	
-	static public Properties filterPasswordsWithEnvVars(Properties inProperties) throws Exception {
+	/**
+	 * Looks for property values if the form ${foo} and tries to find environment property "foo" value to replace with.
+	 * 
+	 * For example, a property value of "${foo}" would be replaced with the value of the environment variable "foo" if a
+	 * value for "foo" exists in the current environment.
+	 * 
+	 * @param inProperties
+	 * @return
+	 * @throws Exception
+	 */
+	static public Properties filterPropertiesWithEnvVars(Properties inProperties) throws Exception {
+		final String filteredFlag = "fe915b1b-7411-4aaa-887f";
+		final String filteredKey = filteredFlag;		
 		Properties result = inProperties;
 		
-		if (inProperties != null && inProperties.size() > 0) {
-			for (String key : inProperties.stringPropertyNames()) {
-				String propertyValue = inProperties.getProperty(key);
-				String newPropertyValue = Tools.getPasswordFromEnv(propertyValue);
-				if (newPropertyValue != null) { // non-null result means the property value was the name of an environment variable
-					inProperties.setProperty(key, newPropertyValue);
+		if (inProperties.containsKey(filteredKey) == false) {
+			// Only process the properties once
+			if (inProperties != null && inProperties.size() > 0) {
+				for (String key : inProperties.stringPropertyNames()) {
+					String propertyValue = inProperties.getProperty(key);
+					String newPropertyValue = Tools.getValueFromEnv(propertyValue);
+					if (newPropertyValue != null) { // non-null result means the property value was the name of an environment variable
+						inProperties.setProperty(key, newPropertyValue);
+					}
 				}
+				inProperties.setProperty(filteredKey, filteredFlag); // set to indicated we've already process these properties
 			}
 		}
 		
@@ -313,20 +329,20 @@ public class Tools {
 	}
 	
 	/**
-	 * Try to find the value of a password variable in the system or JVM environment.  This code substitutes only environment variables formed
+	 * Try to find the value of a property variable in the system or JVM environment.  This code substitutes only property values formed
 	 * like ${cspace.password.mysecret} or ${cspace_password_mysecret_secret}.  The corresponding environment variables would
 	 * be "cspace.password.mysecret" and "cspace.password.mysecret.secret".
 	 * 
-	 * Returns null if the passed in propertyValue is not a password variable -i.e., not something of the form {$cspace.password.foo}
+	 * Returns null if the passed in property value is not a property variable -i.e., not something of the form {$cspace.password.foo}
 	 * 
-	 * Throws an exception if the passed in propertyValue has a valid variable form but the corresponding environment variable is not
+	 * Throws an exception if the passed in property value has a valid variable form but the corresponding environment variable is not
 	 * set.
 	 * 
 	 * @param propertyValue
 	 * @return
 	 * @throws Exception
 	 */
-	static private String getPasswordFromEnv(String propertyValue) throws Exception {
+	static public String getValueFromEnv(String propertyValue) throws Exception {
 		String result = null;
 		//
 		// Replace things like ${cspace.password.cow} with values from either the environment

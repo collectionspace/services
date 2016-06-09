@@ -257,7 +257,7 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      */
 	public void setClientProperties(String clientPropertiesFilename) throws Exception;
 	
-	public void setClientProperties(Properties clientProperties);
+	public void setClientProperties(Properties clientProperties) throws Exception;
 	
 	public String getTenantName();
 }
