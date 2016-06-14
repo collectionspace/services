@@ -69,35 +69,35 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 		setCompletionStatus(STATUS_MIN_PROGRESS);
 
 		try {
-			String docType = getInvocationContext().getDocType();
+			String docType = null;
+			String targetCsid = null;
+			List<String> sourceCsids = new ArrayList<String>();
+			
+			for (Param param : this.getParams()) {
+				String key = param.getKey();
+				
+				// I don't want this batch job to appear in the UI, since it won't run successfully without parameters.
+				// That means it can't be registered with any docType. But if the invocation payload contains a docType,
+				// it will be checked against the registered docType, and will fail. So docType should be passed as a
+				// parameter instead.
+				
+				if (key.equals("docType")) {
+					docType = param.getValue();
+				}
+				else if (key.equals("targetCSID")) {
+					targetCsid = param.getValue();
+				}
+				else if (key.equals("sourceCSID")) {
+					sourceCsids.add(param.getValue());
+				}
+			}
 
 			if (docType == null || docType.equals("")) {
 				throw new Exception("a docType must be supplied");
 			}
-			
-			String targetCsid = null;
-
-			for (Param param : this.getParams()) {
-				if (param.getKey().equals("targetCSID")) {
-					targetCsid = param.getValue();
-					break;
-				}
-			}
 
 			if (targetCsid == null || targetCsid.equals("")) {
 				throw new Exception("a target csid parameter (targetCSID) must be supplied");
-			}
-
-			List<String> sourceCsids;
-			
-			if (this.requestIsForInvocationModeSingle()) {
-				sourceCsids = Arrays.asList(getInvocationContext().getSingleCSID());
-			}
-			else if (this.requestIsForInvocationModeList()) {
-				sourceCsids = getInvocationContext().getListCSIDs().getCsid();
-			}
-			else {
-				throw new Exception("unsupported invocation mode: " + this.getInvocationContext().getMode());
 			}
 			
 			if (sourceCsids.size() == 0) {
