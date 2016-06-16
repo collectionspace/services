@@ -106,7 +106,7 @@
   </target>
    
   <target name="check-property-value-is-not-blank">
-    <fail message="'${property-to-check}' property is defined, but its value is blank (is empty or contains only whitespace characters). This property must contain a non-blank value, and must match the name of an existing tenant. Its value is usually set in either a 'tenant.properties' file, present in the same directory as this Ant build.xml file, or by adding a '-D${property-to-check}=somevalue' argument when running 'ant clone-tenant'.">
+    <fail message="'${property-to-check}' property is defined, but its value is blank (is empty or contains only whitespace characters). This property must contain a non-blank value. Its value is usually set in either a 'tenant.properties' file, present in the same directory as this Ant build.xml file, or by adding a '-D${property-to-check}=somevalue' argument when running 'ant clone-tenant'.">
       <condition>
           <equals arg1="${property-to-check-value}" arg2="" trim="true"/>
       </condition>
