@@ -24,6 +24,8 @@
     delete-files-in-cloned-tenant,
     update-text-in-cloned-tenant"
     description="Make a copy ('clone') of an existing tenant (effectively using it as a template) to create a new tenant">
+    <echo message="A directory for your newly-cloned '${tenant.shortname}' tenant has been successfully created as '${tenants.dir}/${tenant.shortname}' ..."/>
+    <echo message="You can add or modify files in that directory to configure that tenant's settings ..."/>
   </target>
   
   <!-- Main sub-targets -->
