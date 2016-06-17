@@ -1,9 +1,13 @@
 <project name="tenant-utils" basedir=".">
   <description>Utilities for managing folders and files containing per-tenant configurations</description>
   
-  <!-- Import this Ant build file into any other Ant build file
-       via '<import file="./tenant-mgmt-build.xml"/>' -->
+  <!-- Note to developers: for consistency of maintenance and behavior, changes
+       made to this Ant buildfile, tenant-utils-build.xml, should be propagated
+       to each instance of this file across all three of CollectionSpace's
+       build layers: services, application, and ui. -->
   
+  <!-- Import this Ant build file into any other Ant build file
+       via '<import file="./tenant-utils-build.xml"/>' -->
   <!-- If a 'tenant.properties' file is provided, values for
        properties used in this Ant buildfile will be read
        from that file. -->
