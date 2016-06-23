@@ -278,7 +278,7 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 	
 	private InvocationResults updateReferencingRecord(ReferencingRecord record, String fromRefName, String toRefName) throws URISyntaxException, DocumentException {
 		String fromRefNameStem = RefNameUtils.stripAuthorityTermDisplayName(fromRefName);
-		String toRefNameStem = RefNameUtils.stripAuthorityTermDisplayName(toRefName);
+		// String toRefNameStem = RefNameUtils.stripAuthorityTermDisplayName(toRefName);
 		
 		logger.debug("Updating references: record.uri=" + record.getUri() + " fromRefName=" + fromRefName + " toRefName=" + toRefName);
 		
@@ -307,7 +307,8 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 
 						if (refNameStem != null && refNameStem.equals(fromRefNameStem)) {
 							AuthorityTermInfo termInfo = RefNameUtils.parseAuthorityTermInfo(text);
-							String newRefName = toRefNameStem + "'" + termInfo.displayName + "'";
+							// String newRefName = toRefNameStem + "'" + termInfo.displayName + "'";
+							String newRefName = toRefName;
 							
 							node.setText(newRefName);
 						}
