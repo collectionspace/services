@@ -3,6 +3,7 @@ package org.collectionspace.services.batch.nuxeo;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,6 +28,7 @@ import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.nuxeo.common.utils.StringUtils;
@@ -78,7 +80,7 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 				
 				// I don't want this batch job to appear in the UI, since it won't run successfully without parameters.
 				// That means it can't be registered with any docType. But if the invocation payload contains a docType,
-				// it will be checked against the registered docType, and will fail. So docType should be passed as a
+				// it will be checked against the null registered docType, and will fail. So docType should be passed as a
 				// parameter instead.
 				
 				if (key.equals("docType")) {
@@ -163,7 +165,7 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 		
 		logger.debug("Updating target: docType=" + docType + " inAuthority=" + inAuthority + " targetCsid=" + targetCsid);
 		
-		updateAuthorityItem(docType, inAuthority, targetCsid, getUpdatePayload(mergedTermGroupListElement));
+		updateAuthorityItem(docType, inAuthority, targetCsid, getUpdatePayload(targetTermGroupListElement, mergedTermGroupListElement));
 		
 		userNotes.add("The target record with CSID " + targetCsid + " (" + targetRefName + ") was updated.");
 		numAffected++;
@@ -567,16 +569,47 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 		}
 	}
 	
-	private String getUpdatePayload(Element termGroupListElement) {
-		String payload =
-			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-			"<document name=\"persons\">" +
-				"<ns2:persons_common xmlns:ns2=\"http://collectionspace.org/services/person\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-				termGroupListElement.asXML() +
-				"</ns2:persons_common>" +
-			"</document>";
+	private String getUpdatePayload(Element originalTermGroupListElement, Element updatedTermGroupListElement) {
+		List<Element> parents = new ArrayList<Element>();
+		
+		for (Element e = originalTermGroupListElement; e != null; e = e.getParent()) {
+			parents.add(e);
+		}
+		
+		Collections.reverse(parents);
+		
+		// Remove the original termGroupList element
+		parents.remove(parents.size() - 1);
+		
+		// Remove the root
+		Element rootElement = parents.remove(0);
+		
+		// Copy the root to a new document
+		Document document = DocumentHelper.createDocument(copyElement(rootElement));
+		Element current = document.getRootElement();
+		
+		// Copy the remaining parents
+		for (Element parent : parents) {
+			Element parentCopy = copyElement(parent);
+			
+			current.add(parentCopy);
+			current = parentCopy;
+		}
+		
+		// Add the updated termGroupList element
+		
+		current.add(updatedTermGroupListElement);
+		
+		String payload = document.asXML();
 
 		return payload;
+	}
+	
+	private Element copyElement(Element element) {
+		Element copy = DocumentHelper.createElement(element.getQName());
+		copy.appendAttributes(element);
+		
+		return copy;
 	}
 	
 	private class ReferencingRecord {
