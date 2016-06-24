@@ -120,7 +120,7 @@ public class Tools {
     public static String searchAndReplaceWithQuoteReplacement(String source, String find, String replace){
         Pattern pattern = Pattern.compile(find);
         Matcher matcher = pattern.matcher(source);
-        String output = matcher.replaceAll(matcher.quoteReplacement(replace));
+        String output = matcher.replaceAll(Matcher.quoteReplacement(replace));
         return output;
     }
 
@@ -128,6 +128,7 @@ public class Tools {
     static boolean m_fileSystemIsMac = ":".equals(File.separator);
     
     public final static String FILE_EXTENSION_SEPARATOR = ".";
+	public final static String OPTIONAL_VALUE_SUFFIX = "_OPT";
 
     public static boolean fileSystemIsDOS(){return m_fileSystemIsDOS;}
     public static boolean fileSystemIsMac(){return m_fileSystemIsMac;}
@@ -327,6 +328,14 @@ public class Tools {
 		
 		return result;
 	}
+		
+	static public boolean isOptional(String properyValue) {
+		boolean result = false;
+		
+		result = properyValue.endsWith(OPTIONAL_VALUE_SUFFIX);
+		
+		return result;
+	}
 	
 	/**
 	 * Try to find the value of a property variable in the system or JVM environment.  This code substitutes only property values formed
@@ -361,7 +370,11 @@ public class Tools {
 
 			if (result == null || result.isEmpty()) {
 				String errMsg = String.format("Could find neither an environment variable nor a systen variable named '%s'", key);
-				throw new Exception(errMsg);
+				if (isOptional(key) == true) {
+					System.err.println(errMsg);
+				} else {
+					throw new Exception(errMsg);
+				}
 			}
 		}
 		
