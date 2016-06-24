@@ -284,6 +284,12 @@
 	</target>
 
 	<target name="setup_initdb.sql" description="copy init_db scripts, replacing keywords">
+		<copy todir="${jee.server.cspace}/cspace/services/db/postgresql">
+			<fileset dir="${jee.server.cspace}/cspace/services/db/postgresql" includes="init_cspace_db.sql, init_nuxeo_db.sql">
+				<present targetdir="${src}/main/resources/db/postgresql" />
+			</fileset>
+			<globmapper from="*" to="*.bak" />
+		</copy>
 		<copy todir="${jee.server.cspace}/cspace/services/db">
 			<fileset dir="${src}/main/resources/db" />
 			<filterset>
@@ -312,8 +318,12 @@
 	<target name="undeploy" description="undeploy services from ${jee.server.cspace}">
 		<ant antfile="services/build.xml" target="undeploy" inheritAll="false" />
 		<ant antfile="3rdparty/build.xml" target="undeploy" inheritAll="false" />
-		<delete failonerror="false" dir="${jee.server.cspace}/cspace/services" />
+
+		<delete failonerror="false" dir="${jee.server.cspace}/cspace/services/config" />
+		<delete failonerror="false" dir="${jee.server.cspace}/cspace/services/scripts" />
+		<delete failonerror="false" dir="${jee.server.cspace}/cspace/services/db/jdbc_drivers" />
 		<delete failonerror="false" dir="${jee.server.cspace}/cspace/config/services" />
+
 		<!-- Delete mysql-ds.xml to clean up pre-1.8 bundles -->
 		<delete failonerror="false" file="${jee.deploy.cspace}/mysql-ds.xml" />
 		<delete failonerror="false" file="${jee.deploy.cspace}/jee-ds.xml" />

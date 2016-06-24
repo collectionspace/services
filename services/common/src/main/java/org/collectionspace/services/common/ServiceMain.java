@@ -1163,79 +1163,91 @@ public class ServiceMain {
      * 
      * @param dbInitializationScriptFilePath
      * @param dbsCheckedOrCreated 
+     * @throws Exception 
      */
-    private void updateInitializationScript(String dbInitializationScriptFilePath,
-            HashSet<String> dbsCheckedOrCreated, String[] dataSourceNames) {
-        // Get the current copy of the Nuxeo databases initialization script file,
-        // if that file exists, and read all of its lines except for those which
-        // drop databases.
-        List<String> lines = null;
-        // "If the given string" for the pathname provided here "is the empty string, then the
-        // result is the empty abstract pathname," according to Oracle's Javadoc for File.
-        // An empty path string might be provided here if a call to get the database product name failed earlier.
-        File nuxeoDatabasesInitScriptFile = new File(dbInitializationScriptFilePath);
-        try {
-            if (! nuxeoDatabasesInitScriptFile.canRead()) {
-                String msg = String.format("Could not find and/or read the Nuxeo databases initialization script file '%s'",
-                        nuxeoDatabasesInitScriptFile.getCanonicalPath());
-                logger.warn(msg);
-            } else {
-                // Note: Exceptions are written only to the console, not thrown, by
-                // the readFileAsLines() method in the common-api package.
-                lines = FileTools.readFileAsLines(dbInitializationScriptFilePath);
-                Iterator<String> linesIterator = lines.iterator();
-                String currentLine;
-                while (linesIterator.hasNext()) {
-                    currentLine = linesIterator.next();
-                    // Elide all existing DROP DATABASE statements.
-                    if (currentLine.toLowerCase().contains(DROP_DATABASE_SQL_CMD.toLowerCase())) {
-                        linesIterator.remove();
-                    }
-                    // Elide a comment pertaining to the existing
-                    // DROP DATABASE statements.
-                    if (currentLine.toLowerCase().contains(DROP_OBJECTS_SQL_COMMENT.toLowerCase())) {
-                        linesIterator.remove();
-                    }
-                    // Elide all existing DROP USER statements.
-                    if (currentLine.toLowerCase().contains(DROP_USER_SQL_CMD.toLowerCase())) {
-                        linesIterator.remove();
-                    }
-                }
-            }
-            List<String> replacementLines = new ArrayList<String>();
-            // Add back the comment elided above
-            replacementLines.add(DROP_OBJECTS_SQL_COMMENT);
-            // Add new DROP DATABASE lines for every Nuxeo-managed database.
-            for (String dbName : dbsCheckedOrCreated) {
-              if (Tools.notBlank(dbName)) {
-                  replacementLines.add(String.format(DROP_DATABASE_IF_EXISTS_SQL_CMD, dbName));
-              }
-            }
-            // Add new DROP USER commands for every provided datasource.
-            String username;
-            for (String dataSourceName : dataSourceNames) {
-                username = getBasicDataSourceUsername(dataSourceName);
-                if (Tools.notBlank(username)) {
-                    replacementLines.add(String.format(DROP_USER_IF_EXISTS_SQL_CMD, username));
-                }
-            }
-            // Now append all existing lines from that file, except for
-            // any lines that were elided above.
-            if (lines != null && ! lines.isEmpty()) {
-                replacementLines.addAll(lines);
-            }
-            if (! nuxeoDatabasesInitScriptFile.canWrite()) {
-                String msg = String.format("Could not find and/or write the Nuxeo databases initialization script file '%s'",
-                        nuxeoDatabasesInitScriptFile.getCanonicalPath());
-                logger.warn(msg);
-            } else {
-                // Note: Exceptions are written only to the console, not thrown, by
-                // the writeFileFromLines() method in the common-api package.
-                FileTools.writeFileFromLines(dbInitializationScriptFilePath, replacementLines);
-            }
-        } catch (Exception e) {
+    private void updateInitializationScript(String dbInitializationScriptFilePath, HashSet<String> dbsCheckedOrCreated,
+			String[] dataSourceNames) throws Exception {
+    	//
+    	// Get the current copy of the Nuxeo databases initialization script
+		// file and read all of its lines except for those which DROP databases.
+		//
+    	File nuxeoDatabasesInitScriptFile = new File(dbInitializationScriptFilePath);
+		List<String> lines = null;
+		try {
+			if (!nuxeoDatabasesInitScriptFile.canRead()) {
+				String msg = String.format("Could not find and/or read the Nuxeo databases initialization script file '%s'",
+						nuxeoDatabasesInitScriptFile.getCanonicalPath());
+				logger.warn(msg);
+			} else {
+				//
+				// Make a backup of the existing file
+				String destFileName = String.format("%s.%s.bak", dbInitializationScriptFilePath, System.currentTimeMillis());
+				if (FileTools.copyFile(dbInitializationScriptFilePath, destFileName, false) == false) {
+					throw new Exception("Could not backup existing database initialization script.");
+				}
 
-        }
+				//
+				// Process the existing lines
+				lines = FileTools.readFileAsLines(dbInitializationScriptFilePath);
+				Iterator<String> linesIterator = lines.iterator();
+				String currentLine;
+				while (linesIterator.hasNext()) {
+					currentLine = linesIterator.next();
+					// Elide all existing DROP DATABASE statements.
+					if (currentLine.toLowerCase().contains(DROP_DATABASE_SQL_CMD.toLowerCase())) {
+						linesIterator.remove();
+					}
+					// Elide a comment pertaining to the existing
+					// DROP DATABASE statements.
+					if (currentLine.toLowerCase().contains(DROP_OBJECTS_SQL_COMMENT.toLowerCase())) {
+						linesIterator.remove();
+					}
+					// Elide all existing DROP USER statements.
+					if (currentLine.toLowerCase().contains(DROP_USER_SQL_CMD.toLowerCase())) {
+						linesIterator.remove();
+					}
+				}
+			}
+			
+			// Add back the comment elided above
+			List<String> replacementLines = new ArrayList<String>();
+			replacementLines.add(DROP_OBJECTS_SQL_COMMENT);
+			// Add new DROP DATABASE lines for every Nuxeo-managed database.
+			for (String dbName : dbsCheckedOrCreated) {
+				if (Tools.notBlank(dbName)) {
+					replacementLines.add(String.format(DROP_DATABASE_IF_EXISTS_SQL_CMD, dbName));
+				}
+			}
+			
+			// Add new DROP USER commands for every provided datasource.
+			String username;
+			for (String dataSourceName : dataSourceNames) {
+				username = getBasicDataSourceUsername(dataSourceName);
+				if (Tools.notBlank(username)) {
+					replacementLines.add(String.format(DROP_USER_IF_EXISTS_SQL_CMD, username));
+				}
+			}
+			
+			// Now append all existing lines from that file, except for
+			// any lines that were elided above.
+			if (lines != null && !lines.isEmpty()) {
+				replacementLines.addAll(lines);
+			}
+			
+			if (!nuxeoDatabasesInitScriptFile.canWrite()) {
+				String msg = String.format(
+						"Could not find and/or write the Nuxeo databases initialization script file '%s'",
+						nuxeoDatabasesInitScriptFile.getCanonicalPath());
+				logger.warn(msg);
+			} else {
+				// Note: Exceptions are written only to the console, not thrown, by
+				// the writeFileFromLines() method in the common-api package.
+				FileTools.writeFileFromLines(dbInitializationScriptFilePath, replacementLines);
+			}
+		} catch (Exception e) {
+			logger.error("Could not update database initialization script.", e);
+			throw e;
+		}
 
-    }
+	}
 }

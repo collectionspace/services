@@ -205,7 +205,7 @@
             depends="check.db.scripts.deploy.dir" if="${db.scripts.deploy.dir.exists}">
         <delete>
             <fileset dir="${db.scripts.deploy.dir}"
-                     includes="**authorization**.sql"/>
+                     includes="**auth**.sql, acl.sql"/>
         </delete>
     </target>
 

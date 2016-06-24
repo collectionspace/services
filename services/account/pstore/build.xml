@@ -162,7 +162,7 @@
                 <pathelement path="${db.driver.jar}"/>
             </classpath>
         </sql>
-						<sql driver="${db.jdbc.driver.class}"
+		<sql driver="${db.jdbc.driver.class}"
              url="${db.jdbc.cspace.url}"
              userid="${db.cspace.user}"
              password="${db.cspace.user.password}"
@@ -170,7 +170,7 @@
             <classpath>
                 <pathelement path="${db.driver.jar}"/>
             </classpath>
-					</sql>
+		</sql>
     </target>
 	
 	<!-- We are copying only the scripts that are committed to the source tree.  We're *not* copying the ones that
