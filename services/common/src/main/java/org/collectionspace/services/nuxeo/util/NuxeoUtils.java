@@ -22,6 +22,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -44,12 +46,19 @@ import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
+import org.collectionspace.services.lifecycle.Lifecycle;
+import org.collectionspace.services.lifecycle.State;
+import org.collectionspace.services.lifecycle.StateList;
+import org.collectionspace.services.lifecycle.TransitionDef;
+import org.collectionspace.services.lifecycle.TransitionDefList;
+import org.collectionspace.services.lifecycle.TransitionList;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentException;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentFilter;
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
 import org.mortbay.log.Log;
+import org.nuxeo.ecm.core.NXCore;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.ClientException;
@@ -66,6 +75,7 @@ import org.nuxeo.ecm.core.io.DocumentWriter;
 import org.nuxeo.ecm.core.io.impl.DocumentPipeImpl;
 import org.nuxeo.ecm.core.io.impl.plugins.SingleDocumentReader;
 import org.nuxeo.ecm.core.io.impl.plugins.XMLDocumentWriter;
+import org.nuxeo.ecm.core.lifecycle.LifeCycleService;
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.storage.StorageBlob;
 import org.nuxeo.ecm.core.storage.binary.Binary;
@@ -139,6 +149,106 @@ public class NuxeoUtils {
     	return result;
     }
     
+    static public Lifecycle getLifecycle(String docTypeName) {
+    	Lifecycle result = null;
+    	
+    	try {
+    		LifeCycleService lifeCycleService = null;
+			try {
+				lifeCycleService = NXCore.getLifeCycleService();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+	    	String lifeCycleName = lifeCycleService.getLifeCycleNameFor(docTypeName);
+	    	org.nuxeo.ecm.core.lifecycle.LifeCycle nuxeoLifecyle = lifeCycleService.getLifeCycleByName(lifeCycleName);
+	    	
+	    	result = createCollectionSpaceLifecycle(nuxeoLifecyle);	
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			logger.error("Could not retreive life cycle information for Nuxeo doctype: " + docTypeName, e);
+		}
+    	
+    	return result;
+    }
+    
+    static public TransitionDef getTransitionDef(Lifecycle lifecycle, String transition) {
+    	TransitionDef result = null;
+    	
+    	try {
+			List<TransitionDef> transitionDefList = lifecycle.getTransitionDefList().getTransitionDef();
+			Iterator<TransitionDef> iter = transitionDefList.iterator();
+			boolean found = false;
+			while (iter.hasNext() && found == false) {
+				TransitionDef transitionDef = iter.next();
+				if (transitionDef.getName().equalsIgnoreCase(transition)) {
+					result = transitionDef;
+					found = true;
+				}
+			}
+		} catch (Exception e) {
+			logger.error(String.format("Exception trying to retreive lifecycle transition def from '%s' for transition '%s'.",
+					lifecycle.getName(), transition));
+		}
+    	
+    	return result;
+    }
+    
+    
+    /*
+     * Map Nuxeo's life cycle object to our JAX-B based life cycle object
+     */
+    static private Lifecycle createCollectionSpaceLifecycle(org.nuxeo.ecm.core.lifecycle.LifeCycle nuxeoLifecyle) {
+    	Lifecycle result = null;
+    	
+    	if (nuxeoLifecyle != null) {
+    		//
+    		// Copy the life cycle's name
+    		result = new Lifecycle();
+    		result.setName(nuxeoLifecyle.getName());
+    		
+    		// We currently support only one initial state, so take the first one from Nuxeo
+    		Collection<String> initialStateNames = nuxeoLifecyle.getInitialStateNames();
+    		result.setDefaultInitial(initialStateNames.iterator().next());
+    		
+    		// Next, we copy the state and corresponding transition lists
+    		StateList stateList = new StateList();
+    		List<State> states = stateList.getState();
+    		Collection<org.nuxeo.ecm.core.lifecycle.LifeCycleState> nuxeoStates = nuxeoLifecyle.getStates();
+    		for (org.nuxeo.ecm.core.lifecycle.LifeCycleState nuxeoState : nuxeoStates) {
+    			State tempState = new State();
+    			tempState.setDescription(nuxeoState.getDescription());
+    			tempState.setInitial(nuxeoState.isInitial());
+    			tempState.setName(nuxeoState.getName());
+    			// Now get the list of transitions
+    			TransitionList transitionList = new TransitionList();
+    			List<String> transitions = transitionList.getTransition();
+    			Collection<String> nuxeoTransitions = nuxeoState.getAllowedStateTransitions();
+    			for (String nuxeoTransition : nuxeoTransitions) {
+    				transitions.add(nuxeoTransition);
+    			}
+    			tempState.setTransitionList(transitionList);
+    			states.add(tempState);
+    		}
+    		result.setStateList(stateList);
+    		
+    		// Finally, we create the transition definitions
+    		TransitionDefList transitionDefList = new TransitionDefList();
+    		List<TransitionDef> transitionDefs = transitionDefList.getTransitionDef();
+    		Collection<org.nuxeo.ecm.core.lifecycle.LifeCycleTransition> nuxeoTransitionDefs = nuxeoLifecyle.getTransitions();
+    		for (org.nuxeo.ecm.core.lifecycle.LifeCycleTransition nuxeoTransitionDef : nuxeoTransitionDefs) {
+    			TransitionDef tempTransitionDef = new TransitionDef();
+    			tempTransitionDef.setDescription(nuxeoTransitionDef.getDescription());
+    			tempTransitionDef.setDestinationState(nuxeoTransitionDef.getDestinationStateName());
+    			tempTransitionDef.setName(nuxeoTransitionDef.getName());
+    			transitionDefs.add(tempTransitionDef);
+    		}
+    		result.setTransitionDefList(transitionDefList);
+    	}
+    	
+    	return result;
+    }    
+
     static public Thread deleteFileOfBlobAsync(Blob blob) {
     	Thread result = null;
     	

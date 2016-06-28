@@ -87,17 +87,27 @@
 		<documentation>CollectionSpace "cs_replicating" life cycle definition.</documentation>
 		<lifecycle name="cs_replicating" defaultInitial="project">
 			<transitions>
+			
+			<!-- State: Project -->
+				
 				<!-- Transitions TO the "project" state -->
 				<transition name="unreplicate" destinationState="project">
 					<description>Unreplicate the document back to project state.</description>
 				</transition>
+				<transition name="undeprecate" destinationState="project">
+					<description>Undeprecate the document to the project state.</description>
+				</transition>
 				<transition name="undelete" destinationState="project">
 					<description>Undelete the document to the project state.</description>
 				</transition>
+				
 
-				<!-- Transitions FROM "project" state TO the "replicated" and the "deleted" states -->
+				<!-- Transitions FROM "project" state -->
 				<transition name="replicate" destinationState="replicated">
 					<description>Replicate a document from the project state</description>
+				</transition>
+				<transition name="deprecate" destinationState="deprecated">
+					<description>Soft-delete the document from the project state</description>
 				</transition>
 				<transition name="delete" destinationState="deleted">
 					<description>Soft-delete the document from the project state</description>
@@ -107,54 +117,141 @@
 				Notice the convention used in the transition names below.  {transition-verb)_{lifecycle-state} -e.g., delete_replicated, replicate_deleted
 				This convention is critical to the code here: org.collectionspace.services.client.AuthorityClient.AuthorityItemDocumentModelHandler
 			-->
+			
+			<!-- State: replicated_deleted -->
 
 				<!-- Transitions TO "replicated_deleted" state -->
-				<transition name="delete_replicated" destinationState="replicated_deleted">
-					<description>Delete the replicated document from the "replicated" state</description>
-				</transition>
 				<transition name="replicate_deleted" destinationState="replicated_deleted">
 					<description>Replicate the deleted document from the "deleted" state.</description>
 				</transition>
+				<transition name="delete_replicated" destinationState="replicated_deleted">
+					<description>Delete the replicated document from the "replicated" state</description>
+				</transition>
 
 				<!-- Transitions FROM "replicated_deleted" state -->
-				<transition name="undelete_replicated" destinationState="replicated">
-					<description>Undelete the replicated document from replicated_deleted state</description>
-				</transition>
 				<transition name="unreplicate_deleted" destinationState="deleted">
 					<description>Unreplicate the deleted document.</description>
 				</transition>
+				<transition name="undelete_replicated" destinationState="replicated">
+					<description>Undelete the replicated document from replicated_deleted state</description>
+				</transition>
+				
+			<!-- State: replicated_deprecated -->
+				
+				<!-- Transitions TO "replicated_deprecated" state -->
+				<transition name="replicate_deprecated" destinationState="replicated_deprecated">
+					<description>Replicate the deprecated document from the "deprecated" state.</description>
+				</transition>
+				<transition name="deprecate_replicated" destinationState="replicated_deprecated">
+					<description>Deprecate the replicated document from the "replicated" state</description>
+				</transition>
 
+				<!-- Transitions FROM "replicated_deprecated" state -->
+				<transition name="unreplicate_deprecated" destinationState="deprecated">
+					<description>Unreplicate the deprecated document.</description>
+				</transition>
+				<transition name="undeprecate_replicated" destinationState="replicated">
+					<description>Undelete the replicated document from replicated_deleted state</description>
+				</transition>
+				
+			<!-- State: deprecated_deleted -->
+				
+				<!-- Transitions TO "deprecated_deleted" state -->
+				<transition name="deprecate_deleted" destinationState="deprecated_deleted">
+					<description>Deprecate the deleted document from the "deleted" state</description>
+				</transition>
+				<transition name="delete_deprecated" destinationState="deprecated_deleted">
+					<description>Delete the deprecated document from the "deprecated" state.</description>
+				</transition>
+
+				<!-- Transitions FROM "deprecated_deleted" state -->
+				<transition name="undeprecate_deleted" destinationState="deleted">
+					<description>Undelete the replicated document from deprecated_deleted state</description>
+				</transition>
+				<transition name="undelete_deprecated" destinationState="deprecated">
+					<description>Undelete the deprecated document.</description>
+				</transition>
+				
+			<!-- State: replicated_deprecated_deleted -->
+				
+				<!-- Transitions TO "replicated_deprecated_deleted" state -->
+				<transition name="replicate_deprecated_deleted" destinationState="replicated_deprecated_deleted">
+					<description>Delete the deprecated document from the "deprecated" state.</description>
+				</transition>
+				<transition name="deprecate_replicated_deleted" destinationState="replicated_deprecated_deleted">
+					<description>Deprecate the deleted document from the "deleted" state</description>
+				</transition>
+				<transition name="delete_replicated_deprecated" destinationState="replicated_deprecated_deleted">
+					<description>Delete the deprecated document from the "deprecated" state.</description>
+				</transition>				
+
+				<!-- Transitions FROM "replicated_deprecated_deleted" state -->
+				<transition name="unreplicate_deprecated_deleted" destinationState="deprecated_deleted">
+					<description>Undelete the deprecated document.</description>
+				</transition>
+				<transition name="undeprecate_replicated_deleted" destinationState="replicated_deleted">
+					<description>Undelete the replicated document from deprecated_deleted state</description>
+				</transition>
+				<transition name="undelete_replicated_deprecated" destinationState="replicated_deprecated">
+					<description>Undelete the deprecated document.</description>
+				</transition>
 			</transitions>
 
 			<states>
 				<state name="project" description="Default state" initial="true">
 					<transitions>
-						<transition>delete</transition>
-						<!-- To "deleted" state -->
-						<transition>replicate</transition>
-						<!-- To "replicated" state -->
+						<transition>replicate</transition>	<!-- To "replicated" state -->
+						<transition>deprecate</transition>	<!-- To "deprecated" state -->
+						<transition>delete</transition> 	<!-- To "deleted" state -->
 					</transitions>
-				</state>
-				<state name="replicated" description="Replicated state">
-					<transition>unreplicate</transition>
-					<!-- To "project" state -->
-					<transition>delete_replicated</transition>
-					<!-- To "replicated_deleted" state -->
 				</state>
 				<state name="deleted" description="Document is deleted">
 					<transitions>
-						<transition>undelete</transition>
-						<!-- To "project" state -->
-						<transition>replicate_deleted</transition>
-						<!-- To "replicated_deleted" state -->
+						<transition>replicate_deleted</transition>	<!-- To "replicated_deleted" state -->
+						<transition>deprecate_deleted</transition>	<!-- To "deprecated_deleted" state -->						
+						<transition>undelete</transition>			<!-- To "project" state -->
+					</transitions>
+				</state>
+				<state name="replicated" description="Replicated state">
+					<transitions>
+						<transition>unreplicate</transition>		<!-- To "project" state -->
+						<transition>deprecate_replicated</transition>	<!-- To "replicated_deprecated" state -->												
+						<transition>delete_replicated</transition>	<!-- To "replicated_deleted" state -->
 					</transitions>
 				</state>
 				<state name="replicated_deleted" description="Document is replicated and deleted">
 					<transitions>
-						<transition>unreplicate_deleted</transition>
-						<!-- To "deleted" state -->
-						<transition>undelete_replicated</transition>
-						<!-- To "replicated" state -->
+						<transition>unreplicate_deleted</transition>			<!-- To "deleted" state -->
+						<transition>deprecate_replicated_deleted</transition>	<!-- To "replicated_deprecated_deleted state -->
+						<transition>undelete_replicated</transition>			<!-- To "replicated" state -->
+					</transitions>
+				</state>
+				<state name="replicated_deprecated" description="Document is replicated and deprecated">
+					<transitions>
+						<transition>unreplicate_deprecated</transition>			<!-- To "deprecated" state -->
+						<transition>undeprecate_replicated</transition>			<!-- To "replicated" state -->
+						<transition>delete_replicated_deprecated</transition>	<!-- To "replicated_deprecated_deleted state -->
+					</transitions>
+				</state>
+				<state name="replicated_deprecated_deleted" description="Document is replicated, deprecated, and deleted">
+					<transitions>
+						<transition>unreplicate_deprecated_deleted</transition>	<!-- To "deprecated_deleted" state -->
+						<transition>undeprecate_replicated_deleted</transition>	<!-- To "replicated_deleted" state -->
+						<transition>undelete_replicated_deprecated</transition>	<!-- To "replicated_deprecated" state -->
+					</transitions>
+				</state>
+				<state name="deprecated" description="Document is deprecated">
+					<transitions>
+						<transition>replicate_deprecated</transition>	<!-- To "replicated_deprecated" state -->
+						<transition>undeprecate</transition>			<!-- To "project" state -->
+						<transition>delete_deprecated</transition>		<!-- To "deprecated_deleted" state -->
+					</transitions>
+				</state>
+				<state name="deprecated_deleted" description="Document is deprecated and deleted">
+					<transitions>
+						<transition>replicate_deprecated_deleted</transition>	<!-- To "replicated_deprecated_deleted state -->
+						<transition>undeprecate_deleted</transition>	<!-- To "deleted" state -->
+						<transition>undelete_deprecated</transition>	<!-- To "deprecated" state -->
 					</transitions>
 				</state>
 			</states>

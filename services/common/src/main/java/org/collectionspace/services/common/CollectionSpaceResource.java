@@ -23,7 +23,6 @@
  */
 package org.collectionspace.services.common;
 
-import java.lang.reflect.Method;
 import java.util.Map;
 
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
@@ -34,7 +33,6 @@ import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.storage.StorageClient;
 //import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.spi.HttpRequest;
-import org.jboss.resteasy.spi.metadata.ResourceMethod;
 
 /**
  * The Interface CollectionSpaceResource.

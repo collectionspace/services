@@ -44,27 +44,62 @@ public class WorkflowClient extends AbstractCommonListPoxServiceClientImpl<Workf
 	 */
 	
 	public static final String WORKFLOWSTATE_XML_ELEMENT_NAME = COLLECTIONSPACE_CORE_WORKFLOWSTATE;
+	public static final String WORKFLOWTRANSITION_TO = "to";  // Use for Nuxeo lifecycle event handling
+
 	// common to all Nuxeo document lifecycle policies
 	public static final String WORKFLOWSTATE_PROJECT = "project";
 	public static final String WORKFLOWSTATE_DELETED = "deleted";
+
 	// part of the "cs_replicating" Nuxeo document lifecycle policy
+	public static final String WORKFLOWSTATE_DEPRECATED = "deprecated";
+	public static final String WORKFLOWSTATE_DEPRECATED_DELETED = "deprecated_deleted";
 	public static final String WORKFLOWSTATE_REPLICATED = "replicated";
 	public static final String WORKFLOWSTATE_REPLICATED_DELETED = "replicated_deleted";
+	public static final String WORKFLOWSTATE_REPLICATED_DEPRECATED = "replicated_deprecated";
+	public static final String WORKFLOWSTATE_REPLICATED_DEPRECATED_DELETED = "replicated_deprecated_deleted";	
+	
 	// part of the "cs_locking" Nuxeo document lifecycle policy
 	public static final String WORKFLOWSTATE_LOCKED = "locked";
 	public static final String WORKFLOWSTATE_LOCKED_DELETED = "locked_deleted";
 	
 	/*
-	 * Nuxeo document workflow transition verbs
+	 * Nuxeo document workflow transition verbs FOR "cs_replicating" Nuxeo document lifecycle policy
 	 */
-	public static final String WORKFLOWTRANSITION_DELETE = "delete";	
-	public static final String WORKFLOWTRANSITION_UNDELETE = "undelete";
+	public static final String WORKFLOWTRANSITION_REPLICATE = "replicate";
+	public static final String WORKFLOWTRANSITION_DEPRECATE = "deprecate";
+	public static final String WORKFLOWTRANSITION_DELETE = "delete"; // Also used for default lifecycle
+	
+	public static final String WORKFLOWTRANSITION_REPLICATE_DELETED = "replicate_deleted";
+	public static final String WORKFLOWTRANSITION_DEPRECATE_DELETED = "deprecate_deleted";
+	public static final String WORKFLOWTRANSITION_UNDELETE = "undelete"; // Also used for default lifecycle
+	
+	public static final String WORKFLOWTRANSITION_UNREPLICATE = "unreplicate";
+	public static final String WORKFLOWTRANSITION_DEPRECATE_REPLICATED = "deprecate_replicated";
+	public static final String WORKFLOWTRANSITION_DELETE_REPLICATED = "delete_replicated";
+		
+	public static final String WORKFLOWTRANSITION_UNREPLICATE_DELETED = "unreplicate_deleted";
+	public static final String WORKFLOWTRANSITION_DEPRECATE_REPLICATED_DELETED = "deprecate_replicated_deleted";
+	public static final String WORKFLOWTRANSITION_UNDELETE_REPLICATED = "undelete_replicated";
+
+	public static final String WORKFLOWTRANSITION_UNREPLICATE_DEPRECATED = "unreplicate_deprecated";
+	public static final String WORKFLOWTRANSITION_UNDEPRECATE_REPLICATED = "undeprecate_replicated";
+	public static final String WORKFLOWTRANSITION_DELETE_REPLICATED_DEPRECATED = "delete_replicated_deprecated";
+
+	public static final String WORKFLOWTRANSITION_UNREPLICATE_DEPRECATED_DELETED = "unreplicate_deprecated_deleted";
+	public static final String WORKFLOWTRANSITION_UNDEPRECATE_REPLICATED_DELETED = "undeprecate_replicated_deleted";
+	public static final String WORKFLOWTRANSITION_UNDELETE_REPLICATED_DEPRECATED = "undelete_replicated_deprecated";
+	
+	public static final String WORKFLOWTRANSITION_REPLICATE_DEPRECATED = "replicate_deprecated";
+	public static final String WORKFLOWTRANSITION_UNDEPRECATE = "undeprecate";
+	public static final String WORKFLOWTRANSITION_DELETE_DEPRECATED = "delete_deprecated";	
+
+	public static final String WORKFLOWTRANSITION_REPLICATE_DEPRECATED_DELETED = "replicate_deprecated_deleted";
+	public static final String WORKFLOWTRANSITION_UNDEPRECATE_DELETED = "undeprecate_deleted";
+	public static final String WORKFLOWTRANSITION_UNDELETE_DEPRECATED = "undelete_deprecated";
+
 	public static final String WORKFLOWTRANSITION_LOCK = "lock";
 	public static final String WORKFLOWTRANSITION_UNLOCK = "unlock";
-	public static final String WORKFLOWTRANSITION_REPLICATE = "replicate";
-	public static final String WORKFLOWTRANSITION_UNREPLICATE = "unreplicate";
-        
-    public static final String WORKFLOWTRANSITION_TO = "to";
+   
 	//
 	// DocumentHandler workflow-related passed in context properties
 	//
