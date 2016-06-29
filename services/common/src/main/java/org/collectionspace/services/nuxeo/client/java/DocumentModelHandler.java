@@ -86,59 +86,6 @@ public abstract class DocumentModelHandler<T, TL>
     protected String oldRefNameOnUpdate = null;  // FIXME: REM - We should have setters and getters for these
     protected String newRefNameOnUpdate = null;  // FIXME: two fields.
     
-    /*
-     * Map Nuxeo's life cycle object to our JAX-B based life cycle object
-     */
-    private Lifecycle createCollectionSpaceLifecycle(org.nuxeo.ecm.core.lifecycle.LifeCycle nuxeoLifecyle) {
-    	Lifecycle result = null;
-    	
-    	if (nuxeoLifecyle != null) {
-    		//
-    		// Copy the life cycle's name
-    		result = new Lifecycle();
-    		result.setName(nuxeoLifecyle.getName());
-    		
-    		// We currently support only one initial state, so take the first one from Nuxeo
-    		Collection<String> initialStateNames = nuxeoLifecyle.getInitialStateNames();
-    		result.setDefaultInitial(initialStateNames.iterator().next());
-    		
-    		// Next, we copy the state and corresponding transition lists
-    		StateList stateList = new StateList();
-    		List<State> states = stateList.getState();
-    		Collection<org.nuxeo.ecm.core.lifecycle.LifeCycleState> nuxeoStates = nuxeoLifecyle.getStates();
-    		for (org.nuxeo.ecm.core.lifecycle.LifeCycleState nuxeoState : nuxeoStates) {
-    			State tempState = new State();
-    			tempState.setDescription(nuxeoState.getDescription());
-    			tempState.setInitial(nuxeoState.isInitial());
-    			tempState.setName(nuxeoState.getName());
-    			// Now get the list of transitions
-    			TransitionList transitionList = new TransitionList();
-    			List<String> transitions = transitionList.getTransition();
-    			Collection<String> nuxeoTransitions = nuxeoState.getAllowedStateTransitions();
-    			for (String nuxeoTransition : nuxeoTransitions) {
-    				transitions.add(nuxeoTransition);
-    			}
-    			tempState.setTransitionList(transitionList);
-    			states.add(tempState);
-    		}
-    		result.setStateList(stateList);
-    		
-    		// Finally, we create the transition definitions
-    		TransitionDefList transitionDefList = new TransitionDefList();
-    		List<TransitionDef> transitionDefs = transitionDefList.getTransitionDef();
-    		Collection<org.nuxeo.ecm.core.lifecycle.LifeCycleTransition> nuxeoTransitionDefs = nuxeoLifecyle.getTransitions();
-    		for (org.nuxeo.ecm.core.lifecycle.LifeCycleTransition nuxeoTransitionDef : nuxeoTransitionDefs) {
-    			TransitionDef tempTransitionDef = new TransitionDef();
-    			tempTransitionDef.setDescription(nuxeoTransitionDef.getDescription());
-    			tempTransitionDef.setDestinationState(nuxeoTransitionDef.getDestinationStateName());
-    			tempTransitionDef.setName(nuxeoTransitionDef.getName());
-    			transitionDefs.add(tempTransitionDef);
-    		}
-    		result.setTransitionDefList(transitionDefList);
-    	}
-    	
-    	return result;
-    }
     
     /*
      * Returns the the life cycle definition of the related Nuxeo document type for this handler.
@@ -168,27 +115,8 @@ public abstract class DocumentModelHandler<T, TL>
      * @see org.collectionspace.services.common.document.DocumentHandler#getLifecycle(java.lang.String)
      */
     @Override
-    public Lifecycle getLifecycle(String docTypeName) {
-    	Lifecycle result = null;
-    	
-    	try {
-    		LifeCycleService lifeCycleService = null;
-			try {
-				lifeCycleService = NXCore.getLifeCycleService();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			
-	    	String lifeCycleName = lifeCycleService.getLifeCycleNameFor(docTypeName);
-	    	org.nuxeo.ecm.core.lifecycle.LifeCycle nuxeoLifecyle = lifeCycleService.getLifeCycleByName(lifeCycleName);
-	    	
-	    	result = createCollectionSpaceLifecycle(nuxeoLifecyle);	
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			logger.error("Could not retreive life cycle information for Nuxeo doctype: " + docTypeName, e);
-		}
-    	
-    	return result;
+    public Lifecycle getLifecycle(String docTypeName) {    	
+    	return NuxeoUtils.getLifecycle(docTypeName);
     }
     
     /*

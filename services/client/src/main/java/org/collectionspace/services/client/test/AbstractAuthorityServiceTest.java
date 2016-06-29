@@ -349,7 +349,6 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     public void createItem(String testName) throws Exception {
         // Perform setup.
         setupCreate();
-
         String newID = createItemInAuthority((AuthorityClient) getClientInstance(), knownResourceId, getTestAuthorityItemShortId());
 
         // Store the ID returned from the first item resource created
@@ -361,6 +360,28 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
             }
         }
     }
+	
+	@Test(dataProvider = "testName", dependsOnMethods = {"readItem", "CRUDTests"})
+    public void checkAuthorityWorkflowTransitions(String testName) throws Exception {
+        //
+        // First check to see if the authority supports synchronization -i.e., the "cs_replicating" lifecycle policy.
+        //
+    	assertSupportsSync();
+		
+        String itemCsid = createItemInAuthority((AuthorityClient) getClientInstance(), knownResourceId, getTestAuthorityItemShortId() + testName);
+        // Add workflow states
+        updateItemLifeCycleState(testName, knownResourceId, itemCsid, WorkflowClient.WORKFLOWTRANSITION_REPLICATE, WorkflowClient.WORKFLOWSTATE_REPLICATED);
+        updateItemLifeCycleState(testName, knownResourceId, itemCsid, WorkflowClient.WORKFLOWTRANSITION_DEPRECATE, WorkflowClient.WORKFLOWSTATE_REPLICATED_DEPRECATED);
+        updateItemLifeCycleState(testName, knownResourceId, itemCsid, WorkflowClient.WORKFLOWTRANSITION_DELETE, WorkflowClient.WORKFLOWSTATE_REPLICATED_DEPRECATED_DELETED);
+        // Substract workflow states
+        updateItemLifeCycleState(testName, knownResourceId, itemCsid, WorkflowClient.WORKFLOWTRANSITION_UNREPLICATE, WorkflowClient.WORKFLOWSTATE_DEPRECATED_DELETED);
+        updateItemLifeCycleState(testName, knownResourceId, itemCsid, WorkflowClient.WORKFLOWTRANSITION_UNDELETE, WorkflowClient.WORKFLOWSTATE_DEPRECATED);
+        updateItemLifeCycleState(testName, knownResourceId, itemCsid, WorkflowClient.WORKFLOWTRANSITION_UNDEPRECATE, WorkflowClient.WORKFLOWSTATE_PROJECT);
+        // Add other workflow states
+        updateItemLifeCycleState(testName, knownResourceId, itemCsid, WorkflowClient.WORKFLOWTRANSITION_DELETE, WorkflowClient.WORKFLOWSTATE_DELETED);
+        updateItemLifeCycleState(testName, knownResourceId, itemCsid, WorkflowClient.WORKFLOWTRANSITION_REPLICATE, WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED);
+    }
+
     
     /**
      * Verify that we can test synchronization with this authority.  Otherwise, we skip the test.

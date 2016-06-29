@@ -137,7 +137,7 @@ public class WorkflowDocumentModelHandler
      * their current state.  Without this mapping, REST API clients would need to calculate this on their own and use the longer forms like:
      * "delete_replicated", "undelete_replicated", "lock_deleted", "unlock_deleted", etc. 
      */
-    String getQualifiedTransitionName(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef) {
+    public static String getQualifiedTransitionName(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef) {
     	String result = null;
     	
     	String currentTransitionName = result = transitionDef.getName(); // begin with result set to the current name

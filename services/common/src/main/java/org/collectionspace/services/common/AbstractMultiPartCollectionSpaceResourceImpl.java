@@ -49,8 +49,8 @@ import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
 import org.collectionspace.services.lifecycle.Lifecycle;
 import org.collectionspace.services.lifecycle.TransitionDef;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.workflow.WorkflowCommon;
-
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -196,20 +196,12 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
     protected TransitionDef getTransitionDef(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String transition) {
     	TransitionDef result = null;
     	
-    	try {
-			Lifecycle lifecycle = ctx.getDocumentHandler().getLifecycle();
-			List<TransitionDef> transitionDefList = lifecycle.getTransitionDefList().getTransitionDef();
-			Iterator<TransitionDef> iter = transitionDefList.iterator();
-			boolean found = false;
-			while (iter.hasNext() && found == false) {
-				TransitionDef transitionDef = iter.next();
-				if (transitionDef.getName().equalsIgnoreCase(transition)) {
-					result = transitionDef;
-					found = true;
-				}
-			}
+		Lifecycle lifecycle;
+		try {
+			lifecycle = ctx.getDocumentHandler().getLifecycle();
+			result = NuxeoUtils.getTransitionDef(lifecycle, transition);
 		} catch (Exception e) {
-			logger.error("Exception trying to retreive life cycle information for: " + ctx.getDocumentType());
+			logger.error("Failed to get transition definition.", e);
 		}
     	
     	return result;
