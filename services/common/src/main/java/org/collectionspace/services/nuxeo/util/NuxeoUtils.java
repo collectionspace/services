@@ -54,7 +54,7 @@ import org.collectionspace.services.lifecycle.TransitionDefList;
 import org.collectionspace.services.lifecycle.TransitionList;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentException;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
-import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentFilter;
+
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
 import org.mortbay.log.Log;

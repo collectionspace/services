@@ -902,7 +902,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     
 
     @SuppressWarnings("rawtypes")
-    protected void updateLifeCycleState(String testName, String resourceId, String workflowTransition, String lifeCycleState) throws Exception {
+    protected void updateLifeCycleState(String testName, String resourceId, String workflowTransition, String expectedLifeCycleState) throws Exception {
         //
         // Read the existing object
         //
@@ -924,7 +924,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         // Mark it for a soft delete.
         //
         logger.debug("Current workflow state:" + objectAsXmlString(workflowCommons, WorkflowCommon.class));
-        workflowCommons.setCurrentLifeCycleState(lifeCycleState);
+        workflowCommons.setCurrentLifeCycleState(expectedLifeCycleState);
         PoxPayloadOut output = new PoxPayloadOut(WorkflowClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = output.addPart(WorkflowClient.SERVICE_COMMONPART_NAME, workflowCommons);
         //
@@ -955,8 +955,8 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 		        updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
 		        Assert.assertNotNull(workflowCommons);
 		        String currentWorkflowState = updatedWorkflowCommons.getCurrentLifeCycleState();
-		        if (currentWorkflowState.equalsIgnoreCase(lifeCycleState)) {
-		        	logger.debug("Expected workflow state found: " + lifeCycleState);
+		        if (currentWorkflowState.equalsIgnoreCase(expectedLifeCycleState)) {
+		        	logger.debug("Expected workflow state found: " + expectedLifeCycleState);
 		        	break;
 		        }
 	        } finally {
@@ -969,7 +969,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         //
         // Finally, assert the state change happened as expected.
         //
-        Assert.assertEquals(updatedWorkflowCommons.getCurrentLifeCycleState(), lifeCycleState);
+        Assert.assertEquals(updatedWorkflowCommons.getCurrentLifeCycleState(), expectedLifeCycleState);
     }
 
     private CollectionSpacePoxClient assertPoxClient() throws Exception {
@@ -1179,7 +1179,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         }
     }
 
-    protected void updateItemLifeCycleState(String testName, String parentCsid, String itemCsid, String workflowTransition, String lifeCycleState) throws Exception {
+    protected String updateItemLifeCycleState(String testName, String parentCsid, String itemCsid, String workflowTransition, String expectedLifeCycleState) throws Exception {
         //
         // Read the existing object
         //
@@ -1187,6 +1187,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         Response res = client.readItemWorkflow(parentCsid, itemCsid);
         WorkflowCommon workflowCommons = null;
         try {
+        	setupRead();
 	        assertStatusCode(res, testName);
 	        logger.debug("Got object to update life cycle state with ID: " + itemCsid);
 	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
@@ -1201,7 +1202,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         //
         // Mark it for a state change.
         //
-        workflowCommons.setCurrentLifeCycleState(lifeCycleState);
+        workflowCommons.setCurrentLifeCycleState(expectedLifeCycleState);
         PoxPayloadOut output = new PoxPayloadOut(WorkflowClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = output.addPart(WorkflowClient.SERVICE_COMMONPART_NAME, workflowCommons);
         //
@@ -1210,6 +1211,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         res = client.updateItemWorkflowWithTransition(parentCsid, itemCsid, workflowTransition);
         WorkflowCommon updatedWorkflowCommons = null;
         try {
+        	setupUpdate();
 	        assertStatusCode(res, testName);
 	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
@@ -1222,6 +1224,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         
         int trials = 0;
         boolean passed = false;
+        setupRead();
         while (trials < 30) { //wait to see if the lifecycle transition will happen
 	        //
 	        // Read the updated object and make sure it was updated correctly.
@@ -1235,8 +1238,8 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 		        updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
 		        Assert.assertNotNull(workflowCommons);
 		        String currentState = updatedWorkflowCommons.getCurrentLifeCycleState();
-		        if (currentState.equalsIgnoreCase(lifeCycleState)) {
-		        	logger.debug("Expected workflow state found: " + lifeCycleState);
+		        if (currentState.equalsIgnoreCase(expectedLifeCycleState)) {
+		        	logger.debug("Expected workflow state found: " + expectedLifeCycleState);
 		        	break;
 		        }
 		        logger.debug("Workflow state not yet updated for object with id: " + itemCsid + " state is=" +
@@ -1251,7 +1254,8 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         //
         // Finally check to see if the state change was updated as expected.
         //
-        Assert.assertEquals(updatedWorkflowCommons.getCurrentLifeCycleState(), lifeCycleState);
+        Assert.assertEquals(updatedWorkflowCommons.getCurrentLifeCycleState(), expectedLifeCycleState);
+        return updatedWorkflowCommons.getCurrentLifeCycleState();
     }
 }
 
