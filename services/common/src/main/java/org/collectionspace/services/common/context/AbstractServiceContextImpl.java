@@ -713,8 +713,16 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         properties.setProperty(AuthorityClient.PASSWORD_PROPERTY, remoteClientConfig.getPassword());
         properties.setProperty(AuthorityClient.SSL_PROPERTY, remoteClientConfig.getSsl());
         properties.setProperty(AuthorityClient.AUTH_PROPERTY, remoteClientConfig.getAuth());
-        properties.setProperty(AuthorityClient.TENANT_ID_PROPERTY, remoteClientConfig.getTenantId());
-        properties.setProperty(AuthorityClient.TENANT_NAME_PROPERTY, remoteClientConfig.getTenantName());
+        //
+        // Optional values
+        String tenantId = remoteClientConfig.getTenantId();
+        if (tenantId != null) {
+        	properties.setProperty(AuthorityClient.TENANT_ID_PROPERTY, tenantId);
+        }
+        String tenantName = remoteClientConfig.getTenantName();
+        if (tenantName != null) {
+        	properties.setProperty(AuthorityClient.TENANT_NAME_PROPERTY, tenantName);
+        }
         
         result = getClient(properties);
         
