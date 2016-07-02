@@ -27,7 +27,7 @@
 	
     <bean id="springSecurityFilterChain"
           class="org.springframework.security.web.FilterChainProxy">
-        <sec:filter-chain-map path-type="ant">
+        <sec:filter-chain-map request-matcher="ant">
 			<!-- Exclude the resource path to public items' content from AuthN and AuthZ.  Let's us publish resources with anonymous access. -->
 			<sec:filter-chain pattern="/publicitems/*/*/content"
                               filters="none"/>
@@ -39,18 +39,18 @@
 
     <bean id="securityContextPersistenceFilter"
           class="org.springframework.security.web.context.SecurityContextPersistenceFilter">
-        <property name='securityContextRepository'>
+        <constructor-arg>
             <bean class='org.springframework.security.web.context.HttpSessionSecurityContextRepository'>
                 <property name='allowSessionCreation' value='true' />
             </bean>
-        </property>
+        </constructor-arg>
     </bean>
 
 
     <bean id="basicAuthenticationFilter"
           class="org.springframework.security.web.authentication.www.BasicAuthenticationFilter">
-        <property name="authenticationManager" ref="authenticationManager"/>
-        <property name="authenticationEntryPoint" ref="basicAuthenticationEntryPoint"/>
+        <constructor-arg ref="authenticationManager"/>
+        <constructor-arg ref="basicAuthenticationEntryPoint"/>
     </bean>
 
     <bean id="basicAuthenticationEntryPoint"
@@ -70,11 +70,11 @@
 
     <bean id="exTranslationFilter"
           class="org.springframework.security.web.access.ExceptionTranslationFilter">
-        <property name="authenticationEntryPoint" ref="basicAuthenticationEntryPoint"/>
+        <constructor-arg ref="basicAuthenticationEntryPoint"/>
     </bean>
 
     <sec:authentication-manager alias="authenticationManager">
-        <sec:authentication-provider ref="jaasAuthenticationProvider" user-service-ref="userDetailsService"/>
+        <sec:authentication-provider ref="jaasAuthenticationProvider"/>
     </sec:authentication-manager>
 
     <bean id="jaasAuthenticationProvider"
@@ -108,7 +108,7 @@
         <property name="accessDecisionManager" ref="httpRequestAccessDecisionManager"/>
         <!--property name="securityMetadataSource" ref="cspaceMetadataSource"/-->
         <property name="securityMetadataSource">
-            <sec:filter-security-metadata-source>
+            <sec:filter-security-metadata-source use-expressions="false">
                 <sec:intercept-url pattern="/**" access="IS_AUTHENTICATED_REMEMBERED"/>
             </sec:filter-security-metadata-source>
         </property>
@@ -116,13 +116,13 @@
 
     <bean id="httpRequestAccessDecisionManager"
           class="org.springframework.security.access.vote.AffirmativeBased">
-        <property name="allowIfAllAbstainDecisions" value="false"/>
-        <property name="decisionVoters">
+        <constructor-arg>
             <list>
                 <ref bean="roleVoter"/>
                 <ref bean="authenticatedVoter"/>
             </list>
-        </property>
+        </constructor-arg>
+        <property name="allowIfAllAbstainDecisions" value="false"/>
     </bean>
 
     <bean id="authenticatedVoter"

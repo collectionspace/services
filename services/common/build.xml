@@ -198,7 +198,8 @@
             description="undeploy spring binaries from ${jee.server.cspace}">
         <delete>
             <fileset dir="${jee.server.cspace}/lib" includes="org.springframework.*.jar"/>
-            <fileset dir="${jee.server.cspace}/lib" includes="spring-security*.jar"/>
+            <fileset dir="${jee.server.cspace}/lib" includes="spring-*.jar"/>
+            <fileset dir="${jee.server.cspace}/lib" includes="ehcache-*.jar"/>
         </delete>
     </target>
 	

@@ -29,11 +29,12 @@ import java.util.HashSet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.authorization.spi.CSpaceAuthorizationProvider;
+import org.jboss.security.SimpleGroup;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.authentication.jaas.JaasGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
@@ -187,7 +188,7 @@ public class AuthZ {
     public void login() {
     	String user = "SPRING_ADMIN";
     	String password = "SPRING_ADMIN";
-        GrantedAuthority spring_security_admin = new GrantedAuthorityImpl("ROLE_SPRING_ADMIN"); //NOTE: Must match with value in applicationContext-authorization-test.xml (aka SPRING_SECURITY_METADATA)
+        GrantedAuthority spring_security_admin = new JaasGrantedAuthority("ROLE_SPRING_ADMIN", new SimpleGroup("Role")); //NOTE: Must match with value in applicationContext-authorization-test.xml (aka SPRING_SECURITY_METADATA)
         HashSet<GrantedAuthority> gauths = new HashSet<GrantedAuthority>();
         gauths.add(spring_security_admin);
         Authentication authRequest = new UsernamePasswordAuthenticationToken(user, password, gauths);

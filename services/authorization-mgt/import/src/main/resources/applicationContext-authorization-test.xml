@@ -54,14 +54,13 @@
     <bean id="aclAuthorizationStrategy" class="org.springframework.security.acls.domain.AclAuthorizationStrategyImpl">
         <constructor-arg>
             <list>
-                <bean class="org.springframework.security.core.authority.GrantedAuthorityImpl">
+                <bean class="org.springframework.security.authentication.jaas.JaasGrantedAuthority">
                     <constructor-arg value="ROLE_SPRING_ADMIN"/>
-                </bean>
-                <bean class="org.springframework.security.core.authority.GrantedAuthorityImpl">
-                    <constructor-arg value="ROLE_SPRING_ADMIN"/>
-                </bean>
-                <bean class="org.springframework.security.core.authority.GrantedAuthorityImpl">
-                    <constructor-arg value="ROLE_SPRING_ADMIN"/>
+                    <constructor-arg>
+                        <bean class="org.jboss.security.SimpleGroup">
+                            <constructor-arg value="Role"/>
+                        </bean>
+                    </constructor-arg>
                 </bean>
             </list>
         </constructor-arg>
@@ -78,6 +77,14 @@
                 <property name="cacheName" value="aclCache"/>
             </bean>
         </constructor-arg>
+        <constructor-arg>
+            <bean class="org.springframework.security.acls.domain.DefaultPermissionGrantingStrategy">
+                <constructor-arg>
+                    <bean class="org.springframework.security.acls.domain.ConsoleAuditLogger"/>
+                </constructor-arg>
+            </bean>
+        </constructor-arg>
+        <constructor-arg ref="aclAuthorizationStrategy"/>
     </bean>
 
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
