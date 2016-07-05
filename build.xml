@@ -284,6 +284,7 @@
 	</target>
 
 	<target name="setup_initdb.sql" description="copy init_db scripts, replacing keywords">
+		<mkdir dir="${jee.server.cspace}/cspace/services/db/postgresql"/>
 		<copy todir="${jee.server.cspace}/cspace/services/db/postgresql">
 			<fileset dir="${jee.server.cspace}/cspace/services/db/postgresql" includes="init_cspace_db.sql, init_nuxeo_db.sql">
 				<present targetdir="${src}/main/resources/db/postgresql" />
