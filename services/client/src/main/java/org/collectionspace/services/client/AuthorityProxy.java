@@ -153,6 +153,17 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
             @QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
     
+    @GET
+    @Produces({"application/xml"})
+    @Path("/{csid}/items/")
+    Response readItemList(
+    		@PathParam("csid") String vcsid,
+            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
+            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
+            @QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState,
+            @QueryParam(IClientQueryParams.PAGE_SIZE_PARAM) long pageSize,
+            @QueryParam(IClientQueryParams.START_PAGE_PARAM) long pageNum);
+    
     // List Items for a named authority matching a partial term or keywords.
     @GET
     @Produces({"application/xml"})

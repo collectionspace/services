@@ -150,8 +150,9 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * setProxy for the client
      * might be useful to reset proxy (based on auth requirements) that is usually created at the time of
      * constructing a client
+     * @throws Exception 
      */
-    void setProxy();
+    void setProxy() throws Exception;
 
     /**
      * setAuth sets up authentication properties based on given parameters
@@ -160,10 +161,11 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * @param useUser indicates using user name
      * @param password
      * @param usePassword indicates using password
+     * @throws Exception 
      */
     void setAuth(boolean useAuth,
             String user, boolean useUser,
-            String password, boolean usePassword);
+            String password, boolean usePassword) throws Exception;
 
     /**
      * Use auth.

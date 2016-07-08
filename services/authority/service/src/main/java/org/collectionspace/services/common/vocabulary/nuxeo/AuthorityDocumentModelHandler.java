@@ -63,8 +63,8 @@ import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-
 import org.dom4j.Element;
+import org.eclipse.jetty.http.HttpStatus;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
@@ -144,7 +144,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 	        //
 	        //
 	        Long sasRev = getRevision(sasPayloadIn);
-	        if (sasRev > localRev) {
+	        if (sasRev > localRev || true) { // FIXME: Along with the revision number, we need to use other meta information to determine if a sync should happen -for now, alway sync
 	        	//
 	        	// First, sync all the authority items
 	        	//
@@ -492,7 +492,18 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     	return result; // -1 = no sync needed/possible, 0 = sync'd, 1 = created new item
     	
     	
-    }    
+    }
+    
+    private void assertStatusCode(Response res, Specifier specifier, AuthorityClient client) throws Exception {
+        int statusCode = res.getStatus();
+
+    	if (statusCode != HttpStatus.OK_200) {
+        	String errMsg = String.format("Could not retrieve authority information for '%s' on remote server '%s'.  Server returned status code %d",
+        			specifier.getURNValue(), client.getBaseURL(), statusCode);
+        	res.close();
+	        throw new DocumentException(statusCode, errMsg);
+    	}
+    }
     
     /**
      * Request an authority item list payload from the SAS server.
@@ -504,22 +515,32 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
      */
     private PoxPayloadIn requestPayloadInItemList(ServiceContext ctx, Specifier specifier) throws Exception {
     	PoxPayloadIn result = null;
-    	
         AuthorityClient client = (AuthorityClient) ctx.getClient();
+    	//
+    	// First find out how many items exist
         Response res = client.readItemList(specifier.getURNValue(),
         		null,	// partial term string
-        		null	// keyword string
+        		null,	// keyword string
+        		0,		// page size
+        		0		// page number
         		);
+        assertStatusCode(res, specifier, client);
+        AbstractCommonList commonList = res.readEntity(AbstractCommonList.class);
+        res.close();
+        long numOfItems = commonList.getTotalItems();        
+        
+        //
+        // Next, request a payload list with all the items
+        res = client.readItemList(specifier.getURNValue(),
+        		null,		// partial term string
+        		null,		// keyword string
+        		numOfItems,	// page size
+        		0			// page number
+        		);        
+        assertStatusCode(res, specifier, client);
+
         try {
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if (logger.isDebugEnabled()) {
-	            logger.debug(client.getClass().getCanonicalName() + ": status = " + statusCode);
-	        }
-	        
-            result = new PoxPayloadIn((String)res.readEntity(getEntityResponseType())); // Get the entire response!	        
+            result = new PoxPayloadIn((String)res.readEntity(getEntityResponseType())); // Get the entire response.
         } finally {
         	res.close();
         }

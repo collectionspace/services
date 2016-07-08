@@ -47,10 +47,44 @@ import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 // FIXME: Deprecated classes that need to be updated
 import org.jboss.resteasy.client.ProxyFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.conn.ssl.SSLContexts;
 
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.X509TrustManager;
+
+/**
+ * Private class for SSL support
+ */
+class HttpsTrustManager implements X509TrustManager {
+
+	@Override
+	public void checkClientTrusted(X509Certificate[] arg0, String arg1)
+			throws CertificateException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void checkServerTrusted(X509Certificate[] arg0, String arg1)
+			throws CertificateException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public X509Certificate[] getAcceptedIssuers() {
+		return new X509Certificate[]{};
+	}
+
+}
 
 /**
  * Private class for JAX-RS authentication
@@ -498,17 +532,23 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      * allow to reset proxy as per security needs
      */
     @Override
-	public void setProxy() {
+	public void setProxy() throws Exception {
     	ResteasyClient client = null;
         String urlString = url.toString();
     	Class<P> proxyClass = this.getProxyClass();
     	
+    	if (useSSL()) {
+    		SSLContext sslcontext = SSLContexts.custom().useSSL().build();
+            sslcontext.init(null, new X509TrustManager[]{new HttpsTrustManager()}, new SecureRandom());
+            client = (ResteasyClient)ClientBuilder.newBuilder().sslContext(sslcontext).build();
+    	} else {
+        	client = (ResteasyClient)ClientBuilder.newClient();
+    	}
+    	
         if (useAuth()) {
             String user = properties.getProperty(USER_PROPERTY);
             String password = properties.getProperty(PASSWORD_PROPERTY);
-        	client = (ResteasyClient)ClientBuilder.newClient().register(new Authenticator(user, password));
-        } else {
-        	client = (ResteasyClient)ClientBuilder.newClient();
+        	client = client.register(new Authenticator(user, password));
         }
         
         proxy = client.target(urlString).proxy(proxyClass);
@@ -532,7 +572,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
     @Override
 	public void setAuth(boolean useAuth,
             String user, boolean useUser,
-            String password, boolean usePassword) {
+            String password, boolean usePassword) throws Exception {
         if (useAuth == true) {
             setProperty(CollectionSpaceClient.AUTH_PROPERTY, "true");
             if (useUser) {

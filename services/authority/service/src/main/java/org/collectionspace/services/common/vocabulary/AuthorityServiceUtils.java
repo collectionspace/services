@@ -22,7 +22,10 @@ import org.collectionspace.services.config.tenant.RemoteClientConfigurations;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-import org.dom4j.DocumentException;
+import org.collectionspace.services.common.document.DocumentException;
+
+//import org.dom4j.DocumentException;
+import org.eclipse.jetty.http.HttpStatus;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,14 +124,16 @@ public class AuthorityServiceUtils {
         Response res = client.read(specifier.getURNValue());
         try {
 	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if (logger.isDebugEnabled()) {
-	            logger.debug(client.getClass().getCanonicalName() + ": status = " + statusCode);
+	        if (statusCode == HttpStatus.OK_200) {
+	            result = new PoxPayloadIn((String)res.readEntity(responseType)); // Get the entire response!	        	        	
+	        } else {
+	        	String errMsg = String.format("Could not retrieve authority information for '%s' on remote server '%s'.  Server returned status code %d",
+	        			specifier.getURNValue(), remoteClientConfig.getUrl(), statusCode);
+		        if (logger.isDebugEnabled()) {
+		            logger.debug(errMsg);
+		        }
+		        throw new DocumentException(statusCode, errMsg);
 	        }
-	        
-            result = new PoxPayloadIn((String)res.readEntity(responseType)); // Get the entire response!	        
         } finally {
         	res.close();
         }
@@ -155,14 +160,16 @@ public class AuthorityServiceUtils {
         
         try {
 	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if (logger.isDebugEnabled()) {
-	            logger.debug(client.getClass().getCanonicalName() + ": status = " + statusCode);
-	        }
-	        
-            result = new PoxPayloadIn((String)res.readEntity(responseType)); // Get the entire response!	        
+	        if (statusCode == HttpStatus.OK_200) {
+	            result = new PoxPayloadIn((String)res.readEntity(responseType)); // Get the entire response.
+	        } else {
+	        	String errMsg = String.format("Could not retrieve authority item information for '%s:%s' on remote server '%s'.  Server returned status code %d",
+	        			specifier.getParentSpecifier().getURNValue(), specifier.getItemSpecifier().getURNValue(), remoteClientConfig.getUrl(), statusCode);
+		        if (logger.isDebugEnabled()) {
+		            logger.debug(errMsg);
+		        }
+		        throw new DocumentException(statusCode, errMsg);
+	        }	        
         } finally {
         	res.close();
         }
@@ -188,7 +195,7 @@ public class AuthorityServiceUtils {
      * refnames with the correct domain name
      */
 	static public PoxPayloadIn filterRefnameDomains(ServiceContext ctx,
-			PoxPayloadIn payload) throws DocumentException {
+			PoxPayloadIn payload) throws org.dom4j.DocumentException {
 		PoxPayloadIn result = null;
 
 		

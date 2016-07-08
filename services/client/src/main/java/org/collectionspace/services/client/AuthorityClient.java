@@ -153,9 +153,14 @@ public interface AuthorityClient<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P e
      * @return the client response
      */
     public Response readItemList(String inAuthority, String partialTerm, String keywords);
-    
+
+    public Response readItemList(String inAuthority, String partialTerm, String keywords, long pageSize, long pageNum);
+
     public Response readItemList(String inAuthority, String partialTerm, String keywords, Boolean includeDeleted);
     
+    public Response readItemList(String inAuthority, String partialTerm, String keywords, Boolean includeDeleted,
+    		long pageSize, long pageNum);
+
     /**
      * Read item list for named vocabulary, filtering by partial term match, or keywords. Only one of
      * partialTerm or keywords should be specified. If both are specified, keywords

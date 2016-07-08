@@ -210,9 +210,21 @@ public abstract class AuthorityClientImpl<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_
     }
 
     @Override
+    public Response readItemList(String inAuthority, String partialTerm, String keywords, long pageSize, long pageNum) {
+        return getProxy().readItemList(inAuthority, partialTerm, keywords, INCLUDE_DELETE_TRUE, pageSize, pageNum);
+    }
+
+    @Override
     public Response readItemList(String inAuthority, String partialTerm, String keywords, Boolean includeDeleted) {
         return getProxy().readItemList(inAuthority, partialTerm, keywords, includeDeleted.toString());
     }
+    
+    @Override
+    public Response readItemList(String inAuthority, String partialTerm, String keywords, Boolean includeDeleted,
+    		long pageSize, long pageNum) {
+        return getProxy().readItemList(inAuthority, partialTerm, keywords, includeDeleted.toString(), pageSize, pageNum);
+    }
+    
 
     /**
      * Read item list for named vocabulary, filtering by partial term match, or keywords. Only one of
