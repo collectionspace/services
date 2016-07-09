@@ -41,7 +41,7 @@
 					<var ID="csidGot">${oePersonGET.got("//csid")}</var>
 					<var ID="inAuthority">${oePersonauthority.CSID}</var>
 					<var ID="inAuthorityShortIdentifier">${oePersonauthority.sent("//shortIdentifier")}</var>
-					<var ID="displayName">${oePerson.sent("//displayName")}</var>
+					<var ID="displayName">${oePerson.sent("//termDisplayName")}</var>
 					<var ID="shortIdentifier">${oePerson.sent("//shortIdentifier")}</var>
 					<var ID="refName">urn:cspace:core.collectionspace.org:personauthorities:name(${inAuthorityShortIdentifier}):item:name(${shortIdentifier})'${displayName}'</var>
 				</vars>
