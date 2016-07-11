@@ -42,6 +42,8 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.engines.URLConnectionEngine;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
@@ -537,13 +539,15 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
         String urlString = url.toString();
     	Class<P> proxyClass = this.getProxyClass();
     	
-    	if (useSSL()) {
-    		SSLContext sslcontext = SSLContexts.custom().useSSL().build();
-            sslcontext.init(null, new X509TrustManager[]{new HttpsTrustManager()}, new SecureRandom());
-            client = (ResteasyClient)ClientBuilder.newBuilder().sslContext(sslcontext).build();
-    	} else {
-        	client = (ResteasyClient)ClientBuilder.newClient();
-    	}
+//    	if (useSSL()) {
+//    		SSLContext sslcontext = SSLContexts.custom().useSSL().build();
+//            sslcontext.init(null, new X509TrustManager[]{new HttpsTrustManager()}, new SecureRandom());
+//            client = (ResteasyClient)ClientBuilder.newBuilder().sslContext(sslcontext).build();
+//    	} else {
+//        	client = (ResteasyClient)ClientBuilder.newClient();
+//    	}
+    	
+    	client = new ResteasyClientBuilder().httpEngine(new URLConnectionEngine()).build();
     	
         if (useAuth()) {
             String user = properties.getProperty(USER_PROPERTY);
