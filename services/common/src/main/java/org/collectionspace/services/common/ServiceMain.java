@@ -42,6 +42,7 @@ import org.collectionspace.services.config.types.PropertyItemType;
 import org.collectionspace.services.config.types.PropertyType;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 import org.collectionspace.services.nuxeo.client.java.TenantRepository;
+
 import org.apache.commons.io.FileUtils;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.dom4j.Document;
@@ -55,7 +56,19 @@ import org.slf4j.LoggerFactory;
  */
 public class ServiceMain {
 
-    final Logger logger = LoggerFactory.getLogger(ServiceMain.class);
+    final static Logger logger = LoggerFactory.getLogger(ServiceMain.class);
+    
+    /**
+     * For some reason, we have trouble getting logging from this class directed to
+     * the tomcat/catalina console log file.  So we do it explicitly with this method.
+     * 
+     * @param str
+     */
+    private static void mirrorToStdOut(String str) {
+    	System.out.println(str);
+    	ServiceMain.logger.info(str);
+    }
+
     /**
      * volatile is used here to assume about ordering (post JDK 1.5)
      */
@@ -179,21 +192,24 @@ public class ServiceMain {
         //
         if (getClientType().equals(ClientType.JAVA)) {
             nuxeoConnector = NuxeoConnectorEmbedded.getInstance();
+            mirrorToStdOut("\nStarting Nuxeo platform...");
             nuxeoConnector.initialize(
             		getServerRootDir(),
             		getServicesConfigReader().getConfiguration().getRepositoryClient(),
             		ServiceMain.servletContext);
+            mirrorToStdOut("Nuxeo platform started successfully.\n");
         } else {
         	//
         	// Exit if we don't have the correct/known client type
         	//
         	throw new RuntimeException("Unknown CollectionSpace services client type: " + getClientType());
         }
+                
         //
         // Create all the default user accounts and permissions.  Since some of our "cspace" database config files
         // for Spring need to be created at build time, the "cspace" database already will be suffixed with the
         // correct 'cspaceInstanceId' so we don't need to pass it to the JDBCTools methods.
-        //
+        //        
 		try {
 			AuthorizationCommon.createDefaultWorkflowPermissions(tenantBindingConfigReader);
 			String cspaceDatabaseName = getCspaceDatabaseName();
@@ -215,8 +231,42 @@ public class ServiceMain {
         	logger.error("handlePostNuxeoInitDBTasks failed with exception(s): " + e.getLocalizedMessage(), e);
         }
         */
+		showTenantStatus();
     }
-
+    
+    private void showTenantStatus() {
+    	Hashtable<String,TenantBindingType> tenantBindingsList = tenantBindingConfigReader.getTenantBindings(true);
+    	mirrorToStdOut("++++++++++++++++ Summary - CollectionSpace tenant status. ++++++++++++++++++++++++");
+    	String headerTemplate = "%10s %10s %30s %60s %10s";
+    	String headerUnderscore = String.format(headerTemplate,
+    			"______",
+    			"__",
+    			"____",
+    			"____________",
+    			"_______");
+    	String header = String.format(headerTemplate,
+    			"Status",
+    			"ID",
+    			"Name",
+    			"Display Name",
+    			"Version");
+    	mirrorToStdOut(header);
+    	mirrorToStdOut(headerUnderscore);
+    			
+    	for (String tenantId : tenantBindingsList.keySet()) {
+    		TenantBindingType tenantBinding = tenantBindingsList.get(tenantId);
+    		String statusLine = String.format(headerTemplate,
+    				tenantBinding.isCreateDisabled() ? "Disabled" : "Active",
+    				tenantBinding.getId(),
+    				tenantBinding.getName(),
+    				tenantBinding.getDisplayName(),
+    				tenantBinding.getVersion());
+    		mirrorToStdOut(statusLine);
+    	}
+    	// footer
+    	mirrorToStdOut("++++++++++++++++ ........................................ ++++++++++++++++++++++++");
+    }
+    
     /**
      * release releases all resources occupied by service layer infrastructure
      * but not necessarily those occupied by individual services
@@ -338,8 +388,8 @@ public class ServiceMain {
                     if (Tools.isEmpty(initHandlerClassname)) {
                         continue;
                     }
-                    if (logger.isInfoEnabled()) {
-                        logger.info(String.format("Firing post-init handler %s ...", initHandlerClassname));
+                    if (ServiceMain.logger.isDebugEnabled()) {
+                    	ServiceMain.logger.debug(String.format("Firing post-init handler %s ...", initHandlerClassname));
                     }
 
                     List<org.collectionspace.services.config.service.InitHandler.Params.Field>
@@ -508,41 +558,42 @@ public class ServiceMain {
 
         // First check and create the roles as needed. (nuxeo and reader)
         for (TenantBindingType tenantBinding : tenantBindings.values()) {
-                String tId = tenantBinding.getId();
-                String tName = tenantBinding.getName();
-                List<RepositoryDomainType> repoDomainList = tenantBinding.getRepositoryDomain();
-                for (RepositoryDomainType repoDomain : repoDomainList) {
-                        String repoDomainName = repoDomain.getName();
-                        String repositoryName = repoDomain.getRepositoryName();
-                        String cspaceInstanceId = getCspaceInstanceId();
-                        String dbName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
-                        if (nuxeoDBsChecked.contains(dbName)) {
-                                if (logger.isDebugEnabled()) {
-                                        logger.debug("Another user of db: " + dbName + ": Repo: " + repoDomainName
-                                                        + " and tenant: " + tName + " (id:" + tId + ")");
-                                }
-                        } else {
-                                if (logger.isDebugEnabled()) {
-                                        logger.debug("Need to prepare db: " + dbName + " for Repo: " + repoDomainName
-                                                        + " and tenant: " + tName + " (id:" + tId + ")");
-                                }
-                                boolean dbExists = JDBCTools.hasDatabase(dbType, dbName);
-                                if (dbExists) {
-                                        if (logger.isDebugEnabled()) {
-                                                logger.debug("Database: " + dbName + " already exists.");
-                                        }
-                                } else {
-                                        // Create the user as needed
-                                        JDBCTools.createNewDatabaseUser(JDBCTools.CSADMIN_DATASOURCE_NAME, repositoryName, cspaceInstanceId, dbType, nuxeoUser, nuxeoPW);
-                                        if (readerUser != null) {
-                                            JDBCTools.createNewDatabaseUser(JDBCTools.CSADMIN_DATASOURCE_NAME, repositoryName, cspaceInstanceId, dbType, readerUser, readerPW);
-                                        }
-                                        // Create the database
-                                        createDatabaseWithRights(dbType, dbName, nuxeoUser, nuxeoPW, readerUser, readerPW);
-                                }
-                                nuxeoDBsChecked.add(dbName);
+            String tId = tenantBinding.getId();
+            String tName = tenantBinding.getName();
+            
+            List<RepositoryDomainType> repoDomainList = tenantBinding.getRepositoryDomain();
+            for (RepositoryDomainType repoDomain : repoDomainList) {
+                String repoDomainName = repoDomain.getName();
+                String repositoryName = repoDomain.getRepositoryName();
+                String cspaceInstanceId = getCspaceInstanceId();
+                String dbName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
+                if (nuxeoDBsChecked.contains(dbName)) {
+                    if (logger.isDebugEnabled()) {
+                            logger.debug("Another user of db: " + dbName + ": Repo: " + repoDomainName
+                                            + " and tenant: " + tName + " (id:" + tId + ")");
+                    }
+                } else {
+                    if (logger.isDebugEnabled()) {
+                            logger.debug("Need to prepare db: " + dbName + " for Repo: " + repoDomainName
+                                            + " and tenant: " + tName + " (id:" + tId + ")");
+                    }
+                    boolean dbExists = JDBCTools.hasDatabase(dbType, dbName);
+                    if (dbExists) {
+                        if (logger.isDebugEnabled()) {
+                                logger.debug("Database: " + dbName + " already exists.");
                         }
-                } // Loop on repos for tenant
+                    } else {
+                        // Create the user as needed
+                        JDBCTools.createNewDatabaseUser(JDBCTools.CSADMIN_DATASOURCE_NAME, repositoryName, cspaceInstanceId, dbType, nuxeoUser, nuxeoPW);
+                        if (readerUser != null) {
+                            JDBCTools.createNewDatabaseUser(JDBCTools.CSADMIN_DATASOURCE_NAME, repositoryName, cspaceInstanceId, dbType, readerUser, readerPW);
+                        }
+                        // Create the database
+                        createDatabaseWithRights(dbType, dbName, nuxeoUser, nuxeoPW, readerUser, readerPW);
+                    }
+                    nuxeoDBsChecked.add(dbName);
+                }
+            } // Loop on repos for tenant
         } // Loop on tenants
                 
         return nuxeoDBsChecked;
@@ -721,7 +772,7 @@ public class ServiceMain {
             serverRootDir = "."; //assume server is started from server root, e.g. server/cspace
             String msg = String.format("System property '%s' was not set.  Using '%s' instead.",
             		SERVER_HOME_PROPERTY, serverRootDir);
-            logger.warn(msg);
+            mirrorToStdOut(msg);
         }
     }
 

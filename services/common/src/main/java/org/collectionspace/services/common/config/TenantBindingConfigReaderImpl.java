@@ -200,6 +200,8 @@ public class TenantBindingConfigReaderImpl extends AbstractConfigReaderImpl<List
 			if (!tenantBinding.isCreateDisabled()) {
 				enabledTenantBindings.put(tenantBinding.getId(), tenantBinding);
 			} else {
+				logger.warn(String.format("The tenant '%s':'%s' is marked as disabled in its bindings file.",
+						tenantBinding.getName(), tenantBinding.getId()));
 			}
 			readDomains(tenantBinding);
 			readServiceBindings(tenantBinding);
@@ -209,6 +211,13 @@ public class TenantBindingConfigReaderImpl extends AbstractConfigReaderImpl<List
 				if (tenantBinding.isCreateDisabled())
 					logger.info("Tenant tenant id={} is marked createDisabled.", tenantBinding.getId());
 			}
+		}
+		
+		//
+		// Ensure that at least one tenant is enabled, otherwise abort the startup.
+		//
+		if (enabledTenantBindings.isEmpty() == true) {
+			throw new Exception("All of the configured tenants are marked as disabled in their tenant bindings.  At least one tenant needs to be enabled.");
 		}
 	}
 

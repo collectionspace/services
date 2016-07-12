@@ -33,6 +33,8 @@ import java.util.HashMap;
 import java.util.Set;
 
 
+
+
 //import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
@@ -58,9 +60,11 @@ import org.collectionspace.services.client.index.IndexClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.CollectionSpaceResource;
+import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.common.security.SecurityUtils;
+import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -235,15 +239,25 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 		String userId = AuthN.get().getUserId();
 				
 		try {
-			// Need to ensure that user is associated to a tenant
+			//
+			// Need to ensure that user's tenant is not disabled
 			String tenantId = AuthN.get().getCurrentTenantId();
+			TenantBindingType tenantBindingType = ServiceMain.getInstance().getTenantBindingConfigReader().getTenantBinding(tenantId);
+			boolean tenantDisabled = tenantBindingType.isCreateDisabled();
+			if (tenantDisabled == true) {
+				String errMsg = String.format("The user %s's tenant '%s' is disabled.  Contact your CollectionSpace administrator.",
+						userId, tenantBindingType.getDisplayName());
+				Response response = Response.status(
+						Response.Status.CONFLICT).entity(errMsg).type("text/plain").build();
+				throw new CSWebApplicationException(response);				
+			}
 		} catch (IllegalStateException ise) {
-			String msg = "User's account is not associated to any active tenants, userId=" + userId;
+			String errMsg = "User's account is not associated to any active tenants, userId=" + userId;
 			// Note the RFC on return types:
 			// If the request already included Authorization credentials, then the 401 response 
 			// indicates that authorization has been refused for those credentials.
 			Response response = Response.status(
-					Response.Status.UNAUTHORIZED).entity(msg).type("text/plain").build();
+					Response.Status.UNAUTHORIZED).entity(errMsg).type("text/plain").build();
 			throw new CSWebApplicationException(ise, response);
 		}
 		
