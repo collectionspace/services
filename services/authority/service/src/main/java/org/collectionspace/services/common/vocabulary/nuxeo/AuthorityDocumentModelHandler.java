@@ -148,7 +148,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 	        	//
 	        	// First, sync all the authority items
 	        	//
-	        	syncAllItems(ctx, sasSpecifier);
+	        	syncAllItems(ctx, sasSpecifier);  // FIXME: We probably want to consider "paging" this instead of handling the entire set of items.
 	        	//
 	        	// Next, sync the authority resource/record itself
 	        	//
@@ -500,13 +500,13 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     	if (statusCode != HttpStatus.OK_200) {
         	String errMsg = String.format("Could not retrieve authority information for '%s' on remote server '%s'.  Server returned status code %d",
         			specifier.getURNValue(), client.getBaseURL(), statusCode);
-        	res.close();
 	        throw new DocumentException(statusCode, errMsg);
     	}
     }
     
     /**
-     * Request an authority item list payload from the SAS server.
+     * Request an authority item list payload from the SAS server.  This is a non-paging solution.  If the authority
+     * has a very large number of items/terms, we might not be able to handle them all.
      * 
      * @param ctx
      * @param specifier
@@ -516,6 +516,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     private PoxPayloadIn requestPayloadInItemList(ServiceContext ctx, Specifier specifier) throws Exception {
     	PoxPayloadIn result = null;
         AuthorityClient client = (AuthorityClient) ctx.getClient();
+        
     	//
     	// First find out how many items exist
         Response res = client.readItemList(specifier.getURNValue(),
@@ -525,8 +526,12 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         		0		// page number
         		);
         assertStatusCode(res, specifier, client);
-        AbstractCommonList commonList = res.readEntity(AbstractCommonList.class);
-        res.close();
+        AbstractCommonList commonList;
+        try {
+        	commonList = res.readEntity(AbstractCommonList.class);
+        } finally {
+        	res.close();
+        }
         long numOfItems = commonList.getTotalItems();        
         
         //
@@ -538,7 +543,6 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         		0			// page number
         		);        
         assertStatusCode(res, specifier, client);
-
         try {
             result = new PoxPayloadIn((String)res.readEntity(getEntityResponseType())); // Get the entire response.
         } finally {
