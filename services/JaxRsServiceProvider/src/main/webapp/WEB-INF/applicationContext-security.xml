@@ -11,9 +11,11 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:sec="http://www.springframework.org/schema/security"
+       xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+       http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
 
     <!--
         debugging tips : enable following categories in
@@ -22,17 +24,28 @@
         org.springframework.security
     -->
 
+    <!-- Require client id and client secret via basic auth when granting tokens (https://tools.ietf.org/html/rfc6749#section-4.3.2).
+         Note that public (https://tools.ietf.org/html/rfc6749#section-2.1) clients, such as the CSpace web UI, may supply a
+         blank or publicly known "secret." The clientAuthenticationManager bean handles this client authentication. -->
+    <sec:http pattern="/oauth/token/**" create-session="stateless" authentication-manager-ref="clientAuthenticationManager">
+        <sec:intercept-url pattern="/oauth/token/**" access="isFullyAuthenticated()"/>
+        <sec:http-basic entry-point-ref="clientAuthenticationEntryPoint"/>
+        <sec:anonymous enabled="false"/>
+        <sec:csrf disabled="true"/>
+        <sec:access-denied-handler ref="oauthAccessDeniedHandler"/>
+    </sec:http>
+
     <!-- Exclude the resource path to public items' content from AuthN and AuthZ.  Lets us publish resources with anonymous access. -->
     <sec:http pattern="/publicitems/*/*/content" security="none" />
     
     <!-- All other paths must be authenticated. -->
-    <sec:http realm="org.collectionspace.services" create-session="stateless" authentication-manager-ref="authenticationManager">
+    <sec:http realm="org.collectionspace.services" create-session="stateless" authentication-manager-ref="userAuthenticationManager">
         <sec:intercept-url pattern="/**" access="isFullyAuthenticated()" />
         <sec:http-basic />
         <sec:csrf disabled="true" />
     </sec:http>
 
-    <sec:authentication-manager alias="authenticationManager">
+    <sec:authentication-manager id="userAuthenticationManager">
         <sec:authentication-provider ref="jaasAuthenticationProvider"/>
     </sec:authentication-manager>
 
@@ -56,4 +69,45 @@
             </list>
         </property>
     </bean>
+    
+    <sec:authentication-manager id="clientAuthenticationManager">
+        <sec:authentication-provider user-service-ref="clientDetailsUserDetailsService"/>
+    </sec:authentication-manager>
+
+    <bean id="clientDetailsUserDetailsService" class="org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService">
+        <constructor-arg ref="clientDetails"/>
+    </bean>
+
+    <!-- The scope attribute below is a meaningless placeholder. In the future we may want to use it to limit
+         the permissions of particular clients. Currently a client has the full permissions of the user on 
+         behalf of whom it is acting . -->
+    <oauth:client-details-service id="clientDetails">
+        <oauth:client
+            client-id="cspace-ui"
+            resource-ids="cspace-services"
+            authorized-grant-types="password,refresh_token"
+            scope="full"
+            access-token-validity="3600"
+            refresh-token-validity="43200" />
+    </oauth:client-details-service>
+    
+    <bean id="clientAuthenticationEntryPoint" class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
+        <property name="realmName" value="org.collectionspace.services/client"/>
+        <property name="typeName" value="Basic"/>
+    </bean>
+    
+    <bean id="oauthAccessDeniedHandler" class="org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler"/>
+    
+    <bean id="tokenServices" class="org.springframework.security.oauth2.provider.token.DefaultTokenServices">
+        <property name="tokenStore" ref="tokenStore" />
+        <property name="tokenEnhancer" ref="tokenEnhancer" />
+        <property name="supportRefreshToken" value="true" />
+        <property name="clientDetailsService" ref="clientDetails" />
+    </bean>
+
+    <bean id="tokenStore" class="org.springframework.security.oauth2.provider.token.store.JwtTokenStore">
+        <constructor-arg ref="tokenEnhancer" />
+    </bean>
+
+    <bean id="tokenEnhancer" class="org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter" />
 </beans>

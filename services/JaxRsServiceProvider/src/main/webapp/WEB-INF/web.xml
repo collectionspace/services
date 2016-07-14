@@ -141,14 +141,24 @@
     </listener>
 
     <servlet>
+        <servlet-name>oauth</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>oauth</servlet-name>
+        <url-pattern>/oauth/token/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
             <servlet-name>Resteasy</servlet-name>
             <servlet-class>
                 org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher
             </servlet-class>
-    </servlet>    
+    </servlet>
     <servlet-mapping>
         <servlet-name>Resteasy</servlet-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/</url-pattern>
     </servlet-mapping>
 
 </web-app>
