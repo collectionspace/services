@@ -34,6 +34,9 @@ import java.util.regex.Matcher;
  * v.1.4
  */
 public class Tools {
+	
+	private static final String PROPERTY_VAR_REGEX = "\\$\\{([A-Za-z0-9_\\.]+)\\}";
+	
     /** @return first glued to second with the separator string, at most one time - useful for appending paths.
      */
     public static String glue(String first, String separator, String second){
@@ -357,7 +360,7 @@ public class Tools {
 		// Replace things like ${cspace.password.cow} with values from either the environment
 		// or from the JVM system properties.
 		//
-		Pattern pattern = Pattern.compile("\\$\\{([A-Za-z0-9_\\.]+)\\}");  	// For example, "${cspace.password.mysecret}" or "${password_strong_longpassword}"
+		Pattern pattern = Pattern.compile(PROPERTY_VAR_REGEX);  	// For example, "${cspace.password.mysecret}" or "${password_strong_longpassword}"
 		Matcher matcher = pattern.matcher(propertyValue);
 		String key = null;	
 		if (matcher.find()) {
@@ -375,6 +378,25 @@ public class Tools {
 				} else {
 					throw new Exception(errMsg);
 				}
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Test to see if 'propertyValue' is actually a property variable
+	 * @param propertyValue
+	 * @return
+	 */
+	static public boolean isValuePropretyVar(String propertyValue) {
+		boolean result = false;
+		
+		if (propertyValue != null) {
+			Pattern pattern = Pattern.compile(PROPERTY_VAR_REGEX);  	// For example, "${cspace.password.mysecret}" or "${password_strong_longpassword}"
+			Matcher matcher = pattern.matcher(propertyValue);
+			if (matcher.find()) {
+				result = true;
 			}
 		}
 		
