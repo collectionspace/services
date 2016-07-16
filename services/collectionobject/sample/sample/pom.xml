@@ -5,7 +5,7 @@
     <artifactId>org.collectionspace.services.collectionobject.client.sample</artifactId>
     <packaging>jar</packaging>
     <name>collectionobject.client.sample</name>
-    <version>4.4-SNAPSHOT</version>
+    <version>4.5-SNAPSHOT</version>
     
     <dependencies>
         <!-- keep slf4j dependencies on the top -->
