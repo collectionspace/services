@@ -1,7 +1,7 @@
 CollectionSpace is available under the terms of the Educational
 Community License, Version 2.0. All modules are Copyright 2009
 University of Toronto, University of Cambridge, University of
-California, Berkeley, and the Museum of the Moving Image except where
+California at Berkeley, and the Museum of the Moving Image except where
 noted otherwise in the code itself, or if the modules reside in a
 separate directory, they may contain explicit declarations of copyright
 in both the LICENSE file in the directory in which they reside and in
