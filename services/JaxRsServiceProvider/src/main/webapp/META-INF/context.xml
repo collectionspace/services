@@ -11,13 +11,6 @@
 <Context antiResourceLocking="false" privileged="true" path="/cspace-services"
     docBase="cspace-services">
 
-    <!-- 
-		Setup the security realm for the CollectionSpace services
-	 -->
-    <Realm className="org.apache.catalina.realm.JAASRealm" appName="CSpaceJBossDBLoginModule"
-        userClassNames="org.collectionspace.authentication.CSpacePrincipal"
-        roleClassNames="org.collectionspace.authentication.CSpacePrincipal"/>
-
     <!-- Disable HTTP Session persistence between restart since webengine session objects are not serializable -->
     <Manager pathname=""/>
 

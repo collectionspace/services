@@ -54,13 +54,8 @@
     <bean id="aclAuthorizationStrategy" class="org.springframework.security.acls.domain.AclAuthorizationStrategyImpl">
         <constructor-arg>
             <list>
-                <bean class="org.springframework.security.authentication.jaas.JaasGrantedAuthority">
+                <bean class="org.springframework.security.core.authority.SimpleGrantedAuthority">
                     <constructor-arg value="ROLE_SPRING_ADMIN"/>
-                    <constructor-arg>
-                        <bean class="org.jboss.security.SimpleGroup">
-                            <constructor-arg value="Role"/>
-                        </bean>
-                    </constructor-arg>
                 </bean>
             </list>
         </constructor-arg>

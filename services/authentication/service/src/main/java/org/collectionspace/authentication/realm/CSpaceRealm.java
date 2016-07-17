@@ -28,39 +28,53 @@
 
 package org.collectionspace.authentication.realm;
 
-import java.security.acl.Group;
-import java.util.Collection;
-import javax.security.auth.login.LoginException;
+import java.util.Set;
+
+import javax.security.auth.login.AccountException;
+
+import org.collectionspace.authentication.CSpaceTenant;
 
 /**
- * CSpaceRealm defines interface for CollectionSpace Realm
+ * Interface for the CollectionSpace realm.
  */
 public interface CSpaceRealm {
 
-        /**
-     * Obtain password for the given user
+    /**
+     * Retrieves the hashed password used to authenticate a user.
+     * 
      * @param username
-     * @return
-     * @throws LoginException
+     * @return the password
+     * @throws AccountNotFoundException if the user is not found
+     * @throws AccountException if the password could not be retrieved
      */
-    public String getUsersPassword(String username) throws LoginException;
+    public String getPassword(String username) throws AccountException;
 
     /**
-     * Obtain the roles for the authenticated user.
-     * @return collection containing the roles
+     * Retrieves the roles for a user.
+     * 
+     * @param username
+     * @return a collection of roles
+     * @throws AccountException if the roles could not be retrieved
      */
-    public Collection<Group> getRoles(String username, String principalClassName, String groupClassName) throws LoginException;
+    public Set<String> getRoles(String username) throws AccountException;
 
     /**
-     * Obtain the tenants for the authenticated user.
-     * @return collection containing the tenants
+     * Retrieves the enabled tenants associated with a user.
+     * 
+     * @param username
+     * @return a collection of tenants
+     * @throws AccountException if the tenants could not be retrieved
      */
-    public Collection<Group> getTenants(String username, String groupClassName) throws LoginException;
+    public Set<CSpaceTenant> getTenants(String username) throws AccountException;
 
     /**
-     * Obtain the tenants for the authenticated user, allowing access to disable tenants
-     * @return collection containing the tenants
+     * Retrieves the tenants associated with a user, optionally including disabled tenants.
+     * 
+     * @param username
+     * @param includeDisabledTenants if true, include disabled tenants
+     * @return a collection of tenants
+     * @throws AccountException if the tenants could not be retrieved
      */
-    public Collection<Group> getTenants(String username, String groupClassName, boolean includeDisabledTenants) throws LoginException;
+    public Set<CSpaceTenant> getTenants(String username, boolean includeDisabledTenants) throws AccountException;
 
 }

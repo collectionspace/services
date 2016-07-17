@@ -12,10 +12,12 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:sec="http://www.springframework.org/schema/security"
        xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
-       http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
+       http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
     <!--
         debugging tips : enable following categories in
@@ -46,28 +48,35 @@
     </sec:http>
 
     <sec:authentication-manager id="userAuthenticationManager">
-        <sec:authentication-provider ref="jaasAuthenticationProvider"/>
+        <sec:authentication-provider ref="daoAuthenticationProvider"/>
     </sec:authentication-manager>
 
-    <bean id="jaasAuthenticationProvider"
-          class="org.springframework.security.authentication.jaas.JaasAuthenticationProvider">
-        <property name="loginContextName">
-            <value>cspace</value> <!-- value should be same as in application-policy in JBoss login-config.xml -->
+    <bean id="daoAuthenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+        <property name="userDetailsService" ref="userDetailsService" />
+        <property name="passwordEncoder">
+            <bean class="org.springframework.security.authentication.encoding.ShaPasswordEncoder">
+                <constructor-arg value="256"/>
+                <property name="encodeHashAsBase64" value="true" />
+            </bean>
         </property>
-        <property name="loginConfig">
-            <value>/WEB-INF/login.conf</value>
-        </property>
-        <property name="callbackHandlers">
-            <list>
-                <bean class="org.springframework.security.authentication.jaas.JaasNameCallbackHandler"/>
-                <bean class="org.springframework.security.authentication.jaas.JaasPasswordCallbackHandler"/>
-            </list>
-        </property>
-        <property name="authorityGranters">
-            <list>
-                <bean class="org.collectionspace.authentication.spring.CSpaceAuthorityGranter"/>
-            </list>
-        </property>
+    </bean>
+    
+    <bean id="userDetailsService" class="org.collectionspace.authentication.spring.CSpaceUserDetailsService">
+        <constructor-arg>
+            <bean class="org.collectionspace.authentication.realm.db.CSpaceDbRealm">
+                <constructor-arg>
+                    <util:map>
+                        <entry key="dsJndiName" value="CspaceDS" />
+                        <entry key="principalsQuery" value="select passwd from users where username=?" />
+                        <entry key="rolesQuery" value="select r.rolename from roles as r, accounts_roles as ar where ar.user_id=? and ar.role_id=r.csid" />
+                        <entry key="tenantsQueryWithDisabled" value="select t.id, t.name from accounts_common as a, accounts_tenants as at, tenants as t where a.userid=? and a.csid = at.TENANTS_ACCOUNTS_COMMON_CSID and at.tenant_id = t.id" />
+                        <entry key="tenantsQueryNoDisabled" value="select t.id, t.name from accounts_common as a, accounts_tenants as at, tenants as t where a.userid=? and a.csid = at.TENANTS_ACCOUNTS_COMMON_CSID and at.tenant_id = t.id and NOT t.disabled" />
+                        <entry key="maxRetrySeconds" value="5000" />
+                        <entry key="delayBetweenAttemptsMillis" value="200" />
+                    </util:map>
+                </constructor-arg>
+            </bean>
+        </constructor-arg>
     </bean>
     
     <sec:authentication-manager id="clientAuthenticationManager">
@@ -80,7 +89,7 @@
 
     <!-- The scope attribute below is a meaningless placeholder. In the future we may want to use it to limit
          the permissions of particular clients. Currently a client has the full permissions of the user on 
-         behalf of whom it is acting . -->
+         whose behalf it is acting. -->
     <oauth:client-details-service id="clientDetails">
         <oauth:client
             client-id="cspace-ui"
