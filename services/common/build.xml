@@ -200,8 +200,10 @@
             <fileset dir="${jee.server.cspace}/lib" includes="aopalliance-*.jar"/>
             <fileset dir="${jee.server.cspace}/lib" includes="commons-lang3-*.jar"/>
             <fileset dir="${jee.server.cspace}/lib" includes="ehcache-*.jar"/>
+            <fileset dir="${jee.server.cspace}/lib" includes="jackson-*.jar"/>
             <fileset dir="${jee.server.cspace}/lib" includes="org.springframework.*.jar"/>
             <fileset dir="${jee.server.cspace}/lib" includes="spring-*.jar"/>
+            <fileset dir="${jee.server.cspace}/lib" includes="stax2-api-*.jar"/>
         </delete>
     </target>
 	

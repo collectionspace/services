@@ -18,9 +18,10 @@
     
     <bean id="viewResolver" class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
         <property name="defaultViews">
-            <bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView">
-                <property name="extractValueFromSingleKeyModel" value="true" />
-            </bean>
+            <list>
+                <bean class="org.springframework.web.servlet.view.xml.MappingJackson2XmlView" />
+                <bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView" />
+            </list>
         </property>
     </bean>
 </beans>

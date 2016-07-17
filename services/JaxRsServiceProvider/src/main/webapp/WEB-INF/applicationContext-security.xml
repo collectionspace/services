@@ -45,6 +45,9 @@
         <sec:intercept-url pattern="/**" access="isFullyAuthenticated()" />
         <sec:http-basic />
         <sec:csrf disabled="true" />
+        
+        <!-- Handle token auth -->
+        <sec:custom-filter ref="oauthResourceServerFilter" before="PRE_AUTH_FILTER" />
     </sec:http>
 
     <sec:authentication-manager id="userAuthenticationManager">
@@ -78,6 +81,8 @@
             </bean>
         </constructor-arg>
     </bean>
+    
+    <oauth:resource-server id="oauthResourceServerFilter" resource-id="cspace-services" token-services-ref="tokenServices" />
     
     <sec:authentication-manager id="clientAuthenticationManager">
         <sec:authentication-provider user-service-ref="clientDetailsUserDetailsService"/>
@@ -118,5 +123,21 @@
         <constructor-arg ref="tokenEnhancer" />
     </bean>
 
-    <bean id="tokenEnhancer" class="org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter" />
+    <bean id="tokenEnhancer" class="org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter">
+        <!--
+            Can specify a signing key here. By default a random one is generated on bean instantiation,
+            which means that when CSpace is restarted, all granted tokens will become invalid. A
+            public/private key pair may also be supplied, using keyPair.
+        -->
+        <!-- <property name="signingKey" value="" /> -->
+        <property name="accessTokenConverter">
+            <bean class="org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter">
+                <property name="userTokenConverter">
+                    <bean class="org.collectionspace.authentication.spring.CSpaceUserAuthenticationConverter">
+                        <constructor-arg ref="userDetailsService" />
+                    </bean>
+                </property>
+            </bean>
+        </property>
+    </bean>
 </beans>
