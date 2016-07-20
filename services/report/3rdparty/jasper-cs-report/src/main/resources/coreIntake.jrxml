@@ -28,27 +28,24 @@ end AS site,
 ong.objectName AS "objectname",
 case when (bd.item is not null and bd.item <> '') then
  regexp_replace(bd.item, '^.*\)''(.*)''$', '\1')
+ when co.objectnumber is null then 'No objects are related to this Intake.'
  else ''
 end AS description,
 case when (oppp.objectproductionpeople is not null and oppp.objectproductionpeople <> '') then
  regexp_replace(oppp.objectproductionpeople, '^.*\)''(.*)''$', '\1')
  else ''
 end as productionpeople
-
-FROM intakes_common inc
-JOIN hierarchy h1 ON (inc.id=h1.id)
+FROM hierarchy  h1
+JOIN intakes_common inc ON (inc.id=h1.id)
 LEFT OUTER JOIN relations_common rc1 ON (h1.name=rc1.subjectcsid)
 LEFT OUTER JOIN hierarchy h2 ON (rc1.objectcsid=h2.name)
 LEFT OUTER JOIN collectionobjects_common co ON (h2.id=co.id)
-
 LEFT OUTER JOIN hierarchy h3 ON (co.id = h3.parentid AND h3.primarytype='objectNameGroup' AND h3.pos=0)
 LEFT OUTER JOIN objectnamegroup ong ON (ong.id=h3.id)
-
 LEFT OUTER JOIN collectionobjects_common_briefdescriptions bd ON (bd.id=co.id and bd.pos=0)
-
 left outer join hierarchy h4 on (co.id=h4.parentid and h4.pos=0 and h4.name='collectionobjects_common:objectProductionPeopleGroupList')
 left outer join objectproductionpeoplegroup oppp on (oppp.id=h4.id)
-WHERE rc1.subjectcsid = $P{csid}
+WHERE h1.name = $P{csid}
 ORDER BY objectnumber]]>
 	</queryString>
 	<field name="entrynumber" class="java.lang.String"/>
