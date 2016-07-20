@@ -27,25 +27,20 @@ sd.datedisplaydate fieldCollectionDate,
 ong.objectName objectName,
 case when (bd.item is not null and bd.item <> '') then
  regexp_replace(bd.item, '^.*\)''(.*)''$', '\1')
+ when co.objectnumber is null then 'No objects are related to this Group.'
  else ''
 end AS description
-
-FROM groups_common gc
-JOIN hierarchy h1 ON (gc.id=h1.id)
+FROM hierarchy h1
+JOIN groups_common gc ON (gc.id=h1.id)
 LEFT OUTER JOIN relations_common rc1 ON (h1.name=rc1.subjectcsid)
 LEFT OUTER JOIN hierarchy h2 ON (rc1.objectcsid=h2.name)
 LEFT OUTER JOIN collectionobjects_common co ON (h2.id=co.id)
-
 LEFT OUTER JOIN hierarchy h3 ON (co.id = h3.parentid AND h3.primarytype='objectNameGroup' AND h3.pos=0)
 LEFT OUTER JOIN objectnamegroup ong ON (ong.id=h3.id)
-
 LEFT OUTER JOIN collectionobjects_common_briefdescriptions bd ON (bd.id=co.id and bd.pos=0)
-
 left outer join hierarchy h4 on (h2.id = h4.parentid and h4.name = 'collectionobjects_common:fieldCollectionDateGroup')
 left outer join structureddategroup sd on (h4.id = sd.id)
-
-where rc1.subjectcsid = $P{csid}
-
+where h1.name = $P{csid}
 order by objectNumber]]>
 	</queryString>
 	<field name="grouptitle" class="java.lang.String"/>
