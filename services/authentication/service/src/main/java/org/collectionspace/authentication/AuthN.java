@@ -49,8 +49,6 @@
  */
 package org.collectionspace.authentication;
 
-import java.util.List;
-
 import javax.sql.DataSource;
 
 import org.collectionspace.authentication.spi.AuthNContext;
@@ -108,28 +106,11 @@ public class AuthN {
         return authnContext.getUserId();
     }
 
-    /**
-     * getTenantIds returns a list of tenant ids the user is associated with
-     * @return
-     */
-    public List<String> getTenantIds() {
-        return authnContext.getTenantIds();
-    }
-
     public String getCurrentTenantId() {
         return authnContext.getCurrentTenantId();
     }
 
     public String getCurrentTenantName() {
         return authnContext.getCurrentTenantName();
-    }
-
-    /**
-     * getTenants returns tenants associated with user
-     * @see CSpaceTenant
-     * @return
-     */
-    public List<CSpaceTenant> getTenants() {
-        return authnContext.getTenants();
     }
 }

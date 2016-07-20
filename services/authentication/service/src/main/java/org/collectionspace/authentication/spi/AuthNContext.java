@@ -24,8 +24,6 @@
  */
 package org.collectionspace.authentication.spi;
 
-import java.util.List;
-
 import org.collectionspace.authentication.CSpaceTenant;
 import org.collectionspace.authentication.CSpaceUser;
 
@@ -76,17 +74,4 @@ public interface AuthNContext {
      */
     public CSpaceTenant getCurrentTenant();
 
-    /**
-     * Returns all tenants associated with the authenticated user.
-     * 
-     * @return a list of tenants
-     */
-    public List<CSpaceTenant> getTenants();
-
-    /**
-     * Returns the ids of all tenants associated with the authenticated user.
-     * 
-     * @return a list of tenant ids
-     */
-    public List<String> getTenantIds();
 }

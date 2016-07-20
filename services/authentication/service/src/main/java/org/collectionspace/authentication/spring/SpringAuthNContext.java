@@ -23,9 +23,6 @@
  */
 package org.collectionspace.authentication.spring;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.collectionspace.authentication.CSpaceTenant;
 import org.collectionspace.authentication.CSpaceUser;
 import org.collectionspace.authentication.spi.AuthNContext;
@@ -43,15 +40,13 @@ public class SpringAuthNContext implements AuthNContext {
      * @return the username
      */
     public String getUserId() {
-        String result = ANONYMOUS_USER;
-        
         Authentication authToken = SecurityContextHolder.getContext().getAuthentication();
         
-        if (authToken != null) {
-            result = authToken.getName();
+        if (authToken == null) {
+            return ANONYMOUS_USER;
         }
         
-        return result;
+        return authToken.getName();
     }
 
     /**
@@ -101,37 +96,6 @@ public class SpringAuthNContext implements AuthNContext {
      * @return the tenant
      */
     public CSpaceTenant getCurrentTenant() {
-        List<CSpaceTenant> tenants = getTenants();
-        
-        if (tenants.size() < 1) {
-            throw new IllegalStateException("No tenant associated with user " + getUserId());
-        }
-        
-        return tenants.get(0);
-    }
-
-    /**
-     * Returns all tenants associated with the authenticated user.
-     * 
-     * @return a list of tenants
-     */
-    public List<CSpaceTenant> getTenants() {
-        return new ArrayList<CSpaceTenant>(getUser().getTenants());
-    }
-
-    /**
-     * Returns the ids of all tenants associated with the authenticated user.
-     * 
-     * @return a list of tenant ids
-     */
-    public List<String> getTenantIds() {
-        List<CSpaceTenant> tenants = getTenants();
-        List<String> tenantIds = new ArrayList<String>(tenants.size());
-        
-        for (CSpaceTenant tenant : tenants) {
-            tenantIds.add(tenant.getId());
-        }
-        
-        return tenantIds;
+        return getUser().getPrimaryTenant();
     }
 }

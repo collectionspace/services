@@ -72,8 +72,8 @@
                         <entry key="dsJndiName" value="CspaceDS" />
                         <entry key="principalsQuery" value="select passwd from users where username=?" />
                         <entry key="rolesQuery" value="select r.rolename from roles as r, accounts_roles as ar where ar.user_id=? and ar.role_id=r.csid" />
-                        <entry key="tenantsQueryWithDisabled" value="select t.id, t.name from accounts_common as a, accounts_tenants as at, tenants as t where a.userid=? and a.csid = at.TENANTS_ACCOUNTS_COMMON_CSID and at.tenant_id = t.id" />
-                        <entry key="tenantsQueryNoDisabled" value="select t.id, t.name from accounts_common as a, accounts_tenants as at, tenants as t where a.userid=? and a.csid = at.TENANTS_ACCOUNTS_COMMON_CSID and at.tenant_id = t.id and NOT t.disabled" />
+                        <entry key="tenantsQueryWithDisabled" value="select t.id, t.name from accounts_common as a, accounts_tenants as at, tenants as t where a.userid=? and a.csid = at.TENANTS_ACCOUNTS_COMMON_CSID and at.tenant_id = t.id order by t.id" />
+                        <entry key="tenantsQueryNoDisabled" value="select t.id, t.name from accounts_common as a, accounts_tenants as at, tenants as t where a.userid=? and a.csid = at.TENANTS_ACCOUNTS_COMMON_CSID and at.tenant_id = t.id and NOT t.disabled order by t.id" />
                         <entry key="maxRetrySeconds" value="5000" />
                         <entry key="delayBetweenAttemptsMillis" value="200" />
                     </util:map>

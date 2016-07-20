@@ -19,6 +19,7 @@ public class CSpaceUser extends User {
     private static final long serialVersionUID = 3326192720134327612L;
 
     private Set<CSpaceTenant> tenants;
+    private CSpaceTenant primaryTenant;
     
     /**
      * Creates a CSpaceUser with the given username, hashed password, associated
@@ -41,6 +42,10 @@ public class CSpaceUser extends User {
                 authorities);
 
         this.tenants = tenants;
+        
+        if (!tenants.isEmpty()) {
+            primaryTenant = tenants.iterator().next();
+        }
     }
 
     /**
@@ -51,4 +56,14 @@ public class CSpaceUser extends User {
     public Set<CSpaceTenant> getTenants() {
         return tenants;
     }
+    
+    /**
+     * Retrieves the primary tenant associated with the user.
+     * 
+     * @return the tenants
+     */
+    public CSpaceTenant getPrimaryTenant() {
+        return primaryTenant;
+    }
+    
 }
