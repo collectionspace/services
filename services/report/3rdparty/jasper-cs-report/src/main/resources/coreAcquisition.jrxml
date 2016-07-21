@@ -22,6 +22,7 @@ ong.objectName AS "objectname",
 dg.datedisplaydate AS "acquisitiondate",
 case when (bd.item is not null and bd.item <> '') then
  regexp_replace(bd.item, '^.*\)''(.*)''$', '\1')
+ when co.objectnumber is null then 'No objects are related to this Acquisition.'
  else ''
 end AS description,
 case when (oppp.objectproductionpeople is not null and oppp.objectproductionpeople <> '') then
@@ -40,12 +41,10 @@ case when (aca.item is not null and aca.item <> '') then
  regexp_replace(aca.item, '^.*\)''(.*)''$', '\1')
  else ''
 end as donor
-
-FROM acquisitions_common ac
-JOIN hierarchy h1 ON (ac.id=h1.id)
+FROM hierarchy h1
+JOIN acquisitions_common ac ON (ac.id=h1.id)
 LEFT OUTER JOIN relations_common rc1 ON (h1.name=rc1.subjectcsid)
 LEFT OUTER JOIN hierarchy h2 ON (rc1.objectcsid=h2.name)
-
 left outer JOIN collectionobjects_common co ON (h2.id=co.id)
 LEFT OUTER JOIN hierarchy h3 ON (co.id = h3.parentid AND h3.primarytype='objectNameGroup' AND h3.pos=0)
 LEFT OUTER JOIN objectnamegroup ong ON (ong.id=h3.id)
@@ -59,9 +58,7 @@ left outer join objectproductionorganizationgroup opog on (opog.id=h6.id)
 left outer join hierarchy h7 on (ac.id=h7.parentid and h7.pos=0and h7.name='acquisitions_common:acquisitionDateGroupList')
 left outer join structureddategroup dg on (dg.id=h7.id)
 LEFT OUTER JOIN acquisitions_common_acquisitionsources aca ON (aca.id=ac.id and aca.pos=0)
-
-WHERE rc1.subjectcsid = $P{csid}
-
+WHERE h1.name = $P{csid}
 ORDER BY objectnumber]]>
 	</queryString>
 	<field name="acquisitionnumber" class="java.lang.String"/>
