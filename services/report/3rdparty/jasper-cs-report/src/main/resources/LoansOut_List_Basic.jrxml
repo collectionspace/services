@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.1.1.final using JasperReports Library version 6.1.1  -->
 <!-- 2015-12-16T19:37:02 -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Loans Out Basic List" pageWidth="1224" pageHeight="792" orientation="Landscape" columnWidth="1184" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="a1f690a3-5977-4467-85f8-6b0bcd5b7210">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Loans Out Basic List" pageWidth="1224" pageHeight="792" orientation="Landscape" whenNoDataType="NoDataSection" columnWidth="1184" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="a1f690a3-5977-4467-85f8-6b0bcd5b7210">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -59,9 +59,8 @@
 	LEFT OUTER JOIN structureddategroup sdg ON (sdg.id = h9.id)
 	LEFT OUTER JOIN hierarchy h10 ON (coc.id = h10.parentid AND h10.primarytype='measuredPartGroup' AND h10.pos=0)
 	LEFT OUTER JOIN measuredpartgroup mpg ON (mpg.id = h10.id)
-	LEFT OUTER JOIN hierarchy ON (coc.id = hierarchy.id)
-	LEFT OUTER JOIN collectionspace_core core ON coc.id = core.id
-	LEFT OUTER JOIN misc misc ON misc.id = hierarchy.id
+	LEFT OUTER JOIN collectionspace_core core ON (coc.id = core.id)
+	LEFT OUTER JOIN misc misc ON (misc.id = coc.id)
 	WHERE core.tenantid = $P{tenantid} AND misc.lifecyclestate != 'deleted'
 	AND h1.name = $P{csid}]]>
 	</queryString>
@@ -202,4 +201,15 @@
 	<summary>
 		<band splitType="Stretch"/>
 	</summary>
+	<noData>
+		<band height="50">
+			<staticText>
+				<reportElement uuid="f449dbd9-0782-4ffc-9296-1c09a978c94b" style="Column header" x="0" y="22" width="375" height="28"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[No related objects found for this Loan Out.]]></text>
+			</staticText>
+		</band>
+	</noData>
 </jasperReport>
