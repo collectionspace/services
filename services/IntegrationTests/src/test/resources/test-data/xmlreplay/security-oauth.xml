@@ -101,4 +101,28 @@
             <expectedCodes>200,201</expectedCodes>
         </test>
     </testGroup>
+    
+    <testGroup ID="readerTokenUsage">
+        <!-- Token grant with password should succeed-->
+        <test ID="readerTokenGrant" auth="cspace-ui">
+            <method>POST</method>
+            <contentType>application/x-www-form-urlencoded</contentType>
+            <uri>/cspace-services/oauth/token</uri>
+            <filename>security-oauth/password-grant-reader.txt</filename>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        <!-- Getting a resource with the granted access token should succeed -->
+        <test ID="readerGetWithToken" tokenauth='${readerTokenGrant.got("//access_token")}'>
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        <!-- Posting a resource with the granted access token should fail -->
+        <test ID="readerPostWithToken" tokenauth='${readerTokenGrant.got("//access_token")}'>
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <filename>collectionobject/co1.xml</filename>
+            <expectedCodes>403</expectedCodes>
+        </test>
+    </testGroup>
 </xmlReplay>
