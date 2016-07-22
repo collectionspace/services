@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="object" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9fa99a0a-cb25-4ae4-a669-9592fcf6fea0">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="object" language="groovy" pageWidth="612" pageHeight="792" whenNoDataType="NoDataSection" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9fa99a0a-cb25-4ae4-a669-9592fcf6fea0">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -27,7 +27,6 @@ sd.datedisplaydate fieldCollectionDate,
 ong.objectName objectName,
 case when (bd.item is not null and bd.item <> '') then
  regexp_replace(bd.item, '^.*\)''(.*)''$', '\1')
- when co.objectnumber is null then 'No objects are related to this Group.'
  else ''
 end AS description
 FROM hierarchy h1
@@ -40,7 +39,9 @@ LEFT OUTER JOIN objectnamegroup ong ON (ong.id=h3.id)
 LEFT OUTER JOIN collectionobjects_common_briefdescriptions bd ON (bd.id=co.id and bd.pos=0)
 left outer join hierarchy h4 on (h2.id = h4.parentid and h4.name = 'collectionobjects_common:fieldCollectionDateGroup')
 left outer join structureddategroup sd on (h4.id = sd.id)
-where h1.name = $P{csid}
+LEFT OUTER JOIN misc m ON (m.id = co.id)
+WHERE m.lifecyclestate != 'deleted'
+AND h1.name = $P{csid}
 order by objectNumber]]>
 	</queryString>
 	<field name="grouptitle" class="java.lang.String"/>
@@ -268,4 +269,15 @@ order by objectNumber]]>
 	<summary>
 		<band splitType="Stretch"/>
 	</summary>
+	<noData>
+		<band height="50">
+			<staticText>
+				<reportElement uuid="f449dbd9-0782-4ffc-9296-1c09a978c94b" style="Column header" x="0" y="22" width="375" height="28"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[No related objects found for this procedure.]]></text>
+			</staticText>
+		</band>
+	</noData>
 </jasperReport>
