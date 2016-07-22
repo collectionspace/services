@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="object" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="08c07c03-a97f-496c-ba55-729ff2d71763">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="object" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="NoDataSection" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="08c07c03-a97f-496c-ba55-729ff2d71763">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -32,7 +32,6 @@ end AS site,
 ong.objectName AS "objectname",
 case when (bd.item is not null and bd.item <> '') then
  regexp_replace(bd.item, '^.*\)''(.*)''$', '\1')
- when co.objectnumber is null then 'No objects are related to this Loan Out.'
  else ''
 end AS description,
 case when (oppp.objectproductionpeople is not null and oppp.objectproductionpeople <> '') then
@@ -49,7 +48,9 @@ LEFT OUTER JOIN objectnamegroup ong ON (ong.id=h3.id)
 LEFT OUTER JOIN collectionobjects_common_briefdescriptions bd ON (bd.id=co.id and bd.pos=0)
 left outer join hierarchy h4 on (co.id=h4.parentid and h4.pos=0 and h4.name='collectionobjects_common:objectProductionPeopleGroupList')
 left outer join objectproductionpeoplegroup oppp on (oppp.id=h4.id)
-WHERE h1.name = $P{csid}
+LEFT OUTER JOIN misc m ON (m.id = co.id)
+WHERE m.lifecyclestate != 'deleted'
+AND h1.name = $P{csid}
 ORDER BY objectnumber]]>
 	</queryString>
 	<field name="loanoutnumber" class="java.lang.String"/>
@@ -282,4 +283,15 @@ ORDER BY objectnumber]]>
 	<summary>
 		<band splitType="Stretch"/>
 	</summary>
+	<noData>
+		<band height="50">
+			<staticText>
+				<reportElement uuid="f449dbd9-0782-4ffc-9296-1c09a978c94b" style="Column header" x="0" y="22" width="375" height="28"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[No related objects found for this Loan Out.]]></text>
+			</staticText>
+		</band>
+	</noData>
 </jasperReport>
