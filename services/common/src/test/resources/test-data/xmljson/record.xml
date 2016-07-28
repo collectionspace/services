@@ -1,0 +1,47 @@
+<document name="examples">
+    <ns:collectionspace_core xmlns:ns="http://collectionspace.org/collectionspace_core/">
+        <tenantId>123</tenantId>
+        <workflowState>project</workflowState>
+        <createdAt>2016-07-27T04:31:38.290Z</createdAt>
+        <createdBy>someone@collectionspace.org</createdBy>
+        <updatedAt>2016-07-27T04:31:38.648Z</updatedAt>
+        <updatedBy>user@collectionspace.org</updatedBy>
+        <uri>/examples/2ece74b2-2053-458c-a252</uri>
+    </ns:collectionspace_core>
+    <ns:examples_common xmlns:ns="http://collectionspace.org/services/example">
+        <scalar>This is a scalar field value</scalar>
+        <struct>
+            <field1>A value in a structured field</field1>
+            <field2>Another structured field value</field2>
+            <nestedstruct>
+                <id>123abc</id>
+                <description>A nested structured field value</description>
+            </nestedstruct>
+        </struct>
+        <repeat>
+            <item>repeating scalar field value 1</item>
+            <item>repeating scalar field value 2</item>
+            <item>repeating scalar field value 3</item>
+            <item>repeating scalar field value 4</item>
+        </repeat>
+        <repeatstruct>
+            <innerstruct>
+                <name>Big Bird</name>
+                <color>yellow</color>
+            </innerstruct>
+            <innerstruct>
+                <name>Cookie Monster</name>
+                <color>blue</color>
+            </innerstruct>
+            <innerstruct>
+                <name>Elmo</name>
+                <age>3</age>
+                <nestedrepeat>
+                    <nrval>a</nrval>
+                    <nrval>b</nrval>
+                    <nrval>c</nrval>
+                </nestedrepeat>
+            </innerstruct>
+        </repeatstruct>
+    </ns:examples_common>
+</document>
