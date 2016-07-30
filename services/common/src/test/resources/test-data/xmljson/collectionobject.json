@@ -1,0 +1,43 @@
+{
+  "document": {
+    "@name": "collectionobjects",
+    "ns2:collectionspace_core": {
+      "@xmlns:ns2": "http://collectionspace.org/collectionspace_core/",
+      "@xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+      "tenantId": "1",
+      "updatedAt": "2016-07-27T04:31:38.648Z",
+      "workflowState": "deleted",
+      "createdBy": "admin@core.collectionspace.org",
+      "createdAt": "2016-07-27T04:31:38.290Z",
+      "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(2ece74b2-2053-458c-a252)'2'",
+      "uri": "/collectionobjects/2ece74b2-2053-458c-a252",
+      "updatedBy": "admin@core.collectionspace.org"
+    },
+    "ns2:collectionobjects_common": {
+      "@xmlns:ns2": "http://collectionspace.org/services/collectionobject",
+      "@xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+      "responsibleDepartments": {
+        "responsibleDepartment": "new DEPT"
+      },
+      "objectNameList": {
+        "objectNameGroup": {
+          "objectName": "new OBJNAME"
+        }
+      },
+      "comments": {
+        "comment": "new COMMENTS"
+      },
+      "objectNumber": "2",
+      "distinguishingFeatures": "new DISTFEATURES"
+    },
+    "ns2:account_permission": {
+      "@xmlns:ns2": "http://collectionspace.org/services/authorization",
+      "account": {
+        "accountId": "cfc9f870-9c90-4cb7-97ca-96cbd086bbd4",
+        "screenName": "Administrator",
+        "userId": "admin@core.collectionspace.org",
+        "tenantId": "1"
+      }
+    }
+  }
+}

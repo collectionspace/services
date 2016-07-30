@@ -1,3 +1,58 @@
-{ 
-  "foo": "bar"
+{
+  "document": {
+    "@name": "examples",
+    "ns:collectionspace_core": {
+      "@xmlns:ns": "http://collectionspace.org/collectionspace_core/",
+      "tenantId": "123",
+      "workflowState": "project",
+      "createdAt": "2016-07-27T04:31:38.290Z",
+      "createdBy": "someone@collectionspace.org",
+      "updatedAt": "2016-07-27T04:31:38.648Z",
+      "updatedBy": "user@collectionspace.org",
+      "uri": "/examples/2ece74b2-2053-458c-a252"
+    },
+    "ns:examples_common": {
+      "@xmlns:ns": "http://collectionspace.org/services/example",
+      "scalar": "This is a scalar field value",
+      "struct": {
+        "field1": "A value in a structured field",
+        "field2": "Another structured field value",
+        "nestedstruct": {
+          "id": "123abc",
+          "description": "A nested structured field value"
+        }
+      },
+      "repeat": {
+        "item": [
+          "repeating scalar field value 1",
+          "repeating scalar field value 2",
+          "repeating scalar field value 3",
+          "repeating scalar field value 4"
+        ]
+      },
+      "repeatstruct": {
+        "innerstruct": [
+          {
+            "name": "Big Bird",
+            "color": "yellow"
+          },
+          {
+            "name": "Cookie Monster",
+            "color": "blue"
+          },
+          {
+            "name": "Elmo",
+            "age": "3",
+            "nestedrepeat": {
+              "nrval": [
+                "a",
+                "b",
+                "c"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
 }

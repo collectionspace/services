@@ -1,0 +1,62 @@
+{
+  "ns2:abstract-common-list": {
+    "@xmlns:ns2": "http://collectionspace.org/services/jaxb",
+    "pageNum": "0",
+    "pageSize": "5",
+    "itemsInPage": "5",
+    "totalItems": "32",
+    "fieldsReturned": "csid|uri|refName|updatedAt|workflowState|order|termStatus|displayName|shortIdentifier",
+    "list-item": [
+      {
+        "csid": "45377b7e-8071-4f37-8cae",
+        "uri": "/vocabularies/f5992afc-d5e6-49c2-99d4/items/45377b7e-8071-4f37-8cae",
+        "refName": "urn:cspace:pahma.cspace.berkeley.edu:vocabularies:name(languages):item:name(grc)'Ancient Greek'",
+        "updatedAt": "2014-04-24T16:33:14Z",
+        "workflowState": "project",
+        "termStatus": "active",
+        "displayName": "Ancient Greek",
+        "shortIdentifier": "grc"
+      },
+      {
+        "csid": "9fe02421-612d-4de3-a917",
+        "uri": "/vocabularies/f5992afc-d5e6-49c2-99d4/items/9fe02421-612d-4de3-a917",
+        "refName": "urn:cspace:pahma.cspace.berkeley.edu:vocabularies:name(languages):item:name(ara)'Arabic'",
+        "updatedAt": "2014-04-24T16:33:11Z",
+        "workflowState": "project",
+        "termStatus": "active",
+        "displayName": "Arabic",
+        "shortIdentifier": "ara"
+      },
+      {
+        "csid": "7ee9de49-fe9b-462c-9332",
+        "uri": "/vocabularies/f5992afc-d5e6-49c2-99d4/items/7ee9de49-fe9b-462c-9332",
+        "refName": "urn:cspace:pahma.cspace.berkeley.edu:vocabularies:name(languages):item:name(hye)'Armenian'",
+        "updatedAt": "2014-04-24T16:33:12Z",
+        "workflowState": "project",
+        "termStatus": "active",
+        "displayName": "Armenian",
+        "shortIdentifier": "hye"
+      },
+      {
+        "csid": "a1f8c72a-0995-41c7-a9fd",
+        "uri": "/vocabularies/f5992afc-d5e6-49c2-99d4/items/a1f8c72a-0995-41c7-a9fd",
+        "refName": "urn:cspace:pahma.cspace.berkeley.edu:vocabularies:name(languages):item:name(zho)'Chinese'",
+        "updatedAt": "2014-04-24T16:33:12Z",
+        "workflowState": "project",
+        "termStatus": "active",
+        "displayName": "Chinese",
+        "shortIdentifier": "zho"
+      },
+      {
+        "csid": "b468854e-1978-44e8-8e1d",
+        "uri": "/vocabularies/f5992afc-d5e6-49c2-99d4/items/b468854e-1978-44e8-8e1d",
+        "refName": "urn:cspace:pahma.cspace.berkeley.edu:vocabularies:name(languages):item:name(Coptic1398357194892)'Coptic'",
+        "updatedAt": "2014-04-24T16:33:14Z",
+        "workflowState": "project",
+        "termStatus": "active",
+        "displayName": "Coptic",
+        "shortIdentifier": "Coptic1398357194892"
+      }
+    ]
+  }
+}
