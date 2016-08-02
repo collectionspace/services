@@ -16,6 +16,17 @@ import org.jboss.resteasy.util.MediaTypeHelper;
  * XML/JSON conversion.
  */
 public class RequestUtils {
+    
+    /**
+     * Determines if a request's content type is JSON.
+     * 
+     * @param request the request
+     * @return true if the request contains JSON content, false otherwise
+     */
+    public static boolean isJsonContent(HttpServletRequest request) {
+        return StringUtils.equals(request.getContentType(), MediaType.APPLICATION_JSON);
+    }
+    
     /**
      * Determines if a request's preferred response content
      * type is JSON.

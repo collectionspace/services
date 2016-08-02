@@ -30,6 +30,7 @@
           "repeating scalar field value 4"
         ]
       },
+      "empty": null,
       "repeatstruct": {
         "innerstruct": [
           {
@@ -52,6 +53,9 @@
             }
           }
         ]
+      },
+      "emptytop": {
+        "emptynested": null
       }
     }
   }

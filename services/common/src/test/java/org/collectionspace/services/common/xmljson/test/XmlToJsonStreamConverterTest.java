@@ -1,6 +1,6 @@
 package org.collectionspace.services.common.xmljson.test;
 
-import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,7 +25,7 @@ public class XmlToJsonStreamConverterTest {
     private JsonFactory jsonFactory = mapper.getFactory();
     
     @Test
-    public void testConvert() throws XMLStreamException, JsonParseException, IOException {
+    public void testConvert() throws XMLStreamException, IOException {
         testConvert("record");
         testConvert("collectionobject");
         testConvert("collectionobject-list");
@@ -34,10 +34,10 @@ public class XmlToJsonStreamConverterTest {
         testConvert("vocabulary-items");
     }
     
-    private void testConvert(String fileName) throws XMLStreamException, JsonParseException, IOException {
-        System.out.println("-------------------------------------------");
-        System.out.println("Converting " + fileName);
-        System.out.println("-------------------------------------------");
+    private void testConvert(String fileName) throws XMLStreamException, IOException {
+        System.out.println("---------------------------------------------------------");
+        System.out.println("Converting XML to JSON: " + fileName);
+        System.out.println("---------------------------------------------------------");
 
         ClassLoader classLoader = getClass().getClassLoader();
         File xmlFile = new File(classLoader.getResource(FILE_PATH + fileName + ".xml").getFile());

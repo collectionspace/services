@@ -14,6 +14,13 @@ import org.testng.annotations.Test;
 public class RequestUtilsTest {
 
     @Test
+    public void testIsJsonContent() {
+        assertFalse(isJsonContent(requestWithContentType(null)));
+        assertFalse(isJsonContent(requestWithContentType("application/xml")));
+        assertTrue(isJsonContent(requestWithContentType("application/json")));
+    }
+    
+    @Test
     public void testIsJsonPreferred() {
         assertEquals(
                 isJsonPreferred("application/json"),
@@ -87,6 +94,17 @@ public class RequestUtilsTest {
         
         EasyMock.expect(request.getHeaders("Accept"))
             .andReturn(Collections.enumeration(Arrays.asList(accepts)));
+        
+        EasyMock.replay(request);
+        
+        return request;
+    }
+    
+    private HttpServletRequest requestWithContentType(String contentType) {
+        HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
+        
+        EasyMock.expect(request.getContentType())
+            .andReturn(contentType);
         
         EasyMock.replay(request);
         

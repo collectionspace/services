@@ -10,6 +10,7 @@
     </ns:collectionspace_core>
     <ns:examples_common xmlns:ns="http://collectionspace.org/services/example">
         <scalar>This is a scalar field value</scalar>
+        <!-- A random comment -->
         <struct>
             <field1>A value in a structured field</field1>
             <field2>Another structured field value</field2>
