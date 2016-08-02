@@ -1,12 +1,12 @@
 package org.collectionspace.services.common.xmljson;
 
 /**
- * A lightweight representation of a JSON field. Instances are created
+ * <p>A lightweight representation of a JSON field. Instances are created
  * by JsonToXmlStreamConverter in the course of parsing JSON, in order
- * to track the current state.
+ * to track the current state.</p>
  * 
- * Each JSON field has a name and a type, which is either scalar, array,
- * or object.
+ * <p>Each JSON field has a name and a type, which is either scalar, array,
+ * or object.</p>
  */
 public class JsonField {
     private String name;

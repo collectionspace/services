@@ -28,25 +28,25 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
 /**
- * A filter that translates XML responses to JSON.
+ * <p>A filter that translates XML responses to JSON.</p>
  * 
- * This filter only has an effect if the preferred content type of the response
+ * <p>This filter only has an effect if the preferred content type of the response
  * (determined from the Accept header) is JSON. If JSON is preferred, both the
- * request and response are wrapped.
+ * request and response are wrapped.</p>
  * 
- * The request wrapper modifies the Accept header, ensuring that XML is accepted
+ * <p>The request wrapper modifies the Accept header, ensuring that XML is accepted
  * in addition to (but at a lower quality factor than) JSON. This handles the
  * case where the original request only accepts JSON. In that case, XML should
  * also be accepted, so that the XML response may be translated to JSON on the
- * way back.
+ * way back.</p>
  * 
- * The response wrapper provides a buffered output stream, so that XML output
+ * <p>The response wrapper provides a buffered output stream, so that XML output
  * is captured before being sent over the network. If the content type of the
  * response is XML, the content type is changed to JSON, the content of the
  * buffer is translated to JSON, and the JSON is written to the original output
  * stream. If the content type of the response is not XML, the content type is
  * not changed, and the content of the buffer is written to the original
- * output stream unchanged.
+ * output stream unchanged.</p>
  */
 public class XmlToJsonFilter implements Filter {
 

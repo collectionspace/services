@@ -12,15 +12,15 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * A lightweight representation of an XML node. Instances are created
+ * <p>A lightweight representation of an XML node. Instances are created
  * by XmlToJsonStreamConverter in the course of parsing XML. This class
  * differs from a DOM node in that it is intended to contain just the
  * information needed to generate JSON for CSpace, in a structure that
- * is optimized for doing that generation.
+ * is optimized for doing that generation.</p>
  * 
- * Each XML node has a name, and optionally namespaces and attributes.
+ * <p>Each XML node has a name, and optionally namespaces and attributes.
  * The node may contain either text or child nodes (not both, as CSpace
- * XML is assumed not to contain mixed-content elements).
+ * XML is assumed not to contain mixed-content elements).</p>
  */
 public class XmlNode {
     /**
@@ -78,14 +78,14 @@ public class XmlNode {
     }
     
     /**
-     * Gets the value of the node. If this is a text node, the
+     * <p>Gets the value of the node. If this is a text node, the
      * value is a String. Otherwise it's a map of the node's
      * namespaces, attributes, and children, via
-     * getCombinedMap().
+     * getCombinedMap().</p>
      * 
-     * Note that namespaces and attributes are not returned
+     * <p>Note that namespaces and attributes are not returned
      * as part of a text node's value. It is assumed that text
-     * nodes do not have namespace declarations or attributes.
+     * nodes do not have namespace declarations or attributes.</p>
      * 
      * @return the node's value
      */
@@ -299,14 +299,14 @@ public class XmlNode {
     }
 
     /**
-     * Adds a child node to this node.
+     * <p>Adds a child node to this node.</p>
      * 
-     * If the node contains any text content, the text content
+     * <p>If the node contains any text content, the text content
      * is removed, and text content is disallowed from being added
-     * in the future.
+     * in the future.</p>
      * 
-     * If the node to be added contains no content, and
-     * isDiscardEmptyChildren() is true, the node is not added.
+     * <p>If the node to be added contains no content, and
+     * isDiscardEmptyChildren() is true, the node is not added.</p>
      * 
      * @param node the node to add as a child
      */

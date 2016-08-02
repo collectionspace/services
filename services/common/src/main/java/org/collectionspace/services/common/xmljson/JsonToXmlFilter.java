@@ -18,7 +18,15 @@ import javax.xml.stream.XMLStreamException;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
 /**
- * A filter that translates JSON to XML.
+ * <p>A filter that translates JSON requests to XML.</p>
+ * 
+ * <p>This filter only has an effect if the content of the request (determined from
+ * the Content-type header) is JSON. If the content is JSON, the request is
+ * wrapped.</p>
+ * 
+ * <p>The request wrapper changes the Content-type header to XML, and provides an
+ * input stream containing an XML translation of the original JSON request
+ * content.</p>
  */
 public class JsonToXmlFilter implements Filter {
 
@@ -51,7 +59,8 @@ public class JsonToXmlFilter implements Filter {
     }
     
     /**
-     * A request wrapper that .
+     * A request wrapper that has a content type of XML, and replaces the
+     * wrapped input stream with an XML translation.
      */
     public class RequestWrapper extends HttpServletRequestWrapper {
         public RequestWrapper(HttpServletRequest request) {
@@ -74,14 +83,32 @@ public class JsonToXmlFilter implements Filter {
                 throw new IOException("error converting JSON stream to XML", e);
             }
             
-            final InputStream xmlInput = out.toInputStream();
+            return new InputStreamWrapper(out.toInputStream());
+        }
+    }
+    
+    /**
+     * A ServletInputStream that wraps another input stream.
+     */
+    public class InputStreamWrapper extends ServletInputStream {
 
-            return new ServletInputStream() {
-                @Override
-                public int read() throws IOException {
-                    return xmlInput.read();
-                }
-            };
+        /**
+         * The wrapped input stream.
+         */
+        private InputStream in;
+        
+        /**
+         * Creates an InputStreamWrapper that wraps a given input stream.
+         * 
+         * @param in the input stream to wrap
+         */
+        public InputStreamWrapper(InputStream in) {
+            this.in = in;
+        }
+        
+        @Override
+        public int read() throws IOException {
+            return in.read();
         }
     }
 }
