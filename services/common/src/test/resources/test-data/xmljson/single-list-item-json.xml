@@ -1,0 +1,7 @@
+<document name="examples">
+    <ns:examples_common xmlns:ns="http://collectionspace.org/services/example">
+        <comments>
+            <comment>some value</comment>
+        </comments>
+    </ns:examples_common>
+</document>

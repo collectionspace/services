@@ -30,6 +30,7 @@ public class JsonToXmlStreamConverterTest {
         testConvert("vocabulary-items");
         testConvert("numeric-json");
         testConvert("boolean-json");
+        testConvert("single-list-item-json");
         testConvertThrows("empty-json", XMLStreamException.class);
     }
     

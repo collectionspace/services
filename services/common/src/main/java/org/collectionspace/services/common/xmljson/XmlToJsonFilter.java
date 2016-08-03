@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * <p>A filter that translates XML responses to JSON.</p>
@@ -65,7 +66,7 @@ public class XmlToJsonFilter implements Filter {
 
             chain.doFilter(requestWrapper, responseWrapper);
             
-            if (responseWrapper.getContentType().equals(MediaType.APPLICATION_XML)) {
+            if (StringUtils.equals(responseWrapper.getContentType(), MediaType.APPLICATION_XML)) {
                 // Got an XML response. Translate it to JSON.
                 
                 response.setContentType(MediaType.APPLICATION_JSON);
@@ -87,9 +88,11 @@ public class XmlToJsonFilter implements Filter {
             else {
                 // Didn't get an XML response. Just pass it along.
                 
-                InputStream inputStream = responseWrapper.getBuffer().toInputStream();
+                if (responseWrapper.getBuffer() != null) {
+                    InputStream inputStream = responseWrapper.getBuffer().toInputStream();
                 
-                IOUtils.copy(inputStream, response.getOutputStream());
+                    IOUtils.copy(inputStream, response.getOutputStream());
+                }
             }
         }
         else {
