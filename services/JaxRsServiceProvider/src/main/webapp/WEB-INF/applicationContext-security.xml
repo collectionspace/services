@@ -11,12 +11,13 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:sec="http://www.springframework.org/schema/security"
+       xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
        xmlns:util="http://www.springframework.org/schema/util"
-       xmlns:aop="http://www.springframework.org/schema/aop"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans 		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-       http://www.springframework.org/schema/security 	http://www.springframework.org/schema/security/spring-security.xsd
-       http://www.springframework.org/schema/util 		http://www.springframework.org/schema/util/spring-util.xsd">
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+       http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
     <!--
         debugging tips : enable following categories in
@@ -24,115 +25,119 @@
         org.apache.catalina.core
         org.springframework.security
     -->
-	
-    <bean id="springSecurityFilterChain"
-          class="org.springframework.security.web.FilterChainProxy">
-        <sec:filter-chain-map path-type="ant">
-			<!-- Exclude the resource path to public items' content from AuthN and AuthZ.  Let's us publish resources with anonymous access. -->
-			<sec:filter-chain pattern="/publicitems/*/*/content"
-                              filters="none"/>
-            <sec:filter-chain pattern="/**"
-                              filters="securityContextPersistenceFilter,basicAuthenticationFilter,logoutFilter,exTranslationFilter,filterInvocationInterceptor"/>
-        </sec:filter-chain-map>
-    </bean>
-	
 
-    <bean id="securityContextPersistenceFilter"
-          class="org.springframework.security.web.context.SecurityContextPersistenceFilter">
-        <property name='securityContextRepository'>
-            <bean class='org.springframework.security.web.context.HttpSessionSecurityContextRepository'>
-                <property name='allowSessionCreation' value='true' />
+    <!-- Require client id and client secret via basic auth when granting tokens (https://tools.ietf.org/html/rfc6749#section-4.3.2).
+         Note that public (https://tools.ietf.org/html/rfc6749#section-2.1) clients, such as the CSpace web UI, may supply a
+         blank or publicly known "secret." The clientAuthenticationManager bean handles this client authentication. -->
+    <sec:http pattern="/oauth/token/**" create-session="stateless" authentication-manager-ref="clientAuthenticationManager">
+        <sec:intercept-url pattern="/oauth/token/**" access="isFullyAuthenticated()"/>
+        <sec:http-basic entry-point-ref="clientAuthenticationEntryPoint"/>
+        <sec:anonymous enabled="false"/>
+        <sec:csrf disabled="true"/>
+        <sec:access-denied-handler ref="oauthAccessDeniedHandler"/>
+    </sec:http>
+
+    <!-- Exclude the resource path to public items' content from AuthN and AuthZ.  Lets us publish resources with anonymous access. -->
+    <sec:http pattern="/publicitems/*/*/content" security="none" />
+    
+    <!-- All other paths must be authenticated. -->
+    <sec:http realm="org.collectionspace.services" create-session="stateless" authentication-manager-ref="userAuthenticationManager">
+        <sec:intercept-url pattern="/**" access="isFullyAuthenticated()" />
+        <sec:http-basic />
+        <sec:csrf disabled="true" />
+        
+        <!-- Handle token auth -->
+        <sec:custom-filter ref="oauthResourceServerFilter" before="PRE_AUTH_FILTER" />
+    </sec:http>
+
+    <sec:authentication-manager id="userAuthenticationManager">
+        <sec:authentication-provider ref="daoAuthenticationProvider"/>
+    </sec:authentication-manager>
+
+    <bean id="daoAuthenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+        <property name="userDetailsService" ref="userDetailsService" />
+        <property name="passwordEncoder">
+            <bean class="org.springframework.security.authentication.encoding.ShaPasswordEncoder">
+                <constructor-arg value="256"/>
+                <property name="encodeHashAsBase64" value="true" />
             </bean>
         </property>
     </bean>
-
-
-    <bean id="basicAuthenticationFilter"
-          class="org.springframework.security.web.authentication.www.BasicAuthenticationFilter">
-        <property name="authenticationManager" ref="authenticationManager"/>
-        <property name="authenticationEntryPoint" ref="basicAuthenticationEntryPoint"/>
-    </bean>
-
-    <bean id="basicAuthenticationEntryPoint"
-          class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
-        <property name="realmName" value="org.collectionspace.services"/>
-    </bean>
-
-    <bean id="logoutFilter"
-          class="org.springframework.security.web.authentication.logout.LogoutFilter">
-        <constructor-arg value="/"/>
+    
+    <bean id="userDetailsService" class="org.collectionspace.authentication.spring.CSpaceUserDetailsService">
         <constructor-arg>
-            <list>
-                <bean class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler"/>
-            </list>
+            <bean class="org.collectionspace.authentication.realm.db.CSpaceDbRealm">
+                <constructor-arg>
+                    <util:map>
+                        <entry key="dsJndiName" value="CspaceDS" />
+                        <entry key="principalsQuery" value="select passwd from users where username=?" />
+                        <entry key="rolesQuery" value="select r.rolename from roles as r, accounts_roles as ar where ar.user_id=? and ar.role_id=r.csid" />
+                        <entry key="tenantsQueryWithDisabled" value="select t.id, t.name from accounts_common as a, accounts_tenants as at, tenants as t where a.userid=? and a.csid = at.TENANTS_ACCOUNTS_COMMON_CSID and at.tenant_id = t.id order by t.id" />
+                        <entry key="tenantsQueryNoDisabled" value="select t.id, t.name from accounts_common as a, accounts_tenants as at, tenants as t where a.userid=? and a.csid = at.TENANTS_ACCOUNTS_COMMON_CSID and at.tenant_id = t.id and NOT t.disabled order by t.id" />
+                        <entry key="maxRetrySeconds" value="5000" />
+                        <entry key="delayBetweenAttemptsMillis" value="200" />
+                    </util:map>
+                </constructor-arg>
+            </bean>
         </constructor-arg>
     </bean>
-
-    <bean id="exTranslationFilter"
-          class="org.springframework.security.web.access.ExceptionTranslationFilter">
-        <property name="authenticationEntryPoint" ref="basicAuthenticationEntryPoint"/>
-    </bean>
-
-    <sec:authentication-manager alias="authenticationManager">
-        <sec:authentication-provider ref="jaasAuthenticationProvider" user-service-ref="userDetailsService"/>
+    
+    <oauth:resource-server id="oauthResourceServerFilter" resource-id="cspace-services" token-services-ref="tokenServices" />
+    
+    <sec:authentication-manager id="clientAuthenticationManager">
+        <sec:authentication-provider user-service-ref="clientDetailsUserDetailsService"/>
     </sec:authentication-manager>
 
-    <bean id="jaasAuthenticationProvider"
-          class="org.springframework.security.authentication.jaas.JaasAuthenticationProvider">
-        <property name="loginContextName">
-            <value>cspace</value> <!-- value should be same as in application-policy in JBoss login-config.xml -->
-        </property>
-        <property name="loginConfig">
-            <value>/WEB-INF/login.conf</value>
-        </property>
-        <property name="callbackHandlers">
-            <list>
-                <bean class="org.springframework.security.authentication.jaas.JaasNameCallbackHandler"/>
-                <bean class="org.springframework.security.authentication.jaas.JaasPasswordCallbackHandler"/>
-            </list>
-        </property>
-        <property name="authorityGranters">
-            <list>
-                <bean class="org.collectionspace.authentication.spring.CSpaceAuthorityGranter"/>
-            </list>
-        </property>
+    <bean id="clientDetailsUserDetailsService" class="org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService">
+        <constructor-arg ref="clientDetails"/>
     </bean>
 
-    <bean id="userDetailsService"
-          class="org.collectionspace.authentication.spring.CSpaceUserDetailsService">
+    <!-- The scope attribute below is a meaningless placeholder. In the future we may want to use it to limit
+         the permissions of particular clients. Currently a client has the full permissions of the user on 
+         whose behalf it is acting. -->
+    <oauth:client-details-service id="clientDetails">
+        <oauth:client
+            client-id="cspace-ui"
+            resource-ids="cspace-services"
+            authorized-grant-types="password,refresh_token"
+            scope="full"
+            access-token-validity="3600"
+            refresh-token-validity="43200" />
+    </oauth:client-details-service>
+    
+    <bean id="clientAuthenticationEntryPoint" class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
+        <property name="realmName" value="org.collectionspace.services/client"/>
+        <property name="typeName" value="Basic"/>
+    </bean>
+    
+    <bean id="oauthAccessDeniedHandler" class="org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler"/>
+    
+    <bean id="tokenServices" class="org.springframework.security.oauth2.provider.token.DefaultTokenServices">
+        <property name="tokenStore" ref="tokenStore" />
+        <property name="tokenEnhancer" ref="tokenEnhancer" />
+        <property name="supportRefreshToken" value="true" />
+        <property name="clientDetailsService" ref="clientDetails" />
     </bean>
 
-    <bean id="filterInvocationInterceptor"
-          class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">
-        <property name="authenticationManager" ref="authenticationManager"/>
-        <property name="accessDecisionManager" ref="httpRequestAccessDecisionManager"/>
-        <!--property name="securityMetadataSource" ref="cspaceMetadataSource"/-->
-        <property name="securityMetadataSource">
-            <sec:filter-security-metadata-source>
-                <sec:intercept-url pattern="/**" access="IS_AUTHENTICATED_REMEMBERED"/>
-            </sec:filter-security-metadata-source>
-        </property>
+    <bean id="tokenStore" class="org.springframework.security.oauth2.provider.token.store.JwtTokenStore">
+        <constructor-arg ref="tokenEnhancer" />
     </bean>
 
-    <bean id="httpRequestAccessDecisionManager"
-          class="org.springframework.security.access.vote.AffirmativeBased">
-        <property name="allowIfAllAbstainDecisions" value="false"/>
-        <property name="decisionVoters">
-            <list>
-                <ref bean="roleVoter"/>
-                <ref bean="authenticatedVoter"/>
-            </list>
+    <bean id="tokenEnhancer" class="org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter">
+        <!--
+            Can specify a signing key here. By default a random one is generated on bean instantiation,
+            which means that when CSpace is restarted, all granted tokens will become invalid. A
+            public/private key pair may also be supplied, using keyPair.
+        -->
+        <!-- <property name="signingKey" value="" /> -->
+        <property name="accessTokenConverter">
+            <bean class="org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter">
+                <property name="userTokenConverter">
+                    <bean class="org.collectionspace.authentication.spring.CSpaceUserAuthenticationConverter">
+                        <constructor-arg ref="userDetailsService" />
+                    </bean>
+                </property>
+            </bean>
         </property>
     </bean>
-
-    <bean id="authenticatedVoter"
-          class="org.springframework.security.access.vote.AuthenticatedVoter"/>
-    <bean id="roleVoter"
-          class="org.springframework.security.access.vote.RoleVoter"/>
-    <!--bean id="cspaceMetadataSource" class="org.collectionspace.services.authorization.spring.CSpaceSecurityMetadataSource">
-        <property name="urlProperties">
-            <util:properties location="classpath:urls.properties" />
-        </property>
-    </bean-->
-
 </beans>

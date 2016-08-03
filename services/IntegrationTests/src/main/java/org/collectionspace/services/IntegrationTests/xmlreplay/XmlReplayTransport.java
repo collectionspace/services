@@ -51,6 +51,14 @@ public class XmlReplayTransport {
         private static String DD = "--";
         private static String CRLF = "\r\n";
 
+    private static String formatAuth(String authForTest) {
+        if (authForTest.startsWith("Bearer ")) {
+            return authForTest;
+        }
+        
+        return ("Basic " + authForTest);
+    }
+    
     public static ServiceResult doGET(String urlString, String authForTest, String fromTestID) throws Exception {
         ServiceResult pr = new ServiceResult();
         pr.fromTestID = fromTestID;
@@ -64,7 +72,7 @@ public class XmlReplayTransport {
         GetMethod getMethod = new GetMethod(urlString);
         getMethod.addRequestHeader("Accept", "multipart/mixed");
         getMethod.addRequestHeader("Accept", "application/xml");
-        getMethod.setRequestHeader("Authorization", "Basic " + authForTest); //"dGVzdDp0ZXN0");
+        getMethod.setRequestHeader("Authorization", formatAuth(authForTest)); //"dGVzdDp0ZXN0");
         getMethod.setRequestHeader("X-XmlReplay-fromTestID", fromTestID);
         try {
             int statusCode1 = client.executeMethod(getMethod);
@@ -101,7 +109,7 @@ public class XmlReplayTransport {
         DeleteMethod deleteMethod = new DeleteMethod(urlString);
         deleteMethod.setRequestHeader("Accept", "multipart/mixed");
         deleteMethod.addRequestHeader("Accept", "application/xml");
-        deleteMethod.setRequestHeader("Authorization", "Basic " + authForTest);
+        deleteMethod.setRequestHeader("Authorization", formatAuth(authForTest));
         deleteMethod.setRequestHeader("X-XmlReplay-fromTestID", fromTestID);
         int statusCode1 = 0;
         String res = "";
@@ -222,7 +230,7 @@ public class XmlReplayTransport {
                 conn.setRequestProperty("Accept", "application/xml");
                 conn.setRequestProperty("content-type", contentType);
             }
-            conn.setRequestProperty("Authorization", "Basic " + authForTest);  //TODO: remove test user : hard-coded as "dGVzdDp0ZXN0"
+            conn.setRequestProperty("Authorization", formatAuth(authForTest));  //TODO: remove test user : hard-coded as "dGVzdDp0ZXN0"
             conn.setRequestProperty("Connection", "close");
             conn.setRequestProperty("X-XmlReplay-fromTestID", fromTestID);
             conn.setDoOutput(true);
@@ -278,7 +286,7 @@ public class XmlReplayTransport {
             PostMethod postMethod = new PostMethod(urlString);
             postMethod.setRequestHeader("Accept", "multipart/mixed");
             postMethod.addRequestHeader("Accept", "application/xml");
-            postMethod.setRequestHeader("Authorization", "Basic " + authForTest);
+            postMethod.setRequestHeader("Authorization", formatAuth(authForTest));
             postMethod.setRequestHeader("X-XmlReplay-fromTestID", fromTestID);
             //this method takes an array of params.  Not sure what they expect us to do with a raw post:
             //   postMethod.setRequestBody();

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+    <auths>
+        <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
+        <auth ID="cspace-ui">Y3NwYWNlLXVpOg==</auth> <!-- cspace-ui: -->
+        <auth ID="bad">w3NwaWNlLXVpOg==</auth>
+    </auths>
+    
+    <testGroup ID="tokenGranting">
+        <!-- GET, PUT, and DELETE requests should not be supported -->
+        <test ID="tokenGet" auth="cspace-ui">
+            <method>GET</method>
+            <uri>/cspace-services/oauth/token</uri>
+            <expectedCodes>405</expectedCodes>
+        </test>
+        <test ID="tokenPut" auth="cspace-ui">
+            <method>PUT</method>
+            <contentType>application/x-www-form-urlencoded</contentType>
+            <uri>/cspace-services/oauth/token</uri>
+            <filename>security-oauth/password-grant-admin.txt</filename>
+            <expectedCodes>405</expectedCodes>
+        </test>
+        <test ID="tokenDelete" auth="cspace-ui">
+            <method>DELETE</method>
+            <uri>/cspace-services/oauth/token</uri>
+            <expectedCodes>405</expectedCodes>
+        </test>
+        <!-- POST should fail when client credentials are incorrect -->
+        <test ID="tokenPostBadClientCreds" auth="bad">
+            <method>POST</method>
+            <contentType>application/x-www-form-urlencoded</contentType>
+            <uri>/cspace-services/oauth/token</uri>
+            <filename>security-oauth/password-grant-admin.txt</filename>
+            <expectedCodes>401</expectedCodes>
+        </test>
+        <!-- POST should when user credentials are incorrect -->
+        <test ID="tokenPostBadUserCreds" auth="cspace-ui">
+            <method>POST</method>
+            <contentType>application/x-www-form-urlencoded</contentType>
+            <uri>/cspace-services/oauth/token</uri>
+            <filename>security-oauth/password-grant-bad-password.txt</filename>
+            <expectedCodes>400</expectedCodes>
+        </test>
+        <!-- Token grant should succeed -->
+        <test ID="tokenPostSuccess" auth="cspace-ui">
+            <method>POST</method>
+            <contentType>application/x-www-form-urlencoded</contentType>
+            <uri>/cspace-services/oauth/token</uri>
+            <filename>security-oauth/password-grant-admin.txt</filename>
+            <expectedCodes>200</expectedCodes>
+        </test>
+    </testGroup>
+    
+    <testGroup ID="tokenUsage">
+        <!-- Token grant with password should succeed-->
+        <test ID="tokenGrant" auth="cspace-ui">
+            <method>POST</method>
+            <contentType>application/x-www-form-urlencoded</contentType>
+            <uri>/cspace-services/oauth/token</uri>
+            <filename>security-oauth/password-grant-admin.txt</filename>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        <!-- Getting a resource with the granted access token should succeed -->
+        <test ID="getWithToken" tokenauth='${tokenGrant.got("//access_token")}'>
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        <!-- Posting a resource with the granted access token should succeed -->
+        <test ID="postWithToken" tokenauth='${tokenGrant.got("//access_token")}'>
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <filename>collectionobject/co1.xml</filename>
+            <expectedCodes>200,201</expectedCodes>
+        </test>
+        <!-- Getting a resource with a forged token should fail -->
+        <test ID="getWithForgedToken" tokenauth='${tokenGrant.got("//access_token")}xyz'>
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <expectedCodes>401</expectedCodes>
+        </test>
+        <!-- Getting a resource with a refresh token should fail -->
+        <test ID="getWithBadToken" tokenauth='${tokenGrant.got("//refresh_token")}'>
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <expectedCodes>401</expectedCodes>
+        </test>
+        <!-- Getting a new access token with the refresh token should succeed -->
+        <test ID="refreshTokenGrant" auth="cspace-ui">
+            <method>POST</method>
+            <contentType>application/x-www-form-urlencoded</contentType>
+            <uri>/cspace-services/oauth/token</uri>
+            <filename>security-oauth/refresh-token-grant.txt</filename>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        <!-- Posting a resource with the new access token should succeed -->
+        <test ID="postWithNewToken" tokenauth='${refreshTokenGrant.got("//access_token")}'>
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <filename>collectionobject/co1.xml</filename>
+            <expectedCodes>200,201</expectedCodes>
+        </test>
+    </testGroup>
+    
+    <testGroup ID="readerTokenUsage">
+        <!-- Token grant with password should succeed-->
+        <test ID="readerTokenGrant" auth="cspace-ui">
+            <method>POST</method>
+            <contentType>application/x-www-form-urlencoded</contentType>
+            <uri>/cspace-services/oauth/token</uri>
+            <filename>security-oauth/password-grant-reader.txt</filename>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        <!-- Getting a resource with the granted access token should succeed -->
+        <test ID="readerGetWithToken" tokenauth='${readerTokenGrant.got("//access_token")}'>
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        <!-- Posting a resource with the granted access token should fail -->
+        <test ID="readerPostWithToken" tokenauth='${readerTokenGrant.got("//access_token")}'>
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <filename>collectionobject/co1.xml</filename>
+            <expectedCodes>403</expectedCodes>
+        </test>
+    </testGroup>
+</xmlReplay>

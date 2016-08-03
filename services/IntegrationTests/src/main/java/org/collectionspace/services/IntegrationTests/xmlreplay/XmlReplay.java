@@ -566,11 +566,28 @@ public class XmlReplay {
                     String testID = testNode.valueOf("@ID");
                     String testIDLabel = Tools.notEmpty(testID) ? (testGroupID+'.'+testID) : (testGroupID+'.'+testElementIndex);
                     String method = testNode.valueOf("method");
+                    String contentType = testNode.valueOf("contentType");
                     String uri = testNode.valueOf("uri");
                     String fullURL = Tools.glue(protoHostPort, "/", uri);
 
+                    if (contentType == null || contentType.equals("")) {
+                        contentType = XmlReplayTransport.APPLICATION_XML;
+                    }
+                    
+                    String currentAuthForTest = null;
                     String authIDForTest = testNode.valueOf("@auth");
-                    String currentAuthForTest = authsMap.map.get(authIDForTest);
+                    
+                    if (Tools.notEmpty(authIDForTest)){
+                        currentAuthForTest = authsMap.map.get(authIDForTest);
+                    }
+                    else {
+                        String tokenAuthExpression = testNode.valueOf("@tokenauth");
+                        
+                        if (Tools.notEmpty(tokenAuthExpression)){
+                            currentAuthForTest = "Bearer " + evalStruct.eval(tokenAuthExpression, serviceResultsMap, null, jexl, jc);
+                        }
+                    }
+                    
                     if (Tools.notEmpty(currentAuthForTest)){
                         authForTest = currentAuthForTest; //else just run with current from last loop;
                     }
@@ -619,7 +636,7 @@ public class XmlReplay {
                         if (parts.varsList.size()>0){
                             vars = parts.varsList.get(0);
                         }
-                        serviceResult = XmlReplayTransport.doPOST_PUTFromXML(parts.responseFilename, vars, protoHostPort, uri, method, XmlReplayTransport.APPLICATION_XML, evalStruct, authForTest, testIDLabel);
+                        serviceResult = XmlReplayTransport.doPOST_PUTFromXML(parts.responseFilename, vars, protoHostPort, uri, method, contentType, evalStruct, authForTest, testIDLabel);
                         if (vars!=null) {
                             serviceResult.addVars(vars);
                         }

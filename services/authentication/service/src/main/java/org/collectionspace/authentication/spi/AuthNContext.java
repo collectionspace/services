@@ -24,58 +24,54 @@
  */
 package org.collectionspace.authentication.spi;
 
-import javax.security.auth.Subject;
 import org.collectionspace.authentication.CSpaceTenant;
+import org.collectionspace.authentication.CSpaceUser;
 
 /**
- * Utilities to be used by Services runtime to interface with authentication service
- * @author 
+ * Utilities for accessing the authentication context.
  */
-public abstract class AuthNContext {
-
-	public static final String ANONYMOUS_USER = "anonymous";
-	public static final String ANONYMOUS_TENANT_ID = "-1";
-	public static final String ANONYMOUS_TENANT_NAME = ANONYMOUS_USER;
+public interface AuthNContext {
+    
+    public static final String ANONYMOUS_USER = "anonymous";
+    public static final String ANONYMOUS_TENANT_ID = "-1";
+    public static final String ANONYMOUS_TENANT_NAME = ANONYMOUS_USER;
     public static final String SPRING_ADMIN_USER = "SPRING_ADMIN";
     public static final String TENANT_ID_QUERY_PARAM = "tid";
     public static final String TENANT_ID_PATH_PARAM = "tenantId";
 
-	
     /**
-     * getUserId returns authenticated user id
-     * @return
+     * Returns the username of the authenticated user.
+     * 
+     * @return the username
      */
-    public abstract String getUserId();
+    public String getUserId();
 
     /**
-     * getTenantIds get tenant ids from the tenant context associated with the
-     * security context
-     * @return
+     * Returns the authenticated user.
+     * 
+     * @return the user
      */
-    public abstract String[] getTenantIds();
+    public CSpaceUser getUser();
 
     /**
-     * getCurrentTenantId get id of the tenant associated with the authenticated user
-     * @return
+     * Returns the id of the primary tenant associated with the authenticated user.
+     * 
+     * @return the tenant id
      */
-    public abstract String getCurrentTenantId();
+    public String getCurrentTenantId();
 
     /**
-     * getCurrentTenantName get name of the tenant associated with the authenticated user
-     * @return
+     * Returns the name of the primary tenant associated with the authenticated user.
+     * 
+     * @return the tenant name
      */
-    public abstract String getCurrentTenantName();
-
+    public String getCurrentTenantName();
+    
     /**
-     * getTenants get tenant context associated with the security context
-     * @see CSpaceTenant
-     * @return
+     * Returns the primary tenant associated with the authenticated user.
+     * 
+     * @return the tenant
      */
-    public abstract CSpaceTenant[] getTenants();
+    public CSpaceTenant getCurrentTenant();
 
-    /**
-     * getSubject retrieves security context as Subject
-     * @see javax.security.auth.Subject
-     */
-    public abstract Subject getSubject();
 }
