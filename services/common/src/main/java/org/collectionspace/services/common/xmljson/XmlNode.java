@@ -306,8 +306,8 @@ public class XmlNode {
      * in the future.</p>
      * 
      * <p>If the node to be added contains no content, and
-     * isDiscardEmptyChildren() is true, the node is not added.</p>
-     * 
+     * isRetainEmptyChildren() is false, the node is not added.</p>
+     *
      * @param node the node to add as a child
      */
     public void addChild(XmlNode node) {
