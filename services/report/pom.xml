@@ -24,6 +24,11 @@
 					<artifactId>itext</artifactId>
 					<groupId>com.lowagie</groupId>
 				</exclusion>
+				<exclusion>
+					<!-- The services/common module requires a later version of jackson than the 2.1.4 used by jasper, so exclude it here. -->
+					<artifactId>jackson-core</artifactId>
+					<groupId>com.fasterxml.jackson.core</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<!-- Jasper Reports fonts are still at 4.0.0, but are compatible with later 

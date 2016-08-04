@@ -1,0 +1,6 @@
+<document name="examples">
+    <ns:examples_common xmlns:ns="http://collectionspace.org/services/example">
+        <boolTrue>true</boolTrue>
+        <boolFalse>false</boolFalse>
+    </ns:examples_common>
+</document>

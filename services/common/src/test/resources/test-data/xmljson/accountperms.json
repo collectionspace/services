@@ -1,0 +1,949 @@
+{
+  "ns2:account_permission": {
+    "@xmlns:ns2": "http://collectionspace.org/services/authorization",
+    "account": {
+      "accountId": "1731b26a-3f5c-4df1-a1ae-32560a978d33",
+      "screenName": "Administrator",
+      "userId": "admin@core.collectionspace.org",
+      "tenantId": "1"
+    },
+    "permission": [
+      {
+        "permRelationshipId": "6096",
+        "permissionId": "1-_vocabularyitems_*_workflow_deprecate-CRUDL",
+        "resourceName": "/vocabularyitems/*/workflow/deprecate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3028",
+        "permissionId": "1-id-CRUDL",
+        "resourceName": "id",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5574",
+        "permissionId": "1-_concepts_*_workflow_delete-CRUDL",
+        "resourceName": "/concepts/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3035",
+        "permissionId": "1-index-CRUDL",
+        "resourceName": "index",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3036",
+        "permissionId": "1-reports-CRUDL",
+        "resourceName": "reports",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6015",
+        "permissionId": "1-_vocabularies_*_workflow_unreplicate-CRUDL",
+        "resourceName": "/vocabularies/*/workflow/unreplicate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5934",
+        "permissionId": "1-_orgauthorities_*_workflow_delete-CRUDL",
+        "resourceName": "/orgauthorities/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5988",
+        "permissionId": "1-_vocabularies_*_workflow_undeprecate-CRUDL",
+        "resourceName": "/vocabularies/*/workflow/undeprecate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5781",
+        "permissionId": "1-_locationauthorities_*_workflow_undelete-CRUDL",
+        "resourceName": "/locationauthorities/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3046",
+        "permissionId": "1-authorization_roles_accountroles-CRUDL",
+        "resourceName": "authorization/roles/accountroles",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5691",
+        "permissionId": "1-_persons_*_workflow_unreplicate-CRUDL",
+        "resourceName": "/persons/*/workflow/unreplicate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6420",
+        "permissionId": "1-_reports_*_workflow_undelete-CRUDL",
+        "resourceName": "/reports/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3030",
+        "permissionId": "1-servicegroups-CRUDL",
+        "resourceName": "servicegroups",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3010",
+        "permissionId": "1-vocabularies-CRUDL",
+        "resourceName": "vocabularies",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5619",
+        "permissionId": "1-_conceptauthorities_*_workflow_deprecate-CRUDL",
+        "resourceName": "/conceptauthorities/*/workflow/deprecate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3043",
+        "permissionId": "1-authorization_permissions_permroles-CRUDL",
+        "resourceName": "authorization/permissions/permroles",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6168",
+        "permissionId": "1-_placeauthorities_*_workflow_undelete-CRUDL",
+        "resourceName": "/placeauthorities/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5808",
+        "permissionId": "1-_loansin_*_workflow_delete-CRUDL",
+        "resourceName": "/loansin/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3001",
+        "permissionId": "1-personauthorities-CRUDL",
+        "resourceName": "personauthorities",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5547",
+        "permissionId": "1-_concepts_*_workflow_undelete-CRUDL",
+        "resourceName": "/concepts/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5826",
+        "permissionId": "1-_loansout_*_workflow_delete-CRUDL",
+        "resourceName": "/loansout/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5889",
+        "permissionId": "1-_organizations_*_workflow_unreplicate-CRUDL",
+        "resourceName": "/organizations/*/workflow/unreplicate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6078",
+        "permissionId": "1-_vocabularyitems_*_workflow_undelete-CRUDL",
+        "resourceName": "/vocabularyitems/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6150",
+        "permissionId": "1-_places_*_workflow_undelete-CRUDL",
+        "resourceName": "/places/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6186",
+        "permissionId": "1-_objectexit_*_workflow_undelete-CRUDL",
+        "resourceName": "/objectexit/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3004",
+        "permissionId": "1-loansin-CRUDL",
+        "resourceName": "loansin",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5637",
+        "permissionId": "1-_conceptauthorities_*_workflow_unreplicate-CRUDL",
+        "resourceName": "/conceptauthorities/*/workflow/unreplicate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5835",
+        "permissionId": "1-_acquisitions_*_workflow_undelete-CRUDL",
+        "resourceName": "/acquisitions/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6159",
+        "permissionId": "1-_places_*_workflow_delete-CRUDL",
+        "resourceName": "/places/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6366",
+        "permissionId": "1-_publicitems_*_workflow_undelete-CRUDL",
+        "resourceName": "/publicitems/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3014",
+        "permissionId": "1-exhibitions-CRUDL",
+        "resourceName": "exhibitions",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5601",
+        "permissionId": "1-_conceptauthorities_*_workflow_undelete-CRUDL",
+        "resourceName": "/conceptauthorities/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5772",
+        "permissionId": "1-_locations_*_workflow_delete-CRUDL",
+        "resourceName": "/locations/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6141",
+        "permissionId": "1-_exhibitions_*_workflow_delete-CRUDL",
+        "resourceName": "/exhibitions/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6222",
+        "permissionId": "1-_workauthorities_*_workflow_undelete-CRUDL",
+        "resourceName": "/workauthorities/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6267",
+        "permissionId": "1-_citationauthorities_*_workflow_delete-CRUDL",
+        "resourceName": "/citationauthorities/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6357",
+        "permissionId": "1-_media_*_workflow_delete-CRUDL",
+        "resourceName": "/media/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6006",
+        "permissionId": "1-_vocabularies_*_workflow_delete-CRUDL",
+        "resourceName": "/vocabularies/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3032",
+        "permissionId": "1-batch-CRUDL",
+        "resourceName": "batch",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5853",
+        "permissionId": "1-_organizations_*_workflow_undelete-CRUDL",
+        "resourceName": "/organizations/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3042",
+        "permissionId": "1-authorization_permissions-CRUDL",
+        "resourceName": "authorization/permissions",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5979",
+        "permissionId": "1-_vocabularies_*_workflow_undelete-CRUDL",
+        "resourceName": "/vocabularies/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3045",
+        "permissionId": "1-authorization_roles_permroles-CRUDL",
+        "resourceName": "authorization/roles/permroles",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5556",
+        "permissionId": "1-_concepts_*_workflow_undeprecate-CRUDL",
+        "resourceName": "/concepts/*/workflow/undeprecate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6069",
+        "permissionId": "1-_movements_*_workflow_lock-CRUDL",
+        "resourceName": "/movements/*/workflow/lock",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6105",
+        "permissionId": "1-_vocabularyitems_*_workflow_delete-CRUDL",
+        "resourceName": "/vocabularyitems/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3041",
+        "permissionId": "1-authorization_roles-CRUDL",
+        "resourceName": "authorization/roles",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3044",
+        "permissionId": "1-accounts_accountroles-CRUDL",
+        "resourceName": "accounts/accountroles",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3016",
+        "permissionId": "1-placeauthorities-CRUDL",
+        "resourceName": "placeauthorities",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5592",
+        "permissionId": "1-_concepts_*_workflow_replicate-CRUDL",
+        "resourceName": "/concepts/*/workflow/replicate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5880",
+        "permissionId": "1-_organizations_*_workflow_delete-CRUDL",
+        "resourceName": "/organizations/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6123",
+        "permissionId": "1-_vocabularyitems_*_workflow_replicate-CRUDL",
+        "resourceName": "/vocabularyitems/*/workflow/replicate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "2999",
+        "permissionId": "1-conceptauthorities-CRUDL",
+        "resourceName": "conceptauthorities",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6438",
+        "permissionId": "1-_relations_*_workflow_undelete-CRUDL",
+        "resourceName": "/relations/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6492",
+        "permissionId": "1-_contacts_*_workflow_delete-CRUDL",
+        "resourceName": "/contacts/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6213",
+        "permissionId": "1-_works_*_workflow_delete-CRUDL",
+        "resourceName": "/works/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5673",
+        "permissionId": "1-_persons_*_workflow_deprecate-CRUDL",
+        "resourceName": "/persons/*/workflow/deprecate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6276",
+        "permissionId": "1-_intakes_*_workflow_undelete-CRUDL",
+        "resourceName": "/intakes/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3021",
+        "permissionId": "1-citationauthorities-CRUDL",
+        "resourceName": "citationauthorities",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5682",
+        "permissionId": "1-_persons_*_workflow_delete-CRUDL",
+        "resourceName": "/persons/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5727",
+        "permissionId": "1-_personauthorities_*_workflow_deprecate-CRUDL",
+        "resourceName": "/personauthorities/*/workflow/deprecate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5664",
+        "permissionId": "1-_persons_*_workflow_undeprecate-CRUDL",
+        "resourceName": "/persons/*/workflow/undeprecate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6087",
+        "permissionId": "1-_vocabularyitems_*_workflow_undeprecate-CRUDL",
+        "resourceName": "/vocabularyitems/*/workflow/undeprecate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3012",
+        "permissionId": "1-movements-CRUDL",
+        "resourceName": "movements",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6339",
+        "permissionId": "1-_valuationcontrols_*_workflow_delete-CRUDL",
+        "resourceName": "/valuationcontrols/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6384",
+        "permissionId": "1-_blobs_*_workflow_undelete-CRUDL",
+        "resourceName": "/blobs/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5790",
+        "permissionId": "1-_locationauthorities_*_workflow_delete-CRUDL",
+        "resourceName": "/locationauthorities/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6024",
+        "permissionId": "1-_vocabularies_*_workflow_replicate-CRUDL",
+        "resourceName": "/vocabularies/*/workflow/replicate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5754",
+        "permissionId": "1-_personauthorities_*_workflow_replicate-CRUDL",
+        "resourceName": "/personauthorities/*/workflow/replicate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6060",
+        "permissionId": "1-_movements_*_workflow_delete-CRUDL",
+        "resourceName": "/movements/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3027",
+        "permissionId": "1-idgenerators-CRUDL",
+        "resourceName": "idgenerators",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5817",
+        "permissionId": "1-_loansout_*_workflow_undelete-CRUDL",
+        "resourceName": "/loansout/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3015",
+        "permissionId": "1-places-CRUDL",
+        "resourceName": "places",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6231",
+        "permissionId": "1-_workauthorities_*_workflow_delete-CRUDL",
+        "resourceName": "/workauthorities/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5700",
+        "permissionId": "1-_persons_*_workflow_replicate-CRUDL",
+        "resourceName": "/persons/*/workflow/replicate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6249",
+        "permissionId": "1-_citations_*_workflow_delete-CRUDL",
+        "resourceName": "/citations/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6330",
+        "permissionId": "1-_valuationcontrols_*_workflow_undelete-CRUDL",
+        "resourceName": "/valuationcontrols/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3025",
+        "permissionId": "1-valuationcontrols-CRUDL",
+        "resourceName": "valuationcontrols",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3038",
+        "permissionId": "1-dimensions-CRUDL",
+        "resourceName": "dimensions",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6474",
+        "permissionId": "1-_dimensions_*_workflow_lock-CRUDL",
+        "resourceName": "/dimensions/*/workflow/lock",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3034",
+        "permissionId": "1-workflow-CRUDL",
+        "resourceName": "workflow",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6033",
+        "permissionId": "1-_conservation_*_workflow_undelete-CRUDL",
+        "resourceName": "/conservation/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6321",
+        "permissionId": "1-_groups_*_workflow_delete-CRUDL",
+        "resourceName": "/groups/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3020",
+        "permissionId": "1-citations-CRUDL",
+        "resourceName": "citations",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3022",
+        "permissionId": "1-intakes-CRUDL",
+        "resourceName": "intakes",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5952",
+        "permissionId": "1-_orgauthorities_*_workflow_replicate-CRUDL",
+        "resourceName": "/orgauthorities/*/workflow/replicate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3031",
+        "permissionId": "1-blobs-CRUDL",
+        "resourceName": "blobs",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3039",
+        "permissionId": "1-_dimensions_workflow_-CRUDL",
+        "resourceName": "/dimensions/workflow/",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3017",
+        "permissionId": "1-objectexit-CRUDL",
+        "resourceName": "objectexit",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6312",
+        "permissionId": "1-_groups_*_workflow_undelete-CRUDL",
+        "resourceName": "/groups/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3024",
+        "permissionId": "1-groups-CRUDL",
+        "resourceName": "groups",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5565",
+        "permissionId": "1-_concepts_*_workflow_deprecate-CRUDL",
+        "resourceName": "/concepts/*/workflow/deprecate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3005",
+        "permissionId": "1-loansout-CRUDL",
+        "resourceName": "loansout",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6402",
+        "permissionId": "1-_batch_*_workflow_undelete-CRUDL",
+        "resourceName": "/batch/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6375",
+        "permissionId": "1-_publicitems_*_workflow_delete-CRUDL",
+        "resourceName": "/publicitems/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3037",
+        "permissionId": "1-relations-CRUDL",
+        "resourceName": "relations",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5799",
+        "permissionId": "1-_loansin_*_workflow_undelete-CRUDL",
+        "resourceName": "/loansin/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5871",
+        "permissionId": "1-_organizations_*_workflow_deprecate-CRUDL",
+        "resourceName": "/organizations/*/workflow/deprecate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6447",
+        "permissionId": "1-_relations_*_workflow_delete-CRUDL",
+        "resourceName": "/relations/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6195",
+        "permissionId": "1-_objectexit_*_workflow_delete-CRUDL",
+        "resourceName": "/objectexit/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6204",
+        "permissionId": "1-_works_*_workflow_undelete-CRUDL",
+        "resourceName": "/works/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3018",
+        "permissionId": "1-works-CRUDL",
+        "resourceName": "works",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5736",
+        "permissionId": "1-_personauthorities_*_workflow_delete-CRUDL",
+        "resourceName": "/personauthorities/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "2997",
+        "permissionId": "1-accounts-CRUDL",
+        "resourceName": "accounts",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3007",
+        "permissionId": "1-organizations-CRUDL",
+        "resourceName": "organizations",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5898",
+        "permissionId": "1-_organizations_*_workflow_replicate-CRUDL",
+        "resourceName": "/organizations/*/workflow/replicate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5763",
+        "permissionId": "1-_locations_*_workflow_undelete-CRUDL",
+        "resourceName": "/locations/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3006",
+        "permissionId": "1-acquisitions-CRUDL",
+        "resourceName": "acquisitions",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5961",
+        "permissionId": "1-_collectionobjects_*_workflow_undelete-CRUDL",
+        "resourceName": "/collectionobjects/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6465",
+        "permissionId": "1-_dimensions_*_workflow_delete-CRUDL",
+        "resourceName": "/dimensions/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3011",
+        "permissionId": "1-conservation-CRUDL",
+        "resourceName": "conservation",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5943",
+        "permissionId": "1-_orgauthorities_*_workflow_unreplicate-CRUDL",
+        "resourceName": "/orgauthorities/*/workflow/unreplicate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5655",
+        "permissionId": "1-_persons_*_workflow_undelete-CRUDL",
+        "resourceName": "/persons/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3033",
+        "permissionId": "1-imports-CRUDL",
+        "resourceName": "imports",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5916",
+        "permissionId": "1-_orgauthorities_*_workflow_undeprecate-CRUDL",
+        "resourceName": "/orgauthorities/*/workflow/undeprecate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3009",
+        "permissionId": "1-collectionobjects-CRUDL",
+        "resourceName": "collectionobjects",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5646",
+        "permissionId": "1-_conceptauthorities_*_workflow_replicate-CRUDL",
+        "resourceName": "/conceptauthorities/*/workflow/replicate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5745",
+        "permissionId": "1-_personauthorities_*_workflow_unreplicate-CRUDL",
+        "resourceName": "/personauthorities/*/workflow/unreplicate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "2998",
+        "permissionId": "1-concepts-CRUDL",
+        "resourceName": "concepts",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6114",
+        "permissionId": "1-_vocabularyitems_*_workflow_unreplicate-CRUDL",
+        "resourceName": "/vocabularyitems/*/workflow/unreplicate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3008",
+        "permissionId": "1-orgauthorities-CRUDL",
+        "resourceName": "orgauthorities",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3013",
+        "permissionId": "1-vocabularyitems-CRUDL",
+        "resourceName": "vocabularyitems",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5583",
+        "permissionId": "1-_concepts_*_workflow_unreplicate-CRUDL",
+        "resourceName": "/concepts/*/workflow/unreplicate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6411",
+        "permissionId": "1-_batch_*_workflow_delete-CRUDL",
+        "resourceName": "/batch/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5907",
+        "permissionId": "1-_orgauthorities_*_workflow_undelete-CRUDL",
+        "resourceName": "/orgauthorities/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5925",
+        "permissionId": "1-_orgauthorities_*_workflow_deprecate-CRUDL",
+        "resourceName": "/orgauthorities/*/workflow/deprecate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6051",
+        "permissionId": "1-_movements_*_workflow_undelete-CRUDL",
+        "resourceName": "/movements/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3040",
+        "permissionId": "1-contacts-CRUDL",
+        "resourceName": "contacts",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6483",
+        "permissionId": "1-_contacts_*_workflow_undelete-CRUDL",
+        "resourceName": "/contacts/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6258",
+        "permissionId": "1-_citationauthorities_*_workflow_undelete-CRUDL",
+        "resourceName": "/citationauthorities/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3003",
+        "permissionId": "1-locationauthorities-CRUDL",
+        "resourceName": "locationauthorities",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6348",
+        "permissionId": "1-_media_*_workflow_undelete-CRUDL",
+        "resourceName": "/media/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6240",
+        "permissionId": "1-_citations_*_workflow_undelete-CRUDL",
+        "resourceName": "/citations/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3026",
+        "permissionId": "1-media-CRUDL",
+        "resourceName": "media",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3000",
+        "permissionId": "1-persons-CRUDL",
+        "resourceName": "persons",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5970",
+        "permissionId": "1-_collectionobjects_*_workflow_delete-CRUDL",
+        "resourceName": "/collectionobjects/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3029",
+        "permissionId": "1-publicitems-CRUDL",
+        "resourceName": "publicitems",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6042",
+        "permissionId": "1-_conservation_*_workflow_delete-CRUDL",
+        "resourceName": "/conservation/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6177",
+        "permissionId": "1-_placeauthorities_*_workflow_delete-CRUDL",
+        "resourceName": "/placeauthorities/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3002",
+        "permissionId": "1-locations-CRUDL",
+        "resourceName": "locations",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6303",
+        "permissionId": "1-_conditionchecks_*_workflow_delete-CRUDL",
+        "resourceName": "/conditionchecks/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5610",
+        "permissionId": "1-_conceptauthorities_*_workflow_undeprecate-CRUDL",
+        "resourceName": "/conceptauthorities/*/workflow/undeprecate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5628",
+        "permissionId": "1-_conceptauthorities_*_workflow_delete-CRUDL",
+        "resourceName": "/conceptauthorities/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5709",
+        "permissionId": "1-_personauthorities_*_workflow_undelete-CRUDL",
+        "resourceName": "/personauthorities/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3019",
+        "permissionId": "1-workauthorities-CRUDL",
+        "resourceName": "workauthorities",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5997",
+        "permissionId": "1-_vocabularies_*_workflow_deprecate-CRUDL",
+        "resourceName": "/vocabularies/*/workflow/deprecate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6429",
+        "permissionId": "1-_reports_*_workflow_delete-CRUDL",
+        "resourceName": "/reports/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6456",
+        "permissionId": "1-_dimensions_*_workflow_undelete-CRUDL",
+        "resourceName": "/dimensions/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5844",
+        "permissionId": "1-_acquisitions_*_workflow_delete-CRUDL",
+        "resourceName": "/acquisitions/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5718",
+        "permissionId": "1-_personauthorities_*_workflow_undeprecate-CRUDL",
+        "resourceName": "/personauthorities/*/workflow/undeprecate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6132",
+        "permissionId": "1-_exhibitions_*_workflow_undelete-CRUDL",
+        "resourceName": "/exhibitions/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6393",
+        "permissionId": "1-_blobs_*_workflow_delete-CRUDL",
+        "resourceName": "/blobs/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6285",
+        "permissionId": "1-_intakes_*_workflow_delete-CRUDL",
+        "resourceName": "/intakes/*/workflow/delete",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "3023",
+        "permissionId": "1-conditionchecks-CRUDL",
+        "resourceName": "conditionchecks",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "5862",
+        "permissionId": "1-_organizations_*_workflow_undeprecate-CRUDL",
+        "resourceName": "/organizations/*/workflow/undeprecate",
+        "actionGroup": "CRUDL"
+      },
+      {
+        "permRelationshipId": "6294",
+        "permissionId": "1-_conditionchecks_*_workflow_undelete-CRUDL",
+        "resourceName": "/conditionchecks/*/workflow/undelete",
+        "actionGroup": "CRUDL"
+      }
+    ]
+  }
+}

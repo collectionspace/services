@@ -90,7 +90,32 @@
 		<filter-name>CSpaceFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
+
+    <!--
+        A filter that converts JSON requests to XML.
+    -->
+    <filter>
+        <filter-name>JsonToXmlFilter</filter-name>
+        <filter-class>org.collectionspace.services.common.xmljson.JsonToXmlFilter</filter-class>
+    </filter>
     
+    <filter-mapping>
+        <filter-name>JsonToXmlFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
+    <!--
+        A filter that converts XML responses to JSON if needed.
+    -->
+    <filter>
+        <filter-name>XmlToJsonFilter</filter-name>
+        <filter-class>org.collectionspace.services.common.xmljson.XmlToJsonFilter</filter-class>
+    </filter>
+    
+    <filter-mapping>
+        <filter-name>XmlToJsonFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
     <!--
     	***
