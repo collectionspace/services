@@ -17,6 +17,9 @@ public class RequestUtilsTest {
     public void testIsJsonContent() {
         assertFalse(isJsonContent(requestWithContentType(null)));
         assertFalse(isJsonContent(requestWithContentType("application/xml")));
+        assertFalse(isJsonContent(requestWithContentType("application/xml;charset=utf-8")));
+        assertFalse(isJsonContent(requestWithContentType("application/*")));
+        assertFalse(isJsonContent(requestWithContentType("*/*")));
         assertTrue(isJsonContent(requestWithContentType("application/json")));
         assertTrue(isJsonContent(requestWithContentType("application/json;charset=utf-8")));
     }

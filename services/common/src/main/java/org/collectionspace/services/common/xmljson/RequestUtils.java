@@ -30,7 +30,12 @@ public class RequestUtils {
             return false;
         }
         
-        return MediaType.APPLICATION_JSON_TYPE.isCompatible(MediaType.valueOf(contentType));
+        MediaType contentMediaType = MediaType.valueOf(contentType);
+            
+        return (
+            !contentMediaType.isWildcardType() 
+            && !contentMediaType.isWildcardSubtype()
+            && MediaType.APPLICATION_JSON_TYPE.isCompatible(contentMediaType));
     }
     
     /**
