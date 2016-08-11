@@ -24,7 +24,13 @@ public class RequestUtils {
      * @return true if the request contains JSON content, false otherwise
      */
     public static boolean isJsonContent(HttpServletRequest request) {
-        return StringUtils.equals(request.getContentType(), MediaType.APPLICATION_JSON);
+        String contentType = request.getContentType();
+        
+        if (contentType == null) {
+            return false;
+        }
+        
+        return MediaType.APPLICATION_JSON_TYPE.isCompatible(MediaType.valueOf(contentType));
     }
     
     /**

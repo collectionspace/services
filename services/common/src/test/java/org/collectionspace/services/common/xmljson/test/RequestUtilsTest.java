@@ -18,6 +18,7 @@ public class RequestUtilsTest {
         assertFalse(isJsonContent(requestWithContentType(null)));
         assertFalse(isJsonContent(requestWithContentType("application/xml")));
         assertTrue(isJsonContent(requestWithContentType("application/json")));
+        assertTrue(isJsonContent(requestWithContentType("application/json;charset=utf-8")));
     }
     
     @Test
