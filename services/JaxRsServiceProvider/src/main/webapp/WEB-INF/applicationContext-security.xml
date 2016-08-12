@@ -13,19 +13,30 @@
        xmlns:sec="http://www.springframework.org/schema/security"
        xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
        xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
        http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2.xsd
-       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <!--
-        debugging tips : enable following categories in
-        $JBOSS_HOME/server/cspace/conf/jboss-log4j.xml to priority DEBUG
-        org.apache.catalina.core
-        org.springframework.security
-    -->
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <!-- Read properties from security.properties file in the classpath. -->
+        <!-- Values in the file override the defaults set below. -->
+        <property name="locations" value="classpath:security.properties" />
 
+        <!-- Default property values. -->
+        <property name="properties">
+            <props>
+                <prop key="cors.allowed.origins"></prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- Convert string properties to complex types. -->
+    <bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean" />
+    
     <!-- Require client id and client secret via basic auth when granting tokens (https://tools.ietf.org/html/rfc6749#section-4.3.2).
          Note that public (https://tools.ietf.org/html/rfc6749#section-2.1) clients, such as the CSpace web UI, may supply a
          blank or publicly known "secret." The clientAuthenticationManager bean handles this client authentication. -->
@@ -35,6 +46,10 @@
         <sec:anonymous enabled="false"/>
         <sec:csrf disabled="true"/>
         <sec:access-denied-handler ref="oauthAccessDeniedHandler"/>
+        
+        <!-- Handle CORS (preflight OPTIONS requests must be anonymous) -->
+        <sec:intercept-url method="OPTIONS" pattern="/oauth/token/**" access="isAnonymous()"/>
+        <sec:cors configuration-source-ref="corsSource" />
     </sec:http>
 
     <!-- Exclude the resource path to public items' content from AuthN and AuthZ.  Lets us publish resources with anonymous access. -->
@@ -45,6 +60,10 @@
         <sec:intercept-url pattern="/**" access="isFullyAuthenticated()" />
         <sec:http-basic />
         <sec:csrf disabled="true" />
+        
+        <!-- Handle CORS (preflight OPTIONS requests must be anonymous) -->
+        <sec:intercept-url method="OPTIONS" pattern="/**" access="isAnonymous()"/>
+        <sec:cors configuration-source-ref="corsSource" />
         
         <!-- Handle token auth -->
         <sec:custom-filter ref="oauthResourceServerFilter" before="PRE_AUTH_FILTER" />
@@ -138,6 +157,39 @@
                     </bean>
                 </property>
             </bean>
+        </property>
+    </bean>
+    
+    <bean id="corsSource" class="org.springframework.web.cors.UrlBasedCorsConfigurationSource">
+        <property name="corsConfigurations">
+            <util:map>
+                <entry key="/**">
+                    <bean class="org.springframework.web.cors.CorsConfiguration">
+                        <property name="allowCredentials" value="true" />
+                        <property name="allowedHeaders">
+                            <list>
+                                <value>Authorization</value>
+                                <value>Content-Type</value>
+                            </list>
+                        </property>
+                        <property name="allowedMethods">
+                            <list>
+                                <value>POST</value>
+                                <value>GET</value>
+                                <value>PUT</value>
+                                <value>DELETE</value>
+                            </list>
+                        </property>
+                        <property name="allowedOrigins" value="${cors.allowed.origins}" />
+                        <property name="exposedHeaders">
+                            <list>
+                                <value>Location</value>
+                            </list>
+                        </property>
+                        <property name="maxAge" value="86400" />
+                    </bean>
+                </entry>
+            </util:map>
         </property>
     </bean>
 </beans>
