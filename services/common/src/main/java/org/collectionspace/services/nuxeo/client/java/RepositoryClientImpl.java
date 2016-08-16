@@ -1621,6 +1621,11 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
                 ((DocumentModelHandler) handler).setRepositorySession(repoSession);
                 if (handler.handle(Action.DELETE, wrapDoc)) {
                 	repoSession.removeDocument(docRef);
+                	if (logger.isDebugEnabled()) {
+                		String msg = String.format("DELETE - User '%s' hard-deleted document CSID=%s of type %s.",
+                				ctx.getUserId(), id, ctx.getDocumentType());
+                		logger.debug(msg);
+                	}
                 } else {
                 	result = false; // delete failed for some reason
                 }
