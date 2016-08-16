@@ -24,6 +24,7 @@
     <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
         <!-- Read properties from security.properties file in the classpath. -->
         <!-- Values in the file override the defaults set below. -->
+        <property name="ignoreResourceNotFound" value="true" />
         <property name="locations" value="classpath:security.properties" />
 
         <!-- Default property values. -->
