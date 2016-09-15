@@ -37,7 +37,7 @@
     <target name="package-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="package" />
             <arg value="-Dmaven.test.skip=true" />
             <arg value="-f" />
@@ -62,7 +62,7 @@
     <target name="install-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="install" />
             <arg value="-Dmaven.test.skip=true" />
             <arg value="-f" />
@@ -85,7 +85,7 @@
     <target name="clean-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="clean" />
             <arg value="${mvn.opts}" />
         </exec>
@@ -101,7 +101,7 @@
     <target name="test-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="test" />
             <arg value="${mvn.opts}" />
         </exec>
@@ -122,7 +122,7 @@
     <target name="import-windows" if="osfamily-windows" depends="setup_hibernate.cfg">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" /> <!-- To debug, change command here to be 'mvnDebug.bat' -->
+            <arg value="mvn" /> <!-- To debug, change command here to be 'mvnDebug.bat' -->
             <arg value="exec:java" />
             <arg value="-f" />
             <arg value="${basedir}/pom.xml" />

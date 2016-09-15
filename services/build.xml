@@ -33,7 +33,7 @@
     <target name="package-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="package" />
             <arg value="-Dmaven.test.skip=true" />
             <arg value="-f" />
@@ -59,7 +59,7 @@
     <target name="install-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="install" />
             <arg value="-Dmaven.test.skip=true" />
             <arg value="-f" />
@@ -82,7 +82,7 @@
     <target name="clean-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="clean" />
             <arg value="${mvn.opts}" />
         </exec>
@@ -98,7 +98,7 @@
     <target name="test-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="test" />
             <arg value="${mvn.opts}" />
         </exec>
@@ -118,7 +118,7 @@
     <target name="doc-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="javadoc:aggregate" />
             <arg value="${mvn.opts}" />
         </exec>
@@ -229,7 +229,7 @@
         <ant antfile="intake/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="imports/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="group/build.xml" target="undeploy" inheritAll="false"/>
-        <ant antfile="servicegroup/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="servicegroup/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="collectionobject/build.xml" target="undeploy" inheritAll="false"/>
     	<!--
         <ant antfile="note/build.xml" target="undeploy" inheritAll="false"/>
@@ -266,7 +266,7 @@
         <ant antfile="relation/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="id/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="collectionobject/build.xml" target="dist" inheritAll="false"/>
-        <ant antfile="servicegroup/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="servicegroup/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="group/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="loanin/build.xml" target="dist" inheritAll="false"/>

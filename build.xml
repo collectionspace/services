@@ -113,7 +113,7 @@
 	<target name="package-windows" if="osfamily-windows">
 		<exec executable="cmd" failonerror="true">
 			<arg value="/c" />
-			<arg value="mvn.bat" />
+			<arg value="mvn" />
 			<arg value="package" />
 			<arg value="-Dmaven.test.skip=true" />
 			<arg value="-f" />
@@ -137,7 +137,7 @@
 	<target name="install-windows" if="osfamily-windows">
 		<exec executable="cmd" failonerror="true">
 			<arg value="/c" />
-			<arg value="mvn.bat" />
+			<arg value="mvn" />
 			<arg value="install" />
 			<arg value="-Dmaven.test.skip=true" />
 			<arg value="-f" />
@@ -160,7 +160,7 @@
 	<target name="clean-windows" if="osfamily-windows">
 		<exec executable="cmd" failonerror="true">
 			<arg value="/c" />
-			<arg value="mvn.bat" />
+			<arg value="mvn" />
 			<arg value="clean" />
 			<arg value="${mvn.opts}" />
 		</exec>
@@ -176,7 +176,7 @@
 	<target name="test-windows" if="osfamily-windows">
 		<exec executable="cmd" failonerror="true">
 			<arg value="/c" />
-			<arg value="mvn.bat" />
+			<arg value="mvn" />
 			<arg value="test" />
 			<arg value="${mvn.opts}" />
 		</exec>
@@ -245,7 +245,7 @@
 	<target name="create_db-windows" if="osfamily-windows">
 		<exec executable="cmd" failonerror="true">
 			<arg value="/c" />
-			<arg value="mvn.bat" />
+			<arg value="mvn" />
 			<arg value="validate" /> <!-- Ensure proper env vars are set -->
 			<arg value="${mvn.opts}" />
 		</exec>
@@ -347,7 +347,7 @@
 	<target name="eclipse-windows" if="osfamily-windows">
 		<exec executable="cmd" failonerror="true">
 			<arg value="/c" />
-			<arg value="mvn.bat" />
+			<arg value="mvn" />
 			<arg value="eclipse:clean" />
 			<arg value="eclipse:eclipse" />
 			<arg value="${mvn.opts}" />
