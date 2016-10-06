@@ -50,7 +50,6 @@ import org.nuxeo.ecm.core.event.EventService;
 import org.nuxeo.ecm.core.query.QueryFilter;
 import org.nuxeo.ecm.core.query.sql.NXQL;
 import org.nuxeo.ecm.core.storage.FulltextConfiguration;
-import org.nuxeo.ecm.core.storage.StorageException;
 import org.nuxeo.ecm.core.storage.sql.Model;
 import org.nuxeo.ecm.core.storage.sql.Node;
 import org.nuxeo.ecm.core.storage.sql.Session;
@@ -99,7 +98,7 @@ public class ReindexFulltextRoot {
     }
 
     @GET
-    public String get(@QueryParam("batchSize") int batchSize, @QueryParam("batch") int batch) throws StorageException {
+    public String get(@QueryParam("batchSize") int batchSize, @QueryParam("batch") int batch) throws NuxeoException {
         coreSession = SessionFactory.getSession(request);
         return reindexFulltext(batchSize, batch, null);
     }
@@ -113,7 +112,7 @@ public class ReindexFulltextRoot {
      * @return when done, ok + the total number of docs
      * @throws StorageException 
      */
-    public String reindexFulltext(int batchSize, int batch, String query) throws StorageException {
+    public String reindexFulltext(int batchSize, int batch, String query) throws NuxeoException {
         Principal principal = coreSession.getPrincipal();
         if (!(principal instanceof NuxeoPrincipal)) {
             return "unauthorized";
@@ -201,7 +200,7 @@ public class ReindexFulltextRoot {
      * This has to be called once the transaction has been started.
      * @throws StorageException 
      */
-    protected void getLowLevelSession() throws StorageException {
+    protected void getLowLevelSession() throws NuxeoException {
         try {
             SQLSession s = (SQLSession) ((AbstractSession) coreSession).getSession();
             Field f2 = SQLSession.class.getDeclaredField("session");
@@ -213,7 +212,7 @@ public class ReindexFulltextRoot {
         }
     }
 
-    protected List<ReindexInfo> getInfos(String query) throws StorageException {
+    protected List<ReindexInfo> getInfos(String query) throws NuxeoException {
         getLowLevelSession();
         List<ReindexInfo> infos = new ArrayList<ReindexInfo>();
         IterableQueryResult it = session.queryAndFetch(query, NXQL.NXQL,
@@ -230,7 +229,7 @@ public class ReindexFulltextRoot {
         return infos;
     }
 
-    protected void doBatch(List<ReindexInfo> infos) throws StorageException {
+    protected void doBatch(List<ReindexInfo> infos) throws NuxeoException {
         boolean tx;
         boolean ok;
 
@@ -272,7 +271,7 @@ public class ReindexFulltextRoot {
      * things like versions which aren't usually modifiable, and it's also good
      * to bypass all listeners.
      */
-    protected void runSyncBatch(List<Serializable> ids, Set<String> asyncIds) throws StorageException {
+    protected void runSyncBatch(List<Serializable> ids, Set<String> asyncIds) throws NuxeoException {
         getLowLevelSession();
 
         session.getNodesByIds(ids); // batch fetch

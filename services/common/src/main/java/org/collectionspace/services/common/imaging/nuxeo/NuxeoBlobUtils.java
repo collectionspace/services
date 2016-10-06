@@ -55,7 +55,6 @@ import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.blobholder.BlobHolder;
 import org.nuxeo.ecm.core.api.blobholder.DocumentBlobHolder;
 import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
-import org.nuxeo.ecm.core.api.impl.blob.InputStreamBlob;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -646,7 +645,7 @@ public class NuxeoBlobUtils {
 			DocumentRef nuxeoWspace = new IdRef(nuxeoWspaceId);
 			DocumentModel blobLocation = repoSession.getDocument(nuxeoWspace);
 			
-			Blob inputStreamBlob = new InputStreamBlob(inputStream);
+			Blob inputStreamBlob = new FileBlob(inputStream); // creates a temp file to hold the stream
 			DocumentModel documentModel = createDocumentFromBlob(
 					repoSession,
 		            inputStreamBlob, 

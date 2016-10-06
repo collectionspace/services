@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.AuthorityClient;
-import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.api.Tools;
@@ -25,7 +24,6 @@ import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.common.document.DocumentException;
 
 //import org.dom4j.DocumentException;
-import org.eclipse.jetty.http.HttpStatus;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,7 +122,7 @@ public class AuthorityServiceUtils {
         Response res = client.read(specifier.getURNValue());
         try {
 	        int statusCode = res.getStatus();
-	        if (statusCode == HttpStatus.OK_200) {
+	        if (statusCode == org.apache.commons.httpclient.HttpStatus.SC_OK) {
 	            result = new PoxPayloadIn((String)res.readEntity(responseType)); // Get the entire response!	        	        	
 	        } else {
 	        	String errMsg = String.format("Could not retrieve authority information for '%s' on remote server '%s'.  Server returned status code %d",
@@ -160,7 +158,7 @@ public class AuthorityServiceUtils {
         
         try {
 	        int statusCode = res.getStatus();
-	        if (statusCode == HttpStatus.OK_200) {
+	        if (statusCode == org.apache.commons.httpclient.HttpStatus.SC_OK) {
 	            result = new PoxPayloadIn((String)res.readEntity(responseType)); // Get the entire response.
 	        } else {
 	        	String errMsg = String.format("Could not retrieve authority item information for '%s:%s' on remote server '%s'.  Server returned status code %d",

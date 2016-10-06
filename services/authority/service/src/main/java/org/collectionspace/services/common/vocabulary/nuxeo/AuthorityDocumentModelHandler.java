@@ -30,6 +30,7 @@ import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.PayloadInputPart;
@@ -64,7 +65,6 @@ import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.dom4j.Element;
-import org.eclipse.jetty.http.HttpStatus;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
@@ -497,7 +497,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     private void assertStatusCode(Response res, Specifier specifier, AuthorityClient client) throws Exception {
         int statusCode = res.getStatus();
 
-    	if (statusCode != HttpStatus.OK_200) {
+    	if (statusCode != HttpStatus.SC_OK) {
         	String errMsg = String.format("Could not retrieve authority information for '%s' on remote server '%s'.  Server returned status code %d",
         			specifier.getURNValue(), client.getBaseURL(), statusCode);
 	        throw new DocumentException(statusCode, errMsg);

@@ -23,8 +23,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
@@ -34,7 +32,6 @@ import org.collectionspace.services.config.service.InitHandler.Params.Field;
 import org.collectionspace.services.config.service.InitHandler.Params.Property;
 import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.config.service.ServiceBindingType;
-import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,13 +99,12 @@ public class AddIndices extends InitHandler implements IInitHandler {
     		List<Field> fields, 
     		List<Property> properties) throws Exception {
         //todo: all post-init tasks for services, or delegate to services that override.
-        int rows = 0;
-        String sql = "";
         if (logger.isInfoEnabled() && sbt != null) {
             logger.info("Creating indicies, as needed, for designated fields in " + sbt.getName()
                     + " for repository domain " + sbt.getRepositoryDomain().trim() + "...");
         }
 
+        int rows = 0;
         for (Field field : fields) {
             String tableName = field.getTable();
             String fieldName = field.getCol();
@@ -122,6 +118,11 @@ public class AddIndices extends InitHandler implements IInitHandler {
                 rows = addOneIndex(dataSourceName, repositoryName, cspaceInstanceId, tableName, fieldName);
             }
         }
+        
+        if (logger.isDebugEnabled()) {
+        	logger.debug(String.format("Rows indexed during repository initialization is %d.", rows));
+        }
+        
         //
         // Add a uniqueness constraint on the short ID field of authority and authority item tables
         //
@@ -177,7 +178,6 @@ public class AddIndices extends InitHandler implements IInitHandler {
             	result = true;
             }
         } catch (Exception e) {
-        	String errorMsg = e.getLocalizedMessage();
             logger.error(String.format("Error when identifying whether constraint on column '%s' exists in table '%s': %s",
             		SHORT_ID, tableName, e != null ? e : "Unknown error."));
             throw e; // rethrow it.
@@ -267,7 +267,7 @@ public class AddIndices extends InitHandler implements IInitHandler {
             logger.error(String.format("*** ERROR *** Encountered problems when trying to create a uniqueness constraint on column '%s' of table '%s' in repository '%s'.", 
             		SHORT_ID, tableName, repositoryName));
         } else {
-        	Log.debug(String.format("Created a uniqueness constraint on column '%s' of table '%s' in repository '%s'.", 
+        	logger.debug(String.format("Created a uniqueness constraint on column '%s' of table '%s' in repository '%s'.", 
             		SHORT_ID, tableName, repositoryName));
         }
     	

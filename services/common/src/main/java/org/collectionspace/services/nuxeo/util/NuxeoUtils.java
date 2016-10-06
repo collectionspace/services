@@ -54,10 +54,8 @@ import org.collectionspace.services.lifecycle.TransitionDefList;
 import org.collectionspace.services.lifecycle.TransitionList;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentException;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
-
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
-import org.mortbay.log.Log;
 import org.nuxeo.ecm.core.NXCore;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -66,8 +64,8 @@ import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.PathRef;
-import org.nuxeo.ecm.core.api.impl.blob.BlobWrapper;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.io.DocumentPipe;
 import org.nuxeo.ecm.core.io.DocumentReader;
@@ -77,9 +75,6 @@ import org.nuxeo.ecm.core.io.impl.plugins.SingleDocumentReader;
 import org.nuxeo.ecm.core.io.impl.plugins.XMLDocumentWriter;
 import org.nuxeo.ecm.core.lifecycle.LifeCycleService;
 import org.nuxeo.ecm.core.schema.SchemaManager;
-import org.nuxeo.ecm.core.storage.StorageBlob;
-import org.nuxeo.ecm.core.storage.binary.Binary;
-import org.nuxeo.ecm.core.storage.sql.coremodel.SQLBlob;
 import org.nuxeo.runtime.api.Framework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,38 +108,8 @@ public class NuxeoUtils {
      */
     private static File getFileOfBlob(Blob blob) {
     	File result = null;
-    	
-    	if (blob instanceof BlobWrapper) {
-    		BlobWrapper blobWrapper = (BlobWrapper)blob;
-			try {
-				Field blobField;
-				blobField = blobWrapper.getClass().getDeclaredField("blob");
-				boolean accessibleState = blobField.isAccessible();
-				if (accessibleState == false) {
-					blobField.setAccessible(true);
-				}
-    			blob = (StorageBlob)blobField.get(blobWrapper);
-    			blobField.setAccessible(accessibleState); // set it back to its original access state				
-			} catch (Exception e) {
-				logger.error("blob field of BlobWrapper is not accessible.", e);
-			}
-    	}
-    	
-    	if (blob instanceof StorageBlob) {
-    		StorageBlob sqlBlob = (StorageBlob)blob;
-    		Binary binary = sqlBlob.getBinary();
-    		try {
-    			Field fileField = binary.getClass().getDeclaredField("file");
-    			boolean accessibleState = fileField.isAccessible();
-    			if (accessibleState == false) {
-    				fileField.setAccessible(true);
-    			}
-    			result = (File)fileField.get(binary);
-    			fileField.setAccessible(accessibleState); // set it back to its original access state
-    		} catch (Exception e) {
-    			logger.error("Was not able to find the 'file' field", e);
-    		}    		
-    	}
+    	    	
+    	result = blob.getFile();
     	
     	return result;
     }
@@ -311,7 +276,7 @@ public class NuxeoUtils {
     	Exception deleteException = null;
     	try {
 			java.nio.file.Files.delete(fileToDelete.toPath());
-			Log.debug(String.format("Deleted file '%s'.", fileToDelete.getCanonicalPath()));
+			logger.debug(String.format("Deleted file '%s'.", fileToDelete.getCanonicalPath()));
 		} catch (IOException e) {
 			deleteException = e;
 			result = false;
@@ -1059,7 +1024,7 @@ public class NuxeoUtils {
 				returnVal = DocumentUtils.propertyValueAsString(value, docModel, xpath);
 			}
 			result = returnVal;
-		} catch (ClientException ce) {
+		} catch (NuxeoException ce) {
 			String msg = "Unknown Nuxeo client exception.";
 			if (ce instanceof PropertyException) {
 				msg = String.format("Problem retrieving property for xpath { %s } with CSID = %s.", xpath, targetCSID);

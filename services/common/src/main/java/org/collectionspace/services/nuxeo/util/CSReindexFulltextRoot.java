@@ -2,7 +2,7 @@ package org.collectionspace.services.nuxeo.util;
 
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.util.ReindexFulltextRoot;
-import org.nuxeo.ecm.core.storage.StorageException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +18,7 @@ public class CSReindexFulltextRoot extends ReindexFulltextRoot {
 		this.coreSession = repoSession.getCoreSession();
 	}
 
-    public String reindexFulltext(int batchSize, int batch, String query) throws StorageException {
+    public String reindexFulltext(int batchSize, int batch, String query) throws NuxeoException {
 		return super.reindexFulltext(batchSize, batch, query);
 	}
 }
