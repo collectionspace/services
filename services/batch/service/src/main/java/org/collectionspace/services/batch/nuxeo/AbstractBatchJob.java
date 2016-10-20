@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +54,8 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 
 	final Logger logger = LoggerFactory.getLogger(AbstractBatchJob.class);
 
+	private Map<String, String> authorityServiceNamesByDocType;
+	
 	public abstract void run();
 	
 	protected String getFieldXml(Map<String, String> fields, String fieldName) {
@@ -192,6 +195,30 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		return foundMovementCsid;
 	}
 
+	protected PoxPayloadOut findByUri(String uri) throws URISyntaxException, DocumentException {
+		PoxPayloadOut payload = null;
+		String[] uriParts = uri.split("/");
+		
+		if (uriParts.length == 3) {
+			String serviceName = uriParts[1];
+			String csid = uriParts[2];
+		
+			payload = findByCsid(serviceName, csid);
+		}
+		else if (uriParts.length == 5) {
+			String serviceName = uriParts[1];
+			String vocabularyCsid = uriParts[2];
+			String items = uriParts[3];
+			String csid = uriParts[4];
+			
+			if (items.equals("items")) {
+				payload = findAuthorityItemByCsid(serviceName, vocabularyCsid, csid);
+			}
+		}
+
+		return payload;
+	}
+
 	protected PoxPayloadOut findByCsid(String serviceName, String csid) throws URISyntaxException, DocumentException {
 		ResourceBase resource = getResourceMap().get(serviceName);
 		byte[] response = resource.get(null, createUriInfo(), csid);
@@ -303,6 +330,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		for (String vocabularyCsid : vocabularyCsids) {
 			logger.debug("vocabularyCsid=" + vocabularyCsid);
 			
+			// FIXME: This throws DocumentNotFoundException, so will never go to the next vocabulary
 			itemPayload = findAuthorityItemByCsid(serviceName, vocabularyCsid, csid);
 			
 			if (itemPayload != null) {
@@ -320,6 +348,25 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		PoxPayloadOut payload = new PoxPayloadOut(response);
 
 		return payload;
+	}
+	
+	protected String getAuthorityServiceNameForDocType(String authorityDocType) {
+		if (authorityServiceNamesByDocType == null) {
+			authorityServiceNamesByDocType = new HashMap<String, String>();
+			
+			for (String serviceName : getResourceMap().keySet()) {
+				ResourceBase resource = getResourceMap().get(serviceName);
+				
+				if (resource instanceof AuthorityResource) {
+					AuthorityResource<?, ?> authorityResource = (AuthorityResource<?, ?>) resource;
+					String docType = authorityResource.getItemDocType(getTenantId());
+					
+					authorityServiceNamesByDocType.put(docType, serviceName);
+				}
+			}
+		}
+		
+		return authorityServiceNamesByDocType.get(authorityDocType);
 	}
 	
 	protected PoxPayloadOut findTaxonByCsid(String csid) throws URISyntaxException, DocumentException {
@@ -352,15 +399,48 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		return findAuthorityItemByRefName(TaxonomyAuthorityClient.SERVICE_NAME, refName);
 	}
 	
+	protected List<AuthorityRefDocList.AuthorityRefDocItem> findReferencingFields(String serviceName, String parentCsid, String csid, String type, int pageNum, int pageSize) throws URISyntaxException {
+		logger.debug("findReferencingFields serviceName=" + serviceName + " parentCsid=" + parentCsid + " csid=" + csid + " type=" + type);
+
+		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
+		UriTemplateRegistry uriTemplateRegistry = ServiceMain.getInstance().getUriTemplateRegistry();
+
+		// The pageNum and pageSize params don't work right for the refobj request.
+		// More items than the pageSize might be returned, and the next page may
+		// contain repeats of items already returned on the previous page. Any
+		// code that uses this function should be aware of this.
+		
+		AuthorityRefDocList refDocList = resource.getReferencingObjects(parentCsid, csid, uriTemplateRegistry, createRefSearchFilterUriInfo(type, pageNum, pageSize));
+		
+		return refDocList.getAuthorityRefDocItem();
+	}
+
+	/**
+	 * Finds records that reference a given authority item. Soft-deleted records are not included.
+	 * 
+	 * @param serviceName The name of the authority service, e.g. "personauthorities"
+	 * @param parentCsid  The csid of the authority instance (aka vocabulary). This may be a guid or a urn,
+	 *                    e.g. "7a4981c4-77b7-433b-8086", "urn:cspace:name(person)"
+	 * @param csid        The csid of the authority item.
+	 * @param type        The meta-type of the referencing record, e.g. "object", "procedure", "authority".
+	 *                    The possible values are any of the ServiceBindingUtils.SERVICE_TYPE_* constants.
+	 *                    Only referencing records that are of the specified type are returned.
+	 *                    If null, all referencing records of type "object", "procedure", and "authority"
+	 *                    are returned.
+	 * @param sourceField The name of the source field in the referencing record,
+	 *                    e.g. "collectionobjects_common:fieldCollector".
+	 *                    Only records that reference the given item in the specified field are returned.
+	 *                    If null, returns records that reference the item in any field.
+	 * @return            A List containing the csids of referencing records.
+	 * @throws URISyntaxException
+	 */
 	protected List<String> findReferencingObjects(String serviceName, String parentCsid, String csid, String type, String sourceField) throws URISyntaxException {
 		logger.debug("findReferencingObjects serviceName=" + serviceName + " parentCsid=" + parentCsid + " csid=" + csid + " type=" + type + " sourceField=" + sourceField);
 
-		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
-        UriTemplateRegistry uriTemplateRegistry = ServiceMain.getInstance().getUriTemplateRegistry();
-		AuthorityRefDocList refDocList = resource.getReferencingObjects(parentCsid, csid, uriTemplateRegistry, createRefSearchFilterUriInfo(type));
+		List<AuthorityRefDocList.AuthorityRefDocItem> items = findReferencingFields(serviceName, parentCsid, csid, type, 0, 0);
 		List<String> csids = new ArrayList<String>();
 		
-		for (AuthorityRefDocList.AuthorityRefDocItem item : refDocList.getAuthorityRefDocItem()) {
+		for (AuthorityRefDocList.AuthorityRefDocItem item : items) {
 			/*
 			 *  If a multivalue field contains a reference to the object multiple times, the referencing object
 			 *  seems to get returned multiple times in the list, but only the first has a non-null workflow state.
@@ -374,7 +454,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 
 		return csids;
 	}
-
+	
 	protected List<String> findReferencingObjects(String serviceName, String csid, String type, String sourceField) throws URISyntaxException, DocumentException {
 		logger.debug("findReferencingObjects serviceName=" + serviceName + " csid=" + csid + " type=" + type + " sourceField=" + sourceField);
 
@@ -466,7 +546,17 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	}
 	
 	protected UriInfo createRefSearchFilterUriInfo(String type) throws URISyntaxException {
-		return createUriInfo("type=" + type + "&wf_deleted=false&pgSz=0");
+		return createRefSearchFilterUriInfo(type, 1, 0);
+	}
+
+	protected UriInfo createRefSearchFilterUriInfo(String type, int pageNum, int pageSize) throws URISyntaxException {
+		String queryString = "wf_deleted=false&pgSz=" + pageSize + "&pgNum=" + pageNum;
+		
+		if (type != null) {
+			queryString = "type=" + type + "&" + queryString;
+		}
+		
+		return createUriInfo(queryString);
 	}
 
 	protected UriInfo createPagedListUriInfo(String serviceName, int pageNum, int pageSize) throws URISyntaxException {
@@ -502,6 +592,22 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 			}
 		}
 
+		return value;
+	}
+	
+	protected String getFieldValue(PoxPayloadOut payload, String fieldPath) {
+		String value = null;
+
+		for (PayloadOutputPart part : payload.getParts()) {
+			Element element = part.asElement();
+			Node node = element.selectSingleNode(fieldPath);
+
+			if (node != null) {
+				value = node.getText();
+				break;
+			}
+		}
+		
 		return value;
 	}
 
@@ -542,7 +648,11 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		
 		return csid;
 	}
-	
+
+	protected String getRefName(PoxPayloadOut payload) {
+		return getFieldValue(payload, CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA, CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME);
+	}
+
 	protected class ResourceException extends Exception {
 		private static final long serialVersionUID = 1L;
 
