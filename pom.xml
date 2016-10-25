@@ -13,7 +13,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<cspace.services.version>4.5-SNAPSHOT</cspace.services.version>
 		<cspace.services.client.version>4.5-SNAPSHOT</cspace.services.client.version>
-		<nuxeo.general.release>7.10</nuxeo.general.release>
+		<nuxeo.general.release>7.10-HF17</nuxeo.general.release>
 		<nuxeo.shell.version>${nuxeo.general.release}</nuxeo.shell.version>
 		<nuxeo.platform.version>${nuxeo.general.release}</nuxeo.platform.version>
 		<nuxeo.core.version>${nuxeo.general.release}</nuxeo.core.version>
@@ -133,7 +133,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-
+		
 		<repository>
 			<id>public-snapshot</id>
 			<url>http://maven.nuxeo.org/public-snapshot</url>
@@ -158,6 +158,18 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
+
+		<repository>
+			<id>nightly-staging</id>
+			<name>nuxeo-nightly-staging</name>
+			<url>http://mavenin.nuxeo.com/nexus/content/repositories/nightly-staging</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>		
 
 		<repository>
 			<snapshots>

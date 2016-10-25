@@ -63,7 +63,6 @@ import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingUtils;
 import org.collectionspace.services.common.storage.PreparedStatementBuilder;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
-import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
 
@@ -341,7 +340,7 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
      * @throws TransactionException
      * @throws DocumentException
      */
-    @Override
+	@Override
     public void get(ServiceContext ctx, String id, DocumentHandler handler)
             throws DocumentNotFoundException, TransactionException, DocumentException {
 
@@ -359,8 +358,9 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
             try {
                 docModel = repoSession.getDocument(docRef);
                 assertWorkflowState(ctx, docModel);
-            } catch (ClientException ce) {
-                String msg = logException(ce, "Could not find document with CSID=" + id);
+            } catch (org.nuxeo.ecm.core.api.DocumentNotFoundException ce) {
+                String msg = logException(ce,
+                		String.format("Could not find %s resource/record with CSID=%s", ctx.getDocumentType(), id));
                 throw new DocumentNotFoundException(msg, ce);
             }
             //
@@ -1437,7 +1437,7 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
      * cannot be successfully completed
      * @throws DocumentException
      */
-    @Override
+	@Override
     public void update(ServiceContext ctx, String csid, DocumentHandler handler)
             throws BadRequestException, DocumentNotFoundException, TransactionException,
             DocumentException {
@@ -1454,8 +1454,9 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
             DocumentModel doc = null;
             try {
                 doc = repoSession.getDocument(docRef);
-            } catch (ClientException ce) {
-                String msg = logException(ce, "Could not find document to update with CSID=" + csid);
+            } catch (org.nuxeo.ecm.core.api.DocumentNotFoundException ce) {
+                String msg = logException(ce,
+                		String.format("Could not find %s resource/record to update with CSID=%s", ctx.getDocumentType(), csid));
                 throw new DocumentNotFoundException(msg, ce);
             }
             // Check for a versioned document, and check In and Out before we proceed.
@@ -1629,8 +1630,9 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
                 } else {
                 	result = false; // delete failed for some reason
                 }
-            } catch (ClientException ce) {
-                String msg = logException(ce, "Could not find document to delete with CSID=" + id);
+            } catch (org.nuxeo.ecm.core.api.DocumentNotFoundException ce) {
+                String msg = logException(ce,
+                		String.format("Could not find %s resource/record to delete with CSID=%s", ctx.getDocumentType(), id));                
                 throw new DocumentNotFoundException(msg, ce);
             }
             repoSession.save();

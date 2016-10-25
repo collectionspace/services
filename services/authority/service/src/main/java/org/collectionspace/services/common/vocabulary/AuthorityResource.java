@@ -40,6 +40,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.MultivaluedHashMap;
 
 import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
@@ -1064,7 +1065,16 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         String parentcsid = lookupParentCSID(ctx, parentspecifier, "getReferencingObjects(parent)", "GET_ITEM_REF_OBJS", uriInfo);
         String itemcsid = lookupItemCSID(ctx, itemspecifier, parentcsid, "getReferencingObjects(item)", "GET_ITEM_REF_OBJS");
 
-        List<String> serviceTypes = queryParams.remove(ServiceBindingUtils.SERVICE_TYPE_PROP);
+        // RESTEasy returns a read-only set of query params, so we need to make a read-write copy of them
+        MultivaluedHashMap<String, String> tmpQueryParams = new MultivaluedHashMap<String, String>();
+        tmpQueryParams.putAll(queryParams);
+        // Set the original query params to the new copy
+        queryParams = tmpQueryParams;
+        // Update the service context with the new copy
+        ctx.setQueryParams(queryParams);
+        
+        // Remove the "type" property from the query params
+        List<String> serviceTypes = queryParams.remove(ServiceBindingUtils.SERVICE_TYPE_PROP);        
         if (serviceTypes == null || serviceTypes.isEmpty()) {
         	serviceTypes = ServiceBindingUtils.getCommonServiceTypes(true); //CSPACE-5359: Should now include objects, procedures, and authorities
         }

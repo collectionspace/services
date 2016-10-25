@@ -151,14 +151,14 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
-			<artifactId>dbcp</artifactId>
-			<version>6.0.33</version>
+			<artifactId>tomcat-dbcp</artifactId>
+			<version>7.0.64</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
-			<artifactId>catalina</artifactId>
-			<version>6.0.33</version>
+			<artifactId>tomcat-catalina</artifactId>
+			<version>7.0.64</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -199,10 +199,6 @@
 		</dependency>
 
 		<!-- jboss -->
-		<dependency>
-			<groupId>org.jboss.resteasy</groupId>
-			<artifactId>jaxrs-api</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
 			<artifactId>resteasy-jaxrs</artifactId>
@@ -272,13 +268,11 @@
 		<dependency>
 			<groupId>org.nuxeo.common</groupId>
 			<artifactId>nuxeo-common</artifactId>
-			<version>${nuxeo.core.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.runtime</groupId>
 			<artifactId>nuxeo-runtime</artifactId>
-			<version>${nuxeo.core.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
@@ -292,30 +286,25 @@
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-schema</artifactId>
-			<version>${nuxeo.core.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-storage-sql</artifactId>
-			<version>${nuxeo.core.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-storage-sql-ra</artifactId>
-			<version>${nuxeo.core.version}</version>
 		</dependency>
+		<!-- 
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-io</artifactId>
-			<version>${nuxeo.core.version}</version>
 		</dependency>
+		 -->
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-convert</artifactId>
-			<version>${nuxeo.core.version}</version>
 		</dependency>
-		<!-- <dependency> <groupId>org.nuxeo.ecm.core</groupId> <artifactId>nuxeo-core-facade</artifactId> 
-			<version>${nuxeo.core.version}</version> </dependency> -->
 		<dependency>
 			<groupId>org.nuxeo.runtime</groupId>
 			<artifactId>nuxeo-runtime-osgi</artifactId>
@@ -323,8 +312,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
+			<artifactId>nuxeo-opencmis-impl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-opencmis-bindings</artifactId>
-			<version>${nuxeo.core.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>jsr311-api</artifactId>

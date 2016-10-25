@@ -161,7 +161,7 @@
 
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
+			<artifactId>jaxb-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.jvnet.jaxb2-commons</groupId>
@@ -169,10 +169,6 @@
 		</dependency>
 
 		<!-- jboss -->
-		<dependency>
-			<groupId>org.jboss.resteasy</groupId>
-			<artifactId>jaxrs-api</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
 			<artifactId>resteasy-jaxrs</artifactId>
@@ -228,13 +224,11 @@
 		<dependency>
 			<groupId>org.nuxeo.common</groupId>
 			<artifactId>nuxeo-common</artifactId>
-			<version>${nuxeo.core.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.runtime</groupId>
 			<artifactId>nuxeo-runtime</artifactId>
-			<version>${nuxeo.core.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
@@ -248,18 +242,17 @@
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-schema</artifactId>
-			<version>${nuxeo.core.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-storage-sql</artifactId>
-			<version>${nuxeo.core.version}</version>
 		</dependency>
+		<!-- 
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-io</artifactId>
-			<version>${nuxeo.core.version}</version>
 		</dependency>
+		 -->
 		<dependency>
 			<groupId>org.nuxeo.runtime</groupId>
 			<artifactId>nuxeo-runtime-osgi</artifactId>

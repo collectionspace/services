@@ -162,6 +162,10 @@
 					<artifactId>jsp-2.1</artifactId>
 					<groupId>org.mortbay.jetty</groupId>
 				</exclusion>
+				<exclusion>
+					<artifactId>jaxb-impl</artifactId>
+					<groupId>com.sun.xml.bind</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>        
         <dependency>
@@ -365,15 +369,17 @@
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
-            <artifactId>jaxrs-api</artifactId>
-        </dependency>        
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxb-provider</artifactId>
+            <exclusions>
+            	<exclusion>
+            		<artifactId>jaxb-impl</artifactId>
+            		<groupId>com.sun.xml.bind</groupId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -521,17 +527,14 @@
         <dependency>
             <groupId>org.nuxeo.common</groupId>
             <artifactId>nuxeo-common</artifactId>
-            <version>${nuxeo.core.version}</version>
         </dependency>
         <dependency>
             <groupId>org.nuxeo.runtime</groupId>
             <artifactId>nuxeo-runtime</artifactId>
-			<version>${nuxeo.core.version}</version>            
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core</artifactId>
-			<version>${nuxeo.core.version}</version>
 			<exclusions>
                 <exclusion>
                     <groupId>xerces</groupId>
@@ -546,7 +549,6 @@
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-convert</artifactId>
-			<version>${nuxeo.core.version}</version>            
         </dependency>
         <dependency>
             <groupId>org.nuxeo.lib.core</groupId>
@@ -556,34 +558,25 @@
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-storage-sql-ra</artifactId>
-			<version>${nuxeo.core.version}</version>            
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-query</artifactId>
-						<version>${nuxeo.core.version}</version>            
+			<version>${nuxeo.core.version}</version>            
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-schema</artifactId>
-						<version>${nuxeo.core.version}</version>            
         </dependency>
+        <!--
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-io</artifactId>
-			<version>${nuxeo.core.version}</version>            
         </dependency>
-<!--         
-        <dependency>
-		  <groupId>org.nuxeo.runtime</groupId>
-		  <artifactId>nuxeo-runtime-scripting</artifactId>
-		  <version>${nuxeo.core.version}</version>		  
-        </dependency>
- -->        
+         -->
         <dependency>
 			<groupId>org.nuxeo.runtime</groupId>
 			<artifactId>nuxeo-runtime-jtajca</artifactId>
-			<version>${nuxeo.core.version}</version>  
 			<!-- Until issue http://issues.collectionspace.org/browse/CSPACE-4639 is resolved, we
 				<version>5.5-NXP-8140</version>
 				need to use this patched Nuxeo artifact that is only available on our public Maven
@@ -607,7 +600,6 @@
         <dependency>
 			<groupId>org.nuxeo.runtime</groupId>
 			<artifactId>nuxeo-runtime-datasource</artifactId>
-			<version>${nuxeo.core.version}</version>
         </dependency>
         <dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
@@ -639,18 +631,24 @@
 			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-platform-audit-api</artifactId>
 			<version>${nuxeo.core.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>jersey-client</artifactId>
+					<groupId>com.sun.jersey</groupId>
+				</exclusion>
+			</exclusions>
         </dependency>
         <dependency>
             <groupId>org.nuxeo.runtime</groupId>
             <artifactId>nuxeo-runtime-osgi</artifactId>
 			<version>${nuxeo.core.version}</version>            
         </dependency>
+		
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
             <version>4.1.0</version>
         </dependency>
-
          <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>

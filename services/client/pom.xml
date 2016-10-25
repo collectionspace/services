@@ -60,7 +60,7 @@
         <dependency>
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
-			<version>2.9.1</version>
+			<version>2.11.0</version>
   		</dependency>        
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -74,7 +74,7 @@
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
-            <artifactId>jaxrs-api</artifactId>
+            <artifactId>resteasy-jaxrs</artifactId>
         </dependency>        
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -83,6 +83,12 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-multipart-provider</artifactId>
+        </dependency>
+        <dependency>
+			<groupId>org.jboss.logging</groupId>
+			<artifactId>jboss-logging</artifactId>
+			<version>3.1.4.GA</version>
+			<scope>runtime</scope>    	
         </dependency>
         <!-- Set TestNG scope to default (compile), rather than test -->
         <!-- to allow import(s) in AbstractServiceTest class -->
@@ -101,8 +107,7 @@
         </dependency>
         <dependency>
 		    <groupId>com.sun.xml.bind</groupId>
-		    <artifactId>jaxb-impl</artifactId>
-		    <version>2.2.7</version>
+		    <artifactId>jaxb-core</artifactId>
 		    <type>jar</type>
 		    <scope>compile</scope>
 		</dependency>        
