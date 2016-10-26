@@ -107,7 +107,7 @@
 					<description>Replicate a document from the project state</description>
 				</transition>
 				<transition name="deprecate" destinationState="deprecated">
-					<description>Soft-delete the document from the project state</description>
+					<description>Deprecate the document from the project state</description>
 				</transition>
 				<transition name="delete" destinationState="deleted">
 					<description>Soft-delete the document from the project state</description>

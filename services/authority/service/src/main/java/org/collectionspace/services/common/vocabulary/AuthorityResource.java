@@ -40,7 +40,6 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.MultivaluedHashMap;
 
 import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
@@ -54,6 +53,7 @@ import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.StoredValuesUriTemplate;
+import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.UriTemplateFactory;
 import org.collectionspace.services.common.UriTemplateRegistry;
 import org.collectionspace.services.common.UriTemplateRegistryKey;
@@ -362,8 +362,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @Path("{csid}/sync")
     public byte[] synchronize(
             @Context Request request,
-            @Context UriInfo ui,
+            @Context UriInfo uriInfo,
             @PathParam("csid") String identifier) {
+    	uriInfo = new UriInfoWrapper(uriInfo);
     	byte[] result;
     	boolean neededSync = false;
         PoxPayloadOut payloadOut = null;
@@ -374,7 +375,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         //
     	synchronized(AuthorityResource.class) {        
 	        try {
-	            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
+	            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
 	            /*
 	             * Make sure this authority service supports synchronization
 	             */
@@ -418,11 +419,12 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @Override
     public byte[] get(
             @Context Request request,
-            @Context UriInfo ui,
+            @Context UriInfo uriInfo,
             @PathParam("csid") String specifier) {
+    	uriInfo = new UriInfoWrapper(uriInfo);
         PoxPayloadOut result = null;
         try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
             DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
 
             Specifier spec = Specifier.getSpecifier(specifier, "getAuthority", "GET");
@@ -463,6 +465,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @GET
     @Produces("application/xml")
     public AbstractCommonList getAuthorityList(@Context UriInfo uriInfo) { //FIXME - REM 5/3/2012 - This is not reachable from the JAX-RS dispatcher.  Instead the equivalent method in ResourceBase is getting called.
+    	uriInfo = new UriInfoWrapper(uriInfo);
     	AbstractCommonList result = null;
     	
     	try {
@@ -579,14 +582,16 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @Path("{csid}")
     public Response deleteAuthority(
             @Context Request request,
-            @Context UriInfo ui,
+            @Context UriInfo uriInfo,
             @PathParam("csid") String specifier) {
+        uriInfo = new UriInfoWrapper(uriInfo);
+
         if (logger.isDebugEnabled()) {
             logger.debug("deleteAuthority with specifier=" + specifier);
         }
         
         try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
             DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
 
             Specifier spec = Specifier.getSpecifier(specifier, "getAuthority", "GET");
@@ -681,6 +686,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     		@Context UriInfo uriInfo, 
     		@PathParam("csid") String parentIdentifier, // Either a CSID or a URN form -e.g., a8ad38ec-1d7d-4bf2-bd31 or urn:cspace:name(bugsbunny)
     		String xmlPayload) {
+    	uriInfo = new UriInfoWrapper(uriInfo);
     	Response result = null;
     	
         try {
@@ -726,6 +732,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             @PathParam("csid") String parentIdentifier,
             @PathParam("itemcsid") String itemIdentifier,
             @PathParam("transition") String transition) {
+    	uriInfo = new UriInfoWrapper(uriInfo);
         PoxPayloadOut result = null;
         
         try {
@@ -870,6 +877,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     		@Context ResourceMap resourceMap,            
             @PathParam("csid") String parentIdentifier,
             @PathParam("itemcsid") String itemIdentifier) {
+    	uriInfo = new UriInfoWrapper(uriInfo);
         PoxPayloadOut result = null;
         try {
             RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = 
@@ -988,6 +996,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @Produces("application/xml")
     public AbstractCommonList getAuthorityItemList(@PathParam("csid") String authorityIdentifier,
             @Context UriInfo uriInfo) {
+    	uriInfo = new UriInfoWrapper(uriInfo);
     	AbstractCommonList result = null;
     	
         try {
@@ -1028,6 +1037,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             @PathParam("itemcsid") String itemSpecifier,
             @Context UriTemplateRegistry uriTemplateRegistry,
             @Context UriInfo uriInfo) {
+    	uriInfo = new UriInfoWrapper(uriInfo);
         AuthorityRefDocList authRefDocList = null;
         try {
             authRefDocList = getReferencingObjects(null, parentSpecifier, itemSpecifier, uriTemplateRegistry, uriInfo);
@@ -1050,6 +1060,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             String itemspecifier,
             UriTemplateRegistry uriTemplateRegistry,
             UriInfo uriInfo) throws Exception {
+    	uriInfo = new UriInfoWrapper(uriInfo);
     	AuthorityRefDocList authRefDocList = null;
  
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), uriInfo);
@@ -1064,14 +1075,6 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 
         String parentcsid = lookupParentCSID(ctx, parentspecifier, "getReferencingObjects(parent)", "GET_ITEM_REF_OBJS", uriInfo);
         String itemcsid = lookupItemCSID(ctx, itemspecifier, parentcsid, "getReferencingObjects(item)", "GET_ITEM_REF_OBJS");
-
-        // RESTEasy returns a read-only set of query params, so we need to make a read-write copy of them
-        MultivaluedHashMap<String, String> tmpQueryParams = new MultivaluedHashMap<String, String>();
-        tmpQueryParams.putAll(queryParams);
-        // Set the original query params to the new copy
-        queryParams = tmpQueryParams;
-        // Update the service context with the new copy
-        ctx.setQueryParams(queryParams);
         
         // Remove the "type" property from the query params
         List<String> serviceTypes = queryParams.remove(ServiceBindingUtils.SERVICE_TYPE_PROP);        
@@ -1101,6 +1104,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             @PathParam("csid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier,
             @Context UriInfo uriInfo) {
+    	uriInfo = new UriInfoWrapper(uriInfo);
         AuthorityRefList authRefList = null;
         
         try {
@@ -1203,6 +1207,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             @Context UriInfo uriInfo,
             @PathParam("csid") String parentIdentifier,
             @PathParam("itemcsid") String itemIdentifier) {
+    	uriInfo = new UriInfoWrapper(uriInfo);
     	byte[] result;
     	boolean neededSync = false;
         PoxPayloadOut payloadOut = null;
@@ -1248,6 +1253,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             @PathParam("csid") String parentSpecifier,
             @PathParam("itemcsid") String itemSpecifier,
             String xmlPayload) {
+    	uriInfo = new UriInfoWrapper(uriInfo);
         PoxPayloadOut result = null;
         
         try {
@@ -1320,6 +1326,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             @Context UriInfo uriInfo,
             @PathParam("csid") String parentIdentifier,
             @PathParam("itemcsid") String itemIdentifier) {
+    	uriInfo = new UriInfoWrapper(uriInfo);
     	Response result = null;
 
         ensureCSID(parentIdentifier, ServiceMessages.DELETE_FAILED, "AuthorityItem.parentcsid");
@@ -1383,6 +1390,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     		@PathParam("csid") String parentIdentifier,
             @PathParam("itemcsid") String itemIdentifier,
             @Context UriInfo uriInfo) throws Exception {
+    	uriInfo = new UriInfoWrapper(uriInfo);
     	String result = null;
 
         try {

@@ -759,6 +759,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         	//
         	ctx.setUriInfo(this.getServiceContext().getUriInfo()); // try to get a UriInfo instance from the handler's context
         }
+
         ctx.getUriInfo().getQueryParameters().addFirst(WorkflowClient.WORKFLOW_QUERY_ONLY_DELETED, Boolean.toString(onlyRefsToDeletedObjects));  // Add the wf_only_deleted query param to the resource call
     	AuthorityRefDocList refObjs = authorityResource.getReferencingObjects(ctx, inAuthorityCsid, itemCsid, 
     			uriTemplateRegistry, ctx.getUriInfo());
