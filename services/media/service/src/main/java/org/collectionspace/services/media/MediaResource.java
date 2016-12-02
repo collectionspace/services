@@ -33,11 +33,11 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
+import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
-
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -159,22 +159,23 @@ public class MediaResource extends NuxeoBasedResource {
     @Override
     public Response create(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
     		@Context ResourceMap resourceMap,
-    		@Context UriInfo ui,
+    		@Context UriInfo uriInfo,
             String xmlPayload) {
     	Response result = null;
+    	uriInfo = new UriInfoWrapper(uriInfo);
     	
     	//
     	// If we find a "blobUri" query param, then we need to create a blob resource/record first and then the media resource/record
     	//
-        MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+        MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
         String blobUri = queryParams.getFirst(BlobClient.BLOB_URI_PARAM);
         if (blobUri != null && blobUri.isEmpty() == false) {
-        	result = createBlobWithUri(resourceMap, ui, xmlPayload, blobUri); // uses the blob resource and doc handler to create the blob
+        	result = createBlobWithUri(resourceMap, uriInfo, xmlPayload, blobUri); // uses the blob resource and doc handler to create the blob
         	String blobCsid = CollectionSpaceClientUtils.extractId(result);
         	queryParams.add(BlobClient.BLOB_CSID_PARAM, blobCsid); // Add the new blob's csid as an artificial query param -the media doc handler will look for this
         }
         
-       	result = super.create(parentCtx, resourceMap, ui, xmlPayload); // Now call the parent to finish the media resource POST request
+       	result = super.create(parentCtx, resourceMap, uriInfo, xmlPayload); // Now call the parent to finish the media resource POST request
         
         return result;
     }
@@ -182,20 +183,21 @@ public class MediaResource extends NuxeoBasedResource {
     @Override
     public byte[] update(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
     		@Context ResourceMap resourceMap,
-    		@Context UriInfo ui,
+    		@Context UriInfo uriInfo,
     		@PathParam("csid") String csid,
     		String xmlPayload) {
+    	uriInfo = new UriInfoWrapper(uriInfo);
     	//
     	// If we find a "blobUri" query param, then we need to create a blob resource/record first and then the media resource/record
     	//
-        MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+        MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
         String blobUri = queryParams.getFirst(BlobClient.BLOB_URI_PARAM);
         if (blobUri != null && blobUri.isEmpty() == false) {
-        	Response blobresult = createBlobWithUri(resourceMap, ui, xmlPayload, blobUri); // uses the blob resource and doc handler to create the blob
+        	Response blobresult = createBlobWithUri(resourceMap, uriInfo, xmlPayload, blobUri); // uses the blob resource and doc handler to create the blob
         	String blobCsid = CollectionSpaceClientUtils.extractId(blobresult);
         	queryParams.add(BlobClient.BLOB_CSID_PARAM, blobCsid); // Add the new blob's csid as an artificial query param -the media doc handler will look for this
         }
-       	return super.update(parentCtx, resourceMap, ui, csid, xmlPayload); // Now call the parent to finish the media resource PUT request
+       	return super.update(parentCtx, resourceMap, uriInfo, csid, xmlPayload); // Now call the parent to finish the media resource PUT request
     }
 
     /*

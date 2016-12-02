@@ -26,7 +26,9 @@ public class UriInfoWrapper implements UriInfo {
 	public UriInfoWrapper(UriInfo uriInfo) {
 		this.uriInfo = uriInfo;
 		// RESTEasy returns a read-only set of query params, so we need to make a read-write copy of them
-        queryParams.putAll(uriInfo.getQueryParameters());		
+		if (uriInfo != null) {
+			queryParams.putAll(uriInfo.getQueryParameters());
+		}
 	}
 	
 	private UriInfo uriInfo;

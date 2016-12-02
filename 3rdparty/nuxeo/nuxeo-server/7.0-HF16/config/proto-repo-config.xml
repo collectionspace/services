@@ -19,6 +19,13 @@
 <!-- 'clones' of this prototype configuration file, as noted below.) --> 
 <!-- See http://doc.nuxeo.com/display/ADMINDOC/VCS+Configuration for more config details -->
 <component name="config:default-repository">
+	<extension target="org.nuxeo.ecm.core.blob.BlobManager" point="configuration">
+		<blobprovider name="default">
+			<class>org.nuxeo.ecm.core.blob.binary.DefaultBinaryManager</class>
+			<property name="path"></property>
+			<property name="key"></property>
+		</blobprovider>
+	</extension>
     <extension target="org.nuxeo.ecm.core.storage.sql.RepositoryService" point="repository">
         <repository name="default" factory="org.nuxeo.ecm.core.storage.sql.ra.PoolingRepositoryFactory">
 			<pool minPoolSize="0" maxPoolSize="20" blockingTimeoutMillis="100" idleTimeoutMinutes="10"/>

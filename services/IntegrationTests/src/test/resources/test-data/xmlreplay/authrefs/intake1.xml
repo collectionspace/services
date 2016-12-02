@@ -10,17 +10,13 @@
         <insuranceReferenceNumber>1234-5678-90</insuranceReferenceNumber>
         <returnDate>2010-07-14T04:00:00Z</returnDate>
         <valuer>urn:cspace:org.collectionspace.demo:orgauthority:name(organization):organization:name(twentiethcentury-foxfilmcorporation)'Twentieth+Century-Fox+Film+Corporation'</valuer>
-        <conditionCheckNote>We got the governator himself to travel back in time, and bring some
-            robot spiders, so the condition can be proper checked</conditionCheckNote>
+        <conditionCheckNote>We got the governator himself to travel back in time, and bring some robot spiders, so the condition can be proper checked</conditionCheckNote>
         <conditionCheckReferenceNumber>TERM-II</conditionCheckReferenceNumber>
         <entryMethods>
             <entryMethod>found-on-doorstep</entryMethod>
         </entryMethods>
         <insuranceNote>Dont break it - we cannot afford it</insuranceNote>
         <valuationReferenceNumber>911-101-404-411</valuationReferenceNumber>
-        <fieldCollectionSources>
-            <fieldCollectionSource/>
-        </fieldCollectionSources>
         <currentLocationGroupList>
             <currentLocationGroup>
                 <currentLocationFitness>urn:cspace:core.collectionspace.org:vocabularies:name(conditionfitness):item:name(suitable)'Suitable'</currentLocationFitness>
@@ -33,14 +29,10 @@
                 <currentLocation>urn:cspace:core.collectionspace.org:locationauthorities:name(location):item:name(PatricksCube1321979033052)'Patricks Cube'</currentLocation>
             </currentLocationGroup>
         </currentLocationGroupList>
-        <fieldCollectors>
-            <fieldCollector/>
-        </fieldCollectors>
         <insurers>
             <insurer>urn:cspace:org.collectionspace.demo:personauthority:name(person):person:name(arnoldschwarzenegger)'Arnold Schwarzenegger'</insurer>
         </insurers>
-        <packingNote>Packed with bubble-wrap and duct-tape - no one will ever be able to open
-            it</packingNote>
+        <packingNote>Packed with bubble-wrap and duct-tape - no one will ever be able to open it</packingNote>
         <conditionCheckersOrAssessors>
             <conditionCheckerOrAssessor>urn:cspace:org.collectionspace.demo:personauthority:name(person):person:name(tommyjones)'Tommy+Jones'</conditionCheckerOrAssessor>
         </conditionCheckersOrAssessors>

@@ -64,20 +64,13 @@
             <artifactId>commons-logging</artifactId>
             <version>1.1</version>
         </dependency>
-      <!-- javax -->
-
+		
+		<!-- javax -->
 
         <dependency>
             <groupId>javax.security</groupId>
             <artifactId>jaas</artifactId>
             <version>1.0.01</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-            <version>1.6.1</version>
             <scope>provided</scope>
         </dependency>
         

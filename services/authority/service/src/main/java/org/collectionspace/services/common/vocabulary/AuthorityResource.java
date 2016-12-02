@@ -1060,7 +1060,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             String itemspecifier,
             UriTemplateRegistry uriTemplateRegistry,
             UriInfo uriInfo) throws Exception {
-    	uriInfo = new UriInfoWrapper(uriInfo);
+    	//uriInfo = new UriInfoWrapper(uriInfo);
     	AuthorityRefDocList authRefDocList = null;
  
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), uriInfo);

@@ -679,11 +679,13 @@
 		  <artifactId>qdox</artifactId>
 		  <version>1.6.1</version>
 		</dependency>
+		<!-- 
         <dependency>
 		  <groupId>apache-xerces</groupId>
 		  <artifactId>xml-apis</artifactId>
 		  <version>2.9.1</version>
         </dependency>
+        -->
         <dependency>
 		  <groupId>org.apache</groupId>
 		  <artifactId>xmlsec</artifactId>

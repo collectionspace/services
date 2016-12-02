@@ -23,10 +23,7 @@
  */
 package org.collectionspace.services.batch;
 
-import java.util.List;
-
 import org.collectionspace.services.BatchJAXBSchema;
-import org.collectionspace.services.jaxb.InvocableJAXBSchema;
 import org.collectionspace.services.batch.nuxeo.BatchDocumentModelHandler;
 import org.collectionspace.services.client.BatchClient;
 import org.collectionspace.services.client.IQueryManager;
@@ -39,19 +36,11 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
-import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.document.ValidatorHandler;
 import org.collectionspace.services.common.invocable.Invocable;
-import org.collectionspace.services.common.invocable.Invocable.InvocationError;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
-import org.collectionspace.services.common.query.QueryManager;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.nuxeo.ecm.core.api.DocumentModel;
-import org.collectionspace.services.common.ResourceMapHolder;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
-import javax.management.BadAttributeValueExpException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -59,11 +48,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 @Path(BatchClient.SERVICE_PATH)

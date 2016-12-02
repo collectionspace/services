@@ -15,7 +15,10 @@
     <briefDescriptions>
         <!-- First value instance of this repeatable field is blank -->
         <briefDescription></briefDescription>
-        <briefDescription></briefDescription>
         <briefDescription>bob2</briefDescription>
+        <briefDescription></briefDescription>
+        <briefDescription></briefDescription>
+        <briefDescription>bob3</briefDescription>		
+        <briefDescription></briefDescription>		
     </briefDescriptions>
 </ns2:collectionobjects_common>

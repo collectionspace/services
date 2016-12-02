@@ -9,7 +9,6 @@
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.report.jaxb</artifactId>
     <name>services.report.jaxb</name>
     

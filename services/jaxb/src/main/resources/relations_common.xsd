@@ -33,7 +33,7 @@
                 <!-- type of relationship between two entities -->
                 <xs:element name="relationshipType" type="xs:string" minOccurs="1"/>
                 <xs:element name="relationshipMetaType" type="xs:string" minOccurs="0"/>
-                <xs:element name="predicate" type="rel:RelationshipType" minOccurs="1" maxOccurs="1"/>   <!-- new name for relationshipType -->
+                <xs:element name="predicate" type="xs:string" minOccurs="1" maxOccurs="1"/>   <!-- new name for relationshipType -->
                 <xs:element name="predicateDisplayName" type="xs:string" minOccurs="1"/>
                 
                 <xs:element name="objectCsid" type="xs:string"  minOccurs="1" maxOccurs="1"/>        <!-- new name for documentId2 -->

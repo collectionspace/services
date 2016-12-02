@@ -761,6 +761,9 @@ public abstract class AbstractServiceContextImpl<IT, OT>
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.context.ServiceContext#getQueryParams()
+     * 
+     * When we first created these services, the RESTEasy query parameters used to be a modifiable map.  That changed in a
+     * more recent version of RESTEasy, so we need to make a copy of the params into a modifiable map and return it instead.
      */
     @Override
     public MultivaluedMap<String, String> getQueryParams() {

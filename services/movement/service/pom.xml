@@ -51,14 +51,11 @@
             <version>1.0.01</version>
             <scope>provided</scope>
         </dependency>
-
-        <dependency>
+		<dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
-            <version>1.6.1</version>
-            <scope>provided</scope>
         </dependency>
-        
+
         <!-- jboss -->
 
         <dependency>

@@ -211,6 +211,9 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
         } catch (BadRequestException bre) {
             throw bre;
         } catch (Exception e) {
+        	if (logger.isDebugEnabled()) {
+        		logger.debug("Call to low-level Nuxeo document create call failed: ", e);
+        	}
             throw new NuxeoDocumentException(e);
         } finally {
             if (repoSession != null) {

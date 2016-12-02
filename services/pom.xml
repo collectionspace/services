@@ -470,6 +470,18 @@
 				<artifactId>postgresql</artifactId>
 				<version>${postgres.driver.version}</version>
 			</dependency>
+			<dependency>
+	            <groupId>dom4j</groupId>
+	            <artifactId>dom4j</artifactId>
+	            <version>1.6.1</version>
+	            <scope>compile</scope>
+	            <exclusions>
+	            	<exclusion>
+	            		<artifactId>xml-apis</artifactId>
+	            		<groupId>xml-apis</groupId>
+	            	</exclusion>
+	            </exclusions>
+	        </dependency>
         </dependencies>
     </dependencyManagement>
 </project>

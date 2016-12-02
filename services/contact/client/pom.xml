@@ -32,13 +32,21 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.client</artifactId>
             <version>${project.version}</version>
+            <!-- 
+            <exclusions>
+            	<exclusion>
+            		<artifactId>xml-apis</artifactId>
+            		<groupId>xml-apis</groupId>
+            	</exclusion>
+            </exclusions>
+             -->
         </dependency>
+
         <!-- External dependencies -->
-        <dependency>
+
+		<dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
-            <version>1.6.1</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
