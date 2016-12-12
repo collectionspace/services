@@ -38,6 +38,7 @@ import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
+import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
@@ -50,7 +51,6 @@ import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.service.ServiceObjectType;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.servicegroup.nuxeo.ServiceGroupDocumentModelHandler;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,8 +111,6 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
         try {
             CommonList commonList = new CommonList();
             AbstractCommonList list = (AbstractCommonList)commonList;
-	        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
-	    	String commonSchema = ctx.getCommonPartLabel();
 	    	ArrayList<String> svcGroups = new ArrayList<String>();
 	    	svcGroups.add("procedure");
 	    	svcGroups.add("object");
@@ -206,8 +204,9 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
     @GET
     @Path("{csid}/items")
     public AbstractCommonList getItems(
-            @Context UriInfo ui,
+            @Context UriInfo uriInfo,
             @PathParam("csid") String serviceGroupName) {
+    	UriInfoWrapper ui = new UriInfoWrapper(uriInfo);
         ensureCSID(serviceGroupName, NuxeoBasedResource.READ);
         AbstractCommonList list = null;
         try {
