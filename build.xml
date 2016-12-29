@@ -262,6 +262,7 @@
 	</target>
 
 	<target name="create_cspace_db" description="create cspace database">
+	    <echo>Creating the cspace database with credentials ${db.cspace.user}:${db.cspace.user.password}</echo>
 		<sql driver="${db.jdbc.driver.class}" url="${db.jdbc.csadmin.url}" userid="${db.csadmin.user}" password="${db.csadmin.user.password}" autocommit="true" src="${db.script.dir}/init_cspace_db.sql">
 			<classpath>
 				<pathelement path="${db.driver.jar}" />
