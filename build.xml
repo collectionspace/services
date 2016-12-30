@@ -292,7 +292,7 @@
 			</fileset>
 			<globmapper from="*" to="*.bak" />
 		</copy>
-		<copy todir="${jee.server.cspace}/cspace/services/db" overwrite="true">
+		<copy todir="${jee.server.cspace}/cspace/services/db" overwrite="false">
 			<fileset dir="${src}/main/resources/db" />
 			<filterset>
 				<filter token="DB_CSADMIN_NAME" value="${db.csadmin.name}" />
