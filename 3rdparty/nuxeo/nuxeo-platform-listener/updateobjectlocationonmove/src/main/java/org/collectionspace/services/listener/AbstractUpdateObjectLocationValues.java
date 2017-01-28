@@ -6,9 +6,10 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.api.Tools.NoRelatedRecordsException;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
@@ -18,6 +19,8 @@ import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
+import org.nuxeo.ecm.core.api.impl.DocumentModelImpl;
+import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.EventListener;
@@ -41,6 +44,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
     protected final static String COLLECTIONOBJECTS_COMMON_SCHEMA = "collectionobjects_common"; // FIXME: Get from external constant
     private final static String COLLECTIONOBJECT_DOCTYPE = "CollectionObject"; // FIXME: Get from external constant
     protected final static String COMPUTED_CURRENT_LOCATION_PROPERTY = "computedCurrentLocation"; // FIXME: Create and then get from external constant
+    private final static String CURRENT_LOCATION_ELEMENT_NAME = "currentLocation"; // From movement_commons schema.  FIXME: Get from external constant that already exists
     protected final static String MOVEMENTS_COMMON_SCHEMA = "movements_common"; // FIXME: Get from external constant
     private final static String MOVEMENT_DOCTYPE = MovementConstants.NUXEO_DOCTYPE;
     private final static String LOCATION_DATE_PROPERTY = "locationDate"; // FIXME: Get from external constant
@@ -50,7 +54,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
     protected final static String UPDATED_AT_PROPERTY = "updatedAt"; // FIXME: Get from external constant
     private final static String NONVERSIONED_NONPROXY_DOCUMENT_WHERE_CLAUSE_FRAGMENT =
             "AND ecm:isCheckedInVersion = 0"
-            + "AND ecm:isProxy = 0 ";
+            + " AND ecm:isProxy = 0 ";
     private final static String ACTIVE_DOCUMENT_WHERE_CLAUSE_FRAGMENT =
             "AND (ecm:currentLifeCycleState <> 'deleted') "
             + NONVERSIONED_NONPROXY_DOCUMENT_WHERE_CLAUSE_FRAGMENT;
@@ -223,11 +227,19 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
                 continue;
             }
             // Get the CollectionObject's most recent, related Movement.
-            mostRecentMovementDocModel = getMostRecentMovement(coreSession, collectionObjectCsid,
-                    isAboutToBeRemovedEvent, movementCsidToFilter);
-            if (mostRecentMovementDocModel == null) {
-                continue;
-            }
+            
+            try {
+				mostRecentMovementDocModel = getMostRecentMovement(coreSession, collectionObjectCsid,
+				        isAboutToBeRemovedEvent, movementCsidToFilter);
+	            if (mostRecentMovementDocModel == null) {
+	            	// This means we couldn't figure out which Movement record to use.
+	                continue;
+	            }
+			} catch (NoRelatedRecordsException e) {
+				// This means there were NO active Movement records to use.
+				mostRecentMovementDocModel = new DocumentModelImpl(MOVEMENT_DOCTYPE); // Create an empty document model
+			}
+            
             // Update the CollectionObject with values from that Movement.
             collectionObjectDocModel =
                     updateCollectionObjectValuesFromMovement(collectionObjectDocModel, mostRecentMovementDocModel);
@@ -237,6 +249,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
                         COMPUTED_CURRENT_LOCATION_PROPERTY);
                 logger.trace("computedCurrentLocation refName after value update=" + computedCurrentLocationRefName);
             }
+            
             coreSession.saveDocument(collectionObjectDocModel);
         }
     }
@@ -357,7 +370,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
      * CSID.
      */
     protected static DocumentModel getCurrentDocModelFromCsid(CoreSessionInterface session, String collectionObjectCsid) {
-        DocumentModelList collectionObjectDocModels = null;
+        DocumentModelList docModelList = null;
         try {
             final String query = "SELECT * FROM "
                     + NuxeoUtils.BASE_DOCUMENT_TYPE
@@ -365,18 +378,18 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
                     + NuxeoUtils.getByNameWhereClause(collectionObjectCsid)
                     + " "
                     + NONVERSIONED_NONPROXY_DOCUMENT_WHERE_CLAUSE_FRAGMENT;
-            collectionObjectDocModels = session.query(query);
+            docModelList = session.query(query);
         } catch (Exception e) {
             logger.warn("Exception in query to get active document model for CollectionObject: ", e);
         }
-        if (collectionObjectDocModels == null || collectionObjectDocModels.isEmpty()) {
+        if (docModelList == null || docModelList.isEmpty()) {
             logger.warn("Could not get active document models for CollectionObject(s).");
             return null;
-        } else if (collectionObjectDocModels.size() != 1) {
+        } else if (docModelList.size() != 1) {
             logger.debug("Found more than 1 active document with CSID=" + collectionObjectCsid);
             return null;
         }
-        return collectionObjectDocModels.get(0);
+        return docModelList.get(0);
     }
 
     // FIXME: A quick first pass, using an only partly query-based technique for
@@ -415,7 +428,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
      */
     protected static DocumentModel getMostRecentMovement(CoreSessionInterface session, String collectionObjectCsid,
             boolean isAboutToBeRemovedEvent, String aboutToBeRemovedMovementCsidToFilter)
-            throws ClientException {
+            throws ClientException, Tools.NoRelatedRecordsException {
         DocumentModel mostRecentMovementDocModel = null;
         // Get Relation records for Movements related to this CollectionObject.
         //
@@ -444,6 +457,34 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
                 logger.trace("Found " + relationDocModels.size() + " relations to Movement records to/from this CollectionObject record.");
             }
         }
+        
+        //
+        // Remove redundant document models from the list.
+        //
+        relationDocModels = removeRedundantRelations(relationDocModels);
+        
+        //
+        // Remove relationships with inactive movement records
+        //
+        relationDocModels = removeRelationsWithInactiveMovements(session, relationDocModels);
+        
+        if (relationDocModels == null || relationDocModels.size() == 0) throw new Tools.NoRelatedRecordsException();
+        
+        //
+        // If there is only one related movement record, then return it as the most recent
+        // movement record -if it's current location element is not empty.
+        //
+        if (relationDocModels.size() == 1) {
+        	DocumentModel relationDocModel = relationDocModels.get(0);
+        	DocumentModel movementDocModel = getMovementDocModelFromRelation(session, relationDocModel);
+            String currentLocation = (String) movementDocModel.getProperty(MOVEMENTS_COMMON_SCHEMA, CURRENT_LOCATION_ELEMENT_NAME);
+            if (Tools.isBlank(currentLocation) || !isActiveDocument(movementDocModel)) { // currentLocation must be set and record must be active
+            	movementDocModel = null;
+            }
+                        
+            return movementDocModel;
+        }
+        
         // Iterate through related movement records, to find the related
         // Movement record with the most recent location date.
         GregorianCalendar mostRecentLocationDate = EARLIEST_COMPARISON_DATE;
@@ -531,10 +572,110 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
                 }
             }
         }
+        
         return mostRecentMovementDocModel;
     }
+    
+	//
+    // This method assumes that the relation passed into this method is between a Movement record
+    // and a CollectionObject (cataloging) record.
+    //
+    private static DocumentModel getMovementDocModelFromRelation(CoreSessionInterface session, DocumentModel relationDocModel) {
+    	String movementCsid = null;
+    	
+        String subjectDocType = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_DOCTYPE_PROPERTY);
+        if (subjectDocType.endsWith(MOVEMENT_DOCTYPE)) {
+        	movementCsid = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_CSID_PROPERTY);
+        } else {
+        	movementCsid = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
+        }
 
-    /**
+		return getCurrentDocModelFromCsid(session, movementCsid);
+	}
+
+	//
+    // Compares two Relation document models to see if they're either identical or
+    // reciprocal equivalents. 
+    //
+    private static boolean compareRelationDocModels(DocumentModel r1, DocumentModel r2) {
+    	boolean result = false;
+    	
+        String r1_subjectDocType = (String) r1.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_DOCTYPE_PROPERTY);
+        String r1_objectDocType = (String) r1.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_DOCTYPE_PROPERTY);
+        String r1_subjectCsid = (String) r1.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_CSID_PROPERTY);
+        String r1_objectCsid = (String) r1.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
+
+        String r2_subjectDocType = (String) r2.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_DOCTYPE_PROPERTY);
+        String r2_objectDocType = (String) r2.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_DOCTYPE_PROPERTY);
+        String r2_subjectCsid = (String) r2.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_CSID_PROPERTY);
+        String r2_objectCsid = (String) r2.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
+        
+        // Check to see if they're identical
+        if (r1_subjectDocType.equalsIgnoreCase(r2_subjectDocType) && r1_objectDocType.equalsIgnoreCase(r2_objectDocType)
+        		&& r1_subjectCsid.equalsIgnoreCase(r2_subjectCsid) && r1_objectCsid.equalsIgnoreCase(r2_objectCsid)) {
+        	return true;
+        }
+        
+        // Check to see if they're reciprocal
+        if (r1_subjectDocType.equalsIgnoreCase(r2_objectDocType) && r1_objectDocType.equalsIgnoreCase(r2_subjectDocType)
+        		&& r1_subjectCsid.equalsIgnoreCase(r2_objectCsid) && r1_objectCsid.equalsIgnoreCase(r2_subjectCsid)) {
+        	return true;
+        }
+
+    	return result;
+    }
+
+    //
+    // Return a Relation document model list with redundant (either identical or reciprocal) relations removed.
+    //
+    private static DocumentModelList removeRedundantRelations(DocumentModelList relationDocModelList) {
+    	DocumentModelList resultList = new DocumentModelListImpl();
+    	for (DocumentModel relationDocModel : relationDocModelList) {
+    		if (existsInResultList(resultList, relationDocModel) == false) {
+    			resultList.add(relationDocModel);
+    		}
+    	}
+		// TODO Auto-generated method stub
+		return resultList;
+	}
+    
+    //
+    // Return just the list of relationships with active Movement records
+    //
+    private static DocumentModelList removeRelationsWithInactiveMovements(CoreSessionInterface session, DocumentModelList relationDocModelList) {
+    	DocumentModelList resultList = new DocumentModelListImpl();
+    	
+    	for (DocumentModel relationDocModel : relationDocModelList) {
+            String movementCsid = getCsidForDesiredDocTypeFromRelation(relationDocModel, MOVEMENT_DOCTYPE, COLLECTIONOBJECT_DOCTYPE);
+            DocumentModel movementDocModel = getCurrentDocModelFromCsid(session, movementCsid);
+            if (isActiveDocument(movementDocModel) == true) {
+    			resultList.add(relationDocModel);
+            } else {
+            	logger.trace(String.format("Disqualified relationship with inactive Movement record=%s.", movementCsid));
+            }
+    	}
+    	
+		return resultList;
+	}
+    
+
+    //
+    // Check to see if the Relation (or its equivalent reciprocal) is already in the list.
+    //
+	private static boolean existsInResultList(DocumentModelList relationDocModelList, DocumentModel relationDocModel) {
+		boolean result = false;
+		
+    	for (DocumentModel target : relationDocModelList) {
+    		if (compareRelationDocModels(relationDocModel, target) == true) {
+    			result = true;
+    			break;
+    		}
+    	}
+		
+		return result;
+	}
+
+	/**
      * Returns the CSID for a desired document type from a Relation record,
      * where the relationship involves two specified, different document types.
      *

@@ -31,6 +31,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.commons.lang.StringUtils;
 import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -60,6 +61,7 @@ import org.collectionspace.services.lifecycle.StateList;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.lifecycle.TransitionDefList;
 import org.collectionspace.services.lifecycle.TransitionList;
+
 import org.nuxeo.ecm.core.NXCore;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -67,6 +69,7 @@ import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.lifecycle.LifeCycle;
 import org.nuxeo.ecm.core.lifecycle.LifeCycleService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -313,10 +316,14 @@ public abstract class DocumentModelHandler<T, TL>
             //
             // Add updatedAt timestamp and updateBy user
             //
-			documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
-					CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_AT, now);
-			documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
-					CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_BY, userId);
+			if (ctx.shouldUpdateCoreValues() == true) { // Ensure that our caller wants us to record this update
+				documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+						CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_AT, now);
+				documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+						CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_BY, userId);
+			} else {
+				logger.debug(String.format("Document with CSID=%s updated %s by user %s", documentModel.getName(), now, userId));
+			}
 		}		
     }
     

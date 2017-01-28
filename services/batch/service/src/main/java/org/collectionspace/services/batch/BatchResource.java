@@ -180,11 +180,12 @@ public class BatchResource extends NuxeoBasedResource {
     @POST
     @Path("{csid}")
     public InvocationResults invokeBatchJob(
-    		@Context ResourceMap resourceMap, 
+    		@Context ResourceMap resourceMap,
+    		@Context UriInfo ui,
     		@PathParam("csid") String csid,
     		InvocationContext invContext) {
         try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
             BatchDocumentModelHandler handler = (BatchDocumentModelHandler)createDocumentHandler(ctx);
             
             return handler.invokeBatchJob(ctx, csid, resourceMap, invContext);

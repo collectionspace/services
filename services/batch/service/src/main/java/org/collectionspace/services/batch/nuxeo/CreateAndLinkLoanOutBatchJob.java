@@ -1,7 +1,6 @@
 package org.collectionspace.services.batch.nuxeo;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
@@ -11,6 +10,7 @@ import org.collectionspace.services.client.CollectionSpaceClientUtils;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.client.LoanoutClient;
@@ -19,7 +19,8 @@ import org.collectionspace.services.client.RelationClient;
 public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 
 	private static ArrayList<String> invocationModes = null;
-	private InvocationContext context;
+	private InvocationContext invocationCtx;
+	private ServiceContext ctx;
 	private int completionStatus;
 	private ResourceMap resourceMap;
 	private InvocationResults results;
@@ -33,7 +34,7 @@ public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 	
 	public CreateAndLinkLoanOutBatchJob() {
 		CreateAndLinkLoanOutBatchJob.setupClassStatics();
-		context = null;
+		invocationCtx = null;
 		completionStatus = STATUS_UNSTARTED;
 		resourceMap = null;
 		results = new InvocationResults();
@@ -55,17 +56,33 @@ public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 		return CreateAndLinkLoanOutBatchJob.invocationModes;
 	}
 	
+    @Override
+    public void setServiceContext(ServiceContext context) {
+        this.ctx = context;
+    }
+    
+    @Override
+    public ServiceContext getServiceContext() {
+        return ctx;
+    }
+
+    @Override
+    public InvocationContext getInvocationContext() {
+        return invocationCtx;
+    }    
+	
 	/**
 	 * Sets the invocation context for the batch job. Called before run().
 	 * @param context an instance of InvocationContext.
 	 */
+    @Override
 	public void setInvocationContext(InvocationContext context) {
-		this.context = context;
+		this.invocationCtx = context;
 	}
 
 	/**
 	 * Sets the invocation context for the batch job. Called before run().
-	 * @param context an instance of InvocationContext.
+	 * @param invocationCtx an instance of InvocationContext.
 	 */
 	public void setResourceMap(ResourceMap resourceMap) {
 		this.resourceMap = resourceMap;
@@ -80,16 +97,16 @@ public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 		try {
 			// First, create the Loanout
 			if(createLoan() != STATUS_ERROR) {
-				if(INVOCATION_MODE_SINGLE.equalsIgnoreCase(context.getMode())) {
+				if(INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationCtx.getMode())) {
 					if(createRelation(results.getPrimaryURICreated(), 
-										context.getSingleCSID()) != STATUS_ERROR) {
+										invocationCtx.getSingleCSID()) != STATUS_ERROR) {
 						results.setNumAffected(1);
 						results.setUserNote("CreateAndLinkLoanOutBatchJob created new Loanout: "
-								+results.getPrimaryURICreated()+" with a link to the passed "+context.getDocType());
+								+results.getPrimaryURICreated()+" with a link to the passed "+invocationCtx.getDocType());
 						completionStatus = STATUS_COMPLETE;
 					}
-				} else if(INVOCATION_MODE_LIST.equalsIgnoreCase(context.getMode())) {
-					InvocationContext.ListCSIDs listWrapper = context.getListCSIDs();
+				} else if(INVOCATION_MODE_LIST.equalsIgnoreCase(invocationCtx.getMode())) {
+					InvocationContext.ListCSIDs listWrapper = invocationCtx.getListCSIDs();
 					List<String> csids = listWrapper.getCsid();
 					if(csids.size()==0) {
 						completionStatus = STATUS_ERROR;
@@ -109,7 +126,7 @@ public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 					if(completionStatus!=STATUS_ERROR) {
 						results.setNumAffected(nCreated);
 						results.setUserNote("CreateAndLinkLoanOutBatchJob created new Loanout: "
-								+results.getPrimaryURICreated()+" with "+nCreated+" link(s) to "+context.getDocType());
+								+results.getPrimaryURICreated()+" with "+nCreated+" link(s) to "+invocationCtx.getDocType());
 						completionStatus = STATUS_COMPLETE;
 					}
 				}
@@ -156,7 +173,7 @@ public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 			+   "<subjectCsid>"+loanCSID+"</subjectCsid>"
 			+   "<subjectDocumentType>"+LOAN_DOCTYPE+"</subjectDocumentType>"
 			+   "<objectCsid>"+toCSID+"</objectCsid>"
-			+   "<objectDocumentType>"+context.getDocType()+"</objectDocumentType>"
+			+   "<objectDocumentType>"+invocationCtx.getDocType()+"</objectDocumentType>"
 			+   "<relationshipType>"+RELATION_TYPE+"</relationshipType>"
 			+   "<predicateDisplayName>"+RELATION_PREDICATE_DISP+"</predicateDisplayName>"
 			+ "</ns2:relations_common></document>";

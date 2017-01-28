@@ -35,6 +35,10 @@ import java.util.regex.Matcher;
  */
 public class Tools {
 	
+	public static class NoRelatedRecordsException extends Exception {
+		
+	}
+	
 	private static final String PROPERTY_VAR_REGEX = "\\$\\{([A-Za-z0-9_\\.]+)\\}";
 	
     /** @return first glued to second with the separator string, at most one time - useful for appending paths.

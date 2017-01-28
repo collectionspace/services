@@ -201,6 +201,25 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     	return this.getTimeoutParam(uriInfo);
     }
 
+    /**
+     * Returns TRUE unless the "recordUpdates" query param is set with a value of either "false", "FALSE", or "0"
+     * @return
+     */
+    @Override
+    public boolean shouldUpdateCoreValues() {
+		boolean recordUpdates = true;
+		
+		MultivaluedMap<String, String> queryParams = getQueryParams();
+		String paramValue = queryParams.getFirst(IClientQueryParams.UPDATE_CORE_VALUES);
+		if (paramValue != null && paramValue.equalsIgnoreCase(Boolean.FALSE.toString())) { // Find our if the caller wants us to record updates
+			recordUpdates = false;
+		} else if (paramValue != null && paramValue.equals(Long.toString(0))) {
+			recordUpdates = false;
+		}
+		
+		return recordUpdates;
+    }
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.context.ServiceContext#getCommonPartLabel()
      */

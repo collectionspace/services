@@ -27,6 +27,15 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
     protected DocumentModel updateComputedCurrentLocationValue(DocumentModel collectionObjectDocModel,
             DocumentModel movementDocModel)
             throws ClientException {
+    	
+    	//
+    	// First see if we're being asked to clear the computed location field
+    	//
+    	if (movementDocModel.getCoreSession() == null) {
+    		collectionObjectDocModel.setProperty(COLLECTIONOBJECTS_COMMON_SCHEMA,
+                    COMPUTED_CURRENT_LOCATION_PROPERTY, null);
+    		return collectionObjectDocModel;
+    	}
 
         // Get the current location value from the Movement (the "new" value)
         String currentLocationRefName =
@@ -79,6 +88,7 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
                 logger.trace("computedCurrentLocation refName does NOT require updating.");
             }
         }
+        
         return collectionObjectDocModel;
     }
 }

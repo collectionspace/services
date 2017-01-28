@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.ws.rs.core.Response;
 import org.collectionspace.services.common.ResourceMap;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.slf4j.Logger;
@@ -34,7 +35,9 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
             "Could not find required CSID values in the invocation context for this batch job.";
     private List<String> invocationModes;
     private ResourceMap resourceMap;
-    private InvocationContext context;
+    private InvocationContext invocationCtx;
+    private ServiceContext ctx;
+
     private int completionStatus;
     private InvocationResults results;
     private InvocationError errorInfo;
@@ -47,7 +50,7 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
     private void init() {
         this.invocationModes = Collections.emptyList();
         this.resourceMap = null;
-        this.context = null;
+        this.invocationCtx = null;
         this.completionStatus = STATUS_UNSTARTED;
         this.results = new InvocationResults();
         this.errorInfo = null;
@@ -71,13 +74,24 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
         this.resourceMap = resourceMap;
     }
 
+    @Override
+    public void setServiceContext(ServiceContext context) {
+        this.ctx = context;
+    }
+    
+    @Override
+    public ServiceContext getServiceContext() {
+        return ctx;
+    }
+
+    @Override
     public InvocationContext getInvocationContext() {
-        return context;
+        return invocationCtx;
     }
 
     @Override
     public void setInvocationContext(InvocationContext context) {
-        this.context = context;
+        this.invocationCtx = context;
     }
 
     @Override

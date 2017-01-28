@@ -58,12 +58,12 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 	protected final int BAD_REQUEST_STATUS = Response.Status.BAD_REQUEST.getStatusCode();
 
 	public InvocationResults invokeBatchJob(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String csid,
-			ResourceMap resourceMap, InvocationContext invContext) throws Exception {
+			ResourceMap resourceMap, InvocationContext invocationCtx) throws Exception {
 
 		CoreSessionInterface repoSession = null;
 		boolean releaseRepoSession = false;
 
-		String invocationMode = invContext.getMode();
+		String invocationMode = invocationCtx.getMode();
 		String modeProperty = null;
 		boolean checkDocType = true;
 		if (BatchInvocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationMode)) {
@@ -98,9 +98,9 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 			}
 			if (checkDocType) {
 				List<String> forDocTypeList = (List<String>) NuxeoUtils.getProperyValue(docModel, BatchJAXBSchema.FOR_DOC_TYPES); //docModel.getPropertyValue(BatchJAXBSchema.FOR_DOC_TYPES);
-				if (forDocTypeList == null || !forDocTypeList.contains(invContext.getDocType())) {
+				if (forDocTypeList == null || !forDocTypeList.contains(invocationCtx.getDocType())) {
 					throw new BadRequestException("BatchResource: Invoked with unsupported document type: "
-							+ invContext.getDocType());
+							+ invocationCtx.getDocType());
 				}
 			}
 			className = (String) NuxeoUtils.getProperyValue(docModel, BatchJAXBSchema.BATCH_CLASS_NAME); //docModel.getPropertyValue(BatchJAXBSchema.BATCH_CLASS_NAME);
@@ -140,7 +140,8 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 			throw new BadRequestException("BatchResource: Invoked with unsupported context mode: " + invocationMode);
 		}
 
-		batchInstance.setInvocationContext(invContext);
+		batchInstance.setInvocationContext(invocationCtx);
+		batchInstance.setServiceContext(ctx);
 		
 		if (resourceMap != null) {
 			batchInstance.setResourceMap(resourceMap);
