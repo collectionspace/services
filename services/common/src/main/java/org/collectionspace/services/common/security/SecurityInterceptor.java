@@ -322,25 +322,29 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 	}	
     
     private void logLoginContext(LoginContext loginContext) {
+    	if (!logger.isTraceEnabled()) return;
+
 		logger.trace("CollectionSpace services now logged in to Nuxeo with LoginContext: "
 				+ loginContext);
 		Subject subject = loginContext.getSubject();
 		Set<Principal> principals = subject.getPrincipals();
-		logger.debug("Nuxeo login performed with principals: ");
+		logger.trace("Nuxeo login performed with principals: ");
 		for (Principal principal : principals) {
-			logger.debug("[" + principal.getName() + "]");
+			logger.trace("[" + principal.getName() + "]");
 		}
     }
     
     private void logLogoutContext(LoginContext loginContext) {
+    	if (!logger.isTraceEnabled()) return;
+    	
     	if (loginContext != null) {
 			logger.trace("CollectionSpace services now logging out of Nuxeo with LoginContext: "
 					+ loginContext);
 			Subject subject = loginContext.getSubject();
 			Set<Principal> principals = subject.getPrincipals();
-			logger.debug("Nuxeo logout performed with principals: ");
+			logger.trace("Nuxeo logout performed with principals: ");
 			for (Principal principal : principals) {
-				logger.debug("[" + principal.getName() + "]");
+				logger.trace("[" + principal.getName() + "]");
 			}
     	} else {
     		logger.trace("Logged out.");
@@ -374,11 +378,9 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 	        			Thread.currentThread(), threadLocalLoginContext, threadLocalLoginContext.get()));
     		}
         	//
-        	// Debug message
+        	// Debug logging
         	//
-    		if (logger.isDebugEnabled() == true) {
-    			logLoginContext(loginContext);
-    		}
+   			logLoginContext(loginContext);
     	} else {
     		//
     		// We're already logged in somehow?  This is probably not good.  It seems to mean that the LoginContext last
@@ -395,14 +397,12 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
     private synchronized void nuxeoLogout() throws LoginException {
     	LoginContext loginContext = threadLocalLoginContext != null ? threadLocalLoginContext.get() : null; 
         if (loginContext != null) {
-    		if (logger.isDebugEnabled() == true) {
-    			logLogoutContext(loginContext);
-    		}        	
+   			logLogoutContext(loginContext);
             loginContext.logout();
             threadLocalLoginContext.set(null); // We need to clear the login context from this thread, so the next request on this thread has to login again.
             logLogoutContext(null);
             frameworkLogins--;
-            if (logger.isDebugEnabled()) {
+            if (logger.isTraceEnabled()) {
             	String.format("Framework logins: ", frameworkLogins);
             }
         } else {

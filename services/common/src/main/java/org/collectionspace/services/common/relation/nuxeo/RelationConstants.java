@@ -25,7 +25,7 @@ package org.collectionspace.services.common.relation.nuxeo;
 
 
 /**
- * CollectionObjectConstants processes CollectionObject document
+ * RelationConstants processes Relation document
  *
  */
 public class RelationConstants {

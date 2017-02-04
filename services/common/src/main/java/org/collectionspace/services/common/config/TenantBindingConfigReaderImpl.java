@@ -502,10 +502,7 @@ public class TenantBindingConfigReaderImpl extends AbstractConfigReaderImpl<List
 		String result = null;
 
 		if (serviceName != null) {
-			if (logger.isDebugEnabled() == true) {
-				logger.debug(String.format(" * tenant:serviceBindings '%s'", serviceName));
-				//System.out.println(String.format(" * tenant:serviceBindings '%s'", serviceName)); // Debug only
-			}
+			logger.trace(String.format(" * tenant:serviceBindings '%s'", serviceName));
 			result = getTenantQualifiedIdentifier(tenantId, serviceName.toLowerCase());
 		}
 

@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
@@ -14,81 +15,34 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
     private final Log logger = LogFactory.getLog(UpdateObjectLocationOnMove.class);
 
     @Override
-    protected DocumentModel updateCollectionObjectValuesFromMovement(DocumentModel collectionObjectDocModel,
-            DocumentModel movementDocModel) throws ClientException {
+    protected boolean updateCollectionObjectLocation(DocumentModel collectionObjectDocModel,
+    		String movementRecordsLocation) throws ClientException {
+    	boolean result = false;
 
-        collectionObjectDocModel = updateComputedCurrentLocationValue(collectionObjectDocModel, movementDocModel);
-        // This method can be overridden and extended by adding or removing method
-        // calls here, to update a custom set of values in the CollectionObject
-        // record by pulling in values from the related Movement record.
-        return collectionObjectDocModel;
-    }
-
-    protected DocumentModel updateComputedCurrentLocationValue(DocumentModel collectionObjectDocModel,
-            DocumentModel movementDocModel)
-            throws ClientException {
-    	
-    	//
-    	// First see if we're being asked to clear the computed location field
-    	//
-    	if (movementDocModel.getCoreSession() == null) {
-    		collectionObjectDocModel.setProperty(COLLECTIONOBJECTS_COMMON_SCHEMA,
-                    COMPUTED_CURRENT_LOCATION_PROPERTY, null);
-    		return collectionObjectDocModel;
-    	}
-
-        // Get the current location value from the Movement (the "new" value)
-        String currentLocationRefName =
-                (String) movementDocModel.getProperty(MOVEMENTS_COMMON_SCHEMA, CURRENT_LOCATION_PROPERTY);
-
-        // Check that the value returned, which is expected to be a
-        // reference (refName) to an authority term (such as a storage
+        // Check that the location value returned, which is expected to be a reference (refName) to an authority term (such as a storage
         // location or organization term):
+        // 	* Ensure it is not blank.
+        // 	* Ensure it is successfully parsed by the authority item parser.
         //
-        // * Is not blank
-        // * Is capable of being successfully parsed by an authority item parser.
-        if (Tools.isBlank(currentLocationRefName)) {
-            if (logger.isTraceEnabled()) {
-                logger.trace("Current location in Movement record was blank");
-            }
-            return collectionObjectDocModel;
-        } else if (RefNameUtils.parseAuthorityTermInfo(currentLocationRefName) == null) {
-            logger.warn(String.format("Could not parse current location refName '%s' in Movement record",
-                    currentLocationRefName));
-            return collectionObjectDocModel;
-        } else {
-            if (logger.isTraceEnabled()) {
-                logger.trace("current location refName passes basic validation tests.");
-                logger.trace("currentLocation refName=" + currentLocationRefName);
-            }
+        if (Tools.isBlank(movementRecordsLocation)) {
+            return result;
+        } else if (RefNameUtils.parseAuthorityTermInfo(movementRecordsLocation) == null) {
+            logger.warn(String.format("Ignoring movment record.  Could not parse the location field's refName '%s'.",
+            		movementRecordsLocation));
+            return result;
         }
         
-        // Get the computed current location value of the CollectionObject
-        // (the "existing" value)
-        String existingComputedCurrentLocationRefName =
-                (String) collectionObjectDocModel.getProperty(COLLECTIONOBJECTS_COMMON_SCHEMA,
+        // Get the computed current location value of the CollectionObject.
+        String existingComputedCurrentLocation = (String) collectionObjectDocModel.getProperty(COLLECTIONOBJECTS_COMMON_SCHEMA,
                 COMPUTED_CURRENT_LOCATION_PROPERTY);
-        if (logger.isTraceEnabled()) {
-            logger.trace("Existing computedCurrentLocation refName=" + existingComputedCurrentLocationRefName);
-        }
 
-        // If the new value is not blank (redundant with a check just above, but
-        // a quick, extra guard) and the new value is different than the existing value ...
-        if ( (Tools.notBlank(currentLocationRefName)) && (!currentLocationRefName.equals(existingComputedCurrentLocationRefName))) {
-            if (logger.isTraceEnabled()) {
-                logger.trace("computedCurrentLocation refName requires updating.");
-            }
-            // ... update the existing value (in the CollectionObject) with the
-            // new value (from the Movement).
+        // If the movement record's location is different than the existing catalog's then update it and return 'true'
+        if (movementRecordsLocation.equalsIgnoreCase(existingComputedCurrentLocation) == false) {
             collectionObjectDocModel.setProperty(COLLECTIONOBJECTS_COMMON_SCHEMA,
-                    COMPUTED_CURRENT_LOCATION_PROPERTY, currentLocationRefName);
-
-        } else {
-            if (logger.isTraceEnabled()) {
-                logger.trace("computedCurrentLocation refName does NOT require updating.");
-            }
+            		COMPUTED_CURRENT_LOCATION_PROPERTY, movementRecordsLocation);
+            result = true; // We've updated the location field.
         }
         
-        return collectionObjectDocModel;
+        return result;
     }
 }

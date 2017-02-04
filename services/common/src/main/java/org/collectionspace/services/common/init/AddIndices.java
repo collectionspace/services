@@ -319,7 +319,7 @@ public class AddIndices extends InitHandler implements IInitHandler {
 	        		logger.error(errMessage);
 	        	}
 	        } else {
-        		logger.debug(String.format("Uniqueness constraint already exists on '%s' column of table '%s' in repository '%s'.",
+        		logger.trace(String.format("Uniqueness constraint already exists on '%s' column of table '%s' in repository '%s'.",
 		    			SHORT_ID, tableName, repositoryName));	        	
 	        }
         } catch (Exception e) {
