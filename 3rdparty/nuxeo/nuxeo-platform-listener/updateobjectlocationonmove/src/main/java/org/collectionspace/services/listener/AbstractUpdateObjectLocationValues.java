@@ -18,7 +18,8 @@ import org.collectionspace.services.movement.nuxeo.MovementConstants;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-
+import org.nuxeo.common.collections.ScopeType;
+import org.nuxeo.common.collections.ScopedMap;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -28,6 +29,7 @@ import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
+import org.nuxeo.ecm.core.versioning.VersioningService;
 
 public abstract class AbstractUpdateObjectLocationValues implements EventListener {
 
@@ -72,6 +74,9 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
     private final static String ACTIVE_DOCUMENT_WHERE_CLAUSE_FRAGMENT =
             "AND (ecm:currentLifeCycleState <> 'deleted') "
             + NONVERSIONED_NONPROXY_DOCUMENT_WHERE_CLAUSE_FRAGMENT;
+
+	private static final String IGNORE_LOCATION_UPDATE_EVENT_LABEL = "IGNORE_LOCATION_UPDATE_EVENT";
+	private static final String IGNORE_LOCATION_UPDATE_EVENT_OPTION = ScopeType.DEFAULT.getScopePrefix() + "IGNORE_LOCATION_UPDATE_EVENT";
     
     public enum EventNotificationDocumentType {
         // Document type about which we've received a notification
@@ -116,6 +121,20 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
 	    	}
     	}
     }
+    
+    /*
+     * Figure out if we should ignore this event.
+     */
+    private boolean shouldIgnoreEvent(DocumentEventContext docEventContext, String ignoreEventLabel) {
+    	boolean result = false;
+    	
+        Boolean shouldIgnoreEvent = (Boolean) docEventContext.getProperties().get(ignoreEventLabel);
+        if (shouldIgnoreEvent != null && shouldIgnoreEvent) {
+        	result = true;
+        }
+
+        return result;
+    }
 
     @Override
     public void handleEvent(Event event) throws ClientException {
@@ -129,6 +148,14 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
         DocumentModel eventDocModel = docEventContext.getSourceDocument();        
         String eventType = event.getName();
         boolean isAboutToBeRemovedEvent = eventType.equals(DocumentEventTypes.ABOUT_TO_REMOVE);
+        
+        //
+        // This event handler itself sometimes triggers additional events.  To prevent unnecessary cascading event handling, this event
+        // handler sets a flag in the document model indicating we should ignore cascading events.  This method checks that flag and
+        // exits if it is set.
+    	if (shouldIgnoreEvent(docEventContext, IGNORE_LOCATION_UPDATE_EVENT_LABEL) == true) {
+    		return;
+    	}        
 
         //
         // Ensure this event relates to a relationship record (between cataloging and movement records) or a movement record.  If so, get the CSID
@@ -153,11 +180,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
                 return;
             }
         } else if (documentMatchesType(eventDocModel, COLLECTIONOBJECT_DOCTYPE) &&
-        		eventType.equals(DocumentEventTypes.DOCUMENT_UPDATED)) {
-        	//
-        	// This ensures we resolve "stale" location values by recomputing the current location
-        	// when a cataloging records gets updated.  Stale location values can and do occur for a variety of reasons.
-        	//
+        	eventType.equals(DocumentEventTypes.DOCUMENT_UPDATED)) {
         	notificationDocumentType = EventNotificationDocumentType.COLLECTIONOBJECT;
         } else {
         	// We don't need to handle this event.
@@ -190,7 +213,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
         } else if (notificationDocumentType == EventNotificationDocumentType.MOVEMENT) {
             collectionObjectCsids.addAll(getCollectionObjectCsidsRelatedToMovement(eventMovementCsid, session));
         } else if (notificationDocumentType == EventNotificationDocumentType.COLLECTIONOBJECT) {
-        	collectionObjectCsids.add(NuxeoUtils.getCsid(eventDocModel));
+       		collectionObjectCsids.add(NuxeoUtils.getCsid(eventDocModel));
         } else {
             // This event did not involve a document relevant to us.
             return;
@@ -228,7 +251,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
 	            // If the location changed, save/persist the change to the repository and log the change.
 	            //
             	if (didLocationChange == true) {
-    	            session.saveDocument(collectionObjectDocModel);
+            		persisLocationChange(session, collectionObjectDocModel);
     	            //
     	            // Log an INFO message if we've changed the cataloging record's location
     	            //	            
@@ -241,6 +264,26 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
             	}
             }
         }
+    }
+    
+    //
+    // Disable update/documentModified events and persist the location change.
+    //
+    private void persisLocationChange(CoreSessionInterface session, DocumentModel collectionObjectDocModel) {
+    	
+    	//
+    	// Set a flag in the document model indicating that we want to ignore the update event that
+    	// will be triggered by this save/persist request.
+    	ScopedMap contextData = collectionObjectDocModel.getContextData();
+    	contextData.putIfAbsent(IGNORE_LOCATION_UPDATE_EVENT_OPTION, true);
+
+    	//
+    	// Save/Persist the document to the DB
+        session.saveDocument(collectionObjectDocModel);
+        
+        //
+        // Clear the flag we set to ignore events triggered by our save request.
+    	contextData.remove(IGNORE_LOCATION_UPDATE_EVENT_OPTION);
     }
 
     /**
