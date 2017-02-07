@@ -40,6 +40,7 @@ import org.collectionspace.authentication.spi.AuthNContext;
 import org.collectionspace.services.authorization.AccountPermission;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.lifecycle.TransitionDef;
+import org.collectionspace.services.client.AccountClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
@@ -101,6 +102,8 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     private final Logger logger = LoggerFactory.getLogger(RemoteDocumentModelHandlerImpl.class);
     private final static String CR = "\r\n";
     private final static String EMPTYSTR = "";
+	private static final String COLLECTIONSPACE_CORE_SCHEMA = CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA;
+	private static final String ACCOUNT_PERMISSION_COMMON_PART_NAME = AccountClient.SERVICE_COMMON_PART_NAME;
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#setServiceContext(org.collectionspace.services.common.context.ServiceContext)
@@ -408,16 +411,27 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
                 throw new BadRequestException(msg);
             }
 
-            //skip if the part is not in metadata
+            //skip if the part is not in metadata or if it is a system part
             ObjectPartType partMeta = partsMetaMap.get(partLabel);
-            if (partMeta == null) {
+            if (partMeta == null || isSystemPart(partLabel)) {
                 continue;
             }
             fillPart(part, docModel, partMeta, action, ctx);
         }
     }
 
-    /**
+    private boolean isSystemPart(String partLabel) {
+    	boolean result = false;
+    	
+    	if (partLabel != null && (partLabel.equalsIgnoreCase(COLLECTIONSPACE_CORE_SCHEMA) ||
+    			partLabel.equalsIgnoreCase(ACCOUNT_PERMISSION_COMMON_PART_NAME))) {
+    		result = true;
+    	}
+    	
+		return result;
+	}
+
+	/**
      * fillPart fills an XML part into given document model
      * @param part to fill
      * @param docModel for the given object
