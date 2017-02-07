@@ -17,6 +17,7 @@ import org.collectionspace.services.batch.AbstractBatchInvocable;
 import org.collectionspace.services.batch.UriInfoImpl;
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionObjectClient;
+import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.MovementClient;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -25,8 +26,10 @@ import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+
 import org.dom4j.DocumentException;
 //import org.jboss.resteasy.specimpl.UriInfoImpl;
 import org.jdom.Document;
@@ -62,6 +65,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             Namespace.getNamespace(
             COLLECTIONOBJECTS_COMMON_NAMESPACE_PREFIX,
             COLLECTIONOBJECTS_COMMON_NAMESPACE_URI);
+	private static final int DEFAULT_PAGE_SIZE = 1000;
     private final boolean EXCLUDE_DELETED = true;
     private final String CLASSNAME = this.getClass().getSimpleName();
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -136,15 +140,22 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         NuxeoBasedResource collectionObjectResource = (NuxeoBasedResource) resourcemap.get(CollectionObjectClient.SERVICE_NAME);
         NuxeoBasedResource movementResource = (NuxeoBasedResource) resourcemap.get(MovementClient.SERVICE_NAME);
         String computedCurrentLocation;
-        int numUpdated = 0;
+        long numUpdated = 0;
+        long processed = 0;
 
+        long recordsToProcess = csids.size();
+        long logInterval = recordsToProcess / 10 + 2;
         try {
 
             // For each CollectionObject record
             for (String collectionObjectCsid : csids) {
-
-                // FIXME: Optionally set competition status here to
-                // indicate what percentage of records have been processed.
+            	
+            	// Log progress at INFO level
+            	if (processed % logInterval == 0) {
+	            	logger.info(String.format("Recalculated computed location for %d of %d cataloging records.",
+	            			processed, recordsToProcess));
+            	}
+            	processed++;
 
                 // Skip over soft-deleted CollectionObject records
                 //
@@ -198,6 +209,22 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         getResults().setNumAffected(numUpdated);
         return getResults();
     }
+    
+    //
+    // Returns the number of distinct/unique CSID values in the list
+    //
+    private int getNumberOfDistinceRecords(AbstractCommonList abstractCommonList) {
+    	Set<String> resultSet = new HashSet<String>();
+    	
+        for (AbstractCommonList.ListItem listItem : abstractCommonList.getListItem()) {
+	        String csid = AbstractCommonListUtils.ListItemGetElementValue(listItem, CSID_ELEMENT_NAME);
+	        if (!Tools.isBlank(csid)) {
+	            resultSet.add(csid);
+	        }
+        }
+    	
+        return resultSet.size();
+    }
 
     private AbstractCommonList.ListItem getMostRecentMovement(AbstractCommonList relatedMovements) {
         Set<String> alreadyProcessedMovementCsids = new HashSet<String>();
@@ -208,6 +235,20 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         String updateDate;
         String mostRecentLocationDate = "";
         String comparisonUpdateDate = "";
+        
+        //
+        // If there is only one related movement record, then return it as the most recent
+        // movement record -if it's current location element is not empty.
+        //
+        if (getNumberOfDistinceRecords(relatedMovements) == 1) {
+        	mostRecentMovement = relatedMovements.getListItem().get(0);
+            currentLocation = AbstractCommonListUtils.ListItemGetElementValue(mostRecentMovement, CURRENT_LOCATION_ELEMENT_NAME);
+            if (Tools.isBlank(currentLocation)) {
+            	mostRecentMovement = null;
+            }
+            return mostRecentMovement;
+        }
+        
         for (AbstractCommonList.ListItem movementListItem : relatedMovements.getListItem()) {
             movementCsid = AbstractCommonListUtils.ListItemGetElementValue(movementListItem, CSID_ELEMENT_NAME);
             if (Tools.isBlank(movementCsid)) {
@@ -276,6 +317,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             }
 
         }
+        
         return mostRecentMovement;
     }
 
@@ -285,9 +327,10 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
     //
     // Note: any such values must first be exposed in Movement list items,
     // in turn via configuration in Services tenant bindings ("listResultsField").
-    protected int updateCollectionObjectValues(NuxeoBasedResource collectionObjectResource,
-            String collectionObjectCsid, AbstractCommonList.ListItem mostRecentMovement,
-            ResourceMap resourcemap, int numUpdated)
+    protected long updateCollectionObjectValues(NuxeoBasedResource collectionObjectResource,
+            String collectionObjectCsid,
+            AbstractCommonList.ListItem mostRecentMovement,
+            ResourceMap resourcemap, long numUpdated)
             throws DocumentException, URISyntaxException {
         PoxPayloadOut collectionObjectPayload;
         String computedCurrentLocation;
@@ -354,9 +397,12 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         if (logger.isTraceEnabled()) {
             logger.trace("Update payload: " + "\n" + collectionObjectUpdatePayload);
         }
-        byte[] response = collectionObjectResource.update(resourcemap, null, collectionObjectCsid,
+        
+        UriInfo uriInfo = this.setupQueryParamForUpdateRecords(); // Determines if we'll updated the updateAt and updatedBy core values
+        byte[] response = collectionObjectResource.update(resourcemap, uriInfo, collectionObjectCsid,
                 collectionObjectUpdatePayload);
         numUpdated++;
+        
         if (logger.isTraceEnabled()) {
             logger.trace("Computed current location value for CollectionObject " + collectionObjectCsid
                     + " was set to " + computedCurrentLocation);
@@ -406,6 +452,30 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
     protected UriInfo createRelatedRecordsUriInfo(String queryString) throws URISyntaxException {
         URI uri = new URI(null, null, null, queryString, null);
         return createUriInfo(uri.getRawQuery());
+    }
+    
+    protected UriInfo setupQueryParamForUpdateRecords() throws URISyntaxException {
+    	UriInfo result = null;
+    	
+    	//
+    	// Check first to see if we've got a query param.  It will override any invocation context value
+    	//
+    	String updateCoreValues = (String) getServiceContext().getQueryParams().getFirst(IClientQueryParams.UPDATE_CORE_VALUES);
+    	if (Tools.isBlank(updateCoreValues)) {
+    		//
+    		// Since there is no query param, let's check the invocation context
+    		//
+    		updateCoreValues = getInvocationContext().getUpdateCoreValues();    		
+    	}
+    	
+    	//
+    	// If we found a value, then use it to create a query parameter
+    	//
+    	if (Tools.notBlank(updateCoreValues)) {
+        	result = createUriInfo(IClientQueryParams.UPDATE_CORE_VALUES + "=" + updateCoreValues);
+    	}
+    	
+    	return result;
     }
 
     protected String getFieldElementValue(PoxPayloadOut payload, String partLabel, Namespace partNamespace, String fieldPath) {
@@ -458,6 +528,16 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             uriInfo = createUriInfo();
         }
         uriInfo.getQueryParameters().add(WorkflowClient.WORKFLOW_QUERY_NONDELETED, Boolean.FALSE.toString());
+        return uriInfo;
+    }
+    
+    private UriInfo addFilterForPageSize(UriInfo uriInfo, long startPage, long pageSize) throws URISyntaxException {
+    	if (uriInfo == null) {
+            uriInfo = createUriInfo();
+        }
+        uriInfo.getQueryParameters().addFirst(IClientQueryParams.START_PAGE_PARAM, Long.toString(startPage));
+        uriInfo.getQueryParameters().addFirst(IClientQueryParams.PAGE_SIZE_PARAM, Long.toString(pageSize));
+
         return uriInfo;
     }
 
@@ -538,6 +618,13 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         }
         return csids;
     }
+    
+    private void appendItemsToCsidsList(List<String> existingList, AbstractCommonList abstractCommonList) {
+        for (AbstractCommonList.ListItem listitem : abstractCommonList.getListItem()) {
+        	existingList.add(AbstractCommonListUtils.ListItemGetCSID(listitem));
+        }
+    }
+    
 
     private List<String> getMemberCsidsFromGroup(String serviceName, String groupCsid) throws URISyntaxException, DocumentException {
         ResourceMap resourcemap = getResourceMap();
@@ -559,8 +646,25 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         NuxeoBasedResource collectionObjectResource = (NuxeoBasedResource) resourcemap.get(CollectionObjectClient.SERVICE_NAME);
         UriInfo uriInfo = createUriInfo();
         uriInfo = addFilterToExcludeSoftDeletedRecords(uriInfo);
-        AbstractCommonList collectionObjects = collectionObjectResource.getList(uriInfo);
-        List<String> noContextCsids = getCsidsList(collectionObjects);
+
+        boolean morePages = true;
+        long currentPage = 0;
+        long totalItems = 0;
+        long pageSize = DEFAULT_PAGE_SIZE;
+        List<String> noContextCsids = new ArrayList<String>();
+        
+        while (morePages == true) {
+	        uriInfo = addFilterForPageSize(uriInfo, currentPage, pageSize);
+	        AbstractCommonList collectionObjects = collectionObjectResource.getList(uriInfo);
+	        appendItemsToCsidsList(noContextCsids, collectionObjects);
+	        
+	        if (collectionObjects.getItemsInPage() == pageSize) { // We know we're at the last page when the number of items returned in the last request is less than the page size.
+	        	currentPage++;
+	        } else {
+	        	morePages = false;	        	
+	        }
+        }
+        
         return noContextCsids;
     }
 }

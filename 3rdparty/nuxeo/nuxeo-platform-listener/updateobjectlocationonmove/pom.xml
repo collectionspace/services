@@ -32,6 +32,16 @@
             <artifactId>org.collectionspace.services.client</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.location.client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.collectionobject.service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 	
     <build>

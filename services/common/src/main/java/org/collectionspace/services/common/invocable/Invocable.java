@@ -25,6 +25,7 @@ package org.collectionspace.services.common.invocable;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import java.util.List;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.context.ServiceContext;
 
 /**
  * Invocable defines an interface for invocable jobs (batch, reports, exports,
@@ -108,4 +109,13 @@ public interface Invocable {
      * Will only be called if getCompletionStatus() returns STATUS_ERROR.
      */
     public InvocationError getErrorInfo();
+
+    /*
+     * Save a handle to the JAX-RS related service context
+     */
+	void setServiceContext(ServiceContext context);
+
+	ServiceContext getServiceContext();
+
+	InvocationContext getInvocationContext();
 }

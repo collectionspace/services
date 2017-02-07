@@ -101,6 +101,12 @@ public interface ServiceContext<IT, OT> {
     public SecurityContext getSecurityContext();
 
     /**
+     * Returns TRUE unless the "recordUpdates" query param is set with a value of either "false", "FALSE", or "0"
+     * @return
+     */
+    public boolean shouldUpdateCoreValues();
+    
+    /**
      * getTimeoutSecs();
      */
     public int getTimeoutSecs();

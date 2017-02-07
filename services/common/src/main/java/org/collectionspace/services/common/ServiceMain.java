@@ -388,8 +388,8 @@ public class ServiceMain {
                     if (Tools.isEmpty(initHandlerClassname)) {
                         continue;
                     }
-                    if (ServiceMain.logger.isDebugEnabled()) {
-                    	ServiceMain.logger.debug(String.format("Firing post-init handler %s ...", initHandlerClassname));
+                    if (ServiceMain.logger.isTraceEnabled()) {
+                    	ServiceMain.logger.trace(String.format("Firing post-init handler %s ...", initHandlerClassname));
                     }
 
                     List<org.collectionspace.services.config.service.InitHandler.Params.Field>
@@ -864,8 +864,8 @@ public class ServiceMain {
 		}
 
 		if (logger.isInfoEnabled()) {
-			logger.info("Found and can read prototype Nuxeo config file at path %s",
-					prototypeNuxeoDatasourceFile.getAbsolutePath());
+			logger.info(String.format("Using prototype Nuxeo server configuration file at path %s",
+					prototypeNuxeoDatasourceFile.getAbsolutePath()));
 		}
 
 		//
@@ -924,8 +924,8 @@ public class ServiceMain {
 		}
 
 		if (logger.isInfoEnabled()) {
-			logger.info("Found and can read the prototype Elasticsearch configuration file at path '%s'.",
-					result.getAbsolutePath());
+			logger.info(String.format(String.format("Using the prototype Elasticsearch configuration file at path '%s'.",
+					result.getAbsolutePath())));
 		}
 
 		return result;
@@ -946,8 +946,8 @@ public class ServiceMain {
 		}
 
 		if (logger.isInfoEnabled()) {
-			logger.info("Found and can read the prototype Elasticsearch extension file at path %s",
-					result.getAbsolutePath());
+			logger.info(String.format("Using the prototype Elasticsearch extension file at path %s",
+					result.getAbsolutePath()));
 		}
 
 		return result;
@@ -1026,7 +1026,8 @@ public class ServiceMain {
             throw new RuntimeException(msg);
         }
         if (logger.isInfoEnabled()) {
-            logger.info("Found and can read prototype Nuxeo config file at path %s", prototypeNuxeoConfigFile.getAbsolutePath());
+            logger.info(String.format("Using prototype Nuxeo config file at path %s", 
+            		prototypeNuxeoConfigFile.getAbsolutePath()));
         }
         
         //

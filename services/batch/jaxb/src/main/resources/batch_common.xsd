@@ -32,7 +32,10 @@
 					</xs:complexType>
 				</xs:element>
 				<xs:element name="supportsNoContext" type="xs:boolean" />
-				<xs:element name="forSingleDoc" type="xs:boolean" />
+				<xs:element name="supportsSingleDoc" type="xs:boolean" />
+				<xs:element name="supportsDocList" type="xs:boolean" />
+				<xs:element name="supportsGroup" type="xs:boolean" />
+				<!-- Batch specific fields -->
 				<xs:element name="createsNewFocus" type="xs:boolean" />
 				<xs:element name="className" type="xs:string" />
 			</xs:sequence>
