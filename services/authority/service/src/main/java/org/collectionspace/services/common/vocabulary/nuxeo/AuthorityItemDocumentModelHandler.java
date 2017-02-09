@@ -569,7 +569,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         //
         // If the shared authority item is newer, update our local copy
         //
-        if (sasRev > localItemRev || localIsProposed) {
+        if (sasRev > localItemRev || localIsProposed || ctx.shouldForceSync()) {
         	sasPayloadIn = AuthorityServiceUtils.filterRefnameDomains(ctx, sasPayloadIn); // We need to filter the domain name part of any and all refnames in the payload
         	AuthorityResource authorityResource = (AuthorityResource) ctx.getResource(getAuthorityServicePath());
         	PoxPayloadOut payloadOut = authorityResource.updateAuthorityItem(ctx, 

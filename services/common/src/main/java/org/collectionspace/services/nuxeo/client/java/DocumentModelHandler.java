@@ -330,6 +330,13 @@ public abstract class DocumentModelHandler<T, TL>
     protected boolean hasRefNameUpdate() {
     	boolean result = false;
     	
+    	//
+    	// Check to see if the request contains a query parameter asking us to force a refname update
+    	//
+    	if (getServiceContext().shouldForceUpdateRefnameReferences() == true) {
+    		return true;
+    	}
+    	
     	if (Tools.notBlank(newRefNameOnUpdate) && Tools.notBlank(oldRefNameOnUpdate)) {
     		// CSPACE-6372: refNames are different if:
     		//   - any part of the refName is different, using a case insensitive comparison, or

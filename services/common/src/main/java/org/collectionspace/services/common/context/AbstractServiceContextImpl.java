@@ -220,6 +220,28 @@ public abstract class AbstractServiceContextImpl<IT, OT>
 		return recordUpdates;
     }
     
+	/**
+	 * Default value is 'FALSE'
+	 * If this returns true, it means that the refname values in referencing objects (records that reference authority or vocabulary terms) will be updated
+	 * regardless of their current value.  This is sometimes needed when refname values become stale for one of several reasons.
+	 * @return
+	 */
+    @Override
+    public boolean shouldForceUpdateRefnameReferences() {
+		boolean forceUpdates = false;
+		
+		MultivaluedMap<String, String> queryParams = getQueryParams();
+		String paramValue = queryParams.getFirst(IClientQueryParams.FORCE_REFNAME_UPDATES);
+		if (paramValue != null && paramValue.equalsIgnoreCase(Boolean.TRUE.toString())) { // Find our if the caller wants us to force refname updates
+			forceUpdates = true;
+		} else if (paramValue != null && paramValue.equals(Long.toString(1))) {
+			forceUpdates = true;
+		}
+		
+		return forceUpdates;
+    }
+    
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.context.ServiceContext#getCommonPartLabel()
      */
@@ -866,4 +888,24 @@ public abstract class AbstractServiceContextImpl<IT, OT>
 	public void setRepositoryDomain(RepositoryDomainType repositoryDomain) {
 		this.repositoryDomain = repositoryDomain;
 	}
+	
+	/**
+	 * Check for a query parameter that indicates if we should force a sync even if the revision numbers indicate otherwise.
+	 * @return
+	 */
+	@Override
+	public boolean shouldForceSync() {
+		boolean forceSync = false;
+		
+		MultivaluedMap<String, String> queryParams = getQueryParams();
+		String paramValue = queryParams.getFirst(IClientQueryParams.FORCE_SYCN);
+		if (paramValue != null && paramValue.equalsIgnoreCase(Boolean.TRUE.toString())) { // Find our if the caller wants us to force refname updates
+			forceSync = true;
+		} else if (paramValue != null && paramValue.equals(Long.toString(1))) {
+			forceSync = true;
+		}
+		
+		return forceSync;
+    }
+	
 }
