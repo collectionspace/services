@@ -33,4 +33,6 @@ public interface IClientQueryParams {
     public static final String ORDER_BY_PARAM = "sortBy";
     public static final String IMPORT_TIMEOUT_PARAM = "impTimout";
     public static final String UPDATE_CORE_VALUES = "updateCoreValues";
+    public static final String FORCE_REFNAME_UPDATES = "forceRefnameUpdates";
+    public static final String FORCE_SYCN = "forceSync";
 }

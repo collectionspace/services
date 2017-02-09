@@ -594,7 +594,7 @@ public class RefNameServiceUtils {
 
                 // Only match complete refNames - unless and until we decide how to resolve changes
                 // to NPTs we will defer that and only change PTs or refNames as passed in.
-                int nRefsFoundThisPage = processRefObjsDocListForUpdate(docList, ctx.getTenantId(), oldRefName, 
+                int nRefsFoundThisPage = processRefObjsDocListForUpdate(ctx, docList, ctx.getTenantId(), oldRefName, 
                 		queriedServiceBindings, authRefFieldsByService, // Perform the refName updates on the list of document models
                         newRefName);
                 if (nRefsFoundThisPage > 0) {
@@ -747,13 +747,21 @@ public class RefNameServiceUtils {
 	}
 
     private static int processRefObjsDocListForUpdate(
+    		ServiceContext ctx,
             DocumentModelList docList,
             String tenantId,
             String refName,
             Map<String, ServiceBindingType> queriedServiceBindings,
             Map<String, List<AuthRefConfigInfo>> authRefFieldsByService,
             String newAuthorityRefName) {
-    	return processRefObjsDocList(docList, tenantId, refName, false, queriedServiceBindings,
+    	boolean matchBaseOnly = false;
+    	
+    	if (ctx.shouldForceUpdateRefnameReferences() == true) {
+    		refName = RefNameUtils.stripAuthorityTermDisplayName(refName);
+    		matchBaseOnly = true;
+    	}
+    	
+    	return processRefObjsDocList(docList, tenantId, refName, matchBaseOnly, queriedServiceBindings,
     			authRefFieldsByService, null, 0, 0, newAuthorityRefName);
     }
     			
@@ -881,7 +889,7 @@ public class RefNameServiceUtils {
                 ilistItem.setDocName(
                         ServiceBindingUtils.getMappedFieldInDoc(sb, ServiceBindingUtils.OBJ_NAME_PROP, docModel));
             }
-            // Now, we have to loop over the authRefFieldsByService to figure
+            // Now, we have to loop over the authRefFieldsByService to figure out
             // out which field(s) matched this.
             List<AuthRefConfigInfo> matchingAuthRefFields = authRefFieldsByService.get(docType);
             if (matchingAuthRefFields == null || matchingAuthRefFields.isEmpty()) {

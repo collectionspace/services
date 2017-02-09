@@ -102,6 +102,7 @@ public interface ServiceContext<IT, OT> {
 
     /**
      * Returns TRUE unless the "recordUpdates" query param is set with a value of either "false", "FALSE", or "0"
+     * If set to false, core schema values (i.e. updated-at, updated-by, etc) won't be changed on updates.
      * @return
      */
     public boolean shouldUpdateCoreValues();
@@ -381,6 +382,19 @@ public interface ServiceContext<IT, OT> {
      */
 	public CollectionSpaceResource<IT, OT> getResource(
 			String serviceName) throws Exception;
+
+	/**
+	 * If this returns true, it means that the refname values in referencing objects (records that reference authority or vocabulary terms) will be updated
+	 * regardless of their current value.  This is sometimes needed when refname values become stale for one of several reasons.
+	 * @return
+	 */
+	public boolean shouldForceUpdateRefnameReferences();
+
+	/**
+	 * Check for a query parameter that indicates if we should force a sync even if the revision numbers indicate otherwise.
+	 * @return
+	 */
+	public boolean shouldForceSync();
 }
 
 
