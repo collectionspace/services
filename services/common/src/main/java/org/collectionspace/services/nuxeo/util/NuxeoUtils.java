@@ -32,15 +32,18 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.collectionspace.services.common.NuxeoBasedResource;
+import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
@@ -55,7 +58,6 @@ import org.collectionspace.services.lifecycle.TransitionDefList;
 import org.collectionspace.services.lifecycle.TransitionList;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentException;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
-
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
 import org.nuxeo.ecm.core.NXCore;
@@ -722,6 +724,28 @@ public class NuxeoUtils {
     static public NuxeoBasedResource getDocumentResource(String csid) {
     	return null;
     }
+    
+    public static DocumentModel getDocModelForRefName(CoreSessionInterface repoSession, String refName, ResourceMap resourceMap)
+    		throws DocumentNotFoundException, Exception {
+    	RefName.AuthorityItem item = RefName.AuthorityItem.parse(refName);
+    	if (item != null) {
+        	NuxeoBasedResource resource = (NuxeoBasedResource) resourceMap.get(item.inAuthority.resource);
+        	return resource.getDocModelForAuthorityItem(repoSession, item);
+    	}
+    	RefName.Authority authority = RefName.Authority.parse(refName);
+    	// Handle case of objects refNames, which must be csid based.
+    	if(authority != null && !Tools.isEmpty(authority.csid)) {
+        	NuxeoBasedResource resource = (NuxeoBasedResource) resourceMap.get(authority.resource);
+            // Ensure we have the right context.
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = 
+            		resource.createServiceContext(authority.resource);
+            // HACK - this really must be moved to the doc handler, not here. No Nuxeo specific stuff here!
+            DocumentModel docModel = NuxeoUtils.getDocFromCsid(ctx, repoSession, authority.csid);
+            return docModel;
+    	}
+    	
+    	return null;  // We've failed to find a matching document model
+    }    
     
     static public DocumentModel getDocFromSpecifier(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,

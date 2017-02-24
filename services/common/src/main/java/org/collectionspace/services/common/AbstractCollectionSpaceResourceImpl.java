@@ -183,7 +183,7 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
      * 
      * @throws Exception the exception
      */
-    protected ServiceContext<IT, OT> createServiceContext(String serviceName) throws Exception {    	
+    public ServiceContext<IT, OT> createServiceContext(String serviceName) throws Exception {    	
         ServiceContext<IT, OT> ctx = createServiceContext(
         		serviceName,
         		(IT)null, // The input part

@@ -241,7 +241,7 @@ public abstract class DocumentModelHandler<T, TL>
      * @throws PropertyException the property exception
      */
     abstract public AuthorityRefList getAuthorityRefs(String csid,
-    		List<AuthRefConfigInfo> authRefsInfo) throws PropertyException, Exception;    
+    		List<AuthRefConfigInfo> authRefConfigInfoList) throws PropertyException, Exception;    
 
     /*
      * Subclasses should override this method if they need to customize their refname generation

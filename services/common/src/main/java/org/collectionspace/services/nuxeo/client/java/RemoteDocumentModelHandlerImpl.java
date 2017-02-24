@@ -72,6 +72,7 @@ import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.config.service.DocHandlerParams;
 import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ObjectPartType;
@@ -83,6 +84,7 @@ import org.collectionspace.services.relation.RelationshipType;
 import org.dom4j.Element;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.DocumentNotFoundException;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -604,7 +606,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     @Override
     public AuthorityRefList getAuthorityRefs(
             String csid,
-            List<AuthRefConfigInfo> authRefsInfo) throws PropertyException, Exception {
+            List<AuthRefConfigInfo> authRefConfigInfoList) throws PropertyException, Exception {
 
         AuthorityRefList authRefList = new AuthorityRefList();
         AbstractCommonList commonList = (AbstractCommonList) authRefList;
@@ -623,7 +625,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         	int nFoundInPage = 0;
         	int nFoundTotal = 0;
         	
-        	ArrayList<RefNameServiceUtils.AuthRefInfo> foundProps 
+        	ArrayList<RefNameServiceUtils.AuthRefInfo> foundReferences 
         		= new ArrayList<RefNameServiceUtils.AuthRefInfo>();
         	
         	boolean releaseRepoSession = false;
@@ -633,14 +635,15 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         	if (repoSession == null) {
         		repoSession = repoClient.getRepositorySession(ctx);
         		releaseRepoSession = true;
+        		this.setRepositorySession(repoSession); // we (the doc handler) should keep track of this repository session in case we need it
         	}
         	
         	try {
         		DocumentModel docModel = repoClient.getDoc(repoSession, ctx, csid).getWrappedObject();
-	           	RefNameServiceUtils.findAuthRefPropertiesInDoc(docModel, authRefsInfo, null, foundProps);
+	           	RefNameServiceUtils.findAuthRefPropertiesInDoc(docModel, authRefConfigInfoList, null, foundReferences);
 	           	// Slightly goofy pagination support - how many refs do we expect from one object?
-	           	for(RefNameServiceUtils.AuthRefInfo ari:foundProps) {
-	       			if((nFoundTotal >= iFirstToUse) && (nFoundInPage < pageSize)) {
+	           	for(RefNameServiceUtils.AuthRefInfo ari:foundReferences) {
+	       			if ((nFoundTotal >= iFirstToUse) && (nFoundInPage < pageSize)) {
 	       				if(appendToAuthRefsList(ari, list)) {
 	           				nFoundInPage++;
 	               			nFoundTotal++;
@@ -691,25 +694,62 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
 	   			return true;
 	   		}
     	} catch(PropertyException pe) {
-			logger.debug("PropertyException on: "+ari.getProperty().getPath()+pe.getLocalizedMessage());
+    		String msg = "PropertyException on: "+ari.getProperty().getPath()+pe.getLocalizedMessage();
+    		if (logger.isDebugEnabled()) {
+    			logger.debug(msg, pe);
+    		} else {
+    			logger.error(msg);
+    		}
     	}
     	return false;
     }
 
+    /**
+     * Fill in all the values to be returned in the authrefs payload for this item.
+     * 
+     * @param authRefFieldName
+     * @param refName
+     * @return
+     */
     private AuthorityRefList.AuthorityRefItem authorityRefListItem(String authRefFieldName, String refName) {
-
+    	//
+    	// Find the CSID for the authority item
+    	//
+    	String csid = null;
+    	try {
+			DocumentModel docModel = NuxeoUtils.getDocModelForRefName(this.getRepositorySession(), refName, this.getServiceContext().getResourceMap());
+			csid = NuxeoUtils.getCsid(docModel);
+		} catch (Exception e1) {
+			String msg = String.format("Could not find CSID for authority reference with refname = %s.", refName);
+			if (logger.isDebugEnabled()) {
+				logger.debug(msg, e1);
+			} else {
+				logger.error(msg);
+			}
+		}
+    	
         AuthorityRefList.AuthorityRefItem ilistItem = new AuthorityRefList.AuthorityRefItem();
         try {
             RefNameUtils.AuthorityTermInfo termInfo = RefNameUtils.parseAuthorityTermInfo(refName);
+            if (Tools.isEmpty(csid) == false) {
+            	ilistItem.setCsid(csid);
+            }
             ilistItem.setRefName(refName);
             ilistItem.setAuthDisplayName(termInfo.inAuthority.displayName);
             ilistItem.setItemDisplayName(termInfo.displayName);
             ilistItem.setSourceField(authRefFieldName);
             ilistItem.setUri(termInfo.getRelativeUri());
         } catch (Exception e) {
-        	logger.error("Trouble parsing refName from value: "+refName+" in field: "+authRefFieldName+e.getLocalizedMessage());
         	ilistItem = null;
+        	String msg = String.format("Trouble parsing refName from value: %s in field: %s. Error message: %s.",
+        			refName, authRefFieldName + e.getLocalizedMessage());
+        	if (logger.isDebugEnabled()) {
+        		logger.debug(msg, e);
+        	} else {
+        		logger.error(msg);
+        	}
         }
+        
         return ilistItem;
     }
 

@@ -644,23 +644,7 @@ public abstract class NuxeoBasedResource
      */
     public static DocumentModel getDocModelForRefName(CoreSessionInterface repoSession, String refName, ResourceMap resourceMap) 
    			throws Exception, DocumentNotFoundException {
-    	RefName.AuthorityItem item = RefName.AuthorityItem.parse(refName);
-    	if (item != null) {
-        	NuxeoBasedResource resource = (NuxeoBasedResource) resourceMap.get(item.inAuthority.resource);
-        	return resource.getDocModelForAuthorityItem(repoSession, item);
-    	}
-    	RefName.Authority authority = RefName.Authority.parse(refName);
-    	// Handle case of objects refNames, which must be csid based.
-    	if(authority != null && !Tools.isEmpty(authority.csid)) {
-        	NuxeoBasedResource resource = (NuxeoBasedResource) resourceMap.get(authority.resource);
-            // Ensure we have the right context.
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = 
-            		resource.createServiceContext(authority.resource);
-            // HACK - this really must be moved to the doc handler, not here. No Nuxeo specific stuff here!
-            DocumentModel docModel = NuxeoUtils.getDocFromCsid(ctx, repoSession, authority.csid);
-            return docModel;
-    	}
-    	return null;
+    	return NuxeoUtils.getDocModelForRefName(repoSession, refName, resourceMap);
     }
 
     // This is ugly, but prevents us parsing the refName twice. Once we make refName a little more
