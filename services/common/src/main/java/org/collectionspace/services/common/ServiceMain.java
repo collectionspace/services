@@ -1091,18 +1091,22 @@ public class ServiceMain {
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc, "/component", "name",
                 String.format("config:%s-repository", repositoryName));
         
+        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
+        		ConfigUtils.CONFIGURATION_EXTENSION_POINT_XPATH + "/blobprovider", "name",
+                repositoryName);
+        
+        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
+        		ConfigUtils.CONFIGURATION_EXTENSION_POINT_XPATH + "/blobprovider/property[@name='path']",
+        			Tools.isBlank(binaryStorePath) ? repositoryName : binaryStorePath);
+        
         // Text substitutions within first extension point, "repository"
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
         		ConfigUtils.REPOSITORY_EXTENSION_POINT_XPATH + "/repository", "name",
                 repositoryName);
         
-        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-        		ConfigUtils.REPOSITORY_EXTENSION_POINT_XPATH + "/repository", "name",
-                repositoryName);
-        
-        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-        		ConfigUtils.REPOSITORY_EXTENSION_POINT_XPATH + "/repository/binaryStore", "path",
-                Tools.isBlank(binaryStorePath) ? repositoryName : binaryStorePath);  // Can be either partial or full path.  Partial path will be relative to Nuxeo's data directory
+//        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
+//        		ConfigUtils.REPOSITORY_EXTENSION_POINT_XPATH + "/repository/binaryStore", "path",
+//                Tools.isBlank(binaryStorePath) ? repositoryName : binaryStorePath);  // Can be either partial or full path.  Partial path will be relative to Nuxeo's data directory
 
         /* Create the JDBC url options if any exist */
         String jdbcOptions = XmlTools.getElementValue(repoConfigDoc,

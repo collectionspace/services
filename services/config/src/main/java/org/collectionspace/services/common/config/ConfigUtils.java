@@ -15,6 +15,7 @@ public class ConfigUtils {
     public static final String COMPONENT_EXTENSION_XPATH = "/component" + EXTENSION_XPATH;
     public static final String DATASOURCE_EXTENSION_POINT_XPATH = String.format(COMPONENT_EXTENSION_XPATH, "datasources");
     public static final String REPOSITORY_EXTENSION_POINT_XPATH = String.format(COMPONENT_EXTENSION_XPATH, "repository");
+    public static final String CONFIGURATION_EXTENSION_POINT_XPATH = String.format(COMPONENT_EXTENSION_XPATH, "configuration");
     public static final String ELASTICSEARCH_INDEX_EXTENSION_XPATH = String.format(EXTENSION_XPATH, "elasticSearchIndex");
     public static final String ELASTICSEARCH_EXTENSIONS_EXPANDER_STR = "%elasticSearchIndex_extensions%";
     
