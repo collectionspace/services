@@ -332,7 +332,7 @@ public abstract class NuxeoBasedResource
     @GET
     @Path("{csid}")
     public byte[] get(
-            @Context Request request,    		
+            @Context Request request,
             @Context UriInfo uriInfo,
             @PathParam("csid") String csid) {
     	uriInfo = new UriInfoWrapper(uriInfo);
@@ -351,6 +351,39 @@ public abstract class NuxeoBasedResource
         }
 
         return result.getBytes();
+    }
+    
+    /**
+     * Call this method only from other resources (like the Service Groups resource) obtained from the global resource map (ResourceMap).  If the a parent
+     * context exists and it has an open Nuxeo repository session, we will use it; otherwise, we will create a new one.
+     * 
+     * @param parentCtx
+     * @param csid
+     * @return
+     */
+    public PoxPayloadOut getWithParentCtx(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
+    		String csid) {
+    	PoxPayloadOut result = null;
+    	
+        ensureCSID(csid, READ);
+        try {
+            RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext();
+            if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
+            	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
+            }
+            
+            result = get(csid, ctx);// ==> CALL implementation method, which subclasses may override.
+            
+            if (result == null) {
+                Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                        ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
+                throw new CSWebApplicationException(response);
+            }
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);
+        }
+
+    	return result;
     }
 
     protected PoxPayloadOut get(@PathParam("csid") String csid,

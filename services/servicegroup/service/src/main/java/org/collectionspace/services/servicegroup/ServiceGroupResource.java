@@ -302,6 +302,5 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
         }
 
         return result.getBytes();
-
     }
 }

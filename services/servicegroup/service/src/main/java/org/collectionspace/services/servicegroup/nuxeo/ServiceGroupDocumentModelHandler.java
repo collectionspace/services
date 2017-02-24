@@ -104,8 +104,7 @@ public class ServiceGroupDocumentModelHandler
                 String serviceName = ServiceBindingUtils.getServiceNameFromObjectName(bindingReader, ctx.getTenantId(),
                 		docModel.getDocumentType().getName());
                 NuxeoBasedResource resource = (NuxeoBasedResource) ctx.getResourceMap().get(serviceName);
-                resource.hashCode();
-
+                result = resource.getWithParentCtx(ctx, csid);
     		} catch (DocumentException de) {
     			throw de;
     		} catch (Exception e) {
