@@ -43,6 +43,7 @@ public interface IQueryManager {
 	final static String SEARCH_QUALIFIER_AND = SEARCH_TERM_SEPARATOR + "AND" + SEARCH_TERM_SEPARATOR;
 	final static String SEARCH_QUALIFIER_OR = SEARCH_TERM_SEPARATOR + "OR" + SEARCH_TERM_SEPARATOR;
     final static String DEFAULT_SELECT_CLAUSE = "SELECT * FROM ";
+    final static String CSID_QUERY_PARAM = "csid";
 	
 
 	//
@@ -163,5 +164,10 @@ public interface IQueryManager {
 	 * @return the string
 	 */
 	public String createWhereClauseForInvocableByMode(String schema, String mode);
+
+	/*
+	 * 
+	 */
+	public String createWhereClauseFromCsid(String csid);
 	
 }

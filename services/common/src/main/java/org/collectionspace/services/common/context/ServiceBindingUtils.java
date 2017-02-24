@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.collectionspace.services.common.config.PropertyItemUtils;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.service.ServiceObjectType;
@@ -16,7 +17,9 @@ import org.collectionspace.services.config.types.PropertyType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
+
 import java.lang.IndexOutOfBoundsException;
+
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.slf4j.Logger;
@@ -167,7 +170,7 @@ public class ServiceBindingUtils {
 				propName, value, onlyIfNotSet);
     }
     
-    public static String getMappedFieldInDoc( ServiceBindingType sb,
+    public static String getMappedFieldInDoc(ServiceBindingType sb,
     		String logicalFieldName, DocumentModel docModel ) {
     	// Now we have to get the number, which is configured as some field
     	// on each docType
@@ -214,6 +217,21 @@ public class ServiceBindingUtils {
     } 
     
     private static ArrayList<String> commonProcedureServiceTypes = null;
+    
+    /**
+     * Get the service name (service resource path) from the object name (Nuxeo document type)
+     * @param serviceName
+     * @param sb
+     * @return
+     */
+    public static String getServiceNameFromObjectName(TenantBindingConfigReaderImpl bindingReader, String tenantId, String docType) {
+    	String result = null;
+    	
+    	ServiceBindingType bindingType = bindingReader.getServiceBindingForDocType(tenantId, docType);
+    	result = bindingType.getName().toLowerCase();
+    	
+    	return result;
+    }
    
     public static ArrayList<String> getCommonServiceTypes(boolean includeAuthorities) {
         ArrayList<String> commonServiceTypes = new ArrayList<String>();

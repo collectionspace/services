@@ -31,6 +31,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -54,19 +55,19 @@ import org.collectionspace.services.lifecycle.TransitionDefList;
 import org.collectionspace.services.lifecycle.TransitionList;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentException;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
+
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
 import org.nuxeo.ecm.core.NXCore;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.PathRef;
-import org.nuxeo.ecm.core.api.model.PropertyException;
+import org.nuxeo.ecm.core.api.PropertyException;
 import org.nuxeo.ecm.core.io.DocumentPipe;
 import org.nuxeo.ecm.core.io.DocumentReader;
 import org.nuxeo.ecm.core.io.DocumentWriter;
@@ -305,7 +306,7 @@ public class NuxeoUtils {
     	} catch (Exception e) {
     		logger.error("Could not remove facet from DocumentModel instance: " + docModel.getId(), e);
     	}
-    	
+
     	return result;
     }
     
@@ -400,9 +401,9 @@ public class NuxeoUtils {
             bais = new ByteArrayInputStream(baos.toByteArray());
             SAXReader saxReader = new SAXReader();
             doc = saxReader.read(bais);
-        } catch (ClientException ce) {
-        	throw new NuxeoDocumentException(ce);
-        } catch (Exception e) {
+        } catch (org.dom4j.DocumentException ce) {
+        	throw new DocumentException(ce);
+        } catch (IOException e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception while processing document ", e);
             }
@@ -464,7 +465,7 @@ public class NuxeoUtils {
      */
     public static DocumentModel getWorkspaceModel(
     		CoreSessionInterface repoSession, String workspaceName)
-            throws DocumentException, IOException, ClientException {
+            throws DocumentException, IOException {
         DocumentModel result = null;
         //FIXME: commented out as this does not work without tenant qualification
         String workspaceUUID = null;
@@ -494,13 +495,9 @@ public class NuxeoUtils {
             throws DocumentException {
         DocumentModel result = null;
 
-        try {
-            DocumentRef documentRef = new IdRef(nuxeoId);
-            result = repoSession.getDocument(documentRef);
-        } catch (ClientException e) {
-            throw new NuxeoDocumentException(e);
-        }
-
+        DocumentRef documentRef = new IdRef(nuxeoId);
+        result = repoSession.getDocument(documentRef);
+        
         return result;
     }
     
@@ -722,6 +719,10 @@ public class NuxeoUtils {
         return result;
     }
     
+    static public NuxeoBasedResource getDocumentResource(String csid) {
+    	return null;
+    }
+    
     static public DocumentModel getDocFromSpecifier(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
     		CoreSessionInterface repoSession,
@@ -873,7 +874,7 @@ public class NuxeoUtils {
     }
     
     public static boolean documentExists(CoreSessionInterface repoSession,
-    		String csid) throws ClientException {
+    		String csid) {
 		boolean result = false;
 		
 		String statement = String.format(
@@ -933,14 +934,10 @@ public class NuxeoUtils {
     public static String getTenantQualifiedDocType(QueryContext queryCtx, String docType) throws Exception {
     	String result = docType;
     	
-    	try {
-	    	String tenantQualifiedDocType = queryCtx.getTenantQualifiedDoctype();
-			if (docTypeExists(tenantQualifiedDocType) == true) {
-				result = tenantQualifiedDocType;
-			}
-    	} catch (ClientException ce) {
-    		throw new NuxeoDocumentException(ce);
-    	}
+    	String tenantQualifiedDocType = queryCtx.getTenantQualifiedDoctype();
+		if (docTypeExists(tenantQualifiedDocType) == true) {
+			result = tenantQualifiedDocType;
+		}
 		
     	return result;
     }
@@ -952,22 +949,12 @@ public class NuxeoUtils {
     static private boolean docTypeExists(String docType) throws Exception {
     	boolean result = false;
     	
-        SchemaManager schemaManager = null;
-    	try {
-			schemaManager = Framework.getService(org.nuxeo.ecm.core.schema.SchemaManager.class);
-    	} catch (ClientException ce) {
-    		throw new NuxeoDocumentException(ce);
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			logger.error("Could not get Nuxeo SchemaManager instance.", e1);
-			throw e1;
-		}
-    	
+        SchemaManager schemaManager = Framework.getService(org.nuxeo.ecm.core.schema.SchemaManager.class);
 		Set<String> docTypes = schemaManager.getDocumentTypeNamesExtending(docType);
 		if (docTypes != null && docTypes.contains(docType)) {
 			result = true;
 		}
-		
+
     	return result;
     }
     
@@ -979,7 +966,7 @@ public class NuxeoUtils {
      * the DocumentModel.getPropertyValue method.  This method catches that NPE and instead returns null.
      */
     public static Object getProperyValue(DocumentModel docModel,
-    		String propertyName) throws ClientException, PropertyException {
+    		String propertyName) {
     	Object result = null;
     	
     	try {
