@@ -742,7 +742,7 @@ public class NuxeoUtils {
     	// Let's see if our refname refers to an authority item/term.
     	//
     	try {
-	    	item = RefName.AuthorityItem.parse(refName);
+	    	item = RefName.AuthorityItem.parse(refName, true);
 	    	if (item != null) {
 	        	NuxeoBasedResource resource = (NuxeoBasedResource) resourceMap.get(item.inAuthority.resource);
 	        	return resource.getDocModelForAuthorityItem(repoSession, item);

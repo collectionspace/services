@@ -657,6 +657,6 @@ public abstract class NuxeoBasedResource
 
     public DocumentModel getDocModelForRefName(CoreSessionInterface repoSession, String refName) 
    			throws Exception, DocumentNotFoundException {
-    	return getDocModelForAuthorityItem(repoSession, RefName.AuthorityItem.parse(refName));
+    	return getDocModelForAuthorityItem(repoSession, RefName.AuthorityItem.parse(refName, true));
     }
 }

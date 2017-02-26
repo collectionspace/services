@@ -116,7 +116,7 @@ public class RelationValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn,
 	            if (authority != null) {
 	            	result = true;
 	            } else {
-	            	AuthorityItem authItem = AuthorityItem.parse(refName); // See if it is a refname to an authority item or vocabulary term
+	            	AuthorityItem authItem = AuthorityItem.parse(refName, true); // See if it is a refname to an authority item or vocabulary term
 	            	result = authItem != null;
 	            }
         	} catch (IllegalArgumentException e) {

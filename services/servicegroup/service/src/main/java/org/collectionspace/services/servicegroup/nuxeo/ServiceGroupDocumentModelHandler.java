@@ -88,7 +88,7 @@ public class ServiceGroupDocumentModelHandler
     private PoxPayloadOut getAuthorityItem(ServiceContext ctx, String termRefName) throws Exception {
     	PoxPayloadOut result = null;
     	
-    	RefName.AuthorityItem item = RefName.AuthorityItem.parse(termRefName);
+    	RefName.AuthorityItem item = RefName.AuthorityItem.parse(termRefName, true);
     	AuthorityResource authorityResource = (AuthorityResource) ctx.getResourceMap().get(item.inAuthority.resource);
     	
     	AuthorityTermInfo authorityTermInfo = RefNameUtils.parseAuthorityTermInfo(termRefName);
@@ -163,7 +163,7 @@ public class ServiceGroupDocumentModelHandler
 		try {
 	    	//String inAuthorityCsid = (String) NuxeoUtils.getProperyValue(docModel, "inAuthority"); //docModel.getPropertyValue("inAuthority"); // AuthorityItemJAXBSchema.IN_AUTHORITY
 	    	//String refName = (String) NuxeoUtils.getProperyValue(docModel, CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME);
-	    	RefName.AuthorityItem item = RefName.AuthorityItem.parse(termRefName);
+	    	RefName.AuthorityItem item = RefName.AuthorityItem.parse(termRefName, true);
 		} catch (IllegalArgumentException e) {
 			result = false;
 		}
