@@ -412,7 +412,7 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
 
             DocumentModelList docList = null;
             // force limit to 1, and ignore totalSize
-            String query = NuxeoUtils.buildNXQLQuery(ctx, queryContext);
+            String query = NuxeoUtils.buildNXQLQuery(queryContext);
             docList = repoSession.query(query, null, 1, 0, false);
             if (docList.size() != 1) {
                 throw new DocumentNotFoundException("No document found matching filter params: " + query);
@@ -523,7 +523,7 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
             QueryContext queryContext = new QueryContext(ctx, whereClause);
             DocumentModelList docList = null;
             // force limit to 1, and ignore totalSize
-            String query = NuxeoUtils.buildNXQLQuery(ctx, queryContext);
+            String query = NuxeoUtils.buildNXQLQuery(queryContext);
             docList = repoSession.query(query,
                     null, //Filter
                     1, //limit
@@ -1013,7 +1013,7 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
                 docList = getFilteredCMIS(repoSession, ctx, handler, queryContext); //FIXME: REM - Need to deal with paging info in CMIS query
             // NXQL query
             } else {
-                String query = NuxeoUtils.buildNXQLQuery(ctx, queryContext);
+                String query = NuxeoUtils.buildNXQLQuery(queryContext);
                 if (logger.isDebugEnabled()) {
                     logger.debug("Executing NXQL query: " + query.toString());
                 }

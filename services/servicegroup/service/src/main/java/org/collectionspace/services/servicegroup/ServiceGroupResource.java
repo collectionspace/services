@@ -207,7 +207,7 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
 
     @GET
     @Path("{csid}/items")
-    public AbstractCommonList getItemList(
+    public AbstractCommonList getResourceItemList(
             @Context UriInfo uriInfo,
             @PathParam("csid") String serviceGroupName) {
     	UriInfoWrapper ui = new UriInfoWrapper(uriInfo);
@@ -271,7 +271,7 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
 
     @GET
     @Path("{csid}/items/{specifier}")
-    public byte[] getItem(
+    public byte[] getResourceItem(
     		@Context ResourceMap resourceMap,
             @Context UriInfo uriInfo,
             @PathParam("csid") String serviceGroupName,
@@ -296,7 +296,7 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
             DocumentFilter myFilter = new NuxeoDocumentFilter(whereClause, 0, 1);
             handler.setDocumentFilter(myFilter);    
 	        
-            result = handler.getItemForCsid(ctx, groupsList, specifier);
+            result = handler.getResourceItemForCsid(ctx, groupsList, specifier);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.READ_FAILED, serviceGroupName);
         }

@@ -203,13 +203,13 @@ public class RefNameUtils {
     	return new AuthorityInfo(refNameTokens);
     }
 
-    public static AuthorityTermInfo parseAuthorityTermInfo(String refName)
-            throws IllegalArgumentException {
-    	if(refName==null || !refName.startsWith(URN_PREFIX))
-    		throw new IllegalArgumentException( "Null or invalid refName syntax");
-    	String[] refNameTokens = refName.substring(URN_PREFIX_LEN).split(SEPARATOR, AUTH_ITEM_REFNAME_TOKENS);
-    	return new AuthorityTermInfo(refNameTokens);
-    }
+	public static AuthorityTermInfo parseAuthorityTermInfo(String refName) throws IllegalArgumentException {
+		if (refName == null || !refName.startsWith(URN_PREFIX)) {
+			throw new IllegalArgumentException("Null or invalid refName syntax");
+		}
+		String[] refNameTokens = refName.substring(URN_PREFIX_LEN).split(SEPARATOR, AUTH_ITEM_REFNAME_TOKENS);
+		return new AuthorityTermInfo(refNameTokens);
+	}
 
     public static String stripAuthorityTermDisplayName(String refName)
             throws IllegalArgumentException {

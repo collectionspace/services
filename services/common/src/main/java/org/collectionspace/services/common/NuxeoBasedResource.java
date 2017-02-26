@@ -642,9 +642,9 @@ public abstract class NuxeoBasedResource
      * for all inheriting resource classes. Just use ServiceContext.getResourceMap() to get
      * the map, and pass it in.
      */
-    public static DocumentModel getDocModelForRefName(CoreSessionInterface repoSession, String refName, ResourceMap resourceMap) 
+    public static DocumentModel getDocModelForRefName(ServiceContext ctx, String refName, ResourceMap resourceMap) 
    			throws Exception, DocumentNotFoundException {
-    	return NuxeoUtils.getDocModelForRefName(repoSession, refName, resourceMap);
+    	return NuxeoUtils.getDocModelForRefName(ctx, refName, resourceMap);
     }
 
     // This is ugly, but prevents us parsing the refName twice. Once we make refName a little more

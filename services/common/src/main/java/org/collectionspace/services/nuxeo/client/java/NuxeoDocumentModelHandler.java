@@ -278,7 +278,7 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 							+ NuxeoUtils.buildWorkflowNotDeletedWhereClause();
 					QueryContext queryContext = new QueryContext(ctx, whereClause);
 					queryContext.setDocType(IRelationsManager.DOC_TYPE);
-					String query = NuxeoUtils.buildNXQLQuery(ctx, queryContext);
+					String query = NuxeoUtils.buildNXQLQuery(queryContext);
 					// Search for 1 relation that matches. 1 is enough to fail
 					// the filter
 					DocumentModelList docList = repoSession.query(query, null, 1, 0, false);

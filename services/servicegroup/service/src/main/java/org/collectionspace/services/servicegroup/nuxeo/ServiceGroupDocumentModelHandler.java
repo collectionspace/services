@@ -37,10 +37,10 @@ import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ServiceMain;
@@ -49,22 +49,26 @@ import org.collectionspace.services.common.StoredValuesUriTemplate;
 import org.collectionspace.services.common.UriTemplateFactory;
 import org.collectionspace.services.common.UriTemplateRegistry;
 import org.collectionspace.services.common.UriTemplateRegistryKey;
+import org.collectionspace.services.common.api.RefName;
+import org.collectionspace.services.common.api.RefNameUtils;
+import org.collectionspace.services.common.api.RefNameUtils.AuthorityTermInfo;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.query.nuxeo.QueryManagerNuxeoImpl;
-
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.service.ServiceObjectType;
 import org.collectionspace.services.servicegroup.ServicegroupsCommon;
-
+import org.collectionspace.services.common.vocabulary.AuthorityResource;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
-
+import org.nuxeo.ecm.core.api.PropertyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,8 +81,26 @@ public class ServiceGroupDocumentModelHandler
     protected static final String DOC_TYPE_FIELD = "docType";
     protected static final String DOC_NUMBER_FIELD = "docNumber";
     protected static final String DOC_NAME_FIELD = "docName";
+    
+    //
+    // Returns a service payload for an authority item
+    //
+    private PoxPayloadOut getAuthorityItem(ServiceContext ctx, String termRefName) throws Exception {
+    	PoxPayloadOut result = null;
+    	
+    	RefName.AuthorityItem item = RefName.AuthorityItem.parse(termRefName);
+    	AuthorityResource authorityResource = (AuthorityResource) ctx.getResourceMap().get(item.inAuthority.resource);
+    	
+    	AuthorityTermInfo authorityTermInfo = RefNameUtils.parseAuthorityTermInfo(termRefName);
+    	String parentIdentifier = Specifier.createShortIdURNValue(authorityTermInfo.inAuthority.name);
+    	String itemIdentifier = Specifier.createShortIdURNValue(authorityTermInfo.name);
+    	
+    	result = authorityResource.getAuthorityItemWithExistingContext(ctx, parentIdentifier, itemIdentifier);
+    	
+    	return result;
+    }
 
-    public PoxPayloadOut getItemForCsid(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    public PoxPayloadOut getResourceItemForCsid(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
     		List<String> serviceGroupNames,
     		String csid) throws DocumentException {
     	PoxPayloadOut result = null;
@@ -97,14 +119,22 @@ public class ServiceGroupDocumentModelHandler
     	        DocumentModelList docList = this.getDocListForGroup(ctx, serviceGroupNames, queriedServiceBindings,
     	        		repoSession, repoClient);
     	        if (docList == null) { // found no authRef fields - nothing to process
-    	            //return list;
+    	            throw new DocumentNotFoundException();
     	        }
     	        DocumentModel docModel = docList.get(0);
-                TenantBindingConfigReaderImpl bindingReader = ServiceMain.getInstance().getTenantBindingConfigReader();
-                String serviceName = ServiceBindingUtils.getServiceNameFromObjectName(bindingReader, ctx.getTenantId(),
-                		docModel.getDocumentType().getName());
-                NuxeoBasedResource resource = (NuxeoBasedResource) ctx.getResourceMap().get(serviceName);
-                result = resource.getWithParentCtx(ctx, csid);
+    	        //
+    	        // Determine if the docModel is an authority term, object, or some other procedure record.
+    	        //
+    	    	String termRefName = (String) NuxeoUtils.getProperyValue(docModel, CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME);
+    	        if (isAuthorityTermDocument(termRefName) == true) {
+                	result = getAuthorityItem(ctx, termRefName);
+    	        } else {    	        
+	                TenantBindingConfigReaderImpl bindingReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+	                String serviceName = ServiceBindingUtils.getServiceNameFromObjectName(bindingReader, ctx.getTenantId(),
+	                		docModel.getDocumentType().getName());
+	                NuxeoBasedResource resource = (NuxeoBasedResource) ctx.getResourceMap().get(serviceName);
+                	result = resource.getWithParentCtx(ctx, csid);
+    	        }
     		} catch (DocumentException de) {
     			throw de;
     		} catch (Exception e) {
@@ -127,7 +157,21 @@ public class ServiceGroupDocumentModelHandler
         return result;
     }
     
-    private DocumentModelList getDocListForGroup(
+    private boolean isAuthorityTermDocument(String termRefName) {
+		boolean result = true;
+		
+		try {
+	    	//String inAuthorityCsid = (String) NuxeoUtils.getProperyValue(docModel, "inAuthority"); //docModel.getPropertyValue("inAuthority"); // AuthorityItemJAXBSchema.IN_AUTHORITY
+	    	//String refName = (String) NuxeoUtils.getProperyValue(docModel, CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME);
+	    	RefName.AuthorityItem item = RefName.AuthorityItem.parse(termRefName);
+		} catch (IllegalArgumentException e) {
+			result = false;
+		}
+		
+    	return result;
+	}
+
+	private DocumentModelList getDocListForGroup(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
     		List<String> serviceGroupNames,
     		Map<String, ServiceBindingType> queriedServiceBindings,
@@ -270,8 +314,7 @@ public class ServiceGroupDocumentModelHandler
             docType = ServiceBindingUtils.getUnqualifiedTenantDocType(docType);
             ServiceBindingType sb = queriedServiceBindings.get(docType);
             if (sb == null) {
-                throw new RuntimeException(
-                        "processDocList: No Service Binding for docType: " + docType);
+                throw new RuntimeException("processDocList: No Service Binding for docType: " + docType);
             }
             
             String csid = NuxeoUtils.getCsid(docModel);

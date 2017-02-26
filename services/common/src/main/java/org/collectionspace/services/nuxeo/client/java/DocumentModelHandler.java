@@ -425,7 +425,7 @@ public abstract class DocumentModelHandler<T, TL>
     	
     	try {
     		QueryContext queryContext = new QueryContext(ctx, selectClause, whereClause, orderByClause);
-    		result = NuxeoUtils.buildNXQLQuery(ctx, queryContext);
+    		result = NuxeoUtils.buildNXQLQuery(queryContext);
     	} catch (DocumentException de) {
     		throw de;
     	} catch (Exception x) {

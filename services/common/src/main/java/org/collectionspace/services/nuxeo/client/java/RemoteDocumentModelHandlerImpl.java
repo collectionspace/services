@@ -717,7 +717,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     	//
     	String csid = null;
     	try {
-			DocumentModel docModel = NuxeoUtils.getDocModelForRefName(this.getRepositorySession(), refName, this.getServiceContext().getResourceMap());
+			DocumentModel docModel = NuxeoUtils.getDocModelForRefName(getServiceContext(), refName, getServiceContext().getResourceMap());
 			csid = NuxeoUtils.getCsid(docModel);
 		} catch (Exception e1) {
 			String msg = String.format("Could not find CSID for authority reference with refname = %s.", refName);
@@ -1319,7 +1319,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
                             	logger.trace("Fetching CSID for child with only refname: "+newChildRefName);
                             }
                         	DocumentModel newChildDocModel = 
-                        		NuxeoBasedResource.getDocModelForRefName(this.getRepositorySession(), 
+                        		NuxeoBasedResource.getDocModelForRefName(getServiceContext(), 
                         				newChildRefName, getServiceContext().getResourceMap());
                         	newChildCsid = getCsid(newChildDocModel);
             			}

@@ -634,7 +634,7 @@ public class NuxeoUtils {
      * @return an NXQL query
      * @throws Exception if supplied values in the query are invalid.
      */
-    static public final String buildNXQLQuery(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, QueryContext queryContext) throws Exception {
+    static public final String buildNXQLQuery(QueryContext queryContext) throws Exception {
         StringBuilder query = new StringBuilder(queryContext.getSelectClause());
         // Since we have a tenant qualification in the WHERE clause, we do not need 
         // tenant-specific doc types
@@ -709,7 +709,7 @@ public class NuxeoUtils {
         //
         // Since we're doing a query, we get back a list so we need to make sure there is only
         // a single result since CSID values are supposed to be unique.
-        String query = buildNXQLQuery(ctx, queryContext);
+        String query = buildNXQLQuery(queryContext);
         docModelList = repoSession.query(query);
         long resultSize = docModelList.totalSize();
         if (resultSize == 1) {
@@ -725,20 +725,40 @@ public class NuxeoUtils {
     	return null;
     }
     
-    public static DocumentModel getDocModelForRefName(CoreSessionInterface repoSession, String refName, ResourceMap resourceMap)
+    /**
+     * The refname could be for an authority, an authority item/term, or a csid-form to an object or procedure record
+     * @param repoSession
+     * @param refName
+     * @param resourceMap
+     * @return
+     * @throws DocumentNotFoundException
+     * @throws Exception
+     */
+    public static DocumentModel getDocModelForRefName(ServiceContext<PoxPayloadIn,PoxPayloadOut> ctx, String refName, ResourceMap resourceMap)
     		throws DocumentNotFoundException, Exception {
-    	RefName.AuthorityItem item = RefName.AuthorityItem.parse(refName);
-    	if (item != null) {
-        	NuxeoBasedResource resource = (NuxeoBasedResource) resourceMap.get(item.inAuthority.resource);
-        	return resource.getDocModelForAuthorityItem(repoSession, item);
+    	RefName.AuthorityItem item = null;
+    	CoreSessionInterface repoSession = (CoreSessionInterface)ctx.getCurrentRepositorySession();
+    	//
+    	// Let's see if our refname refers to an authority item/term.
+    	//
+    	try {
+	    	item = RefName.AuthorityItem.parse(refName);
+	    	if (item != null) {
+	        	NuxeoBasedResource resource = (NuxeoBasedResource) resourceMap.get(item.inAuthority.resource);
+	        	return resource.getDocModelForAuthorityItem(repoSession, item);
+	    	}
+    	} catch (IllegalArgumentException e) {
+    		// Ignore exception
     	}
-    	RefName.Authority authority = RefName.Authority.parse(refName);
-    	// Handle case of objects refNames, which must be csid based.
-    	if(authority != null && !Tools.isEmpty(authority.csid)) {
+    	
+    	//
+    	// If we got this far, we know the refname doesn't refer to an authority item/term, so it might refer
+    	// to an authority or an object or procedure.
+    	//
+    	RefName.Authority authority = RefName.Authority.parse(refName); // could be an authority or an object or procedure record
+    	// Handle case of objects refNames, which MUST be csid based.
+    	if (authority != null && !Tools.isEmpty(authority.csid)) {
         	NuxeoBasedResource resource = (NuxeoBasedResource) resourceMap.get(authority.resource);
-            // Ensure we have the right context.
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = 
-            		resource.createServiceContext(authority.resource);
             // HACK - this really must be moved to the doc handler, not here. No Nuxeo specific stuff here!
             DocumentModel docModel = NuxeoUtils.getDocFromCsid(ctx, repoSession, authority.csid);
             return docModel;
@@ -780,7 +800,7 @@ public class NuxeoUtils {
 	        //
 	        // Since we're doing a query, we get back a list so we need to make sure there is only
 	        // a single result since CSID values are supposed to be unique.
-	        String query = buildNXQLQuery(ctx, queryContext);
+	        String query = buildNXQLQuery(queryContext);
 	        docModelList = repoSession.query(query);
 	        long resultSize = docModelList.totalSize();
 	        if (resultSize == 1) {
@@ -815,7 +835,7 @@ public class NuxeoUtils {
 	        //
 	        // Since we're doing a query, we get back a list so we need to make sure there is only
 	        // a single result since CSID values are supposed to be unique.
-	        String query = buildNXQLQuery(ctx, queryContext);
+	        String query = buildNXQLQuery(queryContext);
 	        docModelList = repoSession.query(query);
 	        long resultSize = docModelList.totalSize();
 	        if (resultSize == 1) {

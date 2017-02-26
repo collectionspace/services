@@ -173,15 +173,12 @@ public class RefName {
         public String shortIdentifier = "";
         public String displayName = "";
 
-        public static AuthorityItem parse(String urn) {
+        public static AuthorityItem parse(String urn) throws IllegalArgumentException {
             AuthorityItem authorityItem = null;
-            try {
-                RefNameUtils.AuthorityTermInfo termInfo =
-                        RefNameUtils.parseAuthorityTermInfo(urn);
-                authorityItem = authorityItemFromTermInfo(termInfo);
-            } catch (IllegalArgumentException iae) {
-                return null;
-            }
+
+            RefNameUtils.AuthorityTermInfo termInfo = RefNameUtils.parseAuthorityTermInfo(urn);
+            authorityItem = authorityItemFromTermInfo(termInfo);
+
             return authorityItem;
         }
 

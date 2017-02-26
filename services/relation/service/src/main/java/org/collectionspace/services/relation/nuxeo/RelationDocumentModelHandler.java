@@ -404,7 +404,7 @@ public class RelationDocumentModelHandler
             try {
             	refName = (String) relationDocModel.getProperty(commonPartLabel, 
             			(fSubject?RelationJAXBSchema.SUBJECT_REFNAME:RelationJAXBSchema.OBJECT_REFNAME));
-            	docModel = NuxeoBasedResource.getDocModelForRefName(repoSession, refName, ctx.getResourceMap());
+            	docModel = NuxeoBasedResource.getDocModelForRefName(ctx, refName, ctx.getResourceMap());
             } catch (Exception e) {
                 throw new InvalidDocumentException(
                         "Relation record must have a CSID or refName to identify the object of the relation.", e);
