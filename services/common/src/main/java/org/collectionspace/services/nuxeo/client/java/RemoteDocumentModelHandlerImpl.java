@@ -742,7 +742,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         } catch (Exception e) {
         	ilistItem = null;
         	String msg = String.format("Trouble parsing refName from value: %s in field: %s. Error message: %s.",
-        			refName, authRefFieldName + e.getLocalizedMessage());
+        			refName, authRefFieldName, e.getLocalizedMessage());
         	if (logger.isDebugEnabled()) {
         		logger.debug(msg, e);
         	} else {
