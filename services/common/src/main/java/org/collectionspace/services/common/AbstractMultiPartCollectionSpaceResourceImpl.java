@@ -289,10 +289,10 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
     		@Context UriInfo uriInfo,
     		@PathParam("csid") String csid,
     		@PathParam("transition") String transition) {
-        PoxPayloadOut result = null;
+    	PoxPayloadOut result = null;
                 
         try {
-        	result = this.updateWorkflowWithTransition(NULL_CONTEXT, uriInfo, csid, transition);
+        	result = updateWorkflowWithTransition(NULL_CONTEXT, uriInfo, csid, transition);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, csid);
         }

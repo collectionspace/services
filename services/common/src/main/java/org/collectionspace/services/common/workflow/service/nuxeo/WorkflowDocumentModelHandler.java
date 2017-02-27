@@ -176,5 +176,17 @@ public class WorkflowDocumentModelHandler
     		throw ce;
     	}
     }
+    
+    /*
+     * Add the workflow common part(s) to the output result
+     * (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#completeUpdate(org.collectionspace.services.common.document.DocumentWrapper)
+     */
+    @Override
+    public void completeUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	extractAllParts(wrapDoc);
+    	super.completeUpdate(wrapDoc);
+    }
+
 }
 
