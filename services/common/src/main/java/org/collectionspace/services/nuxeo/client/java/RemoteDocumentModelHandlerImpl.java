@@ -217,36 +217,21 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     @Override
     public void completeUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         DocumentModel docModel = wrapDoc.getWrappedObject();
-        // We need to return at least those document part(s) and corresponding payloads that were received
+        
+        String[] schemas = docModel.getDeclaredSchemas();
         Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
-        MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
-        PoxPayloadIn input = ctx.getInput();
-        if (input != null) {
-	        List<PayloadInputPart> inputParts = ctx.getInput().getParts();
-	        for (PayloadInputPart part : inputParts) {
-	            String partLabel = part.getLabel();
-                try{
-                    ObjectPartType partMeta = partsMetaMap.get(partLabel);
-                    // CSPACE-4030 - generates NPE if the part is missing.
-                    if(partMeta!=null) {
-	                    Map<String, Object> unQObjectProperties = extractPart(docModel, partLabel, partMeta);
-	                    if(unQObjectProperties!=null) {
-	                    	addOutputPart(unQObjectProperties, partLabel, partMeta);
-	                    }
-                    }
-                } catch (Throwable t){
-                    logger.error("Unable to addOutputPart: " + partLabel
-                                               + " in serviceContextPath: "+this.getServiceContextPath()
-                                               + " with URI: " + this.getServiceContext().getUriInfo().getPath()
-                                               + " error: " + t);
-                }
-	        }
-        } else {
-        	if (logger.isWarnEnabled() == true) {
-        		logger.warn("MultipartInput part was null for document id = " +
-        				docModel.getName());
-        	}
+        for (String schema : schemas) {
+            ObjectPartType partMeta = partsMetaMap.get(schema);
+            if (partMeta == null) {
+                continue; // unknown part, ignore
+            }
+            Map<String, Object> unQObjectProperties = extractPart(docModel, schema, partMeta);
+            if(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA.equals(schema)) {
+            	addExtraCoreValues(docModel, unQObjectProperties);
+            }
+            addOutputPart(unQObjectProperties, schema, partMeta);
         }
+
         //
         //  If the resource's service supports hierarchy then we need to perform a little more work
         //
