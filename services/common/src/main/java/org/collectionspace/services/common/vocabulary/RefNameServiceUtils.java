@@ -441,7 +441,7 @@ public class RefNameServiceUtils {
              * <xs:element name="workflowState" type="xs:string" minOccurs="1"
              * />
              */
-            String fieldList = "docType|docId|docNumber|docName|sourceField|uri|refName|updatedAt|workflowState";
+            String fieldList = "docType|docId|docNumber|docName|sourceField|uri|refName|updatedAt|workflowState";  // FIXME: Should not be hard-coded string
             commonList.setFieldsReturned(fieldList);
 
             // As a side-effect, the method called below modifies the value of
@@ -966,6 +966,13 @@ public class RefNameServiceUtils {
         return nRefsFoundTotal;
     }
 
+    /**
+     * Clone an AuthorityRefDocItem which is a JAX-B generated class.  Be sure we're copying every field defined in the XSD (XML Schema) that is
+     * found here services\jaxb\src\main\resources\authorityrefdocs.xsd
+     * @param ilistItem
+     * @param sourceField
+     * @return
+     */
     private static AuthorityRefDocList.AuthorityRefDocItem cloneAuthRefDocItem(
             AuthorityRefDocList.AuthorityRefDocItem ilistItem, String sourceField) {
         AuthorityRefDocList.AuthorityRefDocItem newlistItem = new AuthorityRefDocList.AuthorityRefDocItem();
@@ -975,6 +982,9 @@ public class RefNameServiceUtils {
         newlistItem.setDocType(ilistItem.getDocType());
         newlistItem.setUri(ilistItem.getUri());
         newlistItem.setSourceField(sourceField);
+        newlistItem.setRefName(ilistItem.getRefName());
+        newlistItem.setUpdatedAt(ilistItem.getUpdatedAt());
+        newlistItem.setWorkflowState(ilistItem.getWorkflowState());
         return newlistItem;
     }
 
