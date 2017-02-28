@@ -155,6 +155,7 @@
 			</service:documentHandler>
 			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
 				<service:params>
+				    <service:CacheMaxAge>86400</service:CacheMaxAge> <!-- By default, cache blobs for 1 full day -->
 					<service:ListResultsFields>
 						<service:ListResultField>
 							<service:element>name</service:element>

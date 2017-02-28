@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.common;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import java.util.Map;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -38,8 +40,8 @@ import javax.ws.rs.core.UriInfo;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
-import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextProperties;
 import org.collectionspace.services.common.document.BadRequestException;
@@ -53,7 +55,9 @@ import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
 import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.service.DocHandlerParams.Params;
 import org.collectionspace.services.description.ServiceDescription;
+
 import org.jboss.resteasy.spi.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -418,7 +422,7 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     public ServiceDescription getDescription(@Context UriInfo uriInfo) {
     	ServiceDescription result = null;
 
-    	ServiceContext  ctx = null;
+    	ServiceContext<IT, OT>  ctx = null;
         try {
             ctx = createServiceContext(uriInfo);
             result = getDescription(ctx);
@@ -437,7 +441,7 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
      * @param ctx
      * @return
      */
-    public ServiceDescription getDescription(ServiceContext ctx) {
+    public ServiceDescription getDescription(ServiceContext<IT, OT> ctx) {
     	ServiceDescription result = new ServiceDescription();
     	
     	result.setDocumentType(getDocType(ctx.getTenantId()));
@@ -644,5 +648,39 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     public TenantBindingConfigReaderImpl getTenantBindingsReader() {
         return ServiceMain.getInstance().getTenantBindingConfigReader();
     }
-	
+    
+    /**
+     * Get max cache age for HTTP responses from the tenant's service bindings.
+     * 
+     * @param ctx
+     * @return
+     */
+    protected int getCacheMaxAge(ServiceContext<IT, OT> ctx) {
+    	BigInteger result = null;
+    	
+    	try {
+			Params docHandlerParams = ServiceConfigUtils.getDocHandlerParams(ctx.getTenantId(), ctx.getServiceName());
+			if (docHandlerParams.getCacheMaxAge() != null) {
+				result = docHandlerParams.getCacheMaxAge();
+			}
+		} catch (DocumentException e) {
+			logger.debug("Failed to retrieve cache-age-max from service bindings.", e);
+		}
+
+    	return result != null ? result.intValue() : 0;
+    }
+    
+    protected Response.ResponseBuilder setCacheControl(ServiceContext<IT, OT> ctx, Response.ResponseBuilder responseBuilder) {
+    	int cacheMaxAge = getCacheMaxAge(ctx);
+    	
+    	if (cacheMaxAge > 0) {
+	    	CacheControl cacheControl = new CacheControl();
+			cacheControl.setMaxAge(getCacheMaxAge(ctx));
+			responseBuilder.cacheControl(cacheControl);
+	    	logger.debug(String.format("Cache-max-age for service '%s' is set to '%d' in the service bindings for tenant ID='%s'.",
+	    			ctx.getServiceName(), cacheMaxAge, ctx.getTenantId()));
+    	}
+    	
+    	return responseBuilder;
+    }	
 }

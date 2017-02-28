@@ -38,7 +38,6 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.publicitem.PublicItemUtil;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.common.CSWebApplicationException;
-
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
@@ -67,6 +66,8 @@ import java.util.Map;
 @Consumes("application/xml")
 @Produces("application/xml")
 public class BlobResource extends NuxeoBasedResource {
+	
+	private static final int DEFAULT_MAX_CACHE_AGE = 86400; // 1 day of seconds.
 
 	@Override
     public String getServiceName(){
@@ -240,6 +241,17 @@ public class BlobResource extends NuxeoBasedResource {
 		return response;
     }    
     
+    @Override
+    protected int getCacheMaxAge(ServiceContext ctx) {
+    	int result = super.getCacheMaxAge(ctx);
+    	
+    	if (result <= 0) {
+    		result = this.DEFAULT_MAX_CACHE_AGE;
+    	}
+    	
+    	return result;
+    }
+    
     @GET
     @Path("{csid}/content")
     public Response getBlobContent(	@PathParam("csid") String csid) {
@@ -253,13 +265,14 @@ public class BlobResource extends NuxeoBasedResource {
 	    	InputStream contentStream = getBlobContent(ctx, csid, null /*derivative term*/, mimeType /*will get set*/);
 		    
 	    	Response.ResponseBuilder responseBuilder = Response.ok(contentStream, mimeType.toString());
+	    	setCacheControl(ctx, responseBuilder);
 	    	responseBuilder = responseBuilder.header("Content-Disposition","inline;filename=\""
 	    			+ blobsCommon.getName() +"\"");
 	    	result = responseBuilder.build();
     	} catch (Exception e) {
     		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
     	}
-    	
+
     	return result;
     }
     
@@ -338,6 +351,7 @@ public class BlobResource extends NuxeoBasedResource {
 		    	StringBuffer mimeType = new StringBuffer();
 		    	InputStream contentStream = getBlobContent(ctx, csid, derivativeTerm, mimeType);
 			    Response.ResponseBuilder responseBuilder = Response.ok(contentStream, mimeType.toString());
+			    setCacheControl(ctx, responseBuilder);
 		    	responseBuilder = responseBuilder.header("Content-Disposition","inline;filename=\""
 		    			+ blobsCommon.getName() +"\"");
 		    	result = responseBuilder.build();
