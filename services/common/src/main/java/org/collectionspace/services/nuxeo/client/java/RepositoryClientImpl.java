@@ -376,6 +376,9 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
         } catch (IllegalArgumentException iae) {
             throw iae;
         } catch (DocumentException de) {
+        	if (logger.isDebugEnabled()) {
+        		logger.debug(de.getMessage(), de);
+        	}
             throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {

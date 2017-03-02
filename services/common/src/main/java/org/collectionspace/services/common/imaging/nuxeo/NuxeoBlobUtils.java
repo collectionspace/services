@@ -33,9 +33,13 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.ecm.platform.picture.api.ImageInfo;
@@ -55,11 +59,15 @@ import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.blobholder.BlobHolder;
 import org.nuxeo.ecm.core.api.blobholder.DocumentBlobHolder;
 import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
+import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentRef;
+import org.nuxeo.ecm.core.api.PropertyException;
 import org.nuxeo.ecm.core.api.VersioningOption;
+import org.nuxeo.ecm.core.blob.BlobManager;
+import org.nuxeo.ecm.core.blob.BlobProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.io.IOUtils;
@@ -69,6 +77,8 @@ import org.collectionspace.services.common.FileUtilities;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.TransactionException;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.api.CommonAPI;
@@ -88,13 +98,34 @@ import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.config.service.ListResultField;
 
 /**
+ * Use Nuxeo's FileBlob class to create a temporary file that Nuxeo manages.
+ * @author remillet
+ *
+ */
+class CSpaceFileBlob extends FileBlob {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public CSpaceFileBlob(File file, boolean isTempFile) {
+		super(file);
+		this.isTemporary = isTempFile;  // if set to "true", Nuxeo will delete this file once it is finished with it
+	}
+}
+
+/**
  * The Class NuxeoBlobUtils.
  */
 public class NuxeoBlobUtils {
-		
+			
 	/** The Constant logger. */
 	private static final Logger logger = LoggerFactory
 			.getLogger(NuxeoBlobUtils.class);
+	
+    private static final String VIEWS_PROPERTY = "picture:views";
+    private static final String TITLE_PROPERTY = "title";
+    private static final String FILENAME_PROPERTY = "filename";
 
 	//
 	// A maximum byte size for the byte array used to hold an image.  Images larger than this will
@@ -197,31 +228,23 @@ public class NuxeoBlobUtils {
 		return strBuffer.toString();
 	}
 
-	// FIXME: REM - This needs to be configuration-bases and NOT hard coded!
-	// FIXME: REM - Use MultiviewPicture adapter to get some of this information
 	static private String getDerivativeUri(String uri, String derivativeName) {
-		String result = DERIVATIVE_UNKNOWN;
-
-		if (derivativeName.startsWith(DERIVATIVE_ORIGINAL_TAG) == true) {
-			result = DERIVATIVE_ORIGINAL;
-		} else if (derivativeName.startsWith(DERIVATIVE_ORIGINAL_JPEG_TAG) == true) {
-			result = DERIVATIVE_ORIGINAL_JPEG;
-		} else if (derivativeName.startsWith(DERIVATIVE_MEDIUM_TAG) == true) {
-			result = DERIVATIVE_MEDIUM;
-		} else if (derivativeName.startsWith(DERIVATIVE_SMALL_TAG) == true) {
-			result = DERIVATIVE_SMALL;
-		} else if (derivativeName.startsWith(DERIVATIVE_THUMBNAIL_TAG) == true) {
-			result = DERIVATIVE_THUMBNAIL;
-		}
-
-		return uri + result + "/" + BlobInput.URI_CONTENT_PATH;
+		return uri + derivativeName + "/" + BlobInput.URI_CONTENT_PATH;
 	}
 
 	static private HashMap<String, Object> createBlobListItem(Blob blob,
-			String uri) {
+			String uri,
+			String derivativeName) {
 		HashMap<String, Object> item = new HashMap<String, Object>();
 
-		String value = blob.getEncoding();
+		String value = getDerivativeUri(uri, derivativeName);
+		if (!value.trim().isEmpty()) {
+			item.put(BlobJAXBSchema.uri, value);
+		} else {
+			item.put(BlobJAXBSchema.uri, getDerivativeUri(uri, DERIVATIVE_UNKNOWN));
+		}
+
+		value = blob.getEncoding();
 		if (value != null && !value.trim().isEmpty()) {
 			item.put(BlobJAXBSchema.encoding, value);
 		}
@@ -236,10 +259,6 @@ public class NuxeoBlobUtils {
 		value = blob.getFilename();
 		if (value != null && !value.trim().isEmpty()) {
 			item.put(BlobJAXBSchema.name, value);
-		}
-		value = getDerivativeUri(uri, blob.getFilename());
-		if (value != null && !value.trim().isEmpty()) {
-			item.put(BlobJAXBSchema.uri, value);
 		}
 
 		return item;
@@ -274,6 +293,48 @@ public class NuxeoBlobUtils {
 		return result;
 	}
 
+	static private CommonList handleGenericBlobs(DocumentBlobHolder docBlobHolder,
+			CoreSessionInterface repoSession,
+			String repositoryId,
+			CommonList commonList,
+			String uri) {
+		List<Blob> docBlobs = docBlobHolder.getBlobs();			
+		// List<BlobListItem> blobListItems = result.getBlobListItem();
+		HashMap<String, Object> item = null;
+		for (Blob blob : docBlobs) {
+			if (blob != null) {
+				item = createBlobListItem(blob, uri, blob.getDigest());
+				if (item != null) {
+					commonList.addItem(item);
+				}
+			}
+		}
+
+		return commonList;
+	}
+	
+	static private CommonList handlePictureViewBlobs(PictureBlobHolder pictureBlobHolder,
+			CoreSessionInterface repoSession,
+			String repositoryId,
+			CommonList commonList,
+			String uri) {		
+		Set<String> derivativeNameList = NuxeoBlobUtils.getPictureViewNameSet(repoSession, repositoryId);
+		for (String viewName : derivativeNameList) {
+			Blob blob = pictureBlobHolder.getBlob(viewName);
+			if (blob != null) {
+				HashMap<String, Object> item = createBlobListItem(blob, uri, viewName);
+				if (item != null) {
+					commonList.addItem(item);
+				}
+			} else {
+				String msg = String.format("Could not get blob view '%s' for Nuxeo picuture document ID='%s'.",
+						viewName, repositoryId);
+			}
+		}
+
+		return commonList;
+	}
+
 	static public CommonList getBlobDerivatives(CoreSessionInterface repoSession,
 			String repositoryId, List<ListResultField> resultsFields, String uri)
 			throws Exception {
@@ -288,20 +349,14 @@ public class NuxeoBlobUtils {
 		}
 		commonList.setFieldsReturned(fields);
 
-		IdRef documentRef = new IdRef(repositoryId);
-		DocumentModel documentModel = repoSession.getDocument(documentRef);
-		DocumentBlobHolder docBlobHolder = (DocumentBlobHolder) documentModel
-				.getAdapter(BlobHolder.class);
-		List<Blob> docBlobs = docBlobHolder.getBlobs();
-		// List<BlobListItem> blobListItems = result.getBlobListItem();
-		HashMap<String, Object> item = null;
-		for (Blob blob : docBlobs) {
-			if (blob != null) {
-				item = createBlobListItem(blob, uri);
-				commonList.addItem(item);
-			}
+		DocumentModel documentModel = repoSession.getDocument(new IdRef(repositoryId));
+		DocumentBlobHolder docBlobHolder = (DocumentBlobHolder) documentModel.getAdapter(BlobHolder.class);
+		if (docBlobHolder instanceof PictureBlobHolder) {
+			commonList = handlePictureViewBlobs((PictureBlobHolder)docBlobHolder, repoSession, repositoryId, commonList, uri);
+		} else {
+			commonList = handleGenericBlobs((PictureBlobHolder)docBlobHolder, repoSession, repositoryId, commonList, uri);
 		}
-
+		
 		return commonList;
 	}
 
@@ -419,12 +474,12 @@ public class NuxeoBlobUtils {
 		return bigdec;
 	}
 
-	static private BlobsCommon createBlobsCommon(DocumentModel documentModel,
+	static private BlobsCommon createBlobsCommon(ServiceContext ctx, DocumentModel documentModel,
 			Blob nuxeoBlob) {
-		return createBlobsCommon(documentModel, nuxeoBlob, false);
+		return createBlobsCommon(ctx, documentModel, nuxeoBlob, false);
 	}
 	
-	static private BlobsCommon createBlobsCommon(DocumentModel documentModel,
+	static private BlobsCommon createBlobsCommon(ServiceContext ctx, DocumentModel documentModel,
 			Blob nuxeoBlob, Boolean getContentFlag) {
 		BlobsCommon result = new BlobsCommon();
 
@@ -433,6 +488,18 @@ public class NuxeoBlobUtils {
 			result.setName(nuxeoBlob.getFilename());
 			result.setLength(Long.toString(nuxeoBlob.getLength()));
 			result.setRepositoryId(documentModel.getId());
+			// set the blob's digest value
+			String digest = nuxeoBlob.getDigest();
+			if (digest == null) {
+				try {
+			        BlobManager blobManager = Framework.getService(BlobManager.class);
+			        BlobProvider bp = blobManager.getBlobProvider(ctx.getRepositoryName());
+			        digest = bp.getBinaryManager().getBinary(nuxeoBlob).getDigest();
+				} catch (Exception e) {
+					logger.warn(String.format("Could not compute digest value for uploaded media '%s'.", nuxeoBlob.getFilename()));
+				}
+			}
+			result.setDigest(digest);
 			
 			//
 			// If getContentFlag is true then we're being asked for the blob's content, so we don't
@@ -509,8 +576,15 @@ public class NuxeoBlobUtils {
 		return typeService;
 	}
 
-	private static Blob createNuxeoFileBasedBlob(File file) throws Exception {
-		return new FileBlob(file);
+	/**
+	 * Create a temporary Nuxeo FileBlob instance for processing.  Nuxeo will clean this up for us.
+	 * 
+	 * @param file
+	 * @return
+	 * @throws Exception
+	 */
+	private static Blob createFileBlob(File file, boolean isTemporary) throws Exception {
+		return new CSpaceFileBlob(file, isTemporary);
 	}
 
 	/**
@@ -653,7 +727,7 @@ public class NuxeoBlobUtils {
 		            false, 
 		            blobName,
 		            useNuxeoAdaptors);
-			result = createBlobsCommon(documentModel, inputStreamBlob); // Now create the metadata about the Nuxeo blob document
+			result = createBlobsCommon(ctx, documentModel, inputStreamBlob); // Now create the metadata about the Nuxeo blob document
 		} catch (Exception e) {
 			result = null;
 			logger.error("Could not create new Nuxeo blob document.", e); //FIXME: REM - This should probably be re-throwing the exception?
@@ -705,10 +779,12 @@ public class NuxeoBlobUtils {
 				}
 			}			
 			
-			result = createBlobInRepository(repoSession,
+			result = createBlobInRepository(ctx,
+					repoSession,
 					wspaceDoc,
 					purgeOriginal,
-					targetFile, 
+					targetFile,
+					blobInput.isTemporaryFile(),
 					null, // MIME type
 					useNuxeoAdaptors);
 			//
@@ -766,16 +842,18 @@ public class NuxeoBlobUtils {
 	 *            the mime type
 	 * @return the string
 	 */
-	static private BlobsCommon createBlobInRepository(CoreSessionInterface nuxeoSession,
+	static private BlobsCommon createBlobInRepository(ServiceContext ctx,
+			CoreSessionInterface nuxeoSession,
 			DocumentModel blobLocation,
 			boolean purgeOriginal,
 			File file,
+			boolean isFileTemporary,
 			String mimeType,
 			boolean useNuxeoAdaptors) {
 		BlobsCommon result = null;
 
 		try {
-			Blob fileBlob = createNuxeoFileBasedBlob(file);
+			Blob fileBlob = createFileBlob(file, isFileTemporary);
 			DocumentModel documentModel = createDocumentFromBlob(
 					nuxeoSession, fileBlob,
 					blobLocation.getPathAsString(),
@@ -783,7 +861,7 @@ public class NuxeoBlobUtils {
 					file.getName(),
 					useNuxeoAdaptors);
 
-			result = createBlobsCommon(documentModel, fileBlob); // Now create our metadata resource document
+			result = createBlobsCommon(ctx, documentModel, fileBlob); // Now create our metadata resource document
 
 			// If the requester wants us to generate only derivatives, we need to purge/clear the original image file
 			if (purgeOriginal == true && isPurgeAllowed(documentModel) == true) {
@@ -876,7 +954,7 @@ public class NuxeoBlobUtils {
 	static public BlobOutput getBlobOutput(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
 			RepositoryClient<PoxPayloadIn, PoxPayloadOut> repositoryClient,
 			String repositoryId,
-			StringBuffer outMimeType) throws TransactionException {
+			StringBuffer outMimeType) throws TransactionException, DocumentNotFoundException {
 		BlobOutput result = null;
 		
 		boolean repoSessionCleanup = false;
@@ -893,6 +971,12 @@ public class NuxeoBlobUtils {
 				String mimeType = blobsCommon.getMimeType();
 				outMimeType.append(mimeType);
 			}			
+		} catch (DocumentException e) {
+			if (logger.isDebugEnabled()) {
+				logger.debug(e.getMessage(), e);
+			} else {
+				logger.error(e.getMessage());
+			}
 		} finally {
 			if (repoSessionCleanup == true) {
 				releaseRepositorySession(ctx, repositoryClient, repoSession);
@@ -936,6 +1020,21 @@ public class NuxeoBlobUtils {
 		return result;
 	}
 	
+    static public Set<String> getPictureViewNameSet(CoreSessionInterface repoSession, String repositoryId) throws PropertyException {
+        Set<String> result = null;
+        
+        DocumentModel docModel = repoSession.getDocument(new IdRef(repositoryId));
+    	Collection<Property> views = docModel.getProperty(VIEWS_PROPERTY).getChildren();
+    	if (views != null) {
+    		result = new HashSet<String>();
+	        for (Property property : views) {
+	        	result.add((String)property.getValue(TITLE_PROPERTY));
+	        }
+    	}
+        
+        return result;
+    }
+	
 	/**
 	 * Gets the image.
 	 * 
@@ -946,13 +1045,14 @@ public class NuxeoBlobUtils {
 	 * @param derivativeTerm
 	 *            the derivative term
 	 * @return the image
+	 * @throws DocumentNotFoundException 
 	 */
 	static public BlobOutput getBlobOutput(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
 			CoreSessionInterface repoSession,
 			String repositoryId,
 			String derivativeTerm,
 			Boolean getContentFlag,
-			StringBuffer outMimeType) {
+			StringBuffer outMimeType) throws DocumentNotFoundException {
 		BlobOutput result = new BlobOutput();
 		boolean isNonImageDerivative = false;
 
@@ -974,6 +1074,12 @@ public class NuxeoBlobUtils {
 					PictureBlobHolder pictureBlobHolder = (PictureBlobHolder) docBlobHolder;
 					if (derivativeTerm != null) {
 						docBlob = pictureBlobHolder.getBlob(derivativeTerm);
+						if (docBlob == null) {
+							String msg = String.format("Could not find derivative named '%s' for image/picture named '%s' Nuxeo Picture ID='%s'",
+									derivativeTerm, documentModel.getName(), repositoryId);
+							logger.error(msg);
+							throw new DocumentNotFoundException(msg);
+						}
 						// Nuxeo derivatives are all JPEG
 						outMimeType.append(MIME_JPEG); // All Nuxeo image derivatives are JPEG images.
 					} else {
@@ -986,10 +1092,16 @@ public class NuxeoBlobUtils {
 					}
 				}
 				
-				if (logger.isWarnEnabled()) {
-					if (docBlob == null) {
-						String msg = String.format("Could not retrieve document blob for Nuxeo document ID = '%s' CSID = '%s'",
-								repositoryId, NuxeoUtils.getCsid(documentModel));
+				if (docBlob == null && logger.isWarnEnabled()) {
+					String msg = String.format("Could not retrieve document blob from Nuxeo document ID='%s' type='%s' name='%s'",
+							repositoryId, documentModel.getType(), documentModel.getName());
+					
+					if (docBlob == null && docBlobHolder instanceof PictureBlobHolder && derivativeTerm != null) {
+						msg = String.format("Could not retrieve image blob for derivative '%s' of Picture document with Nuxeo ID='%s' and name='%s'",
+								derivativeTerm, repositoryId, documentModel.getName());
+					}
+					
+					if (msg != null) {
 						logger.warn(msg);
 					}
 				}
@@ -999,7 +1111,7 @@ public class NuxeoBlobUtils {
 				// and an InputStream with the bits if the 'getContentFlag' is
 				// set.
 				//
-				BlobsCommon blobsCommon = createBlobsCommon(documentModel, docBlob, getContentFlag);
+				BlobsCommon blobsCommon = createBlobsCommon(ctx, documentModel, docBlob, getContentFlag);
 				result.setBlobsCommon(blobsCommon);
 				if (getContentFlag == true) {
 					InputStream remoteStream = null;
@@ -1052,6 +1164,8 @@ public class NuxeoBlobUtils {
 //					result.setBlobInputStream(bufferedInputStream);
 					result.setBlobInputStream(remoteStream);
 				}
+			} catch (DocumentNotFoundException d) {
+				throw d;
 			} catch (Exception e) {
 				if (logger.isErrorEnabled() == true) {
 					logger.error(e.getMessage(), e);

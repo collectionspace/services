@@ -22,6 +22,7 @@ public class BlobInput {
 	private final static String FILE_ACCESS_ERROR = "The following file is either missing or cannot be read: ";
 	private final static String URL_DOWNLOAD_FAILED = "Could not download file from the following URL: ";
 	
+	private boolean isTemporaryFile = false;
 	private String blobCsid = null;
 	private File blobFile = null;
 	private String blobUri = null;
@@ -176,6 +177,7 @@ public class BlobInput {
 	//
 	public void createBlobFile(HttpServletRequest req, String blobUri) throws Exception {
     	File tmpFile = org.collectionspace.services.common.FileUtilities.createTmpFile(req);
+    	this.setIsTemporaryFile(true);
     	this.setBlobFile(tmpFile);
     	this.setBlobUri(blobUri);
 	}
@@ -209,6 +211,7 @@ public class BlobInput {
 			int status = fetchedFile.getStatus();
 			if (status == Download.COMPLETE) {
 				theBlobFile = fetchedFile.getFile();
+				setIsTemporaryFile(true); // setting to true ensures the file will get cleanup (removed) when we're done with it
 			} else {
 				String msg = URL_DOWNLOAD_FAILED + theBlobUri;
 				logger.error(msg);
@@ -224,6 +227,7 @@ public class BlobInput {
 		} else {
 			throw new MalformedURLException("Could not create a blob file from: " + blobUrl);
 		}
+		
     	this.setBlobFile(theBlobFile);
     	this.setBlobUri(blobUri);
 	}
@@ -234,7 +238,15 @@ public class BlobInput {
 
 	public void setMimeType(String mimeType) {
 		this.blobMimeType = mimeType;
-	}	
+	}
+	
+	public void setIsTemporaryFile(boolean flag) {
+		this.isTemporaryFile = flag;
+	}
+	
+	public boolean isTemporaryFile() {
+		return this.isTemporaryFile;
+	}
 	
 }
 
