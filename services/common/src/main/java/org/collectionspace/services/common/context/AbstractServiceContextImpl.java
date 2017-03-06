@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.authentication.spi.AuthNContext;
@@ -108,6 +109,8 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     private SecurityContext securityContext;
     /** The sessions JAX-RS URI information */
     private UriInfo uriInfo;
+    /** The JAX-RS request information */
+    private Request requestInfo;
     /** The current repository session */
     private Object currentRepositorySession;
     /** A reference count for the current repository session */
@@ -841,6 +844,16 @@ public abstract class AbstractServiceContextImpl<IT, OT>
 	@Override
 	public UriInfo getUriInfo() {
 		return this.uriInfo;
+	}
+	
+	@Override
+	public Request getRequestInfo() {
+		return this.requestInfo;
+	}
+	
+	@Override
+	public void setRequestInfo(Request requestInfo) {
+		this.requestInfo = requestInfo;
 	}
 	
 	/*

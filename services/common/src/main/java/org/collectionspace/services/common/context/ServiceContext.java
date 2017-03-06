@@ -27,11 +27,10 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.CollectionSpaceResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.document.DocumentHandler;
@@ -255,6 +254,12 @@ public interface ServiceContext<IT, OT> {
      * @param map the map of service names to resource instances.
      */
     public void setResourceMap(ResourceMap map);
+    
+    /**
+     * 
+     * @param jaxsRsRequest - Keep track of the JAX-RS request information
+     */
+    public void setRequestInfo(Request jaxsRsRequest);
 
     /**
      * getPartsMetadata returns metadata for object parts used by the service
@@ -395,6 +400,12 @@ public interface ServiceContext<IT, OT> {
 	 * @return
 	 */
 	public boolean shouldForceSync();
+
+	/**
+	 * 
+	 * @return The JAX-RS request information
+	 */
+	Request getRequestInfo();
 }
 
 

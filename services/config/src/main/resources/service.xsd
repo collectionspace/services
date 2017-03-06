@@ -242,7 +242,13 @@
             <xs:element name="params">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element name="CacheMaxAge" type="xs:integer" minOccurs="0" maxOccurs="1" default="86400"/>  <!-- default of 1 day -->
+                    	<xs:element name="CacheControlConfigElement" minOccurs="0" maxOccurs="1"> <!-- Create a cache control setting for a service's responses.  You can have different ones for different responses. -->
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="CacheControlConfigList" type="CacheControlConfig" minOccurs="0" maxOccurs="unbounded"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
                         <xs:element name="SchemaName" type="xs:string" minOccurs="0" maxOccurs="1"/>
                         <xs:element name="RefnameDisplayNameField" type="ListResultField" minOccurs="0" maxOccurs="1"/>  <!-- Should rename 'ListResultField' to a more generic name -->
                         <xs:element name="SupportsHierarchy" type="xs:boolean" minOccurs="0" maxOccurs="1" default="false"/>
@@ -275,8 +281,19 @@
         </xs:sequence>
     </xs:complexType>
 
-
-
-
+    <xs:complexType name="CacheControlConfig">
+        <xs:sequence>
+        	<xs:element name="key" type="xs:string" minOccurs="1" maxOccurs="1" default="default"/>				<!-- The lookup name CSpace used to find these settings.  Set to "default" by default, but pick a unique name among sibling items. -->
+            <xs:element name="private" type="xs:boolean" minOccurs="0" maxOccurs="1" default="false"/>			<!-- only clients (mostly the browser) and no one else in the chain (like a proxy) should cache this -->
+            <xs:element name="public" type="xs:boolean" minOccurs="0" maxOccurs="1" default="true"/>			<!-- any entity in the chain can cache this -->
+            <xs:element name="noCache" type="xs:boolean" minOccurs="0" maxOccurs="1" default="false"/>			<!-- should not be cached in any way/method -->
+            <xs:element name="mustRevalidate" type="xs:boolean" minOccurs="0" maxOccurs="1" default="false"/>	<!-- See http://bit.ly/2mnCwIi -->
+            <xs:element name="proxyRevalidate" type="xs:boolean" minOccurs="0" maxOccurs="1" default="false"/>	
+            <xs:element name="noStore" type="xs:boolean" minOccurs="0" maxOccurs="1" default="false"/>			<!-- can be cached but should not be stored on disk (most browsers will hold the resources in memory until they will be quit) -->
+            <xs:element name="noTransform" type="xs:boolean" minOccurs="0" maxOccurs="1" default="false"/>		<!-- the resource should not be modified (for example shrink image by proxy) -->
+            <xs:element name="maxAge" type="xs:integer" minOccurs="0" maxOccurs="1" default="86400"/>			<!-- how long the resource is valid (measured in seconds) -->
+            <xs:element name="sMaxAge" type="xs:integer" minOccurs="0" maxOccurs="1" default="-1"/>				<!-- same like max-age but this value is just for non clients -->
+        </xs:sequence>
+    </xs:complexType>
 
 </xs:schema>

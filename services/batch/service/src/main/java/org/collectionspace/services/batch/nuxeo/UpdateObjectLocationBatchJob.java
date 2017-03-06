@@ -26,10 +26,8 @@ import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
-import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-
 import org.dom4j.DocumentException;
 //import org.jboss.resteasy.specimpl.UriInfoImpl;
 import org.jdom.Document;
@@ -431,9 +429,21 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
     }
 
     protected PoxPayloadOut findByCsid(NuxeoBasedResource resource, String csid) throws URISyntaxException, DocumentException {
-        byte[] response = resource.get(null, createUriInfo(), csid);
-        PoxPayloadOut payload = new PoxPayloadOut(response);
-        return payload;
+    	PoxPayloadOut result = null;
+    	
+    	try {
+			result = resource.getResourceFromCsid(null, createUriInfo(), csid);
+		} catch (Exception e) {
+			String msg = String.format("UpdateObjectLocation batch job could find/get resource CSID='%s' of type '%s'",
+					csid, resource.getServiceName());
+			if (logger.isDebugEnabled()) {
+				logger.debug(msg, e);
+			} else {
+				logger.error(msg);
+			}
+		}
+    	
+    	return result;
     }
 
     protected UriInfo createUriInfo() throws URISyntaxException {

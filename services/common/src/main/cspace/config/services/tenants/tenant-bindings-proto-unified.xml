@@ -155,7 +155,16 @@
 			</service:documentHandler>
 			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
 				<service:params>
-				    <service:CacheMaxAge>86400</service:CacheMaxAge> <!-- By default, cache blobs for 1 full day -->
+		            <service:CacheControlConfigElement> <!-- See service.xsd XML Schema definitation for all potential cache settings -->
+                		<service:CacheControlConfigList>
+		                    <service:key>GET/blobs/*/content</service:key>
+		                    <service:maxAge>86401</service:maxAge> <!-- By default, cache blobs for 1 full day -->
+		                </service:CacheControlConfigList>
+		                <service:CacheControlConfigList>
+		                    <service:key>GET/blobs/*/derivatives/*/content</service:key>
+		                    <service:maxAge>86402</service:maxAge> <!-- By default, cache blobs for 1 full day -->
+		                </service:CacheControlConfigList>
+            		</service:CacheControlConfigElement>
 					<service:ListResultsFields>
 						<service:ListResultField>
 							<service:element>name</service:element>

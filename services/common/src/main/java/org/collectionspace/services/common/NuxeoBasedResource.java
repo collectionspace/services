@@ -331,27 +331,41 @@ public abstract class NuxeoBasedResource
     //======================= GET ====================================================
     @GET
     @Path("{csid}")
-    public byte[] get(
+    public Response get(
             @Context Request request,
             @Context UriInfo uriInfo,
             @PathParam("csid") String csid) {
     	uriInfo = new UriInfoWrapper(uriInfo);
         PoxPayloadOut result = null;
-        ensureCSID(csid, READ);
+        
         try {
-            RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(uriInfo);
-            result = get(csid, ctx);// ==> CALL implementation method, which subclasses may override.
-            if (result == null) {
-                Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                        ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
-                throw new CSWebApplicationException(response);
-            }
+            result = getResourceFromCsid(request, uriInfo, csid);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);
         }
+        
+        if (result == null) {
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
+            throw new CSWebApplicationException(response);
+        }        
 
-        return result.getBytes();
+        return Response.ok(result.getBytes()).build();
     }
+    
+    public PoxPayloadOut getResourceFromCsid(
+            Request request,
+            UriInfo uriInfo,
+            String csid) throws Exception {
+        PoxPayloadOut result = null;
+        
+        ensureCSID(csid, READ);
+        RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = 
+        		(RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(request, uriInfo);
+        result = get(csid, ctx);// ==> CALL an implementation method, which subclasses may override.
+
+        return result;
+    }    
     
     /**
      * Call this method only from other resources (like the Service Groups resource) obtained from the global resource map (ResourceMap).  If the a parent

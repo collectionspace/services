@@ -23,7 +23,6 @@
  */
 package org.collectionspace.services.common;
 
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,10 +33,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.ServiceConfigUtils;
@@ -51,13 +53,15 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.TransactionException;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
+import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
+import org.collectionspace.services.config.service.CacheControlConfig;
+import org.collectionspace.services.config.service.DocHandlerParams.Params.CacheControlConfigElement;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.service.DocHandlerParams.Params;
 import org.collectionspace.services.description.ServiceDescription;
-
 import org.jboss.resteasy.spi.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,6 +165,14 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         docHandler.setCommonPart(commonPart);
         return docHandler;
     }    
+    
+    protected ServiceContext<IT, OT> createServiceContext(Request requestInfo, UriInfo uriInfo) throws Exception {
+    	ServiceContext<IT, OT> result = this.createServiceContext(uriInfo);
+
+    	result.setRequestInfo(requestInfo);
+
+    	return result;
+	}
     
     /**
      * Creates the service context.
@@ -650,35 +662,105 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     }
     
     /**
-     * Get max cache age for HTTP responses from the tenant's service bindings.
-     * 
-     * @param ctx
+     * Find a named CacheControlConfig instance.
+     * @param element
+     * @param cacheKey
      * @return
      */
-    protected int getCacheMaxAge(ServiceContext<IT, OT> ctx) {
-    	BigInteger result = null;
+    private CacheControlConfig getCacheControl(CacheControlConfigElement element, String cacheKey) {
+    	CacheControlConfig result = null;
+    	
+    	List<CacheControlConfig> list = element.getCacheControlConfigList();
+    	for (CacheControlConfig cacheControlConfig : list) {
+    		if (cacheControlConfig.getKey().equalsIgnoreCase(cacheKey)) {
+    			result = cacheControlConfig;
+    			break;
+    		}
+    	}
+    	
+    	return result;
+    }
+    
+    /*
+     * By default, use the request's URI and HTTP method to form the cache-key to use when looking up the
+     * cache control configuration from the service bindings
+     */
+    protected CacheControl getDefaultCacheControl(ServiceContext<IT, OT> ctx) {
+    	UriInfo uriInfo = ctx.getUriInfo();
+    	Request requestInfo = ctx.getRequestInfo();
+    	
+    	if (uriInfo != null && requestInfo != null) try {
+    		String resName = SecurityUtils.getResourceName(uriInfo);
+    		String requestMethod = requestInfo.getMethod();
+    		return getCacheControl(ctx, String.format("%s/%s", requestMethod, resName));  // example, "GET/blobs/*/content"
+    	} catch (Exception e) {
+    		logger.debug(e.getMessage(), e);
+    	}
+    	
+    	return getCacheControl(ctx, "default"); // Look for a default one if we couldn't find based on the resource request
+    }
+    
+    protected CacheControl getCacheControl(ServiceContext<IT, OT> ctx, String cacheKey) {
+    	CacheControl result = null;
     	
     	try {
 			Params docHandlerParams = ServiceConfigUtils.getDocHandlerParams(ctx.getTenantId(), ctx.getServiceName());
-			if (docHandlerParams.getCacheMaxAge() != null) {
-				result = docHandlerParams.getCacheMaxAge();
+			CacheControlConfig cacheControlConfig = getCacheControl(docHandlerParams.getCacheControlConfigElement(), cacheKey);
+			if (cacheControlConfig != null) {
+				result = new CacheControl();
+				
+				if (cacheControlConfig.isPrivate() != null) {
+					result.setPrivate(cacheControlConfig.isPrivate());
+				}
+				
+				if (cacheControlConfig.isNoCache() != null) {
+					result.setNoCache(cacheControlConfig.isNoCache());
+				}
+				
+				if (cacheControlConfig.isProxyRevalidate() != null) {
+					result.setProxyRevalidate(cacheControlConfig.isProxyRevalidate());
+				}
+				
+				if (cacheControlConfig.isMustRevalidate() != null) {
+					result.setMustRevalidate(cacheControlConfig.isMustRevalidate());
+				}
+				
+				if (cacheControlConfig.isNoStore() != null) {
+					result.setNoStore(cacheControlConfig.isNoStore());
+				}
+				
+				if (cacheControlConfig.isNoTransform() != null) {
+					result.setNoTransform(cacheControlConfig.isNoTransform());
+				}
+				
+				if (cacheControlConfig.getMaxAge() != null) { 
+					result.setMaxAge(cacheControlConfig.getMaxAge().intValue());
+				}
+				
+				if (cacheControlConfig.getSMaxAge() != null) {
+					result.setSMaxAge(cacheControlConfig.getSMaxAge().intValue());
+				}
 			}
 		} catch (DocumentException e) {
-			logger.debug("Failed to retrieve cache-age-max from service bindings.", e);
+			result = null;
+			logger.debug(String.format("Failed to retrieve CacheControlConfig with key '%s' from service bindings '%s'.", cacheKey, ctx.getServiceName()), e);
+		} catch (NullPointerException npe) {
+			result = null;
+			//
+			// NPE might mean optional cache-control config is missing -that's usually ok.
+			logger.trace(npe.getLocalizedMessage(), npe);
 		}
 
-    	return result != null ? result.intValue() : 0;
+    	return result;
     }
     
     protected Response.ResponseBuilder setCacheControl(ServiceContext<IT, OT> ctx, Response.ResponseBuilder responseBuilder) {
-    	int cacheMaxAge = getCacheMaxAge(ctx);
+    	CacheControl cacheControl = getDefaultCacheControl(ctx);
     	
-    	if (cacheMaxAge > 0) {
-	    	CacheControl cacheControl = new CacheControl();
-			cacheControl.setMaxAge(getCacheMaxAge(ctx));
+    	if (cacheControl != null) {
 			responseBuilder.cacheControl(cacheControl);
-	    	logger.debug(String.format("Cache-max-age for service '%s' is set to '%d' in the service bindings for tenant ID='%s'.",
-	    			ctx.getServiceName(), cacheMaxAge, ctx.getTenantId()));
+	    	logger.debug(String.format("Setting default CacheControl for service '%s' responses from the service bindings for tenant ID='%s'.",
+	    			ctx.getServiceName(), ctx.getTenantId()));
     	}
     	
     	return responseBuilder;

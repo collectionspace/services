@@ -54,6 +54,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
@@ -299,13 +300,15 @@ public class MediaResource extends NuxeoBasedResource {
     @GET
     @Path("{csid}/blob/content")
     public Response getBlobContent(
-    		@PathParam("csid") String csid) {
+    		@PathParam("csid") String csid,
+    		@Context Request requestInfo,
+    		@Context UriInfo uriInfo) {
     	Response result = null;
     	
 	    try {
 	    	ensureCSID(csid, READ);
 	        String blobCsid = this.getBlobCsid(csid);
-	    	result = getBlobResource().getBlobContent(blobCsid);	        
+	    	result = getBlobResource().getBlobContent(blobCsid, requestInfo, uriInfo);	        
 	    } catch (Exception e) {
 	        throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);
 	    }
@@ -317,13 +320,15 @@ public class MediaResource extends NuxeoBasedResource {
     @Path("{csid}/blob/derivatives/{derivativeTerm}/content")
     public Response getDerivativeContent(
     		@PathParam("csid") String csid,
-    		@PathParam("derivativeTerm") String derivativeTerm) {
+    		@PathParam("derivativeTerm") String derivativeTerm,
+    		@Context Request requestInfo,
+    		@Context UriInfo uriInfo) {
     	Response result = null;
     	
 	    try {
 	    	ensureCSID(csid, READ);
 	        String blobCsid = this.getBlobCsid(csid);
-	    	result = getBlobResource().getDerivativeContent(blobCsid, derivativeTerm);	        
+	    	result = getBlobResource().getDerivativeContent(blobCsid, derivativeTerm, requestInfo, uriInfo);	        
 	    } catch (Exception e) {
 	        throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);
 	    }

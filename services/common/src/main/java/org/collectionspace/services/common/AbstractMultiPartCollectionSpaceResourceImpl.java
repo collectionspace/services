@@ -34,6 +34,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.client.PayloadOutputPart;
@@ -146,7 +147,7 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
      */
     @GET
     @Path(WorkflowClient.SERVICE_PATH)
-    public Lifecycle getWorkflow(@Context UriInfo uriInfo) {
+    public Lifecycle getWorkflow(@Context Request jaxRsRequest, @Context UriInfo uriInfo) {
     	Lifecycle result;
 
         String documentType = "undefined";

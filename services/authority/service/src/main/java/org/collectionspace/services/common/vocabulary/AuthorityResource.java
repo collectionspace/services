@@ -40,6 +40,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
@@ -417,14 +418,16 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @GET
     @Path("{csid}")
     @Override
-    public byte[] get(
+    public Response get(
             @Context Request request,
             @Context UriInfo uriInfo,
             @PathParam("csid") String specifier) {
+    	Response result = null;
     	uriInfo = new UriInfoWrapper(uriInfo);
-        PoxPayloadOut result = null;
+        PoxPayloadOut payloadout = null;
+        
         try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(request, uriInfo);
             DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
 
             Specifier spec = Specifier.getSpecifier(specifier, "getAuthority", "GET");
@@ -439,20 +442,23 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
                 handler.setDocumentFilter(myFilter);
                 getRepositoryClient(ctx).get(ctx, handler);
             }
-            result = ctx.getOutput();
-
+            
+            payloadout = ctx.getOutput();
+            ResponseBuilder responseBuilder = Response.ok(payloadout.getBytes());
+            this.setCacheControl(ctx, responseBuilder);
+            result = responseBuilder.build();            
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED, specifier);
         }
 
         if (result == null) {
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Get failed, the requested Authority specifier:" + specifier + ": was not found.").type(
+                    "GET request failed. The requested Authority specifier:" + specifier + ": was not found.").type(
                     "text/plain").build();
             throw new CSWebApplicationException(response);
         }
 
-        return result.getBytes();
+        return result;
     }
 
     /**
