@@ -2,6 +2,42 @@
 <tenant:TenantBindingConfig xmlns:merge="http://xmlmerge.el4j.elca.ch" xmlns:tenant="http://collectionspace.org/services/config/tenant">
 
 	<tenant:tenantBinding>
+	    <tenant:eventListenerConfigurations id="default">
+	        <tenant:eventListenerConfig id="UpdateObjectLocationOnMove">
+	            <tenant:className>org.collectionspace.services.listener.UpdateObjectLocationOnMove</tenant:className>
+	            <tenant:paramList id="default">
+	                <tenant:param>
+	                    <tenant:key>key0</tenant:key>
+	                    <tenant:value>value0</tenant:value>
+		            </tenant:param>
+	                <tenant:param>
+	                    <tenant:key>key1</tenant:key>
+	                    <tenant:value>value1</tenant:value>
+		            </tenant:param>
+	                <tenant:param>
+	                    <tenant:key>key2</tenant:key>
+	                    <tenant:value>value2</tenant:value>
+		            </tenant:param>
+	            </tenant:paramList>
+	        </tenant:eventListenerConfig>
+	        <tenant:eventListenerConfig id="UpdateObjectLocationAndCrateOnMove">
+	            <tenant:className>org.collectionspace.services.listener.UpdateObjectLocationAndCrateOnMove</tenant:className>
+	            <tenant:paramList id="default">
+	                <tenant:param>
+	                    <tenant:key>crate-key0</tenant:key>
+	                    <tenant:value>value0</tenant:value>
+		            </tenant:param>
+	                <tenant:param>
+	                    <tenant:key>crate-key1</tenant:key>
+	                    <tenant:value>value1</tenant:value>
+		            </tenant:param>
+	                <tenant:param>
+	                    <tenant:key>crate-key2</tenant:key>
+	                    <tenant:value>value2</tenant:value>
+		            </tenant:param>
+	            </tenant:paramList>
+	        </tenant:eventListenerConfig>
+	    </tenant:eventListenerConfigurations>
 		<tenant:properties>
 			<!-- Controls whether term completion (aka partial term matching, aka autocomplete) searches will automatically insert 
 				a leading wildcard. The default value is 'true', which will cause your search expression to be matched when found anywhere 
@@ -28,21 +64,6 @@
 				<types:value>true</types:value>
 			</types:item>
 		</tenant:properties>
-
-		<!--
-		<tenant:serviceBindings id="Vocabularyitems" merge:matcher="id">
-			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
-				<service:params>
-					<service:RefnameDisplayNameField>
-						<service:ListResultField>
-							<service:element>order</service:element>
-							<service:xpath>order</service:xpath>
-						</service:ListResultField>
-					</service:RefnameDisplayNameField>
-				</service:params>
-			</service:DocHandlerParams>
-		</tenant:serviceBindings>
-		-->
 
 		<!-- begin idgenerator service meta-data -->
 		<tenant:serviceBindings id="idgenerators" merge:matcher="id" name="idgenerators" type="utility"
