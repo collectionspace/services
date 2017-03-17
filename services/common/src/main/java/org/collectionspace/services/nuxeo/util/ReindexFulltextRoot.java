@@ -307,8 +307,7 @@ public class ReindexFulltextRoot {
         session.save();
     }
 
-    protected void runAsyncBatch(Set<String> asyncIds)
-            {
+    protected void runAsyncBatch(Set<String> asyncIds) {
         if (asyncIds.isEmpty()) {
             return;
         }

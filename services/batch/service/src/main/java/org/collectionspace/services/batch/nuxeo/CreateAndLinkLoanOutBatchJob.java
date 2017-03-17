@@ -5,28 +5,24 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.batch.BatchInvocable;
+import org.collectionspace.services.batch.AbstractBatchInvocable;
 import org.collectionspace.services.client.CollectionSpaceClientUtils;
 import org.collectionspace.services.common.NuxeoBasedResource;
-import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
-import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.client.LoanoutClient;
 import org.collectionspace.services.client.RelationClient;
 
-public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
+public class CreateAndLinkLoanOutBatchJob extends AbstractBatchInvocable {
 
 	private static ArrayList<String> invocationModes = null;
 	private InvocationContext invocationCtx;
-	private ServiceContext ctx;
 	private int completionStatus;
-	private ResourceMap resourceMap;
 	private InvocationResults results;
 	private InvocationError errorInfo;
 	private final String RELATION_TYPE = "affects"; 
-	private final String LOAN_DOCTYPE = "LoanOut"; 
+	private final String LOAN_DOCTYPE = "LoanOut";
 	private final String RELATION_PREDICATE_DISP = "affects"; 
 	protected final int CREATED_STATUS = Response.Status.CREATED.getStatusCode();
 	protected final int BAD_REQUEST_STATUS = Response.Status.BAD_REQUEST.getStatusCode();
@@ -36,7 +32,6 @@ public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 		CreateAndLinkLoanOutBatchJob.setupClassStatics();
 		invocationCtx = null;
 		completionStatus = STATUS_UNSTARTED;
-		resourceMap = null;
 		results = new InvocationResults();
 		errorInfo = null;
 	}
@@ -56,16 +51,7 @@ public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 		return CreateAndLinkLoanOutBatchJob.invocationModes;
 	}
 	
-    @Override
-    public void setServiceContext(ServiceContext context) {
-        this.ctx = context;
-    }
     
-    @Override
-    public ServiceContext getServiceContext() {
-        return ctx;
-    }
-
     @Override
     public InvocationContext getInvocationContext() {
         return invocationCtx;
@@ -78,14 +64,6 @@ public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
     @Override
 	public void setInvocationContext(InvocationContext context) {
 		this.invocationCtx = context;
-	}
-
-	/**
-	 * Sets the invocation context for the batch job. Called before run().
-	 * @param invocationCtx an instance of InvocationContext.
-	 */
-	public void setResourceMap(ResourceMap resourceMap) {
-		this.resourceMap = resourceMap;
 	}
 
 	/**
@@ -151,8 +129,8 @@ public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 
 		// First, create the Loanout
 		// We fetch the resource class by service name
-		NuxeoBasedResource resource = (NuxeoBasedResource) resourceMap.get( LoanoutClient.SERVICE_NAME); 
-		Response response = resource.create(resourceMap, null, loanoutPayload);
+		NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(LoanoutClient.SERVICE_NAME); 
+		Response response = resource.create(getResourceMap(), null, loanoutPayload);
 		if(response.getStatus() != CREATED_STATUS) {
 			completionStatus = STATUS_ERROR;
 			errorInfo = new InvocationError(INT_ERROR_STATUS,
@@ -177,8 +155,8 @@ public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 			+   "<relationshipType>"+RELATION_TYPE+"</relationshipType>"
 			+   "<predicateDisplayName>"+RELATION_PREDICATE_DISP+"</predicateDisplayName>"
 			+ "</ns2:relations_common></document>";
-		NuxeoBasedResource resource = (NuxeoBasedResource) resourceMap.get(RelationClient.SERVICE_NAME);
-		Response response = resource.create(resourceMap, null, relationPayload);
+		NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(RelationClient.SERVICE_NAME);
+		Response response = resource.create(getResourceMap(), null, relationPayload);
 		if(response.getStatus() != CREATED_STATUS) {
 			completionStatus = STATUS_ERROR;
 			errorInfo = new InvocationError(INT_ERROR_STATUS,

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Claim schema (XSD)
+    
+    Entity  : Claim
+    Part    : Common
+    Used for: Nuxeo EP core document type
+
+    $LastChangedRevision: $
+    $LastChangedDate: $
+-->
+
+<!-- PATRICK ADVISES CORE SCHEMA CONSIST OF ONLY:
+	* Date filed
+	* Claim number
+	* Filed by (here filedBy)
+	* On behalf of (here filedOnBehalfOf)
+	* Responsible department (here responsibleDepartment)
+-->
+
+<xs:schema
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:ns="http://collectionspace.org/services/claim/"
+	xmlns="http://collectionspace.org/services/claim/"
+	targetNamespace="http://collectionspace.org/services/claim/"
+	version="0.1">
+	
+	<xs:element name="claimNumber" type="xs:string"/>
+	
+	<xs:element name="responsibleDepartments"> <!-- CORE: Responsible department -->
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="responsibleDepartment" type="xs:string"
+					minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="claimClaimantGroupList" type="claimClaimantGroupList"/> <!-- CORE: Filed by; On behalf of -->
+	<xs:element name="claimReceivedGroupList" type="claimReceivedGroupList"/> <!-- CORE: Date filed -->
+	
+	<xs:complexType name="claimClaimantGroupList"> <!-- CORE: Filed by; On behalf of -->
+		<xs:sequence>
+			<xs:element name="claimClaimantGroup" type="claimClaimantGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="claimClaimantGroup"> <!-- CORE: Filed by; On behalf of -->
+		<xs:sequence>
+			<xs:element name="filedBy" type="xs:string"/> <!-- CORE: Filed by -->
+			<xs:element name="filedOnBehalfOf" type="xs:string"/> <!-- CORE: On behalf of -->
+			<xs:element name="claimantNote" type="xs:string"/> <!-- SUGGESTED CORE -->
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="claimReceivedGroupList"> <!-- CORE: Date filed -->
+		<xs:sequence>
+			<xs:element name="claimReceivedGroup" type="claimReceivedGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="claimReceivedGroup"> <!-- CORE: Date filed -->
+		<xs:sequence>
+			<xs:element name="claimReceivedDate" type="xs:date"/> <!-- CORE: Date filed -->
+			<xs:element name="claimReceivedNote" type="xs:string"/> <!-- SUGGESTED CORE -->
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

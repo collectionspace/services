@@ -79,6 +79,27 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
     
     // JAX-RS path for getting service description meta information
 	public static final String SERVICE_DESCRIPTION_PATH = "description";
+	
+    /**
+     * The character used to separate the words in a part label
+     */
+    public static final String PART_LABEL_SEPARATOR = "_";
+    /** The Constant PART_COMMON_LABEL. */
+    public static final String PART_COMMON_LABEL = "common";
+    //
+    // Profile schema name suffixes and extension suffixes
+    //
+	public static final String BOTGARDEN_PROFILE_NAME = "botgarden";
+	public static final String ANTHROPOLOGY_PROFILE_NAME = "anthro";
+    public final static String LHMC_PROFILE_NAME = "lhmc";
+    public final static String FINEART_PROFILE_NAME = "fcart";
+    public final static String HERBARIUM_PROFILE_NAME = "herbarium";
+    //
+    // Profile schema name suffixes and extension suffixes
+    //
+    public final static String NATURALHISTORY_EXTENSION_NAME = "naturalhistory";
+    public final static String NATURALHISTORY_EXT_EXTENSION_NAME = "naturalhistory_extension";
+    public final static String VARIABLEMEDIA_EXTENSION_NAME = "variablemedia";
 
     /**
      * Gets the proxy.

@@ -39,6 +39,7 @@ import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.invocable.Invocable;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
+import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import javax.ws.rs.Consumes;
@@ -49,6 +50,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
 @Path(BatchClient.SERVICE_PATH)
@@ -79,6 +81,46 @@ public class BatchResource extends NuxeoBasedResource {
         }
     }
     
+	// FIXME: Resource classes should not be invoking handlers directly.  This resource method should follow the conventions used by
+	// other resource methods and use the getRepositoryClient() methods.
+	@Override
+    protected AbstractCommonList getCommonList(UriInfo ui) {
+        try {
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
+            MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
+            DocumentHandler handler = createDocumentHandler(ctx);
+            String docType = queryParams.getFirst(IQueryManager.SEARCH_TYPE_DOCTYPE);
+            String mode = queryParams.getFirst(IQueryManager.SEARCH_TYPE_INVOCATION_MODE);
+            String whereClause = null;
+            DocumentFilter documentFilter = null;
+            String common_part = ctx.getCommonPartLabel();
+			
+            if (docType != null && !docType.isEmpty()) {
+                whereClause = QueryManager.createWhereClauseForInvocableByDocType(
+                		common_part, docType);
+                documentFilter = handler.getDocumentFilter();
+                documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
+            }
+			
+            if (mode != null && !mode.isEmpty()) {
+                whereClause = QueryManager.createWhereClauseForInvocableByMode(
+                		common_part, mode);
+                documentFilter = handler.getDocumentFilter();
+                documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
+            }
+			
+            if (whereClause !=null && logger.isDebugEnabled()) {
+                logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
+            }
+			
+            getRepositoryClient(ctx).getFiltered(ctx, handler);
+            AbstractCommonList list = (AbstractCommonList) handler.getCommonPartList();
+            return list;
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.LIST_FAILED);
+        }
+    }
+	
 	/**
 	 * Gets the authorityItem list for the specified authority
 	 * If partialPerm is specified, keywords will be ignored.
@@ -159,9 +201,6 @@ public class BatchResource extends NuxeoBasedResource {
 		return ptClause;
 	}
 
-
-
-    
     @POST
     @Path("{csid}")
     public InvocationResults invokeBatchJob(

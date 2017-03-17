@@ -23,6 +23,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+        	<groupId>org.collectionspace.services</groupId>
+        	<artifactId>org.collectionspace.services.loanout.client</artifactId>
+        	<version>${project.version}</version>
+        </dependency>        
+        <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.collectionobject.jaxb</artifactId>
             <version>${project.version}</version>
@@ -80,7 +85,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
     </dependencies>
     
     <build>

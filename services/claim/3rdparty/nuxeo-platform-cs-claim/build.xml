@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="nuxeo-platform-cs-claim" default="package" basedir=".">
+    <description>
+        claim nuxeo document type
+    </description>
+    <!-- set global properties for this build -->
+    <property name="services.trunk" value="../../../.."/>
+    <!-- environment should be declared before reading build.properties -->
+    <property environment="env" />
+    <property file="${services.trunk}/build.properties" />
+    <property name="mvn.opts" value="-V" />
+    <property name="src" location="src"/>
+    <!-- JAR files used by CollectionSpace 4.0 and later -->
+    <property name="nuxeo.claim.doctype.jars.all"
+        value="collectionspace.claim.doctype.*.jar"/>
+    <property name="nuxeo.claim.schema.jars.all"
+        value="collectionspace.claim.schema.*.jar"/>
+    <!-- Legacy JAR files used by CollectionSpace 3.3 and earlier --> 
+    <property name="nuxeo.claim.legacy.jars.all"
+        value="org.collectionspace.services.claim.3rdparty.nuxeo-*.jar"/>
+    <property name="nuxeo.claim.legacy.jar"
+        value="org.collectionspace.services.claim.3rdparty.nuxeo-${cspace.release}.jar"/>
+
+    <condition property="osfamily-unix">
+        <os family="unix" />
+    </condition>
+    <condition property="osfamily-windows">
+        <os family="windows" />
+    </condition>
+
+    <target name="init" >
+        <!-- Create the time stamp -->
+        <tstamp/>
+    </target>
+
+    <target name="package" depends="package-unix,package-windows"
+        description="Package CollectionSpace Services" />
+    <target name="package-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="package" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="package-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="package" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="install" depends="install-unix,install-windows"
+        description="Install" />
+    <target name="install-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="install" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="install-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="install" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="clean" depends="clean-unix,clean-windows"
+        description="Delete target directories" >
+        <delete dir="${build}"/>
+    </target>
+    <target name="clean-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="clean" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="clean-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="clean" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="test" depends="test-unix,test-windows" description="Run tests" />
+    <target name="test-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="test" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="test-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="test" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="deploy" depends="install"
+        description="deploy claim doctype in ${jee.server.nuxeo}">
+        <!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
+        leaving this only for backwards compatibility reasons. -->
+        <copy file="${basedir}/target/${nuxeo.claim.legacy.jar}"
+        todir="${jee.deploy.nuxeo.plugins}"/>
+    </target>
+
+    <target name="undeploy"
+        description="undeploy claim doctype from ${jee.server.nuxeo}">
+        <delete>
+            <!-- Undeploy doctype and schema artifacts -->
+            <fileset dir="${jee.deploy.nuxeo.plugins}">
+                <include name="${nuxeo.claim.doctype.jars.all}"/>
+            </fileset>
+            <fileset dir="${jee.deploy.nuxeo.plugins}">
+                <include name="${nuxeo.claim.schema.jars.all}"/>
+            </fileset>
+            <!-- Undeploy legacy artifacts -->
+            <fileset dir="${jee.deploy.nuxeo.plugins}">
+                <include name="${nuxeo.claim.legacy.jars.all}"/>
+            </fileset>
+        </delete>
+        <!-- Undeploy legacy artifacts from old deployment location through release 0.6 -->
+        <delete quiet="true">
+            <fileset dir="${jee.deploy.nuxeo.system}">
+                <include name="${nuxeo.claim.legacy.jars.all}"/>
+            </fileset>
+        </delete>
+    </target>
+
+
+    <target name="dist"
+        description="generate distribution for claim doctype" depends="package">
+        <copy todir="${services.trunk}/${dist.deploy.nuxeo.plugins}">
+            <fileset file="${basedir}/target/${nuxeo.claim.legacy.jar}"/>
+        </copy>
+    </target>
+
+</project>
+

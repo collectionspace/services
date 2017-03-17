@@ -3,10 +3,14 @@ package org.collectionspace.services.batch;
 import java.util.Collections;
 import java.util.List;
 import javax.ws.rs.core.Response;
+
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,9 +38,11 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
     protected final String CSID_VALUES_NOT_PROVIDED_IN_INVOCATION_CONTEXT =
             "Could not find required CSID values in the invocation context for this batch job.";
     private List<String> invocationModes;
-    private ResourceMap resourceMap;
+    private ResourceMap<PoxPayloadIn, PoxPayloadOut> resourceMap;
     private InvocationContext invocationCtx;
-    private ServiceContext ctx;
+    private ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx;
+    private String tenantId;
+
 
     private int completionStatus;
     private InvocationResults results;
@@ -65,23 +71,51 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
         this.invocationModes = invocationModes;
     }
 
-    public ResourceMap getResourceMap() {
+    public ResourceMap<PoxPayloadIn, PoxPayloadOut> getResourceMap() {
         return resourceMap;
     }
 
     @Override
-    public void setResourceMap(ResourceMap resourceMap) {
+    public void setResourceMap(ResourceMap<PoxPayloadIn, PoxPayloadOut> resourceMap) {
         this.resourceMap = resourceMap;
     }
 
     @Override
-    public void setServiceContext(ServiceContext context) {
+    public void setServiceContext(ServiceContext<PoxPayloadIn, PoxPayloadOut> context) {
         this.ctx = context;
     }
     
     @Override
-    public ServiceContext getServiceContext() {
+    public ServiceContext<PoxPayloadIn, PoxPayloadOut> getServiceContext() {
         return ctx;
+    }
+	
+    @Override
+    public CoreSessionInterface getRepoSession() {
+    	CoreSessionInterface result = null;
+    	
+    	if (ctx != null) {
+    		result = (CoreSessionInterface) ctx.getCurrentRepositorySession();
+    	} else {
+    		logger.error(String.format("Batch job '%s' invoked with a null/empty service context.", 
+    				this.getClass().getName()));
+    	}
+    	
+    	return result;
+    }
+    
+    @Override    
+    public String getTenantId() {
+        String result = null;
+        
+        if (ctx != null) {
+        	result = ctx.getTenantId();
+        } else {
+    		logger.error(String.format("Batch job '%s' invoked with a null/empty service context.", 
+    				this.getClass().getName()));
+    	}
+        
+        return result;
     }
 
     @Override

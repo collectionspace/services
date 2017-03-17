@@ -9,7 +9,7 @@ import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
-import org.nuxeo.ecm.core.api.ClientException;
+import org.collectionspace.services.nuxeo.listener.AbstractCSEventListenerImpl;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.impl.LifeCycleFilter;
@@ -18,7 +18,7 @@ import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 
-public class UpdateRelationsOnDelete implements EventListener {
+public class UpdateRelationsOnDelete extends AbstractCSEventListenerImpl {
 
     // FIXME: We might experiment here with using log4j instead of Apache Commons Logging;
     // am using the latter to follow Ray's pattern for now
@@ -30,7 +30,7 @@ public class UpdateRelationsOnDelete implements EventListener {
     final static String RELATIONS_COMMON_OBJECT_CSID_FIELD = "relations_common:objectCsid";
 
     @Override
-    public void handleEvent(Event event) throws ClientException {
+    public void handleEvent(Event event) {
         logger.trace("In handleEvent in UpdateRelationsOnDelete ...");
         
         EventContext eventContext = event.getContext();
@@ -82,7 +82,7 @@ public class UpdateRelationsOnDelete implements EventListener {
             DocumentModelList matchingDocuments;
             try {
                 matchingDocuments = session.query(queryString.toString(), workflowStateFilter);
-            } catch (ClientException ce) {
+            } catch (Exception ce) {
                 logger.warn("Error attempting to retrieve relation records where "
                         + "record of type '" + docModel.getType() + "' with CSID " + csid
                         + " is the subject or object of any relation: " + ce.getMessage());

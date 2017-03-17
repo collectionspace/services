@@ -58,10 +58,7 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 	protected final int BAD_REQUEST_STATUS = Response.Status.BAD_REQUEST.getStatusCode();
 
 	public InvocationResults invokeBatchJob(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String csid,
-			ResourceMap resourceMap, InvocationContext invocationCtx) throws Exception {
-
-		CoreSessionInterface repoSession = null;
-		boolean releaseRepoSession = false;
+			ResourceMap<PoxPayloadIn, PoxPayloadOut> resourceMap, InvocationContext invocationCtx) throws Exception {
 
 		String invocationMode = invocationCtx.getMode();
 		String modeProperty = null;
@@ -79,8 +76,11 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 			throw new BadRequestException("BatchResource: unknown Invocation Mode: " + invocationMode);
 		}
 
+		//
+		// Acquire a repository session handle if we don't already have one
+		boolean releaseRepoSession = false;
+		CoreSessionInterface repoSession = this.getRepositorySession();
 		RepositoryClientImpl repoClient = (RepositoryClientImpl) this.getRepositoryClient(ctx);
-		repoSession = this.getRepositorySession();
 		if (repoSession == null) {
 			repoSession = repoClient.getRepositorySession(ctx);
 			releaseRepoSession = true;
@@ -104,6 +104,52 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 				}
 			}
 			className = (String) NuxeoUtils.getProperyValue(docModel, BatchJAXBSchema.BATCH_CLASS_NAME); //docModel.getPropertyValue(BatchJAXBSchema.BATCH_CLASS_NAME);
+	
+			className = className.trim();
+			ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+			Class<?> c = tccl.loadClass(className);
+			// enable validation assertions
+			tccl.setClassAssertionStatus(className, true);
+			if (!BatchInvocable.class.isAssignableFrom(c)) {
+				throw new RuntimeException("BatchResource: Class: " + className + " does not implement BatchInvocable!");
+			}
+	
+			BatchInvocable batchInstance = (BatchInvocable) c.newInstance();
+			List<String> modes = batchInstance.getSupportedInvocationModes();
+			if (!modes.contains(invocationMode)) {
+				throw new BadRequestException("BatchResource: Invoked with unsupported context mode: " + invocationMode);
+			}
+	
+			batchInstance.setInvocationContext(invocationCtx);
+			batchInstance.setServiceContext(ctx);
+			
+			if (resourceMap != null) {
+				batchInstance.setResourceMap(resourceMap);
+			} else {
+				resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
+				if (resourceMap != null) {
+					batchInstance.setResourceMap(resourceMap);
+				} else {
+					logger.warn("BatchResource.invoke did not get a resourceMapHolder in Context!");
+				}
+			}
+	
+			batchInstance.run();
+			int status = batchInstance.getCompletionStatus();
+			if (status == Invocable.STATUS_ERROR) {
+				InvocationError error = batchInstance.getErrorInfo();
+				if (error.getResponseCode() == BAD_REQUEST_STATUS) {
+					throw new BadRequestException("BatchResouce: batchProcess encountered error: "
+							+ batchInstance.getErrorInfo());
+				} else {
+					throw new RuntimeException("BatchResouce: batchProcess encountered error: "
+							+ batchInstance.getErrorInfo());
+	
+				}
+			}
+	
+			InvocationResults results = batchInstance.getResults();
+			return results;
 		} catch (PropertyException pe) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Property exception getting batch values: ", pe);
@@ -125,50 +171,5 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 			}
 		}
 
-		className = className.trim();
-		ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-		Class<?> c = tccl.loadClass(className);
-		// enable validation assertions
-		tccl.setClassAssertionStatus(className, true);
-		if (!BatchInvocable.class.isAssignableFrom(c)) {
-			throw new RuntimeException("BatchResource: Class: " + className + " does not implement BatchInvocable!");
-		}
-
-		BatchInvocable batchInstance = (BatchInvocable) c.newInstance();
-		List<String> modes = batchInstance.getSupportedInvocationModes();
-		if (!modes.contains(invocationMode)) {
-			throw new BadRequestException("BatchResource: Invoked with unsupported context mode: " + invocationMode);
-		}
-
-		batchInstance.setInvocationContext(invocationCtx);
-		batchInstance.setServiceContext(ctx);
-		
-		if (resourceMap != null) {
-			batchInstance.setResourceMap(resourceMap);
-		} else {
-			resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
-			if (resourceMap != null) {
-				batchInstance.setResourceMap(resourceMap);
-			} else {
-				logger.warn("BatchResource.invoke did not get a resourceMapHolder in Context!");
-			}
-		}
-
-		batchInstance.run();
-		int status = batchInstance.getCompletionStatus();
-		if (status == Invocable.STATUS_ERROR) {
-			InvocationError error = batchInstance.getErrorInfo();
-			if (error.getResponseCode() == BAD_REQUEST_STATUS) {
-				throw new BadRequestException("BatchResouce: batchProcess encountered error: "
-						+ batchInstance.getErrorInfo());
-			} else {
-				throw new RuntimeException("BatchResouce: batchProcess encountered error: "
-						+ batchInstance.getErrorInfo());
-
-			}
-		}
-
-		InvocationResults results = batchInstance.getResults();
-		return results;
 	}
 }

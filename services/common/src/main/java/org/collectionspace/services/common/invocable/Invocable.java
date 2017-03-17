@@ -24,6 +24,9 @@ package org.collectionspace.services.common.invocable;
 
 import org.collectionspace.services.common.invocable.InvocationContext;
 import java.util.List;
+
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceContext;
 
@@ -113,9 +116,9 @@ public interface Invocable {
     /*
      * Save a handle to the JAX-RS related service context
      */
-	void setServiceContext(ServiceContext context);
+	void setServiceContext(ServiceContext<PoxPayloadIn, PoxPayloadOut> context);
 
-	ServiceContext getServiceContext();
+	ServiceContext<PoxPayloadIn, PoxPayloadOut> getServiceContext();
 
 	InvocationContext getInvocationContext();
 }

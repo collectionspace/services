@@ -38,8 +38,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.ServiceConfigUtils;
@@ -62,6 +60,7 @@ import org.collectionspace.services.config.service.DocHandlerParams.Params.Cache
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.service.DocHandlerParams.Params;
 import org.collectionspace.services.description.ServiceDescription;
+
 import org.jboss.resteasy.spi.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
