@@ -1,4 +1,4 @@
-package org.collectionspace.services.batch;
+package org.collectionspace.services.common.query;
 
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 import org.jboss.resteasy.specimpl.PathSegmentImpl;

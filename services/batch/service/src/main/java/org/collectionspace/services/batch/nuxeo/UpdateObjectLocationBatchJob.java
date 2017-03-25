@@ -14,7 +14,6 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.batch.AbstractBatchInvocable;
-import org.collectionspace.services.batch.UriInfoImpl;
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.IClientQueryParams;
@@ -27,6 +26,7 @@ import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.invocable.InvocationResults;
+import org.collectionspace.services.common.query.UriInfoImpl;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.dom4j.DocumentException;
 //import org.jboss.resteasy.specimpl.UriInfoImpl;
@@ -137,7 +137,6 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         ResourceMap resourcemap = getResourceMap();
         NuxeoBasedResource collectionObjectResource = (NuxeoBasedResource) resourcemap.get(CollectionObjectClient.SERVICE_NAME);
         NuxeoBasedResource movementResource = (NuxeoBasedResource) resourcemap.get(MovementClient.SERVICE_NAME);
-        String computedCurrentLocation;
         long numUpdated = 0;
         long processed = 0;
 
@@ -397,8 +396,11 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         }
         
         UriInfo uriInfo = this.setupQueryParamForUpdateRecords(); // Determines if we'll updated the updateAt and updatedBy core values
-        byte[] response = collectionObjectResource.update(resourcemap, uriInfo, collectionObjectCsid,
-                collectionObjectUpdatePayload);
+        if (logger.isDebugEnabled()) {
+	        byte[] responseBytes = collectionObjectResource.update(resourcemap, uriInfo, collectionObjectCsid,
+	                collectionObjectUpdatePayload);
+	        logger.debug(String.format("Batch resource: Resonse from collectionobject (cataloging record) update: %s", new String(responseBytes)));
+        }
         numUpdated++;
         
         if (logger.isTraceEnabled()) {
@@ -635,7 +637,6 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         }
     }
     
-
     private List<String> getMemberCsidsFromGroup(String serviceName, String groupCsid) throws URISyntaxException, DocumentException {
         ResourceMap resourcemap = getResourceMap();
         NuxeoBasedResource resource = (NuxeoBasedResource) resourcemap.get(serviceName);
@@ -659,7 +660,6 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
 
         boolean morePages = true;
         long currentPage = 0;
-        long totalItems = 0;
         long pageSize = DEFAULT_PAGE_SIZE;
         List<String> noContextCsids = new ArrayList<String>();
         

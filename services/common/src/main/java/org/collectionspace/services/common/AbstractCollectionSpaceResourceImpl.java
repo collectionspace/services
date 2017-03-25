@@ -37,9 +37,8 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.authorization.PermissionException;
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.ServiceConfigUtils;
@@ -501,6 +500,10 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
             response = Response.status(Response.Status.UNAUTHORIZED).entity(serviceMsg + e.getMessage()).type("text/plain").build();
             result = new CSWebApplicationException(e, response);
 
+        } else if (e instanceof PermissionException) {
+            response = Response.status(Response.Status.FORBIDDEN).entity(serviceMsg + e.getMessage()).type("text/plain").build();
+            result = new CSWebApplicationException(e, response);
+
         } else if (e instanceof DocumentNotFoundException) {
         	//
         	// Don't log this error unless we're in 'trace' mode
@@ -534,6 +537,10 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
             // return new WebApplicationException(e, code);
             result = new CSWebApplicationException(e, response);
            
+        } else if (e instanceof org.dom4j.DocumentException) {
+            int code = Response.Status.BAD_REQUEST.getStatusCode();
+            response = Response.status(code).entity(serviceMsg + e.getMessage()).type("text/plain").build();
+            result = new CSWebApplicationException(e, response);     
         } else if (e instanceof CSWebApplicationException) {
             // subresource may have already thrown this exception
             // so just pass it on

@@ -241,24 +241,25 @@ public class Tools {
       * presentation of error messages to clients.
      * @param includeLines if zero, return all lines of stack trace, otherwise return number of lines from top.
       */
-    public static String errorToString(Throwable e, boolean stackTraceOnException, int includeLines){
-        if (e==null){
-            return "";
-        }
-        String s = e.toString() + "\r\n  -- message: " + e.getMessage();
+	public static String errorToString(Throwable e, boolean stackTraceOnException, int includeLines) {
+		if (e == null) {
+			return "";
+		}
+		String s = "\r\n  -- Exception: " + e.getClass().getCanonicalName() + "\r\n  -- Message: " + e.getMessage();
 
-        StringBuffer causeBuffer = new StringBuffer();
-        Throwable cause = e.getCause();
-        while (cause != null){
-            causeBuffer.append(cause.getClass().getName()+"::"+cause.getMessage()+"\r\n");
-            cause = cause.getCause();
-        }
-        if (causeBuffer.length()>0) s = s + "\r\n  -- Causes: "+causeBuffer.toString();
+		StringBuffer causeBuffer = new StringBuffer();
+		Throwable cause = e.getCause();
+		while (cause != null) {
+			causeBuffer.append(cause.getClass().getName() + "::" + cause.getMessage() + "\r\n");
+			cause = cause.getCause();
+		}
+		if (causeBuffer.length() > 0) {
+			s = s + "\r\n  -- Causes: " + causeBuffer.toString();
+		}
 
-
-        s = s + "\r\n  -- Stack Trace: \r\n  --      " + getStackTrace(e, includeLines);
-        return s;
-    }
+		s = s + "\r\n  -- Stack Trace: \r\n  --      " + getStackTrace(e, includeLines);
+		return s;
+	}
 
     /**
      * Return a set of properties from a properties file.

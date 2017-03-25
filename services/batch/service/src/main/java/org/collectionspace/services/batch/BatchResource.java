@@ -27,6 +27,7 @@ import org.collectionspace.services.BatchJAXBSchema;
 import org.collectionspace.services.batch.nuxeo.BatchDocumentModelHandler;
 import org.collectionspace.services.client.BatchClient;
 import org.collectionspace.services.client.IQueryManager;
+import org.collectionspace.services.client.PayloadPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.NuxeoBasedResource;
@@ -72,11 +73,7 @@ public class BatchResource extends NuxeoBasedResource {
     @Override
     //public Class<BatchCommon> getCommonPartClass() {
     public Class getCommonPartClass() {
-    	try {
-            return Class.forName("org.collectionspace.services.batch.BatchCommon");//.class;
-        } catch (ClassNotFoundException e){
-            return null;
-        }
+    	return BatchCommon.class;
     }
     
 	/**
@@ -105,8 +102,7 @@ public class BatchResource extends NuxeoBasedResource {
         return list;
 	}
 
-    private AbstractCommonList batchSearch(UriInfo ui, 
-    										String docType, String mode) {
+    private AbstractCommonList batchSearch(UriInfo ui, String docType, String mode) {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
             DocumentHandler handler = createDocumentHandler(ctx);
@@ -158,10 +154,18 @@ public class BatchResource extends NuxeoBasedResource {
 		}
 		return ptClause;
 	}
-
-
-
     
+	private BatchCommon getBatchCommon(String csid) throws Exception {
+		BatchCommon result = null;
+    	
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+		PoxPayloadOut ppo = get(csid, ctx);
+		PayloadPart batchCommonPart = ppo.getPart(BatchClient.SERVICE_COMMON_PART_NAME);
+		result = (BatchCommon)batchCommonPart.getBody();
+		
+    	return result;
+    }
+	
     @POST
     @Path("{csid}")
     public InvocationResults invokeBatchJob(
@@ -169,13 +173,15 @@ public class BatchResource extends NuxeoBasedResource {
     		@Context UriInfo ui,
     		@PathParam("csid") String csid,
     		InvocationContext invContext) {
+
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
             BatchDocumentModelHandler handler = (BatchDocumentModelHandler)createDocumentHandler(ctx);
-            
-            return handler.invokeBatchJob(ctx, csid, resourceMap, invContext);
+            return handler.invokeBatchJob(ctx, csid, resourceMap, invContext, getBatchCommon(csid));
         } catch (Exception e) {
-            throw bigReThrow(e, ServiceMessages.POST_FAILED);
+        	String msg = String.format("%s Could not invoke batch job with CSID='%s'.", 
+        			ServiceMessages.POST_FAILED, csid);
+            throw bigReThrow(e, msg);
         }
     }
 }

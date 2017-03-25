@@ -3,7 +3,23 @@
 	<auths>
 		<!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
 		<auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+		<auth ID="reader@core.collectionspace.org">cmVhZGVyQGNvcmUuY29sbGVjdGlvbnNwYWNlLm9yZzpyZWFkZXI=</auth>
+		<auth ID="testAdministator">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
 	</auths>
+	
+	<testGroup ID="testPermissionsAndRoles" autoDeletePOSTS="true">
+		<test ID="createBatchPermissions" auth="test">
+			<method>POST</method>
+			<uri>/cspace-services/batch/</uri>
+			<filename>batch/batch-create-permissions.xml</filename>
+		</test>
+		<test ID="testInvokeNoContext" auth="test" autoDeletePOSTS="false">
+			<method>POST</method>
+			<uri>/cspace-services/batch/${createBatchPermissions.CSID}</uri>
+			<filename>batch/batch-invoke-nocontext.xml</filename>
+		</test>		
+	</testGroup>
+	
 	<testGroup ID="testSingle" autoDeletePOSTS="true">
 		<test ID="createBatch1" auth="test">
 			<method>POST</method>
@@ -13,7 +29,7 @@
 		<test ID="createBatch2" auth="test">
 			<method>POST</method>
 			<uri>/cspace-services/batch/</uri>
-			<filename>batch/batch1.xml</filename>
+			<filename>batch/batch2.xml</filename>
 		</test>
 		<test ID="createBatch" auth="test">
 			<method>POST</method>

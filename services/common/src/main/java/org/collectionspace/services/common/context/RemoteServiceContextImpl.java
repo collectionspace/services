@@ -117,7 +117,8 @@ public class RemoteServiceContextImpl<IT, OT>
     /*
      * Returns the name of the service's acting repository.  Gets this from the tenant and service bindings files
      */
-    public String getRepositoryName() throws Exception {
+    @Override
+	public String getRepositoryName() throws Exception {
     	String result = null;
     	
     	TenantBindingConfigReaderImpl tenantBindingConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();
@@ -181,10 +182,10 @@ public class RemoteServiceContextImpl<IT, OT>
      * @return
      * @throws Exception 
      */
-    public CollectionSpaceResource<IT, OT> getResource(ServiceContext ctx) throws Exception {
+    public CollectionSpaceResource<IT, OT> getResource(ServiceContext<?, ?> ctx) throws Exception {
     	CollectionSpaceResource<IT, OT> result = null;
     	
-    	ResourceMap<IT, OT> resourceMap = ctx.getResourceMap();
+    	ResourceMap resourceMap = ctx.getResourceMap();
     	String resourceName = ctx.getClient().getServiceName();
     	result = (CollectionSpaceResource<IT, OT>) resourceMap.get(resourceName);
     	
@@ -208,7 +209,8 @@ public class RemoteServiceContextImpl<IT, OT>
     /**
      * @param map the map of service names to resource instances.
      */
-    public void setResourceMap(ResourceMap map) {
+    @Override
+	public void setResourceMap(ResourceMap map) {
     	this.resourceMap = map;
     }
 
@@ -218,7 +220,7 @@ public class RemoteServiceContextImpl<IT, OT>
      * @see org.collectionspace.services.common.context.RemoteServiceContext#getLocalContext(java.lang.String)
      */
     @Override
-    public ServiceContext getLocalContext(String localContextClassName) throws Exception {
+    public ServiceContext<IT, OT> getLocalContext(String localContextClassName) throws Exception {
         ClassLoader cloader = Thread.currentThread().getContextClassLoader();
         Class<?> ctxClass = cloader.loadClass(localContextClassName);
         if (!ServiceContext.class.isAssignableFrom(ctxClass)) {
@@ -226,8 +228,8 @@ public class RemoteServiceContextImpl<IT, OT>
                     + " implementation of " + ServiceContext.class.getName());
         }
 
-        Constructor ctor = ctxClass.getConstructor(java.lang.String.class);
-        ServiceContext ctx = (ServiceContext) ctor.newInstance(getServiceName());
+        Constructor<?> ctor = ctxClass.getConstructor(java.lang.String.class);
+        ServiceContext<IT, OT> ctx = (ServiceContext<IT, OT>) ctor.newInstance(getServiceName());
         return ctx;
     }
 

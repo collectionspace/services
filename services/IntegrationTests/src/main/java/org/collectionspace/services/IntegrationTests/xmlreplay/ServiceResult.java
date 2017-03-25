@@ -37,6 +37,7 @@ import java.util.Map;
  * $LastChangedDate:  $
  */
 public class ServiceResult {
+	public boolean autoDelete = true;
     public String testID = "";
     public String testGroupID = "";
     public String fullURL = "";

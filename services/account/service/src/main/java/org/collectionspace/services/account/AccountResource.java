@@ -27,19 +27,29 @@ import org.collectionspace.services.account.storage.AccountStorageClient;
 import org.collectionspace.services.authorization.AccountPermission;
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.AccountRoleRel;
+import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.client.AccountClient;
 import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.common.SecurityResourceBase;
 import org.collectionspace.services.common.ServiceMessages;
+import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
+import org.collectionspace.services.common.query.UriInfoImpl;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -51,6 +61,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -105,12 +116,80 @@ public class AccountResource extends SecurityResourceBase {
     @GET
     @Produces("application/xml")
     public AccountsCommonList getAccountList(@Context UriInfo ui) {
-    	AccountsCommonList result = (AccountsCommonList)getList(ui, AccountsCommon.class);
+    	UriInfoWrapper uriInfoWrapper = new UriInfoWrapper(ui);
+    	AccountsCommonList result = (AccountsCommonList)getList(uriInfoWrapper, AccountsCommon.class);
     	if(logger.isTraceEnabled()) {
         	PayloadOutputPart ppo = new PayloadOutputPart(AccountsCommonList.class.getSimpleName(),
         			result);
     		System.out.println(ppo.asXML());
     	}
+    	return result;
+    }
+    
+    protected UriInfo createUriInfo() throws URISyntaxException {
+        return createUriInfo("");
+    }
+
+    private UriInfo createUriInfo(String queryString) throws URISyntaxException {
+        URI absolutePath = new URI("");
+        URI baseUri = new URI("");
+        return new UriInfoImpl(absolutePath, baseUri, "", queryString, Collections.<PathSegment>emptyList());
+    }
+
+    /**
+     * Perform a search off the accounts for using a user ID
+     * @param userId
+     * @return
+     */
+    private String getAccountCsid(String userId) {
+    	String result = null;
+    	
+    	try {
+			UriInfo uriInfo = createUriInfo(String.format("uid=%s", userId));
+			AccountsCommonList accountsCommonList = getAccountList(uriInfo);
+			if (accountsCommonList != null && accountsCommonList.getAccountListItem() != null) {
+				for (AccountListItem accountListItem: accountsCommonList.getAccountListItem()) {
+					if (accountListItem.getUserid().equalsIgnoreCase(userId)) {
+						result = accountListItem.getCsid();
+						break;
+					}
+				}
+			}
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	return result;
+    }
+    
+    /**
+     * Return the list of roles (display name) for a user id.
+     * 
+     * @param userId
+     * @return
+     */
+    public List<String> getAccountRoles(String userId, String tenantId) {
+    	List<String> result = null;
+    	
+    	String accountCsid = getAccountCsid(userId);
+    	if (accountCsid != null) {
+    		AccountRole accountRole = getAccountRole(accountCsid);
+    		if (accountRole != null && accountRole.getRole() != null) {
+    			List<RoleValue> roleValueList = accountRole.getRole();
+    			if (roleValueList.isEmpty() == false) {
+    				result = new ArrayList<String>();
+    				for (RoleValue roleValue: roleValueList) {
+    					String displayName = roleValue.getDisplayName();
+    					if (displayName == null) {
+    						displayName = RoleClient.inferDisplayName(roleValue.getRoleName(), tenantId);
+    					}
+    					result.add(displayName);
+    				}
+    			}
+    		}
+    	}
+    	
     	return result;
     }
 
@@ -225,7 +304,6 @@ public class AccountResource extends SecurityResourceBase {
         logger.debug("getAccountPerm with accCsid=" + accCsid);
         ensureCSID(accCsid, ServiceMessages.GET_FAILED+ "getAccountPerm account ");
         AccountPermission result = null;
-        String userId = "undefined";
         try {
             result = JpaStorageUtils.getAccountPermissions(accCsid);
         } catch (Exception e) {

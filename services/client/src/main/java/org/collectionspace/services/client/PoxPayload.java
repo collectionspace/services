@@ -63,11 +63,11 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	private void setDomDocument(Document dom) throws DocumentException {
 		this.domDocument = dom;
 		String label = domDocument.getRootElement().getName();
-		if (label != null) {
+		if (label != null && label.equalsIgnoreCase("document")) {
 			this.payloadName = label;
-		} else if (logger.isWarnEnabled() == true) {
-			logger.warn("Incoming message payload is missing a name/label.");
-			logger.warn(this.xmlPayload);
+		} else {
+			String msg = "The following incoming request payload is missing the root <document> element or is otherwise malformed.  For example valid payloads, see https://wiki.collectionspace.org/display/DOC/Common+Services+REST+API+documentation";
+			throw new DocumentException(msg + '\n' + this.xmlPayload);
 		}
 		parseParts();
 	}
@@ -295,7 +295,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
     }
       
     /**
-     * Attempts to marshal a DOM4j element (for a part) into an instance of a JAXB object
+     * Attempts to unmarshal a DOM4j element (for a part) into an instance of a JAXB object
      *
      * @param elementInput the element input
      * @return the object
@@ -310,9 +310,9 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	    	result = um.unmarshal(
 	    			new StreamSource(new StringReader(elementInput.asXML())));	    			
     	} catch (Exception e) {
-    		if (logger.isTraceEnabled() == true) {
-    			logger.trace(e.getMessage());
-    		}
+    		String msg = String.format("Could not unmarshal XML payload '%s' into a JAXB object.", 
+    				elementInput.getName());
+    		logger.warn(msg);
     	}
     	
     	return result;
@@ -345,7 +345,9 @@ public abstract class PoxPayload<PT extends PayloadPart> {
     		Document doc = DocumentHelper.parseText(text);
     		result = doc.getRootElement(); //FIXME: REM - call .detach() to free the element
     	} catch (Exception e) {
-    		e.printStackTrace(); //FIXME: REM - Please use proper logger.isWarning() statement
+    		String msg = String.format("Could not marshal JAXB object '%s' to an XML element.",
+    				jaxbObject.toString());
+    		logger.error(msg);
     	}
     	
     	return result;

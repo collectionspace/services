@@ -1,102 +1,38 @@
 package org.collectionspace.services.batch.nuxeo;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.batch.BatchInvocable;
+import org.collectionspace.services.batch.AbstractBatchInvocable;
 import org.collectionspace.services.client.CollectionSpaceClientUtils;
 import org.collectionspace.services.common.NuxeoBasedResource;
-import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
-import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.invocable.InvocationContext;
-import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.client.LoanoutClient;
 import org.collectionspace.services.client.RelationClient;
 
-public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
+public class CreateAndLinkLoanOutBatchJob extends AbstractBatchInvocable {
 
-	private static ArrayList<String> invocationModes = null;
-	private InvocationContext invocationCtx;
-	private ServiceContext ctx;
-	private int completionStatus;
-	private ResourceMap resourceMap;
-	private InvocationResults results;
-	private InvocationError errorInfo;
 	private final String RELATION_TYPE = "affects"; 
 	private final String LOAN_DOCTYPE = "LoanOut"; 
 	private final String RELATION_PREDICATE_DISP = "affects"; 
-	protected final int CREATED_STATUS = Response.Status.CREATED.getStatusCode();
-	protected final int BAD_REQUEST_STATUS = Response.Status.BAD_REQUEST.getStatusCode();
-	protected final int INT_ERROR_STATUS = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
 	
 	public CreateAndLinkLoanOutBatchJob() {
-		CreateAndLinkLoanOutBatchJob.setupClassStatics();
-		invocationCtx = null;
-		completionStatus = STATUS_UNSTARTED;
-		resourceMap = null;
-		results = new InvocationResults();
-		errorInfo = null;
-	}
-
-	private static void setupClassStatics() {
-		if(invocationModes == null ) {
-			invocationModes = new ArrayList<String>(1);
-			invocationModes.add(INVOCATION_MODE_SINGLE);
-			invocationModes.add(INVOCATION_MODE_LIST);
-		}
-	}
-
-	/**
-	 * @return a set of modes that this plugin can support on invocation. Must be non-empty.
-	 */
-	public List<String> getSupportedInvocationModes() {
-		return CreateAndLinkLoanOutBatchJob.invocationModes;
+        setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_SINGLE, INVOCATION_MODE_LIST));
 	}
 	
-    @Override
-    public void setServiceContext(ServiceContext context) {
-        this.ctx = context;
-    }
-    
-    @Override
-    public ServiceContext getServiceContext() {
-        return ctx;
-    }
-
-    @Override
-    public InvocationContext getInvocationContext() {
-        return invocationCtx;
-    }    
-	
-	/**
-	 * Sets the invocation context for the batch job. Called before run().
-	 * @param context an instance of InvocationContext.
-	 */
-    @Override
-	public void setInvocationContext(InvocationContext context) {
-		this.invocationCtx = context;
-	}
-
-	/**
-	 * Sets the invocation context for the batch job. Called before run().
-	 * @param invocationCtx an instance of InvocationContext.
-	 */
-	public void setResourceMap(ResourceMap resourceMap) {
-		this.resourceMap = resourceMap;
-	}
-
 	/**
 	 * The main work logic of the batch job. Will be called after setContext.
 	 */
+	@Override
 	public void run() {
 		completionStatus = STATUS_MIN_PROGRESS;
 
 		try {
 			// First, create the Loanout
-			if(createLoan() != STATUS_ERROR) {
+			if (createLoan() != STATUS_ERROR) {
 				if(INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationCtx.getMode())) {
 					if(createRelation(results.getPrimaryURICreated(), 
 										invocationCtx.getSingleCSID()) != STATUS_ERROR) {
@@ -151,8 +87,8 @@ public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 
 		// First, create the Loanout
 		// We fetch the resource class by service name
-		NuxeoBasedResource resource = (NuxeoBasedResource) resourceMap.get( LoanoutClient.SERVICE_NAME); 
-		Response response = resource.create(resourceMap, null, loanoutPayload);
+		NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get( LoanoutClient.SERVICE_NAME); 
+		Response response = resource.create(getResourceMap(), null, loanoutPayload);
 		if(response.getStatus() != CREATED_STATUS) {
 			completionStatus = STATUS_ERROR;
 			errorInfo = new InvocationError(INT_ERROR_STATUS,
@@ -177,8 +113,8 @@ public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 			+   "<relationshipType>"+RELATION_TYPE+"</relationshipType>"
 			+   "<predicateDisplayName>"+RELATION_PREDICATE_DISP+"</predicateDisplayName>"
 			+ "</ns2:relations_common></document>";
-		NuxeoBasedResource resource = (NuxeoBasedResource) resourceMap.get(RelationClient.SERVICE_NAME);
-		Response response = resource.create(resourceMap, null, relationPayload);
+		NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(RelationClient.SERVICE_NAME);
+		Response response = resource.create(getResourceMap(), null, relationPayload);
 		if(response.getStatus() != CREATED_STATUS) {
 			completionStatus = STATUS_ERROR;
 			errorInfo = new InvocationError(INT_ERROR_STATUS,
@@ -187,32 +123,4 @@ public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 		}
 		return completionStatus;
 	}
-
-	/**
-	 * @return one of the STATUS_* constants, or a value from 1-99 to indicate progress.
-	 * Implementations need not support partial completion (progress) values, and can transition
-	 * from STATUS_MIN_PROGRESS to STATUS_COMPLETE.
-	 */
-	public int getCompletionStatus() {
-		return completionStatus;
-	}
-
-	/**
-	 * @return information about the batch job actions and results
-	 */
-	public InvocationResults getResults() {
-		if(completionStatus != STATUS_COMPLETE)
-			return null;
-		return results;
-	}
-
-	/**
-	 * @return a user-presentable note when an error occurs in batch processing. Will only
-	 * be called if getCompletionStatus() returns STATUS_ERROR.
-	 */
-	public InvocationError getErrorInfo() {
-		return errorInfo;
-	}
-
-
 }

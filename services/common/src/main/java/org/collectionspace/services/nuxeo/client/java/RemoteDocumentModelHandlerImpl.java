@@ -388,6 +388,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
 
         //iterate over parts received and fill those parts
+        boolean werePartsFilled = false;
         List<PayloadInputPart> inputParts = input.getParts();
         for (PayloadInputPart part : inputParts) {
 
@@ -404,6 +405,14 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
                 continue;
             }
             fillPart(part, docModel, partMeta, action, ctx);
+            werePartsFilled = true;
+        }
+        
+        if (werePartsFilled == false) {
+        	String msg = String.format("%s request failed because there were no XML payload parts in the request.", 
+        			action.toString());
+        	logger.error(msg);
+        	throw new BadRequestException(msg);
         }
     }
 

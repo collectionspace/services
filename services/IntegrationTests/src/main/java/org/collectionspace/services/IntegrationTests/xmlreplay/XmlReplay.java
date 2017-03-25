@@ -244,7 +244,7 @@ public class XmlReplay {
         int deleteFailures = 0;
         for (ServiceResult pr : serviceResultsMap.values()) {
             try {
-                if (Tools.notEmpty(pr.deleteURL)){
+                if (pr.autoDelete == true && Tools.notEmpty(pr.deleteURL)){
                     ServiceResult deleteResult = XmlReplayTransport.doDELETE(pr.deleteURL, pr.auth, pr.testID, "[autodelete:"+logName+"]");
                     if (deleteResult.gotExpectedResult() == false || deleteResult.responseCode != 200) {
                     	reattemptList.put(REATTEMPT_KEY + deleteFailures++, pr); // We need to try again after our dependents have been deleted. cow()
@@ -564,6 +564,14 @@ public class XmlReplay {
                 try {
                     testElementIndex++;
                     String testID = testNode.valueOf("@ID");
+                    //
+                    // Figure out if we will auto delete resources
+                    boolean autoDelete = param_autoDeletePOSTS;
+                    String autoDeleteValue = testNode.valueOf("@autoDeletePOSTS");
+                    if (autoDeleteValue != null && !autoDeleteValue.trim().isEmpty()) {
+                    	autoDelete = Boolean.valueOf(autoDeleteValue).booleanValue();
+                    }
+                    
                     String testIDLabel = Tools.notEmpty(testID) ? (testGroupID+'.'+testID) : (testGroupID+'.'+testElementIndex);
                     String method = testNode.valueOf("method");
                     String contentType = testNode.valueOf("contentType");
@@ -637,6 +645,7 @@ public class XmlReplay {
                             vars = parts.varsList.get(0);
                         }
                         serviceResult = XmlReplayTransport.doPOST_PUTFromXML(parts.responseFilename, vars, protoHostPort, uri, method, contentType, evalStruct, authForTest, testIDLabel);
+                        serviceResult.autoDelete = autoDelete;
                         if (vars!=null) {
                             serviceResult.addVars(vars);
                         }

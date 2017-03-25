@@ -159,7 +159,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 			checkActive();
 			
 			//
-			// All active users are allowed to the *their* (we enforce this) current list of permissions.  If this is not
+			// All active users are allowed to see the *their* (we enforce this) current list of permissions.  If this is not
 			// the request, then we'll do a full AuthZ check.
 			//
 			if (resName.equalsIgnoreCase(ACCOUNT_PERMISSIONS) != true) { //see comment immediately above

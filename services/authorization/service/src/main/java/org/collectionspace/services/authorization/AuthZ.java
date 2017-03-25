@@ -28,6 +28,7 @@ import java.util.HashSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.spi.CSpaceAuthorizationProvider;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -59,6 +60,36 @@ public class AuthZ {
      */
     public final static AuthZ get() {
         return self;
+    }
+    
+    public static String getMethod(ActionType actionType) {
+    	String result = null;
+    	
+    	switch (actionType) {
+    	case CREATE:
+    		result = "POST";
+    		break;
+    	case READ:
+    		result = "GET";
+    		break;
+    	case UPDATE:
+    		result = "PUT";
+    		break;
+    	case DELETE:
+    		result = "DELETE";
+    		break;
+    	case RUN:
+    		result = "RUN";
+    		break;
+    	case SEARCH:
+    		result = "READ";
+    		break;
+    	default:
+    		throw new RuntimeException(String.format("Encountered unexpected action type '%s'.",
+    				actionType.value()));
+    	}
+    	
+    	return result;
     }
     
     private void setupProvider() {

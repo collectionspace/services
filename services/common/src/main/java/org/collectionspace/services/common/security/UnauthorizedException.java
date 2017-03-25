@@ -33,7 +33,11 @@ import org.collectionspace.services.common.ServiceException;
  */
 public class UnauthorizedException extends ServiceException {
 
-    final public static int HTTP_CODE = 401;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	final public static int HTTP_CODE = 401;
 
     /**
      * Creates a new instance of <code>UnauthorizedException</code> without detail message.

@@ -90,7 +90,7 @@ public class CollectionSpaceJaxRsApplication extends Application
 
     private Set<Object> singletons = new HashSet<Object>();
     private Set<Class<?>> empty = new HashSet<Class<?>>();    
-    private ResourceMap<PoxPayloadIn, PoxPayloadOut> resourceMap = new ResourceMapImpl();
+    private ResourceMap resourceMap = new ResourceMapImpl();
     private ServletContext servletContext = null;
 
     public CollectionSpaceJaxRsApplication() {    	

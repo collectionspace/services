@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="batch">
+	<ns2:batch_common xmlns:ns2="http://collectionspace.org/services/batch"
+		xmlns:ns3="http://collectionspace.org/services/jaxb">
+		<name>TestBatchJob</name>
+		<notes>A second benign batch job for testing the Batch service.</notes>
+		<supportsNoContext>false</supportsNoContext>
+		<supportsSingleDoc>false</supportsSingleDoc>
+		<supportsDocList>false</supportsDocList>
+		<supportsGroup>false</supportsGroup>
+		<createsNewFocus>false</createsNewFocus>
+		<className>org.collectionspace.services.batch.nuxeo.TestBatchJob</className>
+	</ns2:batch_common>
+</document>

@@ -158,7 +158,7 @@ public abstract class NuxeoBasedResource
     		@Context UriInfo uriInfo,
             String xmlPayload) {
     	uriInfo = new UriInfoWrapper(uriInfo);
-        return this.create(null, resourceMap, uriInfo, xmlPayload); 
+        return this.create(null, resourceMap, uriInfo, xmlPayload);
     }
     
     public Response create(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, // REM: 8/13/2012 - Some sub-classes will override this method -e.g., MediaResource does.

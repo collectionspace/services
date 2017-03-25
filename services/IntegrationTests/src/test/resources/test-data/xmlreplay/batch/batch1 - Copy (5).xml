@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <document name="batch">
-    <ns2:batch_common
-        xmlns:ns2="http://collectionspace.org/services/batch"
-        xmlns:ns3="http://collectionspace.org/services/jaxb"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- 		xsi:schemaLocation="http://collectionspace.org/services/batch file:batch_common.xsd">
-        <name>TestUpdateObjectLocationBatchJob</name>
-        <forDocTypes>
-            <forDocType>CollectionObject</forDocType>
-        </forDocTypes>
-        <forRoles>
+	<ns2:batch_common xmlns:ns2="http://collectionspace.org/services/batch"
+		xmlns:ns3="http://collectionspace.org/services/jaxb">
+		<name>TestBatchJob</name>
+		<notes>A benign batch job for testing the Batch service.</notes>
+		<forRoles>
 	        <roleDisplayName>TENANT_READER</roleDisplayName>
 	        <roleDisplayName>TENANT_ADMINISTRATOR</roleDisplayName>
     	</forRoles>
@@ -31,11 +26,11 @@
 				<actionGroup>RL</actionGroup>
 	        </resourceActionGroup>
         </resourceActionGroupList>
-        <supportsSingleDoc>true</supportsSingleDoc>
-        <supportsDocList>true</supportsDocList>
-        <supportsGroup>true</supportsGroup>
-        <supportsNoContext>true</supportsNoContext>
-        <createsNewFocus>false</createsNewFocus>
-        <className>org.collectionspace.services.batch.nuxeo.TestBatchJob</className>
-    </ns2:batch_common>
+		<supportsNoContext>false</supportsNoContext>
+		<supportsSingleDoc>false</supportsSingleDoc>
+		<supportsDocList>false</supportsDocList>
+		<supportsGroup>false</supportsGroup>
+		<createsNewFocus>false</createsNewFocus>
+		<className>org.collectionspace.services.batch.nuxeo.TestBatchJob</className>
+	</ns2:batch_common>
 </document>

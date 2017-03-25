@@ -62,7 +62,7 @@ public interface CollectionSpaceResource<IT, OT> {
      * @param ctx the ctx
      * @return the repository client
      */
-    public RepositoryClient getRepositoryClient(ServiceContext<IT, OT> ctx);
+    public RepositoryClient<IT, OT> getRepositoryClient(ServiceContext<IT, OT> ctx);
 
     /**
      * Gets the storage client.

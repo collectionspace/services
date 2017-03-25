@@ -822,10 +822,10 @@ public class ServiceMain {
      */
     private synchronized void populateUriTemplateRegistry() {
        if (uriTemplateRegistry.isEmpty()) {
-    	   CollectionSpaceResource resource = null;
+    	   CollectionSpaceResource<?, ?> resource = null;
             ResourceMap resourceMap = getJaxRSResourceMap();
-            Set<Map.Entry<String, CollectionSpaceResource>> entrySet = resourceMap.entrySet();
-            for (Map.Entry<String, CollectionSpaceResource> entry : entrySet) {
+            Set<Map.Entry<String, CollectionSpaceResource<?, ?>>> entrySet = resourceMap.entrySet();
+            for (Map.Entry<String, CollectionSpaceResource<?, ?>> entry : entrySet) {
                 resource = entry.getValue();
                 Map<UriTemplateRegistryKey, StoredValuesUriTemplate> entries =
                         resource.getUriRegistryEntries();
