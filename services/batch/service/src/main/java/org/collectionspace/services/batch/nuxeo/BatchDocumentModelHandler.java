@@ -223,7 +223,6 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 		boolean releaseRepoSession = false;
 
 		RepositoryClientImpl repoClient = (RepositoryClientImpl) this.getRepositoryClient(ctx);
-		repoSession = this.getRepositorySession();
 		if (repoSession == null) {
 			repoSession = repoClient.getRepositorySession(ctx);
 			releaseRepoSession = true;

@@ -29,7 +29,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.core.MultivaluedMap;
@@ -53,13 +52,9 @@ import org.slf4j.LoggerFactory;
 // FIXME: Deprecated classes that need to be updated
 import org.jboss.resteasy.client.ProxyFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.conn.ssl.SSLContexts;
-
-import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509TrustManager;
 
 /**
@@ -139,12 +134,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
 
     /** The logger. */
     static protected final Logger logger = LoggerFactory.getLogger(AbstractServiceClientImpl.class);
-    /**
-     * The character used to separate the words in a part label
-     */
-    public static final String PART_LABEL_SEPARATOR = "_";
-    /** The Constant PART_COMMON_LABEL. */
-    public static final String PART_COMMON_LABEL = "common";
+
     /** The properties. */
     private Properties properties = new Properties();
     /** The url. */
@@ -152,7 +142,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
     /** The http client. */
     private HttpClient httpClient;
     private org.apache.http.client.HttpClient httpClient4;
-
+    
     /** The RESTEasy proxy */
     private P proxy;
 

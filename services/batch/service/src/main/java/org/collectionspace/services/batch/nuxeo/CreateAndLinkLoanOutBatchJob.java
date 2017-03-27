@@ -16,7 +16,7 @@ import org.collectionspace.services.client.RelationClient;
 public class CreateAndLinkLoanOutBatchJob extends AbstractBatchInvocable {
 
 	private final String RELATION_TYPE = "affects"; 
-	private final String LOAN_DOCTYPE = "LoanOut"; 
+	private final String LOAN_DOCTYPE = "LoanOut";
 	private final String RELATION_PREDICATE_DISP = "affects"; 
 	
 	public CreateAndLinkLoanOutBatchJob() {

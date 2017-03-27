@@ -14,7 +14,7 @@
 	<properties>
 		<annox.version>0.5.0</annox.version>
 		<jaxb2-basics.version>0.6.2</jaxb2-basics.version>
-		<maven-jaxb2-plugin.version>0.12.3</maven-jaxb2-plugin.version>
+		<maven-jaxb2-plugin.version>0.13.1</maven-jaxb2-plugin.version>
 		<jaxb.version>2.2.11</jaxb.version>
 		<resteasy.version>3.0.19.Final</resteasy.version>
 		<mysql.driver.version>5.1.8</mysql.driver.version>
@@ -41,6 +41,7 @@
         <module>jaxb</module>
         <module>hyperjaxb</module>
         <module>common</module>
+        <module>structureddate</module>
         <module>authority</module>
         <module>authorization-mgt</module> <!-- relies on authorization -->
         <module>common-test</module>
@@ -62,11 +63,14 @@
         <module>intake</module>
         <module>loanin</module>
         <module>loanout</module>
+        <module>claim</module>
         <module>exhibition</module>
         <module>conditioncheck</module>
         <module>conservation</module>
         <module>valuationcontrol</module>
         <module>objectexit</module>
+        <module>propagation</module>
+        <module>pottag</module>
         <module>batch</module>
         <module>imports</module>
         <module>location</module>

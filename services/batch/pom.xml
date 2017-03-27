@@ -16,7 +16,7 @@
     <modules>
         <module>jaxb</module>
         <module>service</module>
-        <module>3rdparty</module>
+        <!-- <module>3rdparty</module> --> <!-- Now obsolete since the Nuxeo artifact is now created and deployed from config in the Application Layer -->
         <module>client</module>
     </modules>
 

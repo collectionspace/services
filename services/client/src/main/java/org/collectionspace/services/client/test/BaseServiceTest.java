@@ -173,6 +173,14 @@ public abstract class BaseServiceTest<CLT> {
     public BaseServiceTest() {
         super();
     }
+    
+    protected int getExpectedStatusCode() {
+    	return this.testExpectedStatusCode;
+    }
+    
+    protected ServiceRequestType getRequestType() {
+    	return testRequestType;
+    }
 
     //
     // Decide if cleanup should happen

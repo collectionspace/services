@@ -23,12 +23,12 @@
  */
 package org.collectionspace.services.report.nuxeo;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -271,9 +271,6 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			// export report to pdf and build a response with the bytes
 			//JasperExportManager.exportReportToPdf(jasperprint);
 			
-			// Report will be to a byte output array.
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
 			JRExporter exporter = null;
 			// Strip extension from report filename.
 			String outputFilename = reportFileName;
@@ -331,11 +328,15 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
                         // fill the report
 			JasperPrint jasperPrint = JasperFillManager.fillReport(fileStream, params,conn);
 				
+			// Report will be to a temporary file.
+			File tempOutputFile = Files.createTempFile("report-", null).toFile();
+			FileOutputStream tempOutputStream = new FileOutputStream(tempOutputFile);			
 			exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
-			exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, baos);
+			exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, tempOutputStream);
 			exporter.exportReport();
-			result = new ByteArrayInputStream(baos.toByteArray());
-	
+			tempOutputStream.close();
+			
+			result = new FileInputStream(tempOutputFile);
 	       	return result;
         } catch (SQLException sqle) {
             // SQLExceptions can be chained. We have at least one exception, so

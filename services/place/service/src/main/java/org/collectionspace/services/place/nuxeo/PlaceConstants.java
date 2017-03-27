@@ -23,6 +23,8 @@
  */
 package org.collectionspace.services.place.nuxeo;
 
+import org.collectionspace.services.client.PlaceAuthorityClient;
+
 /**
  * PlaceConstants processes CollectionObject document
  *
@@ -32,4 +34,14 @@ public class PlaceConstants {
     public final static String NUXEO_DOCTYPE = "Place";
     public final static String NUXEO_SCHEMA_NAME = "place";
     public final static String NUXEO_DC_TITLE = "CollectionSpace-Place";
+    
+	public static final String COMMON_SCHEMA_NAME = PlaceAuthorityClient.SERVICE_COMMON_PART_NAME;
+	public final static String COMMON_ITEM_SCHEMA_NAME = PlaceAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+    
+    public final static String DISPLAY_NAME_SCHEMA_NAME = COMMON_ITEM_SCHEMA_NAME;
+    public final static String DISPLAY_NAME_FIELD_NAME = "placeTermGroupList/placeTermGroup/termDisplayName";
+
+    public final static String TERM_TYPE_SCHEMA_NAME = COMMON_ITEM_SCHEMA_NAME;
+    public final static String TERM_TYPE_FIELD_NAME = "placeTermGroupList/placeTermGroup/termType";
+	
 }

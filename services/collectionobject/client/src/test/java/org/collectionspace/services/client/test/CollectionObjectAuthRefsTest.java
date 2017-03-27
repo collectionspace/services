@@ -149,9 +149,6 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
 
         return result;
     }
-
-    /** The number of authority references expected. */
-    private final int NUM_AUTH_REFS_EXPECTED = 7;
     
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
@@ -436,13 +433,22 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
         //
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         Response res = collectionObjectClient.read(knownResourceId);
-        CollectionobjectsCommon collectionObject = null;
         try {
 	        assertStatusCode(res, testName);
 	        PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(String.class));
-	        collectionObject = (CollectionobjectsCommon) extractPart(input,
+	        CollectionobjectsCommon collectionObject = (CollectionobjectsCommon) extractPart(input,
 	        		collectionObjectClient.getCommonPartName(), CollectionobjectsCommon.class);
 	        Assert.assertNotNull(collectionObject);
+	        // Check a sample of one or more person authority ref fields
+	        Assert.assertEquals(collectionObject.getOwners().getOwner().get(0), ownerRefName);
+	        Assert.assertEquals(collectionObject.getFieldCollectionSources().getFieldCollectionSource().get(0), 
+	        		fieldCollectionSourceRefName);
+
+	        // Check a sample of one or more organization authority ref fields
+	        Assert.assertEquals(collectionObject.getContentOrganizations().getContentOrganization().get(0), 
+	        		contentOrganizationRefName);
+	        Assert.assertEquals(collectionObject.getAssocEventOrganizations().getAssocEventOrganization().get(0), 
+	        		assocEventOrganizationRefName);
         } finally {
         	if (res != null) {
                 res.close();
@@ -462,42 +468,33 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
             }
         }
         
+        int expectAuthRefs = personIdsCreated.size() + orgIdsCreated.size();
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
         int numAuthRefsFound = items.size();
-        if(logger.isDebugEnabled()){
-            logger.debug("Expected " + NUM_AUTH_REFS_EXPECTED +
-                " authority references, found " + numAuthRefsFound);
-        }
-        Assert.assertEquals(numAuthRefsFound, NUM_AUTH_REFS_EXPECTED,
-            "Did not find all expected authority references! " +
-            "Expected " + NUM_AUTH_REFS_EXPECTED + ", found " + numAuthRefsFound);
-               
-        // Check a sample of one or more person authority ref fields
-        // Assert.assertEquals(collectionObject.getAssocPersons().getAssocPerson().get(0), assocPersonRefName);
-        Assert.assertEquals(collectionObject.getOwners().getOwner().get(0), ownerRefName);
-        Assert.assertEquals(collectionObject.getFieldCollectionSources().getFieldCollectionSource().get(0), fieldCollectionSourceRefName);
-
-        // Check a sample of one or more organization authority ref fields
-        Assert.assertEquals(collectionObject.getContentOrganizations().getContentOrganization().get(0), contentOrganizationRefName);
-        Assert.assertEquals(collectionObject.getAssocEventOrganizations().getAssocEventOrganization().get(0), assocEventOrganizationRefName);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Expected " + expectAuthRefs + " authority references, found " + numAuthRefsFound);
+        }               
 
         // Optionally output additional data about list members for debugging.
         logger.info(this.toString());
         boolean iterateThroughList = true;
-        if(iterateThroughList && logger.isDebugEnabled()){;
+        if (iterateThroughList && logger.isDebugEnabled()) {
             int i = 0;
-            for(AuthorityRefList.AuthorityRefItem item : items){
+            for (AuthorityRefList.AuthorityRefItem item : items) {
                 logger.debug(testName + ": list-item[" + i + "] Field:" +
                 		item.getSourceField() + " =" +
                         " item display name = " + item.getAuthDisplayName() +
                         " auth display name = " + item.getItemDisplayName());
-                logger.debug(testName + ": list-item[" + i + "] refName=" +
-                        item.getRefName());
-                logger.debug(testName + ": list-item[" + i + "] URI=" +
-                        item.getUri());
+                logger.debug(testName + ": list-item[" + i + "] refName=" + item.getRefName());
+                logger.debug(testName + ": list-item[" + i + "] URI=" + item.getUri());
                 i++;
             }
         }
+        
+        //
+        // Make sure we saw the correct number of authRefs
+        Assert.assertEquals(numAuthRefsFound, expectAuthRefs,
+                "Did not find all expected authority references! " + "Expected " + expectAuthRefs + ", found " + numAuthRefsFound);
     }
 
 
@@ -531,17 +528,19 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
             // Note: Any non-success responses are ignored and not reported.
             collectionObjectClient.delete(resourceId).close();
         }
-        // Note: Any non-success response is ignored and not reported.
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        
+        //
         // Delete persons before PersonAuth
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
             personAuthClient.deleteItem(personAuthCSID, resourceId).close();
         }
         personAuthClient.delete(personAuthCSID).close();
-        // Note: Any non-success response is ignored and not reported.
-        OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
+        
+        //
         // Delete organizations before OrgAuth
+        OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
         for (String resourceId : orgIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
             orgAuthClient.deleteItem(orgAuthCSID, resourceId).close();

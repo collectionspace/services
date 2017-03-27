@@ -106,9 +106,11 @@
         </exec>
     </target>
 
-    <target name="deploy" depends="install"
-    description="deploy batch service">
+    <target name="deploy" depends="install" description="deploy batch service">
+        <!-- Now obsolete since the Nuxeo artifact is now created and deployed from config in the Application Layer -->
+        <!--
         <ant antfile="3rdparty/build.xml" target="deploy" inheritall="false"/>
+        -->
     </target>
 
     <target name="undeploy"

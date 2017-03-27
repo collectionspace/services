@@ -1,9 +1,8 @@
 package org.collectionspace.services.listener;
 
-import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
-import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -17,6 +16,7 @@ import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
+import org.collectionspace.services.nuxeo.listener.AbstractCSEventListenerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.common.collections.ScopeType;
 import org.nuxeo.common.collections.ScopedMap;
@@ -24,14 +24,11 @@ import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
-import org.nuxeo.ecm.core.api.impl.DocumentModelImpl;
 import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
 import org.nuxeo.ecm.core.event.Event;
-import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
-import org.nuxeo.ecm.core.versioning.VersioningService;
 
-public abstract class AbstractUpdateObjectLocationValues implements EventListener {
+public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEventListenerImpl {
 
     // FIXME: We might experiment here with using log4j instead of Apache Commons Logging;
     // am using the latter to follow Ray's pattern for now
@@ -75,8 +72,8 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
             "AND (ecm:currentLifeCycleState <> 'deleted') "
             + NONVERSIONED_NONPROXY_DOCUMENT_WHERE_CLAUSE_FRAGMENT;
 
+    // Used to set/get temp values in a DocumentModel instance
 	private static final String IGNORE_LOCATION_UPDATE_EVENT_LABEL = "IGNORE_LOCATION_UPDATE_EVENT";
-	private static final String IGNORE_LOCATION_UPDATE_EVENT_OPTION = ScopeType.DEFAULT.getScopePrefix() + "IGNORE_LOCATION_UPDATE_EVENT";
     
     public enum EventNotificationDocumentType {
         // Document type about which we've received a notification
@@ -84,8 +81,12 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
         MOVEMENT, RELATION, COLLECTIONOBJECT;
     }
     
-    private static void dumpEvent(Event event, String message) {
-    	if (logger.isDebugEnabled()) {
+    private static void logEvent(Event event, String message) {
+    	logEvent(event, message, false);
+    }
+    
+    private static void logEvent(Event event, String message, boolean forceLogging) {
+    	if (logger.isDebugEnabled() || forceLogging) {
 	        DocumentEventContext docEventContext = (DocumentEventContext) event.getContext();
 	        DocumentModel docModel = docEventContext.getSourceDocument();
 	        String eventType = event.getName();
@@ -138,11 +139,16 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
 
     @Override
     public void handleEvent(Event event) throws ClientException {
-    	dumpEvent(event, "Update Location");
         // Ensure we have all the event data we need to proceed.
-        if (event.getContext() == null || !(event.getContext() instanceof DocumentEventContext)) {
+        if (isRegistered(event) == false || !(event.getContext() instanceof DocumentEventContext)) {
+        	if (logger.isTraceEnabled() == true) {
+        		logEvent(event, "Update Location", true);
+        	}
             return;
         }
+
+        Map<String, String> params = this.getParams(event);
+        logEvent(event, "Update Location");
 
         DocumentEventContext docEventContext = (DocumentEventContext) event.getContext();
         DocumentModel eventDocModel = docEventContext.getSourceDocument();        
@@ -155,7 +161,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
         // exits if it is set.
     	if (shouldIgnoreEvent(docEventContext, IGNORE_LOCATION_UPDATE_EVENT_LABEL) == true) {
     		return;
-    	}        
+    	}
 
         //
         // Ensure this event relates to a relationship record (between cataloging and movement records) or a movement record.  If so, get the CSID
@@ -235,23 +241,24 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
         DocumentModel mostRecentMovementDocModel;
         for (String collectionObjectCsid : collectionObjectCsids) {            
             collectionObjectDocModel = getCurrentDocModelFromCsid(session, collectionObjectCsid);
-            if (isActiveDocument(collectionObjectDocModel) == true) {           
+            if (isActiveDocument(collectionObjectDocModel) == true) {
+            	DocumentModel movementDocModel = getCurrentDocModelFromCsid(session, eventMovementCsid);
 	            //
 	            // Get the CollectionObject's most recent, valid related Movement to use for computing the
 	            // object's current location.
 	            //
-				String mostRecentLocation = getMostRecentMovement(event, session, collectionObjectCsid,
+				String mostRecentLocation = getMostRecentLocation(event, session, collectionObjectCsid,
 						isAboutToBeRemovedEvent, eventMovementCsid);
 	            //
 	            // Update the CollectionObject's Computed Current Location field with the Movement record's location
 				//
-	            boolean didLocationChange = updateCollectionObjectLocation(collectionObjectDocModel, mostRecentLocation);
+	            boolean didLocationChange = updateCollectionObjectLocation(collectionObjectDocModel, movementDocModel, mostRecentLocation);
 	            
 	            //
 	            // If the location changed, save/persist the change to the repository and log the change.
 	            //
             	if (didLocationChange == true) {
-            		persisLocationChange(session, collectionObjectDocModel);
+            		persistLocationChange(session, collectionObjectDocModel);
     	            //
     	            // Log an INFO message if we've changed the cataloging record's location
     	            //	            
@@ -269,13 +276,12 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
     //
     // Disable update/documentModified events and persist the location change.
     //
-    private void persisLocationChange(CoreSessionInterface session, DocumentModel collectionObjectDocModel) {
+    private void persistLocationChange(CoreSessionInterface session, DocumentModel collectionObjectDocModel) {
     	
     	//
     	// Set a flag in the document model indicating that we want to ignore the update event that
     	// will be triggered by this save/persist request.
-    	ScopedMap contextData = collectionObjectDocModel.getContextData();
-    	contextData.putIfAbsent(IGNORE_LOCATION_UPDATE_EVENT_OPTION, true);
+    	setDocModelContextProperty(collectionObjectDocModel, IGNORE_LOCATION_UPDATE_EVENT_LABEL, true);
 
     	//
     	// Save/Persist the document to the DB
@@ -283,7 +289,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
         
         //
         // Clear the flag we set to ignore events triggered by our save request.
-    	contextData.remove(IGNORE_LOCATION_UPDATE_EVENT_OPTION);
+        clearDocModelContextProperty(collectionObjectDocModel, IGNORE_LOCATION_UPDATE_EVENT_LABEL);
     }
 
     /**
@@ -409,30 +415,30 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
      * un-retrievable via their CSIDs.
      *
      * @param session a repository session.
-     * @param collectionObjectCsid a CollectionObject identifier (CSID)
+     * @param csid a CollectionObject identifier (CSID)
      * @return a document model for the document identified by the supplied
      * CSID.
      */
-    protected static DocumentModel getCurrentDocModelFromCsid(CoreSessionInterface session, String collectionObjectCsid) {
+    protected static DocumentModel getCurrentDocModelFromCsid(CoreSessionInterface session, String csid) {
         DocumentModelList docModelList = null;
         
         try {
             final String query = "SELECT * FROM "
                     + NuxeoUtils.BASE_DOCUMENT_TYPE
                     + " WHERE "
-                    + NuxeoUtils.getByNameWhereClause(collectionObjectCsid)
+                    + NuxeoUtils.getByNameWhereClause(csid)
                     + " "
                     + NONVERSIONED_NONPROXY_DOCUMENT_WHERE_CLAUSE_FRAGMENT;
             docModelList = session.query(query);
         } catch (Exception e) {
-            logger.warn("Exception in query to get active document model for CollectionObject: ", e);
+            logger.warn("Exception in query to get active document model for CSID: " + csid, e);
         }
         
         if (docModelList == null || docModelList.isEmpty()) {
-            logger.warn("Could not get active document models for CollectionObject(s).");
+            logger.warn("Could not get active document models for CSID=" + csid);
             return null;
         } else if (docModelList.size() != 1) {
-            logger.error("Found more than 1 active document with CSID=" + collectionObjectCsid);
+            logger.error("Found more than 1 active document with CSID=" + csid);
             return null;
         }
         
@@ -487,7 +493,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
      * @return the most recent Movement record related to the CollectionObject
      * identified by the supplied CSID.
      */
-    protected static String getMostRecentMovement(Event event,
+    protected String getMostRecentLocation(Event event,
     		CoreSessionInterface session, String collectionObjectCsid,
             boolean isAboutToBeRemovedEvent, String eventMovementCsid)
             throws ClientException {
@@ -761,6 +767,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
      * @throws ClientException
      */
     protected abstract boolean updateCollectionObjectLocation(DocumentModel collectionObjectDocModel,
+    		DocumentModel movmentDocModel,
     		String movementRecordsLocation)
             throws ClientException;
 }

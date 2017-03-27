@@ -2,7 +2,6 @@ package org.collectionspace.services.client.test;
 
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
@@ -13,7 +12,8 @@ import org.collectionspace.services.client.XmlTools;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.dom4j.Document;
-import org.jboss.resteasy.client.ClientResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 /*
@@ -23,6 +23,9 @@ import org.testng.Assert;
 public abstract class AbstractPoxServiceTestImpl<CLT extends AbstractCommonList, CPT>
 		extends AbstractServiceTestImpl<CLT, CPT, PoxPayloadOut, String> {
 		
+    private final String CLASS_NAME = AbstractPoxServiceTestImpl.class.getName();
+    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+
 	@Override
 	public CPT extractCommonPartValue(Response res) throws Exception {
 		CPT result = null;
@@ -126,4 +129,5 @@ public abstract class AbstractPoxServiceTestImpl<CLT extends AbstractCommonList,
                     "Part " + partLabel + " was unexpectedly null.");
             return payloadInputPart;
     }
+    
 }

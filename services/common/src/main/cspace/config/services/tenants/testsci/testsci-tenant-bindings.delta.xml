@@ -8,6 +8,25 @@
     <!-- value in cspace/config/services/tenants/testsci-tenant-bindings-proto.xml -->
 
     <tenant:tenantBinding id="2">
+		<tenant:eventListenerConfigurations id="default" merge:matcher="id">
+            <tenant:eventListenerConfig id="UpdateObjectLocationOnMove" merge:matcher="id">
+                <tenant:paramList id="default" merge:matcher="id" merge:action="replace">
+	                <tenant:param>
+	                    <tenant:key>testsci-key0</tenant:key>
+	                    <tenant:value>value0</tenant:value>
+		            </tenant:param>
+	                <tenant:param>
+	                    <tenant:key>testsci-key1</tenant:key>
+	                    <tenant:value>value1</tenant:value>
+		            </tenant:param>
+	                <tenant:param>
+	                    <tenant:key>testsci-key2</tenant:key>
+	                    <tenant:value>value2</tenant:value>
+		            </tenant:param>
+	            </tenant:paramList>
+            </tenant:eventListenerConfig>
+            <tenant:eventListenerConfig id="UpdateObjectLocationAndCrateOnMove" merge:matcher="id" merge:action="delete">
+            </tenant:eventListenerConfig>            
+        </tenant:eventListenerConfigurations>	
     </tenant:tenantBinding>
-
 </tenant:TenantBindingConfig>

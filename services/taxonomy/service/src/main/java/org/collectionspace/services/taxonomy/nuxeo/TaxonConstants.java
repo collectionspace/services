@@ -23,6 +23,9 @@
  */
 package org.collectionspace.services.taxonomy.nuxeo;
 
+import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.TaxonomyAuthorityClient;
+
 /**
  * TaxonConstants provides constants for Taxonomy documents
  *
@@ -32,4 +35,22 @@ public class TaxonConstants {
     public final static String NUXEO_DOCTYPE = "Taxon";
     public final static String NUXEO_SCHEMA_NAME = "taxon";
     public final static String NUXEO_DC_TITLE = "CollectionSpace-Taxon";
+
+	public final static String CORE_SCHEMA_NAME = CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA;
+    public final static String COMMON_SCHEMA_NAME = TaxonomyAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME; //"taxon_common";
+    
+    public final static String IN_AUTHORITY_SCHEMA_NAME = COMMON_SCHEMA_NAME;
+    public final static String IN_AUTHORITY_FIELD_NAME = "inAuthority";
+
+    public final static String DISPLAY_NAME_SCHEMA_NAME = COMMON_SCHEMA_NAME;
+    public final static String DISPLAY_NAME_FIELD_NAME = "taxonTermGroupList/taxonTermGroup/termDisplayName";
+    
+    public final static String FORMATTED_DISPLAY_NAME_SCHEMA_NAME = COMMON_SCHEMA_NAME;
+    public final static String FORMATTED_DISPLAY_NAME_FIELD_NAME = "taxonTermGroupList/taxonTermGroup/termFormattedDisplayName";
+    
+    public final static String REFNAME_SCHEMA_NAME = COMMON_SCHEMA_NAME;
+    public final static String REFNAME_FIELD_NAME = "refName";    
+    
+	public static final String WORKFLOW_STATE_SCHEMA_NAME = CORE_SCHEMA_NAME;
+	public static final String WORKFLOW_STATE_FIELD_NAME = CollectionSpaceClient.COLLECTIONSPACE_CORE_WORKFLOWSTATE; //"workflowState";    
 }

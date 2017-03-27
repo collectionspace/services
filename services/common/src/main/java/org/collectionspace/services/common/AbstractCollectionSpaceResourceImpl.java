@@ -61,6 +61,7 @@ import org.collectionspace.services.config.service.DocHandlerParams.Params.Cache
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.service.DocHandlerParams.Params;
 import org.collectionspace.services.description.ServiceDescription;
+
 import org.jboss.resteasy.spi.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

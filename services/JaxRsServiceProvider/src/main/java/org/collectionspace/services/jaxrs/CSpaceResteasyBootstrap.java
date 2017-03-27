@@ -17,8 +17,7 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 	    	//
 	    	System.out.println(String.format("%tc [INFO] Starting up the CollectionSpace Services' JAX-RS application.", new Date()));
 			super.contextInitialized(event);
-			CollectionSpaceJaxRsApplication app = 
-				(CollectionSpaceJaxRsApplication)deployment.getApplication();
+			CollectionSpaceJaxRsApplication app = (CollectionSpaceJaxRsApplication)deployment.getApplication();
 			Dispatcher disp = deployment.getDispatcher();
 			disp.getDefaultContextObjects().put(ResourceMap.class, app.getResourceMap());
 	    	System.out.println(String.format("%tc [INFO] CollectionSpace Services' JAX-RS application started.", new Date()));

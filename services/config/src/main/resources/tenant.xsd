@@ -45,7 +45,8 @@
             <xs:documentation>Tenant bindings</xs:documentation>
         </xs:annotation>
         <xs:sequence>
-            <xs:element name="repositoryDomain" type="RepositoryDomainType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="repositoryDomain" type="RepositoryDomainType" minOccurs="1" maxOccurs="unbounded"/>
+            <xs:element name="eventListenerConfigurations" type="EventListenerConfigurations" minOccurs="0" maxOccurs="1"/>
             <xs:element name="binaryStorePath" type="xs:string" minOccurs="0" maxOccurs="1"/>
             <xs:element name="properties" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
         	<xs:element name="remoteClientConfigurations" type="RemoteClientConfigurations" minOccurs="0" maxOccurs="1"/>
@@ -78,6 +79,7 @@
 		<xs:sequence>
 			<xs:element name="remoteClientConfig" type="RemoteClientConfig" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
+		<xs:attribute name="id" type="xs:string" use="required"/>
 	</xs:complexType>
 	
 	<xs:complexType name="RemoteClientConfig">
@@ -94,6 +96,40 @@
 			<xs:element name="ssl" type="xs:string" minOccurs="0" maxOccurs="1"/>        
 			<xs:element name="auth" type="xs:string" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="EventListenerConfigurations">
+		<xs:sequence>
+			<xs:element name="eventListenerConfig" type="EventListenerConfig" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="EventListenerConfig">
+		<xs:annotation>
+			<xs:documentation>Connection details for a remote CollectionSpace instance.  Used for things like the Share Authority Server</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="className" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="paramList" type="ParamList" minOccurs="0" maxOccurs="1">
+	            
+            </xs:element>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string" use="required"/>
+		<xs:attribute name="required" type="xs:boolean" use="optional" default="false"/>
+	</xs:complexType>
+	
+	<xs:complexType name="ParamList">
+		<xs:sequence>
+			<xs:element name="param" type="Param" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string" use="required"/>
+	</xs:complexType>
+	
+	<xs:complexType name="Param">
+	    <xs:sequence>
+	        <xs:element name="key" type="xs:string" minOccurs="1" maxOccurs="1"/>
+	        <xs:element name="value" type="xs:string" minOccurs="1" maxOccurs="1"/>
+	   	</xs:sequence>
 	</xs:complexType>
 
 </xs:schema>

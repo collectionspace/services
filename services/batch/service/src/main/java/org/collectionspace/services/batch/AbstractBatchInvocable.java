@@ -10,6 +10,7 @@ import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +41,7 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
     
     private ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx;
     private List<String> invocationModes;
-    private ResourceMap resourceMap;
+    private ResourceMap<PoxPayloadIn, PoxPayloadOut> resourceMap;
 
     protected InvocationContext invocationCtx;
     protected int completionStatus;
@@ -69,12 +70,12 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
         this.invocationModes = invocationModes;
     }
 
-    public ResourceMap getResourceMap() {
+    public ResourceMap<PoxPayloadIn, PoxPayloadOut> getResourceMap() {
         return resourceMap;
     }
 
     @Override
-    public void setResourceMap(ResourceMap resourceMap) {
+    public void setResourceMap(ResourceMap<PoxPayloadIn, PoxPayloadOut> resourceMap) {
         this.resourceMap = resourceMap;
     }
 
@@ -86,6 +87,34 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
     @Override
     public ServiceContext<PoxPayloadIn, PoxPayloadOut> getServiceContext() {
         return ctx;
+    }
+	
+    @Override
+    public CoreSessionInterface getRepoSession() {
+    	CoreSessionInterface result = null;
+    	
+    	if (ctx != null) {
+    		result = (CoreSessionInterface) ctx.getCurrentRepositorySession();
+    	} else {
+    		logger.error(String.format("Batch job '%s' invoked with a null/empty service context.", 
+    				this.getClass().getName()));
+    	}
+    	
+    	return result;
+    }
+    
+    @Override    
+    public String getTenantId() {
+        String result = null;
+        
+        if (ctx != null) {
+        	result = ctx.getTenantId();
+        } else {
+    		logger.error(String.format("Batch job '%s' invoked with a null/empty service context.", 
+    				this.getClass().getName()));
+    	}
+        
+        return result;
     }
 
     @Override

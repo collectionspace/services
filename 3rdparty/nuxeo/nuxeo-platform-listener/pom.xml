@@ -16,6 +16,8 @@
         <module>updateobjectlocationonmove</module>
         <module>updaterelationsondelete</module>
         <module>updateimagederivatives</module>
+        <module>naturalhistory</module>
+        <module>botgarden</module>
     </modules>
 
     <dependencies>
