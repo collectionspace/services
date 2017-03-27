@@ -47,7 +47,8 @@
     
     <run controlFile="versioning/versioning.xml" testGroup="VersionedRecordFiltering" />
     
-    <run controlFile="batch/batch.xml" />
+    <run controlFile="batch/batch.xml" testGroup="testSingle"/>
+    <run controlFile="batch/batch.xml" testGroup="testPermissionsAndRoles"/>
     
     <!-- Uncomment the following when needed to test the UpdateObjectLocationBatchJob -->
     <!-- which updates the computed current location values in CollectionObject records. -->

@@ -275,7 +275,7 @@
                 <expected level="ADDOK" />
                 <filename>batch/res/collectionobject.res.xml</filename>
                 <vars>
-                    <var ID="computedCurrentLocationValue">${createMovement2.currentLocation}</var>
+                    <var ID="computedCurrentLocationValue">${createMovement1.currentLocation}</var>
                 </vars>
             </response>
             <expectedCodes>200</expectedCodes>

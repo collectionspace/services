@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <document name="batch">
-    <ns2:batch_common xmlns:ns2="http://collectionspace.org/services/batch" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <ns2:batch_common xmlns:ns2="http://collectionspace.org/services/batch">
         <name>batch-create-permissions</name>
         <notes>A batch resource for testing the Batch service's permission enforcement before invoking batch jobs.</notes>
         <resourceActionGroupList>
@@ -13,8 +13,8 @@
                 <actionGroup>CRUL</actionGroup>
             </resourceActionGroup>
             <resourceActionGroup>
-                <resourceName>concepts</resourceName>
-                <actionGroup>RL</actionGroup>
+                <resourceName>conceptauthorities</resourceName>
+                <actionGroup>CRL</actionGroup>
             </resourceActionGroup>
             <resourceActionGroup>
                 <resourceName>collectionobjects</resourceName>

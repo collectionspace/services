@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:account_role xmlns:ns2="http://collectionspace.org/services/authorization">
+    <subject>ROLE</subject>
+    <account>
+        <accountId>${createAccount.CSID}</accountId>
+        <screenName>${screenName}</screenName>
+        <userId>${userId}</userId>
+    </account>
+    <role>
+        <roleId>${createRole.CSID}</roleId>
+        <roleName>ROLE_1_BIRD</roleName>
+    </role>
+</ns2:account_role>
