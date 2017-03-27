@@ -87,6 +87,7 @@ public class BatchServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
         String identifier = "batchNumber-" + exitNumber;
         BatchCommon batch = new BatchCommon();
         batch.setName(identifier);
+        batch.setClassName("org.collectionspace.services.batch.nuxeo.TestBatchJob");
         PoxPayloadOut multipart = new PoxPayloadOut(BatchClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(batch, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(new BatchClient().getCommonPartName());
@@ -105,6 +106,7 @@ public class BatchServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 		
 		result.setName("updated-" + batchCommon.getName());
 		result.setNotes("updated-" + batchCommon.getNotes());
+		result.setClassName("org.collectionspace.services.batch.nuxeo.TestBatchJob");
 		
 		return result;
 	}

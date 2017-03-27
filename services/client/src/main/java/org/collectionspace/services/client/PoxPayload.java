@@ -5,8 +5,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -47,7 +50,10 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	
 	// The list of POX parts contained in the xmlText payload
 	/** The parts. */
-	private List<PT> parts = new ArrayList<PT>();	
+	private List<PT> parts = new ArrayList<PT>();
+	
+	// Valid root element labels
+	private static Set<String> validRootElementLabels = new HashSet<String>(Arrays.asList("document", "abstract-common-list"));
 	
 	/**
 	 * Instantiates a new pox payload.
@@ -60,10 +66,19 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 		this.payloadName = name;
 	}
 	
+	/**
+	 * Returns a list of valid root element labels for payloads.
+	 * 
+	 * @return
+	 */
+	public Set<String> getValidRootElementLables() {
+		return validRootElementLabels;
+	}
+	
 	private void setDomDocument(Document dom) throws DocumentException {
 		this.domDocument = dom;
-		String label = domDocument.getRootElement().getName();
-		if (label != null && label.equalsIgnoreCase("document")) {
+		String label = domDocument.getRootElement().getName().toLowerCase();
+		if (label != null && getValidRootElementLables().contains(label)) {
 			this.payloadName = label;
 		} else {
 			String msg = "The following incoming request payload is missing the root <document> element or is otherwise malformed.  For example valid payloads, see https://wiki.collectionspace.org/display/DOC/Common+Services+REST+API+documentation";

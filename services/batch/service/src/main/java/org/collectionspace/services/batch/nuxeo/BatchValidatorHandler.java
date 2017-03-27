@@ -19,6 +19,7 @@ public class BatchValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, Po
     //
     private static final String VALIDATION_ERROR = "The batch record payload was invalid. See log file for more details.";
     private static final String NAME_NULL_ERROR = "The batch record field \"name\" cannot be empty or missing.";
+    private static final String CLASSNAME_NULL_ERROR = "The batch record field \"className\" cannot be empty or missing.";
 	private static final String MISSING_CLASS_ERROR = "The Java class '%s' (fully qualified with package name) for the batch job named '%s' cannot be found.";
 
 	@Override
@@ -105,14 +106,14 @@ public class BatchValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, Po
     	//
     	// Ensure a batch class
         String batchClassName = batchCommon.getClassName();
-        CS_ASSERT(batchName != null, NAME_NULL_ERROR);
-        CS_ASSERT(batchName.isEmpty() == false, NAME_NULL_ERROR);
+        CS_ASSERT(batchClassName != null, CLASSNAME_NULL_ERROR);
+        CS_ASSERT(batchClassName.isEmpty() == false, CLASSNAME_NULL_ERROR);
         
         //
         // Ensure we can find and load the batch Java class
         if (canFindClass(batchClassName) == false) {
         	String msg = String.format(MISSING_CLASS_ERROR, batchClassName, batchCommon.getName());
-        	CS_ASSERT(false, batchClassName);
+        	CS_ASSERT(false, msg);
         }
     }
 	

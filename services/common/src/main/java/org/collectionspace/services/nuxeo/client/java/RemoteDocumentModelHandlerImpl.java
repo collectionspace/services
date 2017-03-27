@@ -408,11 +408,10 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
             werePartsFilled = true;
         }
         
-        if (werePartsFilled == false) {
-        	String msg = String.format("%s request failed because there were no XML payload parts in the request.", 
+        if (logger.isTraceEnabled() && werePartsFilled == false) {
+        	String msg = String.format("%s request had no XML payload parts processed in the request.  Could be a payload with only relations-common-list request.", 
         			action.toString());
-        	logger.error(msg);
-        	throw new BadRequestException(msg);
+        	logger.trace(msg);
         }
     }
 
