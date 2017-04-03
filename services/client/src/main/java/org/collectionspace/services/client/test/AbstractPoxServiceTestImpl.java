@@ -41,7 +41,8 @@ public abstract class AbstractPoxServiceTestImpl<CLT extends AbstractCommonList,
 		return result;
 	}
 	
-    protected void printList(String testName, CLT list) {
+    @Override
+	protected void printList(String testName, CLT list) {
         if (getLogger().isDebugEnabled()){
         	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, getLogger(), testName);
         }
@@ -87,7 +88,8 @@ public abstract class AbstractPoxServiceTestImpl<CLT extends AbstractCommonList,
     /**
      * The entity type expected from the JAX-RS Response object
      */
-    public Class<String> getEntityResponseType() {
+    @Override
+	public Class<String> getEntityResponseType() {
     	return String.class;
     }
 	
@@ -128,6 +130,56 @@ public abstract class AbstractPoxServiceTestImpl<CLT extends AbstractCommonList,
             Assert.assertNotNull(payloadInputPart,
                     "Part " + partLabel + " was unexpectedly null.");
             return payloadInputPart;
+    }
+    
+    /**
+     * Sets up create tests with empty entity body.
+     */
+    @Override
+	protected void setupCreateWithEmptyEntityBody() {
+        testExpectedStatusCode = STATUS_INTERNAL_SERVER_ERROR;
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }
+
+    /**
+     * Sets up create tests with empty entity body.
+     */
+    @Override
+	protected void setupCreateWithInvalidBody() {
+        testExpectedStatusCode = STATUS_INTERNAL_SERVER_ERROR;
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }
+    
+    /**
+     * Sets up create tests with empty entity body.
+     */
+    @Override
+	protected void setupUpdateWithInvalidBody() {
+        testExpectedStatusCode = STATUS_BAD_REQUEST;
+        testRequestType = ServiceRequestType.UPDATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }
+    
+    /**
+     * Sets up create tests with malformed xml.
+     */
+    @Override
+	protected void setupCreateWithMalformedXml() {
+        testExpectedStatusCode = STATUS_INTERNAL_SERVER_ERROR;
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }
+
+    /**
+     * Sets up create tests with wrong xml schema.
+     */
+    @Override
+	protected void setupCreateWithWrongXmlSchema() {
+        testExpectedStatusCode = STATUS_INTERNAL_SERVER_ERROR;
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
     }
     
 }

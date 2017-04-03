@@ -113,7 +113,7 @@ public class UpdateImageDerivatives extends AbstractCSEventListenerImpl {
 
 		EventContext eventContext = event.getContext();
 		if (eventContext != null) {
-			if (eventContext instanceof DocumentEventContext) {
+			if (isRegistered(event) && eventContext instanceof DocumentEventContext) {
 				result = true;
 			}
 		}

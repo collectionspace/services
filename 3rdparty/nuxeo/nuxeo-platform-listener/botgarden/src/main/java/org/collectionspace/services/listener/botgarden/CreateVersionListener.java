@@ -17,10 +17,11 @@ public class CreateVersionListener extends AbstractCSEventListenerImpl {
 
 	final Log logger = LogFactory.getLog(CreateVersionListener.class);
 
+	@Override
 	public void handleEvent(Event event) {
 		EventContext ec = event.getContext();
 
-		if (ec instanceof DocumentEventContext) {
+		if (isRegistered(event) && ec instanceof DocumentEventContext) {
 			DocumentEventContext context = (DocumentEventContext) ec;
 
 			if (ec.hasProperty(SKIP_PROPERTY) && ((Boolean) ec.getProperty(SKIP_PROPERTY))) {

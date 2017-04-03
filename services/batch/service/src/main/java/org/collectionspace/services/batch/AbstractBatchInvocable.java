@@ -41,7 +41,7 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
     
     private ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx;
     private List<String> invocationModes;
-    private ResourceMap<PoxPayloadIn, PoxPayloadOut> resourceMap;
+    private ResourceMap resourceMap;
 
     protected InvocationContext invocationCtx;
     protected int completionStatus;
@@ -70,12 +70,12 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
         this.invocationModes = invocationModes;
     }
 
-    public ResourceMap<PoxPayloadIn, PoxPayloadOut> getResourceMap() {
+    public ResourceMap getResourceMap() {
         return resourceMap;
     }
 
     @Override
-    public void setResourceMap(ResourceMap<PoxPayloadIn, PoxPayloadOut> resourceMap) {
+    public void setResourceMap(ResourceMap resourceMap) {
         this.resourceMap = resourceMap;
     }
 

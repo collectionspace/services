@@ -101,6 +101,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     /*
      * We use this method to force a TestNG execution order for our tests
      */
+	@Override
 	public abstract void CRUDTests(String testName);
     
     /*
@@ -658,7 +659,8 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     /*
      * Test that searches honor the workflow deleted state.
      */
-    @Test(dataProvider = "testName")
+    @Override
+	@Test(dataProvider = "testName")
     public void searchWorkflowDeleted(String testName) throws Exception {
 
         // FIXME: Temporarily avoid running test if client is of an authority service
@@ -1307,6 +1309,47 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 	    invalidStatusCodeMessage(testRequestType, statusCode));
 	    Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
+    
+    /**
+     * Sets up create tests with empty entity body.
+     */
+    @Override
+	protected void setupCreateWithEmptyEntityBody() {
+        testExpectedStatusCode = STATUS_INTERNAL_SERVER_ERROR;
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }
+
+    /**
+     * Sets up create tests with empty entity body.
+     */
+    @Override
+	protected void setupCreateWithInvalidBody() {
+        testExpectedStatusCode = STATUS_INTERNAL_SERVER_ERROR;
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }
+    
+    /**
+     * Sets up create tests with malformed xml.
+     */
+    @Override
+	protected void setupCreateWithMalformedXml() {
+        testExpectedStatusCode = STATUS_INTERNAL_SERVER_ERROR;
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }
+
+    /**
+     * Sets up create tests with wrong xml schema.
+     */
+    @Override
+	protected void setupCreateWithWrongXmlSchema() {
+        testExpectedStatusCode = STATUS_INTERNAL_SERVER_ERROR;
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }
+    
 }
 
 

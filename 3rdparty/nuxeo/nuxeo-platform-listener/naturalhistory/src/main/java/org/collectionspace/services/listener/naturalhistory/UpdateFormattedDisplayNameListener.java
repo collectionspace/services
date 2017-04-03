@@ -1,4 +1,4 @@
-package org.collectionspace.services.listener.ucb;
+package org.collectionspace.services.listener.naturalhistory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +36,7 @@ public class UpdateFormattedDisplayNameListener extends AbstractCSEventListenerI
 	public void handleEvent(Event event) {
 		EventContext ec = event.getContext();
 
-		if (ec instanceof DocumentEventContext) {
+		if (isRegistered(event) && ec instanceof DocumentEventContext) {
 			DocumentEventContext context = (DocumentEventContext) ec;
 			DocumentModel doc = context.getSourceDocument();
 

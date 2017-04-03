@@ -15,7 +15,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.event.Event;
 
 public abstract class AbstractCSEventListenerImpl implements CSEventListener {
-	private static List<String> repositoryNameList = new ArrayList<String>();
+	private static Map<String, List<String>> mapOfrepositoryNames = new HashMap<String, List<String>>(); // <className, repositoryName>
 	private static Map<String, Map<String, Map<String, String>>> eventListenerParamsMap = new HashMap<String, Map<String, Map<String, String>>>();  // <repositoryName, Map<EventListenerId, Map<key, value>>>
 	private static Map<String, String> nameMap = new HashMap<String, String>();
 	
@@ -25,25 +25,44 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
 		// Intentionally left blank
 	}
 	
-	protected List<String> getRepositoryNameList() {
-		return repositoryNameList;
-	}
-	
-	protected Map<String, Map<String, Map<String, String>>> getEventListenerParamsMap() {
-		return eventListenerParamsMap;
-	}
-
+	/**
+	 * Find out if we (the event listener) are registered (via tenant bindings config) to respond events.
+	 */
 	@Override
 	public boolean isRegistered(Event event) {
 		boolean result = false;
 		
 		if (event != null && event.getContext() != null) {
-			result = repositoryNameList.contains(event.getContext().getRepositoryName());
+			result = getRepositoryNameList().contains(event.getContext().getRepositoryName());
 		}
 		
 		return result;
 	}
-
+	
+	/**
+	 * An event listener can be registered by multiple tenants, so we keep track of that here.
+	 * 
+	 * @return - the list of tenants/repositories that an event listener is registered with.
+	 */
+	protected List<String> getRepositoryNameList() {
+		String key = this.getClass().getName();
+		List<String> result = mapOfrepositoryNames.get(key);
+		
+		if (result == null) synchronized(this) {
+			result = new ArrayList<String>();
+			mapOfrepositoryNames.put(key, result);
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * The list of parameters (specified in a tenant's bindings) for event listeners
+	 * @return
+	 */
+	protected Map<String, Map<String, Map<String, String>>> getEventListenerParamsMap() {
+		return eventListenerParamsMap;
+	}
 
 	/**
 	 * Returns 'true' if this collection changed as a result of the call. 
@@ -60,33 +79,35 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
 			result = true;
 		}
 		
-		// Set this event listeners parameters, if any.  Params are qualified with the repositoryName since multiple tenants might be registering the same event listener but with different params.
-		List<Param> paramList = eventListenerConfig.getParamList().getParam(); // values from the tenant bindings that we need to copy into the event listener
-		if (paramList != null) {
-			//
-			// Get the list of event listeners for a given repository
-			Map<String, Map<String, String>> eventListenerRepoParams = getEventListenerParamsMap().get(respositoryName); // Get the set of event listers for a given repository
-			if (eventListenerRepoParams == null) {
-				eventListenerRepoParams = new HashMap<String, Map<String, String>>();
-				getEventListenerParamsMap().put(respositoryName, eventListenerRepoParams); // create and put an empty map
-				result = true;
-			}
-			//
-			// Get the list of params for a given event listener for a given repository
-			Map<String, String> eventListenerParams = eventListenerRepoParams.get(eventListenerConfig.getId()); // Get the set of params for a given event listener for a given repository
-			if (eventListenerParams == null) {
-				eventListenerParams = new HashMap<String, String>();
-				eventListenerRepoParams.put(eventListenerConfig.getId(), eventListenerParams); // create and put an empty map
-				result = true;
-			}
-			//
-			// copy all the values from the tenant bindings into the event listener
-			for (Param params : paramList) {
-				String key = params.getKey();
-				String value = params.getValue();
-				if (Tools.notBlank(key)) {
-					eventListenerParams.put(key, value);
+		if (eventListenerConfig.getParamList() != null) {
+			// Set this event listeners parameters, if any.  Params are qualified with the repositoryName since multiple tenants might be registering the same event listener but with different params.
+			List<Param> paramList = eventListenerConfig.getParamList().getParam(); // values from the tenant bindings that we need to copy into the event listener
+			if (paramList != null) {
+				//
+				// Get the list of event listeners for a given repository
+				Map<String, Map<String, String>> eventListenerRepoParams = getEventListenerParamsMap().get(respositoryName); // Get the set of event listers for a given repository
+				if (eventListenerRepoParams == null) {
+					eventListenerRepoParams = new HashMap<String, Map<String, String>>();
+					getEventListenerParamsMap().put(respositoryName, eventListenerRepoParams); // create and put an empty map
 					result = true;
+				}
+				//
+				// Get the list of params for a given event listener for a given repository
+				Map<String, String> eventListenerParams = eventListenerRepoParams.get(eventListenerConfig.getId()); // Get the set of params for a given event listener for a given repository
+				if (eventListenerParams == null) {
+					eventListenerParams = new HashMap<String, String>();
+					eventListenerRepoParams.put(eventListenerConfig.getId(), eventListenerParams); // create and put an empty map
+					result = true;
+				}
+				//
+				// copy all the values from the tenant bindings into the event listener
+				for (Param params : paramList) {
+					String key = params.getKey();
+					String value = params.getValue();
+					if (Tools.notBlank(key)) {
+						eventListenerParams.put(key, value);
+						result = true;
+					}
 				}
 			}
 		}
@@ -100,8 +121,14 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
 
 	@Override
 	public Map<String, String> getParams(Event event) {
-		String repositoryName = event.getContext().getRepositoryName();
-		return getEventListenerParamsMap().get(repositoryName).get(getName(repositoryName));  // We need to qualify with the repositoryName since this event listener might be register by multiple tenants using different params
+		Map<String, String> result = null;
+		try {
+			String repositoryName = event.getContext().getRepositoryName();
+			result = getEventListenerParamsMap().get(repositoryName).get(getName(repositoryName));  // We need to qualify with the repositoryName since this event listener might be register by multiple tenants using different params
+		} catch (NullPointerException e) {
+			// Do nothing.  Just means no params were configured.
+		}
+		return result;
 	}
 	
 	@Override

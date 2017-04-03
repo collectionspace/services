@@ -25,10 +25,11 @@ public class UpdateLocationListener extends AbstractCSEventListenerImpl {
 	 * <li>Set the previousLocation field to the previous value of the currentLocation field</li>
 	 * </ui>
 	 */
+	@Override
 	public void handleEvent(Event event) {
 		EventContext ec = event.getContext();
 
-		if (ec instanceof DocumentEventContext) {
+		if (isRegistered(event) && ec instanceof DocumentEventContext) {
 			DocumentEventContext context = (DocumentEventContext) ec;
 			DocumentModel doc = context.getSourceDocument();
 

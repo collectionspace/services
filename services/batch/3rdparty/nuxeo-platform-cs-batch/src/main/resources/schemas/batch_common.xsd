@@ -24,14 +24,14 @@
     <xs:element name="forDocTypes">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="forDocType" type="xs:string" minOccurs="1" maxOccurs="unbounded" />
+				<xs:element name="forDocType" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
     <xs:element name="forRoles">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="roleDisplayName" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+                <xs:element name="roleDisplayName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -46,7 +46,7 @@
     
     <xs:complexType name="resourceActionGroupList">
         <xs:sequence>
-            <xs:element name="resourceActionGroup" type="resourceActionGroup" minOccurs="3" maxOccurs="unbounded"/>
+            <xs:element name="resourceActionGroup" type="resourceActionGroup" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
     

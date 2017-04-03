@@ -48,10 +48,11 @@ public class UpdateAccessCodeListener extends AbstractCSEventListenerImpl {
 	private static final String TAXONOMIC_IDENT_GROUP_LIST_FIELD_NAME = TAXON_PATH_ELEMENTS[0];
 	private static final String TAXON_FIELD_NAME = TAXON_PATH_ELEMENTS[2];
 
+	@Override
 	public void handleEvent(Event event) {
 		EventContext ec = event.getContext();
 		
-		if (ec instanceof DocumentEventContext) {
+		if (isRegistered(event) && ec instanceof DocumentEventContext) {
 			DocumentEventContext context = (DocumentEventContext) ec;
 			DocumentModel doc = context.getSourceDocument();
 

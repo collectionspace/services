@@ -30,6 +30,7 @@ public class FormatTaxonBatchJob extends AbstractBatchJob {
 		this.taxonFormatter = new TaxonFormatter();
 	}
 
+	@Override
 	public void run() {
 		setCompletionStatus(STATUS_MIN_PROGRESS);
 

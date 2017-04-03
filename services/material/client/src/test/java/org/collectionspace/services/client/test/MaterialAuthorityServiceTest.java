@@ -243,7 +243,8 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
      * @throws Exception 
      */
 
-    @AfterClass(alwaysRun=true)
+    @Override
+	@AfterClass(alwaysRun=true)
 	public void cleanUp() throws Exception {
 		String noTest = System.getProperty("noTestCleanup");
 		if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
@@ -295,7 +296,8 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
      *
      * @return The root URL for the item service.
      */
-    protected String getItemServiceRootURL(String parentResourceIdentifier) {
+    @Override
+	protected String getItemServiceRootURL(String parentResourceIdentifier) {
         return getResourceURL(parentResourceIdentifier) + "/" + getItemServicePathComponent();
     }
 
@@ -311,7 +313,8 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
      *
      * @return The URL of a specific item resource managed by a service.
      */
-    protected String getItemResourceURL(String parentResourceIdentifier, String itemResourceIdentifier) {
+    @Override
+	protected String getItemResourceURL(String parentResourceIdentifier, String itemResourceIdentifier) {
         return getItemServiceRootURL(parentResourceIdentifier) + "/" + itemResourceIdentifier;
     }
 
@@ -364,7 +367,8 @@ public class MaterialAuthorityServiceTest extends AbstractAuthorityServiceTest<M
                 "Display name in updated object did not match submitted data.");
     }
 
-    protected void compareReadInstances(MaterialauthoritiesCommon original,
+    @Override
+	protected void compareReadInstances(MaterialauthoritiesCommon original,
             MaterialauthoritiesCommon fromRead) throws Exception {
         Assert.assertNotNull(fromRead.getDisplayName());
         Assert.assertNotNull(fromRead.getShortIdentifier());

@@ -15,7 +15,6 @@ import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.impl.LifeCycleFilter;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
-import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 
 public class UpdateRelationsOnDelete extends AbstractCSEventListenerImpl {
@@ -35,7 +34,7 @@ public class UpdateRelationsOnDelete extends AbstractCSEventListenerImpl {
         
         EventContext eventContext = event.getContext();
 
-        if (isDocumentSoftDeletedEvent(eventContext)) {
+        if (isRegistered(event) && isDocumentSoftDeletedEvent(eventContext)) {
             
             logger.trace("A soft deletion event was received by UpdateRelationsOnDelete ...");
             

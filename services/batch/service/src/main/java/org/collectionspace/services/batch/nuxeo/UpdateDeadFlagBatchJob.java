@@ -26,6 +26,7 @@ public class UpdateDeadFlagBatchJob extends AbstractBatchJob {
 		this.setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_SINGLE));
 	}
 
+	@Override
 	public void run() {
 		setCompletionStatus(STATUS_MIN_PROGRESS);
 		

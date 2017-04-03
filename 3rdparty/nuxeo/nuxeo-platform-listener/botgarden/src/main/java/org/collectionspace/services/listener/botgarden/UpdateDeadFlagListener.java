@@ -24,10 +24,11 @@ public class UpdateDeadFlagListener extends AbstractCSEventListenerImpl {
 	/* 
 	 * Set the dead flag and dead date on collectionobjects related to a new or modified movement record.
 	 */
+	@Override
 	public void handleEvent(Event event) {
 		EventContext ec = event.getContext();
 
-		if (ec instanceof DocumentEventContext) {
+		if (isRegistered(event) && ec instanceof DocumentEventContext) {
 			DocumentEventContext context = (DocumentEventContext) ec;
 			DocumentModel doc = context.getSourceDocument();
 

@@ -23,6 +23,7 @@ public class ClearVoucherLabelRequestBatchJob extends AbstractBatchJob {
 		this.setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_SINGLE, INVOCATION_MODE_LIST, INVOCATION_MODE_NO_CONTEXT));
 	}
 	
+	@Override
 	public void run() {
 		setCompletionStatus(STATUS_MIN_PROGRESS);
 		

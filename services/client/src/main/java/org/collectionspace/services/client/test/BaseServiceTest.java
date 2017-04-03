@@ -37,9 +37,12 @@ import javax.activation.MimetypesFileTypeMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.MarshalException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.httpclient.HttpMethodBase;
@@ -572,33 +575,33 @@ public abstract class BaseServiceTest<CLT> {
      * @param clazz the clazz
      * @return the string
      */
-    static protected String objectAsXmlString(Object o, Class<?> clazz) {
-        StringWriter sw = new StringWriter();
-        try {
-            JAXBContext jc = JAXBContext.newInstance(clazz);
-            Marshaller m = jc.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-                    Boolean.TRUE);
-            m.marshal(o, sw);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return sw.toString();
-    }
+	static protected String objectAsXmlString(Object o, Class<?> clazz) {
+		StringWriter sw = new StringWriter();
+		JAXBContext jc;
+		try {
+			jc = JAXBContext.newInstance(clazz);
+			Marshaller m = jc.createMarshaller();
+			try {
+				m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+				m.marshal(o, sw);
+			} catch (MarshalException e) {
+				sw = new StringWriter(); // reset the StringWriter value
+				JAXBElement root = new JAXBElement(new QName("uri", "local"), clazz, o);
+				m.marshal(root, sw);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (JAXBException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		return sw.toString();
+	}
     
     static protected String objectAsXmlString(Object o) {
-        StringWriter sw = new StringWriter();
-        try {
-            JAXBContext jc = JAXBContext.newInstance(o.getClass());
-            Marshaller m = jc.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-                    Boolean.TRUE);
-            m.marshal(o, sw);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return sw.toString();
-    }    
+        return objectAsXmlString(o, o.getClass());
+    }
 
     /**
      * getObjectFromFile get object of given class from given file (in classpath)
@@ -807,6 +810,24 @@ public abstract class BaseServiceTest<CLT> {
 	//
 	
     /**
+     * Sets up create tests with empty entity body.
+     */
+    protected void setupCreateWithEmptyEntityBody() {
+        testExpectedStatusCode = STATUS_BAD_REQUEST;
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }
+
+    /**
+     * Sets up create tests with empty entity body.
+     */
+    protected void setupCreateWithInvalidBody() {
+        testExpectedStatusCode = STATUS_BAD_REQUEST;
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }
+    
+    /**
      * Sets up create tests with malformed xml.
      */
     protected void setupCreateWithMalformedXml() {
@@ -913,6 +934,15 @@ public abstract class BaseServiceTest<CLT> {
         testRequestType = ServiceRequestType.DELETE;
         testSetup(testExpectedStatusCode, testRequestType);
     }
+        
+    /**
+     * Sets up create tests with empty entity body.
+     */
+    protected void setupUpdateWithInvalidBody() {
+        testExpectedStatusCode = STATUS_BAD_REQUEST;
+        testRequestType = ServiceRequestType.UPDATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }    
 
     // Failure outcomes
 
@@ -924,34 +954,7 @@ public abstract class BaseServiceTest<CLT> {
         testRequestType = ServiceRequestType.DELETE;
         testSetup(testExpectedStatusCode, testRequestType);
     }
-    
-    /**
-     * Sets up create tests with empty entity body.
-     */
-    protected void setupCreateWithEmptyEntityBody() {
-        testExpectedStatusCode = STATUS_BAD_REQUEST;
-        testRequestType = ServiceRequestType.CREATE;
-        testSetup(testExpectedStatusCode, testRequestType);
-    }
-
-    /**
-     * Sets up create tests with empty entity body.
-     */
-    protected void setupCreateWithInvalidBody() {
-        testExpectedStatusCode = STATUS_BAD_REQUEST;
-        testRequestType = ServiceRequestType.CREATE;
-        testSetup(testExpectedStatusCode, testRequestType);
-    }
-    
-    /**
-     * Sets up create tests with empty entity body.
-     */
-    protected void setupUpdateWithInvalidBody() {
-        testExpectedStatusCode = STATUS_BAD_REQUEST;
-        testRequestType = ServiceRequestType.UPDATE;
-        testSetup(testExpectedStatusCode, testRequestType);
-    }
-    
+        
     public void updateWithEmptyEntityBody(String testName) throws Exception {
         //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }

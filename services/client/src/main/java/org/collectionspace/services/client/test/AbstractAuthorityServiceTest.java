@@ -12,7 +12,6 @@ import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadInputPart;
-import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.RelationClient;
@@ -1467,4 +1466,35 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 		
 		return result;
 	}
+	
+    /**
+     * Sets up create tests with empty entity body.
+     */
+    @Override
+	protected void setupCreateWithEmptyEntityBody() {
+        testExpectedStatusCode = STATUS_INTERNAL_SERVER_ERROR;
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }
+	
+    /**
+     * Sets up create tests with malformed xml.
+     */
+    @Override
+	protected void setupCreateWithMalformedXml() {
+        testExpectedStatusCode = STATUS_INTERNAL_SERVER_ERROR;  // Malformed payload never gets past RESTEasy filter
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }
+
+    /**
+     * Sets up create tests with wrong xml schema.
+     */
+    @Override
+	protected void setupCreateWithWrongXmlSchema() {
+        testExpectedStatusCode = STATUS_INTERNAL_SERVER_ERROR;  // Empty payload never gets past RESTEasy filter
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }    
+    
 }

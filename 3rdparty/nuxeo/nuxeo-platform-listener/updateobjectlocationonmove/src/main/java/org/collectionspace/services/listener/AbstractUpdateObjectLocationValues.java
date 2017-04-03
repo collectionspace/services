@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.collectionspace.services.client.LocationAuthorityClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
@@ -18,9 +19,7 @@ import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
 import org.collectionspace.services.nuxeo.listener.AbstractCSEventListenerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-import org.nuxeo.common.collections.ScopeType;
-import org.nuxeo.common.collections.ScopedMap;
-import org.nuxeo.ecm.core.api.ClientException;
+
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
@@ -138,7 +137,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
     }
 
     @Override
-    public void handleEvent(Event event) throws ClientException {
+    public void handleEvent(Event event) {
         // Ensure we have all the event data we need to proceed.
         if (isRegistered(event) == false || !(event.getContext() instanceof DocumentEventContext)) {
         	if (logger.isTraceEnabled() == true) {
@@ -147,7 +146,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
             return;
         }
 
-        Map<String, String> params = this.getParams(event);
+        Map<String, String> params = this.getParams(event);  // Will be null if no params were configured.
         logEvent(event, "Update Location");
 
         DocumentEventContext docEventContext = (DocumentEventContext) event.getContext();
@@ -302,7 +301,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
      * related to the Movement record.
      */
     private Set<String> getCollectionObjectCsidsRelatedToMovement(String movementCsid,
-            CoreSessionInterface coreSession) throws ClientException {
+            CoreSessionInterface coreSession) {
 
         Set<String> csids = new HashSet<>();
 
@@ -387,13 +386,9 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
         boolean isActiveDocument = false;
 
         if (docModel != null) {	        
-	        try {
-	            if (!docModel.getCurrentLifeCycleState().contains(WorkflowClient.WORKFLOWSTATE_DELETED)) {
-	                isActiveDocument = true;
-	            }
-	        } catch (ClientException ce) {
-	            logger.warn("Error while identifying whether document is an active document: ", ce);
-	        }
+            if (!docModel.getCurrentLifeCycleState().contains(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+                isActiveDocument = true;
+            }
 	        //
 	        // If doc model is the target of the "aboutToBeRemoved" event, mark it as not active.
 	        //
@@ -495,8 +490,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
      */
     protected String getMostRecentLocation(Event event,
     		CoreSessionInterface session, String collectionObjectCsid,
-            boolean isAboutToBeRemovedEvent, String eventMovementCsid)
-            throws ClientException {
+            boolean isAboutToBeRemovedEvent, String eventMovementCsid) {
     	//
     	// Assume we can determine the most recent location by creating an indeterminate result
     	//
@@ -739,7 +733,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
      * and related document types.
      */
     protected static String getCsidForDesiredDocTypeFromRelation(DocumentModel relationDocModel,
-            String desiredDocType, String relatedDocType) throws ClientException {
+            String desiredDocType, String relatedDocType) {
         String csid = null;
         String subjectDocType = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_DOCTYPE_PROPERTY);
         String objectDocType = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_DOCTYPE_PROPERTY);
@@ -768,6 +762,5 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
      */
     protected abstract boolean updateCollectionObjectLocation(DocumentModel collectionObjectDocModel,
     		DocumentModel movmentDocModel,
-    		String movementRecordsLocation)
-            throws ClientException;
+    		String movementRecordsLocation);
 }

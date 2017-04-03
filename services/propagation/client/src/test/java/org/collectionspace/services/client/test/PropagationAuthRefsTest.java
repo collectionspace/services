@@ -220,7 +220,7 @@ public class PropagationAuthRefsTest extends BaseServiceTest<AbstractCommonList>
         AuthorityRefList list = null;
         try {
 	        assertStatusCode(res, testName);
-	        list = (AuthorityRefList) res.getEntity();
+	        list = (AuthorityRefList)res.readEntity(AuthorityRefList.class);
 	        Assert.assertNotNull(list);
         } finally {
         	if (res != null) {
@@ -270,7 +270,8 @@ public class PropagationAuthRefsTest extends BaseServiceTest<AbstractCommonList>
      * may be expected to be deleted by certain tests.
      * @throws Exception 
      */
-    @AfterClass(alwaysRun=true)
+    @Override
+	@AfterClass(alwaysRun=true)
     public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
     	if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
@@ -306,7 +307,8 @@ public class PropagationAuthRefsTest extends BaseServiceTest<AbstractCommonList>
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-    public String getServiceName() {
+    @Override
+	public String getServiceName() {
         return PropagationClient.SERVICE_NAME;
     }
 

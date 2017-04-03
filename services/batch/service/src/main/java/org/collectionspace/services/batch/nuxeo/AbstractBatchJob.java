@@ -14,6 +14,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+
 import org.collectionspace.services.batch.AbstractBatchInvocable;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
@@ -33,6 +34,7 @@ import org.collectionspace.services.common.UriTemplateRegistry;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
+import org.collectionspace.services.common.query.UriInfoImpl;
 import org.collectionspace.services.common.relation.RelationResource;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -45,23 +47,16 @@ import org.dom4j.Element;
 import org.dom4j.Node;
 
 import org.jboss.resteasy.specimpl.PathSegmentImpl;
-//import org.jboss.resteasy.specimpl.UriInfoImpl;
-import org.collectionspace.services.batch.UriInfoImpl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractBatchJob extends AbstractBatchInvocable {
-	public final int CREATED_STATUS = Response.Status.CREATED.getStatusCode();
-	public final int BAD_REQUEST_STATUS = Response.Status.BAD_REQUEST.getStatusCode();
-	public final int INT_ERROR_STATUS = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
 
 	final Logger logger = LoggerFactory.getLogger(AbstractBatchJob.class);
 
 	private Map<String, String> authorityServiceNamesByDocType;
-	
-	public abstract void run();
-	
+		
 	protected String getFieldXml(Map<String, String> fields, String fieldName) {
 		return getFieldXml(fieldName, fields.get(fieldName));
 	}

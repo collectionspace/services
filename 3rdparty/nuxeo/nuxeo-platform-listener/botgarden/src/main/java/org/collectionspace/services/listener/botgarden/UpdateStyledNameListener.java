@@ -5,8 +5,6 @@ import org.apache.commons.logging.LogFactory;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 import org.collectionspace.services.batch.nuxeo.FormatVoucherNameBatchJob;
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.loanout.nuxeo.LoanoutBotGardenConstants;
@@ -24,10 +22,11 @@ public class UpdateStyledNameListener extends AbstractCSEventListenerImpl {
 
 	final Log logger = LogFactory.getLog(UpdateStyledNameListener.class);
 
+	@Override
 	public void handleEvent(Event event) {
 		EventContext ec = event.getContext();
 
-		if (ec instanceof DocumentEventContext) {
+		if (isRegistered(event) && ec instanceof DocumentEventContext) {
 			DocumentEventContext context = (DocumentEventContext) ec;
 			DocumentModel doc = context.getSourceDocument();
 
@@ -83,7 +82,7 @@ public class UpdateStyledNameListener extends AbstractCSEventListenerImpl {
 	}
 	
 	private FormatVoucherNameBatchJob createFormatter() {
-		ResourceMap<PoxPayloadIn, PoxPayloadOut> resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
+		ResourceMap resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
 
 		FormatVoucherNameBatchJob formatter = new FormatVoucherNameBatchJob();
 		formatter.setResourceMap(resourceMap);

@@ -160,6 +160,9 @@
                     	<bindingIncludes>
                 			<include>bindings.xjb</include>
               			</bindingIncludes>
+                        <args>
+                            <arg>-Xannotate</arg> 
+                        </args>
                         <extension>true</extension>
                         <jdk5>true</jdk5>
                         <ejb3>false</ejb3>

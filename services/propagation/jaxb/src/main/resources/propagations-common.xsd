@@ -35,6 +35,7 @@
                 <xs:element name="propDate" type="structuredDateGroup"/>
                 <xs:element name="propReason" type="xs:string"/>
                 <xs:element name="propType" type="xs:string"/>
+                <xs:element name="taggedBy" type="xs:string"/>
                 <xs:element name="propBy" type="xs:string"/>
                 <xs:element name="propComments" type="xs:string"/>
                 <xs:element name="numStarted" type="xs:integer"/>

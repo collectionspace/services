@@ -38,6 +38,7 @@ import org.collectionspace.services.authorization.perms.PermissionAction;
 import org.collectionspace.services.authorization.perms.PermissionsList;
 import org.collectionspace.services.client.PermissionFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
+import org.collectionspace.services.client.test.ServiceRequestType;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.slf4j.Logger;
@@ -89,7 +90,8 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
     /**
      * The entity type expected from the JAX-RS Response object
      */
-    public Class<Permission> getEntityResponseType() {
+    @Override
+	public Class<Permission> getEntityResponseType() {
     	return Permission.class;
     }
     
@@ -106,6 +108,36 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
     protected String getKnowResourceIdentifier() {
     	return knownResource;
     }
+    
+    /**
+     * Sets up create tests with empty entity body.
+     */
+    @Override
+	protected void setupCreateWithEmptyEntityBody() {
+        testExpectedStatusCode = STATUS_INTERNAL_SERVER_ERROR;  // Empty payload never gets past RESTEasy filter
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }
+    
+    /**
+     * Sets up create tests with malformed xml.
+     */
+    @Override
+	protected void setupCreateWithMalformedXml() {
+        testExpectedStatusCode = STATUS_INTERNAL_SERVER_ERROR;  // Malformed payload never gets past RESTEasy filter
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }
+
+    /**
+     * Sets up create tests with wrong xml schema.
+     */
+    @Override
+	protected void setupCreateWithWrongXmlSchema() {
+        testExpectedStatusCode = STATUS_INTERNAL_SERVER_ERROR;  // Empty payload never gets past RESTEasy filter
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }    
     
     /**
      * Creates the without resource name.
@@ -430,23 +462,23 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
     	// Do nothing.  Simply here to for a TestNG execution order for our tests
     }
 
-	@Override
-	public void updateWithEmptyEntityBody(String testName) throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void updateWithMalformedXml(String testName) throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void updateWithWrongXmlSchema(String testName) throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
+//	@Override
+//	public void updateWithEmptyEntityBody(String testName) throws Exception {
+//		// TODO Auto-generated method stub
+//		
+//	}
+//
+//	@Override
+//	public void updateWithMalformedXml(String testName) throws Exception {
+//		// TODO Auto-generated method stub
+//		
+//	}
+//
+//	@Override
+//	public void updateWithWrongXmlSchema(String testName) throws Exception {
+//		// TODO Auto-generated method stub
+//		
+//	}
 
 	@Override
 	protected long getSizeOfList(PermissionsList list) {

@@ -35,6 +35,7 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 		setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_SINGLE));
 	}
 
+	@Override
 	public void run() {
 		setCompletionStatus(STATUS_MIN_PROGRESS);
 

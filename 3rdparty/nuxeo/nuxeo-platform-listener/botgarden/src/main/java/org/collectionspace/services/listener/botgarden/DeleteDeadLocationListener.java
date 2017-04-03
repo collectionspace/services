@@ -18,10 +18,11 @@ public class DeleteDeadLocationListener extends AbstractCSEventListenerImpl {
     /* 
      * Delete dead locations. 
      */
-    public void handleEvent(Event event) {
+    @Override
+	public void handleEvent(Event event) {
         EventContext ec = event.getContext();
 
-        if (ec instanceof DocumentEventContext) {
+        if (isRegistered(event) && ec instanceof DocumentEventContext) {
             DocumentEventContext context = (DocumentEventContext) ec;
             DocumentModel doc = context.getSourceDocument();
 

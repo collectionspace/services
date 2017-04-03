@@ -20,8 +20,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.CollectionSpaceResource;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.StoredValuesUriTemplate;
@@ -33,7 +31,6 @@ import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.nuxeo.util.ReindexFulltextRoot.ReindexInfo;
 import org.nuxeo.ecm.core.api.AbstractSession;
-import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.IterableQueryResult;
 import org.nuxeo.ecm.core.api.NuxeoException;
@@ -222,7 +219,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 	private void initResourceMap() {
 		resourcesByDocType = new HashMap<String, NuxeoBasedResource>();
 
-		for (CollectionSpaceResource<PoxPayloadIn, PoxPayloadOut> resource : getResourceMap().values()) {
+		for (CollectionSpaceResource<?, ?> resource : getResourceMap().values()) {
 			Map<UriTemplateRegistryKey, StoredValuesUriTemplate> entries = resource.getUriRegistryEntries();
 			
 			for (UriTemplateRegistryKey key : entries.keySet()) {

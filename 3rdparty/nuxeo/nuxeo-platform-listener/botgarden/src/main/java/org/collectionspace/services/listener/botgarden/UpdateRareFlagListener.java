@@ -6,8 +6,6 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.batch.nuxeo.UpdateRareFlagBatchJob;
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectBotGardenConstants;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
@@ -42,10 +40,11 @@ public class UpdateRareFlagListener extends AbstractCSEventListenerImpl {
 	private static final String PLANT_ATTRIBUTES_GROUP_LIST_FIELD_NAME = CONSERVATION_CATEGORY_PATH_ELEMENTS[0];
 	private static final String CONSERVATION_CATEGORY_FIELD_NAME = CONSERVATION_CATEGORY_PATH_ELEMENTS[2];
 
+	@Override
 	public void handleEvent(Event event) {
 		EventContext ec = event.getContext();
 
-		if (ec instanceof DocumentEventContext) {
+		if (isRegistered(event) && ec instanceof DocumentEventContext) {
 			DocumentEventContext context = (DocumentEventContext) ec;
 			DocumentModel doc = context.getSourceDocument();
 
@@ -191,7 +190,7 @@ public class UpdateRareFlagListener extends AbstractCSEventListenerImpl {
 	}
 
 	private UpdateRareFlagBatchJob createUpdater() {
-		ResourceMap<PoxPayloadIn, PoxPayloadOut> resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
+		ResourceMap resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
 
 		UpdateRareFlagBatchJob updater = new UpdateRareFlagBatchJob();
 		updater.setResourceMap(resourceMap);

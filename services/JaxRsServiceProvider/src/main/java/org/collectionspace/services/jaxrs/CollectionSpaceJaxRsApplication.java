@@ -25,8 +25,6 @@ package org.collectionspace.services.jaxrs;
 import org.collectionspace.services.account.AccountResource;
 import org.collectionspace.services.account.TenantResource;
 import org.collectionspace.services.blob.BlobResource;
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.id.IDResource;
 import org.collectionspace.services.media.MediaResource;
@@ -168,7 +166,7 @@ public class CollectionSpaceJaxRsApplication extends Application
     }
 
     @Override
-    public ResourceMap<PoxPayloadIn, PoxPayloadOut> getResourceMap() {
+    public ResourceMap getResourceMap() {
         return resourceMap;
     }
     

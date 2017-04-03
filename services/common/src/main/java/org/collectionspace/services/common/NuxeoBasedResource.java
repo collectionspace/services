@@ -643,7 +643,7 @@ public abstract class NuxeoBasedResource
 	}
     
     @Override
-    public ServiceDescription getDescription(ServiceContext ctx) {
+    public ServiceDescription getDescription(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
     	ServiceDescription result = new ServiceDescription();
     	
     	result.setDocumentType(getDocType(ctx.getTenantId()));
@@ -656,7 +656,7 @@ public abstract class NuxeoBasedResource
      * for all inheriting resource classes. Just use ServiceContext.getResourceMap() to get
      * the map, and pass it in.
      */
-    public static DocumentModel getDocModelForRefName(ServiceContext ctx, String refName, ResourceMap resourceMap) 
+    public static DocumentModel getDocModelForRefName(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String refName, ResourceMap resourceMap) 
    			throws Exception, DocumentNotFoundException {
     	return NuxeoUtils.getDocModelForRefName(ctx, refName, resourceMap);
     }

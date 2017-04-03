@@ -158,11 +158,19 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
         }
     }
     
+    /**
+     * Sets up create tests with malformed xml.
+     */
+	protected void setupcreateItemWithBadShortId() {
+        testExpectedStatusCode = STATUS_BAD_REQUEST;  // Malformed payload never gets past RESTEasy filter
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }    
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     		dependsOnMethods = {"authorityTests"})
     public void createItemWithBadShortId(String testName) throws Exception {
-        setupCreateWithMalformedXml();
+    	setupcreateItemWithBadShortId();
 
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();

@@ -24,9 +24,7 @@ package org.collectionspace.services.client.test;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PottagClient;
-import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.pottag.PottagsCommon;
 
@@ -47,9 +45,6 @@ public class PottagServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
     /** The logger. */
     private final String CLASS_NAME = PottagServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    // Instance variables specific to this test.
-    private final static String CURRENT_DATE_UTC = GregorianCalendarDateTimeUtils.currentDateUTC();
-
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
@@ -70,22 +65,12 @@ public class PottagServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
                 + "' does not match expected data '" + getUTF8DataFragment());		
 	}    
      
-	@Override
-	protected void compareUpdatedInstances(PottagsCommon pottagCommon,
-			PottagsCommon updatedPottagCommon) throws Exception {
-        // Check selected fields in the updated common part.
-        Assert.assertEquals(updatedPottagCommon.getFamily(), pottagCommon.getFamily(),
-                "Data in updated object did not match submitted data.");
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("UTF-8 data sent=" + pottagCommon.getLabelData() + "\n"
-                    + "UTF-8 data received=" + updatedPottagCommon.getLabelData());
-        }
-        Assert.assertTrue(updatedPottagCommon.getLabelData().contains(getUTF8DataFragment()),
-                "UTF-8 data retrieved '" + updatedPottagCommon.getLabelData() + "' does not contain expected data '" + getUTF8DataFragment());
-        Assert.assertEquals(updatedPottagCommon.getLabelData(),
-                pottagCommon.getLabelData(), "Data in updated object did not match submitted data.");
-	}
+    @Override
+    protected void compareUpdatedInstances(PottagsCommon requestedUpdate,
+    		PottagsCommon actualUpdate) throws Exception {
+        Assert.assertEquals(requestedUpdate.getFamily(), actualUpdate.getFamily(),
+                "Display name in updated object did not match submitted data.");
+    }
     
     // ---------------------------------------------------------------
     // Utility methods used by tests above
@@ -139,8 +124,7 @@ public class PottagServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
         pottagCommon.setLabelData(getUTF8DataFragment());
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
-        PayloadOutputPart commonPart =
-                multipart.addPart(new PottagClient().getCommonPartName(), pottagCommon);
+        multipart.addPart(new PottagClient().getCommonPartName(), pottagCommon);
 
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, pottag common");
@@ -162,16 +146,18 @@ public class PottagServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
         PoxPayloadOut result = createPottagInstance(identifier);
         return result;
 	}
-
+	
 	@Override
 	protected PottagsCommon updateInstance(PottagsCommon commonPartObject) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		String updatedFamily = "Updated-" + commonPartObject.getFamily();
+		commonPartObject.setFamily(updatedFamily);
+		
+		return commonPartObject;
 	}
 
 	@Override
 	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return new PottagClient();
 	}
 }
