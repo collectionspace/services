@@ -135,7 +135,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
-					<version>2.2</version>
+					<version>3.3</version>
 				</plugin>				
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -248,7 +248,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.6.1</version>
                 <configuration>
                     <!--show>public</show-->
                 </configuration>
@@ -271,17 +270,16 @@
                      <onlyAnalyze>org.collectionspace.*</onlyAnalyze>
                 </configuration>
             </plugin-->
-            <plugin>
+            <!--<plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
-                <version>2.0.1</version>
+                <version>3.0.1</version>
                 <configuration>
                     <onlyAnalyze>org.collectionspace.*</onlyAnalyze>
                     <findbugsXmlOutput>true</findbugsXmlOutput>
-                    <!-- Optional directory to put findbugs xml report -->
                     <findbugsXmlOutputDirectory>target/site</findbugsXmlOutputDirectory>
                 </configuration>
-            </plugin>
+            </plugin>-->
 
         </plugins>
     </reporting>

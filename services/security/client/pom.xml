@@ -110,10 +110,10 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <tasks>
+                            <target>
                                 <property name="runtime-classpath" refid="maven.runtime.classpath"/>
                                 <ant target="setup_hibernate.cfg" inheritRefs="true"/>
-                            </tasks>
+                            </target>
                         </configuration>
                     </execution>
                 </executions>

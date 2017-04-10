@@ -47,15 +47,5 @@
             <version>1.1.6</version>
         </dependency>
     </dependencies>
-    
-    <!-- Global Biodiversity Information Facility - http://www.gbif.org/ -->
-    <repositories>
-        <repository>
-            <id>gbif-all</id>
-            <name>gbif-all</name>
-            <url>http://repository.gbif.org/content/groups/gbif</url>
-        </repository>
-    </repositories>
-
 </project>
 
