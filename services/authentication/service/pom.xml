@@ -62,6 +62,18 @@
             <version>3.1.4.GA</version>
         </dependency>
         <dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-catalina</artifactId>
+			<version>7.0.64</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-dbcp</artifactId>
+			<version>7.0.64</version>
+			<scope>provided</scope>
+		</dependency>
+        <dependency>
         <!--
             <groupId>jboss</groupId>
             <artifactId>jbosssx</artifactId>

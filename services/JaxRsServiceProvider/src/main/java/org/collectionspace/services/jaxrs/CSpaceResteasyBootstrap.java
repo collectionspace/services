@@ -9,6 +9,7 @@ import java.util.Date;
 
 public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 	
+	@Override
 	public void  contextInitialized(ServletContextEvent event) {
 		try {
 			//
@@ -23,6 +24,7 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 	    	System.out.println(String.format("%tc [INFO] CollectionSpace Services' JAX-RS application started.", new Date()));
 		} catch (Throwable e) {
 			e.printStackTrace();
+			throw e;
 		}
 	}
 	
