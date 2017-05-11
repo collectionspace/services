@@ -38,14 +38,10 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.blob.BlobsCommon;
 import org.collectionspace.services.blob.DimensionSubGroup;
 import org.collectionspace.services.blob.MeasuredPartGroup;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 
@@ -54,6 +50,7 @@ import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
  * $LastChangedRevision:  $
  * $LastChangedDate:  $
  */
+@SuppressWarnings("rawtypes")
 public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, BlobsCommon> {
 
     private final String CLASS_NAME = BlobServiceTest.class.getName();
@@ -84,9 +81,14 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
 	}
     
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new BlobClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new BlobClient(clientPropertiesFilename);
+	}
 
     @Override
     protected AbstractCommonList getCommonList(Response response) {
@@ -261,11 +263,11 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
     // ---------------------------------------------------------------
     
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
     	return createBlobInstance(identifier);
     }    
     
-    private PoxPayloadOut createBlobInstance(String exitNumber) {
+    private PoxPayloadOut createBlobInstance(String exitNumber) throws Exception {
     	BlobClient client = new BlobClient();
         String identifier = "blobNumber-" + exitNumber;
         BlobsCommon blob = new BlobsCommon();
@@ -283,7 +285,7 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
 
 	@Override
 	protected PoxPayloadOut createInstance(String commonPartName,
-			String identifier) {
+			String identifier) throws Exception {
 		return createInstance(identifier);
 	}
 

@@ -20,19 +20,24 @@ public interface IRelationsManager {
 			
     /** The Constant SUBJECT. */
     static public final String SUBJECT = "subjectCsid";
+    static public final String SUBJECT_DOCTYPE = "subjectDocumentType";
+
     static public final String SUBJECT_REFNAME = "subjectRefName";    
     static public final String SUBJECT_QP = "sbj";
-    static public final String SUBJECT_TYPE = "subjectType";
+//    static public final String SUBJECT_TYPE = "subjectType";
     static public final String SUBJECT_TYPE_QP = SUBJECT_QP + "Type";
     
     /** The Constant PREDICATE. */
     static public final String PREDICATE = "predicate";
     static public final String PREDICATE_QP = "prd";
+    static public final String RELATIONSHIP_TYPE = "relationshipType";
+
     
     /** The Constant OBJECT. */
     static public final String OBJECT = "objectCsid";
+    static public final String OBJECT_DOCTYPE = "objectDocumentType";    
     static public final String OBJECT_REFNAME = "objectRefName";
     static public final String OBJECT_QP = "obj";
-    static public final String OBJECT_TYPE = "objectType";
+//    static public final String OBJECT_TYPE = "objectType";
     static public final String OBJECT_TYPE_QP = OBJECT_QP + "Type";
 }

@@ -24,7 +24,7 @@ package org.collectionspace.services.id;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.ws.rs.core.MediaType;
+
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
@@ -33,18 +33,12 @@ import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.client.test.BaseServiceTest;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.common.document.BadRequestException;
-import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.id.IDGeneratorSerializer;
 import org.collectionspace.services.id.NumericIDGeneratorPart;
 import org.collectionspace.services.id.SettableIDGenerator;
 import org.collectionspace.services.id.StringIDGeneratorPart;
-import org.collectionspace.services.jaxb.AbstractCommonList;
-
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,9 +62,14 @@ public class IdServiceTest extends BaseServiceTest {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
-    	return (CollectionSpaceClient) new IdClient();
+    protected CollectionSpaceClient getClientInstance() throws Exception {
+    	return new IdClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+    	return new IdClient(clientPropertiesFilename);
+	}
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
@@ -284,7 +283,7 @@ public class IdServiceTest extends BaseServiceTest {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
      */
     @Override
-    public String getServicePathComponent() {
+    public String getServicePathComponent() throws Exception {
         return new IdClient().getServicePathComponent();
     }
 

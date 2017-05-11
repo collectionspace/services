@@ -16,6 +16,8 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.objectexit.ObjectexitCommon;
+
 /**
  * ObjectExitClient.java
  *
@@ -23,7 +25,7 @@ package org.collectionspace.services.client;
  * $LastChangedDate: 2010-05-17 18:25:37 -0700 (Mon, 17 May 2010) $
  *
  */
-public class ObjectExitClient extends AbstractCommonListPoxServiceClientImpl<ObjectExitProxy> {
+public class ObjectExitClient extends AbstractCommonListPoxServiceClientImpl<ObjectExitProxy, ObjectexitCommon> {
 
     public static final String SERVICE_NAME = "objectexit";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
@@ -31,7 +33,15 @@ public class ObjectExitClient extends AbstractCommonListPoxServiceClientImpl<Obj
     public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    @Override
+    public ObjectExitClient() throws Exception {
+		super();
+	}
+
+    public ObjectExitClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
+
+	@Override
     public String getServiceName() {
         return SERVICE_NAME;
     }

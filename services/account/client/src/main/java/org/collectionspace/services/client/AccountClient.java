@@ -28,8 +28,10 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
+import org.apache.http.HttpStatus;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
+import org.collectionspace.services.description.ServiceDescription;
 
 /**
  * A AccountClient.
@@ -41,7 +43,16 @@ public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList,
     public static final String SERVICE_NAME = "accounts";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
     public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
+    public static final String SERVICE_COMMON_PART_NAME = SERVICE_NAME + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
     public final static String IMMUTABLE = "immutable";
+
+	public AccountClient() throws Exception {
+		super();
+	}
+
+	public AccountClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
 
 	@Override
 	public String getServiceName() {
@@ -57,7 +68,7 @@ public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList,
     }
     
     public String getTenantId() {
-        return getProperty(AccountClient.TENANT_PROPERTY);
+        return getProperty(AccountClient.TENANT_NAME_PROPERTY);
     }
 
 	@Override
@@ -73,6 +84,7 @@ public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList,
      * @return response
      * @see org.collectionspace.hello.client.AccountProxy#readList()
      */
+	@Override
     public Response readList() {
         return getProxy().readList();
     }
@@ -86,6 +98,7 @@ public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList,
      * @return response
      * @see org.collectionspace.hello.client.AccountProxy#getAccount(java.lang.String)
      */
+    @Override
     public Response read(String csid) {
         return getProxy().read(csid);
     }
@@ -96,6 +109,7 @@ public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList,
      * @return response
      * @see org.collectionspace.hello.client.AccountProxy#create(org.collectionspace.services.account.AccountsCommon)
      */
+    @Override
     public Response create(AccountsCommon multipart) {
         return getProxy().create(multipart);
     }
@@ -107,7 +121,23 @@ public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList,
      * @return response
      * @see org.collectionspace.hello.client.AccountProxy#updateAccount(java.lang.Long, org.collectionspace.services.account.AccountsCommon)
      */
+    @Override
     public Response update(String csid, AccountsCommon multipart) {
         return getProxy().update(csid, multipart);
     }
+    
+    /**
+     * 
+     */
+	@Override
+	public ServiceDescription getServiceDescription() {
+		ServiceDescription result = null;
+		
+        Response res = getProxy().getServiceDescription();
+        if (res.getStatus() == HttpStatus.SC_OK) {
+        	result = (ServiceDescription) res.readEntity(ServiceDescription.class);
+        }
+        
+        return result;
+	}
 }

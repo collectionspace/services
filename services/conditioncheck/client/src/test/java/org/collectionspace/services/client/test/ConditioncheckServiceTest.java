@@ -24,6 +24,7 @@ package org.collectionspace.services.client.test;
 
 //import java.util.ArrayList;
 import java.util.List;
+
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.AbstractCommonListUtils;
@@ -38,10 +39,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.conditioncheck.ConditionchecksCommon;
 import org.collectionspace.services.conditioncheck.HazardGroupList;
 import org.collectionspace.services.conditioncheck.HazardGroup;
-
-import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,9 +68,14 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new ConditioncheckClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new ConditioncheckClient(clientPropertiesFilename);
+	}
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
@@ -644,7 +647,7 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
     }
 
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
         return createConditioncheckInstance(identifier);
     }
 
@@ -663,8 +666,9 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
      *
      * @param conditioncheckRefNumber the conditioncheck number
      * @return the multipart output
+     * @throws Exception 
      */
-    private PoxPayloadOut createConditioncheckInstance(String conditionCheckRefNumber) {
+    private PoxPayloadOut createConditioncheckInstance(String conditionCheckRefNumber) throws Exception {
 
         ConditionchecksCommon conditioncheckCommon = new ConditionchecksCommon();
         conditioncheckCommon.setConditionCheckRefNumber(conditionCheckRefNumber);
@@ -700,7 +704,7 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
 
     @Override
     protected PoxPayloadOut createInstance(String commonPartName,
-            String identifier) {
+            String identifier) throws Exception {
         PoxPayloadOut result = createConditioncheckInstance(identifier);
         return result;
     }

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -48,9 +49,6 @@ import org.collectionspace.services.organization.OrgauthoritiesCommon;
 import org.collectionspace.services.organization.OrganizationsCommon;
 import org.collectionspace.services.organization.OrgTermGroup;
 import org.collectionspace.services.organization.OrgTermGroupList;
-
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -70,6 +68,14 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
     private final String CLASS_NAME = OrgAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
+    /**
+     * Default constructor.  Used to set the short ID for all tests authority items
+     */
+    public OrgAuthorityServiceTest() {
+    	super();
+        TEST_SHORTID = "TestOrg";
+    }
+    
     @Override
     public String getServicePathComponent() {
         return OrgAuthorityClient.SERVICE_PATH_COMPONENT;
@@ -79,22 +85,24 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
     protected String getServiceName() {
         return OrgAuthorityClient.SERVICE_NAME;
     }
-    private final String TEST_SHORT_ID = "TestOrg";
+    
     private final String TEST_ORG_NAME = "Test Org";
     private final String TEST_ORG_MAIN_BODY_NAME = "The real official test organization";
     private final String TEST_ORG_FOUNDING_PLACE = "Anytown, USA";
-    // FIXME: Change this to a structured date once this field changes in the schema.
     private final String TEST_ORG_FOUNDING_DATE = "May 26, 1907";
     
+    /** The known item resource short ID. */
     private String knownItemResourceShortIdentifer = null;
     
     /** The known contact resource id. */
     private String knownContactResourceId = null;
     
     /** The all contact resource ids created. */
-    private Map<String, String> allContactResourceIdsCreated =
-            new HashMap<String, String>();
+    private Map<String, String> allContactResourceIdsCreated = new HashMap<String, String>();
 
+    /**
+     * 
+     */
     protected void setKnownItemResource(String id, String shortIdentifer) {
         knownItemResourceId = id;
         knownItemResourceShortIdentifer = shortIdentifer;
@@ -104,12 +112,17 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new OrgAuthorityClient();
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new OrgAuthorityClient(clientPropertiesFilename);
+	}
+
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
         OrgAuthorityClient client = new OrgAuthorityClient();
         String displayName = "displayName-" + identifier;
         PoxPayloadOut multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
@@ -118,10 +131,10 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
     }
 
     @Override
-    protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) {
+    protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) throws Exception {
         String headerLabel = new OrgAuthorityClient().getItemCommonPartName();
         
-        String shortId = TEST_SHORT_ID;
+        String shortId = TEST_SHORTID + identifier;
         Map<String, String> testOrgMap = new HashMap<String, String>();
         testOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
         testOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, TEST_ORG_FOUNDING_DATE);
@@ -137,6 +150,11 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         return OrgAuthorityClientUtils.createOrganizationInstance(identifier, testOrgMap, terms, headerLabel);
     }
 
+	@Override
+	protected String createItemInAuthority(AuthorityClient client, String authorityId, String shortId) {
+		return createItemInAuthority(client, authorityId, shortId, null /*refname*/);
+	}
+    
     /**
      * Creates the item in authority.
      *
@@ -144,17 +162,13 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      * @param authRefName the auth ref name
      * @return the string
      */
-    private String createItemInAuthority(String vcsid, String authRefName) {
+    private String createItemInAuthority(AuthorityClient client, String vcsid, String shortId, String authRefName) {
 
         final String testName = "createItemInAuthority";
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ":...");
         }
-
-        // Submit the request to the service and store the response.
-        OrgAuthorityClient client = new OrgAuthorityClient();
         
-        String shortId = TEST_SHORT_ID;
         Map<String, String> testOrgMap = new HashMap<String, String>();
         testOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
         testOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, TEST_ORG_FOUNDING_DATE);
@@ -174,7 +188,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         testOrgRepeatablesMap.put(OrganizationJAXBSchema.CONTACT_NAMES, testOrgContactNames);
 
         String newID = OrgAuthorityClientUtils.createItemInAuthority(
-                vcsid, authRefName, testOrgMap, terms, testOrgRepeatablesMap, client);
+                vcsid, authRefName, testOrgMap, terms, testOrgRepeatablesMap, (OrgAuthorityClient) client);
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
@@ -197,10 +211,11 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      * Creates the contact.
      *
      * @param testName the test name
+     * @throws Exception 
      */
     @Test(dataProvider = "testName", groups = {"create"},
     		dependsOnMethods = {"createItem"})
-    public void createContact(String testName) {
+    public void createContact(String testName) throws Exception {
         setupCreate();
         String newID = createContactInItem(knownResourceId, knownItemResourceId);
     }
@@ -211,8 +226,9 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      * @param parentcsid the parentcsid
      * @param itemcsid the itemcsid
      * @return the string
+     * @throws Exception 
      */
-    private String createContactInItem(String parentcsid, String itemcsid) {
+    private String createContactInItem(String parentcsid, String itemcsid) throws Exception {
 
         final String testName = "createContactInItem";
         if (logger.isDebugEnabled()) {
@@ -296,7 +312,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         readInternal(testName, null, knownResourceShortIdentifer);
     }
 
-    protected void readInternal(String testName, String CSID, String shortId) {
+    protected void readInternal(String testName, String CSID, String shortId) throws Exception {
         // Perform setup.
         setupRead();
 
@@ -542,10 +558,11 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      * Read contact non existent.
      *
      * @param testName the test name
+     * @throws Exception 
      */
     @Test(dataProvider = "testName", groups = {"readItem"},
     		dependsOnMethods = {"readContact"})
-    public void readContactNonExistent(String testName) {
+    public void readContactNonExistent(String testName) throws Exception {
         // Perform setup.
         setupReadNonExistent();
 
@@ -572,20 +589,22 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
     /**
      * Read item list.
+     * @throws Exception 
      */
     @Override
 //	@Test(groups = {"readList"}, dependsOnMethods = {"readList"})
-    public void readItemList(String testName) {
+    public void readItemList(String testName) throws Exception {
         readItemList(knownAuthorityWithItems, null);
     }
 
     /**
      * Read item list by authority name.
+     * @throws Exception 
      */
     @Override
 //    @Test(dataProvider = "testName",
 //    		dependsOnMethods = {"readItem"})
-    public void readItemListByName(String testName) {
+    public void readItemListByName(String testName) throws Exception {
         readItemList(null, READITEMS_SHORT_IDENTIFIER);
     }
 
@@ -594,8 +613,9 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      *
      * @param vcsid the vcsid
      * @param name the name
+     * @throws Exception 
      */
-    private void readItemList(String vcsid, String name) {
+    private void readItemList(String vcsid, String name) throws Exception {
 
         final String testName = "readItemList";
         // Perform setup.
@@ -649,10 +669,11 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
     /**
      * Read contact list.
+     * @throws Exception 
      */
     @Test(groups = {"readList"},
     		dependsOnMethods = {"org.collectionspace.services.client.test.AbstractAuthorityServiceTest.readItemList"})
-    public void readContactList() {
+    public void readContactList() throws Exception {
         readContactList(knownResourceId, knownItemResourceId);
     }
 
@@ -661,8 +682,9 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      *
      * @param parentcsid the parentcsid
      * @param itemcsid the itemcsid
+     * @throws Exception 
      */
-    private void readContactList(String parentcsid, String itemcsid) {
+    private void readContactList(String parentcsid, String itemcsid) throws Exception {
         final String testName = "readContactList";
         // Perform setup.
         setupReadList();
@@ -855,10 +877,11 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      * Delete non existent contact.
      *
      * @param testName the test name
+     * @throws Exception 
      */
     @Test(dataProvider = "testName", groups = {"delete"},
     		dependsOnMethods = {"deleteContact"})
-    public void deleteNonExistentContact(String testName) {
+    public void deleteNonExistentContact(String testName) throws Exception {
         // Perform setup.
         setupDeleteNonExistent();
 
@@ -909,10 +932,11 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun = true)
     @Override
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
@@ -937,14 +961,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             // below are ignored and not reported.
             client.deleteContact(parentResourceId, itemResourceId, contactResourceId).close();
         }
-        // Clean up item resources.
-        for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
-            itemResourceId = entry.getKey();
-            parentResourceId = entry.getValue();
-            // Note: Any non-success responses from the delete operation
-            // below are ignored and not reported.
-            client.deleteItem(parentResourceId, itemResourceId).close();
-        }
+
         // Clean up parent resources.
         super.cleanUp();
 
@@ -1053,11 +1070,6 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 	}
 
 	@Override
-	protected String createItemInAuthority(String authorityId) {
-		return createItemInAuthority(authorityId, null /*refname*/);
-	}
-
-	@Override
 	protected OrganizationsCommon updateItemInstance(OrganizationsCommon organizationsCommon) {
                             
             OrgTermGroupList termList = organizationsCommon.getOrgTermGroupList();
@@ -1074,7 +1086,8 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
 	@Override
 	protected void compareUpdatedItemInstances(OrganizationsCommon original,
-			OrganizationsCommon updated) throws Exception {
+			OrganizationsCommon updated,
+			boolean compareRevNumbers) throws Exception {
             
             OrgTermGroupList originalTermList = original.getOrgTermGroupList();
             Assert.assertNotNull(originalTermList);
@@ -1091,6 +1104,10 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(),
                 originalTerms.get(0).getTermDisplayName(),
                 "Value in updated record did not match submitted data.");
+            
+            if (compareRevNumbers == true) {
+            	Assert.assertEquals(original.getRev(), updated.getRev(), "Revision numbers should match.");
+            }
 	}
 
 	@Override
@@ -1144,5 +1161,4 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         		original.getDisplayName(),
                 "Display name in updated object did not match submitted data.");
 	}
-
 }

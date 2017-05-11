@@ -28,6 +28,8 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
+
 // FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
 
 /**
@@ -36,7 +38,7 @@ import javax.ws.rs.core.Response;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public class CollectionObjectClient extends AbstractCommonListPoxServiceClientImpl<CollectionObjectProxy> {
+public class CollectionObjectClient extends AbstractCommonListPoxServiceClientImpl<CollectionObjectProxy, CollectionobjectsCommon> {
 
     public static final String SERVICE_NAME = "collectionobjects";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
@@ -45,7 +47,15 @@ public class CollectionObjectClient extends AbstractCommonListPoxServiceClientIm
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
     public static final String SERVICE_COMMON_PART_NAME = SERVICE_NAME + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
 
-    @Override
+    public CollectionObjectClient() throws Exception {
+		super();
+	}
+
+    public CollectionObjectClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
+
+	@Override
     public String getServiceName() {
         return SERVICE_NAME;
     }

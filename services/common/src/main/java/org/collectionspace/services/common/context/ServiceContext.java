@@ -27,8 +27,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.common.CollectionSpaceResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.ValidatorHandler;
@@ -36,6 +39,7 @@ import org.collectionspace.services.common.security.SecurityContext;
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.RemoteClientConfig;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
 
 /**
@@ -95,6 +99,13 @@ public interface ServiceContext<IT, OT> {
      */
     public SecurityContext getSecurityContext();
 
+    /**
+     * Returns TRUE unless the "recordUpdates" query param is set with a value of either "false", "FALSE", or "0"
+     * If set to false, core schema values (i.e. updated-at, updated-by, etc) won't be changed on updates.
+     * @return
+     */
+    public boolean shouldUpdateCoreValues();
+    
     /**
      * getTimeoutSecs();
      */
@@ -243,6 +254,12 @@ public interface ServiceContext<IT, OT> {
      * @param map the map of service names to resource instances.
      */
     public void setResourceMap(ResourceMap map);
+    
+    /**
+     * 
+     * @param jaxsRsRequest - Keep track of the JAX-RS request information
+     */
+    public void setRequestInfo(Request jaxsRsRequest);
 
     /**
      * getPartsMetadata returns metadata for object parts used by the service
@@ -351,6 +368,44 @@ public interface ServiceContext<IT, OT> {
 	public RepositoryDomainType getRepositoryDomain();
 
 	public void setRepositoryDomain(RepositoryDomainType repositoryDomain);
+
+	public CollectionSpaceClient getClient() throws Exception;
+	
+	public CollectionSpaceClient getClient(String clientProperitesFilename) throws Exception;
+	
+	public CollectionSpaceClient getClient(RemoteClientConfig remoteClientConfig) throws Exception;
+
+    /**
+     * @return the JAX-RS resource of service for the current context.
+     * @throws Exception 
+     */
+    public CollectionSpaceResource<IT, OT> getResource() throws Exception;
+
+    /**
+     * @return the JAX-RS resource of service for the current context.
+     * @throws Exception 
+     */
+	public CollectionSpaceResource<IT, OT> getResource(
+			String serviceName) throws Exception;
+
+	/**
+	 * If this returns true, it means that the refname values in referencing objects (records that reference authority or vocabulary terms) will be updated
+	 * regardless of their current value.  This is sometimes needed when refname values become stale for one of several reasons.
+	 * @return
+	 */
+	public boolean shouldForceUpdateRefnameReferences();
+
+	/**
+	 * Check for a query parameter that indicates if we should force a sync even if the revision numbers indicate otherwise.
+	 * @return
+	 */
+	public boolean shouldForceSync();
+
+	/**
+	 * 
+	 * @return The JAX-RS request information
+	 */
+	Request getRequestInfo();
 }
 
 

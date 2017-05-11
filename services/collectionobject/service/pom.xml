@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.collectionobject</artifactId>
-        <version>4.3-SNAPSHOT</version>
+        <version>4.5-SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
@@ -87,13 +87,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-            <version>1.6.1</version>
-            <scope>provided</scope>
-        </dependency>
-        
         <!-- jboss -->
 
         <dependency>
@@ -133,21 +126,30 @@
         <finalName>collectionspace-services-collectionobject</finalName>
         <plugins>
         	<plugin>
-            <groupId>com.qmino</groupId>
-            <artifactId>miredot-maven-plugin</artifactId>
-            <version>1.3.1</version>
-            <executions>
-               <execution>
-                  <goals>
-                     <goal>restdoc</goal>
-                  </goals>
-               </execution>
-            </executions>
-            <configuration>
-				<licence>
-					UHJvamVjdHxvcmcuY29sbGVjdGlvbnNwYWNlLnNlcnZpY2VzLm9yZy5jb2xsZWN0aW9uc3BhY2Uuc2VydmljZXMuY29sbGVjdGlvbm9iamVjdC5zZXJ2aWNlfDIwMTktMDItMjh8dHJ1ZSNNQ3dDRkdHK29EM2hWTVRyckIveDVaWExNcWRBNWhyL0FoUXo2bkVKV1k1NjdabnFBelh6UFdiOW1iRnVIdz09
-				</licence>                <!-- insert other configuration here (optional) -->
-            </configuration>
+        	    <groupId>com.qmino</groupId>
+        	    <artifactId>miredot-plugin</artifactId>
+        	    <version>2.0.3</version>
+        	    <executions>
+        	        <execution>
+        	            <goals>
+        	                <goal>restdoc</goal>
+        	            </goals>
+        	        </execution>
+        	    </executions>
+        	    <configuration>
+        	        <organizationId>5427820b-5465-4a49-98fb-cb39ff772f23</organizationId>
+        	        <restModel>
+        	            <restFramework>
+        	                <name>jax-rs</name>
+        	            </restFramework>
+        	        </restModel>
+        	        <output>
+        	            <html>
+        	                <jsonDoc>Hidden</jsonDoc>
+        	            </html>
+        	        </output>
+        	        <!-- insert other configuration here (optional) -->
+        	    </configuration>
          </plugin>
         </plugins>
         <pluginManagement>
@@ -163,12 +165,8 @@
         						<pluginExecution>
         							<pluginExecutionFilter>
         								<groupId>com.qmino</groupId>
-        								<artifactId>
-        									miredot-maven-plugin
-        								</artifactId>
-        								<versionRange>
-        									[1.3.1,)
-        								</versionRange>
+        							    <artifactId>miredot-plugin</artifactId>
+        							    <versionRange>[2.0.3,)</versionRange>
         								<goals>
         									<goal>restdoc</goal>
         								</goals>

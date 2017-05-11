@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.location</artifactId>
-        <version>4.3-SNAPSHOT</version>
+        <version>4.5-SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
@@ -75,13 +75,6 @@
             <groupId>javax.security</groupId>
             <artifactId>jaas</artifactId>
             <version>1.0.01</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-            <version>1.6.1</version>
             <scope>provided</scope>
         </dependency>
         

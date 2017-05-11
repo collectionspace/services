@@ -163,6 +163,7 @@ public class AccountDocumentHandler
             AccountsCommon account = (AccountsCommon) obj;
             AccountListItem accListItem = new AccountListItem();
             accListItem.setScreenName(account.getScreenName());
+            accListItem.setUserid(account.getUserId());
             accListItem.setEmail(account.getEmail());
             accListItem.setStatus(account.getStatus());
             String id = account.getCsid();

@@ -25,23 +25,15 @@ package org.collectionspace.services.client.test;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ObjectExitClient;
 import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.objectexit.ObjectexitCommon;
-
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
-import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * ObjectExitServiceTest, carries out tests against a deployed and running ObjectExit Service. <p/>
@@ -65,9 +57,14 @@ public class ObjectExitServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
 	}
     
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new ObjectExitClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new ObjectExitClient(clientPropertiesFilename);
+	}
 
     @Override
     protected AbstractCommonList getCommonList(Response response) {
@@ -79,12 +76,12 @@ public class ObjectExitServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
     // ---------------------------------------------------------------
     
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
     	ObjectExitClient client = new ObjectExitClient();
     	return createObjectExitInstance(identifier);
     }
     
-    private PoxPayloadOut createObjectExitInstance(String exitNumber) {
+    private PoxPayloadOut createObjectExitInstance(String exitNumber) throws Exception {
         String identifier = "objectexitNumber-" + exitNumber;
         ObjectexitCommon objectexit = new ObjectexitCommon();
         objectexit.setExitNumber(identifier);
@@ -108,7 +105,7 @@ public class ObjectExitServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
 
 	@Override
 	protected PoxPayloadOut createInstance(String commonPartName,
-			String identifier) {
+			String identifier) throws Exception {
         PoxPayloadOut result = createObjectExitInstance(createIdentifier());
 		return result;
 	}

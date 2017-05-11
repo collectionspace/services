@@ -27,7 +27,9 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
+
 import org.collectionspace.services.common.invocable.InvocationContext;
+import org.collectionspace.services.report.ReportsCommon;
 
 /**
  * A ReportClient.
@@ -35,7 +37,7 @@ import org.collectionspace.services.common.invocable.InvocationContext;
  * @version $Revision:$
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
-public class ReportClient extends AbstractCommonListPoxServiceClientImpl<ReportProxy> {
+public class ReportClient extends AbstractCommonListPoxServiceClientImpl<ReportProxy, ReportsCommon> {
 
     public static final String SERVICE_NAME = "reports";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
@@ -53,7 +55,15 @@ public class ReportClient extends AbstractCommonListPoxServiceClientImpl<ReportP
     public static final String COMPILED_REPORT_EXTENSION = ".jasper";
     public static final String REPORT_DECSRIPTION_EXTENSION = ".jrxml";
 
-    @Override
+    public ReportClient() throws Exception {
+		super();
+	}
+
+    public ReportClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
+
+	@Override
     public String getServiceName() {
         return SERVICE_NAME;
     }

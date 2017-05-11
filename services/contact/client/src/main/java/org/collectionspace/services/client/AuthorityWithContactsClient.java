@@ -10,8 +10,8 @@ import org.jboss.resteasy.client.ClientResponse;
  * ILT - Authority item list type
  * P - Proxy type
  */
-public interface AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
-	extends AuthorityClient<AUTHORITY_ITEM_TYPE, P> {
+public interface AuthorityWithContactsClient<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
+	extends AuthorityClient<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P> {
     /**
      * Creates the contact.
      *

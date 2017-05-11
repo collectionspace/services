@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.collectionspace.services</groupId>
 		<artifactId>org.collectionspace.services.main</artifactId>
-		<version>4.3-SNAPSHOT</version>
+		<version>4.5-SNAPSHOT</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -37,6 +37,11 @@
 		<dependency>
 			<groupId>org.collectionspace.services</groupId>
 			<artifactId>org.collectionspace.services.relation.client</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.collectionspace.services</groupId>
+			<artifactId>org.collectionspace.services.account.client</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -151,14 +156,14 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
-			<artifactId>dbcp</artifactId>
-			<version>6.0.33</version>
+			<artifactId>tomcat-dbcp</artifactId>
+			<version>7.0.64</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
-			<artifactId>catalina</artifactId>
-			<version>6.0.33</version>
+			<artifactId>tomcat-catalina</artifactId>
+			<version>7.0.64</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -181,8 +186,6 @@
 			<version>1.0</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- <dependency> <groupId>dom4j</groupId> <artifactId>dom4j</artifactId> 
-			<version>1.6.1</version> <scope>provided</scope> </dependency> -->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -199,10 +202,6 @@
 		</dependency>
 
 		<!-- jboss -->
-		<dependency>
-			<groupId>org.jboss.resteasy</groupId>
-			<artifactId>jaxrs-api</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
 			<artifactId>resteasy-jaxrs</artifactId>
@@ -246,16 +245,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
-			<artifactId>nuxeo-platform-mimetype-api</artifactId>
-			<version>${nuxeo.platform.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.nuxeo.ecm.platform</groupId>
-			<artifactId>nuxeo-platform-mimetype-core</artifactId>
-			<version>${nuxeo.platform.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-platform-types-api</artifactId>
 			<version>${nuxeo.platform.version}</version>
 		</dependency>
@@ -282,13 +271,11 @@
 		<dependency>
 			<groupId>org.nuxeo.common</groupId>
 			<artifactId>nuxeo-common</artifactId>
-			<version>${nuxeo.core.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.runtime</groupId>
 			<artifactId>nuxeo-runtime</artifactId>
-			<version>${nuxeo.core.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
@@ -302,30 +289,25 @@
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-schema</artifactId>
-			<version>${nuxeo.core.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-storage-sql</artifactId>
-			<version>${nuxeo.core.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-storage-sql-ra</artifactId>
-			<version>${nuxeo.core.version}</version>
 		</dependency>
+		<!-- 
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-io</artifactId>
-			<version>${nuxeo.core.version}</version>
 		</dependency>
+		 -->
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-convert</artifactId>
-			<version>${nuxeo.core.version}</version>
 		</dependency>
-		<!-- <dependency> <groupId>org.nuxeo.ecm.core</groupId> <artifactId>nuxeo-core-facade</artifactId> 
-			<version>${nuxeo.core.version}</version> </dependency> -->
 		<dependency>
 			<groupId>org.nuxeo.runtime</groupId>
 			<artifactId>nuxeo-runtime-osgi</artifactId>
@@ -333,8 +315,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
+			<artifactId>nuxeo-opencmis-impl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-opencmis-bindings</artifactId>
-			<version>${nuxeo.core.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>jsr311-api</artifactId>
@@ -384,6 +369,25 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aop</artifactId>
 			<version>${spring.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.8.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+			<version>3.4</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.xmlunit</groupId>
+			<artifactId>xmlunit-core</artifactId>
+			<version>2.2.1</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

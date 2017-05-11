@@ -2,23 +2,24 @@ package org.collectionspace.services.nuxeo.client.java;
 
 import java.security.Principal;
 
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.Filter;
 import org.nuxeo.ecm.core.api.IterableQueryResult;
-import org.nuxeo.ecm.core.api.NoRollbackOnException;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.api.impl.LifeCycleFilter;
 import org.nuxeo.ecm.core.api.CoreSession;
+import org.nuxeo.runtime.transaction.TransactionHelper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CoreSessionWrapper implements CoreSessionInterface {
 
 	private CoreSession repoSession;
+	private boolean transactionSetForRollback = false;
 	
     /** The logger. */
     private static Logger logger = LoggerFactory.getLogger(CoreSessionWrapper.class);
@@ -37,11 +38,28 @@ public class CoreSessionWrapper implements CoreSessionInterface {
     			filter != null ? filter.toString() : "none", limit, offset, countTotal, query));
     }
     
-	
 	public CoreSessionWrapper(CoreSession repoSession) {
 		this.repoSession = repoSession;
 	}
 
+	/*
+	 * Mark this session's transaction for rollback only
+	 */
+	@Override
+    public void setTransactionRollbackOnly() {
+		TransactionHelper.setTransactionRollbackOnly();
+    	transactionSetForRollback = true;
+    }
+	
+	@Override
+    public boolean isTransactionMarkedForRollbackOnly() {
+		if (transactionSetForRollback != TransactionHelper.isTransactionMarkedRollback()) {
+			logger.error(String.format("Transaction status is in an inconsistent state.  Internal state is '%b'.  TransactionHelper statis is '%b'.",
+					transactionSetForRollback, TransactionHelper.isTransactionMarkedRollback()));
+		}
+    	return transactionSetForRollback;
+    }
+	
 	@Override
 	public 	CoreSession getCoreSession() {
 		return repoSession;
@@ -54,7 +72,12 @@ public class CoreSessionWrapper implements CoreSessionInterface {
     
     @Override
     public void close() throws Exception {
-    	repoSession.close();
+    	try {
+    		repoSession.close();
+    	} catch (Throwable t) {
+    		logger.error(String.format("Could not close session for repository '%s'.", this.repoSession.getRepositoryName()),
+    				t);
+    	}
     }
 
     /**
@@ -134,7 +157,6 @@ public class CoreSessionWrapper implements CoreSessionInterface {
      * @throws ClientException
      * @throws SecurityException
      */
-    @NoRollbackOnException
     @Override
     public DocumentModel getDocument(DocumentRef docRef) throws ClientException {
 	    return repoSession.getDocument(docRef);
@@ -142,12 +164,36 @@ public class CoreSessionWrapper implements CoreSessionInterface {
 
     @Override
     public DocumentModel saveDocument(DocumentModel docModel) throws ClientException {
-    	return repoSession.saveDocument(docModel);
+    	DocumentModel result = null;
+    	
+    	try {
+    		if (isTransactionMarkedForRollbackOnly() == false) {
+    			result = repoSession.saveDocument(docModel);
+    		} else {
+        		logger.trace(String.format("The repository session on thread '%d' has a transaction that is marked for rollback.",
+        				Thread.currentThread().getId()));
+        	}
+    	} catch (Throwable t) {
+    		setTransactionRollbackOnly();
+    		throw t;
+    	}
+    	
+    	return result;
     }
 
     @Override
     public void save() throws ClientException {
-    	repoSession.save();
+    	try {
+    		if (isTransactionMarkedForRollbackOnly() == false) {
+    			repoSession.save();
+    		} else {
+        		logger.trace(String.format("The repository session on thread '%d' has a transaction that is marked for rollback.",
+        				Thread.currentThread().getId()));
+        	}
+    	} catch (Throwable t) {
+    		setTransactionRollbackOnly();
+    		throw t;
+    	}
     }
 
     /**
@@ -158,7 +204,17 @@ public class CoreSessionWrapper implements CoreSessionInterface {
      */
     @Override
     public void saveDocuments(DocumentModel[] docModels) throws ClientException {
-    	repoSession.saveDocuments(docModels);
+    	try {
+	    	if (isTransactionMarkedForRollbackOnly() == false) {
+	    		repoSession.saveDocuments(docModels);
+	    	} else {
+        		logger.trace(String.format("The repository session on thread '%d' has a transaction that is marked for rollback.",
+        				Thread.currentThread().getId()));
+        	}
+    	} catch (Throwable t) {
+    		setTransactionRollbackOnly();
+    		throw t;
+    	}
     }
 
     /**
@@ -217,7 +273,6 @@ public class CoreSessionWrapper implements CoreSessionInterface {
      *         specified parent document is not a folder
      * @throws ClientException
      */
-    @NoRollbackOnException
     @Override
     public DocumentModelList getChildren(DocumentRef parent) throws ClientException {
     	return repoSession.getChildren(parent);

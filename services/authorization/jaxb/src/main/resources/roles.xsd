@@ -1,15 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-
-<!--
-    CollectionSpace default (security) authorization provider schema (XSD)
-
-    Entity(s)  : role
-    Used for:
-
-    $LastChangedRevision: 916 $
-    $LastChangedDate: 2009-11-05 16:59:20 -0800 (Thu, 05 Nov 2009) $
--->
-
 <xs:schema 
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
@@ -41,7 +30,7 @@
 	<xs:annotation>
 		<xs:appinfo>
 			<jaxb:globalBindings generateIsSetMethod="true" localScoping="toplevel">
-				<jaxb:serializable/>
+				<jaxb:serializable uid="1966"/>
 			</jaxb:globalBindings>
 		</xs:appinfo>
 	</xs:annotation>

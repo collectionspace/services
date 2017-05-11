@@ -67,7 +67,6 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 //import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
-import org.mortbay.log.Log;
 import org.nuxeo.ecm.core.io.ExportConstants;
 import org.nuxeo.common.collections.PrimitiveArrays;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -1444,7 +1443,7 @@ public class DocumentUtils {
 					try {
 						result = type.decode(dateVal);
 					} catch (Exception e) { // Nuxeo may not be able to decode dates like "July 11, 2001", so we'll try to convert it to ISO 8601 first
-						Log.debug(String.format(
+						logger.debug(String.format(
 								"Nuxeo could not decode date string '%s'.  CSpace will try to convert it to an ISO 8601 timestamp for Nuxeo first.", dateVal), e);
 					}
 					// All other date or date/time values must first converted

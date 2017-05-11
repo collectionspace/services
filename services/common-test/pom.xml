@@ -6,7 +6,7 @@
     <parent>
         <artifactId>org.collectionspace.services.main</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>4.3-SNAPSHOT</version>
+        <version>4.5-SNAPSHOT</version>
     </parent>
     <artifactId>org.collectionspace.services.common-test</artifactId>
     <name>services.common-test</name>
@@ -54,10 +54,6 @@
                     <artifactId>webserver</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>jaxrs-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>

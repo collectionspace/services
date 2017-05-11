@@ -23,9 +23,7 @@
  */
 package org.collectionspace.services.common;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -38,7 +36,6 @@ import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.config.ServiceConfigUtils;
-import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -50,15 +47,13 @@ import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRe
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.service.DocHandlerParams;
 import org.collectionspace.services.config.service.ListResultField;
-import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.description.ServiceDescription;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
-
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.util.HttpResponseCodes;
-
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 
@@ -94,14 +89,76 @@ public abstract class NuxeoBasedResource
         }
     }
     
+    //======================= REINDEX ====================================================
+    @GET
+    @Path("{csid}/index/{indexid}")
+    public Response reindex(
+            @Context Request request,    		
+            @Context UriInfo uriInfo,
+            @PathParam("csid") String csid,
+            @PathParam("indexid") String indexid) {
+    	uriInfo = new UriInfoWrapper(uriInfo);
+       	Response result = Response.status(Response.Status.OK).entity("Reindex complete.").type("text/plain").build();
+       	boolean success = false;
+       	
+        ensureCSID(csid, READ);
+        try {
+            RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(uriInfo);
+            DocumentHandler handler = createDocumentHandler(ctx);
+            success = getRepositoryClient(ctx).reindex(handler, csid, indexid);
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.REINDEX_FAILED, csid);
+        }
+        
+        if (success == false) {
+            Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.REINDEX_FAILED + ServiceMessages.resourceNotReindexedMsg(csid)).type("text/plain").build();
+            throw new CSWebApplicationException(response);
+        }
+       	
+       	return result;
+    }
+    
+    //======================= REINDEX ====================================================
+    @GET
+    @Path("index/{indexid}")
+    public Response reindex(
+            @Context Request request,
+            @Context UriInfo uriInfo,
+            @PathParam("indexid") String indexid) {
+    	uriInfo = new UriInfoWrapper(uriInfo);
+       	Response result = Response.noContent().build();
+       	boolean success = false;
+       	String docType = null;
+       	
+        try {
+            RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(uriInfo);
+            docType = ctx.getTenantQualifiedDoctype(); // this will used in the error message if an error occurs
+            DocumentHandler handler = createDocumentHandler(ctx);
+            success = getRepositoryClient(ctx).reindex(handler, indexid);
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.REINDEX_FAILED);
+        }
+        
+        if (success == false) {
+            Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.REINDEX_FAILED + ServiceMessages.resourceNotReindexedMsg(docType)).type("text/plain").build();
+            throw new CSWebApplicationException(response);
+        }
+       	
+       	return result;
+    }
+    
+    
     //======================= CREATE ====================================================
     
     @POST
     public Response create(
     		@Context ResourceMap resourceMap,
-    		@Context UriInfo ui,
+    		@Context UriInfo uriInfo,
             String xmlPayload) {
-        return this.create(null, resourceMap, ui, xmlPayload); 
+    	uriInfo = new UriInfoWrapper(uriInfo);
+        return this.create(null, resourceMap, uriInfo, xmlPayload);
     }
     
     public Response create(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, // REM: 8/13/2012 - Some sub-classes will override this method -e.g., MediaResource does.
@@ -154,33 +211,69 @@ public abstract class NuxeoBasedResource
     		@Context UriInfo uriInfo,
     		@PathParam("csid") String csid,
     		String xmlPayload) {
+    	uriInfo = new UriInfoWrapper(uriInfo);
         return this.update(null, resourceMap, uriInfo, csid, xmlPayload); 
     }
 
+    /**
+     * 
+     * @param parentCtx
+     * @param resourceMap
+     * @param uriInfo
+     * @param csid
+     * @param xmlPayload
+     * @return
+     */
     public byte[] update(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, // REM: 8/13/2012 - Some sub-classes will override this method -e.g., MediaResource does.
     		@Context ResourceMap resourceMap,
     		@Context UriInfo uriInfo,
     		@PathParam("csid") String csid,
     		String xmlPayload) {
         PoxPayloadOut result = null;
+        
         ensureCSID(csid, UPDATE);
         try {
             PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate, uriInfo);
-            ctx.setResourceMap(resourceMap);
-            if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
-            	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
-            }            
-            result = update(csid, theUpdate, ctx); //==> CALL implementation method, which subclasses may override.
+            result = update(parentCtx, resourceMap, uriInfo, csid, theUpdate);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED, csid);
         }
+        
         return result.getBytes();
+    }
+    
+    /**
+     * This method is used to synchronize data with the SAS (Shared Authority Server).
+     * 
+     * @param parentCtx
+     * @param resourceMap
+     * @param uriInfo
+     * @param csid
+     * @param theUpdate
+     * @return
+     * @throws Exception
+     */
+    public PoxPayloadOut update(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, // REM: 4/6/2016 - Some sub-classes will override this method -e.g., MediaResource does.
+    		ResourceMap resourceMap,
+    		UriInfo uriInfo,
+    		String csid,
+    		PoxPayloadIn theUpdate) throws Exception {
+    	PoxPayloadOut result = null;
+    	
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate, uriInfo);
+        ctx.setResourceMap(resourceMap);
+        if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
+        	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
+        	ctx.setProperties(parentCtx.getProperties()); // transfer all the parent properties to the current context
+        }            
+        result = update(csid, theUpdate, ctx); //==> CALL implementation method, which subclasses may override.
+    	
+    	return result;
     }
 
     /** Subclasses may override this overload, which gets called from #udpate(String,MultipartInput)   */
     protected PoxPayloadOut update(String csid,
-            PoxPayloadIn theUpdate,
+            PoxPayloadIn theUpdate, // not used in this method, but could be used by an overriding method
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
             throws Exception {
         DocumentHandler handler = createDocumentHandler(ctx);
@@ -238,15 +331,63 @@ public abstract class NuxeoBasedResource
     //======================= GET ====================================================
     @GET
     @Path("{csid}")
-    public byte[] get(
-            @Context Request request,    		
+    public Response get(
+            @Context Request request,
             @Context UriInfo uriInfo,
             @PathParam("csid") String csid) {
+    	uriInfo = new UriInfoWrapper(uriInfo);
         PoxPayloadOut result = null;
+        
+        try {
+            result = getResourceFromCsid(request, uriInfo, csid);
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);
+        }
+        
+        if (result == null) {
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
+            throw new CSWebApplicationException(response);
+        }        
+
+        return Response.ok(result.getBytes()).build();
+    }
+    
+    public PoxPayloadOut getResourceFromCsid(
+            Request request,
+            UriInfo uriInfo,
+            String csid) throws Exception {
+        PoxPayloadOut result = null;
+        
+        ensureCSID(csid, READ);
+        RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = 
+        		(RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(request, uriInfo);
+        result = get(csid, ctx);// ==> CALL an implementation method, which subclasses may override.
+
+        return result;
+    }    
+    
+    /**
+     * Call this method only from other resources (like the Service Groups resource) obtained from the global resource map (ResourceMap).  If the a parent
+     * context exists and it has an open Nuxeo repository session, we will use it; otherwise, we will create a new one.
+     * 
+     * @param parentCtx
+     * @param csid
+     * @return
+     */
+    public PoxPayloadOut getWithParentCtx(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
+    		String csid) {
+    	PoxPayloadOut result = null;
+    	
         ensureCSID(csid, READ);
         try {
-            RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(uriInfo);
+            RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext();
+            if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
+            	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
+            }
+            
             result = get(csid, ctx);// ==> CALL implementation method, which subclasses may override.
+            
             if (result == null) {
                 Response response = Response.status(Response.Status.NOT_FOUND).entity(
                         ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
@@ -256,7 +397,7 @@ public abstract class NuxeoBasedResource
             throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);
         }
 
-        return result.getBytes();
+    	return result;
     }
 
     protected PoxPayloadOut get(@PathParam("csid") String csid,
@@ -303,18 +444,19 @@ public abstract class NuxeoBasedResource
 
     //======================= GET without csid. List, search, etc. =====================================
     @GET
-    public AbstractCommonList getList(@Context UriInfo ui) {
+    public AbstractCommonList getList(@Context UriInfo uriInfo) {
+    	uriInfo = new UriInfoWrapper(uriInfo);
         AbstractCommonList list = null;
         
-        MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+        MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
         if (isGetAllRequest(queryParams) == false) {
             String orderBy = queryParams.getFirst(IClientQueryParams.ORDER_BY_PARAM);
             String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
             String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
             String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
-            list = search(ui, orderBy, keywords, advancedSearch, partialTerm);
+            list = search(uriInfo, orderBy, keywords, advancedSearch, partialTerm);
         } else {
-            list = getCommonList(ui);
+            list = getCommonList(uriInfo);
         }
         
         return list;
@@ -434,6 +576,7 @@ public abstract class NuxeoBasedResource
     public AuthorityRefList getAuthorityRefs(
             @PathParam("csid") String csid,
             @Context UriInfo uriInfo) {
+    	uriInfo = new UriInfoWrapper(uriInfo);
         AuthorityRefList authRefList = null;
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
@@ -498,31 +641,24 @@ public abstract class NuxeoBasedResource
     	
     	return result;
 	}
+    
+    @Override
+    public ServiceDescription getDescription(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
+    	ServiceDescription result = new ServiceDescription();
+    	
+    	result.setDocumentType(getDocType(ctx.getTenantId()));
+    	
+    	return result;
+    }
 	
     /*
      * ResourceBase create and update calls will set the resourceMap into the service context
      * for all inheriting resource classes. Just use ServiceContext.getResourceMap() to get
      * the map, and pass it in.
      */
-    public static DocumentModel getDocModelForRefName(CoreSessionInterface repoSession, String refName, ResourceMap resourceMap) 
+    public static DocumentModel getDocModelForRefName(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String refName, ResourceMap resourceMap) 
    			throws Exception, DocumentNotFoundException {
-    	RefName.AuthorityItem item = RefName.AuthorityItem.parse(refName);
-    	if(item != null) {
-        	NuxeoBasedResource resource = resourceMap.get(item.inAuthority.resource);
-        	return resource.getDocModelForAuthorityItem(repoSession, item);
-    	}
-    	RefName.Authority authority = RefName.Authority.parse(refName);
-    	// Handle case of objects refNames, which must be csid based.
-    	if(authority != null && !Tools.isEmpty(authority.csid)) {
-        	NuxeoBasedResource resource = resourceMap.get(authority.resource);
-            // Ensure we have the right context.
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = 
-            		resource.createServiceContext(authority.resource);
-            // HACK - this really must be moved to the doc handler, not here. No Nuxeo specific stuff here!
-            DocumentModel docModel = NuxeoUtils.getDocFromCsid(ctx, repoSession, authority.csid);
-            return docModel;
-    	}
-    	return null;
+    	return NuxeoUtils.getDocModelForRefName(ctx, refName, resourceMap);
     }
 
     // This is ugly, but prevents us parsing the refName twice. Once we make refName a little more
@@ -535,94 +671,6 @@ public abstract class NuxeoBasedResource
 
     public DocumentModel getDocModelForRefName(CoreSessionInterface repoSession, String refName) 
    			throws Exception, DocumentNotFoundException {
-    	return getDocModelForAuthorityItem(repoSession, RefName.AuthorityItem.parse(refName));
+    	return getDocModelForAuthorityItem(repoSession, RefName.AuthorityItem.parse(refName, true));
     }
-    
-    protected String getDocType(String tenantId) {
-        return getDocType(tenantId, getServiceName());
-    }
-
-    /**
-     * Returns the Nuxeo document type associated with a specified service, within a specified tenant.
-     * 
-     * @param tenantId a tenant ID
-     * @param serviceName a service name
-     * @return the Nuxeo document type associated with that service and tenant.
-     */
-    // FIXME: This method may properly belong in a different services package or class.
-    // Also, we need to check for any existing methods that may duplicate this one.
-    protected String getDocType(String tenantId, String serviceName) {
-        String docType = "";
-        if (Tools.isBlank(tenantId)) {
-            return docType;
-        }
-        ServiceBindingType sb = getTenantBindingsReader().getServiceBinding(tenantId, serviceName);
-        if (sb == null) {
-            return docType;
-        }
-        docType = sb.getObject().getName(); // Reads the Nuxeo Document Type from tenant bindings configuration
-        return docType;
-    }
-    
-    /**
-     * Returns a UriRegistry entry: a map of tenant-qualified URI templates
-     * for the current resource, for all tenants
-     * 
-     * @return a map of URI templates for the current resource, for all tenants
-     */
-    public Map<UriTemplateRegistryKey,StoredValuesUriTemplate> getUriRegistryEntries() {
-        Map<UriTemplateRegistryKey,StoredValuesUriTemplate> uriRegistryEntriesMap =
-                new HashMap<UriTemplateRegistryKey,StoredValuesUriTemplate>();
-        List<String> tenantIds = getTenantBindingsReader().getTenantIds();
-        for (String tenantId : tenantIds) {
-                uriRegistryEntriesMap.putAll(getUriRegistryEntries(tenantId, getDocType(tenantId), UriTemplateFactory.RESOURCE));
-        }
-        return uriRegistryEntriesMap;
-    }
-    
-    /**
-     * Returns a UriRegistry entry: a map of tenant-qualified URI templates
-     * for the current resource, for a specified tenants
-     * 
-     * @return a map of URI templates for the current resource, for a specified tenant
-     */
-    protected Map<UriTemplateRegistryKey,StoredValuesUriTemplate> getUriRegistryEntries(String tenantId,
-            String docType, UriTemplateFactory.UriTemplateType type) {
-        Map<UriTemplateRegistryKey,StoredValuesUriTemplate> uriRegistryEntriesMap =
-                new HashMap<UriTemplateRegistryKey,StoredValuesUriTemplate>();
-        UriTemplateRegistryKey key;
-        if (Tools.isBlank(tenantId) || Tools.isBlank(docType)) {
-            return uriRegistryEntriesMap;
-        }
-        key = new UriTemplateRegistryKey();
-        key.setTenantId(tenantId);
-        key.setDocType(docType); 
-        uriRegistryEntriesMap.put(key, getUriTemplate(type));
-        return uriRegistryEntriesMap;
-    }
-    
-    /**
-     * Returns a URI template of the appropriate type, populated with the
-     * current service name as one of its stored values.
-     *      * 
-     * @param type a URI template type
-     * @return a URI template of the appropriate type.
-     */
-    protected StoredValuesUriTemplate getUriTemplate(UriTemplateFactory.UriTemplateType type) {
-        Map<String,String> storedValuesMap = new HashMap<String,String>();
-        storedValuesMap.put(UriTemplateFactory.SERVICENAME_VAR, getServiceName());
-        StoredValuesUriTemplate template =
-                UriTemplateFactory.getURITemplate(type, storedValuesMap);
-        return template;
-    }
-
-    /**
-     * Returns a reader for reading values from tenant bindings configuration
-     * 
-     * @return a tenant bindings configuration reader
-     */
-    protected TenantBindingConfigReaderImpl getTenantBindingsReader() {
-        return ServiceMain.getInstance().getTenantBindingConfigReader();
-    }
-    
 }

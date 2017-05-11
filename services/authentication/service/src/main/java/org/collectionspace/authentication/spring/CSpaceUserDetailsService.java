@@ -43,43 +43,74 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.collectionspace.authentication.spring;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
-import org.springframework.dao.DataAccessException;
+import javax.security.auth.login.AccountException;
+import javax.security.auth.login.AccountNotFoundException;
+
+import org.collectionspace.authentication.CSpaceTenant;
+import org.collectionspace.authentication.CSpaceUser;
+import org.collectionspace.authentication.realm.CSpaceRealm;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
- * A CollectionSpace UserDetailsService for spring
- * mockup code to cheat spring config reader...not used by Spring JaasAuthenticationProvider
+ * A Spring UserDetailsService for CollectionSpace.
  */
-//FIXME remove test/mockup code
 public class CSpaceUserDetailsService implements UserDetailsService {
+    private CSpaceRealm realm = null;
 
-    private Map<String, User> users = new HashMap<String, User>();
-    private List<GrantedAuthority> auths = AuthorityUtils.createAuthorityList("ROLE_USER");
-
-    public CSpaceUserDetailsService() {
-        users.put("test", new User("test", "", true, true, true, true, auths));
+    public CSpaceUserDetailsService(CSpaceRealm realm) {
+        this.realm = realm;
     }
 
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException {
-        if (users.get(username) == null) {
-            throw new UsernameNotFoundException("User not found: " + username);
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        String password = null;
+        Set<CSpaceTenant> tenants = null;
+        Set<GrantedAuthority> grantedAuthorities = null;
+        
+        try {
+            password = realm.getPassword(username);
+            tenants = getTenants(username);
+            grantedAuthorities = getAuthorities(username);
         }
-
-        return users.get(username);
+        catch (AccountNotFoundException e) {
+            throw new UsernameNotFoundException(e.getMessage(), e);
+        }
+        catch (AccountException e) {
+            throw new AuthenticationServiceException(e.getMessage(), e);
+        }
+        
+        return
+            new CSpaceUser(
+                username,
+                password,
+                tenants,
+                grantedAuthorities);
+    }
+    
+    protected Set<GrantedAuthority> getAuthorities(String username) throws AccountException {
+        Set<String> roles = realm.getRoles(username);
+        Set<GrantedAuthority> authorities = new LinkedHashSet<GrantedAuthority>(roles.size());
+        
+        for (String role : roles) {
+            authorities.add(new SimpleGrantedAuthority(role));
+        }
+        
+        return authorities;
+    }
+    
+    protected Set<CSpaceTenant> getTenants(String username) throws AccountException {
+        Set<CSpaceTenant> tenants = realm.getTenants(username);
+        
+        return tenants;
     }
 }

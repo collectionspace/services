@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:permission_role xmlns:ns2="http://collectionspace.org/services/authorization">
+    <permission>
+        <permissionId>1-objectexit-RL</permissionId>
+        <resourceName>objectexit</resourceName>
+    </permission>    
+    <permission>
+        <permissionId>1-batch-CRUDL</permissionId>
+        <resourceName>batch</resourceName>
+    </permission>
+    <role>
+        <roleId>${createRole.CSID}</roleId>
+        <roleName>ROLE_1_BIRD</roleName>
+    </role>
+</ns2:permission_role>

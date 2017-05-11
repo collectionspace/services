@@ -22,25 +22,20 @@
  */
 package org.collectionspace.services.client.test;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.ServiceGroupClient;
 import org.collectionspace.services.client.ServiceGroupProxy;
-import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.servicegroup.ServicegroupsCommon;
 
-import org.jboss.resteasy.client.ClientResponse;
+import javax.ws.rs.core.Response;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,9 +62,14 @@ public class ServiceGroupServiceTest extends BaseServiceTest<AbstractCommonList>
 	}
     
     @Override
-    protected CollectionSpaceClient<AbstractCommonList, PoxPayloadOut, String, ServiceGroupProxy> getClientInstance() {
+    protected CollectionSpaceClient<AbstractCommonList, PoxPayloadOut, String, ServiceGroupProxy> getClientInstance() throws Exception {
         return new ServiceGroupClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new ServiceGroupClient(clientPropertiesFilename);
+	}
 
     @Override
     protected AbstractCommonList getCommonList(Response response) {

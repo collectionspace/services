@@ -15,7 +15,7 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
-import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
+import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
 
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -52,7 +52,7 @@ public class RelationUtils {
         // relations_common:subjectRefName = 'urn:cspace:core.collectionspace.org:placeauthorities:name(place):item:name(Amystan1348082103923)\'Amystan\''"
         String query = String.format("%s:%s = '%s'", IRelationsManager.SERVICE_COMMONPART_NAME, targetField, escapedRefName);
 
-        RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl) repoClient;
+        RepositoryClientImpl nuxeoRepoClient = (RepositoryClientImpl) repoClient;
         DocumentWrapper<DocumentModelList> docListWrapper = nuxeoRepoClient.findDocs(ctx, repoSession,
                 docTypes, query, orderByClause, pageSize, pageNum, computeTotal);
         DocumentModelList docList = docListWrapper.getWrappedObject();

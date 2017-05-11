@@ -24,13 +24,13 @@
 package org.collectionspace.services.conservation.nuxeo;
 
 import org.collectionspace.services.conservation.ConservationCommon;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 
 /** ConservationDocumentModelHandler
  *  $LastChangedRevision$
  *  $LastChangedDate$
  */
 public class ConservationDocumentModelHandler
-        extends DocHandlerBase<ConservationCommon> {
+        extends NuxeoDocumentModelHandler<ConservationCommon> {
 }
 

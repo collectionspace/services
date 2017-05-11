@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- 
+    Valid modes - {"single", "list", "group", "nocontext"}
+-->
+<ns2:invocationContext xmlns:ns2="http://collectionspace.org/services/common/invocable" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <mode>mode0</mode>
+    <updateCoreValues>updateCoreValues0</updateCoreValues>
+    <docType>docType0</docType>
+    <singleCSID>singleCSID0</singleCSID>
+    <groupCSID>groupCSID0</groupCSID>
+    <listCSIDs>
+        <csid>csid0</csid>
+        <csid>csid1</csid>
+        <csid>csid2</csid>
+    </listCSIDs>
+    <params>
+        <param>
+        </param>
+        <param>
+        </param>
+        <param>
+        </param>
+    </params>
+</ns2:invocationContext>

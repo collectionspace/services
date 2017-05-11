@@ -16,8 +16,10 @@ import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.collectionspace.authentication.AuthN;
+import org.collectionspace.services.client.XmlTools;
 import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
@@ -35,12 +37,16 @@ import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.ServiceConfig;
 import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.EventListenerConfig;
+import org.collectionspace.services.config.tenant.EventListenerConfigurations;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.services.config.types.PropertyItemType;
 import org.collectionspace.services.config.types.PropertyType;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 import org.collectionspace.services.nuxeo.client.java.TenantRepository;
+import org.collectionspace.services.nuxeo.listener.CSEventListener;
+import org.collectionspace.services.nuxeo.listener.AbstractCSEventListenerImpl;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.dom4j.Document;
 import org.slf4j.Logger;
@@ -53,7 +59,20 @@ import org.slf4j.LoggerFactory;
  */
 public class ServiceMain {
 
-    final Logger logger = LoggerFactory.getLogger(ServiceMain.class);
+    final static Logger logger = LoggerFactory.getLogger(ServiceMain.class);
+	private static final int PRIMARY_REPOSITORY_DOMAIN = 0;
+
+    /**
+     * For some reason, we have trouble getting logging from this class directed to
+     * the tomcat/catalina console log file.  So we do it explicitly with this method.
+     * 
+     * @param str
+     */
+    private static void mirrorToStdOut(String str) {
+    	System.out.println(str);
+    	ServiceMain.logger.info(str);
+    }
+
     /**
      * volatile is used here to assume about ordering (post JDK 1.5)
      */
@@ -70,11 +89,7 @@ public class ServiceMain {
     private ServicesConfigReaderImpl servicesConfigReader;
     private TenantBindingConfigReaderImpl tenantBindingConfigReader;
     private UriTemplateRegistry uriTemplateRegistry = new UriTemplateRegistry();
-    
-    private static final String COMPONENT_EXTENSION_XPATH = "/component/extension[@point='%s']";
-    private static final String DATASOURCE_EXTENSION_POINT_XPATH = String.format(COMPONENT_EXTENSION_XPATH, "datasources");
-    private static final String REPOSITORY_EXTENSION_POINT_XPATH = String.format(COMPONENT_EXTENSION_XPATH, "repository");
-    
+        
     private static final String DROP_DATABASE_SQL_CMD = "DROP DATABASE";
     private static final String DROP_DATABASE_IF_EXISTS_SQL_CMD = DROP_DATABASE_SQL_CMD + " IF EXISTS %s;";
     private static final String DROP_USER_SQL_CMD = "DROP USER";
@@ -163,6 +178,7 @@ public class ServiceMain {
         // Create or update Nuxeo's per-repository configuration files.
         createOrUpdateNuxeoDatasourceConfigFiles();
         createOrUpdateNuxeoRepositoryConfigFiles();
+        createOrUpdateNuxeoElasticsearchConfigFiles();
         
         // Create the Nuxeo-managed databases, along with the requisite
         // access rights to each.
@@ -174,27 +190,35 @@ public class ServiceMain {
         String[] dataSourceNames = {JDBCTools.NUXEO_DATASOURCE_NAME, JDBCTools.NUXEO_READER_DATASOURCE_NAME};
         updateInitializationScript(getNuxeoDatabasesInitScriptFilename(),
                 dbsCheckedOrCreated, dataSourceNames);
-
+        
         //
         // Start up and initialize our embedded Nuxeo instance.
         //
         if (getClientType().equals(ClientType.JAVA)) {
             nuxeoConnector = NuxeoConnectorEmbedded.getInstance();
+            mirrorToStdOut("\nStarting Nuxeo platform...");
             nuxeoConnector.initialize(
             		getServerRootDir(),
             		getServicesConfigReader().getConfiguration().getRepositoryClient(),
             		ServiceMain.servletContext);
+            mirrorToStdOut("Nuxeo platform started successfully.\n");
         } else {
         	//
         	// Exit if we don't have the correct/known client type
         	//
         	throw new RuntimeException("Unknown CollectionSpace services client type: " + getClientType());
         }
+        
+        //
+        //
+        //
+        initializeEventListeners();        
+                
         //
         // Create all the default user accounts and permissions.  Since some of our "cspace" database config files
         // for Spring need to be created at build time, the "cspace" database already will be suffixed with the
         // correct 'cspaceInstanceId' so we don't need to pass it to the JDBCTools methods.
-        //
+        //        
 		try {
 			AuthorizationCommon.createDefaultWorkflowPermissions(tenantBindingConfigReader);
 			String cspaceDatabaseName = getCspaceDatabaseName();
@@ -216,8 +240,127 @@ public class ServiceMain {
         	logger.error("handlePostNuxeoInitDBTasks failed with exception(s): " + e.getLocalizedMessage(), e);
         }
         */
+		showTenantStatus();
     }
+        
+    /**
+     * Returns the primary repository name for a tenant -there's usually just one.
+     * @param tenantBinding
+     * @return
+     * @throws InstantiationException
+     */
+    
+	protected String getPrimaryRepositoryName(TenantBindingType tenantBinding) throws InstantiationException {
+    	String result = "default";
+    	
+    	List<RepositoryDomainType> repositoryDomainList = tenantBinding.getRepositoryDomain();
+    	if (repositoryDomainList != null && repositoryDomainList.isEmpty() == false) {
+    		String repositoryName = repositoryDomainList.get(PRIMARY_REPOSITORY_DOMAIN).getRepositoryName();
+    		if (repositoryName != null && !repositoryName.isEmpty()) {
+    			result = repositoryName;
+    		}
+    	} else {
+    		String msg = String.format("Tenant bindings for '%s' is missing a repositoryDomain element in its bindings file.",
+    				tenantBinding.getName());
+    		logger.error(msg);
+    		throw new InstantiationException(msg);
+    	}
+    	
+    	return result;
+    }
+    
+    /**
+     * Initialize the event listeners.  We're essentially registering listeners with tenants.  This ensures that listeners ignore events
+     * caused by other tenants.
+     */
+    private void initializeEventListeners() {
+    	Hashtable<String, TenantBindingType> tenantBindings = this.tenantBindingConfigReader.getTenantBindings();
+    	
+        for (TenantBindingType tenantBinding : tenantBindings.values()) {
+        	EventListenerConfigurations eventListenerConfigurations = tenantBinding.getEventListenerConfigurations();
+        	if (eventListenerConfigurations != null) {
+        		List<EventListenerConfig> eventListenerConfigList = eventListenerConfigurations.getEventListenerConfig();
+                ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        		for (EventListenerConfig eventListenerConfig : eventListenerConfigList) {
+        			String clazz = eventListenerConfig.getClassName().trim();
+        			if (clazz.isEmpty() == false) {
+	                    try {
+	        	            Class<?> c = tccl.loadClass(clazz);
+	        	            if (CSEventListener.class.isAssignableFrom(c)) {
+	        	            	CSEventListener listener = (AbstractCSEventListenerImpl) c.newInstance();
+	        	            	listener.register(getPrimaryRepositoryName(tenantBinding), eventListenerConfig);  // Register the listener with a tenant using its repository name
+	        	            	if (logger.isInfoEnabled()) {
+	        	            		String msg = String.format("Event Listener - Success: Tenant '%30s'\tActivated listener %s:%s",
+	        	            				tenantBinding.getName(), eventListenerConfig.getId(), clazz);
+	        	            		logger.info(msg);
+	        	            	}
+	        	            }
+	                    } catch (ClassNotFoundException e) {
+	                    	String msg = String.format("Event Listener - FAILURE: Tenant '%30s'\tFailed to find event listener %s:%s",
+	                    			tenantBinding.getName(), eventListenerConfig.getId(), clazz);
+	                    	logger.warn(msg);
+	                    	logger.trace(msg, e);
+	                    	failIfRequired(eventListenerConfig);
+	                    } catch (InstantiationException e) {
+	                    	String msg = String.format("Event Listener - FAILURE: Tenant '%30s'\tFailed to instantiate event listener %s:%s",
+	                    			tenantBinding.getName(), eventListenerConfig.getId(), clazz);
+	                    	logger.warn(msg);
+	                    	logger.trace(msg, e);
+	                    	failIfRequired(eventListenerConfig);
+						} catch (IllegalAccessException e) {
+	                    	String msg = String.format("Event Listener - FAILURE: Tenant '%30s'\tIllegal access to event listener %s:%s",
+	                    			tenantBinding.getName(), eventListenerConfig.getId(), clazz);
+	                    	logger.warn(msg);
+	                    	logger.trace(msg, e);
+	                    	failIfRequired(eventListenerConfig);
+						}
+        			}
+        		}
+        	}
+        	logger.info("\n");
+        }
+	}
 
+	private void failIfRequired(EventListenerConfig eventListenerConfig) {
+		if (eventListenerConfig.isRequired() == true) {
+			throw new RuntimeException(String.format("Required event listener '%s' missing or could not be instantiated.", eventListenerConfig.getId()));
+		}
+		
+	}
+
+	private void showTenantStatus() {
+    	Hashtable<String,TenantBindingType> tenantBindingsList = tenantBindingConfigReader.getTenantBindings(true);
+    	mirrorToStdOut("++++++++++++++++ Summary - CollectionSpace tenant status. ++++++++++++++++++++++++");
+    	String headerTemplate = "%10s %10s %30s %60s %10s";
+    	String headerUnderscore = String.format(headerTemplate,
+    			"______",
+    			"__",
+    			"____",
+    			"____________",
+    			"_______");
+    	String header = String.format(headerTemplate,
+    			"Status",
+    			"ID",
+    			"Name",
+    			"Display Name",
+    			"Version");
+    	mirrorToStdOut(header);
+    	mirrorToStdOut(headerUnderscore);
+    			
+    	for (String tenantId : tenantBindingsList.keySet()) {
+    		TenantBindingType tenantBinding = tenantBindingsList.get(tenantId);
+    		String statusLine = String.format(headerTemplate,
+    				tenantBinding.isCreateDisabled() ? "Disabled" : "Active",
+    				tenantBinding.getId(),
+    				tenantBinding.getName(),
+    				tenantBinding.getDisplayName(),
+    				tenantBinding.getVersion());
+    		mirrorToStdOut(statusLine);
+    	}
+    	// footer
+    	mirrorToStdOut("++++++++++++++++ ........................................ ++++++++++++++++++++++++");
+    }
+    
     /**
      * release releases all resources occupied by service layer infrastructure
      * but not necessarily those occupied by individual services
@@ -339,8 +482,8 @@ public class ServiceMain {
                     if (Tools.isEmpty(initHandlerClassname)) {
                         continue;
                     }
-                    if (logger.isInfoEnabled()) {
-                        logger.info(String.format("Firing post-init handler %s ...", initHandlerClassname));
+                    if (ServiceMain.logger.isTraceEnabled()) {
+                    	ServiceMain.logger.trace(String.format("Firing post-init handler %s ...", initHandlerClassname));
                     }
 
                     List<org.collectionspace.services.config.service.InitHandler.Params.Field>
@@ -417,13 +560,21 @@ public class ServiceMain {
     }
     
     private String getNuxeoProtoConfigFilename() {
-        return JEEServerDeployment.NUXEO_PROTOTYPE_CONFIG_FILENAME;
+        return JEEServerDeployment.NUXEO_PROTOTYPE_REPO_CONFIG_FILENAME;
     }
     
     private String getNuxeoProtoDatasourceFilename() {
         return JEEServerDeployment.NUXEO_PROTOTYPE_DATASOURCE_FILENAME;
-    }    
+    }
     
+    private String getNuxeoProtoElasticsearchConfigFilename() {
+        return JEEServerDeployment.NUXEO_PROTO_ELASTICSEARCH_CONFIG_FILENAME;
+    }    
+
+    private String getNuxeoProtoElasticsearchExtensionFilename() {
+        return JEEServerDeployment.NUXEO_PROTO_ELASTICSEARCH_EXTENSION_FILENAME;
+    }    
+
     private String getDatabaseScriptsPath() {
         DatabaseProductType dbType;
         String databaseProductName;
@@ -501,41 +652,42 @@ public class ServiceMain {
 
         // First check and create the roles as needed. (nuxeo and reader)
         for (TenantBindingType tenantBinding : tenantBindings.values()) {
-                String tId = tenantBinding.getId();
-                String tName = tenantBinding.getName();
-                List<RepositoryDomainType> repoDomainList = tenantBinding.getRepositoryDomain();
-                for (RepositoryDomainType repoDomain : repoDomainList) {
-                        String repoDomainName = repoDomain.getName();
-                        String repositoryName = repoDomain.getRepositoryName();
-                        String cspaceInstanceId = getCspaceInstanceId();
-                        String dbName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
-                        if (nuxeoDBsChecked.contains(dbName)) {
-                                if (logger.isDebugEnabled()) {
-                                        logger.debug("Another user of db: " + dbName + ": Repo: " + repoDomainName
-                                                        + " and tenant: " + tName + " (id:" + tId + ")");
-                                }
-                        } else {
-                                if (logger.isDebugEnabled()) {
-                                        logger.debug("Need to prepare db: " + dbName + " for Repo: " + repoDomainName
-                                                        + " and tenant: " + tName + " (id:" + tId + ")");
-                                }
-                                boolean dbExists = JDBCTools.hasDatabase(dbType, dbName);
-                                if (dbExists) {
-                                        if (logger.isDebugEnabled()) {
-                                                logger.debug("Database: " + dbName + " already exists.");
-                                        }
-                                } else {
-                                        // Create the user as needed
-                                        JDBCTools.createNewDatabaseUser(JDBCTools.CSADMIN_DATASOURCE_NAME, repositoryName, cspaceInstanceId, dbType, nuxeoUser, nuxeoPW);
-                                        if (readerUser != null) {
-                                            JDBCTools.createNewDatabaseUser(JDBCTools.CSADMIN_DATASOURCE_NAME, repositoryName, cspaceInstanceId, dbType, readerUser, readerPW);
-                                        }
-                                        // Create the database
-                                        createDatabaseWithRights(dbType, dbName, nuxeoUser, nuxeoPW, readerUser, readerPW);
-                                }
-                                nuxeoDBsChecked.add(dbName);
+            String tId = tenantBinding.getId();
+            String tName = tenantBinding.getName();
+            
+            List<RepositoryDomainType> repoDomainList = tenantBinding.getRepositoryDomain();
+            for (RepositoryDomainType repoDomain : repoDomainList) {
+                String repoDomainName = repoDomain.getName();
+                String repositoryName = repoDomain.getRepositoryName();
+                String cspaceInstanceId = getCspaceInstanceId();
+                String dbName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
+                if (nuxeoDBsChecked.contains(dbName)) {
+                    if (logger.isDebugEnabled()) {
+                            logger.debug("Another user of db: " + dbName + ": Repo: " + repoDomainName
+                                            + " and tenant: " + tName + " (id:" + tId + ")");
+                    }
+                } else {
+                    if (logger.isDebugEnabled()) {
+                            logger.debug("Need to prepare db: " + dbName + " for Repo: " + repoDomainName
+                                            + " and tenant: " + tName + " (id:" + tId + ")");
+                    }
+                    boolean dbExists = JDBCTools.hasDatabase(dbType, dbName);
+                    if (dbExists) {
+                        if (logger.isDebugEnabled()) {
+                                logger.debug("Database: " + dbName + " already exists.");
                         }
-                } // Loop on repos for tenant
+                    } else {
+                        // Create the user as needed
+                        JDBCTools.createNewDatabaseUser(JDBCTools.CSADMIN_DATASOURCE_NAME, repositoryName, cspaceInstanceId, dbType, nuxeoUser, nuxeoPW);
+                        if (readerUser != null) {
+                            JDBCTools.createNewDatabaseUser(JDBCTools.CSADMIN_DATASOURCE_NAME, repositoryName, cspaceInstanceId, dbType, readerUser, readerPW);
+                        }
+                        // Create the database
+                        createDatabaseWithRights(dbType, dbName, nuxeoUser, nuxeoPW, readerUser, readerPW);
+                    }
+                    nuxeoDBsChecked.add(dbName);
+                }
+            } // Loop on repos for tenant
         } // Loop on tenants
                 
         return nuxeoDBsChecked;
@@ -714,7 +866,7 @@ public class ServiceMain {
             serverRootDir = "."; //assume server is started from server root, e.g. server/cspace
             String msg = String.format("System property '%s' was not set.  Using '%s' instead.",
             		SERVER_HOME_PROPERTY, serverRootDir);
-            logger.warn(msg);
+            mirrorToStdOut(msg);
         }
     }
 
@@ -747,6 +899,14 @@ public class ServiceMain {
         return tenantBindingConfigReader;
     }
     
+    public ResourceMap getJaxRSResourceMap() {
+        ResourceMap result;
+        
+        result = ResteasyProviderFactory.getContextData(ResourceMap.class);
+        
+        return result;
+    }
+    
     /**
      *  Populate a registry of URI templates by querying each resource
      *  for its own entries in the registry.
@@ -756,15 +916,15 @@ public class ServiceMain {
      */
     private synchronized void populateUriTemplateRegistry() {
        if (uriTemplateRegistry.isEmpty()) {
-            NuxeoBasedResource resource = null;
-            ResourceMap resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
-            for (Map.Entry<String, NuxeoBasedResource> entry : resourceMap.entrySet()) {
+    	   CollectionSpaceResource<?, ?> resource = null;
+            ResourceMap resourceMap = getJaxRSResourceMap();
+            Set<Map.Entry<String, CollectionSpaceResource<?, ?>>> entrySet = resourceMap.entrySet();
+            for (Map.Entry<String, CollectionSpaceResource<?, ?>> entry : entrySet) {
                 resource = entry.getValue();
                 Map<UriTemplateRegistryKey, StoredValuesUriTemplate> entries =
                         resource.getUriRegistryEntries();
                 uriTemplateRegistry.putAll(entries);
             }
-
             // FIXME: Contacts itself should not have an entry in the URI template registry;
             // there should be a Contacts entry in that registry only for use in
             // building URIs for resources that have contacts as a sub-resource
@@ -798,8 +958,8 @@ public class ServiceMain {
 		}
 
 		if (logger.isInfoEnabled()) {
-			logger.info("Found and can read prototype Nuxeo config file at path %s",
-					prototypeNuxeoDatasourceFile.getAbsolutePath());
+			logger.info(String.format("Using prototype Nuxeo server configuration file at path %s",
+					prototypeNuxeoDatasourceFile.getAbsolutePath()));
 		}
 
 		//
@@ -842,6 +1002,104 @@ public class ServiceMain {
 			}
 		}
 	}
+	
+	private File getProtoElasticsearchConfigFile() throws Exception {
+		File result = new File(getCspaceServicesConfigDir() + File.separator
+				+ getNuxeoProtoElasticsearchConfigFilename());
+		// FIXME: Consider checking for the presence of existing configuration
+		// files, rather than always failing outright if the prototype file for
+		// creating new or updated files can't be located.
+		if (result.canRead() == false) {
+			String msg = String
+					.format("Could not find and/or read the prototype Elasticsearch config file '%s'. "
+							+ "Please redeploy this file by running 'ant deploy' from the Services layer source code's '3rdparty/nuxeo' module.",
+							result.getCanonicalPath());
+			throw new RuntimeException(msg);
+		}
+
+		if (logger.isInfoEnabled()) {
+			logger.info(String.format(String.format("Using the prototype Elasticsearch configuration file at path '%s'.",
+					result.getAbsolutePath())));
+		}
+
+		return result;
+	}
+	
+	private File getProtoElasticsearchExtensionFile() throws Exception {
+		File result = new File(getCspaceServicesConfigDir() + File.separator
+				+ getNuxeoProtoElasticsearchExtensionFilename());
+		// FIXME: Consider checking for the presence of existing configuration
+		// files, rather than always failing outright if the prototype file for
+		// creating new or updated files can't be located.
+		if (result.canRead() == false) {
+			String msg = String
+					.format("Could not find and/or read the prototype Elasticsearch extension file '%s'. "
+							+ "Please redeploy this file by running 'ant deploy' from the Services layer source code's '3rdparty/nuxeo' module.",
+							result.getCanonicalPath());
+			throw new RuntimeException(msg);
+		}
+
+		if (logger.isInfoEnabled()) {
+			logger.info(String.format("Using the prototype Elasticsearch extension file at path %s",
+					result.getAbsolutePath()));
+		}
+
+		return result;
+	}	
+	
+	private void createOrUpdateNuxeoElasticsearchConfigFiles() throws Exception {
+		//
+		// Get the prototype copy of the Nuxeo Elasticsearch extension element and
+		// fill it in for each tenant
+		//
+		File protoElasticsearchExtensionFile = getProtoElasticsearchExtensionFile();
+		StringBuffer extensionList = new StringBuffer();
+		Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
+		for (TenantBindingType tbt : tenantBindingTypeMap.values()) {
+			List<String> repositoryNameList = ConfigUtils.getRepositoryNameList(tbt);
+			logger.debug("Getting repository name(s) for tenant " + tbt.getName());
+
+			if (repositoryNameList == null || repositoryNameList.isEmpty() == true) {
+				logger.error(String.format("Could not get repository name(s) for tenant %s", tbt.getName()));
+				continue; // break out of loop and go to the next tenant binding
+			} else {
+				for (String repositoryName : repositoryNameList) {
+					if (Tools.isBlank(repositoryName)) {
+						logger.error(String.format("Repository name(s) for tenant %s was empty.", tbt.getName()));
+					} else {
+						logger.debug(String.format("Repository name is %s", repositoryName));
+						Document protoElasticsearchExtensionDoc = XmlTools.fileToXMLDocument(protoElasticsearchExtensionFile);
+						
+						protoElasticsearchExtensionDoc = updateElasticSearchExtensionDoc(protoElasticsearchExtensionDoc, repositoryName, this.getCspaceInstanceId());
+						if (logger.isDebugEnabled()) {
+							String extension = protoElasticsearchExtensionDoc.asXML();
+							logger.trace(String.format("Updated Elasticsearch extension for '%s' repository: contents=\n", repositoryName, extension));
+						}
+						//extensionList.append(protoElasticsearchExtensionDoc.asXML() + '\n');	
+						extensionList.append(XmlTools.asXML(protoElasticsearchExtensionDoc, true) + '\n');	
+					}
+				}
+			}
+		}
+		
+		//
+		// Create the final Nuxeo Elasticsearch configuration file and deploy it to the Nuxeo server.
+		//
+		if (extensionList.length() > 0) {
+			// Get the prototype copy of the Nuxeo Elasticsearch config file.
+			String str = FileUtils.readFileToString(getProtoElasticsearchConfigFile());
+			str = str.replace(ConfigUtils.ELASTICSEARCH_EXTENSIONS_EXPANDER_STR, extensionList);
+
+			//
+			// Create the final xml Elasticsearch config and fill in the correct values.
+			//
+			File elasticSearchConfigFile = new File(getNuxeoConfigDir() + File.separator
+					+ JEEServerDeployment.NUXEO_ELASTICSEARCH_CONFIG_FILENAME);
+			FileUtilities.StringToFile(str, elasticSearchConfigFile);
+		} else {
+			logger.error("Could not create Elasticsearch configuration files.  Check that the prototype configuration files are properly formatted and in the correct location.");
+		}	
+	}
     
    /**
     * Ensure that Nuxeo repository configuration files exist for each repository
@@ -862,7 +1120,8 @@ public class ServiceMain {
             throw new RuntimeException(msg);
         }
         if (logger.isInfoEnabled()) {
-            logger.info("Found and can read prototype Nuxeo config file at path %s", prototypeNuxeoConfigFile.getAbsolutePath());
+            logger.info(String.format("Using prototype Nuxeo config file at path %s", 
+            		prototypeNuxeoConfigFile.getAbsolutePath()));
         }
         
         //
@@ -926,26 +1185,30 @@ public class ServiceMain {
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc, "/component", "name",
                 String.format("config:%s-repository", repositoryName));
         
+        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
+        		ConfigUtils.CONFIGURATION_EXTENSION_POINT_XPATH + "/blobprovider", "name",
+                repositoryName);
+        
+        repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
+        		ConfigUtils.CONFIGURATION_EXTENSION_POINT_XPATH + "/blobprovider/property[@name='path']",
+        			Tools.isBlank(binaryStorePath) ? repositoryName : binaryStorePath);
+        
         // Text substitutions within first extension point, "repository"
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository", "name",
+        		ConfigUtils.REPOSITORY_EXTENSION_POINT_XPATH + "/repository", "name",
                 repositoryName);
         
-        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository", "name",
-                repositoryName);
-        
-        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/binaryStore", "path",
-                Tools.isBlank(binaryStorePath) ? repositoryName : binaryStorePath);  // Can be either partial or full path.  Partial path will be relative to Nuxeo's data directory
+//        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
+//        		ConfigUtils.REPOSITORY_EXTENSION_POINT_XPATH + "/repository/binaryStore", "path",
+//                Tools.isBlank(binaryStorePath) ? repositoryName : binaryStorePath);  // Can be either partial or full path.  Partial path will be relative to Nuxeo's data directory
 
         /* Create the JDBC url options if any exist */
         String jdbcOptions = XmlTools.getElementValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/property[@name='JDBCOptions']");
+        		ConfigUtils.REPOSITORY_EXTENSION_POINT_XPATH + "/repository/property[@name='JDBCOptions']");
         jdbcOptions = Tools.isBlank(jdbcOptions) ? "" : "?" + jdbcOptions;
         
         repoConfigDoc = XmlTools.setElementValue(repoConfigDoc,
-                REPOSITORY_EXTENSION_POINT_XPATH + "/repository/property[@name='DatabaseName']",
+        		ConfigUtils.REPOSITORY_EXTENSION_POINT_XPATH + "/repository/property[@name='DatabaseName']",
                 databaseName + jdbcOptions);
                 
         return repoConfigDoc;
@@ -964,50 +1227,79 @@ public class ServiceMain {
         // Set the <datasource> element's  name attribute
         String datasoureName = "jdbc/" + repositoryName;
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                DATASOURCE_EXTENSION_POINT_XPATH + "/datasource", "name", datasoureName);
+        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/datasource", "name", datasoureName);
         
         // Get the DB server name
         String serverName = XmlTools.getElementValue(repoConfigDoc,
-        		DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='ServerName']");
+        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='ServerName']");
         // Get the JDBC options
         String jdbcOptions = XmlTools.getElementValue(repoConfigDoc,
-        		DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='JDBCOptions']");
+        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='JDBCOptions']");
         jdbcOptions = Tools.isBlank(jdbcOptions) ? "" : "?" + jdbcOptions;
         // Get the DB port nubmer
         String portNumber = XmlTools.getElementValue(repoConfigDoc,
-        		DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='PortNumber']");
+        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='PortNumber']");
         // Build the JDBC URL from the parts
         String jdbcUrl = String.format("jdbc:postgresql://%s:%s/%s%s", //FIXME: 'postgresql' string should not be hard coded here
         		serverName, portNumber, databaseName, jdbcOptions);
         
         // Set the <datasource> element's url attribute
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                DATASOURCE_EXTENSION_POINT_XPATH + "/datasource", "url", jdbcUrl);
+        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/datasource", "url", jdbcUrl);
         logger.debug(String.format("Built up the following JDBC url: %s", jdbcUrl));
         
         // Get the DB username
         String username = XmlTools.getElementValue(repoConfigDoc,
-        		DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='User']");
+        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='User']");
         // Set the <datasource> element's user attribute
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                DATASOURCE_EXTENSION_POINT_XPATH + "/datasource", "username", username);
+        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/datasource", "username", username);
         
         // Get the DB password
         String password = XmlTools.getElementValue(repoConfigDoc,
-        		DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='Password']");
+        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/property[@name='Password']");
         // Set the <datasource> element's password attribute
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                DATASOURCE_EXTENSION_POINT_XPATH + "/datasource", "password", password);
+        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/datasource", "password", password);
         
         // Set the <link> element's name attribute
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                DATASOURCE_EXTENSION_POINT_XPATH + "/link", "name", "jdbc/repository_" + repositoryName);
+        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/link", "name", "jdbc/repository_" + repositoryName);
         // Set the <link> element's global attribute
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-                DATASOURCE_EXTENSION_POINT_XPATH + "/link", "global", datasoureName);
+        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/link", "global", datasoureName);
         
         return repoConfigDoc;
-    }    
+    }
+    
+    private String getElasticsearchIndexName(Document repoConfigDoc, String repositoryName,
+    		String cspaceInstanceId) {
+    	String result = ConfigUtils.DEFAULT_ELASTICSEARCH_INDEX_NAME;
+    	
+    	if (repositoryName.equalsIgnoreCase(ConfigUtils.DEFAULT_NUXEO_REPOSITORY_NAME) == false) {
+    		return repositoryName;
+    	}
+    	
+    	return result;
+    }
+    
+    /*
+     * This method is filling out the elasticsearch-config.xml file with tenant specific repository information.
+     */
+    private Document updateElasticSearchExtensionDoc(Document elasticsearchConfigDoc, String repositoryName,
+    		String cspaceInstanceId) {
+        
+        // Set the <elasticSearchIndex> element's  name attribute
+        String indexName = getElasticsearchIndexName(elasticsearchConfigDoc, repositoryName, cspaceInstanceId);
+        elasticsearchConfigDoc = XmlTools.setAttributeValue(elasticsearchConfigDoc,
+        		ConfigUtils.ELASTICSEARCH_INDEX_EXTENSION_XPATH + "/elasticSearchIndex", "name", indexName);
+        
+        // Set the <elasticSearchIndex> element's repository attribute
+        elasticsearchConfigDoc = XmlTools.setAttributeValue(elasticsearchConfigDoc,
+        		ConfigUtils.ELASTICSEARCH_INDEX_EXTENSION_XPATH + "/elasticSearchIndex", "repository", repositoryName);
+        
+        return elasticsearchConfigDoc;
+    }
 
     /**
      * Update the current copy of the Nuxeo databases initialization script file by
@@ -1021,79 +1313,91 @@ public class ServiceMain {
      * 
      * @param dbInitializationScriptFilePath
      * @param dbsCheckedOrCreated 
+     * @throws Exception 
      */
-    private void updateInitializationScript(String dbInitializationScriptFilePath,
-            HashSet<String> dbsCheckedOrCreated, String[] dataSourceNames) {
-        // Get the current copy of the Nuxeo databases initialization script file,
-        // if that file exists, and read all of its lines except for those which
-        // drop databases.
-        List<String> lines = null;
-        // "If the given string" for the pathname provided here "is the empty string, then the
-        // result is the empty abstract pathname," according to Oracle's Javadoc for File.
-        // An empty path string might be provided here if a call to get the database product name failed earlier.
-        File nuxeoDatabasesInitScriptFile = new File(dbInitializationScriptFilePath);
-        try {
-            if (! nuxeoDatabasesInitScriptFile.canRead()) {
-                String msg = String.format("Could not find and/or read the Nuxeo databases initialization script file '%s'",
-                        nuxeoDatabasesInitScriptFile.getCanonicalPath());
-                logger.warn(msg);
-            } else {
-                // Note: Exceptions are written only to the console, not thrown, by
-                // the readFileAsLines() method in the common-api package.
-                lines = FileTools.readFileAsLines(dbInitializationScriptFilePath);
-                Iterator<String> linesIterator = lines.iterator();
-                String currentLine;
-                while (linesIterator.hasNext()) {
-                    currentLine = linesIterator.next();
-                    // Elide all existing DROP DATABASE statements.
-                    if (currentLine.toLowerCase().contains(DROP_DATABASE_SQL_CMD.toLowerCase())) {
-                        linesIterator.remove();
-                    }
-                    // Elide a comment pertaining to the existing
-                    // DROP DATABASE statements.
-                    if (currentLine.toLowerCase().contains(DROP_OBJECTS_SQL_COMMENT.toLowerCase())) {
-                        linesIterator.remove();
-                    }
-                    // Elide all existing DROP USER statements.
-                    if (currentLine.toLowerCase().contains(DROP_USER_SQL_CMD.toLowerCase())) {
-                        linesIterator.remove();
-                    }
-                }
-            }
-            List<String> replacementLines = new ArrayList<String>();
-            // Add back the comment elided above
-            replacementLines.add(DROP_OBJECTS_SQL_COMMENT);
-            // Add new DROP DATABASE lines for every Nuxeo-managed database.
-            for (String dbName : dbsCheckedOrCreated) {
-              if (Tools.notBlank(dbName)) {
-                  replacementLines.add(String.format(DROP_DATABASE_IF_EXISTS_SQL_CMD, dbName));
-              }
-            }
-            // Add new DROP USER commands for every provided datasource.
-            String username;
-            for (String dataSourceName : dataSourceNames) {
-                username = getBasicDataSourceUsername(dataSourceName);
-                if (Tools.notBlank(username)) {
-                    replacementLines.add(String.format(DROP_USER_IF_EXISTS_SQL_CMD, username));
-                }
-            }
-            // Now append all existing lines from that file, except for
-            // any lines that were elided above.
-            if (lines != null && ! lines.isEmpty()) {
-                replacementLines.addAll(lines);
-            }
-            if (! nuxeoDatabasesInitScriptFile.canWrite()) {
-                String msg = String.format("Could not find and/or write the Nuxeo databases initialization script file '%s'",
-                        nuxeoDatabasesInitScriptFile.getCanonicalPath());
-                logger.warn(msg);
-            } else {
-                // Note: Exceptions are written only to the console, not thrown, by
-                // the writeFileFromLines() method in the common-api package.
-                FileTools.writeFileFromLines(dbInitializationScriptFilePath, replacementLines);
-            }
-        } catch (Exception e) {
+    private void updateInitializationScript(String dbInitializationScriptFilePath, HashSet<String> dbsCheckedOrCreated,
+			String[] dataSourceNames) throws Exception {
+    	//
+    	// Get the current copy of the Nuxeo databases initialization script
+		// file and read all of its lines except for those which DROP databases.
+		//
+    	File nuxeoDatabasesInitScriptFile = new File(dbInitializationScriptFilePath);
+		List<String> lines = null;
+		try {
+			if (!nuxeoDatabasesInitScriptFile.canRead()) {
+				String msg = String.format("Could not find and/or read the Nuxeo databases initialization script file '%s'",
+						nuxeoDatabasesInitScriptFile.getCanonicalPath());
+				logger.warn(msg);
+			} else {
+				//
+				// Make a backup of the existing file
+				String destFileName = String.format("%s.%s.bak", dbInitializationScriptFilePath, System.currentTimeMillis());
+				if (FileTools.copyFile(dbInitializationScriptFilePath, destFileName, false) == false) {
+					throw new Exception("Could not backup existing database initialization script.");
+				}
 
-        }
+				//
+				// Process the existing lines
+				lines = FileTools.readFileAsLines(dbInitializationScriptFilePath);
+				Iterator<String> linesIterator = lines.iterator();
+				String currentLine;
+				while (linesIterator.hasNext()) {
+					currentLine = linesIterator.next();
+					// Elide all existing DROP DATABASE statements.
+					if (currentLine.toLowerCase().contains(DROP_DATABASE_SQL_CMD.toLowerCase())) {
+						linesIterator.remove();
+					}
+					// Elide a comment pertaining to the existing
+					// DROP DATABASE statements.
+					if (currentLine.toLowerCase().contains(DROP_OBJECTS_SQL_COMMENT.toLowerCase())) {
+						linesIterator.remove();
+					}
+					// Elide all existing DROP USER statements.
+					if (currentLine.toLowerCase().contains(DROP_USER_SQL_CMD.toLowerCase())) {
+						linesIterator.remove();
+					}
+				}
+			}
+			
+			// Add back the comment elided above
+			List<String> replacementLines = new ArrayList<String>();
+			replacementLines.add(DROP_OBJECTS_SQL_COMMENT);
+			// Add new DROP DATABASE lines for every Nuxeo-managed database.
+			for (String dbName : dbsCheckedOrCreated) {
+				if (Tools.notBlank(dbName)) {
+					replacementLines.add(String.format(DROP_DATABASE_IF_EXISTS_SQL_CMD, dbName));
+				}
+			}
+			
+			// Add new DROP USER commands for every provided datasource.
+			String username;
+			for (String dataSourceName : dataSourceNames) {
+				username = getBasicDataSourceUsername(dataSourceName);
+				if (Tools.notBlank(username)) {
+					replacementLines.add(String.format(DROP_USER_IF_EXISTS_SQL_CMD, username));
+				}
+			}
+			
+			// Now append all existing lines from that file, except for
+			// any lines that were elided above.
+			if (lines != null && !lines.isEmpty()) {
+				replacementLines.addAll(lines);
+			}
+			
+			if (!nuxeoDatabasesInitScriptFile.canWrite()) {
+				String msg = String.format(
+						"Could not find and/or write the Nuxeo databases initialization script file '%s'",
+						nuxeoDatabasesInitScriptFile.getCanonicalPath());
+				logger.warn(msg);
+			} else {
+				// Note: Exceptions are written only to the console, not thrown, by
+				// the writeFileFromLines() method in the common-api package.
+				FileTools.writeFileFromLines(dbInitializationScriptFilePath, replacementLines);
+			}
+		} catch (Exception e) {
+			logger.error("Could not update database initialization script.", e);
+			throw e;
+		}
 
-    }
+	}
 }

@@ -25,6 +25,7 @@ package org.collectionspace.services.client.test;
 import java.util.HashMap;
 
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
+import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -36,6 +37,7 @@ import org.collectionspace.services.vocabulary.VocabularyitemsCommon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.core.Response;
@@ -49,33 +51,49 @@ import javax.ws.rs.core.Response;
  */
 public class VocabularyServiceTest extends AbstractAuthorityServiceTest<VocabulariesCommon, VocabularyitemsCommon> {
 
-    private final String CLASS_NAME = VocabularyServiceTest.class.getName();
-    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+	// The class for logging
+    private final Logger logger = LoggerFactory.getLogger(VocabularyServiceTest.class);
+    
     // Instance variables specific to this test.
     final String SERVICE_PATH_COMPONENT = VocabularyClient.SERVICE_PATH_COMPONENT;//"vocabularies";
     final String SERVICE_PAYLOAD_NAME = VocabularyClient.SERVICE_PAYLOAD_NAME;
     final String SERVICE_ITEM_PAYLOAD_NAME = VocabularyClient.SERVICE_ITEM_PAYLOAD_NAME;
 
+    /**
+     * Default constructor.  Used to set the short ID for all tests authority items
+     */
+    public VocabularyServiceTest() {
+    	super();
+        TEST_SHORTID = "vocabTest";
+    }
 
+    @Override
+	protected String getTestAuthorityItemShortId() {
+		return getTestAuthorityItemShortId(true); // The short ID of every person item we create should be unique
+	}
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new VocabularyClient();
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new VocabularyClient(clientPropertiesFilename);
+	}
+    
     @Override
-    protected String createItemInAuthority(String authorityId) {
+    protected String createItemInAuthority(AuthorityClient client, String authorityId, String shortId) {
     	String result = null;
     	
-        VocabularyClient client = new VocabularyClient();
         HashMap<String, String> itemInfo = new HashMap<String, String>();
-        String shortId = createIdentifier();
         itemInfo.put(AuthorityItemJAXBSchema.SHORT_IDENTIFIER, shortId);
         itemInfo.put(AuthorityItemJAXBSchema.DISPLAY_NAME, "display-" + shortId);
         result = VocabularyClientUtils.createItemInVocabulary(authorityId,
-                null /*knownResourceRefName*/, itemInfo, client);
+                null /*knownResourceRefName*/, itemInfo, (VocabularyClient) client);
         allResourceItemIdsCreated.put(result, authorityId);
         
         return result;
@@ -99,26 +117,17 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
             }
         }
     }
-    
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-//    		dependsOnMethods = {"createItem"})
-    @Override
-    public void createItemList(String testName) throws Exception {
-    	knownAuthorityWithItems = createResource(testName, READITEMS_SHORT_IDENTIFIER);
-        for (int j = 0; j < nItemsToCreateInList; j++) {
-        	createItemInAuthority(knownAuthorityWithItems);
-        }
-    }    
-    
+        
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     		dependsOnMethods = {"CRUDTests"})
     public void createWithNonuniqueShortId(String testName) throws Exception {
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
 
         // Create a new vocabulary
+        String shortId = "nonunique" + random.nextInt(1000); // Prevent collisions with past test sessions that never cleaned up properly
         VocabularyClient client = new VocabularyClient();
         PoxPayloadOut multipart = VocabularyClientUtils.createEnumerationInstance(
-                "Vocab with non-unique Short Id", "nonunique", client.getCommonPartName());
+                "Vocab with non-unique Short Id", shortId, client.getCommonPartName());
         Response res = client.create(multipart);
         try {
         	assertStatusCode(res, testName);
@@ -149,11 +158,19 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
         }
     }
     
+    /**
+     * Sets up create tests with malformed xml.
+     */
+	protected void setupcreateItemWithBadShortId() {
+        testExpectedStatusCode = STATUS_BAD_REQUEST;  // Malformed payload never gets past RESTEasy filter
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }    
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     		dependsOnMethods = {"authorityTests"})
     public void createItemWithBadShortId(String testName) throws Exception {
-        setupCreateWithMalformedXml();
+    	setupcreateItemWithBadShortId();
 
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
@@ -302,7 +319,7 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
 	}
     
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
     	VocabularyClient client = new VocabularyClient();
         return createInstance(client.getCommonPartName(), identifier);
     }    
@@ -334,10 +351,10 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
     //
 
     @Override
-    protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) {
+    protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) throws Exception {
     	String headerLabel = new VocabularyClient().getItemCommonPartName();
         HashMap<String, String> vocabItemInfo = new HashMap<String, String>();
-        String shortId = createIdentifier();
+        String shortId = identifier;
         vocabItemInfo.put(AuthorityItemJAXBSchema.SHORT_IDENTIFIER, shortId);
         vocabItemInfo.put(AuthorityItemJAXBSchema.DISPLAY_NAME, "display-" + shortId);
 
@@ -354,10 +371,15 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
 
 	@Override
 	protected void compareUpdatedItemInstances(VocabularyitemsCommon original,
-			VocabularyitemsCommon updated) throws Exception {
+			VocabularyitemsCommon updated,
+			boolean compareRevNumbers) throws Exception {
         Assert.assertEquals(updated.getDisplayName(),
         		original.getDisplayName(),
                 "Display name in updated VocabularyItem did not match submitted data.");
+        
+        if (compareRevNumbers == true) {
+        	Assert.assertEquals(original.getRev(), updated.getRev(), "Revision numbers should match.");
+        }
 	}
 
 	@Override
@@ -379,5 +401,10 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
                 itemInfo, commonPartName);
 		return result;
 	}
-    
+	
+    @AfterClass(alwaysRun = true)
+    @Override
+    public void cleanUp() throws Exception {
+    	super.cleanUp();
+    }	
 }

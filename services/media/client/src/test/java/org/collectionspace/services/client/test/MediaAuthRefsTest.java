@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
@@ -42,13 +41,9 @@ import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.media.MediaCommon;
 import org.collectionspace.services.person.PersonTermGroup;
-
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,11 +79,16 @@ public class MediaAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     }
 
     @Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+	}
+
+    @Override
     protected AbstractCommonList getCommonList(Response response) {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
-    private PoxPayloadOut createMediaInstance(String depositorRefName, String title) {
+    private PoxPayloadOut createMediaInstance(String depositorRefName, String title) throws Exception {
         this.title = title;
         this.depositorRefName = depositorRefName;
         MediaCommon media = new MediaCommon();
@@ -123,7 +123,7 @@ public class MediaAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         }
     }
 
-    protected void createPersonRefs() {
+    protected void createPersonRefs() throws Exception {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding refName by which it can be identified.
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
@@ -150,14 +150,14 @@ public class MediaAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         depositorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
     }
 
-    protected String createPerson(String firstName, String surName, String shortId, String authRefName) {
+    protected String createPerson(String firstName, String surName, String shortId, String authRefName) throws Exception {
     	String result = null;
     	
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         Map<String, String> personInfo = new HashMap<String, String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
-        personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
+        personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId + random.nextInt(1000));
         List<PersonTermGroup> personTerms = new ArrayList<PersonTermGroup>();
         PersonTermGroup term = new PersonTermGroup();
         String termName = firstName + " " + surName;
@@ -245,9 +245,10 @@ public class MediaAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun = true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             logger.debug("Skipping Cleanup phase ...");

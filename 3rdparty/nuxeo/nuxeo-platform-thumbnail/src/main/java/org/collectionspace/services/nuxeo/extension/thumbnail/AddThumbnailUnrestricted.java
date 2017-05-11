@@ -94,7 +94,8 @@ public class AddThumbnailUnrestricted extends UnrestrictedSessionRunner {
     	String result = null;
     	
     	// Compute the digest
-        result = fileManager.computeDigest(blob); // REM - Warning: Why is this operation so slow?
+//        result = fileManager.computeDigest(blob); // REM - Warning: Why is this operation so slow?
+        result = blob.getDigest();
         
         return result;
     }

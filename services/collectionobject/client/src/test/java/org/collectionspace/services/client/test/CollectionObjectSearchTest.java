@@ -25,6 +25,7 @@ package org.collectionspace.services.client.test;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -93,26 +94,13 @@ public class CollectionObjectSearchTest extends BaseServiceTest<AbstractCommonLi
 
 	@Override
 	protected String getServiceName() {
-		throw new UnsupportedOperationException(); // FIXME: REM - See
-													// http://issues.collectionspace.org/browse/CSPACE-3498
+		throw new UnsupportedOperationException(); // FIXME: REM - See // http://issues.collectionspace.org/browse/CSPACE-3498
 	}
 
 	@Override
 	protected String getServicePathComponent() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException(); // FIXME: REM - See
-													// http://issues.collectionspace.org/browse/CSPACE-3498
+		throw new UnsupportedOperationException(); // FIXME: REM - See // http://issues.collectionspace.org/browse/CSPACE-3498
 	}
-
-	// /* (non-Javadoc)
-	// * @see
-	// org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
-	// */
-	// @Override
-	// protected String getServicePathComponent() {
-	// return new CollectionObjectClient().getServicePathComponent(); //FIXME:
-	// REM = Remove all refs to this method.
-	// }
 
 	/*
 	 * (non-Javadoc)
@@ -122,8 +110,13 @@ public class CollectionObjectSearchTest extends BaseServiceTest<AbstractCommonLi
 	 * ()
 	 */
 	@Override
-	protected CollectionSpaceClient getClientInstance() {
+	protected CollectionSpaceClient getClientInstance() throws Exception {
 		return new CollectionObjectClient();
+	}
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+		return new CollectionObjectClient(clientPropertiesFilename);
 	}
 	
 	/**
@@ -134,9 +127,10 @@ public class CollectionObjectSearchTest extends BaseServiceTest<AbstractCommonLi
 	 * database-specific constraint or otherwise, if the number of records
 	 * containing a particular keyword represent too high a proportion of the
 	 * total number of records.
+	 * @throws Exception 
 	 */
 	@BeforeClass(alwaysRun = true)
-	public void setup() {
+	public void setup() throws Exception {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Creating " + numNoiseWordResources
 					+ " 'noise word' resources ...");
@@ -374,7 +368,7 @@ public class CollectionObjectSearchTest extends BaseServiceTest<AbstractCommonLi
 	// }
 	// }
 	@Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, groups = { "utf8" })
-	public void searchWithUTF8Keyword(String testName) {
+	public void searchWithUTF8Keyword(String testName) throws Exception {
 		// Create one or more keyword retrievable resources, each containing
 		// two specified keywords.
 		long numKeywordRetrievableResources = 2;
@@ -454,9 +448,10 @@ public class CollectionObjectSearchTest extends BaseServiceTest<AbstractCommonLi
 	 * For this reason, it attempts to remove all resources created at any point
 	 * during testing, even if some of those resources may be expected to be
 	 * deleted by certain tests.
+	 * @throws Exception 
 	 */
 	@AfterClass(alwaysRun = true)
-	public void cleanUp() {
+	public void cleanUp() throws Exception {
 		String noTest = System.getProperty("noTestCleanup");
 		if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
 			if (logger.isDebugEnabled()) {
@@ -477,7 +472,7 @@ public class CollectionObjectSearchTest extends BaseServiceTest<AbstractCommonLi
 	// ---------------------------------------------------------------
 	// Utility methods used by tests above
 	// ---------------------------------------------------------------
-	private void createCollectionObjects(long numToCreate, String keyword) {
+	private void createCollectionObjects(long numToCreate, String keyword) throws Exception {
 		List keywords = new ArrayList<String>();
 		keywords.add(keyword);
 		boolean keywordsInSameField = true;
@@ -485,7 +480,7 @@ public class CollectionObjectSearchTest extends BaseServiceTest<AbstractCommonLi
 	}
 
 	private void createCollectionObjects(long numToCreate,
-			List<String> keywords, boolean keywordsInSameField) {
+			List<String> keywords, boolean keywordsInSameField) throws Exception {
 		testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
 		CollectionObjectClient client = new CollectionObjectClient();
 		for (long i = 0; i < numToCreate; i++) {
@@ -508,7 +503,7 @@ public class CollectionObjectSearchTest extends BaseServiceTest<AbstractCommonLi
 	}
 
 	private PoxPayloadOut createCollectionObjectInstance(long i,
-			List<String> keywords, boolean keywordsInSameField) {
+			List<String> keywords, boolean keywordsInSameField) throws Exception {
 		CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
 		collectionObject.setObjectNumber(createIdentifier());
 		if (keywordsInSameField) {
@@ -544,13 +539,13 @@ public class CollectionObjectSearchTest extends BaseServiceTest<AbstractCommonLi
 		return sb.toString();
 	}
 
-	private Response doSearch(List<String> keywords) {
+	private Response doSearch(List<String> keywords) throws Exception {
 		String searchParamValue = listToString(keywords, KEYWORD_SEPARATOR);
 		return doSearch(searchParamValue);
 	}
 
 	private Response doAdvancedSearch(
-			String propertyName, String propertyValue, String operator) {
+			String propertyName, String propertyValue, String operator) throws Exception {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Searching on property: " + propertyName + "="
 					+ "'" + propertyValue + "'");
@@ -563,7 +558,7 @@ public class CollectionObjectSearchTest extends BaseServiceTest<AbstractCommonLi
 		return res;
 	}
 
-	private Response doSearch(String keyword) {
+	private Response doSearch(String keyword) throws Exception {
 		String searchParamValue = keyword;
 		if (logger.isDebugEnabled()) {
 			logger.debug("Searching on keyword(s): " + searchParamValue

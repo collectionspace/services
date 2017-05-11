@@ -27,9 +27,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
-import javax.ws.rs.core.Response;
-import org.collectionspace.services.authorization.perms.EffectType;
 
+import javax.ws.rs.core.Response;
+
+import org.collectionspace.services.authorization.perms.EffectType;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionAction;
 import org.collectionspace.services.authorization.PermissionRole;
@@ -45,10 +46,8 @@ import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.client.RoleFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.client.test.ServiceRequestType;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
@@ -81,7 +80,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
      * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
      */
     @Override
-    protected String getServicePathComponent() {
+    protected String getServicePathComponent() throws Exception {
         return new RolePermissionClient().getServicePathComponent();
     }
     
@@ -103,9 +102,10 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
     
     /**
      * Seed data.
+     * @throws Exception 
      */
     @BeforeClass(alwaysRun = true)
-    public void seedData() {
+    public void seedData() throws Exception {
 
         String rn1 = getRoleName();
         String r1RoleId = createRole(rn1);
@@ -140,9 +140,14 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new RolePermissionClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new RolePermissionClient(clientPropertiesFilename);
+	}	
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readPaginatedList(java.lang.String)
@@ -533,10 +538,11 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
 
     /**
      * Clean up.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun = true)
     @Override
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         setupDelete();
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
@@ -562,8 +568,9 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
      * @param resName the res name
      * @param effect the effect
      * @return the string
+     * @throws Exception 
      */
-    private String createPermission(String resName, EffectType effect) {
+    private String createPermission(String resName, EffectType effect) throws Exception {
         setupCreate();
         PermissionClient permClient = new PermissionClient();
         List<PermissionAction> actions = PermissionFactory.createDefaultActions();
@@ -595,8 +602,9 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
      * Delete permission.
      *
      * @param permId the perm id
+     * @throws Exception 
      */
-    private void deletePermission(String permId) {
+    private void deletePermission(String permId) throws Exception {
         setupDelete();
         PermissionClient permClient = new PermissionClient();
 
@@ -623,8 +631,9 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
      *
      * @param roleName the role name
      * @return the string
+     * @throws Exception 
      */
-    private String createRole(String roleName) {
+    private String createRole(String roleName) throws Exception {
         setupCreate();
         RoleClient roleClient = new RoleClient();
 
@@ -657,8 +666,9 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
      * Delete role.
      *
      * @param roleId the role id
+     * @throws Exception 
      */
-    private void deleteRole(String roleId) {
+    private void deleteRole(String roleId) throws Exception {
         setupDelete();
         RoleClient roleClient = new RoleClient();
         Response res = null;
@@ -725,5 +735,5 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
         		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
     public void CRUDTests(String testName) {
     	// Do nothing.  Simply here to for a TestNG execution order for our tests
-    }	
+    }
 }

@@ -3,55 +3,128 @@
 	<auths>
 		<!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
 		<auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+	    <auth ID="bigbird@cspace.org">YmlnYmlyZEBjc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
 	</auths>
+	
+	<testGroup ID="testPermissionsAndRoles" autoDeletePOSTS="true">
+	    <!-- 
+	       Setup accounts, roles, and permissions for tests.
+	    -->
+	    <test ID="createAccount" auth="admin@core.collectionspace.org">
+	        <method>POST</method>
+	        <uri>/cspace-services/accounts</uri>
+	        <filename>batch/account-create-bigbird.xml</filename>
+	        <vars>
+	            <var ID="email">bigbird@cspace.org</var>
+	            <var ID="screenName">bigbird@cspace.org</var>
+	            <var ID="userId">bigbird@cspace.org</var>
+	            <var ID="password">QWRtaW5pc3RyYXRvcg==</var>  <!-- This value is the string "Administrator" base64 encoded. -->
+	        </vars>
+	    </test>
+	    <test ID="createRole">
+	        <method>POST</method>
+	        <uri>/cspace-services/authorization/roles</uri>
+	        <filename>batch/role-create-bird.xml</filename>
+	    </test>
+	    <test ID="permissionroles-post-bird" autoDeletePOSTS="false">
+	        <method>POST</method>
+	        <uri>/cspace-services/authorization/roles/${createRole.CSID}/permroles</uri>
+	        <filename>batch/permissionroles-post-bird.xml</filename>
+	    </test>
+	    <test ID="accountroles-post-bigbird" autoDeletePOSTS="false">
+	        <method>POST</method>
+	        <uri>/cspace-services/accounts/${createAccount.CSID}/accountroles</uri>
+	        <filename>batch/accountroles-post-bigbird.xml</filename>
+	        <vars>
+	            <var ID="screenName">bigbird@cspace.org</var>
+	            <var ID="userId">bigbird@cspace.org</var>
+	        </vars>
+	    </test>
+	    
+	    <!-- 
+	        Test batch service's PERMISSION enforcement for running batch jobs
+	    -->
+	    <test ID="createBatchPermissions">
+			<method>POST</method>
+			<uri>/cspace-services/batch/</uri>
+			<filename>batch/batch-create-permissions.xml</filename>
+		</test>
+	    <test ID="testInvokeNoContext" auth="admin@core.collectionspace.org" autoDeletePOSTS="false">
+			<method>POST</method>
+			<uri>/cspace-services/batch/${createBatchPermissions.CSID}</uri>
+			<filename>batch/batch-invoke-nocontext.xml</filename>
+		</test>
+	    <test ID="testInvokeNoContext" auth="bigbird@cspace.org" autoDeletePOSTS="false">
+	        <method>POST</method>
+	        <uri>/cspace-services/batch/${createBatchPermissions.CSID}</uri>
+	        <filename>batch/batch-invoke-nocontext.xml</filename>
+			<expectedCodes>403</expectedCodes>
+	    </test>
+	    
+	    <!-- 
+	       Test batch service's ROLE enforcement for running batch jobs 
+	    -->
+	    <test ID="createBatchRoles">
+	        <method>POST</method>
+	        <uri>/cspace-services/batch/</uri>
+	        <filename>batch/batch-create-roles.xml</filename>
+	    </test>
+	    <test ID="testInvokeNoContext" auth="admin@core.collectionspace.org" autoDeletePOSTS="false">
+	        <method>POST</method>
+	        <uri>/cspace-services/batch/${createBatchRoles.CSID}</uri>
+	        <filename>batch/batch-invoke-nocontext.xml</filename>
+	    </test>
+	    <test ID="testInvokeNoContext" auth="bigbird@cspace.org" autoDeletePOSTS="false">
+	        <method>POST</method>
+	        <uri>/cspace-services/batch/${createBatchRoles.CSID}</uri>
+	        <filename>batch/batch-invoke-nocontext.xml</filename>
+	        <expectedCodes>403</expectedCodes>
+	    </test>
+	</testGroup>
+	
 	<testGroup ID="testSingle" autoDeletePOSTS="true">
-		<test ID="createBatch1" auth="test">
+	    <test ID="TestCreateAndLinkLoanOutBatchJob" auth="test">
 			<method>POST</method>
 			<uri>/cspace-services/batch/</uri>
-			<filename>batch/batch1.xml</filename>
+		    <filename>batch/TestCreateAndLinkLoanOutBatchJob.xml</filename>
 		</test>
-		<test ID="createBatch2" auth="test">
-			<method>POST</method>
-			<uri>/cspace-services/batch/</uri>
-			<filename>batch/batch1.xml</filename>
-		</test>
-		<test ID="createBatch" auth="test">
+		<test ID="createCollObj1" auth="test">
 			<method>POST</method>
 			<uri>/cspace-services/collectionobjects/</uri>
 			<filename>batch/collObj1.xml</filename>
 		</test>
 		<test ID="testInvokeSingle" auth="test" autoDeletePOSTS="false">
 			<method>POST</method>
-			<uri>/cspace-services/batch/${createBatch1.CSID}</uri>
-			<filename>batch/batchInvContextSingle.xml</filename>
+		    <uri>/cspace-services/batch/${TestCreateAndLinkLoanOutBatchJob.CSID}</uri>
+		    <filename>batch/batch-invoke-single.xml</filename>
 			<vars>
-				<var ID="CollObj1">${createBatch.CSID}</var>
+				<var ID="CollObj1">${createCollObj1.CSID}</var>
 			</vars>
 		</test>
 		<test ID="testInvokeList" auth="test" autoDeletePOSTS="false">
 			<method>POST</method>
-			<uri>/cspace-services/batch/${createBatch1.CSID}</uri>
-			<filename>batch/batchInvContextList.xml</filename>
+			<uri>/cspace-services/batch/${TestCreateAndLinkLoanOutBatchJob.CSID}</uri>
+		    <filename>batch/batch-invoke-list.xml</filename>
 			<vars>
-				<var ID="CollObj1">${createBatch.CSID}</var>
+				<var ID="CollObj1">${createCollObj1.CSID}</var>
 			</vars>
 		</test>
 		<test ID="testBadInvoke" auth="test" autoDeletePOSTS="false">
 			<method>POST</method>
 			<expectedCodes>400</expectedCodes>
-			<uri>/cspace-services/batch/${createBatch1.CSID}</uri>
-			<filename>batch/batchBadInvContext.xml</filename>
+			<uri>/cspace-services/batch/${TestCreateAndLinkLoanOutBatchJob.CSID}</uri>
+		    <filename>batch/batch-invoke-gargabe.xml</filename>
 			<vars>
-				<var ID="CollObj1">${createBatch.CSID}</var>
+				<var ID="CollObj1">${createCollObj1.CSID}</var>
 			</vars>
 		</test>
 		<test ID="testInvokeEmptyList" auth="test" autoDeletePOSTS="false">
 			<method>POST</method>
 			<expectedCodes>400</expectedCodes>
-			<uri>/cspace-services/batch/${createBatch1.CSID}</uri>
-			<filename>batch/batchBadInvContextList.xml</filename>
+			<uri>/cspace-services/batch/${TestCreateAndLinkLoanOutBatchJob.CSID}</uri>
+		    <filename>batch/batch-invoke-list-empty.xml</filename>
 			<vars>
-				<var ID="CollObj1">${createBatch.CSID}</var>
+				<var ID="CollObj1">${createCollObj1.CSID}</var>
 			</vars>
 		</test>
 		<test ID="testFilteredList1" auth="test">
@@ -67,11 +140,11 @@
      <testGroup ID="cleanup" autoDeletePOSTS="true">
          <test ID="cl1"  auth="test">
              <method>DELETE</method>
-             <uri>/cspace-services/batch/${createBatch1.CSID}</uri>
+             <uri>/cspace-services/batch/${TestCreateAndLinkLoanOutBatchJob.CSID}</uri>
          </test>
          <test ID="cl2"  auth="test">
              <method>DELETE</method>
-             <uri>/cspace-services/collectionobjects/${createBatch.CSID}</uri>
+             <uri>/cspace-services/collectionobjects/${createCollObj1.CSID}</uri>
          </test>
 			 </testGroup>
 			 -->

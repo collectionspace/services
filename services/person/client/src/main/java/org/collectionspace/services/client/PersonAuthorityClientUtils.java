@@ -44,7 +44,6 @@ import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.SchoolOrStyleList;
 import org.collectionspace.services.person.StructuredDateGroup;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,13 +56,15 @@ public class PersonAuthorityClientUtils {
     private static final Logger logger =
         LoggerFactory.getLogger(PersonAuthorityClientUtils.class);
 	private static final ServiceRequestType READ_REQ = ServiceRequestType.READ;
+    static private final Random random = new Random(System.currentTimeMillis());
 
     /**
      * @param csid the id of the PersonAuthority
      * @param client if null, creates a new client
      * @return
+     * @throws Exception 
      */
-    public static String getAuthorityRefName(String csid, PersonAuthorityClient client){
+    public static String getAuthorityRefName(String csid, PersonAuthorityClient client) throws Exception{
     	if (client == null) {
     		client = new PersonAuthorityClient();
     	}
@@ -96,8 +97,9 @@ public class PersonAuthorityClientUtils {
      * @param csid the id of the PersonAuthority
      * @param client if null, creates a new client
      * @return
+     * @throws Exception 
      */
-    public static String getPersonRefName(String inAuthority, String csid, PersonAuthorityClient client){
+    public static String getPersonRefName(String inAuthority, String csid, PersonAuthorityClient client) throws Exception{
     	if ( client == null) {
     		client = new PersonAuthorityClient();
     	}
@@ -134,8 +136,7 @@ public class PersonAuthorityClientUtils {
      * @param headerLabel the header label
      * @return the multipart output
      */
-    public static PoxPayloadOut createPersonAuthorityInstance(
-    		String displayName, String shortIdentifier, String headerLabel ) {
+    public static PoxPayloadOut createPersonAuthorityInstance(String displayName, String shortIdentifier, String headerLabel ) {
         PersonauthoritiesCommon personAuthority = new PersonauthoritiesCommon();
         personAuthority.setDisplayName(displayName);
         personAuthority.setShortIdentifier(shortIdentifier);
@@ -146,8 +147,8 @@ public class PersonAuthorityClientUtils {
         PayloadOutputPart commonPart = multipart.addPart(personAuthority, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(headerLabel);
 
-        if(logger.isDebugEnabled()){
-        	logger.debug("to be created, personAuthority common ", 
+        if (logger.isDebugEnabled()) {
+        	logger.debug("To be created, personAuthority common: ", 
         				personAuthority, PersonauthoritiesCommon.class);
         }
 
@@ -166,7 +167,7 @@ public class PersonAuthorityClientUtils {
     public static PoxPayloadOut createPersonInstance(String inAuthority,
     		String personAuthRefName,
     		Map<String, String> personInfo,
-                List<PersonTermGroup> terms,
+            List<PersonTermGroup> terms,
     		String headerLabel){
         if (terms == null || terms.isEmpty()) {
             terms = getTermGroupInstance(getGeneratedIdentifier());
@@ -189,9 +190,11 @@ public class PersonAuthorityClientUtils {
      * @return the multipart output
      */
     public static PoxPayloadOut createPersonInstance(String inAuthority, 
-    		String personAuthRefName, Map<String, String> personInfo,
-                List<PersonTermGroup> terms,
-                Map<String, List<String>> personRepeatablesInfo, String headerLabel){
+    		String personAuthRefName,
+    		Map<String, String> personInfo,
+            List<PersonTermGroup> terms,
+            Map<String, List<String>> personRepeatablesInfo,
+            String headerLabel){
         PersonsCommon person = new PersonsCommon();
         person.setInAuthority(inAuthority);
     	String shortId = personInfo.get(PersonJAXBSchema.SHORT_IDENTIFIER);
@@ -467,7 +470,12 @@ public class PersonAuthorityClientUtils {
     }
     
     private static String getGeneratedIdentifier() {
-        return "id" + new Date().getTime(); 
+        return "id" + createIdentifier();
    }
+    
+    private static String createIdentifier() {
+        long identifier = System.currentTimeMillis() + random.nextInt();
+        return Long.toString(identifier);
+    }    
 
 }

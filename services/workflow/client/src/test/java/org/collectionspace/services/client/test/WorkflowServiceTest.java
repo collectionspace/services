@@ -60,9 +60,14 @@ public class WorkflowServiceTest extends AbstractPoxServiceTestImpl<AbstractComm
 	}
     
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new DimensionClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new DimensionClient(clientPropertiesFilename);
+	}
 
     //
     // Test overrides
@@ -161,7 +166,7 @@ public class WorkflowServiceTest extends AbstractPoxServiceTestImpl<AbstractComm
     // ---------------------------------------------------------------
     
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
         String dimensionsCommonPartName = new DimensionClient().getCommonPartName();
     	return createInstance(identifier, dimensionsCommonPartName);
     }    
@@ -175,7 +180,7 @@ public class WorkflowServiceTest extends AbstractPoxServiceTestImpl<AbstractComm
 	/*
 	 * We're using a DimensionsCommon instance to test the workflow service.
 	 */
-    private PoxPayloadOut createDimensionInstance(String dimensionValue) {
+    private PoxPayloadOut createDimensionInstance(String dimensionValue) throws Exception {
         String commonPartName = new DimensionClient().getCommonPartName();
         return createDimensionInstance(commonPartName, dimensionValue);
     }
@@ -198,6 +203,5 @@ public class WorkflowServiceTest extends AbstractPoxServiceTestImpl<AbstractComm
         }
 
         return multipart;
-    }
-	
+    }	
 }

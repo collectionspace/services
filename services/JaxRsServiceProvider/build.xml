@@ -40,7 +40,7 @@
     <target name="install-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="install" />
             <arg value="-Dmaven.test.skip=true" />
             <arg value="-f" />
@@ -65,7 +65,7 @@
     <target name="package-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="package" />
             <arg value="-Dmaven.test.skip=true" />
             <arg value="-f" />
@@ -89,7 +89,7 @@
     <target name="clean-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="clean" />
             <arg value="${mvn.opts}" />
         </exec>
@@ -105,7 +105,7 @@
     <target name="test-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="test" />
             <arg value="${mvn.opts}" />
         </exec>
@@ -128,7 +128,7 @@
     <target name="hotdeploy-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="properties:read-project-properties" />
             <arg value="cargo:deployer-undeploy" />
             <arg value="cargo:deployer-deploy" />
@@ -140,7 +140,11 @@
         </exec>
     </target>
 
-    <target name="deploy" depends="package,deploy_services_artifacts"
+    <target name="deploy" depends="quick-deploy,deploy_services_artifacts"
+    description="deploy cspace services in ${jee.server.cspace}">
+    </target>
+
+    <target name="quick-deploy" depends="package"
     description="deploy cspace services in ${jee.server.cspace}">
 		<delete file="${catalina.context.cspace}"/> <!-- This is a Tomcat specific file that we seem to need to delete inorder for it to be replace with a more recent one during deployment -->
 		<delete dir="${jee.deploy.cspace}/${cspace.services.context}"/>
@@ -161,6 +165,9 @@
 	<target name="deploy_services_artifacts"
 		description="Generates and deploys the CollectionSpace Services' schema bundles, doctype bundles, and tenant bindings.">
 		<exec executable="${env.JAVA_HOME}/bin/java" failonerror="true">
+			<!--
+			<arg value="-agentlib:jdwp=transport=dt_socket,server=y,address=8998,suspend=y" />  // Uncomment for remote debugging
+			-->
 			<arg value="-Done-jar.silent=true" />
 			<arg value="-Dcatalina.home=${env.CSPACE_JEESERVER_HOME}" />
 			<arg value="-jar" />

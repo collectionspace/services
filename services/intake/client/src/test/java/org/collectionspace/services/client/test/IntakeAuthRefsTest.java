@@ -44,16 +44,9 @@ import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.InsurerList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.person.PersonTermGroup;
-
-import org.jboss.resteasy.client.ClientResponse;
-
-//import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,9 +74,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     private String conditionCheckerOrAssessorRefName = null;
     private String insurerRefName = null;
     private String valuerRefName = null;
-    private final int NUM_AUTH_REFS_EXPECTED = 5;
-    private final static String CURRENT_DATE_UTC =
-            GregorianCalendarDateTimeUtils.currentDateUTC();
+    private final static String CURRENT_DATE_UTC = GregorianCalendarDateTimeUtils.currentDateUTC();
 
 	@Override
 	protected String getServiceName() {
@@ -97,6 +88,11 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     protected CollectionSpaceClient getClientInstance() {
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+	}
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
@@ -166,7 +162,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         intakeIdsCreated.add(newId);
     }
     
-    protected void createPersonRefs() {
+    protected void createPersonRefs() throws Exception {
     	//
     	// First, create a new person authority
     	//
@@ -206,7 +202,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         personIdsCreated.add(csid);
     }
     
-    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
+    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) throws Exception {
     	String result = null;
     	
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
@@ -239,8 +235,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     }
 
     // Success outcomes
-    @Test(dataProvider="testName",
-        dependsOnMethods = {"createWithAuthRefs"})
+    @Test(dataProvider="testName", dependsOnMethods = {"createWithAuthRefs"})
     public void readAndCheckAuthRefs(String testName) throws Exception {
         // Perform setup.
         testSetup(STATUS_OK, ServiceRequestType.READ);
@@ -251,8 +246,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         try {
 	        assertStatusCode(res, testName);
 	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
-	        IntakesCommon intake = (IntakesCommon) extractPart(input,
-	        		intakeClient.getCommonPartName(), IntakesCommon.class);
+	        IntakesCommon intake = (IntakesCommon) extractPart(input, intakeClient.getCommonPartName(), IntakesCommon.class);
 	        Assert.assertNotNull(intake);
 	        // Check a couple of fields
 	        Assert.assertEquals(intake.getCurrentOwner(), currentOwnerRefName);
@@ -278,30 +272,28 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
         int numAuthRefsFound = items.size();
-        if(logger.isDebugEnabled()){
-            logger.debug("Expected " + NUM_AUTH_REFS_EXPECTED +
-                " authority references, found " + numAuthRefsFound);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Expected " + personIdsCreated.size() + " authority references, found " + numAuthRefsFound);
         }
-        Assert.assertEquals(numAuthRefsFound, NUM_AUTH_REFS_EXPECTED,
-            "Did not find all expected authority references! " +
-            "Expected " + NUM_AUTH_REFS_EXPECTED + ", found " + numAuthRefsFound);
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
-        if(iterateThroughList && logger.isDebugEnabled()){
+        if (iterateThroughList && logger.isDebugEnabled()) {
             int i = 0;
             for(AuthorityRefList.AuthorityRefItem item : items){
                 logger.debug(testName + ": list-item[" + i + "] Field:" +
                 		item.getSourceField() + "= " +
                         item.getAuthDisplayName() +
                         item.getItemDisplayName());
-                logger.debug(testName + ": list-item[" + i + "] refName=" +
-                        item.getRefName());
-                logger.debug(testName + ": list-item[" + i + "] URI=" +
-                        item.getUri());
+                logger.debug(testName + ": list-item[" + i + "] refName=" + item.getRefName());
+                logger.debug(testName + ": list-item[" + i + "] URI=" + item.getUri());
                 i++;
             }
         }
+        //
+        // Ensure we got the correct number of authRefs
+        Assert.assertEquals(numAuthRefsFound, personIdsCreated.size(),
+        		"Did not find all expected authority references! " + "Expected " + personIdsCreated.size() + ", found " + numAuthRefsFound);
     }
 
 
@@ -316,11 +308,12 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
-    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+    	if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Skipping Cleanup phase ...");
             }
@@ -334,8 +327,9 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         for (String resourceId : intakeIdsCreated) {
             intakeClient.delete(resourceId).close();
         }
+        //
+        // Delete all the person records then the parent resource
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-        // Delete persons before PersonAuth
         for (String resourceId : personIdsCreated) {
             personAuthClient.deleteItem(personAuthCSID, resourceId).close();
         }
@@ -356,7 +350,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 				String depositor,
 				String conditionCheckerAssessor,
 				String insurer,
-				String Valuer ) {
+				String Valuer ) throws Exception {
         IntakesCommon intake = new IntakesCommon();
         intake.setEntryNumber(entryNumber);
         intake.setEntryDate(entryDate);

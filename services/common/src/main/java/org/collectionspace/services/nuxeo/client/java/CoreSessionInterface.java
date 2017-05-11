@@ -16,6 +16,10 @@ public interface CoreSessionInterface {
 
 	public CoreSession getCoreSession();
 	
+    public void setTransactionRollbackOnly();
+    
+    public boolean isTransactionMarkedForRollbackOnly();
+	
     /**
      * Gets the root document of this repository.
      *

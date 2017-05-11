@@ -123,8 +123,9 @@ public class AccountRoleDocumentHandler
      * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#handleDelete(org.collectionspace.services.common.document.DocumentWrapper)
      */
     @Override
-    public void handleDelete(DocumentWrapper<List<AccountRoleRel>> wrapDoc) throws Exception {
+    public boolean handleDelete(DocumentWrapper<List<AccountRoleRel>> wrapDoc) throws Exception {
         fillCommonPart(getCommonPart(), wrapDoc, true);
+        return true;
     }
 
     /* (non-Javadoc)

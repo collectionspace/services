@@ -81,7 +81,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
      * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
      */
     @Override
-    protected String getServicePathComponent() {
+    protected String getServicePathComponent() throws Exception {
         return new AccountRoleClient().getServicePathComponent();
     }
     
@@ -94,9 +94,10 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
 
     /**
      * Seed data.
+     * @throws Exception 
      */
     @BeforeClass(alwaysRun = true)
-    public void seedData() {
+    public void seedData() throws Exception {
         String userId = "acc-role-user1";
         String accId = createAccount(userId, "acc-role-user1-test@cspace.org");
         AccountValue ava = new AccountValue();
@@ -132,9 +133,14 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new AccountRoleClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new AccountRoleClient(clientPropertiesFilename);
+	}
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
@@ -455,11 +461,11 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
 
     /**
      * Clean up.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun = true)
     @Override
-    public void cleanUp() {
-
+    public void cleanUp() throws Exception {
         setupDelete();
 
         String noTest = System.getProperty("noTestCleanup");
@@ -488,8 +494,9 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
      * @param userName the user name
      * @param email the email
      * @return the string
+     * @throws Exception 
      */
-    private String createAccount(String userName, String email) {
+    private String createAccount(String userName, String email) throws Exception {
         AccountClient accClient = new AccountClient();
         AccountsCommon account = AccountFactory.createAccountInstance(
                 userName, userName, userName, email, accClient.getTenantId(),
@@ -510,7 +517,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
         return result;
     }
 
-    private void findPrebuiltAdminAccount() {
+    private void findPrebuiltAdminAccount() throws Exception {
     	// Search for the prebuilt admin user and then hold its CSID
     	if (prebuiltAdminCSID == null) {
             setupReadList();
@@ -538,8 +545,9 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
      * Delete account.
      *
      * @param accId the acc id
+     * @throws Exception 
      */
-    private void deleteAccount(String accId) {
+    private void deleteAccount(String accId) throws Exception {
         AccountClient accClient = new AccountClient();
         setupDelete();
         Response res = accClient.delete(accId);
@@ -557,8 +565,9 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
      *
      * @param roleName the role name
      * @return the string
+     * @throws Exception 
      */
-    private String createRole(String roleName) {
+    private String createRole(String roleName) throws Exception {
     	String result = null;
     	
         RoleClient roleClient = new RoleClient();
@@ -583,8 +592,9 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
      * Delete role.
      *
      * @param roleId the role id
+     * @throws Exception 
      */
-    private void deleteRole(String roleId) {
+    private void deleteRole(String roleId) throws Exception {
         setupDelete();
         RoleClient roleClient = new RoleClient();
         Response res = roleClient.delete(roleId);

@@ -39,14 +39,10 @@ import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationshipType;
-
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +71,8 @@ public class RelationServiceTest extends AbstractPoxServiceTestImpl<RelationsCom
     private String oliveObjectRefName = UNINITIALIZED_REFNAME;
     
     private String personAuthCSID = null;
-    private String personShortId = PERSON_AUTHORITY_NAME;
+    private String personAuthShortId = PERSON_AUTHORITY_NAME + System.currentTimeMillis();
+    private String personAuthDisplayName = personAuthShortId;
     
 
     /** The SERVICE path component. */
@@ -85,9 +82,14 @@ public class RelationServiceTest extends AbstractPoxServiceTestImpl<RelationsCom
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
     	return new RelationClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+    	return new RelationClient(clientPropertiesFilename);
+	}
      
     protected Class<RelationsCommonList> getCommonListType() {
     	return (Class<RelationsCommonList>)RelationsCommonList.class;
@@ -95,14 +97,15 @@ public class RelationServiceTest extends AbstractPoxServiceTestImpl<RelationsCom
         
     /**
      * Creates the person refs as a precondition for running the tests in this class.
+     * @throws Exception 
      */
     @BeforeSuite
-    private void createPersonRefs() {
+    private void createPersonRefs() throws Exception {
         setupCreate();
 
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
-                PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
+        		personAuthDisplayName, personAuthShortId, personAuthClient.getCommonPartName());
         Response res = personAuthClient.create(multipart);
         try {
 	        int statusCode = res.getStatus();
@@ -132,13 +135,37 @@ public class RelationServiceTest extends AbstractPoxServiceTestImpl<RelationsCom
     }
     
     @AfterSuite
-    private void deletePersonRefs() {
-    	//
-    	// Delete all the persons we created for the tests
-    	//
+    private void deletePersonRefs() throws Exception {
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        for (String csid:personIdsCreated) {
+	        Response res = personAuthClient.deleteItem(personAuthCSID, csid);
+	        try {
+		        int statusCode = res.getStatus();
+		
+		        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+		                invalidStatusCodeMessage(testRequestType, statusCode));
+		        Assert.assertEquals(statusCode, this.STATUS_OK);
+	        } finally {
+	        	res.close();
+	        }
+        }
+        //
+        // Now delete the container (the parent)
+        //
+        Response res = personAuthClient.delete(personAuthCSID);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, this.STATUS_OK);
+        } finally {
+        	res.close();
+        }
+        
     }
 
-    private String createPerson(String firstName, String surName, String shortId, String authRefName) {
+    private String createPerson(String firstName, String surName, String shortId, String authRefName) throws Exception {
     	String result = null;
     	
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
@@ -234,7 +261,7 @@ public class RelationServiceTest extends AbstractPoxServiceTestImpl<RelationsCom
         return relationCommon;
     }
 
-    private PoxPayloadOut createRelationInstance(RelationsCommon relation) {
+    private PoxPayloadOut createRelationInstance(RelationsCommon relation) throws Exception {
         PoxPayloadOut result = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart =
         	result.addPart(new RelationClient().getCommonPartName(), relation);
@@ -250,8 +277,9 @@ public class RelationServiceTest extends AbstractPoxServiceTestImpl<RelationsCom
      *
      * @param identifier the identifier
      * @return the multipart output
+     * @throws Exception 
      */
-    private PoxPayloadOut createRelationInstance(String identifier) {
+    private PoxPayloadOut createRelationInstance(String identifier) throws Exception {
         RelationsCommon relation = createRelationsCommon(identifier);
         PoxPayloadOut result = createRelationInstance(relation);
         return result;
@@ -306,7 +334,7 @@ public class RelationServiceTest extends AbstractPoxServiceTestImpl<RelationsCom
 
 	@Override
 	protected PoxPayloadOut createInstance(String commonPartName,
-			String identifier) {
+			String identifier) throws Exception {
 		return createRelationInstance(identifier);
 	}
 

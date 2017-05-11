@@ -7,21 +7,20 @@ import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.common.api.CommonAPI;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
+import org.collectionspace.services.nuxeo.listener.AbstractCSEventListenerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.Blob;
-import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.blobholder.BlobHolder;
 import org.nuxeo.ecm.core.api.blobholder.DocumentBlobHolder;
 //import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
-import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 //import org.nuxeo.ecm.platform.picture.api.ImagingDocumentConstants;
 import org.nuxeo.ecm.platform.picture.api.ImagingDocumentConstants;
 
-public class UpdateImageDerivatives implements EventListener {
+public class UpdateImageDerivatives extends AbstractCSEventListenerImpl {
 
 	// All Nuxeo sessions that get passed around to CollectionSpace code need to
 	// be wrapped inside of a CoreSessionWrapper. For example:
@@ -33,7 +32,7 @@ public class UpdateImageDerivatives implements EventListener {
 	private final static Log logger = LogFactory.getLog(UpdateImageDerivatives.class);
 
 	@Override
-	public void handleEvent(Event event) throws ClientException {
+	public void handleEvent(Event event) {
 		if (logger.isTraceEnabled()) {
 			logger.trace(String.format("Entering handleEvent in '%s'...", getClass().getName()));
 		}
@@ -72,7 +71,7 @@ public class UpdateImageDerivatives implements EventListener {
 	private void purgeOriginalImage(DocumentModel docModel, CoreSessionInterface nuxeoSession) {
 		//
 		// Empty the document model's "content" property -this does not delete the actual file/blob it
-		// just disassociates the blob content (aka, the orginal image) from the document.
+		// just disassociates the blob content (aka, the original image) from the document.
 		//
 		docModel.setPropertyValue("file:content", (Serializable) null);
 		
@@ -114,7 +113,7 @@ public class UpdateImageDerivatives implements EventListener {
 
 		EventContext eventContext = event.getContext();
 		if (eventContext != null) {
-			if (eventContext instanceof DocumentEventContext) {
+			if (isRegistered(event) && eventContext instanceof DocumentEventContext) {
 				result = true;
 			}
 		}

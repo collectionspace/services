@@ -2,5 +2,5 @@
 <ns2:collectionobjects_common xmlns:ns2="http://collectionspace.org/services/collectionobject">
 <objectNumber>objectNumber</objectNumber>
 <!-- test child repeatable field with null value -->
-<responsibleDepartments><responsibleDepartment></responsibleDepartment></responsibleDepartments>
+<responsibleDepartments><responsibleDepartment>rd1</responsibleDepartment><responsibleDepartment></responsibleDepartment></responsibleDepartments>
 </ns2:collectionobjects_common> 

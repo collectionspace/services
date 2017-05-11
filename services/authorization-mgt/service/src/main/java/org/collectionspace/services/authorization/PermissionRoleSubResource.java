@@ -56,9 +56,6 @@ public class PermissionRoleSubResource
     final Logger logger = LoggerFactory.getLogger(PermissionRoleSubResource.class);
     /** The storage client. */
     final StorageClient storageClient = new JpaRelationshipStorageClient<PermissionRole>();
-    //
-    private String permissionRoleCsid = null;
-
     /**
      * Instantiates a new permission role sub resource.
      *

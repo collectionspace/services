@@ -16,10 +16,12 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.conditioncheck.ConditionchecksCommon;
+
 /**
  * ConditioncheckClient.java
  */
-public class ConditioncheckClient extends AbstractCommonListPoxServiceClientImpl<ConditioncheckProxy> {
+public class ConditioncheckClient extends AbstractCommonListPoxServiceClientImpl<ConditioncheckProxy, ConditionchecksCommon> {
 
     public static final String SERVICE_NAME = "conditionchecks";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
@@ -27,7 +29,15 @@ public class ConditioncheckClient extends AbstractCommonListPoxServiceClientImpl
     public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    /* (non-Javadoc)
+    public ConditioncheckClient() throws Exception {
+		super();
+	}
+
+    public ConditioncheckClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
+
+	/* (non-Javadoc)
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
      */
     @Override

@@ -37,7 +37,7 @@
     <target name="package-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="package" />
             <arg value="-Dmaven.test.skip=true" />
             <arg value="-f" />
@@ -62,7 +62,7 @@
     <target name="install-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="install" />
             <arg value="-Dmaven.test.skip=true" />
             <arg value="-f" />
@@ -85,7 +85,7 @@
     <target name="clean-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="clean" />
             <arg value="${mvn.opts}" />
         </exec>
@@ -101,7 +101,7 @@
     <target name="test-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="test" />
             <arg value="${mvn.opts}" />
         </exec>
@@ -126,10 +126,15 @@
       description="Undeploy report files">
     </target>
     
+	<!-- Removes only the source reports that originated from the source directory.  Ones added
+		manually remain.
+	-->
     <target name="undeploy_source_report_files"
       description="Undeploy source (.jrxml) report files">
       <delete failonerror="false">
-        <fileset dir="${jee.server.cspace}/cspace/reports" includes="*.jrxml"/>
+        <fileset dir="${jee.server.cspace}/cspace/reports" includes="*.jrxml">
+			<present targetdir="${basedir}/jasper-cs-report/src/main/resources" />
+		</fileset>
       </delete>
     </target>
     
@@ -149,7 +154,7 @@
       -->
     </target>
 
-    <target name="undeploy" depends="undeploy_compiled_report_files"
+    <target name="undeploy" depends="undeploy_report_files"
       description="Undeploy report-related artifacts">
         <ant antfile="nuxeo-platform-cs-report/build.xml" target="undeploy" inheritall="false"/>
     </target>

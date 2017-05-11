@@ -37,9 +37,12 @@ import javax.activation.MimetypesFileTypeMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.MarshalException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.httpclient.HttpMethodBase;
@@ -60,7 +63,9 @@ import org.w3c.dom.Document;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.TestServiceClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.common.api.FileTools;
@@ -79,6 +84,7 @@ import org.collectionspace.services.common.api.FileTools;
 /*
  * <CLT> - Common list type
  */
+@SuppressWarnings("rawtypes")
 public abstract class BaseServiceTest<CLT> {
 	//A default MIME type result
     static protected final String DEFAULT_MIME = "application/octet-stream; charset=ISO-8859-1";
@@ -86,20 +92,30 @@ public abstract class BaseServiceTest<CLT> {
     protected static final String MAVEN_BASEDIR_PROPERTY = "maven.basedir";
     /** The Constant logger. */
     private static final Logger logger = LoggerFactory.getLogger(BaseServiceTest.class);
-    /** The Constant serviceClient. */
-    protected static final TestServiceClient serviceClient = new TestServiceClient();
+    
+    /** The static serviceClient for all instances */
+    protected static TestServiceClient serviceClient;
+    static {
+    	try {
+			serviceClient = new TestServiceClient();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+    }
     
     protected String knownResourceIdentifier = null;
     /** Use this to keep track of a single known resource */
     protected String knownResourceId = null;
     /* Use this to keep track of resources to delete */
     protected List<String> allResourceIdsCreated = new ArrayList<String>();
+    /* Use this to keep track of relationship resources to delete */
+    protected List<String> allRelationResourceIdsCreated = new ArrayList<String>();
     /* Use this to track authority items */
     protected Map<String, String> allResourceItemIdsCreated = new HashMap<String, String>(); /* itemCsid, parentCsid */
     /* A runtime/command-line parameter to indicate if we should delete all the test related resource objects */
     static private final String NO_TEST_CLEANUP = "noTestCleanup";
     /* A random number generator */
-    static private final Random random = new Random(System.currentTimeMillis());
+    protected static final Random random = new Random(System.currentTimeMillis());
     
     
     /** The non-existent id. */
@@ -141,24 +157,34 @@ public abstract class BaseServiceTest<CLT> {
     //
     // Status constants
     //
-    protected static final int STATUS_BAD_REQUEST =
-        Response.Status.BAD_REQUEST.getStatusCode();
-    protected static final int STATUS_CREATED =
-        Response.Status.CREATED.getStatusCode();
-    protected static final int STATUS_INTERNAL_SERVER_ERROR =
-        Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
-    protected static final int STATUS_NOT_FOUND =
-        Response.Status.NOT_FOUND.getStatusCode();
-    protected static final int STATUS_OK =
-            Response.Status.OK.getStatusCode();
-    protected static final int STATUS_FORBIDDEN =
-            Response.Status.FORBIDDEN.getStatusCode();
+    protected static final int STATUS_BAD_REQUEST = Response.Status.BAD_REQUEST.getStatusCode();
+    protected static final int STATUS_CREATED = Response.Status.CREATED.getStatusCode();
+    protected static final int STATUS_INTERNAL_SERVER_ERROR = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
+    protected static final int STATUS_NOT_FOUND = Response.Status.NOT_FOUND.getStatusCode();
+    protected static final int STATUS_OK = Response.Status.OK.getStatusCode();
+    protected static final int STATUS_FORBIDDEN = Response.Status.FORBIDDEN.getStatusCode();
     
     //
     // "Global flag to cancel cleanup() method
     //
     private static boolean cancelCleanup = false;
+        
+    /**
+     * Instantiates a new base service test.
+     * @throws Exception 
+     */
+    public BaseServiceTest() {
+        super();
+    }
     
+    protected int getExpectedStatusCode() {
+    	return this.testExpectedStatusCode;
+    }
+    
+    protected ServiceRequestType getRequestType() {
+    	return testRequestType;
+    }
+
     //
     // Decide if cleanup should happen
     //
@@ -177,13 +203,6 @@ public abstract class BaseServiceTest<CLT> {
     	cancelCleanup = true;
     }
 
-    /**
-     * Instantiates a new base service test.
-     */
-    public BaseServiceTest() {
-        super();
-    }
-
     /*
      * A getter for retrieving the tests logger
      */
@@ -200,8 +219,17 @@ public abstract class BaseServiceTest<CLT> {
      * Gets the client.
      *
      * @return the client
+     * @throws Exception 
      */
-    abstract protected CollectionSpaceClient getClientInstance();
+	abstract protected CollectionSpaceClient getClientInstance() throws Exception;
+
+    /**
+     * Gets the client.
+     *
+     * @return the client
+     * @throws Exception 
+     */
+    abstract protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception;
 
     /*
      * Subclasses can override this method to return their AbstractCommonList subclass
@@ -237,8 +265,9 @@ public abstract class BaseServiceTest<CLT> {
      * base path, if any.
      *
      * @return The URL path component of the service.
+     * @throws Exception 
      */
-    protected abstract String getServicePathComponent();
+    protected abstract String getServicePathComponent() throws Exception;
     
     protected abstract String getServiceName();
 
@@ -440,7 +469,7 @@ public abstract class BaseServiceTest<CLT> {
      * Tests can override this method to customize their identifiers.
      */
     protected String createIdentifier() {
-        long identifier = System.currentTimeMillis() + random.nextInt();
+        long identifier = System.currentTimeMillis() + Math.abs(random.nextInt());
         return Long.toString(identifier);
     }
     
@@ -480,18 +509,32 @@ public abstract class BaseServiceTest<CLT> {
      * @return the object
      * @throws Exception the exception
      */
-    static protected Object extractPart(PoxPayloadIn input, String label, Class<?> clazz)
-            throws Exception {
-    	Object result = null;
-    	PayloadInputPart payloadInputPart = input.getPart(label);
-        if (payloadInputPart != null) {
-        	result = payloadInputPart.getBody();
-        } else if (logger.isWarnEnabled() == true) {
-        	logger.warn("Payload part: " + label +
-        			" is missing from payload: " + input.getName());
-        }
-        return result;
-            }
+	static protected Object extractPart(PoxPayloadIn input, String label, Class<?> clazz) throws Exception {
+		Object result = null;
+		
+		PayloadInputPart payloadInputPart = input.getPart(label);
+		if (payloadInputPart != null) {
+			result = payloadInputPart.getBody();
+		} else if (logger.isWarnEnabled() == true) {
+			logger.warn("Payload part: " + label + " is missing from payload: " + input.getName());
+		}
+		
+		return result;
+	}
+	
+	static protected Object extractPart(PoxPayloadOut output, String label, Class<?> clazz) throws Exception {
+		Object result = null;
+		
+		PayloadOutputPart payloadOutPart = output.getPart(label);
+		if (payloadOutPart != null) {
+			result = payloadOutPart.getBody();
+		} else if (logger.isWarnEnabled() == true) {
+			logger.warn("Payload part: " + label + " is missing from payload: " + output.getName());
+		}
+		
+		return result;
+	}
+	
 
     /**
      * Gets the part object.
@@ -532,33 +575,33 @@ public abstract class BaseServiceTest<CLT> {
      * @param clazz the clazz
      * @return the string
      */
-    static protected String objectAsXmlString(Object o, Class<?> clazz) {
-        StringWriter sw = new StringWriter();
-        try {
-            JAXBContext jc = JAXBContext.newInstance(clazz);
-            Marshaller m = jc.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-                    Boolean.TRUE);
-            m.marshal(o, sw);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return sw.toString();
-    }
+	static protected String objectAsXmlString(Object o, Class<?> clazz) {
+		StringWriter sw = new StringWriter();
+		JAXBContext jc;
+		try {
+			jc = JAXBContext.newInstance(clazz);
+			Marshaller m = jc.createMarshaller();
+			try {
+				m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+				m.marshal(o, sw);
+			} catch (MarshalException e) {
+				sw = new StringWriter(); // reset the StringWriter value
+				JAXBElement root = new JAXBElement(new QName("uri", "local"), clazz, o);
+				m.marshal(root, sw);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (JAXBException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		return sw.toString();
+	}
     
     static protected String objectAsXmlString(Object o) {
-        StringWriter sw = new StringWriter();
-        try {
-            JAXBContext jc = JAXBContext.newInstance(o.getClass());
-            Marshaller m = jc.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-                    Boolean.TRUE);
-            m.marshal(o, sw);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return sw.toString();
-    }    
+        return objectAsXmlString(o, o.getClass());
+    }
 
     /**
      * getObjectFromFile get object of given class from given file (in classpath)
@@ -734,45 +777,56 @@ public abstract class BaseServiceTest<CLT> {
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun = true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         if (cleanupCancelled() == true) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Skipping Cleanup phase ...");
             }
             return;
         }
-        
-        if (logger.isDebugEnabled()) {
-            logger.debug("Cleaning up temporary resources created for testing ...");
-        }
-        CollectionSpaceClient client = this.getClientInstance();
-        //
-        // First, check to see if we need to cleanup any authority items
-        //
-        if (this.isAuthorityClient(client) == true) {
-            AuthorityClient authorityClient = (AuthorityClient) client;
-            for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
-                String itemResourceId = entry.getKey();
-                String authorityResourceId = entry.getValue();
-                // Note: Any non-success responses are ignored and not reported.
-                authorityClient.deleteItem(authorityResourceId, itemResourceId).close();
-            }
-        }
-        //
-        // Next, delete all other entities include possible authorities.
-        //
+        cleanUp(this.getClientInstance());
+    }
+    
+    public void cleanUp(CollectionSpaceClient client) {
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
             client.delete(resourceId).close();
         }
+        //
+        // Clean up relationship records we created during testing
+        //
+        for (String resourceId : allRelationResourceIdsCreated) {
+            // Note: Any non-success responses are ignored and not reported.
+            client.delete(resourceId).close();
+        }
+        
     }
 	
 	//
 	// Status code setup methods for tests
 	//
 	
+    /**
+     * Sets up create tests with empty entity body.
+     */
+    protected void setupCreateWithEmptyEntityBody() {
+        testExpectedStatusCode = STATUS_BAD_REQUEST;
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }
+
+    /**
+     * Sets up create tests with empty entity body.
+     */
+    protected void setupCreateWithInvalidBody() {
+        testExpectedStatusCode = STATUS_BAD_REQUEST;
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }
+    
     /**
      * Sets up create tests with malformed xml.
      */
@@ -880,6 +934,15 @@ public abstract class BaseServiceTest<CLT> {
         testRequestType = ServiceRequestType.DELETE;
         testSetup(testExpectedStatusCode, testRequestType);
     }
+        
+    /**
+     * Sets up create tests with empty entity body.
+     */
+    protected void setupUpdateWithInvalidBody() {
+        testExpectedStatusCode = STATUS_BAD_REQUEST;
+        testRequestType = ServiceRequestType.UPDATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }    
 
     // Failure outcomes
 
@@ -891,34 +954,7 @@ public abstract class BaseServiceTest<CLT> {
         testRequestType = ServiceRequestType.DELETE;
         testSetup(testExpectedStatusCode, testRequestType);
     }
-    
-    /**
-     * Sets up create tests with empty entity body.
-     */
-    protected void setupCreateWithEmptyEntityBody() {
-        testExpectedStatusCode = STATUS_BAD_REQUEST;
-        testRequestType = ServiceRequestType.CREATE;
-        testSetup(testExpectedStatusCode, testRequestType);
-    }
-
-    /**
-     * Sets up create tests with empty entity body.
-     */
-    protected void setupCreateWithInvalidBody() {
-        testExpectedStatusCode = STATUS_BAD_REQUEST;
-        testRequestType = ServiceRequestType.CREATE;
-        testSetup(testExpectedStatusCode, testRequestType);
-    }
-    
-    /**
-     * Sets up create tests with empty entity body.
-     */
-    protected void setupUpdateWithInvalidBody() {
-        testExpectedStatusCode = STATUS_BAD_REQUEST;
-        testRequestType = ServiceRequestType.UPDATE;
-        testSetup(testExpectedStatusCode, testRequestType);
-    }
-    
+        
     public void updateWithEmptyEntityBody(String testName) throws Exception {
         //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }

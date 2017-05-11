@@ -23,14 +23,13 @@
 package org.collectionspace.services.security.client.test;
 
 import java.util.List;
+
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.collectionspace.services.account.AccountTenant;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.Status;
@@ -83,9 +82,14 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new AccountClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new AccountClient(clientPropertiesFilename);
+	}	
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
@@ -195,9 +199,8 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTest#create()
      */
-    @Test(dataProvider = "testName",
-    		dependsOnMethods = {"createActiveAccount"})
-    public void create(String testName) {
+    @Test(dataProvider = "testName", dependsOnMethods = {"createActiveAccount"})
+    public void create(String testName) throws Exception {
         setupCreate();
 
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
@@ -224,9 +227,8 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
 
     }
 
-    @Test(dataProvider = "testName",
-    		dependsOnMethods = {"createActiveAccount"})
-    public void createWithoutAuthn(String testName) {
+    @Test(dataProvider = "testName", dependsOnMethods = {"createActiveAccount"})
+    public void createWithoutAuthn(String testName) throws Exception {
         setupCreate();
         
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
@@ -249,9 +251,8 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
         }
     }
 
-    @Test(dataProvider = "testName",
-    		dependsOnMethods = {"createInactiveAccount"})
-    public void createWithInactiveAccount(String testName) {
+    @Test(dataProvider = "testName", dependsOnMethods = {"createInactiveAccount"})
+    public void createWithInactiveAccount(String testName) throws Exception {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setAuth(true, "george", true, "george08", true);
         String identifier = createIdentifier();
@@ -273,10 +274,10 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
 
     /**
      * Creates the collection object instance without password.
+     * @throws Exception 
      */
-    @Test(dataProvider = "testName",
-    		dependsOnMethods = {"createActiveAccount"})
-    public void createWithoutPassword(String testName) {
+    @Test(dataProvider = "testName", dependsOnMethods = {"createActiveAccount"})
+    public void createWithoutPassword(String testName) throws Exception {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         String user = collectionObjectClient.getProperty(collectionObjectClient.USER_PROPERTY);
         collectionObjectClient.setAuth(true, user, true, "", false);
@@ -296,10 +297,10 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
 
     /**
      * Creates the collection object with unknown user
+     * @throws Exception 
      */
-    @Test(dataProvider = "testName",
-    		dependsOnMethods = {"createActiveAccount"})
-    public void createWithUnknownUser(String testName) {
+    @Test(dataProvider = "testName", dependsOnMethods = {"createActiveAccount"})
+    public void createWithUnknownUser(String testName) throws Exception {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setAuth(true, "foo", true, "bar", true);
         String identifier = createIdentifier();
@@ -318,10 +319,10 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
 
     /**
      * Creates the collection object instance with incorrect password.
+     * @throws Exception 
      */
-    @Test(dataProvider = "testName",
-    		dependsOnMethods = {"createActiveAccount"})
-    public void createWithIncorrectPassword(String testName) {
+    @Test(dataProvider = "testName", dependsOnMethods = {"createActiveAccount"})
+    public void createWithIncorrectPassword(String testName) throws Exception {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         String user = collectionObjectClient.getProperty(collectionObjectClient.USER_PROPERTY);
         collectionObjectClient.setAuth(true, user, true, "bar", true);
@@ -341,9 +342,10 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
 
     /**
      * Creates the collection object instance with incorrect user password.
+     * @throws Exception 
      */
     @Test(dataProvider = "testName", dependsOnMethods = {"createActiveAccount"})
-    public void createWithIncorrectUserPassword(String testName) {
+    public void createWithIncorrectUserPassword(String testName) throws Exception {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setAuth(true, "foo", true, "bar", true);
         String identifier = createIdentifier();
@@ -362,9 +364,10 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
 
     /**
      * Creates the collection object instance with incorrect user password.
+     * @throws Exception 
      */
     @Test(dataProvider = "testName", dependsOnMethods = {"createActiveAccount"})
-    public void createWithoutTenant(String testName) {
+    public void createWithoutTenant(String testName) throws Exception {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setAuth(true, "babybop", true, "babybop09", true);
         String identifier = createIdentifier();
@@ -494,5 +497,5 @@ public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonLis
 	protected Class<AbstractCommonList> getCommonListType() {
 		// TODO Auto-generated method stub
 		return null;
-	}	
+	}
 }

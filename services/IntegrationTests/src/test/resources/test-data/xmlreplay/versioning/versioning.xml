@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xmlReplay>
-  <!-- Authenticate into the lifesci tenant. By default, versioning -->
+  <!-- Authenticate into the testsci tenant. By default, versioning -->
   <!-- support is exposed in the Location/Movement/Inventory service -->
   <!-- in that tenant. -->
-  <auths default="admin@lifesci.collectionspace.org">
-    <auth ID="admin@lifesci.collectionspace.org"
-      >YWRtaW5AbGlmZXNjaS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+  <auths default="admin@testsci.collectionspace.org">
+    <auth ID="admin@testsci.collectionspace.org"
+      >YWRtaW5AdGVzdHNjaS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
   </auths>
 
   <!-- Verifies that, by default: -->
@@ -13,7 +13,7 @@
   <!--   * Only the current version of a record is retrieved on a read request. -->
   <testGroup ID="VersionedRecordFiltering" autoDeletePOSTS="true">
   
-    <test ID="CreateMovement" auth="admin@lifesci.collectionspace.org">
+    <test ID="CreateMovement" auth="admin@testsci.collectionspace.org">
       <method>POST</method>
       <uri>/cspace-services/movements/</uri>
       <filename>versioning/movement.xml</filename>
@@ -34,7 +34,7 @@
       <uri>/cspace-services/movements</uri>
     </test>
     
-    <test ID="UpdateMovement" auth="admin@lifesci.collectionspace.org">
+    <test ID="UpdateMovement" auth="admin@testsci.collectionspace.org">
       <method>PUT</method>
       <uri>/cspace-services/movements/${CreateMovement.CSID}</uri>
       <filename>versioning/movement.xml</filename>

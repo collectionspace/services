@@ -5,21 +5,22 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.collectionspace.services</groupId>
 	<artifactId>org.collectionspace.services</artifactId>
-	<version>4.3-SNAPSHOT</version>
+	<version>4.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>services</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<cspace.services.version>4.3-SNAPSHOT</cspace.services.version>
-		<cspace.services.client.version>4.3-SNAPSHOT</cspace.services.client.version>
-		<nuxeo.general.release>6.0</nuxeo.general.release>
+		<cspace.services.version>4.5-SNAPSHOT</cspace.services.version>
+		<cspace.services.client.version>4.5-SNAPSHOT</cspace.services.client.version>
+		<nuxeo.general.release>7.10-HF17</nuxeo.general.release>
 		<nuxeo.shell.version>${nuxeo.general.release}</nuxeo.shell.version>
 		<nuxeo.platform.version>${nuxeo.general.release}</nuxeo.platform.version>
 		<nuxeo.core.version>${nuxeo.general.release}</nuxeo.core.version>
 		<chemistry.opencmis.version.nx>0.12.0-NX2</chemistry.opencmis.version.nx>
-		<spring.version>3.0.5.RELEASE</spring.version>
-		<spring.security.version>3.0.5.RELEASE</spring.security.version>
+		<spring.version>4.3.1.RELEASE</spring.version>
+		<spring.security.version>4.1.1.RELEASE</spring.security.version>
+		<spring.security.oauth2.version>2.0.10.RELEASE</spring.security.oauth2.version>
 	</properties>
 
 	<distributionManagement>
@@ -81,7 +82,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-		<repository>
+		<!-- <repository>
 			<id>maven2-repository.dev.java.net</id>
 			<name>Java.net Maven 2 Repository</name>
 			<url>http://download.java.net/maven/2</url>
@@ -89,7 +90,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-		<!-- <repository> <id>maven1-repository.dev.java.net</id> <name>Java.net 
+		<repository> <id>maven1-repository.dev.java.net</id> <name>Java.net 
 			Maven 1 Repository</name> <url>http://download.java.net/maven/1</url> <layout>legacy</layout> 
 			<snapshots> <enabled>false</enabled> </snapshots> </repository> -->
 
@@ -110,7 +111,7 @@
 			</snapshots>
 		</repository>
 
-		<!--
+		<!-- codehaus was shutdown in May 2015
 		<repository>
 			<id>codehaus repo</id>
 			<name>codehaus repo</name>
@@ -132,7 +133,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-
+		
 		<repository>
 			<id>public-snapshot</id>
 			<url>http://maven.nuxeo.org/public-snapshot</url>
@@ -159,6 +160,18 @@
 		</repository>
 
 		<repository>
+			<id>nightly-staging</id>
+			<name>nuxeo-nightly-staging</name>
+			<url>http://mavenin.nuxeo.com/nexus/content/repositories/nightly-staging</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>		
+
+		<repository>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -181,6 +194,19 @@
 			<name>External release repository of the Apache projects</name>
 			<url>https://repository.apache.org/content/groups/public/</url>
 		</repository>
+	    
+	    <!-- Global Biodiversity Information Facility - http://www.gbif.org/ -->
+	    <repository>
+	        <snapshots>
+	            <enabled>false</enabled>
+	        </snapshots>
+	        <releases>
+	            <enabled>true</enabled>
+	        </releases>	        
+	        <id>gbif-all</id>
+	        <name>gbif-all</name>
+	        <url>http://repository.gbif.org/content/groups/gbif</url>
+	    </repository>	    
 
 	</repositories>
 
@@ -216,6 +242,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</pluginRepository>
+		<!-- Codehaus repo was shutdown in May 2015
 		<pluginRepository>
 			<id>Codehaus Repository</id>
 			<url>http://repository.codehaus.org/</url>
@@ -226,6 +253,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</pluginRepository>
+		-->
 	</pluginRepositories>
 
 	<build>
@@ -234,7 +262,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>2.6.1</version>
+					<version>2.10.4</version>
 					<configuration>
 						<show>public</show>
 					</configuration>
@@ -334,6 +362,7 @@
 				before we perform any build related tasks. -->
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
 				<executions>
 					<execution>
 						<id>check-environment-vars</id>
@@ -343,8 +372,11 @@
 						</goals>
 						<configuration>
 							<tasks>
+								<property environment="env" />
 								<fail unless="env.CSPACE_INSTANCE_ID"
 									message="Required environment variable CSPACE_INSTANCE_ID has not been set. Use '_default' as a default value." />
+								<fail unless="env.JEE_PORT"
+									message="Required environment variable JEE_PORT has not been set.  Use '8180' as a default value." />
 								<fail unless="env.DB_HOST"
 									message="Required environment variable DB_HOST has not been set.  Use 'localhost' as a default value." />
 								<fail unless="env.DB_PORT"
@@ -459,7 +491,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.6</version>
+				<version>2.9</version>
 				<configuration>
 				</configuration>
 				<reportSets>

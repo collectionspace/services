@@ -43,7 +43,6 @@ import org.collectionspace.services.work.WorkTermGroup;
 import org.collectionspace.services.work.WorkTermGroupList;
 import org.collectionspace.services.work.WorkauthoritiesCommon;
 import org.collectionspace.services.work.WorksCommon;
-import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -58,9 +57,16 @@ import org.testng.annotations.Test;
 public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<WorkauthoritiesCommon, WorksCommon> {
 
     /** The logger. */
-    private final String CLASS_NAME = WorkAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(WorkAuthorityServiceTest.class);
 
+    /**
+     * Default constructor.  Used to set the short ID for all tests authority items
+     */
+    public WorkAuthorityServiceTest() {
+    	super();
+        TEST_SHORTID = "muppetstakemanhattan";
+    }
+    
     @Override
     public String getServicePathComponent() {
         return WorkAuthorityClient.SERVICE_PATH_COMPONENT;
@@ -77,13 +83,6 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
     
     // Instance variables specific to this test.
     
-//    /** The SERVICE path component. */
-//    final String SERVICE_PATH_COMPONENT = "workauthorities";
-//    
-//    /** The ITEM service path component. */
-//    final String ITEM_SERVICE_PATH_COMPONENT = "items";
-//    
-
     final String TEST_WORK_TERM_DISPLAY_NAME = "Muppets Take Manhattan (1984)";
     final String TEST_WORK_TERM_NAME = "Muppets Take Manhattan";
     final String TEST_WORK_TERM_TYPE = "";
@@ -101,22 +100,26 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
     final String TEST_WORK_CREATOR_GROUP_CREATOR_TYPE = "director";
     final String TEST_WORK_PUBLISHER_GROUP_PUBLISHER = "TriStar Pictures";
     final String TEST_WORK_PUBLISHER_GROUP_PUBLISHER_TYPE = "Distributor";
-    final String TEST_WORK_SHORT_IDENTIFIER = "muppetstakemanhattan";
     final String TEST_WORK_REFNAME = "refname";
-    
-    /** The known resource id. */
-    private String knownResourceShortIdentifer = null;
-    private String knownResourceRefName = null;
-    private String knownWorkTypeRefName = null;
-    
+        
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new WorkAuthorityClient();
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new WorkAuthorityClient(clientPropertiesFilename);
+	}
+
+    @Override
+    protected String createItemInAuthority(AuthorityClient client, String authorityId, String shortId) {
+        return createItemInAuthority(client, authorityId, shortId, null /*refname*/);
+    }
+	
     /**
      * Creates the item in authority.
      *
@@ -124,14 +127,13 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
      * @param authRefName the auth ref name
      * @return the string
      */
-    private String createItemInAuthority(String vcsid, String authRefName) {
+    private String createItemInAuthority(AuthorityClient client, String vcsid, String shortId, String authRefName) {
         final String testName = "createItemInAuthority("+vcsid+","+authRefName+")"; 
     
         // Submit the request to the service and store the response.
-        WorkAuthorityClient client = new WorkAuthorityClient();
         Map<String, String> workMap = new HashMap<String,String>();
         // TODO Make work type and status be controlled vocabs.
-        workMap.put(WorkJAXBSchema.SHORT_IDENTIFIER, TEST_WORK_SHORT_IDENTIFIER);
+        workMap.put(WorkJAXBSchema.SHORT_IDENTIFIER, shortId);
         workMap.put(WorkJAXBSchema.WORK_TYPE, TEST_WORK_TYPE);
         workMap.put(WorkJAXBSchema.WORK_HISTORY_NOTE, TEST_WORK_HISTORY_NOTE);
         
@@ -145,12 +147,12 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
         terms.add(term);
         
         String newID = WorkAuthorityClientUtils.createItemInAuthority(vcsid,
-                authRefName, workMap, terms, client );    
+                authRefName, workMap, terms, (WorkAuthorityClient)client);    
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
         if (knownItemResourceId == null){
-            setKnownItemResource(newID, TEST_WORK_SHORT_IDENTIFIER);
+            setKnownItemResource(newID, shortId);
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownItemResourceId=" + newID);
             }
@@ -207,8 +209,7 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
 		// Submit the updated resource to the service and store the response.
 		PoxPayloadOut output = new PoxPayloadOut(
 				WorkAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-		PayloadOutputPart commonPart = output.addPart(
-				client.getItemCommonPartName(), work);
+		output.addPart(client.getItemCommonPartName(), work);
 		setupUpdateWithInvalidBody(); // we expected a failure here.
 		res = client.updateItem(knownResourceId, knownItemResourceId, output);
 		try {
@@ -219,85 +220,6 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
 			}
 		}
 	}
-
-    /**
-     * Read item list.
-     */
-    @Test(dataProvider = "testName", groups = {"readList"},
-               dependsOnMethods = {"readList"})
-    public void readItemList(String testName) {
-        readItemList(knownAuthorityWithItems, null);
-    }
-
-    /**
-     * Read item list by authority name.
-     */
-    @Test(dataProvider = "testName", groups = {"readList"},
-            dependsOnMethods = {"readItemList"})
-    public void readItemListByAuthorityName(String testName) {
-        readItemList(null, READITEMS_SHORT_IDENTIFIER);
-    }
-    
-    /**
-     * Read item list.
-     * 
-     * @param vcsid
-     *            the vcsid
-     * @param name
-     *            the name
-     */
-    private void readItemList(String vcsid, String shortId) {
-        String testName = "readItemList";
-
-        // Perform setup.
-        setupReadList();
-
-        // Submit the request to the service and store the response.
-        WorkAuthorityClient client = new WorkAuthorityClient();
-        Response res = null;
-        if (vcsid != null) {
-            res = client.readItemList(vcsid, null, null);
-        } else if (shortId != null) {
-            res = client.readItemListForNamedAuthority(shortId, null, null);
-        } else {
-            Assert.fail("readItemList passed null csid and name!");
-        }
-        
-        AbstractCommonList list = null;
-        try {
-            assertStatusCode(res, testName);
-            list = res.readEntity(AbstractCommonList.class);
-        } finally {
-            if (res != null) {
-                res.close();
-            }
-        }
-        
-        List<AbstractCommonList.ListItem> items = list.getListItem();
-        int nItemsReturned = items.size();
-        // There will be 'nItemsToCreateInList'
-        // items created by the createItemList test,
-        // all associated with the same parent resource.
-        int nExpectedItems = nItemsToCreateInList;
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": Expected " + nExpectedItems
-                    + " items; got: " + nItemsReturned);
-        }
-        Assert.assertEquals(nItemsReturned, nExpectedItems);
-
-        for (AbstractCommonList.ListItem item : items) {
-            String value = AbstractCommonListUtils.ListItemGetElementValue(
-                    item, WorkJAXBSchema.REF_NAME);
-            Assert.assertTrue((null != value), "Item refName is null!");
-            value = AbstractCommonListUtils.ListItemGetElementValue(item,
-                    WorkJAXBSchema.WORK_TERM_DISPLAY_NAME);
-            Assert.assertTrue((null != value), "Item termDisplayName is null!");
-        }
-        if (logger.isTraceEnabled()) {
-            AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger,
-                    testName);
-        }
-    }
 
     @Override
     public void delete(String testName) throws Exception {
@@ -332,40 +254,41 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
 
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
-        String noTest = System.getProperty("noTestCleanup");
-        if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Skipping Cleanup phase ...");
-            }
-            return;
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Cleaning up temporary resources created for testing ...");
-        }
-        String parentResourceId;
-        String itemResourceId;
-        // Clean up contact resources.
-        WorkAuthorityClient client = new WorkAuthorityClient();
-        parentResourceId = knownResourceId;
-        // Clean up item resources.
-        for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
-            itemResourceId = entry.getKey();
-            parentResourceId = entry.getValue();
-            // Note: Any non-success responses from the delete operation
-            // below are ignored and not reported.
-            client.deleteItem(parentResourceId, itemResourceId).close();
-        }
-        // Clean up parent resources.
-        for (String resourceId : allResourceIdsCreated) {
-            // Note: Any non-success responses from the delete operation
-            // below are ignored and not reported.
-        client.delete(resourceId).close();
-        }
-    }
+	public void cleanUp() throws Exception {
+		String noTest = System.getProperty("noTestCleanup");
+		if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Skipping Cleanup phase ...");
+			}
+			return;
+		}
+		if (logger.isDebugEnabled()) {
+			logger.debug("Cleaning up temporary resources created for testing ...");
+		}
+		String parentResourceId;
+		String itemResourceId;
+		// Clean up contact resources.
+		WorkAuthorityClient client = new WorkAuthorityClient();
+		parentResourceId = knownResourceId;
+		// Clean up item resources.
+		for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
+			itemResourceId = entry.getKey();
+			parentResourceId = entry.getValue();
+			// Note: Any non-success responses from the delete operation
+			// below are ignored and not reported.
+			client.deleteItem(parentResourceId, itemResourceId).close();
+		}
+		// Clean up parent resources.
+		for (String resourceId : allResourceIdsCreated) {
+			// Note: Any non-success responses from the delete operation
+			// below are ignored and not reported.
+			client.delete(resourceId).close();
+		}
+	}
 
     // ---------------------------------------------------------------
     // Utility methods used by tests above
@@ -406,10 +329,9 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
         return getItemServiceRootURL(parentResourceIdentifier) + "/" + itemResourceIdentifier;
     }
 
-        @Override
+    @Override
     public void authorityTests(String testName) {
         // TODO Auto-generated method stub
-        
     }
 
     //
@@ -466,46 +388,44 @@ public class WorkAuthorityServiceTest extends AbstractAuthorityServiceTest<Worka
     // Authority item specific overrides
     //
     
-    @Override
-    protected String createItemInAuthority(String authorityId) {
-        return createItemInAuthority(authorityId, null /*refname*/);
-    }
+	@Override
+	protected WorksCommon updateItemInstance(WorksCommon worksCommon) {
 
-    @Override
-    protected WorksCommon updateItemInstance(WorksCommon worksCommon) {
-                            
-            WorkTermGroupList termList = worksCommon.getWorkTermGroupList();
-            Assert.assertNotNull(termList);
-            List<WorkTermGroup> terms = termList.getWorkTermGroup();
-            Assert.assertNotNull(terms);
-            Assert.assertTrue(terms.size() > 0);
-            terms.get(0).setTermDisplayName("updated-" + terms.get(0).getTermDisplayName());
-            terms.get(0).setTermName("updated-" + terms.get(0).getTermName());
-            worksCommon.setWorkTermGroupList(termList);
+		WorkTermGroupList termList = worksCommon.getWorkTermGroupList();
+		Assert.assertNotNull(termList);
+		List<WorkTermGroup> terms = termList.getWorkTermGroup();
+		Assert.assertNotNull(terms);
+		Assert.assertTrue(terms.size() > 0);
+		terms.get(0).setTermDisplayName("updated-" + terms.get(0).getTermDisplayName());
+		terms.get(0).setTermName("updated-" + terms.get(0).getTermName());
+		worksCommon.setWorkTermGroupList(termList);
 
-            return worksCommon;
-    }
+		return worksCommon;
+	}
 
-    @Override
-    protected void compareUpdatedItemInstances(WorksCommon original,
-            WorksCommon updated) throws Exception {
-            
-            WorkTermGroupList originalTermList = original.getWorkTermGroupList();
-            Assert.assertNotNull(originalTermList);
-            List<WorkTermGroup> originalTerms = originalTermList.getWorkTermGroup();
-            Assert.assertNotNull(originalTerms);
-            Assert.assertTrue(originalTerms.size() > 0);
-            
-            WorkTermGroupList updatedTermList = updated.getWorkTermGroupList();
-            Assert.assertNotNull(updatedTermList);
-            List<WorkTermGroup> updatedTerms = updatedTermList.getWorkTermGroup();
-            Assert.assertNotNull(updatedTerms);
-            Assert.assertTrue(updatedTerms.size() > 0);
-            
-            Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(),
-                originalTerms.get(0).getTermDisplayName(),
-                "Value in updated record did not match submitted data.");
-    }
+	@Override
+	protected void compareUpdatedItemInstances(WorksCommon original, WorksCommon updated, boolean compareRevNumbers)
+			throws Exception {
+
+		WorkTermGroupList originalTermList = original.getWorkTermGroupList();
+		Assert.assertNotNull(originalTermList);
+		List<WorkTermGroup> originalTerms = originalTermList.getWorkTermGroup();
+		Assert.assertNotNull(originalTerms);
+		Assert.assertTrue(originalTerms.size() > 0);
+
+		WorkTermGroupList updatedTermList = updated.getWorkTermGroupList();
+		Assert.assertNotNull(updatedTermList);
+		List<WorkTermGroup> updatedTerms = updatedTermList.getWorkTermGroup();
+		Assert.assertNotNull(updatedTerms);
+		Assert.assertTrue(updatedTerms.size() > 0);
+
+		Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(), originalTerms.get(0).getTermDisplayName(),
+				"Value in updated record did not match submitted data.");
+
+		if (compareRevNumbers == true) {
+			Assert.assertEquals(original.getRev(), updated.getRev(), "Revision numbers should match.");
+		}
+	}
 
     @Override
     protected void verifyReadItemInstance(WorksCommon item)

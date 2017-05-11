@@ -22,10 +22,6 @@
  */
 package org.collectionspace.services.client.test;
 
-import java.util.List;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ContactClient;
@@ -40,10 +36,11 @@ import org.collectionspace.services.contact.EmailGroup;
 import org.collectionspace.services.contact.EmailGroupList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
-import org.jboss.resteasy.client.ClientResponse;
+import java.util.List;
+
+import javax.ws.rs.core.Response;
 
 import org.testng.Assert;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +53,6 @@ import org.slf4j.LoggerFactory;
  */
 public class ContactServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, ContactsCommon> {
 
-    private final String CLASS_NAME = ContactServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(ContactServiceTest.class);
     // Instance variables specific to this test.
 //    final String SERVICE_PATH_COMPONENT = "contacts";
@@ -75,10 +71,15 @@ public class ContactServiceTest extends AbstractPoxServiceTestImpl<AbstractCommo
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new ContactClient();
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new ContactClient(clientPropertiesFilename);
+	}
+	
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */

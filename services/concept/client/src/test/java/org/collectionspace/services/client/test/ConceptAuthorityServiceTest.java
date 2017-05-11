@@ -34,14 +34,12 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ConceptAuthorityClient;
 import org.collectionspace.services.client.ConceptAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.concept.ConceptTermGroup;
 import org.collectionspace.services.concept.ConceptTermGroupList;
 import org.collectionspace.services.concept.ConceptauthoritiesCommon;
 import org.collectionspace.services.concept.ConceptsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.dom4j.DocumentException;
-import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -58,11 +56,16 @@ import org.testng.annotations.Test;
 public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<ConceptauthoritiesCommon, ConceptsCommon> {
 
 	/** The logger. */
-    private final String CLASS_NAME = ConceptAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(ConceptAuthorityServiceTest.class);
-    private final static String CURRENT_DATE_UTC =
-        GregorianCalendarDateTimeUtils.currentDateUTC();
 
+    /**
+     * Default constructor.  Used to set the short ID for all tests authority items
+     */
+    public ConceptAuthorityServiceTest() {
+    	super();
+        TEST_SHORTID = "concept1";
+    }
+    
 	@Override
 	public String getServicePathComponent() {
 		return ConceptAuthorityClient.SERVICE_PATH_COMPONENT;
@@ -80,7 +83,6 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
     // Instance variables specific to this test.
     
     final String TEST_NAME = "Concept 1";
-    final String TEST_SHORTID = "concept1";
     final String TEST_SCOPE_NOTE = "Covers quite a bit";
     // TODO Make status type be a controlled vocab term.
     final String TEST_STATUS = "Approved";
@@ -91,9 +93,14 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
     	return new ConceptAuthorityClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+    	return new ConceptAuthorityClient(clientPropertiesFilename);
+	}
     
     /**
      * Creates the item in authority.
@@ -103,22 +110,19 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
      * @return the string
      */
 	@Override
-	protected String createItemInAuthority(String authorityId) {
+	protected String createItemInAuthority(AuthorityClient client, String authorityId, String shortId) {
 
         final String testName = "createItemInAuthority("+authorityId+")";
         if(logger.isDebugEnabled()){
             logger.debug(testName);
         }
 
-        // Submit the request to the service and store the response.
-        ConceptAuthorityClient client = new ConceptAuthorityClient();
-        
-        String commonPartXML = createCommonPartXMLForItem(TEST_SHORTID, TEST_NAME);
+        String commonPartXML = createCommonPartXMLForItem(shortId, TEST_NAME);
 
         String newID = null;
         try {
         	newID = ConceptAuthorityClientUtils.createItemInAuthority(authorityId,
-        		commonPartXML, client );
+        		commonPartXML, (ConceptAuthorityClient) client);
         } catch( Exception e ) {
             logger.error("Problem creating item from XML: "+e.getLocalizedMessage());
             logger.debug("commonPartXML: "+commonPartXML);
@@ -128,7 +132,7 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
         // Store the ID returned from the first item resource created
         // for additional tests below.
         if (knownItemResourceId == null){
-        	setKnownItemResource(newID, TEST_SHORTID);
+        	setKnownItemResource(newID, shortId);
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownItemResourceId=" + newID);
             }
@@ -141,32 +145,15 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
 
         return newID;
     }
-    
-    /**
-     * Read item list.
-     */
-    @Test(dataProvider = "testName", groups = {"readList"},
-    		dependsOnMethods = {"readList"})
-    public void readItemList(String testName) {
-        readItemList(knownAuthorityWithItems, null);
-    }
-
-    /**
-     * Read item list by authority name.
-     */
-    @Test(dataProvider = "testName", groups = {"readList"},
-    		dependsOnMethods = {"readItemList"})
-    public void readItemListByAuthorityName(String testName) {
-        readItemList(null, READITEMS_SHORT_IDENTIFIER);
-    }
-    
+        
     /**
      * Read item list.
      *
      * @param vcsid the vcsid
      * @param name the name
+     * @throws Exception 
      */
-    private void readItemList(String vcsid, String shortId) {
+    private void readItemList(String vcsid, String shortId) throws Exception {
 
         String testName = "readItemList";
 
@@ -251,10 +238,11 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
     * For this reason, it attempts to remove all resources created
     * at any point during testing, even if some of those resources
     * may be expected to be deleted by certain tests.
+ * @throws Exception 
     */
 
    @AfterClass(alwaysRun=true)
-   public void cleanUp() {
+   public void cleanUp() throws Exception {
        String noTest = System.getProperty("noTestCleanup");
    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
            if (logger.isDebugEnabled()) {
@@ -337,7 +325,7 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
 	
     @Override
    	protected PoxPayloadOut createInstance(String commonPartName,
-    			String identifier) {
+    			String identifier) throws Exception {
     	ConceptAuthorityClient client = new ConceptAuthorityClient();
         String shortId = identifier;
     	String displayName = "displayName-" + shortId;
@@ -416,25 +404,27 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
 
 	@Override
 	protected void compareUpdatedItemInstances(ConceptsCommon original,
-			ConceptsCommon updated) throws Exception {
-            ConceptTermGroupList originalTermList = original.getConceptTermGroupList();
-            Assert.assertNotNull(originalTermList);
-            List<ConceptTermGroup> originalTerms = originalTermList.getConceptTermGroup();
-            Assert.assertNotNull(originalTerms);
-            Assert.assertTrue(originalTerms.size() > 0);
-            
-            ConceptTermGroupList updatedTermList = updated.getConceptTermGroupList();
-            Assert.assertNotNull(updatedTermList);
-            List<ConceptTermGroup> updatedTerms = updatedTermList.getConceptTermGroup();
-            Assert.assertNotNull(updatedTerms);
-            Assert.assertTrue(updatedTerms.size() > 0);
-            
-            Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(),
-                originalTerms.get(0).getTermDisplayName(),
-                "Value in updated record did not match submitted data.");
-            Assert.assertEquals(updatedTerms.get(0).getTermStatus(),
-                originalTerms.get(0).getTermDisplayName(),
-                "Value in updated record did not match submitted data.");
+			ConceptsCommon updated,
+			boolean compareRevNumbers) throws Exception {
+		ConceptTermGroupList originalTermList = original.getConceptTermGroupList();
+		Assert.assertNotNull(originalTermList);
+		List<ConceptTermGroup> originalTerms = originalTermList.getConceptTermGroup();
+		Assert.assertNotNull(originalTerms);
+		Assert.assertTrue(originalTerms.size() > 0);
+
+		ConceptTermGroupList updatedTermList = updated.getConceptTermGroupList();
+		Assert.assertNotNull(updatedTermList);
+		List<ConceptTermGroup> updatedTerms = updatedTermList.getConceptTermGroup();
+		Assert.assertNotNull(updatedTerms);
+		Assert.assertTrue(updatedTerms.size() > 0);
+
+		Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(), originalTerms.get(0).getTermDisplayName(), "Value in updated record did not match submitted data.");
+		Assert.assertEquals(updatedTerms.get(0).getTermStatus(), originalTerms.get(0).getTermDisplayName(),
+				"Value in updated record did not match submitted data.");
+		
+		if (compareRevNumbers == true) {
+        	Assert.assertEquals(original.getRev(), updated.getRev(), "Revision numbers did not match.");
+        }
 	}
 
 	@Override
@@ -462,5 +452,4 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
         }
         return null;
 	}
-
 }

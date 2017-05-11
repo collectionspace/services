@@ -35,19 +35,15 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ClaimClient;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
-import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.claim.ClaimsCommon;
 import org.collectionspace.services.claim.ClaimClaimantGroupList;
 import org.collectionspace.services.claim.ClaimClaimantGroup;
 import org.collectionspace.services.person.PersonTermGroup;
-
-import org.jboss.resteasy.client.ClientResponse;
 
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -67,19 +63,15 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
     private final String CLASS_NAME = ClaimAuthRefsTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    final String SERVICE_NAME = "claims";
-    final String SERVICE_PATH_COMPONENT = "claims";
 
     // Instance variables specific to this test.
-    final String PERSON_AUTHORITY_NAME = "TestPersonAuthForClaim";
+    final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
     private String knownResourceId = null;
     private List<String> claimIdsCreated = new ArrayList<String>();
     private List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
     private String claimFilerRefName = null;
     private String claimOnBehalfOfRefName = null;
-
-    private final int NUM_AUTH_REFS_EXPECTED = 2;
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -93,7 +85,8 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getCommonList(Response response) {
+	protected AbstractCommonList getCommonList(
+			Response response) {
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
@@ -116,75 +109,61 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         // One or more fields in this resource will be PersonAuthority
         // references, and will refer to Person resources by their refNames.
         ClaimClient claimClient = new ClaimClient();
-        PoxPayloadOut multipart = createClaimInstance(
-                "claimNumber-" + identifier,
+        PoxPayloadOut claminInstance = createClaimInstance("claimNumber-" + identifier,
                 claimFilerRefName,
                 claimOnBehalfOfRefName);
-        Response res = claimClient.create(multipart);
-        int statusCode = res.getStatus();
+        Response res = claimClient.create(claminInstance);
         try {
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            //
-            // Specifically:
-            // Does it fall within the set of valid status codes?
-            // Does it exactly match the expected status code?
-            if(logger.isDebugEnabled()){
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(testRequestType, statusCode));
-            Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-            // Store the ID returned from the first resource created
-            // for additional tests below.
-            if (knownResourceId == null){
-                knownResourceId = extractId(res);
-                if (logger.isDebugEnabled()) {
-                    logger.debug(testName + ": knownResourceId=" + knownResourceId);
-                }
-            }
-        
-            // Store the IDs from every resource created by tests,
-            // so they can be deleted after tests have been run.
-            claimIdsCreated.add(extractId(res));
+	        int statusCode = res.getStatus();	
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode), invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        String csid = extractId(res);
+	        if (knownResourceId == null) {
+	            knownResourceId = csid;
+	        }
+	        // Store the IDs from every resource created by tests,
+	        // so they can be deleted after tests have been run.
+	        claimIdsCreated.add(csid);
         } finally {
-            res.close();
+        	res.close();
         }
     }
 
-    protected void createPersonRefs(){
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+    protected void createPersonRefs() throws Exception{
         // Create a temporary PersonAuthority resource, and its corresponding
         // refName by which it can be identified.
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         Response res = personAuthClient.create(multipart);
         try {
-            int statusCode = res.getStatus();
-            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-            Assert.assertEquals(statusCode, STATUS_CREATED);
-            personAuthCSID = extractId(res);
+	        int statusCode = res.getStatus();
+	
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	            invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        personAuthCSID = extractId(res);
         } finally {
-            res.close();
+        	res.close();
         }
-        String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
+        String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, personAuthClient);
         
         // Create temporary Person resources, and their corresponding refNames
         // by which they can be identified.
        	String csid = createPerson("Carrie", "ClaimFiler", "carrieClaimFiler", authRefName);
         personIdsCreated.add(csid);
-        claimFilerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        claimFilerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, personAuthClient);
 
        	csid = createPerson("Ben", "BehalfOf", "benBehalfOf", authRefName);
         personIdsCreated.add(csid);
-        claimOnBehalfOfRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        claimOnBehalfOfRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, personAuthClient);
     }
     
-    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
-        String result = null;
-        
+    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) throws Exception {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
@@ -196,20 +175,16 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         term.setTermDisplayName(termName);
         term.setTermName(termName);
         personTerms.add(term);
-    	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
+    	PoxPayloadOut multipart =
+    		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
     				authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
         Response res = personAuthClient.createItem(personAuthCSID, multipart);
-        try {
-            int statusCode = res.getStatus();
-            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(testRequestType, statusCode));
-            Assert.assertEquals(statusCode, STATUS_CREATED);
-            result = extractId(res);
-        } finally {
-            res.close();
-        }
-        
-        return result;
+        int statusCode = res.getStatus();
+
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, STATUS_CREATED);
+    	return extractId(res);
     }
 
     // Success outcomes
@@ -222,52 +197,49 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         // Submit the request to the service and store the response.
         ClaimClient claimClient = new ClaimClient();
         Response res = claimClient.read(knownResourceId);
-        ClaimsCommon claimCommon = null;
-        // Extract and return the common part of the record.
         try {
-            assertStatusCode(res, testName);
-            // Extract the common part from the response.
-            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
-            claimCommon = (ClaimsCommon) extractPart(input,
-                claimClient.getCommonPartName(), ClaimsCommon.class);
-            Assert.assertNotNull(claimCommon);
-            if(logger.isDebugEnabled()){
-                logger.debug(objectAsXmlString(claimCommon, ClaimsCommon.class));
-            }
+	        assertStatusCode(res, testName);	
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
+	        ClaimsCommon claimCommon = (ClaimsCommon) extractPart(input, claimClient.getCommonPartName(), ClaimsCommon.class);
+	        Assert.assertNotNull(claimCommon);
+	        
+	        if(logger.isDebugEnabled()){
+	            logger.debug(objectAsXmlString(claimCommon, ClaimsCommon.class));
+	        }
+	        // Check a couple of fields
+	        Assert.assertEquals(claimCommon.getClaimClaimantGroupList().getClaimClaimantGroup().get(0).getFiledBy(), claimFilerRefName);
+	        Assert.assertEquals(claimCommon.getClaimClaimantGroupList().getClaimClaimantGroup().get(0).getFiledOnBehalfOf(), claimOnBehalfOfRefName);
         } finally {
-            if (res != null) {
+        	if (res != null) {
                 res.close();
             }
         }
-        // Check a couple of fields
-        Assert.assertEquals(claimCommon.getClaimClaimantGroupList().getClaimClaimantGroup().get(0).getFiledBy(), claimFilerRefName);
-        Assert.assertEquals(claimCommon.getClaimClaimantGroupList().getClaimClaimantGroup().get(0).getFiledOnBehalfOf(), claimOnBehalfOfRefName);
         
         // Get the auth refs and check them
-        Response res2 = claimClient.getAuthorityRefs(knownResourceId);
+        res = claimClient.getAuthorityRefs(knownResourceId);
         AuthorityRefList list = null;
         try {
-            assertStatusCode(res2, testName);
-            list = res2.readEntity(AuthorityRefList.class);
-            Assert.assertNotNull(list);
+	        assertStatusCode(res, testName);
+	        list = res.readEntity(AuthorityRefList.class);
+	        Assert.assertNotNull(list);
         } finally {
-            if (res2 != null) {
-                res2.close();
+        	if (res != null) {
+        		res.close();
             }
         }
         
+        int expectedAuthRefs = personIdsCreated.size();
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
         int numAuthRefsFound = items.size();
-        if(logger.isDebugEnabled()){
-            logger.debug("Expected " + NUM_AUTH_REFS_EXPECTED +
-                " authority references, found " + numAuthRefsFound);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Expected " + expectedAuthRefs + " authority references, found " + numAuthRefsFound);
         }
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
-        if(iterateThroughList && logger.isDebugEnabled()){
+        if (iterateThroughList && logger.isDebugEnabled()) {
             int i = 0;
-            for(AuthorityRefList.AuthorityRefItem item : items){
+            for (AuthorityRefList.AuthorityRefItem item : items) {
                 logger.debug(testName + ": list-item[" + i + "] Field:" +
                 		item.getSourceField() + "= " +
                         item.getAuthDisplayName() +
@@ -279,11 +251,9 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
                 i++;
             }
         }
-        
-        Assert.assertEquals(numAuthRefsFound, NUM_AUTH_REFS_EXPECTED,
-            "Did not find all expected authority references! " +
-            "Expected " + NUM_AUTH_REFS_EXPECTED + ", found " + numAuthRefsFound);
 
+        Assert.assertEquals(numAuthRefsFound, expectedAuthRefs,
+                "Did not find all expected authority references! " + "Expected " + expectedAuthRefs + ", found " + numAuthRefsFound);
     }
 
 
@@ -298,35 +268,38 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
-    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+    	if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Skipping Cleanup phase ...");
             }
             return;
     	}
-        if (logger.isDebugEnabled()) {
+    	if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-        // Delete Person resource(s) (before PersonAuthority resources).
-        for (String resourceId : personIdsCreated) {
-            // Note: Any non-success responses are ignored and not reported.
-            personAuthClient.deleteItem(personAuthCSID, resourceId).close();
-        }
-        // Delete PersonAuthority resource(s).
-        // Note: Any non-success response is ignored and not reported.
-        if (personAuthCSID != null) {
-	        personAuthClient.delete(personAuthCSID);
-        }
-        // Delete Claim resource(s).
+        
+    	//
+    	// Delete Claim resource(s).
         ClaimClient claimClient = new ClaimClient();
         for (String resourceId : claimIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
             claimClient.delete(resourceId).close();
+        }
+        
+        //
+        // Delete Person resource(s) (before PersonAuthority resources). 
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        for (String resourceId : personIdsCreated) {
+            // Note: Any non-success responses are ignored and not reported.
+            personAuthClient.deleteItem(personAuthCSID, resourceId).close();
+        }
+        if (personAuthCSID != null) {
+	        personAuthClient.delete(personAuthCSID).close();
         }
     }
 
@@ -336,17 +309,17 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
     @Override
     protected String getServiceName() {
-        return SERVICE_NAME;
+        return ClaimClient.SERVICE_NAME;
     }
 
     @Override
     public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
+        return ClaimClient.SERVICE_PATH_COMPONENT;
     }
 
    private PoxPayloadOut createClaimInstance(String claimNumber,
             String claimFiler,
-            String claimFiledOnBehalfOf) {
+            String claimFiledOnBehalfOf) throws Exception {
         ClaimsCommon claimCommon = new ClaimsCommon();
         claimCommon.setClaimNumber(claimNumber);
         ClaimClaimantGroupList claimClaimantGroupList = new ClaimClaimantGroupList();
@@ -368,4 +341,9 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
         return multipart;
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+		throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+	}
 }

@@ -31,7 +31,6 @@ import org.collectionspace.services.client.DimensionFactory;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.dimension.DimensionsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.slf4j.Logger;
@@ -68,9 +67,14 @@ public class DimensionServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new DimensionClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new DimensionClient(clientPropertiesFilename);
+	}	
     
     protected void compareInstances(DimensionsCommon original, DimensionsCommon updated) throws Exception {
         Assert.assertEquals(original.getValueDate(),
@@ -101,7 +105,7 @@ public class DimensionServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
     }
 
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
     	DimensionClient client = new DimensionClient();
     	return createInstance(client.getCommonPartName(), identifier);
     }
@@ -213,7 +217,7 @@ public class DimensionServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
         		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
     public void CRUDTests(String testName) {
     	// Do nothing.  Simply here to for a TestNG execution order for our tests
-    }	
+    }
 
     /*
     @Override

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
@@ -35,8 +36,6 @@ import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.person.PersonTermGroup;
-
-import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -107,10 +106,15 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
     	return new PersonAuthorityClient();
     }
-    
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+    	return new PersonAuthorityClient(clientPropertiesFilename);
+	}
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
@@ -262,9 +266,10 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
     
     /**
      * Reads an item list by partial term.
+     * @throws Exception 
      */
     @Test(dataProvider="testName")
-    public void partialTermMatch(String testName) {
+    public void partialTermMatch(String testName) throws Exception {
         for(int i=0; i<partialTerms.length; i++) {
         	long startTime = System.currentTimeMillis();
             int numMatchesFound = readItemListWithFilters(testName, authId, 
@@ -292,9 +297,10 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
      * @param partialTerm A partial term to match item resources.
      * @param partialTerm A keyword list to match item resources.
      * @return The number of item resources matched by the partial term.
+     * @throws Exception 
      */
     private int readItemListWithFilters(String testName, 
-    		String authorityCsid, String partialTerm, String keywords) {
+    		String authorityCsid, String partialTerm, String keywords) throws Exception {
 
         // Perform setup.
         int expectedStatusCode = Response.Status.OK.getStatusCode();
@@ -332,9 +338,10 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
     	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
@@ -351,6 +358,4 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
         }
         client.delete(authId).close();
     }
-
-
 }

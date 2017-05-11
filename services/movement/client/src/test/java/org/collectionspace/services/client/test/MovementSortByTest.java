@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.MovementJAXBSchema;
@@ -39,14 +40,10 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.movement.MovementsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,6 +82,11 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
     protected CollectionSpaceClient getClientInstance() {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+	}
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
@@ -495,9 +497,10 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun = true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
@@ -650,7 +653,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
     private PoxPayloadOut createMovementInstance(
             String movementReferenceNumber,
             String movementNote,
-            String locationDate) {
+            String locationDate) throws Exception {
         MovementsCommon movementCommon = new MovementsCommon();
         movementCommon.setMovementReferenceNumber(movementReferenceNumber);
         movementCommon.setMovementNote(movementNote);

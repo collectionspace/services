@@ -23,6 +23,7 @@
 package org.collectionspace.services.client.test;
 
 import java.util.List;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -34,17 +35,13 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
 import org.collectionspace.services.acquisition.AcquisitionDateGroupList;
 import org.collectionspace.services.acquisition.AcquisitionSourceList;
 import org.collectionspace.services.acquisition.OwnerList;
-import org.jboss.resteasy.client.ClientResponse;
 import org.collectionspace.services.acquisition.StructuredDateGroup;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,9 +76,14 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
     	return new AcquisitionClient();
     }
+    
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+    	return new AcquisitionClient(clientPropertiesFilename);
+	}
     
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
@@ -708,7 +710,7 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
     // ---------------------------------------------------------------
 
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
     	return createAcquisitionInstance(identifier);
     }
         
@@ -717,8 +719,9 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
      *
      * @param identifier the identifier
      * @return the multipart output
+     * @throws Exception 
      */
-    private PoxPayloadOut createAcquisitionInstance(String identifier) {
+    private PoxPayloadOut createAcquisitionInstance(String identifier) throws Exception {
         AcquisitionsCommon acquisition = new AcquisitionsCommon();
         acquisition.setAcquisitionReferenceNumber("acquisitionReferenceNumber-"  + identifier);
 
@@ -923,6 +926,6 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
         		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
     public void CRUDTests(String testName) {
     	// Do nothing.  Simply here to for a TestNG execution order for our tests
-    }	
+    }
 }
 

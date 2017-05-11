@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.common.workflow.service.nuxeo;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,9 +68,14 @@ public class WorkflowDocumentModelHandler
     	// the super/parent handleUpdate() method.
     	//
     	ServiceContext ctx = this.getServiceContext();
-    	DocumentModelHandler docHandler = (DocumentModelHandler)ctx.getProperty(WorkflowClient.PARENT_DOCHANDLER);
+    	DocumentModelHandler targetDocHandler = (DocumentModelHandler)ctx.getProperty(WorkflowClient.TARGET_DOCHANDLER);
+    	
+    	// We need to make sure the repo session is available to the handler and its service context
+    	targetDocHandler.setRepositorySession(this.getRepositorySession()); // Make sure the target doc handler has a repository session to work with
+    	targetDocHandler.getServiceContext().setCurrentRepositorySession(this.getRepositorySession());
+    	
     	TransitionDef transitionDef =  (TransitionDef)ctx.getProperty(WorkflowClient.TRANSITION_ID);
-    	docHandler.handleWorkflowTransition(wrapDoc, transitionDef);
+    	targetDocHandler.handleWorkflowTransition(ctx, wrapDoc, transitionDef);  // Call the target resouce's handler first
     	//
     	// If no exception occurred, then call the super's method
     	//
@@ -121,35 +127,30 @@ public class WorkflowDocumentModelHandler
             addOutputPart(unQObjectProperties, schema, partMeta);
         }
     }
-
-    /**
-     * Get the identifier for the transition that sets a document to
-     * the supplied, destination workflow state.
-     *
-     * @param state a destination workflow state.
-     * @return an identifier for the transition required to
-     * place the document in that workflow state.
+    
+    /*
+     * Maps the transition name to handle existing states like "replicated" and "deleted".  This allows us to do things like replicate "deleted"
+     * records, delete "replicated" records, etc.  For example, this code maps the transition name "delete" to "delete_replicated" on records in the "replicated" state.
+     * As another example, it would map "undelete" to "undelete_replicated" for replicated records and just "undelete" for records in any other state.
+     * 
+     * Essentially, this mapping allows REST API clients to use the "delete", "undelete", "replicate", "unreplicate", etc transitions on records no matter what
+     * their current state.  Without this mapping, REST API clients would need to calculate this on their own and use the longer forms like:
+     * "delete_replicated", "undelete_replicated", "lock_deleted", "unlock_deleted", etc. 
      */
-    @Deprecated 
-    private String getTransitionFromState(String state) {
-        String result = TRANSITION_UNKNOWN;
+    public static String getQualifiedTransitionName(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef) {
+    	String result = null;
+    	
+    	String currentTransitionName = result = transitionDef.getName(); // begin with result set to the current name
+    	DocumentModel docModel = wrapDoc.getWrappedObject();
+    	Collection<String> allowedTransitionList = docModel.getAllowedStateTransitions();
+    	for (String allowedTransitionName:allowedTransitionList) {
+    		if (allowedTransitionName.startsWith(currentTransitionName)) {
+    			result = allowedTransitionName;
+    			break; // we found a mapping
+    		}
+    	}
 
-        // FIXME We may wish to add calls, such as those in
-        // org.nuxeo.ecm.core.lifecycle.impl.LifeCycleImpl, to validate incoming
-        // destination workflow state and the set of allowable state transitions.
-
-        if (state.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_DELETED)) {
-            result = WorkflowClient.WORKFLOWTRANSITION_DELETE;
-        } else if (state.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_ACTIVE)) {
-            result = WorkflowClient.WORKFLOWTRANSITION_UNDELETE; //FIXME, could also be transition WORKFLOWTRANSITION_UNLOCK
-        } else if (state.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_LOCKED)) {
-            result = WorkflowClient.WORKFLOWTRANSITION_LOCK;
-        } else {
-        	logger.warn("An attempt was made to transition a document to an unknown workflow state = "
-        			+ state);
-        }        
-        
-        return result;
+    	return result;
     }
     
     /*
@@ -165,7 +166,7 @@ public class WorkflowDocumentModelHandler
     	
     	try {
     		TransitionDef transitionDef = (TransitionDef)this.getServiceContext().getProperty(WorkflowClient.TRANSITION_ID);
-    		transitionToFollow = transitionDef.getName();
+    		transitionToFollow = getQualifiedTransitionName(wrapDoc, transitionDef);
 	        docModel.followTransition(transitionToFollow);
     	} catch (Exception e) {
     		String msg = "Unable to follow workflow transition to state = "
@@ -174,6 +175,18 @@ public class WorkflowDocumentModelHandler
     		ClientException ce = new ClientException("Unable to follow workflow transition: " + transitionToFollow);
     		throw ce;
     	}
-    }    
+    }
+    
+    /*
+     * Add the workflow common part(s) to the output result
+     * (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#completeUpdate(org.collectionspace.services.common.document.DocumentWrapper)
+     */
+    @Override
+    public void completeUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	extractAllParts(wrapDoc);
+    	super.completeUpdate(wrapDoc);
+    }
+
 }
 

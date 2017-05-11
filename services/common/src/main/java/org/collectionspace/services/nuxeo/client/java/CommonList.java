@@ -23,16 +23,12 @@
  */
 package org.collectionspace.services.nuxeo.client.java;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.jvnet.jaxb2_commons.lang.ToString;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -43,13 +39,8 @@ import org.w3c.dom.Element;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlSeeAlso;
-
-import org.slf4j.LoggerFactory;
 
 /**
  * This class allows us to generically represent and marshall a set of list
@@ -76,7 +67,7 @@ public class CommonList extends AbstractCommonList {
 	private DocumentBuilder parser;
 	@XmlTransient
 	private Document doc;
-    
+	    
     public CommonList()
     	throws javax.xml.parsers.ParserConfigurationException {
     	super();

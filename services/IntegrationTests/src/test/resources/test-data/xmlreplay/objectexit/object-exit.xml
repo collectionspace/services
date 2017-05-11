@@ -54,15 +54,19 @@
                 <label>objectexit_common</label>
              </response>
         </test>
+         <test ID="cleanup"  auth="test">
+             <method>DELETE</method>
+             <uri>/cspace-services/objectexit/${oe1.CSID}</uri>
+         </test>		
     </testGroup>
     
     <testGroup ID="testStartName" autoDeletePOSTS="false">
-         <test ID="oe1"  auth="test">
+         <test ID="oe1x"  auth="test">
              <method>POST</method>
              <uri>/cspace-services/objectexit/</uri>
              <filename>objectexit/oe1.xml</filename>
          </test>
-        <test ID="oe2">
+        <test ID="oe2x">
             <method>GET</method>
             <uri>/cspace-services/objectexit/${oe1.CSID}</uri>
             <response>

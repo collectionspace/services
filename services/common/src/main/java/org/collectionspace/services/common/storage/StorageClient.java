@@ -24,6 +24,9 @@ import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.TransactionException;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.lifecycle.TransitionDef;
 
 /**
@@ -69,7 +72,7 @@ public interface StorageClient {
      * @throws DocumentNotFoundException if entity not found
      * @throws DocumentException
      */
-    void delete(ServiceContext ctx, String id, DocumentHandler handler) throws DocumentNotFoundException, DocumentException;
+    boolean delete(ServiceContext ctx, String id, DocumentHandler handler) throws DocumentNotFoundException, DocumentException;
 
 
     /**
@@ -141,5 +144,19 @@ public interface StorageClient {
      */
     void doWorkflowTransition(ServiceContext ctx, String id, DocumentHandler handler, TransitionDef transitionDef) 
     		throws BadRequestException, DocumentNotFoundException, DocumentException;
+
+    /*
+     * Ask a resource to synchronize itself with a shared server resource.  Returns "TRUE" if sync was needed.
+     */
+	boolean synchronize(ServiceContext ctx, Object specifier, DocumentHandler handler)
+			throws DocumentNotFoundException, TransactionException,
+			DocumentException;
+
+    /*
+     * Ask an item resource (e.g., an Authority or Vocabulary items) to synchronize itself with a shared server resource.  Returns "TRUE" if sync was needed.
+     */
+	boolean synchronizeItem(ServiceContext ctx, AuthorityItemSpecifier itemSpecifier, DocumentHandler handler)
+			throws DocumentNotFoundException, TransactionException,
+			DocumentException;
 
 }

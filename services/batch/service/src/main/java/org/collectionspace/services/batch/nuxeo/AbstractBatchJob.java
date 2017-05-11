@@ -14,8 +14,8 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+
 import org.collectionspace.services.batch.AbstractBatchInvocable;
-import org.collectionspace.services.batch.UriInfoImpl;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.CollectionSpaceClientUtils;
@@ -34,30 +34,29 @@ import org.collectionspace.services.common.UriTemplateRegistry;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
+import org.collectionspace.services.common.query.UriInfoImpl;
 import org.collectionspace.services.common.relation.RelationResource;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
+
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.Node;
+
 import org.jboss.resteasy.specimpl.PathSegmentImpl;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractBatchJob extends AbstractBatchInvocable {
-	public final int CREATED_STATUS = Response.Status.CREATED.getStatusCode();
-	public final int BAD_REQUEST_STATUS = Response.Status.BAD_REQUEST.getStatusCode();
-	public final int INT_ERROR_STATUS = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
 
 	final Logger logger = LoggerFactory.getLogger(AbstractBatchJob.class);
 
 	private Map<String, String> authorityServiceNamesByDocType;
-	
-	public abstract void run();
-	
+		
 	protected String getFieldXml(Map<String, String> fields, String fieldName) {
 		return getFieldXml(fieldName, fields.get(fieldName));
 	}
@@ -93,7 +92,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 				"</ns2:relations_common>" +
 			"</document>";
 
-		NuxeoBasedResource resource = getResourceMap().get(RelationClient.SERVICE_NAME);
+		NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(RelationClient.SERVICE_NAME);
 		Response response = resource.create(getResourceMap(), null, createRelationPayload);
 
 		if (response.getStatus() == CREATED_STATUS) {
@@ -220,10 +219,10 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	}
 
 	protected PoxPayloadOut findByCsid(String serviceName, String csid) throws URISyntaxException, DocumentException {
-		NuxeoBasedResource resource = getResourceMap().get(serviceName);
-		byte[] response = resource.get(null, createUriInfo(), csid);
+		NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(serviceName);
+		byte[] outputBytes = (byte[]) resource.get(null, createUriInfo(), csid).getEntity();
 
-		PoxPayloadOut payload = new PoxPayloadOut(response);
+		PoxPayloadOut payload = new PoxPayloadOut(outputBytes);
 
 		return payload;
 	}
@@ -241,7 +240,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	}
 	
 	protected List<String> findAll(String serviceName, int pageSize, int pageNum, String sortBy) throws URISyntaxException, DocumentException {
-		NuxeoBasedResource resource = getResourceMap().get(serviceName);	
+		NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(serviceName);	
 
 		return findAll(resource, pageSize, pageNum, null);
 	}
@@ -355,7 +354,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 			authorityServiceNamesByDocType = new HashMap<String, String>();
 			
 			for (String serviceName : getResourceMap().keySet()) {
-				ResourceBase resource = getResourceMap().get(serviceName);
+				AuthorityResource resource = (AuthorityResource) getResourceMap().get(serviceName);
 				
 				if (resource instanceof AuthorityResource) {
 					AuthorityResource<?, ?> authorityResource = (AuthorityResource<?, ?>) resource;

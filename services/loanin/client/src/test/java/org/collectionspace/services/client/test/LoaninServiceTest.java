@@ -24,6 +24,7 @@ package org.collectionspace.services.client.test;
 
 //import java.util.ArrayList;
 import java.util.List;
+
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.AbstractCommonListUtils;
@@ -38,10 +39,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanin.LenderGroup;
 import org.collectionspace.services.loanin.LenderGroupList;
 import org.collectionspace.services.loanin.LoansinCommon;
-
-import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,9 +68,14 @@ public class LoaninServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new LoaninClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new LoaninClient(clientPropertiesFilename);
+	}
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
@@ -629,7 +632,7 @@ public class LoaninServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
     }
 
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
         return createLoaninInstance(identifier);
     }
 
@@ -638,8 +641,9 @@ public class LoaninServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
      *
      * @param identifier the identifier
      * @return the multipart output
+     * @throws Exception 
      */
-    private PoxPayloadOut createLoaninInstance(String identifier) {
+    private PoxPayloadOut createLoaninInstance(String identifier) throws Exception {
         return createLoaninInstance(
                 "loaninNumber-" + identifier,
                 "returnDate-" + identifier);
@@ -651,9 +655,10 @@ public class LoaninServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
      * @param loaninNumber the loanin number
      * @param returnDate the return date
      * @return the multipart output
+     * @throws Exception 
      */
     private PoxPayloadOut createLoaninInstance(String loaninNumber,
-            String returnDate) {
+            String returnDate) throws Exception {
 
         LoansinCommon loaninCommon = new LoansinCommon();
         loaninCommon.setLoanInNumber(loaninNumber);
@@ -686,7 +691,7 @@ public class LoaninServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
 
 	@Override
 	protected PoxPayloadOut createInstance(String commonPartName,
-			String identifier) {
+			String identifier) throws Exception {
         PoxPayloadOut result = createLoaninInstance(identifier);
         return result;
 	}

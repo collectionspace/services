@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.loanout</artifactId>        
-        <version>4.3-SNAPSHOT</version>
+        <version>4.5-SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
@@ -22,6 +22,11 @@
             <artifactId>org.collectionspace.services.loanout.jaxb</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+        	<groupId>org.collectionspace.services</groupId>
+        	<artifactId>org.collectionspace.services.loanout.client</artifactId>
+        	<version>${project.version}</version>
+        </dependency>        
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.collectionobject.jaxb</artifactId>
@@ -44,13 +49,6 @@
             <groupId>javax.security</groupId>
             <artifactId>jaas</artifactId>
             <version>1.0.01</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-            <version>1.6.1</version>
             <scope>provided</scope>
         </dependency>
         
@@ -87,7 +85,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
     </dependencies>
     
     <build>

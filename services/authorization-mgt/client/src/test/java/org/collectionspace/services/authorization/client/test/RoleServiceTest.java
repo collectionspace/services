@@ -24,6 +24,8 @@ package org.collectionspace.services.authorization.client.test;
 
 //import java.util.ArrayList;
 //import java.util.List;
+import java.util.Random;
+
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
@@ -32,10 +34,8 @@ import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RolesList;
 import org.collectionspace.services.client.RoleFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +51,10 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
     /** The logger. */
     private final static String CLASS_NAME = RoleServiceTest.class.getName();
     private final static Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    
+
+    // Used to create unique identifiers
+    static private final Random random = new Random(System.currentTimeMillis());
+
     // Instance variables specific to this test.
     /** The known resource id. */
     private String knownRoleName = "ROLE_USERS_MOCK-1";
@@ -66,7 +69,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
     }
     
     @Override
-    protected String getServicePathComponent() {
+    protected String getServicePathComponent() throws Exception {
         return new RoleClient().getServicePathComponent();
     }
 
@@ -81,10 +84,15 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new RoleClient();
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new RoleClient(clientPropertiesFilename);
+	}	
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readPaginatedList(java.lang.String)
      */
@@ -225,7 +233,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
 
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
-        Role role = createRoleInstance(knownRoleName + System.currentTimeMillis(),
+        Role role = createRoleInstance(knownRoleName + createIdentifier(),
                 "role users with non-unique display name",
                 true);
         role.setDisplayName(knownRoleDisplayName);
@@ -254,6 +262,11 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
         } finally {
         	res.close();
         }
+    }
+    
+    protected String createIdentifier() {
+        long identifier = System.currentTimeMillis() + random.nextInt();
+        return Long.toString(identifier);
     }
 
     /**
@@ -938,5 +951,5 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
 	@Override
 	protected long getSizeOfList(RolesList list) {
 		return list.getRole().size();
-	}	
+	}
 }

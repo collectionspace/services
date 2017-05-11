@@ -28,8 +28,10 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
+import org.apache.http.HttpStatus;
 import org.collectionspace.services.account.Tenant;
 import org.collectionspace.services.account.TenantsList;
+import org.collectionspace.services.description.ServiceDescription;
 
 /**
  * A TenantClient.
@@ -38,7 +40,12 @@ import org.collectionspace.services.account.TenantsList;
  */
 public class TenantClient extends AbstractServiceClientImpl<TenantsList, Tenant,
 		Tenant, TenantProxy> {
-    public static final String SERVICE_NAME = "tenants";
+	
+    public TenantClient() throws Exception {
+		super();
+	}
+
+	public static final String SERVICE_NAME = "tenants";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
     public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 
@@ -68,6 +75,7 @@ public class TenantClient extends AbstractServiceClientImpl<TenantsList, Tenant,
      * @return response
      * @see org.collectionspace.hello.client.TenantProxy#readList()
      */
+	@Override
     public Response readList() {
         return getProxy().readList();
     }
@@ -81,6 +89,7 @@ public class TenantClient extends AbstractServiceClientImpl<TenantsList, Tenant,
      * @return response
      * @see org.collectionspace.hello.client.TenantProxy#getTenant(java.lang.String)
      */
+    @Override
     public Response read(String id) {
         return getProxy().read(id);
     }
@@ -91,6 +100,7 @@ public class TenantClient extends AbstractServiceClientImpl<TenantsList, Tenant,
      * @return response
      * @see org.collectionspace.hello.client.TenantProxy#create(org.collectionspace.services.account.Tenant)
      */
+    @Override
     public Response create(Tenant multipart) {
         return getProxy().create(multipart);
     }
@@ -102,7 +112,20 @@ public class TenantClient extends AbstractServiceClientImpl<TenantsList, Tenant,
      * @return response
      * @see org.collectionspace.hello.client.TenantProxy#updateTenant(java.lang.Long, org.collectionspace.services.account.Tenant)
      */
+    @Override
     public Response update(String id, Tenant multipart) {
         return getProxy().update(id, multipart);
     }
+    
+	@Override
+	public ServiceDescription getServiceDescription() {
+		ServiceDescription result = null;
+		
+        Response res = getProxy().getServiceDescription();
+        if (res.getStatus() == HttpStatus.SC_OK) {
+        	result = (ServiceDescription) res.readEntity(ServiceDescription.class);
+        }
+        
+        return result;
+	}
 }

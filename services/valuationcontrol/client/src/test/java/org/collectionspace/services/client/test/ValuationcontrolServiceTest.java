@@ -22,10 +22,6 @@
  */
 package org.collectionspace.services.client.test;
 
-//import java.util.ArrayList;
-import java.util.List;
-import javax.ws.rs.core.Response;
-
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ValuationcontrolClient;
@@ -36,9 +32,9 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.valuationcontrol.ValuationcontrolsCommon;
 
-import org.jboss.resteasy.client.ClientResponse;
-import org.testng.Assert;
+import javax.ws.rs.core.Response;
 
+import org.testng.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,14 +52,16 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
     final String SERVICE_NAME = "valuationcontrols";
     final String SERVICE_PATH_COMPONENT = "valuationcontrols";
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
-     */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new ValuationcontrolClient();
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new ValuationcontrolClient(clientPropertiesFilename);
+	}
+	
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
@@ -622,7 +620,7 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
     }
 
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
         return createValuationcontrolInstance(identifier);
     }
 
@@ -641,8 +639,9 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
      *
      * @param valuationcontrolRefNumber the valuationcontrol number
      * @return the multipart output
+     * @throws Exception 
      */
-    private PoxPayloadOut createValuationcontrolInstance(String valuationcontrolRefNumber) {
+    private PoxPayloadOut createValuationcontrolInstance(String valuationcontrolRefNumber) throws Exception {
 
         ValuationcontrolsCommon valuationcontrolCommon = new ValuationcontrolsCommon();
         valuationcontrolCommon.setValuationcontrolRefNumber(valuationcontrolRefNumber);
@@ -668,7 +667,7 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
 
     @Override
     protected PoxPayloadOut createInstance(String commonPartName,
-            String identifier) {
+            String identifier) throws Exception {
         PoxPayloadOut result = createValuationcontrolInstance(identifier);
         return result;
     }

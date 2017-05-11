@@ -1,0 +1,98 @@
+<ns2:permissions_list xmlns:ns2="http://collectionspace.org/services/authorization/perms">
+    <permission csid="15-idgenerators-CRUDL">
+        <description>Generated admin permission.</description>
+        <resourceName>idgenerators</resourceName>
+        <actionGroup>CRUDL</actionGroup>
+        <action Hjid="1">
+            <name>CREATE</name>
+            <objectIdentity>1159431374</objectIdentity>
+            <objectIdentityResource>15:idgenerators#create</objectIdentityResource>
+        </action>
+        <action Hjid="2">
+            <name>READ</name>
+            <objectIdentity>-615118360</objectIdentity>
+            <objectIdentityResource>15:idgenerators#read</objectIdentityResource>
+        </action>
+        <action Hjid="3">
+            <name>UPDATE</name>
+            <objectIdentity>1672879259</objectIdentity>
+            <objectIdentityResource>15:idgenerators#update</objectIdentityResource>
+        </action>
+        <action Hjid="4">
+            <name>DELETE</name>
+            <objectIdentity>1176267133</objectIdentity>
+            <objectIdentityResource>15:idgenerators#delete</objectIdentityResource>
+        </action>
+        <action Hjid="5">
+            <name>SEARCH</name>
+            <objectIdentity>1605388666</objectIdentity>
+            <objectIdentityResource>15:idgenerators#search</objectIdentityResource>
+        </action>
+        <effect>PERMIT</effect>
+        <createdAt>2012-06-11T23:19:09.066</createdAt>
+    </permission>
+    <permission csid="15-id-CRUDL">
+        <description>Generated admin permission.</description>
+        <resourceName>id</resourceName>
+        <actionGroup>CRUDL</actionGroup>
+        <action Hjid="6">
+            <name>CREATE</name>
+            <objectIdentity>-203156594</objectIdentity>
+            <objectIdentityResource>15:id#create</objectIdentityResource>
+        </action>
+        <action Hjid="7">
+            <name>READ</name>
+            <objectIdentity>1551059112</objectIdentity>
+            <objectIdentityResource>15:id#read</objectIdentityResource>
+        </action>
+        <action Hjid="8">
+            <name>UPDATE</name>
+            <objectIdentity>310291291</objectIdentity>
+            <objectIdentityResource>15:id#update</objectIdentityResource>
+        </action>
+        <action Hjid="9">
+            <name>DELETE</name>
+            <objectIdentity>-186320835</objectIdentity>
+            <objectIdentityResource>15:id#delete</objectIdentityResource>
+        </action>
+        <action Hjid="10">
+            <name>SEARCH</name>
+            <objectIdentity>242800698</objectIdentity>
+            <objectIdentityResource>15:id#search</objectIdentityResource>
+        </action>
+        <effect>PERMIT</effect>
+        <createdAt>2012-06-11T23:19:09.068</createdAt>
+    </permission>
+    <permission csid="15-servicegroups-CRUDL">
+        <description>Generated admin permission.</description>
+        <resourceName>servicegroups</resourceName>
+        <actionGroup>CRUDL</actionGroup>
+        <action Hjid="11">
+            <name>CREATE</name>
+            <objectIdentity>1035471244</objectIdentity>
+            <objectIdentityResource>15:servicegroups#create</objectIdentityResource>
+        </action>
+        <action Hjid="12">
+            <name>READ</name>
+            <objectIdentity>1042851366</objectIdentity>
+            <objectIdentityResource>15:servicegroups#read</objectIdentityResource>
+        </action>
+        <action Hjid="13">
+            <name>UPDATE</name>
+            <objectIdentity>1548919129</objectIdentity>
+            <objectIdentityResource>15:servicegroups#update</objectIdentityResource>
+        </action>
+        <action Hjid="14">
+            <name>DELETE</name>
+            <objectIdentity>1052307003</objectIdentity>
+            <objectIdentityResource>15:servicegroups#delete</objectIdentityResource>
+        </action>
+        <action Hjid="15">
+            <name>SEARCH</name>
+            <objectIdentity>1481428536</objectIdentity>
+            <objectIdentityResource>15:servicegroups#search</objectIdentityResource>
+        </action>
+        <effect>PERMIT</effect>
+        <createdAt>2012-06-11T23:19:09.068</createdAt>
+    </permission>
+</ns2:permissions_list>

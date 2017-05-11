@@ -17,12 +17,13 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.citation.CitationauthoritiesCommon;
 import org.collectionspace.services.citation.CitationsCommon;
 
 /**
  * The Class CitationAuthorityClient.
  */
-public class CitationAuthorityClient extends AuthorityClientImpl<CitationsCommon, CitationAuthorityProxy> {
+public class CitationAuthorityClient extends AuthorityClientImpl<CitationauthoritiesCommon, CitationsCommon, CitationAuthorityProxy> {
 
     public static final String SERVICE_NAME = "citationauthorities";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
@@ -42,6 +43,17 @@ public class CitationAuthorityClient extends AuthorityClientImpl<CitationsCommon
     public static final String SERVICE_ITEM_COMMON_PART_NAME = SERVICE_ITEM_NAME
             + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
 
+    //
+    // Constructors
+    //
+    public CitationAuthorityClient() throws Exception {
+    	super();
+    }
+    
+    public CitationAuthorityClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
+    
     @Override
     public String getServiceName() {
         return SERVICE_NAME;

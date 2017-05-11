@@ -44,13 +44,9 @@ import org.collectionspace.services.loanin.LenderGroup;
 import org.collectionspace.services.loanin.LenderGroupList;
 import org.collectionspace.services.loanin.LoansinCommon;
 import org.collectionspace.services.person.PersonTermGroup;
-
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +86,12 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     protected CollectionSpaceClient getClientInstance() {
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
-    
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+	}
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
@@ -161,7 +162,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         loaninIdsCreated.add(newId);
     }
     
-    protected void createPersonRefs(){
+    protected void createPersonRefs() throws Exception{
 
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding
@@ -208,7 +209,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         // repeatable / multivalued authority reference fields.  Be sure to
     }
     
-    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
+    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) throws Exception {
     	String result = null;
     	
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
@@ -330,9 +331,10 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
     	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
@@ -382,7 +384,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     		String lendersAuthorizer,
     		String lendersContact,
     		String borrowersContact,
-    		String borrowersAuthorizer) {
+    		String borrowersAuthorizer) throws Exception {
     	LoansinCommon loaninCommon = new LoansinCommon();
     	loaninCommon.setLoanInNumber(loaninNumber);
     	loaninCommon.setLoanInNumber(returnDate);

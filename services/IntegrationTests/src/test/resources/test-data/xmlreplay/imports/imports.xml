@@ -3,7 +3,7 @@
     <auths>
         <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
         <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
-        <auth ID="admin@lifesci.collectionspace.org">YWRtaW5AbGlmZXNjaS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+        <auth ID="admin@testsci.collectionspace.org">YWRtaW5AdGVzdHNjaS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
     </auths>
     
     <!-- ================================================================================ -->
@@ -411,16 +411,16 @@
     </testGroup>
     
     <!--
-      By default, the demonstration 'lifesci' tenant is configured to use a separate,
+      By default, the demonstration 'testsci' tenant is configured to use a separate,
       rather than a shared, Nuxeo repository domain.
 
-      The test(s) in this test group authenticate as a user in the lifesci tenant and
+      The test(s) in this test group authenticate as a user in the testsci tenant and
       thus verify that imports also work with separate, per-tenant repository domains.
     -->
     <testGroup ID="importsSeparateRepoTestGroup" autoDeletePOSTS="false">
 
         <!-- Import a single ObjectExit record into a separate repo domain -->
-        <test ID="importObjectExitSeparateRepo" auth="admin@lifesci.collectionspace.org">
+        <test ID="importObjectExitSeparateRepo" auth="admin@testsci.collectionspace.org">
             <expectedCodes>200</expectedCodes>
             <method>POST</method>
             <uri>/cspace-services/imports</uri>
@@ -430,7 +430,7 @@
                 <filename>imports/res/import-objectexit.res.xml</filename>
             </response>
         </test>
-        <test ID="deleteObjectExitSeparateRepo" auth="admin@lifesci.collectionspace.org">
+        <test ID="deleteObjectExitSeparateRepo" auth="admin@testsci.collectionspace.org">
             <expectedCodes>200</expectedCodes>
             <method>DELETE</method>
             <uri>/cspace-services/objectexit/${importObjectExitSeparateRepo.got("//csid")}</uri>

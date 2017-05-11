@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
@@ -42,13 +41,9 @@ import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.blob.BlobsCommon;
 import org.collectionspace.services.person.PersonTermGroup;
-
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,13 +78,18 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     protected CollectionSpaceClient getClientInstance() {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
+    
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+	}    
 
     @Override
     protected AbstractCommonList getCommonList(Response response) {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
-    private PoxPayloadOut createBlobInstance(String depositorRefName) {
+    private PoxPayloadOut createBlobInstance(String depositorRefName) throws Exception {
     	BlobClient blobClient = new BlobClient();
         this.depositorRefName = depositorRefName;
         this.blobName = "testblob-"+createIdentifier();
@@ -124,7 +124,7 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         }
     }
 
-    protected void createPersonRefs() {
+    protected void createPersonRefs() throws Exception {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding refName by which it can be identified.
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
@@ -150,7 +150,7 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         }
     }
 
-    protected String createPerson(String firstName, String surName, String shortId, String authRefName) {
+    protected String createPerson(String firstName, String surName, String shortId, String authRefName) throws Exception {
     	String result = null;
     	
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
@@ -240,9 +240,10 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun = true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             logger.debug("Skipping Cleanup phase ...");

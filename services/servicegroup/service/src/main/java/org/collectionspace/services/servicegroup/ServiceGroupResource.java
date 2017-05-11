@@ -36,8 +36,10 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.NuxeoBasedResource;
+import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
+import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
@@ -46,11 +48,14 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.query.QueryManager;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.service.ServiceObjectType;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentFilter;
 import org.collectionspace.services.servicegroup.nuxeo.ServiceGroupDocumentModelHandler;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,8 +116,6 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
         try {
             CommonList commonList = new CommonList();
             AbstractCommonList list = (AbstractCommonList)commonList;
-	        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
-	    	String commonSchema = ctx.getCommonPartLabel();
 	    	ArrayList<String> svcGroups = new ArrayList<String>();
 	    	svcGroups.add("procedure");
 	    	svcGroups.add("object");
@@ -202,12 +205,12 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
         return result.getBytes();
     }
 
-
     @GET
     @Path("{csid}/items")
-    public AbstractCommonList getItems(
-            @Context UriInfo ui,
+    public AbstractCommonList getResourceItemList(
+            @Context UriInfo uriInfo,
             @PathParam("csid") String serviceGroupName) {
+    	UriInfoWrapper ui = new UriInfoWrapper(uriInfo);
         ensureCSID(serviceGroupName, NuxeoBasedResource.READ);
         AbstractCommonList list = null;
         try {
@@ -221,14 +224,15 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
 	        	groupsList = new ArrayList<String>();
 	        	groupsList.add(serviceGroupName);
 	        }
-	        // set up a keyword search
+	        
+	        // check first for a csid query parameter
             MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
-            String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
-	        if (keywords != null && !keywords.isEmpty()) {
-	            String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
-	            if(Tools.isEmpty(whereClause)) {
+	        String csid = queryParams.getFirst(IQueryManager.CSID_QUERY_PARAM);
+	        if (csid != null && !csid.isEmpty()) {
+	            String whereClause = QueryManager.createWhereClauseFromCsid(csid);
+	            if (Tools.isEmpty(whereClause)) {
 	                if (logger.isDebugEnabled()) {
-	                	logger.debug("The WHERE clause is empty for keywords: ["+keywords+"]");
+	                	logger.debug("The WHERE clause is empty for csid: ["+csid+"]");
 	                }
 	            } else {
 		            DocumentFilter documentFilter = handler.getDocumentFilter();
@@ -237,8 +241,27 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
 		                logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
 		            }
 	            }
+	        } else {
+		        // check to see if we have to set up a keyword search
+	            String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
+		        if (keywords != null && !keywords.isEmpty()) {
+		            String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
+		            if(Tools.isEmpty(whereClause)) {
+		                if (logger.isDebugEnabled()) {
+		                	logger.debug("The WHERE clause is empty for keywords: ["+keywords+"]");
+		                }
+		            } else {
+			            DocumentFilter documentFilter = handler.getDocumentFilter();
+			            documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
+			            if (logger.isDebugEnabled()) {
+			                logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
+			            }
+		            }
+		        }	        	
 	        }
-            list = handler.getItemsForGroup(ctx, groupsList);
+	        
+	        // make the query
+            list = handler.getItemListForGroup(ctx, groupsList);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.READ_FAILED, serviceGroupName);
         }
@@ -246,5 +269,38 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
         return list;
     }
 
+    @GET
+    @Path("{csid}/items/{specifier}")
+    public byte[] getResourceItem(
+    		@Context ResourceMap resourceMap,
+            @Context UriInfo uriInfo,
+            @PathParam("csid") String serviceGroupName,
+            @PathParam("specifier") String specifier) {
+    	UriInfoWrapper ui = new UriInfoWrapper(uriInfo);
+        ensureCSID(serviceGroupName, NuxeoBasedResource.READ);
+        PoxPayloadOut result = null;
+        
+        try {
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
+	        ServiceGroupDocumentModelHandler handler = (ServiceGroupDocumentModelHandler)
+	        				createDocumentHandler(ctx);
+	        ArrayList<String> groupsList = null;  
+	        if("common".equalsIgnoreCase(serviceGroupName)) {
+	        	groupsList = ServiceBindingUtils.getCommonServiceTypes(INCLUDE_AUTHORITIES);
+	        } else {
+	        	groupsList = new ArrayList<String>();
+	        	groupsList.add(serviceGroupName);
+	        }
+	        
+            String whereClause = QueryManager.createWhereClauseFromCsid(specifier);
+            DocumentFilter myFilter = new NuxeoDocumentFilter(whereClause, 0, 1);
+            handler.setDocumentFilter(myFilter);    
+	        
+            result = handler.getResourceItemForCsid(ctx, groupsList, specifier);
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.READ_FAILED, serviceGroupName);
+        }
 
+        return result.getBytes();
+    }
 }

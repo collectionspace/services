@@ -21,9 +21,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+
 import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.common.api.Tools;
@@ -38,7 +40,6 @@ import org.collectionspace.services.organization.OrgTermGroupList;
 import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.collectionspace.services.organization.StructuredDateGroup;
 
 /**
@@ -55,8 +56,9 @@ public class OrgAuthorityClientUtils {
      * @param csid the id of the OrgAuthority
      * @param client if null, creates a new client
      * @return
+     * @throws Exception 
      */
-    public static String getAuthorityRefName(String csid, OrgAuthorityClient client){
+    public static String getAuthorityRefName(String csid, OrgAuthorityClient client) throws Exception{
     	if (client==null) {
     		client = new OrgAuthorityClient();
     	}
@@ -90,8 +92,9 @@ public class OrgAuthorityClientUtils {
      * @param csid the ID of the Organization
      * @param client if null, creates a new client
      * @return
+     * @throws Exception 
      */
-    public static String getOrgRefName(String inAuthority, String csid, OrgAuthorityClient client){
+    public static String getOrgRefName(String inAuthority, String csid, OrgAuthorityClient client) throws Exception{
     	if (client == null) {
     		client = new OrgAuthorityClient();
     	}

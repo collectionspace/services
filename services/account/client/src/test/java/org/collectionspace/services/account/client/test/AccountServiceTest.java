@@ -32,10 +32,8 @@ import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
 import org.collectionspace.services.account.AccountListItem;
 import org.collectionspace.services.account.Status;
-import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.client.AccountFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
-import org.collectionspace.services.client.test.ServiceRequestType;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.slf4j.Logger;
@@ -81,7 +79,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
      * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
      */
     @Override
-    protected String getServicePathComponent() {
+    protected String getServicePathComponent() throws Exception {
         return new AccountClient().getServicePathComponent();
     }
 
@@ -89,10 +87,15 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new AccountClient();
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new AccountClient(clientPropertiesFilename);
+	}
+	
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
@@ -379,32 +382,6 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
         } finally {
         	res.close();
         }
-    }
-
-    //
-    // Tests with expected failure outcomes
-    //
-    // Placeholders until the three tests below can be uncommented.
-    // See Issue CSPACE-401.
-    @Override
-    public void createWithEmptyEntityBody(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithMalformedXml(java.lang.String)
-     */
-    @Override
-    public void createWithMalformedXml(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithWrongXmlSchema(java.lang.String)
-     */
-    @Override
-    public void createWithWrongXmlSchema(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     // ---------------------------------------------------------------
@@ -702,7 +679,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
         }
     }
     
-    private void findPrebuiltAdminAccount() {
+    private void findPrebuiltAdminAccount() throws Exception {
     	// Search for the prebuilt admin user and then hold its CSID
     	if (prebuiltAdminCSID == null) {
             setupReadList();
@@ -1125,7 +1102,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
 
 	@Override
 	protected AccountsCommon createInstance(String commonPartName,
-			String identifier) {
+			String identifier) throws Exception {
 		AccountClient client = new AccountClient();
         AccountsCommon account =
                 createAccountInstance(knownUserId, knownUserId, knownUserPassword,
@@ -1169,5 +1146,4 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
 	protected long getSizeOfList(AccountsCommonList list) {
 		return list.getTotalItems();
 	}
-	
 }

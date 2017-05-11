@@ -9,16 +9,15 @@ import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
-import org.nuxeo.ecm.core.api.ClientException;
+import org.collectionspace.services.nuxeo.listener.AbstractCSEventListenerImpl;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.impl.LifeCycleFilter;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
-import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 
-public class UpdateRelationsOnDelete implements EventListener {
+public class UpdateRelationsOnDelete extends AbstractCSEventListenerImpl {
 
     // FIXME: We might experiment here with using log4j instead of Apache Commons Logging;
     // am using the latter to follow Ray's pattern for now
@@ -30,12 +29,12 @@ public class UpdateRelationsOnDelete implements EventListener {
     final static String RELATIONS_COMMON_OBJECT_CSID_FIELD = "relations_common:objectCsid";
 
     @Override
-    public void handleEvent(Event event) throws ClientException {
+    public void handleEvent(Event event) {
         logger.trace("In handleEvent in UpdateRelationsOnDelete ...");
         
         EventContext eventContext = event.getContext();
 
-        if (isDocumentSoftDeletedEvent(eventContext)) {
+        if (isRegistered(event) && isDocumentSoftDeletedEvent(eventContext)) {
             
             logger.trace("A soft deletion event was received by UpdateRelationsOnDelete ...");
             
@@ -72,6 +71,9 @@ public class UpdateRelationsOnDelete implements EventListener {
             List<String> workflowStatesToFilter = new ArrayList<String>();
             workflowStatesToFilter.add(WorkflowClient.WORKFLOWSTATE_DELETED);
             workflowStatesToFilter.add(WorkflowClient.WORKFLOWSTATE_LOCKED);
+            workflowStatesToFilter.add(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED);
+            workflowStatesToFilter.add(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED);
+            
             LifeCycleFilter workflowStateFilter = new LifeCycleFilter(null, workflowStatesToFilter);
             
             // Perform the filtered query
@@ -79,7 +81,7 @@ public class UpdateRelationsOnDelete implements EventListener {
             DocumentModelList matchingDocuments;
             try {
                 matchingDocuments = session.query(queryString.toString(), workflowStateFilter);
-            } catch (ClientException ce) {
+            } catch (Exception ce) {
                 logger.warn("Error attempting to retrieve relation records where "
                         + "record of type '" + docModel.getType() + "' with CSID " + csid
                         + " is the subject or object of any relation: " + ce.getMessage());
@@ -110,13 +112,17 @@ public class UpdateRelationsOnDelete implements EventListener {
      */
     private boolean isDocumentSoftDeletedEvent(EventContext eventContext) {
         boolean isSoftDeletedEvent = false;
+        
         if (eventContext instanceof DocumentEventContext) {
             if (eventContext.getProperties().containsKey(WorkflowClient.WORKFLOWTRANSITION_TO)
-                    && eventContext.getProperties().get(WorkflowClient.WORKFLOWTRANSITION_TO).equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+                    &&
+                (eventContext.getProperties().get(WorkflowClient.WORKFLOWTRANSITION_TO).equals(WorkflowClient.WORKFLOWSTATE_DELETED)
+                		||
+                eventContext.getProperties().get(WorkflowClient.WORKFLOWTRANSITION_TO).equals(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED))) {
                 isSoftDeletedEvent = true;
             }
         }
+        
         return isSoftDeletedEvent;
     }
-    
 }

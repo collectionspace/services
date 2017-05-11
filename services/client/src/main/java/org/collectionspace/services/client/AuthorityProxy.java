@@ -10,12 +10,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 
 import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
-import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.common.api.CommonAPI;
 
 /*
  * ILT = Item list type
@@ -37,17 +34,35 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
     @Path("/{vcsid}/items/{csid}")
     Response readItem(@PathParam("vcsid") String vcsid,
     		@PathParam("csid") String csid,
-    		@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
+    		@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState,
+    		@QueryParam(CommonAPI.showRelations_QP) String showRelations);
+    
     
     //(U)pdate Item
     @PUT
     @Path("/{vcsid}/items/{csid}")
     Response updateItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid, byte[] xmlPayload);
+    
+    //(U)pdate Item    
+    @PUT
+    @Path("/urn:cspace:name({specifier})/items/urn:cspace:name({itemspecifier})")
+    Response updateNamedItemInNamedAuthority(
+    		@PathParam("specifier")String specifier,
+    		@PathParam("itemspecifier")String itemspecifier, 
+    		byte[] xmlPayload);
 
     //(D)elete Item
     @DELETE
     @Path("/{vcsid}/items/{csid}")
     Response deleteItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
+    
+    //(D)elete Item
+    @DELETE
+    @Path("/urn:cspace:name({specifier})/items/urn:cspace:name({itemspecifier})")
+    public Response deleteNamedItemInNamedAuthority(
+    		@PathParam("specifier")String specifier,
+    		@PathParam("itemspecifier")String itemspecifier);
+
     
     /**
      * Get a list of objects that reference a given authority term.
@@ -75,7 +90,21 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
             @PathParam("itemcsid") String itemcsid);
     
     /*
-     * 
+     * Synchronization methods
+     */
+    
+    // Sync by name
+    @POST
+    @Path("/urn:cspace:name({name})/sync")
+    Response syncByName(@PathParam("name") String name);
+    
+    // Sync by name or CSID
+    @POST
+    @Path("/{identifier}/sync")
+    public Response sync(@PathParam("identifier") String identifier);
+    
+    /*
+     * READ/GET Methods
      */
     
     //(R)ead by name
@@ -107,7 +136,8 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
     @Path("/urn:cspace:name({specifier})/items/urn:cspace:name({itemspecifier})")
     Response readNamedItemInNamedAuthority(@PathParam("specifier") String specifier, 
     		@PathParam("itemspecifier") String itemspecifier,
-    		@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
+    		@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState,
+    		@QueryParam(CommonAPI.showRelations_QP) String showRelations);
     
     /*
      * Item subresource List methods
@@ -122,6 +152,17 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
             @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
             @QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
+    
+    @GET
+    @Produces({"application/xml"})
+    @Path("/{csid}/items/")
+    Response readItemList(
+    		@PathParam("csid") String vcsid,
+            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
+            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
+            @QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState,
+            @QueryParam(IClientQueryParams.PAGE_SIZE_PARAM) long pageSize,
+            @QueryParam(IClientQueryParams.START_PAGE_PARAM) long pageNum);
     
     // List Items for a named authority matching a partial term or keywords.
     @GET

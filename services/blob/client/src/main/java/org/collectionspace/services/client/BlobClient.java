@@ -19,6 +19,7 @@ package org.collectionspace.services.client;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.blob.BlobsCommon;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 
 /**
@@ -28,7 +29,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
  * $LastChangedDate: 2010-05-17 18:25:37 -0700 (Mon, 17 May 2010) $
  *
  */
-public class BlobClient extends AbstractCommonListPoxServiceClientImpl<BlobProxy> {
+public class BlobClient extends AbstractCommonListPoxServiceClientImpl<BlobProxy, BlobsCommon> {
 	public static final String SERVICE_NAME = "blobs";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -44,6 +45,14 @@ public class BlobClient extends AbstractCommonListPoxServiceClientImpl<BlobProxy
 	public static final String IMAGE_MEASURED_PART_LABEL = "digitalImage";
 	public static final String IMAGE_WIDTH_LABEL = "width";
 	public static final String IMAGE_HEIGHT_LABEL = "height";	
+
+	public BlobClient() throws Exception {
+		super();
+	}
+
+	public BlobClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
 
 	@Override
 	public String getServiceName() {

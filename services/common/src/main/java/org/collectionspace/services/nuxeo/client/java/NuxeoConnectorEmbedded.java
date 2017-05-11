@@ -11,11 +11,15 @@ import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.config.RepositoryClientConfigType;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-
+import org.nuxeo.ecm.core.api.CoreInstance;
+import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.SystemPrincipal;
+import org.nuxeo.ecm.core.api.repository.Repository;
+import org.nuxeo.ecm.core.api.repository.RepositoryManager;
 import org.nuxeo.osgi.application.FrameworkBootstrap;
-
+import org.nuxeo.runtime.api.Framework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,10 +113,24 @@ public class NuxeoConnectorEmbedded {
 		fb = new FrameworkBootstrap(NuxeoConnectorEmbedded.class.getClassLoader(),
 				nuxeoHomeDir);
 		fb.setHostName("Tomcat");
-		fb.setHostVersion("7.0.57"); //FIXME: Should not be hard coded.
+		fb.setHostVersion("7.0.64"); //FIXME: Should not be hard coded.
 		
 		fb.initialize();
 		fb.start();
+		
+		// Test to see if we can connect to the default repository
+		CoreSession coreSession = null;
+		try {
+			Repository defaultRepo = Framework.getService(RepositoryManager.class).getDefaultRepository();
+			coreSession = CoreInstance.openCoreSession(defaultRepo.getName(), new SystemPrincipal(null));
+		} catch (Throwable t) {
+			logger.error(t.getMessage());
+			throw new RuntimeException("Could not start the Nuxeo EP Framework", t);
+		} finally {
+			if (coreSession != null) {
+				CoreInstance.closeCoreSession(coreSession);
+			}
+		}
 	}
 
 	/**

@@ -1,19 +1,24 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
-
-import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /*
  * LT - List type
  * ILT - Authority item list type
  * P - Proxy type
  */
-public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P extends AuthorityWithContactsProxy>
-	extends AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P>
-	implements AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P> {
+public abstract class AuthorityWithContactsClientImpl<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P extends AuthorityWithContactsProxy>
+	extends AuthorityClientImpl<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P>
+	implements AuthorityWithContactsClient<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P> {
 	
+	public AuthorityWithContactsClientImpl(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
+
+	public AuthorityWithContactsClientImpl() throws Exception {
+		super();
+	}
+
 	@Override
     public Response createContact(String parentcsid,
             String itemcsid, PoxPayloadOut xmlPayload) {

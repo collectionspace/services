@@ -38,14 +38,28 @@ public class CollectionSpaceServiceContextListener implements ServletContextList
         } catch (Throwable e) {
             e.printStackTrace();
             //fail here
+            System.err.println("[ERROR] ***");
             System.err.println("[ERROR] The CollectionSpace Services could not initialize.  Please see the log files for details.");
-            throw new RuntimeException(e);
+            System.err.println("[ERROR] ***");
+//            throw new RuntimeException(e);
         }
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent event) {
-        //ServiceMain.getInstance().release();
-        JpaStorageUtils.releaseEntityManagerFactories();
+        ServiceMain instance = null;
+        
+        try {
+        	ServiceMain.getInstance();
+        } catch (Throwable t) {
+        	// Do nothing.  Error already logged by the Services layer
+        } finally {
+	        if (instance != null) {
+	        	instance.release();
+	        } else {
+	        	System.err.println("ERROR: The CollectionSpace Services layer failed to startup successfully.  Look in the tomcat logs and cspace-services logs for details.");
+	        }
+	        JpaStorageUtils.releaseEntityManagerFactories();
+        }
     }
 }

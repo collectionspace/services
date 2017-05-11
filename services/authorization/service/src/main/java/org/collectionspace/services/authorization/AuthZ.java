@@ -28,12 +28,13 @@ import java.util.HashSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.spi.CSpaceAuthorizationProvider;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
@@ -59,6 +60,36 @@ public class AuthZ {
      */
     public final static AuthZ get() {
         return self;
+    }
+    
+    public static String getMethod(ActionType actionType) {
+    	String result = null;
+    	
+    	switch (actionType) {
+    	case CREATE:
+    		result = "POST";
+    		break;
+    	case READ:
+    		result = "GET";
+    		break;
+    	case UPDATE:
+    		result = "PUT";
+    		break;
+    	case DELETE:
+    		result = "DELETE";
+    		break;
+    	case RUN:
+    		result = "RUN";
+    		break;
+    	case SEARCH:
+    		result = "READ";
+    		break;
+    	default:
+    		throw new RuntimeException(String.format("Encountered unexpected action type '%s'.",
+    				actionType.value()));
+    	}
+    	
+    	return result;
     }
     
     private void setupProvider() {
@@ -187,7 +218,7 @@ public class AuthZ {
     public void login() {
     	String user = "SPRING_ADMIN";
     	String password = "SPRING_ADMIN";
-        GrantedAuthority spring_security_admin = new GrantedAuthorityImpl("ROLE_SPRING_ADMIN"); //NOTE: Must match with value in applicationContext-authorization-test.xml (aka SPRING_SECURITY_METADATA)
+        GrantedAuthority spring_security_admin = new SimpleGrantedAuthority("ROLE_SPRING_ADMIN"); //NOTE: Must match with value in applicationContext-authorization-test.xml (aka SPRING_SECURITY_METADATA)
         HashSet<GrantedAuthority> gauths = new HashSet<GrantedAuthority>();
         gauths.add(spring_security_admin);
         Authentication authRequest = new UsernamePasswordAuthenticationToken(user, password, gauths);

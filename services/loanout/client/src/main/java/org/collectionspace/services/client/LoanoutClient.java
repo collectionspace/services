@@ -16,13 +16,15 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.loanout.LoansoutCommon;
+
 /**
  * LoanoutClient.java
  *
  * $LastChangedRevision$
  * $LastChangedDate$
  */
-public class LoanoutClient extends AbstractCommonListPoxServiceClientImpl<LoanoutProxy> {
+public class LoanoutClient extends AbstractCommonListPoxServiceClientImpl<LoanoutProxy, LoansoutCommon> {
 
     public static final String SERVICE_NAME = "loansout";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
@@ -30,7 +32,15 @@ public class LoanoutClient extends AbstractCommonListPoxServiceClientImpl<Loanou
     public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    @Override
+    public LoanoutClient() throws Exception {
+		super();
+	}
+
+    public LoanoutClient(String clientPropertiesFilename) throws Exception {
+    	super(clientPropertiesFilename);
+	}
+
+	@Override
     public String getServiceName() {
         return SERVICE_NAME;
     }

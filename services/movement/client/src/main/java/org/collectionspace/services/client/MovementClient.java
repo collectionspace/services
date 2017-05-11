@@ -19,6 +19,8 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.movement.MovementsCommon;
+
 /**
  * MovementClient.java
  *
@@ -26,12 +28,16 @@ import javax.ws.rs.core.Response;
  * $LastChangedDate$
  *
  */
-public class MovementClient extends AbstractCommonListPoxServiceClientImpl<MovementProxy> {
-    public static final String SERVICE_NAME = "movements";
+public class MovementClient extends AbstractCommonListPoxServiceClientImpl<MovementProxy, MovementsCommon> {
+	public static final String SERVICE_NAME = "movements";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
+
+    public MovementClient() throws Exception {
+		super();
+	}
 
     @Override
     public String getServiceName() {

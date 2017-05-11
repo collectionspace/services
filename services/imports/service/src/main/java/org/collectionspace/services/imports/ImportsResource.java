@@ -28,7 +28,7 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ConfigurationException;
-import org.collectionspace.services.common.FileUtils;
+import org.collectionspace.services.common.FileUtilities;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.api.FileTools;
@@ -446,7 +446,7 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 
 					fileStream = part.getBody(InputStream.class, null);
 
-					File zipfile = FileUtils.createTmpFile(fileStream,
+					File zipfile = FileUtilities.createTmpFile(fileStream,
 							getServiceName() + "_");
 					String zipfileName = zipfile.getCanonicalPath();
 					logger.trace("Imports zip file saved to:" + zipfileName);

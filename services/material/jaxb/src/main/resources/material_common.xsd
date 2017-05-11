@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Material schema (XSD)
+
+    Entity  : Material
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    jaxb:version="1.0" elementFormDefault="unqualified"
+    xmlns:ns="http://collectionspace.org/services/material"
+    xmlns="http://collectionspace.org/services/material"
+    targetNamespace="http://collectionspace.org/services/material"
+    version="0.1"
+    >
+
+    <!-- avoid XmlRootElement nightmare, see http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html-->
+
+    <!-- Material -->
+    <xs:element name="materials_common">
+        <xs:complexType>
+            <xs:sequence>
+                <!--  Common identifier -->
+                <xs:element name="csid" type="xs:string" />
+				<xs:element name="rev" type="xs:integer" /> <!-- Revision number -->
+
+                <!--  Common Authority Information Group -->
+                <!--  inAuthority is the csid of the owning MaterialAuthority -->
+                <xs:element name="inAuthority" type="xs:string"/>
+                <xs:element name="shortIdentifier" type="xs:string"/>
+                <xs:element name="refName" type="xs:string"/>
+
+                <!-- List of materialTerms -->
+                <xs:element name="materialTermGroupList" type="materialTermGroupList"/>
+
+                <xs:element name="familyName" type="xs:string"/>
+                <xs:element name="className" type="xs:string"/>
+                <xs:element name="genericName" type="xs:string"/>
+
+                <xs:element name="description" type="xs:string"/>
+                
+                <xs:element name="typicalUses" type="typicalUseList"/>
+                
+                <xs:element name="materialProductionOrganizationGroupList" type="materialProductionOrganizationGroupList"/>
+                <xs:element name="materialProductionPersonGroupList" type="materialProductionPersonGroupList"/>
+                <xs:element name="materialProductionPlaceGroupList" type="materialProductionPlaceGroupList"/>
+                <xs:element name="featuredApplicationGroupList" type="featuredApplicationGroupList"/>
+                <xs:element name="materialCitationGroupList" type="materialCitationGroupList"/>
+                <xs:element name="externalUrlGroupList" type="externalUrlGroupList"/>
+                <xs:element name="additionalResourceGroupList" type="additionalResourceGroupList"/>
+                
+                <xs:element name="commonForm" type="xs:string"/>
+                <xs:element name="formTypeGroupList" type="formTypeGroupList"/>
+                <xs:element name="typicalSizeGroupList" type="typicalSizeGroupList"/>
+                <xs:element name="formNote" type="xs:string"/>
+                <xs:element name="acousticalPropertyGroupList" type="acousticalPropertyGroupList"/>
+                <xs:element name="durabilityPropertyGroupList" type="durabilityPropertyGroupList"/>
+                <xs:element name="electricalPropertyGroupList" type="electricalPropertyGroupList"/>
+                <xs:element name="mechanicalPropertyGroupList" type="mechanicalPropertyGroupList"/>
+                <xs:element name="hygrothermalPropertyGroupList" type="hygrothermalPropertyGroupList"/>
+                <xs:element name="opticalPropertyGroupList" type="opticalPropertyGroupList"/>
+                <xs:element name="sensorialPropertyGroupList" type="sensorialPropertyGroupList"/>
+                <xs:element name="smartMaterialPropertyGroupList" type="smartMaterialPropertyGroupList"/>
+                <xs:element name="additionalPropertyGroupList" type="additionalPropertyGroupList"/>
+                <xs:element name="propertyNote" type="xs:string"/>
+                
+                <xs:element name="recycledContentGroupList" type="recycledContentGroupList"/>
+                <xs:element name="lifecycleComponentGroupList" type="lifecycleComponentGroupList"/>
+                <xs:element name="embodiedEnergyGroupList" type="embodiedEnergyGroupList"/>
+                <xs:element name="certificationCreditGroupList" type="certificationCreditGroupList"/>
+                <xs:element name="ecologyNote" type="xs:string"/>
+
+                <xs:element name="castingProcesses" type="castingProcessList"/>
+                <xs:element name="deformingProcesses" type="deformingProcessList"/>
+                <xs:element name="joiningProcesses" type="joiningProcessList"/>
+                <xs:element name="machiningProcesses" type="machiningProcessList"/>
+                <xs:element name="moldingProcesses" type="moldingProcessList"/>
+                <xs:element name="rapidPrototypingProcesses" type="rapidPrototypingProcessList"/>
+                <xs:element name="surfacingProcesses" type="surfacingProcessList"/>
+                <xs:element name="additionalProcessGroupList" type="additionalProcessGroupList"/>
+                <xs:element name="processNote" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="materialTermGroupList">
+        <xs:sequence>
+            <xs:element name="materialTermGroup" type="materialTermGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="materialTermGroup">
+        <xs:sequence>
+            <xs:element name="termDisplayName" type="xs:string"/>
+            <xs:element name="termFormattedDisplayName" type="xs:string"/>
+            <xs:element name="termName" type="xs:string"/>
+            <xs:element name="termType" type="xs:string"/>
+            <xs:element name="termStatus" type="xs:string"/>
+            <xs:element name="termQualifier" type="xs:string"/>
+            <xs:element name="termLanguage" type="xs:string"/>
+            <xs:element name="termPrefForLang" type="xs:boolean"/>
+            <xs:element name="termSource" type="xs:string"/>
+            <xs:element name="termSourceDetail" type="xs:string"/>
+            <xs:element name="termSourceID" type="xs:string"/>
+            <xs:element name="termSourceNote" type="xs:string"/>
+            <xs:element name="historicalStatus" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="typicalUseList">
+        <xs:sequence>
+            <xs:element name="typicalUse" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="materialProductionOrganizationGroupList">
+        <xs:sequence>
+            <xs:element name="materialProductionOrganizationGroup" type="materialProductionOrganizationGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="materialProductionOrganizationGroup">
+        <xs:sequence>
+            <xs:element name="materialProductionOrganization" type="xs:string"/>
+            <xs:element name="materialProductionOrganizationRole" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="materialProductionPersonGroupList">
+        <xs:sequence>
+            <xs:element name="materialProductionPersonGroup" type="materialProductionPersonGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="materialProductionPersonGroup">
+        <xs:sequence>
+            <xs:element name="materialProductionPerson" type="xs:string"/>
+            <xs:element name="materialProductionPersonRole" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="materialProductionPlaceGroupList">
+        <xs:sequence>
+            <xs:element name="materialProductionPlaceGroup" type="materialProductionPlaceGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="materialProductionPlaceGroup">
+        <xs:sequence>
+            <xs:element name="materialProductionPlace" type="xs:string"/>
+            <xs:element name="materialProductionPlaceRole" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="featuredApplicationGroupList">
+        <xs:sequence>
+            <xs:element name="featuredApplicationGroup" type="featuredApplicationGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="featuredApplicationGroup">
+        <xs:sequence>
+            <xs:element name="featuredApplication" type="xs:string"/>
+            <xs:element name="featuredApplicationNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="materialCitationGroupList">
+        <xs:sequence>
+            <xs:element name="materialCitationGroup" type="materialCitationGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="materialCitationGroup">
+        <xs:sequence>
+            <xs:element name="materialCitationSource" type="xs:string"/>
+            <xs:element name="materialCitationSourceDetail" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="externalUrlGroupList">
+        <xs:sequence>
+            <xs:element name="externalUrlGroup" type="externalUrlGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="externalUrlGroup">
+        <xs:sequence>
+            <xs:element name="externalUrl" type="xs:string"/>
+            <xs:element name="externalUrlNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="additionalResourceGroupList">
+        <xs:sequence>
+            <xs:element name="additionalResourceGroup" type="additionalResourceGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="additionalResourceGroup">
+        <xs:sequence>
+            <xs:element name="additionalResource" type="xs:string"/>
+            <xs:element name="additionalResourceNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="formTypeGroupList">
+        <xs:sequence>
+            <xs:element name="formTypeGroup" type="formTypeGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="formTypeGroup">
+        <xs:sequence>
+            <xs:element name="formType" type="xs:string"/>
+            <xs:element name="formSubtype" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="typicalSizeGroupList">
+        <xs:sequence>
+            <xs:element name="typicalSizeGroup" type="typicalSizeGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="typicalSizeGroup">
+        <xs:sequence>
+            <xs:element name="typicalSize" type="xs:string"/>
+            <xs:element name="typicalSizeDimensionGroupList" type="typicalSizeDimensionGroupList"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="typicalSizeDimensionGroupList">
+        <xs:sequence>
+            <xs:element name="typicalSizeDimensionGroup" type="typicalSizeDimensionGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="typicalSizeDimensionGroup">
+        <xs:sequence>
+            <xs:element name="dimension" type="xs:string"/>
+            <xs:element name="measurementUnit" type="xs:string"/>
+            <xs:element name="value" type="xs:decimal"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="acousticalPropertyGroupList">
+        <xs:sequence>
+            <xs:element name="acousticalPropertyGroup" type="acousticalPropertyGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="acousticalPropertyGroup">
+        <xs:sequence>
+            <xs:element name="acousticalPropertyType" type="xs:string"/>
+            <xs:element name="acousticalPropertyNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="durabilityPropertyGroupList">
+        <xs:sequence>
+            <xs:element name="durabilityPropertyGroup" type="durabilityPropertyGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="durabilityPropertyGroup">
+        <xs:sequence>
+            <xs:element name="durabilityPropertyType" type="xs:string"/>
+            <xs:element name="durabilityPropertyNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="electricalPropertyGroupList">
+        <xs:sequence>
+            <xs:element name="electricalPropertyGroup" type="electricalPropertyGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="electricalPropertyGroup">
+        <xs:sequence>
+            <xs:element name="electricalPropertyType" type="xs:string"/>
+            <xs:element name="electricalPropertyNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="mechanicalPropertyGroupList">
+        <xs:sequence>
+            <xs:element name="mechanicalPropertyGroup" type="mechanicalPropertyGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="mechanicalPropertyGroup">
+        <xs:sequence>
+            <xs:element name="mechanicalPropertyType" type="xs:string"/>
+            <xs:element name="mechanicalPropertyUnit" type="xs:string"/>
+            <xs:element name="mechanicalPropertyValue" type="xs:decimal"/>
+            <xs:element name="mechanicalPropertyNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="hygrothermalPropertyGroupList">
+        <xs:sequence>
+            <xs:element name="hygrothermalPropertyGroup" type="hygrothermalPropertyGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="hygrothermalPropertyGroup">
+        <xs:sequence>
+            <xs:element name="hygrothermalPropertyType" type="xs:string"/>
+            <xs:element name="hygrothermalPropertyUnit" type="xs:string"/>
+            <xs:element name="hygrothermalPropertyValue" type="xs:decimal"/>
+            <xs:element name="hygrothermalPropertyNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="opticalPropertyGroupList">
+        <xs:sequence>
+            <xs:element name="opticalPropertyGroup" type="opticalPropertyGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="opticalPropertyGroup">
+        <xs:sequence>
+            <xs:element name="opticalPropertyType" type="xs:string"/>
+            <xs:element name="opticalPropertyNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="sensorialPropertyGroupList">
+        <xs:sequence>
+            <xs:element name="sensorialPropertyGroup" type="sensorialPropertyGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="sensorialPropertyGroup">
+        <xs:sequence>
+            <xs:element name="sensorialPropertyType" type="xs:string"/>
+            <xs:element name="sensorialPropertyNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="smartMaterialPropertyGroupList">
+        <xs:sequence>
+            <xs:element name="smartMaterialPropertyGroup" type="smartMaterialPropertyGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="smartMaterialPropertyGroup">
+        <xs:sequence>
+            <xs:element name="smartMaterialPropertyType" type="xs:string"/>
+            <xs:element name="smartMaterialPropertyNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="additionalPropertyGroupList">
+        <xs:sequence>
+            <xs:element name="additionalPropertyGroup" type="additionalPropertyGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="additionalPropertyGroup">
+        <xs:sequence>
+            <xs:element name="additionalPropertyType" type="xs:string"/>
+            <xs:element name="additionalPropertyNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="recycledContentGroupList">
+        <xs:sequence>
+            <xs:element name="recycledContentGroup" type="recycledContentGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="recycledContentGroup">
+        <xs:sequence>
+            <xs:element name="recycledContent" type="xs:decimal"/>
+            <xs:element name="recycledContentQualifier" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="lifecycleComponentGroupList">
+        <xs:sequence>
+            <xs:element name="lifecycleComponentGroup" type="lifecycleComponentGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="lifecycleComponentGroup">
+        <xs:sequence>
+            <xs:element name="lifecycleComponent" type="xs:string"/>
+            <xs:element name="lifecycleComponentNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="embodiedEnergyGroupList">
+        <xs:sequence>
+            <xs:element name="embodiedEnergyGroup" type="embodiedEnergyGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="embodiedEnergyGroup">
+        <xs:sequence>
+            <xs:element name="embodiedEnergyValue" type="xs:decimal"/>
+            <xs:element name="embodiedEnergyUnit" type="xs:string"/>
+            <xs:element name="embodiedEnergyNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="certificationCreditGroupList">
+        <xs:sequence>
+            <xs:element name="certificationCreditGroup" type="certificationCreditGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="certificationCreditGroup">
+        <xs:sequence>
+            <xs:element name="certificationProgram" type="xs:string"/>
+            <xs:element name="certificationCreditNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="castingProcessList">
+        <xs:sequence>
+            <xs:element name="castingProcess" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="deformingProcessList">
+        <xs:sequence>
+            <xs:element name="deformingProcess" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="joiningProcessList">
+        <xs:sequence>
+            <xs:element name="joiningProcess" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="machiningProcessList">
+        <xs:sequence>
+            <xs:element name="machiningProcess" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="moldingProcessList">
+        <xs:sequence>
+            <xs:element name="moldingProcess" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="rapidPrototypingProcessList">
+        <xs:sequence>
+            <xs:element name="rapidPrototypingProcess" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="surfacingProcessList">
+        <xs:sequence>
+            <xs:element name="surfacingProcess" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="additionalProcessGroupList">
+        <xs:sequence>
+            <xs:element name="additionalProcessGroup" type="additionalProcessGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="additionalProcessGroup">
+        <xs:sequence>
+            <xs:element name="additionalProcess" type="xs:string"/>
+            <xs:element name="additionalProcessNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+</xs:schema>

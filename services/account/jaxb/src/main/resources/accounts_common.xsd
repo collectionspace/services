@@ -229,6 +229,7 @@
 		                        </xs:annotation>
 		                        <xs:sequence>
 		                            <xs:element name="screenName" type="xs:string" minOccurs="1"/>
+		                            <xs:element name="userid" type="xs:string" minOccurs="1" />
 		                            <xs:element name="personRefName" type="xs:string" minOccurs="1" />
 		                            <xs:element name="email" type="xs:string" minOccurs="1" />
 		                            <xs:element name="status" type="status" minOccurs="1" />

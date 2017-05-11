@@ -23,8 +23,6 @@
  */
 package org.collectionspace.services.report.nuxeo;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -77,7 +75,7 @@ import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.jaxb.InvocableJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
-import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
+import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.jfree.util.Log;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -154,7 +152,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
         			+invocationMode);
 		}
 		
-		RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
+		RepositoryClientImpl repoClient = (RepositoryClientImpl)this.getRepositoryClient(ctx);
 		repoSession = this.getRepositorySession();
 		if (repoSession == null) {
 			repoSession = repoClient.getRepositorySession(ctx);
@@ -273,10 +271,6 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			// export report to pdf and build a response with the bytes
 			//JasperExportManager.exportReportToPdf(jasperprint);
 			
-			// Output to a temp file, since large reports may overrun the heap.
-			File tempOutputFile = Files.createTempFile("report-", null).toFile();
-			FileOutputStream tempOutputStream = new FileOutputStream(tempOutputFile);
-
 			JRExporter exporter = null;
 			// Strip extension from report filename.
 			String outputFilename = reportFileName;
@@ -334,14 +328,15 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
                         // fill the report
 			JasperPrint jasperPrint = JasperFillManager.fillReport(fileStream, params,conn);
 				
+			// Report will be to a temporary file.
+			File tempOutputFile = Files.createTempFile("report-", null).toFile();
+			FileOutputStream tempOutputStream = new FileOutputStream(tempOutputFile);			
 			exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
 			exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, tempOutputStream);
 			exporter.exportReport();
-			
 			tempOutputStream.close();
 			
 			result = new FileInputStream(tempOutputFile);
-	
 	       	return result;
         } catch (SQLException sqle) {
             // SQLExceptions can be chained. We have at least one exception, so

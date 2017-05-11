@@ -26,33 +26,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-
 import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.ContactClientUtils;
 import org.collectionspace.services.contact.AddressGroup;
 import org.collectionspace.services.contact.AddressGroupList;
 import org.collectionspace.services.contact.ContactsCommon;
-
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.PersonJAXBSchema;
-import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.PersonTermGroup;
 import org.collectionspace.services.person.PersonTermGroupList;
 import org.collectionspace.services.person.PersonsCommon;
-
-import org.jboss.resteasy.client.ClientResponse;
-//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -71,6 +65,19 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     /** The logger. */
     private final String CLASS_NAME = PersonAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    
+    /**
+     * Default constructor.  Used to set the short ID for all tests authority items
+     */
+    public PersonAuthorityServiceTest() {
+    	super();
+    	TEST_SHORTID = "johnWayneActor";
+    }
+    
+    @Override
+	protected String getTestAuthorityItemShortId() {
+		return getTestAuthorityItemShortId(true); // The short ID of every person item we create should be unique
+	}
 
     @Override
     public String getServicePathComponent() {
@@ -85,6 +92,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     public String getItemServicePathComponent() {
         return AuthorityClient.ITEMS;
     }
+    
     /** The test forename. */
     final String TEST_FORE_NAME = "John";
     /** The test middle name. */
@@ -97,14 +105,13 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     final String TEST_DEATH_DATE = "June 11, 1979";
     //private String knownResourceRefName = null;
     private String knownItemResourceShortIdentifer = null;
-    // The resource ID of an item resource used for partial term matching tests.
-    private String knownItemPartialTermResourceId = null;
     /** The known contact resource id. */
     private String knownContactResourceId = null;
     /** The all contact resource ids created. */
     private Map<String, String> allContactResourceIdsCreated =
             new HashMap<String, String>();
 
+    
     protected void setKnownResource(String id, String shortIdentifer,
             String refName) {
         knownResourceId = id;
@@ -121,20 +128,23 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new PersonAuthorityClient();
     }
+    
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new PersonAuthorityClient(clientPropertiesFilename);
+	}
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
-    // Success outcomes
-    /* (non-Javadoc)
+
+	/* (non-Javadoc)
      * @see org.collectionspace.services.client.test.ServiceTest#create(java.lang.String)
      */
     @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-//    groups = {"create"})
     public void create(String testName) throws Exception {
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
@@ -149,6 +159,10 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         PoxPayloadOut multipart =
                 PersonAuthorityClientUtils.createPersonAuthorityInstance(
                 displayName, shortId, client.getCommonPartName());
+        // Extract the short ID since it might have been randomized by the createPersonAuthRefName() method
+        PersonauthoritiesCommon personAuthority = (PersonauthoritiesCommon) extractPart(multipart,
+                client.getCommonPartName(), PersonauthoritiesCommon.class);
+        shortId = personAuthority.getShortIdentifier();
 
         String newID = null;
         Response res = client.create(multipart);
@@ -173,20 +187,22 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     }
 
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
         PersonAuthorityClient client = new PersonAuthorityClient();
+        
         String displayName = "displayName-" + identifier;
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
                 displayName, identifier, client.getCommonPartName());
+        
         return multipart;
     }
 
     @Override
-    protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) {
+    protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) throws Exception {
         String headerLabel = new PersonAuthorityClient().getItemCommonPartName();
         
         HashMap<String, String> personInfo = new HashMap<String, String>();
-        String shortId = "MarkTwainAuthor";
+        String shortId = "MarkTwainAuthor" + identifier;
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
         
         List<PersonTermGroup> terms = new ArrayList<PersonTermGroup>();
@@ -213,15 +229,17 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         return PersonAuthorityClientUtils.createPersonInstance(parentCsid, identifier, personInfo, terms, headerLabel);
     }
 
+    
     /**
      * Creates an item in an authority, using test data.
      *
      * @param vcsid the vcsid
      * @param authRefName the auth ref name
      * @return the string
+     * @throws Exception 
      */
     @Override
-    protected String createItemInAuthority(String vcsid) {
+    protected String createItemInAuthority(AuthorityClient client, String vcsid, String shortId) throws Exception {
 
         final String testName = "createItemInAuthority";
         if (logger.isDebugEnabled()) {
@@ -232,7 +250,6 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         //
         // Fill the property map
         //
-        String shortId = "johnWayneActor";
         johnWayneMap.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
         johnWayneMap.put(PersonJAXBSchema.GENDER, "male");
         johnWayneMap.put(PersonJAXBSchema.BIRTH_DATE, TEST_BIRTH_DATE);
@@ -259,7 +276,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         johnWayneGroups.add("Scottish");
         johnWayneRepeatablesMap.put(PersonJAXBSchema.GROUPS, johnWayneGroups);
 
-        return createItemInAuthority(vcsid, null /*authRefName*/, shortId, johnWayneMap, johnWayneTerms, johnWayneRepeatablesMap);
+        return createItemInAuthority(client, vcsid, null /*authRefName*/, shortId, johnWayneMap, johnWayneTerms, johnWayneRepeatablesMap);
 
     }
 
@@ -271,9 +288,10 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * @param itemFieldProperties a set of properties specifying the values of fields.
      * @param itemRepeatableFieldProperties a set of properties specifying the values of repeatable fields.
      * @return the string
+     * @throws Exception 
      */
-    private String createItemInAuthority(String vcsid, String authRefName, String shortId,
-            Map itemFieldProperties, List<PersonTermGroup> terms, Map itemRepeatableFieldProperties) {
+    private String createItemInAuthority(AuthorityClient client, String vcsid, String authRefName, String shortId,
+            Map<String, String> itemFieldProperties, List<PersonTermGroup> terms, Map<String, List<String>> itemRepeatableFieldProperties) throws Exception {
 
         final String testName = "createItemInAuthority";
         if (logger.isDebugEnabled()) {
@@ -281,7 +299,9 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         }
 
         // Submit the request to the service and store the response.
-        PersonAuthorityClient client = new PersonAuthorityClient();
+        if (client == null) {
+        	client = new PersonAuthorityClient();
+        }
         PoxPayloadOut multipart =
                 PersonAuthorityClientUtils.createPersonInstance(vcsid, null /*authRefName*/, itemFieldProperties,
                 terms, itemRepeatableFieldProperties, client.getItemCommonPartName());
@@ -305,6 +325,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
                 logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);
             }
         }
+        
         if (logger.isDebugEnabled()) {
             logger.debug(testName + " (created):" + vcsid + "/(" + newID + "," + shortId + ")");
         }
@@ -317,16 +338,32 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         return newID;
     }
 
+    /*
+     * This override asks for a unique identifier (short ID in the case of authority tests).
+     * 
+     * (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createResource(java.lang.String, java.lang.String)
+     */
+    @Override
+    protected String createResource(String testName, String identifier) throws Exception {
+        String result = null;
+        
+    	CollectionSpaceClient client = this.getClientInstance();
+        result = createResource(client, testName, identifier, true);
+    	
+    	return result;
+    }
+    
     /**
      * Creates the contact.
      *
      * @param testName the test name
+     * @throws Exception 
      */
-    @Test(dataProvider = "testName", groups = {"create"},
-    		dependsOnMethods = {"createItem"})
-    public void createContact(String testName) {
+    @Test(dataProvider = "testName", groups = {"create"}, dependsOnMethods = {"createItem"})
+    public void createContact(String testName) throws Exception {
         setupCreate();
-        String newID = createContactInItem(knownResourceId, knownItemResourceId);
+        createContactInItem(knownResourceId, knownItemResourceId);
     }
 
     /**
@@ -335,8 +372,9 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * @param parentcsid the parentcsid
      * @param itemcsid the itemcsid
      * @return the string
+     * @throws Exception 
      */
-    private String createContactInItem(String parentcsid, String itemcsid) {
+    private String createContactInItem(String parentcsid, String itemcsid) throws Exception {
 
         final String testName = "createContactInItem";
         if (logger.isDebugEnabled()) {
@@ -399,9 +437,8 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 
         // Submit the request to the service and store the response.
         Response res = client.create(multipart);
-
         // Check the status code of the response: does it match
-        // the expected response(s)?
+        // the expected response(s)?  We expect failure here.
         try {
         	assertStatusCode(res, testName);
         } finally {
@@ -416,10 +453,11 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * non-word characters.
      *
      * @param testName the test name
+     * @throws Exception 
      */
     @Test(dataProvider = "testName", groups = {"create", "nonWordCharsInShortId"},
     		dependsOnMethods = {"org.collectionspace.services.client.test.AbstractServiceTestImpl.create"})
-    public void createItemWithShortIdNonWordChars(String testName) {
+    public void createItemWithShortIdNonWordChars(String testName) throws Exception {
         testExpectedStatusCode = STATUS_BAD_REQUEST;
         testRequestType = ServiceRequestType.CREATE;
         testSetup(testExpectedStatusCode, testRequestType);
@@ -436,7 +474,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         term.setTermName(shortId);
         terms.add(term);
         
-        final Map NULL_REPEATABLE_FIELD_PROPERTIES = null;
+        final Map<String, List<String>> NULL_REPEATABLE_FIELD_PROPERTIES = null;
         PoxPayloadOut multipart =
                 PersonAuthorityClientUtils.createPersonInstance(knownResourceId,
                 null /*knownResourceRefName*/, fieldProperties, terms,
@@ -445,14 +483,15 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         // Send the request and receive a response
         Response res = client.createItem(knownResourceId, multipart);
         // Check the status code of the response: does it match
-        // the expected response(s)?
+        // the expected response(s)?  We expect failure here, so there will be no
+        // new ID to keep track of for later cleanup.
         try {
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
         		res.close();
         	}
-        }
+        }        
     }
 
     // ---------------------------------------------------------------
@@ -513,7 +552,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         readInternal(testName, null, knownResourceShortIdentifer);
     }
 
-    protected void readInternal(String testName, String CSID, String shortId) {
+    protected void readInternal(String testName, String CSID, String shortId) throws Exception {
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
         Response res = null;
@@ -685,7 +724,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 
         // Submit the updated resource to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(PersonAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(client.getItemCommonPartName(), person);
+        output.addPart(client.getItemCommonPartName(), person);
         setupUpdateWithInvalidBody();
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
         try {
@@ -741,10 +780,10 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * Read contact non existent.
      *
      * @param testName the test name
+     * @throws Exception 
      */
-    @Test(dataProvider = "testName", groups = {"readItem"},
-    		dependsOnMethods = {"readContact"})
-    public void readContactNonExistent(String testName) {
+    @Test(dataProvider = "testName", groups = {"readItem"}, dependsOnMethods = {"readContact"})
+    public void readContactNonExistent(String testName) throws Exception {
         // Perform setup.
         setupReadNonExistent();
 
@@ -766,88 +805,12 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     // ---------------------------------------------------------------
 
     /**
-     * Read item list.
-     */
-    @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-//    groups = {"readList"}, dependsOnMethods = {"readList"})
-    public void readItemList(String testName) {
-        readItemList(knownAuthorityWithItems, null, testName);
-    }
-
-    /**
-     * Read item list by authority name.
-     */
-    @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-//    groups = {"readList"}, dependsOnMethods = {"readItemList"})
-    public void readItemListByName(String testName) {
-        readItemList(null, READITEMS_SHORT_IDENTIFIER, testName);
-    }
-
-    /**
-     * Read item list.
-     *
-     * @param vcsid the vcsid
-     * @param name the name
-     */
-    private void readItemList(String vcsid, String name, String testName) {
-        setupReadList();
-        // Submit the request to the service and store the response.
-        PersonAuthorityClient client = new PersonAuthorityClient();
-        Response res = null;
-        if (vcsid != null) {
-            res = client.readItemList(vcsid, null, null);
-        } else if (name != null) {
-            res = client.readItemListForNamedAuthority(name, null, null);
-        } else {
-            Assert.fail("readItemList passed null csid and name!");
-        }
-        AbstractCommonList list = null;
-        try {
-            assertStatusCode(res, testName);
-            list = res.readEntity(AbstractCommonList.class);
-        } finally {
-        	if (res != null) {
-                res.close();
-            }
-        }
-
-        List<AbstractCommonList.ListItem> items = list.getListItem();
-        int nItemsReturned = items.size();
-        // There will be 'nItemsToCreateInList'
-        // items created by the createItemList test,
-        // all associated with the same parent resource.
-        int nExpectedItems = nItemsToCreateInList;
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": Expected "
-                    + nExpectedItems + " items; got: " + nItemsReturned);
-        }
-        Assert.assertEquals(nItemsReturned, nExpectedItems);
-
-        for (AbstractCommonList.ListItem item : items) {
-            String value =
-                    AbstractCommonListUtils.ListItemGetElementValue(item, AuthorityItemJAXBSchema.REF_NAME);
-            Assert.assertTrue((null != value), "Item refName is null!");
-            
-            // Per CSPACE-5132, lists items still return a field named displayName,
-            // not termDisplayName, for backward compatibility.
-            // (The format of list items will change significantly in CSPACE-5134.)
-            value =
-                    AbstractCommonListUtils.ListItemGetElementValue(item, AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
-            Assert.assertTrue((null != value), "Item termDisplayName is null!");
-        }
-        if (logger.isTraceEnabled()) {
-            AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
-        }
-    }
-
-    /**
      * Read contact list.
+     * @throws Exception 
      */
     @Test(groups = {"readList"},
     		dependsOnMethods = {"org.collectionspace.services.client.test.AbstractAuthorityServiceTest.readItemList"})
-    public void readContactList() {
+    public void readContactList() throws Exception {
         readContactList(knownResourceId, knownItemResourceId);
     }
 
@@ -856,8 +819,9 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      *
      * @param parentcsid the parentcsid
      * @param itemcsid the itemcsid
+     * @throws Exception 
      */
-    private void readContactList(String parentcsid, String itemcsid) {
+    private void readContactList(String parentcsid, String itemcsid) throws Exception {
         final String testName = "readContactList";
 
         // Perform setup.
@@ -943,7 +907,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 
         // Submit the updated resource to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(PersonAuthorityClient.SERVICE_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(client.getCommonPartName(), personAuthority);
+        output.addPart(client.getCommonPartName(), personAuthority);
         setupUpdate();
         res = client.update(knownResourceId, output);
         try {
@@ -968,14 +932,12 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     }
 
     /**
-     * Update item.
+     * Update item override -see immediate superclass.
      *
      * @param testName the test name
      * @throws Exception the exception
      */
     @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-//    groups = {"update"}, dependsOnMethods = {"update"})
     public void updateItem(String testName) throws Exception {
         // Retrieve the contents of a resource to update.
         PersonAuthorityClient client = new PersonAuthorityClient();
@@ -1023,7 +985,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 
         // Submit the updated resource to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(PersonAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(client.getItemCommonPartName(), person);
+        output.addPart(client.getItemCommonPartName(), person);
         setupUpdate();
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
         try {
@@ -1112,7 +1074,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 
         // Submit the updated resource to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(ContactClient.SERVICE_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(contactsCommonLabel, contact);
+        output.addPart(contactsCommonLabel, contact);
         setupUpdate();
         res = client.updateContact(knownResourceId, knownItemResourceId, knownContactResourceId, output);
         try {
@@ -1207,10 +1169,11 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * Delete non existent contact.
      *
      * @param testName the test name
+     * @throws Exception 
      */
     @Test(dataProvider = "testName", groups = {"delete"},
     		dependsOnMethods = {"deleteContact"})
-    public void deleteNonExistentContact(String testName) {
+    public void deleteNonExistentContact(String testName) throws Exception {
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
         setupDeleteNonExistent();
@@ -1260,10 +1223,11 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun = true)
     @Override
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
@@ -1271,15 +1235,17 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
             }
             return;
         }
+        
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
+        
         String parentResourceId;
         String itemResourceId;
         String contactResourceId;
         // Clean up contact resources.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        parentResourceId = knownResourceId;
+        parentResourceId = this.getKnowResourceId();
         for (Map.Entry<String, String> entry : allContactResourceIdsCreated.entrySet()) {
             contactResourceId = entry.getKey();
             itemResourceId = entry.getValue();
@@ -1289,15 +1255,9 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
             		contactResourceId);
             res.close();
         }
-        // Clean up item resources.
-        for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
-            itemResourceId = entry.getKey();
-            parentResourceId = entry.getValue();
-            // Note: Any non-success responses from the delete operation
-            // below are ignored and not reported.
-            client.deleteItem(parentResourceId, itemResourceId).close();
-        }
-        // Clean up parent resources.
+        //
+        // Finally, clean call our superclass' cleanUp method.
+        //
         super.cleanUp();
     }
 
@@ -1408,7 +1368,8 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 
 	@Override
 	protected void compareUpdatedItemInstances(PersonsCommon original,
-			PersonsCommon updated) throws Exception {
+			PersonsCommon updated,
+			boolean compareRevNumbers) throws Exception {
             
             PersonTermGroupList originalTermList = original.getPersonTermGroupList();
             Assert.assertNotNull(originalTermList);
@@ -1425,6 +1386,10 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
             Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(),
                 originalTerms.get(0).getTermDisplayName(),
                 "Value in updated record did not match submitted data.");
+            
+            if (compareRevNumbers == true) {
+            	Assert.assertEquals(original.getRev(), updated.getRev(), "Revision numbers should match.");
+            }
 	}
 
 	@Override
@@ -1468,7 +1433,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         return result;
     }
 	        
-        @Override
+    @Override
 	protected PersonauthoritiesCommon updateInstance(PersonauthoritiesCommon personauthoritiesCommon) {
 		PersonauthoritiesCommon result = new PersonauthoritiesCommon();
 		
@@ -1490,7 +1455,5 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 	@Override
 	protected void verifyReadItemInstance(PersonsCommon item) throws Exception {
 		// Do nothing for now.  Add more 'read' validation checks here if applicable.
-	}
-        
-        
+	}        
 }

@@ -25,7 +25,9 @@ package org.collectionspace.services.vocabulary.nuxeo;
 
 import java.util.regex.Pattern;
 
+import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommon;
+import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
@@ -60,36 +62,44 @@ public class VocabularyItemValidatorHandler implements ValidatorHandler {
         }
         
         try {
-            MultipartServiceContext mctx = (MultipartServiceContext) ctx;
-            VocabularyitemsCommon vocabItem = (VocabularyitemsCommon) mctx.getInputPart(mctx.getCommonPartLabel(),
-                    VocabularyitemsCommon.class);
-            String msg = "";
+            String errMessage = "";
             boolean invalid = false;
+            MultipartServiceContext mctx = (MultipartServiceContext) ctx;
+            VocabularyitemsCommon vocabItem = (VocabularyitemsCommon) mctx.getInputPart(mctx.getCommonPartLabel());
             
-            // Validation occurring on both creates and updates
-            String displayName = vocabItem.getDisplayName();
-            if ((displayName == null) || (displayName.trim().length() < 2)) {
-                invalid = true;
-                msg += "displayName must be non-null and contain at least 2 non-whitespace characters";
-            }
-            
-            // Validation specific to creates or updates
-            if (action.equals(Action.CREATE)) {
-                String shortId = vocabItem.getShortIdentifier();
-                // Per CSPACE-2215, shortIdentifier values that are null (missing)
-                // oe the empty string are now legally accepted in create payloads.
-                // In either of those cases, a short identifier will be synthesized from
-                // a display name or supplied in another manner.
-                if ((shortId != null) && (shortIdBadPattern.matcher(shortId).find())) {
+            if (vocabItem != null) {
+	            // Validation occurring on both creates and updates
+	            String displayName = vocabItem.getDisplayName();
+	            if (displayName == null || displayName.trim().length() < 2) {
+	                invalid = true;
+	                errMessage += "displayName must be non-null and contain at least 2 non-whitespace characters";
+	            }
+	            
+	            // Validation specific to creates or updates
+	            if (action.equals(Action.CREATE)) {
+	                String shortId = vocabItem.getShortIdentifier();
+	                // Per CSPACE-2215, shortIdentifier values that are null (missing
+	                // or the empty string) are now legally accepted in CREATE/POST payloads.
+	                // In either of these cases, a short identifier will be synthesized from
+	                // a display name or supplied in another manner.
+	                if ((shortId != null) && (shortIdBadPattern.matcher(shortId).find())) {
+	                    invalid = true;
+	                    errMessage += "shortIdentifier must only contain standard word characters";
+	                }
+	            } else if (action.equals(Action.UPDATE)) {
+	            	// What is this ELSE clause for?
+	            }
+            } else {
+            	RelationsCommonList rcl = (RelationsCommonList) mctx.getInputPart(RelationClient.SERVICE_COMMON_LIST_NAME);
+            	if (rcl == null) {
                     invalid = true;
-                    msg += "shortIdentifier must only contain standard word characters";
-                }
-            } else if (action.equals(Action.UPDATE)) {
+                    errMessage += "The vocabulary item payload is missing both a common payload and relations part.  At lease one of these must exist in the payload.";
+            	}            	
             }
-
+            
             if (invalid) {
-                logger.error(msg);
-                throw new InvalidDocumentException(msg);
+                logger.error(errMessage);
+                throw new InvalidDocumentException(errMessage);
             }
         } catch (InvalidDocumentException ide) {
             throw ide;

@@ -26,6 +26,7 @@ package org.collectionspace.services.common.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentHandler;
@@ -47,6 +48,26 @@ public class ServiceConfigUtils {
 
     final static Logger logger = LoggerFactory.getLogger(ServiceConfigUtils.class);
 
+	public static DocHandlerParams.Params getDocHandlerParams(String tenantId, String serviceName) throws DocumentException {
+        TenantBindingConfigReaderImpl tReader =
+                ServiceMain.getInstance().getTenantBindingConfigReader();
+        TenantBindingType tenantBinding = tReader.getTenantBinding(tenantId);
+        if (tenantBinding == null) {
+            String msg = "No tenant binding found for tenantId=" + tenantId
+                    + " while processing request for service= " + serviceName;
+            logger.error(msg);
+            throw new IllegalStateException(msg);
+        }
+        ServiceBindingType serviceBinding = tReader.getServiceBinding(tenantId, serviceName);
+		DocHandlerParams dhb = serviceBinding.getDocHandlerParams();
+		if (dhb != null && dhb.getParams() != null) {
+			return dhb.getParams();
+		}
+		
+		throw new DocumentException("No DocHandlerParams configured for: "
+				+ serviceBinding.getName());
+	}
+	
     /*
      * Returns the document handler parameters that were loaded at startup from the
      * tenant bindings config file.

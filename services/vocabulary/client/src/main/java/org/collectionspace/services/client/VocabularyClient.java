@@ -26,12 +26,13 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.vocabulary.VocabulariesCommon;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommon;
 
 /**
  * The Class VocabularyClient.
  */
-public class VocabularyClient extends AuthorityClientImpl<VocabularyitemsCommon, VocabularyProxy> {
+public class VocabularyClient extends AuthorityClientImpl<VocabulariesCommon, VocabularyitemsCommon, VocabularyProxy> {
 	public static final String SERVICE_NAME = "vocabularies";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -43,6 +44,23 @@ public class VocabularyClient extends AuthorityClientImpl<VocabularyitemsCommon,
 	public static final String SERVICE_ITEM_NAME = "vocabularyitems";
 	public static final String SERVICE_ITEM_PAYLOAD_NAME = SERVICE_ITEM_NAME;
 	
+    public static final String SERVICE_COMMON_PART_NAME = SERVICE_NAME
+            + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
+    public static final String SERVICE_ITEM_COMMON_PART_NAME = SERVICE_ITEM_NAME
+            + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
+	
+	
+    //
+    // Constructors
+    //
+    public VocabularyClient() throws Exception {
+    	super();
+    }
+    
+    public VocabularyClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
+    
 	@Override
 	public String getServiceName() {
 		return SERVICE_NAME;

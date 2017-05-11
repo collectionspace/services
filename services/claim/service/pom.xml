@@ -4,10 +4,11 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.claim</artifactId>        
-        <version>4.3-SNAPSHOT</version>
+        <version>4.5-SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
+    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.claim.service</artifactId>
     <name>services.claim.service</name>
     <packaging>jar</packaging>       
@@ -16,6 +17,7 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
@@ -87,6 +89,7 @@
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-api</artifactId>
+            <version>${nuxeo.core.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>jboss-remoting</artifactId>

@@ -30,28 +30,18 @@ import org.collectionspace.services.concept.ConceptsCommon;
 /**
  * ConceptDocumentModelHandler
  *
- * $LastChangedRevision: $
- * $LastChangedDate: $
- */
-/**
- * @author pschmitz
- *
  */
 public class ConceptDocumentModelHandler
         extends AuthorityItemDocumentModelHandler<ConceptsCommon> {
 
     public ConceptDocumentModelHandler() {
-    	super(ConceptAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
+    	super(ConceptAuthorityClient.SERVICE_COMMON_PART_NAME, ConceptAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 
     @Override
     public String getAuthorityServicePath(){
         return ConceptAuthorityClient.SERVICE_PATH_COMPONENT;    //  CSPACE-3932
     }
-	
-    /**
-     * Note that Concept has no displayName computation support.
-     */
 	
     /**
      * getQProperty converts the given property to qualified schema property
@@ -62,5 +52,11 @@ public class ConceptDocumentModelHandler
     public String getQProperty(String prop) {
         return ConceptConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
+    
+	@Override
+	public String getParentCommonSchemaName() {
+		// TODO Auto-generated method stub
+		return ConceptAuthorityClient.SERVICE_COMMON_PART_NAME;
+	}
 }
 

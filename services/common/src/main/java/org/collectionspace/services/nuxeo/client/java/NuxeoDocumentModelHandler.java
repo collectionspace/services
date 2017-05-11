@@ -35,8 +35,11 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.IRelationsManager;
+import org.collectionspace.services.client.PoxPayload;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.XmlTools;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ReflectionMapper;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.api.Tools;
@@ -53,10 +56,9 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-
+import org.dom4j.Document;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,6 +108,42 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 	public void setCommonPart(T commonPart) {
 		this.commonPart = commonPart;
 	}
+
+    /**
+     * The entity type expected from the JAX-RS Response object.  By default it is of type String.  Child classes
+     * can override this if they need to.
+     */
+    protected Class<String> getEntityResponseType() {
+    	return String.class;
+    }
+    
+    protected String getWorkflowState(PoxPayload payload) {
+    	String result = null;
+    	
+		Document document = payload.getDOMDocument();
+		result = XmlTools.getElementValue(document, "//" + WorkflowClient.WORKFLOWSTATE_XML_ELEMENT_NAME);
+		
+		return result;
+    }
+    
+    protected Long getRevision(PoxPayload payload) {
+    	Long result = null;
+    	
+		Document document = payload.getDOMDocument();
+		String xmlRev = XmlTools.getElementValue(document, "//rev");
+		result = Long.valueOf(xmlRev);
+		
+		return result;
+    }
+    
+    protected List getItemList(PoxPayloadIn payloadIn) {
+    	List result = null;
+    	
+		Document document = payloadIn.getDOMDocument();
+		result = XmlTools.getElementNodes(document, "//list-item");
+		
+		return result;
+    }
 
 	/**
 	 * Subclass DocHandlers may override this method to control exact creation of the common list.
@@ -182,7 +220,7 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 		CommonList commonList = new CommonList();
 		String markRtSbj = null;
 		CoreSessionInterface repoSession = null;
-		RepositoryJavaClientImpl repoClient = null;
+		RepositoryClientImpl repoClient = null;
 		boolean releaseRepoSession = false;
 
 		AbstractServiceContextImpl ctx = (AbstractServiceContextImpl) getServiceContext();
@@ -193,8 +231,8 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 
 		try {
 			if (markRtSbj != null) {
-				repoClient = (RepositoryJavaClientImpl) this.getRepositoryClient(ctx);
-				RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl) repoClient;
+				repoClient = (RepositoryClientImpl) this.getRepositoryClient(ctx);
+				RepositoryClientImpl nuxeoRepoClient = (RepositoryClientImpl) repoClient;
 				repoSession = this.getRepositorySession();
 				if (repoSession == null) {
 					repoSession = repoClient.getRepositorySession(ctx);
@@ -240,7 +278,7 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 							+ NuxeoUtils.buildWorkflowNotDeletedWhereClause();
 					QueryContext queryContext = new QueryContext(ctx, whereClause);
 					queryContext.setDocType(IRelationsManager.DOC_TYPE);
-					String query = NuxeoUtils.buildNXQLQuery(ctx, queryContext);
+					String query = NuxeoUtils.buildNXQLQuery(queryContext);
 					// Search for 1 relation that matches. 1 is enough to fail
 					// the filter
 					DocumentModelList docList = repoSession.query(query, null, 1, 0, false);
