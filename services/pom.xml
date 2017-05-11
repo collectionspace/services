@@ -52,7 +52,6 @@
         <module>relation</module>
         <module>query</module>
         <module>acquisition</module>
-        <module>claim</module>
         <module>vocabulary</module>
         <module>organization</module>
         <module>person</module>
@@ -93,7 +92,6 @@
         <module>PerformanceTests</module>
         <module>security</module>
         <module>JaxRsServiceProvider</module>
-        <module>structureddate</module>
     </modules>
 
     <dependencies>

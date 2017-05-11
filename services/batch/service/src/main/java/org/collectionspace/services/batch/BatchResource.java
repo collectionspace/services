@@ -77,40 +77,6 @@ public class BatchResource extends NuxeoBasedResource {
     public Class getCommonPartClass() {
     	return BatchCommon.class;
     }
-
-    @Override
-    protected AbstractCommonList getCommonList(UriInfo ui) {
-        try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
-            MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
-            DocumentHandler handler = createDocumentHandler(ctx);
-            String docType = queryParams.getFirst(IQueryManager.SEARCH_TYPE_DOCTYPE);
-            String mode = queryParams.getFirst(IQueryManager.SEARCH_TYPE_INVOCATION_MODE);
-            String whereClause = null;
-            DocumentFilter documentFilter = null;
-            String common_part =ctx.getCommonPartLabel(); 
-            if (docType != null && !docType.isEmpty()) {
-                whereClause = QueryManager.createWhereClauseForInvocableByDocType(
-                		common_part, docType);
-                documentFilter = handler.getDocumentFilter();
-                documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
-            }
-            if (mode != null && !mode.isEmpty()) {
-                whereClause = QueryManager.createWhereClauseForInvocableByMode(
-                		common_part, mode);
-                documentFilter = handler.getDocumentFilter();
-                documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
-            }
-            if (whereClause !=null && logger.isDebugEnabled()) {
-                logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
-            }
-            getRepositoryClient(ctx).getFiltered(ctx, handler);
-            AbstractCommonList list = (AbstractCommonList) handler.getCommonPartList();
-            return list;
-        } catch (Exception e) {
-            throw bigReThrow(e, ServiceMessages.LIST_FAILED);
-        }
-    }
     
 	/**
 	// other resource methods and use the getRepositoryClient() methods.
