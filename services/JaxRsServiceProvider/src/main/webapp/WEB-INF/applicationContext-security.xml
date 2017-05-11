@@ -32,7 +32,7 @@
 			<sec:filter-chain pattern="/publicitems/*/*/content"
                               filters="none"/>
             <sec:filter-chain pattern="/**"
-                              filters="securityContextPersistenceFilter,basicAuthenticationFilter,logoutFilter,exTranslationFilter,filterInvocationInterceptor"/>
+                              filters="securityContextPersistenceFilter,basicAuthenticationFilter,userAttributeFilter,logoutFilter,exTranslationFilter,filterInvocationInterceptor"/>
         </sec:filter-chain-map>
     </bean>
 	
@@ -56,6 +56,10 @@
     <bean id="basicAuthenticationEntryPoint"
           class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
         <property name="realmName" value="org.collectionspace.services"/>
+    </bean>
+
+    <bean id="userAttributeFilter"
+          class="org.collectionspace.authentication.spring.CSpaceUserAttributeFilter">
     </bean>
 
     <bean id="logoutFilter"

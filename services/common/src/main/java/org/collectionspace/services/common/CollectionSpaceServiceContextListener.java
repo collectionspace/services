@@ -7,6 +7,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
+
 /**
  * CollectionSpaceServiceContextListener is a ServletContextListener that helps initialize
  * the services layer at deployment and undeployment times
@@ -44,5 +46,6 @@ public class CollectionSpaceServiceContextListener implements ServletContextList
     @Override
     public void contextDestroyed(ServletContextEvent event) {
         //ServiceMain.getInstance().release();
+        JpaStorageUtils.releaseEntityManagerFactories();
     }
 }

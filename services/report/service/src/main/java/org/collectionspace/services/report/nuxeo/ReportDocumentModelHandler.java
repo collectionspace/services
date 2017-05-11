@@ -28,7 +28,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -271,8 +273,9 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			// export report to pdf and build a response with the bytes
 			//JasperExportManager.exportReportToPdf(jasperprint);
 			
-			// Report will be to a byte output array.
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			// Output to a temp file, since large reports may overrun the heap.
+			File tempOutputFile = Files.createTempFile("report-", null).toFile();
+			FileOutputStream tempOutputStream = new FileOutputStream(tempOutputFile);
 
 			JRExporter exporter = null;
 			// Strip extension from report filename.
@@ -332,9 +335,12 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			JasperPrint jasperPrint = JasperFillManager.fillReport(fileStream, params,conn);
 				
 			exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
-			exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, baos);
+			exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, tempOutputStream);
 			exporter.exportReport();
-			result = new ByteArrayInputStream(baos.toByteArray());
+			
+			tempOutputStream.close();
+			
+			result = new FileInputStream(tempOutputFile);
 	
 	       	return result;
         } catch (SQLException sqle) {

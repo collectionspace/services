@@ -1005,7 +1005,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         }
     }
     
-    protected String getItemDocType(String tenantId) {
+    public String getItemDocType(String tenantId) {
         return getDocType(tenantId, getItemServiceName());
     }
         

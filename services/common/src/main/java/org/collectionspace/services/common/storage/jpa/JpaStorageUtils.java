@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.EntityManager;
@@ -49,7 +50,6 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.security.SecurityUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +69,8 @@ public class JpaStorageUtils {
     // This is the column name for ID field of all the JPA objects
     public static final String CSID_LABEL = "csid";
     
+    private static Map<String, EntityManagerFactory> entityManagerFactoryCache = new HashMap<String, EntityManagerFactory>();
+
     private static boolean useTenantId(String tenantId) {
     	boolean result = true;
     	
@@ -596,30 +598,43 @@ public class JpaStorageUtils {
     public static EntityManagerFactory getEntityManagerFactory(
             String persistenceUnit) {
     	EntityManagerFactory result = null;
-    	
-    	try {
-    		result = Persistence.createEntityManagerFactory(persistenceUnit);
-    	} catch (javax.persistence.PersistenceException e) {
-    		logger.warn("Could not find a persistence unit for: " + persistenceUnit);
-    	}
+
+        result = getCachedEntityManagerFactory(persistenceUnit);
     	
 		//
 		// Try using a backup persistence unit if the specified one is not available and log a warning
 		//
-    	if (result == null && !persistenceUnit.equalsIgnoreCase(CS_PERSISTENCE_UNIT)) try {
-    		result = Persistence.createEntityManagerFactory(CS_PERSISTENCE_UNIT);
-    	} catch (javax.persistence.PersistenceException e) {
-    		logger.warn("Could not find a persistence unit for: " + CS_PERSISTENCE_UNIT);
-    	}
+        if (result == null && !persistenceUnit.equalsIgnoreCase(CS_PERSISTENCE_UNIT)) {
+            result = getCachedEntityManagerFactory(CS_PERSISTENCE_UNIT);
+        }
     	
     	//
     	// One more try.
     	//
-    	if (result == null && !persistenceUnit.equalsIgnoreCase(CS_AUTHZ_PERSISTENCE_UNIT)) try {
-    		result = Persistence.createEntityManagerFactory(CS_AUTHZ_PERSISTENCE_UNIT);
-    	} catch (javax.persistence.PersistenceException e) {
-    		logger.warn("Problem with the persistence unit for: " + CS_AUTHZ_PERSISTENCE_UNIT, e);
-    	}
+        if (result == null && !persistenceUnit.equalsIgnoreCase(CS_AUTHZ_PERSISTENCE_UNIT)) {
+            result = getCachedEntityManagerFactory(CS_AUTHZ_PERSISTENCE_UNIT);
+        }
+
+        return result;
+    }
+
+    private static EntityManagerFactory getCachedEntityManagerFactory(
+            String persistenceUnit) {
+        EntityManagerFactory result = null;
+
+        result = entityManagerFactoryCache.get(persistenceUnit);
+
+        if (result == null) {
+            try {
+                result = Persistence.createEntityManagerFactory(persistenceUnit);
+            } catch (javax.persistence.PersistenceException e) {
+                logger.warn("Could not find a persistence unit for: " + persistenceUnit);
+            }
+
+            if (result != null) {
+                entityManagerFactoryCache.put(persistenceUnit, result);
+            }
+        }
 
         return result;
     }
@@ -630,10 +645,24 @@ public class JpaStorageUtils {
      * @param emf the emf
      */
     public static void releaseEntityManagerFactory(EntityManagerFactory emf) {
-        if (emf != null) {
+        // CSPACE-6823: The conventional usage of this class has been to call
+        // getEntityManagerFactory(), do something, and then immediately call
+        // releaseEntityManagerFactory(). Now that EntityManagerFactory instances
+        // are cached and re-used, they should not be closed after each use.
+        // Instead, releaseEntityManagerFactories() should be called when the
+        // services layer is stopped.
+        
+        // if (emf != null) {
+        //     emf.close();
+        // }
+    }
+
+    public static void releaseEntityManagerFactories() {
+        for (EntityManagerFactory emf : entityManagerFactoryCache.values()) {
             emf.close();
         }
-
+        
+        entityManagerFactoryCache.clear();
     }
 }
 
