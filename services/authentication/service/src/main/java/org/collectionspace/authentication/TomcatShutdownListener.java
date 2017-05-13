@@ -39,7 +39,7 @@ public class TomcatShutdownListener implements LifecycleListener {
 			if (failed) {
 				triggerShutdown(isInit, server);
 			} else if (!isInit) {
-				logger.log(Level.INFO, "CollectionSpace Startup successful.");
+				logger.log(Level.INFO, "CollectionSpace Startup successful." + "\007" + "\007" + "\007");
 			}
 		}
 	}
