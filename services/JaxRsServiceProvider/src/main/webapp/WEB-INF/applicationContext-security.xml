@@ -66,6 +66,9 @@
         <sec:intercept-url method="OPTIONS" pattern="/**" access="isAnonymous()"/>
         <sec:cors configuration-source-ref="corsSource" />
         
+        <!-- Insert the username from the security context into a request attribute for logging -->
+        <sec:custom-filter ref="userAttributeFilter" after="SECURITY_CONTEXT_FILTER" />
+
         <!-- Handle token auth -->
         <sec:custom-filter ref="oauthResourceServerFilter" before="PRE_AUTH_FILTER" />
     </sec:http>
@@ -192,5 +195,9 @@
                 </entry>
             </util:map>
         </property>
+    </bean>
+
+    <bean id="userAttributeFilter"
+        class="org.collectionspace.authentication.spring.CSpaceUserAttributeFilter">
     </bean>
 </beans>
