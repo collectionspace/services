@@ -417,6 +417,10 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
     protected static DocumentModel getCurrentDocModelFromCsid(CoreSessionInterface session, String csid) {
         DocumentModelList docModelList = null;
         
+        if (Tools.isEmpty(csid)) {
+        	return null;
+        }
+        
         try {
             final String query = "SELECT * FROM "
                     + NuxeoUtils.BASE_DOCUMENT_TYPE

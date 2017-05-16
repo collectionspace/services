@@ -78,7 +78,6 @@ public class BatchResource extends NuxeoBasedResource {
     	return BatchCommon.class;
     }
     
-	/**
 	// other resource methods and use the getRepositoryClient() methods.
 	@Override
     protected AbstractCommonList getCommonList(UriInfo ui) {

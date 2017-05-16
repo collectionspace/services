@@ -508,8 +508,10 @@ public class NuxeoUtils {
     	
     	if (csid != null) {
     		result = "ecm:name = " + "\'" + csid + "\'";
+    	} else {
+    		logger.error("Call to NuxeoUtils.getByNameWhereClause() with null valued CSID.");
     	}
-    	
+    	    	
     	return result;
     }
         
