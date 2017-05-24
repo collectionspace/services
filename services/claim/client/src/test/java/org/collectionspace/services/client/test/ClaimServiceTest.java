@@ -30,8 +30,8 @@ import org.collectionspace.services.client.ClaimClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.claim.ClaimsCommon;
 import org.collectionspace.services.claim.ResponsibleDepartmentsList;
-import org.collectionspace.services.claim.ClaimClaimantGroupList;
-import org.collectionspace.services.claim.ClaimClaimantGroup;
+import org.collectionspace.services.claim.ClaimantGroupList;
+import org.collectionspace.services.claim.ClaimantGroup;
 import org.collectionspace.services.claim.ClaimReceivedGroupList;
 import org.collectionspace.services.claim.ClaimReceivedGroup;
 
@@ -112,12 +112,12 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
         responsibleDepartments.add("First Responsible Department-" + identifier);
         responsibleDepartments.add("Second Responsible Department-" + identifier);
 
-        ClaimClaimantGroupList claimClaimantGroupList = new ClaimClaimantGroupList();
-        ClaimClaimantGroup claimClaimantGroup = new ClaimClaimantGroup();
-        claimClaimantGroup.setFiledBy("urn:cspace:core.collectionspace.org:personauthorities:name(TestPersonAuth):item:name(carrieClaimFiler)'Carrie ClaimFiler'");
-        claimClaimantGroup.setFiledOnBehalfOf("urn:cspace:core.collectionspace.org:personauthorities:name(TestPersonAuth):item:name(benBehalfOf)'Ben BehalfOf'");
-        claimClaimantGroup.setClaimantNote(getUTF8DataFragment());
-        claimClaimantGroupList.getClaimClaimantGroup().add(claimClaimantGroup);
+        ClaimantGroupList claimantGroupList = new ClaimantGroupList();
+        ClaimantGroup claimantGroup = new ClaimantGroup();
+        claimantGroup.setClaimFiledBy("urn:cspace:core.collectionspace.org:personauthorities:name(TestPersonAuth):item:name(carrieClaimFiler)'Carrie ClaimFiler'");
+        claimantGroup.setClaimFiledOnBehalfOf("urn:cspace:core.collectionspace.org:personauthorities:name(TestPersonAuth):item:name(benBehalfOf)'Ben BehalfOf'");
+        claimantGroup.setClaimantNote(getUTF8DataFragment());
+        claimantGroupList.getClaimantGroup().add(claimantGroup);
 
         ClaimReceivedGroupList claimReceivedGroupList = new ClaimReceivedGroupList();
         ClaimReceivedGroup claimReceivedGroup = new ClaimReceivedGroup();
@@ -126,7 +126,7 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
         claimReceivedGroupList.getClaimReceivedGroup().add(claimReceivedGroup);
 
         claimCommon.setResponsibleDepartments(responsibleDepartmentsList);
-        claimCommon.setClaimClaimantGroupList(claimClaimantGroupList);
+        claimCommon.setClaimantGroupList(claimantGroupList);
         claimCommon.setClaimReceivedGroupList(claimReceivedGroupList);
         claimCommon.setClaimNumber(claimNumber);
 
@@ -162,10 +162,8 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 	    // Update its content.
 	    claimCommon.setClaimNumber(""); // Test deletion of existing string value
 	
-	    String claimNote = claimCommon.getClaimClaimantGroupList().getClaimClaimantGroup().get(0).getClaimantNote();
-	    claimCommon.getClaimClaimantGroupList().getClaimClaimantGroup().get(0).setClaimantNote("updated claim note-" + claimNote);
-	
-	    claimCommon.getResponsibleDepartments().getResponsibleDepartment().remove(0); // Test removing a value from a list
+	    String claimNote = claimCommon.getClaimantGroupList().getClaimantGroup().get(0).getClaimantNote();
+	    claimCommon.getClaimantGroupList().getClaimantGroup().get(0).setClaimantNote("updated claim note-" + claimNote);
 	
 	    String currentTimestamp = GregorianCalendarDateTimeUtils.timestampUTC();
 	    claimCommon.getClaimReceivedGroupList().getClaimReceivedGroup().get(0).setClaimReceivedDate(currentTimestamp);
@@ -188,7 +186,7 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
         Assert.assertTrue(receivedDate.equals(CURRENT_DATE_UTC));
         
         // Check the values of fields containing Unicode UTF-8 (non-Latin-1) characters.
-        String claimNote = fromRead.getClaimClaimantGroupList().getClaimClaimantGroup().get(0).getClaimantNote();
+        String claimNote = fromRead.getClaimantGroupList().getClaimantGroup().get(0).getClaimantNote();
         
         if(logger.isDebugEnabled()){
             logger.debug("UTF-8 data sent=" + getUTF8DataFragment() + "\n"
@@ -201,19 +199,10 @@ public class ClaimServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 	
 	@Override
 	protected void compareUpdatedInstances(ClaimsCommon claimCommon, ClaimsCommon updatedClaimCommon) throws Exception {
-		String originalClaimNote = claimCommon.getClaimClaimantGroupList().getClaimClaimantGroup().get(0).getClaimantNote();
-        String updatedClaimNote = updatedClaimCommon.getClaimClaimantGroupList().getClaimClaimantGroup().get(0).getClaimantNote();
+		String originalClaimNote = claimCommon.getClaimantGroupList().getClaimantGroup().get(0).getClaimantNote();
+        String updatedClaimNote = updatedClaimCommon.getClaimantGroupList().getClaimantGroup().get(0).getClaimantNote();
 
         Assert.assertEquals(updatedClaimNote, originalClaimNote,
-            "Data in updated object did not match submitted data.");
-
-        List<String> updatedResponsibleDepartments = updatedClaimCommon.getResponsibleDepartments().getResponsibleDepartment();
-        Assert.assertEquals(1,
-            updatedResponsibleDepartments.size(),
-            "Data in updated object did not match submitted data.");
-
-        Assert.assertEquals(updatedResponsibleDepartments.get(0),
-            claimCommon.getResponsibleDepartments().getResponsibleDepartment().get(0),
             "Data in updated object did not match submitted data.");
 
         Assert.assertNotSame(claimCommon.getClaimReceivedGroupList().getClaimReceivedGroup().get(0).getClaimReceivedDate(),
