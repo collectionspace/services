@@ -41,8 +41,8 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.claim.ClaimsCommon;
-import org.collectionspace.services.claim.ClaimClaimantGroupList;
-import org.collectionspace.services.claim.ClaimClaimantGroup;
+import org.collectionspace.services.claim.ClaimantGroupList;
+import org.collectionspace.services.claim.ClaimantGroup;
 import org.collectionspace.services.person.PersonTermGroup;
 
 import org.testng.Assert;
@@ -207,8 +207,8 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 	            logger.debug(objectAsXmlString(claimCommon, ClaimsCommon.class));
 	        }
 	        // Check a couple of fields
-	        Assert.assertEquals(claimCommon.getClaimClaimantGroupList().getClaimClaimantGroup().get(0).getFiledBy(), claimFilerRefName);
-	        Assert.assertEquals(claimCommon.getClaimClaimantGroupList().getClaimClaimantGroup().get(0).getFiledOnBehalfOf(), claimOnBehalfOfRefName);
+	        Assert.assertEquals(claimCommon.getClaimantGroupList().getClaimantGroup().get(0).getClaimFiledBy(), claimFilerRefName);
+	        Assert.assertEquals(claimCommon.getClaimantGroupList().getClaimantGroup().get(0).getClaimFiledOnBehalfOf(), claimOnBehalfOfRefName);
         } finally {
         	if (res != null) {
                 res.close();
@@ -322,12 +322,12 @@ public class ClaimAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
             String claimFiledOnBehalfOf) throws Exception {
         ClaimsCommon claimCommon = new ClaimsCommon();
         claimCommon.setClaimNumber(claimNumber);
-        ClaimClaimantGroupList claimClaimantGroupList = new ClaimClaimantGroupList();
-        ClaimClaimantGroup claimClaimantGroup = new ClaimClaimantGroup();
-        claimClaimantGroup.setFiledBy(claimFiler);
-        claimClaimantGroup.setFiledOnBehalfOf(claimFiledOnBehalfOf);
-        claimClaimantGroupList.getClaimClaimantGroup().add(claimClaimantGroup);
-        claimCommon.setClaimClaimantGroupList(claimClaimantGroupList);
+        ClaimantGroupList claimantGroupList = new ClaimantGroupList();
+        ClaimantGroup claimantGroup = new ClaimantGroup();
+        claimantGroup.setClaimFiledBy(claimFiler);
+        claimantGroup.setClaimFiledOnBehalfOf(claimFiledOnBehalfOf);
+        claimantGroupList.getClaimantGroup().add(claimantGroup);
+        claimCommon.setClaimantGroupList(claimantGroupList);
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart =
