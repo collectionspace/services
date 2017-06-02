@@ -3,7 +3,7 @@
 # Specify an input display date, and an expected output structured date. Fields expected to be null
 # in the structured date may be omitted.
 #
-# If the structured date's displayDate field is omitted, it will be expected to be equal to the 
+# If the structured date's displayDate field is omitted, it will be expected to be equal to the
 # input display date. This is the usual case.
 #
 # The StructuredDate's earliestSingleDate and latestDate should be specified as a
@@ -14,7 +14,7 @@
 #
 # Input Display Date                     Expected Structured Date
 # =======================================================================================================
-# 
+#
 # Valid dates
 # -------------------------------------------------------------------------------------------------------
 
@@ -65,7 +65,7 @@
   '1974 A.D.':                           # year
                                          earliestSingleDate: [1974,  1,  1, CE]
                                          latestDate:         [1974, 12, 31, CE]
-  
+
   '1974 a.d.':                           # year
                                          earliestSingleDate: [1974,  1,  1, CE]
                                          latestDate:         [1974, 12, 31, CE]
@@ -101,7 +101,7 @@
   "300s-200s BC":                        # hyphenatedRange, century
                                          earliestSingleDate: [ 399,  1,  1, BCE]
                                          latestDate:         [ 200, 12, 31, BCE]
-                                         
+
   "1970's-1980's":                       # hyphenatedRange, decade
                                          earliestSingleDate: [1970,  1,  1, CE]
                                          latestDate:         [1989, 12, 31, CE]
@@ -121,7 +121,7 @@
   '30s BC-20s BC':                       # hyphenatedRange, decade
                                          earliestSingleDate: [  39,  1,  1, BCE]
                                          latestDate:         [  20, 12, 31, BCE]
-                          
+
   '1974-2013':                           # hyphenatedRange, year
                                          earliestSingleDate: [1974,  1,  1, CE]
                                          latestDate:         [2013, 12, 31, CE]
@@ -145,7 +145,7 @@
   '12 BC - 30':                          # hyphenatedRange, year
                                          earliestSingleDate: [  12,  1,  1, BCE]
                                          latestDate:         [  30, 12, 31, CE]
-                            
+
   'Spring 1974-Summer 1975':             # hyphenatedRange, quarterYear
                                          earliestSingleDate: [1974,  4,  1, CE]
                                          latestDate:         [1975,  9, 30, CE]
@@ -172,476 +172,476 @@
 
   '1st half 2000 - 1st half 2001':       # hyphenatedRange, halfYear
                                          earliestSingleDate: [2000,  1,  1, CE]
-                                         latestDate:         [2001,  6, 30, CE]                                                    
+                                         latestDate:         [2001,  6, 30, CE]
 
   'second half 1998 - last half 2003':   # hyphenatedRange, halfYear
                                          earliestSingleDate: [1998,  7,  1, CE]
-                                         latestDate:         [2003, 12, 31, CE]                                                    
+                                         latestDate:         [2003, 12, 31, CE]
 
   'second half 1998 - last half 2003 ad': # hyphenatedRange, halfYear
                                          earliestSingleDate: [1998,  7,  1, CE]
-                                         latestDate:         [2003, 12, 31, CE]                                                    
+                                         latestDate:         [2003, 12, 31, CE]
 
   '2nd half 12 - first half 11 BC':      # hyphenatedRange, halfYear
                                          earliestSingleDate: [  12,  7,  1, BCE]
-                                         latestDate:         [  11,  6, 30, BCE]                                                    
+                                         latestDate:         [  11,  6, 30, BCE]
 
   '2nd half 12 b.c. - first half 2 AD':  # hyphenatedRange, halfYear
                                          earliestSingleDate: [  12,  7,  1, BCE]
-                                         latestDate:         [   2,  6, 30, CE]                                                    
+                                         latestDate:         [   2,  6, 30, CE]
 
   '1st half 2000':                       # halfYear
                                          earliestSingleDate: [2000,  1,  1, CE]
-                                         latestDate:         [2000,  6, 30, CE]                                                    
-                            
+                                         latestDate:         [2000,  6, 30, CE]
+
   '2nd half 2000':                       # halfYear
                                          earliestSingleDate: [2000,  7,  1, CE]
-                                         latestDate:         [2000, 12, 31, CE]                                                    
+                                         latestDate:         [2000, 12, 31, CE]
 
   'last half 2000':                      # halfYear
                                          earliestSingleDate: [2000,  7,  1, CE]
-                                         latestDate:         [2000, 12, 31, CE]   
+                                         latestDate:         [2000, 12, 31, CE]
 
   'early 1960s':                         # partialDecade
                                          earliestSingleDate: [1960,  1,  1, CE]
-                                         latestDate:         [1963, 12, 31, CE]                                                                                             
+                                         latestDate:         [1963, 12, 31, CE]
 
   "mid 1960's":                          # partialDecade
                                          earliestSingleDate: [1964,  1,  1, CE]
-                                         latestDate:         [1966, 12, 31, CE]                                                                                             
+                                         latestDate:         [1966, 12, 31, CE]
 
   'late 1960s':                          # partialDecade
                                          earliestSingleDate: [1967,  1,  1, CE]
-                                         latestDate:         [1969, 12, 31, CE]                                                                                             
+                                         latestDate:         [1969, 12, 31, CE]
 
   'early 1960s ce':                      # partialDecade
                                          earliestSingleDate: [1960,  1,  1, CE]
-                                         latestDate:         [1963, 12, 31, CE]                                                                                             
+                                         latestDate:         [1963, 12, 31, CE]
 
   "mid-1960's a.d.":                     # partialDecade
                                          earliestSingleDate: [1964,  1,  1, CE]
-                                         latestDate:         [1966, 12, 31, CE]                                                                                             
+                                         latestDate:         [1966, 12, 31, CE]
 
   'late 1960s AD':                       # partialDecade
                                          earliestSingleDate: [1967,  1,  1, CE]
-                                         latestDate:         [1969, 12, 31, CE]                                                                                             
+                                         latestDate:         [1969, 12, 31, CE]
 
   'early 530s bc':                       # partialDecade
                                          earliestSingleDate: [ 539,  1,  1, BCE]
-                                         latestDate:         [ 537, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 537, 12, 31, BCE]
 
   "middle 530's b.c.":                   # partialDecade
                                          earliestSingleDate: [ 536,  1,  1, BCE]
-                                         latestDate:         [ 534, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 534, 12, 31, BCE]
 
   'late 530s B.C.':                      # partialDecade
                                          earliestSingleDate: [ 533,  1,  1, BCE]
-                                         latestDate:         [ 530, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 530, 12, 31, BCE]
 
   "mid 1960's-early 1970's":             # hyphenatedRange, partialDecade
                                          earliestSingleDate: [1964,  1,  1, CE]
-                                         latestDate:         [1973, 12, 31, CE]                                                                                             
+                                         latestDate:         [1973, 12, 31, CE]
 
   "mid 1960's-early 1970's a.d.":        # hyphenatedRange, partialDecade
                                          earliestSingleDate: [1964,  1,  1, CE]
-                                         latestDate:         [1973, 12, 31, CE]                                                                                             
+                                         latestDate:         [1973, 12, 31, CE]
 
   "mid 520's-early 480's b.c.":          # hyphenatedRange, partialDecade
                                          earliestSingleDate: [ 526,  1,  1, BCE]
-                                         latestDate:         [ 487, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 487, 12, 31, BCE]
 
   '1960s':                               # decade
                                          earliestSingleDate: [1960,  1,  1, CE]
-                                         latestDate:         [1969, 12, 31, CE]                                                                                             
+                                         latestDate:         [1969, 12, 31, CE]
 
   "1920's":                              # decade
                                          earliestSingleDate: [1920,  1,  1, CE]
-                                         latestDate:         [1929, 12, 31, CE]                                                                                             
+                                         latestDate:         [1929, 12, 31, CE]
 
   '1920S':                               # decade
                                          earliestSingleDate: [1920,  1,  1, CE]
-                                         latestDate:         [1929, 12, 31, CE]                                                                                             
+                                         latestDate:         [1929, 12, 31, CE]
 
   "20's BC":                             # decade
                                          earliestSingleDate: [  29,  1,  1, BCE]
-                                         latestDate:         [  20, 12, 31, BCE]                                                                                             
+                                         latestDate:         [  20, 12, 31, BCE]
 
   '1960s-1980s':                         # hyphenatedRange, decade
                                          earliestSingleDate: [1960,  1,  1, CE]
-                                         latestDate:         [1989, 12, 31, CE]                                                                                             
+                                         latestDate:         [1989, 12, 31, CE]
 
   '1960s-1980s A.D.':                    # hyphenatedRange, decade
                                          earliestSingleDate: [1960,  1,  1, CE]
-                                         latestDate:         [1989, 12, 31, CE]                                                                                             
+                                         latestDate:         [1989, 12, 31, CE]
 
   '1960s–1920s B.C.':                    # hyphenatedRange, decade (en dash)
                                          earliestSingleDate: [1969,  1,  1, BCE]
-                                         latestDate:         [1920, 12, 31, BCE]                                                                                             
+                                         latestDate:         [1920, 12, 31, BCE]
 
   "1960's-early 1980's":                 # hyphenatedRange, decade, partialDecade
                                          earliestSingleDate: [1960,  1,  1, CE]
-                                         latestDate:         [1983, 12, 31, CE]                                                                                             
+                                         latestDate:         [1983, 12, 31, CE]
 
   "late 1820's - 1880's":                # hyphenatedRange, partialDecade, decade
                                          earliestSingleDate: [1827,  1,  1, CE]
-                                         latestDate:         [1889, 12, 31, CE]                                                                                             
+                                         latestDate:         [1889, 12, 31, CE]
 
   'early 1900s':                         # partialCentury
                                          earliestSingleDate: [1900,  1,  1, CE]
-                                         latestDate:         [1933, 12, 31, CE]                                                                                             
+                                         latestDate:         [1933, 12, 31, CE]
 
   'mid 1900s':                           # partialCentury
                                          earliestSingleDate: [1933,  1,  1, CE]
-                                         latestDate:         [1966, 12, 31, CE]                                                                                             
+                                         latestDate:         [1966, 12, 31, CE]
 
   "Late 1900's":                         # partialCentury
                                          earliestSingleDate: [1966,  1,  1, CE]
-                                         latestDate:         [1999, 12, 31, CE]                                                                                             
+                                         latestDate:         [1999, 12, 31, CE]
 
   'early 1900s ad':                      # partialCentury
                                          earliestSingleDate: [1900,  1,  1, CE]
-                                         latestDate:         [1933, 12, 31, CE]                                                                                             
+                                         latestDate:         [1933, 12, 31, CE]
 
   'mid 1900s CE':                        # partialCentury
                                          earliestSingleDate: [1933,  1,  1, CE]
-                                         latestDate:         [1966, 12, 31, CE]                                                                                             
+                                         latestDate:         [1966, 12, 31, CE]
 
   "Late 1900's A.D.":                    # partialCentury
                                          earliestSingleDate: [1966,  1,  1, CE]
-                                         latestDate:         [1999, 12, 31, CE]                                                                                             
+                                         latestDate:         [1999, 12, 31, CE]
 
   'early 18th century':                  # partialCentury
                                          earliestSingleDate: [1701,  1,  1, CE]
-                                         latestDate:         [1734, 12, 31, CE]                                                                                             
+                                         latestDate:         [1734, 12, 31, CE]
 
   'mid-18th century':                    # partialCentury
                                          earliestSingleDate: [1734,  1,  1, CE]
-                                         latestDate:         [1767, 12, 31, CE]                                                                                             
+                                         latestDate:         [1767, 12, 31, CE]
 
   'Late 18th century':                   # partialCentury
                                          earliestSingleDate: [1767,  1,  1, CE]
-                                         latestDate:         [1800, 12, 31, CE]                                                                                             
+                                         latestDate:         [1800, 12, 31, CE]
 
   'early 100s b.c.':                     # partialCentury
                                          earliestSingleDate: [ 199,  1,  1, BCE]
-                                         latestDate:         [ 166, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 166, 12, 31, BCE]
 
   'middle 100s bc':                      # partialCentury
                                          earliestSingleDate: [ 166,  1,  1, BCE]
-                                         latestDate:         [ 133, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 133, 12, 31, BCE]
 
   "Late 100's B.C.":                     # partialCentury
                                          earliestSingleDate: [ 133,  1,  1, BCE]
-                                         latestDate:         [ 100, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 100, 12, 31, BCE]
 
   'early 2nd century b.c.':              # partialCentury
                                          earliestSingleDate: [ 200,  1,  1, BCE]
-                                         latestDate:         [ 167, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 167, 12, 31, BCE]
 
   'mid 2nd century bc':                  # partialCentury
                                          earliestSingleDate: [ 167,  1,  1, BCE]
-                                         latestDate:         [ 134, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 134, 12, 31, BCE]
 
   'Late 2nd Century B.C.':               # partialCentury
                                          earliestSingleDate: [ 134,  1,  1, BCE]
-                                         latestDate:         [ 101, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 101, 12, 31, BCE]
 
   'mid-17th century - late 18th century': # hyphenatedRange, partialCentury
                                          earliestSingleDate: [1634,  1,  1, CE]
-                                         latestDate:         [1800, 12, 31, CE]                                                                                             
+                                         latestDate:         [1800, 12, 31, CE]
 
   'mid 17th century - late 18th century a.d.': # hyphenatedRange, partialCentury
                                          earliestSingleDate: [1634,  1,  1, CE]
-                                         latestDate:         [1800, 12, 31, CE]                                                                                             
+                                         latestDate:         [1800, 12, 31, CE]
 
   'middle 17th century AD - late 18th century a.d.': # hyphenatedRange, partialCentury
                                          earliestSingleDate: [1634,  1,  1, CE]
-                                         latestDate:         [1800, 12, 31, CE]                                                                                             
+                                         latestDate:         [1800, 12, 31, CE]
 
   'late 1800s - early 1900s':            # hyphenatedRange, partialCentury
                                          earliestSingleDate: [1866,  1,  1, CE]
-                                         latestDate:         [1933, 12, 31, CE]                                                                                             
+                                         latestDate:         [1933, 12, 31, CE]
 
   'late 1800s - early 1900s ce':         # hyphenatedRange, partialCentury
                                          earliestSingleDate: [1866,  1,  1, CE]
-                                         latestDate:         [1933, 12, 31, CE]                                                                                             
+                                         latestDate:         [1933, 12, 31, CE]
 
   "mid 200s-late 100's BCE":             # hyphenatedRange, partialCentury
                                          earliestSingleDate: [ 266,  1,  1, BCE]
-                                         latestDate:         [ 100, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 100, 12, 31, BCE]
 
   'late 4th century - early 3rd century bc': # hyphenatedRange, partialCentury
                                          earliestSingleDate: [ 334,  1,  1, BCE]
-                                         latestDate:         [ 267, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 267, 12, 31, BCE]
 
   'late 4th century B.C. - early 3rd century BC': # hyphenatedRange, partialCentury
                                          earliestSingleDate: [ 334,  1,  1, BCE]
-                                         latestDate:         [ 267, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 267, 12, 31, BCE]
 
   'late 2nd century B.C. - mid 1st century': # hyphenatedRange, partialCentury
                                          earliestSingleDate: [ 134,  1,  1, BCE]
-                                         latestDate:         [  67, 12, 31, CE]                                                                                             
+                                         latestDate:         [  67, 12, 31, CE]
 
   'late 2nd century B.C. - early 3rd century A.D.': # hyphenatedRange, partialCentury
                                          earliestSingleDate: [ 134,  1,  1, BCE]
-                                         latestDate:         [ 234, 12, 31, CE]                                                                                             
+                                         latestDate:         [ 234, 12, 31, CE]
 
   '1st quarter 1900s':                   # quarterCentury
                                          earliestSingleDate: [1900,  1,  1, CE]
-                                         latestDate:         [1924, 12, 31, CE]                                                                                             
+                                         latestDate:         [1924, 12, 31, CE]
 
   'second quarter 1900s':                # quarterCentury
                                          earliestSingleDate: [1925,  1,  1, CE]
-                                         latestDate:         [1949, 12, 31, CE]                                                                                             
+                                         latestDate:         [1949, 12, 31, CE]
 
   "3rd quarter 1900's":                  # quarterCentury
                                          earliestSingleDate: [1950,  1,  1, CE]
-                                         latestDate:         [1974, 12, 31, CE]                                                                                             
+                                         latestDate:         [1974, 12, 31, CE]
 
   "fourth quarter 1900's":               # quarterCentury
                                          earliestSingleDate: [1975,  1,  1, CE]
-                                         latestDate:         [1999, 12, 31, CE]                                                                                             
+                                         latestDate:         [1999, 12, 31, CE]
 
   'first quarter 18th century':          # quarterCentury
                                          earliestSingleDate: [1701,  1,  1, CE]
-                                         latestDate:         [1725, 12, 31, CE]                                                                                             
+                                         latestDate:         [1725, 12, 31, CE]
 
   '2nd quarter 18th century':            # quarterCentury
                                          earliestSingleDate: [1726,  1,  1, CE]
-                                         latestDate:         [1750, 12, 31, CE]                                                                                             
+                                         latestDate:         [1750, 12, 31, CE]
 
   'third quarter 18th century':          # quarterCentury
                                          earliestSingleDate: [1751,  1,  1, CE]
-                                         latestDate:         [1775, 12, 31, CE]                                                                                             
+                                         latestDate:         [1775, 12, 31, CE]
 
   '4th quarter 18th century':            # quarterCentury
                                          earliestSingleDate: [1776,  1,  1, CE]
-                                         latestDate:         [1800, 12, 31, CE]                                                                                             
+                                         latestDate:         [1800, 12, 31, CE]
 
   'first quarter 1st century a.d.':      # quarterCentury
                                          earliestSingleDate: [   1,  1,  1, CE]
-                                         latestDate:         [  25, 12, 31, CE]                                                                                             
+                                         latestDate:         [  25, 12, 31, CE]
 
   '4th quarter 22nd century CE':         # quarterCentury
                                          earliestSingleDate: [2176,  1,  1, CE]
-                                         latestDate:         [2200, 12, 31, CE]                                                                                             
+                                         latestDate:         [2200, 12, 31, CE]
 
   'First quarter 300s BC':               # quarterCentury
                                          earliestSingleDate: [ 399,  1,  1, BCE]
-                                         latestDate:         [ 375, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 375, 12, 31, BCE]
 
   "2nd quarter 300's BC":                # quarterCentury
                                          earliestSingleDate: [ 374,  1,  1, BCE]
-                                         latestDate:         [ 350, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 350, 12, 31, BCE]
 
   'third quarter 300s BC':               # quarterCentury
                                          earliestSingleDate: [ 349,  1,  1, BCE]
-                                         latestDate:         [ 325, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 325, 12, 31, BCE]
 
   '4th quarter 300s B.C.':               # quarterCentury
                                          earliestSingleDate: [ 324,  1,  1, BCE]
-                                         latestDate:         [ 300, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 300, 12, 31, BCE]
 
   'First quarter 1st century BC':        # quarterCentury
                                          earliestSingleDate: [ 100,  1,  1, BCE]
-                                         latestDate:         [  76, 12, 31, BCE]                                                                                             
+                                         latestDate:         [  76, 12, 31, BCE]
 
   '2nd quarter 1st century BC':          # quarterCentury
                                          earliestSingleDate: [  75,  1,  1, BCE]
-                                         latestDate:         [  51, 12, 31, BCE]                                                                                             
+                                         latestDate:         [  51, 12, 31, BCE]
 
   'third quarter 1st century BC':        # quarterCentury
                                          earliestSingleDate: [  50,  1,  1, BCE]
-                                         latestDate:         [  26, 12, 31, BCE]                                                                                             
+                                         latestDate:         [  26, 12, 31, BCE]
 
   '4th quarter 1st century BC':          # quarterCentury
                                          earliestSingleDate: [  25,  1,  1, BCE]
-                                         latestDate:         [   1, 12, 31, BCE]                                                                                             
+                                         latestDate:         [   1, 12, 31, BCE]
 
   '1st quarter 2nd century B.C.':        # quarterCentury
                                          earliestSingleDate: [ 200,  1,  1, BCE]
-                                         latestDate:         [ 176, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 176, 12, 31, BCE]
 
   'second quarter 2nd century BCE':      # quarterCentury
                                          earliestSingleDate: [ 175,  1,  1, BCE]
-                                         latestDate:         [ 151, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 151, 12, 31, BCE]
 
   '3rd quarter 2nd century b.c.':        # quarterCentury
                                          earliestSingleDate: [ 150,  1,  1, BCE]
-                                         latestDate:         [ 126, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 126, 12, 31, BCE]
 
   'fourth quarter 2nd century b.c.e.':   # quarterCentury
                                          earliestSingleDate: [ 125,  1,  1, BCE]
-                                         latestDate:         [ 101, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 101, 12, 31, BCE]
 
   'last quarter 2nd century b.c.e.':     # quarterCentury
                                          earliestSingleDate: [ 125,  1,  1, BCE]
-                                         latestDate:         [ 101, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 101, 12, 31, BCE]
 
   '1st quarter 18th century - 3rd quarter 19th century': # hyphenatedRange, quarterCentury
                                          earliestSingleDate: [1701,  1,  1, CE]
-                                         latestDate:         [1875, 12, 31, CE]                                                                                             
+                                         latestDate:         [1875, 12, 31, CE]
 
   '1st quarter 18th century - 3rd quarter 19th century a.d.': # hyphenatedRange, quarterCentury
                                          earliestSingleDate: [1701,  1,  1, CE]
-                                         latestDate:         [1875, 12, 31, CE]                                                                                             
+                                         latestDate:         [1875, 12, 31, CE]
 
   '4th quarter 3rd century - 3rd quarter 2nd century b.c.': # hyphenatedRange, quarterCentury
                                          earliestSingleDate: [ 225,  1,  1, BCE]
-                                         latestDate:         [ 126, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 126, 12, 31, BCE]
 
   '4th quarter 1st century b.c.-1st quarter 1st century ce': # hyphenatedRange, quarterCentury
                                          earliestSingleDate: [  25,  1,  1, BCE]
-                                         latestDate:         [  25, 12, 31, CE]                                                                                             
+                                         latestDate:         [  25, 12, 31, CE]
 
   '1st half 1900s':                      # halfCentury
                                          earliestSingleDate: [1900,  1,  1, CE]
-                                         latestDate:         [1949, 12, 31, CE]                                                                                             
+                                         latestDate:         [1949, 12, 31, CE]
 
   'second half 1900s':                   # halfCentury
                                          earliestSingleDate: [1950,  1,  1, CE]
-                                         latestDate:         [1999, 12, 31, CE]                                                                                             
+                                         latestDate:         [1999, 12, 31, CE]
 
   'last half 1900s':                     # halfCentury
                                          earliestSingleDate: [1950,  1,  1, CE]
-                                         latestDate:         [1999, 12, 31, CE]                                                                                             
+                                         latestDate:         [1999, 12, 31, CE]
 
   'first half 20th century':             # halfCentury
                                          earliestSingleDate: [1901,  1,  1, CE]
-                                         latestDate:         [1950, 12, 31, CE]                                                                                             
+                                         latestDate:         [1950, 12, 31, CE]
 
   '2nd half 20th century':               # halfCentury
                                          earliestSingleDate: [1951,  1,  1, CE]
-                                         latestDate:         [2000, 12, 31, CE]                                                                                             
+                                         latestDate:         [2000, 12, 31, CE]
 
   '1st half 1900s A.D.':                 # halfCentury
                                          earliestSingleDate: [1900,  1,  1, CE]
-                                         latestDate:         [1949, 12, 31, CE]                                                                                             
+                                         latestDate:         [1949, 12, 31, CE]
 
   "second half 1900's c.e.":             # halfCentury
                                          earliestSingleDate: [1950,  1,  1, CE]
-                                         latestDate:         [1999, 12, 31, CE]                                                                                             
+                                         latestDate:         [1999, 12, 31, CE]
 
   '1st half 1900s B.C.':                 # halfCentury
                                          earliestSingleDate: [1999,  1,  1, BCE]
-                                         latestDate:         [1950, 12, 31, BCE]                                                                                             
+                                         latestDate:         [1950, 12, 31, BCE]
 
   "second half 1900's b.c.e.":           # halfCentury
                                          earliestSingleDate: [1949,  1,  1, BCE]
-                                         latestDate:         [1900, 12, 31, BCE]                                                                                             
+                                         latestDate:         [1900, 12, 31, BCE]
 
   'first half first century b.c.':       # halfCentury
                                          earliestSingleDate: [ 100,  1,  1, BCE]
-                                         latestDate:         [  51, 12, 31, BCE]                                                                                             
+                                         latestDate:         [  51, 12, 31, BCE]
 
   "second half 1st century BCE":         # halfCentury
                                          earliestSingleDate: [  50,  1,  1, BCE]
-                                         latestDate:         [   1, 12, 31, BCE]                                                                                             
+                                         latestDate:         [   1, 12, 31, BCE]
 
   '1st half 1900s - 1st half 2000s':     # hyphenatedRange, halfCentury
                                          earliestSingleDate: [1900,  1,  1, CE]
-                                         latestDate:         [2049, 12, 31, CE]                                                                                             
+                                         latestDate:         [2049, 12, 31, CE]
 
   '1st half 1900s - 1st half 2000s ad':  # hyphenatedRange, halfCentury
                                          earliestSingleDate: [1900,  1,  1, CE]
-                                         latestDate:         [2049, 12, 31, CE]                                                                                             
+                                         latestDate:         [2049, 12, 31, CE]
 
   '2nd half 900s - 1st half 700s bc':    # hyphenatedRange, halfCentury
                                          earliestSingleDate: [ 949,  1,  1, BCE]
-                                         latestDate:         [ 750, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 750, 12, 31, BCE]
 
   '2nd half 200s bc - 1st half 100s':    # hyphenatedRange, halfCentury
                                          earliestSingleDate: [ 249,  1,  1, BCE]
-                                         latestDate:         [ 149, 12, 31, CE]                                                                                             
+                                         latestDate:         [ 149, 12, 31, CE]
 
   '1900s':                               # century
                                          earliestSingleDate: [1900,  1,  1, CE]
-                                         latestDate:         [1999, 12, 31, CE]                                                                                             
+                                         latestDate:         [1999, 12, 31, CE]
 
   '20th century':                        # century
                                          earliestSingleDate: [1901,  1,  1, CE]
-                                         latestDate:         [2000, 12, 31, CE]                                                                                             
+                                         latestDate:         [2000, 12, 31, CE]
 
   '20th century AD':                     # century
                                          earliestSingleDate: [1901,  1,  1, CE]
-                                         latestDate:         [2000, 12, 31, CE]                                                                                             
+                                         latestDate:         [2000, 12, 31, CE]
 
   "1600's":                              # century
                                          earliestSingleDate: [1600,  1,  1, CE]
-                                         latestDate:         [1699, 12, 31, CE]                                                                                             
+                                         latestDate:         [1699, 12, 31, CE]
 
   '21st century':                        # century
                                          earliestSingleDate: [2001,  1,  1, CE]
-                                         latestDate:         [2100, 12, 31, CE]                                                                                                                                                                               
+                                         latestDate:         [2100, 12, 31, CE]
 
   '1st century BC':                      # century
                                          earliestSingleDate: [ 100,  1,  1, BCE]
-                                         latestDate:         [   1, 12, 31, BCE]                                                                                             
+                                         latestDate:         [   1, 12, 31, BCE]
 
   '8th century BC':                      # century
                                          earliestSingleDate: [ 800,  1,  1, BCE]
-                                         latestDate:         [ 701, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 701, 12, 31, BCE]
 
   "100's BC":                            # century
                                          earliestSingleDate: [ 199,  1,  1, BCE]
-                                         latestDate:         [ 100, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 100, 12, 31, BCE]
 
   '19th century - 20th century':         # hyphenatedRange, century
                                          earliestSingleDate: [1801,  1,  1, CE]
-                                         latestDate:         [2000, 12, 31, CE]                                                                                             
+                                         latestDate:         [2000, 12, 31, CE]
 
   '19th century - 20th century ad':      # hyphenatedRange, century
                                          earliestSingleDate: [1801,  1,  1, CE]
-                                         latestDate:         [2000, 12, 31, CE]                                                                                             
+                                         latestDate:         [2000, 12, 31, CE]
 
   '3rd century - 2nd century B.C.':      # hyphenatedRange, century
                                          earliestSingleDate: [ 300,  1,  1, BCE]
-                                         latestDate:         [ 101, 12, 31, BCE]                                                                                             
+                                         latestDate:         [ 101, 12, 31, BCE]
 
   '3rd century BC - 1st century A.D.':   # hyphenatedRange, century
                                          earliestSingleDate: [ 300,  1,  1, BCE]
-                                         latestDate:         [ 100, 12, 31, CE]                                                                                             
+                                         latestDate:         [ 100, 12, 31, CE]
 
   'late 1880s - early 1900s':            # hyphenatedRange, partialDecade, partialCentury
                                          earliestSingleDate: [1887,  1,  1, CE]
-                                         latestDate:         [1933, 12, 31, CE]                                                                                             
+                                         latestDate:         [1933, 12, 31, CE]
 
   '1st millennium':                      # millennium
                                          earliestSingleDate: [   1,  1,  1, CE]
-                                         latestDate:         [1000, 12, 31, CE]                                                                                             
+                                         latestDate:         [1000, 12, 31, CE]
 
   '2nd millennium':                      # millennium
                                          earliestSingleDate: [1001,  1,  1, CE]
-                                         latestDate:         [2000, 12, 31, CE]                                                                                             
+                                         latestDate:         [2000, 12, 31, CE]
 
   '3rd millennium':                      # millennium
                                          earliestSingleDate: [2001,  1,  1, CE]
-                                         latestDate:         [3000, 12, 31, CE]                                                                                             
+                                         latestDate:         [3000, 12, 31, CE]
 
   '5th millennium':                      # millennium
                                          earliestSingleDate: [4001,  1,  1, CE]
-                                         latestDate:         [5000, 12, 31, CE]                                                                                             
+                                         latestDate:         [5000, 12, 31, CE]
 
   '1st Millennium BC':                   # millennium
                                          earliestSingleDate: [1000,  1,  1, BCE]
-                                         latestDate:         [   1, 12, 31, BCE]                                                                                             
+                                         latestDate:         [   1, 12, 31, BCE]
 
   '2nd millennium B.C.E.':               # millennium
                                          earliestSingleDate: [2000,  1,  1, BCE]
-                                         latestDate:         [1001, 12, 31, BCE]                                                                                             
+                                         latestDate:         [1001, 12, 31, BCE]
 
   '1st millennium-2nd millennium':       # hyphenatedRange, millennium
                                          earliestSingleDate: [   1,  1,  1, CE]
-                                         latestDate:         [2000, 12, 31, CE]                                                                                             
+                                         latestDate:         [2000, 12, 31, CE]
 
   '1st millennium-2nd millennium ad':    # hyphenatedRange, millennium
                                          earliestSingleDate: [   1,  1,  1, CE]
-                                         latestDate:         [2000, 12, 31, CE]                                                                                             
+                                         latestDate:         [2000, 12, 31, CE]
 
   '3rd millennium-2nd millennium bc':    # hyphenatedRange, millennium
                                          earliestSingleDate: [3000,  1,  1, BCE]
-                                         latestDate:         [1001, 12, 31, BCE]                                                                                             
-                             
+                                         latestDate:         [1001, 12, 31, BCE]
+
   'Winter 2000':                         # quarterYear, seasonYear
                                          earliestSingleDate: [2000,  1,  1, CE]
                                          latestDate:         [2000,  3, 31, CE]
@@ -677,11 +677,11 @@
   'Autumn 2000':                         # quarterYear, seasonYear
                                          earliestSingleDate: [2000, 10,  1, CE]
                                          latestDate:         [2000, 12, 31, CE]
- 
+
   'Aut 2000':                            # quarterYear, seasonYear
                                          earliestSingleDate: [2000, 10,  1, CE]
                                          latestDate:         [2000, 12, 31, CE]
- 
+
   'Sum 12 BC':                           # quarterYear, seasonYear
                                          earliestSingleDate: [  12,  7,  1, BCE]
                                          latestDate:         [  12,  9, 30, BCE]
@@ -740,7 +740,7 @@
 
   '1st quarter - 3rd quarter 2000':      # hyphenatedRange, quarterYear
                                          earliestSingleDate: [2000,  1,  1, CE]
-                                         latestDate:         [2000,  9, 30, CE] 
+                                         latestDate:         [2000,  9, 30, CE]
 
   '2nd quarter - last quarter 2000':     # hyphenatedRange, quarterYear
                                          earliestSingleDate: [2000,  4,  1, CE]
@@ -841,12 +841,12 @@
   'May 130-May 120 BC':                  # hyphenatedRange, month
                                          earliestSingleDate: [ 130,  5,  1, BCE]
                                          latestDate:         [ 120,  5, 31, BCE]
-                             
+
   '3/12/2013':                           # date
                                          earliestSingleDate: [2013,  3, 12, CE]
 
   '03/05/13':                            # date
-                                         earliestSingleDate: [   3,  5, 13, CE]
+                                         earliestSingleDate: [  13,  3,  5, CE]
 
   '7-6-1773':                            # date
                                          earliestSingleDate: [1773,  7,  6, CE]
@@ -867,10 +867,10 @@
                                          earliestSingleDate: [  13, 12,  3, CE]
 
   '12-12-3':                             # date
-                                         earliestSingleDate: [  12, 12,  3, CE]
+                                         earliestSingleDate: [   3, 12, 12, CE]
 
   '3-12-12':                             # date
-                                         earliestSingleDate: [   3, 12, 12, CE]
+                                         earliestSingleDate: [  12,  3, 12, CE]
 
   '3-12-32':                             # date
                                          earliestSingleDate: [  32,  3, 12, CE]
@@ -1106,13 +1106,13 @@
   "3/4/2000?":                           # oneDisplayDate - with question mark
                                          earliestSingleDate: [2000,  3,  4, CE]
 
-# -------------------------------------------------------------------------------------------------------                                         
+# -------------------------------------------------------------------------------------------------------
 # Invalid dates
 # -------------------------------------------------------------------------------------------------------
 
   '':                                    # empty
                                          null
-                            
+
   'Octo 19, 1821':                       # invalid month
                                          null
 
@@ -1121,22 +1121,22 @@
 
   'May-Foo 2000':                        # invalid month
                                          null
-                            
+
   'Something else':                      # totally not a date
-                                         null            
+                                         null
 
   'BC 12, Sumer':                        # invalid season
                                          null
 
   '5th quarter 1900':                    # invalid quarter number
                                          null
-                            
+
   '0th quarter 1900':                    # invalid quarter number
-                                         null                
+                                         null
 
   'third half 1900':                     # invalid half number
-                                         null                                               
-                                                        
+                                         null
+
   '0th half 1900':                       # invalid half number
                                          null
 
@@ -1148,4 +1148,3 @@
 
   '3/4?/2005':                           # question mark
                                          null
-                                                                                        

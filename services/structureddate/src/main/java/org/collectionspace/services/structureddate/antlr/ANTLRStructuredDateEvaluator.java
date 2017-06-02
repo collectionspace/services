@@ -86,18 +86,18 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Ye
  * and an ANTLR listener to generate a structured date from the resulting parse
  * tree.
  */
-public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener implements StructuredDateEvaluator {	
+public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener implements StructuredDateEvaluator {
 	/**
 	 * The result of the evaluation.
 	 */
 	protected StructuredDate result;
-	
+
 	/**
 	 * The operation stack. The parse listener methods that are implemented here
 	 * pop input parameters off the stack, and push results back on to the stack.
 	 */
 	protected Stack<Object> stack;
-	
+
 	public ANTLRStructuredDateEvaluator() {
 
 	}
@@ -115,13 +115,13 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		StructuredDateLexer lexer = new StructuredDateLexer(inputStream);
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 		StructuredDateParser parser = new StructuredDateParser(tokenStream);
-		
+
 		// Don't try to recover from parse errors, just bail.
 		parser.setErrorHandler(new BailErrorStrategy());
-		
+
 		// Don't print error messages to the console.
 		parser.removeErrorListeners();
-		
+
 		// Generate our own custom error messages.
 		parser.addParseListener(this);
 
@@ -133,24 +133,24 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			// ParseCancellationException is thrown by the BailErrorStrategy when there is a
 			// parse error, with the underlying RecognitionException as the cause.
 			RecognitionException re = (RecognitionException) e.getCause();
-			
+
 			throw new StructuredDateFormatException(getErrorMessage(re), re);
 		}
-		
+
 		// The parsing was successful. Return the result.
 		return result;
 	}
-	
+
 	@Override
 	public void exitDisplayDate(DisplayDateContext ctx) {
 		if (ctx.exception != null) return;
 
 		Date latestDate = (Date) stack.pop();
 		Date earliestDate = (Date) stack.pop();
-		
+
 		// If the earliest date and the latest date are the same, it's just a "single" date.
 		// There's no need to have the latest, so set it to null.
-		
+
 		if (earliestDate.equals(latestDate)) {
 			latestDate = null;
 		}
@@ -167,27 +167,27 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Date earliestDate = (Date) stack.pop();
 
 		// Set null eras to the default.
-		
+
 		if (earliestDate.getEra() == null) {
 			earliestDate.setEra(Date.DEFAULT_ERA);
 		}
-		
+
 		if (latestDate.getEra() == null) {
 			latestDate.setEra(Date.DEFAULT_ERA);
 		}
-		
+
 		// Finalize any deferred calculations.
-		
+
 		if (latestDate instanceof DeferredDate) {
 			((DeferredDate) latestDate).resolveDate();
 		}
-		
+
 		if (earliestDate instanceof DeferredDate) {
 			((DeferredDate) earliestDate).resolveDate();
 		}
-		
+
 		// Calculate the earliest date or end date.
-		
+
 		if (ctx.BEFORE() != null) {
 			latestDate = earliestDate;
 			earliestDate = DateUtils.getEarliestBeforeDate(earliestDate, latestDate);
@@ -212,21 +212,21 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		int latestInterval = DateUtils.getCircaIntervalYears(latestDate.getYear(), latestDate.getEra());
 
 		// Express the circa interval as a qualifier.
-		
+
 		// stack.push(earliestDate.withQualifier(QualifierType.MINUS, earliestInterval, QualifierUnit.YEARS));
 		// stack.push(latestDate.withQualifier(QualifierType.PLUS, latestInterval, QualifierUnit.YEARS));
-		
+
 		// OR:
-		
+
 		// Express the circa interval as an offset calculated into the year.
-		
+
 		DateUtils.subtractYears(earliestDate, earliestInterval);
 		DateUtils.addYears(latestDate, latestInterval);
-		
+
 		stack.push(earliestDate);
 		stack.push(latestDate);
 	}
-	
+
 	@Override
 	public void exitCertainDate(CertainDateContext ctx) {
 		if (ctx.exception != null) return;
@@ -235,25 +235,25 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Date earliestDate = (Date) stack.pop();
 
 		// Set null eras to the default.
-		
+
 		if (earliestDate.getEra() == null) {
 			earliestDate.setEra(Date.DEFAULT_ERA);
 		}
-		
+
 		if (latestDate.getEra() == null) {
 			latestDate.setEra(Date.DEFAULT_ERA);
 		}
-		
+
 		// Finalize any deferred calculations.
-		
+
 		if (latestDate instanceof DeferredDate) {
 			((DeferredDate) latestDate).resolveDate();
 		}
-		
+
 		if (earliestDate instanceof DeferredDate) {
 			((DeferredDate) earliestDate).resolveDate();
 		}
-	
+
 		stack.push(earliestDate);
 		stack.push(latestDate);
 	}
@@ -261,7 +261,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitHyphenatedRange(HyphenatedRangeContext ctx) {
 		if (ctx.exception != null) return;
-		
+
 		Date latestEndDate = (Date) stack.pop();
 		stack.pop(); // latestStartDate
 		stack.pop(); // earliestEndDate
@@ -273,9 +273,9 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		if (earliestStartDate.getEra() == null && latestEndDate.getEra() != null) {
 			earliestStartDate.setEra(latestEndDate.getEra());
 		}
-		
+
 		// Finalize any deferred calculations.
-		
+
 		if (earliestStartDate instanceof DeferredDate) {
 			((DeferredDate) earliestStartDate).resolveDate();
 		}
@@ -291,20 +291,20 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitNthCenturyRange(NthCenturyRangeContext ctx) {
 		if (ctx.exception != null) return;
-		
+
 		Era era = (Era) stack.pop();
 		Integer endN = (Integer) stack.pop();
-		Part endPart = (Part) stack.pop();		
+		Part endPart = (Part) stack.pop();
 		Integer startN = (Integer) stack.pop();
 		Part startPart = (Part) stack.pop();
-		
+
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
-		
+
 		int startYear = DateUtils.nthCenturyToYear(startN);
 		int endYear = DateUtils.nthCenturyToYear(endN);
-		
+
 		stack.push(startPart == null ? DateUtils.getCenturyStartDate(startYear, era) : DateUtils.getPartialCenturyStartDate(startYear, startPart, era));
 		stack.push(startPart == null ? DateUtils.getCenturyEndDate(startYear, era) : DateUtils.getPartialCenturyEndDate(startYear, startPart, era));
 		stack.push(endPart == null ? DateUtils.getCenturyStartDate(endYear, era) : DateUtils.getPartialCenturyStartDate(endYear, endPart, era));
@@ -319,13 +319,13 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer year = (Integer) stack.pop();
 		Integer numMonthEnd = (Integer) stack.pop();
 		Integer numMonthStart = (Integer) stack.pop();
-		
+
 		stack.push(new Date(year, numMonthStart, 1, era));
 		stack.push(new Date(year, numMonthStart, DateUtils.getDaysInMonth(numMonthStart, year, era), era));
 		stack.push(new Date(year, numMonthEnd, 1, era));
 		stack.push(new Date(year, numMonthEnd, DateUtils.getDaysInMonth(numMonthEnd, year, era), era));
 	}
-	
+
 	@Override
 	public void exitQuarterInYearRange(QuarterInYearRangeContext ctx) {
 		if (ctx.exception != null) return;
@@ -334,7 +334,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer year = (Integer) stack.pop();
 		Integer lastQuarter = (Integer) stack.pop();
 		Integer firstQuarter = (Integer) stack.pop();
-		
+
 		stack.push(DateUtils.getQuarterYearStartDate(firstQuarter, year).withEra(era));
 		stack.push(DateUtils.getQuarterYearEndDate(firstQuarter, year, era).withEra(era));
 		stack.push(DateUtils.getQuarterYearStartDate(lastQuarter, year).withEra(era));
@@ -350,13 +350,13 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer dayOfMonthEnd = (Integer) stack.pop();
 		Integer dayOfMonthStart = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
-		
+
 		stack.push(new Date(year, numMonth, dayOfMonthStart, era));
 		stack.push(new Date(year, numMonth, dayOfMonthStart, era));
 		stack.push(new Date(year, numMonth, dayOfMonthEnd, era));
 		stack.push(new Date(year, numMonth, dayOfMonthEnd, era));
 	}
-	
+
 	@Override
 	public void exitNumDayInMonthRange(NumDayInMonthRangeContext ctx) {
 		if (ctx.exception != null) return;
@@ -366,66 +366,66 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer dayOfMonthEnd = (Integer) stack.pop();
 		Integer dayOfMonthStart = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
-		
+
 		stack.push(new Date(year, numMonth, dayOfMonthStart, era));
 		stack.push(new Date(year, numMonth, dayOfMonthStart, era));
 		stack.push(new Date(year, numMonth, dayOfMonthEnd, era));
 		stack.push(new Date(year, numMonth, dayOfMonthEnd, era));
 	}
-	
+
 	@Override
 	public void exitDate(DateContext ctx) {
 		if (ctx.exception != null) return;
 
 		// Expect the canonical year-month-day-era ordering
 		// to be on the stack.
-		
+
 		Era era = (Era) stack.pop();
 		Integer dayOfMonth = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
 		Integer year = (Integer) stack.pop();
-		
+
 		// For the latest date we could either return null, or a copy of the earliest date,
 		// since the UI doesn't care. Use a copy of the earliest date, since it makes
 		// things easier here if we don't have to test for null up the tree.
-		
+
 		stack.push(new Date(year, numMonth, dayOfMonth, era));
 		stack.push(new Date(year, numMonth, dayOfMonth, era));
 	}
-	
-	
+
+
 	@Override
 	public void exitNumDate(NumDateContext ctx) {
 		if (ctx.exception != null) return;
-		
+
 		// This could either be year-month-day, or
 		// month-day-year. Try to determine which,
 		// and reorder the stack into the canonical
 		// year-month-day-era ordering.
-		
+
 		Era era = (Era) stack.pop();
 		Integer num3 = (Integer) stack.pop();
 		Integer num2 = (Integer) stack.pop();
 		Integer num1 = (Integer) stack.pop();
-		
-		// Default to a year-month-day interpretation.
-		
-		int year = num1;
-		int numMonth = num2;
-		int dayOfMonth = num3;
-		
-		if (DateUtils.isValidDate(num1, num2, num3, era)) {
-			// Interpreting as year-month-day produces a valid date. Go with it.
+
+		// Default to a month-day-year interpretation.
+
+		int numMonth = num1;
+		int dayOfMonth = num2;
+		int year = num3;
+
+		if (DateUtils.isValidDate(num3, num1, num2, era)) {
+			// Interpreting as month-day-year produces a valid date. Go with it.
 		}
-		else if (DateUtils.isValidDate(num3, num1, num2, era)) {
-			// Interpreting as year-month-day doesn't produce a valid date, but
-			// month-day-year does. Go with month-day-year.
-			
-			year = num3;
-			numMonth = num1;
-			dayOfMonth = num2;
+		else if (DateUtils.isValidDate(num1, num2, num3, era)) {
+			// Interpreting as month-day-year doesn't produce a valid date, but
+			// year-month-day does. Go with year-month-day.
+
+			year = num1;
+			numMonth = num2;
+			dayOfMonth = num3;
 		}
-		
+
 		stack.push(year);
 		stack.push(numMonth);
 		stack.push(dayOfMonth);
@@ -438,7 +438,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		// Reorder the stack into a canonical ordering,
 		// year-month-day-era.
-		
+
 		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer dayOfMonth = (Integer) stack.pop();
@@ -456,12 +456,12 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		// Reorder the stack into a canonical ordering,
 		// year-month-day-era.
-		
+
 		Integer dayOfMonth = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Era era = (Era) stack.pop();
-		
+
 		stack.push(year);
 		stack.push(numMonth);
 		stack.push(dayOfMonth);
@@ -475,15 +475,15 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
-		
+
 		stack.push(new Date(year, numMonth, 1, era));
 		stack.push(new Date(year, numMonth, DateUtils.getDaysInMonth(numMonth, year, era), era));
 	}
-	
+
 	@Override
 	public void exitInvMonthYear(InvMonthYearContext ctx) {
 		if (ctx.exception != null) return;
-		
+
 		// Invert the arguments.
 
 		Integer numMonth = (Integer) stack.pop();
@@ -494,15 +494,15 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		stack.push(year);
 		stack.push(era);
 	}
-	
+
 	@Override
 	public void exitYearSpanningWinter(YearSpanningWinterContext ctx) {
 		if (ctx.exception != null) return;
-		
+
 		Era era = (Era) stack.pop();
 		Integer endYear = (Integer) stack.pop();
 		Integer startYear = (Integer) stack.pop();
-		
+
 		stack.push(new Date(startYear, 12, 1).withEra(era));
 		stack.push(DateUtils.getQuarterYearEndDate(1, endYear, era).withEra(era));
 	}
@@ -510,11 +510,11 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitPartialYear(PartialYearContext ctx) {
 		if (ctx.exception != null) return;
-		
+
 		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Part part = (Part) stack.pop();
-		
+
 		stack.push(DateUtils.getPartialYearStartDate(part, year).withEra(era));
 		stack.push(DateUtils.getPartialYearEndDate(part, year, era).withEra(era));
 	}
@@ -522,7 +522,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitQuarterYear(QuarterYearContext ctx) {
 		if (ctx.exception != null) return;
-		
+
 		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer quarter = (Integer) stack.pop();
@@ -534,25 +534,25 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitHalfYear(HalfYearContext ctx) {
 		if (ctx.exception != null) return;
-		
+
 		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer half = (Integer) stack.pop();
 
 		stack.push(DateUtils.getHalfYearStartDate(half, year).withEra(era));
 		stack.push(DateUtils.getHalfYearEndDate(half, year, era).withEra(era));
-	}	
-	
+	}
+
 	@Override
 	public void exitInvSeasonYear(InvSeasonYearContext ctx) {
 		if (ctx.exception != null) return;
-		
+
 		// Invert the arguments.
-		
+
 		Integer quarter = (Integer) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Era era = (Era) stack.pop();
-		
+
 		stack.push(quarter);
 		stack.push(year);
 		stack.push(era);
@@ -564,7 +564,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
-		
+
 		stack.push(new Date(year, 1, 1, era));
 		stack.push(new Date(year, 12, 31, era));
 	}
@@ -576,7 +576,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Part part = (Part) stack.pop();
-		
+
 		if (era != null) {
 			// If the era was explicitly specified, the start and end years
 			// may be calculated now.
@@ -591,7 +591,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			// range, where the era will be inherited from the era of the end of
 			// the range; this era won't be known until farther up the parse tree,
 			// when both sides of the range will have been parsed.
-			
+
 			stack.push(new DeferredPartialDecadeStartDate(year, part));
 			stack.push(new DeferredPartialDecadeEndDate(year, part));
 		}
@@ -605,7 +605,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer year = (Integer) stack.pop();
 
 		// Calculate the start and end year of the decade, which depends on the era.
-		
+
 		if (era != null) {
 			// If the era was explicitly specified, the start and end years
 			// may be calculated now.
@@ -633,7 +633,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Part part = (Part) stack.pop();
-		
+
 		if (era != null) {
 			// If the era was explicitly specified, the start and end years
 			// may be calculated now.
@@ -648,7 +648,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			// range, where the era will be inherited from the era of the end of
 			// the range; this era won't be known until farther up the parse tree,
 			// when both sides of the range will have been parsed.
-			
+
 			stack.push(new DeferredPartialCenturyStartDate(year, part));
 			stack.push(new DeferredPartialCenturyEndDate(year, part));
 		}
@@ -661,7 +661,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer quarter = (Integer) stack.pop();
-		
+
 		if (era != null) {
 			// If the era was explicitly specified, the start and end years
 			// may be calculated now.
@@ -676,7 +676,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			// range, where the era will be inherited from the era of the end of
 			// the range; this era won't be known until farther up the parse tree,
 			// when both sides of the range will have been parsed.
-			
+
 			stack.push(new DeferredQuarterCenturyStartDate(year, quarter));
 			stack.push(new DeferredQuarterCenturyEndDate(year, quarter));
 		}
@@ -685,11 +685,11 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitHalfCentury(HalfCenturyContext ctx) {
 		if (ctx.exception != null) return;
-		
+
 		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer half = (Integer) stack.pop();
-		
+
 		if (era != null) {
 			// If the era was explicitly specified, the start and end years
 			// may be calculated now.
@@ -704,7 +704,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			// range, where the era will be inherited from the era of the end of
 			// the range; this era won't be known until farther up the parse tree,
 			// when both sides of the range will have been parsed.
-			
+
 			stack.push(new DeferredHalfCenturyStartDate(year, half));
 			stack.push(new DeferredHalfCenturyEndDate(year, half));
 		}
@@ -731,7 +731,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			// range, where the era will be inherited from the era of the end of
 			// the range; this era won't be known until farther up the parse tree,
 			// when both sides of the range will have been parsed.
-			
+
 			stack.push(new DeferredCenturyStartDate(year));
 			stack.push(new DeferredCenturyEndDate(year));
 		}
@@ -740,7 +740,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitMillennium(MillenniumContext ctx) {
 		if (ctx.exception != null) return;
-		
+
 		Era era = (Era) stack.pop();
 		Integer n = (Integer) stack.pop();
 
@@ -758,7 +758,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			// range, where the era will be inherited from the era of the end of
 			// the range; this era won't be known until farther up the parse tree,
 			// when both sides of the range will have been parsed.
-			
+
 			stack.push(new DeferredMillenniumStartDate(n));
 			stack.push(new DeferredMillenniumEndDate(n));
 		}
@@ -767,14 +767,14 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitStrCentury(StrCenturyContext ctx) {
 		if (ctx.exception != null) return;
-		
+
 		Integer n = (Integer) stack.pop();
-		
+
 		// Convert the nth number to a year number,
 		// and push on the stack.
-		
+
 		Integer year = DateUtils.nthCenturyToYear(n);
-		
+
 		stack.push(year);
 	}
 
@@ -786,11 +786,11 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// and push on the stack.
 
 		Integer year = new Integer(stripEndLetters(ctx.HUNDREDS().getText()));
-		
+
 		if (year == 0) {
 			throw new StructuredDateFormatException("unexpected century '" + ctx.HUNDREDS().getText() + "'");
 		}
-		
+
 		stack.push(year);
 	}
 
@@ -816,9 +816,9 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		// Convert the string to a number,
 		// and push on the stack.
-		
+
 		Integer year = new Integer(ctx.NUMBER().getText());
-				
+
 		if (year == 0) {
 			throw new StructuredDateFormatException("unexpected year '" + ctx.NUMBER().getText() + "'");
 		}
@@ -832,13 +832,13 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		// Convert the string a number,
 		// and push on the stack.
-		
+
 		Integer month = new Integer(ctx.NUMBER().getText());
-		
+
 		if (month < 1 || month > 12) {
 			throw new StructuredDateFormatException("unexpected month '" + ctx.NUMBER().getText() + "'");
 		}
-		
+
 		stack.push(month);
 	}
 
@@ -851,20 +851,20 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// alternative with nth instead of LAST,
 		// the nth handler will already have pushed
 		// a number on the stack.
-		
+
 		if (ctx.LAST() != null) {
 			stack.push(new Integer(2));
 		}
-		
+
 		// Check for a valid half.
-		
+
 		Integer n = (Integer) stack.peek();
-		
+
 		if (n < 1 || n > 2) {
 			throw new StructuredDateFormatException("unexpected half '" + n + "'");
 		}
 	}
-	
+
 	@Override
 	public void exitNthQuarter(NthQuarterContext ctx) {
 		if (ctx.exception != null) return;
@@ -874,15 +874,15 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// alternative with nth instead of LAST,
 		// the nth handler will already have pushed
 		// a number on the stack.
-		
+
 		if (ctx.LAST() != null) {
 			stack.push(new Integer(4));
 		}
-		
+
 		// Check for a valid quarter.
-		
+
 		Integer n = (Integer) stack.peek();
-		
+
 		if (n < 1 || n > 4) {
 			throw new StructuredDateFormatException("unexpected quarter '" + n + "'");
 		}
@@ -891,12 +891,12 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitNth(NthContext ctx) {
 		if (ctx.exception != null) return;
-		
+
 		// Convert the string to a number,
 		// and push on the stack.
-		
+
 		Integer n = null;
-		
+
 		if (ctx.NTHSTR() != null) {
 			n = new Integer(stripEndLetters(ctx.NTHSTR().getText()));
 		}
@@ -912,37 +912,37 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		else if (ctx.FOURTH() != null) {
 			n = 4;
 		}
-		
+
 		stack.push(n);
 	}
 
 	@Override
 	public void exitStrMonth(StrMonthContext ctx) {
 		if (ctx.exception != null) return;
-		
+
 		// Convert the month name to a number,
 		// and push on the stack.
-		
+
 		TerminalNode monthNode = ctx.MONTH();
-		
+
 		if (monthNode == null) {
 			monthNode = ctx.SHORTMONTH();
 		}
-		
+
 		String monthStr = monthNode.getText();
 
 		stack.push(DateUtils.getMonthByName(monthStr));
 	}
-	
+
 	@Override
 	public void exitStrSeason(StrSeasonContext ctx) {
 		if (ctx.exception != null) return;
-		
+
 		// Convert the season to a quarter number,
 		// and push on the stack.
-		
+
 		Integer quarter = null;
-		
+
 		if (ctx.WINTER() != null) {
 			quarter = 1;
 		}
@@ -955,18 +955,18 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		else if (ctx.FALL() != null) {
 			quarter = 4;
 		}
-		
+
 		stack.push(quarter);
 	}
 
 	@Override
 	public void exitAllOrPartOf(AllOrPartOfContext ctx) {
 		if (ctx.exception != null) return;
-		
+
 		// If a part was specified, it will have been
 		// pushed on the stack in exitPartOf(). If not,
 		// push null on the stack.
-		
+
 		if (ctx.partOf() == null) {
 			stack.push(null);
 		}
@@ -975,12 +975,12 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitPartOf(PartOfContext ctx) {
 		if (ctx.exception != null) return;
-		
+
 		// Convert the token to a Part,
 		// and push on the stack.
-		
+
 		Part part = null;
-		
+
 		if (ctx.EARLY() != null) {
 			part = Part.EARLY;
 		}
@@ -990,7 +990,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		else if (ctx.LATE() != null) {
 			part = Part.LATE;
 		}
-		
+
 		stack.push(part);
 	}
 
@@ -1000,16 +1000,16 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		// Convert the token to an Era,
 		// and push on the stack.
-		
+
 		Era era = null;
-		
+
 		if (ctx.BC() != null) {
 			era = Era.BCE;
 		}
 		else if (ctx.AD() != null) {
 			era = Era.CE;
 		}
-		
+
 		stack.push(era);
 	}
 
@@ -1019,16 +1019,16 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		// Convert the numeric string to an Integer,
 		// and push on the stack.
-		
+
 		Integer dayOfMonth = new Integer(ctx.NUMBER().getText());
-		
+
 		if (dayOfMonth == 0 || dayOfMonth > 31) {
 			throw new StructuredDateFormatException("unexpected day of month '" + ctx.NUMBER().getText() + "'");
 		}
 
 		stack.push(dayOfMonth);
 	}
-	
+
 	@Override
 	public void exitNum(NumContext ctx) {
 		if (ctx.exception != null) return;
@@ -1037,21 +1037,21 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// and push on the stack.
 
 		Integer num = new Integer(ctx.NUMBER().getText());
-		
+
 		stack.push(num);
 	}
 
 	protected String getErrorMessage(RecognitionException re) {
 		String message = "";
-		
+
 		Parser recognizer = (Parser) re.getRecognizer();
 		TokenStream tokens = recognizer.getInputStream();
-		
+
 		if (re instanceof NoViableAltException) {
 			NoViableAltException e = (NoViableAltException) re;
 			Token startToken = e.getStartToken();
 			String input = (startToken.getType() == Token.EOF ) ? "end of text" : quote(tokens.getText(startToken, e.getOffendingToken()));
-				
+
 			message = "no viable date format found at " + input;
 		}
 		else if (re instanceof InputMismatchException) {
@@ -1062,26 +1062,26 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		else if (re instanceof FailedPredicateException) {
 			FailedPredicateException e = (FailedPredicateException) re;
 			String ruleName = recognizer.getRuleNames()[recognizer.getContext().getRuleIndex()];
-			
+
 			message = "failed predicate " + ruleName + ": " + e.getMessage();
 		}
-		
+
 		return message;
 	}
-	
+
 	protected String quote(String text) {
 		return "'" + text + "'";
 	}
-	
+
 	protected String getTokenDisplayString(Token token) {
 		String string;
-		
+
 		if (token == null) {
 			string = "[no token]";
 		}
 		else {
 			String text = token.getText();
-			
+
 			if (text == null) {
 				if (token.getType() == Token.EOF ) {
 					string = "end of text";
@@ -1094,17 +1094,17 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 				string = quote(text);
 			}
 		}
-		
+
 		return string;
 	}
 
 	protected String stripEndLetters(String input) {
 		return input.replaceAll("[^\\d]+$", "");
 	}
-	
+
 	public static void main(String[] args) {
 		StructuredDateEvaluator evaluator = new ANTLRStructuredDateEvaluator();
-		
+
 		for (String displayDate : args) {
 			try {
 				evaluator.evaluate(displayDate);
