@@ -84,7 +84,7 @@ public class VocabularyItemValidatorHandler implements ValidatorHandler {
 	                // a display name or supplied in another manner.
 	                if ((shortId != null) && (shortIdBadPattern.matcher(shortId).find())) {
 	                    invalid = true;
-	                    errMessage += "shortIdentifier must only contain standard word characters";
+	                    errMessage += "shortIdentifier must only contain standard word characters: " + shortId;
 	                }
 	            } else if (action.equals(Action.UPDATE)) {
 	            	// What is this ELSE clause for?

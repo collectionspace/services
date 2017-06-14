@@ -1,8 +1,8 @@
 package org.collectionspace.services.structureddate;
 
 public enum Era {
-	BCE ("urn:cspace:core.collectionspace.org:vocabularies:name(dateera):item:name(bce)'BCE'"),
-	CE  ("urn:cspace:core.collectionspace.org:vocabularies:name(dateera):item:name(ce)'CE'");
+	BCE ("urn:cspace:*:vocabularies:name(dateera):item:name(bce)'BCE'"),
+	CE  ("urn:cspace:*:vocabularies:name(dateera):item:name(ce)'CE'");
 	
 	private final String value;
 	
@@ -10,8 +10,14 @@ public enum Era {
 		this.value = value;
 	}
 	
+	@Override
 	public String toString() {
 		return value;
+	}
+	
+	public String toString(String tenantDomain) {
+		String result = toString().replace("*", tenantDomain);
+		return result;
 	}
 	
 	public String toDisplayString() {
