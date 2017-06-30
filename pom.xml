@@ -195,7 +195,7 @@
 			<url>https://repository.apache.org/content/groups/public/</url>
 		</repository>
 	    
-	    <!-- Global Biodiversity Information Facility - http://www.gbif.org/ -->
+	    <!-- Global Biodiversity Information Facility - http://www.gbif.org/
 	    <repository>
 	        <snapshots>
 	            <enabled>false</enabled>
@@ -206,7 +206,7 @@
 	        <id>gbif-all</id>
 	        <name>gbif-all</name>
 	        <url>http://repository.gbif.org/content/groups/gbif</url>
-	    </repository>	    
+	    </repository>	 -->   
 
 	</repositories>
 
