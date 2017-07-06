@@ -23,35 +23,26 @@
  */
 package org.collectionspace.services.batch;
 
-import java.util.List;
-
 import org.collectionspace.services.BatchJAXBSchema;
-import org.collectionspace.services.jaxb.InvocableJAXBSchema;
 import org.collectionspace.services.batch.nuxeo.BatchDocumentModelHandler;
 import org.collectionspace.services.client.BatchClient;
 import org.collectionspace.services.client.IQueryManager;
+import org.collectionspace.services.client.PayloadPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
-import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.document.ValidatorHandler;
 import org.collectionspace.services.common.invocable.Invocable;
-import org.collectionspace.services.common.invocable.Invocable.InvocationError;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.query.QueryManager;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.nuxeo.ecm.core.api.DocumentModel;
-import org.collectionspace.services.common.ResourceMapHolder;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
-import javax.management.BadAttributeValueExpException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -59,17 +50,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 @Path(BatchClient.SERVICE_PATH)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public class BatchResource extends ResourceBase {
+public class BatchResource extends NuxeoBasedResource {
 	
 	protected final String COMMON_SCHEMA = "batch_common";
 
@@ -87,14 +75,11 @@ public class BatchResource extends ResourceBase {
     @Override
     //public Class<BatchCommon> getCommonPartClass() {
     public Class getCommonPartClass() {
-    	try {
-            return Class.forName("org.collectionspace.services.batch.BatchCommon");//.class;
-        } catch (ClassNotFoundException e){
-            return null;
-        }
+    	return BatchCommon.class;
     }
-
-    @Override
+    
+	// other resource methods and use the getRepositoryClient() methods.
+	@Override
     protected AbstractCommonList getCommonList(UriInfo ui) {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
@@ -104,22 +89,26 @@ public class BatchResource extends ResourceBase {
             String mode = queryParams.getFirst(IQueryManager.SEARCH_TYPE_INVOCATION_MODE);
             String whereClause = null;
             DocumentFilter documentFilter = null;
-            String common_part =ctx.getCommonPartLabel(); 
+            String common_part = ctx.getCommonPartLabel();
+			
             if (docType != null && !docType.isEmpty()) {
                 whereClause = QueryManager.createWhereClauseForInvocableByDocType(
                 		common_part, docType);
                 documentFilter = handler.getDocumentFilter();
                 documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }
+			
             if (mode != null && !mode.isEmpty()) {
                 whereClause = QueryManager.createWhereClauseForInvocableByMode(
                 		common_part, mode);
                 documentFilter = handler.getDocumentFilter();
                 documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }
+			
             if (whereClause !=null && logger.isDebugEnabled()) {
                 logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
             }
+			
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             AbstractCommonList list = (AbstractCommonList) handler.getCommonPartList();
             return list;
@@ -127,7 +116,7 @@ public class BatchResource extends ResourceBase {
             throw bigReThrow(e, ServiceMessages.LIST_FAILED);
         }
     }
-    
+	
 	/**
 	 * Gets the authorityItem list for the specified authority
 	 * If partialPerm is specified, keywords will be ignored.
@@ -154,8 +143,7 @@ public class BatchResource extends ResourceBase {
         return list;
 	}
 
-    private AbstractCommonList batchSearch(UriInfo ui, 
-    										String docType, String mode) {
+    private AbstractCommonList batchSearch(UriInfo ui, String docType, String mode) {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
             DocumentHandler handler = createDocumentHandler(ctx);
@@ -207,23 +195,34 @@ public class BatchResource extends ResourceBase {
 		}
 		return ptClause;
 	}
-
-
-
     
+	private BatchCommon getBatchCommon(String csid) throws Exception {
+		BatchCommon result = null;
+    	
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+		PoxPayloadOut ppo = get(csid, ctx);
+		PayloadPart batchCommonPart = ppo.getPart(BatchClient.SERVICE_COMMON_PART_NAME);
+		result = (BatchCommon)batchCommonPart.getBody();
+		
+    	return result;
+    }
+	
     @POST
     @Path("{csid}")
     public InvocationResults invokeBatchJob(
-    		@Context ResourceMap resourceMap, 
+    		@Context ResourceMap resourceMap,
+    		@Context UriInfo ui,
     		@PathParam("csid") String csid,
     		InvocationContext invContext) {
+
         try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
             BatchDocumentModelHandler handler = (BatchDocumentModelHandler)createDocumentHandler(ctx);
-            
-            return handler.invokeBatchJob(ctx, csid, resourceMap, invContext);
+            return handler.invokeBatchJob(ctx, csid, resourceMap, invContext, getBatchCommon(csid));
         } catch (Exception e) {
-            throw bigReThrow(e, ServiceMessages.POST_FAILED);
+        	String msg = String.format("%s Could not invoke batch job with CSID='%s'.", 
+        			ServiceMessages.POST_FAILED, csid);
+            throw bigReThrow(e, msg);
         }
     }
 }

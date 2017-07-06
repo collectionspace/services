@@ -5,20 +5,22 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.collectionspace.services</groupId>
 	<artifactId>org.collectionspace.services</artifactId>
-	<version>4.1.1</version>
+	<version>5.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>services</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<cspace.services.version>4.1.1</cspace.services.version>
-		<cspace.services.client.version>4.1.1</cspace.services.client.version>
-		<nuxeo.general.release>5.5.0-HF07</nuxeo.general.release>
+		<cspace.services.version>5.0-SNAPSHOT</cspace.services.version>
+		<cspace.services.client.version>5.0-SNAPSHOT</cspace.services.client.version>
+		<nuxeo.general.release>7.10-HF17</nuxeo.general.release>
 		<nuxeo.shell.version>${nuxeo.general.release}</nuxeo.shell.version>
 		<nuxeo.platform.version>${nuxeo.general.release}</nuxeo.platform.version>
 		<nuxeo.core.version>${nuxeo.general.release}</nuxeo.core.version>
-		<spring.version>3.0.5.RELEASE</spring.version>
-		<spring.security.version>3.0.5.RELEASE</spring.security.version>
+		<chemistry.opencmis.version.nx>0.12.0-NX2</chemistry.opencmis.version.nx>
+		<spring.version>4.3.1.RELEASE</spring.version>
+		<spring.security.version>4.1.1.RELEASE</spring.security.version>
+		<spring.security.oauth2.version>2.0.10.RELEASE</spring.security.oauth2.version>
 	</properties>
 
 	<distributionManagement>
@@ -57,6 +59,14 @@
 			</snapshots>
 		</repository>
 		<repository>
+			<id>libs-snapshot-local</id>
+			<name>libs-snapshot-local</name>
+			<url>http://nightly.collectionspace.org:8081/artifactory/libs-snapshot-local</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
 			<id>repo1</id>
 			<name>Maven repo1</name>
 			<url>http://repo1.maven.org/maven2</url>
@@ -72,7 +82,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-		<repository>
+		<!-- <repository>
 			<id>maven2-repository.dev.java.net</id>
 			<name>Java.net Maven 2 Repository</name>
 			<url>http://download.java.net/maven/2</url>
@@ -80,7 +90,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-		<!-- <repository> <id>maven1-repository.dev.java.net</id> <name>Java.net 
+		<repository> <id>maven1-repository.dev.java.net</id> <name>Java.net 
 			Maven 1 Repository</name> <url>http://download.java.net/maven/1</url> <layout>legacy</layout> 
 			<snapshots> <enabled>false</enabled> </snapshots> </repository> -->
 
@@ -101,6 +111,7 @@
 			</snapshots>
 		</repository>
 
+		<!-- codehaus was shutdown in May 2015
 		<repository>
 			<id>codehaus repo</id>
 			<name>codehaus repo</name>
@@ -109,6 +120,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
+		-->
 
 		<repository>
 			<id>nuxeo-public</id>
@@ -121,7 +133,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-
+		
 		<repository>
 			<id>public-snapshot</id>
 			<url>http://maven.nuxeo.org/public-snapshot</url>
@@ -148,6 +160,18 @@
 		</repository>
 
 		<repository>
+			<id>nightly-staging</id>
+			<name>nuxeo-nightly-staging</name>
+			<url>http://mavenin.nuxeo.com/nexus/content/repositories/nightly-staging</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>		
+
+		<repository>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -170,6 +194,19 @@
 			<name>External release repository of the Apache projects</name>
 			<url>https://repository.apache.org/content/groups/public/</url>
 		</repository>
+	    
+	    <!-- Global Biodiversity Information Facility - http://www.gbif.org/ -->
+	    <repository>
+	        <snapshots>
+	            <enabled>false</enabled>
+	        </snapshots>
+	        <releases>
+	            <enabled>true</enabled>
+	        </releases>	        
+	        <id>gbif-all</id>
+	        <name>gbif-all</name>
+	        <url>http://repository.gbif.org/content/groups/gbif</url>
+	    </repository>	    
 
 	</repositories>
 
@@ -205,6 +242,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</pluginRepository>
+		<!-- Codehaus repo was shutdown in May 2015
 		<pluginRepository>
 			<id>Codehaus Repository</id>
 			<url>http://repository.codehaus.org/</url>
@@ -215,6 +253,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</pluginRepository>
+		-->
 	</pluginRepositories>
 
 	<build>
@@ -223,7 +262,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>2.6.1</version>
+					<version>2.10.4</version>
 					<configuration>
 						<show>public</show>
 					</configuration>
@@ -231,7 +270,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>2.3</version>
+					<version>3.1</version>
 					<configuration>
 						<source>1.7</source>
 						<target>1.7</target>
@@ -282,6 +321,7 @@
 						</execution>
 					</executions>
 				</plugin>
+
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
 					only. It has no influence on the Maven build itself. -->
 				<plugin>
@@ -291,19 +331,6 @@
 					<configuration>
 						<lifecycleMappingMetadata>
 							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.jvnet.hyperjaxb3</groupId>
-										<artifactId>maven-hyperjaxb3-plugin</artifactId>
-										<versionRange>[0.5.6,)</versionRange>
-										<goals>
-											<goal>generate</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<execute></execute>
-									</action>
-								</pluginExecution>
 								<pluginExecution>
 									<pluginExecutionFilter>
 										<groupId>
@@ -329,17 +356,13 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-			</plugin>
-			<!-- 
-				This plugin ensures that the required environment variables are set before we perform
-				any build related tasks.
-			 -->
+			<!-- This plugin ensures that the required environment variables are set 
+				before we perform any build related tasks. -->
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
 				<executions>
 					<execution>
 						<id>check-environment-vars</id>
@@ -349,18 +372,34 @@
 						</goals>
 						<configuration>
 							<tasks>
-								<fail unless="env.CSPACE_JEESERVER_HOME" message="Required environment variable CSPACE_JEESERVER_HOME has not been set." />
-								<fail unless="env.DB_CSPACE_PASSWORD" message="Required environment variable DB_CSPACE_PASSWORD has not been set." />
-								<fail unless="env.DB_NUXEO_PASSWORD" message="Required environment variable DB_NUXEO_PASSWORD has not been set." />
-								<fail unless="env.DB_READER_PASSWORD" message="Required environment variable DB_READER_PASSWORD has not been set." />
-								<fail unless="env.DB_CSADMIN_PASSWORD" message="Required environment variable DB_CSADMIN_PASSWORD has not been set." />
-								<!--
-									Fail if these deprecated environment variables are set.
-								-->
-								<fail if="env.DB_USER" message="The deprecated environment variable DB_USER should not be set." />
-								<fail if="env.DB_PASSWORD" message="The deprecated environment variable DB_PASSWORD should not be set.  Ensure that DB_CSADMIN_PASSWORD is set instead." />
-								<fail if="env.DB_PASSWORD_CSPACE" message="The deprecated environment variable DB_PASSWORD_CSPACE should not be set.  Ensure that DB_CSPACE_PASSWORD is set instead." />
-								<fail if="env.DB_PASSWORD_NUXEO" message="The deprecated environment variable DB_PASSWORD_NUXEO should not be set.  Ensure that DB_NUXEO_PASSWORD is set instead." />
+								<property environment="env" />
+								<fail unless="env.CSPACE_INSTANCE_ID"
+									message="Required environment variable CSPACE_INSTANCE_ID has not been set. Use '_default' as a default value." />
+								<fail unless="env.JEE_PORT"
+									message="Required environment variable JEE_PORT has not been set.  Use '8180' as a default value." />
+								<fail unless="env.DB_HOST"
+									message="Required environment variable DB_HOST has not been set.  Use 'localhost' as a default value." />
+								<fail unless="env.DB_PORT"
+									message="Required environment variable DB_PORT has not been set.  Use 5432 as a default value." />
+								<fail unless="env.CSPACE_JEESERVER_HOME"
+									message="Required environment variable CSPACE_JEESERVER_HOME has not been set.  Usually the same value as CATALINA_HOME environment variable." />
+								<fail unless="env.DB_CSPACE_PASSWORD"
+									message="Required environment variable DB_CSPACE_PASSWORD has not been set." />
+								<fail unless="env.DB_NUXEO_PASSWORD"
+									message="Required environment variable DB_NUXEO_PASSWORD has not been set." />
+								<fail unless="env.DB_READER_PASSWORD"
+									message="Required environment variable DB_READER_PASSWORD has not been set." />
+								<fail unless="env.DB_CSADMIN_PASSWORD"
+									message="Required environment variable DB_CSADMIN_PASSWORD has not been set." />
+								<!-- Fail if these deprecated environment variables are set. -->
+								<fail if="env.DB_USER"
+									message="The deprecated environment variable DB_USER should not be set." />
+								<fail if="env.DB_PASSWORD"
+									message="The deprecated environment variable DB_PASSWORD should not be set.  Ensure that DB_CSADMIN_PASSWORD is set instead." />
+								<fail if="env.DB_PASSWORD_CSPACE"
+									message="The deprecated environment variable DB_PASSWORD_CSPACE should not be set.  Ensure that DB_CSPACE_PASSWORD is set instead." />
+								<fail if="env.DB_PASSWORD_NUXEO"
+									message="The deprecated environment variable DB_PASSWORD_NUXEO should not be set.  Ensure that DB_NUXEO_PASSWORD is set instead." />
 							</tasks>
 						</configuration>
 					</execution>
@@ -371,6 +410,12 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.1</version>
+				<scope>test</scope>
+			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
@@ -446,7 +491,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.6</version>
+				<version>2.9</version>
 				<configuration>
 				</configuration>
 				<reportSets>

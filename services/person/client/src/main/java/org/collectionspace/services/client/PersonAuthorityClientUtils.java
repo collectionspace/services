@@ -43,11 +43,9 @@ import org.collectionspace.services.person.PersonTermGroupList;
 import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.SchoolOrStyleList;
-import org.jboss.resteasy.client.ClientResponse;
-//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
+import org.collectionspace.services.person.StructuredDateGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.collectionspace.services.person.StructuredDateGroup;
 
 /**
  * The Class PersonAuthorityClientUtils.
@@ -58,17 +56,19 @@ public class PersonAuthorityClientUtils {
     private static final Logger logger =
         LoggerFactory.getLogger(PersonAuthorityClientUtils.class);
 	private static final ServiceRequestType READ_REQ = ServiceRequestType.READ;
+    static private final Random random = new Random(System.currentTimeMillis());
 
     /**
      * @param csid the id of the PersonAuthority
      * @param client if null, creates a new client
      * @return
+     * @throws Exception 
      */
-    public static String getAuthorityRefName(String csid, PersonAuthorityClient client){
+    public static String getAuthorityRefName(String csid, PersonAuthorityClient client) throws Exception{
     	if (client == null) {
     		client = new PersonAuthorityClient();
     	}
-        ClientResponse<String> res = client.read(csid);
+        Response res = client.read(csid);
         try {
 	        int statusCode = res.getStatus();
 	        if(!READ_REQ.isValidStatusCode(statusCode)
@@ -77,7 +77,7 @@ public class PersonAuthorityClientUtils {
 	        }
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	            PersonauthoritiesCommon personAuthority = 
 	            	(PersonauthoritiesCommon) CollectionSpaceClientUtils.extractPart(input,
 	                    client.getCommonPartName(), PersonauthoritiesCommon.class);
@@ -89,7 +89,7 @@ public class PersonAuthorityClientUtils {
 	            throw new RuntimeException(e);
 	        }
         } finally {
-        	res.releaseConnection();
+        	res.close();
         }
     }
 
@@ -97,12 +97,13 @@ public class PersonAuthorityClientUtils {
      * @param csid the id of the PersonAuthority
      * @param client if null, creates a new client
      * @return
+     * @throws Exception 
      */
-    public static String getPersonRefName(String inAuthority, String csid, PersonAuthorityClient client){
+    public static String getPersonRefName(String inAuthority, String csid, PersonAuthorityClient client) throws Exception{
     	if ( client == null) {
     		client = new PersonAuthorityClient();
     	}
-        ClientResponse<String> res = client.readItem(inAuthority, csid);
+        Response res = client.readItem(inAuthority, csid);
         try {
 	        int statusCode = res.getStatus();
 	        if(!READ_REQ.isValidStatusCode(statusCode)
@@ -111,7 +112,7 @@ public class PersonAuthorityClientUtils {
 	        }
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	            PersonsCommon person = 
 	            	(PersonsCommon) CollectionSpaceClientUtils.extractPart(input,
 	                    client.getItemCommonPartName(), PersonsCommon.class);
@@ -123,7 +124,7 @@ public class PersonAuthorityClientUtils {
 	            throw new RuntimeException(e);
 	        }
         } finally {
-        	res.releaseConnection();
+        	res.close();
         }
     }
 
@@ -135,8 +136,7 @@ public class PersonAuthorityClientUtils {
      * @param headerLabel the header label
      * @return the multipart output
      */
-    public static PoxPayloadOut createPersonAuthorityInstance(
-    		String displayName, String shortIdentifier, String headerLabel ) {
+    public static PoxPayloadOut createPersonAuthorityInstance(String displayName, String shortIdentifier, String headerLabel ) {
         PersonauthoritiesCommon personAuthority = new PersonauthoritiesCommon();
         personAuthority.setDisplayName(displayName);
         personAuthority.setShortIdentifier(shortIdentifier);
@@ -147,8 +147,8 @@ public class PersonAuthorityClientUtils {
         PayloadOutputPart commonPart = multipart.addPart(personAuthority, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(headerLabel);
 
-        if(logger.isDebugEnabled()){
-        	logger.debug("to be created, personAuthority common ", 
+        if (logger.isDebugEnabled()) {
+        	logger.debug("To be created, personAuthority common: ", 
         				personAuthority, PersonauthoritiesCommon.class);
         }
 
@@ -167,7 +167,7 @@ public class PersonAuthorityClientUtils {
     public static PoxPayloadOut createPersonInstance(String inAuthority,
     		String personAuthRefName,
     		Map<String, String> personInfo,
-                List<PersonTermGroup> terms,
+            List<PersonTermGroup> terms,
     		String headerLabel){
         if (terms == null || terms.isEmpty()) {
             terms = getTermGroupInstance(getGeneratedIdentifier());
@@ -190,9 +190,11 @@ public class PersonAuthorityClientUtils {
      * @return the multipart output
      */
     public static PoxPayloadOut createPersonInstance(String inAuthority, 
-    		String personAuthRefName, Map<String, String> personInfo,
-                List<PersonTermGroup> terms,
-                Map<String, List<String>> personRepeatablesInfo, String headerLabel){
+    		String personAuthRefName,
+    		Map<String, String> personInfo,
+            List<PersonTermGroup> terms,
+            Map<String, List<String>> personRepeatablesInfo,
+            String headerLabel){
         PersonsCommon person = new PersonsCommon();
         person.setInAuthority(inAuthority);
     	String shortId = personInfo.get(PersonJAXBSchema.SHORT_IDENTIFIER);
@@ -306,7 +308,7 @@ public class PersonAuthorityClientUtils {
     			personMap, terms, personRepeatablesMap, client.getItemCommonPartName());
     	
     	String result = null;
-    	ClientResponse<Response> res = client.createItem(vcsid, multipart);
+    	Response res = client.createItem(vcsid, multipart);
     	try {
 	    	int statusCode = res.getStatus();
 	
@@ -322,7 +324,7 @@ public class PersonAuthorityClientUtils {
 	
 	    	result = extractId(res);
     	} finally {
-    		res.releaseConnection();
+    		res.close();
     	}
     	
     	return result;
@@ -369,7 +371,7 @@ public class PersonAuthorityClientUtils {
      * @param res the res
      * @return the string
      */
-    public static String extractId(ClientResponse<Response> res) {
+    public static String extractId(Response res) {
         MultivaluedMap<String, Object> mvm = res.getMetadata();
         // FIXME: This may throw an NPE if the Location: header isn't present
         String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
@@ -382,7 +384,7 @@ public class PersonAuthorityClientUtils {
         	logger.debug("id=" + id);
         }
         return id;
-    }
+    }    
     
     /**
      * Returns an error message indicating that the status code returned by a
@@ -468,7 +470,12 @@ public class PersonAuthorityClientUtils {
     }
     
     private static String getGeneratedIdentifier() {
-        return "id" + new Date().getTime(); 
+        return "id" + createIdentifier();
    }
+    
+    private static String createIdentifier() {
+        long identifier = System.currentTimeMillis() + random.nextInt();
+        return Long.toString(identifier);
+    }    
 
 }

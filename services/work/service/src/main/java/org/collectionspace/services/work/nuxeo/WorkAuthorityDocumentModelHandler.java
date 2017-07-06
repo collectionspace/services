@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.work.nuxeo;
 
+import org.collectionspace.services.client.WorkAuthorityClient;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.work.WorkauthoritiesCommon;
 
@@ -33,13 +34,8 @@ import org.collectionspace.services.work.WorkauthoritiesCommon;
 public class WorkAuthorityDocumentModelHandler
         extends AuthorityDocumentModelHandler<WorkauthoritiesCommon> {
 
-    /**
-     * Common part schema label
-     */
-    private static final String COMMON_PART_LABEL = "workauthorities_common";   
-    
     public WorkAuthorityDocumentModelHandler() {
-        super(COMMON_PART_LABEL);
+        super(WorkAuthorityClient.SERVICE_COMMON_PART_NAME, WorkAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
     
     /**

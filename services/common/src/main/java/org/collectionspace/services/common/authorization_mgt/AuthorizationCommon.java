@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
@@ -31,7 +32,6 @@ import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.perms.EffectType;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionAction;
-
 import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
@@ -45,7 +45,6 @@ import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.tenant.TenantBindingType;
-
 import org.collectionspace.services.lifecycle.Lifecycle;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.lifecycle.TransitionDefList;
@@ -53,7 +52,6 @@ import org.collectionspace.services.lifecycle.TransitionDefList;
 //import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.security.acls.model.AlreadyExistsException;
 
 
@@ -70,28 +68,18 @@ public class AuthorizationCommon {
     // for READ-ONLY
     final public static String ACTIONGROUP_RL_NAME = "RL";
     final public static ActionType[] ACTIONSET_RL = {ActionType.READ, ActionType.SEARCH};
-
-    
-	/*
-	 * Inner class to deal with predefined ADMIN and READER action groupds
-	 */
-	public class ActionGroup {
-		String name;
-		ActionType[] actions;
-	}
 	
 	static ActionGroup ACTIONGROUP_CRUDL;
 	static ActionGroup ACTIONGROUP_RL;
 	
 	// A static block to initialize the predefined action groups
 	static {
-		AuthorizationCommon ac = new AuthorizationCommon();
 		// For admin
-		ACTIONGROUP_CRUDL = ac.new ActionGroup();
+		ACTIONGROUP_CRUDL = new ActionGroup();
 		ACTIONGROUP_CRUDL.name = ACTIONGROUP_CRUDL_NAME;
 		ACTIONGROUP_CRUDL.actions = ACTIONSET_CRUDL;
 		// For reader
-		ACTIONGROUP_RL = ac.new ActionGroup();
+		ACTIONGROUP_RL = new ActionGroup();
 		ACTIONGROUP_RL.name = ACTIONGROUP_RL_NAME;
 		ACTIONGROUP_RL.actions = ACTIONSET_RL;
 
@@ -303,14 +291,14 @@ public class AuthorizationCommon {
     
     private static Permission createWorkflowPermission(TenantBindingType tenantBinding,
     		ServiceBindingType serviceBinding,
-    		TransitionDef transitionDef,
+    		String transitionVerb,
     		ActionGroup actionGroup)
     {
     	Permission result = null;
     	String workFlowServiceSuffix;
     	String transitionName;
-    	if (transitionDef != null) {
-    		transitionName = transitionDef.getName();
+    	if (transitionVerb != null) {
+    		transitionName = transitionVerb;
     		workFlowServiceSuffix = WorkflowClient.SERVICE_AUTHZ_SUFFIX;
     	} else {
     		transitionName = ""; //since the transitionDef was null, we're assuming that this is the base workflow permission to be created    		
@@ -645,11 +633,11 @@ public class AuthorizationCommon {
     		String insertAccountTenantSQL;
     		if (databaseProductType == DatabaseProductType.MYSQL) {
     			insertAccountTenantSQL =
-    					"INSERT INTO accounts_tenants (TENANTS_ACCOUNTSCOMMON_CSID,tenant_id) "
+    					"INSERT INTO accounts_tenants (TENANTS_ACCOUNTS_COMMON_CSID,tenant_id) "
     							+ " VALUES(?, ?)";
     		} else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
     			insertAccountTenantSQL =
-    					"INSERT INTO accounts_tenants (HJID, TENANTS_ACCOUNTSCOMMON_CSID,tenant_id) "
+    					"INSERT INTO accounts_tenants (HJID, TENANTS_ACCOUNTS_COMMON_CSID,tenant_id) "
     							+ " VALUES(nextval('hibernate_sequence'), ?, ?)";
     		} else {
     			throw new Exception("Unrecognized database system.");
@@ -1023,6 +1011,19 @@ public class AuthorizationCommon {
 	    return pa;
 	}
 	
+	private static HashSet<String> getTransitionVerbList(TenantBindingType tenantBinding, ServiceBindingType serviceBinding) {
+		HashSet<String> result = new HashSet<String>();
+		
+		TransitionDefList transitionDefList = getTransitionDefList(tenantBinding, serviceBinding);
+    	for (TransitionDef transitionDef : transitionDefList.getTransitionDef()) {
+    		String transitionVerb = transitionDef.getName();
+    		String[] tokens = transitionVerb.split("_");  // Split the verb into words.  The workflow verbs are compound words combined with the '_' character.
+    		result.add(tokens[0]); // We only care about the first word.
+    	}
+
+    	return result;
+	}
+	
 	private static TransitionDefList getTransitionDefList(TenantBindingType tenantBinding, ServiceBindingType serviceBinding) {
 		TransitionDefList result = null;
 		try {
@@ -1039,7 +1040,7 @@ public class AuthorizationCommon {
 		
 		if (result == null) {
 			if (serviceBinding.getType().equalsIgnoreCase(ServiceBindingUtils.SERVICE_TYPE_SECURITY) == false) {
-				logger.warn("Could not retrieve a lifecycle transition definition list from: "
+				logger.debug("Could not retrieve a lifecycle transition definition list from: "
 						+ serviceBinding.getName()
 						+ " with tenant ID = "
 						+ tenantBinding.getId());
@@ -1069,34 +1070,33 @@ public class AuthorizationCommon {
 	        Hashtable<String, TenantBindingType> tenantBindings =
 	            	tenantBindingConfigReader.getTenantBindings();
 	        for (String tenantId : tenantBindings.keySet()) {
+	        	logger.info(String.format("Creating/verifying workflow permissions for tenant ID=%s.", tenantId));
 		        TenantBindingType tenantBinding = tenantBindings.get(tenantId);
 	    		Role adminRole = AuthorizationCommon.getRole(em, tenantBinding.getId(), ROLE_TENANT_ADMINISTRATOR);
 	    		Role readonlyRole = AuthorizationCommon.getRole(em, tenantBinding.getId(), ROLE_TENANT_READER);
+	    		
+	    		if (adminRole == null || readonlyRole == null) {
+	    			String msg = String.format("One or more of the required default CollectionSpace administrator roles is missing or was never created.  If you're setting up a new instance of CollectionSpace, shutdown the Tomcat server and run the 'ant import' command from the root/top level CollectionSpace 'Services' source directory.  Then try restarting Tomcat.");
+	    			logger.error(msg);
+	    			throw new RuntimeException("One or more of the required default CollectionSpace administrator roles is missing or was never created.");
+	    		}
+	    		
 		        for (ServiceBindingType serviceBinding : tenantBinding.getServiceBindings()) {
 		        	String prop = ServiceBindingUtils.getPropertyValue(serviceBinding, REFRESH_AUTZ_PROP);
 		        	if (prop == null ? true : Boolean.parseBoolean(prop)) {
 			        		try {
 			        		em.getTransaction().begin();
 				        	TransitionDefList transitionDefList = getTransitionDefList(tenantBinding, serviceBinding);
-				        	for (TransitionDef transitionDef : transitionDefList.getTransitionDef()) {
+				        	HashSet<String> transitionVerbList = getTransitionVerbList(tenantBinding, serviceBinding);
+				        	for (String transitionVerb : transitionVerbList) {
 				        		//
 				        		// Create the permission for the admin role
-				        		Permission adminPerm = createWorkflowPermission(tenantBinding, serviceBinding, transitionDef, ACTIONGROUP_CRUDL);
-				        		persist(em, adminPerm, adminRole, true);
+				        		Permission adminPerm = createWorkflowPermission(tenantBinding, serviceBinding, transitionVerb, ACTIONGROUP_CRUDL);
+				        		persist(em, adminPerm, adminRole, true, ACTIONGROUP_CRUDL);
 				        		//
 				        		// Create the permission for the read-only role
-				        		Permission readonlyPerm = createWorkflowPermission(tenantBinding, serviceBinding, transitionDef, ACTIONGROUP_RL);
-				        		
-				        		Profiler profiler = new Profiler(AuthorizationCommon.class, 1);
-				        		profiler.start("createDefaultPermissions started:" + readonlyPerm.getCsid());
-				        		persist(em, readonlyPerm, readonlyRole, true); // Persist/store the permission and permrole records and related Spring Security info
-				        		profiler.stop();
-				        		logger.debug("Finished full perm generation for "
-				        				+ ":" + tenantBinding.getId()
-				        				+ ":" + serviceBinding.getName()
-				        				+ ":" + transitionDef.getName()
-				        				+ ":" + ACTIONGROUP_RL
-				        				+ ":" + profiler.getCumulativeTime());			        		
+				        		Permission readonlyPerm = createWorkflowPermission(tenantBinding, serviceBinding, transitionVerb, ACTIONGROUP_RL);				        		
+				        		persist(em, readonlyPerm, readonlyRole, true, ACTIONGROUP_RL); // Persist/store the permission and permrole records and related Spring Security info
 				        	}
 				        	em.getTransaction().commit();
 			        	} catch (IllegalStateException e) {
@@ -1145,7 +1145,7 @@ public class AuthorizationCommon {
     /*
      * Persists the Permission, PermissionRoleRel, and Spring Security table entries all in one transaction
      */
-    private static void persist(EntityManager em, Permission permission, Role role, boolean enforceTenancy) throws Exception {
+    private static void persist(EntityManager em, Permission permission, Role role, boolean enforceTenancy, ActionGroup actionGroup) throws Exception {
 		AuthorizationStore authzStore = new AuthorizationStore();
 		// First persist the Permission record
 		authzStore.store(em, permission);
@@ -1168,7 +1168,7 @@ public class AuthorizationCommon {
 			logger.debug("Finished full perm generation for "
 					+ ":" + permission.getTenantId()
 					+ ":" + permission.getResourceName()
-					+ ":" + ACTIONGROUP_RL
+					+ ":" + actionGroup.getName()
 					+ ":" + profiler.getCumulativeTime());
 		}
         

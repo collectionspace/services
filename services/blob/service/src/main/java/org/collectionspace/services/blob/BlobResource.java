@@ -25,12 +25,11 @@ package org.collectionspace.services.blob;
 
 import org.collectionspace.services.publicitem.PublicitemsCommon;
 import org.collectionspace.services.client.BlobClient;
-import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PayloadPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.FileUtils;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.FileUtilities;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.blob.BlobInput;
@@ -39,7 +38,6 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.publicitem.PublicItemUtil;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.common.CSWebApplicationException;
-
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
@@ -47,33 +45,35 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 //FIXME: REM - We should not have Nuxeo dependencies in our resource classes.
 
 @Path(BlobClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class BlobResource extends ResourceBase {
-
+public class BlobResource extends NuxeoBasedResource {
+	
+	private static final int DEFAULT_MAX_CACHE_AGE = 86400; // 1 day of seconds.
+	private static final String DERIVATIVES_REGEX = "(\\w+)(/blobs/\\*/derivatives/)(\\w+)(/content)"; // matches things like 'GET/blobs/*/derivatives/Medium/content'
+	
 	@Override
     public String getServiceName(){
         return BlobClient.SERVICE_NAME;
@@ -121,7 +121,7 @@ public class BlobResource extends ResourceBase {
     	return result;
     }
     
-    private InputStream getBlobContent(ServiceContext ctx,
+    private InputStream getBlobContent(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
     		String csid, 
     		String derivativeTerm, 
     		StringBuffer outMimeType) throws CSWebApplicationException {
@@ -151,9 +151,10 @@ public class BlobResource extends ResourceBase {
     	}
     	
     	if (result == null) {
+    		String errMsg = String.format("Index failed. Could not get the contents for the Blob with CSID = '%s'.",
+    				csid);
 	        Response response = Response.status(
-	                Response.Status.INTERNAL_SERVER_ERROR).entity(
-	                		"Index failed. Could not get the contents for the Blob.").type("text/plain").build();
+	                Response.Status.INTERNAL_SERVER_ERROR).entity(errMsg).type("text/plain").build();
 	        throw new CSWebApplicationException(response);
     	}
     	
@@ -162,13 +163,14 @@ public class BlobResource extends ResourceBase {
     
     /*
      * This method can replace the 'createBlob' -specifically, this JAX-RS technique can replace the call to
-     * the BlobInput.createBlobFile() method.  In theory, this should reduce by 1 the number of time we need to copy
+     * the BlobInput.createBlobFile() method.  In theory, this should reduce by 1 the number of times we need to copy
      * bits around.
      */
     @POST
     @Path("{csid}/prototype")
     @Consumes("multipart/form-data")
     @Produces(MediaType.TEXT_PLAIN)
+    @Deprecated
     public Response prototype(@PathParam("csid") String csid,
     		@Context HttpServletRequest req,
     		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri,
@@ -187,7 +189,7 @@ public class BlobResource extends ResourceBase {
     			String mediaType = part.getMediaType().toString();
     			System.out.println("Media type is:" + mediaType);
     			fileStream = part.getBody(InputStream.class, null);
-    			FileUtils.createTmpFile(fileStream, getServiceName() + "_");
+    			FileUtilities.createTmpFile(fileStream, getServiceName() + "_");
     		}
     		
 	    	ResponseBuilder rb = Response.ok();
@@ -245,30 +247,61 @@ public class BlobResource extends ResourceBase {
 		return response;
     }    
     
+    /**
+     * If there is no explicit setting in the Blobs service binding, we'll ask the HTTP client to cache blobs for 1 full day.
+     * @param ctx
+     * @param cacheKey
+     * @return
+     */
+    @Override
+    protected CacheControl getCacheControl(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String cacheKey) {
+    	CacheControl result = null;
+    	
+    	if (cacheKey.matches(DERIVATIVES_REGEX)) {
+    		Pattern p = Pattern.compile(DERIVATIVES_REGEX);
+    		Matcher m = p.matcher(cacheKey);
+    		if (m.find()) {
+    			cacheKey = String.format("%s%s*%s", m.group(1), m.group(2), m.group(4));  // Converts something like this "GET/blobs/*/derivatives/Medium/content" into this "GET/blobs/*/derivatives/*/content"
+    		}
+    	}
+    	
+    	result = super.getCacheControl(ctx, cacheKey);
+    	if (result == null) {
+    		result = new CacheControl();
+    		result.setMaxAge(DEFAULT_MAX_CACHE_AGE);
+    	}
+    	
+    	return result;
+    }
+    
     @GET
     @Path("{csid}/content")
-    public Response getBlobContent(	@PathParam("csid") String csid) {
+    public Response getBlobContent(
+    		@PathParam("csid") String csid,
+    		@Context Request jaxRsRequest,
+    		@Context UriInfo uriInfo) {
     	Response result = null;
-    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null; 
     	
     	try {
-	    	ctx = createServiceContext();
+	    	ctx = createServiceContext(jaxRsRequest, uriInfo);
 			BlobsCommon blobsCommon = getBlobsCommon(csid);
 	    	StringBuffer mimeType = new StringBuffer();
 	    	InputStream contentStream = getBlobContent(ctx, csid, null /*derivative term*/, mimeType /*will get set*/);
 		    
 	    	Response.ResponseBuilder responseBuilder = Response.ok(contentStream, mimeType.toString());
+	    	setCacheControl(ctx, responseBuilder);
 	    	responseBuilder = responseBuilder.header("Content-Disposition","inline;filename=\""
 	    			+ blobsCommon.getName() +"\"");
 	    	result = responseBuilder.build();
     	} catch (Exception e) {
     		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
     	}
-    	
+
     	return result;
     }
     
-    private BlobsCommon getBlobsCommon(String csid) throws Exception {
+	private BlobsCommon getBlobsCommon(String csid) throws Exception {
     	BlobsCommon result = null;
     	
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
@@ -333,23 +366,29 @@ public class BlobResource extends ResourceBase {
     @Path("{csid}/derivatives/{derivativeTerm}/content")
     public Response getDerivativeContent(
     		@PathParam("csid") String csid,
-    		@PathParam("derivativeTerm") String derivativeTerm) {
+    		@PathParam("derivativeTerm") String derivativeTerm,
+    		@Context Request jaxRsRequest,
+    		@Context UriInfo uriInfo) {
     	Response result = null;
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
     	
 	    	try {
-		    	ctx = createServiceContext();
+	    		// Setup the call to get the blob derivative
+		    	ctx = createServiceContext(jaxRsRequest, uriInfo);
 				BlobsCommon blobsCommon = getBlobsCommon(csid);
 		    	StringBuffer mimeType = new StringBuffer();
+		    	// Get the blob derivative from Nuxeo
 		    	InputStream contentStream = getBlobContent(ctx, csid, derivativeTerm, mimeType);
+		    	// Build a response
 			    Response.ResponseBuilder responseBuilder = Response.ok(contentStream, mimeType.toString());
+			    setCacheControl(ctx, responseBuilder);
 		    	responseBuilder = responseBuilder.header("Content-Disposition","inline;filename=\""
 		    			+ blobsCommon.getName() +"\"");
 		    	result = responseBuilder.build();
 	    	} catch (Exception e) {
 	    		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
 	    	}
-	    	
+
 	    return result;
     }
     

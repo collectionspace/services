@@ -30,7 +30,7 @@ import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.CSWebApplicationException;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler;
@@ -54,7 +54,7 @@ import javax.ws.rs.core.UriInfo;
 @Path("/relations")
 @Consumes("application/xml")
 @Produces("application/xml")
-public class RelationResource extends ResourceBase {
+public class RelationResource extends NuxeoBasedResource {
 	public final static String serviceName = "relations";
 	final Logger logger = LoggerFactory.getLogger(RelationResource.class);
 	
@@ -104,7 +104,7 @@ public class RelationResource extends ResourceBase {
     		String objectType) throws CSWebApplicationException {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
-            if (parentCtx != null) { // If the parent context has an open repository session then use it
+            if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) { // If the parent context has a non-null and open repository session then use it
             	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession());
             }
             DocumentHandler handler = createDocumentHandler(ctx);

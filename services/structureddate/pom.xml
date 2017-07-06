@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.collectionspace.services</groupId>
 		<artifactId>org.collectionspace.services.main</artifactId>
-		<version>4.1.1</version>
+	    <version>5.0-SNAPSHOT</version>
 	</parent>
 	
 	<modelVersion>4.0.0</modelVersion>
@@ -54,6 +54,16 @@
 			<artifactId>antlr4-runtime</artifactId>
 			<version>4.1</version>
 		</dependency>
+		<dependency>
+  			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-maven-plugin</artifactId>
+  			<version>4.6</version>
+		</dependency>
+		<dependency>
+    		<groupId>org.sonatype.m2e.extras</groupId>
+    		<artifactId>org.sonatype.m2e.antlr</artifactId>
+    		<version>0.13.0.20110622-1538</version>
+		</dependency>
 	</dependencies>
 	
 	<build>
@@ -96,7 +106,9 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore/>
+										<configurator>
+           									<id>org.sonatype.m2e.antlr.antlrConfigurator</id>
+         								</configurator>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>

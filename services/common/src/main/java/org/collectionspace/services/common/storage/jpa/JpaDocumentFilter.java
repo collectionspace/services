@@ -50,7 +50,6 @@
 package org.collectionspace.services.common.storage.jpa;
 
 import java.util.List;
-import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.context.ServiceContext;
 
@@ -84,4 +83,10 @@ public class JpaDocumentFilter extends DocumentFilter {
         paramList.add(new ParamBinding("tenantId", getTenantId()));
         return whereClause;
     }
+
+	@Override
+	public boolean getPageSizeDirty() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

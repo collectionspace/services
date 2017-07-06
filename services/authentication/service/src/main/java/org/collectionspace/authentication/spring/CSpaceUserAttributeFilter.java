@@ -23,22 +23,12 @@ public class CSpaceUserAttributeFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
             HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
+        chain.doFilter(request, response);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = null;
-        
-        if (authentication != null && authentication.isAuthenticated()) {
-            Object principal = authentication.getPrincipal();
-            
-            if (principal != null) {
-                username = principal.toString();
-            }
+
+        if (authentication != null) {
+            request.setAttribute(ATTRIBUTE_NAME, authentication.getName());
         }
-        
-        if (username != null) {
-            request.setAttribute(ATTRIBUTE_NAME, username);
-        }
-        
-        chain.doFilter(request, response);
     }
 }

@@ -22,10 +22,6 @@
  */
 package org.collectionspace.services.client.test;
 
-//import java.util.ArrayList;
-import java.util.List;
-import javax.ws.rs.core.Response;
-
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ValuationcontrolClient;
@@ -36,9 +32,9 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.valuationcontrol.ValuationcontrolsCommon;
 
-import org.jboss.resteasy.client.ClientResponse;
-import org.testng.Assert;
+import javax.ws.rs.core.Response;
 
+import org.testng.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,21 +52,22 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
     final String SERVICE_NAME = "valuationcontrols";
     final String SERVICE_PATH_COMPONENT = "valuationcontrols";
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
-     */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new ValuationcontrolClient();
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new ValuationcontrolClient(clientPropertiesFilename);
+	}
+	
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected AbstractCommonList getCommonList(
-            ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(AbstractCommonList.class);
+    protected AbstractCommonList getCommonList(Response response) {
+        return response.readEntity(AbstractCommonList.class);
     }
 
     // ---------------------------------------------------------------
@@ -95,7 +92,7 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createValuationcontrolInstance(identifier);
         String newID = null;
-        ClientResponse<Response> res = client.create(multipart);
+        Response res = client.create(multipart);
         try {
             int statusCode = res.getStatus();
 
@@ -115,7 +112,7 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
             newID = extractId(res);
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -253,14 +250,14 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
 
         // Submit the request to the service and store the response.
         ValuationcontrolClient client = new ValuationcontrolClient();
-        ClientResponse<String> res = client.read(knownResourceId);
+        Response res = client.read(knownResourceId);
         PoxPayloadIn input = null;
         try {
             assertStatusCode(res, testName);
-            input = new PoxPayloadIn(res.getEntity());
+            input = new PoxPayloadIn(res.readEntity(String.class));
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -301,7 +298,7 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
 
         // Submit the request to the service and store the response.
         ValuationcontrolClient client = new ValuationcontrolClient();
-        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
+        Response res = client.read(NON_EXISTENT_ID);
         try {
             int statusCode = res.getStatus();
 
@@ -315,7 +312,7 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -339,7 +336,7 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
         // Submit the request to the service and store the response.
         AbstractCommonList list = null;
         ValuationcontrolClient client = new ValuationcontrolClient();
-        ClientResponse<AbstractCommonList> res = client.readList();
+        Response res = client.readList();
         assertStatusCode(res, testName);
         try {
             int statusCode = res.getStatus();
@@ -353,10 +350,10 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
 
-            list = res.getEntity();
+            list = res.readEntity(getCommonListType());
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -389,17 +386,17 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
 
         // Retrieve the contents of a resource to update.
         ValuationcontrolClient client = new ValuationcontrolClient();
-        ClientResponse<String> res = client.read(knownResourceId);
+        Response res = client.read(knownResourceId);
         PoxPayloadIn input = null;
         try {
             assertStatusCode(res, testName);
-            input = new PoxPayloadIn(res.getEntity());
+            input = new PoxPayloadIn(res.readEntity(String.class));
             if (logger.isDebugEnabled()) {
                 logger.debug("got object to update with ID: " + knownResourceId);
             }
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -439,10 +436,10 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
             Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
-            input = new PoxPayloadIn(res.getEntity());
+            input = new PoxPayloadIn(res.readEntity(String.class));
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -487,7 +484,7 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
         // The only relevant ID may be the one used in update(), below.
         ValuationcontrolClient client = new ValuationcontrolClient();
         PoxPayloadOut multipart = createValuationcontrolInstance(NON_EXISTENT_ID);
-        ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
+        Response res = client.update(NON_EXISTENT_ID, multipart);
         try {
             int statusCode = res.getStatus();
 
@@ -501,7 +498,7 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -524,7 +521,7 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
 
         // Submit the request to the service and store the response.
         ValuationcontrolClient client = new ValuationcontrolClient();
-        ClientResponse<Response> res = client.delete(knownResourceId);
+        Response res = client.delete(knownResourceId);
         try {
             int statusCode = res.getStatus();
 
@@ -538,7 +535,7 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -557,7 +554,7 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
 
         // Submit the request to the service and store the response.
         ValuationcontrolClient client = new ValuationcontrolClient();
-        ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
+        Response res = client.delete(NON_EXISTENT_ID);
         try {
             int statusCode = res.getStatus();
 
@@ -571,7 +568,7 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -623,7 +620,7 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
     }
 
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
         return createValuationcontrolInstance(identifier);
     }
 
@@ -642,16 +639,17 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
      *
      * @param valuationcontrolRefNumber the valuationcontrol number
      * @return the multipart output
+     * @throws Exception 
      */
-    private PoxPayloadOut createValuationcontrolInstance(String valuationcontrolRefNumber) {
+    private PoxPayloadOut createValuationcontrolInstance(String valuationcontrolRefNumber) throws Exception {
 
         ValuationcontrolsCommon valuationcontrolCommon = new ValuationcontrolsCommon();
         valuationcontrolCommon.setValuationcontrolRefNumber(valuationcontrolRefNumber);
         valuationcontrolCommon.setValueNote(getUTF8DataFragment());
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
-        PayloadOutputPart commonPart =
-                multipart.addPart(new ValuationcontrolClient().getCommonPartName(), valuationcontrolCommon);
+        PayloadOutputPart commonPart = multipart.addPart(new ValuationcontrolClient().getCommonPartName(),
+        		valuationcontrolCommon);
 
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, valuationcontrol common");
@@ -669,7 +667,7 @@ public class ValuationcontrolServiceTest extends AbstractPoxServiceTestImpl<Abst
 
     @Override
     protected PoxPayloadOut createInstance(String commonPartName,
-            String identifier) {
+            String identifier) throws Exception {
         PoxPayloadOut result = createValuationcontrolInstance(identifier);
         return result;
     }

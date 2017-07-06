@@ -23,26 +23,17 @@
 package org.collectionspace.services.client.test;
 
 import java.util.List;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.MovementClient;
+import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.movement.MovementsCommon;
 import org.collectionspace.services.movement.MovementMethodsList;
-
-import org.jboss.resteasy.client.ClientResponse;
-
-import org.collectionspace.services.client.AbstractCommonListUtils;
-import org.collectionspace.services.client.PayloadInputPart;
-import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,9 +54,8 @@ public class MovementServiceTest extends
 	final String SERVICE_NAME = "movements";
 	final String SERVICE_PATH_COMPONENT = "movements";
 
-	private final static String TIMESTAMP_UTC = GregorianCalendarDateTimeUtils
-			.timestampUTC();
-
+	private final static String TIMESTAMP_UTC =
+			GregorianCalendarDateTimeUtils.timestampUTC();
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -74,7 +64,7 @@ public class MovementServiceTest extends
 	 * ()
 	 */
 	@Override
-	protected CollectionSpaceClient getClientInstance() {
+	protected CollectionSpaceClient getClientInstance() throws Exception {
 		return new MovementClient();
 	}
 
@@ -104,14 +94,15 @@ public class MovementServiceTest extends
 	 * @param identifier
 	 *            the identifier
 	 * @return the multipart output
+	 * @throws Exception 
 	 */
-	private PoxPayloadOut createMovementInstance(String identifier) {
+	private PoxPayloadOut createMovementInstance(String identifier) throws Exception {
 		return createInstance("movementReferenceNumber-" + identifier);
 	}
 
 	@Override
 	protected PoxPayloadOut createInstance(String commonPartName,
-			String identifier) {
+			String identifier) throws Exception {
 		PoxPayloadOut result = createMovementInstance(identifier);
 		return result;
 	}
@@ -123,9 +114,10 @@ public class MovementServiceTest extends
 	 *            A movement reference number.
 	 * @return Multipart output suitable for use as a payload in a create or
 	 *         update request.
+	 * @throws Exception 
 	 */
 	@Override
-	protected PoxPayloadOut createInstance(String movementReferenceNumber) {
+	protected PoxPayloadOut createInstance(String movementReferenceNumber) throws Exception {
 		MovementsCommon movementCommon = new MovementsCommon();
 		// FIXME: Values of currentLocation, normalLocation,
 		// and movementContact should be refNames.
@@ -256,5 +248,11 @@ public class MovementServiceTest extends
 	@Test(dataProvider = "testName", dependsOnMethods = { "org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests" })
 	public void CRUDTests(String testName) {
 		// TODO Auto-generated method stub
+	}
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

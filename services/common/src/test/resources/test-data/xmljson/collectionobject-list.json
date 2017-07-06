@@ -1,0 +1,348 @@
+{
+  "ns2:abstract-common-list": {
+    "@xmlns:ns2": "http://collectionspace.org/services/jaxb",
+    "pageNum": "0",
+    "pageSize": "40",
+    "itemsInPage": "40",
+    "totalItems": "41",
+    "fieldsReturned": "csid|uri|refName|updatedAt|workflowState|title|objectNumber|objectName|responsibleDepartment",
+    "list-item": [
+      {
+        "csid": "2ece74b2-2053-458c-a252",
+        "uri": "/collectionobjects/2ece74b2-2053-458c-a252",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(2ece74b2-2053-458c-a252)'2'",
+        "updatedAt": "2016-07-27T04:31:38.648Z",
+        "workflowState": "deleted",
+        "objectNumber": "2",
+        "objectName": "new OBJNAME",
+        "responsibleDepartment": "new DEPT"
+      },
+      {
+        "csid": "b6bc8b80-0a1a-4279-8d4d",
+        "uri": "/collectionobjects/b6bc8b80-0a1a-4279-8d4d",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(b6bc8b80-0a1a-4279-8d4d)'2'",
+        "updatedAt": "2016-07-27T04:31:38.222Z",
+        "workflowState": "deleted",
+        "objectNumber": "2",
+        "objectName": "new OBJNAME",
+        "responsibleDepartment": "new DEPT"
+      },
+      {
+        "csid": "af661f9f-6f9d-425e-b3d9",
+        "uri": "/collectionobjects/af661f9f-6f9d-425e-b3d9",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(af661f9f-6f9d-425e-b3d9)'1'",
+        "updatedAt": "2016-07-27T04:30:43.568Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "75539775-b5db-4690-9d01",
+        "uri": "/collectionobjects/75539775-b5db-4690-9d01",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(75539775-b5db-4690-9d01)'1'",
+        "updatedAt": "2016-07-27T04:30:41.491Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "2d15f7ed-5aff-4222-9d07",
+        "uri": "/collectionobjects/2d15f7ed-5aff-4222-9d07",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(2d15f7ed-5aff-4222-9d07)'1'",
+        "updatedAt": "2016-07-27T04:30:39.256Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "4cfc4992-f25b-44f2-a083",
+        "uri": "/collectionobjects/4cfc4992-f25b-44f2-a083",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(4cfc4992-f25b-44f2-a083)'1'",
+        "updatedAt": "2016-07-27T04:30:37.419Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "156d2b43-474d-4780-bd47",
+        "uri": "/collectionobjects/156d2b43-474d-4780-bd47",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(156d2b43-474d-4780-bd47)'1'",
+        "updatedAt": "2016-07-27T04:30:31.616Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "917c4ef9-3c3f-4d14-af70",
+        "uri": "/collectionobjects/917c4ef9-3c3f-4d14-af70",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(917c4ef9-3c3f-4d14-af70)'1'",
+        "updatedAt": "2016-07-27T04:30:31.584Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "87c905d5-5501-430f-b5f4",
+        "uri": "/collectionobjects/87c905d5-5501-430f-b5f4",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(87c905d5-5501-430f-b5f4)'1'",
+        "updatedAt": "2016-07-27T04:30:31.554Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "1a31a1c0-9d88-4cd4-aead",
+        "uri": "/collectionobjects/1a31a1c0-9d88-4cd4-aead",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(1a31a1c0-9d88-4cd4-aead)'1'",
+        "updatedAt": "2016-07-27T04:30:28.838Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "bc5975b2-1bc2-4b56-b761",
+        "uri": "/collectionobjects/bc5975b2-1bc2-4b56-b761",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(bc5975b2-1bc2-4b56-b761)'1'",
+        "updatedAt": "2016-07-27T04:30:28.812Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "839e172c-d790-44a8-896a",
+        "uri": "/collectionobjects/839e172c-d790-44a8-896a",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(839e172c-d790-44a8-896a)'1'",
+        "updatedAt": "2016-07-27T04:30:28.773Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "3869b0ee-9276-428d-954f",
+        "uri": "/collectionobjects/3869b0ee-9276-428d-954f",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(3869b0ee-9276-428d-954f)'1'",
+        "updatedAt": "2016-07-27T04:30:26.837Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "86360825-a2ee-4d7e-b51d",
+        "uri": "/collectionobjects/86360825-a2ee-4d7e-b51d",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(86360825-a2ee-4d7e-b51d)'1'",
+        "updatedAt": "2016-07-27T04:30:26.812Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "f346e6ee-bae9-4700-9e96",
+        "uri": "/collectionobjects/f346e6ee-bae9-4700-9e96",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(f346e6ee-bae9-4700-9e96)'1'",
+        "updatedAt": "2016-07-27T04:30:26.786Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "f3782e3e-af7b-4f29-89a6",
+        "uri": "/collectionobjects/f3782e3e-af7b-4f29-89a6",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(f3782e3e-af7b-4f29-89a6)'1'",
+        "updatedAt": "2016-07-27T04:30:24.335Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "ae25c04a-f044-45cd-96ff",
+        "uri": "/collectionobjects/ae25c04a-f044-45cd-96ff",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(ae25c04a-f044-45cd-96ff)'1'",
+        "updatedAt": "2016-07-27T04:30:24.310Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "873b5a5b-6753-4eea-b0c3",
+        "uri": "/collectionobjects/873b5a5b-6753-4eea-b0c3",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(873b5a5b-6753-4eea-b0c3)'1'",
+        "updatedAt": "2016-07-27T04:30:24.285Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "dacd5398-708a-4580-a994",
+        "uri": "/collectionobjects/dacd5398-708a-4580-a994",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(dacd5398-708a-4580-a994)'TestObject'",
+        "updatedAt": "2016-07-27T04:30:21.092Z",
+        "workflowState": "deleted",
+        "objectNumber": "TestObject"
+      },
+      {
+        "csid": "0a07c7a2-5fd6-43e7-ac64",
+        "uri": "/collectionobjects/0a07c7a2-5fd6-43e7-ac64",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(0a07c7a2-5fd6-43e7-ac64)'TestObject'",
+        "updatedAt": "2016-07-27T04:30:19.971Z",
+        "workflowState": "deleted",
+        "objectNumber": "TestObject"
+      },
+      {
+        "csid": "49b577d7-44c7-49a8-8790",
+        "uri": "/collectionobjects/49b577d7-44c7-49a8-8790",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(49b577d7-44c7-49a8-8790)'1'",
+        "updatedAt": "2016-07-27T04:30:18.964Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "73af460b-7f51-40ad-8b84",
+        "uri": "/collectionobjects/73af460b-7f51-40ad-8b84",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(73af460b-7f51-40ad-8b84)'1'",
+        "updatedAt": "2016-07-27T04:30:18.935Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "47d3251d-9019-4e46-be94",
+        "uri": "/collectionobjects/47d3251d-9019-4e46-be94",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(47d3251d-9019-4e46-be94)'1'",
+        "updatedAt": "2016-07-27T04:30:18.908Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "0f21a77d-181e-4282-aac0",
+        "uri": "/collectionobjects/0f21a77d-181e-4282-aac0",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(0f21a77d-181e-4282-aac0)'4'",
+        "updatedAt": "2016-07-27T04:30:12.914Z",
+        "workflowState": "deleted",
+        "objectNumber": "4"
+      },
+      {
+        "csid": "6d5ed5d9-7d50-4378-89c0",
+        "uri": "/collectionobjects/6d5ed5d9-7d50-4378-89c0",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(6d5ed5d9-7d50-4378-89c0)'4'",
+        "updatedAt": "2016-07-27T04:30:11.336Z",
+        "workflowState": "project",
+        "objectNumber": "4"
+      },
+      {
+        "csid": "e19171dc-a9e5-40bc-927d",
+        "uri": "/collectionobjects/e19171dc-a9e5-40bc-927d",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(e19171dc-a9e5-40bc-927d)'3'",
+        "updatedAt": "2016-07-27T04:30:09.367Z",
+        "workflowState": "project",
+        "objectNumber": "3"
+      },
+      {
+        "csid": "710d2c75-a9dc-45f6-9cc1",
+        "uri": "/collectionobjects/710d2c75-a9dc-45f6-9cc1",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(710d2c75-a9dc-45f6-9cc1)'objectNumber2'",
+        "updatedAt": "2016-07-27T04:30:07.914Z",
+        "workflowState": "deleted",
+        "objectNumber": "objectNumber2"
+      },
+      {
+        "csid": "fc70b360-cfdd-4131-90e1",
+        "uri": "/collectionobjects/fc70b360-cfdd-4131-90e1",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(fc70b360-cfdd-4131-90e1)'1'",
+        "updatedAt": "2016-07-27T04:30:05.995Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "c789c0c1-b1b5-4192-b70b",
+        "uri": "/collectionobjects/c789c0c1-b1b5-4192-b70b",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(c789c0c1-b1b5-4192-b70b)'objectNumber'",
+        "updatedAt": "2016-07-27T04:30:05.967Z",
+        "workflowState": "deleted",
+        "title": "aardvark title",
+        "objectNumber": "objectNumber"
+      },
+      {
+        "csid": "d57a545e-fc03-4d76-8206",
+        "uri": "/collectionobjects/d57a545e-fc03-4d76-8206",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(d57a545e-fc03-4d76-8206)'1'",
+        "updatedAt": "2016-07-27T04:30:04.915Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "1ee68c99-d76d-4192-b229",
+        "uri": "/collectionobjects/1ee68c99-d76d-4192-b229",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(1ee68c99-d76d-4192-b229)'1'",
+        "updatedAt": "2016-07-27T04:30:04.884Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "b9ab1401-3a7c-48e9-a611",
+        "uri": "/collectionobjects/b9ab1401-3a7c-48e9-a611",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(b9ab1401-3a7c-48e9-a611)'2010.1.9'",
+        "updatedAt": "2016-07-27T04:29:32.099Z",
+        "workflowState": "deleted",
+        "title": "Der Ring des Nibelungen",
+        "objectNumber": "2010.1.9",
+        "objectName": "objectName",
+        "responsibleDepartment": "ethnography1"
+      },
+      {
+        "csid": "a3068a72-6451-44e1-ada4",
+        "uri": "/collectionobjects/a3068a72-6451-44e1-ada4",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(a3068a72-6451-44e1-ada4)'2010.1.9'",
+        "updatedAt": "2016-07-27T04:29:11.224Z",
+        "workflowState": "deleted",
+        "objectNumber": "2010.1.9",
+        "responsibleDepartment": "ethnography1 a"
+      },
+      {
+        "csid": "46b9c971-59d6-4d81-8dd6",
+        "uri": "/collectionobjects/46b9c971-59d6-4d81-8dd6",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(46b9c971-59d6-4d81-8dd6)'2010.1.9'",
+        "updatedAt": "2016-07-27T04:29:11.195Z",
+        "workflowState": "deleted",
+        "objectNumber": "2010.1.9",
+        "responsibleDepartment": "ethnography1 a"
+      },
+      {
+        "csid": "0625dfcc-919e-4e1e-ab45",
+        "uri": "/collectionobjects/0625dfcc-919e-4e1e-ab45",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(0625dfcc-919e-4e1e-ab45)'2010.1.9'",
+        "updatedAt": "2016-07-27T04:29:11.165Z",
+        "workflowState": "deleted",
+        "title": "title",
+        "objectNumber": "2010.1.9",
+        "responsibleDepartment": "ethnography1"
+      },
+      {
+        "csid": "4c2104d1-e0c4-436e-847d",
+        "uri": "/collectionobjects/4c2104d1-e0c4-436e-847d",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(4c2104d1-e0c4-436e-847d)'objectNumber'",
+        "updatedAt": "2016-07-27T04:28:51.149Z",
+        "workflowState": "deleted",
+        "title": "aardvark title",
+        "objectNumber": "objectNumber"
+      },
+      {
+        "csid": "0a6e07d7-a264-4dec-8fbf",
+        "uri": "/collectionobjects/0a6e07d7-a264-4dec-8fbf",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(0a6e07d7-a264-4dec-8fbf)'2010.1.9'",
+        "updatedAt": "2016-07-27T04:28:51.130Z",
+        "workflowState": "deleted",
+        "title": "title",
+        "objectNumber": "2010.1.9",
+        "responsibleDepartment": "ethnography1"
+      },
+      {
+        "csid": "92a05139-73f3-402c-97b8",
+        "uri": "/collectionobjects/92a05139-73f3-402c-97b8",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(92a05139-73f3-402c-97b8)'32'",
+        "updatedAt": "2016-07-27T04:28:33.836Z",
+        "workflowState": "project",
+        "objectNumber": "32",
+        "objectName": "Left-handed screwdriver"
+      },
+      {
+        "csid": "53c451b7-b60c-45ac-818c",
+        "uri": "/collectionobjects/53c451b7-b60c-45ac-818c",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(53c451b7-b60c-45ac-818c)'1'",
+        "updatedAt": "2016-07-27T04:27:15.302Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      },
+      {
+        "csid": "297614ff-6c95-4445-a938",
+        "uri": "/collectionobjects/297614ff-6c95-4445-a938",
+        "refName": "urn:cspace:core.collectionspace.org:collectionobjects:id(297614ff-6c95-4445-a938)'1'",
+        "updatedAt": "2016-07-27T04:27:15.281Z",
+        "workflowState": "deleted",
+        "objectNumber": "1"
+      }
+    ]
+  }
+}

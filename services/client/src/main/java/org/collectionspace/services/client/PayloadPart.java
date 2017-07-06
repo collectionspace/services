@@ -47,6 +47,13 @@ public abstract class PayloadPart {
 
 	abstract public String asXML();
 	
+	/**
+	 * Clear the root DOM element
+	 */
+	public void clearElementBody() {
+		elementBody = null;
+	}
+	
 	public Element asElement() {
 		Element result = elementBody;
 		// if we don't already have an Element, let's try to create one from a JAXB object

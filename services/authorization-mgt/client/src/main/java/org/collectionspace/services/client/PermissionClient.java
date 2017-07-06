@@ -27,10 +27,11 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 
+import org.apache.http.HttpStatus;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionsList;
+import org.collectionspace.services.description.ServiceDescription;
 
 /**
  * A PermissionClient.
@@ -42,7 +43,16 @@ public class PermissionClient extends AbstractServiceClientImpl<PermissionsList,
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
-    /* (non-Javadoc)
+    
+	public PermissionClient() throws Exception {
+		super();
+	}
+
+	public PermissionClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
+
+	/* (non-Javadoc)
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
      */
     @Override
@@ -68,12 +78,13 @@ public class PermissionClient extends AbstractServiceClientImpl<PermissionsList,
      * @return
      * @see org.collectionspace.hello.client.PermissionProxy#readList()
      */
-    public ClientResponse<PermissionsList> readList() {
+	@Override
+    public Response readList() {
         return getProxy().readList();
 
     }
 
-    public ClientResponse<PermissionsList> readSearchList(String resourceName) {
+    public Response readSearchList(String resourceName) {
         return getProxy().readSearchList(resourceName);
 
     }
@@ -83,7 +94,8 @@ public class PermissionClient extends AbstractServiceClientImpl<PermissionsList,
      * @return
      * @see org.collectionspace.hello.client.PermissionProxy#getAccount(java.lang.String)
      */
-    public ClientResponse<Permission> read(String csid) {
+    @Override
+    public Response read(String csid) {
         return getProxy().read(csid);
     }
 
@@ -92,7 +104,8 @@ public class PermissionClient extends AbstractServiceClientImpl<PermissionsList,
      * @return
      * @see org.collectionspace.hello.client.PermissionProxy#create(org.collectionspace.services.permission.Permission)
      */
-    public ClientResponse<Response> create(Permission permission) {
+    @Override
+    public Response create(Permission permission) {
         return getProxy().create(permission);
     }
 
@@ -102,7 +115,20 @@ public class PermissionClient extends AbstractServiceClientImpl<PermissionsList,
      * @return
      * @see org.collectionspace.hello.client.PermissionProxy#updateAccount(java.lang.Long, org.collectionspace.services.permission.Permission)
      */
-    public ClientResponse<Permission> update(String csid, Permission permission) {
+    @Override
+    public Response update(String csid, Permission permission) {
         return getProxy().update(csid, permission);
     }
+    
+	@Override
+	public ServiceDescription getServiceDescription() {
+		ServiceDescription result = null;
+		
+        Response res = getProxy().getServiceDescription();
+        if (res.getStatus() == HttpStatus.SC_OK) {
+        	result = (ServiceDescription) res.readEntity(ServiceDescription.class);
+        }
+        
+        return result;
+	}
 }

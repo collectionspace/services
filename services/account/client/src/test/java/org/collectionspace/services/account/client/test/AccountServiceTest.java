@@ -23,23 +23,19 @@
 package org.collectionspace.services.account.client.test;
 
 import java.util.List;
+
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 
 import org.collectionspace.services.client.AccountClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
 import org.collectionspace.services.account.AccountListItem;
-
 import org.collectionspace.services.account.Status;
 import org.collectionspace.services.client.AccountFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
-import org.collectionspace.services.client.test.ServiceRequestType;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +65,13 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
         return AccountClient.SERVICE_NAME;
     }
     
+    /**
+     * The entity type expected from the JAX-RS Response object
+     */
+    public Class<AccountsCommon> getEntityResponseType() {
+    	return AccountsCommon.class;
+    }
+    
     /*
      * This method is called only by the parent class, AbstractServiceTestImpl
      */
@@ -76,7 +79,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
      * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
      */
     @Override
-    protected String getServicePathComponent() {
+    protected String getServicePathComponent() throws Exception {
         return new AccountClient().getServicePathComponent();
     }
 
@@ -84,16 +87,20 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new AccountClient();
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new AccountClient(clientPropertiesFilename);
+	}
+	
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected AccountsCommonList getCommonList(
-            ClientResponse<AccountsCommonList> response) {
+    protected AccountsCommonList getCommonList(Response response) {
         //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
         throw new UnsupportedOperationException();
     }
@@ -130,14 +137,18 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
                 "barney@dinoland.com",
                 client.getTenantId(), true, false, true, true);
 
-        ClientResponse<Response> res = client.create(account);
-        int statusCode = res.getStatus();
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.create(account);
+        try {
+	        int statusCode = res.getStatus();
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     /**
@@ -155,15 +166,19 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
         AccountsCommon account =
                 createAccountInstance("babybop", "babybop", "hithere08", "babybop@dinoland.com",
                 client.getTenantId(), true, true, true, true);
-        ClientResponse<Response> res = client.create(account);
-        int statusCode = res.getStatus();
-        // Does it exactly match the expected status code?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.create(account);
+        try {
+	        int statusCode = res.getStatus();
+	        // Does it exactly match the expected status code?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     /**
@@ -181,15 +196,19 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
         AccountsCommon account =
                 createAccountInstance("babybop", "babybop", "hithere08", "babybop@dinoland.com",
                 client.getTenantId(), true, false, false, true);
-        ClientResponse<Response> res = client.create(account);
-        int statusCode = res.getStatus();
-        // Does it exactly match the expected status code?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.create(account);
+        try {
+	        int statusCode = res.getStatus();
+	        // Does it exactly match the expected status code?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     /**
@@ -207,15 +226,19 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
         AccountsCommon account =
                 createAccountInstance("babybop", "babybop", "hithere08", "babybop.dinoland.com",
                 client.getTenantId(), true, false, true, true);
-        ClientResponse<Response> res = client.create(account);
-        int statusCode = res.getStatus();
-        // Does it exactly match the expected status code?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.create(account);
+        try {
+	        int statusCode = res.getStatus();
+	        // Does it exactly match the expected status code?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     /**
@@ -233,15 +256,19 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
         AccountsCommon account =
                 createAccountInstance("babybop", "babybop", "hithere08", "babybop@dinoland.com",
                 client.getTenantId(), false, false, true, true);
-        ClientResponse<Response> res = client.create(account);
-        int statusCode = res.getStatus();
-        // Does it exactly match the expected status code?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.create(account);
+        try {
+	        int statusCode = res.getStatus();
+	        // Does it exactly match the expected status code?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     /**
@@ -259,15 +286,19 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
         AccountsCommon account =
                 createAccountInstance("babybop", "babybop", "shpswd", "babybop@dinoland.com",
                 client.getTenantId(), true, false, true, true);
-        ClientResponse<Response> res = client.create(account);
-        int statusCode = res.getStatus();
-        // Does it exactly match the expected status code?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.create(account);
+        try {
+	        int statusCode = res.getStatus();
+	        // Does it exactly match the expected status code?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     /**
@@ -285,15 +316,19 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
         AccountsCommon account =
                 createAccountInstance("babybop", "babybop", "hithere08", "babybop/dinoland.com",
                 client.getTenantId(), false, true, false, false);
-        ClientResponse<Response> res = client.create(account);
-        int statusCode = res.getStatus();
-        // Does it exactly match the expected status code?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.create(account);
+        try {
+	        int statusCode = res.getStatus();
+	        // Does it exactly match the expected status code?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     //
@@ -307,60 +342,46 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
         AccountsCommon account1 =
                 createAccountInstance("curious", "curious", "hithere08", "curious@george.com",
                 client.getTenantId(), true, false, true, true);
-        ClientResponse<Response> res = client.create(account1);
-        int statusCode = res.getStatus();
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-        allResourceIdsCreated.add(extractId(res));
+        Response res = client.create(account1);
+        try {
+	        int statusCode = res.getStatus();
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	        allResourceIdsCreated.add(extractId(res));
+        } finally {
+        	res.close();
+        }
 
         AccountsCommon account2 =
                 createAccountInstance("tom", "tom", "hithere09", "tom@jerry.com",
                 client.getTenantId(), true, false, true, true);
         res = client.create(account2);
-        statusCode = res.getStatus();
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-        allResourceIdsCreated.add(extractId(res));
+        try {
+	        int statusCode = res.getStatus();
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	        allResourceIdsCreated.add(extractId(res));
+        } finally {
+        	res.close();
+        }
 
         AccountsCommon account3 =
                 createAccountInstance("mj", "mj", "hithere10", "mj@dinoland.com",
                 client.getTenantId(), true, false, true, true);
         res = client.create(account3);
-        statusCode = res.getStatus();
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-        allResourceIdsCreated.add(extractId(res));
-    }
-
-    //
-    // Tests with expected failure outcomes
-    //
-    // Placeholders until the three tests below can be uncommented.
-    // See Issue CSPACE-401.
-    @Override
-    public void createWithEmptyEntityBody(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithMalformedXml(java.lang.String)
-     */
-    @Override
-    public void createWithMalformedXml(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithWrongXmlSchema(java.lang.String)
-     */
-    @Override
-    public void createWithWrongXmlSchema(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
+        try {
+	        int statusCode = res.getStatus();
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	        allResourceIdsCreated.add(extractId(res));
+        } finally {
+        	res.close();
+        }
     }
 
     // ---------------------------------------------------------------
@@ -381,11 +402,11 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
 
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
-        ClientResponse<AccountsCommonList> res =
+        Response res =
                 client.readSearchList("tom", null, null);
         try {
 	        assertStatusCode(res, testName);	        
-	        AccountsCommonList list = res.getEntity();	
+	        AccountsCommonList list = res.readEntity(AccountsCommonList.class);	
 	        Assert.assertEquals(1, list.getAccountListItem().size());
 	        // Optionally output additional data about list members for debugging.
 	        boolean iterateThroughList = true;
@@ -394,7 +415,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
 	        }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -418,10 +439,10 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
 
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
-        ClientResponse<AccountsCommonList> res = client.readSearchList(null, "tom", null);
+        Response res = client.readSearchList(null, "tom", null);
         try {
 	        assertStatusCode(res, testName);	        
-	        AccountsCommonList list = res.getEntity();
+	        AccountsCommonList list = res.readEntity(AccountsCommonList.class);
 	        Assert.assertEquals(1, list.getAccountListItem().size());
 	        // Optionally output additional data about list members for debugging.
 	        boolean iterateThroughList = true;
@@ -430,7 +451,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
 	        }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -448,10 +469,10 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
 
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
-        ClientResponse<AccountsCommonList> res = client.readSearchList(null, null, "dinoland");
+        Response res = client.readSearchList(null, null, "dinoland");
         try {
 	        assertStatusCode(res, testName);	        
-	        AccountsCommonList list = res.getEntity();
+	        AccountsCommonList list = res.readEntity(AccountsCommonList.class);
 	        Assert.assertEquals(2, list.getAccountListItem().size());
 	        // Optionally output additional data about list members for debugging.
 	        boolean iterateThroughList = true;
@@ -460,7 +481,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
 	        }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -478,10 +499,10 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
 
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
-        ClientResponse<AccountsCommonList> res = client.readSearchList("tom", null, "jerry");
+        Response res = client.readSearchList("tom", null, "jerry");
         try {
 	        assertStatusCode(res, testName);
-	        AccountsCommonList list = res.getEntity();
+	        AccountsCommonList list = res.readEntity(AccountsCommonList.class);
 	        Assert.assertEquals(1, list.getAccountListItem().size());
 	        // Optionally output additional data about list members for debugging.
 	        boolean iterateThroughList = true;
@@ -490,7 +511,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
 	        }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -511,18 +532,22 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
         setupUpdate();
 
         AccountClient client = new AccountClient();
-        ClientResponse<AccountsCommon> res = client.read(knownResourceId);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": read status = " + res.getStatus());
+        Response res = client.read(knownResourceId);
+        AccountsCommon accountFound = null;
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": read status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
+	
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": got object to update password with ID: " + knownResourceId);
+	        }
+	        accountFound = res.readEntity(AccountsCommon.class);
+	        Assert.assertNotNull(accountFound);
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": got object to update password with ID: " + knownResourceId);
-        }
-        AccountsCommon accountFound =
-                (AccountsCommon) res.getEntity();
-        Assert.assertNotNull(accountFound);
 
         //create a new account object to test partial updates
         AccountsCommon accountToUpdate = new AccountsCommon();
@@ -539,20 +564,24 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
         // Submit the request to the service and store the response.
         res = client.update(knownResourceId, accountToUpdate);
         int statusCode = res.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        AccountsCommon accountUpdated = res.readEntity(AccountsCommon.class);
+	        Assert.assertNotNull(accountUpdated);
+	
+//	        Assert.assertEquals(accountUpdated.getPassword(),
+//	                accountFound.getPassword(),
+//	                "Data in updated object did not match submitted data.");
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        AccountsCommon accountUpdated = (AccountsCommon) res.getEntity();
-        Assert.assertNotNull(accountUpdated);
-
-//        Assert.assertEquals(accountUpdated.getPassword(),
-//                accountFound.getPassword(),
-//                "Data in updated object did not match submitted data.");
     }
 
     /**
@@ -579,16 +608,19 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
 
         AccountClient client = new AccountClient();
         // Submit the request to the service and store the response.
-        ClientResponse<AccountsCommon> res = client.update(knownResourceId, accountToUpdate);
-        int statusCode = res.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.update(knownResourceId, accountToUpdate);
+        try {
+	        int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
-
     }
 
     /**
@@ -602,16 +634,21 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
         // Perform setup.
         setupUpdate();
         AccountClient client = new AccountClient();
-        ClientResponse<AccountsCommon> res = client.read(knownResourceId);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": read status = " + res.getStatus());
+        Response res = client.read(knownResourceId);
+        AccountsCommon accountFound = null;
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": read status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
+	
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": got object to update password with ID: " + knownResourceId);
+	        }
+	        accountFound = res.readEntity(AccountsCommon.class);
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": got object to update password with ID: " + knownResourceId);
-        }
-        AccountsCommon accountFound = (AccountsCommon) res.getEntity();
 
         AccountsCommon accountToUpdate = new AccountsCommon();
         accountToUpdate.setCsid(knownResourceId);
@@ -628,26 +665,29 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
 
         // Submit the request to the service and store the response.
         res = client.update(knownResourceId, accountToUpdate);
-        int statusCode = res.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
     
-    private void findPrebuiltAdminAccount() {
+    private void findPrebuiltAdminAccount() throws Exception {
     	// Search for the prebuilt admin user and then hold its CSID
     	if (prebuiltAdminCSID == null) {
             setupReadList();
             AccountClient client = new AccountClient();
-            ClientResponse<AccountsCommonList> res =
-                    client.readSearchList(null, this.prebuiltAdminUserId, null);
+            Response res = client.readSearchList(null, this.prebuiltAdminUserId, null);
             try {
 	            assertStatusCode(res, "findPrebuiltAdminAccount");
-	            AccountsCommonList list = res.getEntity();
+	            AccountsCommonList list = res.readEntity(AccountsCommonList.class);
 	            List<AccountListItem> items = list.getAccountListItem();
 	            Assert.assertEquals(1, items.size(), "Found more than one Admin account!");
 	            AccountListItem item = items.get(0);
@@ -657,7 +697,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
 	            }
             } finally {
             	if (res != null) {
-                    res.releaseConnection();
+                    res.close();
                 }
             }
     	}
@@ -671,18 +711,23 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
         setupUpdate();
 
         AccountClient client = new AccountClient();
-        ClientResponse<AccountsCommon> res = client.read(prebuiltAdminCSID);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": read status = " + res.getStatus());
+        Response res = client.read(prebuiltAdminCSID);
+        AccountsCommon accountFound = null;
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": read status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
+	
+	        if (logger.isDebugEnabled()) {
+	            logger.debug("Did get on Admin Account to update with ID: " + prebuiltAdminCSID);
+	        }
+	        accountFound = res.readEntity(AccountsCommon.class);
+	        Assert.assertNotNull(accountFound);
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Did get on Admin Account to update with ID: " + prebuiltAdminCSID);
-        }
-        AccountsCommon accountFound = (AccountsCommon) res.getEntity();
-        Assert.assertNotNull(accountFound);
-
+        
         //create a new account object to test partial updates
         AccountsCommon accountToUpdate = new AccountsCommon();
         accountToUpdate.setCsid(prebuiltAdminCSID);
@@ -697,21 +742,25 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
 
         // Submit the request to the service and store the response.
         res = client.update(prebuiltAdminCSID, accountToUpdate);
-        int statusCode = res.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        // Note that the error is not returned, it is just ignored
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        AccountsCommon accountUpdated = res.readEntity(AccountsCommon.class);
+	        Assert.assertNotNull(accountUpdated);
+	
+	    	Assert.assertFalse(accountUpdated.getEmail().equals(accountToUpdate.getEmail()),
+	    		"Admin Account (with metadata lock) allowed update to change the email!");
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        // Note that the error is not returned, it is just ignored
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        AccountsCommon accountUpdated = (AccountsCommon) res.getEntity();
-        Assert.assertNotNull(accountUpdated);
-
-    	Assert.assertFalse(accountUpdated.getEmail().equals(accountToUpdate.getEmail()),
-    		"Admin Account (with metadata lock) allowed update to change the email!");
     }
     
     
@@ -725,7 +774,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
         			client.getTenantId(), true, false, true, true);
         account.setMetadataProtection(AccountClient.IMMUTABLE);
         account.setRolesProtection(AccountClient.IMMUTABLE);
-        ClientResponse<Response> res = client.create(account);
+        Response res = client.create(account);
         String testResourceId = null;
         try {
         	assertStatusCode(res, testName);
@@ -738,17 +787,17 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
 	        }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
         setupRead();
 
         // Submit the request to the service and store the response.
-        ClientResponse<AccountsCommon> accountRes = client.read(testResourceId);
+        Response accountRes = client.read(testResourceId);
         try {
 	        assertStatusCode(accountRes, testName);
-	        AccountsCommon accountRead = (AccountsCommon) accountRes.getEntity();
+	        AccountsCommon accountRead = accountRes.readEntity(AccountsCommon.class);
 	        Assert.assertNotNull(accountRead);
 	        String mdProtection = accountRead.getMetadataProtection();
 	        String rolesProtection = accountRead.getRolesProtection();
@@ -762,7 +811,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
 	    			"Account allowed create to set the perms protection flag.");
         } finally {
         	if (accountRes != null) {
-        		accountRes.releaseConnection();
+        		accountRes.close();
             }
         }
         
@@ -777,11 +826,11 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
     	accountRes = client.update(testResourceId, accountToUpdate);
     	try {
     		assertStatusCode(accountRes, testName);
-	    	AccountsCommon accountUpdated = (AccountsCommon) accountRes.getEntity();
+	    	AccountsCommon accountUpdated = accountRes.readEntity(AccountsCommon.class);
 	    	Assert.assertNotNull(accountUpdated);
 	        if (logger.isDebugEnabled()) {
 	            logger.debug(testName + "Updated account: ");
-	            logger.debug(objectAsXmlString(accountUpdated,AccountsCommon.class));
+	            logger.debug(objectAsXmlString(accountUpdated, AccountsCommon.class));
 	        }
 	    	Assert.assertFalse(
 	    			AccountClient.IMMUTABLE.equalsIgnoreCase(accountUpdated.getMetadataProtection()),
@@ -791,7 +840,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
 	    			"Account allowed update of the roles protection flag.");
     	} finally {
     		if (accountRes != null) {
-    			accountRes.releaseConnection();
+    			accountRes.close();
             }
     	}
     }
@@ -808,17 +857,22 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
         setupUpdate();
 
         AccountClient client = new AccountClient();
-        ClientResponse<AccountsCommon> res = client.read(knownResourceId);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": read status = " + res.getStatus());
+        Response res = client.read(knownResourceId);
+        AccountsCommon accountFound = null;
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": read status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
+	
+	        if (logger.isDebugEnabled()) {
+	            logger.debug("got object to update with ID: " + knownResourceId);
+	        }
+	        accountFound = res.readEntity(AccountsCommon.class);
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("got object to update with ID: " + knownResourceId);
-        }
-        AccountsCommon accountFound = (AccountsCommon) res.getEntity();
-
+        
         //create a new account object to test partial updates
         AccountsCommon accountToUpdate = new AccountsCommon();
         accountToUpdate.setCsid(knownResourceId);
@@ -834,21 +888,25 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
 
         // Submit the request to the service and store the response.
         res = client.update(knownResourceId, accountToUpdate);
-        int statusCode = res.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        AccountsCommon accountUpdated = res.readEntity(AccountsCommon.class);
+	        Assert.assertNotNull(accountUpdated);
+	
+	        Assert.assertEquals(accountUpdated.getStatus(),
+	                accountToUpdate.getStatus(),
+	                "Data in updated object did not match submitted data.");
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        AccountsCommon accountUpdated = (AccountsCommon) res.getEntity();
-        Assert.assertNotNull(accountUpdated);
-
-        Assert.assertEquals(accountUpdated.getStatus(),
-                accountToUpdate.getStatus(),
-                "Data in updated object did not match submitted data.");
     }
 
     // Failure outcomes
@@ -889,21 +947,23 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in updateAccount(), below.
         AccountClient client = new AccountClient();
-        AccountsCommon account =
-                createAccountInstance("simba", "simba", "tiger", "simba@lionking.com",
+        AccountsCommon account = createAccountInstance("simba", "simba", "tiger", "simba@lionking.com",
                 client.getTenantId(), true, false, true, true);
-        ClientResponse<AccountsCommon> res =
-                client.update(NON_EXISTENT_ID, account);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.update(NON_EXISTENT_ID, account);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     /**
@@ -921,18 +981,22 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in updateAccount(), below.
         AccountClient client = new AccountClient();
-        ClientResponse<AccountsCommon> res = client.read(knownResourceId);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": read status = " + res.getStatus());
+        Response res = client.read(knownResourceId);
+        AccountsCommon accountToUpdate = null;
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": read status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
+	
+	        if (logger.isDebugEnabled()) {
+	            logger.debug("got object to update with ID: " + knownResourceId);
+	        }
+	        accountToUpdate = res.readEntity(AccountsCommon.class);
+	        Assert.assertNotNull(accountToUpdate);
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("got object to update with ID: " + knownResourceId);
-        }
-        AccountsCommon accountToUpdate =
-                (AccountsCommon) res.getEntity();
-        Assert.assertNotNull(accountToUpdate);
 
         accountToUpdate.setUserId("barneyFake");
         if (logger.isDebugEnabled()) {
@@ -942,16 +1006,20 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
         }
 
         res = client.update(knownResourceId, accountToUpdate);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     // ---------------------------------------------------------------
@@ -1034,7 +1102,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
 
 	@Override
 	protected AccountsCommon createInstance(String commonPartName,
-			String identifier) {
+			String identifier) throws Exception {
 		AccountClient client = new AccountClient();
         AccountsCommon account =
                 createAccountInstance(knownUserId, knownUserId, knownUserPassword,
@@ -1074,4 +1142,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonLi
                 "Data in updated object did not match submitted data.");
 	}
 	
+	@Override
+	protected long getSizeOfList(AccountsCommonList list) {
+		return list.getTotalItems();
+	}
 }

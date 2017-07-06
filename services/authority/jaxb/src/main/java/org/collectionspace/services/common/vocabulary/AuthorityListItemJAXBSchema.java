@@ -29,5 +29,7 @@ public interface AuthorityListItemJAXBSchema {
 	final static String SHORT_IDENTIFIER = "shortIdentifier";
 	final static String VOCAB_TYPE = "vocabType";
 	final static String CSID = "csid";
+    final static String REV = "rev";
+    final static String SAS = "sas"; // boolean flag indicating if authority is a shared authority item
 	final static String URI = "url";
 }

@@ -19,7 +19,9 @@ package org.collectionspace.services.common.storage.jpa;
 
 import java.util.Date;
 import java.util.List;
+
 import javax.persistence.RollbackException;
+
 import java.sql.BatchUpdateException;
 
 import javax.persistence.EntityManager;
@@ -35,13 +37,14 @@ import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.document.JaxbUtils;
-
+import org.collectionspace.services.common.document.TransactionException;
 import org.collectionspace.services.common.storage.StorageClient;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.common.context.ServiceContextProperties;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.lifecycle.TransitionDef;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -455,8 +458,10 @@ public class JpaStorageClientImpl implements StorageClient {
      * @see org.collectionspace.services.common.storage.StorageClient#delete(org.collectionspace.services.common.context.ServiceContext, java.lang.String)
      */
     @Override
-    public void delete(ServiceContext ctx, String id, DocumentHandler handler)
+    public boolean delete(ServiceContext ctx, String id, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
+    	boolean result = true;
+    	
         if (ctx == null) {
             throw new IllegalArgumentException(
                     "delete(ctx, ix, handler): ctx is missing");
@@ -465,6 +470,7 @@ public class JpaStorageClientImpl implements StorageClient {
             throw new IllegalArgumentException(
                     "delete(ctx, ix, handler): handler is missing");
         }
+        
         EntityManagerFactory emf = null;
         EntityManager em = null;
         try {
@@ -507,6 +513,8 @@ public class JpaStorageClientImpl implements StorageClient {
                 JpaStorageUtils.releaseEntityManagerFactory(emf);
             }
         }
+        
+        return result;
     }
 
     /**
@@ -586,4 +594,30 @@ public class JpaStorageClientImpl implements StorageClient {
 			DocumentException {
 		// Do nothing.  JPA services do not support workflow.
 	}
+
+	@Override
+	public void deleteWithWhereClause(ServiceContext ctx, String whereClause,
+			DocumentHandler handler) throws DocumentNotFoundException,
+			DocumentException {
+        throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean synchronize(ServiceContext ctx, Object specifier,
+			DocumentHandler handler) throws DocumentNotFoundException,
+			TransactionException, DocumentException {
+		// TODO Auto-generated method stub
+		// Do nothing. Subclasses can override if they want/need to.
+		return true;
+	}
+	
+	@Override
+	public boolean synchronizeItem(ServiceContext ctx, AuthorityItemSpecifier itemSpecifier,
+			DocumentHandler handler) throws DocumentNotFoundException,
+			TransactionException, DocumentException {
+		// TODO Auto-generated method stub
+		// Do nothing. Subclasses can override if they want/need to.
+		return true;
+	}
+
 }

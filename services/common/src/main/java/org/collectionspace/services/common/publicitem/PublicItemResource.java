@@ -24,20 +24,21 @@
 package org.collectionspace.services.common.publicitem;
 
 import java.io.InputStream;
+import java.lang.reflect.Method;
 
 import org.collectionspace.authentication.spi.AuthNContext;
 import org.collectionspace.services.publicitem.PublicitemsCommon;
 import org.collectionspace.services.client.PublicItemClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.blob.BlobOutput;
 import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.imaging.nuxeo.NuxeoBlobUtils;
-import org.jboss.resteasy.core.ResourceMethod;
+//import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.spi.HttpRequest;
-
+import org.jboss.resteasy.spi.metadata.ResourceMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +55,7 @@ import javax.ws.rs.core.UriInfo;
 @Path(PublicItemClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class PublicItemResource extends ResourceBase {
+public class PublicItemResource extends NuxeoBasedResource {
 
     final Logger logger = LoggerFactory.getLogger(PublicItemResource.class);
 
@@ -76,7 +77,7 @@ public class PublicItemResource extends ResourceBase {
 
 	@Override
 	public boolean allowAnonymousAccess(HttpRequest request,
-			ResourceMethod method) {
+			Class<?> resourceClass) {
 		return true;
 	}
 	

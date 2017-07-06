@@ -17,12 +17,13 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.PersonsCommon;
 
 /**
  * The Class PersonAuthorityClient.
  */
-public class PersonAuthorityClient extends AuthorityWithContactsClientImpl<PersonsCommon, PersonAuthorityProxy> {
+public class PersonAuthorityClient extends AuthorityWithContactsClientImpl<PersonauthoritiesCommon, PersonsCommon, PersonAuthorityProxy> {
 
     public static final String SERVICE_NAME = "personauthorities";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
@@ -42,7 +43,22 @@ public class PersonAuthorityClient extends AuthorityWithContactsClientImpl<Perso
     public static final String SERVICE_ITEM_COMMON_PART_NAME = SERVICE_ITEM_NAME
             + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
 
-    @Override
+    //
+    // Constructors
+    //
+    public PersonAuthorityClient() throws Exception {
+    	super();
+    }
+    
+    public PersonAuthorityClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
+
+    //
+    // Overrides
+    //
+    
+	@Override
     public String getServiceName() {
         return SERVICE_NAME;
     }

@@ -18,8 +18,10 @@
 package org.collectionspace.services.common.document;
 
 import java.util.Map;
+
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.QueryContext;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.lifecycle.Lifecycle;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -45,7 +47,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 public interface DocumentHandler<T, TL, WT, WTL> {
 
     public enum Action {
-        CREATE, GET, GET_ALL, UPDATE, DELETE, WORKFLOW
+        CREATE, GET, GET_ALL, UPDATE, DELETE, WORKFLOW, SYNC
     }
     
     public Lifecycle getLifecycle();
@@ -82,7 +84,7 @@ public interface DocumentHandler<T, TL, WT, WTL> {
     /**
      * updateWorkflowTransition - prepare for a workflow transition
      */
-    public void handleWorkflowTransition(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef) throws Exception;
+    public void handleWorkflowTransition(ServiceContext ctx, DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef) throws Exception;
     
     /**
      * prepareCreate processes documents before creating document in repository
@@ -123,7 +125,7 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * @param doc wrapped doc
      * @throws Exception
      */
-    public void handle(Action action, DocumentWrapper<?> docWrap) throws Exception;
+    public boolean handle(Action action, DocumentWrapper<?> docWrap) throws Exception;
 
     /**
      * handleCreate processes documents before creating document in repository
@@ -158,7 +160,7 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * @param wrapDoc
      * @throws Exception
      */
-    public void handleDelete(DocumentWrapper<WT> wrapDoc) throws Exception;
+    public boolean handleDelete(DocumentWrapper<WT> wrapDoc) throws Exception;
 
     /**
      * complete is called by the client to provide an opportunity to the handler
@@ -332,6 +334,13 @@ public interface DocumentHandler<T, TL, WT, WTL> {
     public String getUnQProperty(String qProp);
     
     /**
+     * get a query string that will be used to return a set of documents that should be indexed/re-index
+     * @throws Exception 
+     * @throws DocumentException 
+     */
+    public String getDocumentsToIndexQuery(String indexId, String csid) throws DocumentException, Exception;
+    
+    /**
      * Creates the CMIS query from the service context.  Each document handler is responsible for returning a valid CMIS query using the
      * information in the current service context -which includes things like the query parameters, etc.
      * @throws DocumentException 
@@ -354,5 +363,25 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * @return a set of zero or more parameter values relevant to this handler
      */
     public Map<String,String> getJDBCQueryParams();
+
+    /**
+     * 
+     * @throws Exception
+     */
+	void prepareSync() throws Exception;
+
+	/**
+	 * 
+	 * @param wrapDoc
+	 * @throws Exception
+	 */
+	boolean handleSync(DocumentWrapper<Object> wrapDoc) throws Exception;
+
+	/**
+	 * 
+	 * @param wrapDoc
+	 * @throws Exception
+	 */
+	void completeSync(DocumentWrapper<Object> wrapDoc) throws Exception;
 
 }

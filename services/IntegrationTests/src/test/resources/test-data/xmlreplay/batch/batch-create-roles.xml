@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="batch">
+    <ns2:batch_common xmlns:ns2="http://collectionspace.org/services/batch">
+        <name>batch-create-roles</name>
+        <notes>A batch job record for testing the batch service's authz enforcement or roles before running a batch job.</notes>
+        <forRoles>
+            <roleDisplayName>TENANT_READER</roleDisplayName>
+            <roleDisplayName>TENANT_ADMINISTRATOR</roleDisplayName>
+        </forRoles>
+        <supportsNoContext>true</supportsNoContext>
+        <className>org.collectionspace.services.batch.nuxeo.TestBatchJob</className>
+    </ns2:batch_common>
+</document>

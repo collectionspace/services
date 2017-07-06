@@ -23,6 +23,7 @@
 package org.collectionspace.services.client.test;
 
 import java.io.IOException;
+
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -34,7 +35,6 @@ import org.apache.commons.httpclient.methods.OptionsMethod;
 import org.apache.commons.httpclient.methods.TraceMethod;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.TestServiceClient;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -53,8 +53,8 @@ public class ServiceLayerTest {
     private final String CLASS_NAME = ServiceLayerTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     
-    private TestServiceClient serviceClient = new TestServiceClient();
-    private HttpClient httpClient = serviceClient.getHttpClient();
+    private TestServiceClient serviceClient;
+    private HttpClient httpClient;
 
     @BeforeSuite
     void printServiceClientProperties() {
@@ -72,6 +72,11 @@ public class ServiceLayerTest {
             logger.debug("password = "
                     + serviceClient.getProperty(CollectionSpaceClient.PASSWORD_PROPERTY));
         }
+    }
+    
+    public ServiceLayerTest() throws Exception {
+        serviceClient = new TestServiceClient();
+        httpClient = serviceClient.getHttpClient();
     }
 
     @Test

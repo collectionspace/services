@@ -23,7 +23,7 @@
  */
 package org.collectionspace.services.loanout;
 
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +36,7 @@ import javax.ws.rs.Produces;
 //@Path(LoanoutClient.SERVICE_PATH_COMPONENT)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class LoanoutResource extends ResourceBase {
+public class LoanoutResource extends NuxeoBasedResource {
 
     private final static String serviceName = "loansout";
     

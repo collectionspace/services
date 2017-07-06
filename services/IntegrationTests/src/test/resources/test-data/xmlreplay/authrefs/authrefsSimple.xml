@@ -93,6 +93,5 @@
 				<filename>authrefs/res/foo.res.xml</filename>
 			 </response>
 		</test>
-
 	</testGroup>
 </xmlReplay>

@@ -29,7 +29,7 @@ import org.collectionspace.services.PublicitemsCommonJAXBSchema;
 import org.collectionspace.services.publicitem.PublicitemsCommon;
 import org.collectionspace.services.client.PublicItemClient;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
 /** PublicItemDocumentModelHandler
@@ -37,7 +37,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
  *  $LastChangedDate$
  */
 public class PublicItemDocumentModelHandler
-        extends DocHandlerBase<PublicitemsCommon> {
+        extends NuxeoDocumentModelHandler<PublicitemsCommon> {
 	
 	@Override
 	public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {

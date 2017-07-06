@@ -27,13 +27,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.authentication.spi.AuthNContext;
+import org.collectionspace.services.client.AuthorityClient;
+import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.config.PropertyItemUtils;
 import org.collectionspace.services.common.config.ServiceConfigUtils;
@@ -47,6 +54,7 @@ import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.RemoteClientConfig;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.services.config.types.PropertyItemType;
@@ -72,11 +80,13 @@ import org.slf4j.LoggerFactory;
  * @param <IT>
  * @param <OT>
  */
+@SuppressWarnings("rawtypes")
 public abstract class AbstractServiceContextImpl<IT, OT>
         implements ServiceContext<IT, OT> {
 
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(AbstractServiceContextImpl.class);
+    
     /** The properties. */
     Map<String, Object> properties = new HashMap<String, Object>();
     /** The object part map. */
@@ -91,17 +101,21 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     private String overrideDocumentType = null;
     /** The val handlers. */
     private List<ValidatorHandler<IT, OT>> valHandlers = null;
+    /** The authority client -use for shared authority server */
+    private AuthorityClient authorityClient = null;
     /** The doc handler. */
     private DocumentHandler docHandler = null;
     /** security context */
     private SecurityContext securityContext;
     /** The sessions JAX-RS URI information */
     private UriInfo uriInfo;
+    /** The JAX-RS request information */
+    private Request requestInfo;
     /** The current repository session */
     private Object currentRepositorySession;
     /** A reference count for the current repository session */
     private int currentRepoSesssionRefCount = 0;
-
+        
     /**
      * Instantiates a new abstract service context impl.
      */
@@ -165,7 +179,72 @@ public abstract class AbstractServiceContextImpl<IT, OT>
 	        }
         }
     }
+    
+    public int getTimeoutParam(UriInfo ui) {
+		int result = DEFAULT_TX_TIMEOUT;
 
+		MultivaluedMap<String, String> queryParams = (ui == null) ? null : ui.getQueryParameters();
+		if (queryParams != null) {
+			String timeoutString = queryParams.getFirst(IClientQueryParams.IMPORT_TIMEOUT_PARAM);
+			if (timeoutString != null)
+				try {
+					result = Integer.parseInt(timeoutString);
+				} catch (NumberFormatException e) {
+					logger.warn("Transaction timeout period parameter could not be parsed.  The characters in the parameter string must all be decimal digits.  The Import service will use the default timeout period instead.",
+							e);
+				}
+		}
+
+		return result;
+	}
+    
+    @Override
+    public int getTimeoutSecs() {
+    	UriInfo uriInfo = this.getUriInfo();
+    	return this.getTimeoutParam(uriInfo);
+    }
+
+    /**
+     * Returns TRUE unless the "recordUpdates" query param is set with a value of either "false", "FALSE", or "0"
+     * @return
+     */
+    @Override
+    public boolean shouldUpdateCoreValues() {
+		boolean recordUpdates = true;
+		
+		MultivaluedMap<String, String> queryParams = getQueryParams();
+		String paramValue = queryParams.getFirst(IClientQueryParams.UPDATE_CORE_VALUES);
+		if (paramValue != null && paramValue.equalsIgnoreCase(Boolean.FALSE.toString())) { // Find our if the caller wants us to record updates
+			recordUpdates = false;
+		} else if (paramValue != null && paramValue.equals(Long.toString(0))) {
+			recordUpdates = false;
+		}
+		
+		return recordUpdates;
+    }
+    
+	/**
+	 * Default value is 'FALSE'
+	 * If this returns true, it means that the refname values in referencing objects (records that reference authority or vocabulary terms) will be updated
+	 * regardless of their current value.  This is sometimes needed when refname values become stale for one of several reasons.
+	 * @return
+	 */
+    @Override
+    public boolean shouldForceUpdateRefnameReferences() {
+		boolean forceUpdates = false;
+		
+		MultivaluedMap<String, String> queryParams = getQueryParams();
+		String paramValue = queryParams.getFirst(IClientQueryParams.FORCE_REFNAME_UPDATES);
+		if (paramValue != null && paramValue.equalsIgnoreCase(Boolean.TRUE.toString())) { // Find our if the caller wants us to force refname updates
+			forceUpdates = true;
+		} else if (paramValue != null && paramValue.equals(Long.toString(1))) {
+			forceUpdates = true;
+		}
+		
+		return forceUpdates;
+    }
+    
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.context.ServiceContext#getCommonPartLabel()
      */
@@ -478,12 +557,24 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         }
     }
 
+    /**
+     * Helps to filter for queries that either want to include or exclude documents in deleted workflow states.
+     * 
+     * @param queryParams
+     * @return
+     */
     private static String buildWorkflowWhereClause(MultivaluedMap<String, String> queryParams) {
     	String result = null;
     	
         String includeDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_NONDELETED);
+        String includeOnlyDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_ONLY_DELETED);
+
     	if (includeDeleted != null && includeDeleted.equalsIgnoreCase(Boolean.FALSE.toString())) {    	
-    		result = "ecm:currentLifeCycleState <> 'deleted'";
+    		result = String.format("(ecm:currentLifeCycleState <> '%s' AND ecm:currentLifeCycleState <> '%s' AND ecm:currentLifeCycleState <> '%s')",
+    				WorkflowClient.WORKFLOWSTATE_DELETED, WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED, WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED);
+    	} else if (includeOnlyDeleted != null && includeOnlyDeleted.equalsIgnoreCase(Boolean.TRUE.toString())) {
+    		result = String.format("(ecm:currentLifeCycleState <> '%s' AND ecm:currentLifeCycleState <> '%s' AND ecm:currentLifeCycleState <> '%s')",
+    				WorkflowClient.WORKFLOWSTATE_PROJECT, WorkflowClient.WORKFLOWSTATE_LOCKED, WorkflowClient.WORKFLOWSTATE_REPLICATED);
     	}
     	
     	return result;
@@ -508,10 +599,11 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         // reflect the values of those parameters in the document filter
         // to specify sort ordering, pagination, etc.
         //
-        if (this.getQueryParams() != null) {
-          docFilter.setSortOrder(this.getQueryParams());
-          docFilter.setPagination(this.getQueryParams());
-          String workflowWhereClause = buildWorkflowWhereClause(queryParams);
+        MultivaluedMap<String, String> queryParameters = this.getQueryParams();
+        if (queryParameters != null) {
+          docFilter.setSortOrder(queryParameters);
+          docFilter.setPagination(queryParameters);
+          String workflowWhereClause = buildWorkflowWhereClause(queryParameters);
           if (workflowWhereClause != null) {
         	  docFilter.appendWhereClause(workflowWhereClause, IQueryManager.SEARCH_QUALIFIER_AND);			
           }            
@@ -596,6 +688,91 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         return valHandlers;
     }
     
+    /**
+     * If one doesn't already exist, use the default properties filename to load a set of properties that
+     * will be used to create an HTTP client to a CollectionSpace instance.
+     */
+    @Override
+    public AuthorityClient getClient() throws Exception {
+    	AuthorityClient result = authorityClient;
+
+        if (authorityClient == null) {
+        	result = authorityClient = getClient(CollectionSpaceClient.DEFAULT_CLIENT_PROPERTIES_FILENAME);
+        }
+    	
+        return result;
+    }
+    
+    /*
+     * Use the properties filename passed in to load the URL and credentials that will be used
+     * to create a new HTTP client.
+     * 
+     * Never uses or resets the this.authorityClient member.  Always creates a new HTTP client using
+     * the loaded properties.
+     * 
+     * (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getClient(java.lang.String)
+     */
+	@Override
+    public AuthorityClient getClient(String clientPropertiesFilename) throws Exception {
+    	AuthorityClient result = null;
+    	
+        Properties inProperties = Tools.loadProperties(clientPropertiesFilename, true);
+        result = getClient(inProperties);
+        
+        return result;
+    }
+    
+    public AuthorityClient getClient(Properties inProperties) throws Exception {
+    	AuthorityClient result = null;
+    	
+        String authorityClientClazz = getServiceBinding().getClientHandler();
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        authorityClientClazz = authorityClientClazz.trim();
+        try {
+            Class<?> c = tccl.loadClass(authorityClientClazz);
+            if (AuthorityClient.class.isAssignableFrom(c)) {
+            	result = authorityClient = ((AuthorityClient) c.newInstance());
+            	result.setClientProperties(inProperties);
+            } else {
+            	logger.error(String.format("The service binding clientHandler class '%s' for '%s' service was not of type AuthorityClient.",
+            			authorityClientClazz, this.getServiceName()));
+            }
+        } catch (ClassNotFoundException e) {
+        	String msg = String.format("Missing document validation handler: '%s'.", authorityClientClazz);
+        	logger.warn(msg);
+        	logger.trace(msg, e);
+        }
+        
+        return result;
+    }
+    
+    @Override
+    public AuthorityClient getClient(RemoteClientConfig remoteClientConfig) throws Exception {
+    	AuthorityClient result = null;
+    	
+        Properties properties = new Properties();
+        properties.setProperty(AuthorityClient.URL_PROPERTY, remoteClientConfig.getUrl());
+        properties.setProperty(AuthorityClient.USER_PROPERTY, remoteClientConfig.getUser());
+        properties.setProperty(AuthorityClient.PASSWORD_PROPERTY, remoteClientConfig.getPassword());
+        properties.setProperty(AuthorityClient.SSL_PROPERTY, remoteClientConfig.getSsl());
+        properties.setProperty(AuthorityClient.AUTH_PROPERTY, remoteClientConfig.getAuth());
+        //
+        // Optional values
+        String tenantId = remoteClientConfig.getTenantId();
+        if (tenantId != null) {
+        	properties.setProperty(AuthorityClient.TENANT_ID_PROPERTY, tenantId);
+        }
+        String tenantName = remoteClientConfig.getTenantName();
+        if (tenantName != null) {
+        	properties.setProperty(AuthorityClient.TENANT_NAME_PROPERTY, tenantName);
+        }
+        
+        result = getClient(properties);
+        
+        return result;
+    }
+    
     @Override
     public void addValidatorHandler(ValidatorHandler<IT, OT> validator) throws Exception {
         if (valHandlers == null) {
@@ -628,6 +805,9 @@ public abstract class AbstractServiceContextImpl<IT, OT>
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.context.ServiceContext#getQueryParams()
+     * 
+     * When we first created these services, the RESTEasy query parameters used to be a modifiable map.  That changed in a
+     * more recent version of RESTEasy, so we need to make a copy of the params into a modifiable map and return it instead.
      */
     @Override
     public MultivaluedMap<String, String> getQueryParams() {
@@ -664,6 +844,16 @@ public abstract class AbstractServiceContextImpl<IT, OT>
 	@Override
 	public UriInfo getUriInfo() {
 		return this.uriInfo;
+	}
+	
+	@Override
+	public Request getRequestInfo() {
+		return this.requestInfo;
+	}
+	
+	@Override
+	public void setRequestInfo(Request requestInfo) {
+		this.requestInfo = requestInfo;
 	}
 	
 	/*
@@ -714,4 +904,24 @@ public abstract class AbstractServiceContextImpl<IT, OT>
 	public void setRepositoryDomain(RepositoryDomainType repositoryDomain) {
 		this.repositoryDomain = repositoryDomain;
 	}
+	
+	/**
+	 * Check for a query parameter that indicates if we should force a sync even if the revision numbers indicate otherwise.
+	 * @return
+	 */
+	@Override
+	public boolean shouldForceSync() {
+		boolean forceSync = false;
+		
+		MultivaluedMap<String, String> queryParams = getQueryParams();
+		String paramValue = queryParams.getFirst(IClientQueryParams.FORCE_SYCN);
+		if (paramValue != null && paramValue.equalsIgnoreCase(Boolean.TRUE.toString())) { // Find our if the caller wants us to force refname updates
+			forceSync = true;
+		} else if (paramValue != null && paramValue.equals(Long.toString(1))) {
+			forceSync = true;
+		}
+		
+		return forceSync;
+    }
+	
 }

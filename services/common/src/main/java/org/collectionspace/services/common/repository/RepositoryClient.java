@@ -28,12 +28,12 @@ import java.util.List;
 
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
-
-import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 //
 // All of these Nuxeo specific classes should not be here.  This is supposed to be
 // a repository-neutral interface.
@@ -132,7 +132,7 @@ public interface RepositoryClient<IT, OT> extends StorageClient {
      * @param where NXQL where clause to get the document
      * @throws DocumentException
      */
-    public String findDocCSID(RepositoryInstanceInterface repoSession, 
+    public String findDocCSID(CoreSessionInterface repoSession, 
             ServiceContext<IT, OT> ctx, String where)
             throws DocumentNotFoundException, DocumentException;
 
@@ -155,4 +155,27 @@ public interface RepositoryClient<IT, OT> extends StorageClient {
             String where,
             int pageSize, int pageNum, boolean computeTotal)
             throws DocumentNotFoundException, DocumentException;
+
+    /**
+     * Reindex a single resource/document.
+     * 
+     * @param ctx
+     * @param id
+     * @param handler
+     * @throws DocumentNotFoundException
+     * @throws DocumentException
+     */
+	boolean reindex(DocumentHandler handler, String csid, String indexid)
+			throws DocumentNotFoundException, DocumentException;
+
+	/**
+	 * Reindex all resources/documents of a specified type
+	 * 
+	 * @param ctx
+	 * @param handler
+	 * @throws DocumentNotFoundException
+	 * @throws DocumentException
+	 */
+	boolean reindex(DocumentHandler handler, String indexid)
+			throws DocumentNotFoundException, DocumentException;
 }

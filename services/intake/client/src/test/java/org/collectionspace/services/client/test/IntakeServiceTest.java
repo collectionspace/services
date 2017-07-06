@@ -23,10 +23,11 @@
 package org.collectionspace.services.client.test;
 
 import java.util.List;
+
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.dom4j.Element;
-
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IntakeClient;
 import org.collectionspace.services.client.PayloadInputPart;
@@ -40,11 +41,8 @@ import org.collectionspace.services.intake.CurrentLocationGroup;
 import org.collectionspace.services.intake.CurrentLocationGroupList;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-
-import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,137 +63,24 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
             GregorianCalendarDateTimeUtils.currentDateUTC();
 
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new IntakeClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new IntakeClient(clientPropertiesFilename);
+	}
 
     @Override
     protected String getServiceName() {
         return IntakeClient.SERVICE_NAME;
     }
-
-    // ---------------------------------------------------------------
-    // CRUD tests : CREATE tests
-    // ---------------------------------------------------------------
-    
-    // See Issue CSPACE-401.
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithEmptyEntityBody(java.lang.String)
-     */
-    @Override
-    public void createWithEmptyEntityBody(String testName) throws Exception {
-        //Should this really be empty?
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithMalformedXml(java.lang.String)
-     */
-    @Override
-    public void createWithMalformedXml(String testName) throws Exception {
-        //Should this really be empty?
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithWrongXmlSchema(java.lang.String)
-     */
-    @Override
-    public void createWithWrongXmlSchema(String testName) throws Exception {
-        //Should this really be empty?
-    }
-
-    /*
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-    dependsOnMethods = {"create", "testSubmitRequest"})
-    public void createWithEmptyEntityBody(String testName) throws Exception {
-    
-    if (logger.isDebugEnabled()) {
-    logger.debug(testBanner(testName, CLASS_NAME));
-    }
-    // Perform setup.
-    setupCreateWithEmptyEntityBody();
-    
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getServiceRootURL();
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = "";
-    int statusCode = submitRequest(method, url, mediaType, entity);
-    
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-    logger.debug("createWithEmptyEntityBody url=" + url +
-    " status=" + statusCode);
-    }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-    
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-    dependsOnMethods = {"create", "testSubmitRequest"})
-    public void createWithMalformedXml(String testName) throws Exception {
-    
-    if (logger.isDebugEnabled()) {
-    logger.debug(testBanner(testName, CLASS_NAME));
-    }
-    // Perform setup.
-    setupCreateWithMalformedXml();
-    
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getServiceRootURL();
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = MALFORMED_XML_DATA; // Constant from base class.
-    int statusCode = submitRequest(method, url, mediaType, entity);
-    
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-    logger.debug(testName + ": url=" + url +
-    " status=" + statusCode);
-    }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-    
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-    dependsOnMethods = {"create", "testSubmitRequest"})
-    public void createWithWrongXmlSchema(String testName) throws Exception {
-    
-    if (logger.isDebugEnabled()) {
-    logger.debug(testBanner(testName, CLASS_NAME));
-    }
-    // Perform setup.
-    setupCreateWithWrongXmlSchema(testName, logger);
-    
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getServiceRootURL();
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = WRONG_XML_SCHEMA_DATA;
-    int statusCode = submitRequest(method, url, mediaType, entity);
-    
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-    logger.debug(testName + ": url=" + url +
-    " status=" + statusCode);
-    }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-     */
     
     // ---------------------------------------------------------------
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
-    
+    @Override
 	protected void compareReadInstances(IntakesCommon original, IntakesCommon fromRead) throws Exception {
         // Verify the number and contents of values in repeatable fields,
         // as created in the instance record used for testing.
@@ -228,8 +113,6 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
                 + "' does not match expected data '" + getUTF8DataFragment());
 	}
     
-    // Failure outcomes
-
     @Override
     public void delete(String testName) throws Exception {
     	// Do nothing because this test is not ready to delete the "knownResourceId".
@@ -264,13 +147,19 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
 
         // Retrieve the contents of a resource to update.
         IntakeClient client = new IntakeClient();
-        ClientResponse<String> res = client.read(knownResourceId);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": read status = " + res.getStatus());
+        PoxPayloadIn input = null;
+        Response res = client.read(knownResourceId);
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": read status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
+	
+	        input = new PoxPayloadIn(res.readEntity(String.class));
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
-
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        
         PayloadInputPart payloadInputPart = input.getPart(COLLECTIONSPACE_CORE_SCHEMA);
         Element coreAsElement = null;
         if (payloadInputPart != null) {
@@ -307,21 +196,25 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
 
         // Create an output payload to send to the service, and add the common part
         PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
-        PayloadOutputPart corePart = output.addPart(
-        					COLLECTIONSPACE_CORE_SCHEMA, coreAsElement);
+        PayloadOutputPart corePart = output.addPart(COLLECTIONSPACE_CORE_SCHEMA, coreAsElement);
         
         // Submit the request to the service and store the response.
         res = client.update(knownResourceId, output);
-        int statusCode = res.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        input = new PoxPayloadIn(res.getEntity());
+	    try {
+	        int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        input = new PoxPayloadIn(res.readEntity(String.class));
+	    } finally {
+	    	res.close();
+	    }
+	        
         PayloadInputPart updatedCorePart = input.getPart(COLLECTIONSPACE_CORE_SCHEMA);
         Element updatedCoreAsElement = null;
         if (updatedCorePart != null) {
@@ -348,123 +241,6 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
 
     }
 
-    // Failure outcomes
-    // Placeholders until the three tests below can be uncommented.
-    
-    // See Issue CSPACE-401.
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithEmptyEntityBody(java.lang.String)
-     */
-    @Override
-    public void updateWithEmptyEntityBody(String testName) throws Exception {
-        //Should this really be empty?
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithMalformedXml(java.lang.String)
-     */
-    @Override
-    public void updateWithMalformedXml(String testName) throws Exception {
-        //Should this really be empty?
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithWrongXmlSchema(java.lang.String)
-     */
-    @Override
-    public void updateWithWrongXmlSchema(String testName) throws Exception {
-        //Should this really be empty?
-    }
-
-    /*
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-    dependsOnMethods = {"create", "update", "testSubmitRequest"})
-    public void updateWithEmptyEntityBody(String testName) throws Exception {
-    
-    if (logger.isDebugEnabled()) {
-    logger.debug(testBanner(testName, CLASS_NAME));
-    }
-    // Perform setup.
-    setupUpdateWithEmptyEntityBody();
-    
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getResourceURL(knownResourceId);
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = "";
-    int statusCode = submitRequest(method, url, mediaType, entity);
-    
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-    logger.debug(testName + ": url=" + url +
-    " status=" + statusCode);
-    }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-    
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-    dependsOnMethods = {"create", "update", "testSubmitRequest"})
-    public void updateWithMalformedXml(String testName) throws Exception {
-    
-    if (logger.isDebugEnabled()) {
-    logger.debug(testBanner(testName, CLASS_NAME));
-    }
-    // Perform setup.
-    setupUpdateWithMalformedXml();
-    
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getResourceURL(knownResourceId);
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = MALFORMED_XML_DATA;
-    int statusCode = submitRequest(method, url, mediaType, entity);
-    
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-    logger.debug(testName + ": url=" + url +
-    " status=" + statusCode);
-    }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-    
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-    dependsOnMethods = {"create", "update", "testSubmitRequest"})
-    public void updateWithWrongXmlSchema(String testName) throws Exception {
-    
-    if (logger.isDebugEnabled()) {
-    logger.debug(testBanner(testName, CLASS_NAME));
-    }
-    // Perform setup.
-    setupUpdateWithWrongXmlSchema();
-    
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getResourceURL(knownResourceId);
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = WRONG_XML_SCHEMA_DATA;
-    int statusCode = submitRequest(method, url, mediaType, entity);
-    
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-    logger.debug(testName + ": url=" + url +
-    " status=" + statusCode);
-    }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-     */
-
     // ---------------------------------------------------------------
     // Utility tests : tests of code used in tests above
     // ---------------------------------------------------------------
@@ -482,9 +258,10 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
      *
      * @param identifier the identifier
      * @return the multipart output
+     * @throws Exception 
      */
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
         return createIntakeInstance(
                 "entryNumber-" + identifier,
                 CURRENT_DATE_UTC,
@@ -498,10 +275,11 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
      * @param entryDate the entry date
      * @param depositor the depositor
      * @return the multipart output
+     * @throws Exception 
      */
     private PoxPayloadOut createIntakeInstance(String entryNumber,
             String entryDate,
-            String depositor) {
+            String depositor) throws Exception {
         IntakesCommon intake = new IntakesCommon();
         intake.setEntryNumber(entryNumber);
         intake.setEntryDate(entryDate);
@@ -547,7 +325,7 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
 
 	@Override
 	protected PoxPayloadOut createInstance(String commonPartName,
-			String identifier) {
+			String identifier) throws Exception {
 		return this.createInstance(identifier);
 	}
 
@@ -560,13 +338,17 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
 
         CurrentLocationGroupList currentLocationGroupList = intakesCommon.getCurrentLocationGroupList();
         Assert.assertNotNull(currentLocationGroupList);
+        
         List<CurrentLocationGroup> currentLocationGroups = currentLocationGroupList.getCurrentLocationGroup();
-        Assert.assertNotNull(currentLocationGroups);
+        Assert.assertNotNull(currentLocationGroups);        
         Assert.assertTrue(currentLocationGroups.size() > 0);
+        
         CurrentLocationGroup currentLocationGroup = currentLocationGroups.get(0);
         Assert.assertNotNull(currentLocationGroup);
+        
         String currentLocationNote = currentLocationGroup.getCurrentLocationNote();
         Assert.assertNotNull(currentLocationNote);
+        
         String updatedCurrentLocationNote = "updated-" + currentLocationNote;
         currentLocationGroups.get(0).setCurrentLocationNote(updatedCurrentLocationNote);
         result.setCurrentLocationGroupList(currentLocationGroupList);
@@ -617,6 +399,6 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
     		dependsOnMethods = {
         		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
 	public void CRUDTests(String testName) {
-		// TODO Auto-generated method stub		
+		// Needed for TestNG dependency chain.		
 	}
 }

@@ -31,10 +31,12 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.commons.lang.StringUtils;
 import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.api.CommonAPI;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.RefName.RefNameInterface;
@@ -45,6 +47,7 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.AbstractMultipartDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
@@ -52,6 +55,7 @@ import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.lifecycle.Lifecycle;
 import org.collectionspace.services.lifecycle.State;
 import org.collectionspace.services.lifecycle.StateList;
@@ -63,7 +67,7 @@ import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.nuxeo.ecm.core.lifecycle.LifeCycle;
 import org.nuxeo.ecm.core.lifecycle.LifeCycleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,64 +83,11 @@ public abstract class DocumentModelHandler<T, TL>
         extends AbstractMultipartDocumentHandlerImpl<T, TL, DocumentModel, DocumentModelList> {
 
     private final Logger logger = LoggerFactory.getLogger(DocumentModelHandler.class);
-    private RepositoryInstanceInterface repositorySession;
+    private CoreSessionInterface repositorySession;
 
     protected String oldRefNameOnUpdate = null;  // FIXME: REM - We should have setters and getters for these
     protected String newRefNameOnUpdate = null;  // FIXME: two fields.
     
-    /*
-     * Map Nuxeo's life cycle object to our JAX-B based life cycle object
-     */
-    private Lifecycle createCollectionSpaceLifecycle(org.nuxeo.ecm.core.lifecycle.LifeCycle nuxeoLifecyle) {
-    	Lifecycle result = null;
-    	
-    	if (nuxeoLifecyle != null) {
-    		//
-    		// Copy the life cycle's name
-    		result = new Lifecycle();
-    		result.setName(nuxeoLifecyle.getName());
-    		
-    		// We currently support only one initial state, so take the first one from Nuxeo
-    		Collection<String> initialStateNames = nuxeoLifecyle.getInitialStateNames();
-    		result.setDefaultInitial(initialStateNames.iterator().next());
-    		
-    		// Next, we copy the state and corresponding transition lists
-    		StateList stateList = new StateList();
-    		List<State> states = stateList.getState();
-    		Collection<org.nuxeo.ecm.core.lifecycle.LifeCycleState> nuxeoStates = nuxeoLifecyle.getStates();
-    		for (org.nuxeo.ecm.core.lifecycle.LifeCycleState nuxeoState : nuxeoStates) {
-    			State tempState = new State();
-    			tempState.setDescription(nuxeoState.getDescription());
-    			tempState.setInitial(nuxeoState.isInitial());
-    			tempState.setName(nuxeoState.getName());
-    			// Now get the list of transitions
-    			TransitionList transitionList = new TransitionList();
-    			List<String> transitions = transitionList.getTransition();
-    			Collection<String> nuxeoTransitions = nuxeoState.getAllowedStateTransitions();
-    			for (String nuxeoTransition : nuxeoTransitions) {
-    				transitions.add(nuxeoTransition);
-    			}
-    			tempState.setTransitionList(transitionList);
-    			states.add(tempState);
-    		}
-    		result.setStateList(stateList);
-    		
-    		// Finally, we create the transition definitions
-    		TransitionDefList transitionDefList = new TransitionDefList();
-    		List<TransitionDef> transitionDefs = transitionDefList.getTransitionDef();
-    		Collection<org.nuxeo.ecm.core.lifecycle.LifeCycleTransition> nuxeoTransitionDefs = nuxeoLifecyle.getTransitions();
-    		for (org.nuxeo.ecm.core.lifecycle.LifeCycleTransition nuxeoTransitionDef : nuxeoTransitionDefs) {
-    			TransitionDef tempTransitionDef = new TransitionDef();
-    			tempTransitionDef.setDescription(nuxeoTransitionDef.getDescription());
-    			tempTransitionDef.setDestinationState(nuxeoTransitionDef.getDestinationStateName());
-    			tempTransitionDef.setName(nuxeoTransitionDef.getName());
-    			transitionDefs.add(tempTransitionDef);
-    		}
-    		result.setTransitionDefList(transitionDefList);
-    	}
-    	
-    	return result;
-    }
     
     /*
      * Returns the the life cycle definition of the related Nuxeo document type for this handler.
@@ -166,30 +117,8 @@ public abstract class DocumentModelHandler<T, TL>
      * @see org.collectionspace.services.common.document.DocumentHandler#getLifecycle(java.lang.String)
      */
     @Override
-    public Lifecycle getLifecycle(String docTypeName) {
-    	org.nuxeo.ecm.core.lifecycle.LifeCycle nuxeoLifecyle;
-    	Lifecycle result = null;
-    	
-    	try {
-    		LifeCycleService lifeCycleService = null;
-			try {
-				lifeCycleService = NXCore.getLifeCycleService();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			
-	    	String lifeCycleName; 
-	    	lifeCycleName = lifeCycleService.getLifeCycleNameFor(docTypeName);
-	    	nuxeoLifecyle = lifeCycleService.getLifeCycleByName(lifeCycleName);
-	    	
-	    	result = createCollectionSpaceLifecycle(nuxeoLifecyle);	
-//			result = (Lifecycle)FileTools.getJaxbObjectFromFile(Lifecycle.class, "default-lifecycle.xml");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			logger.error("Could not retreive life cycle information for Nuxeo doctype: " + docTypeName, e);
-		}
-    	
-    	return result;
+    public Lifecycle getLifecycle(String docTypeName) {    	
+    	return NuxeoUtils.getLifecycle(docTypeName);
     }
     
     /*
@@ -203,9 +132,15 @@ public abstract class DocumentModelHandler<T, TL>
     public String getUri(DocumentModel docModel) {
         return getServiceContextPath()+getCsid(docModel);
     }
+    
+    public String getUri(Specifier specifier) {
+        return getServiceContextPath() + specifier.value;
+    }
+    
         
     public RepositoryClient<PoxPayloadIn, PoxPayloadOut> getRepositoryClient(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
-        RepositoryClient<PoxPayloadIn, PoxPayloadOut> repositoryClient = RepositoryClientFactory.getInstance().getClient(ctx.getRepositoryClientName());
+        RepositoryClient<PoxPayloadIn, PoxPayloadOut> repositoryClient = 
+        		(RepositoryClient<PoxPayloadIn, PoxPayloadOut>) RepositoryClientFactory.getInstance().getClient(ctx.getRepositoryClientName());
         return repositoryClient;
     }
 
@@ -213,7 +148,7 @@ public abstract class DocumentModelHandler<T, TL>
      * getRepositorySession returns Nuxeo Repository Session
      * @return
      */
-    public RepositoryInstanceInterface getRepositorySession() {
+    public CoreSessionInterface getRepositorySession() {
     	
         return repositorySession;
     }
@@ -222,7 +157,7 @@ public abstract class DocumentModelHandler<T, TL>
      * setRepositorySession sets repository session
      * @param repoSession
      */
-    public void setRepositorySession(RepositoryInstanceInterface repoSession) {
+    public void setRepositorySession(CoreSessionInterface repoSession) {
         this.repositorySession = repoSession;
     }
 
@@ -249,7 +184,7 @@ public abstract class DocumentModelHandler<T, TL>
 
     @Override
     public void handleGet(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-        extractAllParts(wrapDoc);
+   		extractAllParts(wrapDoc);
     }
 
     @Override
@@ -305,7 +240,7 @@ public abstract class DocumentModelHandler<T, TL>
      * @throws PropertyException the property exception
      */
     abstract public AuthorityRefList getAuthorityRefs(String csid,
-    		List<AuthRefConfigInfo> authRefsInfo) throws PropertyException, Exception;    
+    		List<AuthRefConfigInfo> authRefConfigInfoList) throws PropertyException, Exception;    
 
     /*
      * Subclasses should override this method if they need to customize their refname generation
@@ -355,7 +290,7 @@ public abstract class DocumentModelHandler<T, TL>
         	// Nuxeo webapp.
         	//
         	try {
-    	        documentModel.setProperty("dublincore", "title",
+    	        documentModel.setProperty(CommonAPI.NUXEO_DUBLINCORE_SCHEMANAME, CommonAPI.NUXEO_DUBLINCORE_TITLE,
     	                documentModel.getName());
         	} catch (Exception x) {
         		if (logger.isWarnEnabled() == true) {
@@ -380,15 +315,26 @@ public abstract class DocumentModelHandler<T, TL>
             //
             // Add updatedAt timestamp and updateBy user
             //
-			documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
-					CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_AT, now);
-			documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
-					CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_BY, userId);
+			if (ctx.shouldUpdateCoreValues() == true) { // Ensure that our caller wants us to record this update
+				documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+						CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_AT, now);
+				documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+						CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_BY, userId);
+			} else {
+				logger.debug(String.format("Document with CSID=%s updated %s by user %s", documentModel.getName(), now, userId));
+			}
 		}		
     }
     
     protected boolean hasRefNameUpdate() {
     	boolean result = false;
+    	
+    	//
+    	// Check to see if the request contains a query parameter asking us to force a refname update
+    	//
+    	if (getServiceContext().shouldForceUpdateRefnameReferences() == true) {
+    		return true;
+    	}
     	
     	if (Tools.notBlank(newRefNameOnUpdate) && Tools.notBlank(oldRefNameOnUpdate)) {
     		// CSPACE-6372: refNames are different if:
@@ -410,7 +356,7 @@ public abstract class DocumentModelHandler<T, TL>
     	return result;
     }
     
-    protected void handleRefNameChanges(ServiceContext ctx, DocumentModel docModel) throws ClientException {
+    protected void handleRefNameChanges(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, DocumentModel docModel) throws ClientException {
     	// First get the old refName
     	this.oldRefNameOnUpdate = (String)docModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
             		CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME);
@@ -454,6 +400,40 @@ public abstract class DocumentModelHandler<T, TL>
     	return result;
     }
     
+    @Override
+    public String getDocumentsToIndexQuery(String indexId, String csid) throws DocumentException, Exception {
+    	String result = null;
+    	
+    	ServiceContext<PoxPayloadIn,PoxPayloadOut> ctx = this.getServiceContext();
+    	String selectClause = "SELECT ecm:uuid, ecm:primaryType FROM ";
+    	String docFilterWhereClause = this.getDocumentFilter().getWhereClause();
+    	//
+    	// The where clause could be a combination of the document filter's where clause plus a CSID qualifier
+    	//
+    	String whereClause = (csid == null) ? null : String.format("ecm:name = '%s'", csid); // AND ecm:currentLifeCycleState <> 'deleted'"
+        if (whereClause != null && !whereClause.trim().isEmpty()) {
+            // Due to an apparent bug/issue in how Nuxeo translates the NXQL query string
+            // into SQL, we need to parenthesize our 'where' clause
+        	if (docFilterWhereClause != null && !docFilterWhereClause.trim().isEmpty()) {
+        		whereClause = whereClause + IQueryManager.SEARCH_QUALIFIER_AND + "(" + docFilterWhereClause + ")";
+        	}
+        } else {
+        	whereClause = docFilterWhereClause;
+        }
+    	String orderByClause = "ecm:uuid";
+    	
+    	try {
+    		QueryContext queryContext = new QueryContext(ctx, selectClause, whereClause, orderByClause);
+    		result = NuxeoUtils.buildNXQLQuery(queryContext);
+    	} catch (DocumentException de) {
+    		throw de;
+    	} catch (Exception x) {
+    		throw x;
+    	}
+
+    	return result;
+    }
+    
 	/**
 	 * Creates the CMIS query from the service context. Each document handler is
 	 * responsible for returning (can override) a valid CMIS query using the information in the
@@ -485,10 +465,8 @@ public abstract class DocumentModelHandler<T, TL>
 	    	String matchObjDocTypes = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_MATCH_OBJ_DOCTYPES);
 	    	String selectDocType = (String)queryParams.getFirst(IQueryManager.SELECT_DOC_TYPE_FIELD);
 
-	    	//String docType = this.getServiceContext().getDocumentType();
-	    	// If this type in this tenant has been extended, be sure to use that so extension schema is visible.
-	    	String docType = NuxeoUtils.getTenantQualifiedDocType(this.getServiceContext());
-	    	if (selectDocType != null && !selectDocType.isEmpty()) {  
+	    	String docType = this.getServiceContext().getDocumentType();
+	    	if (selectDocType != null && !selectDocType.isEmpty()) {
 	    		docType = selectDocType;
 	    	}
 	    	String selectFields = IQueryManager.CMIS_TARGET_CSID + ", "
@@ -501,6 +479,7 @@ public abstract class DocumentModelHandler<T, TL>
 	    	String relObjectCsidCol = IRelationsManager.CMIS_CSPACE_RELATIONS_OBJECT_ID;
 	    	String relSubjectCsidCol = IRelationsManager.CMIS_CSPACE_RELATIONS_SUBJECT_ID;
 	    	String targetCsidCol = IQueryManager.CMIS_TARGET_CSID;
+	    	String tenantID = this.getServiceContext().getTenantId();
 
 	    	//
 	    	// Create the "ON" and "WHERE" query clauses based on the params passed into the HTTP request.  
@@ -532,6 +511,9 @@ public abstract class DocumentModelHandler<T, TL>
 	    							+ " IN " + matchObjDocTypes + ")";
 	    	}
 	    	
+	    	// Qualify the query with the current tenant ID.
+    		theWhereClause += IQueryManager.SEARCH_QUALIFIER_AND + IQueryManager.CMIS_JOIN_TENANT_ID_FILTER + " = '" + tenantID + "'";
+    		
 	    	// This could later be in control of a queryParam, to omit if we want to see versions, or to
 	    	// only see old versions.
     		theWhereClause += IQueryManager.SEARCH_QUALIFIER_AND + IQueryManager.CMIS_JOIN_NUXEO_IS_VERSION_FILTER;

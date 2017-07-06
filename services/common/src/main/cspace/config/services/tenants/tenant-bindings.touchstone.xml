@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tenant:TenantBindingConfig xmlns:tenant="http://collectionspace.org/services/config/tenant" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://collectionspace.org/services/config/tenant http://collectionspace.org/services/config/tenant.xsd">
-  <tenant:tenantBinding id="2" name="lifesci.collectionspace.org" displayName="Default tenant Lifesci" version="0.1">
-    <tenant:repositoryDomain name="default-domain" storageName="lifesci_domain" repositoryClient="nuxeo-java" repositoryName="lifesci_domain" />
+  <tenant:tenantBinding id="2" name="testsci.collectionspace.org" displayName="Default tenant testsci" version="0.1">
+    <tenant:repositoryDomain name="default-domain" storageName="testsci_domain" repositoryClient="nuxeo-java" repositoryName="testsci_domain" />
     <tenant:properties>
       <types:item xmlns:types="http://collectionspace.org/services/config/types">
         <types:key>datePattern</types:key>

@@ -22,6 +22,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -29,42 +31,53 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.collectionspace.services.common.NuxeoBasedResource;
+import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.query.QueryContext;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
+import org.collectionspace.services.lifecycle.Lifecycle;
+import org.collectionspace.services.lifecycle.State;
+import org.collectionspace.services.lifecycle.StateList;
+import org.collectionspace.services.lifecycle.TransitionDef;
+import org.collectionspace.services.lifecycle.TransitionDefList;
+import org.collectionspace.services.lifecycle.TransitionList;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentException;
-import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
+import org.nuxeo.ecm.core.NXCore;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.ClientException;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.api.Blob;
-import org.nuxeo.ecm.core.api.ConnectionException;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.PathRef;
-import org.nuxeo.ecm.core.api.model.PropertyException;
+import org.nuxeo.ecm.core.api.PropertyException;
 import org.nuxeo.ecm.core.io.DocumentPipe;
 import org.nuxeo.ecm.core.io.DocumentReader;
 import org.nuxeo.ecm.core.io.DocumentWriter;
 import org.nuxeo.ecm.core.io.impl.DocumentPipeImpl;
 import org.nuxeo.ecm.core.io.impl.plugins.SingleDocumentReader;
 import org.nuxeo.ecm.core.io.impl.plugins.XMLDocumentWriter;
+import org.nuxeo.ecm.core.lifecycle.LifeCycleService;
 import org.nuxeo.ecm.core.schema.SchemaManager;
-import org.nuxeo.ecm.core.search.api.client.querymodel.descriptor.QueryModelDescriptor;
-import org.nuxeo.ecm.core.storage.sql.Binary;
-import org.nuxeo.ecm.core.storage.sql.coremodel.SQLBlob;
 import org.nuxeo.runtime.api.Framework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,39 +105,189 @@ public class NuxeoUtils {
     private static final String ORDER_BY_CLAUSE_REGEX = "\\w+(_\\w+)?:\\w+(/(\\*|\\w+))*( ASC| DESC)?(, \\w+(_\\w+)?:\\w+(/(\\*|\\w+))*( ASC| DESC)?)*";
 	
     /* 
-     * Keep this method private.  This method uses reflection to gain access to a protected field in Nuxeo's "Binary" class.  Once we learn how
+     * Keep this method private.  This method uses reflection to gain access to a protected field in Nuxeo's "Binary" class.  If and when we learn how
      * to locate the "file" field of a Binary instance without breaking our "contract" with this class, we should minimize
      * our use of this method.
      */
     private static File getFileOfBlob(Blob blob) {
     	File result = null;
+    	    	
+    	result = blob.getFile();
     	
-    	if (blob instanceof SQLBlob) {
-    		SQLBlob sqlBlob = (SQLBlob)blob;
-    		Binary binary = sqlBlob.getBinary();
-    		try {
-    			Field fileField = binary.getClass().getDeclaredField("file");
-    			boolean accessibleState = fileField.isAccessible();
-    			if (accessibleState == false) {
-    				fileField.setAccessible(true);
+    	return result;
+    }
+    
+    static public Lifecycle getLifecycle(String docTypeName) {
+    	Lifecycle result = null;
+    	
+    	try {
+    		LifeCycleService lifeCycleService = null;
+			try {
+				lifeCycleService = NXCore.getLifeCycleService();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+	    	String lifeCycleName = lifeCycleService.getLifeCycleNameFor(docTypeName);
+	    	org.nuxeo.ecm.core.lifecycle.LifeCycle nuxeoLifecyle = lifeCycleService.getLifeCycleByName(lifeCycleName);
+	    	
+	    	result = createCollectionSpaceLifecycle(nuxeoLifecyle);	
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			logger.error("Could not retreive life cycle information for Nuxeo doctype: " + docTypeName, e);
+		}
+    	
+    	return result;
+    }
+    
+    static public TransitionDef getTransitionDef(Lifecycle lifecycle, String transition) {
+    	TransitionDef result = null;
+    	
+    	try {
+			List<TransitionDef> transitionDefList = lifecycle.getTransitionDefList().getTransitionDef();
+			Iterator<TransitionDef> iter = transitionDefList.iterator();
+			boolean found = false;
+			while (iter.hasNext() && found == false) {
+				TransitionDef transitionDef = iter.next();
+				if (transitionDef.getName().equalsIgnoreCase(transition)) {
+					result = transitionDef;
+					found = true;
+				}
+			}
+		} catch (Exception e) {
+			logger.error(String.format("Exception trying to retreive lifecycle transition def from '%s' for transition '%s'.",
+					lifecycle.getName(), transition));
+		}
+    	
+    	return result;
+    }
+    
+    
+    /*
+     * Map Nuxeo's life cycle object to our JAX-B based life cycle object
+     */
+    static private Lifecycle createCollectionSpaceLifecycle(org.nuxeo.ecm.core.lifecycle.LifeCycle nuxeoLifecyle) {
+    	Lifecycle result = null;
+    	
+    	if (nuxeoLifecyle != null) {
+    		//
+    		// Copy the life cycle's name
+    		result = new Lifecycle();
+    		result.setName(nuxeoLifecyle.getName());
+    		
+    		// We currently support only one initial state, so take the first one from Nuxeo
+    		Collection<String> initialStateNames = nuxeoLifecyle.getInitialStateNames();
+    		result.setDefaultInitial(initialStateNames.iterator().next());
+    		
+    		// Next, we copy the state and corresponding transition lists
+    		StateList stateList = new StateList();
+    		List<State> states = stateList.getState();
+    		Collection<org.nuxeo.ecm.core.lifecycle.LifeCycleState> nuxeoStates = nuxeoLifecyle.getStates();
+    		for (org.nuxeo.ecm.core.lifecycle.LifeCycleState nuxeoState : nuxeoStates) {
+    			State tempState = new State();
+    			tempState.setDescription(nuxeoState.getDescription());
+    			tempState.setInitial(nuxeoState.isInitial());
+    			tempState.setName(nuxeoState.getName());
+    			// Now get the list of transitions
+    			TransitionList transitionList = new TransitionList();
+    			List<String> transitions = transitionList.getTransition();
+    			Collection<String> nuxeoTransitions = nuxeoState.getAllowedStateTransitions();
+    			for (String nuxeoTransition : nuxeoTransitions) {
+    				transitions.add(nuxeoTransition);
     			}
-    			result = (File)fileField.get(binary);
-    			fileField.setAccessible(accessibleState); // set it back to its original access state
-    		} catch (Exception e) {
-    			logger.error("Was not able to find the 'file' field", e);
-    		}    		
+    			tempState.setTransitionList(transitionList);
+    			states.add(tempState);
+    		}
+    		result.setStateList(stateList);
+    		
+    		// Finally, we create the transition definitions
+    		TransitionDefList transitionDefList = new TransitionDefList();
+    		List<TransitionDef> transitionDefs = transitionDefList.getTransitionDef();
+    		Collection<org.nuxeo.ecm.core.lifecycle.LifeCycleTransition> nuxeoTransitionDefs = nuxeoLifecyle.getTransitions();
+    		for (org.nuxeo.ecm.core.lifecycle.LifeCycleTransition nuxeoTransitionDef : nuxeoTransitionDefs) {
+    			TransitionDef tempTransitionDef = new TransitionDef();
+    			tempTransitionDef.setDescription(nuxeoTransitionDef.getDescription());
+    			tempTransitionDef.setDestinationState(nuxeoTransitionDef.getDestinationStateName());
+    			tempTransitionDef.setName(nuxeoTransitionDef.getName());
+    			transitionDefs.add(tempTransitionDef);
+    		}
+    		result.setTransitionDefList(transitionDefList);
     	}
+    	
+    	return result;
+    }    
+
+    static public Thread deleteFileOfBlobAsync(Blob blob) {
+    	Thread result = null;
+    	
+    	//
+    	// Define a new thread that will try to delete the file of the blob.  We
+    	// need this to happen on a separate thread because our current thread seems
+    	// to still have an active handle to the file so our non-thread delete calls
+    	// are failing.  The new thread will make 10 attempts, separated by 1 second, to
+    	// delete the file.  If after 10 attempts, it still can't delete the file, it will
+    	// log an error.
+    	//
+    	final File fileToDelete = getFileOfBlob(blob);
+    	final String blobName = blob.getFilename();
+    	Thread deleteFileThread = new Thread() {
+    		@Override public void run() {
+	    		boolean deleteSuccess = false;
+	    		int attempts = 0;
+	    		while (attempts++ < 10 && deleteSuccess != true) {
+	    			deleteSuccess = deleteFile(fileToDelete);
+	    			if (deleteSuccess == false) {
+	    				//
+	    				// We couldn't delete the file, so some other thread might still
+	    				// have a handle to it.  Let's put this thread to sleep for 1 second
+	    				// before trying to delete it again.
+	    				//
+		    			try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							logger.error(String.format("Unable to delete file '%s' of blob '%s'.",
+		    					fileToDelete.getAbsoluteFile(), blobName), e);
+						}
+	    			}
+	    		}
+	    		//
+	    		// Now log the result.
+	    		//
+	    		if (deleteSuccess) {
+	    			logger.debug(String.format("Successfully deleted file '%s' of blob '%s'.",
+	    					fileToDelete.getAbsoluteFile(), blobName));
+	    		} else {
+	    			logger.error(String.format("Unable to delete file '%s' of blob '%s'.",
+	    					fileToDelete.getAbsoluteFile(), blobName));
+	    		}
+    		}
+    	};
+    	deleteFileThread.start();
+    	result = deleteFileThread;
     	
     	return result;
     }
     
     static public boolean deleteFileOfBlob(Blob blob) {
-    	boolean result = false;
-    	
     	File fileToDelete = getFileOfBlob(blob);
-    	result = fileToDelete.delete();
+    	return deleteFile(fileToDelete);
+    }
+    
+    static public boolean deleteFile(File fileToDelete) {
+    	boolean result = true;
+    	
+    	Exception deleteException = null;
+    	try {
+			java.nio.file.Files.delete(fileToDelete.toPath());
+			logger.debug(String.format("Deleted file '%s'.", fileToDelete.getCanonicalPath()));
+		} catch (IOException e) {
+			deleteException = e;
+			result = false;
+		}
+    	
 		if (result == false) {
-			logger.warn("Could not delete the blob file at: " + fileToDelete.getAbsolutePath());
+			logger.warn("Could not delete the file at: " + fileToDelete.getAbsolutePath(),
+					deleteException);
 		}
     	
     	return result;
@@ -138,14 +301,14 @@ public class NuxeoUtils {
     	Set<String> result = null;
     	
     	try {
-			Field f = docModel.getClass().getDeclaredField("facets");
-			f.setAccessible(true);
-			result = (Set<String>) f.get(docModel);
-			f.setAccessible(false);
+			Field field = docModel.getClass().getDeclaredField("facets");
+			field.setAccessible(true);
+			result = (Set<String>) field.get(docModel);
+			field.setAccessible(false);
     	} catch (Exception e) {
     		logger.error("Could not remove facet from DocumentModel instance: " + docModel.getId(), e);
     	}
-    	
+
     	return result;
     }
     
@@ -220,7 +383,7 @@ public class NuxeoUtils {
      * @return
      * @throws DocumentException
      */
-    public static Document getDocument(RepositoryInstanceInterface repoSession, DocumentModel nuxeoDoc)
+    public static Document getDocument(CoreSessionInterface repoSession, DocumentModel nuxeoDoc)
             throws DocumentException {
         Document doc = null;
         DocumentWriter writer = null;
@@ -230,7 +393,7 @@ public class NuxeoUtils {
         try {
             baos = new ByteArrayOutputStream();
             //nuxeo io.impl begin
-            reader = new SingleDocumentReader(repoSession.getRepositoryInstance(), nuxeoDoc);
+            reader = new SingleDocumentReader(repoSession.getCoreSession(), nuxeoDoc);
             writer = new XMLDocumentWriter(baos);
             DocumentPipe pipe = new DocumentPipeImpl();
             //nuxeo io.impl end
@@ -240,9 +403,9 @@ public class NuxeoUtils {
             bais = new ByteArrayInputStream(baos.toByteArray());
             SAXReader saxReader = new SAXReader();
             doc = saxReader.read(bais);
-        } catch (ClientException ce) {
-        	throw new NuxeoDocumentException(ce);
-        } catch (Exception e) {
+        } catch (org.dom4j.DocumentException ce) {
+        	throw new DocumentException(ce);
+        } catch (IOException e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception while processing document ", e);
             }
@@ -280,7 +443,7 @@ public class NuxeoUtils {
      *
      * @throws DocumentException the document exception
      */
-    public static Document getDocument(RepositoryInstanceInterface repoSession, String csid)
+    public static Document getDocument(CoreSessionInterface repoSession, String csid)
             throws DocumentException {
         Document result = null;
 
@@ -303,8 +466,8 @@ public class NuxeoUtils {
      * @throws ClientException the client exception
      */
     public static DocumentModel getWorkspaceModel(
-    		RepositoryInstanceInterface repoSession, String workspaceName)
-            throws DocumentException, IOException, ClientException {
+    		CoreSessionInterface repoSession, String workspaceName)
+            throws DocumentException, IOException {
         DocumentModel result = null;
         //FIXME: commented out as this does not work without tenant qualification
         String workspaceUUID = null;
@@ -330,17 +493,13 @@ public class NuxeoUtils {
      * @throws DocumentException the document exception
      */
     public static DocumentModel getDocumentModel(
-    		RepositoryInstanceInterface repoSession, String nuxeoId)
+    		CoreSessionInterface repoSession, String nuxeoId)
             throws DocumentException {
         DocumentModel result = null;
 
-        try {
-            DocumentRef documentRef = new IdRef(nuxeoId);
-            result = repoSession.getDocument(documentRef);
-        } catch (ClientException e) {
-            throw new NuxeoDocumentException(e);
-        }
-
+        DocumentRef documentRef = new IdRef(nuxeoId);
+        result = repoSession.getDocument(documentRef);
+        
         return result;
     }
     
@@ -349,8 +508,10 @@ public class NuxeoUtils {
     	
     	if (csid != null) {
     		result = "ecm:name = " + "\'" + csid + "\'";
+    	} else {
+    		logger.error("Call to NuxeoUtils.getByNameWhereClause() with null valued CSID.");
     	}
-    	
+    	    	
     	return result;
     }
         
@@ -381,7 +542,7 @@ public class NuxeoUtils {
         //
         query.append(/*IQueryManager.SEARCH_QUALIFIER_AND +*/ " WHERE " + CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA + ":"
                 + CollectionSpaceClient.COLLECTIONSPACE_CORE_TENANTID
-                + " = " + queryContext.getTenantId());
+                + " = " + "'" + queryContext.getTenantId() + "'");
         //
         // Finally, append the incoming where clause
         //
@@ -475,8 +636,8 @@ public class NuxeoUtils {
      * @return an NXQL query
      * @throws Exception if supplied values in the query are invalid.
      */
-    static public final String buildNXQLQuery(ServiceContext ctx, QueryContext queryContext) throws Exception {
-        StringBuilder query = new StringBuilder("SELECT * FROM ");
+    static public final String buildNXQLQuery(QueryContext queryContext) throws Exception {
+        StringBuilder query = new StringBuilder(queryContext.getSelectClause());
         // Since we have a tenant qualification in the WHERE clause, we do not need 
         // tenant-specific doc types
         // query.append(NuxeoUtils.getTenantQualifiedDocType(queryContext)); // Nuxeo doctype must be tenant qualified.
@@ -486,7 +647,7 @@ public class NuxeoUtils {
         return query.toString();
     }
     
-    static public final String buildCMISQuery(ServiceContext ctx, QueryContext queryContext) throws Exception {
+    static public final String buildCMISQuery(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, QueryContext queryContext) throws Exception {
         StringBuilder query = new StringBuilder("SELECT * FROM ");
 
         /*
@@ -509,7 +670,7 @@ public class NuxeoUtils {
      * @return an NXQL query
      */
     static public final String buildNXQLQuery(List<String> docTypes, QueryContext queryContext) throws Exception {
-        StringBuilder query = new StringBuilder("SELECT * FROM "); 
+        StringBuilder query = new StringBuilder(queryContext.getSelectClause()); 
         boolean fFirst = true;
         for (String docType : docTypes) {
             if (fFirst) {
@@ -536,7 +697,7 @@ public class NuxeoUtils {
     
     static public DocumentModel getDocFromCsid(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-    		RepositoryInstanceInterface repoSession,
+    		CoreSessionInterface repoSession,
     		String csid) throws Exception {
 	    DocumentModel result = null;
 	
@@ -550,7 +711,7 @@ public class NuxeoUtils {
         //
         // Since we're doing a query, we get back a list so we need to make sure there is only
         // a single result since CSID values are supposed to be unique.
-        String query = buildNXQLQuery(ctx, queryContext);
+        String query = buildNXQLQuery(queryContext);
         docModelList = repoSession.query(query);
         long resultSize = docModelList.totalSize();
         if (resultSize == 1) {
@@ -560,7 +721,134 @@ public class NuxeoUtils {
         }
 
         return result;
+    }
+    
+    static public NuxeoBasedResource getDocumentResource(String csid) {
+    	return null;
+    }
+    
+    /**
+     * The refname could be for an authority, an authority item/term, or a csid-form to an object or procedure record
+     * @param repoSession
+     * @param refName
+     * @param resourceMap
+     * @return
+     * @throws DocumentNotFoundException
+     * @throws Exception
+     */
+    public static DocumentModel getDocModelForRefName(ServiceContext<PoxPayloadIn,PoxPayloadOut> ctx, String refName, ResourceMap resourceMap)
+    		throws DocumentNotFoundException, Exception {
+    	RefName.AuthorityItem item = null;
+    	CoreSessionInterface repoSession = (CoreSessionInterface)ctx.getCurrentRepositorySession();
+    	//
+    	// Let's see if our refname refers to an authority item/term.
+    	//
+    	try {
+	    	item = RefName.AuthorityItem.parse(refName, true);
+	    	if (item != null) {
+	        	NuxeoBasedResource resource = (NuxeoBasedResource) resourceMap.get(item.inAuthority.resource);
+	        	return resource.getDocModelForAuthorityItem(repoSession, item);
+	    	}
+    	} catch (IllegalArgumentException e) {
+    		// Ignore exception
+    	}
+    	
+    	//
+    	// If we got this far, we know the refname doesn't refer to an authority item/term, so it might refer
+    	// to an authority or an object or procedure.
+    	//
+    	RefName.Authority authority = RefName.Authority.parse(refName); // could be an authority or an object or procedure record
+    	// Handle case of objects refNames, which MUST be csid based.
+    	if (authority != null && !Tools.isEmpty(authority.csid)) {
+        	NuxeoBasedResource resource = (NuxeoBasedResource) resourceMap.get(authority.resource);
+            // HACK - this really must be moved to the doc handler, not here. No Nuxeo specific stuff here!
+            DocumentModel docModel = NuxeoUtils.getDocFromCsid(ctx, repoSession, authority.csid);
+            return docModel;
+    	}
+    	
+    	return null;  // We've failed to find a matching document model
     }    
+    
+    static public DocumentModel getDocFromSpecifier(
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    		CoreSessionInterface repoSession,
+    		String schemaName,
+    		AuthorityItemSpecifier specifier) throws Exception {
+	    DocumentModel result = null;
+	
+        if (specifier.getItemSpecifier().form == SpecifierForm.CSID) {
+            result = getDocFromCsid(ctx, repoSession, specifier.getItemSpecifier().value);
+        } else {
+        	//
+        	// The parent part of the specifier must be a CSID form.
+        	//
+        	if (specifier.getParentSpecifier().form != SpecifierForm.CSID) {
+        		throw new DocumentException(String.format("Specifier for item parent must be of CSID form but was '%s'",
+        				specifier.getParentSpecifier().value));
+        	}
+        	//
+        	// Build the query to get the authority item.  Parent value must be a CSID.
+        	//
+            String whereClause = RefNameServiceUtils.buildWhereForAuthItemByName(schemaName,
+            		specifier.getItemSpecifier().value, specifier.getParentSpecifier().value);  // parent value must be a CSID
+	        QueryContext queryContext = new QueryContext(ctx, whereClause);
+	        //
+	        // Set of query context using the current service context, but change the document type
+	        // to be the base Nuxeo document type so we can look for the document across service workspaces
+	        //
+	        queryContext.setDocType(NuxeoUtils.BASE_DOCUMENT_TYPE);
+	    
+		    DocumentModelList docModelList = null;
+	        //
+	        // Since we're doing a query, we get back a list so we need to make sure there is only
+	        // a single result since CSID values are supposed to be unique.
+	        String query = buildNXQLQuery(queryContext);
+	        docModelList = repoSession.query(query);
+	        long resultSize = docModelList.totalSize();
+	        if (resultSize == 1) {
+	        	result = docModelList.get(0);
+	        } else if (resultSize > 1) {
+	        	throw new DocumentException("Found more than 1 document with specifier ID = " + specifier.getItemSpecifier().value);
+	        }
+        }
+
+        return result;
+    } 
+    
+    static public DocumentModel getDocFromSpecifier(
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    		CoreSessionInterface repoSession,
+    		String schemaName,
+    		Specifier specifier) throws Exception {
+	    DocumentModel result = null;
+	
+        if (specifier.form == SpecifierForm.CSID) {
+            result = getDocFromCsid(ctx, repoSession, specifier.value);
+        } else {
+            String whereClause = RefNameServiceUtils.buildWhereForAuthByName(schemaName, specifier.value);
+	        QueryContext queryContext = new QueryContext(ctx, whereClause);
+	        //
+	        // Set of query context using the current service context, but change the document type
+	        // to be the base Nuxeo document type so we can look for the document across service workspaces
+	        //
+	        queryContext.setDocType(NuxeoUtils.BASE_DOCUMENT_TYPE);
+	    
+		    DocumentModelList docModelList = null;
+	        //
+	        // Since we're doing a query, we get back a list so we need to make sure there is only
+	        // a single result since CSID values are supposed to be unique.
+	        String query = buildNXQLQuery(queryContext);
+	        docModelList = repoSession.query(query);
+	        long resultSize = docModelList.totalSize();
+	        if (resultSize == 1) {
+	        	result = docModelList.get(0);
+	        } else if (resultSize > 1) {
+	        	throw new DocumentException("Found more than 1 document with CSID = " + specifier.value);
+	        }
+        }
+
+        return result;
+    }     
 
     /*
     public static void printDocumentModel(DocumentModel docModel) throws Exception {
@@ -586,7 +874,7 @@ public class NuxeoUtils {
      * @param id
      * @return PathRef
      */
-    public static DocumentRef createPathRef(ServiceContext ctx, String id) {
+    public static DocumentRef createPathRef(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String id) {
         return new PathRef("/" + ctx.getRepositoryDomainStorageName() +
                 "/" + Workspaces +
                 "/" + ctx.getRepositoryWorkspaceName() +
@@ -621,40 +909,25 @@ public class NuxeoUtils {
         return id;
     }
     
-    public static boolean documentExists(RepositoryInstanceInterface repoSession,
-    		String csid) throws ClientException {
+    /**
+     * Return the string literal in a form ready to embed in an NXQL statement.
+     *
+     * @param s
+     * @return
+     */
+    public static String prepareStringLiteral(String s) {
+        return "'" + s.replaceAll("'", "\\\\'") + "'";
+    }
+    
+    public static boolean documentExists(CoreSessionInterface repoSession,
+    		String csid) {
 		boolean result = false;
 		
-		/*
-		 * This is the code that Nuxeo support suggested, however it will not work with their
-		 * remote API's -it only works locally.
-		
-				String qname = QueryModelDescriptor.prepareStringLiteral(csid);
-				String statement = String.format(
-						"SELECT ecm:uuid FROM Document WHERE ecm:name = %s", qname);
-				ResultSetQueryResult res = (ResultSetQueryResult) repoSession
-						.queryAndFetch(statement, "NXQL");
-				result = res.hasNext();
-				if (result = false) {
-					if (logger.isDebugEnabled() == true) {
-						logger.debug("Existance check failed for document with CSID = " + csid);
-					}
-				} else {
-					//String uuid = (String) res.next().get(NXQL.ECM_UUID);
-				}
-		*/
-		
-		/*
-		 * Until I hear back from Nuxeo, we can use the following code:
-		 */
-		String qname = QueryModelDescriptor.prepareStringLiteral(csid);
 		String statement = String.format(
-				"SELECT ecm:uuid FROM Document WHERE ecm:name = %s", qname);
-//		ResultSetQueryResult res = (ResultSetQueryResult) repoSession
-//				.queryAndFetch(statement, "NXQL");
-		DocumentModelList  res = repoSession.query(statement, 1/*return no more than 1*/);//, "NXQL");
+				"SELECT ecm:uuid FROM Document WHERE ecm:name = %s", prepareStringLiteral(csid));
+		final int RETURN_ONE_ROW = 1; // Return no more than 1 row
+		DocumentModelList  res = repoSession.query(statement, RETURN_ONE_ROW);
 
-//		result = res.hasNext();
 		result = res.iterator().hasNext();
 		if (result = false) {
 			if (logger.isDebugEnabled() == true) {
@@ -680,7 +953,7 @@ public class NuxeoUtils {
     }
 
     
-    public static String getTenantQualifiedDocType(ServiceContext ctx, String docType) throws Exception {
+    public static String getTenantQualifiedDocType(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String docType) throws Exception {
     	String result = docType;
     	
 		String tenantQualifiedDocType = ctx.getTenantQualifiedDoctype(docType);
@@ -691,7 +964,7 @@ public class NuxeoUtils {
     	return result;
     }
 
-    public static String getTenantQualifiedDocType(ServiceContext ctx) throws NuxeoDocumentException {
+    public static String getTenantQualifiedDocType(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) throws NuxeoDocumentException {
     	String result = null;
 
     	try {
@@ -707,14 +980,10 @@ public class NuxeoUtils {
     public static String getTenantQualifiedDocType(QueryContext queryCtx, String docType) throws Exception {
     	String result = docType;
     	
-    	try {
-	    	String tenantQualifiedDocType = queryCtx.getTenantQualifiedDoctype();
-			if (docTypeExists(tenantQualifiedDocType) == true) {
-				result = tenantQualifiedDocType;
-			}
-    	} catch (ClientException ce) {
-    		throw new NuxeoDocumentException(ce);
-    	}
+    	String tenantQualifiedDocType = queryCtx.getTenantQualifiedDoctype();
+		if (docTypeExists(tenantQualifiedDocType) == true) {
+			result = tenantQualifiedDocType;
+		}
 		
     	return result;
     }
@@ -726,22 +995,33 @@ public class NuxeoUtils {
     static private boolean docTypeExists(String docType) throws Exception {
     	boolean result = false;
     	
-        SchemaManager schemaManager = null;
-    	try {
-			schemaManager = Framework.getService(org.nuxeo.ecm.core.schema.SchemaManager.class);
-    	} catch (ClientException ce) {
-    		throw new NuxeoDocumentException(ce);
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			logger.error("Could not get Nuxeo SchemaManager instance.", e1);
-			throw e1;
-		}
-    	
+        SchemaManager schemaManager = Framework.getService(org.nuxeo.ecm.core.schema.SchemaManager.class);
 		Set<String> docTypes = schemaManager.getDocumentTypeNamesExtending(docType);
 		if (docTypes != null && docTypes.contains(docType)) {
 			result = true;
 		}
-		
+
+    	return result;
+    }
+    
+    /*
+     * Returns the property value for an instance of a DocumentModel.  If there is no value for the
+     * property, we'll return null.
+     * 
+     * Beginning in Nuxeo 6, if a DocumentModel has no value for the property, we get a NPE when calling
+     * the DocumentModel.getPropertyValue method.  This method catches that NPE and instead returns null.
+     */
+    public static Object getProperyValue(DocumentModel docModel,
+    		String propertyName) {
+    	Object result = null;
+    	
+    	try {
+    		result = docModel.getPropertyValue(propertyName);
+    	} catch (NullPointerException npe) {
+			logger.warn(String.format("Could not get a value for the property '%s' in Nuxeo document with CSID '%s'.",
+					propertyName, docModel.getName()));
+    	}
+    	
     	return result;
     }
     
@@ -765,20 +1045,22 @@ public class NuxeoUtils {
 			String schema, String xpath) throws NuxeoDocumentException {
 		Object result = null;
 
+		String targetCSID = null;
 		xpath = schema + ":" + xpath;
 		try {
 			Object value = docModel.getPropertyValue(xpath);
+			targetCSID = docModel.getName();
 			String returnVal = null;
 			if (value == null) {
-		            // Nothing to do - leave returnVal null
+				// Nothing to do - leave returnVal null
 			} else {
-                            returnVal = DocumentUtils.propertyValueAsString(value, docModel, xpath);
+				returnVal = DocumentUtils.propertyValueAsString(value, docModel, xpath);
 			}
 			result = returnVal;
-		} catch (ClientException ce) {
+		} catch (NuxeoException ce) {
 			String msg = "Unknown Nuxeo client exception.";
 			if (ce instanceof PropertyException) {
-				msg = "Problem retrieving property {" + xpath + "}. Bad XPath spec?" + ce.getLocalizedMessage();
+				msg = String.format("Problem retrieving property for xpath { %s } with CSID = %s.", xpath, targetCSID);
 			}
 			throw new NuxeoDocumentException(msg, ce);  // We need to wrap this exception in order to retry failed requests caused by network errors
 		} catch (ClassCastException cce) {
@@ -803,6 +1085,9 @@ public class NuxeoUtils {
 				throw new IndexOutOfBoundsException("Problem retrieving property {" + xpath
 						+ "}:" + ioobe.getLocalizedMessage());
 			}
+		} catch (NullPointerException npe) {
+			logger.trace(String.format("Null value found for property '%s' for document with ID %s",
+					xpath, docModel.getName()), npe);
 		}
 
 		return result;

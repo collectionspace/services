@@ -4,7 +4,7 @@
     <parent>
         <artifactId>org.collectionspace.services.authorization-mgt</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>4.1.1</version>
+        <version>5.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>org.collectionspace.services.authorization-mgt.service</artifactId>
@@ -14,8 +14,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>3.0.0.RELEASE</spring.version>
-        <spring.security.version>3.0.2.RELEASE</spring.security.version>
     </properties>
 
     <dependencies>
@@ -157,7 +155,6 @@
         <dependency>
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache</artifactId>
-            <version>1.6.2</version>
             <optional>true</optional>
         </dependency>
 
@@ -189,8 +186,7 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+            </dependency>
     </dependencies>
 
     <build>

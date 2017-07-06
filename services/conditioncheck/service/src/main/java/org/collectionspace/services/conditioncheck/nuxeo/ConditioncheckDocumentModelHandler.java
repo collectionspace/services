@@ -24,10 +24,10 @@
 package org.collectionspace.services.conditioncheck.nuxeo;
 
 import org.collectionspace.services.conditioncheck.ConditionchecksCommon;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 
 /** ConditioncheckDocumentModelHandler
  */
 public class ConditioncheckDocumentModelHandler
-        extends DocHandlerBase<ConditionchecksCommon> {
+        extends NuxeoDocumentModelHandler<ConditionchecksCommon> {
 }

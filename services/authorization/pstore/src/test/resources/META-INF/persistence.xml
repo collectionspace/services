@@ -2,8 +2,8 @@
 <persistence version="1.0" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd
              http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_1_0.xsd" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:orm="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <persistence-unit name="org.collectionspace.services.authorization">
-        <class>org.collectionspace.services.authorization.Permission</class>
-        <class>org.collectionspace.services.authorization.PermissionAction</class>
+        <class>org.collectionspace.services.authorization.perms.Permission</class>
+        <class>org.collectionspace.services.authorization.perms.PermissionAction</class>
         <class>org.collectionspace.services.authorization.PermissionRoleRel</class>
         <class>org.collectionspace.services.authorization.Role</class>
         <class>org.collectionspace.services.authorization.AccountRoleRel</class>

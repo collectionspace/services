@@ -18,11 +18,8 @@
 package org.collectionspace.services.common.api;
 
 import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Locale;
 import java.util.TimeZone;
 
 import org.slf4j.Logger;
@@ -48,7 +45,7 @@ public class GregorianCalendarDateTimeUtils {
      */
      public static String timestampUTC() {
          return formatAsISO8601Timestamp(currentDateAndTime(DateUtils.UTCTimeZone()));
-     }
+     }     
      
     /**
      * Returns a String representing the current date and time instance.
@@ -88,6 +85,20 @@ public class GregorianCalendarDateTimeUtils {
         return gcal;
     }
 
+    /**
+     * Returns a representation of a calendar date
+     * as an ISO 8601-formatted timestamp in the UTC time zone.
+     *
+     * @param cal a calendar date and time instance.
+     *
+     * @return    a representation of that calendar date and time instance,
+     *            as an ISO 8601-formatted timestamp in the UTC time zone.
+     */
+    public static String formatAsISO8601Timestamp(Date date) {
+        GregorianCalendar gcal = new GregorianCalendar();
+        gcal.setTime(date);
+        return formatAsISO8601Timestamp(gcal);
+    }
     
     /**
      * Returns a representation of a calendar date and time instance,

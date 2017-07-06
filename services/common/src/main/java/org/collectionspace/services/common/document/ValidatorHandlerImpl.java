@@ -48,6 +48,7 @@ public abstract class ValidatorHandlerImpl<IT, OT> implements ValidatorHandler<I
                 errorMsg = "Validation exception occurred in: "
                         + this.getClass().getName();
             }
+            logger.error(errorMsg);
             throw new AssertionError(errorMsg);
         }
     }

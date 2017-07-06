@@ -1,0 +1,13 @@
+{
+  "document": {
+    "@name": "examples",
+    "ns:examples_common": {
+      "@xmlns:ns": "http://collectionspace.org/services/example",
+      "comments": {
+        "comment": [
+          "some value"
+        ]
+      }
+    }
+  }
+}

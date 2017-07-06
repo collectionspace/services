@@ -23,10 +23,10 @@
  */
 package org.collectionspace.services.imports.nuxeo;
 
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.imports.ImportsCommon;
 
 public class ImportsDocumentModelHandler 
-	extends DocHandlerBase<ImportsCommon> {
+	extends NuxeoDocumentModelHandler<ImportsCommon> {
 }
 

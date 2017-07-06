@@ -28,6 +28,8 @@ public class XmlReplay {
     public static final String DEFAULT_CONTROL = "xml-replay-control.xml";
     public static final String DEFAULT_MASTER_CONTROL = "xml-replay-master.xml";
     public static final String DEFAULT_DEV_MASTER_CONTROL = "dev-master.xml";
+	private static final int MAX_REATTEMPTS = 10;
+	private static final String REATTEMPT_KEY = "REATTEMPT_KEY";
 
     private String reportsDir = "";
     public String getReportsDir(){
@@ -228,7 +230,7 @@ public class XmlReplay {
     }
 
     public List<ServiceResult>  autoDelete(String logName){
-        return autoDelete(this.serviceResultsMap, logName);
+        return autoDelete(this.serviceResultsMap, logName, 0);
     }
 
     /** Use this method to clean up resources created on the server that returned CSIDs, if you have
@@ -236,12 +238,17 @@ public class XmlReplay {
      * @param serviceResultsMap a Map of ServiceResult objects, which will contain ServiceResult.deleteURL.
      * @return a List<String> of debug info about which URLs could not be deleted.
      */
-    public static List<ServiceResult> autoDelete(Map<String, ServiceResult> serviceResultsMap, String logName){
+    private static List<ServiceResult> autoDelete(Map<String, ServiceResult> serviceResultsMap, String logName, int reattempt) {
         List<ServiceResult> results = new ArrayList<ServiceResult>();
-        for (ServiceResult pr : serviceResultsMap.values()){
+        HashMap<String, ServiceResult> reattemptList = new HashMap<String, ServiceResult>();
+        int deleteFailures = 0;
+        for (ServiceResult pr : serviceResultsMap.values()) {
             try {
-                if (Tools.notEmpty(pr.deleteURL)){
+                if (pr.autoDelete == true && Tools.notEmpty(pr.deleteURL)){
                     ServiceResult deleteResult = XmlReplayTransport.doDELETE(pr.deleteURL, pr.auth, pr.testID, "[autodelete:"+logName+"]");
+                    if (deleteResult.gotExpectedResult() == false || deleteResult.responseCode != 200) {
+                    	reattemptList.put(REATTEMPT_KEY + deleteFailures++, pr); // We need to try again after our dependents have been deleted. cow()
+                    }
                     results.add(deleteResult);
                 } else {
                     ServiceResult errorResult = new ServiceResult();
@@ -263,6 +270,15 @@ public class XmlReplay {
                 results.add(errorResult);
             }
         }
+        //
+        // If there were things we had trouble deleting, it might have been because they had dependents that
+        // needed to be deleted first.  Therefore, we're going to try again and again (recursively) up until we reach
+        // our MAX_REATTEMPTS limit.
+        //
+        if (reattemptList.size() > 0 && reattempt < MAX_REATTEMPTS) {
+        	return autoDelete(reattemptList, logName, ++reattempt); // recursive call
+        }
+        
         return results;
     }
 
@@ -548,13 +564,38 @@ public class XmlReplay {
                 try {
                     testElementIndex++;
                     String testID = testNode.valueOf("@ID");
+                    //
+                    // Figure out if we will auto delete resources
+                    boolean autoDelete = param_autoDeletePOSTS;
+                    String autoDeleteValue = testNode.valueOf("@autoDeletePOSTS");
+                    if (autoDeleteValue != null && !autoDeleteValue.trim().isEmpty()) {
+                    	autoDelete = Boolean.valueOf(autoDeleteValue).booleanValue();
+                    }
+                    
                     String testIDLabel = Tools.notEmpty(testID) ? (testGroupID+'.'+testID) : (testGroupID+'.'+testElementIndex);
                     String method = testNode.valueOf("method");
+                    String contentType = testNode.valueOf("contentType");
                     String uri = testNode.valueOf("uri");
                     String fullURL = Tools.glue(protoHostPort, "/", uri);
 
+                    if (contentType == null || contentType.equals("")) {
+                        contentType = XmlReplayTransport.APPLICATION_XML;
+                    }
+                    
+                    String currentAuthForTest = null;
                     String authIDForTest = testNode.valueOf("@auth");
-                    String currentAuthForTest = authsMap.map.get(authIDForTest);
+                    
+                    if (Tools.notEmpty(authIDForTest)){
+                        currentAuthForTest = authsMap.map.get(authIDForTest);
+                    }
+                    else {
+                        String tokenAuthExpression = testNode.valueOf("@tokenauth");
+                        
+                        if (Tools.notEmpty(tokenAuthExpression)){
+                            currentAuthForTest = "Bearer " + evalStruct.eval(tokenAuthExpression, serviceResultsMap, null, jexl, jc);
+                        }
+                    }
+                    
                     if (Tools.notEmpty(currentAuthForTest)){
                         authForTest = currentAuthForTest; //else just run with current from last loop;
                     }
@@ -603,7 +644,8 @@ public class XmlReplay {
                         if (parts.varsList.size()>0){
                             vars = parts.varsList.get(0);
                         }
-                        serviceResult = XmlReplayTransport.doPOST_PUTFromXML(parts.responseFilename, vars, protoHostPort, uri, method, XmlReplayTransport.APPLICATION_XML, evalStruct, authForTest, testIDLabel);
+                        serviceResult = XmlReplayTransport.doPOST_PUTFromXML(parts.responseFilename, vars, protoHostPort, uri, method, contentType, evalStruct, authForTest, testIDLabel);
+                        serviceResult.autoDelete = autoDelete;
                         if (vars!=null) {
                             serviceResult.addVars(vars);
                         }
@@ -716,8 +758,8 @@ public class XmlReplay {
                     results.add(serviceResult);
                 }
             }
-            if (Tools.isTrue(autoDeletePOSTS)&&param_autoDeletePOSTS){
-                autoDelete(serviceResultsMap, "default");
+            if (Tools.isTrue(autoDeletePOSTS) && param_autoDeletePOSTS){
+                autoDelete(serviceResultsMap, "default", 0);
             }
         }
 

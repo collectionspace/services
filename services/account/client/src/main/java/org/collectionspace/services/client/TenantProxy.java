@@ -38,7 +38,6 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.account.Tenant;
 import org.collectionspace.services.account.TenantsList;
-import org.jboss.resteasy.client.ClientResponse;
 
 /**
  * @version $Revision:$
@@ -50,25 +49,25 @@ public interface TenantProxy extends CollectionSpaceProxy<TenantsList> {
 
     @GET
     @Produces({"application/xml"})
-    ClientResponse<TenantsList> readList();
+    Response readList();
 
     @GET
     @Produces({"application/xml"})
-    ClientResponse<TenantsList> readSearchList(
+    Response readSearchList(
 				@QueryParam("name") String name, 
 				@QueryParam("disabled") String disabled);
 
     //(C)reate
     @POST
-    ClientResponse<Response> create(Tenant multipart);
+    Response create(Tenant multipart);
 
     //(R)ead
     @GET
     @Path("/{csid}")
-    ClientResponse<Tenant> read(@PathParam("id") String id);
+    Response read(@PathParam("id") String id);
 
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<Tenant> update(@PathParam("id") String id, Tenant multipart);    
+    Response update(@PathParam("id") String id, Tenant multipart);    
 }

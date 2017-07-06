@@ -2,7 +2,7 @@
 
 <!--
     Dimension schema (XSD)
-    
+
     Entity  : Dimension
     Part    : Common
     Used for: Nuxeo EP core document type
@@ -11,13 +11,13 @@
     $LastChangedDate: 2009-10-14 14:48:05 -0700 (Wed, 14 Oct 2009) $
 -->
 
-<xs:schema 
+<xs:schema
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:ns="http://collectionspace.org/dimension/"
     xmlns="http://collectionspace.org/dimension/"
     targetNamespace="http://collectionspace.org/dimension/"
     version="0.1">
-    
+
     <!-- See http://wiki.collectionspace.org/display/collectionspace/Dimension+Schema -->
 
     <xs:element name="measuredPart" type="xs:string"/>
@@ -31,5 +31,5 @@
     <xs:element name="valueDate" type="xs:string"/>
     <xs:element name="valueQualifier" type="xs:string"/>
     <xs:element name="dimensionNote" type="xs:string"/>
-    
+
 </xs:schema>

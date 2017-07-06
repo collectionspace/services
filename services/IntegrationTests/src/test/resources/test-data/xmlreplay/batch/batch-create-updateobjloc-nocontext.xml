@@ -2,16 +2,40 @@
 <document name="batch">
     <ns2:batch_common
         xmlns:ns2="http://collectionspace.org/services/batch"
-        xmlns:ns3="http://collectionspace.org/services/jaxb">
+        xmlns:ns3="http://collectionspace.org/services/jaxb"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ 		xsi:schemaLocation="http://collectionspace.org/services/batch file:batch_common.xsd">
         <name>TestUpdateObjectLocationBatchJob</name>
         <forDocTypes>
             <forDocType>CollectionObject</forDocType>
         </forDocTypes>
+        <forRoles>
+	        <roleDisplayName>TENANT_READER</roleDisplayName>
+	        <roleDisplayName>TENANT_ADMINISTRATOR</roleDisplayName>
+    	</forRoles>
+    	<resourceActionGroupList>
+	        <resourceActionGroup>
+	            <resourceName>blobs</resourceName>
+				<actionGroup>CRUL</actionGroup>
+	        </resourceActionGroup>
+	        <resourceActionGroup>
+	            <resourceName>media</resourceName>
+				<actionGroup>CRUL</actionGroup>
+	        </resourceActionGroup>
+	        <resourceActionGroup>
+	            <resourceName>concepts</resourceName>
+				<actionGroup>RL</actionGroup>
+	        </resourceActionGroup>
+	        <resourceActionGroup>
+	            <resourceName>collectionobjects</resourceName>
+				<actionGroup>RL</actionGroup>
+	        </resourceActionGroup>
+        </resourceActionGroupList>
         <supportsSingleDoc>true</supportsSingleDoc>
         <supportsDocList>true</supportsDocList>
         <supportsGroup>true</supportsGroup>
         <supportsNoContext>true</supportsNoContext>
         <createsNewFocus>false</createsNewFocus>
-        <className>org.collectionspace.services.batch.nuxeo.UpdateObjectLocationBatchJob</className>
+        <className>org.collectionspace.services.batch.nuxeo.TestBatchJob</className>
     </ns2:batch_common>
 </document>

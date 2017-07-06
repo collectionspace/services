@@ -202,85 +202,90 @@ public class FileTools {
         return saveFile(dir, relativeName, content, forceParentDirs, DEFAULT_ENCODING);
     }
     
-    public static File saveFile(String dir, String relativeName, String content, boolean forceParentDirs, String encoding) {
-        File result = null;
-        PrintWriter writer;
-        try{
-            if (forceParentDirs) forceParentDirectories(dir+'/'+relativeName);
-            result = new File(dir,relativeName);
-            if (Tools.notBlank(encoding)) {
-                writer = new PrintWriter(result, encoding);
-            } else {
-                writer = new PrintWriter(result);
-            }
-        }catch (Exception e){
-            System.out.println("Can't write to file in FileTools.saveFile: " + relativeName + " :: " + e);
-            return null;
-        }
-        writer.write(content);
-        writer.close();
-        return result;
-    }
-
-    // FIXME: Java 7 now offers an integral method for this purpose,
-    // java.nio.file.Files.createTempDirectory()
-    public static File createTmpDir(String filePrefix){
-        String tmpDir = System.getProperty(JAVA_TEMP_DIR_PROPERTY);
-		File result = new File(tmpDir, filePrefix + UUID.randomUUID().toString());
+	public static File saveFile(String dir, String relativeName,
+			String content, boolean forceParentDirs, String encoding) {
+		File result = null;
+		PrintWriter writer;
+		try {
+			if (forceParentDirs)
+				forceParentDirectories(dir + '/' + relativeName);
+			result = new File(dir, relativeName);
+			if (Tools.notBlank(encoding)) {
+				writer = new PrintWriter(result, encoding);
+			} else {
+				writer = new PrintWriter(result);
+			}
+		} catch (Exception e) {
+			System.out.println("Can't write to file in FileTools.saveFile: "
+					+ relativeName + " :: " + e);
+			return null;
+		}
+		writer.write(content);
+		writer.close();
 		return result;
-    }
+	}
+
+	/*
+	 * Create a prefixed temporary directory in the system's default temp dir
+	 */
+    public static File createTmpDir(String filePrefix) throws IOException{
+		
+		Path path = Files.createTempDirectory(filePrefix);
+
+		return path.toFile();
+    }    
     
-    /**
-     * Returns information about the Java temporary directory,
-     * including its path and selected access rights of the
-     * current code to that directory.
-     * 
-     * This can potentially be helpful when troubleshooting issues
-     * related to code that uses that temporary directory, as per CSPACE-5766.
-     * 
-     * @return information about the Java temporary directory.
-     */
-    public static String getJavaTmpDirInfo() {
-        StringBuffer strBuf = new StringBuffer("");
-        String tmpDirProperty = System.getProperty(JAVA_TEMP_DIR_PROPERTY);
-        strBuf.append("\n");
-        if (Tools.notBlank(tmpDirProperty)) {
-            strBuf.append("Java temporary directory property=");
-            strBuf.append(tmpDirProperty);
-            strBuf.append("\n");
-        } else {
-            strBuf.append("Could not get Java temporary directory property");
-            strBuf.append("\n");
-            return strBuf.toString();
-        }
-        File tmpDir = new File(tmpDirProperty); // Throws only NPE, if tmpDirProperty is null
-        boolean tmpDirExists = false;
-        boolean tmpDirIsDirectory = false;
-        try {
-            tmpDirExists = tmpDir.exists();
-            strBuf.append("Temporary directory exists=");
-            strBuf.append(tmpDirExists);
-            strBuf.append("\n");
-            tmpDirIsDirectory = tmpDir.isDirectory();
-            strBuf.append("Temporary directory is actually a directory=");
-            strBuf.append(tmpDirIsDirectory);
-            strBuf.append("\n");           
-        } catch (SecurityException se) {
-            strBuf.append("Security manager settings prohibit reading temporary directory: ");
-            strBuf.append(se.getMessage());
-            strBuf.append("\n");
-            return strBuf.toString();
-        }
-        if (tmpDirExists && tmpDirIsDirectory) {
-            try {
-                boolean tmpDirIsWriteable = tmpDir.canWrite();
-                strBuf.append("Temporary directory is writeable by application=");
-                strBuf.append(tmpDirIsWriteable);
-            } catch (SecurityException se) {
-                strBuf.append("Security manager settings prohibit writing to temporary directory: ");
-                strBuf.append(se.getMessage());
-           }           
-        }
-        return strBuf.toString();
-    }
+	/**
+	 * Returns information about the Java temporary directory, including its
+	 * path and selected access rights of the current code to that directory.
+	 * 
+	 * This can potentially be helpful when troubleshooting issues related to
+	 * code that uses that temporary directory, as per CSPACE-5766.
+	 * 
+	 * @return information about the Java temporary directory.
+	 */
+	public static String getJavaTmpDirInfo() {
+		StringBuffer strBuf = new StringBuffer("");
+		String tmpDirProperty = System.getProperty(JAVA_TEMP_DIR_PROPERTY);
+		strBuf.append("\n");
+		if (Tools.notBlank(tmpDirProperty)) {
+			strBuf.append("Java temporary directory property=");
+			strBuf.append(tmpDirProperty);
+			strBuf.append("\n");
+		} else {
+			strBuf.append("Could not get Java temporary directory property");
+			strBuf.append("\n");
+			return strBuf.toString();
+		}
+		File tmpDir = new File(tmpDirProperty); // Throws only NPE, if
+												// tmpDirProperty is null
+		boolean tmpDirExists = false;
+		boolean tmpDirIsDirectory = false;
+		try {
+			tmpDirExists = tmpDir.exists();
+			strBuf.append("Temporary directory exists=");
+			strBuf.append(tmpDirExists);
+			strBuf.append("\n");
+			tmpDirIsDirectory = tmpDir.isDirectory();
+			strBuf.append("Temporary directory is actually a directory=");
+			strBuf.append(tmpDirIsDirectory);
+			strBuf.append("\n");
+		} catch (SecurityException se) {
+			strBuf.append("Security manager settings prohibit reading temporary directory: ");
+			strBuf.append(se.getMessage());
+			strBuf.append("\n");
+			return strBuf.toString();
+		}
+		if (tmpDirExists && tmpDirIsDirectory) {
+			try {
+				boolean tmpDirIsWriteable = tmpDir.canWrite();
+				strBuf.append("Temporary directory is writeable by application=");
+				strBuf.append(tmpDirIsWriteable);
+			} catch (SecurityException se) {
+				strBuf.append("Security manager settings prohibit writing to temporary directory: ");
+				strBuf.append(se.getMessage());
+			}
+		}
+		return strBuf.toString();
+	}
 }

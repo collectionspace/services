@@ -28,11 +28,10 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
-
-import org.collectionspace.services.authorization.AccountRole;
+import org.apache.http.HttpStatus;
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RolesList;
-import org.jboss.resteasy.client.ClientResponse;
+import org.collectionspace.services.description.ServiceDescription;
 
 /**
  * A RoleClient.
@@ -45,8 +44,48 @@ public class RoleClient extends AbstractServiceClientImpl<RolesList, Role, Role,
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
 	public final static String IMMUTABLE = "immutable";
+	private final static String BACKEND_ROLE_PREFIX = "ROLE_";
 
-    @Override
+    public RoleClient() throws Exception {
+		super();
+	}
+
+    public RoleClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
+    
+    /**
+     * Creates a backend (Spring Security as of v4.5) role name.
+     * @param roleDisplayName
+     * @param tenantId
+     * @return
+     */
+    static public String getBackendRoleName(String roleDisplayName, String tenantId) {
+        String roleName = roleDisplayName.toUpperCase();
+        String rolePrefix = BACKEND_ROLE_PREFIX + tenantId + "_";
+        if (!roleName.startsWith(rolePrefix)) {
+            roleName = rolePrefix + roleName;
+        }
+        return roleName;
+    }
+    
+    /*
+     * Only call this method with a valid backend role name (not the display name).
+     */
+    static public String inferDisplayName(String backendRoleName, String tenantId) {
+        String rolePrefix = BACKEND_ROLE_PREFIX + tenantId + "_";
+        String inferredRoleName = backendRoleName.replace(rolePrefix, "");
+        
+        if (logger.isWarnEnabled()) {
+        	String msg = String.format("Role display name '%s' is being inferred from backend role name '%s'.", 
+        			inferredRoleName, backendRoleName);
+        	logger.warn(msg);
+        }
+        
+        return inferredRoleName;
+    }
+    
+	@Override
     public String getServiceName() { 
     	throw new UnsupportedOperationException(); //FIXME: REM - http://issues.collectionspace.org/browse/CSPACE-3498 }
     }
@@ -59,21 +98,23 @@ public class RoleClient extends AbstractServiceClientImpl<RolesList, Role, Role,
         return SERVICE_PATH_COMPONENT;
     }
 
-    public ClientResponse<RolesList> readList() {
+    @Override
+	public Response readList() {
         return getProxy().readList();
 
     }
 
-    public ClientResponse<RolesList> readSearchList(String roleName) {
+    public Response readSearchList(String roleName) {
         return getProxy().readSearchList(roleName);
 
     }
 
-    public ClientResponse<Role> read(String csid) {
+    @Override
+	public Response read(String csid) {
         return getProxy().read(csid);
     }
     
-    public ClientResponse<AccountRole> readRoleAccounts(String csid) {
+    public Response readRoleAccounts(String csid) {
     	return getProxy().readRoleAccounts(csid);
     }
 
@@ -83,7 +124,8 @@ public class RoleClient extends AbstractServiceClientImpl<RolesList, Role, Role,
      * @param role the role
      * @return the client response
      */
-    public ClientResponse<Response> create(Role role) {
+    @Override
+	public Response create(Role role) {
         return getProxy().create(role);
     }
 
@@ -92,12 +134,25 @@ public class RoleClient extends AbstractServiceClientImpl<RolesList, Role, Role,
      * @param role
      * @return
      */
-    public ClientResponse<Role> update(String csid, Role role) {
+    @Override
+	public Response update(String csid, Role role) {
         return getProxy().update(csid, role);
     }
 
 	@Override
 	public Class<RoleProxy> getProxyClass() {
 		return RoleProxy.class;
+	}
+
+	@Override
+	public ServiceDescription getServiceDescription() {
+		ServiceDescription result = null;
+		
+        Response res = getProxy().getServiceDescription();
+        if (res.getStatus() == HttpStatus.SC_OK) {
+        	result = (ServiceDescription) res.readEntity(ServiceDescription.class);
+        }
+        
+        return result;
 	}
 }

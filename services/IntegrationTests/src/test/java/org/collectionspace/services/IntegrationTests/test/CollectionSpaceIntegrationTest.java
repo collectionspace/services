@@ -42,12 +42,13 @@ import org.collectionspace.services.collectionobject.TitleGroupList;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.relation.RelationsCommon;
-import org.jboss.resteasy.client.ClientResponse;
 
 /**
  * The Class CollectionSpaceIntegrationTest.
  */
 public abstract class CollectionSpaceIntegrationTest {
+    protected List<String> allRelationResourceIdsCreated = new ArrayList<String>();
+    protected List<String> allResourceIdsCreated = new ArrayList<String>();
 
 	/*
 	 * Package scoped methods.
@@ -138,25 +139,18 @@ public abstract class CollectionSpaceIntegrationTest {
 		return Long.toString(identifier);
 	}
 
-	/**
-	 * Extract id.
-	 * 
-	 * @param res the res
-	 * 
-	 * @return the string
-	 */
-	String extractId(ClientResponse<Response> res) {
+	String extractId(Response res) {
 		String result = null;
 		
-		MultivaluedMap mvm = res.getMetadata();
-		String uri = (String) ((ArrayList) mvm.get("Location")).get(0);
+		MultivaluedMap<String, Object> mvm = res.getMetadata();
+		String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
 		verbose("extractId:uri=" + uri);
 		String[] segments = uri.split("/");
 		result = segments[segments.length - 1];
 		verbose("id=" + result);
 		
 		return result;
-	}
+	}	
 
 	/**
 	 * Extract part.
@@ -173,13 +167,13 @@ public abstract class CollectionSpaceIntegrationTest {
 	 * @throws Exception
 	 *             the exception
 	 */
-	static Object extractPart(PoxPayloadIn input, String label, Class clazz) {
+	static Object extractPart(PoxPayloadIn input, String label) {
 		Object obj = null;
 
 		PayloadInputPart payloadInputPart = input.getPart(label);
 		if (payloadInputPart != null) {
 			obj = payloadInputPart.getBody();
-				}
+		}
 
 		return obj;
 	}

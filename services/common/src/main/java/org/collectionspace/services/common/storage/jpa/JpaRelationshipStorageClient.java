@@ -384,9 +384,10 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
      * @throws DocumentException
      */
     @Override
-    public void delete(ServiceContext ctx, String id, DocumentHandler handler)
+    public boolean delete(ServiceContext ctx, String id, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
-
+    	boolean result = true;
+    	
         if (ctx == null) {
             throw new IllegalArgumentException(
                     "delete : ctx is missing");
@@ -431,6 +432,8 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
                 JpaStorageUtils.releaseEntityManagerFactory(emf);
             }
         }
+        
+        return result;
     }
 
     /**

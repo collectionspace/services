@@ -29,10 +29,9 @@ import java.net.HttpURLConnection;
 
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ServiceException;
 import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
@@ -48,27 +47,18 @@ import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
 import org.collectionspace.services.relation.RelationsDocListItem;
-
-// HACK HACK HACK
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.PersonAuthorityClient;
-import org.collectionspace.services.client.CitationAuthorityClient;
-import org.collectionspace.services.client.OrgAuthorityClient;
-import org.collectionspace.services.client.LocationAuthorityClient;
-import org.collectionspace.services.client.TaxonomyAuthorityClient;
-import org.collectionspace.services.client.PlaceAuthorityClient;
-import org.collectionspace.services.client.WorkAuthorityClient;
-import org.collectionspace.services.client.ConceptAuthorityClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
-import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
-import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
+import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
+
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,18 +85,25 @@ public class RelationDocumentModelHandler
     
     private static final String ERROR_TERMS_IN_WORKFLOWSTATE = "Cannot modify a relationship if either end is in the workflow state: ";
 
-    
+    /*
+     * Will return 'true' if either the subject's or object's current workflow state *contain* the passed in workflow
+     * state.
+     * 
+     * For example:
+     * 	- will return 'true' if the subject's workflow state is "replicated_deleted" and the passed in workflow state is "replicated" or "deleted".
+     *  - will return 'true' if the subject's or object's workflow state is "locked" and the passed in workflow state is "locked"
+     */
     private boolean subjectOrObjectInWorkflowState(DocumentWrapper<DocumentModel> wrapDoc, String workflowState) throws ServiceException {
     	boolean result = false;
     	DocumentModel relationDocModel = wrapDoc.getWrappedObject();
     	String errMsg = ERROR_TERMS_IN_WORKFLOWSTATE + workflowState;
     			
-    	RepositoryInstanceInterface repoSession = this.getRepositorySession();
+    	CoreSessionInterface repoSession = this.getRepositorySession();
         try {
 			DocumentModel subjectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, SUBJ_DOC_MODEL);
 			DocumentModel objectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, OBJ_DOC_MODEL);
-			if (subjectDocModel.getCurrentLifeCycleState().equalsIgnoreCase(workflowState) ||
-					objectDocModel.getCurrentLifeCycleState().equalsIgnoreCase(workflowState)) {
+			if (subjectDocModel.getCurrentLifeCycleState().contains(workflowState) ||
+					objectDocModel.getCurrentLifeCycleState().contains(workflowState)) {
 				result = true;
 			}
 		} catch (Exception e) {
@@ -120,17 +117,16 @@ public class RelationDocumentModelHandler
     
 	@Override
 	/*
-	 * Until we rework the RepositoryClient to handle the workflow transition (just like it does for 'create', 'get', 'update', and 'delete', this method will only check to see if the transition is allowed.  Until then,
-	 * the WorkflowDocumentModelHandler class does the actual workflow transition.
+	 * Until we rework the RepositoryClient to handle the workflow transition (just like it does for 'create', 'get', 'update', and 'delete'), this method will only check to see
+	 * if the transition is allowed.  Until then, the WorkflowDocumentModelHandler class does the actual workflow transition.
 	 * 
 	 * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#handleWorkflowTransition(org.collectionspace.services.common.document.DocumentWrapper, org.collectionspace.services.lifecycle.TransitionDef)
 	 */
-	public void handleWorkflowTransition(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)
-			throws Exception {
-		String workflowState = transitionDef.getDestinationState();
-		if (subjectOrObjectInWorkflowState(wrapDoc, workflowState) == true) {
+	public void handleWorkflowTransition(ServiceContext ctx, DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)
+			throws Exception {		
+		if (subjectOrObjectInWorkflowState(wrapDoc, WorkflowClient.WORKFLOWSTATE_LOCKED) == true) {
     		throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
-                    "Cannot change a relationship if either end of it is in the workflow state: " + workflowState);
+                    "Cannot change a relationship if either end of it is in the workflow state: " + WorkflowClient.WORKFLOWSTATE_LOCKED);
 		}
 	}
 
@@ -142,7 +138,7 @@ public class RelationDocumentModelHandler
         // And take care of ensuring all the values for the relation info are correct 
         populateSubjectAndObjectValues(wrapDoc);
     	
-        // both subject and object cannot be locked
+        // We can't create a relationship record if either the subject or the object is in a locked workflow state
     	String workflowState = WorkflowClient.WORKFLOWSTATE_LOCKED;
     	if (subjectOrObjectInWorkflowState(wrapDoc, workflowState) == true) {
     		throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
@@ -160,15 +156,19 @@ public class RelationDocumentModelHandler
     }
     
     @Override
-    public void handleDelete(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    public boolean handleDelete(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	boolean result = true;
+    	
     	String workflowState = WorkflowClient.WORKFLOWSTATE_LOCKED;
-    	// both subject and object cannot be locked
+    	// Neither the subject nor the object can be locked
     	if (subjectOrObjectInWorkflowState(wrapDoc, workflowState) == false) {
     		super.handleDelete(wrapDoc);
     	} else {
     		throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
                     "Cannot delete a relationship if either end is in the workflow state: " + workflowState);
     	}
+    	
+    	return result;
     }
     
     private void populateSubjectAndObjectValues(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
@@ -177,8 +177,7 @@ public class RelationDocumentModelHandler
         // we will also set those.
         // Note that this introduces another caching problem... 
         DocumentModel relationDocModel = wrapDoc.getWrappedObject();
-        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
-        RepositoryInstanceInterface repoSession = this.getRepositorySession();
+        CoreSessionInterface repoSession = this.getRepositorySession();
         
         DocumentModel subjectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, SUBJ_DOC_MODEL);
         DocumentModel objectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, OBJ_DOC_MODEL);
@@ -230,7 +229,7 @@ public class RelationDocumentModelHandler
     public RelationsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         RelationsCommonList relList = this.extractPagingInfo(new RelationsCommonList(), wrapDoc);
         relList.setFieldsReturned("subjectCsid|relationshipType|predicateDisplayName|relationshipMetaType|objectCsid|uri|csid|subject|object");
-        ServiceContext ctx = getServiceContext();
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
         String serviceContextPath = getServiceContextPath();
 
         TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
@@ -376,7 +375,7 @@ public class RelationDocumentModelHandler
     private final boolean OBJ_DOC_MODEL = false;
     
     private DocumentModel getSubjectOrObjectDocModel(
-    		RepositoryInstanceInterface repoSession,
+    		CoreSessionInterface repoSession,
     		DocumentModel relationDocModel,
     		boolean fSubject) throws Exception {
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
@@ -398,14 +397,14 @@ public class RelationDocumentModelHandler
             // provided as an alternate identifier.
         }
         if (Tools.notBlank(csid)) {
-        	RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl)getRepositoryClient(ctx);
+        	RepositoryClientImpl nuxeoRepoClient = (RepositoryClientImpl)getRepositoryClient(ctx);
             DocumentWrapper<DocumentModel> docWrapper = nuxeoRepoClient.getDocFromCsid(ctx, repoSession, csid);
             docModel = docWrapper.getWrappedObject();
         } else { //  if (Tools.isBlank(objectCsid)) {
             try {
             	refName = (String) relationDocModel.getProperty(commonPartLabel, 
             			(fSubject?RelationJAXBSchema.SUBJECT_REFNAME:RelationJAXBSchema.OBJECT_REFNAME));
-            	docModel = ResourceBase.getDocModelForRefName(repoSession, refName, ctx.getResourceMap());
+            	docModel = NuxeoBasedResource.getDocModelForRefName(ctx, refName, ctx.getResourceMap());
             } catch (Exception e) {
                 throw new InvalidDocumentException(
                         "Relation record must have a CSID or refName to identify the object of the relation.", e);

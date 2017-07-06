@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Location schema (XSD)
+
+    Entity  : Location
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+-->
+
 <xs:schema 
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
@@ -19,6 +28,7 @@
             <xs:sequence>
                 <!--  Common identifier -->
                 <xs:element name="csid" type="xs:string" />
+				<xs:element name="rev" type="xs:integer" /> <!-- Revision number -->
                 
                 <!--  Location Information Group -->
                 <!--  inAuthority is the csid of the owning LocationAuthority -->

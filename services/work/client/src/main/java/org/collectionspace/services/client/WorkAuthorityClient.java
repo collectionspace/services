@@ -15,12 +15,13 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.work.WorkauthoritiesCommon;
 import org.collectionspace.services.work.WorksCommon;
 
 /**
  * The Class WorkAuthorityClient.
  */
-public class WorkAuthorityClient extends AuthorityClientImpl<WorksCommon, WorkAuthorityProxy> {
+public class WorkAuthorityClient extends AuthorityClientImpl<WorkauthoritiesCommon, WorksCommon, WorkAuthorityProxy> {
 
     public static final String SERVICE_NAME = "workauthorities";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
@@ -40,6 +41,17 @@ public class WorkAuthorityClient extends AuthorityClientImpl<WorksCommon, WorkAu
     public static final String SERVICE_ITEM_COMMON_PART_NAME = SERVICE_ITEM_NAME
             + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
 
+    //
+    // Constructors
+    //
+    public WorkAuthorityClient() throws Exception {
+    	super();
+    }
+    
+    public WorkAuthorityClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
+    
     @Override
     public String getServiceName() {
         return SERVICE_NAME;

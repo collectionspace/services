@@ -1,0 +1,29 @@
+<jaxb:bindings version="1.0"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:annox="http://annox.dev.java.net"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <!--
+    <jaxb:bindings schemaLocation="permissions_roles.xsd" node="/xs:schema">
+        <jaxb:bindings node="xs:complexType[@name='permission_role']">
+            <annox:annotate>
+                <annox:annotate annox:class="javax.xml.bind.annotation.XmlRootElement" name="permission_role" />
+            </annox:annotate>
+        </jaxb:bindings>
+    </jaxb:bindings>
+	<jaxb:bindings schemaLocation="accounts_roles.xsd" node="/xs:schema">
+        <jaxb:bindings node="xs:complexType[@name='account_role']">
+            <annox:annotate>
+                <annox:annotate annox:class="javax.xml.bind.annotation.XmlRootElement" name="account_role" />
+            </annox:annotate>
+        </jaxb:bindings>
+    </jaxb:bindings>
+	<jaxb:bindings schemaLocation="accounts_permissions.xsd" node="/xs:schema">
+        <jaxb:bindings node="xs:complexType[@name='account_permission']">
+            <annox:annotate>
+                <annox:annotate annox:class="javax.xml.bind.annotation.XmlRootElement" name="account_permission" />
+            </annox:annotate>
+        </jaxb:bindings>
+    </jaxb:bindings>
+    -->
+</jaxb:bindings>

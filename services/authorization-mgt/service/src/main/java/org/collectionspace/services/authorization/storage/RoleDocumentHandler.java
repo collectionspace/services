@@ -67,8 +67,7 @@ public class RoleDocumentHandler
         }
         
         setTenant(role);
-        role.setRoleName(fixRoleName(role.getRoleName(),
-        		role.getTenantId()));
+        role.setRoleName(RoleClient.getBackendRoleName(role.getRoleName(), role.getTenantId()));
         role.setCsid(id);
         // We do not allow creation of locked roles through the services.
         role.setMetadataProtection(null);
@@ -81,7 +80,7 @@ public class RoleDocumentHandler
         Role roleReceived = getCommonPart();
         // If marked as metadata immutable, do not do update
         if(!RoleClient.IMMUTABLE.equals(roleFound.getMetadataProtection())) {
-	        roleReceived.setRoleName(fixRoleName(roleReceived.getRoleName(),
+	        roleReceived.setRoleName(RoleClient.getBackendRoleName(roleReceived.getRoleName(),
 	        		roleFound.getTenantId()));
 	        merge(roleReceived, roleFound);
         }
@@ -209,15 +208,6 @@ public class RoleDocumentHandler
         if (!SecurityUtils.isCSpaceAdmin()) {
             role.setTenantId(null);
         }
-    }
-
-    private String fixRoleName(String role, String tenantId) {
-        String roleName = role.toUpperCase();
-        String rolePrefix = "ROLE_" + tenantId + "_";
-        if (!roleName.startsWith(rolePrefix)) {
-            roleName = rolePrefix + roleName;
-        }
-        return roleName;
     }
 
     private void setTenant(Role role) {

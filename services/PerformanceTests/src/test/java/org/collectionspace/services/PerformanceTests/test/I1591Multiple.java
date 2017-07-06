@@ -28,14 +28,8 @@ import javax.ws.rs.core.Response;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
-
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -53,17 +47,20 @@ import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 public class I1591Multiple extends CollectionSpacePerformanceTest {
 
     final Logger logger = LoggerFactory.getLogger(I1591Multiple.class);
-    private final String COLLECTION_OBJECT_COMMON_PART_NAME =
-        getCollectionObjectCommonPartName();
     private static int MAX_RECORDS = 500;
     String[] coList = new String[MAX_RECORDS];
+    private String COLLECTION_OBJECT_COMMON_PART_NAME;
+    
+    public I1591Multiple() throws Exception {
+        COLLECTION_OBJECT_COMMON_PART_NAME = getCollectionObjectCommonPartName();
+    }
 
-    private String getCollectionObjectCommonPartName() {
+    private String getCollectionObjectCommonPartName() throws Exception {
         return new CollectionObjectClient().getCommonPartName();
     }
 
     @Test
-    public void testCreateWithMultipleClientInstantiations() {
+    public void testCreateWithMultipleClientInstantiations() throws Exception {
         coList = this.createCollectionObjects(MAX_RECORDS);
     }
 
@@ -75,8 +72,9 @@ public class I1591Multiple extends CollectionSpacePerformanceTest {
      * @param identifier A arbitrary identifier to use when filling
      *                   the CollectionObject's fields with values.
      * @return A resource ID for the newly-created object.
+     * @throws Exception 
      */
-    private String createCollectionObject(long identifier) throws AssertionError {
+    private String createCollectionObject(long identifier) throws AssertionError, Exception {
 
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         String resourceId = null;
@@ -91,15 +89,15 @@ public class I1591Multiple extends CollectionSpacePerformanceTest {
         commonPart.setLabel(collectionObjectClient.getCommonPartName());
 
         // Make a create call with that payload and check the response.
-        ClientResponse<Response> response = collectionObjectClient.create(multipart);
+        Response response = collectionObjectClient.create(multipart);
         try {
             Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
             resourceId = extractId(response);
-        // Since failed Asserts can throw an Exception, ensure
-        // that the underlying HTTP connection is explicitly closed
-        // under all circumstances.
+	        // Since failed Asserts can throw an Exception, ensure
+	        // that the underlying HTTP connection is explicitly closed
+	        // under all circumstances.
         } finally {
-            response.releaseConnection();
+            response.close();
         }
 
         // Return the ID of the newly-created CollectionObject resource.
@@ -111,35 +109,33 @@ public class I1591Multiple extends CollectionSpacePerformanceTest {
      *
      * @param numberOfObjects The number of CollectionObject resources to create.
      * @return A list of the resource IDs of the newly-created object resources.
+     * @throws Exception 
      */
-    public String[] createCollectionObjects(int numberOfObjects) {
+	public String[] createCollectionObjects(int numberOfObjects) throws Exception {
+		long identifier = 0;
+		int i = 0;
 
-            long identifier = 0;
-            int i = 0;
+		try {
+			for (i = 0; i <= numberOfObjects; i++) {
+				identifier = System.currentTimeMillis();
+				coList[i] = createCollectionObject(identifier);
+				if (logger.isDebugEnabled() == true) {
+					logger.debug("Created CollectionObject #: " + i);
+				}
+			}
+		} catch (AssertionError e) {
+			if (logger.isDebugEnabled() == true) {
+				logger.debug("FAILURE: Created " + i + " of " + numberOfObjects
+						+ " before failing.");
+			}
+			Assert.assertTrue(false);
+		}
 
-            try {
-                for (i = 0; i <= numberOfObjects; i++) {
-                    identifier = System.currentTimeMillis();
-                    coList[i] = createCollectionObject(identifier);
-                    if (logger.isDebugEnabled() == true) {
-                        logger.debug("Created CollectionObject #: " + i);
-                    }
-                }
-            } catch (AssertionError e) {
-                if (logger.isDebugEnabled() == true) {
-                    logger.debug("FAILURE: Created " + i +
-                        " of " + numberOfObjects +
-                        " before failing.");
-                }
-                Assert.assertTrue(false);
-            }
-
-            return coList;
-    }
+		return coList;
+	}
 
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
-
+    public void cleanUp() throws Exception {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         String resourceId = "";
 
@@ -149,11 +145,10 @@ public class I1591Multiple extends CollectionSpacePerformanceTest {
 
         for (int i = 0; i < coList.length; i++) {
             resourceId = coList[i];
-            ClientResponse<Response> res = collectionObjectClient.delete(resourceId);
+            collectionObjectClient.delete(resourceId).close();
             if (logger.isDebugEnabled() == true) {
                 logger.debug("Deleted CollectionObject #: " + i);
             }
-            res.releaseConnection();
         }
         
         if (logger.isDebugEnabled()) {

@@ -27,9 +27,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
-import javax.ws.rs.core.Response;
-import org.collectionspace.services.authorization.perms.EffectType;
 
+import javax.ws.rs.core.Response;
+
+import org.collectionspace.services.authorization.perms.EffectType;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionAction;
 import org.collectionspace.services.authorization.PermissionRole;
@@ -45,11 +46,8 @@ import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.client.RoleFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.client.test.ServiceRequestType;
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
@@ -82,7 +80,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
      * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
      */
     @Override
-    protected String getServicePathComponent() {
+    protected String getServicePathComponent() throws Exception {
         return new RolePermissionClient().getServicePathComponent();
     }
     
@@ -96,10 +94,18 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
     }
 
     /**
+     * The entity type expected from the JAX-RS Response object
+     */
+    public Class<PermissionRole> getEntityResponseType() {
+    	return PermissionRole.class;
+    }
+    
+    /**
      * Seed data.
+     * @throws Exception 
      */
     @BeforeClass(alwaysRun = true)
-    public void seedData() {
+    public void seedData() throws Exception {
 
         String rn1 = getRoleName();
         String r1RoleId = createRole(rn1);
@@ -134,9 +140,14 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new RolePermissionClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new RolePermissionClient(clientPropertiesFilename);
+	}	
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readPaginatedList(java.lang.String)
@@ -168,9 +179,8 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
         PermissionRole permRole = createPermissionRoleInstance(rv,
                 permValues.values(), true, true);
         RolePermissionClient client = new RolePermissionClient();
-        ClientResponse<Response> res = null;
+        Response res = client.create(rv.getRoleId(), permRole);
         try {
-            res = client.create(rv.getRoleId(), permRole);
             int statusCode = res.getStatus();
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": status = " + statusCode);
@@ -185,7 +195,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
             }
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -244,9 +254,8 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
 
         // Submit the request to the service and store the response.
         RolePermissionClient client = new RolePermissionClient();
-        ClientResponse<PermissionRole> res = null;
+        Response res = client.read(roleValues.get(getRoleName()).getRoleId());
         try {
-            res = client.read(roleValues.get(getRoleName()).getRoleId());
             int statusCode = res.getStatus();
 
             // Check the status code of the response: does it match
@@ -258,11 +267,11 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
 
-            PermissionRole output = (PermissionRole) res.getEntity();
+            PermissionRole output = res.readEntity(PermissionRole.class);
             Assert.assertNotNull(output);
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -279,10 +288,8 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
 
         // Submit the request to the service and store the response.
         RolePermissionClient client = new RolePermissionClient();
-        ClientResponse<PermissionRole> res = null;
+        Response res = client.read(NON_EXISTENT_ID);
         try {
-
-            res = client.read(NON_EXISTENT_ID);
             int statusCode = res.getStatus();
 
             // Check the status code of the response: does it match
@@ -295,7 +302,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -305,10 +312,8 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
         setupRead();
         // Submit the request to the service and store the response.
         RolePermissionClient client = new RolePermissionClient();
-        ClientResponse<PermissionRole> res = null;
+        Response res = client.read(roleValues.get(getRoleName() + NO_REL_SUFFIX).getRoleId());
         try {
-
-            res = client.read(roleValues.get(getRoleName() + NO_REL_SUFFIX).getRoleId());
             int statusCode = res.getStatus();
 
             // Check the status code of the response: does it match
@@ -319,7 +324,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
             Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
-            PermissionRole output = (PermissionRole) res.getEntity();
+            PermissionRole output = res.readEntity(PermissionRole.class);
 
             String sOutput = objectAsXmlString(output, PermissionRole.class);
             if (logger.isDebugEnabled()) {
@@ -327,7 +332,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
             }
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -416,16 +421,15 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
         // Submit the request to the service and store the response.
         RolePermissionClient client = new RolePermissionClient();
         RoleValue rv = roleValues.get(getRoleName());
-        ClientResponse<Response> delRes = null;
+        Response delRes = client.delete(rv.getRoleId());
         try {
-        	delRes = client.delete(rv.getRoleId());
             int statusCode = delRes.getStatus();
             Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
             if (delRes != null) {
-            	delRes.releaseConnection();
+            	delRes.close();
             }
         }
 
@@ -434,22 +438,24 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
         setupDelete();
         
         rv = roleValues.get(getRoleName());
-        ClientResponse<PermissionRole> readResponse = client.read(rv.getRoleId());
-        PermissionRole toDelete = readResponse.getEntity();
-        readResponse.releaseConnection();        
+        Response readResponse = client.read(rv.getRoleId());
+        PermissionRole toDelete = null;
+        try {
+	        toDelete = readResponse.readEntity(PermissionRole.class);
+        } finally {
+        	readResponse.close();
+        }
         
         rv = toDelete.getRole().get(0);
-        ClientResponse<Response> res = null;
+        Response res = client.delete(rv.getRoleId(), toDelete);
         try {
-            res = client.delete(
-                    rv.getRoleId(), toDelete);
             int statusCode = res.getStatus();
             Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -532,10 +538,11 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
 
     /**
      * Clean up.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun = true)
     @Override
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         setupDelete();
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
@@ -561,15 +568,16 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
      * @param resName the res name
      * @param effect the effect
      * @return the string
+     * @throws Exception 
      */
-    private String createPermission(String resName, EffectType effect) {
+    private String createPermission(String resName, EffectType effect) throws Exception {
         setupCreate();
         PermissionClient permClient = new PermissionClient();
         List<PermissionAction> actions = PermissionFactory.createDefaultActions();
         Permission permission = PermissionFactory.createPermissionInstance(resName,
                 "default permissions for " + resName,
                 actions, effect, true, true, true);
-        ClientResponse<Response> res = null;
+        Response res = null;
         String id = null;
         try {
             res = permClient.create(permission);
@@ -584,7 +592,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
             id = extractId(res);
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         return id;
@@ -594,14 +602,14 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
      * Delete permission.
      *
      * @param permId the perm id
+     * @throws Exception 
      */
-    private void deletePermission(String permId) {
+    private void deletePermission(String permId) throws Exception {
         setupDelete();
         PermissionClient permClient = new PermissionClient();
 
-        ClientResponse<Response> res = null;
+        Response res = permClient.delete(permId);
         try {
-            res = permClient.delete(permId);
             int statusCode = res.getStatus();
             if (logger.isDebugEnabled()) {
                 logger.debug("deletePermission: delete permission id="
@@ -613,7 +621,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
 
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -623,8 +631,9 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
      *
      * @param roleName the role name
      * @return the string
+     * @throws Exception 
      */
-    private String createRole(String roleName) {
+    private String createRole(String roleName) throws Exception {
         setupCreate();
         RoleClient roleClient = new RoleClient();
 
@@ -632,7 +641,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
         		roleName, //the display name
                 "role for " + roleName, true);
         role.setRoleGroup("something");
-        ClientResponse<Response> res = null;
+        Response res = null;
         String id = null;
         try {
             res = roleClient.create(role);
@@ -647,7 +656,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
             id = extractId(res);
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         return id;
@@ -657,11 +666,12 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
      * Delete role.
      *
      * @param roleId the role id
+     * @throws Exception 
      */
-    private void deleteRole(String roleId) {
+    private void deleteRole(String roleId) throws Exception {
         setupDelete();
         RoleClient roleClient = new RoleClient();
-        ClientResponse<Response> res = null;
+        Response res = null;
         try {
             res = roleClient.delete(roleId);
             int statusCode = res.getStatus();
@@ -673,7 +683,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
-            res.releaseConnection();
+            res.close();
         }
 
     }
@@ -709,6 +719,12 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
     	return roleValues.get(getRoleName()).getRoleId();
     }
 	
+	@Override
+	protected long getSizeOfList(PermissionRole permRole) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Method getSizeOfList() is not implemented because this service does not support lists.");
+	}
+    
     /*
      * For convenience and terseness, this test method is the base of the test execution dependency chain.  Other test methods may
      * refer to this method in their @Test annotation declarations.
@@ -719,5 +735,5 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
         		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
     public void CRUDTests(String testName) {
     	// Do nothing.  Simply here to for a TestNG execution order for our tests
-    }	
+    }
 }
