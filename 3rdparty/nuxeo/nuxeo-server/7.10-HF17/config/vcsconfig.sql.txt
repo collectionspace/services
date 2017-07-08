@@ -4,6 +4,35 @@
 # or https://doc.nuxeo.com/nxdoc/repository-configuration/#page-title
 #
 
+#CATEGORY: first
+
+#
+# Create the text search configuration for accent-insensitive full text search.
+# See also: <fulltext> element in proto-repo-config.xml.
+#
+
+# Uh oh, superuser privileges are needed to install the unaccent extension,
+# so the below statement won't execute as the nuxeo user.
+# CREATE EXTENSION IF NOT EXISTS unaccent;
+# Instead just check if the unaccent extension is installed, and fail with a
+# useful error message if it's not.
+
+#TEST:
+SELECT 1 FROM pg_extension WHERE extname = 'unaccent';
+
+#IF: emptyResult
+LOG.FATAL The postgres unaccent extension must be installed in all nuxeo repository databases. To fix this, connect to each nuxeo repository database (those owned by a nuxeo_* user) as a superuser, and execute the statement "CREATE EXTENSION unaccent;". Then restart tomcat.
+
+DO $$
+BEGIN
+	IF NOT EXISTS (SELECT 1 FROM pg_ts_config WHERE cfgname = 'unaccent_english') THEN
+		CREATE TEXT SEARCH CONFIGURATION unaccent_english ( COPY = english );
+		ALTER TEXT SEARCH CONFIGURATION unaccent_english
+			ALTER MAPPING FOR asciihword, asciiword, hword_asciipart, hword, hword_part, word
+			WITH unaccent, english_stem;
+	END IF;
+END $$;
+
 #CATEGORY: afterTableCreation
 
 #
