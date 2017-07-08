@@ -64,76 +64,16 @@ import org.slf4j.LoggerFactory;
  *
  * @author
  */
-public class CollectionObjectValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, PoxPayloadOut> {
-
-    final Logger logger = LoggerFactory.getLogger(CollectionObjectValidatorHandler.class);
-
-    //
-    // Error Strings
-    //
-    private static final String VALIDATION_ERROR = "The collection object record payload was invalid. See log file for more details.";
-    private static final String OBJECTNUMBER_NULL_ERROR = "The collection object field \"objectNumber\" cannot be empty or missing.";
-
-    @Override
-    protected Class<?> getCommonPartClass() {
-    	return CollectionobjectsCommon.class;
-    }
-
-	@Override
-	protected void handleGet(){
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected void handleGetAll() {
-		// TODO Auto-generated method stub
-
-	}
-
+public class BAMPFACollectionObjectValidatorHandler extends CollectionObjectValidatorHandler {
 	@Override
 	protected void handleUpdate()
 			throws InvalidDocumentException {
-    	try {
-            CollectionobjectsCommon co = (CollectionobjectsCommon) getCommonPart();
-            //validateCollectionobjectsCommon(co);   REM - Commented out this validation on UPDATE, see CSPACE-6705
-    	} catch (AssertionError e) {
-    		if (logger.isErrorEnabled() == true) {
-    			logger.error(e.getMessage(), e);
-    		}
-    		throw new InvalidDocumentException(VALIDATION_ERROR, e);
-    	}
+			// Allow an empty object number.
 	}
 
 	@Override
-	protected void handleDelete() {
-		// TODO Auto-generated method stub
-
+	protected void handleCreate()
+			throws InvalidDocumentException {
+		// Allow an empty object number.
 	}
-
-    @Override
-    protected void handleCreate()
-    		throws InvalidDocumentException {
-    	try {
-            CollectionobjectsCommon co = (CollectionobjectsCommon) getCommonPart();
-            // BAMPFA - Allow an empty object number.
-            // validateCollectionobjectsCommon(co);
-    	} catch (AssertionError e) {
-    		if (logger.isErrorEnabled() == true) {
-    			logger.error(e.getMessage(), e);
-    		}
-    		throw new InvalidDocumentException(VALIDATION_ERROR, e);
-    	}
-    }
-
-    //
-    // Private Methods
-    //
-    private void validateCollectionobjectsCommon(CollectionobjectsCommon co) throws AssertionError {
-    	CS_ASSERT(co != null);
-        String objectNumber = co.getObjectNumber();
-        CS_ASSERT(objectNumber != null, OBJECTNUMBER_NULL_ERROR);
-        CS_ASSERT(objectNumber.isEmpty() == false, OBJECTNUMBER_NULL_ERROR);
-
-    }
 }
