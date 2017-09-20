@@ -551,31 +551,6 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         }
         return result.getBytes();
     }
-
-    /**
-     * Delete authority.
-     * 
-     * @param csid the csid
-     * 
-     * @return the response
-     */
-    @Deprecated
-//    @DELETE
-    @Path("{csid}")
-    public Response old_deleteAuthority(@PathParam("csid") String csid) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("deleteAuthority with csid=" + csid);
-        }
-        try {
-            ensureCSID(csid, ServiceMessages.DELETE_FAILED, "Authority.csid");
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
-            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
-            getRepositoryClient(ctx).delete(ctx, csid, handler);
-            return Response.status(HttpResponseCodes.SC_OK).build();
-        } catch (Exception e) {
-            throw bigReThrow(e, ServiceMessages.DELETE_FAILED, csid);
-        }
-    }
     
     /**
      * Delete authority
