@@ -461,7 +461,7 @@ public abstract class DocumentModelHandler<T, TL>
 	    	MultivaluedMap<String, String> queryParams = getServiceContext().getQueryParams();
 	    	String asSubjectCsid = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_SUBJECT);
 	    	String asObjectCsid = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_OBJECT);
-	    	String asEitherCsid = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_EITHER);
+//	    	String asEitherCsid = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_EITHER);
 	    	String matchObjDocTypes = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_MATCH_OBJ_DOCTYPES);
 	    	String selectDocType = (String)queryParams.getFirst(IQueryManager.SELECT_DOC_TYPE_FIELD);
 
@@ -478,6 +478,7 @@ public abstract class DocumentModelHandler<T, TL>
 	    	String relTable = IRelationsManager.DOC_TYPE + " " + IQueryManager.CMIS_RELATIONS_PREFIX;
 	    	String relObjectCsidCol = IRelationsManager.CMIS_CSPACE_RELATIONS_OBJECT_ID;
 	    	String relSubjectCsidCol = IRelationsManager.CMIS_CSPACE_RELATIONS_SUBJECT_ID;
+	    	String relEitherCsidCol = IRelationsManager.CMIS_CSPACE_RELATIONS_EITHER_ID;
 	    	String targetCsidCol = IQueryManager.CMIS_TARGET_CSID;
 	    	String tenantID = this.getServiceContext().getTenantId();
 
@@ -494,11 +495,10 @@ public abstract class DocumentModelHandler<T, TL>
 	    		// Since our query param is the "object" value, join the tables where the CSID of the document is the other side (the "subject") of the relationship.
 	    		theOnClause = relSubjectCsidCol + " = " + targetCsidCol; 
 	    		theWhereClause = relObjectCsidCol + " = " + "'" + asObjectCsid + "'";
-	    	} else if (asEitherCsid != null && !asEitherCsid.isEmpty()) {
-	    		theOnClause = relObjectCsidCol + " = " + targetCsidCol
-	    				+ " OR " + relSubjectCsidCol + " = " + targetCsidCol;
-	    		theWhereClause = relSubjectCsidCol + " = " + "'" + asEitherCsid + "'"
-	    				+ " OR " + relObjectCsidCol + " = " + "'" + asEitherCsid + "'";
+//	    	} else if (asEitherCsid != null && !asEitherCsid.isEmpty()) {
+//	    		theOnClause = relEitherCsidCol + " = " + targetCsidCol; // See https://issues.collectionspace.org/browse/DRYD-119
+//	    		theWhereClause = relSubjectCsidCol + " = " + "'" + asEitherCsid + "'"
+//	    				+ " OR " + relObjectCsidCol + " = " + "'" + asEitherCsid + "'";
 	    	} else {
 	    		//Since the call to isCMISQuery() return true, we should never get here.
 	    		logger.error("Attempt to make CMIS query failed because the HTTP request was missing valid query parameters.");
