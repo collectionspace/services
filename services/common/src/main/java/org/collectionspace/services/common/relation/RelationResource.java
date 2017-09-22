@@ -91,8 +91,9 @@ public class RelationResource extends NuxeoBasedResource {
 		String predicate = queryParams.getFirst(IRelationsManager.PREDICATE_QP);
 		String objectCsid = queryParams.getFirst(IRelationsManager.OBJECT_QP);
 		String objectType = queryParams.getFirst(IRelationsManager.OBJECT_TYPE_QP);
+		String subjectOrObject = queryParams.getFirst(IRelationsManager.SUBJECT_OR_OBJECT);
 
-		return this.getRelationList(parentCtx, uriInfo, subjectCsid, subjectType, predicate, objectCsid, objectType);
+		return this.getRelationList(parentCtx, uriInfo, subjectCsid, subjectType, predicate, objectCsid, objectType, subjectOrObject);
 	}
 
     private RelationsCommonList getRelationList(
@@ -101,7 +102,8 @@ public class RelationResource extends NuxeoBasedResource {
     		String subjectCsid, String subjectType,
     		String predicate,
     		String objectCsid,
-    		String objectType) throws CSWebApplicationException {
+    		String objectType,
+    		String subjectOrObject) throws CSWebApplicationException {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
             if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) { // If the parent context has a non-null and open repository session then use it
@@ -109,7 +111,7 @@ public class RelationResource extends NuxeoBasedResource {
             }
             DocumentHandler handler = createDocumentHandler(ctx);
 
-            String relationClause = RelationsUtils.buildWhereClause(subjectCsid, subjectType, predicate, objectCsid, objectType);
+            String relationClause = RelationsUtils.buildWhereClause(subjectCsid, subjectType, predicate, objectCsid, objectType, subjectOrObject);
             handler.getDocumentFilter().appendWhereClause(relationClause, IQueryManager.SEARCH_QUALIFIER_AND);
             //
             // Handle keyword clause

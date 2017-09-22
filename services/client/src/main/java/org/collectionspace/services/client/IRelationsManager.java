@@ -31,6 +31,9 @@ public interface IRelationsManager {
 //    static public final String SUBJECT_TYPE = "subjectType";
     static public final String SUBJECT_TYPE_QP = SUBJECT_QP + "Type";
     
+    // A query param for specifying either Subject or Object
+    static public final String SUBJECT_OR_OBJECT = "sbjOrObj";
+    
     /** The Constant PREDICATE. */
     static public final String PREDICATE = "predicate";
     static public final String PREDICATE_QP = "prd";

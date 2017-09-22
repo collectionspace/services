@@ -52,20 +52,32 @@ public class RelationsUtils {
      */
     public static String buildWhereClause(String subject, String subjectType,
     		String predicate,
-    		String object, String objectType) {
+    		String object, String objectType,
+    		String subjectOrObject) {
     	String result = null;
     	
-    	StringBuilder stringBuilder = new StringBuilder();
+    	StringBuilder stringBuilder = new StringBuilder();    	
+    	
     	if (subject != null) {
     		stringBuilder.append(RelationConstants.NUXEO_SCHEMA_NAME + ":" +
     				RelationJAXBSchema.SUBJECT_CSID + " = " + "'" + subject + "'");
     	}
     	
+    	// (subectCsid = ${csid} OR objectCsid = ${csid})
+    	if (subjectOrObject != null) {
+    		if (stringBuilder.length() > 0) {
+    			stringBuilder.append(IQueryManager.SEARCH_QUALIFIER_AND);
+    		}
+    		stringBuilder.append("(" + RelationConstants.NUXEO_SCHEMA_NAME + ":" +
+    				RelationJAXBSchema.SUBJECT_CSID + " = " + "'" + subjectOrObject + "'");
+    		stringBuilder.append(" OR " + RelationConstants.NUXEO_SCHEMA_NAME + ":" +
+    				RelationJAXBSchema.OBJECT_CSID + " = " + "'" + subjectOrObject + "'" + ")");
+    	}    	
+    	
     	if (subjectType != null) {
     		if (stringBuilder.length() > 0) {
     			stringBuilder.append(IQueryManager.SEARCH_QUALIFIER_AND);
     		}
-    		// BUG - this should use the new field RelationJAXBSchema.SUBJECT_DOCTYPE
     		stringBuilder.append(RelationConstants.NUXEO_SCHEMA_NAME + ":" +
     				RelationJAXBSchema.SUBJECT_DOCTYPE + " = " + "'" + subjectType + "'");
     	}

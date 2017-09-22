@@ -273,7 +273,7 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 				String id = NuxeoUtils.getCsid(docModel);
 				item.put(STANDARD_LIST_CSID_FIELD, id);
 				if (markRtSbj != null) {
-					String relationClause = RelationsUtils.buildWhereClause(markRtSbj, null, null, id, null);
+					String relationClause = RelationsUtils.buildWhereClause(markRtSbj, null, null, id, null, null);
 					String whereClause = relationClause + IQueryManager.SEARCH_QUALIFIER_AND
 							+ NuxeoUtils.buildWorkflowNotDeletedWhereClause();
 					QueryContext queryContext = new QueryContext(ctx, whereClause);
