@@ -218,19 +218,24 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 	@Override
 	public AbstractCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
 		CommonList commonList = new CommonList();
-		String markRtSbj = null;
 		CoreSessionInterface repoSession = null;
 		RepositoryClientImpl repoClient = null;
 		boolean releaseRepoSession = false;
 
 		AbstractServiceContextImpl ctx = (AbstractServiceContextImpl) getServiceContext();
 		MultivaluedMap<String, String> queryParams = getServiceContext().getQueryParams();
-		markRtSbj = queryParams.getFirst(IQueryManager.MARK_RELATED_TO_CSID_AS_SUBJECT);
-		if (markRtSbj != null && markRtSbj.isEmpty())
+		String markRtSbj = queryParams.getFirst(IQueryManager.MARK_RELATED_TO_CSID_AS_SUBJECT);
+		if (markRtSbj != null && markRtSbj.isEmpty()) {
 			markRtSbj = null;
+		}
+		
+		String markRtSbjOrObj = queryParams.getFirst(IQueryManager.MARK_RELATED_TO_CSID_AS_EITHER);
+		if (markRtSbjOrObj != null && markRtSbjOrObj.isEmpty()) {
+			markRtSbjOrObj = null;
+		}
 
 		try {
-			if (markRtSbj != null) {
+			if (markRtSbj != null || markRtSbjOrObj != null) {
 				repoClient = (RepositoryClientImpl) this.getRepositoryClient(ctx);
 				RepositoryClientImpl nuxeoRepoClient = (RepositoryClientImpl) repoClient;
 				repoSession = this.getRepositorySession();
@@ -245,7 +250,7 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 			List<ListResultField> resultsFields = getListItemsArray();
 			int nFields = resultsFields.size() + NUM_STANDARD_LIST_RESULT_FIELDS;
 			int baseFields = NUM_STANDARD_LIST_RESULT_FIELDS;
-			if (markRtSbj != null) {
+			if (markRtSbj != null || markRtSbjOrObj != null) {
 				nFields++;
 				baseFields++;
 			}
@@ -257,7 +262,7 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 			fields[3] = STANDARD_LIST_UPDATED_AT_FIELD;
 			fields[4] = STANDARD_LIST_WORKFLOW_FIELD;
 			
-			if (markRtSbj != null) {
+			if (markRtSbj != null || markRtSbjOrObj != null) {
 				fields[5] = STANDARD_LIST_MARK_RT_FIELD;
 			}
 			
@@ -272,8 +277,8 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 				DocumentModel docModel = iter.next();
 				String id = NuxeoUtils.getCsid(docModel);
 				item.put(STANDARD_LIST_CSID_FIELD, id);
-				if (markRtSbj != null) {
-					String relationClause = RelationsUtils.buildWhereClause(markRtSbj, null, null, id, null, null);
+				if (markRtSbj != null || markRtSbjOrObj != null) {
+					String relationClause = RelationsUtils.buildWhereClause(markRtSbj, null, null, id, null, markRtSbjOrObj);
 					String whereClause = relationClause + IQueryManager.SEARCH_QUALIFIER_AND
 							+ NuxeoUtils.buildWorkflowNotDeletedWhereClause();
 					QueryContext queryContext = new QueryContext(ctx, whereClause);

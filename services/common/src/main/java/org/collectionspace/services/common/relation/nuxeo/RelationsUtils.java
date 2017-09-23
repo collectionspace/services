@@ -56,24 +56,50 @@ public class RelationsUtils {
     		String subjectOrObject) {
     	String result = null;
     	
-    	StringBuilder stringBuilder = new StringBuilder();    	
+    	StringBuilder stringBuilder = new StringBuilder();
     	
-    	if (subject != null) {
-    		stringBuilder.append(RelationConstants.NUXEO_SCHEMA_NAME + ":" +
-    				RelationJAXBSchema.SUBJECT_CSID + " = " + "'" + subject + "'");
-    	}
-    	
-    	// (subectCsid = ${csid} OR objectCsid = ${csid})
+    	//
+    	// (subectCsid = ${csid} OR objectCsid = ${csid}) overrides the individual subject or object query params
+    	// (Example,	((rel.subjectcsid = subject AND rel.objectcsid = target)
+    	//					OR 
+    	//				(rel.subjectcsid = target AND rel.objectcsid = subject))
+    	//
     	if (subjectOrObject != null) {
-    		if (stringBuilder.length() > 0) {
-    			stringBuilder.append(IQueryManager.SEARCH_QUALIFIER_AND);
-    		}
+    		String target = object;
+    		stringBuilder.append("(");
     		stringBuilder.append("(" + RelationConstants.NUXEO_SCHEMA_NAME + ":" +
     				RelationJAXBSchema.SUBJECT_CSID + " = " + "'" + subjectOrObject + "'");
-    		stringBuilder.append(" OR " + RelationConstants.NUXEO_SCHEMA_NAME + ":" +
+    		stringBuilder.append(" AND " + RelationConstants.NUXEO_SCHEMA_NAME + ":" +
+    				RelationJAXBSchema.OBJECT_CSID + " = " + "'" + target + "'" + ")");
+    		stringBuilder.append(" OR ");
+    		stringBuilder.append("(" + RelationConstants.NUXEO_SCHEMA_NAME + ":" +
+    				RelationJAXBSchema.SUBJECT_CSID + " = " + "'" + target + "'");
+    		stringBuilder.append(" AND " + RelationConstants.NUXEO_SCHEMA_NAME + ":" +
     				RelationJAXBSchema.OBJECT_CSID + " = " + "'" + subjectOrObject + "'" + ")");
-    	}    	
+    		stringBuilder.append(")");
+
+    	} else {
+        	if (subject != null) {
+        		if (stringBuilder.length() > 0) {
+        			stringBuilder.append(IQueryManager.SEARCH_QUALIFIER_AND);
+        		}
+
+        		stringBuilder.append(RelationConstants.NUXEO_SCHEMA_NAME + ":" +
+        				RelationJAXBSchema.SUBJECT_CSID + " = " + "'" + subject + "'");
+        	}
+        	
+        	if (object != null) {
+        		if (stringBuilder.length() > 0) {
+        			stringBuilder.append(IQueryManager.SEARCH_QUALIFIER_AND);
+        		}
+        		stringBuilder.append(RelationConstants.NUXEO_SCHEMA_NAME + ":" +
+        				RelationJAXBSchema.OBJECT_CSID + " = " + "'" + object + "'");
+        	}    		
+    	}
     	
+    	//
+    	// Check for the other possible query params
+    	//
     	if (subjectType != null) {
     		if (stringBuilder.length() > 0) {
     			stringBuilder.append(IQueryManager.SEARCH_QUALIFIER_AND);
@@ -89,15 +115,7 @@ public class RelationsUtils {
     		stringBuilder.append(RelationConstants.NUXEO_SCHEMA_NAME + ":" +
     				RelationJAXBSchema.RELATIONSHIP_TYPE + " = " + "'" + predicate + "'");
     	}
-    	
-    	if (object != null) {
-    		if (stringBuilder.length() > 0) {
-    			stringBuilder.append(IQueryManager.SEARCH_QUALIFIER_AND);
-    		}
-    		stringBuilder.append(RelationConstants.NUXEO_SCHEMA_NAME + ":" +
-    				RelationJAXBSchema.OBJECT_CSID + " = " + "'" + object + "'");
-    	}
-    	
+    	    	
     	if (objectType != null) {
     		if (stringBuilder.length() > 0) {
     			stringBuilder.append(IQueryManager.SEARCH_QUALIFIER_AND);
