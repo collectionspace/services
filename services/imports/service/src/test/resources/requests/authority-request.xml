@@ -5,7 +5,7 @@
             <personauthorities_common:displayName>Perf Test Person Auth ${docID}</personauthorities_common:displayName>
             <personauthorities_common:shortIdentifier>perfTestPersons-${docID}</personauthorities_common:shortIdentifier>
             <personauthorities_common:vocabType>PersonAuthority</personauthorities_common:vocabType>
-            <personauthorities_common:refName>urn:cspace:collectionspace.org:Personauthorities:name(perfTestPersons)'Perf Test Person Auth'</personauthorities_common:refName>
+            <personauthorities_common:refName>urn:cspace:collectionspace.org:Personauthorities:name(perfTestPersons-${docID})'Perf Test Person Auth ${docID}'</personauthorities_common:refName>
         </schema>
     </import>
     <import seq="2" service="Personauthorities" type="Personauthority" CSID="11111111-2222-3333-4444-123456789012">
@@ -13,7 +13,7 @@
             <personauthorities_common:displayName>Perf Test Person Auth ${docID}</personauthorities_common:displayName>
             <personauthorities_common:shortIdentifier>perfTestPersons-${docID}</personauthorities_common:shortIdentifier>
             <personauthorities_common:vocabType>PersonAuthority</personauthorities_common:vocabType>
-            <personauthorities_common:refName>urn:cspace:collectionspace.org:Personauthorities:name(perfTestPersons)'Perf Test Person Auth'</personauthorities_common:refName>
+            <personauthorities_common:refName>urn:cspace:collectionspace.org:Personauthorities:name(perfTestPersons-${docID})'Perf Test Person Auth ${docID}'</personauthorities_common:refName>
         </schema>
     </import>
 </imports>
