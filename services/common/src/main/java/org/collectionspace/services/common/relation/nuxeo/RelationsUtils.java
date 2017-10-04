@@ -58,13 +58,13 @@ public class RelationsUtils {
     	
     	StringBuilder stringBuilder = new StringBuilder();
     	
-    	//
-    	// (subectCsid = ${csid} OR objectCsid = ${csid}) overrides the individual subject or object query params
-    	// (Example,	((rel.subjectcsid = subject AND rel.objectcsid = target)
-    	//					OR 
-    	//				(rel.subjectcsid = target AND rel.objectcsid = subject))
-    	//
-    	if (subjectOrObject != null) {
+    	if (subjectOrObject != null && object != null) {
+        	// Used for GET requests like: cspace-services/collectionobjects?mkRtSbjOrObj=cf5db000-4e65-42d5-8117
+    		//
+        	// (Example,	((rel.subjectcsid = subject AND rel.objectcsid = target)
+        	//					OR 
+        	//				(rel.subjectcsid = target AND rel.objectcsid = subject))
+        	//
     		String target = object;
     		stringBuilder.append("(");
     		stringBuilder.append("(" + RelationConstants.NUXEO_SCHEMA_NAME + ":" +
@@ -77,8 +77,21 @@ public class RelationsUtils {
     		stringBuilder.append(" AND " + RelationConstants.NUXEO_SCHEMA_NAME + ":" +
     				RelationJAXBSchema.OBJECT_CSID + " = " + "'" + subjectOrObject + "'" + ")");
     		stringBuilder.append(")");
-
+    	} else if (subjectOrObject != null) {
+    		// Used for GET requests like: cspace-services/relations?sbjOrObj=cf5db000-4e65-42d5-8117
+        	//
+        	// (subectCsid = ${csid} OR objectCsid = ${csid}) overrides the individual subject or object query params
+        	// (Example,	(rel.subjectcsid = subjectOrObject	OR rel.objectcsid = subjectOrObject)
+        	//
+    		stringBuilder.append("(" + RelationConstants.NUXEO_SCHEMA_NAME + ":" +
+    				RelationJAXBSchema.SUBJECT_CSID + " = " + "'" + subjectOrObject + "'");
+    		stringBuilder.append(" OR ");
+    		stringBuilder.append(RelationConstants.NUXEO_SCHEMA_NAME + ":" +
+    				RelationJAXBSchema.OBJECT_CSID + " = " + "'" + subjectOrObject + "')");
     	} else {
+    		// Used for GET requests like: cspace-services/relations?sbj=cf5db000-4e65-42d5-8117
+    		// and cspace-services/relations?obj=cf5db000-4e65-42d5-8117
+    		//
         	if (subject != null) {
         		if (stringBuilder.length() > 0) {
         			stringBuilder.append(IQueryManager.SEARCH_QUALIFIER_AND);

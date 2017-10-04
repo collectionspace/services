@@ -39,16 +39,20 @@ import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.common.relation.nuxeo.RelationsUtils;
 import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
+import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 @Path("/relations")
@@ -128,6 +132,17 @@ public class RelationResource extends NuxeoBasedResource {
         }
     }
 
+    @DELETE
+    public Response delete(@Context UriInfo uriInfo) {
+    	Response result = Response.status(200).build();
+    	
+    	RelationsCommonList relationsList = this.getList(null, uriInfo);
+    	for (RelationListItem relation : relationsList.getRelationListItem()) {
+    		Response deleteResponse = this.delete(relation.getCsid());
+    	}
+    	
+    	return result;
+    }
 
 }
 
