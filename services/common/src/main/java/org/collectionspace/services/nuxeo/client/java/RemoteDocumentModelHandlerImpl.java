@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.nuxeo.client.java;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -53,6 +54,7 @@ import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.NuxeoBasedResource;
+import org.collectionspace.services.common.ServiceException;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.context.JaxRsContext;
@@ -63,6 +65,7 @@ import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.common.relation.RelationResource;
@@ -215,6 +218,32 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         }
     }
 	
+    @Override
+    public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+        DocumentModel docModel = wrapDoc.getWrappedObject();
+    	String workflowState = WorkflowClient.WORKFLOWSTATE_LOCKED;
+        
+    	if (docModel.getCurrentLifeCycleState().contains(workflowState) == true) {
+    		throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
+                    "Cannot UPDATE a resource/record if it is in the workflow state: " + workflowState);
+    	} else {
+    		super.handleUpdate(wrapDoc);
+    	}
+    }
+    
+    @Override
+    public boolean handleDelete(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+        DocumentModel docModel = wrapDoc.getWrappedObject();
+    	String workflowState = WorkflowClient.WORKFLOWSTATE_LOCKED;
+        
+    	if (docModel.getCurrentLifeCycleState().contains(workflowState) == true) {
+    		throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
+                    "Cannot DELETE a resource/record if it is in the workflow state: " + workflowState);
+    	} else {
+    		return super.handleDelete(wrapDoc);
+    	}
+    }    
+    
     /* NOTE: The authority item doc handler overrides (after calling) this method.  It performs refName updates.  In this
      * method we just update any and all relationship records that use refNames that have changed.
      * (non-Javadoc)

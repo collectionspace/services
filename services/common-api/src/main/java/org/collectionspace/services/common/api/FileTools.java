@@ -41,13 +41,16 @@ import java.util.UUID;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Laramie Crocker
  * $LastChangedRevision:  $
  * $LastChangedDate:  $
  */
 public class FileTools {
-    
+    private static final Logger logger = LoggerFactory.getLogger(FileTools.class);
     public static String DEFAULT_ENCODING = "";
     public static String UTF8_ENCODING = "UTF-8";
     public static Charset UTF8_CHARSET = java.nio.charset.StandardCharsets.UTF_8;
@@ -122,7 +125,9 @@ public class FileTools {
         if (parent != null){
             File p = new File(parent);
             p.mkdirs();
-            System.out.println("Making directory: "+p.getCanonicalPath());
+            if (logger.isTraceEnabled()) {
+                logger.trace("Making directory: " + p.getCanonicalPath());
+            }
         }
     }
 
