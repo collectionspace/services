@@ -203,7 +203,7 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 	public Response create(@Context UriInfo ui,
 			String xmlPayload) {
 		String result = null;
-		ResponseBuilder rb = Response.serverError();
+		ResponseBuilder rb = Response.serverError(); // Assume we'll fail to successfully fulfill the request.
 		
 		try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
@@ -213,6 +213,9 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 			// result = createFromInputSource(inputSource);
 			String inputFilename = payloadToFilename(xmlPayload);
 			result = createFromFilename(inputFilename, timeout);
+			if (result.contains("ERROR") == false) {
+				rb = Response.ok(); // SUCCESS
+			}
 	        rb.entity(result);
 		} catch (Exception e) {
 	        result = e.getMessage();
