@@ -203,22 +203,23 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 	public Response create(@Context UriInfo ui,
 			String xmlPayload) {
 		String result = null;
-		ResponseBuilder rb = Response.ok();
+		ResponseBuilder rb = Response.serverError();
+		
 		try {
-                        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
 			int timeout = ctx.getTimeoutSecs(); // gets it from query param 'impTimout' or uses default if no query param specified
+			
 			// InputSource inputSource = payloadToInputSource(xmlPayload);
 			// result = createFromInputSource(inputSource);
 			String inputFilename = payloadToFilename(xmlPayload);
 			result = createFromFilename(inputFilename, timeout);
+	        rb.entity(result);
 		} catch (Exception e) {
-                        result = e.getMessage();
-                        logger.error(result);
-			rb = Response.status(Response.Status.INTERNAL_SERVER_ERROR);
-		} finally {
-                    rb.entity(result);
-                    return rb.build();
-                }
+	        result = e.getMessage();
+	        logger.error(result);
+		}
+		
+        return rb.build();
 	}
 
 	public static String createFromInputSource(InputSource inputSource,

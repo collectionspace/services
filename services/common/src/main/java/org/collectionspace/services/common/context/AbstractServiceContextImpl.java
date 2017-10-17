@@ -186,13 +186,18 @@ public abstract class AbstractServiceContextImpl<IT, OT>
 		MultivaluedMap<String, String> queryParams = (ui == null) ? null : ui.getQueryParameters();
 		if (queryParams != null) {
 			String timeoutString = queryParams.getFirst(IClientQueryParams.IMPORT_TIMEOUT_PARAM);
-			if (timeoutString != null)
-				try {
+			if (timeoutString == null) {
+				timeoutString = queryParams.getFirst(IClientQueryParams.IMPORT_TIMOUT_PARAM);
+			}
+			
+			if (timeoutString != null) {
+				try {					
 					result = Integer.parseInt(timeoutString);
 				} catch (NumberFormatException e) {
 					logger.warn("Transaction timeout period parameter could not be parsed.  The characters in the parameter string must all be decimal digits.  The Import service will use the default timeout period instead.",
 							e);
 				}
+			}
 		}
 
 		return result;

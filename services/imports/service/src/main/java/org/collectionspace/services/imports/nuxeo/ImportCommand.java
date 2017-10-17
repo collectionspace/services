@@ -1,7 +1,6 @@
 package org.collectionspace.services.imports.nuxeo;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,21 +9,14 @@ import java.util.TreeSet;
 import org.collectionspace.services.nuxeo.client.java.NuxeoClientEmbedded;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
-import org.nuxeo.common.utils.FileUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentRef;
-import org.nuxeo.ecm.core.api.IdRef;
-import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.ecm.core.io.DocumentPipe;
 import org.nuxeo.ecm.core.io.DocumentReader;
 import org.nuxeo.ecm.core.io.DocumentTranslationMap;
 import org.nuxeo.ecm.core.io.DocumentWriter;
 import org.nuxeo.ecm.core.io.impl.DocumentPipeImpl;
 import org.nuxeo.ecm.core.io.impl.plugins.DocumentModelWriter;
-import org.nuxeo.ecm.platform.importer.service.DefaultImporterService;
-import org.nuxeo.ecm.platform.importer.service.DefaultImporterServiceImpl;
-import org.nuxeo.ecm.platform.importer.xml.parser.XMLImporterService;
-import org.nuxeo.runtime.api.Framework;
 // we use our own override of this: import org.nuxeo.ecm.core.io.impl.plugins.XMLDirectoryReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +37,7 @@ public class ImportCommand {
                 String msg = String.format("Start of import is Local time: %tT", Calendar.getInstance());
                 logger.debug(msg);
             }
-            return newImportTree(repoSession, file, workspacesPath, timeout);
+            return importTree(repoSession, file, workspacesPath, timeout);
         } catch (Exception e) {
             throw e;
         } finally {
@@ -55,26 +47,6 @@ public class ImportCommand {
             }
             client.releaseRepository(repoSession);
         }
-    }
-    
-//    DocumentModel root = session.getRootDocument();
-//    File xml = File("/where/is/my/umbrella");
-//    XMLImporterService importer = Framework.getLocalService(XMLImporterService.class);
-//    importer.importDocuments(root, xml);
-    
-    private String newImportTree(CoreSessionInterface repoSession, File file, String toPath, int timeout) throws IOException {
-        File source = new File("C:/dev/tools/apache-tomcat-7.0.64/temp/imports-2014210770025398386/Personauthorities.zip");
-        if (source.exists()) {
-        	String targetPath = "/core-domain/Workspaces/Personauthorities/"; ///core-domain/Workspaces/Personauthorities
-        	DocumentRef docRef = new PathRef(targetPath);
-        	DocumentModel root = repoSession.getDocument(docRef);
-        	XMLImporterService importerService = Framework.getLocalService(XMLImporterService.class);
-            importerService.importDocuments(root, source);
-        } else {
-        	System.err.println("Could not find file: " + source.getAbsolutePath());
-        }
-        
-        return "New Import Service Run";
     }
 
     /*
@@ -102,7 +74,11 @@ public class ImportCommand {
             // pipe.addTransformer(transformer);
             pipe.setReader(reader);
             pipe.setWriter(writer);
+            
+            logger.trace(String.format(">>> Pipe importer start: %d", System.currentTimeMillis()));
             DocumentTranslationMap dtm = pipe.run();
+            logger.trace(String.format("<<< Pipe importer stop: %d", System.currentTimeMillis()));
+            
             if (dtm == null) {
                 throw new Exception("Could not process import payload. Check XML markup for not-well-formed errors, elements not matching import schema, etc.");
             }
