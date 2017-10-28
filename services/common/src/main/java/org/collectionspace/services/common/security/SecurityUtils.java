@@ -36,12 +36,11 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.index.IndexClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.authentication.AuthN;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.authentication.AuthN;
-import org.collectionspace.authentication.spi.AuthNContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.jboss.crypto.digest.DigestCallback;
@@ -55,7 +54,6 @@ import org.jboss.security.Base64Utils;
  */
 public class SecurityUtils {
 
-	private static final String ADMIN_TENANT_ID = "0";
     private static final Logger logger = LoggerFactory.getLogger(SecurityUtils.class);
     public static final String URI_PATH_SEPARATOR = "/";
     public static final int MIN_PASSWORD_LENGTH = 8;
@@ -293,12 +291,12 @@ public class SecurityUtils {
     	try {
     		tenantId = AuthN.get().getCurrentTenantId();
     	} catch (Throwable e) {
-    		tenantId = ADMIN_TENANT_ID;
+    		tenantId = AuthN.ADMIN_TENANT_ID;
     	}
     	
         if (tenantId != null) {
-            if (ADMIN_TENANT_ID.equals(tenantId) == true ||
-            		AuthNContext.ANONYMOUS_TENANT_ID.equals(tenantId)) {
+            if (AuthN.ADMIN_TENANT_ID.equals(tenantId) == true ||
+            		AuthN.ANONYMOUS_TENANT_ID.equals(tenantId)) {
                 result = true;
             }
         }

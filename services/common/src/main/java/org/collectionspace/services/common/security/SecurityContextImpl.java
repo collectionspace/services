@@ -49,7 +49,7 @@ public class SecurityContextImpl implements SecurityContext {
     	String result = AuthN.get().getCurrentTenantId();
     	
     	String userId = AuthN.get().getUserId();
-        if (userId.equals(AuthNContext.ANONYMOUS_USER) == true) {
+        if (userId.equals(AuthN.ANONYMOUS_USER) == true) {
             //
             // If anonymous access is being attempted, then a tenant ID needs to be set as a query param
             //        	
@@ -60,7 +60,7 @@ public class SecurityContextImpl implements SecurityContext {
         	}
         	
 //        	String tenantId = uriInfo.getQueryParameters().getFirst(AuthNContext.TENANT_ID_QUERY_PARAM);
-        	String tenantId = uriInfo.getPathParameters().getFirst(AuthNContext.TENANT_ID_PATH_PARAM);
+        	String tenantId = uriInfo.getPathParameters().getFirst(AuthN.TENANT_ID_PATH_PARAM);
         	if (tenantId == null) {
         		String errMsg = String.format("Anonymous access to '%s' attempted without a valid tenant ID query paramter.",
         				uriInfo.getPath());

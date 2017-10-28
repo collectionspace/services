@@ -32,6 +32,7 @@ import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import org.collectionspace.services.authorization.perms.Permission;
+import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.perms.PermissionsList;
@@ -408,11 +409,11 @@ public class AuthorizationGen {
         Role role = new Role();
         
         role.setDescription("A generated super role that has permissions to manage tenants.");
-        role.setDisplayName(AuthorizationCommon.ROLE_ALL_TENANTS_MANAGER);
+        role.setDisplayName(AuthN.ROLE_ALL_TENANTS_MANAGER);
         role.setRoleName(AuthorizationCommon.getQualifiedRoleName(
-        		AuthorizationCommon.ALL_TENANTS_MANAGER_TENANT_ID, role.getDisplayName()));
-        role.setCsid(AuthorizationCommon.ROLE_ALL_TENANTS_MANAGER_ID);
-        role.setTenantId(AuthorizationCommon.ALL_TENANTS_MANAGER_TENANT_ID);
+        		AuthN.ALL_TENANTS_MANAGER_TENANT_ID, role.getDisplayName()));
+        role.setCsid(AuthN.ROLE_ALL_TENANTS_MANAGER_ID);
+        role.setTenantId(AuthN.ALL_TENANTS_MANAGER_TENANT_ID);
         
         return role;
     }

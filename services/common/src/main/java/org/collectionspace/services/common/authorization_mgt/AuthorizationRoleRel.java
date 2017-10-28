@@ -2,6 +2,7 @@ package org.collectionspace.services.common.authorization_mgt;
 
 import org.collectionspace.services.authorization.AccountValue;
 import org.collectionspace.services.authorization.PermissionRoleRel;
+import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.authorization.AccountRoleRel;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.RoleValue;
@@ -30,7 +31,7 @@ public class AuthorizationRoleRel {
      */
     static public RoleValue buildRoleValue(AccountRoleRel arr) {
     	RoleValue rv = null;
-    	if (arr.getRoleId().equals(AuthorizationCommon.ROLE_SPRING_ADMIN_ID) == false) {
+    	if (arr.getRoleId().equals(AuthN.ROLE_SPRING_ADMIN_ID) == false) {
 	    	rv = new RoleValue();
 	        rv.setRoleId(arr.getRoleId());
 	        rv.setRoleName(arr.getRoleName());

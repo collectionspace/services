@@ -87,13 +87,6 @@ public class AuthorizationCommon {
 	
     final static Logger logger = LoggerFactory.getLogger(AuthorizationCommon.class);
 
-    //
-    // The "super" role has a predefined ID of "0" and a tenant ID of "0";
-    //
-    final public static String ROLE_ALL_TENANTS_MANAGER = "ALL_TENANTS_MANAGER";
-    final public static String ROLE_ALL_TENANTS_MANAGER_ID = "0";
-    final public static String ALL_TENANTS_MANAGER_TENANT_ID = "0";
-
     final public static String ROLE_TENANT_ADMINISTRATOR = "TENANT_ADMINISTRATOR";
     final public static String ROLE_TENANT_READER = "TENANT_READER";
 	
@@ -105,14 +98,10 @@ public class AuthorizationCommon {
     public static final String TENANT_ADMIN_ACCT_PREFIX = "admin@"; 
     public static final String TENANT_READER_ACCT_PREFIX = "reader@"; 
     public static final String ROLE_PREFIX = "ROLE_"; 
-    public static final String SPRING_ADMIN_ROLE = "ROLE_SPRING_ADMIN"; 
     public static final String TENANT_ADMIN_ROLE_SUFFIX = "_TENANT_ADMINISTRATOR"; 
     public static final String TENANT_READER_ROLE_SUFFIX = "_TENANT_READER"; 
     public static final String DEFAULT_ADMIN_PASSWORD = "Administrator";
     public static final String DEFAULT_READER_PASSWORD = "reader";
-
-    public static final String ROLE_SPRING_ADMIN_ID = "-1";
-    public static final String ROLE_SPRING_ADMIN_NAME = "ROLE_SPRING_ADMIN";
     
     // SQL for init tasks
 	final private static String INSERT_ACCOUNT_ROLE_SQL_MYSQL = 
@@ -135,7 +124,7 @@ public class AuthorizationCommon {
 	final private static String QUERY_TENANT_MGR_USER_SQL = 
     		"SELECT username FROM users WHERE username = '"+TENANT_MANAGER_USER+"'";
 	final private static String GET_TENANT_MGR_ROLE_SQL =
-			"SELECT csid from roles WHERE tenant_id='"+ALL_TENANTS_MANAGER_TENANT_ID+"' and rolename=?";
+			"SELECT csid from roles WHERE tenant_id='" + AuthN.ALL_TENANTS_MANAGER_TENANT_ID + "' and rolename=?";
 
     public static Role getRole(String tenantId, String displayName) {
     	Role role = null;
@@ -685,7 +674,7 @@ public class AuthorizationCommon {
     	PreparedStatement pstmt = null;
     	try {
     		final String querySpringRole = 
-    				"SELECT csid from roles WHERE rolename='"+SPRING_ADMIN_ROLE+"'";
+    				"SELECT csid from roles WHERE rolename='"+AuthN.ROLE_SPRING_ADMIN_NAME+"'";
     		stmt = conn.createStatement();
     		ResultSet rs = stmt.executeQuery(querySpringRole);
     		if(rs.next()) {
@@ -761,8 +750,8 @@ public class AuthorizationCommon {
 		String tenantMgrRoleCSID = null;
     	PreparedStatement pstmt = null;
     	try {
-    		String rolename = getQualifiedRoleName(ALL_TENANTS_MANAGER_TENANT_ID, 
-    												ROLE_ALL_TENANTS_MANAGER);    		
+    		String rolename = getQualifiedRoleName(AuthN.ALL_TENANTS_MANAGER_TENANT_ID, 
+    				AuthN.ROLE_ALL_TENANTS_MANAGER);    		
     		pstmt = conn.prepareStatement(GET_TENANT_MGR_ROLE_SQL); // create a statement
     		ResultSet rs = null;
     		pstmt.setString(1, rolename);	// set rolename param
@@ -826,7 +815,7 @@ public class AuthorizationCommon {
     				pstmt.executeUpdate();
     				// Now add the Spring Admin Role to the admin accounts
     				pstmt.setString(3, springAdminRoleCSID);	// set role_id param
-    				pstmt.setString(4, SPRING_ADMIN_ROLE);		// set rolename param
+    				pstmt.setString(4, AuthN.ROLE_SPRING_ADMIN_NAME);		// set rolename param
     				if (logger.isDebugEnabled()) {
     					logger.debug("createDefaultAccounts binding account: "
     							+adminUserId+" to Spring Admin role: "+springAdminRoleCSID);
@@ -952,7 +941,7 @@ public class AuthorizationCommon {
 	    		String tenantManagerRoleCSID = findTenantManagerRole(conn);
 	    		bindTenantManagerAccountRole(conn, databaseProductType, 
 	    				TENANT_MANAGER_USER, AuthN.TENANT_MANAGER_ACCT_ID, 
-	    				tenantManagerRoleCSID, ROLE_ALL_TENANTS_MANAGER);
+	    				tenantManagerRoleCSID, AuthN.ROLE_ALL_TENANTS_MANAGER);
     		}
         } catch (Exception e) {
 			logger.debug("Exception in createDefaultAccounts: " + e.getLocalizedMessage());

@@ -33,6 +33,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.authentication.AuthN;
 import org.collectionspace.authentication.spi.AuthNContext;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
@@ -141,8 +142,8 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         checkTenantContext();
 
         String tenantId = securityContext.getCurrentTenantId();
-        if (AuthorizationCommon.ALL_TENANTS_MANAGER_TENANT_ID.equals(tenantId) ||
-        		AuthNContext.ANONYMOUS_TENANT_ID.equals(tenantId)) {
+        if (AuthN.ALL_TENANTS_MANAGER_TENANT_ID.equals(tenantId) ||
+        		AuthN.ANONYMOUS_TENANT_ID.equals(tenantId)) {
         	// Tenant Manager has no tenant binding, so don't bother...
         	tenantBinding = null;
         	serviceBinding = null;

@@ -39,7 +39,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 
-import org.collectionspace.authentication.spi.AuthNContext;
+import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.authorization.AccountPermission;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.lifecycle.TransitionDef;
@@ -65,7 +65,6 @@ import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.common.relation.RelationResource;
@@ -77,7 +76,6 @@ import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
-import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.config.service.DocHandlerParams;
 import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ObjectPartType;
@@ -86,10 +84,10 @@ import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsDocListItem;
 import org.collectionspace.services.relation.RelationshipType;
+
 import org.dom4j.Element;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.DocumentNotFoundException;
 import org.nuxeo.ecm.core.api.impl.DataModelImpl;
 import org.nuxeo.ecm.core.api.model.DocumentPart;
 import org.nuxeo.ecm.core.api.model.Property;
@@ -367,7 +365,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         }
         
         String currentUser = ctx.getUserId();
-        if (currentUser.equalsIgnoreCase(AuthNContext.ANONYMOUS_USER) == false) {
+        if (currentUser.equalsIgnoreCase(AuthN.ANONYMOUS_USER) == false) {
         	addAccountPermissionsPart();
         }
     }

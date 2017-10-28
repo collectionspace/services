@@ -99,7 +99,7 @@ public class ServiceMain {
     private ServiceMain() {
     	// Intentionally blank
     }
-    
+        
     /*
      * 
      * Set this singletons ServletContext without any call to initialize
@@ -231,6 +231,12 @@ public class ServiceMain {
 					e.getLocalizedMessage(), e);
 			throw e;
 		}
+		
+		//
+		// Ensure default vocabulary and authority instances and their corresponding terms exist.
+		//
+//		initializeVocabularies();
+//		initializeAuthorities();
         
         /*
          * This might be useful for something, but the reader grants are better handled in the ReportPostInitHandler.
@@ -243,7 +249,7 @@ public class ServiceMain {
 		showTenantStatus();
     }
         
-    /**
+	/**
      * Returns the primary repository name for a tenant -there's usually just one.
      * @param tenantBinding
      * @return

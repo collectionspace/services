@@ -26,6 +26,7 @@ package org.collectionspace.services.common.publicitem;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 
+import org.collectionspace.authentication.AuthN;
 import org.collectionspace.authentication.spi.AuthNContext;
 import org.collectionspace.services.publicitem.PublicitemsCommon;
 import org.collectionspace.services.client.PublicItemClient;
@@ -87,7 +88,7 @@ public class PublicItemResource extends NuxeoBasedResource {
             @Context Request request,
             @Context UriInfo uriInfo,
             @PathParam("csid") String csid,
-            @PathParam(AuthNContext.TENANT_ID_PATH_PARAM) String tenantId) {
+            @PathParam(AuthN.TENANT_ID_PATH_PARAM) String tenantId) {
     	Response result = null;
 
         try {

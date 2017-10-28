@@ -31,6 +31,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
+import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.PermissionRole;
@@ -175,7 +176,7 @@ public class AuthorizationSeedDriver {
 
     private void login() {
         //GrantedAuthority cspace_admin = new SimpleGrantedAuthority("ROLE_ADMINISTRATOR");
-        GrantedAuthority spring_security_admin = new SimpleGrantedAuthority("ROLE_SPRING_ADMIN"); //NOTE: Must match with value in applicationContext-authorization-test.xml (aka SPRING_SECURITY_METADATA)
+        GrantedAuthority spring_security_admin = new SimpleGrantedAuthority(AuthN.ROLE_SPRING_ADMIN_NAME); //NOTE: Must match with value in applicationContext-authorization-test.xml (aka SPRING_SECURITY_METADATA)
         HashSet<GrantedAuthority> gauths = new HashSet<GrantedAuthority>();
         //gauths.add(cspace_admin);
         gauths.add(spring_security_admin);

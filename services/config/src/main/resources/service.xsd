@@ -29,17 +29,31 @@
     >
 
     <xs:import namespace="http://collectionspace.org/services/config/types" schemaLocation="types.xsd" />
+    
+    
+    <xs:element name="root" type="ServiceBindingType"></xs:element>
+    
 
     <xs:complexType name="ServiceBindingType">
         <xs:sequence>
             <!-- other URI paths using which this service binding could be accessed -->
             <xs:element name="uriPath" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            
             <!-- object representation served by the service -->
             <xs:element name="object" type="ServiceObjectType" minOccurs="1" maxOccurs="1"/>
+            
             <!-- document handler to be used to process the content (need to be in classpath) -->
             <xs:element name="documentHandler" type="xs:string" minOccurs="1" maxOccurs="1"/>
-
             <xs:element name="DocHandlerParams" type="DocHandlerParams" minOccurs="0" maxOccurs="1"/>
+            
+            <!-- optional instances definitions -->
+            <xs:element name="AuthorityInstanceList">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="AuthorityInstance" type="AuthorityInstanceType" minOccurs="1" maxOccurs="unbounded"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
 
             <!-- validator handler(s) to be used to validate the content (need to be in classpath) -->
             <!-- validator handler is called for create (POST) and update (PUT) requests only -->
@@ -56,6 +70,7 @@
             <xs:element name="repositoryWorkspaceId" type="xs:string" minOccurs="0" maxOccurs="1"/>
             <xs:element name="properties" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
+        
         <!-- name of the service, this is also the default URI path to access this service binding -->
         <xs:attribute name="name" type="xs:string" use="required"/>
         <xs:attribute name="type" type="xs:string" use="optional"/>
@@ -65,6 +80,31 @@
         <xs:attribute name="requiresUniqueShortId" type="xs:boolean" default="false"/>
     </xs:complexType>
 
+    <!-- Used for defining a vocabulary or authority instance and its terms -->
+    <xs:complexType name="AuthorityInstanceType">
+        <xs:sequence>
+            <xs:element name="web-url" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+            <xs:element name="title-ref" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+            <xs:element name="title" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+<!--            <xs:element ref="termList"/> -->
+        </xs:sequence>
+    </xs:complexType>
+        
+<!--
+    <xs:element name="termList">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="term"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="term">
+        <xs:complexType mixed="true">
+            <xs:attribute name="id" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+-->
+    
     <!--
         ServiceObjectType defines the manifest for a collectionspace
         object.  includes properties of the object as well as manifests
