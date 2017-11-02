@@ -23,6 +23,7 @@ import org.collectionspace.services.material.MaterialsCommon;
  */
 public class MaterialAuthorityClient extends AuthorityClientImpl<MaterialauthoritiesCommon, MaterialsCommon, MaterialAuthorityProxy> {
 
+	public static final String SERVICE_BINDING_NAME = "MaterialAuthority";
     public static final String SERVICE_NAME = "materialauthorities";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
     public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -81,4 +82,16 @@ public class MaterialAuthorityClient extends AuthorityClientImpl<Materialauthori
     public void setInAuthority(MaterialsCommon item, String inAuthorityCsid) {
         item.setInAuthority(inAuthorityCsid);
     }
+
+	@Override
+	public String createAuthorityInstance(String shortIdentifier, String displayName) {
+		PoxPayloadOut poxPayloadOut = MaterialAuthorityClientUtils.createMaterialAuthorityInstance(displayName, shortIdentifier, SERVICE_COMMON_PART_NAME);
+		return poxPayloadOut.asXML();
+	}
+
+	@Override
+	public String createAuthorityItemInstance(String shortIdentifier, String displayName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -365,7 +365,8 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         }
         
         String currentUser = ctx.getUserId();
-        if (currentUser.equalsIgnoreCase(AuthN.ANONYMOUS_USER) == false) {
+        if (currentUser.equalsIgnoreCase(AuthN.ANONYMOUS_USER) == false &&
+        		currentUser.equalsIgnoreCase(AuthN.SPRING_ADMIN_USER) == false) {
         	addAccountPermissionsPart();
         }
     }

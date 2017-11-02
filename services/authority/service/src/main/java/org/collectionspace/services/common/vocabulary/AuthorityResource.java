@@ -664,7 +664,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @Path("{csid}/items")
     public Response createAuthorityItem(
     		@Context ResourceMap resourceMap,
-    		@Context UriInfo uriInfo, 
+    		@Context UriInfo uriInfo,
     		@PathParam("csid") String parentIdentifier, // Either a CSID or a URN form -e.g., a8ad38ec-1d7d-4bf2-bd31 or urn:cspace:name(bugsbunny)
     		String xmlPayload) {
     	uriInfo = new UriInfoWrapper(uriInfo);
@@ -678,7 +678,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
         }
-        
+
         return result;
     }
 

@@ -62,6 +62,7 @@ import org.testng.annotations.DataProvider;
 import org.w3c.dom.Document;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.CollectionSpaceClientUtils;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -451,17 +452,7 @@ public abstract class BaseServiceTest<CLT> {
      * @return the string
      */
     static protected String extractId(Response res) {
-        MultivaluedMap<String, Object> mvm = res.getMetadata();
-        String uri = (String) ((List<Object>) mvm.get("Location")).get(0);
-        if (logger.isDebugEnabled()) {
-            logger.debug("extractId:uri=" + uri);
-        }
-        String[] segments = uri.split("/");
-        String id = segments[segments.length - 1];
-        if (logger.isDebugEnabled()) {
-            logger.debug("id=" + id);
-        }
-        return id;
+        return CollectionSpaceClientUtils.extractId(res);
     }
     
  

@@ -188,4 +188,16 @@ public interface AuthorityClient<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P e
     public Response readItemWorkflow(String vcsid, String csid);
     
     public Response updateItemWorkflowWithTransition(String vcsid, String csid, String workflowTransition);
+    
+    //
+    // General utils
+    //
+    
+    /*
+     * Should return a valid XML payload for creating an authority instance 
+     */
+    public String createAuthorityInstance(String shortIdentifier, String displayName);
+    
+    public String createAuthorityItemInstance(String shortIdentifier, String displayName);
+    
 }

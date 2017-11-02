@@ -92,4 +92,19 @@ public class PersonAuthorityClient extends AuthorityWithContactsClientImpl<Perso
     public void setInAuthority(PersonsCommon item, String inAuthorityCsid) {
         item.setInAuthority(inAuthorityCsid);
     }
+
+    //
+    // Should return a valid XML payload for creating an authority instance
+    //
+	@Override
+	public String createAuthorityInstance(String shortIdentifier, String displayName) {
+		PoxPayloadOut personAuthorityInstance = PersonAuthorityClientUtils.createPersonAuthorityInstance(displayName, shortIdentifier, SERVICE_COMMON_PART_NAME);
+		return personAuthorityInstance.asXML();
+	}
+
+	@Override
+	public String createAuthorityItemInstance(String shortIdentifier, String displayName) {
+		PoxPayloadOut personAuthorityInstance = PersonAuthorityClientUtils.createPersonInstance(shortIdentifier, displayName, SERVICE_COMMON_PART_NAME);
+		return personAuthorityInstance.asXML();
+	}
 }

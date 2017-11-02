@@ -43,4 +43,16 @@ public class GenericAuthorityClientImpl extends
 		return null;
 	}
 
+	@Override
+	public String createAuthorityInstance(String shortIdentifier, String displayName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String createAuthorityItemInstance(String shortIdentifier, String displayName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

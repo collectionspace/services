@@ -86,11 +86,10 @@
             <xs:element name="web-url" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
             <xs:element name="title-ref" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
             <xs:element name="title" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
-<!--            <xs:element ref="termList"/> -->
+            <xs:element ref="termList"/>
         </xs:sequence>
     </xs:complexType>
         
-<!--
     <xs:element name="termList">
         <xs:complexType>
             <xs:sequence>
@@ -103,7 +102,6 @@
             <xs:attribute name="id" use="required" type="xs:NCName"/>
         </xs:complexType>
     </xs:element>
--->
     
     <!--
         ServiceObjectType defines the manifest for a collectionspace
