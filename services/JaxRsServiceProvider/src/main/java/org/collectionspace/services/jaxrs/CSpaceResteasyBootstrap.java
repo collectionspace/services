@@ -45,7 +45,10 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 			Dispatcher disp = deployment.getDispatcher();
 			disp.getDefaultContextObjects().put(ResourceMap.class, app.getResourceMap());
 			
-			initializeAuthorities(app.getResourceMap());
+			String initAuthsString = System.getProperty("org.collectionspace.services.authorities.init", Boolean.TRUE.toString()); // Property can be set in the tomcat/bin/setenv.sh (or setenv.bat) file
+			if (Boolean.valueOf(initAuthsString) == true) {
+				initializeAuthorities(app.getResourceMap());
+			}
 			
 			logger.log(Level.INFO, String.format("%tc [INFO] CollectionSpace Services' JAX-RS application started.", new Date()));
 		} catch (Exception e) {
@@ -162,6 +165,10 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
     	Response response = null;
 
     	TermList termListElement = authorityInstance.getTermList();
+    	if (termListElement == null) {
+    		return;
+    	}
+    	
     	for (Term term : termListElement.getTerm()) {
     		//
     		// Check to see if the term already exists
