@@ -227,7 +227,7 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 	    		String xmlPayload = client.createAuthorityItemInstance(termShortId, termDisplayName);
 	    		try {
 	    			authorityResource.createAuthorityItem(resourceMap, null, authoritySpecifier, xmlPayload);
-	    			logger.log(Level.INFO, String.format("Created a new term '%s:%s' in the authority of type '%s' with the short ID of '%s'.",
+	    			logger.log(Level.FINE, String.format("Created a new term '%s:%s' in the authority of type '%s' with the short ID of '%s'.",
 	    					termDisplayName, termShortId, serviceName, authorityInstance.getTitleRef()));
 	    		} catch (CSWebApplicationException e) {
 	    			response = e.getResponse();
