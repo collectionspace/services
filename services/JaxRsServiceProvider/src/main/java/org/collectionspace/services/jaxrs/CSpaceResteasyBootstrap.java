@@ -7,6 +7,8 @@ import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
 
 import org.collectionspace.authentication.CSpaceTenant;
+import org.collectionspace.services.account.Tenant;
+import org.collectionspace.services.account.TenantResource;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.common.CSWebApplicationException;
@@ -31,6 +33,7 @@ import java.util.logging.Level;
 public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 	
 	java.util.logging.Logger logger = java.util.logging.Logger.getAnonymousLogger();
+	static final String RESET_AUTHORITIES_PROPERTY = "org.collectionspace.services.authorities.reset";
 	
 	@Override
 	public void  contextInitialized(ServletContextEvent event) {
@@ -45,10 +48,8 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 			Dispatcher disp = deployment.getDispatcher();
 			disp.getDefaultContextObjects().put(ResourceMap.class, app.getResourceMap());
 			
-			String initAuthsString = System.getProperty("org.collectionspace.services.authorities.init", Boolean.TRUE.toString()); // Property can be set in the tomcat/bin/setenv.sh (or setenv.bat) file
-			if (Boolean.valueOf(initAuthsString) == true) {
-				initializeAuthorities(app.getResourceMap());
-			}
+			String resetAuthsString = System.getProperty(RESET_AUTHORITIES_PROPERTY, Boolean.TRUE.toString()); // Property can be set in the tomcat/bin/setenv.sh (or setenv.bat) file
+			initializeAuthorities(app.getResourceMap(), Boolean.valueOf(resetAuthsString));
 			
 			logger.log(Level.INFO, String.format("%tc [INFO] CollectionSpace Services' JAX-RS application started.", new Date()));
 		} catch (Exception e) {
@@ -56,6 +57,7 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 			throw new RuntimeException(e);
 		}
 	}
+	
 	
     @Override
     public void contextDestroyed(ServletContextEvent event) {
@@ -69,25 +71,32 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
      * @param resourceMap
      * @throws Exception
      */
-    public void initializeAuthorities(ResourceMap resourceMap) throws Exception {
+    public void initializeAuthorities(ResourceMap resourceMap, boolean reset) throws Exception {
     	TenantBindingConfigReaderImpl tenantBindingConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();    	
     	Hashtable<String, TenantBindingType> tenantBindingsTable = tenantBindingConfigReader.getTenantBindings(false);
     	for (TenantBindingType tenantBindings : tenantBindingsTable.values()) {
 			CSpaceTenant tenant = new CSpaceTenant(tenantBindings.getId(), tenantBindings.getName());
-    		for (ServiceBindingType serviceBinding : tenantBindings.getServiceBindings()) {
-    			AuthorityInstanceList element = serviceBinding.getAuthorityInstanceList();
-    			if (element != null && element.getAuthorityInstance() != null) {
-    				List<AuthorityInstanceType> authorityInstanceList = element.getAuthorityInstance();
-    				for (AuthorityInstanceType authorityInstance : authorityInstanceList) {
-    					try {
-    						initializeAuthorityInstance(resourceMap, authorityInstance, serviceBinding, tenant);
-    					} catch (Exception e) {
-    						logger.log(Level.SEVERE, "Could not initialize authorities and authority terms: " + e.getMessage());
-    						throw e;
-    					}
-    				}
-    			}
-    		}
+			if (shouldInitializeAuthorities(tenant, reset) == true) {
+	    		for (ServiceBindingType serviceBinding : tenantBindings.getServiceBindings()) {
+	    			AuthorityInstanceList element = serviceBinding.getAuthorityInstanceList();
+	    			if (element != null && element.getAuthorityInstance() != null) {
+	    				List<AuthorityInstanceType> authorityInstanceList = element.getAuthorityInstance();
+	    				for (AuthorityInstanceType authorityInstance : authorityInstanceList) {
+	    					try {
+	    						initializeAuthorityInstance(resourceMap, authorityInstance, serviceBinding, tenant, reset);
+	    					} catch (Exception e) {
+	    						logger.log(Level.SEVERE, "Could not initialize authorities and authority terms: " + e.getMessage());
+	    						throw e;
+	    					}
+	    				}
+	    			}
+	    		}
+	    		//
+	    		// If we made it this far, we've either created the tenant's authorities and terms or we've reset them.  Either way,
+	    		// we should mark the isAuthoritiesInitialized field of the tenant to 'true'.
+	    		//
+	    		setAuthoritiesInitialized(tenant, true);
+			}
     	}
 	}
     
@@ -98,16 +107,43 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
         Object classInstance = co.newInstance(null);
         return (AuthorityClient) classInstance;
     }
+    
+    private boolean shouldInitializeAuthorities(CSpaceTenant cspaceTenant, boolean reset) {
+		AuthZ.get().login(); // login as super admin
+		TenantResource tenantResource = new TenantResource();
+		Tenant tenantState = tenantResource.getTenant(cspaceTenant.getId());
+
+		//
+		// If the tenant's authorities have been initialized and
+		// we're not being asked to reset them, we'll return 'false'
+		// making any changes
+		//
+		return tenantState.isAuthoritiesInitialized() == false || reset == true;
+    }
+    
+    private void setAuthoritiesInitialized(CSpaceTenant cspaceTenant, boolean initState) {
+		AuthZ.get().login(); // login as super admin
+		TenantResource tenantResource = new TenantResource();
+		Tenant tenantState = tenantResource.getTenant(cspaceTenant.getId());
+
+		tenantState.setAuthoritiesInitialized(initState);
+		tenantResource.updateTenant(cspaceTenant.getId(), tenantState);
+	}
+
 
     /*
      * Check to see if an an authority instance and its corresponding terms exist.  If not, try to create them.
      */
-    private void initializeAuthorityInstance(ResourceMap resourceMap, AuthorityInstanceType authorityInstance, ServiceBindingType serviceBinding, CSpaceTenant tenant) throws Exception {
+    private void initializeAuthorityInstance(ResourceMap resourceMap, 
+    		AuthorityInstanceType authorityInstance, 
+    		ServiceBindingType serviceBinding, 
+    		CSpaceTenant cspaceTenant,
+    		boolean reset) throws Exception {
     	int status = -1;
     	Response response = null;
 		String serviceName = serviceBinding.getName();
-    	
-		AuthZ.get().login(tenant);
+		
+		AuthZ.get().login(cspaceTenant);
 		String clientClassName = serviceBinding.getClientHandler();
 		AuthorityClient client = getAuthorityClient(clientClassName);
 		String authoritySpecifier = RefName.shortIdToPath(authorityInstance.getTitleRef());  // e.g., urn:cspace:name(ulan)
@@ -147,9 +183,9 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 		}		
 		
 		//
-		// Finally, try to create or verify the authority terms.
+		// Next, try to create or verify the authority terms.
 		//
-		initializeAuthorityInstanceTerms(authorityResource, client, authoritySpecifier, resourceMap, authorityInstance, serviceName, tenant);
+		initializeAuthorityInstanceTerms(authorityResource, client, authoritySpecifier, resourceMap, authorityInstance, serviceName, cspaceTenant);		
 	}
     
     private void initializeAuthorityInstanceTerms(

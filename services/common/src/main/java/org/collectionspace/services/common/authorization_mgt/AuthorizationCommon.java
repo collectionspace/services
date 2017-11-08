@@ -409,7 +409,7 @@ public class AuthorizationCommon {
     		ArrayList<String> existingTenants) throws SQLException, Exception {
 		// Need to define and look for a createDisabled attribute in tenant config
     	final String insertTenantSQL = 
-    		"INSERT INTO tenants (id,name,disabled,created_at) VALUES (?,?,FALSE,now())";
+    		"INSERT INTO tenants (id,name,authorities_initialized,disabled,created_at) VALUES (?,?,FALSE,FALSE,now())";
         PreparedStatement pstmt = null;
     	try {
     		pstmt = conn.prepareStatement(insertTenantSQL); // create a statement

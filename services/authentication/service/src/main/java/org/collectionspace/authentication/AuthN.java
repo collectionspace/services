@@ -74,13 +74,17 @@ public class AuthN {
     final public static String ROLE_ALL_TENANTS_MANAGER = "ALL_TENANTS_MANAGER";
     final public static String ROLE_ALL_TENANTS_MANAGER_ID = "0";
     final public static String ALL_TENANTS_MANAGER_TENANT_ID = "0";
-    public static final String ADMIN_TENANT_ID = "0";
-    public static final String ANONYMOUS_TENANT_ID = "-1";
     
+    public static final String ADMIN_TENANT_ID = "0";
+	public static final String ADMIN_TENANT_NAME = "tenant_admin";
+
+    public static final String ANONYMOUS_TENANT_ID = "-1";
     public static final String ANONYMOUS_USER = "anonymous";
     public static final String ANONYMOUS_TENANT_NAME = ANONYMOUS_USER;
+    
     public static final String SPRING_ADMIN_USER = "SPRING_ADMIN";
     public static final String SPRING_ADMIN_PASSWORD = "SPRING_ADMIN";
+    
     public static final String TENANT_ID_QUERY_PARAM = "tid";
     public static final String TENANT_ID_PATH_PARAM = "tenantId";
     

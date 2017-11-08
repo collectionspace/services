@@ -114,6 +114,20 @@ public class SpringAuthNContext implements AuthNContext {
      */
     @Override
 	public CSpaceTenant getCurrentTenant() {
-        return getUser().getPrimaryTenant();
+    	CSpaceTenant result = null;
+    	
+    	CSpaceUser cspaceUser = getUser();
+    	if (cspaceUser != null) {
+    		result = getUser().getPrimaryTenant();
+    	} else {
+    		String username = getUserId();
+	        if (username.equals(AuthN.ANONYMOUS_USER)) {
+	            result = new CSpaceTenant(AuthN.ANONYMOUS_TENANT_ID, AuthN.ANONYMOUS_TENANT_NAME);
+	        } else if (username.equals(AuthN.SPRING_ADMIN_USER)) {
+	            result = new CSpaceTenant(AuthN.ADMIN_TENANT_ID, AuthN.ADMIN_TENANT_NAME);
+	        } 
+    	}
+    	
+    	return result;
     }
 }

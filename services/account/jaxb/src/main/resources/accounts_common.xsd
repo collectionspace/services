@@ -314,6 +314,15 @@
 						</xs:appinfo>
 					</xs:annotation>
 				</xs:element>
+				<xs:element name="authoritiesInitialized" type="xs:boolean">
+					<xs:annotation>
+						<xs:appinfo>
+							<hj:basic>
+								<orm:column name="authorities_initialized" nullable="false" />
+							</hj:basic>
+						</xs:appinfo>
+					</xs:annotation>
+				</xs:element>
 				<xs:element name="disabled" type="xs:boolean">
 					<xs:annotation>
 						<xs:appinfo>

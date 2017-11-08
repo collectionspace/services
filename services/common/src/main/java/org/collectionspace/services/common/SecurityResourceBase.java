@@ -51,7 +51,7 @@ public abstract class SecurityResourceBase extends AbstractCollectionSpaceResour
         try {
             ServiceContext ctx = createServiceContext((Object) null, objectClass);
             DocumentHandler handler = createDocumentHandler(ctx);
-            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+            MultivaluedMap<String, String> queryParams = (ui != null ? ui.getQueryParameters() : null);
             DocumentFilter myFilter = handler.createDocumentFilter();
             myFilter.setPagination(queryParams);
             myFilter.setQueryParams(queryParams);
