@@ -48,7 +48,7 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 			Dispatcher disp = deployment.getDispatcher();
 			disp.getDefaultContextObjects().put(ResourceMap.class, app.getResourceMap());
 			
-			String resetAuthsString = System.getProperty(RESET_AUTHORITIES_PROPERTY, Boolean.TRUE.toString()); // Property can be set in the tomcat/bin/setenv.sh (or setenv.bat) file
+			String resetAuthsString = System.getProperty(RESET_AUTHORITIES_PROPERTY, Boolean.FALSE.toString()); // Property can be set in the tomcat/bin/setenv.sh (or setenv.bat) file
 			initializeAuthorities(app.getResourceMap(), Boolean.valueOf(resetAuthsString));
 			
 			logger.log(Level.INFO, String.format("%tc [INFO] CollectionSpace Services' JAX-RS application started.", new Date()));
