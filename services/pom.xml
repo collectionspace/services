@@ -180,10 +180,17 @@
 							</goals>
 							<configuration>
 								<extension>true</extension>
+								<schemaDirectory>src/main/resources</schemaDirectory>
+								<schemaIncludes>
+									<include>*.xsd</include>
+								</schemaIncludes>
+								<bindingDirectory>src/main/resources</bindingDirectory>
 								<bindingIncludes>
-                					<include>xbindings.xjb</include>
+                					<include>bindings.xml</include>
               					</bindingIncludes>
 								<args>
+									<arg>-extension</arg>
+									<arg>-Xnamespace-prefix</arg>
 								 	<arg>-Xannotate</arg> 
 								 	<arg>-verbose</arg> 
 									<!-- <arg>-XtoString</arg> -->
@@ -211,6 +218,13 @@
 							</configuration>
 						</execution>
 					</executions>
+					<dependencies>
+						<dependency>
+							<groupId>org.jvnet.jaxb2_commons</groupId>
+							<artifactId>jaxb2-namespace-prefix</artifactId> <!-- Used to force a specific namespace prefix specified in src/main/resource/bindings.xml -->
+							<version>1.4-snapshot</version>
+						</dependency>
+					</dependencies>
 				</plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
