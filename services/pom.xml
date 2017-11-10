@@ -222,7 +222,7 @@
 						<dependency>
 							<groupId>org.jvnet.jaxb2_commons</groupId>
 							<artifactId>jaxb2-namespace-prefix</artifactId> <!-- Used to force a specific namespace prefix specified in src/main/resource/bindings.xml -->
-							<version>1.4-snapshot</version>
+							<version>1.4-SNAPSHOT</version>
 						</dependency>
 					</dependencies>
 				</plugin>
