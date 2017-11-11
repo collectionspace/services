@@ -247,9 +247,9 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 
 			String commonSchema = getServiceContext().getCommonPartLabel();
 			extractPagingInfo(commonList, wrapDoc);
-			List<ListResultField> resultsFields = getListItemsArray();
-			int nFields = resultsFields.size() + NUM_STANDARD_LIST_RESULT_FIELDS;
+			List<ListResultField> resultsFields = getListItemsArray(); // Get additional list result fields defined in the service bindings
 			int baseFields = NUM_STANDARD_LIST_RESULT_FIELDS;
+			int nFields = resultsFields.size() + NUM_STANDARD_LIST_RESULT_FIELDS;
 			if (markRtSbj != null || markRtSbjOrObj != null) {
 				nFields++;
 				baseFields++;
@@ -271,12 +271,18 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 				fields[i] = field.getElement();
 			}
 			commonList.setFieldsReturned(fields);
+			
 			Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
 			HashMap<String, Object> item = new HashMap<String, Object>();
 			while (iter.hasNext()) {
 				DocumentModel docModel = iter.next();
 				String id = NuxeoUtils.getCsid(docModel);
 				item.put(STANDARD_LIST_CSID_FIELD, id);
+				
+				//
+				// If the mark-related query param was set, check to see if the doc we're processing
+				// is related to the value specified in the mark-related query param.
+				//
 				if (markRtSbj != null || markRtSbjOrObj != null) {
 					String relationClause = RelationsUtils.buildWhereClause(markRtSbj, null, null, id, null, markRtSbjOrObj);
 					String whereClause = relationClause + IQueryManager.SEARCH_QUALIFIER_AND
@@ -289,6 +295,7 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 					DocumentModelList docList = repoSession.query(query, null, 1, 0, false);
 					item.put(STANDARD_LIST_MARK_RT_FIELD, docList.isEmpty() ? "false" : "true");
 				}
+				
 				String uri = getUri(docModel);
 				item.put(STANDARD_LIST_URI_FIELD, uri);
 				item.put(STANDARD_LIST_REFNAME_FIELD, getRefname(docModel));

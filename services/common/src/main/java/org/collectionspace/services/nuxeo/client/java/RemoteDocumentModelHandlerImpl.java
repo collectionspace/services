@@ -319,6 +319,31 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
 
         return (TL) commonList;
     }
+    
+    /**
+     * Extract paging info.
+     *
+     * @param commonsList the commons list
+     * @return the tL
+     * @throws Exception the exception
+     */
+    public TL extractPagingInfo(TL theCommonList, DocumentModelList docList)
+            throws Exception {
+        AbstractCommonList commonList = (AbstractCommonList) theCommonList;
+
+        DocumentFilter docFilter = this.getDocumentFilter();
+        long pageSize = docFilter.getPageSize();
+        long pageNum = pageSize != 0 ? docFilter.getOffset() / pageSize : pageSize;
+        // set the page size and page number
+        commonList.setPageNum(pageNum);
+        commonList.setPageSize(pageSize);
+        // Set num of items in list. this is useful to our testing framework.
+        commonList.setItemsInPage(docList.size());
+        // set the total result size
+        commonList.setTotalItems(docList.totalSize());
+
+        return (TL) commonList;
+    }    
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractAllParts(org.collectionspace.services.common.document.DocumentWrapper)
