@@ -1,5 +1,7 @@
 package org.collectionspace.services.common.authorization_mgt;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,6 +20,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.collectionspace.authentication.AuthN;
+import org.collectionspace.services.account.AccountListItem;
+
+import org.collectionspace.services.authentication.Token;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceAction;
 import org.collectionspace.services.authorization.PermissionException;
@@ -32,6 +37,7 @@ import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.perms.EffectType;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionAction;
+
 import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
@@ -44,6 +50,8 @@ import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.EmailConfig;
+import org.collectionspace.services.config.tenant.PasswordResetConfig;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.services.lifecycle.Lifecycle;
 import org.collectionspace.services.lifecycle.TransitionDef;
@@ -58,6 +66,15 @@ import org.springframework.security.acls.model.AlreadyExistsException;
 public class AuthorizationCommon {
 	
 	final public static String REFRESH_AUTZ_PROP = "refreshAuthZOnStartup";
+	
+	//
+	// For token generation and password reset
+	//
+	final private static String DEFAULT_PASSWORD_RESET_EMAIL_MESSAGE = "Hello {{greeting}},\n\r\n\rYou've started the process to reset your CollectionSpace account password. To finish resetting your password, go to the Reset Password page {{link}} on CollectionSpace.\n\r\n\rIf clicking the link doesn't work, copy and paste the following link into your browser address bar and click Go.\n\r\n\r{{link}}\n\r Thanks,\n\r\n\r CollectionSpace Administrator\n\r\n\rPlease do not reply to this email. This mailbox is not monitored and you will not receive a response. For assistance, contact your CollectionSpace Administrator directly.";
+	final private static String tokensalt = "74102328UserDetailsReset";
+	final private static int TIME_SCALAR = 100000;
+	private static final String DEFAULT_PASSWORD_RESET_EMAIL_SUBJECT = "Password reset for CollectionSpace account";
+
     //
     // ActionGroup labels/constants
     //
@@ -125,6 +142,7 @@ public class AuthorizationCommon {
     		"SELECT username FROM users WHERE username = '"+TENANT_MANAGER_USER+"'";
 	final private static String GET_TENANT_MGR_ROLE_SQL =
 			"SELECT csid from roles WHERE tenant_id='" + AuthN.ALL_TENANTS_MANAGER_TENANT_ID + "' and rolename=?";
+
 
     public static Role getRole(String tenantId, String displayName) {
     	Role role = null;
@@ -1162,5 +1180,88 @@ public class AuthorizationCommon {
 		}
         
     }
+	
+	public static boolean hasTokenExpired(EmailConfig emailConfig, Token token) throws NoSuchAlgorithmException {
+		boolean result = false;
+		
+		int maxConfigSeconds = emailConfig.getPasswordResetConfig().getTokenExpirationSeconds().intValue();
+		int maxTokenSeconds = token.getExpireSeconds().intValue();
+		
+		long createdTime = token.getCreatedAtItem().getTime();		
+		long configExpirationTime = createdTime + maxConfigSeconds * 1000;		// the current tenant config for how long a token stays valid
+		long tokenDefinedExirationTime = createdTime + maxTokenSeconds * 1000;	// the tenant config for how long a token stays valid when the token was created.
+		
+		if (configExpirationTime != tokenDefinedExirationTime) {
+			String msg = String.format("The configured expiration time for the token = '%s' changed from when the token was created.",
+					token.getId());
+			logger.warn(msg);
+		}
+		//
+		// Note: the current tenant bindings config for expiration takes precedence over the config used to create the token.
+		//
+		if (System.currentTimeMillis() >= configExpirationTime) {
+			result = true;
+		}
+		
+		return result;
+	}
+		
+	/*
+	 * Validate that the password reset configuration is correct.
+	 */
+	private static String validatePasswordResetConfig(PasswordResetConfig passwordResetConfig) {
+		String result = null;
+		
+		if (passwordResetConfig != null) {
+			result = passwordResetConfig.getMessage();
+			if (result == null || result.length() == 0) {
+				result = DEFAULT_PASSWORD_RESET_EMAIL_MESSAGE;
+				logger.warn("Could not find a password reset message in the tenant's configuration.  Using the default one");
+			}
+			
+			if (result.contains("{{link}}") == false) {
+				logger.warn("The tenant's password reset message does not contain a required '{{link}}' marker.");
+				result = null;
+			}
+			
+			if (passwordResetConfig.getLoginpage() == null || passwordResetConfig.getLoginpage().trim().isEmpty()) {
+				logger.warn("The tenant's password reset configuration is missing a 'loginpage' value.  It should be set to something like '/collectionspace/ui/core/html/index.html'.");
+				result = null;
+			}
+			
+		    String subject = passwordResetConfig.getSubject();
+		    if (subject == null || subject.trim().isEmpty()) {
+		    	passwordResetConfig.setSubject(DEFAULT_PASSWORD_RESET_EMAIL_SUBJECT);
+		    }
 
+		}
+		
+		return result;
+	}
+	
+	/*
+	 * Generate a password reset message. Embeds an authorization token to reset a user's password.
+	 */
+	public static String generatePasswordResetEmailMessage(EmailConfig emailConfig, AccountListItem accountListItem, Token token) throws Exception {
+		String result = null;
+		
+		result = validatePasswordResetConfig(emailConfig.getPasswordResetConfig());
+		if (result == null) {
+			String errMsg = String.format("The password reset configuration for the tenant ID='%s' is missing or malformed.  Could not initiate a password reset for user ID='%s. See the log files for more details.",
+					token.getTenantId(), accountListItem.getEmail());
+			throw new Exception(errMsg);
+		}
+		
+		String link = emailConfig.getBaseurl() + emailConfig.getPasswordResetConfig().getLoginpage() + "?token=" + token.getId();
+		result = result.replaceAll("\\{\\{link\\}\\}", link);
+		
+		if (result.contains("{{greeting}}")) {
+			String greeting = accountListItem.getScreenName();
+			result = result.replaceAll("\\{\\{greeting\\}\\}", greeting);
+			result = result.replaceAll("\\\\n", "\\\n");
+			result = result.replaceAll("\\\\r", "\\\r");
+		}			
+		
+		return result;
+	}
 }

@@ -50,6 +50,7 @@
             <xs:element name="binaryStorePath" type="xs:string" minOccurs="0" maxOccurs="1"/>
             <xs:element name="properties" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
         	<xs:element name="remoteClientConfigurations" type="RemoteClientConfigurations" minOccurs="0" maxOccurs="1"/>
+        	<xs:element name="emailConfig" type="EmailConfig" minOccurs="0" maxOccurs="1"/>
             <xs:element name="serviceBindings" type="service:ServiceBindingType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <!-- tenant id, a UUID -->
@@ -95,6 +96,53 @@
 			<xs:element name="tenantName" type="xs:string" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="ssl" type="xs:string" minOccurs="0" maxOccurs="1"/>        
 			<xs:element name="auth" type="xs:string" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="EmailConfig">
+		<xs:annotation>
+			<xs:documentation>Configuration for how a tenant sends email notifications</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="baseurl" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="from" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="smtpConfig" type="SMTPConfig" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="passwordResetConfig" type="PasswordResetConfig" minOccurs="1" maxOccurs="1"/>			
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="SMTPConfig">
+		<xs:annotation>
+			<xs:documentation>SMTP config for sending emails.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="host" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="port" type="xs:integer" minOccurs="1" maxOccurs="1"/>
+		    <xs:element name="debug" type="xs:boolean" minOccurs="1" maxOccurs="1" default="true"/>
+			<xs:element name="smtpAuth" type="SMTPAuthConfig" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="SMTPAuthConfig">
+		<xs:annotation>
+			<xs:documentation>SMTP authentication config for sending emails.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="username" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="password" type="xs:string" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+		<xs:attribute name="enabled" type="xs:boolean" use="optional" default="false"/>
+	</xs:complexType>
+	
+	<xs:complexType name="PasswordResetConfig">
+		<xs:annotation>
+			<xs:documentation>Config for password resets</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="tokenExpirationSeconds" type="xs:integer" minOccurs="1" maxOccurs="1"/>		
+			<xs:element name="loginpage" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="subject" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="message" type="xs:string" minOccurs="1" maxOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>
 	

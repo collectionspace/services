@@ -58,15 +58,18 @@ public class SpringAuthNContext implements AuthNContext {
      */
     @Override
 	public CSpaceUser getUser() {
+    	CSpaceUser result = null;
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Object principal = authentication.getPrincipal();
+        Object principal = null;
+        if (authentication != null) {
+            principal = authentication.getPrincipal();
+            if (principal instanceof CSpaceUser ) {
+            	result = (CSpaceUser) principal;
+            }
+        }        
         
-        CSpaceUser user = null;
-        if (principal instanceof CSpaceUser ) {
-        	user = (CSpaceUser) principal;
-        }
-        
-        return user;
+        return result;
     }
 
     /**

@@ -84,6 +84,8 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 	/** The Constant logger. */
 	private static final Logger logger = LoggerFactory.getLogger(SecurityInterceptor.class);
 	private static final String ACCOUNT_PERMISSIONS = "accounts/*/accountperms";
+	private static final String PASSWORD_RESET = "accounts/requestpasswordreset";
+	private static final String PROCESS_PASSWORD_RESET = "accounts/processpasswordreset";
 	private static final String NUXEO_ADMIN = null;
     //
     // Use this thread specific member instance to hold our login context with Nuxeo
@@ -99,6 +101,11 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
     private boolean isAnonymousRequest(HttpRequest request, ResourceMethodInvoker resourceMethodInvoker) {
     	boolean result = false;
     	
+		String resName = SecurityUtils.getResourceName(request.getUri());
+		if (resName.equalsIgnoreCase(PASSWORD_RESET) || resName.equals(PROCESS_PASSWORD_RESET)) {
+			return true;
+		}
+    	
 		Class<?> resourceClass = resourceMethodInvoker.getResourceClass();
 		try {
 			CollectionSpaceResource resourceInstance = (CollectionSpaceResource)resourceClass.newInstance();
@@ -112,6 +119,23 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
     	return result;
     }
         
+    /*
+     * Check to see if the resource required authorization to access
+     * 
+     */
+    private boolean requiresAuthorization(String resName) {
+    	boolean result = true;
+		//
+    	// All active users are allowed to see the *their* (we enforce this) current list of permissions.  If this is not
+		// the request, then we'll do a full AuthZ check.
+    	//
+    	if (resName.equalsIgnoreCase(ACCOUNT_PERMISSIONS) == true) {
+    		result = false;
+    	}
+    	
+    	return result;
+    }
+    
 	/* (non-Javadoc)
 	 * @see org.jboss.resteasy.spi.interception.PreProcessInterceptor#preProcess(org.jboss.resteasy.spi.HttpRequest, org.jboss.resteasy.core.ResourceMethod)
 	 */
@@ -158,11 +182,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 			//
 			checkActive();
 			
-			//
-			// All active users are allowed to see the *their* (we enforce this) current list of permissions.  If this is not
-			// the request, then we'll do a full AuthZ check.
-			//
-			if (resName.equalsIgnoreCase(ACCOUNT_PERMISSIONS) != true) { //see comment immediately above
+			if (requiresAuthorization(resName) == true) { //see comment immediately above
 				AuthZ authZ = AuthZ.get();
 				CSpaceResource res = new URIResourceImpl(AuthN.get().getCurrentTenantId(), resName, httpMethod);
 				if (authZ.isAccessAllowed(res) == false) {

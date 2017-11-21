@@ -14,6 +14,7 @@
         <class>org.collectionspace.services.account.AccountTenant</class>
         <class>org.collectionspace.services.account.Status</class>        
         <class>org.collectionspace.services.authentication.User</class>
+        <class>org.collectionspace.services.authentication.Token</class>
         <class>org.collectionspace.services.authorization.perms.Permission</class>
         <class>org.collectionspace.services.authorization.perms.PermissionAction</class>
         <class>org.collectionspace.services.authorization.PermissionRoleRel</class>
