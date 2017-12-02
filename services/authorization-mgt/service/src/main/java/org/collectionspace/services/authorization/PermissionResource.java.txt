@@ -26,6 +26,7 @@ package org.collectionspace.services.authorization;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionsList;
 import org.collectionspace.services.authorization.storage.AuthorizationDelegate;
+import org.collectionspace.services.client.CollectionSpaceClientUtils;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PermissionClient;
 import org.collectionspace.services.common.SecurityResourceBase;
@@ -90,6 +91,19 @@ public class PermissionResource extends SecurityResourceBase {
     @POST
     public Response createPermission(Permission input) {
         return create(input);
+    }
+    
+    public Permission createPermissionFromInstance(Permission input) {
+    	Permission result = null;
+    	
+    	String permCsid = null;
+    	Response response = createPermission(input);
+    	if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
+    		permCsid = CollectionSpaceClientUtils.extractId(response);
+        	result = getPermission(permCsid);
+    	}
+    	    	
+    	return result;
     }
 
     @GET

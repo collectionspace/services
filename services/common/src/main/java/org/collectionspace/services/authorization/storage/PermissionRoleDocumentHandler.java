@@ -32,6 +32,7 @@ import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.PermissionsRolesList;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
+
 import org.collectionspace.services.common.authorization_mgt.AuthorizationRoleRel;
 import org.collectionspace.services.common.authorization_mgt.PermissionRoleUtil;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -206,7 +207,9 @@ public class PermissionRoleDocumentHandler
         } else {
             //subject mismatch should have been checked during validation
         }
-        PermissionRoleUtil.buildPermissionRoleRel(pr, subject, prrl, handleDelete);
+        
+        String tenantId = this.getServiceContext().getTenantId();
+        PermissionRoleUtil.buildPermissionRoleRel(pr, subject, prrl, handleDelete, tenantId);
     }
     
     /* (non-Javadoc)

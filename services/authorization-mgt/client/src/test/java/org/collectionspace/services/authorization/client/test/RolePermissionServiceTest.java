@@ -106,7 +106,6 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
      */
     @BeforeClass(alwaysRun = true)
     public void seedData() throws Exception {
-
         String rn1 = getRoleName();
         String r1RoleId = createRole(rn1);
         RoleValue rv1 = new RoleValue();
@@ -121,17 +120,21 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
         rv2.setRoleName(rn2);
         roleValues.put(rv2.getRoleName(), rv2);
 
-        String ra1 = "fooService" + TEST_MARKER;
-        String permId1 = createPermission(ra1, EffectType.PERMIT);
+        String permId1 = createPermission("fooService" + TEST_MARKER);
+        Permission persistedPerm = readPermission(permId1);
         PermissionValue pva1 = new PermissionValue();
-        pva1.setResourceName(ra1);
+        pva1.setResourceName(persistedPerm.getResourceName());
+        pva1.setActionGroup(persistedPerm.getActionGroup());
+        pva1.setTenantId(persistedPerm.getTenantId());
         pva1.setPermissionId(permId1);
         permValues.put(pva1.getResourceName(), pva1);
 
-        String ra2 = "barService" + TEST_MARKER;
-        String permId2 = createPermission(ra1, EffectType.PERMIT);
+        String permId2 = createPermission("barService" + TEST_MARKER);
+        persistedPerm = readPermission(permId2);
         PermissionValue pva2 = new PermissionValue();
-        pva2.setResourceName(ra2);
+        pva2.setResourceName(persistedPerm.getResourceName());
+        pva2.setActionGroup(persistedPerm.getActionGroup());
+        pva2.setTenantId(persistedPerm.getTenantId());
         pva2.setPermissionId(permId2);
         permValues.put(pva2.getResourceName(), pva2);
     }
@@ -570,13 +573,13 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
      * @return the string
      * @throws Exception 
      */
-    private String createPermission(String resName, EffectType effect) throws Exception {
+    private String createPermission(String resName) throws Exception {
         setupCreate();
         PermissionClient permClient = new PermissionClient();
         List<PermissionAction> actions = PermissionFactory.createDefaultActions();
         Permission permission = PermissionFactory.createPermissionInstance(resName,
                 "default permissions for " + resName,
-                actions, effect, true, true, true);
+                actions, EffectType.PERMIT, true, true, true);
         Response res = null;
         String id = null;
         try {
@@ -596,6 +599,32 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
             }
         }
         return id;
+    }
+    
+    private Permission readPermission(String csid) throws Exception {
+    	Permission result = null;
+    	
+        setupRead();
+        PermissionClient permClient = new PermissionClient();
+        Response res = null;
+
+        try {
+            res = permClient.read(csid);
+            int statusCode = res.getStatus();
+            if (logger.isDebugEnabled()) {
+                logger.debug("readPermission: csid=" + csid
+                        + " status = " + statusCode);
+            }
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
+            result = (Permission) res.readEntity(Permission.class);
+        } finally {
+            if (res != null) {
+                res.close();
+            }
+        }
+        return result;
     }
 
     /**

@@ -41,6 +41,7 @@ import org.collectionspace.services.authorization.perms.PermissionAction;
 import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
+
 import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
@@ -49,10 +50,12 @@ import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
+
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.tenant.EmailConfig;
 import org.collectionspace.services.config.tenant.PasswordResetConfig;
 import org.collectionspace.services.config.tenant.TenantBindingType;
+
 import org.collectionspace.services.lifecycle.Lifecycle;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.lifecycle.TransitionDefList;
@@ -142,6 +145,8 @@ public class AuthorizationCommon {
     		"SELECT username FROM users WHERE username = '"+TENANT_MANAGER_USER+"'";
 	final private static String GET_TENANT_MGR_ROLE_SQL =
 			"SELECT csid from roles WHERE tenant_id='" + AuthN.ALL_TENANTS_MANAGER_TENANT_ID + "' and rolename=?";
+
+	public static final String IGNORE_TENANT_ID = null; // A null constant to indicate an empty/unused value for the tenant ID
 
 
     public static Role getRole(String tenantId, String displayName) {
@@ -1066,6 +1071,8 @@ public class AuthorizationCommon {
 	
     public static void createDefaultWorkflowPermissions(TenantBindingConfigReaderImpl tenantBindingConfigReader) throws Exception //FIXME: REM - 4/11/2012 - Rename to createWorkflowPermissions
     {
+    	java.util.logging.Logger logger = java.util.logging.Logger.getAnonymousLogger();
+
     	AuthZ.get().login(); //login to Spring Security manager
     	
         EntityManagerFactory emf = JpaStorageUtils.getEntityManagerFactory(JpaStorageUtils.CS_PERSISTENCE_UNIT);
@@ -1084,7 +1091,7 @@ public class AuthorizationCommon {
 	    		
 	    		if (adminRole == null || readonlyRole == null) {
 	    			String msg = String.format("One or more of the required default CollectionSpace administrator roles is missing or was never created.  If you're setting up a new instance of CollectionSpace, shutdown the Tomcat server and run the 'ant import' command from the root/top level CollectionSpace 'Services' source directory.  Then try restarting Tomcat.");
-	    			logger.error(msg);
+	    			logger.info(msg);
 	    			throw new RuntimeException("One or more of the required default CollectionSpace administrator roles is missing or was never created.");
 	    		}
 	    		
@@ -1107,10 +1114,10 @@ public class AuthorizationCommon {
 				        	}
 				        	em.getTransaction().commit();
 			        	} catch (IllegalStateException e) {
-			        		logger.debug(e.getLocalizedMessage(), e); //We end up here if there is no document handler for the service -this is ok for some of the services.
+			        		logger.fine(e.getLocalizedMessage()); //We end up here if there is no document handler for the service -this is ok for some of the services.
 			        	}
 		        	} else {
-		        		logger.warn("AuthZ refresh service binding property is set to FALSE so default permissions will NOT be refreshed for: "
+		        		logger.warning("AuthZ refresh service binding property is set to FALSE so default permissions will NOT be refreshed for: "
 		        				+ serviceBinding.getName());
 		        	}
 		        }
@@ -1120,9 +1127,7 @@ public class AuthorizationCommon {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception and rolling back permission creation: ", e);
-            }
+            logger.fine("Caught exception and rolling back permission creation: " + e.getMessage());
             throw e;
         } finally {
             if (em != null) {
@@ -1163,7 +1168,8 @@ public class AuthorizationCommon {
 		if (permRoleRel == null) {
 			PermissionRole permRole = createPermissionRole(em, permission, role, enforceTenancy);
 	        List<PermissionRoleRel> permRoleRels = new ArrayList<PermissionRoleRel>();
-	        PermissionRoleUtil.buildPermissionRoleRel(em, permRole, SubjectType.ROLE, permRoleRels, false /*not for delete*/);
+	        PermissionRoleUtil.buildPermissionRoleRel(em, permRole, SubjectType.ROLE, permRoleRels,
+	        		false /*not for delete*/, role.getTenantId());
 	        for (PermissionRoleRel prr : permRoleRels) {
 	            authzStore.store(em, prr);
 	        }

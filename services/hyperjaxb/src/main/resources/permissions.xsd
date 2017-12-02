@@ -36,7 +36,14 @@
             </xs:documentation>
 			<xs:appinfo>
 				<hj:entity>
-					<orm:table name="permissions" />
+					<orm:table name="permissions">
+						<orm:unique-constraint>
+                            <!-- combined length should be < 1000 bytes -->
+                            <orm:column-name>resource_name</orm:column-name>
+                            <orm:column-name>action_group</orm:column-name>
+                            <orm:column-name>tenant_id</orm:column-name>
+	                    </orm:unique-constraint>
+                    </orm:table>
 				</hj:entity>
 			</xs:appinfo>
 		</xs:annotation>

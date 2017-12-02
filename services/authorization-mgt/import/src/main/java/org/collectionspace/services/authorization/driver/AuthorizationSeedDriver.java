@@ -40,6 +40,7 @@ import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.authorization.importer.AuthorizationGen;
 import org.collectionspace.services.authorization.importer.AuthorizationSeed;
+import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationStore;
 import org.collectionspace.services.common.authorization_mgt.PermissionRoleUtil;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
@@ -228,7 +229,8 @@ public class AuthorizationSeedDriver {
 	        logger.info("Seeding Permissions/Roles relationships metadata to database.");
 	        List<PermissionRoleRel> permRoleRels = new ArrayList<PermissionRoleRel>();
 	        for (PermissionRole pr : authzGen.getDefaultPermissionRoles()) {
-	            PermissionRoleUtil.buildPermissionRoleRel(em, pr, SubjectType.ROLE, permRoleRels, false /*not for delete*/);
+	        	String tenantId = getTenantId(pr);
+	            PermissionRoleUtil.buildPermissionRoleRel(em, pr, SubjectType.ROLE, permRoleRels, false /*not for delete*/, tenantId);
 	        }
 	        for (PermissionRoleRel permRoleRel : permRoleRels) {
 	            authzStore.store(em, permRoleRel);
@@ -254,7 +256,20 @@ public class AuthorizationSeedDriver {
         }
     }
 
-    private TransactionStatus beginTransaction(String name) {
+    /*
+     * Find the associated tenant ID for this permission role instance.  Uses the tenant ID found in the first role.  
+     */
+    private String getTenantId(PermissionRole pr) {
+		String result = null;
+		
+		// Since all the role and permission values in a PermissionRole instance *must* have the same tenant ID, we
+		// can just get the tenant ID from the 0th (first) role.
+		result = pr.getRole().get(0).getTenantId();
+		
+		return result;
+	}
+
+	private TransactionStatus beginTransaction(String name) {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         // explicitly setting the transaction name is something that can only be done programmatically
         def.setName(name);

@@ -86,8 +86,8 @@ public class AccountResource extends SecurityResourceBase {
 
 	final Logger logger = LoggerFactory.getLogger(AccountResource.class);
     final StorageClient storageClient = new AccountStorageClient();
-    private static final String PASSWORD_RESET_PATH = "requestpasswordreset";
-	private static final String PROCESS_PASSWORD_RESET_PATH = "processpasswordreset";
+    private static final String PASSWORD_RESET_PATH = "/requestpasswordreset";
+	private static final String PROCESS_PASSWORD_RESET_PATH = "/processpasswordreset";
 
     @Override
     protected String getVersionString() {

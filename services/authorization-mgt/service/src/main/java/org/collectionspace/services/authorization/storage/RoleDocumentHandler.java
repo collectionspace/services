@@ -87,34 +87,36 @@ public class RoleDocumentHandler
     }
 
     /**
-     * merge manually merges the from from to the to role
+     * Merge fields manually from 'from' to the 'to' role
      * -this method is created due to inefficiency of JPA EM merge
      * @param from
      * @param to
      * @return merged role
      */
     private Role merge(Role from, Role to) throws Exception {
-        //role name cannot be changed
+        // A role's name cannot be changed
         if (!(from.getRoleName().equalsIgnoreCase(to.getRoleName()))) {
             String msg = "Role name cannot be changed " + to.getRoleName();
             logger.error(msg);
             throw new BadRequestException(msg);
         }
-        if (from.getDisplayName() != null) {
+        
+        if (from.getDisplayName() != null && !from.getDisplayName().trim().isEmpty() ) {
         	to.setDisplayName(from.getDisplayName());
         }
-        if (from.getRoleGroup() != null) {
+        if (from.getRoleGroup() != null && !from.getRoleGroup().trim().isEmpty()) {
             to.setRoleGroup(from.getRoleGroup());
         }
-        if (from.getDescription() != null) {
+        if (from.getDescription() != null && !from.getDescription().trim().isEmpty()) {
             to.setDescription(from.getDescription());
         }
-        // Note that we do not allow update of locks
+
         if (logger.isDebugEnabled()) {
         	org.collectionspace.services.authorization.ObjectFactory objectFactory =
         		new org.collectionspace.services.authorization.ObjectFactory();
-            logger.debug("merged role=" + JaxbUtils.toString(objectFactory.createRole(to) ,Role.class));
+            logger.debug("Merged role on update=" + JaxbUtils.toString(objectFactory.createRole(to), Role.class));
         }
+        
         return to;
     }
 
@@ -206,7 +208,7 @@ public class RoleDocumentHandler
      */
     private void sanitize(Role role) {
         if (!SecurityUtils.isCSpaceAdmin()) {
-            role.setTenantId(null);
+            role.setTenantId(null); // REM - See no reason for hiding the tenant ID?
         }
     }
 

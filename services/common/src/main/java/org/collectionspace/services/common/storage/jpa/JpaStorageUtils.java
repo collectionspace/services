@@ -75,15 +75,21 @@ public class JpaStorageUtils {
     	boolean result = true;
     	
         boolean csAdmin = SecurityUtils.isCSpaceAdmin();
-    	if (csAdmin == true || tenantId == null) {
+        if (csAdmin == true) {
+        	logger.trace("Running as the CSAdmin user.");
+        	//Thread.dumpStack();
+        }
+        
+    	if (tenantId == null) {
     		result = false;
+        	logger.trace("Ignoring tenant ID during .");
+        	//Thread.dumpStack();
     	}
 
     	return result;
     }
     
-    public static Object getEntity(String id, Class entityClazz)
-    		throws DocumentNotFoundException {
+    public static Object getEntity(String id, Class entityClazz) {
         EntityManagerFactory emf = null;
         EntityManager em = null;
         Object entityFound = null;
@@ -92,6 +98,8 @@ public class JpaStorageUtils {
             em = emf.createEntityManager();
             //FIXME: it would be nice to verify tenantid as well
             entityFound = em.find(entityClazz, id);
+        } catch (Throwable t) {
+        	throw t;
         } finally {
             if (em != null) {
                 releaseEntityManagerFactory(emf);
