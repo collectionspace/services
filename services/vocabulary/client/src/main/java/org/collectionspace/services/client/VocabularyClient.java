@@ -104,4 +104,16 @@ public class VocabularyClient extends AuthorityClientImpl<VocabulariesCommon, Vo
 	public String getInAuthority(VocabularyitemsCommon item) {
 		return item.getInAuthority();
 	}
+
+	@Override
+	public String createAuthorityInstance(String shortIdentifier, String displayName) {
+		PoxPayloadOut poxPayloadout = VocabularyClientUtils.createVocabularyInstance(displayName, shortIdentifier, SERVICE_COMMON_PART_NAME);
+		return poxPayloadout.asXML();
+	}
+
+	@Override
+	public String createAuthorityItemInstance(String shortIdentifier, String displayName) {
+		PoxPayloadOut poxPayloadout = VocabularyClientUtils.createVocabularyItemInstance(displayName, shortIdentifier, SERVICE_COMMON_PART_NAME);
+		return poxPayloadout.asXML();
+	}
 }

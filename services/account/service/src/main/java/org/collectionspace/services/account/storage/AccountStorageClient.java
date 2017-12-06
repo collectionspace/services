@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.storage.csidp.UserStorageClient;
 import org.collectionspace.services.authentication.User;
@@ -125,13 +126,13 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             }
             throw new DocumentException(e);
         } finally {
-            if (em != null) {
+            if (emf != null) {
                 JpaStorageUtils.releaseEntityManagerFactory(emf);
             }
         }
     }
 
-        @Override
+    @Override
     public void get(ServiceContext ctx, String id, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
         if (ctx == null) {
@@ -146,8 +147,7 @@ public class AccountStorageClient extends JpaStorageClientImpl {
         if (docFilter == null) {
             docFilter = handler.createDocumentFilter();
         }
-        EntityManagerFactory emf = null;
-        EntityManager em = null;
+
         try {
             handler.prepare(Action.GET);
             Object o = null;
@@ -159,9 +159,6 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             o = JpaStorageUtils.getEntity(
                     "org.collectionspace.services.account.AccountsCommon", whereClause, params);
             if (null == o) {
-                if (em != null && em.getTransaction().isActive()) {
-                    em.getTransaction().rollback();
-                }
                 String msg = "could not find entity with id=" + id;
                 throw new DocumentNotFoundException(msg);
             }
@@ -175,10 +172,6 @@ public class AccountStorageClient extends JpaStorageClientImpl {
                 logger.debug("Caught exception ", e);
             }
             throw new DocumentException(e);
-        } finally {
-            if (emf != null) {
-                JpaStorageUtils.releaseEntityManagerFactory(emf);
-            }
         }
     }
 

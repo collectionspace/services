@@ -56,6 +56,7 @@ public class ServiceMessages {
     public static final String SEARCH_FAILED = "Search request" + FAILED;
     public static final String AUTH_REFS_FAILED = "Authority references request" + FAILED;
     
+    public static final String PASSWORD_RESET_REQUEST_FAILED = "Password reset request" + FAILED;
     public static final String UNKNOWN_ERROR_MSG = "Unknown error ";
     public static final String VALIDATION_FAILURE = "Validation failure ";
     public static final String MISSING_CSID = "missing csid";

@@ -28,6 +28,10 @@ import java.util.HashSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.collectionspace.authentication.AuthN;
+import org.collectionspace.authentication.CSpaceTenant;
+import org.collectionspace.authentication.CSpaceUser;
+import org.collectionspace.authentication.spi.AuthNContext;
 import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.spi.CSpaceAuthorizationProvider;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -215,13 +219,38 @@ public class AuthZ {
         return provider.getPermissionEvaluator().hasPermission(res, action);
     }
     
+    //
+    // Login as the admin of no specific tenant
+    //
     public void login() {
-    	String user = "SPRING_ADMIN";
-    	String password = "SPRING_ADMIN";
-        GrantedAuthority spring_security_admin = new SimpleGrantedAuthority("ROLE_SPRING_ADMIN"); //NOTE: Must match with value in applicationContext-authorization-test.xml (aka SPRING_SECURITY_METADATA)
+    	String user = AuthN.SPRING_ADMIN_USER;
+    	String password = AuthN.SPRING_ADMIN_PASSWORD;
+    	
         HashSet<GrantedAuthority> gauths = new HashSet<GrantedAuthority>();
-        gauths.add(spring_security_admin);
+        gauths.add(new SimpleGrantedAuthority(AuthN.ROLE_SPRING_ADMIN_NAME)); //NOTE: Must match with value in applicationContext-authorization-test.xml (aka SPRING_SECURITY_METADATA));
+        
         Authentication authRequest = new UsernamePasswordAuthenticationToken(user, password, gauths);
+        SecurityContextHolder.getContext().setAuthentication(authRequest);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Spring Security login successful for user=" + user);
+        }
+    }
+    
+    //
+    // Login as the admin for a specific tenant
+    //
+    public void login(CSpaceTenant tenant) {
+    	String user = AuthN.SPRING_ADMIN_USER;
+    	String password = AuthN.SPRING_ADMIN_PASSWORD;
+    	    	
+    	HashSet<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>();
+    	grantedAuthorities.add(new SimpleGrantedAuthority(AuthN.ROLE_SPRING_ADMIN_NAME));
+    	
+    	HashSet<CSpaceTenant> tenantSet = new HashSet<CSpaceTenant>();
+    	tenantSet.add(tenant);
+    	CSpaceUser principal = new CSpaceUser(user, password, tenantSet, grantedAuthorities);
+    	
+        Authentication authRequest = new UsernamePasswordAuthenticationToken(principal, password, grantedAuthorities);
         SecurityContextHolder.getContext().setAuthentication(authRequest);
         if (logger.isDebugEnabled()) {
             logger.debug("Spring Security login successful for user=" + user);

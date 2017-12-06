@@ -92,4 +92,16 @@ public class TaxonomyAuthorityClient extends AuthorityClientImpl<Taxonomyauthori
 	public void setInAuthority(TaxonCommon item, String inAuthorityCsid) {
 		item.setInAuthority(inAuthorityCsid);
 	}
+
+	@Override
+	public String createAuthorityInstance(String shortIdentifier, String displayName) {
+		PoxPayloadOut poxPayloadout = TaxonomyAuthorityClientUtils.createTaxonomyAuthorityInstance(displayName, shortIdentifier, SERVICE_COMMON_PART_NAME);
+		return poxPayloadout.asXML();
+	}
+
+	@Override
+	public String createAuthorityItemInstance(String shortIdentifier, String displayName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

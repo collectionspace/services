@@ -24,6 +24,7 @@ import javax.persistence.RollbackException;
 
 import java.sql.BatchUpdateException;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
@@ -42,6 +43,7 @@ import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.common.context.ServiceContextProperties;
+import org.collectionspace.services.common.authorization_mgt.AuthorizationStore;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.lifecycle.TransitionDef;
@@ -105,7 +107,6 @@ public class JpaStorageClientImpl implements StorageClient {
     public String create(ServiceContext ctx,
             DocumentHandler handler) throws BadRequestException,
             DocumentException {
-    	boolean rollbackTransaction = false;
         if (ctx == null) {
             throw new IllegalArgumentException(
                     "create: ctx is missing");
@@ -114,18 +115,29 @@ public class JpaStorageClientImpl implements StorageClient {
             throw new IllegalArgumentException(
                     "create: handler is missing");
         }
+        
+    	boolean rollbackTransaction = false;
         EntityManagerFactory emf = null;
         EntityManager em = null;
         try {
             handler.prepare(Action.CREATE);
             Object entity = handler.getCommonPart();
             DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(entity);
-            handler.handle(Action.CREATE, wrapDoc);
-            JaxbUtils.setValue(entity, "setCreatedAtItem", Date.class, new Date());
-            emf = JpaStorageUtils.getEntityManagerFactory();
+            
+            emf = JpaStorageUtils.getEntityManagerFactory();            
             em = emf.createEntityManager();
-            em.getTransaction().begin(); { //begin of transaction block
-            	em.persist(entity);
+            em.getTransaction().begin(); { //begin of transaction block            
+	            ctx.setProperty(AuthorizationStore.ENTITY_MANAGER_PROP_KEY, em);
+	            try {
+	            	handler.handle(Action.CREATE, wrapDoc);
+		            JaxbUtils.setValue(entity, "setCreatedAtItem", Date.class, new Date());
+		            em.persist(entity);	            	
+	            } catch (EntityExistsException ee) {
+	            	//
+	            	// We found an existing matching entity in the store, so we don't need to create one.  Just update the transient 'entity' instance with the existing persisted entity we found.
+	            	//
+	            	entity = wrapDoc.getWrappedObject(); // the handler should have reset the wrapped transient object with the existing persisted entity we just found.
+	            }
             }
             em.getTransaction().commit();
             handler.complete(Action.CREATE, wrapDoc);
@@ -143,6 +155,7 @@ public class JpaStorageClientImpl implements StorageClient {
             }
             throw DocumentException.createDocumentException(e);
         } finally {
+            ctx.setProperty(AuthorizationStore.ENTITY_MANAGER_PROP_KEY, null);
             if (em != null) {
             	if (rollbackTransaction == true) {
             		if (em.getTransaction().isActive() == true) {
@@ -493,7 +506,6 @@ public class JpaStorageClientImpl implements StorageClient {
             handler.handle(Action.DELETE, wrapDoc);
             em.remove(entityFound);
             em.getTransaction().commit();
-
             handler.complete(Action.DELETE, wrapDoc);
         } catch (DocumentException de) {
             if (em != null && em.getTransaction().isActive()) {

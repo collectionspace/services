@@ -52,20 +52,71 @@ public class RelationsUtils {
      */
     public static String buildWhereClause(String subject, String subjectType,
     		String predicate,
-    		String object, String objectType) {
+    		String object, String objectType,
+    		String subjectOrObject) {
     	String result = null;
     	
     	StringBuilder stringBuilder = new StringBuilder();
-    	if (subject != null) {
+    	
+    	if (subjectOrObject != null && object != null) {
+        	// Used for GET requests like: cspace-services/collectionobjects?mkRtSbjOrObj=cf5db000-4e65-42d5-8117
+    		//
+        	// (Example,	((rel.subjectcsid = subject AND rel.objectcsid = target)
+        	//					OR 
+        	//				(rel.subjectcsid = target AND rel.objectcsid = subject))
+        	//
+    		String target = object;
+    		stringBuilder.append("(");
+    		stringBuilder.append("(" + RelationConstants.NUXEO_SCHEMA_NAME + ":" +
+    				RelationJAXBSchema.SUBJECT_CSID + " = " + "'" + subjectOrObject + "'");
+    		stringBuilder.append(" AND " + RelationConstants.NUXEO_SCHEMA_NAME + ":" +
+    				RelationJAXBSchema.OBJECT_CSID + " = " + "'" + target + "'" + ")");
+    		stringBuilder.append(" OR ");
+    		stringBuilder.append("(" + RelationConstants.NUXEO_SCHEMA_NAME + ":" +
+    				RelationJAXBSchema.SUBJECT_CSID + " = " + "'" + target + "'");
+    		stringBuilder.append(" AND " + RelationConstants.NUXEO_SCHEMA_NAME + ":" +
+    				RelationJAXBSchema.OBJECT_CSID + " = " + "'" + subjectOrObject + "'" + ")");
+    		stringBuilder.append(")");
+    	} else if (subjectOrObject != null) {
+    		// Used for GET requests like: cspace-services/relations?sbjOrObj=cf5db000-4e65-42d5-8117
+        	//
+        	// (subectCsid = ${csid} OR objectCsid = ${csid}) overrides the individual subject or object query params
+        	// (Example,	(rel.subjectcsid = subjectOrObject	OR rel.objectcsid = subjectOrObject)
+        	//
+    		stringBuilder.append("(" + RelationConstants.NUXEO_SCHEMA_NAME + ":" +
+    				RelationJAXBSchema.SUBJECT_CSID + " = " + "'" + subjectOrObject + "'");
+    		stringBuilder.append(" OR ");
     		stringBuilder.append(RelationConstants.NUXEO_SCHEMA_NAME + ":" +
-    				RelationJAXBSchema.SUBJECT_CSID + " = " + "'" + subject + "'");
+    				RelationJAXBSchema.OBJECT_CSID + " = " + "'" + subjectOrObject + "')");
+    	} else {
+    		// Used for GET requests like: cspace-services/relations?sbj=cf5db000-4e65-42d5-8117
+    		// and cspace-services/relations?obj=cf5db000-4e65-42d5-8117
+    		//
+        	if (subject != null) {
+        		if (stringBuilder.length() > 0) {
+        			stringBuilder.append(IQueryManager.SEARCH_QUALIFIER_AND);
+        		}
+
+        		stringBuilder.append(RelationConstants.NUXEO_SCHEMA_NAME + ":" +
+        				RelationJAXBSchema.SUBJECT_CSID + " = " + "'" + subject + "'");
+        	}
+        	
+        	if (object != null) {
+        		if (stringBuilder.length() > 0) {
+        			stringBuilder.append(IQueryManager.SEARCH_QUALIFIER_AND);
+        		}
+        		stringBuilder.append(RelationConstants.NUXEO_SCHEMA_NAME + ":" +
+        				RelationJAXBSchema.OBJECT_CSID + " = " + "'" + object + "'");
+        	}    		
     	}
     	
+    	//
+    	// Check for the other possible query params
+    	//
     	if (subjectType != null) {
     		if (stringBuilder.length() > 0) {
     			stringBuilder.append(IQueryManager.SEARCH_QUALIFIER_AND);
     		}
-    		// BUG - this should use the new field RelationJAXBSchema.SUBJECT_DOCTYPE
     		stringBuilder.append(RelationConstants.NUXEO_SCHEMA_NAME + ":" +
     				RelationJAXBSchema.SUBJECT_DOCTYPE + " = " + "'" + subjectType + "'");
     	}
@@ -77,15 +128,7 @@ public class RelationsUtils {
     		stringBuilder.append(RelationConstants.NUXEO_SCHEMA_NAME + ":" +
     				RelationJAXBSchema.RELATIONSHIP_TYPE + " = " + "'" + predicate + "'");
     	}
-    	
-    	if (object != null) {
-    		if (stringBuilder.length() > 0) {
-    			stringBuilder.append(IQueryManager.SEARCH_QUALIFIER_AND);
-    		}
-    		stringBuilder.append(RelationConstants.NUXEO_SCHEMA_NAME + ":" +
-    				RelationJAXBSchema.OBJECT_CSID + " = " + "'" + object + "'");
-    	}
-    	
+    	    	
     	if (objectType != null) {
     		if (stringBuilder.length() > 0) {
     			stringBuilder.append(IQueryManager.SEARCH_QUALIFIER_AND);

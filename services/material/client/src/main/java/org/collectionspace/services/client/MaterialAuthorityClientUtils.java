@@ -40,7 +40,7 @@ public class MaterialAuthorityClientUtils {
         materialAuthority.setShortIdentifier(shortIdentifier);
         String refName = createMaterialAuthRefName(shortIdentifier, displayName);
         materialAuthority.setRefName(refName);
-        materialAuthority.setVocabType("MaterialAuthority"); //FIXME: REM - Should this really be hard-coded?
+        materialAuthority.setVocabType(MaterialAuthorityClient.SERVICE_BINDING_NAME);
         PoxPayloadOut multipart = new PoxPayloadOut(MaterialAuthorityClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(materialAuthority, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(headerLabel);

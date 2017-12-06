@@ -219,6 +219,14 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</pluginRepository>
+	    <pluginRepository>
+	        <id>plugins-snapshot-local</id>
+	        <name>plugins-snapshot-local</name>
+	        <url>http://nightly.collectionspace.org:8081/artifactory/plugins-snapshot-local</url>
+	        <snapshots>
+	            <enabled>true</enabled>
+	        </snapshots>
+	    </pluginRepository>
 		<pluginRepository>
 			<id>repo1</id>
 			<name>Maven repo1</name>

@@ -65,7 +65,7 @@ public class AuthorizationDelegate {
      * @throws Exception
      * @see PermissionRole
      */
-    static void addPermissions(ServiceContext ctx, PermissionRole pr) throws Exception {
+    public static void addPermissions(ServiceContext ctx, PermissionRole pr) throws Exception {
         SubjectType subject = PermissionRoleUtil.getRelationSubject(ctx, pr);
         AuthZ authz = AuthZ.get();
         if (subject.equals(SubjectType.ROLE)) {
@@ -116,7 +116,7 @@ public class AuthorizationDelegate {
      * @param pr permissionrole
      * @throws Exception
      */
-    static void deletePermissions(ServiceContext ctx, PermissionRole pr)
+    public static void deletePermissions(ServiceContext ctx, PermissionRole pr)
             throws Exception {
         SubjectType subject = PermissionRoleUtil.getRelationSubject(ctx, pr);
         AuthZ authz = AuthZ.get();
@@ -225,7 +225,7 @@ public class AuthorizationDelegate {
      * @see PermissionValue
      * @see CSpaceResource
      */
-    private static CSpaceResource[] getResources(Permission p) {
+    private static CSpaceResource[] getResources(Permission p) { // REM - We could use PermissionValue instead -would save the caller from needing to go to the DB for the Permission instance
         List<CSpaceResource> rl = new ArrayList<CSpaceResource>();
 
         for (PermissionAction pa : p.getAction()) {

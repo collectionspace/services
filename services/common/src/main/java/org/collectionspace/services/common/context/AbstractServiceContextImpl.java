@@ -33,6 +33,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.authentication.AuthN;
 import org.collectionspace.authentication.spi.AuthNContext;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
@@ -141,8 +142,8 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         checkTenantContext();
 
         String tenantId = securityContext.getCurrentTenantId();
-        if (AuthorizationCommon.ALL_TENANTS_MANAGER_TENANT_ID.equals(tenantId) ||
-        		AuthNContext.ANONYMOUS_TENANT_ID.equals(tenantId)) {
+        if (AuthN.ALL_TENANTS_MANAGER_TENANT_ID.equals(tenantId) ||
+        		AuthN.ANONYMOUS_TENANT_ID.equals(tenantId)) {
         	// Tenant Manager has no tenant binding, so don't bother...
         	tenantBinding = null;
         	serviceBinding = null;
@@ -186,13 +187,18 @@ public abstract class AbstractServiceContextImpl<IT, OT>
 		MultivaluedMap<String, String> queryParams = (ui == null) ? null : ui.getQueryParameters();
 		if (queryParams != null) {
 			String timeoutString = queryParams.getFirst(IClientQueryParams.IMPORT_TIMEOUT_PARAM);
-			if (timeoutString != null)
-				try {
+			if (timeoutString == null) {
+				timeoutString = queryParams.getFirst(IClientQueryParams.IMPORT_TIMOUT_PARAM);
+			}
+			
+			if (timeoutString != null) {
+				try {					
 					result = Integer.parseInt(timeoutString);
 				} catch (NumberFormatException e) {
 					logger.warn("Transaction timeout period parameter could not be parsed.  The characters in the parameter string must all be decimal digits.  The Import service will use the default timeout period instead.",
 							e);
 				}
+			}
 		}
 
 		return result;

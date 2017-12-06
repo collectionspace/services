@@ -9,7 +9,6 @@ import java.util.TreeSet;
 import org.collectionspace.services.nuxeo.client.java.NuxeoClientEmbedded;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
-
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.io.DocumentPipe;
@@ -75,7 +74,11 @@ public class ImportCommand {
             // pipe.addTransformer(transformer);
             pipe.setReader(reader);
             pipe.setWriter(writer);
+            
+            logger.trace(String.format(">>> Pipe importer start: %d", System.currentTimeMillis()));
             DocumentTranslationMap dtm = pipe.run();
+            logger.trace(String.format("<<< Pipe importer stop: %d", System.currentTimeMillis()));
+            
             if (dtm == null) {
                 throw new Exception("Could not process import payload. Check XML markup for not-well-formed errors, elements not matching import schema, etc.");
             }

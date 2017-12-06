@@ -413,7 +413,7 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
             	em.remove(getRelationship(em, r));
             }
             em.getTransaction().commit();
-            handler.complete(Action.DELETE, wrapDoc);
+            handler.complete(Action.DELETE, wrapDoc); // Delete from the Spring Security tables.  Would be better if this was part of the earlier transaction.
         } catch (DocumentException de) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();

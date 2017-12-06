@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -31,12 +32,15 @@ public abstract class SecurityResourceBase extends AbstractCollectionSpaceResour
         }
 
     public Object get(String csid, Class objectClass) {
+    	return get((UriInfo)null, csid, objectClass);
+    }
 
+    public Object get(UriInfo ui, String csid, Class objectClass) {
         logger.debug("get with csid=" + csid);
         ensureCSID(csid, ServiceMessages.GET_FAILED + "csid");
         Object result = null;
         try {
-            ServiceContext ctx = createServiceContext((Object) null, objectClass);
+            ServiceContext ctx = createServiceContext((Object) null, objectClass, ui);            
             DocumentHandler handler = createDocumentHandler(ctx);
             getStorageClient(ctx).get(ctx, csid, handler);
             result = ctx.getOutput();
@@ -49,9 +53,9 @@ public abstract class SecurityResourceBase extends AbstractCollectionSpaceResour
 
     public Object getList(UriInfo ui, Class objectClass) {
         try {
-            ServiceContext ctx = createServiceContext((Object) null, objectClass);
+            ServiceContext ctx = createServiceContext((Object) null, objectClass, ui);
             DocumentHandler handler = createDocumentHandler(ctx);
-            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+            MultivaluedMap<String, String> queryParams = (ui != null ? ui.getQueryParameters() : null);
             DocumentFilter myFilter = handler.createDocumentFilter();
             myFilter.setPagination(queryParams);
             myFilter.setQueryParams(queryParams);
@@ -65,13 +69,17 @@ public abstract class SecurityResourceBase extends AbstractCollectionSpaceResour
         }
     }
 
-    public Object update(@PathParam("csid") String csid, Object theUpdate, Class objectClass) {
+    public Object update(String csid, Object theUpdate, Class objectClass) {
+    	return update((UriInfo)null, csid, theUpdate, objectClass);
+    }
+    
+    public Object update(UriInfo ui, String csid, Object theUpdate, Class objectClass) {
         if (logger.isDebugEnabled()) {
             logger.debug("updateRole with csid=" + csid);
         }
         ensureCSID(csid, ServiceMessages.PUT_FAILED + this.getClass().getName());
         try {
-            ServiceContext ctx = createServiceContext(theUpdate, objectClass);
+            ServiceContext ctx = createServiceContext(theUpdate, objectClass, ui);
             DocumentHandler handler = createDocumentHandler(ctx);
             getStorageClient(ctx).update(ctx, csid, handler);
             return ctx.getOutput();

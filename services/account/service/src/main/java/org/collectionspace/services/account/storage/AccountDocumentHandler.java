@@ -164,6 +164,8 @@ public class AccountDocumentHandler
             AccountListItem accListItem = new AccountListItem();
             accListItem.setScreenName(account.getScreenName());
             accListItem.setUserid(account.getUserId());
+            accListItem.setTenantid(account.getTenants().get(0).getTenantId()); // pick the default/first tenant
+            accListItem.setTenants(account.getTenants());
             accListItem.setEmail(account.getEmail());
             accListItem.setStatus(account.getStatus());
             String id = account.getCsid();

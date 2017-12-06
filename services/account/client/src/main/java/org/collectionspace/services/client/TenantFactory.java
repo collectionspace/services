@@ -30,34 +30,37 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author 
+ * @author
  */
 public class TenantFactory {
 	static private final Logger logger = LoggerFactory.getLogger(TenantFactory.class);
 
 	/**
 	 * create tenant instance
+	 * 
 	 * @param screenName
 	 * @param userName
 	 * @param passwd
 	 * @param email
-	 * @param tenantId add non-null tenant id else let service take tenant id of
-	 * the authenticated user
+	 * @param tenantId
+	 *            add non-null tenant id else let service take tenant id of the
+	 *            authenticated user
 	 * @param useScreenName
 	 * @param invalidTenant
 	 * @param useUser
 	 * @param usePassword
 	 * @return
 	 */
-	public static Tenant createTenantInstance(String id,
-			String name, boolean disabled) {
+	public static Tenant createTenantInstance(String id, String name, boolean disabled,
+			boolean authoritiesInitialized) {
 
 		Tenant tenant = new Tenant();
 		tenant.setName(name);
 		tenant.setId(id);
+		tenant.setAuthoritiesInitialized(authoritiesInitialized);
 		tenant.setDisabled(disabled);
-	return tenant;
 
-}
+		return tenant;
+	}
 
 }

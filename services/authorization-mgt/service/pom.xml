@@ -186,7 +186,7 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
-            </dependency>
+        </dependency>
     </dependencies>
 
     <build>

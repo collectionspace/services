@@ -1,5 +1,7 @@
 package org.collectionspace.services.common.authorization_mgt;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,6 +20,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.collectionspace.authentication.AuthN;
+import org.collectionspace.services.account.AccountListItem;
+
+import org.collectionspace.services.authentication.Token;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceAction;
 import org.collectionspace.services.authorization.PermissionException;
@@ -32,9 +37,11 @@ import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.perms.EffectType;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionAction;
+
 import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
+
 import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
@@ -43,8 +50,12 @@ import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
+
 import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.EmailConfig;
+import org.collectionspace.services.config.tenant.PasswordResetConfig;
 import org.collectionspace.services.config.tenant.TenantBindingType;
+
 import org.collectionspace.services.lifecycle.Lifecycle;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.lifecycle.TransitionDefList;
@@ -58,6 +69,15 @@ import org.springframework.security.acls.model.AlreadyExistsException;
 public class AuthorizationCommon {
 	
 	final public static String REFRESH_AUTZ_PROP = "refreshAuthZOnStartup";
+	
+	//
+	// For token generation and password reset
+	//
+	final private static String DEFAULT_PASSWORD_RESET_EMAIL_MESSAGE = "Hello {{greeting}},\n\r\n\rYou've started the process to reset your CollectionSpace account password. To finish resetting your password, go to the Reset Password page {{link}} on CollectionSpace.\n\r\n\rIf clicking the link doesn't work, copy and paste the following link into your browser address bar and click Go.\n\r\n\r{{link}}\n\r Thanks,\n\r\n\r CollectionSpace Administrator\n\r\n\rPlease do not reply to this email. This mailbox is not monitored and you will not receive a response. For assistance, contact your CollectionSpace Administrator directly.";
+	final private static String tokensalt = "74102328UserDetailsReset";
+	final private static int TIME_SCALAR = 100000;
+	private static final String DEFAULT_PASSWORD_RESET_EMAIL_SUBJECT = "Password reset for CollectionSpace account";
+
     //
     // ActionGroup labels/constants
     //
@@ -87,13 +107,6 @@ public class AuthorizationCommon {
 	
     final static Logger logger = LoggerFactory.getLogger(AuthorizationCommon.class);
 
-    //
-    // The "super" role has a predefined ID of "0" and a tenant ID of "0";
-    //
-    final public static String ROLE_ALL_TENANTS_MANAGER = "ALL_TENANTS_MANAGER";
-    final public static String ROLE_ALL_TENANTS_MANAGER_ID = "0";
-    final public static String ALL_TENANTS_MANAGER_TENANT_ID = "0";
-
     final public static String ROLE_TENANT_ADMINISTRATOR = "TENANT_ADMINISTRATOR";
     final public static String ROLE_TENANT_READER = "TENANT_READER";
 	
@@ -105,14 +118,10 @@ public class AuthorizationCommon {
     public static final String TENANT_ADMIN_ACCT_PREFIX = "admin@"; 
     public static final String TENANT_READER_ACCT_PREFIX = "reader@"; 
     public static final String ROLE_PREFIX = "ROLE_"; 
-    public static final String SPRING_ADMIN_ROLE = "ROLE_SPRING_ADMIN"; 
     public static final String TENANT_ADMIN_ROLE_SUFFIX = "_TENANT_ADMINISTRATOR"; 
     public static final String TENANT_READER_ROLE_SUFFIX = "_TENANT_READER"; 
     public static final String DEFAULT_ADMIN_PASSWORD = "Administrator";
     public static final String DEFAULT_READER_PASSWORD = "reader";
-
-    public static final String ROLE_SPRING_ADMIN_ID = "-1";
-    public static final String ROLE_SPRING_ADMIN_NAME = "ROLE_SPRING_ADMIN";
     
     // SQL for init tasks
 	final private static String INSERT_ACCOUNT_ROLE_SQL_MYSQL = 
@@ -135,7 +144,10 @@ public class AuthorizationCommon {
 	final private static String QUERY_TENANT_MGR_USER_SQL = 
     		"SELECT username FROM users WHERE username = '"+TENANT_MANAGER_USER+"'";
 	final private static String GET_TENANT_MGR_ROLE_SQL =
-			"SELECT csid from roles WHERE tenant_id='"+ALL_TENANTS_MANAGER_TENANT_ID+"' and rolename=?";
+			"SELECT csid from roles WHERE tenant_id='" + AuthN.ALL_TENANTS_MANAGER_TENANT_ID + "' and rolename=?";
+
+	public static final String IGNORE_TENANT_ID = null; // A null constant to indicate an empty/unused value for the tenant ID
+
 
     public static Role getRole(String tenantId, String displayName) {
     	Role role = null;
@@ -420,7 +432,7 @@ public class AuthorizationCommon {
     		ArrayList<String> existingTenants) throws SQLException, Exception {
 		// Need to define and look for a createDisabled attribute in tenant config
     	final String insertTenantSQL = 
-    		"INSERT INTO tenants (id,name,disabled,created_at) VALUES (?,?,FALSE,now())";
+    		"INSERT INTO tenants (id,name,authorities_initialized,disabled,created_at) VALUES (?,?,FALSE,FALSE,now())";
         PreparedStatement pstmt = null;
     	try {
     		pstmt = conn.prepareStatement(insertTenantSQL); // create a statement
@@ -685,7 +697,7 @@ public class AuthorizationCommon {
     	PreparedStatement pstmt = null;
     	try {
     		final String querySpringRole = 
-    				"SELECT csid from roles WHERE rolename='"+SPRING_ADMIN_ROLE+"'";
+    				"SELECT csid from roles WHERE rolename='"+AuthN.ROLE_SPRING_ADMIN_NAME+"'";
     		stmt = conn.createStatement();
     		ResultSet rs = stmt.executeQuery(querySpringRole);
     		if(rs.next()) {
@@ -761,8 +773,8 @@ public class AuthorizationCommon {
 		String tenantMgrRoleCSID = null;
     	PreparedStatement pstmt = null;
     	try {
-    		String rolename = getQualifiedRoleName(ALL_TENANTS_MANAGER_TENANT_ID, 
-    												ROLE_ALL_TENANTS_MANAGER);    		
+    		String rolename = getQualifiedRoleName(AuthN.ALL_TENANTS_MANAGER_TENANT_ID, 
+    				AuthN.ROLE_ALL_TENANTS_MANAGER);    		
     		pstmt = conn.prepareStatement(GET_TENANT_MGR_ROLE_SQL); // create a statement
     		ResultSet rs = null;
     		pstmt.setString(1, rolename);	// set rolename param
@@ -826,7 +838,7 @@ public class AuthorizationCommon {
     				pstmt.executeUpdate();
     				// Now add the Spring Admin Role to the admin accounts
     				pstmt.setString(3, springAdminRoleCSID);	// set role_id param
-    				pstmt.setString(4, SPRING_ADMIN_ROLE);		// set rolename param
+    				pstmt.setString(4, AuthN.ROLE_SPRING_ADMIN_NAME);		// set rolename param
     				if (logger.isDebugEnabled()) {
     					logger.debug("createDefaultAccounts binding account: "
     							+adminUserId+" to Spring Admin role: "+springAdminRoleCSID);
@@ -952,7 +964,7 @@ public class AuthorizationCommon {
 	    		String tenantManagerRoleCSID = findTenantManagerRole(conn);
 	    		bindTenantManagerAccountRole(conn, databaseProductType, 
 	    				TENANT_MANAGER_USER, AuthN.TENANT_MANAGER_ACCT_ID, 
-	    				tenantManagerRoleCSID, ROLE_ALL_TENANTS_MANAGER);
+	    				tenantManagerRoleCSID, AuthN.ROLE_ALL_TENANTS_MANAGER);
     		}
         } catch (Exception e) {
 			logger.debug("Exception in createDefaultAccounts: " + e.getLocalizedMessage());
@@ -1059,6 +1071,8 @@ public class AuthorizationCommon {
 	
     public static void createDefaultWorkflowPermissions(TenantBindingConfigReaderImpl tenantBindingConfigReader) throws Exception //FIXME: REM - 4/11/2012 - Rename to createWorkflowPermissions
     {
+    	java.util.logging.Logger logger = java.util.logging.Logger.getAnonymousLogger();
+
     	AuthZ.get().login(); //login to Spring Security manager
     	
         EntityManagerFactory emf = JpaStorageUtils.getEntityManagerFactory(JpaStorageUtils.CS_PERSISTENCE_UNIT);
@@ -1077,7 +1091,7 @@ public class AuthorizationCommon {
 	    		
 	    		if (adminRole == null || readonlyRole == null) {
 	    			String msg = String.format("One or more of the required default CollectionSpace administrator roles is missing or was never created.  If you're setting up a new instance of CollectionSpace, shutdown the Tomcat server and run the 'ant import' command from the root/top level CollectionSpace 'Services' source directory.  Then try restarting Tomcat.");
-	    			logger.error(msg);
+	    			logger.info(msg);
 	    			throw new RuntimeException("One or more of the required default CollectionSpace administrator roles is missing or was never created.");
 	    		}
 	    		
@@ -1100,10 +1114,10 @@ public class AuthorizationCommon {
 				        	}
 				        	em.getTransaction().commit();
 			        	} catch (IllegalStateException e) {
-			        		logger.debug(e.getLocalizedMessage(), e); //We end up here if there is no document handler for the service -this is ok for some of the services.
+			        		logger.fine(e.getLocalizedMessage()); //We end up here if there is no document handler for the service -this is ok for some of the services.
 			        	}
 		        	} else {
-		        		logger.warn("AuthZ refresh service binding property is set to FALSE so default permissions will NOT be refreshed for: "
+		        		logger.warning("AuthZ refresh service binding property is set to FALSE so default permissions will NOT be refreshed for: "
 		        				+ serviceBinding.getName());
 		        	}
 		        }
@@ -1113,9 +1127,7 @@ public class AuthorizationCommon {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception and rolling back permission creation: ", e);
-            }
+            logger.fine("Caught exception and rolling back permission creation: " + e.getMessage());
             throw e;
         } finally {
             if (em != null) {
@@ -1156,7 +1168,8 @@ public class AuthorizationCommon {
 		if (permRoleRel == null) {
 			PermissionRole permRole = createPermissionRole(em, permission, role, enforceTenancy);
 	        List<PermissionRoleRel> permRoleRels = new ArrayList<PermissionRoleRel>();
-	        PermissionRoleUtil.buildPermissionRoleRel(em, permRole, SubjectType.ROLE, permRoleRels, false /*not for delete*/);
+	        PermissionRoleUtil.buildPermissionRoleRel(em, permRole, SubjectType.ROLE, permRoleRels,
+	        		false /*not for delete*/, role.getTenantId());
 	        for (PermissionRoleRel prr : permRoleRels) {
 	            authzStore.store(em, prr);
 	        }
@@ -1173,5 +1186,88 @@ public class AuthorizationCommon {
 		}
         
     }
+	
+	public static boolean hasTokenExpired(EmailConfig emailConfig, Token token) throws NoSuchAlgorithmException {
+		boolean result = false;
+		
+		int maxConfigSeconds = emailConfig.getPasswordResetConfig().getTokenExpirationSeconds().intValue();
+		int maxTokenSeconds = token.getExpireSeconds().intValue();
+		
+		long createdTime = token.getCreatedAtItem().getTime();		
+		long configExpirationTime = createdTime + maxConfigSeconds * 1000;		// the current tenant config for how long a token stays valid
+		long tokenDefinedExirationTime = createdTime + maxTokenSeconds * 1000;	// the tenant config for how long a token stays valid when the token was created.
+		
+		if (configExpirationTime != tokenDefinedExirationTime) {
+			String msg = String.format("The configured expiration time for the token = '%s' changed from when the token was created.",
+					token.getId());
+			logger.warn(msg);
+		}
+		//
+		// Note: the current tenant bindings config for expiration takes precedence over the config used to create the token.
+		//
+		if (System.currentTimeMillis() >= configExpirationTime) {
+			result = true;
+		}
+		
+		return result;
+	}
+		
+	/*
+	 * Validate that the password reset configuration is correct.
+	 */
+	private static String validatePasswordResetConfig(PasswordResetConfig passwordResetConfig) {
+		String result = null;
+		
+		if (passwordResetConfig != null) {
+			result = passwordResetConfig.getMessage();
+			if (result == null || result.length() == 0) {
+				result = DEFAULT_PASSWORD_RESET_EMAIL_MESSAGE;
+				logger.warn("Could not find a password reset message in the tenant's configuration.  Using the default one");
+			}
+			
+			if (result.contains("{{link}}") == false) {
+				logger.warn("The tenant's password reset message does not contain a required '{{link}}' marker.");
+				result = null;
+			}
+			
+			if (passwordResetConfig.getLoginpage() == null || passwordResetConfig.getLoginpage().trim().isEmpty()) {
+				logger.warn("The tenant's password reset configuration is missing a 'loginpage' value.  It should be set to something like '/collectionspace/ui/core/html/index.html'.");
+				result = null;
+			}
+			
+		    String subject = passwordResetConfig.getSubject();
+		    if (subject == null || subject.trim().isEmpty()) {
+		    	passwordResetConfig.setSubject(DEFAULT_PASSWORD_RESET_EMAIL_SUBJECT);
+		    }
 
+		}
+		
+		return result;
+	}
+	
+	/*
+	 * Generate a password reset message. Embeds an authorization token to reset a user's password.
+	 */
+	public static String generatePasswordResetEmailMessage(EmailConfig emailConfig, AccountListItem accountListItem, Token token) throws Exception {
+		String result = null;
+		
+		result = validatePasswordResetConfig(emailConfig.getPasswordResetConfig());
+		if (result == null) {
+			String errMsg = String.format("The password reset configuration for the tenant ID='%s' is missing or malformed.  Could not initiate a password reset for user ID='%s. See the log files for more details.",
+					token.getTenantId(), accountListItem.getEmail());
+			throw new Exception(errMsg);
+		}
+		
+		String link = emailConfig.getBaseurl() + emailConfig.getPasswordResetConfig().getLoginpage() + "?token=" + token.getId();
+		result = result.replaceAll("\\{\\{link\\}\\}", link);
+		
+		if (result.contains("{{greeting}}")) {
+			String greeting = accountListItem.getScreenName();
+			result = result.replaceAll("\\{\\{greeting\\}\\}", greeting);
+			result = result.replaceAll("\\\\n", "\\\n");
+			result = result.replaceAll("\\\\r", "\\\r");
+		}			
+		
+		return result;
+	}
 }
