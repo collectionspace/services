@@ -23,23 +23,28 @@
  */
 package org.collectionspace.services.common.authorization_mgt;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
 
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextProperties;
-import org.collectionspace.services.common.storage.jpa.JpaRelationshipStorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 
+import org.collectionspace.services.authorization.perms.ActionType;
+import org.collectionspace.services.authorization.perms.EffectType;
 import org.collectionspace.services.authorization.perms.Permission;
+import org.collectionspace.services.authorization.perms.PermissionAction;
+import org.collectionspace.services.authorization.storage.PermissionStorageConstants;
+import org.collectionspace.services.authorization.PermissionResource;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionRoleRel;
 import org.collectionspace.services.authorization.PermissionValue;
-import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
 
@@ -101,13 +106,15 @@ public class PermissionRoleUtil {
     		PermissionRole pr,
     		SubjectType subject,
     		List<PermissionRoleRel> prrl,
-    		boolean handleDelete) throws Exception {
+    		boolean handleDelete,
+    		String tenantId) throws Exception {
+    	
         if (subject.equals(SubjectType.ROLE)) {
         	List<PermissionValue> permissionValues = pr.getPermission();
         	if (permissionValues != null && permissionValues.size() > 0) {
 	            PermissionValue pv = permissionValues.get(0);
 	            for (RoleValue rv : pr.getRole()) {
-	                PermissionRoleRel prr = buildPermissonRoleRel(em, pv, rv, subject, handleDelete);
+	                PermissionRoleRel prr = buildPermissonRoleRel(em, pv, rv, subject, handleDelete, tenantId);
 	                prrl.add(prr);
 	            }
         	}
@@ -116,7 +123,7 @@ public class PermissionRoleUtil {
         	if (roleValues != null && roleValues.size() > 0) {
 	            RoleValue rv = roleValues.get(0);
 	            for (PermissionValue pv : pr.getPermission()) {
-	                PermissionRoleRel prr = buildPermissonRoleRel(em, pv, rv, subject, handleDelete);
+	                PermissionRoleRel prr = buildPermissonRoleRel(em, pv, rv, subject, handleDelete, tenantId);
 	                prrl.add(prr);
 	            }
         	}
@@ -127,7 +134,8 @@ public class PermissionRoleUtil {
     		PermissionRole pr,
     		SubjectType subject,
     		List<PermissionRoleRel> prrl,
-    		boolean handleDelete) throws Exception {
+    		boolean handleDelete,
+    		String tenantId) throws Exception {
         EntityManagerFactory emf = null;
         EntityManager em = null;
         try {
@@ -135,7 +143,7 @@ public class PermissionRoleUtil {
             em = emf.createEntityManager();
             em.getTransaction().begin();
             
-            buildPermissionRoleRel(em, pr, subject, prrl, handleDelete);
+            buildPermissionRoleRel(em, pr, subject, prrl, handleDelete, tenantId);
             
             em.getTransaction().commit();
         	em.close();            
@@ -154,6 +162,52 @@ public class PermissionRoleUtil {
         }
     }    
 
+    /*
+     * Try to find a persisted Permission record using a PermissionValue instance.
+     *
+     */
+    static private Permission lookupPermission(EntityManager em, PermissionValue permissionValue, String tenantId) {
+    	Permission result = null;
+    	
+    	String actionGroup = permissionValue.getActionGroup() != null ? permissionValue.getActionGroup().trim() : null;
+    	String resourceName = permissionValue.getResourceName() != null ? permissionValue.getResourceName().trim() : null;
+    	String permissionId = permissionValue.getPermissionId() != null ? permissionValue.getPermissionId().trim() : null;
+    	//
+    	// If we have a permission ID, use it to try to lookup the persisted permission
+    	//
+    	if (permissionId != null && !permissionId.isEmpty()) {
+	    	try {
+		    	result = (Permission)JpaStorageUtils.getEntity(em, permissionId, Permission.class);
+	    	} catch (Throwable e) {
+	    		String msg = String.format("Searched for but couldn't find a permission with CSID='%s'.",
+	    				permissionId);
+	    		logger.trace(msg);
+	    	}
+    	} else if ((resourceName != null && !resourceName.isEmpty()) && 
+    			(actionGroup != null && !actionGroup.isEmpty())) {
+    		//
+    		// If there was no permission ID, then we can try to find the permission with the resource name and action group tuple
+    		//
+	    	try {
+		    	result = (Permission)JpaStorageUtils.getEntityByDualKeys(em, 
+		    			Permission.class.getName(),
+		    			PermissionStorageConstants.RESOURCE_NAME, permissionValue.getResourceName(), 
+		    			PermissionStorageConstants.ACTION_GROUP, permissionValue.getActionGroup(),
+		    			tenantId);
+	    	} catch (NoResultException e) {
+	    		String msg = String.format("Searched for but couldn't find a permission for resource='%s', action group='%s', and tenant ID='%s'.",
+	    				permissionValue.getResourceName(), permissionValue.getActionGroup(), tenantId);
+	    		logger.trace(msg);
+	    	}
+    	} else {
+    		String errMsg = String.format("Couldn't perform lookup of permission.  Not enough information provided.  Lookups requires a permission CSID or a resource name and action group tuple.  The provided information was permission ID='%s', resourceName='%s', and actionGroup='%s'.",
+    				permissionId, resourceName, actionGroup);
+    		logger.warn(errMsg);
+    	}
+    	
+    	return result;
+    }
+    
     /**
      * Builds a permisson role relationship for either 'create' or 'delete'
      *
@@ -161,65 +215,45 @@ public class PermissionRoleUtil {
      * @param rv the rv (currently using only the ID)
      * @param handleDelete the handle delete
      * @return the permission role rel
+     * @throws DocumentException 
      */
     static private PermissionRoleRel buildPermissonRoleRel(EntityManager em, PermissionValue permissionValue,
     		RoleValue roleValue,
     		SubjectType subject,
-    		boolean handleDelete)
-    			throws DocumentNotFoundException {
+    		boolean handleDelete,  // if 'true' then we're deleting not building a permission-role record
+    		String tenantId) throws DocumentException {
 
     	PermissionRoleRel result = null;
+    	Permission permission = lookupPermission(em, permissionValue, tenantId);
     	
     	//
-    	// Ensure we can find both the Permission and Role to relate.
-    	// FIXME: REM - This is a workaround until the Import utility creates Perm/Role relationships
-    	// correctly.  The import utility should create and store the permissions and roles BEFORE creating the relationships
+    	// If we couldn't find an existing permission and we're not processing a DELETE request, we need to create
+    	// a new permission.
     	//
-    	PermissionValue pv = permissionValue;
-    	
-    	//
-    	// This lookup is slow, do we really need it?
-    	//
-    	/*
-    	try {
-	    	Permission permission = (Permission)JpaStorageUtils.getEntity(em, pv.getPermissionId(), //FIXME: REM 4/5/2012 - To improve performance, we should use a passed in Permission instance
-	    			Permission.class);
-	    	if (permission != null) {
-	    		// If the permission already exists, then use it to fill our the relation record
-	    		pv = JpaRelationshipStorageClient.createPermissionValue(permission);
-	    	}
-    	} catch (DocumentNotFoundException e) {
-    		// ignore this exception, pv is set to permissionValue;
+    	if (permission == null && handleDelete == false) {
+    		permission = new Permission();
+    		permission.setResourceName(permissionValue.getResourceName());
+    		permission.setActionGroup(permissionValue.getActionGroup());
+    		permission.setEffect(EffectType.PERMIT); // By default, CollectionSpace currently (11/2017) supports only PERMIT
+    		List<PermissionAction> actionList = createPermActionList(permissionValue.getActionGroup());
+    		permission.setAction(actionList);
+    		permission = createPermission(permission);
+    		if (permission == null) {
+    			String errMsg = "Could not create new permission for new permission-role relationship.";
+    			throw new DocumentException(errMsg);
+    		}
     	}
-    	*/
     	
     	//
-    	// Ensure we can find both the Permission and Role to relate.
-    	// FIXME: REM - This is a workaround until the Import utility creates Perm/Role relationships
-    	// correctly.  The import utility should create and store the permissions and roles BEFORE creating the relationships
+    	// Create the permission-role to persist
     	//
-    	RoleValue rv = roleValue;
-    	
-    	/*
-    	 * This lookup is slow, can we avoid it?
-    	try {
-	    	Role role = (Role)JpaStorageUtils.getEntity(em, rv.getRoleId(),
-	    			Role.class);
-	    	if (role != null) {
-	    		// If the role already exists, then use it to fill out the relation record
-	    		rv = JpaRelationshipStorageClient.createRoleValue(role);
-	    	}
-    	} catch (DocumentNotFoundException e) {
-    		// ignore this exception, rv is set to roleValue
-    	}
-    	 */
-    	
         result = new PermissionRoleRel();
-        result.setPermissionId(pv.getPermissionId());
-        result.setPermissionResource(pv.getResourceName());
-        result.setActionGroup(pv.getActionGroup());
-        result.setRoleId(rv.getRoleId());
-        result.setRoleName(rv.getRoleName());
+        result.setPermissionId(permission.getCsid());
+        result.setPermissionResource(permission.getResourceName());
+        result.setActionGroup(permission.getActionGroup());
+        result.setRoleId(roleValue.getRoleId());
+        result.setRoleName(roleValue.getRoleName());
+        
         //
         // For 'delete' we need to set the hjid of the existing relstionship
         //
@@ -236,7 +270,58 @@ public class PermissionRoleUtil {
         return result;
     }
 
-    /**
+    private static Permission createPermission(Permission permission) {
+		Permission result = null;
+		
+		PermissionResource permissionResource = new PermissionResource();  // Get the PermissionResource singleton instance (RESTEasy ensures it is a singleton)
+		result = permissionResource.createPermissionFromInstance(permission);
+		
+		return result;
+	}
+
+	private static List<PermissionAction> createPermActionList(String actionGroup) throws DocumentException {
+    	ArrayList<PermissionAction> result = new ArrayList<PermissionAction>();
+    	
+    	for (char c : actionGroup.toUpperCase().toCharArray()) {
+    		PermissionAction permAction = new PermissionAction();
+    		switch (c) {
+	    		case 'C':
+	    			permAction.setName(ActionType.CREATE);
+	    			break;
+	    			
+	    		case 'R':
+	    			permAction.setName(ActionType.READ);
+	    			break;
+	    			
+	    		case 'U':
+	    			permAction.setName(ActionType.UPDATE);
+	    			break;
+	    			
+	    		case 'D':
+	    			permAction.setName(ActionType.DELETE);
+	    			break;
+	    			
+	    		case 'L':
+	    			permAction.setName(ActionType.SEARCH);
+	    			break;
+	    			
+	    		default:
+	    			String errMsg = String.format("Illegal action group token '%c' in permission action group '%s'.",
+	    					c, actionGroup);
+	    			throw new DocumentException(errMsg);
+    		}
+    		
+    		if (result.add(permAction) == false) {
+    			String warnMsg = String.format("Illegal or duplicate action group token '%c' in permission action group '%s'.",
+    					c, actionGroup);
+    			logger.warn(warnMsg);
+    		}
+    	}
+    	
+		return result;
+	}
+
+	/**
      * Checks if is invalid tenant.
      *
      * @param tenantId the tenant id

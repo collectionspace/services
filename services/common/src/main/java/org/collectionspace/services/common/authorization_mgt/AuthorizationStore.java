@@ -34,7 +34,7 @@ import javax.persistence.EntityManagerFactory;
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.PermissionRoleRel;
 import org.collectionspace.services.authorization.perms.Permission;
-import org.collectionspace.services.common.authorization_mgt.RoleStorageConstants;
+import org.collectionspace.services.authorization.storage.RoleStorageConstants;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.slf4j.Logger;
@@ -48,6 +48,7 @@ public class AuthorizationStore {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthorizationStore.class);
     private final static String PERSISTENCE_UNIT = "org.collectionspace.services.authorization";
+    public final static String ENTITY_MANAGER_PROP_KEY = EntityManager.class.getCanonicalName();
 
     static public Role getRoleByName(String roleName, String tenantId) {
     	Role theRole = null;

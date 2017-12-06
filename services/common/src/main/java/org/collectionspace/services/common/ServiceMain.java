@@ -18,8 +18,11 @@ import javax.sql.DataSource;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
+
 import org.collectionspace.authentication.AuthN;
+
 import org.collectionspace.services.client.XmlTools;
+
 import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
@@ -30,10 +33,11 @@ import org.collectionspace.services.common.config.ServicesConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.init.AddIndices;
-import org.collectionspace.services.config.service.InitHandler.Params.Field;
 import org.collectionspace.services.common.init.IInitHandler;
 import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.common.storage.JDBCTools;
+
+import org.collectionspace.services.config.service.InitHandler.Params.Field;
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.ServiceConfig;
 import org.collectionspace.services.config.service.ServiceBindingType;
@@ -43,10 +47,12 @@ import org.collectionspace.services.config.tenant.RepositoryDomainType;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.services.config.types.PropertyItemType;
 import org.collectionspace.services.config.types.PropertyType;
+
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 import org.collectionspace.services.nuxeo.client.java.TenantRepository;
 import org.collectionspace.services.nuxeo.listener.CSEventListener;
 import org.collectionspace.services.nuxeo.listener.AbstractCSEventListenerImpl;
+
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.dom4j.Document;
 import org.slf4j.Logger;
@@ -99,7 +105,7 @@ public class ServiceMain {
     private ServiceMain() {
     	// Intentionally blank
     }
-    
+        
     /*
      * 
      * Set this singletons ServletContext without any call to initialize
@@ -231,6 +237,12 @@ public class ServiceMain {
 					e.getLocalizedMessage(), e);
 			throw e;
 		}
+		
+		//
+		// Ensure default vocabulary and authority instances and their corresponding terms exist.
+		//
+//		initializeVocabularies();
+//		initializeAuthorities();
         
         /*
          * This might be useful for something, but the reader grants are better handled in the ReportPostInitHandler.
@@ -243,7 +255,7 @@ public class ServiceMain {
 		showTenantStatus();
     }
         
-    /**
+	/**
      * Returns the primary repository name for a tenant -there's usually just one.
      * @param tenantBinding
      * @return

@@ -230,6 +230,17 @@
 		                        <xs:sequence>
 		                            <xs:element name="screenName" type="xs:string" minOccurs="1"/>
 		                            <xs:element name="userid" type="xs:string" minOccurs="1" />
+		                            <xs:element name="tenantid" type="xs:string" minOccurs="1" />
+		                            <xs:element name="tenants" type="account_tenant" minOccurs="1" maxOccurs="unbounded">
+				                    <xs:annotation>
+				                        <xs:documentation>
+				                            tenant association is usually not required to be provided by the
+				                            service consumer. only in cases where a user in CollectionSpace
+				                            has access to the spaces of multiple tenants, this is used
+				                            to associate that user with more than one tenants
+				                        </xs:documentation>
+				                    </xs:annotation>
+                					</xs:element>		                            
 		                            <xs:element name="personRefName" type="xs:string" minOccurs="1" />
 		                            <xs:element name="email" type="xs:string" minOccurs="1" />
 		                            <xs:element name="status" type="status" minOccurs="1" />
@@ -281,7 +292,7 @@
             </xs:element>
         </xs:sequence>
     </xs:complexType>
-
+	
     <!-- FIXME tenant definition could be in a separate schema -->
 	<xs:element name="tenant">
 		<xs:complexType>
@@ -310,6 +321,15 @@
 						<xs:appinfo>
 							<hj:basic>
 								<orm:column name="name" nullable="false" />
+							</hj:basic>
+						</xs:appinfo>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="authoritiesInitialized" type="xs:boolean">
+					<xs:annotation>
+						<xs:appinfo>
+							<hj:basic>
+								<orm:column name="authorities_initialized" nullable="false" />
 							</hj:basic>
 						</xs:appinfo>
 					</xs:annotation>

@@ -23,8 +23,11 @@
  */
 package org.collectionspace.services.nuxeo.client.java;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,7 +39,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 
-import org.collectionspace.authentication.spi.AuthNContext;
+import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.authorization.AccountPermission;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.lifecycle.TransitionDef;
@@ -51,6 +54,7 @@ import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.NuxeoBasedResource;
+import org.collectionspace.services.common.ServiceException;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.context.JaxRsContext;
@@ -72,7 +76,6 @@ import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
-import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.config.service.DocHandlerParams;
 import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ObjectPartType;
@@ -81,11 +84,15 @@ import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsDocListItem;
 import org.collectionspace.services.relation.RelationshipType;
+
 import org.dom4j.Element;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.DocumentNotFoundException;
+import org.nuxeo.ecm.core.api.impl.DataModelImpl;
+import org.nuxeo.ecm.core.api.model.DocumentPart;
+import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.model.PropertyException;
+import org.nuxeo.ecm.core.api.model.impl.ScalarProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -209,6 +216,32 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         }
     }
 	
+    @Override
+    public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+        DocumentModel docModel = wrapDoc.getWrappedObject();
+    	String workflowState = WorkflowClient.WORKFLOWSTATE_LOCKED;
+        
+    	if (docModel.getCurrentLifeCycleState().contains(workflowState) == true) {
+    		throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
+                    "Cannot UPDATE a resource/record if it is in the workflow state: " + workflowState);
+    	} else {
+    		super.handleUpdate(wrapDoc);
+    	}
+    }
+    
+    @Override
+    public boolean handleDelete(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+        DocumentModel docModel = wrapDoc.getWrappedObject();
+    	String workflowState = WorkflowClient.WORKFLOWSTATE_LOCKED;
+        
+    	if (docModel.getCurrentLifeCycleState().contains(workflowState) == true) {
+    		throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
+                    "Cannot DELETE a resource/record if it is in the workflow state: " + workflowState);
+    	} else {
+    		return super.handleDelete(wrapDoc);
+    	}
+    }    
+    
     /* NOTE: The authority item doc handler overrides (after calling) this method.  It performs refName updates.  In this
      * method we just update any and all relationship records that use refNames that have changed.
      * (non-Javadoc)
@@ -286,6 +319,31 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
 
         return (TL) commonList;
     }
+    
+    /**
+     * Extract paging info.
+     *
+     * @param commonsList the commons list
+     * @return the tL
+     * @throws Exception the exception
+     */
+    public TL extractPagingInfo(TL theCommonList, DocumentModelList docList)
+            throws Exception {
+        AbstractCommonList commonList = (AbstractCommonList) theCommonList;
+
+        DocumentFilter docFilter = this.getDocumentFilter();
+        long pageSize = docFilter.getPageSize();
+        long pageNum = pageSize != 0 ? docFilter.getOffset() / pageSize : pageSize;
+        // set the page size and page number
+        commonList.setPageNum(pageNum);
+        commonList.setPageSize(pageSize);
+        // Set num of items in list. this is useful to our testing framework.
+        commonList.setItemsInPage(docList.size());
+        // set the total result size
+        commonList.setTotalItems(docList.totalSize());
+
+        return (TL) commonList;
+    }    
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractAllParts(org.collectionspace.services.common.document.DocumentWrapper)
@@ -332,7 +390,8 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         }
         
         String currentUser = ctx.getUserId();
-        if (currentUser.equalsIgnoreCase(AuthNContext.ANONYMOUS_USER) == false) {
+        if (currentUser.equalsIgnoreCase(AuthN.ANONYMOUS_USER) == false &&
+        		currentUser.equalsIgnoreCase(AuthN.SPRING_ADMIN_USER) == false) {
         	addAccountPermissionsPart();
         }
     }
@@ -433,20 +492,105 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
      * @param partMeta metadata for the object to fill
      * @throws Exception
      */
-    protected void fillPart(PayloadInputPart part, DocumentModel docModel,
-            ObjectPartType partMeta, Action action, ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
-            throws Exception {
-        //check if this is an xml part
-        if (part.getMediaType().equals(MediaType.APPLICATION_XML_TYPE)) {
-        	Element element = part.getElementBody();
-            Map<String, Object> objectProps = DocumentUtils.parseProperties(partMeta, element, ctx);
-                if (action == Action.UPDATE) {
-                    this.filterReadOnlyPropertiesForPart(objectProps, partMeta);
-                }
-                docModel.setProperties(partMeta.getLabel(), objectProps);
-            }
-        }
-
+	protected void fillPart(PayloadInputPart part, DocumentModel docModel, ObjectPartType partMeta, Action action,
+			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) throws Exception {
+		// check if this is an xml part
+		if (part.getMediaType().equals(MediaType.APPLICATION_XML_TYPE)) {
+			Element element = part.getElementBody();
+			Map<String, Object> objectProps = DocumentUtils.parseProperties(partMeta, element, ctx);
+			if (action == Action.UPDATE) {
+				this.filterReadOnlyPropertiesForPart(objectProps, partMeta);
+			}
+			String schemaName = partMeta.getLabel();
+			docModel.setProperties(schemaName, objectProps);
+			Set<String> fieldNameSet = getFieldNamesSet(objectProps);
+			setFieldsDirty(docModel, schemaName, fieldNameSet);  // Force Nuxeo to update EVERY field by marking them dirty/modified
+		}
+	}
+	
+	
+	/**
+	 * Due to an apparent Nuxeo bug, we need to explicitly mark all fields as dirty for updates
+	 * to take place properly.  See https://issues.collectionspace.org/browse/CSPACE-7124
+	 * 
+	 * We should improve this code by marking dirty/modified only the fields that were part of the UPDATE/PUT request
+	 * payload.  The current code will mark any field with a name in the 'fieldNameSet' set.  Since field names do not
+	 * have to be unique in document/record, we might end up unnecessarily marking some fields as modified -not ideal but
+	 * better than brute-force marking ALL fields as modified.
+	 * 
+	 * @param docModel
+	 * @param schemaName
+	 */
+	private void setFieldsDirty(DocumentModel docModel, String schemaName, Set<String> fieldNameSet) {
+        DataModelImpl dataModel = (DataModelImpl) docModel.getDataModel(schemaName);
+        DocumentPart documentPart = dataModel.getDocumentPart();
+        setFieldsDirty(documentPart.getChildren(), fieldNameSet);
+    }
+	
+	/**
+	 * Recursively step through all the children and sub-children setting their dirty flags.
+	 * See https://issues.collectionspace.org/browse/CSPACE-7124
+	 * @param children
+	 */
+	private void setFieldsDirty(Collection<Property> children, Set<String> fieldNameSet) {
+		if (children != null && (children.size() > 0)) {
+			for (Property prop : children ) {
+				String propName = prop.getName();
+				logger.debug(propName);
+	            if (prop.isPhantom() == false) {
+	                if (prop.isScalar() == false) {
+	                	setFieldsDirty(prop.getChildren(), fieldNameSet);
+	                } else if (fieldNameSet.contains(propName)) {
+	                	ScalarProperty scalarProp = (ScalarProperty)prop;
+	                	scalarProp.setIsModified();
+	                }
+	            }
+	        }
+		}
+	}
+	
+	/*
+	 * Gets the set of field names used in a map of properties.  We'll use this make our workaround to a
+	 * bug (See https://issues.collectionspace.org/browse/CSPACE-7124) more efficient by only marking fields
+	 * with names in this set as modified -ie, needing persisting.
+	 * 
+	 * Since the map of properties can contain other maps of properties as values, there can be duplicate
+	 * field names in the 'objectProps' map.  And since we're creating a set, there can be no duplicates in the result.
+	 * 
+	 */
+	private Set<String> getFieldNamesSet(Map<String, Object> objectProps) {
+		HashSet<String> result = new HashSet<String>();
+		
+		addFieldNamesToSet(result, objectProps);
+		
+		return result;
+	}
+	
+	private void addFieldNamesToSet(Set<String> fieldNameSet, List<Object> valueList) {
+		for (Object value : valueList) {
+			if (value instanceof List) {
+				addFieldNamesToSet(fieldNameSet, (List<Object>)value);
+			} else if (value instanceof Map) {
+				addFieldNamesToSet(fieldNameSet, (Map<String, Object>)value);
+			} else {
+				logger.debug(value.toString());
+			}
+		}
+	}
+		
+	private void addFieldNamesToSet(Set<String> fieldNameSet, Map<String, Object> objectProps) {
+		for (String key : objectProps.keySet()) {
+			Object value = objectProps.get(key);
+			if (value instanceof Map) {
+				addFieldNamesToSet(fieldNameSet, (Map<String, Object>)value);
+			} else if (value instanceof List) {
+				addFieldNamesToSet(fieldNameSet, (List)value);
+			} else {
+				fieldNameSet.add(key);
+			}
+		}
+	}
+	
     /**
      * Filters out read only properties, so they cannot be set on update.
      * TODO: add configuration support to do this generally

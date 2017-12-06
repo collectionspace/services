@@ -722,7 +722,11 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
             if (handler.isCMISQuery() == true) {
                 String inList = buildInListForDocTypes(docTypes);
                 ctx.getQueryParams().add(IQueryManager.SEARCH_RELATED_MATCH_OBJ_DOCTYPES, inList);
-                docList = getFilteredCMIS(repoSession, ctx, handler, queryContext);
+                if (isSubjectOrObjectQuery(ctx)) {
+                	docList = getFilteredCMISForSubjectOrObject(repoSession, ctx, handler, queryContext);
+                } else {
+                	docList = getFilteredCMIS(repoSession, ctx, handler, queryContext);
+                }
             } else {
                 String query = NuxeoUtils.buildNXQLQuery(docTypes, queryContext);
                 if (logger.isDebugEnabled()) {
@@ -743,7 +747,100 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
         return wrapDoc;
     }
 
-    /**
+    private DocumentModelList getFilteredCMISForSubjectOrObject(CoreSessionInterface repoSession,
+			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, DocumentHandler handler, QueryContext queryContext) throws DocumentNotFoundException, DocumentException {
+    	DocumentModelList result = null;
+    	
+    	if (isSubjectOrObjectQuery(ctx) == true) {
+    		MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
+        	String asEitherCsid = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_EITHER);
+        	
+    		queryParams.remove(IQueryManager.SEARCH_RELATED_TO_CSID_AS_SUBJECT);
+    		queryParams.remove(IQueryManager.SEARCH_RELATED_TO_CSID_AS_OBJECT);
+
+        	//
+        	// First query for subjectCsid results.
+        	//
+    		queryParams.addFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_SUBJECT, asEitherCsid);
+            DocumentModelList subjectDocList = getFilteredCMIS(repoSession, ctx, handler, queryContext);
+            queryParams.remove(IQueryManager.SEARCH_RELATED_TO_CSID_AS_SUBJECT);
+            
+        	//
+        	// Next query for objectCsid results.
+        	//
+	    	queryParams.addFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_OBJECT, asEitherCsid);
+            DocumentModelList objectDocList = getFilteredCMIS(repoSession, ctx, handler, queryContext);
+            queryParams.remove(IQueryManager.SEARCH_RELATED_TO_CSID_AS_OBJECT);
+
+            //
+            // Finally, combine the two results
+            //
+            result = mergeDocumentModelLists(subjectDocList, objectDocList);
+    	}
+    	
+		return result;
+	}
+
+	private DocumentModelList mergeDocumentModelLists(DocumentModelList subjectDocList,
+			DocumentModelList objectDocList) {
+		DocumentModelList result = null;
+		
+		if (subjectDocList == null || subjectDocList.isEmpty()) {
+			return objectDocList;
+		}
+		
+		if (objectDocList == null || objectDocList.isEmpty()) {
+			return subjectDocList;
+		}
+		
+        result = new DocumentModelListImpl();
+        
+        // Add the subject list
+		Iterator<DocumentModel> iterator = subjectDocList.iterator();
+		while (iterator.hasNext()) {
+			DocumentModel dm = iterator.next();
+			addToResults(result, dm);
+		}
+		
+		// Add the object list
+		iterator = objectDocList.iterator();
+		while (iterator.hasNext()) {
+			DocumentModel dm = iterator.next();
+			addToResults(result, dm);
+		}
+
+		// Set the 'totalSize' value for book keeping sake
+		((DocumentModelListImpl) result).setTotalSize(result.size());
+
+		return result;
+	}
+
+	//
+	// Only add if it is not already in the list
+	private void addToResults(DocumentModelList result, DocumentModel dm) {
+		Iterator<DocumentModel> iterator = result.iterator();
+		boolean found = false;
+		
+		while (iterator.hasNext()) {
+			DocumentModel existingDm = iterator.next();
+			if (existingDm.getId().equals(dm.getId())) {
+				found = true;
+				break;
+			}
+		}
+		
+		if (found == false) {
+			result.add(dm);
+		}
+	}
+
+	private boolean isSubjectOrObjectQuery(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
+    	MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
+    	String asEitherCsid = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_EITHER);
+    	return asEitherCsid != null && !asEitherCsid.isEmpty();
+	}
+
+	/**
      * Find a list of documentModels from the Nuxeo repository
      *
      * @param docTypes a list of DocType names to match
@@ -1012,8 +1109,12 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
             if (handler.isJDBCQuery() == true) {
                 docList = getFilteredJDBC(repoSession, ctx, handler);
             // CMIS query
-            } else if (handler.isCMISQuery() == true) {
-                docList = getFilteredCMIS(repoSession, ctx, handler, queryContext); //FIXME: REM - Need to deal with paging info in CMIS query
+            } else if (handler.isCMISQuery() == true) { //FIXME: REM - Need to deal with paging info in CMIS query
+                if (isSubjectOrObjectQuery(ctx)) {
+                	docList = getFilteredCMISForSubjectOrObject(repoSession, ctx, handler, queryContext);
+                } else {
+                    docList = getFilteredCMIS(repoSession, ctx, handler, queryContext); 
+                }
             // NXQL query
             } else {
                 String query = NuxeoUtils.buildNXQLQuery(queryContext);

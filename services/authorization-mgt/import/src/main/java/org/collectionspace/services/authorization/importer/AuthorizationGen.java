@@ -32,6 +32,7 @@ import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import org.collectionspace.services.authorization.perms.Permission;
+import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.perms.PermissionsList;
@@ -298,12 +299,12 @@ public class AuthorizationGen {
 
     public void associateDefaultPermissionsRoles() {
         for (Permission p : adminPermList) {
-            PermissionRole permAdmRole = associatePermissionRoles(p, adminRoles, true);
+            PermissionRole permAdmRole = associatePermissionToRoles(p, adminRoles, true);
             adminPermRoleList.add(permAdmRole);
         }
 
         for (Permission p : readerPermList) {
-            PermissionRole permRdrRole = associatePermissionRoles(p, readerRoles, true);
+            PermissionRole permRdrRole = associatePermissionToRoles(p, readerRoles, true);
             readerPermRoleList.add(permRdrRole);
         }
         
@@ -319,17 +320,18 @@ public class AuthorizationGen {
         // Now associate the tenant management perms to the role
         for (Permission p : tenantMgmntPermList) {
         	// Note we enforce tenant, as should all be tenant 0 (the special one)
-            PermissionRole permTMRole = associatePermissionRoles(p, roles, true);
+            PermissionRole permTMRole = associatePermissionToRoles(p, roles, true);
             tenantMgmntPermRoleList.add(permTMRole);
         }        
     }
 
+    @Deprecated
     public List<PermissionRole> associatePermissionsRoles(List<Permission> perms, List<Role> roles, boolean enforceTenancy) {
     	List<PermissionRole> result = null;
     	
         List<PermissionRole> permRoles = new ArrayList<PermissionRole>();
         for (Permission perm : perms) {
-            PermissionRole permRole = associatePermissionRoles(perm, roles, enforceTenancy);
+            PermissionRole permRole = associatePermissionToRoles(perm, roles, enforceTenancy);
             if (permRole != null) {
             	permRoles.add(permRole);
             }
@@ -342,19 +344,21 @@ public class AuthorizationGen {
         return result;
     }
 
-    private PermissionRole associatePermissionRoles(Permission perm,
+    private PermissionRole associatePermissionToRoles(Permission perm,
             List<Role> roles, boolean enforceTenancy) {
     	PermissionRole result = null;
     	
         PermissionRole pr = new PermissionRole();
         pr.setSubject(SubjectType.ROLE);
-        List<PermissionValue> permValues = new ArrayList<PermissionValue>();
-        pr.setPermission(permValues);
+        List<PermissionValue> permValueList = new ArrayList<PermissionValue>();
+        pr.setPermission(permValueList);
+        
         PermissionValue permValue = new PermissionValue();
         permValue.setPermissionId(perm.getCsid());
         permValue.setResourceName(perm.getResourceName().toLowerCase());
         permValue.setActionGroup(perm.getActionGroup());
-        permValues.add(permValue);
+        permValue.setTenantId(perm.getTenantId());
+        permValueList.add(permValue);
 
         List<RoleValue> roleValues = new ArrayList<RoleValue>();
         for (Role role : roles) {
@@ -367,6 +371,7 @@ public class AuthorizationGen {
 	            // This needs to use the qualified name, not the display name
 	            rv.setRoleName(role.getRoleName().toUpperCase());
 	            rv.setRoleId(role.getCsid());
+	            rv.setTenantId(role.getTenantId());
 	            roleValues.add(rv);
         	} else {
         		if (logger.isTraceEnabled() == true) {
@@ -408,11 +413,11 @@ public class AuthorizationGen {
         Role role = new Role();
         
         role.setDescription("A generated super role that has permissions to manage tenants.");
-        role.setDisplayName(AuthorizationCommon.ROLE_ALL_TENANTS_MANAGER);
+        role.setDisplayName(AuthN.ROLE_ALL_TENANTS_MANAGER);
         role.setRoleName(AuthorizationCommon.getQualifiedRoleName(
-        		AuthorizationCommon.ALL_TENANTS_MANAGER_TENANT_ID, role.getDisplayName()));
-        role.setCsid(AuthorizationCommon.ROLE_ALL_TENANTS_MANAGER_ID);
-        role.setTenantId(AuthorizationCommon.ALL_TENANTS_MANAGER_TENANT_ID);
+        		AuthN.ALL_TENANTS_MANAGER_TENANT_ID, role.getDisplayName()));
+        role.setCsid(AuthN.ROLE_ALL_TENANTS_MANAGER_ID);
+        role.setTenantId(AuthN.ALL_TENANTS_MANAGER_TENANT_ID);
         
         return role;
     }

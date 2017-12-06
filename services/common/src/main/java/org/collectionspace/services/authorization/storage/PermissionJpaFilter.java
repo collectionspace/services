@@ -26,6 +26,7 @@ package org.collectionspace.services.authorization.storage;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentFilter;

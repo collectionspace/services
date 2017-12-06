@@ -49,25 +49,26 @@ public class SecurityContextImpl implements SecurityContext {
     	String result = AuthN.get().getCurrentTenantId();
     	
     	String userId = AuthN.get().getUserId();
-        if (userId.equals(AuthNContext.ANONYMOUS_USER) == true) {
+        if (userId.equals(AuthN.ANONYMOUS_USER) == true) {
             //
             // If anonymous access is being attempted, then a tenant ID needs to be set as a query param
             //        	
         	if (uriInfo == null) {
-        		String errMsg = "Anonymous access attempted without a valid tenant ID query paramter.  A null 'UriInfo' instance was passed into the service context constructor.";
+        		String errMsg = "Anonymous access attempted without a valid tenant ID query or path paramter.  Error: A null 'UriInfo' instance was passed into the service context constructor.";
         		logger.error(errMsg);
         		throw new UnauthorizedException(errMsg);
         	}
         	
-//        	String tenantId = uriInfo.getQueryParameters().getFirst(AuthNContext.TENANT_ID_QUERY_PARAM);
-        	String tenantId = uriInfo.getPathParameters().getFirst(AuthNContext.TENANT_ID_PATH_PARAM);
-        	if (tenantId == null) {
-        		String errMsg = String.format("Anonymous access to '%s' attempted without a valid tenant ID query paramter.",
+        	String tenantIdQueryParam = uriInfo.getQueryParameters().getFirst(AuthN.TENANT_ID_QUERY_PARAM);
+        	String tenantPathParam = uriInfo.getPathParameters().getFirst(AuthN.TENANT_ID_PATH_PARAM);
+        	if (tenantIdQueryParam == null && tenantPathParam == null) {
+        		String errMsg = String.format("Anonymous access to '%s' attempted without a valid tenant ID query or path paramter.",
         				uriInfo.getPath());
         		logger.error(errMsg);
         		throw new UnauthorizedException(errMsg);
         	}
-	        result = tenantId;
+        	
+	        result = tenantIdQueryParam != null ? tenantIdQueryParam : tenantPathParam; // If both have value, user the query param (not path) value
         }
         
         return result;

@@ -58,6 +58,7 @@ import org.collectionspace.services.claim.ClaimResource;
 import org.collectionspace.services.exhibition.ExhibitionResource;
 import org.collectionspace.services.conditioncheck.ConditioncheckResource;
 import org.collectionspace.services.conservation.ConservationResource;
+import org.collectionspace.services.authorization.PermissionResource;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Application;
@@ -68,7 +69,6 @@ import java.util.Set;
 
 
 //import org.collectionspace.services.common.FileUtils;
-import org.collectionspace.services.authorization.PermissionResource;
 import org.collectionspace.services.authorization.RoleResource;
 import org.collectionspace.services.common.NuxeoBasedResource;	  	
 import org.collectionspace.services.common.ResourceMap;

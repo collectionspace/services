@@ -23,6 +23,7 @@
  */
 package org.collectionspace.authentication.spring;
 
+import org.collectionspace.authentication.AuthN;
 import org.collectionspace.authentication.CSpaceTenant;
 import org.collectionspace.authentication.CSpaceUser;
 import org.collectionspace.authentication.spi.AuthNContext;
@@ -39,27 +40,36 @@ public class SpringAuthNContext implements AuthNContext {
      * 
      * @return the username
      */
-    public String getUserId() {
+    @Override
+	public String getUserId() {
         Authentication authToken = SecurityContextHolder.getContext().getAuthentication();
         
         if (authToken == null) {
-            return ANONYMOUS_USER;
+            return AuthN.ANONYMOUS_USER;
         }
         
         return authToken.getName();
     }
 
     /**
-     * Returns the authenticated user.
+     * Returns the authenticated CSpaceUser user.
      * 
      * @return the user
      */
-    public CSpaceUser getUser() {
+    @Override
+	public CSpaceUser getUser() {
+    	CSpaceUser result = null;
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Object principal = authentication.getPrincipal();
-        CSpaceUser user = (CSpaceUser) principal;
+        Object principal = null;
+        if (authentication != null) {
+            principal = authentication.getPrincipal();
+            if (principal instanceof CSpaceUser ) {
+            	result = (CSpaceUser) principal;
+            }
+        }        
         
-        return user;
+        return result;
     }
 
     /**
@@ -67,14 +77,23 @@ public class SpringAuthNContext implements AuthNContext {
      * 
      * @return the tenant id
      */
-    public String getCurrentTenantId() {
-        String username = getUserId();
-        
-        if (username.equals(ANONYMOUS_USER) || username.equals(SPRING_ADMIN_USER)) {
-            return ANONYMOUS_TENANT_ID;
-        }
-
-        return getCurrentTenant().getId();
+    @Override
+	public String getCurrentTenantId() {
+    	String result = null;
+    	
+    	CSpaceUser cspaceUser = getUser();
+    	if (cspaceUser != null) {
+            result = getCurrentTenant().getId();
+    	} else {
+	        String username = getUserId();        
+	        if (username.equals(AuthN.ANONYMOUS_USER)) {
+	            result = AuthN.ANONYMOUS_TENANT_ID;
+	        } else if (username.equals(AuthN.SPRING_ADMIN_USER)) {
+	            result = AuthN.ADMIN_TENANT_ID;
+	        }
+    	}
+    	
+    	return result;
     }
 
     /**
@@ -82,9 +101,10 @@ public class SpringAuthNContext implements AuthNContext {
      * 
      * @return the tenant name
      */
-    public String getCurrentTenantName() {
-        if (getUserId().equals(ANONYMOUS_USER)) {
-            return ANONYMOUS_TENANT_NAME;
+    @Override
+	public String getCurrentTenantName() {
+        if (getUserId().equals(AuthN.ANONYMOUS_USER)) {
+            return AuthN.ANONYMOUS_TENANT_NAME;
         }
 
         return getCurrentTenant().getName();
@@ -95,7 +115,22 @@ public class SpringAuthNContext implements AuthNContext {
      * 
      * @return the tenant
      */
-    public CSpaceTenant getCurrentTenant() {
-        return getUser().getPrimaryTenant();
+    @Override
+	public CSpaceTenant getCurrentTenant() {
+    	CSpaceTenant result = null;
+    	
+    	CSpaceUser cspaceUser = getUser();
+    	if (cspaceUser != null) {
+    		result = getUser().getPrimaryTenant();
+    	} else {
+    		String username = getUserId();
+	        if (username.equals(AuthN.ANONYMOUS_USER)) {
+	            result = new CSpaceTenant(AuthN.ANONYMOUS_TENANT_ID, AuthN.ANONYMOUS_TENANT_NAME);
+	        } else if (username.equals(AuthN.SPRING_ADMIN_USER)) {
+	            result = new CSpaceTenant(AuthN.ADMIN_TENANT_ID, AuthN.ADMIN_TENANT_NAME);
+	        } 
+    	}
+    	
+    	return result;
     }
 }

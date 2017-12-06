@@ -11,9 +11,7 @@ import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommon;
 import org.collectionspace.services.vocabulary.VocabulariesCommon;
-import org.jboss.resteasy.client.ClientResponse;
-//import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
-//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +19,7 @@ public class VocabularyClientUtils {
     private static final Logger logger =
         LoggerFactory.getLogger(VocabularyClientUtils.class);
     
-    public static PoxPayloadOut createEnumerationInstance(
+    public static PoxPayloadOut createVocabularyInstance(
     		String displayName, String shortIdentifier, String headerLabel ) {
         VocabulariesCommon vocabulary = new VocabulariesCommon();
         vocabulary.setDisplayName(displayName);
@@ -41,14 +39,17 @@ public class VocabularyClientUtils {
         return multipart;
     }
 
-		// Note that we do not use the map, but we will once we add more info to the 
-		// items
     public static PoxPayloadOut createVocabularyItemInstance( 
     		String vocabularyRefName, Map<String, String> vocabItemInfo, String headerLabel){
-        VocabularyitemsCommon vocabularyItem = new VocabularyitemsCommon();
     	String shortId = vocabItemInfo.get(AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
     	String displayName = vocabItemInfo.get(AuthorityItemJAXBSchema.DISPLAY_NAME);
-       	vocabularyItem.setShortIdentifier(shortId);
+    	return createVocabularyItemInstance(displayName, shortId, headerLabel);
+    }
+    
+    public static PoxPayloadOut createVocabularyItemInstance(
+    		String displayName, String shortIdentifier, String headerLabel ){
+        VocabularyitemsCommon vocabularyItem = new VocabularyitemsCommon();
+       	vocabularyItem.setShortIdentifier(shortIdentifier);
        	vocabularyItem.setDisplayName(displayName);
     	//String refName = createVocabularyItemRefName(vocabularyRefName, shortId, displayName);
        	//vocabularyItem.setRefName(refName);
@@ -62,7 +63,7 @@ public class VocabularyClientUtils {
         }
 
         return multipart;
-    }
+    }    
 
     public static String createItemInVocabulary(String vcsid, 
     		String vocabularyRefName, Map<String,String> itemMap,

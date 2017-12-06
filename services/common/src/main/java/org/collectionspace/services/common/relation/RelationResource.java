@@ -39,16 +39,20 @@ import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.common.relation.nuxeo.RelationsUtils;
 import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
+import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 @Path("/relations")
@@ -91,8 +95,9 @@ public class RelationResource extends NuxeoBasedResource {
 		String predicate = queryParams.getFirst(IRelationsManager.PREDICATE_QP);
 		String objectCsid = queryParams.getFirst(IRelationsManager.OBJECT_QP);
 		String objectType = queryParams.getFirst(IRelationsManager.OBJECT_TYPE_QP);
+		String subjectOrObject = queryParams.getFirst(IRelationsManager.SUBJECT_OR_OBJECT);
 
-		return this.getRelationList(parentCtx, uriInfo, subjectCsid, subjectType, predicate, objectCsid, objectType);
+		return this.getRelationList(parentCtx, uriInfo, subjectCsid, subjectType, predicate, objectCsid, objectType, subjectOrObject);
 	}
 
     private RelationsCommonList getRelationList(
@@ -101,7 +106,8 @@ public class RelationResource extends NuxeoBasedResource {
     		String subjectCsid, String subjectType,
     		String predicate,
     		String objectCsid,
-    		String objectType) throws CSWebApplicationException {
+    		String objectType,
+    		String subjectOrObject) throws CSWebApplicationException {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
             if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) { // If the parent context has a non-null and open repository session then use it
@@ -109,7 +115,7 @@ public class RelationResource extends NuxeoBasedResource {
             }
             DocumentHandler handler = createDocumentHandler(ctx);
 
-            String relationClause = RelationsUtils.buildWhereClause(subjectCsid, subjectType, predicate, objectCsid, objectType);
+            String relationClause = RelationsUtils.buildWhereClause(subjectCsid, subjectType, predicate, objectCsid, objectType, subjectOrObject);
             handler.getDocumentFilter().appendWhereClause(relationClause, IQueryManager.SEARCH_QUALIFIER_AND);
             //
             // Handle keyword clause
@@ -126,6 +132,17 @@ public class RelationResource extends NuxeoBasedResource {
         }
     }
 
+    @DELETE
+    public Response delete(@Context UriInfo uriInfo) {
+    	Response result = Response.status(200).build();
+    	
+    	RelationsCommonList relationsList = this.getList(null, uriInfo);
+    	for (RelationListItem relation : relationsList.getRelationListItem()) {
+    		Response deleteResponse = this.delete(relation.getCsid());
+    	}
+    	
+    	return result;
+    }
 
 }
 

@@ -81,4 +81,16 @@ public class PlaceAuthorityClient extends AuthorityClientImpl<PlaceauthoritiesCo
     public void setInAuthority(PlacesCommon item, String inAuthorityCsid) {
         item.setInAuthority(inAuthorityCsid);
     }
+
+	@Override
+	public String createAuthorityInstance(String shortIdentifier, String displayName) {
+		PoxPayloadOut poxPayloadout = PlaceAuthorityClientUtils.createPlaceAuthorityInstance(displayName, shortIdentifier, SERVICE_COMMON_PART_NAME);
+		return poxPayloadout.asXML();
+	}
+
+	@Override
+	public String createAuthorityItemInstance(String shortIdentifier, String displayName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -68,9 +68,32 @@ public class AuthN {
     private static DataSource dataSource = null;
     private AuthNContext authnContext;
     
+    //
+    // The "super" role has a predefined ID of "0" and a tenant ID of "0";
+    //
+    final public static String ROLE_ALL_TENANTS_MANAGER = "ALL_TENANTS_MANAGER";
+    final public static String ROLE_ALL_TENANTS_MANAGER_ID = "0";
+    final public static String ALL_TENANTS_MANAGER_TENANT_ID = "0";
+    
+    public static final String ADMIN_TENANT_ID = "0";
+	public static final String ADMIN_TENANT_NAME = "tenant_admin";
+
+    public static final String ANONYMOUS_TENANT_ID = "-1";
+    public static final String ANONYMOUS_USER = "anonymous";
+    public static final String ANONYMOUS_TENANT_NAME = ANONYMOUS_USER;
+    
+    public static final String SPRING_ADMIN_USER = "SPRING_ADMIN";
+    public static final String SPRING_ADMIN_PASSWORD = "SPRING_ADMIN";
+    
+    public static final String TENANT_ID_QUERY_PARAM = "tid";
+    public static final String TENANT_ID_PATH_PARAM = "tenantId";
+    
+    public static final String ROLE_SPRING_ADMIN_ID = "-1";
+    public static final String ROLE_SPRING_ADMIN_NAME = "ROLE_SPRING_ADMIN";
+
     // Define a special account value for the tenantManager. Yes, this is a hack, but
     // less troublesome than the alternatives.
-    public static final String TENANT_MANAGER_ACCT_ID = "0"; 
+    public static final String TENANT_MANAGER_ACCT_ID = ALL_TENANTS_MANAGER_TENANT_ID;
 
     private AuthN() {
         //hardcoded initialization of a provider

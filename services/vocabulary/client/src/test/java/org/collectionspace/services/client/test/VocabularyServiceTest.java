@@ -106,7 +106,7 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
 
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
-        PoxPayloadOut multipart = VocabularyClientUtils.createEnumerationInstance(
+        PoxPayloadOut multipart = VocabularyClientUtils.createVocabularyInstance(
                 "Vocab with Bad Short Id", "Bad Short Id!", client.getCommonPartName());
         Response res = client.create(multipart);
         try {
@@ -126,7 +126,7 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
         // Create a new vocabulary
         String shortId = "nonunique" + random.nextInt(1000); // Prevent collisions with past test sessions that never cleaned up properly
         VocabularyClient client = new VocabularyClient();
-        PoxPayloadOut multipart = VocabularyClientUtils.createEnumerationInstance(
+        PoxPayloadOut multipart = VocabularyClientUtils.createVocabularyInstance(
                 "Vocab with non-unique Short Id", shortId, client.getCommonPartName());
         Response res = client.create(multipart);
         try {
@@ -313,7 +313,7 @@ public class VocabularyServiceTest extends AbstractAuthorityServiceTest<Vocabula
 	protected PoxPayloadOut createInstance(String commonPartName,
 			String identifier) {
         String displayName = "displayName-" + identifier;
-        PoxPayloadOut result = VocabularyClientUtils.createEnumerationInstance(
+        PoxPayloadOut result = VocabularyClientUtils.createVocabularyInstance(
                 displayName, identifier, commonPartName);
 		return result;
 	}

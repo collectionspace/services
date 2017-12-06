@@ -50,6 +50,8 @@
 
 package org.collectionspace.services.account.storage;
 
+import org.collectionspace.services.client.AccountClient;
+
 /**
  * AccountStorageConstants declares query params, etc.
  * @author
@@ -58,8 +60,7 @@ public class AccountStorageConstants {
 
     final public static String Q_SCREEN_NAME = "sn";
     final public static String Q_USER_ID= "uid";
-    final public static String Q_EMAIL = "email";
-
+    final public static String Q_EMAIL = AccountClient.EMAIL_QUERY_PARAM;
 
     final public static String SCREEN_NAME = "screenName";
     final public static String USER_ID = "userId";

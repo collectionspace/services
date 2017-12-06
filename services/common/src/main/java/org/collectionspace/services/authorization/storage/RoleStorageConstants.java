@@ -22,7 +22,7 @@
  *  limitations under the License.
  */
 
-package org.collectionspace.services.common.authorization_mgt;
+package org.collectionspace.services.authorization.storage;
 
 /**
  * RoleStorageConstants declares query params, etc.

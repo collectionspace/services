@@ -28,6 +28,7 @@ import java.util.ArrayList;
 
 import javax.persistence.PersistenceException;
 
+import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.account.storage.AccountRoleDocumentHandler;
 //import org.collectionspace.services.authorization.AccountRolesList;
 //import org.collectionspace.services.authorization.AccountRolesList.AccountRoleListItem;
@@ -178,8 +179,8 @@ public class AccountRoleSubResource
     	input.setRole(springRoles);
     	RoleValue springAdminRole = new RoleValue();
     	springRoles.add(springAdminRole);
-    	springAdminRole.setRoleId(AuthorizationCommon.ROLE_SPRING_ADMIN_ID);
-    	springAdminRole.setRoleName(AuthorizationCommon.ROLE_SPRING_ADMIN_NAME);
+    	springAdminRole.setRoleId(AuthN.ROLE_SPRING_ADMIN_ID);
+    	springAdminRole.setRoleName(AuthN.ROLE_SPRING_ADMIN_NAME);
 
     	// The Spring role relationship may already exist, if it does then we'll get a PersistenceException that
     	// we'll just ignore.
@@ -191,7 +192,7 @@ public class AccountRoleSubResource
     		//If we get this exception, it means that the role relationship already exists, so
     		//we can just ignore this exception.
     		if (logger.isTraceEnabled() == true) {
-    			logger.trace(AuthorizationCommon.ROLE_SPRING_ADMIN_NAME +
+    			logger.trace(AuthN.ROLE_SPRING_ADMIN_NAME +
     					" relationship already exists for account: " +
     					input.getAccount().get(0).getAccountId(), e);
     		}

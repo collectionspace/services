@@ -127,7 +127,7 @@ public class PersonAuthorityClientUtils {
         	res.close();
         }
     }
-
+    
     /**
      * Creates the person authority instance.
      *
@@ -155,6 +155,19 @@ public class PersonAuthorityClientUtils {
         return multipart;
     }
 
+    /*
+     * Create a very simple Person term -just a short ID and display name.
+     */
+	public static PoxPayloadOut createPersonInstance(String shortIdentifier, String displayName,
+			String headerLabel) {
+		List<PersonTermGroup> terms = getTermGroupInstance(shortIdentifier, displayName);
+		
+		Map<String, String> personInfo = new HashMap<String, String>();
+    	personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortIdentifier);
+
+		return createPersonInstance(null, null, personInfo, terms, null, headerLabel);
+	}    
+    
     /**
      * Creates a person instance.
      *
@@ -164,16 +177,16 @@ public class PersonAuthorityClientUtils {
      * @param headerLabel the header label
      * @return the multipart output
      */
-    public static PoxPayloadOut createPersonInstance(String inAuthority,
+    public static PoxPayloadOut createPersonInstance(
+    		String inAuthority,
     		String personAuthRefName,
     		Map<String, String> personInfo,
             List<PersonTermGroup> terms,
-    		String headerLabel){
+    		String headerLabel) {
         if (terms == null || terms.isEmpty()) {
             terms = getTermGroupInstance(getGeneratedIdentifier());
         }
-        final Map<String, List<String>> EMPTY_PERSON_REPEATABLES_INFO =
-                new HashMap<String, List<String>>();
+        final Map<String, List<String>> EMPTY_PERSON_REPEATABLES_INFO = new HashMap<String, List<String>>();
         return createPersonInstance(inAuthority, null /*personAuthRefName*/,
                 personInfo, terms, EMPTY_PERSON_REPEATABLES_INFO, headerLabel);
     }
@@ -189,12 +202,14 @@ public class PersonAuthorityClientUtils {
      * @param headerLabel the header label
      * @return the multipart output
      */
-    public static PoxPayloadOut createPersonInstance(String inAuthority, 
+    public static PoxPayloadOut createPersonInstance(
+    		String inAuthority,
     		String personAuthRefName,
     		Map<String, String> personInfo,
             List<PersonTermGroup> terms,
             Map<String, List<String>> personRepeatablesInfo,
-            String headerLabel){
+            String headerLabel) {
+    	
         PersonsCommon person = new PersonsCommon();
         person.setInAuthority(inAuthority);
     	String shortId = personInfo.get(PersonJAXBSchema.SHORT_IDENTIFIER);
@@ -203,29 +218,30 @@ public class PersonAuthorityClientUtils {
     	}      	
     	person.setShortIdentifier(shortId);
     	
-    	String value;
-        List<String> values = null;
+        if (personInfo != null) {
+        	String value;
 
-        if((value = (String)personInfo.get(PersonJAXBSchema.BIRTH_DATE))!=null) {
-            StructuredDateGroup birthDate = new StructuredDateGroup();
-            birthDate.setDateDisplayDate(value);
-            person.setBirthDateGroup(birthDate);
+			if ((value = personInfo.get(PersonJAXBSchema.BIRTH_DATE)) != null) {
+				StructuredDateGroup birthDate = new StructuredDateGroup();
+				birthDate.setDateDisplayDate(value);
+				person.setBirthDateGroup(birthDate);
+			}
+			if ((value = personInfo.get(PersonJAXBSchema.DEATH_DATE)) != null) {
+				StructuredDateGroup deathDate = new StructuredDateGroup();
+				deathDate.setDateDisplayDate(value);
+				person.setDeathDateGroup(deathDate);
+			}
+			if ((value = personInfo.get(PersonJAXBSchema.BIRTH_PLACE)) != null)
+				person.setBirthPlace(value);
+			if ((value = personInfo.get(PersonJAXBSchema.DEATH_PLACE)) != null)
+				person.setDeathPlace(value);
+			if ((value = personInfo.get(PersonJAXBSchema.GENDER)) != null)
+				person.setGender(value);
+			if ((value = personInfo.get(PersonJAXBSchema.BIO_NOTE)) != null)
+				person.setBioNote(value);
+			if ((value = personInfo.get(PersonJAXBSchema.NAME_NOTE)) != null)
+				person.setNameNote(value);
         }
-        if((value = (String)personInfo.get(PersonJAXBSchema.DEATH_DATE))!=null) {
-            StructuredDateGroup deathDate = new StructuredDateGroup();
-            deathDate.setDateDisplayDate(value);
-            person.setDeathDateGroup(deathDate);
-        }
-        if((value = (String)personInfo.get(PersonJAXBSchema.BIRTH_PLACE))!=null)
-        	person.setBirthPlace(value);
-        if((value = (String)personInfo.get(PersonJAXBSchema.DEATH_PLACE))!=null)
-        	person.setDeathPlace(value);
-        if((value = (String)personInfo.get(PersonJAXBSchema.GENDER))!=null)
-        	person.setGender(value);
-         if((value = (String)personInfo.get(PersonJAXBSchema.BIO_NOTE))!=null)
-        	person.setBioNote(value);
-        if((value = (String)personInfo.get(PersonJAXBSchema.NAME_NOTE))!=null)
-        	person.setNameNote(value);
         
         // Set values in the Term Information Group
         PersonTermGroupList termList = new PersonTermGroupList();
@@ -235,41 +251,41 @@ public class PersonAuthorityClientUtils {
         termList.getPersonTermGroup().addAll(terms); 
         person.setPersonTermGroupList(termList);
         
-        if (personRepeatablesInfo != null) {
-            if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.GROUPS))!=null) {
-                    GroupList groupsList = new GroupList();
-                    List<String> groups = groupsList.getGroup();
-                    groups.addAll(values);
-                    person.setGroups(groupsList);
-            }
-            if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.NATIONALITIES))!=null) {
-                    NationalityList nationalitiesList = new NationalityList();
-                    List<String> nationalities = nationalitiesList.getNationality();
-                    nationalities.addAll(values);
-                    person.setNationalities(nationalitiesList);
-            }
+		if (personRepeatablesInfo != null) {
+			List<String> values = null;
 
-            if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.OCCUPATIONS))!=null) {
-                    OccupationList occupationsList = new OccupationList();
-                    List<String> occupations = occupationsList.getOccupation();
-                    occupations.addAll(values);
-                    person.setOccupations(occupationsList);
-            }
-            if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.SCHOOLS_OR_STYLES))!=null) {
-                    SchoolOrStyleList schoolOrStyleList = new SchoolOrStyleList();
-                    List<String> schoolsOrStyles = schoolOrStyleList.getSchoolOrStyle();
-                    schoolsOrStyles.addAll(values);
-                    person.setSchoolsOrStyles(schoolOrStyleList);
-            }        
-        }
+			if ((values = (List<String>) personRepeatablesInfo.get(PersonJAXBSchema.GROUPS)) != null) {
+				GroupList groupsList = new GroupList();
+				List<String> groups = groupsList.getGroup();
+				groups.addAll(values);
+				person.setGroups(groupsList);
+			}
+			if ((values = (List<String>) personRepeatablesInfo.get(PersonJAXBSchema.NATIONALITIES)) != null) {
+				NationalityList nationalitiesList = new NationalityList();
+				List<String> nationalities = nationalitiesList.getNationality();
+				nationalities.addAll(values);
+				person.setNationalities(nationalitiesList);
+			}
 
-        
+			if ((values = (List<String>) personRepeatablesInfo.get(PersonJAXBSchema.OCCUPATIONS)) != null) {
+				OccupationList occupationsList = new OccupationList();
+				List<String> occupations = occupationsList.getOccupation();
+				occupations.addAll(values);
+				person.setOccupations(occupationsList);
+			}
+			if ((values = (List<String>) personRepeatablesInfo.get(PersonJAXBSchema.SCHOOLS_OR_STYLES)) != null) {
+				SchoolOrStyleList schoolOrStyleList = new SchoolOrStyleList();
+				List<String> schoolsOrStyles = schoolOrStyleList.getSchoolOrStyle();
+				schoolsOrStyles.addAll(values);
+				person.setSchoolsOrStyles(schoolOrStyleList);
+			}
+		}
+
         PoxPayloadOut multipart = new PoxPayloadOut(PersonAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = multipart.addPart(person,
-            MediaType.APPLICATION_XML_TYPE);
+        PayloadOutputPart commonPart = multipart.addPart(person, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(headerLabel);
 
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
         	logger.debug("to be created, person common ", person, PersonsCommon.class);
         }
 
@@ -457,14 +473,22 @@ public class PersonAuthorityClientUtils {
 		return newStr.toString();
     }
     
-    public static List<PersonTermGroup> getTermGroupInstance(String identifier) {
-        if (Tools.isBlank(identifier)) {
-            identifier = getGeneratedIdentifier();
+    private static List<PersonTermGroup> getTermGroupInstance(String shortIdentifier) {
+    	return getTermGroupInstance(shortIdentifier, shortIdentifier);
+    }
+    
+    public static List<PersonTermGroup> getTermGroupInstance(String shortIdentifier, String displayName) {
+        if (Tools.isBlank(shortIdentifier)) {
+        	shortIdentifier = getGeneratedIdentifier();
         }
+        if (Tools.isBlank(shortIdentifier)) {
+            displayName = shortIdentifier;
+        }
+        
         List<PersonTermGroup> terms = new ArrayList<PersonTermGroup>();
         PersonTermGroup term = new PersonTermGroup();
-        term.setTermDisplayName(identifier);
-        term.setTermName(identifier);
+        term.setTermDisplayName(displayName);
+        term.setTermName(shortIdentifier);
         terms.add(term);
         return terms;
     }
@@ -476,6 +500,5 @@ public class PersonAuthorityClientUtils {
     private static String createIdentifier() {
         long identifier = System.currentTimeMillis() + random.nextInt();
         return Long.toString(identifier);
-    }    
-
+    }
 }
