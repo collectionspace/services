@@ -22,20 +22,26 @@
  */
 package org.collectionspace.services.authorization.client.test;
 
-//import java.util.ArrayList;
-//import java.util.List;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
-
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.PermissionClient;
 import org.collectionspace.services.client.RoleClient;
+import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RolesList;
+import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.client.RoleFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
+
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +60,14 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
 
     // Used to create unique identifiers
     static private final Random random = new Random(System.currentTimeMillis());
+    
+	private static final String PERM_1_RL_RESOURCE = "ROLE_TEST_PERMVALUE_RESOURCE_1";
+	private static final String PERM_1_RL_ACTIONGROUP = "RL";
+	private static final String PERM_2_RL_RESOURCE = "ROLE_TEST_PERMVALUE_RESOURCE_2";
+	private static final String PERM_2_RL_ACTIONGROUP = "CRUL";
+	private static final String PERM_3_RL_RESOURCE = "ROLE_TEST_PERMVALUE_RESOURCE_3";
+	private static final String PERM_3_RL_ACTIONGROUP = "CRUDL";
+
 
     // Instance variables specific to this test.
     /** The known resource id. */
@@ -61,7 +75,10 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
     private String knownRoleDisplayName = "ROLE_DISPLAYNAME_USERS_MOCK-1";
     private String verifyResourceId = null;
     private String verifyRoleName = "collections_manager_mock-1";
-//    private List<String> allResourceIdsCreated = new ArrayList<String>();
+    //
+    // Permission values
+    //
+    private List<PermissionValue> permissionValues = RoleFactory.EMPTY_PERMVALUE_LIST;
 
     @Override
     public String getServiceName() { 
@@ -91,9 +108,87 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
 	@Override
 	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
         return new RoleClient(clientPropertiesFilename);
-	}	
+	}
+	
+    /**
+     * Seed data.
+     * @throws Exception 
+     */
+    @BeforeClass(alwaysRun = true)
+    public void seedData() throws Exception {
+    	permissionValues = new ArrayList<PermissionValue>();
+    	permissionValues.add(createPermissionValueInstance(PERM_1_RL_RESOURCE, PERM_1_RL_ACTIONGROUP));
+    	permissionValues.add(createPermissionValueInstance(PERM_2_RL_RESOURCE, PERM_2_RL_ACTIONGROUP));
+    	permissionValues.add(createPermissionValueInstance(PERM_3_RL_RESOURCE, PERM_3_RL_ACTIONGROUP));
+    }
     
-    /* (non-Javadoc)
+    private PermissionValue createPermissionValueInstance(String resource, String actionGroup) {
+		PermissionValue permValue = new PermissionValue();
+		permValue.setResourceName(resource);
+		permValue.setActionGroup(actionGroup);
+		return permValue;
+	}
+
+	/**
+     * Clean up.
+     * @throws Exception 
+     */
+    @AfterClass(alwaysRun = true)
+    @Override
+    public void cleanUp() throws Exception {
+        String noTest = System.getProperty("noTestCleanup");
+        if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Skipping Cleanup phase ...");
+            }
+            return;
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Cleaning up temporary resources created for testing ...");
+        }
+        //
+        // Delete the permissions we indirectly created with when we created via the "createRoleWithPerms()" test 
+        //
+        for (PermissionValue pv : permissionValues) {
+            deletePermission(pv);
+        }
+        
+        //
+        // Call our parent cleanup method.
+        //
+        super.cleanUp();
+    }
+    
+
+    /*
+     * Use a resource name and action group value to find and delete a permission record/resource.
+     */
+    private void deletePermission(PermissionValue permissionValue) throws Exception {
+    	int statusCode = Response.Status.OK.getStatusCode();
+        PermissionClient client = new PermissionClient();
+        Permission permission = client.read(permissionValue.getResourceName(), permissionValue.getActionGroup());
+    	if (permission != null) {
+            Response res = client.delete(permission.getCsid());
+            try {
+    	        statusCode = res.getStatus();
+            } finally {
+            	res.close();
+            }
+    	} else {
+    		//
+    		// Something bad happened.
+    		//
+        	statusCode = Response.Status.BAD_REQUEST.getStatusCode();    		
+    	}
+    	
+    	if (statusCode != Response.Status.OK.getStatusCode()) {
+    		String msg = String.format("Could not delete test Permission record: resource name='%s', actionGroup='%s'.",
+    				permissionValue.getResourceName(), permissionValue.getActionGroup());
+    		logger.error(msg);    		
+    	}
+	}
+
+	/* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readPaginatedList(java.lang.String)
      */
     @Override
@@ -116,7 +211,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
         Role role = createRoleInstance(knownRoleName, "All users are required to be in this role",
-                true);
+                true, RoleFactory.EMPTY_PERMVALUE_LIST);
         Response res = client.create(role);
         try {
 	        int statusCode = res.getStatus();
@@ -141,6 +236,81 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
 	            logger.debug(testName + ": knownResourceId=" + knownResourceId);
 	        }
         } finally {
+        	res.close();
+        }
+    }
+    
+    @Test(dataProvider = "testName", 
+    		dependsOnMethods = {"CRUDTests"})
+    public void createRoleWithPerms(String testName) throws Exception {
+        // Perform setup, such as initializing the type of service request
+        // (e.g. CREATE, DELETE), its valid and expected status codes, and
+        // its associated HTTP method name (e.g. POST, DELETE).
+        setupCreate();
+
+        // Submit the request to the service and store the response.
+        RoleClient client = new RoleClient();
+        Role role = createRoleInstance("CREATE_ROLE_WITH_PERMS" + System.currentTimeMillis(), "A role created with perms.",
+                true, permissionValues);
+        Response res = client.create(role);
+        try {
+	        int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        //
+	        // Specifically:
+	        // Does it fall within the set of valid status codes?
+	        // Does it exactly match the expected status code?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        // Store the ID returned from this create operation
+	        // for additional tests below.
+	        String csid = extractId(res);
+	        allResourceIdsCreated.add(csid);
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": role with perms ID=" + csid);
+	        }
+        } finally {
+        	res.close();
+        }
+    }    
+    
+    @Test(dataProvider = "testName", 
+    		dependsOnMethods = {"CRUDTests"})    
+    public void createDupliateRole(String testName) throws Exception {
+        // Perform setup, such as initializing the type of service request
+        // (e.g. CREATE, DELETE), its valid and expected status codes, and
+        // its associated HTTP method name (e.g. POST, DELETE).
+        setupDuplicate();
+
+        // Submit the request to the service and store the response.
+        RoleClient client = new RoleClient();
+        Role role = createRoleInstance(knownRoleName, "This is a duplicate of an existing role.",
+                true, RoleFactory.EMPTY_PERMVALUE_LIST);
+        Response res = client.create(role);
+        try {
+	        int statusCode = res.getStatus();
+	        if (statusCode == 201) {
+	        	// We expected NOT to create a new role, so if we did then we need to keep track of it and eventually delete it.
+		        String duplicateRole = extractId(res);
+		        allResourceIdsCreated.add(duplicateRole);
+	        }
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        //
+	        // Specifically:
+	        // Does it exactly match the expected status code?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+        } finally {        	
         	res.close();
         }
     }
@@ -880,22 +1050,31 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
      */
     public Role createRoleInstance(String roleName,
             String description,
-            boolean useRoleName) {
+            boolean useRoleName,
+            List<PermissionValue> permValueList) {
 
         Role role = RoleFactory.createRoleInstance(roleName,
         		roleName, //the display name
         		description,
-                useRoleName);
+                useRoleName,
+                permValueList);
+        
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, role");
             org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();            
             logger.debug(objectAsXmlString(objectFactory.createRole(role),
                     Role.class));
         }
+        
         return role;
-
     }
-
+    
+    public Role createRoleInstance(String roleName,
+            String description,
+            boolean useRoleName) {
+    	return this.createRoleInstance(roleName, description, useRoleName, RoleFactory.EMPTY_PERMVALUE_LIST);
+    }
+    
     /**
      * Prints the list.
      *

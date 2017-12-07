@@ -245,6 +245,14 @@ public class PermissionRoleUtil {
     	}
     	
     	//
+    	// Since our permissionValue may not have been supplied by the client with an ID, we need
+    	// to add it now.
+    	//
+    	if (permissionValue.getPermissionId() == null || permissionValue.getPermissionId().trim().isEmpty()) {
+    		permissionValue.setPermissionId(permission.getCsid());
+    	}
+    	
+    	//
     	// Create the permission-role to persist
     	//
         result = new PermissionRoleRel();

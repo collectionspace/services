@@ -32,9 +32,14 @@ import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.config.ConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.document.TransactionException;
 import org.collectionspace.services.common.security.UnauthorizedException;
+import org.collectionspace.services.common.storage.StorageClient;
+import org.collectionspace.services.common.storage.TransactionContext;
+import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.tenant.TenantBindingType;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -244,5 +249,72 @@ public class RemoteServiceContextImpl<IT, OT>
 			throws Exception {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("Unimplemented method.");
+	}
+	
+	//
+	// Transaction management methods
+	//
+	
+	private TransactionContext getCurrentTransactionContext() {
+		return (TransactionContext) this.getProperty(StorageClient.SC_TRANSACTION_CONTEXT_KEY);
+	}
+
+	@Override
+	public void releaseConnection() throws TransactionException {
+		if (isTransactionContextShared() == true) {
+			throw new TransactionException("Attempted to release a shared storage connection.  Only the originator can release the connection");
+		}
+		
+		TransactionContext transactionCtx = getCurrentTransactionContext();		
+		if (transactionCtx != null) {
+			transactionCtx.close();
+	        this.setProperty(StorageClient.SC_TRANSACTION_CONTEXT_KEY, null);
+		} else {
+			throw new TransactionException("Attempted to release a non-existent storage connection.  Transaction context missing from service context.");
+		}
+	}
+
+	@Override
+	public TransactionContext openConnection() throws TransactionException {
+		TransactionContext result = getCurrentTransactionContext();
+		if (result != null) {
+			throw new TransactionException("Attempted to open a new connection when a current connection is still part of the current service context.  The current connection must be closed with the releaseConnection() method.");
+		}
+
+		result = new JPATransactionContext(this);
+        this.setProperty(StorageClient.SC_TRANSACTION_CONTEXT_KEY, result);
+
+		return result;
+	}
+
+	@Override
+	public void setTransactionContext(TransactionContext transactionCtx) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * Returns true if the TransactionContext is shared with another ServiceContext instance
+	 * @throws TransactionException 
+	 */
+	@Override
+	public boolean isTransactionContextShared() throws TransactionException {
+		boolean result = true;
+		
+		TransactionContext transactionCtx = getCurrentTransactionContext();
+		if (transactionCtx != null) {
+			if (transactionCtx.getServiceContext() == this) {  // check to see if the service context used to create the connection is the same as the current service context
+				result = false;
+			}
+		} else {
+			throw new TransactionException("Transaction context missing from service context.");
+		}
+		
+		return result;
+	}
+
+	@Override
+	public boolean hasActiveConnection() {
+		return getCurrentTransactionContext() != null;
 	}
 }

@@ -27,10 +27,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.collectionspace.services.authorization.PermissionRole;
+import org.collectionspace.services.authorization.PermissionRoleSubResource;
+import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.Role;
+import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.RolesList;
+import org.collectionspace.services.authorization.SubjectType;
 
+import org.collectionspace.services.client.PermissionRoleFactory;
 import org.collectionspace.services.client.RoleClient;
+import org.collectionspace.services.client.RoleFactory;
+
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
@@ -72,6 +80,22 @@ public class RoleDocumentHandler
         // We do not allow creation of locked roles through the services.
         role.setMetadataProtection(null);
         role.setPermsProtection(null);
+    }
+    
+    @Override
+    public void completeCreate(DocumentWrapper<Role> wrapDoc) throws Exception {
+    	Role role = wrapDoc.getWrappedObject();
+    	List<PermissionValue> permValueList = role.getPermission();
+    	if (permValueList != null && permValueList.size() > 0) {
+    		// create and persist a permrole instance
+    		// The caller of this method needs to ensure a valid and active EM (EntityManager) instance is in the Service context
+    		RoleValue roleValue = RoleFactory.createRoleValueInstance(role);
+    		PermissionRole permRole = PermissionRoleFactory.createPermissionRoleInstance(SubjectType.PERMISSION, roleValue,
+    				permValueList, true, true);
+            PermissionRoleSubResource subResource =
+                    new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
+            String permrolecsid = subResource.createPermissionRole(permRole, SubjectType.PERMISSION);
+    	}
     }
 
     @Override

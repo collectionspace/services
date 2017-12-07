@@ -50,7 +50,11 @@
 package org.collectionspace.services.client;
 
 
+import java.util.List;
+
+import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.Role;
+import org.collectionspace.services.authorization.RoleValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +65,9 @@ import org.slf4j.LoggerFactory;
 public class RoleFactory {
 
     static private final Logger logger = LoggerFactory.getLogger(RoleFactory.class);
+    
+	public static final List<PermissionValue> EMPTY_PERMVALUE_LIST = null;
+
     /**
      * create role instance
      * @param roleName
@@ -71,7 +78,8 @@ public class RoleFactory {
     public static Role createRoleInstance(String roleName,
     		String displayName,
             String description,
-            boolean useRoleName) {
+            boolean useRoleName,
+            List<PermissionValue> permValueList) {
 
         Role role = new Role();
         if (useRoleName == true) {
@@ -79,7 +87,20 @@ public class RoleFactory {
         }
         role.setDisplayName(displayName);
         role.setDescription(description);
+        role.setPermission(permValueList);
+        
         return role;
 
+    }
+    
+    public static RoleValue createRoleValueInstance(Role role) {
+    	RoleValue result = new RoleValue();
+    	
+    	result.setDisplayName(role.getDisplayName());
+    	result.setRoleId(role.getCsid());
+    	result.setRoleName(role.getRoleName());
+    	result.setTenantId(role.getTenantId());
+    	
+    	return result;
     }
 }

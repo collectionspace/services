@@ -184,7 +184,7 @@
             <filename>dimension/1.xml</filename>
         </test>
         <test ID="dimensionBigbirdPUTAfterPermrolesDeleted">
-            <expectedCodes>404</expectedCodes>
+            <expectedCodes>403</expectedCodes>
             <method>PUT</method>
             <uri>/cspace-services/dimensions/${dimension1.CSID}</uri>
             <filename>dimension/2-put.xml</filename>

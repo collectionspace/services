@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:role xmlns:ns2="http://collectionspace.org/services/authorization">
-  <roleName>ROLE_TEST_INTERN</roleName>
-  <description>role for ROLE_TEST_INTERN</description>
+    <roleName>ROLE_TEST_INTERN</roleName>
+    <description>role for ROLE_TEST_INTERN</description>
+    <permission>
+        <permRelationshipId>4381</permRelationshipId>
+        <permissionId>1-vocabularies-RL</permissionId>
+        <resourceName>vocabularies</resourceName>
+        <actionGroup>RL</actionGroup>
+    </permission>
+    <permission>
+        <permRelationshipId>4382</permRelationshipId>
+        <permissionId>1-groups-RL</permissionId>
+        <resourceName>groups</resourceName>
+        <actionGroup>RL</actionGroup>
+    </permission>
 </ns2:role>
