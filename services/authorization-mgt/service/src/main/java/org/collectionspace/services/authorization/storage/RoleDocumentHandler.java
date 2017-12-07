@@ -38,7 +38,7 @@ import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.client.PermissionRoleFactory;
 import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.client.RoleFactory;
-
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
@@ -99,16 +99,40 @@ public class RoleDocumentHandler
     }
 
     @Override
-    public void handleUpdate(DocumentWrapper<Role> wrapDoc) throws Exception {
-        Role roleFound = wrapDoc.getWrappedObject();
-        Role roleReceived = getCommonPart();
-        // If marked as metadata immutable, do not do update
-        if(!RoleClient.IMMUTABLE.equals(roleFound.getMetadataProtection())) {
-	        roleReceived.setRoleName(RoleClient.getBackendRoleName(roleReceived.getRoleName(),
-	        		roleFound.getTenantId()));
-	        merge(roleReceived, roleFound);
-        }
-    }
+	public void handleUpdate(DocumentWrapper<Role> wrapDoc) throws Exception {
+		Role roleFound = wrapDoc.getWrappedObject();
+		Role roleReceived = getCommonPart();
+		// If marked as metadata immutable, do not do update
+		if (!RoleClient.IMMUTABLE.equals(roleFound.getMetadataProtection())) {
+			roleReceived
+					.setRoleName(RoleClient.getBackendRoleName(roleReceived.getRoleName(), roleFound.getTenantId()));
+			merge(roleReceived, roleFound);
+		}
+		//
+		// Update perms is supplied.
+		//
+		List<PermissionValue> permValueList = roleReceived.getPermission();
+		if (permValueList != null) {
+            PermissionRoleSubResource subResource =
+                    new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
+            //
+            // First, delete the existing permroles
+            //
+            subResource.deletePermissionRole(roleFound.getCsid(), SubjectType.PERMISSION);
+            //
+            // Next, create the new permroles
+            //
+    		RoleValue roleValue = RoleFactory.createRoleValueInstance(roleFound);
+    		PermissionRole permRole = PermissionRoleFactory.createPermissionRoleInstance(SubjectType.PERMISSION, roleValue,
+    				permValueList, true, true);            
+            subResource.createPermissionRole(permRole, SubjectType.PERMISSION);
+            //
+            // Finally, set the updated perm list in the result
+            //
+            PermissionRole newPermRole = subResource.getPermissionRole(roleFound.getCsid(), SubjectType.PERMISSION);
+            roleFound.setPermission(newPermRole.getPermission());
+		}
+	}
 
     /**
      * Merge fields manually from 'from' to the 'to' role
@@ -169,7 +193,18 @@ public class RoleDocumentHandler
     public Role extractCommonPart(
             DocumentWrapper<Role> wrapDoc)
             throws Exception {
-        return wrapDoc.getWrappedObject();
+        Role role = wrapDoc.getWrappedObject();
+        
+        String includePermsQueryParamValue = (String) getServiceContext().getQueryParams().getFirst(RoleClient.INCLUDE_PERMS_QP);
+        boolean includePerms = Tools.isTrue(includePermsQueryParamValue);
+        if (includePerms) {
+	        PermissionRoleSubResource permRoleResource =
+	                new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
+	        PermissionRole permRole = permRoleResource.getPermissionRole(role.getCsid(), SubjectType.PERMISSION);
+	        role.setPermission(permRole.getPermission());
+        }
+    
+        return role;
     }
 
     @Override
@@ -232,7 +267,7 @@ public class RoleDocumentHandler
      */
     private void sanitize(Role role) {
         if (!SecurityUtils.isCSpaceAdmin()) {
-            role.setTenantId(null); // REM - See no reason for hiding the tenant ID?
+            // role.setTenantId(null); // REM - There's no reason for hiding the tenant ID is there?
         }
     }
 

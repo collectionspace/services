@@ -77,6 +77,12 @@
             <uri>/cspace-services/authorization/roles</uri>
             <filename>security/3-role-test-cm.xml</filename>
         </test>
+        <test ID="updateRoleTestCM">
+            <method>PUT</method>
+            <uri>/cspace-services/authorization/roles</uri>
+            <filename>security/3a-update-role-test-cm.xml</filename>
+            <fromTestID>roleTestCM</fromTestID>
+        </test>
         <test ID="roleIntern">
             <method>POST</method>
             <uri>/cspace-services/authorization/roles</uri>

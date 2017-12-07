@@ -93,8 +93,8 @@ public class RoleResource extends SecurityResourceBase {
 
     @GET
     @Path("{csid}")
-    public Role getRole(@PathParam("csid") String csid) {
-        return (Role)get(csid, Role.class);
+    public Role getRole(@PathParam("csid") String csid, @Context UriInfo ui) {
+        return (Role)get(ui, csid, Role.class);
     }
     
     /*
