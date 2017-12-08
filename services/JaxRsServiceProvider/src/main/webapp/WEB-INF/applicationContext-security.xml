@@ -55,17 +55,17 @@
 
     <sec:http realm="org.collectionspace.services" create-session="stateless" authentication-manager-ref="userAuthenticationManager">
         <!-- Exclude the resource path to public items' content from AuthN and AuthZ. Lets us publish resources with anonymous access. -->
-        <sec:intercept-url pattern="/publicitems/*/*/content" access="isAnonymous()" />
-        
+        <sec:intercept-url pattern="/publicitems/*/*/content" access="permitAll" />
+
         <!-- Exclude the resource path to handle an account password reset request from AuthN and AuthZ. Lets us process password resets anonymous access. -->
-        <sec:intercept-url pattern="/accounts/requestpasswordreset" access="isAnonymous()" />
-        
+        <sec:intercept-url pattern="/accounts/requestpasswordreset" access="permitAll" />
+
         <!-- Exclude the resource path to account process a password resets from AuthN and AuthZ. Lets us process password resets anonymous access. -->
-        <sec:intercept-url pattern="/accounts/processpasswordreset" access="isAnonymous()" />
+        <sec:intercept-url pattern="/accounts/processpasswordreset" access="permitAll" />
 
         <!-- All other paths must be authenticated. -->
         <sec:intercept-url pattern="/**" access="isFullyAuthenticated()" />
-        
+
         <sec:http-basic />
         <sec:anonymous username="anonymous" />
         <sec:csrf disabled="true" />
