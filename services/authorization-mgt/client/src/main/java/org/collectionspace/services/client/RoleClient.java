@@ -44,7 +44,7 @@ public class RoleClient extends AbstractServiceClientImpl<RolesList, Role, Role,
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
 	public final static String IMMUTABLE = "immutable";
-	public final static String INCLUDE_PERMS_QP = "includePerms";
+	public final static String INCLUDE_PERMS_QP = "showPerms";
 	
 	//
 	// Used to qualify backend role name
