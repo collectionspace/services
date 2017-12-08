@@ -54,6 +54,7 @@ import org.collectionspace.services.common.UriTemplateRegistryKey;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.RefNameUtils.AuthorityTermInfo;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.AbstractServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
@@ -311,17 +312,23 @@ public class ServiceGroupDocumentModelHandler
 		
 		MultivaluedMap<String, String> queryParams = getServiceContext().getQueryParams();
 		String markRtSbj = queryParams.getFirst(IQueryManager.MARK_RELATED_TO_CSID_AS_SUBJECT);
-		if (markRtSbj != null && markRtSbj.isEmpty()) {
+		if (Tools.isBlank(markRtSbj)) {
 			markRtSbj = null;
 		}
 		
 		String markRtSbjOrObj = queryParams.getFirst(IQueryManager.MARK_RELATED_TO_CSID_AS_EITHER);
-		if (markRtSbjOrObj != null && markRtSbjOrObj.isEmpty()) {
+		if (Tools.isBlank(markRtSbjOrObj)) {
 			markRtSbjOrObj = null;
+		} else {
+			if (Tools.isBlank(markRtSbj) == false) {
+				logger.warn(String.format("Ignoring query param %s='%s' since overriding query param %s='%s' exists.",
+						IQueryManager.MARK_RELATED_TO_CSID_AS_SUBJECT, markRtSbj, IQueryManager.MARK_RELATED_TO_CSID_AS_EITHER, markRtSbjOrObj));
+			}
+			markRtSbj = markRtSbjOrObj; // Mark the record as related independent of whether it is the subject or object of a relationship
 		}
 		
 		try {
-			if (markRtSbj != null || markRtSbjOrObj != null) {
+			if (markRtSbj != null) {
 				repoClient = (RepositoryClientImpl) this.getRepositoryClient(ctx);
 				RepositoryClientImpl nuxeoRepoClient = (RepositoryClientImpl) repoClient;
 				repoSession = this.getRepositorySession();
@@ -340,7 +347,7 @@ public class ServiceGroupDocumentModelHandler
 	        fields[5] = DOC_NAME_FIELD;
 	        fields[6] = DOC_NUMBER_FIELD;
 	        fields[7] = DOC_TYPE_FIELD;	        
-			if (markRtSbj != null || markRtSbjOrObj != null) {
+			if (markRtSbj != null) {
 		        fields[8] = STANDARD_LIST_MARK_RT_FIELD;
 			}
 
@@ -364,8 +371,8 @@ public class ServiceGroupDocumentModelHandler
 				// If the mark-related query param was set, check to see if the doc we're processing
 				// is related to the value specified in the mark-related query param.
 				//	            
-				if (markRtSbj != null || markRtSbjOrObj != null) {
-					String relationClause = RelationsUtils.buildWhereClause(markRtSbj, null, null, csid, null, markRtSbjOrObj);
+				if (markRtSbj != null) {
+					String relationClause = RelationsUtils.buildWhereClause(markRtSbj, null, null, csid, null, markRtSbj == markRtSbjOrObj);
 					String whereClause = relationClause + IQueryManager.SEARCH_QUALIFIER_AND
 							+ NuxeoUtils.buildWorkflowNotDeletedWhereClause();
 					QueryContext queryContext = new QueryContext(ctx, whereClause);
