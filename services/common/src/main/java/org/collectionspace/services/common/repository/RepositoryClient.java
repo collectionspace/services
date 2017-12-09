@@ -31,6 +31,7 @@ import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.document.TransactionException;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
@@ -178,4 +179,18 @@ public interface RepositoryClient<IT, OT> extends StorageClient {
 	 */
 	boolean reindex(DocumentHandler handler, String indexid)
 			throws DocumentNotFoundException, DocumentException;
+
+	/**
+	 * Delete a list of objects
+	 * 
+	 * @param ctx
+	 * @param idList
+	 * @param handler
+	 * @return
+	 * @throws DocumentNotFoundException
+	 * @throws DocumentException
+	 * @throws TransactionException
+	 */
+	boolean delete(ServiceContext ctx, List<String> idList, DocumentHandler handler)
+			throws DocumentNotFoundException, DocumentException, TransactionException;
 }

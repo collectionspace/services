@@ -41,10 +41,13 @@ import org.collectionspace.services.common.relation.nuxeo.RelationsUtils;
 import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
-
+import org.jboss.resteasy.util.HttpResponseCodes;
+import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -139,13 +142,36 @@ public class RelationResource extends NuxeoBasedResource {
 
     @DELETE
     public Response delete(@Context UriInfo uriInfo) {
-    	Response result = Response.status(200).build();
+    	Response result = Response.status(HttpResponseCodes.SC_OK).build();
     	
-    	RelationsCommonList relationsList = this.getList(null, uriInfo);
-    	for (RelationListItem relation : relationsList.getRelationListItem()) {
-    		Response deleteResponse = this.delete(relation.getCsid());
-    	}
-    	
+    	List<String> csidList = new ArrayList<String>();
+        try {
+	    	RelationsCommonList relationsList = this.getList(null, uriInfo);
+	    	for (RelationListItem relation : relationsList.getRelationListItem()) {
+	    		csidList.add(relation.getCsid());
+	    	}
+	    	
+	    	if (csidList.isEmpty() == false) {
+	            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+	        	DocumentHandler<PoxPayloadIn, PoxPayloadOut, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
+	            getRepositoryClient(ctx).delete(ctx, csidList, handler);
+	    	} else {
+	            result = Response.status(HttpResponseCodes.SC_NOT_FOUND).build();
+	    	}
+        } catch (Exception e) {
+        	String separator = ", ";
+    		String payloadDescription = "unknown";
+        	if (csidList.isEmpty() == false) {
+        		StringBuffer tempStr = new StringBuffer();
+        		for (String csid : csidList) {
+        			tempStr.append(csid);
+        			tempStr.append(separator);
+        		}
+        		payloadDescription = String.format("{%s}", tempStr.substring(0, tempStr.length() - separator.length()));
+        	}
+            throw bigReThrow(e, ServiceMessages.DELETE_FAILED, payloadDescription);
+        }
+
     	return result;
     }
 
