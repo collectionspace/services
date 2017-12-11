@@ -36,5 +36,7 @@ public class PermissionStorageConstants {
 
     final public static String RESOURCE_NAME = "resourceName";
     final public static String ACTION_GROUP = "actionGroup";
+	public static final String PERMREL_ROLE_ID = "roleId";
+	public static final String PERMREL_PERM_ID = "permissionId";
 
 }

@@ -291,6 +291,15 @@ public abstract class BaseServiceTest<CLT> {
     }
     
     /**
+     * Sets up create duplicate request.
+     */
+    protected void setupDuplicate() {
+        testExpectedStatusCode = STATUS_BAD_REQUEST;
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }    
+    
+    /**
      * Initializes setup values for a given test.
      *
      * @param expectedStatusCode  A status code expected to be returned in the response.

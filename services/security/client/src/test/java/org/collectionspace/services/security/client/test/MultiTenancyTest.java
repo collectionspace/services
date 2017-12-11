@@ -611,7 +611,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         roleClient.setAuth(true, ui.userName, true, ui.password, true);
         Role role = RoleFactory.createRoleInstance(roleName,
         		roleName, //the display name
-                "role for " + roleName, true);
+                "role for " + roleName, true, RoleFactory.EMPTY_PERMVALUE_LIST);
         role.setTenantId(tenantId);
         Response res = roleClient.create(role);
         try {

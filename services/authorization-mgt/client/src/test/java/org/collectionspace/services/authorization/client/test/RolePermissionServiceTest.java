@@ -668,7 +668,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
 
         Role role = RoleFactory.createRoleInstance(roleName,
         		roleName, //the display name
-                "role for " + roleName, true);
+                "role for " + roleName, true, RoleFactory.EMPTY_PERMVALUE_LIST);
         role.setRoleGroup("something");
         Response res = null;
         String id = null;

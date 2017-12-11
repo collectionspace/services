@@ -690,7 +690,7 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
 		Role role = RoleFactory.createRoleInstance(roleName, roleName, // the
 																		// display
 																		// name
-				"role for " + roleName, true);
+				"role for " + roleName, true, RoleFactory.EMPTY_PERMVALUE_LIST);
 		Response res = roleClient.create(role);
 		try {
 			assertStatusCode(res, "CreateRole");

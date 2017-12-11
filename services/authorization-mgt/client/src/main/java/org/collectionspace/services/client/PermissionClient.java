@@ -31,8 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
-
 import org.apache.http.HttpStatus;
+
 import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionAction;
@@ -96,7 +96,6 @@ public class PermissionClient extends AbstractServiceClientImpl<PermissionsList,
 
     public Response readSearchList(String resourceName) {
         return getProxy().readSearchList(resourceName);
-
     }
 
     /**
@@ -107,6 +106,30 @@ public class PermissionClient extends AbstractServiceClientImpl<PermissionsList,
     @Override
     public Response read(String csid) {
         return getProxy().read(csid);
+    }
+    
+    /*
+     * We expect a single result.  An resourceName/actionGroup tuple should uniquely identify the permission resource
+     */
+    public Permission read(String resourceName, String actionGroup) {
+    	Permission result = null;
+    	
+    	Response res = getProxy().read(resourceName, actionGroup);
+    	try {
+	    	if (res != null && res.getStatus() == Response.Status.OK.getStatusCode()) {
+		    	PermissionsList permsListElement = res.readEntity(PermissionsList.class);
+		    	if (permsListElement != null && permsListElement.getPermission() != null) {
+		    		List<Permission> permsList = permsListElement.getPermission();
+		    		if (permsList.size() == 1) {
+		    			result = permsList.get(0);
+		    		}
+		    	}
+	    	}
+    	} finally {
+    		res.close();
+    	}
+    	
+    	return result;
     }
 
     /**

@@ -35,6 +35,8 @@ import org.collectionspace.services.lifecycle.TransitionDef;
  */
 public interface StorageClient {
 
+	public static final String SC_TRANSACTION_CONTEXT_KEY = "SC_ACTIVE_TRANSACTION_KEY";
+	
     /**
      * create entity in the persistence store
      * @param ctx service context under which this method is invoked

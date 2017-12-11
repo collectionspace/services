@@ -656,8 +656,8 @@ public class XmlReplay {
                         fullURL = fixupFullURL(fullURL, protoHostPort, uri);
                     } else if (method.equalsIgnoreCase("DELETE")){
                         String fromTestID = testNode.valueOf("fromTestID");
-                        ServiceResult pr = serviceResultsMap.get(fromTestID);
-                        if (pr!=null){
+                        ServiceResult pr = Tools.notBlank(fromTestID) ? serviceResultsMap.get(fromTestID) : null;
+                        if (pr != null) {
                             serviceResult = XmlReplayTransport.doDELETE(pr.deleteURL, authForTest, testIDLabel, fromTestID);
                             serviceResult.fromTestID = fromTestID;
                             if (expectedCodes.size()>0){

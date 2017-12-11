@@ -29,7 +29,6 @@ public class RelationUtils {
     private static final Logger logger = LoggerFactory.getLogger(RelationUtils.class);
     private static final int DEFAULT_PAGE_SIZE = 1000;
 
-
     /*
      * Performs an NXQL query to find refName references in relationship records.
      */

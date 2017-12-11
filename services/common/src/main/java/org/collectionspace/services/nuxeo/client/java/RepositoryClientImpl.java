@@ -204,13 +204,15 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
             // create document with documentmodel
             doc = repoSession.createDocument(doc);
             repoSession.save();
-// TODO for sub-docs need to call into the handler to let it deal with subitems. Pass in the id,
-// and assume the handler has the state it needs (doc fragments). 
+			// TODO for sub-docs need to call into the handler to let it deal with subitems. Pass in the id,
+			// and assume the handler has the state it needs (doc fragments). 
             handler.complete(Action.CREATE, wrapDoc);
             return id;
         } catch (BadRequestException bre) {
+        	rollbackTransaction(repoSession);
             throw bre;
-        } catch (Exception e) {
+        } catch (Throwable e) {
+        	rollbackTransaction(repoSession);
         	if (logger.isDebugEnabled()) {
         		logger.debug("Call to low-level Nuxeo document create call failed: ", e);
         	}
@@ -220,11 +222,9 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
                 releaseRepositorySession(ctx, repoSession);
             }
         }
-
     }
     
-
-    @Override
+	@Override
     public boolean reindex(DocumentHandler handler, String indexid) throws DocumentNotFoundException, DocumentException
     {
     	return reindex(handler, null, indexid);
@@ -245,9 +245,10 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
             //
             // Set repository session to handle the document
             //
-        } catch (Exception e) {
+        } catch (Throwable e) {
+        	rollbackTransaction(repoSession);
             if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception ", e);
+                logger.debug("Caught exception trying to reindex Nuxeo repository ", e);
             }
             throw new NuxeoDocumentException(e);
         } finally {
@@ -265,8 +266,7 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
     	boolean result = false;
     	
         if (handler == null) {
-            throw new IllegalArgumentException(
-                    "RepositoryJavaClient.get: handler is missing");
+            throw new IllegalArgumentException("RepositoryJavaClient.get: handler is missing");
         }
 
         CoreSessionInterface repoSession = null;
@@ -278,10 +278,13 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
             result = handler.handle(Action.SYNC, wrapDoc);
             handler.complete(Action.SYNC, wrapDoc);
         } catch (IllegalArgumentException iae) {
+        	rollbackTransaction(repoSession);
             throw iae;
         } catch (DocumentException de) {
+        	rollbackTransaction(repoSession);
             throw de;
-        } catch (Exception e) {
+        } catch (Throwable e) {
+        	rollbackTransaction(repoSession);
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
@@ -314,13 +317,13 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
             result = handler.handle(Action.SYNC, wrapDoc);
             handler.complete(Action.SYNC, wrapDoc);
         } catch (IllegalArgumentException iae) {
+        	rollbackTransaction(repoSession);
             throw iae;
         } catch (DocumentException de) {
+        	rollbackTransaction(repoSession);
             throw de;
-        } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception ", e);
-            }
+        } catch (Throwable e) {
+        	rollbackTransaction(repoSession);
             throw new NuxeoDocumentException(e);
         } finally {
             if (repoSession != null) {
@@ -380,7 +383,7 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
         		logger.debug(de.getMessage(), de);
         	}
             throw de;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
@@ -435,7 +438,7 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
             throw iae;
         } catch (DocumentException de) {
             throw de;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
@@ -1597,12 +1600,16 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
             repoSession.save();
             handler.complete(Action.UPDATE, wrapDoc);
         } catch (BadRequestException bre) {
+        	rollbackTransaction(repoSession);
             throw bre;
         } catch (DocumentException de) {
+        	rollbackTransaction(repoSession);
             throw de;
         } catch (CSWebApplicationException wae) {
+        	rollbackTransaction(repoSession);
             throw wae;
-        } catch (Exception e) {
+        } catch (Throwable e) {
+        	rollbackTransaction(repoSession);
             throw new NuxeoDocumentException(e);
         } finally {
             if (repoSession != null) {
@@ -1622,6 +1629,7 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
      * @throws ClientException
      * @throws DocumentException
      */
+	@Deprecated
     public void saveDocWithoutHandlerProcessing(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             CoreSessionInterface repoSession,
@@ -1703,7 +1711,7 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
      * @throws DocumentException
      */
     @Override
-    public boolean delete(ServiceContext ctx, String id, DocumentHandler handler) throws DocumentNotFoundException,
+    public boolean delete(ServiceContext ctx, List<String> idList, DocumentHandler handler) throws DocumentNotFoundException,
             DocumentException, TransactionException {
     	boolean result = true;
     	
@@ -1715,41 +1723,46 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
             throw new IllegalArgumentException(
                     "delete(ctx, ix, handler): handler is missing");
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Deleting document with CSID=" + id);
-        }
+                
         CoreSessionInterface repoSession = null;
         try {
             handler.prepare(Action.DELETE);
             repoSession = getRepositorySession(ctx);
-            DocumentWrapper<DocumentModel> wrapDoc = null;
-            try {
-                DocumentRef docRef = NuxeoUtils.createPathRef(ctx, id);
-                wrapDoc = new DocumentWrapperImpl<DocumentModel>(repoSession.getDocument(docRef));
-                ((DocumentModelHandler) handler).setRepositorySession(repoSession);
-                if (handler.handle(Action.DELETE, wrapDoc)) {
-                	repoSession.removeDocument(docRef);
-                	if (logger.isDebugEnabled()) {
-                		String msg = String.format("DELETE - User '%s' hard-deleted document CSID=%s of type %s.",
-                				ctx.getUserId(), id, ctx.getDocumentType());
-                		logger.debug(msg);
-                	}
-                } else {
-                	result = false; // delete failed for some reason
+            
+            for (String id : idList) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Deleting document with CSID=" + id);
                 }
-            } catch (org.nuxeo.ecm.core.api.DocumentNotFoundException ce) {
-                String msg = logException(ce,
-                		String.format("Could not find %s resource/record to delete with CSID=%s", ctx.getDocumentType(), id));                
-                throw new DocumentNotFoundException(msg, ce);
+	            DocumentWrapper<DocumentModel> wrapDoc = null;
+	            try {
+	                DocumentRef docRef = NuxeoUtils.createPathRef(ctx, id);
+	                wrapDoc = new DocumentWrapperImpl<DocumentModel>(repoSession.getDocument(docRef));
+	                ((DocumentModelHandler) handler).setRepositorySession(repoSession);
+	                if (handler.handle(Action.DELETE, wrapDoc) == true) {
+	                	repoSession.removeDocument(docRef);
+	                	if (logger.isDebugEnabled()) {
+	                		String msg = String.format("DELETE - User '%s' hard-deleted document CSID=%s of type %s.",
+	                				ctx.getUserId(), id, ctx.getDocumentType());
+	                		logger.debug(msg);
+	                	}
+	                } else {
+                		String msg = String.format("Could not delete %s resource with csid=%s.",
+                				handler.getServiceContext().getServiceName(), id);
+                		throw new DocumentException(msg);
+	                }
+	            } catch (org.nuxeo.ecm.core.api.DocumentNotFoundException ce) {
+	                String msg = logException(ce,
+	                		String.format("Could not find %s resource/record to delete with CSID=%s", ctx.getDocumentType(), id));                
+	                throw new DocumentNotFoundException(msg, ce);
+	            }
+	            repoSession.save();
+	            handler.complete(Action.DELETE, wrapDoc);
             }
-            repoSession.save();
-            handler.complete(Action.DELETE, wrapDoc);
         } catch (DocumentException de) {
+        	rollbackTransaction(repoSession);
             throw de;
-        } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception ", e);
-            }
+        } catch (Throwable e) {
+        	rollbackTransaction(repoSession);
             throw new NuxeoDocumentException(e);
         } finally {
             if (repoSession != null) {
@@ -1757,6 +1770,25 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
             }
         }
         
+        return result;
+    }
+    
+    /**
+     * delete a document from the Nuxeo repository
+     *
+     * @param ctx service context under which this method is invoked
+     * @param id of the document
+     * @throws DocumentException
+     */
+    @Override
+    public boolean delete(ServiceContext ctx, String id, DocumentHandler handler) throws DocumentNotFoundException,
+            DocumentException, TransactionException {
+    	boolean result;    	
+        
+    	List<String> idList = new ArrayList<String>();
+    	idList.add(id);
+    	result = delete(ctx, idList, handler);
+    	
         return result;
     }
 
@@ -1819,7 +1851,8 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
                 logger.debug("Path to Domain: " + domainDoc.getPathAsString());
                 logger.debug("Path to Workspaces root: " + workspacesRoot.getPathAsString());
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
+        	rollbackTransaction(repoSession);
             if (logger.isDebugEnabled()) {
                 logger.debug("Could not create tenant domain name=" + repositoryDomain.getStorageName() + " caught exception ", e);
             }
@@ -1850,9 +1883,6 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
                 if (logger.isTraceEnabled()) {
                     logger.trace("Caught exception ", e);  // The document doesn't exist, this let's us know we need to create it
                 }
-                //there is no way to identify if document does not exist due to
-                //lack of typed exception for getDocument method
-                return null;
             } finally {
                 if (repoSession != null) {
                     releaseRepositorySession(null, repoSession);
@@ -1923,7 +1953,8 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
                 logger.debug("Created workspace name=" + workspaceName
                         + " id=" + workspaceId);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
+        	rollbackTransaction(repoSession);
             if (logger.isDebugEnabled()) {
                 logger.debug("createWorkspace caught exception ", e);
             }
@@ -1999,11 +2030,12 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
         	if (repoSession == null) {
 	            repoName = ctx.getRepositoryName(); // Notice we are overriding the passed in 'repoName' since we have a valid service context passed in to us
         	}
-        } else if (repoName == null || repoName.trim().isEmpty()) {
-            String errMsg = String.format("We can't get a connection to the Nuxeo repo because the service context passed in was null and no repository name was passed in either.");
+        } else if (Tools.isBlank(repoName)) {
+            String errMsg = String.format("Either a valid session context or repository name are required to get a new connection.");
             logger.error(errMsg);
             throw new Exception(errMsg);
         }
+        
         if (repoSession == null) {
             //
             // If we couldn't find a repoSession from the service context (or the context was null) then we need to create a new one using
@@ -2016,19 +2048,23 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
                 logger.trace("Reusing the current context's repository session.");
             }
         }
-
-        try {
-	        if (logger.isTraceEnabled()) {
-	            logger.trace("Testing call to getRepository() repository root: " + repoSession.getRootDocument());
-	        }
-        } catch (Throwable e) {
-        	logger.trace("Test call to Nuxeo's getRepository() repository root failed", e);
-        }
+        //
+        // Debugging only code
+        //
+		if (logger.isTraceEnabled()) {
+			try {
+				if (logger.isTraceEnabled()) {
+					logger.trace("Testing call to getRepository() repository root: " + repoSession.getRootDocument());
+				}
+			} catch (Throwable e) {
+				logger.trace("Test call to Nuxeo's getRepository() repository root failed", e);
+			}
+		}
 
         profiler.stop();
 
         if (ctx != null) {
-            ctx.setCurrentRepositorySession(repoSession); // For reusing, save the repository session in the current service context
+            ctx.setCurrentRepositorySession(repoSession); // For reusing, save the repository session in the current service context.  The context will reference count it.
         }
 
         return repoSession;
@@ -2178,5 +2214,11 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
             restrict = false;
         }
         return restrict;
+    }
+    
+    private void rollbackTransaction(CoreSessionInterface repoSession) {
+    	if (repoSession != null) {
+    		repoSession.setTransactionRollbackOnly();
+    	}
     }
 }

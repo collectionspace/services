@@ -26,19 +26,24 @@ package org.collectionspace.services.authorization.storage;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
+
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionRoleRel;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.PermissionsRolesList;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
-
+import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationRoleRel;
 import org.collectionspace.services.common.authorization_mgt.PermissionRoleUtil;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentFilter;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
+import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +84,69 @@ public class PermissionRoleDocumentHandler
     @Override
     public void handleCreate(DocumentWrapper<List<PermissionRoleRel>> wrapDoc) throws Exception {
         fillCommonPart(getCommonPart(), wrapDoc);
+        filterOutExisting(wrapDoc);
+    }
+    
+    private boolean permRoleRelExists(EntityManager em, PermissionRoleRel permRoleRel) {
+    	boolean result = false;
+    	
+    	PermissionRoleRel queryResult = null;
+    	try {
+	    	queryResult = (PermissionRoleRel) JpaStorageUtils.getEntityByDualKeys(em, 
+	    			PermissionRoleRel.class.getName(),
+	    			PermissionStorageConstants.PERMREL_ROLE_ID, permRoleRel.getRoleId(), 
+	    			PermissionStorageConstants.PERMREL_PERM_ID, permRoleRel.getPermissionId());
+    	} catch (NoResultException e) {
+    		// Ignore exception.  Just means the permission hasn't been stored/persisted yet.
+    	}
+    	
+    	if (queryResult != null) {
+    		result = true;
+    	}
+    	
+    	return result;
+    }
+    
+    /**
+     * Find the existing (already persisted) 
+     * @param wrapDoc
+     * @throws Exception
+     */
+    private void filterOutExisting(DocumentWrapper<List<PermissionRoleRel>> wrapDoc) throws Exception {
+    	List<PermissionRoleRel> permRoleRelList = wrapDoc.getWrappedObject();
+    	
+        EntityManagerFactory emf = null;
+        EntityManager em = null;
+        try {
+            emf = JpaStorageUtils.getEntityManagerFactory(JpaStorageUtils.CS_PERSISTENCE_UNIT);
+            em = emf.createEntityManager();
+            em.getTransaction().begin();
+            
+            for (PermissionRoleRel permRoleRel : permRoleRelList) {
+            	if (permRoleRelExists(em, permRoleRel) == true) {
+            		//
+            		// Remove the item from the list since it already exists
+            		//
+            		permRoleRelList.remove(permRoleRel);
+            	}
+            }
+            
+            em.getTransaction().commit();
+        	em.close();            
+        } catch (Exception e) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            throw e;
+        } finally {
+            if (em != null) {
+                JpaStorageUtils.releaseEntityManagerFactory(emf);
+            }
+        }
+
     }
 
     /* (non-Javadoc)

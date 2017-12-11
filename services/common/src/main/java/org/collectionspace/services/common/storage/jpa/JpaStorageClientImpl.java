@@ -135,6 +135,7 @@ public class JpaStorageClientImpl implements StorageClient {
 	            } catch (EntityExistsException ee) {
 	            	//
 	            	// We found an existing matching entity in the store, so we don't need to create one.  Just update the transient 'entity' instance with the existing persisted entity we found.
+	            	// An entity's document handler class will throw this exception only if attempting to create (but not actually creating) duplicate is ok -e.g., Permission records.
 	            	//
 	            	entity = wrapDoc.getWrappedObject(); // the handler should have reset the wrapped transient object with the existing persisted entity we just found.
 	            }

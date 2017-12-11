@@ -225,17 +225,26 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 		AbstractServiceContextImpl ctx = (AbstractServiceContextImpl) getServiceContext();
 		MultivaluedMap<String, String> queryParams = getServiceContext().getQueryParams();
 		String markRtSbj = queryParams.getFirst(IQueryManager.MARK_RELATED_TO_CSID_AS_SUBJECT);
-		if (markRtSbj != null && markRtSbj.isEmpty()) {
+		if (Tools.isBlank(markRtSbj)) {
 			markRtSbj = null;
 		}
 		
+		//
+		// We may be being asked to mark the record as related independent of whether it is the subject or object of a relationship.
+		//
 		String markRtSbjOrObj = queryParams.getFirst(IQueryManager.MARK_RELATED_TO_CSID_AS_EITHER);
-		if (markRtSbjOrObj != null && markRtSbjOrObj.isEmpty()) {
+		if (Tools.isBlank(markRtSbjOrObj)) {
 			markRtSbjOrObj = null;
+		} else {
+			if (Tools.isBlank(markRtSbj) == false) {
+				logger.warn(String.format("Ignoring query param %s=%s since overriding query param %s=%s exists.",
+						IQueryManager.MARK_RELATED_TO_CSID_AS_SUBJECT, markRtSbj, IQueryManager.MARK_RELATED_TO_CSID_AS_EITHER, markRtSbjOrObj));
+			}
+			markRtSbj = markRtSbjOrObj; // Mark the record as related independent of whether it is the subject or object of a relationship
 		}
 
 		try {
-			if (markRtSbj != null || markRtSbjOrObj != null) {
+			if (markRtSbj != null) {
 				repoClient = (RepositoryClientImpl) this.getRepositoryClient(ctx);
 				RepositoryClientImpl nuxeoRepoClient = (RepositoryClientImpl) repoClient;
 				repoSession = this.getRepositorySession();
@@ -250,7 +259,7 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 			List<ListResultField> resultsFields = getListItemsArray(); // Get additional list result fields defined in the service bindings
 			int baseFields = NUM_STANDARD_LIST_RESULT_FIELDS;
 			int nFields = resultsFields.size() + NUM_STANDARD_LIST_RESULT_FIELDS;
-			if (markRtSbj != null || markRtSbjOrObj != null) {
+			if (markRtSbj != null) {
 				nFields++;
 				baseFields++;
 			}
@@ -262,7 +271,7 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 			fields[3] = STANDARD_LIST_UPDATED_AT_FIELD;
 			fields[4] = STANDARD_LIST_WORKFLOW_FIELD;
 			
-			if (markRtSbj != null || markRtSbjOrObj != null) {
+			if (markRtSbj != null) {
 				fields[5] = STANDARD_LIST_MARK_RT_FIELD;
 			}
 			
@@ -283,8 +292,8 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 				// If the mark-related query param was set, check to see if the doc we're processing
 				// is related to the value specified in the mark-related query param.
 				//
-				if (markRtSbj != null || markRtSbjOrObj != null) {
-					String relationClause = RelationsUtils.buildWhereClause(markRtSbj, null, null, id, null, markRtSbjOrObj);
+				if (markRtSbj != null) {
+					String relationClause = RelationsUtils.buildWhereClause(markRtSbj, null, null, id, null, markRtSbj == markRtSbjOrObj);
 					String whereClause = relationClause + IQueryManager.SEARCH_QUALIFIER_AND
 							+ NuxeoUtils.buildWorkflowNotDeletedWhereClause();
 					QueryContext queryContext = new QueryContext(ctx, whereClause);
