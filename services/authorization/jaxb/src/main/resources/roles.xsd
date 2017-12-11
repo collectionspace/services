@@ -13,6 +13,8 @@
 		jaxb:extensionBindingPrefixes="hj orm xjc"
     >
 
+    <xs:include schemaLocation="authorization_common.xsd"/>
+
     <!--
     see http://weblogs.java.net/blog/2006/03/03/why-does-jaxb-put-xmlrootelement-sometimes-not-always
     for more details behind xjc:simple
@@ -109,24 +111,24 @@
                     </xs:appinfo>
                 </xs:annotation>
             </xs:element>
-						<xs:element name="metadataProtection" type="xs:string" minOccurs="0" maxOccurs="1">
-								<xs:annotation>
-										<xs:appinfo>
-												<hj:basic>
-														<orm:column name="metadata_protection"  nullable="true"/>
-												</hj:basic>
-										</xs:appinfo>
-								</xs:annotation>
-						</xs:element>
-						<xs:element name="permsProtection" type="xs:string" minOccurs="0" maxOccurs="1">
-								<xs:annotation>
-										<xs:appinfo>
-												<hj:basic>
-														<orm:column name="perms_protection"  nullable="true"/>
-												</hj:basic>
-										</xs:appinfo>
-								</xs:annotation>
-						</xs:element>
+			<xs:element name="metadataProtection" type="xs:string" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+							<xs:appinfo>
+									<hj:basic>
+											<orm:column name="metadata_protection"  nullable="true"/>
+									</hj:basic>
+							</xs:appinfo>
+					</xs:annotation>
+			</xs:element>
+			<xs:element name="permsProtection" type="xs:string" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+							<xs:appinfo>
+									<hj:basic>
+											<orm:column name="perms_protection"  nullable="true"/>
+									</hj:basic>
+							</xs:appinfo>
+					</xs:annotation>
+			</xs:element>
             <xs:element name="createdAt" type="xs:dateTime">
                 <xs:annotation>
                     <xs:appinfo>
@@ -145,6 +147,7 @@
                     </xs:appinfo>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="permission" type="ns:permission_value" minOccurs="1" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="csid" type="xs:string">
             <xs:annotation>
@@ -155,6 +158,7 @@
                 </xs:appinfo>
             </xs:annotation>
         </xs:attribute>
+        
     </xs:complexType>
 </xs:schema>
 

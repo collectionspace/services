@@ -34,8 +34,11 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.common.CollectionSpaceResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.TransactionException;
 import org.collectionspace.services.common.document.ValidatorHandler;
 import org.collectionspace.services.common.security.SecurityContext;
+import org.collectionspace.services.common.storage.TransactionContext;
+import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.config.service.ServiceBindingType;
@@ -406,6 +409,31 @@ public interface ServiceContext<IT, OT> {
 	 * @return The JAX-RS request information
 	 */
 	Request getRequestInfo();
+	
+	/**
+	 * 
+	 */
+	public TransactionContext openConnection() throws TransactionException; // Only 1 active connection at a time
+	
+	/**
+	 * 
+	 */
+	public boolean hasActiveConnection();
+	
+	/**
+	 * 
+	 */
+	public void releaseConnection() throws TransactionException; // Assumes there's been a call to getConnection.
+	
+	/**
+	 * 
+	 */
+	public void setTransactionContext(TransactionContext transactionCtx); // For sharing a transaction context with another service context.
+	
+	/**
+	 * 
+	 */
+	public boolean isTransactionContextShared() throws TransactionException;
 }
 
 

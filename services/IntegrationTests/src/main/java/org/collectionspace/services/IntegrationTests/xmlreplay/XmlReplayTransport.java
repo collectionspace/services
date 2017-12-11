@@ -110,7 +110,9 @@ public class XmlReplayTransport {
         deleteMethod.setRequestHeader("Accept", "multipart/mixed");
         deleteMethod.addRequestHeader("Accept", "application/xml");
         deleteMethod.setRequestHeader("Authorization", formatAuth(authForTest));
-        deleteMethod.setRequestHeader("X-XmlReplay-fromTestID", fromTestID);
+        if (Tools.notBlank(fromTestID)) {
+        	deleteMethod.setRequestHeader("X-XmlReplay-fromTestID", fromTestID);
+        }
         int statusCode1 = 0;
         String res = "";
         try {

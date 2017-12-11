@@ -573,7 +573,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
         RoleClient roleClient = new RoleClient();
         Role role = RoleFactory.createRoleInstance(roleName,
         		roleName, //the display name
-                "role for " + roleName, true);
+                "role for " + roleName, true, RoleFactory.EMPTY_PERMVALUE_LIST);
         setupCreate();
         Response res = roleClient.create(role);
         try {

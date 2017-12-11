@@ -47,7 +47,8 @@ import org.collectionspace.services.authorization.perms.PermissionsList;
 @Consumes({"application/xml"})
 public interface PermissionProxy extends CollectionSpaceProxy<PermissionsList> {
 
-    @GET
+    @Override
+	@GET
     @Produces({"application/xml"})
     Response readList();
 
@@ -62,7 +63,11 @@ public interface PermissionProxy extends CollectionSpaceProxy<PermissionsList> {
     @GET
     @Path("/{csid}")
     Response read(@PathParam("csid") String csid);
-
+    
+    //(R)read
+    @GET
+    Response read(@QueryParam("res") String resourceName, @QueryParam("actGrp") String actionGroup);
+    
     //(U)pdate
     @PUT
     @Path("/{csid}")
