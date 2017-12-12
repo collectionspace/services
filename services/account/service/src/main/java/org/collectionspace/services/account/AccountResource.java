@@ -50,12 +50,16 @@ import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.config.tenant.EmailConfig;
 import org.collectionspace.services.config.tenant.TenantBindingType;
+
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -76,6 +80,7 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.bind.DatatypeConverter;
 
 
 /** AccountResource provides RESTful interface to the account service  */
@@ -222,10 +227,13 @@ public class AccountResource extends SecurityResourceBase {
      *
      * @param ui
      * @return
+     * @throws UnsupportedEncodingException 
+     * @throws DocumentNotFoundException 
+     * @throws IOException 
      */
     @POST
     @Path(PROCESS_PASSWORD_RESET_PATH)
-    public Response processPasswordReset(@Context UriInfo ui) {
+    synchronized public Response processPasswordReset(@Context UriInfo ui) throws UnsupportedEncodingException, DocumentNotFoundException {
     	Response response = null;
 
     	//
@@ -237,19 +245,20 @@ public class AccountResource extends SecurityResourceBase {
         //
         // Get the 'token' and 'password' params
         //
-        String tokenId = queryParams.getFirst("token");
+        String tokenId = queryParams.getFirst(AccountClient.PASSWORD_RESET_TOKEN_QP);
         if (tokenId == null || tokenId.trim().isEmpty()) {
         	response = Response.status(Response.Status.BAD_REQUEST).entity(
         			"The query parameter 'token' is missing or contains no value.").type("text/plain").build();
         	return response;
         }
 
-        String password = queryParams.getFirst("password");
-        if (password == null || password.trim().isEmpty()) {
+        String base64EncodedPassword = queryParams.getFirst(AccountClient.PASSWORD_RESET_PASSWORD_QP);
+        if (base64EncodedPassword == null || base64EncodedPassword.trim().isEmpty()) {
         	response = Response.status(Response.Status.BAD_REQUEST).entity(
         			"The query parameter 'password' is missing or contains no value.").type("text/plain").build();
         	return response;
         }
+        String password = new String(DatatypeConverter.parseBase64Binary(base64EncodedPassword), StandardCharsets.UTF_8);
 
         //
         // Retrieve the token from the DB
@@ -257,6 +266,9 @@ public class AccountResource extends SecurityResourceBase {
         Token token;
 		try {
 			token = TokenStorageClient.get(tokenId);
+			if (token != null && token.isEnabled() == false) {
+				throw new DocumentNotFoundException();
+			}
 		} catch (DocumentNotFoundException e1) {
     		String errMsg = String.format("The token '%s' is not valid or does not exist.",
     				tokenId);
@@ -299,6 +311,7 @@ public class AccountResource extends SecurityResourceBase {
 					accountUpdate.setUserId(targetAccount.getUserId());
 					accountUpdate.setPassword(password.getBytes());
 					updateAccount(ui, targetAccount.getCsid(), accountUpdate);
+					TokenStorageClient.update(tokenId, false); // disable the token so it can't be used again.
 					String msg = String.format("Successfully reset password using token ID='%s'.",
 							token.getId());
 		        	response = Response.status(Response.Status.OK).entity(msg).type("text/plain").build();
