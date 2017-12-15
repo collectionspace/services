@@ -29,11 +29,11 @@ import java.util.UUID;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 
 import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.CSpaceAction;
+import org.collectionspace.services.authorization.RolesList;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionAction;
 import org.collectionspace.services.authorization.perms.PermissionsList;
@@ -49,6 +49,7 @@ import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +58,7 @@ import org.slf4j.LoggerFactory;
  * @author 
  */
 public class PermissionDocumentHandler
-		extends JpaDocumentHandler<Permission, PermissionsList, Permission, List> {
+		extends JpaDocumentHandler<Permission, PermissionsList, Permission, List<Permission>> {
 
     private final Logger logger = LoggerFactory.getLogger(PermissionDocumentHandler.class);
     private Permission permission;
@@ -241,7 +242,7 @@ public class PermissionDocumentHandler
     }
 
     @Override
-    public void handleGetAll(DocumentWrapper<List> wrapDoc) throws Exception {
+    public void handleGetAll(DocumentWrapper<List<Permission>> wrapDoc) throws Exception {
         PermissionsList permissionsList = extractCommonPartList(wrapDoc);
         setCommonPartList(permissionsList);
         getServiceContext().setOutput(getCommonPartList());
@@ -251,6 +252,32 @@ public class PermissionDocumentHandler
     public void completeDelete(DocumentWrapper<Permission> wrapDoc) throws Exception {
     }
 
+    /*
+     * See https://issues.collectionspace.org/browse/DRYD-181
+     * 
+     * For backward compatibility, we could not change the permission list to be a child class of AbstractCommonList.  This
+     * would have change the result payload and would break existing API clients.  So the best we can do, it treat
+     * the role list payload as a special case and return the paging information.
+     * 
+     */
+	protected PermissionsList extractPagingInfoForPerms(PermissionsList permList, DocumentWrapper<List<Permission>> wrapDoc)
+            throws Exception {
+
+        DocumentFilter docFilter = this.getDocumentFilter();
+        long pageSize = docFilter.getPageSize();
+        long pageNum = pageSize != 0 ? docFilter.getOffset() / pageSize : pageSize;
+        // set the page size and page number
+        permList.setPageNum(pageNum);
+        permList.setPageSize(pageSize);
+        List<Permission> docList = wrapDoc.getWrappedObject();
+        // Set num of items in list. this is useful to our testing framework.
+        permList.setItemsInPage(docList.size());
+        // set the total result size
+        permList.setTotalItems(docFilter.getTotalItemsResult());
+
+        return permList;
+    }
+	
     @Override
     public Permission extractCommonPart(
             DocumentWrapper<Permission> wrapDoc)
@@ -266,10 +293,10 @@ public class PermissionDocumentHandler
 
     @Override
     public PermissionsList extractCommonPartList(
-            DocumentWrapper<List> wrapDoc)
+            DocumentWrapper<List<Permission>> wrapDoc)
             throws Exception {
 
-        PermissionsList permissionsList = new PermissionsList();
+    	PermissionsList permissionsList = extractPagingInfoForPerms(new PermissionsList(), wrapDoc);
         List<Permission> list = new ArrayList<Permission>();
         permissionsList.setPermission(list);
         for (Object obj : wrapDoc.getWrappedObject()) {
@@ -277,6 +304,7 @@ public class PermissionDocumentHandler
             sanitize(permission);
             list.add(permission);
         }
+        
         return permissionsList;
     }
 

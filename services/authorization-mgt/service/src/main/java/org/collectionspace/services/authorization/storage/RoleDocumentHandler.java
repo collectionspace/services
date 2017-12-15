@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.collectionspace.services.account.AccountsCommonList;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionRoleSubResource;
 import org.collectionspace.services.authorization.PermissionValue;
@@ -45,7 +46,7 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
-
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +55,7 @@ import org.slf4j.LoggerFactory;
  * @author 
  */
 public class RoleDocumentHandler
-		extends JpaDocumentHandler<Role, RolesList, Role, List> {
+		extends JpaDocumentHandler<Role, RolesList, Role, List<Role>> {
     private final Logger logger = LoggerFactory.getLogger(RoleDocumentHandler.class);
     private Role role;
     private RolesList rolesList;
@@ -170,9 +171,9 @@ public class RoleDocumentHandler
 
     @Override
     public void completeUpdate(DocumentWrapper<Role> wrapDoc) throws Exception {
-        Role upAcc = wrapDoc.getWrappedObject();
-        getServiceContext().setOutput(upAcc);
-        sanitize(upAcc);
+        Role updatedRole = wrapDoc.getWrappedObject();
+        getServiceContext().setOutput(updatedRole);
+        sanitize(updatedRole);
     }
 
     @Override
@@ -183,7 +184,7 @@ public class RoleDocumentHandler
     }
 
     @Override
-    public void handleGetAll(DocumentWrapper<List> wrapDoc) throws Exception {
+    public void handleGetAll(DocumentWrapper<List<Role>> wrapDoc) throws Exception {
         RolesList rolesList = extractCommonPartList(wrapDoc);
         setCommonPartList(rolesList);
         getServiceContext().setOutput(getCommonPartList());
@@ -213,19 +214,44 @@ public class RoleDocumentHandler
         throw new UnsupportedOperationException("operation not relevant for AccountDocumentHandler");
     }
 
-    @Override
-    public RolesList extractCommonPartList(
-            DocumentWrapper<List> wrapDoc)
+    /*
+     * See https://issues.collectionspace.org/browse/DRYD-181
+     * 
+     * For backward compatibility, we could not change the role list to be a child class of AbstractCommonList.  This
+     * would have change the result payload and would break existing API clients.  So the best we can do, it treat
+     * the role list payload as a special case and return the paging information.
+     * 
+     */
+	protected RolesList extractPagingInfoForRoles(RolesList roleList, DocumentWrapper<List<Role>> wrapDoc)
             throws Exception {
 
-        RolesList rolesList = new RolesList();
+        DocumentFilter docFilter = this.getDocumentFilter();
+        long pageSize = docFilter.getPageSize();
+        long pageNum = pageSize != 0 ? docFilter.getOffset() / pageSize : pageSize;
+        // set the page size and page number
+        roleList.setPageNum(pageNum);
+        roleList.setPageSize(pageSize);
+        List<Role> docList = wrapDoc.getWrappedObject();
+        // Set num of items in list. this is useful to our testing framework.
+        roleList.setItemsInPage(docList.size());
+        // set the total result size
+        roleList.setTotalItems(docFilter.getTotalItemsResult());
+
+        return roleList;
+    }
+	
+    @Override
+    public RolesList extractCommonPartList(
+            DocumentWrapper<List<Role>> wrapDoc) throws Exception {
+
+        RolesList rolesList = extractPagingInfoForRoles(new RolesList(), wrapDoc);        
         List<Role> list = new ArrayList<Role>();
         rolesList.setRole(list);
-        for (Object obj : wrapDoc.getWrappedObject()) {
-            Role role = (Role) obj;
+        for (Role role : wrapDoc.getWrappedObject()) {
             sanitize(role);
             list.add(role);
         }
+        
         return rolesList;
     }
 
