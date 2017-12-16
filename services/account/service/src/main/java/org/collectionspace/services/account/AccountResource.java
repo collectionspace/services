@@ -26,6 +26,7 @@ package org.collectionspace.services.account;
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.account.storage.AccountStorageClient;
 import org.collectionspace.services.account.storage.csidp.TokenStorageClient;
+import org.collectionspace.services.authentication.Passwordreset;
 import org.collectionspace.services.authentication.Token;
 import org.collectionspace.services.authorization.AccountPermission;
 import org.collectionspace.services.authorization.AccountRole;
@@ -234,10 +235,7 @@ public class AccountResource extends SecurityResourceBase {
      */
     @POST
     @Path(PROCESS_PASSWORD_RESET_PATH)
-    @Consumes("application/x-www-form-urlencoded")
-    synchronized public Response processPasswordReset(@Context UriInfo ui, 
-    		@FormParam("token") String tokenId,
-    		@FormParam("password") String base64EncodedPassword) throws UnsupportedEncodingException, DocumentNotFoundException {
+    synchronized public Response processPasswordReset(Passwordreset passwordreset, @Context UriInfo ui) throws UnsupportedEncodingException, DocumentNotFoundException {
     	Response response = null;
 
     	//
@@ -249,12 +247,14 @@ public class AccountResource extends SecurityResourceBase {
         //
         // Get the 'token' and 'password' params
         //
+        String tokenId = passwordreset.getToken();
         if (tokenId == null || tokenId.trim().isEmpty()) {
         	response = Response.status(Response.Status.BAD_REQUEST).entity(
         			"The query parameter 'token' is missing or contains no value.").type("text/plain").build();
         	return response;
         }
 
+        String base64EncodedPassword = passwordreset.getPassword();
         if (base64EncodedPassword == null || base64EncodedPassword.trim().isEmpty()) {
         	response = Response.status(Response.Status.BAD_REQUEST).entity(
         			"The query parameter 'password' is missing or contains no value.").type("text/plain").build();
