@@ -89,6 +89,24 @@
         </xs:complexType>
     </xs:element>
     
+    <!-- Non-persistent JaxB object for password reset POST requsts -->
+    <xs:element name="passwordreset">
+	    <xs:complexType>
+	        <xs:annotation>
+	            <xs:appinfo>
+	                <hj:ignored/>
+	            </xs:appinfo>
+	        </xs:annotation>
+	        <xs:sequence>
+	            <xs:annotation>
+	                <xs:documentation>The payload for a password reset request</xs:documentation>
+	            </xs:annotation>
+				<xs:element name="token" type="xs:string"/>
+				<xs:element name="password" type="xs:string"/>
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+    
     <xs:element name="token">
         <xs:complexType>
             <xs:annotation>

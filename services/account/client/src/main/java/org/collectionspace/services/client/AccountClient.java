@@ -46,6 +46,8 @@ public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList,
     public static final String SERVICE_COMMON_PART_NAME = SERVICE_NAME + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
     public final static String IMMUTABLE = "immutable";
     public final static String EMAIL_QUERY_PARAM = "email";
+	public static final String PASSWORD_RESET_TOKEN_QP = "token";
+	public static final String PASSWORD_RESET_PASSWORD_QP = "password";
 
 	public AccountClient() throws Exception {
 		super();

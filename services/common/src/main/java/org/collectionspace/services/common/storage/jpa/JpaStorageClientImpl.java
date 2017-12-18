@@ -272,7 +272,11 @@ public class JpaStorageClientImpl implements StorageClient {
             //FIXME is transaction required for get?
             em.getTransaction().begin();
             List list = q.getResultList();
+            long totalItems = getTotalItems(em, ctx, handler); // Find out how many items our query would find independent of the paging restrictions
             em.getTransaction().commit();
+            
+            docFilter.setTotalItemsResult(totalItems); // Save the items total in the doc filter for later reporting
+
             DocumentWrapper<List> wrapDoc = new DocumentWrapperImpl<List>(list);
             handler.handle(Action.GET_ALL, wrapDoc);
             handler.complete(Action.GET_ALL, wrapDoc);
@@ -290,7 +294,31 @@ public class JpaStorageClientImpl implements StorageClient {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * Return the COUNT for a query to find the total number of matches independent of the paging restrictions.
+     */
+    private long getTotalItems(EntityManager em, ServiceContext ctx, DocumentHandler handler) {
+    	long result = -1;
+    	
+        DocumentFilter docFilter = handler.getDocumentFilter();
+        StringBuilder queryStrBldr = new StringBuilder("SELECT COUNT(*) FROM ");
+        queryStrBldr.append(getEntityName(ctx));
+        queryStrBldr.append(" a");
+        
+        List<DocumentFilter.ParamBinding> params = docFilter.buildWhereForSearch(queryStrBldr);
+        String queryStr = queryStrBldr.toString();
+        Query q = em.createQuery(queryStr);
+        //bind parameters
+        for (DocumentFilter.ParamBinding p : params) {
+            q.setParameter(p.getName(), p.getValue());
+        }
+
+        result = (long) q.getSingleResult();
+
+        return result;
+    }
+
+	/* (non-Javadoc)
      * @see org.collectionspace.services.common.storage.StorageClient#update(org.collectionspace.services.common.context.ServiceContext, java.lang.String, org.collectionspace.services.common.document.DocumentHandler)
      */
     @Override

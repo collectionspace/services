@@ -37,6 +37,7 @@ import javax.persistence.Query;
 
 import org.collectionspace.services.authentication.Token;
 import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.security.SecurityUtils;
@@ -93,14 +94,7 @@ public class TokenStorageClient {
         
         try {
             EntityManager em = emf.createEntityManager();
-            em.getTransaction().begin();
-	        tokenFound = em.find(Token.class, id);
-            em.getTransaction().commit();
-	        if (tokenFound == null) {
-	            String msg = "Could not find token with ID=" + id;
-	            logger.error(msg);
-	            throw new DocumentNotFoundException(msg);
-	        }
+            tokenFound = get(em, id);
         } finally {
             if (emf != null) {
                 JpaStorageUtils.releaseEntityManagerFactory(emf);
@@ -117,27 +111,50 @@ public class TokenStorageClient {
      */
     static public void update(String id, boolean enabledFlag) throws DocumentNotFoundException {
         EntityManagerFactory emf = JpaStorageUtils.getEntityManagerFactory();
-        Token tokenFound = null;
+        EntityManager em = null;
         
+        Token tokenFound = null;
         try {
-            EntityManager em = emf.createEntityManager();
-	        tokenFound = get(id);
-	        if (id != null) {
+            em = emf.createEntityManager();
+	        tokenFound = get(em, id);
+	        if (tokenFound != null) {
+	            em.getTransaction().begin();
 	            tokenFound.setEnabled(enabledFlag);
 	            tokenFound.setUpdatedAtItem(new Date());
 	            if (logger.isDebugEnabled()) {
 	                logger.debug("Updated token=" + JaxbUtils.toString(tokenFound, Token.class));
 	            }
-	            em.persist(tokenFound);
+	            em.getTransaction().commit();
+	        } else {
+	        	String msg = String.format("Could not find token with id='%s'", id);
+	        	throw new DocumentNotFoundException(msg);
 	        }
         } finally {
+        	if (em != null && em.isOpen()) {
+        		em.close();
+        	}
             if (emf != null) {
                 JpaStorageUtils.releaseEntityManagerFactory(emf);
             }
         }        
     }
 
-    /**
+    public static Token get(EntityManager em, String id) throws DocumentNotFoundException {
+        Token tokenFound = null;
+        
+        em.getTransaction().begin();
+        tokenFound = em.find(Token.class, id);
+        em.getTransaction().commit();
+        if (tokenFound == null) {
+            String msg = "Could not find token with ID=" + id;
+            logger.error(msg);
+            throw new DocumentNotFoundException(msg);
+        }
+        
+        return tokenFound;
+    }
+
+	/**
      * Deletes the token with given id
      * @param id
      * @throws Exception if user for given userId not found

@@ -41,6 +41,11 @@
 	            <xs:annotation>
 	                <xs:documentation>permission configuration list</xs:documentation>
 	            </xs:annotation>
+				<xs:element name="pageNum" type="xs:unsignedInt"/>
+				<xs:element name="pageSize" type="xs:unsignedInt"/>
+				<!-- "itemsInPage" is useful to our testing framework's unit tests -->
+				<xs:element name="itemsInPage" type="xs:unsignedInt"/>
+				<xs:element name="totalItems" type="xs:unsignedInt"/>	            
 	            <xs:element name="permission" type="ns:permission" minOccurs="1" maxOccurs="unbounded"/>
 	        </xs:sequence>
 	    </xs:complexType>
