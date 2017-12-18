@@ -123,6 +123,13 @@
             <fileset dir="${basedir}/lib/spring"/>
         </copy>
     </target>
+	
+	<target name="deploy_aspectj"
+            description="deploy AspectJ binaries in ${jee.server.cspace}">
+        <copy todir="${jee.server.cspace}/lib">
+            <fileset dir="${basedir}/lib/aspectj"/>
+        </copy>
+    </target>
 
     <target name="deploy_slf4j"
             description="deploy spring binaries in ${jee.server.cspace}">
@@ -172,6 +179,7 @@
         <copy todir="${jee.server.cspace}/conf"
               file="${src}/main/cspace/config/log/jboss-log4j-release.xml"/>
 		-->
+		<antcall target="deploy_aspectj" />
         <antcall target="deploy_spring" />
         <antcall target="deploy_slf4j" />
         <antcall target="deploy_xmlmerge" />
@@ -180,7 +188,8 @@
 
     <target name="undeploy"
             description="undeploy common elements from ${jee.server.cspace}">
-        <antcall target="undeploy_spring" />
+        <antcall target="undeploy_aspectj" />
+		<antcall target="undeploy_spring" />
 		<antcall target="undeploy_slf4j" />
 		<antcall target="undeploy_xmlmerge" />
 		<!--
@@ -204,6 +213,13 @@
             <fileset dir="${jee.server.cspace}/lib" includes="org.springframework.*.jar"/>
             <fileset dir="${jee.server.cspace}/lib" includes="spring-*.jar"/>
             <fileset dir="${jee.server.cspace}/lib" includes="stax2-api-*.jar"/>
+        </delete>
+    </target>
+	
+	<target name="undeploy_aspectj"
+            description="undeploy AspectJ binaries from ${jee.server.cspace}">
+        <delete>
+            <fileset dir="${jee.server.cspace}/lib" includes="aspectj*-*.jar"/>
         </delete>
     </target>
 	

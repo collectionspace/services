@@ -208,4 +208,8 @@
     <bean id="userAttributeFilter"
         class="org.collectionspace.authentication.spring.CSpaceUserAttributeFilter">
     </bean>
+    
+    <!-- Switches on the AOP (AspectJ) load-time weaving -->
+    <context:load-time-weaver/>
+    
 </beans>

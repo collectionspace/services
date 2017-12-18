@@ -50,7 +50,7 @@ public abstract class JpaDocumentHandler<T, TL, WT, WLT>
         // Set num of items in list. this is useful to our testing framework.
         commonList.setItemsInPage(docList.size());
         // set the total result size
-        commonList.setTotalItems(docList.size());
+        commonList.setTotalItems(docFilter.getTotalItemsResult());
 
         return (TL) commonList;
     }

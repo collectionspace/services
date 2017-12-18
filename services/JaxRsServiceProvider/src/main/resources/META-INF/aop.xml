@@ -1,0 +1,14 @@
+<!DOCTYPE aspectj PUBLIC
+        "-//AspectJ//DTD//EN" "http://www.eclipse.org/aspectj/dtd/aspectj.dtd">
+<aspectj>
+    <weaver>
+        <!-- only weave classes in our application-specific packages -->
+        <include within="org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.*"/> 
+        <include within="org.collectionspace.services.aspect.*"/>
+    </weaver>
+    
+    <aspects>        
+        <!-- weave in just this aspect -->        
+        <aspect name="org.collectionspace.services.aspect.HyperJaxb3TimezoneAspect"/>
+    </aspects>
+</aspectj>

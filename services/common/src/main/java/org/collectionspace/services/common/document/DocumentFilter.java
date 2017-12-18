@@ -61,6 +61,11 @@ public abstract class DocumentFilter {
     /** The page size. */
     protected int pageSize;			// Pagination limit for list results
     
+    /** The total number of items for a query result -independent of paging restrictions.
+     * 
+     */
+    protected long totalItemsResult = -1;
+    
     //queryParams is not initialized as it would require a multi-valued map implementation
     //unless it is used from opensource lib...this variable holds ref to
     //implementation available in JBoss RESTeasy
@@ -515,4 +520,18 @@ public abstract class DocumentFilter {
     protected String getTenantId() {
         return AuthN.get().getCurrentTenantId();
     }
+
+    /*
+     * Used to set the total number of items matching a query -independent of the paging restrictions.
+     */
+	public void setTotalItemsResult(long totalItems) {
+		totalItemsResult = totalItems;
+	}
+	
+    /*
+     * Used to get the total number of items matching the last query made -independent of the paging restrictions.
+     */	
+	public long getTotalItemsResult() {
+		return totalItemsResult;
+	}	
 }
