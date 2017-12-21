@@ -171,12 +171,12 @@ public class ServiceMain {
     	// set our root directory
     	setServerRootDir();
     	
-    	// read in and set our Services config
+		// read in and set our Services config
     	readAndSetServicesConfig();
-    	
+
     	// Set our AuthN's datasource to for the cspaceDataSource
     	AuthN.setDataSource(JDBCTools.getDataSource(JDBCTools.CSPACE_DATASOURCE_NAME));
-    	
+    	    	
     	// In each tenant, set properties that don't already have values
     	// to their default values.
         propagateConfiguredProperties();
@@ -219,39 +219,42 @@ public class ServiceMain {
         //
         //
         initializeEventListeners();        
-                
+        
         //
-        // Create all the default user accounts and permissions.  Since some of our "cspace" database config files
+        // Mark if a tenant's bindings have changed since the last time we started, by comparing the MD5 hash of each tenant's bindings with that of
+        // the bindings the last time we started/launch.
+        //
+        String cspaceDatabaseName = getCspaceDatabaseName();
+        Hashtable<String, TenantBindingType> tenantBindings = tenantBindingConfigReader.getTenantBindings();
+        for (String tenantId : tenantBindings.keySet()) {
+	        TenantBindingType tenantBinding = tenantBindings.get(tenantId);
+	        String persistedMD5Hash = AuthorizationCommon.getPersistedMD5Hash(tenantId, cspaceDatabaseName);
+	        String currentMD5Hash = tenantBinding.getConfigMD5Hash();
+	    	AuthorizationCommon.setTenantConfigMD5Hash(tenantId, currentMD5Hash); // store this for later.  We'll persist this info with the tenant record.
+	        tenantBinding.setConfigChangedSinceLastStart(hasConfigChanged(tenantBinding, persistedMD5Hash, currentMD5Hash));
+        }
+        
+        //
+        // Create all the tenant records, default user accounts, roles, and permissions.  Since some of our "cspace" database config files
         // for Spring need to be created at build time, the "cspace" database already will be suffixed with the
         // correct 'cspaceInstanceId' so we don't need to pass it to the JDBCTools methods.
         //        
 		try {
-			AuthorizationCommon.createDefaultWorkflowPermissions(tenantBindingConfigReader);
-			String cspaceDatabaseName = getCspaceDatabaseName();
 			DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType(JDBCTools.CSPACE_DATASOURCE_NAME,
-					cspaceDatabaseName);
-			AuthorizationCommon.createDefaultAccounts(tenantBindingConfigReader, databaseProductType,
-					cspaceDatabaseName);
+					cspaceDatabaseName);    	
+
+			AuthorizationCommon.createTenants(tenantBindingConfigReader, databaseProductType, cspaceDatabaseName);
+			AuthorizationCommon.createDefaultWorkflowPermissions(tenantBindingConfigReader, databaseProductType, cspaceDatabaseName);
+			AuthorizationCommon.createDefaultAccounts(tenantBindingConfigReader, databaseProductType, cspaceDatabaseName);
+			AuthorizationCommon.persistTenantBindingsMD5Hash(tenantBindingConfigReader, databaseProductType, cspaceDatabaseName);
 		} catch (Exception e) {
-			logger.error("Default accounts and permissions setup failed with exception(s): " +
+			logger.error("Default create/update of tenants, accounts, roles and permissions setup failed with exception(s): " +
 					e.getLocalizedMessage(), e);
 			throw e;
 		}
-		
 		//
-		// Ensure default vocabulary and authority instances and their corresponding terms exist.
+		// Log tenant status -shows all tenants' info and active status.
 		//
-//		initializeVocabularies();
-//		initializeAuthorities();
-        
-        /*
-         * This might be useful for something, but the reader grants are better handled in the ReportPostInitHandler.
-        try {
-        	handlePostNuxeoInitDBTasks();
-        } catch(Throwable e) {        	
-        	logger.error("handlePostNuxeoInitDBTasks failed with exception(s): " + e.getLocalizedMessage(), e);
-        }
-        */
 		showTenantStatus();
     }
         
@@ -398,6 +401,25 @@ public class ServiceMain {
         tenantBindingConfigReader = new TenantBindingConfigReaderImpl(getServerRootDir()); 
         tenantBindingConfigReader.read(useAppGeneratedBindings);
     }
+    
+    /*
+     * Returns 'true' if the tenant bindings have change since we last started up the Services layer of if the 'forceUpdate' field in the bindings
+     * has been set to 'true'
+     * 
+     */
+	private static boolean hasConfigChanged(TenantBindingType tenantBinding, String persistedMD5Hash,
+			String currentMD5Hash) {
+		boolean result = false;
+		
+		if (persistedMD5Hash == null || tenantBinding.isForceUpdate() == true) {
+			result = true;
+		} else {
+			result = !persistedMD5Hash.equals(currentMD5Hash);  // if the two hashes don't match, the tenant bindings have changed so we'll return 'true'
+		}
+		
+		return result;
+	}
+    
 
     private void propagateConfiguredProperties() {
         List<PropertyType> repoPropListHolder =

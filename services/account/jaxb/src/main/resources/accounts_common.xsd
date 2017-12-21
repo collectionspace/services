@@ -325,6 +325,15 @@
 						</xs:appinfo>
 					</xs:annotation>
 				</xs:element>
+				<xs:element name="configMD5Hash" type="xs:string">
+					<xs:annotation>
+						<xs:appinfo>
+							<hj:basic>
+								<orm:column name="config_md5hash"/>
+							</hj:basic>
+						</xs:appinfo>
+					</xs:annotation>
+				</xs:element>				
 				<xs:element name="authoritiesInitialized" type="xs:boolean">
 					<xs:annotation>
 						<xs:appinfo>
