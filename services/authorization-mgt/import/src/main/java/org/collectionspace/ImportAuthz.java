@@ -35,6 +35,8 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.collectionspace.services.authorization.driver.AuthorizationSeedDriver;
+import org.collectionspace.services.common.document.TransactionException;
+import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,11 +139,12 @@ public class ImportAuthz {
     //
     // Create our AuthZ metadata
     //
-    public static void main(String[] args) {
+    public static void main(String[] args) throws TransactionException {
 
         Options options = createOptions();
 
         CommandLineParser parser = new GnuParser();
+        JPATransactionContext jpaTransactionContext = new JPATransactionContext();
         try {
             // parse the command line arguments
             CommandLine line = parser.parse(options, args);
@@ -160,20 +163,24 @@ public class ImportAuthz {
             //
             AuthorizationSeedDriver driver = new AuthorizationSeedDriver(
                     user, password, tenantBinding, exportDir);
-            driver.generate();
+        	jpaTransactionContext.beginTransaction();
+            driver.generate(jpaTransactionContext);
             logger.info("Finished processing all tenant bindings files and generating all AuthN/AuthZ metadata.");
             //
             // If the "-g" option was set, then we will NOT seed the AuthZ tables.  Instead, we'll
             // just merge the prototypical tenant bindings and generate the permissions XML output
             //
             if (generateOnly(generate_only) == false) {
-            	driver.seed();
+            	driver.seed(jpaTransactionContext);
             } else {
             	logError("WARNING: '-g' was set to 'true' so AuthZ tables were ***NOT*** seeded.");
             }
+            jpaTransactionContext.commitTransaction();
         } catch (ParseException exp) {
+        	jpaTransactionContext.markForRollback();
         	logError("Parsing failed.  Reason: " + exp.getMessage());
         } catch (Exception e) {
+        	jpaTransactionContext.markForRollback();
         	logError("Error : " + e.getMessage());
         	logError(MSG_SEPARATOR);
             printUsage(System.err);
@@ -181,6 +188,8 @@ public class ImportAuthz {
             logError("Import failed: ");
             logInitialErrorCauseMsg(e);
             System.exit(1);
+        } finally {
+        	jpaTransactionContext.close();
         }
     }
 }

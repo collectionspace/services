@@ -44,6 +44,7 @@ import org.collectionspace.services.authorization.URIResourceImpl;
 import org.collectionspace.services.common.authorization_mgt.PermissionRoleUtil;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,25 +67,27 @@ public class AuthorizationDelegate {
      * @see PermissionRole
      */
     public static void addPermissions(ServiceContext ctx, PermissionRole pr) throws Exception {
+    	JPATransactionContext jpaTransactionContext = (JPATransactionContext) ctx.getCurrentTransactionContext();
+    	
         SubjectType subject = PermissionRoleUtil.getRelationSubject(ctx, pr);
         AuthZ authz = AuthZ.get();
         if (subject.equals(SubjectType.ROLE)) {
             PermissionValue pv = pr.getPermission().get(0);
-            Permission p = getPermission(pv.getPermissionId());
+            Permission p = getPermission(jpaTransactionContext, pv.getPermissionId());
             if (p == null) {
                 String msg = "addPermissions: No permission found for id=" + pv.getPermissionId();
                 logger.error(msg);
                 throw new DocumentNotFoundException(msg);
             }
             CSpaceResource[] resources = getResources(p);
-            String[] roles = getRoles(pr.getRole());
+            String[] roles = getRoles(jpaTransactionContext, pr.getRole());
             for (CSpaceResource res : resources) {
                 boolean grant = p.getEffect().equals(EffectType.PERMIT) ? true : false;
                 authz.addPermissions(res, roles, grant);
             }
         } else if (SubjectType.PERMISSION.equals(subject)) {
             RoleValue rv = pr.getRole().get(0);
-            Role r = getRole(rv.getRoleId());
+            Role r = getRole(jpaTransactionContext, rv.getRoleId());
             if (r == null) {
                 String msg = "addPermissions: No role found for id=" + rv.getRoleId();
                 logger.error(msg);
@@ -94,7 +97,7 @@ public class AuthorizationDelegate {
             // This needs to use the qualified name, not the display name
             String[] roles = {r.getRoleName()};
             for (PermissionValue pv : pr.getPermission()) {
-                Permission p = getPermission(pv.getPermissionId());
+                Permission p = getPermission(jpaTransactionContext, pv.getPermissionId());
                 if (p == null) {
                     String msg = "addPermissions: No permission found for id=" + pv.getPermissionId();
                     logger.error(msg);
@@ -118,20 +121,22 @@ public class AuthorizationDelegate {
      */
     public static void deletePermissions(ServiceContext ctx, PermissionRole pr)
             throws Exception {
+    	JPATransactionContext jpaTransactionContext = (JPATransactionContext) ctx.getCurrentTransactionContext();
+
         SubjectType subject = PermissionRoleUtil.getRelationSubject(ctx, pr);
         AuthZ authz = AuthZ.get();
         if (subject.equals(SubjectType.ROLE)) {
         	List<PermissionValue> permissionValues = pr.getPermission();
         	if (permissionValues != null & permissionValues.size() > 0) {
 	            PermissionValue pv = permissionValues.get(0);
-	            Permission p = getPermission(pv.getPermissionId());
+	            Permission p = getPermission(jpaTransactionContext, pv.getPermissionId());
 	            if (p == null) {
 	                String msg = "deletePermissions: No permission found for id=" + pv.getPermissionId();
 	                logger.error(msg);
 	                throw new DocumentNotFoundException(msg);
 	            }
 	            CSpaceResource[] resources = getResources(p);
-	            String[] roles = getRoles(pr.getRole());
+	            String[] roles = getRoles(jpaTransactionContext, pr.getRole());
 	            for (CSpaceResource res : resources) {
 	                authz.deletePermissions(res, roles);
 	            }
@@ -140,7 +145,7 @@ public class AuthorizationDelegate {
         	List<RoleValue> roleValues = pr.getRole();
         	if (roleValues != null && roleValues.size() > 0) {
 	            RoleValue rv = roleValues.get(0);
-	            Role r = getRole(rv.getRoleId());
+	            Role r = getRole(jpaTransactionContext, rv.getRoleId());
 	            if (r == null) {
 	                String msg = "deletePermissions: No role found for id=" + rv.getRoleId();
 	                logger.error(msg);
@@ -150,7 +155,7 @@ public class AuthorizationDelegate {
 	            // This needs to use the qualified name, not the display name
 	            String[] roles = {r.getRoleName()}; 
 	            for (PermissionValue pv : pr.getPermission()) {
-	                Permission p = getPermission(pv.getPermissionId());
+	                Permission p = getPermission(jpaTransactionContext, pv.getPermissionId());
 	                if (p == null) {
 	                    String msg = "deletePermissions: No permission found for id=" + pv.getPermissionId();
 	                    logger.error(msg);
@@ -175,8 +180,8 @@ public class AuthorizationDelegate {
     //the Spring ACL instead of ACE(s) that is associated with each role
     //the ACL might be needed for other ACEs (including those for ROLE_ADMINISTRATOR,
     //ROLE_TENANT_ADMINISTRATOR, etc.)...
-    static public void deletePermissions(String permCsid) throws Exception {
-        Permission p = getPermission(permCsid);
+    static public void deletePermissions(JPATransactionContext jpaTransactionContext, String permCsid) throws Exception {
+        Permission p = getPermission(jpaTransactionContext, permCsid);
         if (p == null) {
             String msg = "deletePermissions: No permission found for id=" + permCsid;
             logger.error(msg);
@@ -202,11 +207,11 @@ public class AuthorizationDelegate {
      * @return string array with role names
      * @see RoleValue
      */
-    private static String[] getRoles(List<RoleValue> rvl)
+    private static String[] getRoles(JPATransactionContext jpaTransactionContext, List<RoleValue> rvl)
     		throws DocumentNotFoundException {
         List<String> rvls = new ArrayList<String>();
         for (RoleValue rv : rvl) {
-            Role r = getRole(rv.getRoleId());
+            Role r = getRole(jpaTransactionContext, rv.getRoleId());
             if (r == null) {
                 String msg = "getRoles: No role found for id=" + rv.getRoleId();
                 logger.error(msg);
@@ -215,6 +220,7 @@ public class AuthorizationDelegate {
             }
             rvls.add(r.getRoleName());
         }
+        
         return rvls.toArray(new String[0]);
     }
 
@@ -242,17 +248,15 @@ public class AuthorizationDelegate {
         return rl.toArray(new CSpaceResource[0]);
     }
 
-    private static Permission getPermission(String permCsid)
+    private static Permission getPermission(JPATransactionContext jpaTransactionContext, String permCsid)
     		throws DocumentNotFoundException {
-        Permission p = (Permission) JpaStorageUtils.getEntity(permCsid,
+        Permission p = (Permission) JpaStorageUtils.getEntity(jpaTransactionContext, permCsid,
                 Permission.class);
         return p;
     }
 
-    private static Role getRole(String roleCsid)
-    		throws DocumentNotFoundException {
-        Role r = (Role) JpaStorageUtils.getEntity(roleCsid,
-                Role.class);
+    private static Role getRole(JPATransactionContext jpaTransactionContext, String roleCsid) throws DocumentNotFoundException {
+        Role r = (Role) JpaStorageUtils.getEntity(jpaTransactionContext, roleCsid, Role.class);
         return r;
     }
 

@@ -32,9 +32,15 @@ import org.collectionspace.services.account.AccountTenant;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
 import org.collectionspace.services.account.AccountListItem;
+import org.collectionspace.services.account.AccountRoleSubResource;
 import org.collectionspace.services.account.Status;
-
+import org.collectionspace.services.authorization.AccountRole;
+import org.collectionspace.services.authorization.AccountValue;
+import org.collectionspace.services.authorization.SubjectType;
+import org.collectionspace.services.account.RoleValue;
 import org.collectionspace.services.client.AccountClient;
+import org.collectionspace.services.client.AccountFactory;
+import org.collectionspace.services.client.AccountRoleFactory;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -50,7 +56,7 @@ import org.slf4j.LoggerFactory;
  * @author 
  */
 public class AccountDocumentHandler
-        extends JpaDocumentHandler<AccountsCommon, AccountsCommonList, AccountsCommon, List> {
+        extends JpaDocumentHandler<AccountsCommon, AccountsCommonList, AccountsCommon, List<AccountsCommon>> {
 
     private final Logger logger = LoggerFactory.getLogger(AccountDocumentHandler.class);
     private AccountsCommon account;
@@ -73,8 +79,31 @@ public class AccountDocumentHandler
         AccountsCommon accountFound = wrapDoc.getWrappedObject();
         AccountsCommon accountReceived = getCommonPart();
         // If marked as metadata immutable, do not do update
-        if(!AccountClient.IMMUTABLE.equals(accountFound.getMetadataProtection())) {
+        if (!AccountClient.IMMUTABLE.equals(accountFound.getMetadataProtection())) {
         	merge(accountReceived, accountFound);
+        }
+        //
+        // Update the accountroles if supplied
+        //
+        List<RoleValue> roleValueList = accountReceived.getRole();
+        if (roleValueList != null && roleValueList.size() > 0) {
+			AccountRoleSubResource subResource = 
+					new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
+			//
+			// First, delete the exist accountroles
+			//
+			subResource.deleteAccountRole(getServiceContext(), accountFound.getCsid(), SubjectType.ROLE);
+			//
+			// Next, create the new accountroles
+			//
+			AccountRole accountRole = AccountRoleFactory.createAccountRoleInstance(accountFound, 
+					roleValueList, true, true);
+			String accountRoleCsid = subResource.createAccountRole(getServiceContext(), accountRole, SubjectType.ROLE);
+			//
+			// Finally, set the updated role list in the result
+			//
+			AccountRole newAccountRole = subResource.getAccountRole(getServiceContext(), accountFound.getCsid(), SubjectType.ROLE);
+			accountFound.setRole(AccountRoleFactory.convert(newAccountRole.getRole()));
         }
     }
 
@@ -117,6 +146,17 @@ public class AccountDocumentHandler
     }
 
     @Override
+    public void completeCreate(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
+    	AccountsCommon accountsCommon = wrapDoc.getWrappedObject();
+    	List<RoleValue> roleValueList = account.getRole();
+    	if (roleValueList != null && roleValueList.size() > 0) {
+    		AccountRoleSubResource subResource = new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
+    		AccountRole accountRole = AccountRoleFactory.createAccountRoleInstance(accountsCommon, roleValueList, true, true);
+			String accountRoleCsid = subResource.createAccountRole(this.getServiceContext(), accountRole, SubjectType.ROLE);
+    	}
+    }
+    
+    @Override
     public void completeUpdate(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
         AccountsCommon upAcc = wrapDoc.getWrappedObject();
         getServiceContext().setOutput(upAcc);
@@ -131,7 +171,7 @@ public class AccountDocumentHandler
     }
 
     @Override
-    public void handleGetAll(DocumentWrapper<List> wrapDoc) throws Exception {
+    public void handleGetAll(DocumentWrapper<List<AccountsCommon>> wrapDoc) throws Exception {
         AccountsCommonList accList = extractCommonPartList(wrapDoc);
         setCommonPartList(accList);
         getServiceContext().setOutput(getCommonPartList());
@@ -152,7 +192,7 @@ public class AccountDocumentHandler
 
     @Override
     public AccountsCommonList extractCommonPartList(
-            DocumentWrapper<List> wrapDoc)
+            DocumentWrapper<List<AccountsCommon>> wrapDoc)
             throws Exception {
 
     	AccountsCommonList accList = this.extractPagingInfo(new AccountsCommonList(), wrapDoc);

@@ -202,6 +202,11 @@ public class AccountRoleDocumentHandler
 //        return result;
     }
 
+    @Override
+    public void prepareCreate() throws Exception {
+    	// Ensure the roles exist
+    }
+    
     public void fillCommonPart(AccountRole ar,
     		DocumentWrapper<List<AccountRoleRel>> wrapDoc,
     		boolean handleDelete)

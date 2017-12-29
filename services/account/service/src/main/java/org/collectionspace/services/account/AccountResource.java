@@ -68,7 +68,6 @@ import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -111,12 +110,14 @@ public class AccountResource extends SecurityResourceBase {
         return AccountsCommon.class;
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public ServiceContextFactory<AccountsCommon, AccountsCommon> getServiceContextFactory() {
         return (ServiceContextFactory<AccountsCommon, AccountsCommon>) RemoteServiceContextFactory.get();
     }
 
-    @Override
+    @SuppressWarnings("rawtypes")
+	@Override
     public StorageClient getStorageClient(ServiceContext ctx) {
         //FIXME use ctx to identify storage client
         return storageClient;
@@ -445,26 +446,34 @@ public class AccountResource extends SecurityResourceBase {
     public Response deleteAccount(@Context UriInfo uriInfo, @PathParam("csid") String csid) {
         logger.debug("deleteAccount with csid=" + csid);
         ensureCSID(csid, ServiceMessages.DELETE_FAILED);
+        
         try {
         	AccountsCommon account = (AccountsCommon)get(csid, AccountsCommon.class);
             // If marked as metadata immutable, do not delete
-            if(AccountClient.IMMUTABLE.equals(account.getMetadataProtection())) {
+            if (AccountClient.IMMUTABLE.equals(account.getMetadataProtection())) {
                 Response response =
                 	Response.status(Response.Status.FORBIDDEN).entity("Account: "+csid+" is immutable.").type("text/plain").build();
                 return response;
             }
-            //FIXME ideally the following two ops should be in the same tx CSPACE-658
-            //delete all relationships
-            AccountRoleSubResource subResource = new AccountRoleSubResource("accounts/accountroles");
-            subResource.deleteAccountRole(csid, SubjectType.ROLE);
+            //
+            // We need to delete the account and the account/role relationships in a
+            // single transaction
+            //
             ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext((AccountsCommon) null,
                     AccountsCommon.class, uriInfo);
-            getStorageClient(ctx).delete(ctx, csid);
-            return Response.status(HttpResponseCodes.SC_OK).build();
+            ctx.openConnection();
+            try {
+	            AccountRoleSubResource subResource = new AccountRoleSubResource("accounts/accountroles");
+	            subResource.deleteAccountRole(ctx, csid, SubjectType.ROLE);
+	            getStorageClient(ctx).delete(ctx, csid);
+            } finally {
+            	ctx.closeConnection();
+            }
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, csid);
         }
 
+        return Response.status(HttpResponseCodes.SC_OK).build();        
     }
 
     @POST
@@ -473,7 +482,7 @@ public class AccountResource extends SecurityResourceBase {
             @PathParam("csid") String accCsid,
             AccountRole input) {
         if (method != null) {
-            if ("delete".equalsIgnoreCase(method)) {
+            if ("delete".equalsIgnoreCase(method)) { // How would this ever be true?
                 return deleteAccountRole(accCsid, input);
             }
         }
@@ -482,14 +491,14 @@ public class AccountResource extends SecurityResourceBase {
         try {
         	AccountsCommon account = (AccountsCommon)get(accCsid, AccountsCommon.class);
             // If marked as roles immutable, do not create
-            if(AccountClient.IMMUTABLE.equals(account.getRolesProtection())) {
+            if (AccountClient.IMMUTABLE.equals(account.getRolesProtection())) {
                 Response response =
                 	Response.status(Response.Status.FORBIDDEN).entity("Roles for Account: "+accCsid+" are immutable.").type("text/plain").build();
                 return response;
             }
             AccountRoleSubResource subResource =
                     new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
-            String accrolecsid = subResource.createAccountRole(input, SubjectType.ROLE);
+            String accrolecsid = subResource.createAccountRole((ServiceContext)null, input, SubjectType.ROLE);
             UriBuilder path = UriBuilder.fromResource(AccountResource.class);
             path.path(accCsid + "/accountroles/" + accrolecsid);
             Response response = Response.created(path.build()).build();
@@ -511,7 +520,7 @@ public class AccountResource extends SecurityResourceBase {
             AccountRoleSubResource subResource =
                     new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
             //get relationships for an account
-            result = subResource.getAccountRoleRel(accCsid, SubjectType.ROLE, accrolecsid);
+            result = subResource.getAccountRoleRel((ServiceContext)null, accCsid, SubjectType.ROLE, accrolecsid);
          } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED, accCsid);
         }
@@ -526,14 +535,16 @@ public class AccountResource extends SecurityResourceBase {
         logger.debug("getAccountRole with accCsid=" + accCsid);
         ensureCSID(accCsid, ServiceMessages.GET_FAILED+ "accountroles account ");
         AccountRole result = null;
+        
         try {
             AccountRoleSubResource subResource =
                     new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
             //get relationships for an account
-            result = subResource.getAccountRole(accCsid, SubjectType.ROLE);
+            result = subResource.getAccountRole((ServiceContext)null, accCsid, SubjectType.ROLE);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED, accCsid);
         }
+        
         checkResult(result, accCsid, ServiceMessages.GET_FAILED);
         return result;
     }
@@ -542,6 +553,7 @@ public class AccountResource extends SecurityResourceBase {
     @Path("{csid}/accountperms")
     public AccountPermission getAccountPerm(@PathParam("csid") String accCsid) {
         logger.debug("getAccountPerm with accCsid=" + accCsid);
+        
         ensureCSID(accCsid, ServiceMessages.GET_FAILED+ "getAccountPerm account ");
         AccountPermission result = null;
         try {
@@ -550,12 +562,14 @@ public class AccountResource extends SecurityResourceBase {
             throw bigReThrow(e, ServiceMessages.GET_FAILED, accCsid);
         }
         checkResult(result, accCsid, ServiceMessages.GET_FAILED);
+        
         return result;
     }
 
     public Response deleteAccountRole(String accCsid, AccountRole input) {
         logger.debug("deleteAccountRole with accCsid=" + accCsid);
         ensureCSID(accCsid, ServiceMessages.DELETE_FAILED+ "accountroles account ");
+        
         try {
         	AccountsCommon account = (AccountsCommon)get(accCsid, AccountsCommon.class);
             // If marked as roles immutable, do not delete
@@ -567,11 +581,12 @@ public class AccountResource extends SecurityResourceBase {
             AccountRoleSubResource subResource =
                     new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
             //delete all relationships for an account
-            subResource.deleteAccountRole(accCsid, SubjectType.ROLE, input);
-            return Response.status(HttpResponseCodes.SC_OK).build();
+            subResource.deleteAccountRole((ServiceContext)null, accCsid, SubjectType.ROLE, input);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, accCsid);
         }
+        
+        return Response.status(HttpResponseCodes.SC_OK).build();
     }
 
     @DELETE
@@ -579,10 +594,11 @@ public class AccountResource extends SecurityResourceBase {
     public Response deleteAccountRole(@PathParam("csid") String accCsid) {
         logger.debug("deleteAccountRole: All roles related to account with accCsid=" + accCsid);
         ensureCSID(accCsid, ServiceMessages.DELETE_FAILED+ "accountroles account ");
+        
         try {
             // If marked as roles immutable, do not delete
         	AccountsCommon account = (AccountsCommon)get(accCsid, AccountsCommon.class);
-            if(AccountClient.IMMUTABLE.equals(account.getRolesProtection())) {
+            if (AccountClient.IMMUTABLE.equals(account.getRolesProtection())) {
                 Response response =
                 	Response.status(Response.Status.FORBIDDEN).entity("Roles for Account: "+accCsid+" are immutable.").type("text/plain").build();
                 return response;
@@ -590,10 +606,12 @@ public class AccountResource extends SecurityResourceBase {
             AccountRoleSubResource subResource =
                     new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
             //delete all relationships for an account
-            subResource.deleteAccountRole(accCsid, SubjectType.ROLE);
-            return Response.status(HttpResponseCodes.SC_OK).build();
+            subResource.deleteAccountRole((ServiceContext)null, accCsid, SubjectType.ROLE);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, accCsid);
         }
+        
+        return Response.status(HttpResponseCodes.SC_OK).build();
+
     }
 }

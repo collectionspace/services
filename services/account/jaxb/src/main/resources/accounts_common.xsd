@@ -54,6 +54,9 @@
                 <xs:appinfo>
                     <hj:entity>
                         <orm:table name="accounts_common">
+	                        <orm:unique-constraint>
+	                            <orm:column-name>userid</orm:column-name>
+		                    </orm:unique-constraint>
                         </orm:table>
                     </hj:entity>
                 </xs:appinfo>
@@ -183,6 +186,7 @@
                         </xs:appinfo>
                     </xs:annotation>
                 </xs:element>
+                <xs:element name="role" type="ns:role_value" minOccurs="1" maxOccurs="unbounded"/>
             </xs:sequence>
             <xs:attribute name="csid" type="xs:string">
                 <xs:annotation>
@@ -196,6 +200,24 @@
         </xs:complexType>
     </xs:element>
 
+    <xs:complexType name="role_value" >
+        <xs:annotation>
+            <xs:documentation>
+                RoleValue is used relationships
+            </xs:documentation>
+            <xs:appinfo>
+                <hj:ignored/>
+            </xs:appinfo>
+        </xs:annotation>
+        <xs:sequence>
+        	<xs:element name="roleRelationshipId" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="roleId" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="roleName" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="displayName" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="tenantId" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+    
     <!-- This is the base class for paginated lists -->
     <xs:complexType name="abstractCommonList">
         <xs:annotation>

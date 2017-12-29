@@ -49,6 +49,7 @@ import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.common.storage.JDBCTools;
+import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 
 import org.collectionspace.services.config.service.ServiceBindingType;
@@ -68,7 +69,7 @@ import org.springframework.security.acls.model.AlreadyExistsException;
 
 public class AuthorizationCommon {
 	
-	final public static String REFRESH_AUTZ_PROP = "refreshAuthZOnStartup";
+	final public static String REFRESH_AUTHZ_PROP = "refreshAuthZOnStartup";
 	
 	//
 	// For token generation and password reset
@@ -162,20 +163,21 @@ public class AuthorizationCommon {
 		return tenantConfigMD5HashTable.put(tenantId, md5hash);
 	}	
 	
-    public static Role getRole(String tenantId, String displayName) {
+	@Deprecated
+    public static Role xgetRole(String tenantId, String displayName) {
     	Role role = null;
     	
     	String roleName = AuthorizationCommon.getQualifiedRoleName(tenantId, displayName);
-    	role = AuthorizationStore.getRoleByName(roleName, tenantId);
+    	//role = AuthorizationStore.getRoleByName(roleName, tenantId);
         
         return role;
     }
     
-    public static Role getRole(EntityManager em, String tenantId, String displayName) {
+    public static Role getRole(JPATransactionContext jpaTransactionContext, String tenantId, String displayName) {
     	Role role = null;
     	
     	String roleName = AuthorizationCommon.getQualifiedRoleName(tenantId, displayName);
-    	role = AuthorizationStore.getRoleByName(em, roleName, tenantId);
+    	role = AuthorizationStore.getRoleByName(jpaTransactionContext, roleName, tenantId);
         
         return role;
     }
@@ -349,7 +351,7 @@ public class AuthorizationCommon {
     	return result;
     }
     
-    private static PermissionRole createPermissionRole(EntityManager em,
+    private static PermissionRole createPermissionRole(
     		Permission permission,
     		Role role,
     		boolean enforceTenancy) throws Exception
@@ -899,6 +901,7 @@ public class AuthorizationCommon {
     /*
      * Using the tenant bindings, ensure there are corresponding Tenant records (db columns).
      */
+    //FIXME: This code should be using JPA objects and JPATransactionContext, not raw SQL.
     public static void createTenants(
     		TenantBindingConfigReaderImpl tenantBindingConfigReader,
     		DatabaseProductType databaseProductType,
@@ -927,6 +930,14 @@ public class AuthorizationCommon {
 		}
 	}
     
+    /**
+     * 
+     * @param tenantBindingConfigReader
+     * @param databaseProductType
+     * @param cspaceDatabaseName
+     * @throws Exception
+     */
+    //FIXME: This code should be using the JPA objects and JPATransactionContext, not raw SQL.
     public static void createDefaultAccounts(
     		TenantBindingConfigReaderImpl tenantBindingConfigReader,
     		DatabaseProductType databaseProductType,
@@ -1084,7 +1095,9 @@ public class AuthorizationCommon {
 	 * @param cspaceDatabaseName
 	 * @throws Exception
 	 */
-    public static void createDefaultWorkflowPermissions(TenantBindingConfigReaderImpl tenantBindingConfigReader,
+    public static void createDefaultWorkflowPermissions(
+    		JPATransactionContext jpaTransactionContext,
+    		TenantBindingConfigReaderImpl tenantBindingConfigReader,
     		DatabaseProductType databaseProductType, 
     		String cspaceDatabaseName) throws Exception //FIXME: REM - 4/11/2012 - Rename to createWorkflowPermissions
     {
@@ -1092,12 +1105,7 @@ public class AuthorizationCommon {
 
     	AuthZ.get().login(); //login to Spring Security manager
     	
-        EntityManagerFactory emf = JpaStorageUtils.getEntityManagerFactory(JpaStorageUtils.CS_PERSISTENCE_UNIT);
-        EntityManager em = null;
-
         try {
-            em = emf.createEntityManager();
-
 	        Hashtable<String, TenantBindingType> tenantBindings = tenantBindingConfigReader.getTenantBindings();
 	        for (String tenantId : tenantBindings.keySet()) {
 	        	logger.info(String.format("Creating/verifying workflow permissions for tenant ID=%s.", tenantId));
@@ -1106,8 +1114,8 @@ public class AuthorizationCommon {
 		        	continue; // skip the rest of the loop and go to the next tenant
 		        }
 		        
-	    		Role adminRole = AuthorizationCommon.getRole(em, tenantBinding.getId(), ROLE_TENANT_ADMINISTRATOR);
-	    		Role readonlyRole = AuthorizationCommon.getRole(em, tenantBinding.getId(), ROLE_TENANT_READER);
+	    		Role adminRole = AuthorizationCommon.getRole(jpaTransactionContext, tenantBinding.getId(), ROLE_TENANT_ADMINISTRATOR);
+	    		Role readonlyRole = AuthorizationCommon.getRole(jpaTransactionContext, tenantBinding.getId(), ROLE_TENANT_READER);
 	    		
 	    		if (adminRole == null || readonlyRole == null) {
 	    			String msg = String.format("One or more of the required default CollectionSpace administrator roles is missing or was never created.  If you're setting up a new instance of CollectionSpace, shutdown the Tomcat server and run the 'ant import' command from the root/top level CollectionSpace 'Services' source directory.  Then try restarting Tomcat.");
@@ -1116,25 +1124,27 @@ public class AuthorizationCommon {
 	    		}
 	    		
 		        for (ServiceBindingType serviceBinding : tenantBinding.getServiceBindings()) {
-		        	String prop = ServiceBindingUtils.getPropertyValue(serviceBinding, REFRESH_AUTZ_PROP);
+		        	String prop = ServiceBindingUtils.getPropertyValue(serviceBinding, REFRESH_AUTHZ_PROP);
 		        	if (prop == null ? true : Boolean.parseBoolean(prop)) {
-			        		try {
-			        		em.getTransaction().begin();
+			        	try {
+			        		jpaTransactionContext.beginTransaction();
 				        	TransitionDefList transitionDefList = getTransitionDefList(tenantBinding, serviceBinding);
 				        	HashSet<String> transitionVerbList = getTransitionVerbList(tenantBinding, serviceBinding);
 				        	for (String transitionVerb : transitionVerbList) {
 				        		//
 				        		// Create the permission for the admin role
 				        		Permission adminPerm = createWorkflowPermission(tenantBinding, serviceBinding, transitionVerb, ACTIONGROUP_CRUDL);
-				        		persist(em, adminPerm, adminRole, true, ACTIONGROUP_CRUDL);
+				        		persist(jpaTransactionContext, adminPerm, adminRole, true, ACTIONGROUP_CRUDL);
 				        		//
 				        		// Create the permission for the read-only role
 				        		Permission readonlyPerm = createWorkflowPermission(tenantBinding, serviceBinding, transitionVerb, ACTIONGROUP_RL);				        		
-				        		persist(em, readonlyPerm, readonlyRole, true, ACTIONGROUP_RL); // Persist/store the permission and permrole records and related Spring Security info
+				        		persist(jpaTransactionContext, readonlyPerm, readonlyRole, true, ACTIONGROUP_RL); // Persist/store the permission and permrole records and related Spring Security info
 				        	}
-				        	em.getTransaction().commit();
+				        	jpaTransactionContext.commitTransaction();
 			        	} catch (IllegalStateException e) {
 			        		logger.fine(e.getLocalizedMessage()); //We end up here if there is no document handler for the service -this is ok for some of the services.
+			        	} catch (Exception x) {
+			        		jpaTransactionContext.markForRollback();
 			        	}
 		        	} else {
 		        		logger.warning("AuthZ refresh service binding property is set to FALSE so default permissions will NOT be refreshed for: "
@@ -1142,17 +1152,10 @@ public class AuthorizationCommon {
 		        	}
 		        }
 	        }
-            em.close();
     	} catch (Exception e) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+    		jpaTransactionContext.markForRollback();
             logger.fine("Caught exception and rolling back permission creation: " + e.getMessage());
             throw e;
-        } finally {
-            if (em != null) {
-                JpaStorageUtils.releaseEntityManagerFactory(emf);
-            }
         }
     }
     
@@ -1223,7 +1226,10 @@ public class AuthorizationCommon {
     	return result;
     }
 
-	private static PermissionRoleRel findPermRoleRel(EntityManager em, String permissionId, String RoleId) {
+	private static PermissionRoleRel findPermRoleRel(
+			JPATransactionContext jpaTransactionContext,
+			String permissionId,
+			String RoleId) {
     	PermissionRoleRel result = null;
     	
     	try {
@@ -1232,7 +1238,7 @@ public class AuthorizationCommon {
 	        params.put("id", permissionId);
 	        params.put("roleId", RoleId);        
 	
-	        result = (PermissionRoleRel) JpaStorageUtils.getEntity(em,
+	        result = (PermissionRoleRel) JpaStorageUtils.getEntity(jpaTransactionContext,
 	        		PermissionRoleRel.class.getCanonicalName(), whereClause, params);
     	} catch (Exception e) {
     		//Do nothing. Will return null;
@@ -1244,21 +1250,21 @@ public class AuthorizationCommon {
     /*
      * Persists the Permission, PermissionRoleRel, and Spring Security table entries all in one transaction
      */
-    private static void persist(EntityManager em, Permission permission, Role role, boolean enforceTenancy, ActionGroup actionGroup) throws Exception {
+    private static void persist(JPATransactionContext jpaTransactionContext, Permission permission, Role role, boolean enforceTenancy, ActionGroup actionGroup) throws Exception {
 		AuthorizationStore authzStore = new AuthorizationStore();
 		// First persist the Permission record
-		authzStore.store(em, permission);
+		authzStore.store(jpaTransactionContext, permission);
 		
 		// If the PermRoleRel doesn't already exists then relate the permission and the role in a new PermissionRole (the service payload)
 		// Create a PermissionRoleRel (the database relation table for the permission and role)
-		PermissionRoleRel permRoleRel = findPermRoleRel(em, permission.getCsid(), role.getCsid());
+		PermissionRoleRel permRoleRel = findPermRoleRel(jpaTransactionContext, permission.getCsid(), role.getCsid());
 		if (permRoleRel == null) {
-			PermissionRole permRole = createPermissionRole(em, permission, role, enforceTenancy);
+			PermissionRole permRole = createPermissionRole(permission, role, enforceTenancy);
 	        List<PermissionRoleRel> permRoleRels = new ArrayList<PermissionRoleRel>();
-	        PermissionRoleUtil.buildPermissionRoleRel(em, permRole, SubjectType.ROLE, permRoleRels,
+	        PermissionRoleUtil.buildPermissionRoleRel(jpaTransactionContext, permRole, SubjectType.ROLE, permRoleRels,
 	        		false /*not for delete*/, role.getTenantId());
 	        for (PermissionRoleRel prr : permRoleRels) {
-	            authzStore.store(em, prr);
+	            authzStore.store(jpaTransactionContext, prr);
 	        }
 			Profiler profiler = new Profiler(AuthorizationCommon.class, 2);
 			profiler.start();

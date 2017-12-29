@@ -61,8 +61,16 @@ public class RemoteServiceContextImpl<IT, OT>
     /** The output. */
     private OT output;
     /** The target of the HTTP request **/
-    JaxRsContext jaxRsContext;
     
+    //
+    // Reference count for things like JPA connections
+    //
+    private int transactionConnectionRefCount = 0;
+    
+    //
+    // RESTEasy context
+    //
+    JaxRsContext jaxRsContext;    
     ResourceMap resourceMap = null;
     
     @Override
@@ -255,42 +263,58 @@ public class RemoteServiceContextImpl<IT, OT>
 	// Transaction management methods
 	//
 	
-	private TransactionContext getCurrentTransactionContext() {
+	@Override
+	public TransactionContext getCurrentTransactionContext() {
 		return (TransactionContext) this.getProperty(StorageClient.SC_TRANSACTION_CONTEXT_KEY);
 	}
 
 	@Override
-	public void releaseConnection() throws TransactionException {
-		if (isTransactionContextShared() == true) {
-			throw new TransactionException("Attempted to release a shared storage connection.  Only the originator can release the connection");
+	synchronized public void closeConnection() throws TransactionException {
+		if (transactionConnectionRefCount == 0) {
+			throw new TransactionException("Attempted to release a connection that doesn't exist or has already been released.");
 		}
-		
-		TransactionContext transactionCtx = getCurrentTransactionContext();		
-		if (transactionCtx != null) {
-			transactionCtx.close();
-	        this.setProperty(StorageClient.SC_TRANSACTION_CONTEXT_KEY, null);
+
+		if (isTransactionContextShared() == true) {
+			//
+			// If it's a shared connection, we can't close it.  Just reduce the refcount by 1
+			//
+			String warnMsg = "Attempted to release a shared storage connection.  Only the originator can release the connection";
+			logger.warn(warnMsg);
+			transactionConnectionRefCount--;
 		} else {
-			throw new TransactionException("Attempted to release a non-existent storage connection.  Transaction context missing from service context.");
+			TransactionContext transactionCtx = getCurrentTransactionContext();
+			if (transactionCtx != null) {
+				if (--transactionConnectionRefCount == 0) {
+					transactionCtx.close();
+			        this.setProperty(StorageClient.SC_TRANSACTION_CONTEXT_KEY, null);
+				}
+			} else {
+				throw new TransactionException("Attempted to release a non-existent storage connection.  Transaction context missing from service context.");
+			}
 		}
 	}
 
 	@Override
-	public TransactionContext openConnection() throws TransactionException {
+	synchronized public TransactionContext openConnection() throws TransactionException {
 		TransactionContext result = getCurrentTransactionContext();
-		if (result != null) {
-			throw new TransactionException("Attempted to open a new connection when a current connection is still part of the current service context.  The current connection must be closed with the releaseConnection() method.");
+		
+		if (result == null) {
+			result = new JPATransactionContext(this);
+	        this.setProperty(StorageClient.SC_TRANSACTION_CONTEXT_KEY, result);
 		}
-
-		result = new JPATransactionContext(this);
-        this.setProperty(StorageClient.SC_TRANSACTION_CONTEXT_KEY, result);
-
+		transactionConnectionRefCount++;
+		
 		return result;
 	}
 
 	@Override
-	public void setTransactionContext(TransactionContext transactionCtx) {
-		// TODO Auto-generated method stub
-		
+	public void setTransactionContext(TransactionContext transactionCtx) throws TransactionException {
+		TransactionContext currentTransactionCtx = this.getCurrentTransactionContext();
+		if (currentTransactionCtx == null) {
+			setProperty(StorageClient.SC_TRANSACTION_CONTEXT_KEY, transactionCtx);
+		} else if (currentTransactionCtx != transactionCtx) {
+			throw new TransactionException("Transaction context already set from service context.");
+		}
 	}
 
 	/**

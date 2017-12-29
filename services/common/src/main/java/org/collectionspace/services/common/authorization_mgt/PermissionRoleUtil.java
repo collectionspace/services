@@ -32,8 +32,10 @@ import javax.persistence.NoResultException;
 
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.TransactionException;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextProperties;
+import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 
 import org.collectionspace.services.authorization.perms.ActionType;
@@ -102,7 +104,7 @@ public class PermissionRoleUtil {
      * @param prrl persistent entities built are inserted into this list
      * @param toDelete the to delete
      */
-    static public void buildPermissionRoleRel(EntityManager em, 
+    static public void buildPermissionRoleRel(JPATransactionContext jpaTransactionContext, 
     		PermissionRole pr,
     		SubjectType subject,
     		List<PermissionRoleRel> prrl,
@@ -114,7 +116,7 @@ public class PermissionRoleUtil {
         	if (permissionValues != null && permissionValues.size() > 0) {
 	            PermissionValue pv = permissionValues.get(0);
 	            for (RoleValue rv : pr.getRole()) {
-	                PermissionRoleRel prr = buildPermissonRoleRel(em, pv, rv, subject, handleDelete, tenantId);
+	                PermissionRoleRel prr = buildPermissonRoleRel(jpaTransactionContext, pv, rv, subject, handleDelete, tenantId);
 	                prrl.add(prr);
 	            }
         	}
@@ -123,42 +125,34 @@ public class PermissionRoleUtil {
         	if (roleValues != null && roleValues.size() > 0) {
 	            RoleValue rv = roleValues.get(0);
 	            for (PermissionValue pv : pr.getPermission()) {
-	                PermissionRoleRel prr = buildPermissonRoleRel(em, pv, rv, subject, handleDelete, tenantId);
+	                PermissionRoleRel prr = buildPermissonRoleRel(jpaTransactionContext, pv, rv, subject, handleDelete, tenantId);
 	                prrl.add(prr);
 	            }
         	}
         }
     }
     
-    static public void buildPermissionRoleRel( 
+    static public void buildPermissionRoleRel(
+    		ServiceContext ctx,
     		PermissionRole pr,
     		SubjectType subject,
     		List<PermissionRoleRel> prrl,
     		boolean handleDelete,
     		String tenantId) throws Exception {
-        EntityManagerFactory emf = null;
-        EntityManager em = null;
+    	
+        JPATransactionContext jpaTransactionContext = (JPATransactionContext)ctx.openConnection();
         try {
-            emf = JpaStorageUtils.getEntityManagerFactory(JpaStorageUtils.CS_PERSISTENCE_UNIT);
-            em = emf.createEntityManager();
-            em.getTransaction().begin();
-            
-            buildPermissionRoleRel(em, pr, subject, prrl, handleDelete, tenantId);
-            
-            em.getTransaction().commit();
-        	em.close();            
+            jpaTransactionContext.beginTransaction();            
+            buildPermissionRoleRel(jpaTransactionContext, pr, subject, prrl, handleDelete, tenantId);
+            jpaTransactionContext.commitTransaction();
         } catch (Exception e) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+        	jpaTransactionContext.markForRollback();
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
             throw e;
         } finally {
-            if (em != null) {
-                JpaStorageUtils.releaseEntityManagerFactory(emf);
-            }
+            ctx.closeConnection();
         }
     }    
 
@@ -166,7 +160,7 @@ public class PermissionRoleUtil {
      * Try to find a persisted Permission record using a PermissionValue instance.
      *
      */
-    static private Permission lookupPermission(EntityManager em, PermissionValue permissionValue, String tenantId) {
+    static private Permission lookupPermission(JPATransactionContext jpaTransactionContext, PermissionValue permissionValue, String tenantId) throws TransactionException {
     	Permission result = null;
     	
     	String actionGroup = permissionValue.getActionGroup() != null ? permissionValue.getActionGroup().trim() : null;
@@ -177,7 +171,7 @@ public class PermissionRoleUtil {
     	//
     	if (permissionId != null && !permissionId.isEmpty()) {
 	    	try {
-		    	result = (Permission)JpaStorageUtils.getEntity(em, permissionId, Permission.class);
+		    	result = (Permission)JpaStorageUtils.getEntity(jpaTransactionContext, permissionId, Permission.class);
 	    	} catch (Throwable e) {
 	    		String msg = String.format("Searched for but couldn't find a permission with CSID='%s'.",
 	    				permissionId);
@@ -189,7 +183,7 @@ public class PermissionRoleUtil {
     		// If there was no permission ID, then we can try to find the permission with the resource name and action group tuple
     		//
 	    	try {
-		    	result = (Permission)JpaStorageUtils.getEntityByDualKeys(em, 
+		    	result = (Permission)JpaStorageUtils.getEntityByDualKeys(jpaTransactionContext, 
 		    			Permission.class.getName(),
 		    			PermissionStorageConstants.RESOURCE_NAME, permissionValue.getResourceName(), 
 		    			PermissionStorageConstants.ACTION_GROUP, permissionValue.getActionGroup(),
@@ -217,14 +211,14 @@ public class PermissionRoleUtil {
      * @return the permission role rel
      * @throws DocumentException 
      */
-    static private PermissionRoleRel buildPermissonRoleRel(EntityManager em, PermissionValue permissionValue,
+    static private PermissionRoleRel buildPermissonRoleRel(JPATransactionContext jpaTransactionContext, PermissionValue permissionValue,
     		RoleValue roleValue,
     		SubjectType subject,
     		boolean handleDelete,  // if 'true' then we're deleting not building a permission-role record
     		String tenantId) throws DocumentException {
 
     	PermissionRoleRel result = null;
-    	Permission permission = lookupPermission(em, permissionValue, tenantId);
+    	Permission permission = lookupPermission(jpaTransactionContext, permissionValue, tenantId);
     	
     	//
     	// If we couldn't find an existing permission and we're not processing a DELETE request, we need to create
@@ -237,7 +231,7 @@ public class PermissionRoleUtil {
     		permission.setEffect(EffectType.PERMIT); // By default, CollectionSpace currently (11/2017) supports only PERMIT
     		List<PermissionAction> actionList = createPermActionList(permissionValue.getActionGroup());
     		permission.setAction(actionList);
-    		permission = createPermission(permission);
+    		permission = createPermission(jpaTransactionContext, permission);
     		if (permission == null) {
     			String errMsg = "Could not create new permission for new permission-role relationship.";
     			throw new DocumentException(errMsg);
@@ -278,11 +272,11 @@ public class PermissionRoleUtil {
         return result;
     }
 
-    private static Permission createPermission(Permission permission) {
+    private static Permission createPermission(JPATransactionContext jpaTransactionContext, Permission permission) {
 		Permission result = null;
 		
 		PermissionResource permissionResource = new PermissionResource();  // Get the PermissionResource singleton instance (RESTEasy ensures it is a singleton)
-		result = permissionResource.createPermissionFromInstance(permission);
+		result = permissionResource.createPermissionFromInstance(jpaTransactionContext, permission);
 		
 		return result;
 	}

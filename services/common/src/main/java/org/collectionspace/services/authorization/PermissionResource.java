@@ -38,6 +38,8 @@ import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.storage.StorageClient;
+import org.collectionspace.services.common.storage.TransactionContext;
+import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
@@ -80,30 +82,31 @@ public class PermissionResource extends SecurityResourceBase {
         return Permission.class;
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public ServiceContextFactory<Permission, Permission> getServiceContextFactory() {
         return RemoteServiceContextFactory.get();
     }
 
     @Override
-    public StorageClient getStorageClient(ServiceContext ctx) {
+    public StorageClient getStorageClient(@SuppressWarnings("rawtypes") ServiceContext ctx) {
         //FIXME use ctx to identify storage client
         return storageClient;
     }
 
     @POST
-    public Response createPermission(Permission input) {
-        return create(input);
+    public Response createPermission(JPATransactionContext jpaTransactionContext, Permission input) {
+        return create(jpaTransactionContext, input);
     }
     
-    public Permission createPermissionFromInstance(Permission input) {
+    public Permission createPermissionFromInstance(JPATransactionContext jpaTransactionContext, Permission input) {
     	Permission result = null;
     	
     	String permCsid = null;
-    	Response response = createPermission(input);
+    	Response response = createPermission(jpaTransactionContext, input);
     	if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
     		permCsid = CollectionSpaceClientUtils.extractId(response);
-        	result = getPermission(permCsid);
+        	result = (Permission)get(jpaTransactionContext, permCsid, Permission.class);
     	}
     	    	
     	return result;
@@ -133,33 +136,38 @@ public class PermissionResource extends SecurityResourceBase {
          return (Permission)update(csid, theUpdate, Permission.class);
     }
 
-    @DELETE
+    @SuppressWarnings("unchecked")
+	@DELETE
     @Path("{csid}")
-    public Response deletePermission(@PathParam("csid") String csid) {
+    public Response deletePermission(@PathParam("csid") String csid) throws Exception {
         logger.debug("deletePermission with csid=" + csid);
         ensureCSID(csid, ServiceMessages.DELETE_FAILED + "permission ");
+
+		ServiceContext<Permission, Permission> ctx = createServiceContext((Permission) null, Permission.class);
+        TransactionContext transactionContext = ctx.openConnection();
         try {
             //FIXME ideally the following two ops should be in the same tx CSPACE-658
             //delete all relationships for this permission
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.PERMISSION_PERMROLE_SERVICE);
-            subResource.deletePermissionRole(csid, SubjectType.ROLE);
+            subResource.deletePermissionRole(ctx, csid, SubjectType.ROLE);
             //NOTE for delete permissions in the authz provider
             //at the PermissionRoleSubResource/DocHandler level, there is no visibility
             //if permission is deleted, so do it here, however,
             //this is a very dangerous operation as it deletes the Spring ACL instead of ACE(s)
             //the ACL might be needed for other ACEs roles...
-            AuthorizationDelegate.deletePermissions(csid);
+            AuthorizationDelegate.deletePermissions((JPATransactionContext)transactionContext, csid);
 
-            ServiceContext<Permission, Permission> ctx = createServiceContext((Permission) null, Permission.class);
             getStorageClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, csid);
+        } finally {
+        	ctx.closeConnection();
         }
     }
 
-    @POST
+	@POST
     @Path("{csid}/permroles")
     public Response createPermissionRole(@QueryParam("_method") String method,
             @PathParam("csid") String permCsid,
@@ -174,7 +182,7 @@ public class PermissionResource extends SecurityResourceBase {
         try {
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.PERMISSION_PERMROLE_SERVICE);
-            String permrolecsid = subResource.createPermissionRole(input, SubjectType.ROLE);
+            String permrolecsid = subResource.createPermissionRole((ServiceContext<Permission, Permission>)null, input, SubjectType.ROLE);
             UriBuilder path = UriBuilder.fromResource(PermissionResource.class);
             path.path(permCsid + "/permroles/" + permrolecsid);
             Response response = Response.created(path.build()).build();
@@ -184,7 +192,7 @@ public class PermissionResource extends SecurityResourceBase {
         }
     }
 
-    @GET
+	@GET
     @Path("{csid}/permroles/{id}")
     public PermissionRoleRel getPermissionRole(
             @PathParam("csid") String permCsid,
@@ -196,7 +204,7 @@ public class PermissionResource extends SecurityResourceBase {
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.PERMISSION_PERMROLE_SERVICE);
             //get relationships for a permission
-            result = subResource.getPermissionRoleRel(permCsid, SubjectType.ROLE, permrolecsid);
+            result = subResource.getPermissionRoleRel((ServiceContext<Permission, Permission>)null, permCsid, SubjectType.ROLE, permrolecsid);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED, permCsid);
         }
@@ -204,7 +212,7 @@ public class PermissionResource extends SecurityResourceBase {
         return result;
     }
 
-    @GET
+	@GET
     @Path("{csid}/permroles")
     public PermissionRole getPermissionRole(
             @PathParam("csid") String permCsid) {
@@ -215,7 +223,7 @@ public class PermissionResource extends SecurityResourceBase {
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.PERMISSION_PERMROLE_SERVICE);
             //get relationships for a permission
-            result = subResource.getPermissionRole(permCsid, SubjectType.ROLE);
+            result = subResource.getPermissionRole((ServiceContext<Permission, Permission>)null, permCsid, SubjectType.ROLE);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED, permCsid);
         }
@@ -230,7 +238,7 @@ public class PermissionResource extends SecurityResourceBase {
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.PERMISSION_PERMROLE_SERVICE);
             //delete all relationships for a permission
-            subResource.deletePermissionRole(permCsid, SubjectType.ROLE, input);
+            subResource.deletePermissionRole((ServiceContext<Permission, Permission>)null, permCsid, SubjectType.ROLE, input);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, permCsid);
@@ -247,7 +255,7 @@ public class PermissionResource extends SecurityResourceBase {
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.PERMISSION_PERMROLE_SERVICE);
             //delete all relationships for a permission
-            subResource.deletePermissionRole(permCsid, SubjectType.ROLE);
+            subResource.deletePermissionRole((ServiceContext<Permission, Permission>)null, permCsid, SubjectType.ROLE);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, permCsid);

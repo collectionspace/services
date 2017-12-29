@@ -26,8 +26,6 @@ package org.collectionspace.services.authorization.storage;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 
 import org.collectionspace.services.authorization.PermissionRole;
@@ -36,14 +34,18 @@ import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.PermissionsRolesList;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
-import org.collectionspace.services.authorization.perms.Permission;
+
 import org.collectionspace.services.common.authorization_mgt.AuthorizationRoleRel;
 import org.collectionspace.services.common.authorization_mgt.PermissionRoleUtil;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.document.TransactionException;
+import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentFilter;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,12 +89,12 @@ public class PermissionRoleDocumentHandler
         filterOutExisting(wrapDoc);
     }
     
-    private boolean permRoleRelExists(EntityManager em, PermissionRoleRel permRoleRel) {
+    private boolean permRoleRelExists(JPATransactionContext jpaTransactionContext, PermissionRoleRel permRoleRel) throws TransactionException {
     	boolean result = false;
     	
     	PermissionRoleRel queryResult = null;
     	try {
-	    	queryResult = (PermissionRoleRel) JpaStorageUtils.getEntityByDualKeys(em, 
+	    	queryResult = (PermissionRoleRel) JpaStorageUtils.getEntityByDualKeys(jpaTransactionContext, 
 	    			PermissionRoleRel.class.getName(),
 	    			PermissionStorageConstants.PERMREL_ROLE_ID, permRoleRel.getRoleId(), 
 	    			PermissionStorageConstants.PERMREL_PERM_ID, permRoleRel.getPermissionId());
@@ -112,41 +114,33 @@ public class PermissionRoleDocumentHandler
      * @param wrapDoc
      * @throws Exception
      */
-    private void filterOutExisting(DocumentWrapper<List<PermissionRoleRel>> wrapDoc) throws Exception {
+    @SuppressWarnings("rawtypes")
+	private void filterOutExisting(DocumentWrapper<List<PermissionRoleRel>> wrapDoc) throws Exception {
     	List<PermissionRoleRel> permRoleRelList = wrapDoc.getWrappedObject();
     	
-        EntityManagerFactory emf = null;
-        EntityManager em = null;
+    	ServiceContext ctx = getServiceContext();
+        JPATransactionContext jpaTransactionContext = (JPATransactionContext)ctx.openConnection();
         try {
-            emf = JpaStorageUtils.getEntityManagerFactory(JpaStorageUtils.CS_PERSISTENCE_UNIT);
-            em = emf.createEntityManager();
-            em.getTransaction().begin();
+        	jpaTransactionContext.beginTransaction();
             
             for (PermissionRoleRel permRoleRel : permRoleRelList) {
-            	if (permRoleRelExists(em, permRoleRel) == true) {
+            	if (permRoleRelExists(jpaTransactionContext, permRoleRel) == true) {
             		//
             		// Remove the item from the list since it already exists
             		//
             		permRoleRelList.remove(permRoleRel);
             	}
             }
-            
-            em.getTransaction().commit();
-        	em.close();            
+            jpaTransactionContext.commitTransaction();
         } catch (Exception e) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+        	jpaTransactionContext.markForRollback();
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
             throw e;
         } finally {
-            if (em != null) {
-                JpaStorageUtils.releaseEntityManagerFactory(emf);
-            }
+            ctx.closeConnection();
         }
-
     }
 
     /* (non-Javadoc)
@@ -177,7 +171,8 @@ public class PermissionRoleDocumentHandler
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#handleGet(org.collectionspace.services.common.document.DocumentWrapper)
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void handleGet(DocumentWrapper<List<PermissionRoleRel>> wrapDoc) throws Exception {
         setCommonPart(extractCommonPart(wrapDoc));
         getServiceContext().setOutput(permissionRole);
@@ -263,7 +258,8 @@ public class PermissionRoleDocumentHandler
      * @param handleDelete the handle delete
      * @throws Exception the exception
      */
-    public void fillCommonPart(PermissionRole pr,
+    @SuppressWarnings("rawtypes")
+	public void fillCommonPart(PermissionRole pr,
     			DocumentWrapper<List<PermissionRoleRel>> wrapDoc,
     			boolean handleDelete)
             throws Exception {
@@ -276,8 +272,9 @@ public class PermissionRoleDocumentHandler
             //subject mismatch should have been checked during validation
         }
         
-        String tenantId = this.getServiceContext().getTenantId();
-        PermissionRoleUtil.buildPermissionRoleRel(pr, subject, prrl, handleDelete, tenantId);
+        ServiceContext ctx = this.getServiceContext();
+        String tenantId = ctx.getTenantId();
+        PermissionRoleUtil.buildPermissionRoleRel(ctx, pr, subject, prrl, handleDelete, tenantId);
     }
     
     /* (non-Javadoc)

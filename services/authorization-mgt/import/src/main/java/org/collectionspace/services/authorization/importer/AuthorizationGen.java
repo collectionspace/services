@@ -46,6 +46,7 @@ import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon
 import org.collectionspace.services.common.config.ServicesConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.security.SecurityUtils;
+import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 
@@ -109,7 +110,7 @@ public class AuthorizationGen {
      * @see initialize
      * @return
      */
-    public void createDefaultPermissions() {
+    public void createDefaultPermissions(JPATransactionContext jpaTransactionContext) {
         for (String tenantId : tenantBindings.keySet()) {
             List<Permission> adminPerms = createDefaultAdminPermissions(tenantId, AUTHZ_IS_ENTITY_PROXY);
             adminPermList.addAll(adminPerms);
@@ -129,7 +130,7 @@ public class AuthorizationGen {
      * @return
      */
     public List<Permission> createDefaultAdminPermissions(String tenantId, boolean isEntityProxy) {
-        ArrayList<Permission> apcList = new ArrayList<Permission>();
+        ArrayList<Permission> result = new ArrayList<Permission>();
         TenantBindingType tbinding = tenantBindings.get(tenantId);
         for (ServiceBindingType sbinding : tbinding.getServiceBindings()) {
 
@@ -138,22 +139,20 @@ public class AuthorizationGen {
         	if (isEntityProxy == true) {
         		resourceName = SecurityUtils.getResourceEntity(resourceName);
         	}
-            Permission perm = buildAdminPermission(tbinding.getId(),
-                    resourceName);
-            apcList.add(perm);
+            Permission perm = buildAdminPermission(tbinding.getId(), resourceName);
+            result.add(perm);
 
             //add permissions for alternate paths
             if (isEntityProxy == false) {
 	            List<String> uriPaths = sbinding.getUriPath();
 	            for (String uriPath : uriPaths) {
-	                perm = buildAdminPermission(tbinding.getId(),
-	                        uriPath.toLowerCase());
-	                apcList.add(perm);
+	                perm = buildAdminPermission(tbinding.getId(), uriPath.toLowerCase());
+	                result.add(perm);
 	            }
             }
         }
         
-        return apcList;
+        return result;
     }
 
     /**
@@ -248,20 +247,20 @@ public class AuthorizationGen {
      * createDefaultRoles creates default admin and reader roles
      * for each tenant found in the given tenant binding file
      */
-    public void createDefaultRoles() {
+    public void createDefaultRoles(JPATransactionContext jpaTransactionContext) {
         for (String tenantId : tenantBindings.keySet()) {
 
-            Role arole = buildTenantAdminRole(tenantId);
+            Role arole = buildTenantAdminRole(jpaTransactionContext, tenantId);
             adminRoles.add(arole);
 
-            Role rrole = buildTenantReaderRole(tenantId);
+            Role rrole = buildTenantReaderRole(jpaTransactionContext, tenantId);
             readerRoles.add(rrole);
         }
     }
 
-    private Role buildTenantAdminRole(String tenantId) {
+    private Role buildTenantAdminRole(JPATransactionContext jpaTransactionContext, String tenantId) {
     	String type = "admin";
-        Role result = AuthorizationCommon.getRole(tenantId, AuthorizationCommon.ROLE_TENANT_ADMINISTRATOR);
+        Role result = AuthorizationCommon.getRole(jpaTransactionContext, tenantId, AuthorizationCommon.ROLE_TENANT_ADMINISTRATOR);
         
         if (result == null) {
     		// the role doesn't exist already, so we need to create it
@@ -272,9 +271,9 @@ public class AuthorizationGen {
         return result;
     }
 
-    private Role buildTenantReaderRole(String tenantId) {
+    private Role buildTenantReaderRole(JPATransactionContext jpaTransactionContext, String tenantId) {
     	String type = "read only";
-        Role result = AuthorizationCommon.getRole(tenantId, AuthorizationCommon.ROLE_TENANT_READER);
+        Role result = AuthorizationCommon.getRole(jpaTransactionContext, tenantId, AuthorizationCommon.ROLE_TENANT_READER);
         
         if (result == null) {
     		// the role doesn't exist already, so we need to create it

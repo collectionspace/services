@@ -25,8 +25,7 @@ package org.collectionspace.services.account.storage;
 
 import java.util.Date;
 import java.util.HashMap;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+
 import org.collectionspace.services.account.Tenant;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
@@ -38,6 +37,7 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.document.JaxbUtils;
+import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 
@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
  * are used where possible to perform the persistence operations atomically.
  * @author 
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class TenantStorageClient extends JpaStorageClientImpl {
 
     private final Logger logger = LoggerFactory.getLogger(TenantStorageClient.class);
@@ -58,41 +59,28 @@ public class TenantStorageClient extends JpaStorageClientImpl {
     public TenantStorageClient() {
     }
 
-    @Override
+	@Override
     public String create(ServiceContext ctx,
             DocumentHandler handler) throws BadRequestException,
             DocumentException {
-
-    	/*
-        if (ctx == null) {
-            throw new IllegalArgumentException(
-                    "TenantStorageClient.create : ctx is missing");
-        }
-        */
-        if (handler == null) {
-            throw new IllegalArgumentException(
-                    "TenantStorageClient.create: handler is missing");
-        }
-        EntityManagerFactory emf = null;
-        EntityManager em = null;
+        String result = null;
+		
+    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();    	
         Tenant tenant = (Tenant) handler.getCommonPart();
         try {
             handler.prepare(Action.CREATE);
             DocumentWrapper<Tenant> wrapDoc =
                     new DocumentWrapperImpl<Tenant>(tenant);
             handler.handle(Action.CREATE, wrapDoc);
-            emf = JpaStorageUtils.getEntityManagerFactory();
-            em = emf.createEntityManager();
-            em.getTransaction().begin();
+            jpaConnectionContext.beginTransaction();
             tenant.setCreatedAtItem(new Date());
-            em.persist(tenant);
-            em.getTransaction().commit();
+            jpaConnectionContext.persist(tenant);
             handler.complete(Action.CREATE, wrapDoc);
-            return (String) JaxbUtils.getValue(tenant, "getId");
+            jpaConnectionContext.commitTransaction();
+            
+            result = (String)JaxbUtils.getValue(tenant, "getId");
         } catch (BadRequestException bre) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+        	jpaConnectionContext.markForRollback();
             throw bre;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
@@ -100,16 +88,14 @@ public class TenantStorageClient extends JpaStorageClientImpl {
             }
             boolean uniqueConstraint = false;
             try {
-            	if(em.find(Tenant.class, tenant.getId()) != null) {
+            	if(jpaConnectionContext.find(Tenant.class, tenant.getId()) != null) {
             		//might be unique constraint violation
             		uniqueConstraint = true;
             	} 
             } catch(Exception ignored) {
             	//Ignore - we just care if exists
             }
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+        	jpaConnectionContext.markForRollback();
             if (uniqueConstraint) {
                 String msg = "TenantId exists. Non unique tenantId=" + tenant.getId();
                 logger.error(msg);
@@ -117,31 +103,21 @@ public class TenantStorageClient extends JpaStorageClientImpl {
             }
             throw new DocumentException(e);
         } finally {
-            if (em != null) {
-                JpaStorageUtils.releaseEntityManagerFactory(emf);
-            }
+            ctx.closeConnection();
         }
+        
+        return result;
     }
 
-        @Override
+	@Override
     public void get(ServiceContext ctx, String id, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
-        /*
-        if (ctx == null) {
-            throw new IllegalArgumentException(
-                    "get: ctx is missing");
-        } 
-        */
-        if (handler == null) {
-            throw new IllegalArgumentException(
-                    "get: handler is missing");
-        }
         DocumentFilter docFilter = handler.getDocumentFilter();
         if (docFilter == null) {
             docFilter = handler.createDocumentFilter();
         }
-        EntityManagerFactory emf = null;
-        EntityManager em = null;
+
+    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();    	
         try {
             handler.prepare(Action.GET);
             Object o = null;
@@ -152,10 +128,7 @@ public class TenantStorageClient extends JpaStorageClientImpl {
             o = JpaStorageUtils.getEntity(
                     "org.collectionspace.services.account.Tenant", whereClause, params);
             if (null == o) {
-                if (em != null && em.getTransaction().isActive()) {
-                    em.getTransaction().rollback();
-                }
-                String msg = "could not find entity with id=" + id;
+                String msg = "Could not find entity with id=" + id;
                 throw new DocumentNotFoundException(msg);
             }
             DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(o);
@@ -169,9 +142,7 @@ public class TenantStorageClient extends JpaStorageClientImpl {
             }
             throw new DocumentException(e);
         } finally {
-            if (emf != null) {
-                JpaStorageUtils.releaseEntityManagerFactory(emf);
-            }
+            ctx.closeConnection();
         }
     }
 
@@ -179,50 +150,35 @@ public class TenantStorageClient extends JpaStorageClientImpl {
     public void update(ServiceContext ctx, String id, DocumentHandler handler)
             throws BadRequestException, DocumentNotFoundException,
             DocumentException {
-        /*
-        if (ctx == null) {
-            throw new IllegalArgumentException(
-                    "TenantStorageClient.update : ctx is missing");
-        }
-         */
-        if (handler == null) {
-            throw new IllegalArgumentException(
-                    "TenantStorageClient.update: handler is missing");
-        }
-        EntityManagerFactory emf = null;
-        EntityManager em = null;
+    	
+    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();    	
         try {
             handler.prepare(Action.UPDATE);
+            
             Tenant tenantReceived = (Tenant) handler.getCommonPart();
-            emf = JpaStorageUtils.getEntityManagerFactory();
-            em = emf.createEntityManager();
-            em.getTransaction().begin();
-            Tenant tenantFound = getTenant(em, id);
+            jpaConnectionContext.beginTransaction();
+            Tenant tenantFound = getTenant(jpaConnectionContext, id);
             checkAllowedUpdates(tenantReceived, tenantFound);
             DocumentWrapper<Tenant> wrapDoc =
                     new DocumentWrapperImpl<Tenant>(tenantFound);
             handler.handle(Action.UPDATE, wrapDoc);
-            em.getTransaction().commit();
             handler.complete(Action.UPDATE, wrapDoc);
+            
+            jpaConnectionContext.commitTransaction();
         } catch (BadRequestException bre) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+        	jpaConnectionContext.markForRollback();
             throw bre;
         } catch (DocumentException de) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+        	jpaConnectionContext.markForRollback();
             throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
+        	jpaConnectionContext.markForRollback();
             throw new DocumentException(e);
         } finally {
-            if (emf != null) {
-                JpaStorageUtils.releaseEntityManagerFactory(emf);
-            }
+            ctx.closeConnection();
         }
     }
 
@@ -234,53 +190,35 @@ public class TenantStorageClient extends JpaStorageClientImpl {
         if (logger.isDebugEnabled()) {
             logger.debug("deleting entity with id=" + id);
         }
-        /*
-        if (ctx == null) {
-            throw new IllegalArgumentException(
-                    "TenantStorageClient.delete : ctx is missing");
-        }
-        */
-        EntityManagerFactory emf = null;
-        EntityManager em = null;
+
+    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();    	
         try {
-            emf = JpaStorageUtils.getEntityManagerFactory();
-            em = emf.createEntityManager();
-
-            Tenant tenantFound = getTenant(em, id);
-            em.getTransaction().begin();
-            em.remove(tenantFound);
-            em.getTransaction().commit();
-
+            Tenant tenantFound = getTenant(jpaConnectionContext, id);
+            jpaConnectionContext.beginTransaction();
+            jpaConnectionContext.remove(tenantFound);
+            jpaConnectionContext.commitTransaction();
         } catch (DocumentException de) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+            jpaConnectionContext.markForRollback();
             throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+            jpaConnectionContext.markForRollback();
             throw new DocumentException(e);
         } finally {
-            if (emf != null) {
-                JpaStorageUtils.releaseEntityManagerFactory(emf);
-            }
+            ctx.closeConnection();
         }
     }
 
-    private Tenant getTenant(EntityManager em, String id) throws DocumentNotFoundException {
-        Tenant tenantFound = em.find(Tenant.class, id);
+    private Tenant getTenant(JPATransactionContext jpaConnectionContext, String id) throws DocumentNotFoundException {
+        Tenant tenantFound = (Tenant) jpaConnectionContext.find(Tenant.class, id);
         if (tenantFound == null) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
             String msg = "could not find account with id=" + id;
             logger.error(msg);
             throw new DocumentNotFoundException(msg);
         }
+        
         return tenantFound;
     }
 

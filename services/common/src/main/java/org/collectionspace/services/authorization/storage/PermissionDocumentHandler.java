@@ -28,25 +28,27 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.EntityExistsException;
-import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+
+import org.collectionspace.services.client.PermissionClient;
+import org.collectionspace.services.client.PermissionClient.ActionCompare;
 
 import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.CSpaceAction;
-import org.collectionspace.services.authorization.RolesList;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionAction;
 import org.collectionspace.services.authorization.perms.PermissionsList;
-import org.collectionspace.services.client.PermissionClient;
-import org.collectionspace.services.client.PermissionClient.ActionCompare;
 import org.collectionspace.services.authorization.URIResourceImpl;
-import org.collectionspace.services.common.authorization_mgt.AuthorizationStore;
+
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.JaxbUtils;
+import org.collectionspace.services.common.document.TransactionException;
 import org.collectionspace.services.common.security.SecurityUtils;
+import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 
@@ -57,6 +59,7 @@ import org.slf4j.LoggerFactory;
  * Document handler for Permission
  * @author 
  */
+@SuppressWarnings("rawtypes")
 public class PermissionDocumentHandler
 		extends JpaDocumentHandler<Permission, PermissionsList, Permission, List<Permission>> {
 
@@ -132,12 +135,14 @@ public class PermissionDocumentHandler
         }
     }
     
-    private Permission findExistingPermission(EntityManager em, Permission perm) {
+	private Permission findExistingPermission(Permission perm) throws TransactionException {
     	Permission result = null;
-		String tenantId = getServiceContext().getTenantId(); // we need a tenant ID 
-        
+    	
+		ServiceContext ctx = getServiceContext();
+		String tenantId = ctx.getTenantId(); // we need a tenant ID 
+		JPATransactionContext jpaTransactionContext = (JPATransactionContext)ctx.openConnection();
 		try {
-	    	result = (Permission)JpaStorageUtils.getEntityByDualKeys(em, 
+	    	result = (Permission)JpaStorageUtils.getEntityByDualKeys(jpaTransactionContext, 
 	    			Permission.class.getName(),
 	    			PermissionStorageConstants.RESOURCE_NAME, perm.getResourceName(), 
 	    			PermissionStorageConstants.ACTION_GROUP, perm.getActionGroup(),
@@ -148,6 +153,8 @@ public class PermissionDocumentHandler
 						perm.getResourceName(), perm.getActionGroup(), tenantId);
 				logger.trace(msg);
 			}
+		} finally {
+			ctx.closeConnection();
 		}
 
     	return result;
@@ -158,10 +165,8 @@ public class PermissionDocumentHandler
     	//
     	// First check to see if an equivalent permission exists
     	//
-    	Permission permission = wrapDoc.getWrappedObject();
-    	
-    	EntityManager em = (EntityManager) this.getServiceContext().getProperty(AuthorizationStore.ENTITY_MANAGER_PROP_KEY);
-    	Permission existingPermission = findExistingPermission(em, permission);
+    	Permission permission = wrapDoc.getWrappedObject();    	
+    	Permission existingPermission = findExistingPermission(permission);
 
     	if (existingPermission == null) {
 	        String id = UUID.randomUUID().toString();        
@@ -224,7 +229,8 @@ public class PermissionDocumentHandler
         return to;
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void completeUpdate(DocumentWrapper<Permission> wrapDoc) throws Exception {
         Permission upAcc = wrapDoc.getWrappedObject();
         getServiceContext().setOutput(upAcc);
@@ -234,14 +240,16 @@ public class PermissionDocumentHandler
         //new based on new actions and effect
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void handleGet(DocumentWrapper<Permission> wrapDoc) throws Exception {
         setCommonPart(extractCommonPart(wrapDoc));
         sanitize(getCommonPart());
         getServiceContext().setOutput(permission);
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void handleGetAll(DocumentWrapper<List<Permission>> wrapDoc) throws Exception {
         PermissionsList permissionsList = extractCommonPartList(wrapDoc);
         setCommonPartList(permissionsList);
