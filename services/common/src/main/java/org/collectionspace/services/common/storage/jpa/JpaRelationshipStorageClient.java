@@ -39,7 +39,7 @@ import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.AccountRoleRel;
 import org.collectionspace.services.authorization.PermissionRoleRel;
-
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
@@ -50,7 +50,7 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.document.JaxbUtils;
-
+import org.hsqldb.lib.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,32 +150,30 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
     public void get(ServiceContext ctx, String id, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
 
-        if (getObject(ctx, id) == null) {
-            String msg = "get: "
-                    + "could not find the object with id=" + id;
-            logger.error(msg);
-            throw new DocumentNotFoundException(msg);
-        }
-        
-        String objectId = getObjectId(ctx);
-        if (logger.isDebugEnabled()) {
-            logger.debug("get: using objectId=" + objectId);
-        }
-        Class objectClass = getObjectClass(ctx);
-        if (logger.isDebugEnabled()) {
-            logger.debug("get: using object class=" + objectClass.getName());
-        }
-        DocumentFilter docFilter = handler.getDocumentFilter();
-        if (docFilter == null) {
-            docFilter = handler.createDocumentFilter();
-        }
-        
-    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();    	
+    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();
         try {
+	        if (getObject(ctx, id) == null) {
+	            String msg = "get: " + "could not find the object with id=" + id;
+	            logger.error(msg);
+	            throw new DocumentNotFoundException(msg);
+	        }
+	        
+	        String objectId = getObjectId(ctx);
+	        Class objectClass = getObjectClass(ctx);
+	        DocumentFilter docFilter = handler.getDocumentFilter();
+	        if (docFilter == null) {
+	            docFilter = handler.createDocumentFilter();
+	        }
+        
             handler.prepare(Action.GET);
             StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
             queryStrBldr.append(getEntityName(ctx));
             queryStrBldr.append(" a");
+            
+            String joinFetch = docFilter.getJoinFetchClause();
+            if (Tools.notBlank(joinFetch)) {
+                queryStrBldr.append(" " + joinFetch);
+            }
 
             queryStrBldr.append(" WHERE " + objectId + " = :objectId");
             String where = docFilter.getWhereClause();
@@ -190,10 +188,10 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
             Query q = jpaConnectionContext.createQuery(queryStr);
             q.setParameter("objectId", id);
 
-            List<T> rl = new ArrayList<T>();
+            List<T> relList = new ArrayList<T>();
         	jpaConnectionContext.beginTransaction();
             try {
-                rl = q.getResultList();
+                relList = q.getResultList();
             } catch (NoResultException nre) {
                 String msg = "get(1): " + " could not find relationships for object class="
                         + objectClass.getName() + " id=" + id;
@@ -201,20 +199,23 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
                     logger.debug(msg, nre);
                 }
             }
-            if (rl.size() == 0) {
+            if (relList.size() == 0) {
                 String msg = "get(2): " + " could not find relationships for object class="
                         + objectClass.getName() + " id=" + id;
                 if (logger.isDebugEnabled()) {
                     logger.debug(msg);
                 }
             }
-            DocumentWrapper<List<T>> wrapDoc =
-                    new DocumentWrapperImpl<List<T>>(rl);
+            DocumentWrapper<List<T>> wrapDoc = new DocumentWrapperImpl<List<T>>(relList);
             handler.handle(Action.GET, wrapDoc);
             handler.complete(Action.GET, wrapDoc);
             jpaConnectionContext.commitTransaction();
+        } catch (DocumentNotFoundException nfe) {
+        	jpaConnectionContext.markForRollback();
+        	throw nfe;
         } catch (DocumentException de) {
         	jpaConnectionContext.markForRollback();
+        	throw de;
         } catch (Exception e) {
         	jpaConnectionContext.markForRollback();
             if (logger.isDebugEnabled()) {

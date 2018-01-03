@@ -25,6 +25,7 @@ import org.collectionspace.services.account.AccountListItem;
 import org.collectionspace.services.authentication.Token;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceAction;
+import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.PermissionException;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionRoleRel;
@@ -227,23 +228,16 @@ public class AuthorizationCommon {
         for (RoleValue roleValue : permRole.getRole()) {
             principals.add(roleValue.getRoleName());
         }
+        
+        boolean grant = perm.getEffect().equals(EffectType.PERMIT) ? true : false;
         List<PermissionAction> permActions = perm.getAction();
+        ArrayList<CSpaceResource> resources = new ArrayList<CSpaceResource>();
         for (PermissionAction permAction : permActions) {
-        	try {
-	            CSpaceAction action = URIResourceImpl.getAction(permAction.getName()); 
-	            URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(),
-	                    perm.getResourceName(), action);
-	            boolean grant = perm.getEffect().equals(EffectType.PERMIT) ? true : false;
-	            AuthZ.get().addPermissions(uriRes, principals.toArray(new String[0]), grant);//CSPACE-4967
-        	} catch (PermissionException e) {
-        		//
-        		// Only throw the exception if it is *not* an already-exists exception
-        		//
-        		if (e.getCause() instanceof AlreadyExistsException == false) {
-        			throw e;
-        		}
-        	}
+            CSpaceAction action = URIResourceImpl.getAction(permAction.getName()); 
+            URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(), perm.getResourceName(), action);
+            resources.add(uriRes);
         }
+        AuthZ.get().addPermissions(resources.toArray(new CSpaceResource[0]), principals.toArray(new String[0]), grant); // CSPACE-4967
     }
     
     private static Connection getConnection(String databaseName) throws NamingException, SQLException {

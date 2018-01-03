@@ -38,6 +38,7 @@ import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.TransactionContext;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.context.ServiceContextProperties;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.lifecycle.TransitionDef;
 
@@ -168,7 +169,7 @@ public class JpaStorageClientImpl implements StorageClient {
         try {
             handler.prepare(Action.GET);
             Object o = null;
-            o = JpaStorageUtils.getEntity(jpaTransactionContext, getEntityName(ctx), id, ctx.getTenantId());
+            o = JpaStorageUtils.getEntity(jpaTransactionContext, handler.getDocumentFilter(), getEntityName(ctx), id, ctx.getTenantId());
             if (null == o) {
                 String msg = "Could not find entity with id=" + id;
                 throw new DocumentNotFoundException(msg);
@@ -217,6 +218,11 @@ public class JpaStorageClientImpl implements StorageClient {
             StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
             queryStrBldr.append(getEntityName(ctx));
             queryStrBldr.append(" a");
+            
+            String joinFetch = docFilter.getJoinFetchClause();
+            if (Tools.notBlank(joinFetch)) {
+                queryStrBldr.append(" " + joinFetch);
+            }
             
             List<DocumentFilter.ParamBinding> params = docFilter.buildWhereForSearch(queryStrBldr);
             String queryStr = queryStrBldr.toString(); //for debugging

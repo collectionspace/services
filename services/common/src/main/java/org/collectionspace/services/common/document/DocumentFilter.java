@@ -243,6 +243,10 @@ public abstract class DocumentFilter {
         return selectClause != null ? selectClause : DEFAULT_SELECT_CLAUSE;
     }
     
+    public String getJoinFetchClause() {
+    	return null;
+    }
+    
     /**
      * Gets the where clause.
      *

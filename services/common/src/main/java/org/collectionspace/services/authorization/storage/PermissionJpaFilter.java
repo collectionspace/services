@@ -154,4 +154,16 @@ public class PermissionJpaFilter extends JpaDocumentFilter {
     public List<ParamBinding> buildWhere(StringBuilder queryStrBldr) {
         return new ArrayList<ParamBinding>();
     }
+    
+    /*
+     * The Permission resource would normally lazy-load the "action" field.  Witht this clause, we force JPA to load the action field.
+     * 
+     * (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentFilter#getJoinFetchClause()
+     */
+    @Override
+	public String getJoinFetchClause() {
+    	return "JOIN FETCH a.action i";
+    }
+
 }

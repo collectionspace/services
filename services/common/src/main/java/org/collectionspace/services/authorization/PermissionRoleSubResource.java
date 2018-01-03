@@ -34,6 +34,7 @@ import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaRelationshipStorageClient;
@@ -227,7 +228,7 @@ public class PermissionRoleSubResource
         DocumentHandler handler = createDocumentHandler(ctx);
         getStorageClient(ctx).get(ctx, csid, handler);
         result = (PermissionRole) ctx.getOutput();
-
+        
         return result;
     }
 
@@ -246,8 +247,13 @@ public class PermissionRoleSubResource
         if (logger.isDebugEnabled()) {
             logger.debug("deletePermissionRole with csid=" + csid);
         }
-        PermissionRole permRole = this.getPermissionRole(parentCtx, csid, subject);
-        deletePermissionRole(parentCtx, csid, subject, permRole);
+        PermissionRole permRole = getPermissionRole(parentCtx, csid, subject);
+        if (permRole != null) {
+        	deletePermissionRole(parentCtx, csid, subject, permRole);
+        } else {
+        	String msg = String.format("The permission CSID=%s is missing or not related to any roles.", csid);
+        	throw new DocumentNotFoundException(msg);
+        }
     }
 
     /**

@@ -66,49 +66,45 @@ public class AuthorizationDelegate {
      * @throws Exception
      * @see PermissionRole
      */
-    public static void addPermissions(ServiceContext ctx, PermissionRole pr) throws Exception {
+    public static void addRelationships(ServiceContext ctx, PermissionRole pr) throws Exception {
     	JPATransactionContext jpaTransactionContext = (JPATransactionContext) ctx.getCurrentTransactionContext();
     	
         SubjectType subject = PermissionRoleUtil.getRelationSubject(ctx, pr);
         AuthZ authz = AuthZ.get();
         if (subject.equals(SubjectType.ROLE)) {
             PermissionValue pv = pr.getPermission().get(0);
-            Permission p = getPermission(jpaTransactionContext, pv.getPermissionId());
-            if (p == null) {
+            Permission permission = getPermission(jpaTransactionContext, pv.getPermissionId());
+            if (permission == null) {
                 String msg = "addPermissions: No permission found for id=" + pv.getPermissionId();
                 logger.error(msg);
                 throw new DocumentNotFoundException(msg);
             }
-            CSpaceResource[] resources = getResources(p);
+            CSpaceResource[] resources = getResources(permission);
             String[] roles = getRoles(jpaTransactionContext, pr.getRole());
-            for (CSpaceResource res : resources) {
-                boolean grant = p.getEffect().equals(EffectType.PERMIT) ? true : false;
-                authz.addPermissions(res, roles, grant);
-            }
+            boolean grant = permission.getEffect().equals(EffectType.PERMIT) ? true : false;
+            authz.addPermissions(resources, roles, grant);
         } else if (SubjectType.PERMISSION.equals(subject)) {
             RoleValue rv = pr.getRole().get(0);
-            Role r = getRole(jpaTransactionContext, rv.getRoleId());
-            if (r == null) {
+            Role role = getRole(jpaTransactionContext, rv.getRoleId());
+            if (role == null) {
                 String msg = "addPermissions: No role found for id=" + rv.getRoleId();
                 logger.error(msg);
                 throw new DocumentNotFoundException(msg);
             }
-            //using r not rv ensures we're getting the "ROLE" prefix/qualified name
+            // Using a Role and not RoleValue ensures we're getting the "ROLE" prefix/qualified name
             // This needs to use the qualified name, not the display name
-            String[] roles = {r.getRoleName()};
+            String[] roles = {role.getRoleName()};
             for (PermissionValue pv : pr.getPermission()) {
                 Permission p = getPermission(jpaTransactionContext, pv.getPermissionId());
                 if (p == null) {
-                    String msg = "addPermissions: No permission found for id=" + pv.getPermissionId();
+                    String msg = "addPermissions: No permission resource found for csid=" + pv.getPermissionId();
                     logger.error(msg);
                     //TODO: would be nice contiue to still send 400 back
                     continue;
                 }
                 CSpaceResource[] resources = getResources(p);
-                for (CSpaceResource res : resources) {
-                    boolean grant = p.getEffect().equals(EffectType.PERMIT) ? true : false;
-                    authz.addPermissions(res, roles, grant);
-                }
+                boolean grant = p.getEffect().equals(EffectType.PERMIT) ? true : false;
+                authz.addPermissions(resources, roles, grant);
             }
         }
     }
@@ -119,7 +115,7 @@ public class AuthorizationDelegate {
      * @param pr permissionrole
      * @throws Exception
      */
-    public static void deletePermissions(ServiceContext ctx, PermissionRole pr)
+    public static void deletePermissionsFromRoles(ServiceContext ctx, PermissionRole pr)
             throws Exception {
     	JPATransactionContext jpaTransactionContext = (JPATransactionContext) ctx.getCurrentTransactionContext();
 
@@ -137,9 +133,7 @@ public class AuthorizationDelegate {
 	            }
 	            CSpaceResource[] resources = getResources(p);
 	            String[] roles = getRoles(jpaTransactionContext, pr.getRole());
-	            for (CSpaceResource res : resources) {
-	                authz.deletePermissions(res, roles);
-	            }
+                authz.deletePermissionsFromRoles(resources, roles);
         	}
         } else if (SubjectType.PERMISSION.equals(subject)) {
         	List<RoleValue> roleValues = pr.getRole();
@@ -163,9 +157,7 @@ public class AuthorizationDelegate {
 	                    continue;
 	                }
 	                CSpaceResource[] resources = getResources(p);
-	                for (CSpaceResource res : resources) {
-	                    authz.deletePermissions(res, roles);
-	                }
+                    authz.deletePermissionsFromRoles(resources, roles);
 	            }
         	}
         }
@@ -187,18 +179,9 @@ public class AuthorizationDelegate {
             logger.error(msg);
             throw new DocumentNotFoundException(msg);
         }
-        CSpaceResource[] resources = getResources(p);
-        AuthZ authz = AuthZ.get();
 
-        for (CSpaceResource res : resources) {
-            try {
-                authz.deletePermissions(res);
-            } catch (PermissionException pe) {
-                //perms are created downthere only if roles are related to the permissions
-                logger.info("no permissions found in authz service provider for "
-                        + "permCsid=" + permCsid + " res=" + res.getId());
-            }
-        }
+        CSpaceResource[] resources = getResources(p);
+        AuthZ.get().deletePermissions(resources);
     }
 
     /**

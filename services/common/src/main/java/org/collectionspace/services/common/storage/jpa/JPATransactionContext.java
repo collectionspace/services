@@ -81,6 +81,11 @@ public class JPATransactionContext extends TransactionContext {
 	}
 	
 	@Override
+	public Object merge(Object entity) {
+		return em.merge(entity);
+	}
+	
+	@Override
 	public Object find(Class entityClass, Object primaryKey) {
 		return em.find(entityClass, primaryKey);
 	}

@@ -40,6 +40,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.TransactionStatus;
 
 /**
  * AuthZ is the authorization service singleton used by the services runtime
@@ -121,9 +122,18 @@ public class AuthZ {
      * @param principals
      *      * @param grant true to grant false to deny
      */
-    public void addPermissions(CSpaceResource res, String[] principals, boolean grant) throws PermissionException {
-        CSpaceAction action = res.getAction();
-        addPermissions(res, action, principals, grant);
+    public void addPermissions(CSpaceResource[] resources, String[] principals, boolean grant) throws PermissionException {
+        TransactionStatus status = provider.beginTransaction("addPermssions");
+        try {
+            for (CSpaceResource res : resources) {
+                CSpaceAction action = res.getAction();
+            	addPermissions(res, action, principals, grant);
+            }
+	        provider.commitTransaction(status);
+        } catch (Throwable t) {
+        	provider.rollbackTransaction(status);
+        	throw t;
+        }        
     }
 
     /**
@@ -133,9 +143,9 @@ public class AuthZ {
      * @param principals
      * @param grant true to grant false to deny
      */
-    public void addPermissions(CSpaceResource res, CSpaceAction action, String[] principals, boolean grant)
+    private void addPermissions(CSpaceResource res, CSpaceAction action, String[] principals, boolean grant)
             throws PermissionException {
-        provider.getPermissionManager().addPermissions(res, action, principals, grant);
+        provider.getPermissionManager().addPermissionsToRoles(res, action, principals, grant);
         provider.clearAclCache();
     }
 
@@ -146,10 +156,20 @@ public class AuthZ {
      * @param res
      * @param principals
      */
-    public void deletePermissions(CSpaceResource res, String[] principals)
+    public void deletePermissionsFromRoles(CSpaceResource[] resources, String[] principals)
             throws PermissionNotFoundException, PermissionException {
-        CSpaceAction action = res.getAction();
-        deletePermissions(res, action, principals);
+    	
+        TransactionStatus status = provider.beginTransaction("deletePermssions");
+        try {
+        	for (CSpaceResource res : resources) {
+		        CSpaceAction action = res.getAction();
+		        deletePermissionsFromRoles(res, action, principals);
+            }
+	        provider.commitTransaction(status);
+	    } catch (Throwable t) {
+	    	provider.rollbackTransaction(status);
+	    	throw t;
+	    }
     }
 
     /**
@@ -159,9 +179,9 @@ public class AuthZ {
      * @param action
      * @param principals
      */
-    public void deletePermissions(CSpaceResource res, CSpaceAction action, String[] principals)
+    private void deletePermissionsFromRoles(CSpaceResource res, CSpaceAction action, String[] principals)
             throws PermissionNotFoundException, PermissionException {
-        provider.getPermissionManager().deletePermissions(res, action, principals);
+        provider.getPermissionManager().deletePermissionsFromRoles(res, action, principals);
         provider.clearAclCache();
     }
 
@@ -173,14 +193,23 @@ public class AuthZ {
      * @param res
      * @param principals
      */
-    public void deletePermissions(CSpaceResource res)
+    public void deletePermissions(CSpaceResource[] resources)
             throws PermissionNotFoundException, PermissionException {
-        CSpaceAction action = res.getAction();
-        if (action != null) {
-            deletePermissions(res, action);
-        } else {
-            provider.getPermissionManager().deletePermissions(res);
-            provider.clearAclCache();
+        TransactionStatus status = provider.beginTransaction("deletePermssions");
+        try {
+	        for (CSpaceResource res : resources) {
+		        CSpaceAction action = res.getAction();
+		        if (action != null) {
+		            deletePermissions(res, action);
+		        } else {
+		            provider.getPermissionManager().deletePermissions(res);
+		            provider.clearAclCache();
+		        }
+	        }
+	        provider.commitTransaction(status);
+        } catch (Throwable t) {
+        	provider.rollbackTransaction(status);
+        	throw t;
         }
     }
 
@@ -191,7 +220,7 @@ public class AuthZ {
      * @param action
      * @param principals
      */
-    public void deletePermissions(CSpaceResource res, CSpaceAction action)
+    private void deletePermissions(CSpaceResource res, CSpaceAction action)
             throws PermissionNotFoundException, PermissionException {
         provider.getPermissionManager().deletePermissions(res, action);
         provider.clearAclCache();

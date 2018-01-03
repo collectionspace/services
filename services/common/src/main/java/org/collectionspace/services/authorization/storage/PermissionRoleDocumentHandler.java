@@ -149,7 +149,7 @@ public class PermissionRoleDocumentHandler
     @Override
     public void completeCreate(DocumentWrapper<List<PermissionRoleRel>> wrapDoc) throws Exception {
         PermissionRole pr = getCommonPart();
-        AuthorizationDelegate.addPermissions(getServiceContext(), pr);
+        AuthorizationDelegate.addRelationships(getServiceContext(), pr);
     }
 
     /* (non-Javadoc)
@@ -201,7 +201,7 @@ public class PermissionRoleDocumentHandler
     @Override
     public void completeDelete(DocumentWrapper<List<PermissionRoleRel>> wrapDoc) throws Exception {
         PermissionRole pr = getCommonPart();
-        AuthorizationDelegate.deletePermissions(getServiceContext(), pr);
+        AuthorizationDelegate.deletePermissionsFromRoles(getServiceContext(), pr);
     }
 
     /* (non-Javadoc)

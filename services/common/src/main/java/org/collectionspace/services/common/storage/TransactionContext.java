@@ -34,4 +34,6 @@ public abstract class TransactionContext {
 	abstract public Query createQuery(String qlString);
 	
 	abstract public void remove(Object entity);
+
+	abstract public Object merge(Object entity);
 }

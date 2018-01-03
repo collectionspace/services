@@ -44,7 +44,7 @@ public interface CSpacePermissionManager {
      * @see CSpaceResource
      * @see CSpaceAction
      */
-    public void addPermissions(CSpaceResource res, CSpaceAction action, String[] principals, boolean grant)
+    public void addPermissionsToRoles(CSpaceResource res, CSpaceAction action, String[] principals, boolean grant)
             throws PermissionException;
 
     /**
@@ -57,7 +57,7 @@ public interface CSpacePermissionManager {
      * @see CSpaceResource
      * @see CSpaceAction
      */
-    public void deletePermissions(CSpaceResource res, CSpaceAction action, String[] principals)
+    public void deletePermissionsFromRoles(CSpaceResource res, CSpaceAction action, String[] principals)
             throws PermissionNotFoundException, PermissionException;
 
     /**

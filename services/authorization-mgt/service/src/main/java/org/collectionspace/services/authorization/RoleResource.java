@@ -152,42 +152,43 @@ public class RoleResource extends SecurityResourceBase {
 
 	@DELETE
     @Path("{csid}")
-    public Response deleteRole(@PathParam("csid") String csid, @Context UriInfo ui) {
+    public Response deleteRole(@PathParam("csid") String csid, @Context UriInfo ui) throws Exception {
         logger.debug("deleteRole with csid=" + csid);
         ensureCSID(csid, ServiceMessages.DELETE_FAILED + "deleteRole ");
 
+        ServiceContext<Role, Role> ctx = createServiceContext((Role) null, Role.class);
+        TransactionContext transactionContext = ctx.openConnection(); // ensure we do all this in one transaction
         try {
-            ServiceContext<Role, Role> ctx = createServiceContext((Role) null, Role.class);
-            ctx.openConnection(); // ensure we do all this in one transaction
-            try {
-	        	Role role = (Role)get(csid, Role.class);
-	            // If marked as metadata immutable, do not delete
-	            if (RoleClient.IMMUTABLE.equals(role.getMetadataProtection())) {
-	                Response response = 
-	                	Response.status(Response.Status.FORBIDDEN).entity("Role: "+csid+" is immutable.").type("text/plain").build();
-	                return response;
-	            }
-	            //
-	            // delete all the permission/role relationships
-	            //
-	            PermissionRoleSubResource permRoleResource =
-	                    new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
-	            permRoleResource.deletePermissionRole(ctx, csid, SubjectType.PERMISSION);
-	            //
-	            //delete all the account/role relationships associate with this role
-	            //
-	            AccountRoleSubResource accountRoleResource =
-	                new AccountRoleSubResource(AccountRoleSubResource.ROLE_ACCOUNTROLE_SERVICE);
-	            accountRoleResource.deleteAccountRole(ctx, csid, SubjectType.ACCOUNT);
-	            //
-	            //finally, delete the role itself
-	            //
-	            ((JpaStorageClientImpl) getStorageClient(ctx)).deleteWhere(ctx, csid);
-            } finally {
-            	ctx.closeConnection();
+        	transactionContext.beginTransaction();
+        	Role role = (Role)get(csid, Role.class);
+            // If marked as metadata immutable, do not delete
+            if (RoleClient.IMMUTABLE.equals(role.getMetadataProtection())) {
+                Response response = 
+                	Response.status(Response.Status.FORBIDDEN).entity("Role: "+csid+" is immutable.").type("text/plain").build();
+                return response;
             }
-        } catch (Exception e) {
+            //
+            // delete all the permission/role relationships
+            //
+            PermissionRoleSubResource permRoleResource =
+                    new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
+            permRoleResource.deletePermissionRole(ctx, csid, SubjectType.PERMISSION);
+            //
+            //delete all the account/role relationships associate with this role
+            //
+            AccountRoleSubResource accountRoleResource =
+                new AccountRoleSubResource(AccountRoleSubResource.ROLE_ACCOUNTROLE_SERVICE);
+            accountRoleResource.deleteAccountRole(ctx, csid, SubjectType.ACCOUNT);
+            //
+            //finally, delete the role itself
+            //
+            ((JpaStorageClientImpl) getStorageClient(ctx)).deleteWhere(ctx, csid);
+            transactionContext.commitTransaction();
+        } catch(Exception e) {
+        	transactionContext.markForRollback();
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, csid);
+        } finally {
+        	ctx.closeConnection();
         }
         
         return Response.status(HttpResponseCodes.SC_OK).build();

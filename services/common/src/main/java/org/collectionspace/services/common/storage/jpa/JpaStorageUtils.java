@@ -45,8 +45,10 @@ import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.PermissionRoleRel;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.URIResourceImpl;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationRoleRel;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.document.JaxbUtils;
@@ -328,7 +330,19 @@ public class JpaStorageUtils {
         return result;
     }
     
-    public static Object getEnityByKey(JPATransactionContext jpaTransactionContext, String entityName, String key, String value,
+    public static Object getEnityByKey(
+    		JPATransactionContext jpaTransactionContext,
+    		String entityName, 
+    		String key, 
+    		String value,
+            String tenantId) throws TransactionException {
+    	return getEnityByKey(jpaTransactionContext, (DocumentFilter)null, entityName, key, value, tenantId);
+    }
+    
+    public static Object getEnityByKey(
+    		JPATransactionContext jpaTransactionContext,
+    		DocumentFilter docFilter,
+    		String entityName, String key, String value,
             String tenantId) throws TransactionException {
         Object result = null;
         
@@ -337,9 +351,17 @@ public class JpaStorageUtils {
             StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
             queryStrBldr.append(entityName);
             queryStrBldr.append(" a");
-            queryStrBldr.append(" WHERE " + key + " = :" + key);
+            
+            if (docFilter != null) {
+	            String joinFetch = docFilter.getJoinFetchClause();
+	            if (Tools.notBlank(joinFetch)) {
+	            	queryStrBldr.append(" " + joinFetch);
+	            }
+            }
+            
+            queryStrBldr.append(" WHERE a." + key + " = :" + key);
             if (useTenantId == true) {
-                queryStrBldr.append(" AND tenantId = :tenantId");
+                queryStrBldr.append(" AND a.tenantId = :tenantId");
             }
             String queryStr = queryStrBldr.toString(); //for debugging            
             Query q = jpaTransactionContext.createQuery(queryStr);
@@ -434,12 +456,13 @@ public class JpaStorageUtils {
      */
     public static Object getEntity(
     		JPATransactionContext jpaTransactionContext,
+    		DocumentFilter docFilter,
     		String entityName,
     		String id,
             String tenantId) throws TransactionException {
-    	return getEnityByKey(jpaTransactionContext, entityName, CSID_LABEL, id, tenantId);
+    	return getEnityByKey(jpaTransactionContext, docFilter, entityName, CSID_LABEL, id, tenantId);
     }
-    
+
     /**
      * getEntity 
      * @param entityName fully qualified entity name

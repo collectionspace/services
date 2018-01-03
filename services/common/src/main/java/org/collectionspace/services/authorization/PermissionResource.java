@@ -95,6 +95,10 @@ public class PermissionResource extends SecurityResourceBase {
     }
 
     @POST
+    public Response createPermission(Permission input) {
+        return create(input);
+    }
+    
     public Response createPermission(JPATransactionContext jpaTransactionContext, Permission input) {
         return create(jpaTransactionContext, input);
     }
@@ -139,32 +143,42 @@ public class PermissionResource extends SecurityResourceBase {
     @SuppressWarnings("unchecked")
 	@DELETE
     @Path("{csid}")
-    public Response deletePermission(@PathParam("csid") String csid) throws Exception {
+    synchronized public Response deletePermission(@PathParam("csid") String csid) throws Exception {
         logger.debug("deletePermission with csid=" + csid);
         ensureCSID(csid, ServiceMessages.DELETE_FAILED + "permission ");
 
 		ServiceContext<Permission, Permission> ctx = createServiceContext((Permission) null, Permission.class);
         TransactionContext transactionContext = ctx.openConnection();
         try {
-            //FIXME ideally the following two ops should be in the same tx CSPACE-658
-            //delete all relationships for this permission
+        	transactionContext.beginTransaction();
+        	//
+        	// First, delete the relationships between the Permission resource and any Role resources.
+        	//
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.PERMISSION_PERMROLE_SERVICE);
             subResource.deletePermissionRole(ctx, csid, SubjectType.ROLE);
-            //NOTE for delete permissions in the authz provider
-            //at the PermissionRoleSubResource/DocHandler level, there is no visibility
-            //if permission is deleted, so do it here, however,
-            //this is a very dangerous operation as it deletes the Spring ACL instead of ACE(s)
-            //the ACL might be needed for other ACEs roles...
-            AuthorizationDelegate.deletePermissions((JPATransactionContext)transactionContext, csid);
-
+            //
+            // Next, delete the low-level (Spring Security) permissions.
+            //
+            // NOTE: For deletePermission() in the authz provider at the PermissionRoleSubResource/DocHandler level, there is no visibility
+            // if permission is deleted, so do it here.
+            //
+            // WARNING: This operation deletes the Spring ACL (not the ACEs). It's possible the ACL might be needed for other ACEs roles...
+            //
+            AuthorizationDelegate.deletePermissions((JPATransactionContext)transactionContext, csid); // Deletes the low-level (Spring Security) permissions
+            //
+            // Lastly, delete the Permission resource itself and commit the transaction
+            //
             getStorageClient(ctx).delete(ctx, csid);
-            return Response.status(HttpResponseCodes.SC_OK).build();
+            transactionContext.commitTransaction();
         } catch (Exception e) {
+        	transactionContext.markForRollback();
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, csid);
         } finally {
         	ctx.closeConnection();
         }
+        
+        return Response.status(HttpResponseCodes.SC_OK).build();
     }
 
 	@POST
@@ -237,20 +251,23 @@ public class PermissionResource extends SecurityResourceBase {
         try {
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.PERMISSION_PERMROLE_SERVICE);
-            //delete all relationships for a permission
+            //
+            // Delete all role relationships for a permission
+            //
             subResource.deletePermissionRole((ServiceContext<Permission, Permission>)null, permCsid, SubjectType.ROLE, input);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, permCsid);
         }
     }
-    
+
     @DELETE
     @Path("{csid}/permroles")    
     public Response deletePermissionRole(
             @PathParam("csid") String permCsid) {
         logger.debug("Delete all the role relationships of the permissions with permCsid=" + permCsid);
-         ensureCSID(permCsid, ServiceMessages.DELETE_FAILED + "permroles permission ");
+        ensureCSID(permCsid, ServiceMessages.DELETE_FAILED + "permroles permission ");
+         
         try {
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.PERMISSION_PERMROLE_SERVICE);
