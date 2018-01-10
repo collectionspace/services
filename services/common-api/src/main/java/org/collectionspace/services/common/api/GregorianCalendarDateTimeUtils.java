@@ -22,6 +22,9 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.XMLGregorianCalendar;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +68,10 @@ public class GregorianCalendarDateTimeUtils {
     */
     public static GregorianCalendar currentDateAndTimeUTC() {
         return currentDateAndTime(DateUtils.UTCTimeZone());
+    }
+    
+    public static XMLGregorianCalendar currentXMLGregorianCalendarUTC() throws DatatypeConfigurationException {
+    	return javax.xml.datatype.DatatypeFactory.newInstance().newXMLGregorianCalendar(currentDateAndTimeUTC());
     }
 
    /**

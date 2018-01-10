@@ -51,6 +51,12 @@
 			<groupId>org.collectionspace.services</groupId>
 			<artifactId>org.collectionspace.services.account.client</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-codec</groupId>
+					<artifactId>commons-codec</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.collectionspace.services</groupId>
@@ -58,6 +64,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<!-- 3rd Pary dependencies -->
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.4</version>
+		</dependency>
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
@@ -145,6 +156,12 @@
 			<groupId>ch.elca.el4j.modules</groupId>
 			<artifactId>module-xml_merge-common</artifactId>
 			<version>3.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-codec</groupId>
+					<artifactId>commons-codec</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.collectionspace.services</groupId>
@@ -228,6 +245,10 @@
 				<exclusion>
 					<artifactId>nuxeo-core-storage-sql</artifactId>
 					<groupId>org.nuxeo.ecm.core</groupId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-codec</groupId>
+					<artifactId>commons-codec</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

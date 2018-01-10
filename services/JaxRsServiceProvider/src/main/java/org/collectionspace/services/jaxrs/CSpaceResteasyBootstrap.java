@@ -11,12 +11,14 @@ import org.collectionspace.services.account.Tenant;
 import org.collectionspace.services.account.TenantResource;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.client.AuthorityClient;
+
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
+
 import org.collectionspace.services.config.service.AuthorityInstanceType;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.service.ServiceBindingType.AuthorityInstanceList;
@@ -34,6 +36,7 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 	
 	java.util.logging.Logger logger = java.util.logging.Logger.getAnonymousLogger();
 	static final String RESET_AUTHORITIES_PROPERTY = "org.collectionspace.services.authorities.reset";
+	private static final String QUICK_BOOT_PROPERTY = "org.collectionspace.services.quickboot";
 	
 	@Override
 	public void  contextInitialized(ServletContextEvent event) {
@@ -48,8 +51,11 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 			Dispatcher disp = deployment.getDispatcher();
 			disp.getDefaultContextObjects().put(ResourceMap.class, app.getResourceMap());
 			
-			String resetAuthsString = System.getProperty(RESET_AUTHORITIES_PROPERTY, Boolean.FALSE.toString()); // Property can be set in the tomcat/bin/setenv.sh (or setenv.bat) file
-			initializeAuthorities(app.getResourceMap(), Boolean.valueOf(resetAuthsString));
+			String quickBoot = System.getProperty(QUICK_BOOT_PROPERTY, Boolean.FALSE.toString()); // Property can be set in the tomcat/bin/setenv.sh (or setenv.bat) file
+			if (Boolean.valueOf(quickBoot) == false) {
+				String resetAuthsString = System.getProperty(RESET_AUTHORITIES_PROPERTY, Boolean.FALSE.toString()); // Property can be set in the tomcat/bin/setenv.sh (or setenv.bat) file
+				initializeAuthorities(app.getResourceMap(), Boolean.valueOf(resetAuthsString));
+			}
 			
 			logger.log(Level.INFO, String.format("%tc [INFO] CollectionSpace Services' JAX-RS application started.", new Date()));
 		} catch (Exception e) {

@@ -2,6 +2,9 @@ package org.collectionspace.services.IntegrationTests.test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+import javax.xml.bind.DatatypeConverter;
 
 import static org.testng.Assert.*;
 
@@ -77,9 +80,11 @@ public class JsonIntegrationTest {
     
     @Test
     public void testAuth() throws ClientProtocolException, IOException {
+        String base64EncodedPassword = DatatypeConverter.printBase64Binary(PASSWORD.getBytes(StandardCharsets.UTF_8));
+        
         JsonNode jsonNode;
         
-        jsonNode = postAuthForm("oauth/token", "grant_type=password&username=" + USERNAME + "&password=" + PASSWORD);
+        jsonNode = postAuthForm("oauth/token", "grant_type=password&username=" + USERNAME + "&password=" + base64EncodedPassword);
 
         assertEquals(jsonNode.at("/token_type").asText(), "bearer");
         assertTrue(StringUtils.isNotEmpty(jsonNode.at("/access_token").asText()));
