@@ -1,6 +1,5 @@
 package org.collectionspace.services.common.authorization_mgt;
 
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,6 +12,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.naming.NamingException;
@@ -77,6 +77,11 @@ public class AuthorizationCommon {
 	final private static String tokensalt = "74102328UserDetailsReset";
 	final private static int TIME_SCALAR = 100000;
 	private static final String DEFAULT_PASSWORD_RESET_EMAIL_SUBJECT = "Password reset for CollectionSpace account";
+	
+	//
+	// Keep track of the MD5 hash value for the tenant bindings
+	//
+	private static final Map<String, String> tenantConfigMD5HashTable = new HashMap<String, String>();
 
     //
     // ActionGroup labels/constants
@@ -149,6 +154,14 @@ public class AuthorizationCommon {
 	public static final String IGNORE_TENANT_ID = null; // A null constant to indicate an empty/unused value for the tenant ID
 
 
+	public static String getTenantConfigMD5Hash(String tenantId) {
+		return tenantConfigMD5HashTable.get(tenantId);
+	}
+	
+	public static String setTenantConfigMD5Hash(String tenantId, String md5hash) {
+		return tenantConfigMD5HashTable.put(tenantId, md5hash);
+	}	
+	
     public static Role getRole(String tenantId, String displayName) {
     	Role role = null;
     	
@@ -427,39 +440,7 @@ public class AuthorizationCommon {
 
     	return existingTenants;
     }
-    
-    private static void createMissingTenants(Connection conn, Hashtable<String, String> tenantInfo,
-    		ArrayList<String> existingTenants) throws SQLException, Exception {
-		// Need to define and look for a createDisabled attribute in tenant config
-    	final String insertTenantSQL = 
-    		"INSERT INTO tenants (id,name,authorities_initialized,disabled,created_at) VALUES (?,?,FALSE,FALSE,now())";
-        PreparedStatement pstmt = null;
-    	try {
-    		pstmt = conn.prepareStatement(insertTenantSQL); // create a statement
-    		for(String tId : tenantInfo.keySet()) {
-    			if(existingTenants.contains(tId)) {
-    				if (logger.isDebugEnabled()) {
-    					logger.debug("createMissingTenants: tenant exists (skipping): "
-    							+tenantInfo.get(tId));
-    				}
-    				continue;
-    			}
-    			pstmt.setString(1, tId);					// set id param
-    			pstmt.setString(2, tenantInfo.get(tId));	// set name param
-    			if (logger.isDebugEnabled()) {
-    				logger.debug("createMissingTenants adding entry for tenant: "+tId);
-    			}
-    			pstmt.executeUpdate();
-    		}
-    		pstmt.close();
-    	} catch(Exception e) {
-    		throw e;
-    	} finally {
-    		if(pstmt!=null)
-    			pstmt.close();
-    	}
-    }
-    
+        
     private static ArrayList<String> findOrCreateDefaultUsers(Connection conn, Hashtable<String, String> tenantInfo) 
         	throws SQLException, Exception {
     	// Second find or create the users
@@ -915,6 +896,37 @@ public class AuthorizationCommon {
     	}
     }
     
+    /*
+     * Using the tenant bindings, ensure there are corresponding Tenant records (db columns).
+     */
+    public static void createTenants(
+    		TenantBindingConfigReaderImpl tenantBindingConfigReader,
+    		DatabaseProductType databaseProductType,
+			String cspaceDatabaseName) throws Exception {
+		logger.debug("ServiceMain.createTenants starting...");
+		Hashtable<String, String> tenantInfo = getTenantNamesFromConfig(tenantBindingConfigReader);
+		Connection conn = null;
+		try {
+			conn = getConnection(cspaceDatabaseName);
+			ArrayList<String> existingTenants = compileExistingTenants(conn, tenantInfo);
+
+			// Note that this only creates tenants not marked as "createDisabled"
+			createMissingTenants(conn, tenantInfo, existingTenants);
+		} catch (Exception e) {
+			logger.debug("Exception in createTenants: " + e.getLocalizedMessage());
+			throw e;
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException sqle) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("SQL Exception closing statement/connection: " + sqle.getLocalizedMessage());
+				}
+			}
+		}
+	}
+    
     public static void createDefaultAccounts(
     		TenantBindingConfigReaderImpl tenantBindingConfigReader,
     		DatabaseProductType databaseProductType,
@@ -932,10 +944,6 @@ public class AuthorizationCommon {
         // accounts, users, account-tenants, account-roles, and start over.
         try {
         	conn = getConnection(cspaceDatabaseName);
-	        ArrayList<String> existingTenants = compileExistingTenants(conn, tenantInfo);
-	        
-	    	// Note that this only creates tenants not marked as "createDisabled"
-	        createMissingTenants(conn, tenantInfo, existingTenants);
 	        
 	        ArrayList<String> usersInRepo = findOrCreateDefaultUsers(conn, tenantInfo);
 	        
@@ -1069,7 +1077,16 @@ public class AuthorizationCommon {
 		return result;
 	}
 	
-    public static void createDefaultWorkflowPermissions(TenantBindingConfigReaderImpl tenantBindingConfigReader) throws Exception //FIXME: REM - 4/11/2012 - Rename to createWorkflowPermissions
+	/**
+	 * 
+	 * @param tenantBindingConfigReader
+	 * @param databaseProductType
+	 * @param cspaceDatabaseName
+	 * @throws Exception
+	 */
+    public static void createDefaultWorkflowPermissions(TenantBindingConfigReaderImpl tenantBindingConfigReader,
+    		DatabaseProductType databaseProductType, 
+    		String cspaceDatabaseName) throws Exception //FIXME: REM - 4/11/2012 - Rename to createWorkflowPermissions
     {
     	java.util.logging.Logger logger = java.util.logging.Logger.getAnonymousLogger();
 
@@ -1081,11 +1098,14 @@ public class AuthorizationCommon {
         try {
             em = emf.createEntityManager();
 
-	        Hashtable<String, TenantBindingType> tenantBindings =
-	            	tenantBindingConfigReader.getTenantBindings();
+	        Hashtable<String, TenantBindingType> tenantBindings = tenantBindingConfigReader.getTenantBindings();
 	        for (String tenantId : tenantBindings.keySet()) {
 	        	logger.info(String.format("Creating/verifying workflow permissions for tenant ID=%s.", tenantId));
 		        TenantBindingType tenantBinding = tenantBindings.get(tenantId);
+		        if (tenantBinding.isConfigChangedSinceLastStart() == false) {
+		        	continue; // skip the rest of the loop and go to the next tenant
+		        }
+		        
 	    		Role adminRole = AuthorizationCommon.getRole(em, tenantBinding.getId(), ROLE_TENANT_ADMINISTRATOR);
 	    		Role readonlyRole = AuthorizationCommon.getRole(em, tenantBinding.getId(), ROLE_TENANT_READER);
 	    		
@@ -1136,7 +1156,74 @@ public class AuthorizationCommon {
         }
     }
     
-    private static PermissionRoleRel findPermRoleRel(EntityManager em, String permissionId, String RoleId) {
+	private static void createMissingTenants(Connection conn, Hashtable<String, String> tenantInfo,
+    		ArrayList<String> existingTenants) throws SQLException, Exception {
+		// Need to define and look for a createDisabled attribute in tenant config
+    	final String insertTenantSQL = 
+    		"INSERT INTO tenants (id,name,authorities_initialized,disabled,created_at) VALUES (?,?,FALSE,FALSE,now())";
+        PreparedStatement pstmt = null;
+    	try {
+    		pstmt = conn.prepareStatement(insertTenantSQL); // create a statement
+    		for(String tId : tenantInfo.keySet()) {
+    			if(existingTenants.contains(tId)) {
+    				if (logger.isDebugEnabled()) {
+    					logger.debug("createMissingTenants: tenant exists (skipping): "
+    							+tenantInfo.get(tId));
+    				}
+    				continue;
+    			}
+    			pstmt.setString(1, tId);					// set id param
+    			pstmt.setString(2, tenantInfo.get(tId));	// set name param
+    			if (logger.isDebugEnabled()) {
+    				logger.debug("createMissingTenants adding entry for tenant: "+tId);
+    			}
+    			pstmt.executeUpdate();
+    		}
+    		pstmt.close();
+    	} catch(Exception e) {
+    		throw e;
+    	} finally {
+    		if(pstmt!=null)
+    			pstmt.close();
+    	}
+    }
+    
+    public static String getPersistedMD5Hash(String tenantId, String cspaceDatabaseName) throws Exception {
+    	String result = null;
+    	
+    	ArrayList<String> existingTenants = new ArrayList<String>();
+    	// First find or create the tenants
+    	final String queryTenantSQL = String.format("SELECT id, name, config_md5hash FROM tenants WHERE id = '%s'", tenantId);
+    	
+    	Statement stmt = null;
+    	Connection conn;
+    	int rowCount = 0;
+    	try {
+			conn = getConnection(cspaceDatabaseName);
+    		stmt = conn.createStatement();
+    		ResultSet rs = stmt.executeQuery(queryTenantSQL);
+    		while (rs.next()) {
+    			if (rowCount > 0) {
+    				String errMsg = String.format("Unable to configure tenant ID='%s'.  There appears to be more than one tenant with that ID in the AuthN/AuthZ database named '%s'.",
+    						tenantId, cspaceDatabaseName);
+    				throw new Exception(errMsg);
+    			}
+    			String tId = rs.getString("id");		// for debugging only
+    			String tName = rs.getString("name");	// for debugging only
+    			result = rs.getString("config_md5hash");
+    			rowCount++;
+    		}
+    		rs.close();
+    	} catch(Exception e) {
+    		throw e;
+    	} finally {
+    		if (stmt != null) stmt.close();
+    	}
+    	
+    	return result;
+    }
+
+	private static PermissionRoleRel findPermRoleRel(EntityManager em, String permissionId, String RoleId) {
     	PermissionRoleRel result = null;
     	
     	try {
@@ -1270,4 +1357,30 @@ public class AuthorizationCommon {
 		
 		return result;
 	}
+
+	public static void persistTenantBindingsMD5Hash(TenantBindingConfigReaderImpl tenantBindingConfigReader,
+			DatabaseProductType databaseProductType, String cspaceDatabaseName) throws Exception {
+		// Need to define and look for a createDisabled attribute in tenant config
+		String updateTableSQL = "UPDATE tenants SET config_md5hash = ? WHERE id = ?";
+
+    	Connection conn;
+        PreparedStatement pstmt = null;
+    	try {
+			conn = getConnection(cspaceDatabaseName);
+    		pstmt = conn.prepareStatement(updateTableSQL); // create a statement
+    		for (String tId : AuthorizationCommon.tenantConfigMD5HashTable.keySet()) {
+    			pstmt.setString(1, AuthorizationCommon.getTenantConfigMD5Hash(tId));
+    			pstmt.setString(2, tId);
+    			if (logger.isDebugEnabled()) {
+    				logger.debug("createMissingTenants adding entry for tenant: " + tId);
+    			}
+    			pstmt.executeUpdate();
+    		}
+    		pstmt.close();
+    	} catch(Exception e) {
+    		throw e;
+    	} finally {
+    		if (pstmt!=null) pstmt.close();
+    	}
+    }
 }

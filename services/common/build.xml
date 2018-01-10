@@ -11,6 +11,7 @@
     <property name="mvn.opts" value="-V" />
     <property name="src" location="src"/>
     <property name="build" location="build"/>
+    <property name="common.jar" value="collectionspace-services-common.jar"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -179,6 +180,8 @@
         <copy todir="${jee.server.cspace}/conf"
               file="${src}/main/cspace/config/log/jboss-log4j-release.xml"/>
 		-->
+        <copy file="${basedir}/target/${common.jar}" todir="${jee.server.cspace}/lib"/>
+
 		<antcall target="deploy_aspectj" />
         <antcall target="deploy_spring" />
         <antcall target="deploy_slf4j" />
@@ -200,6 +203,7 @@
 		<!--
         <delete failonerror="false" file="${jee.server.cspace}/conf/jboss-log4j-release.xml"/>
 		-->
+        <delete failonerror="false" file="${jee.server.cspace}/lib/${common.jar}"/>
         <delete failonerror="false" dir="${jee.server.cspace}/cspace/config/services"/>
     </target>
 

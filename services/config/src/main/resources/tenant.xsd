@@ -52,6 +52,13 @@
         	<xs:element name="remoteClientConfigurations" type="RemoteClientConfigurations" minOccurs="0" maxOccurs="1"/>
         	<xs:element name="emailConfig" type="EmailConfig" minOccurs="0" maxOccurs="1"/>
             <xs:element name="serviceBindings" type="service:ServiceBindingType" minOccurs="0" maxOccurs="unbounded"/>
+			<!--
+				Processing all of the tenant bindings at startup involves several sub-tasks and is expensive (slow), so we'll compute the MD5 hash of the config and persist it in the corresponding tenant record.
+				Some of the startup sub-tasks can compare the MD5 hash of the current tenant bindings with that of the last startup to see if anything has changed.  If the hashes match, there's been no changes so
+				a sub-task can decide whether to run or not.				  
+			-->        	
+        	<xs:element name="configMD5Hash" type="xs:string" minOccurs="0" maxOccurs="1"/>					<!-- Transient, only used during startup.  Not part of config file. -->
+        	<xs:element name="configChangedSinceLastStart" type="xs:boolean" minOccurs="0" maxOccurs="1"/>	<!-- Transient, only used during startup.  Not part of config file. -->
         </xs:sequence>
         <!-- tenant id, a UUID -->
         <xs:attribute name="id" type="xs:ID" use="required"/>
@@ -62,6 +69,7 @@
         <xs:attribute name="displayName" type="xs:string" use="required"/>
         <xs:attribute name="version" type="types:VersionType" use="required"/>
         <xs:attribute name="createDisabled" type="xs:boolean" use="optional" default="false"/>
+        <xs:attribute name="forceUpdate" type="xs:boolean" use="optional" default="false"/>
 
     </xs:complexType>
 

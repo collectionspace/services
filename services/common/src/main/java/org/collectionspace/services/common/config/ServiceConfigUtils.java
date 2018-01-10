@@ -47,6 +47,8 @@ import org.slf4j.LoggerFactory;
 public class ServiceConfigUtils {
 
     final static Logger logger = LoggerFactory.getLogger(ServiceConfigUtils.class);
+    
+	public static final String FORCE_BINDINGS_UPDATE = "-1";
 
 	public static DocHandlerParams.Params getDocHandlerParams(String tenantId, String serviceName) throws DocumentException {
         TenantBindingConfigReaderImpl tReader =

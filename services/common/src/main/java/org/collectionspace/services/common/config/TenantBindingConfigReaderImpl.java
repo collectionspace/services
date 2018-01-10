@@ -27,11 +27,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.common.api.Tools;
@@ -159,7 +164,7 @@ public class TenantBindingConfigReaderImpl extends AbstractConfigReaderImpl<List
 					+ JEEServerDeployment.TENANT_BINDINGS_FILENAME_PREFIX + MERGED_SUFFIX;
 			File mergedOutFile = new File(mergedFileName);
 			try {
-				FileUtils.copyInputStreamToFile(result, mergedOutFile);
+				FileUtils.copyInputStreamToFile(result, mergedOutFile); // Save the merge file for debugging
 			} catch (IOException e) {
 				logger.warn("Could not create a copy of the merged tenant configuration at: " + mergedFileName, e);
 			}
@@ -293,6 +298,13 @@ public class TenantBindingConfigReaderImpl extends AbstractConfigReaderImpl<List
 					try {
 						tenantBindingConfig = (TenantBindingConfig) parse(tenantBindingsStream,
 								TenantBindingConfig.class);
+						//
+						// Compute the MD5 hash of the tenant's binding file.  We'll persist this a little later during startup.  If the value hasn't
+						// changed since we last startedup, we can skip some of the startup steps.
+						//
+						tenantBindingsStream.reset();
+						String md5hash = new String(Hex.encodeHex(DigestUtils.md5(tenantBindingsStream)));
+						tenantBindingConfig.getTenantBinding().setConfigMD5Hash(md5hash); // use this to compare with the last persisted one and to persist as the new hash
 					} catch (Exception e) {
 						logger.error("Could not parse the merged tenant bindings.", e);
 					}

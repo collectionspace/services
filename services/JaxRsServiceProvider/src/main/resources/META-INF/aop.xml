@@ -3,12 +3,12 @@
 <aspectj>
     <weaver>
         <!-- only weave classes in our application-specific packages -->
-        <include within="org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.*"/> 
+        <include within="org.collectionspace.services..*"/>
         <include within="org.collectionspace.services.aspect.*"/>
     </weaver>
     
     <aspects>        
-        <!-- weave in just this aspect -->        
-        <aspect name="org.collectionspace.services.aspect.HyperJaxb3TimezoneAspect"/>
+        <!-- weave in just this aspect --> 
+        <aspect name="org.collectionspace.services.aspect.JaxbXMLGregorianCalendarMarshal"/>
     </aspects>
 </aspectj>

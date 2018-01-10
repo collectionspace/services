@@ -7,7 +7,11 @@
        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
        http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
 
-    <oauth:authorization-server client-details-service-ref="clientDetails" token-services-ref="tokenServices">
+    <oauth:authorization-server
+        client-details-service-ref="clientDetails"
+        token-services-ref="tokenServices"
+        authorization-request-manager-ref="oauthRequestManager"
+    >
         <oauth:refresh-token />
         <oauth:password authentication-manager-ref="userAuthenticationManager" />
     </oauth:authorization-server>
@@ -15,7 +19,11 @@
     <mvc:annotation-driven />
 
     <mvc:default-servlet-handler />
-    
+
+    <bean id="oauthRequestManager" class="org.collectionspace.services.authorization.spring.CSpaceOAuth2RequestFactory">
+        <constructor-arg ref="clientDetails" />
+    </bean>
+
     <bean id="viewResolver" class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
         <property name="defaultViews">
             <list>
