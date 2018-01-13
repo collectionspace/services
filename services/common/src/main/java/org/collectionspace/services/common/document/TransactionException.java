@@ -22,10 +22,6 @@ package org.collectionspace.services.common.document;
  * 
  */
 public class TransactionException extends DocumentException {
-
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	// Custom HTTP status code, per the extensibility offered via RFC-2616

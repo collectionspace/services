@@ -73,21 +73,24 @@ public class AccountStorageClient extends JpaStorageClientImpl {
         try {
             account = (AccountsCommon) handler.getCommonPart();
             handler.prepare(Action.CREATE);
-            DocumentWrapper<AccountsCommon> wrapDoc =
-                    new DocumentWrapperImpl<AccountsCommon>(account);
+            DocumentWrapper<AccountsCommon> wrapDoc = new DocumentWrapperImpl<AccountsCommon>(account);
             handler.handle(Action.CREATE, wrapDoc);
             jpaConnectionContext.beginTransaction();
             //
-            // If userid and password are given, add to default id provider
+            // If userid and password are given, add to default ID provider -i.e., add it to the Spring Security account list
             //
             if (account.getUserId() != null && isForCSpaceIdentityProvider(account.getPassword())) {
                 User user = userStorageClient.create(account.getUserId(), account.getPassword());
-	            jpaConnectionContext.persist(user);        	
+	            jpaConnectionContext.persist(user);
             }
-
+            //
+            // Now add the account to the CSpace list of accounts
+            //
             account.setCreatedAtItem(new Date());
             jpaConnectionContext.persist(account);        	
-
+            //
+            // Finish creating related resources -e.g., account-role relationships
+            //
             handler.complete(Action.CREATE, wrapDoc);
             jpaConnectionContext.commitTransaction();
 

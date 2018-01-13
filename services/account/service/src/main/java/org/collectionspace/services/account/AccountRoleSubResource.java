@@ -175,23 +175,23 @@ public class AccountRoleSubResource
      */
     public String createAccountRole(ServiceContext parentCtx, AccountRole input, SubjectType subject)
             throws Exception {
-    	
     	//
     	// We need to associate every new account with the Spring Security Admin role so we can make
     	// changes to the Spring Security ACL tables.  The Spring Security Admin role has NO CollectionSpace
     	// specific permissions.  It is an internal/private role that service consumers and end-users NEVER see.
     	//
     	
-    	//Preserve the original incoming list of roles
+    	// Preserve the original incoming list of roles
     	List<RoleValue> inputRoleValues = input.getRole();
 
-    	//Change the role list to be just the Spring role
-    	List<RoleValue> springRoles = new ArrayList<RoleValue>();
-    	input.setRole(springRoles);
-    	RoleValue springAdminRole = new RoleValue();
-    	springRoles.add(springAdminRole);
-    	springAdminRole.setRoleId(AuthN.ROLE_SPRING_ADMIN_ID);
-    	springAdminRole.setRoleName(AuthN.ROLE_SPRING_ADMIN_NAME);
+    	// Temporarily change the role list to be just the Spring role
+    	List<RoleValue> springRoleValueList = new ArrayList<RoleValue>();
+    	input.setRole(springRoleValueList);
+    	
+    	RoleValue springAdminRoleValue = new RoleValue();
+    	springRoleValueList.add(springAdminRoleValue);
+    	springAdminRoleValue.setRoleId(AuthN.ROLE_SPRING_ADMIN_ID);
+    	springAdminRoleValue.setRoleName(AuthN.ROLE_SPRING_ADMIN_NAME);
 
     	// The Spring role relationship may already exist, if it does then we'll get a PersistenceException that
     	// we'll just ignore.
@@ -210,7 +210,7 @@ public class AccountRoleSubResource
     	}
     	
     	//
-    	// Now we'll add the account relationships for the original incoming roles.
+    	// Now we'll add the actual account-role relationships for the original incoming payload.
     	//
     	input.setRole(inputRoleValues);
         ServiceContext<AccountRole, AccountRole> ctx = createServiceContext(parentCtx, input, subject);

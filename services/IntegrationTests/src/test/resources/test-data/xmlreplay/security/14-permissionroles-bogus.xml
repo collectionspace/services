@@ -2,12 +2,12 @@
 <ns2:permission_role
 xmlns:ns2="http://collectionspace.org/services/authorization">
   <permission>
-    <permissionId>${permBigbird.CSID}</permissionId>
+    <permissionId>bogus-perm</permissionId>
     <resourceName>dimensions</resourceName>
   </permission>
   <role>
-    <roleId>${roleTestCM.CSID}</roleId>
-    <roleName>xROLE_TEST_CM</roleName>
+    <roleId>bogus-role</roleId>
+    <roleName>xROLE_TEST_INTERN</roleName>
   </role>
 </ns2:permission_role>
 

@@ -137,7 +137,7 @@ public class SpringPermissionManager implements CSpacePermissionManager {
      * @throws PermissionException
      */
     @Override
-    public void deletePermissionsFromRoles(CSpaceResource res, CSpaceAction action, String[] principals)
+    public void deletePermissionFromRoles(CSpaceResource res, CSpaceAction action, String[] principals)
             throws PermissionNotFoundException, PermissionException {
         ObjectIdentity oid = SpringAuthorizationProvider.getObjectIdentity(res);
         Sid[] sids = SpringAuthorizationProvider.getSids(principals);
@@ -180,14 +180,6 @@ public class SpringPermissionManager implements CSpacePermissionManager {
                 }
                 throw new PermissionException(msg, ex);
             }
-        }
-        if (log.isDebugEnabled()) {
-            log.debug("deletedpermissions(res,action,prin[]), success for "
-                    + " res=" + res.toString()
-                    + " action=" + action.toString()
-                    + " oid=" + oid.toString()
-                    + " perm=" + p.toString()
-                    + " sids=" + sids.toString());
         }
     }
 
@@ -360,7 +352,7 @@ public class SpringPermissionManager implements CSpacePermissionManager {
                     + " found " + aces + " aces");
         }
         ArrayList<Integer> foundAces = new ArrayList<Integer>();
-        Iterator iter = acel.listIterator();
+        Iterator<AccessControlEntry> iter = acel.listIterator();
         //not possible to delete while iterating
         while (iter.hasNext()) {
             AccessControlEntry ace = (AccessControlEntry) iter.next();
@@ -376,11 +368,17 @@ public class SpringPermissionManager implements CSpacePermissionManager {
             }
             i++;
         }
+        
+        boolean updateNeeded = false;
         for (int j = foundAces.size() - 1; j >= 0; j--) {
             //the following operation does not work while iterating in the while loop
             acl.deleteAce(foundAces.get(j)); //autobox
+            updateNeeded = true;
         }
-        provider.getProviderAclService().updateAcl(acl);
+        
+        if (updateNeeded) {
+        	provider.getProviderAclService().updateAcl(acl);
+        }
 
         if (log.isDebugEnabled()) {
             log.debug("deletePermissions: for acl oid=" + oid.toString()

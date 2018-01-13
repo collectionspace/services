@@ -25,7 +25,7 @@
 package org.collectionspace.services.authorization.storage;
 
 /**
- * RoleStorageConstants declares query params, etc.
+ * RoleStorageConstants declares JPA query params, etc. See JAX-B file roles.xsd for details
  * @author
  */
 public class RoleStorageConstants {
@@ -33,6 +33,8 @@ public class RoleStorageConstants {
     final public static String Q_ROLE_NAME = "r";
 
     final public static String ROLE_NAME = "roleName";
+    final public static String ROLE_ID = "csid";
+    final public static String ROLE_TENANT_ID = "tenant_id";
 
     final public static String PERM_ROLE_REL_ROLE_ID = "roleId";
     final public static String PERM_ROLE_REL_PERM_ID = "permissionId";

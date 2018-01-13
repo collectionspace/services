@@ -115,8 +115,8 @@ public class JpaStorageClientImpl implements StorageClient {
             try {
             	handler.handle(Action.CREATE, wrapDoc);
 	            JaxbUtils.setValue(entity, "setCreatedAtItem", Date.class, new Date());
-	            jpaConnectionContext.persist(entity);        	
-            } catch (EntityExistsException ee) {
+	            jpaConnectionContext.persist(entity);
+            } catch (EntityExistsException ee) { // FIXME: No, don't allow duplicates
             	//
             	// We found an existing matching entity in the store, so we don't need to create one.  Just update the transient 'entity' instance with the existing persisted entity we found.
             	// An entity's document handler class will throw this exception only if attempting to create (but not actually creating) duplicate is ok -e.g., Permission records.
@@ -410,27 +410,22 @@ public class JpaStorageClientImpl implements StorageClient {
      * cost: a get before delete
      * @see org.collectionspace.services.common.storage.StorageClient#delete(org.collectionspace.services.common.context.ServiceContext, java.lang.String)
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({ "rawtypes" })
 	@Override
     public boolean delete(ServiceContext ctx, String id, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
-    	boolean result = true;
+    	boolean result = false;
     	
     	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection(); 
         try {
             jpaConnectionContext.beginTransaction();
-            handler.prepare(Action.DELETE);
             Object entityFound = getEntity(ctx, id);
             if (entityFound == null) {
-            	jpaConnectionContext.markForRollback();
                 String msg = "delete(ctx, ix, handler) could not find entity with id=" + id;
                 logger.error(msg);
                 throw new DocumentNotFoundException(msg);
             }
-            DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(entityFound);
-            handler.handle(Action.DELETE, wrapDoc);
-            jpaConnectionContext.remove(entityFound);
-            handler.complete(Action.DELETE, wrapDoc);
+            result = delete(ctx, entityFound, handler);
             jpaConnectionContext.commitTransaction();
         } catch (DocumentException de) {
         	jpaConnectionContext.markForRollback();
@@ -447,6 +442,38 @@ public class JpaStorageClientImpl implements StorageClient {
         
         return result;
     }
+    
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+    public boolean delete(ServiceContext ctx, Object entity, DocumentHandler handler)
+            throws DocumentNotFoundException, DocumentException {
+    	boolean result = false;
+    	
+    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection(); 
+        try {
+            jpaConnectionContext.beginTransaction();
+            handler.prepare(Action.DELETE);
+            DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(entity);
+            handler.handle(Action.DELETE, wrapDoc);
+            jpaConnectionContext.remove(entity);
+            handler.complete(Action.DELETE, wrapDoc);
+            jpaConnectionContext.commitTransaction();
+            result = true;
+        } catch (DocumentException de) {
+        	jpaConnectionContext.markForRollback();
+        	throw de;
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("delete(ctx, ix, handler): Caught exception ", e);
+            }
+            jpaConnectionContext.markForRollback();
+            throw new DocumentException(e);
+        } finally {
+        	ctx.closeConnection();
+        }
+        
+        return result;
+    }    
 
     /**
      * Gets the entityReceived name.
@@ -501,9 +528,9 @@ public class JpaStorageClientImpl implements StorageClient {
             throws DocumentNotFoundException, TransactionException {
     	Object entityFound = null;
     	
-    	JPATransactionContext jpaTransactionConnection = (JPATransactionContext)ctx.openConnection();
+    	JPATransactionContext jpaTransactionContext = (JPATransactionContext)ctx.openConnection();
     	try {
-	        entityFound = JpaStorageUtils.getEntity(jpaTransactionConnection.getEntityManager(), id, entityClazz);
+	        entityFound = JpaStorageUtils.getEntity(jpaTransactionContext, id, entityClazz); // FIXME: # Should be qualifying with the tenant ID
 	        if (entityFound == null) {
 	            String msg = "could not find entity of type=" + entityClazz.getName()
 	                    + " with id=" + id;

@@ -45,6 +45,7 @@ import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.security.SecurityUtils;
+import org.collectionspace.services.common.storage.TransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
 
 import org.slf4j.Logger;
@@ -164,6 +165,13 @@ public class RoleDocumentHandler
         //
     	List<PermissionValue> permValueList = role.getPermission();
     	if (permValueList != null && permValueList.size() > 0) {
+    		//
+    		// To prevent new Permissions being created (especially low-level Spring Security perms), we'll first flush the current
+    		// JPA context to ensure our Role can be successfully persisted.
+    		//
+    		TransactionContext jpaTransactionContext = this.getServiceContext().getCurrentTransactionContext();
+    		jpaTransactionContext.flush();
+    		
     		// create and persist a permrole instance
     		// The caller of this method needs to ensure a valid and active EM (EntityManager) instance is in the Service context
     		RoleValue roleValue = RoleFactory.createRoleValueInstance(role);

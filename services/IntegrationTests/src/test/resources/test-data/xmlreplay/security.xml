@@ -6,19 +6,72 @@
         <auth ID="user1@museum1">dXNlcjFAbXVzZXVtMS5vcmc6dXNlcjFAbXVzZXVtMS5vcmc=</auth>
         <auth ID="bigbird2010">YmlnYmlyZDIwMTA6YmlnYmlyZDIwMTA=</auth>
         <auth ID="elmo2010">ZWxtbzIwMTA6ZWxtbzIwMTA=</auth>
+        <auth ID="grover2018">Z3JvdmVyMjAxODpncm92ZXIyMDE4</auth>
+        
     </auths>
     
+    <testGroup ID="slipOut" autoDeletePOSTS="true">
+        <test ID="slipOutPerm">
+            <method>POST</method>
+            <uri>/cspace-services/authorization/permissions</uri>
+            <filename>security/slipOutPerm.xml</filename>
+        </test>
+        <test ID="slipOutRole">
+            <method>POST</method>
+            <uri>/cspace-services/authorization/roles</uri>
+            <filename>security/slipOutRole.xml</filename>
+        </test>
+        <test ID="accountGrover">
+            <method>POST</method>
+            <uri>/cspace-services/accounts</uri>
+            <filename>security/create-account-grover.xml</filename>
+        </test>
+        <test ID="slipOutVocab-1" auth="grover2018">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies</uri>
+            <filename>security/slipOutVocab-1.xml</filename>
+        </test>
+        <test ID="update-slipOutPerm" auth="admin@core.collectionspace.org">
+            <method>PUT</method>
+            <uri>/cspace-services/authorization/permissions/${slipOutPerm.CSID}</uri>
+            <filename>security/slipOutPerm-update.xml</filename>
+        </test>
+        <test ID="slipOutVocab-2" auth="grover2018">
+            <expectedCodes>403</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies</uri>
+            <filename>security/slipOutVocab-2.xml</filename>
+        </test>
+    </testGroup>
+    
+    <testGroup ID="DefaultPermmissions" autoDeletePOSTS="true">
+        <test ID="get1-loansin-CRUDL">
+            <method>GET</method>
+            <uri>/cspace-services/authorization/permissions/1-loansin-CRUDL</uri>
+            <response>
+                <expected level="TEXT" />
+                <filename>security/res/get1-loansin-CRUDL.res.xml</filename>
+                <label>permission</label>
+            </response>
+        </test>
+        <test ID="get1-loansin-CRUDLpermRoles">
+            <method>GET</method>
+            <uri>/cspace-services/authorization/permissions/1-loansin-CRUDL/permroles</uri>
+        </test>
+    </testGroup>
     
     <testGroup ID="deleteBug" autoDeletePOSTS="false">
+
         <test ID="permElmo">
             <method>POST</method>
             <uri>/cspace-services/authorization/permissions</uri>
             <filename>security/2-elmo-permission.xml</filename>
         </test>
         <test ID="elmoPermroles">
+            <expectedCodes>400</expectedCodes>
             <method>POST</method>
             <uri>/cspace-services/authorization/permissions/${permElmo.CSID}/permroles</uri>
-            <filename>security/10-permissionroles-elmo.xml</filename>
+            <filename>security/14-permissionroles-bogus.xml</filename>
         </test>
         <test ID="accountElmo">
             <method>POST</method>
@@ -41,6 +94,7 @@
             <fromTestID>dimension1</fromTestID>
         </test>
         <test ID="deleteElmoPermroles">
+            <expectedCodes>404</expectedCodes>
             <method>DELETE</method>
             <uri>/cspace-services/authorization/permissions/${permElmo.CSID}/permroles</uri>
         </test>
@@ -284,8 +338,6 @@
 			<filename>dimension/2-put.xml</filename>
         </test>
 
-
-
        <test ID="dimensionBigbird_GET">
             <method>GET</method>
             <uri>/cspace-services/dimensions/</uri>
@@ -417,7 +469,8 @@
         <!-- CLEANUP -->
         
         <test ID="deletePermrolesBigbird" auth="admin@core.collectionspace.org">
-            <msg>Deleting permroles from bigbird2010</msg>
+            <msg>Deleting permroles already deleted in test ID="deletePermrolesBigbird"</msg>
+            <expectedCodes>404</expectedCodes>
             <method>DELETE</method>
             <uri>/cspace-services/authorization/permissions/${permBigbird.CSID}/permroles</uri>
         </test>

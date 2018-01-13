@@ -26,27 +26,31 @@ package org.collectionspace.services.common.authorization_mgt;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
-import org.collectionspace.services.common.document.TransactionException;
+import org.collectionspace.services.common.document.JaxbUtils;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextProperties;
 import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
+
+import org.collectionspace.services.client.RoleClient;
+import org.collectionspace.authentication.AuthN;
 
 import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.perms.EffectType;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionAction;
 import org.collectionspace.services.authorization.storage.PermissionStorageConstants;
+import org.collectionspace.services.authorization.storage.RoleStorageConstants;
 import org.collectionspace.services.authorization.PermissionResource;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionRoleRel;
 import org.collectionspace.services.authorization.PermissionValue;
+import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
 
@@ -69,7 +73,7 @@ public class PermissionRoleUtil {
      * @param ctx the ctx
      * @return the relation subject
      */
-    static public SubjectType getRelationSubject(ServiceContext ctx) {
+    static public SubjectType getRelationSubject(ServiceContext<?, ?> ctx) {
         Object o = ctx.getProperty(ServiceContextProperties.SUBJECT);
         if (o == null) {
             throw new IllegalArgumentException(ServiceContextProperties.SUBJECT
@@ -86,7 +90,7 @@ public class PermissionRoleUtil {
      * @param pr the pr
      * @return the relation subject
      */
-    static public SubjectType getRelationSubject(ServiceContext ctx, PermissionRole pr) {
+    static public SubjectType getRelationSubject(ServiceContext<?, ?> ctx, PermissionRole pr) {
         SubjectType subject = pr.getSubject();
         if (subject == null) {
             //it is not required to give subject as URI determines the subject
@@ -101,39 +105,45 @@ public class PermissionRoleUtil {
      *
      * @param pr permissionrole
      * @param subject the subject
-     * @param prrl persistent entities built are inserted into this list
+     * @param permRoleRelationshipList persistent entities built are inserted into this list
      * @param toDelete the to delete
      */
     static public void buildPermissionRoleRel(JPATransactionContext jpaTransactionContext, 
     		PermissionRole pr,
     		SubjectType subject,
-    		List<PermissionRoleRel> prrl,
+    		List<PermissionRoleRel> permRoleRelationshipList,
     		boolean handleDelete,
     		String tenantId) throws Exception {
     	
         if (subject.equals(SubjectType.ROLE)) {
         	List<PermissionValue> permissionValues = pr.getPermission();
-        	if (permissionValues != null && permissionValues.size() > 0) {
+        	if (permissionValues != null && permissionValues.size() == 1) {
 	            PermissionValue pv = permissionValues.get(0);
 	            for (RoleValue rv : pr.getRole()) {
-	                PermissionRoleRel prr = buildPermissonRoleRel(jpaTransactionContext, pv, rv, subject, handleDelete, tenantId);
-	                prrl.add(prr);
+	                PermissionRoleRel permRoleRelationship = buildPermissonRoleRel(jpaTransactionContext, pv, rv, subject, handleDelete, tenantId);
+	                permRoleRelationshipList.add(permRoleRelationship);
 	            }
+        	} else {
+        		String msg = "There must be one and only one Permission supplied in the payload when creating this Permission-Roles relationshiop.";
+        		throw new DocumentException(msg);
         	}
         } else if (subject.equals(SubjectType.PERMISSION)) {
         	List<RoleValue> roleValues = pr.getRole();
-        	if (roleValues != null && roleValues.size() > 0) {
+        	if (roleValues != null && roleValues.size() == 1) {
 	            RoleValue rv = roleValues.get(0);
 	            for (PermissionValue pv : pr.getPermission()) {
 	                PermissionRoleRel prr = buildPermissonRoleRel(jpaTransactionContext, pv, rv, subject, handleDelete, tenantId);
-	                prrl.add(prr);
+	                permRoleRelationshipList.add(prr);
 	            }
+        	} else {
+        		String msg = "There must be one and only one Role supplied in the payload when creating this Role-Permissions relationshiop.";
+        		throw new DocumentException(msg);
         	}
         }
     }
     
     static public void buildPermissionRoleRel(
-    		ServiceContext ctx,
+    		ServiceContext<?, ?> ctx,
     		PermissionRole pr,
     		SubjectType subject,
     		List<PermissionRoleRel> prrl,
@@ -160,7 +170,7 @@ public class PermissionRoleUtil {
      * Try to find a persisted Permission record using a PermissionValue instance.
      *
      */
-    static private Permission lookupPermission(JPATransactionContext jpaTransactionContext, PermissionValue permissionValue, String tenantId) throws TransactionException {
+    static private Permission lookupPermission(JPATransactionContext jpaTransactionContext, PermissionValue permissionValue, String tenantId) throws DocumentException {
     	Permission result = null;
     	
     	String actionGroup = permissionValue.getActionGroup() != null ? permissionValue.getActionGroup().trim() : null;
@@ -171,19 +181,23 @@ public class PermissionRoleUtil {
     	//
     	if (permissionId != null && !permissionId.isEmpty()) {
 	    	try {
-		    	result = (Permission)JpaStorageUtils.getEntity(jpaTransactionContext, permissionId, Permission.class);
+		    	result = (Permission)JpaStorageUtils.getEntityByDualKeys(
+		    			jpaTransactionContext, 
+		    			Permission.class.getName(),
+		    			PermissionStorageConstants.ID, permissionId, 
+		    			PermissionStorageConstants.TENANT_ID, tenantId);
 	    	} catch (Throwable e) {
 	    		String msg = String.format("Searched for but couldn't find a permission with CSID='%s'.",
 	    				permissionId);
 	    		logger.trace(msg);
 	    	}
-    	} else if ((resourceName != null && !resourceName.isEmpty()) && 
-    			(actionGroup != null && !actionGroup.isEmpty())) {
+    	} else if (Tools.notBlank(resourceName) && Tools.notBlank(actionGroup)) {
     		//
     		// If there was no permission ID, then we can try to find the permission with the resource name and action group tuple
     		//
 	    	try {
-		    	result = (Permission)JpaStorageUtils.getEntityByDualKeys(jpaTransactionContext, 
+		    	result = (Permission)JpaStorageUtils.getEntityByDualKeys(
+		    			jpaTransactionContext, 
 		    			Permission.class.getName(),
 		    			PermissionStorageConstants.RESOURCE_NAME, permissionValue.getResourceName(), 
 		    			PermissionStorageConstants.ACTION_GROUP, permissionValue.getActionGroup(),
@@ -196,8 +210,28 @@ public class PermissionRoleUtil {
     	} else {
     		String errMsg = String.format("Couldn't perform lookup of permission.  Not enough information provided.  Lookups requires a permission CSID or a resource name and action group tuple.  The provided information was permission ID='%s', resourceName='%s', and actionGroup='%s'.",
     				permissionId, resourceName, actionGroup);
-    		logger.warn(errMsg);
+    		throw new DocumentException(errMsg);
     	}
+    	
+    	if (result == null) {
+    		throw new DocumentNotFoundException(String.format("Could not find Permission resource with CSID='%s', actionGroup='%s', resourceName='%s'.", 
+    				permissionId, actionGroup, resourceName));
+    	}
+    	
+    	return result;
+    }
+    /**
+     * Ensure the Role's permission relationships can be changed.
+     * 
+     * @param role
+     * @return
+     */
+    static private boolean canRoleRelatedTo(Role role) {
+    	boolean result = true;
+    	
+        if (RoleClient.IMMUTABLE.equals(role.getPermsProtection()) && !AuthN.get().isSystemAdmin()) {
+        	result = false;
+        }
     	
     	return result;
     }
@@ -218,8 +252,18 @@ public class PermissionRoleUtil {
     		String tenantId) throws DocumentException {
 
     	PermissionRoleRel result = null;
+    	Role role = lookupRole(jpaTransactionContext, roleValue, tenantId);
+    	//
+    	// Ensure we can change the Role's permissions-related relationships.
+    	//
+        if (canRoleRelatedTo(role) == false) {
+        	String msg = String.format("Role with CSID='%s' cannot have its associated permissions changed.", role.getCsid());
+        	throw new DocumentException(msg);
+        }
+    	//
+        // Get the permission info
+        //
     	Permission permission = lookupPermission(jpaTransactionContext, permissionValue, tenantId);
-    	
     	//
     	// If we couldn't find an existing permission and we're not processing a DELETE request, we need to create
     	// a new permission.
@@ -236,6 +280,10 @@ public class PermissionRoleUtil {
     			String errMsg = "Could not create new permission for new permission-role relationship.";
     			throw new DocumentException(errMsg);
     		}
+    	} else if (permission == null && handleDelete == true) {
+    		String msg = String.format("Could not find an existing permission that matches this: %s", 
+    				JaxbUtils.toString(permissionValue, PermissionValue.class));
+    		throw new DocumentException(msg);
     	}
     	
     	//
@@ -271,8 +319,46 @@ public class PermissionRoleUtil {
     	
         return result;
     }
+    
+    public static RoleValue fetchRoleValue(ServiceContext<?, ?> ctx, String roleId) throws DocumentNotFoundException {
+    	RoleValue result = null;
+    	
+    	JPATransactionContext jpaTransactionContext = (JPATransactionContext) ctx.getCurrentTransactionContext();
+    	Role role = lookupRole(jpaTransactionContext, roleId, ctx.getTenantId());
+    	result = AuthorizationRoleRel.buildRoleValue(role);
+    	
+    	return result;
+    }
 
-    private static Permission createPermission(JPATransactionContext jpaTransactionContext, Permission permission) {
+    private static Role lookupRole(JPATransactionContext jpaTransactionContext, RoleValue roleValue, String tenantId) throws DocumentNotFoundException {
+    	return lookupRole(jpaTransactionContext, roleValue.getRoleId(), tenantId);
+	}
+    
+    private static Role lookupRole(JPATransactionContext jpaTransactionContext, String roleId, String tenantId) throws DocumentNotFoundException {
+    	Role result = null;
+    	
+    	try {
+	    	result = (Role)JpaStorageUtils.getEntityByDualKeys(
+	    					jpaTransactionContext,
+	    	    			Role.class.getName(),
+	    	    			RoleStorageConstants.ROLE_ID, roleId, 
+	    	    			RoleStorageConstants.ROLE_TENANT_ID, tenantId);
+    	} catch (Throwable e) {
+    		String msg = String.format("Searched for but couldn't find a role with CSID='%s'.",
+    				roleId);
+    		logger.trace(msg);
+    	}
+    	
+    	if (result == null) {
+    		String msg = String.format("Could not find Role resource with CSID='%s'", roleId);
+    		throw new DocumentNotFoundException(msg);
+    	}
+    	
+    	return result;
+	}
+    
+
+	private static Permission createPermission(JPATransactionContext jpaTransactionContext, Permission permission) {
 		Permission result = null;
 		
 		PermissionResource permissionResource = new PermissionResource();  // Get the PermissionResource singleton instance (RESTEasy ensures it is a singleton)
@@ -320,6 +406,17 @@ public class PermissionRoleUtil {
     		}
     	}
     	
+		return result;
+	}
+	
+	static public boolean isEmpty(PermissionRole permRole) {
+		boolean result = true;
+		
+		if (permRole != null && !Tools.isEmpty(permRole.getPermission()) 
+				&& !Tools.isEmpty(permRole.getRole()) && permRole.getSubject() != null) {
+			result = false;
+		}
+		
 		return result;
 	}
 

@@ -124,14 +124,14 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
 //        pvi.setPermissionId(iPermId);
 //        permValues.put(pvi.getResourceName(), pvi);
 
-        String rn1 = "ROLE_CO1" + TEST_MARKER;
+        String rn1 = "xROLE_CO1" + TEST_MARKER;
         String r1RoleId = createRole(rn1);
         RoleValue rv1 = new RoleValue();
         rv1.setRoleId(r1RoleId);
         rv1.setRoleName(rn1);
         roleValues.put(rv1.getRoleName(), rv1);
 
-        String rn2 = "ROLE_CO2" + TEST_MARKER;
+        String rn2 = "xROLE_CO2" + TEST_MARKER;
         String r2RoleId = createRole(rn2);
         RoleValue rv2 = new RoleValue();
         rv2.setRoleId(r2RoleId);

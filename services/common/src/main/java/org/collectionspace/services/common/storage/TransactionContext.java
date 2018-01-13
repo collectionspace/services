@@ -36,4 +36,7 @@ public abstract class TransactionContext {
 	abstract public void remove(Object entity);
 
 	abstract public Object merge(Object entity);
+
+	abstract public void flush();
+
 }

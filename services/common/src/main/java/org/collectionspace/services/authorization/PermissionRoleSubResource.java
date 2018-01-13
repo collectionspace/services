@@ -30,6 +30,7 @@ import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.storage.PermissionRoleDocumentHandler;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
+import org.collectionspace.services.common.authorization_mgt.PermissionRoleUtil;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
@@ -51,6 +52,8 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("rawtypes")
 public class PermissionRoleSubResource
         extends AbstractCollectionSpaceResourceImpl<PermissionRole, PermissionRole> {
+    /** The logger. */
+    final Logger logger = LoggerFactory.getLogger(PermissionRoleSubResource.class);
 
     public final static String ROLE_PERMROLE_SERVICE = "authorization/roles/permroles";
     public final static String PERMISSION_PERMROLE_SERVICE = "authorization/permissions/permroles";
@@ -58,8 +61,6 @@ public class PermissionRoleSubResource
     //service name to identify binding
     /** The service name. */
     private String serviceName = "authorization/permroles";
-    /** The logger. */
-    final Logger logger = LoggerFactory.getLogger(PermissionRoleSubResource.class);
     /** The storage client. */
     final StorageClient storageClient = new JpaRelationshipStorageClient<PermissionRole>();
     /**
@@ -247,15 +248,32 @@ public class PermissionRoleSubResource
         if (logger.isDebugEnabled()) {
             logger.debug("deletePermissionRole with csid=" + csid);
         }
+        
         PermissionRole permRole = getPermissionRole(parentCtx, csid, subject);
-        if (permRole != null) {
+        if (PermissionRoleUtil.isEmpty(permRole) == false) {
         	deletePermissionRole(parentCtx, csid, subject, permRole);
         } else {
-        	String msg = String.format("The permission CSID=%s is missing or not related to any roles.", csid);
+        	String msg = String.format("The %s CSID=%s is missing or not related to any objects.",
+        			getInverse(subject).toString().toLowerCase(), csid);
         	throw new DocumentNotFoundException(msg);
         }
     }
-
+    
+    /*
+     * Returns the inverse of the subject (the object)
+     */
+    private SubjectType getInverse(SubjectType subject) {
+    	SubjectType result;
+    	
+    	if (subject.equals(SubjectType.PERMISSION)) {
+    		result = SubjectType.ROLE;
+    	} else {
+    		result = SubjectType.PERMISSION;
+    	}
+    	
+    	return result;
+    }
+    
     /**
      * deletePermissionRole deletes permission-role relationships using given
      * csid of object (permission/role) and subject (role/permission)

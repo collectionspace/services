@@ -10,6 +10,6 @@
     </permission>
     <role>
         <roleId>${createRole.CSID}</roleId>
-        <roleName>ROLE_1_BIRD</roleName>
+        <roleName>xROLE_1_BIRD</roleName>
     </role>
 </ns2:permission_role>

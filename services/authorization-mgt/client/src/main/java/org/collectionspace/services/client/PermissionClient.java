@@ -49,6 +49,8 @@ public class PermissionClient extends AbstractServiceClientImpl<PermissionsList,
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";
+    public final static String IMMUTABLE = "immutable";
+    public static final String PERMISSION_UPDATE_CSID = "PERMISSION_UPDATE_CSID";
 	
 	public enum ActionCompare {
 	    ACTION_GROUP_EMPTY, ACTION_LIST_EMPTY, ACTIONS_MISSING, MATCHES, MISMATCHES

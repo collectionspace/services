@@ -39,7 +39,7 @@ import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionAction;
 import org.collectionspace.services.authorization.perms.PermissionsList;
 import org.collectionspace.services.authorization.URIResourceImpl;
-
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
@@ -63,7 +63,7 @@ import org.slf4j.LoggerFactory;
 public class PermissionDocumentHandler
 		extends JpaDocumentHandler<Permission, PermissionsList, Permission, List<Permission>> {
 
-    private final Logger logger = LoggerFactory.getLogger(PermissionDocumentHandler.class);
+	private final Logger logger = LoggerFactory.getLogger(PermissionDocumentHandler.class);
     private Permission permission;
     private PermissionsList permissionsList;
     
@@ -131,7 +131,6 @@ public class PermissionDocumentHandler
             URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(), perm.getResourceName(), action);
             permAction.setObjectIdentity(uriRes.getHashedId().toString());
             permAction.setObjectIdentityResource(uriRes.getId());
-            //PermissionActionUtil.update(perm, permAction);
         }
     }
     
@@ -165,11 +164,18 @@ public class PermissionDocumentHandler
     	//
     	// First check to see if an equivalent permission exists
     	//
+    	ServiceContext<Permission, Permission> ctx = getServiceContext();
     	Permission permission = wrapDoc.getWrappedObject();    	
     	Permission existingPermission = findExistingPermission(permission);
 
     	if (existingPermission == null) {
-	        String id = UUID.randomUUID().toString();        
+    		//
+    		// If our call originates from an UPDATE/PUT request, then we can find a CSID in the service context
+    		//
+    		String id = (String)ctx.getProperty(PermissionClient.PERMISSION_UPDATE_CSID);
+    		if (Tools.isEmpty(id) == true) {
+    			id = UUID.randomUUID().toString();
+    		}
 	        permission.setCsid(id);
 	        setTenant(permission);
 	        handlePermissionActions(permission);
@@ -185,59 +191,63 @@ public class PermissionDocumentHandler
     public void completeCreate(DocumentWrapper<Permission> wrapDoc) throws Exception {
     }
 
+    /**
+     * Not used.  Due to an issue with the JPA 1.0 update mechanism, we had to perform the update process
+     * in the PermissionResource class.  Look there for more details. 
+     */
+    @Deprecated
     @Override
     public void handleUpdate(DocumentWrapper<Permission> wrapDoc) throws Exception {
-        Permission permissionFound = wrapDoc.getWrappedObject();
-        Permission permissionReceived = getCommonPart();
-        merge(permissionReceived, permissionFound);
     }
 
-    /**
-     * merge manually merges the from from to the to permission
-     * -this method is created due to inefficiency of JPA EM merge
-     * @param from
-     * @param to
-     * @return merged permission
+    /*
+     * Merge two Permission resources for an update/put request.
      */
-    private Permission merge(Permission from, Permission to) throws Exception {
-        if (!(from.getResourceName().equalsIgnoreCase(to.getResourceName()))) {
-            String msg = "Resource name cannot be changed " + to.getResourceName();
-            logger.error(msg);
-            throw new BadRequestException(msg);
-        }
-        //resource name, attribute  cannot be changed
-
-        if (from.getDescription() != null) {
-            to.setDescription(from.getDescription());
-        }
-        if (from.getEffect() != null) {
-            to.setEffect(from.getEffect());
-        }
-        List<PermissionAction> fromActions = from.getAction();
-        if (!fromActions.isEmpty()) {
-            // Override the whole list, no reconciliation by design
-            to.setAction(fromActions);
-            // Update the actionGroup field to reflect the new action list
-            to.setActionGroup(PermissionClient.getActionGroup(fromActions));
+    public Permission merge(Permission perm, Permission theUpdate) throws DocumentException {
+    	Permission result = perm;
+    	
+        if (!Tools.isEmpty(theUpdate.getResourceName()) && !theUpdate.getResourceName().equalsIgnoreCase(perm.getResourceName())) {
+        	String msg = String.format("Failed attempt to change Permission's (CSID='%S') resource name from '%s' to '%s'.",
+        			perm.getCsid(), perm.getResourceName(), theUpdate.getResourceName());
+            throw new DocumentException(msg);
         }
 
+        if (theUpdate.getDescription() != null) {
+            perm.setDescription(theUpdate.getDescription());
+        }
+        if (theUpdate.getEffect() != null) {
+            perm.setEffect(theUpdate.getEffect());
+        }
+        //
+        // Override the whole perm-action list, no reconciliation by design. We've
+        // already cleaned-up and removed all the old perm-role relationships
+        //
+        // If the update didn't provide any new perm-actions, then we leave the
+        // existing ones alone.
+        //
+        if (Tools.isEmpty(theUpdate.getAction()) == false) {
+        	perm.setAction(theUpdate.getAction());
+        	perm.setActionGroup(PermissionClient.getActionGroup(theUpdate.getAction()));
+        }
+        
         if (logger.isDebugEnabled()) {
-            logger.debug("merged permission=" + JaxbUtils.toString(to, Permission.class));
+            logger.debug("merged permission=" + JaxbUtils.toString(perm, Permission.class));
         }
-
-        handlePermissionActions(to);
-        return to;
+        
+        return result;
     }
-
+    
+    /**
+     * Because of issues with JPA 1.0 not being able to propagate updates from the 'permissions' table to the related 'permissions_actions'
+     * table, we need to handle updates in the PermissionResource class by deleting and creating the Permission resource
+     */
     @SuppressWarnings("unchecked")
 	@Override
+	@Deprecated
     public void completeUpdate(DocumentWrapper<Permission> wrapDoc) throws Exception {
-        Permission upAcc = wrapDoc.getWrappedObject();
-        getServiceContext().setOutput(upAcc);
-        sanitize(upAcc);
-        //FIXME update lower-layer authorization (acls)
-        //will require deleting old permissions for this resource and adding
-        //new based on new actions and effect
+        Permission updatedPerm = wrapDoc.getWrappedObject();
+        getServiceContext().setOutput(updatedPerm);
+        sanitize(updatedPerm);
     }
 
     @SuppressWarnings("unchecked")

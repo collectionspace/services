@@ -55,6 +55,7 @@ public class RemoteServiceContextImpl<IT, OT>
 
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(RemoteServiceContextImpl.class);
+    
     //input stores original content as received over the wire
     /** The input. */
     private IT input;    
@@ -163,12 +164,12 @@ public class RemoteServiceContextImpl<IT, OT>
      */
     @Override
     public void setInput(IT input) {
-        //for security reasons, do not allow to set input again (from handlers)
-        if (this.input != null) {
-            String msg = "Resetting or changing an context's input is not allowed.";
-            logger.error(msg);
-            throw new IllegalStateException(msg);
-        }
+    	if (logger.isDebugEnabled()) {
+	        if (this.input != null) {
+	            String msg = "\n#\n# Resetting or changing an context's input is not advised.\n#";
+	            logger.warn(msg);
+	        }
+    	}
         this.input = input;
     }
 
@@ -195,7 +196,8 @@ public class RemoteServiceContextImpl<IT, OT>
      * @return
      * @throws Exception 
      */
-    public CollectionSpaceResource<IT, OT> getResource(ServiceContext<?, ?> ctx) throws Exception {
+    @SuppressWarnings("unchecked")
+	public CollectionSpaceResource<IT, OT> getResource(ServiceContext<?, ?> ctx) throws Exception {
     	CollectionSpaceResource<IT, OT> result = null;
     	
     	ResourceMap resourceMap = ctx.getResourceMap();
@@ -232,7 +234,8 @@ public class RemoteServiceContextImpl<IT, OT>
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.context.RemoteServiceContext#getLocalContext(java.lang.String)
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public ServiceContext<IT, OT> getLocalContext(String localContextClassName) throws Exception {
         ClassLoader cloader = Thread.currentThread().getContextClassLoader();
         Class<?> ctxClass = cloader.loadClass(localContextClassName);
@@ -278,8 +281,10 @@ public class RemoteServiceContextImpl<IT, OT>
 			//
 			// If it's a shared connection, we can't close it.  Just reduce the refcount by 1
 			//
-			String warnMsg = "Attempted to release a shared storage connection.  Only the originator can release the connection";
-			logger.warn(warnMsg);
+			if (logger.isTraceEnabled()) {
+				String traceMsg = "Attempted to release a shared storage connection.  Only the originator can release the connection";
+				logger.trace(traceMsg);
+			}
 			transactionConnectionRefCount--;
 		} else {
 			TransactionContext transactionCtx = getCurrentTransactionContext();

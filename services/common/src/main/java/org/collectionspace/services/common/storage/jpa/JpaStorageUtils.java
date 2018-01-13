@@ -440,6 +440,7 @@ public class JpaStorageUtils {
         if (useTenantId == true) {
             q.setParameter("tenantId", tenantId);
         }
+        
         result = q.getSingleResult();
 
         return result;

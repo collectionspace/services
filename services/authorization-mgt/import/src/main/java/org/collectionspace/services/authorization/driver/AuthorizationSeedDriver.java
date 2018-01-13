@@ -115,6 +115,7 @@ public class AuthorizationSeedDriver {
 
     public void generate(JPATransactionContext jpaTransactionContext) {
         try {
+        	login();
             authzGen = new AuthorizationGen();
             authzGen.initialize(tenantBindingFile);
             authzGen.createDefaultRoles(jpaTransactionContext);
@@ -129,16 +130,21 @@ public class AuthorizationSeedDriver {
         } catch (Exception ex) {
             logger.error("AuthorizationSeedDriver caught an exception: ", ex);
             throw new RuntimeException(ex);
+        } finally {
+        	logout();
         }
     }
 
     public void seed(JPATransactionContext jpaTransactionContext) {
         TransactionStatus status = null;
         try {
+            login();
+            //
         	// Push all the authz info into the cspace DB tables -this include default roles, permissions, and permroles
+            //
             store();
-
-            setupSpring();
+            
+            setupSpringSecurity();
             status = beginTransaction("seedData");
             AuthorizationSeed authzSeed = new AuthorizationSeed();
             authzSeed.seedPermissions(jpaTransactionContext, authzGen.getDefaultPermissions(), authzGen.getDefaultPermissionRoles());
@@ -164,10 +170,9 @@ public class AuthorizationSeedDriver {
     /**
      * Setup of Spring Security context
      */
-    private void setupSpring() {
+    private void setupSpringSecurity() {
         ClassPathXmlApplicationContext appContext = new ClassPathXmlApplicationContext(
                 new String[]{SPRING_SECURITY_METADATA});
-        login();
         System.setProperty("spring-beans-config", SPRING_SECURITY_METADATA);
         //
         // authZ local not used but call to AuthZ.get() has side-effect of initializing our Spring Security context

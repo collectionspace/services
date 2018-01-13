@@ -54,6 +54,7 @@ public class ServiceResult {
     public String error = "";
     public String fromTestID = "";
     public String auth = "";
+    public String adminAuth = "";
     public String boundary = "";
     public String payloadStrictness = "";
     public long contentLength = 0;

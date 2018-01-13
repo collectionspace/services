@@ -167,8 +167,8 @@
                             </hj:basic>
                         </xs:appinfo>
                     </xs:annotation>
-								</xs:element>
-								<xs:element name="createdAt" type="xs:dateTime">
+				</xs:element>
+				<xs:element name="createdAt" type="xs:dateTime">
                     <xs:annotation>
                         <xs:appinfo>
                             <hj:basic>

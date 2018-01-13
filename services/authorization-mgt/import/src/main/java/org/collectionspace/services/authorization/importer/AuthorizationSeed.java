@@ -106,7 +106,7 @@ public class AuthorizationSeed {
         	}
             for (PermissionRole pr : permRoleList) {
                 if (pr.getPermission().get(0).getPermissionId().equals(p.getCsid())) {
-                	AuthorizationCommon.addPermissionsForUri(p, pr);
+                	AuthorizationCommon.addPermissionsForUri(jpaTransactionContext, p, pr);
                 }
             }
         }

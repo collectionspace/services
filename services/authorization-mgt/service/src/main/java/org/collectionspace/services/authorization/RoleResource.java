@@ -30,6 +30,7 @@ import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.TransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
@@ -57,7 +58,7 @@ import javax.ws.rs.core.UriInfo;
 @Consumes("application/xml")
 @Produces("application/xml")
 @SuppressWarnings("unchecked")
-public class RoleResource extends SecurityResourceBase {
+public class RoleResource extends SecurityResourceBase<Role, Role> {
 
     final Logger logger = LoggerFactory.getLogger(RoleResource.class);
     final StorageClient storageClient = new JpaStorageClientImpl();
@@ -78,12 +79,12 @@ public class RoleResource extends SecurityResourceBase {
     }
 
     @Override
-    public ServiceContextFactory getServiceContextFactory() {
+    public ServiceContextFactory<Role, Role> getServiceContextFactory() {
         return RemoteServiceContextFactory.get();
     }
 
     @Override
-    public StorageClient getStorageClient(ServiceContext ctx) {
+    public StorageClient getStorageClient(ServiceContext<Role, Role> ctx) {
         //FIXME use ctx to identify storage client
         return storageClient;
     }
@@ -114,7 +115,7 @@ public class RoleResource extends SecurityResourceBase {
             AccountRoleSubResource subResource =
                     new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
             //get relationships for a role
-            result = subResource.getAccountRole((ServiceContext)null, accCsid, SubjectType.ACCOUNT);
+            result = subResource.getAccountRole((ServiceContext<Role, Role>)null, accCsid, SubjectType.ACCOUNT);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED, accCsid);
         }
@@ -164,15 +165,19 @@ public class RoleResource extends SecurityResourceBase {
             // If marked as metadata immutable, do not delete
             if (RoleClient.IMMUTABLE.equals(role.getMetadataProtection())) {
                 Response response = 
-                	Response.status(Response.Status.FORBIDDEN).entity("Role: "+csid+" is immutable.").type("text/plain").build();
+                	Response.status(Response.Status.FORBIDDEN).entity("Role: "+csid+" is immutable.").type("text/plain").build(); // FIXME: Should be status code 423 (resource locked)
                 return response;
             }
             //
-            // delete all the permission/role relationships
+            // delete all the permission/role relationships (if any)
             //
             PermissionRoleSubResource permRoleResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
-            permRoleResource.deletePermissionRole(ctx, csid, SubjectType.PERMISSION);
+            try {
+            	permRoleResource.deletePermissionRole(ctx, csid, SubjectType.PERMISSION);
+            } catch (DocumentNotFoundException dnf) {
+            	// consume exception, not a problem.  Just means no relationships exist
+            }
             //
             //delete all the account/role relationships associate with this role
             //
@@ -182,7 +187,7 @@ public class RoleResource extends SecurityResourceBase {
             //
             //finally, delete the role itself
             //
-            ((JpaStorageClientImpl) getStorageClient(ctx)).deleteWhere(ctx, csid);
+            ((JpaStorageClientImpl) getStorageClient(ctx)).deleteWhere(ctx, csid); // FIXME: We should/could get rid the SID in Spring Security table as well
             transactionContext.commitTransaction();
         } catch(Exception e) {
         	transactionContext.markForRollback();
@@ -198,26 +203,31 @@ public class RoleResource extends SecurityResourceBase {
     @Path("{csid}/permroles")
     public Response createRolePermission(@QueryParam("_method") String method, @PathParam("csid") String roleCsid,
             PermissionRole input) {
-        if (method != null) {
+        if (method != null) { // FIXME: Not sure how method could every be "delete"
             if ("delete".equalsIgnoreCase(method)) {
                 return deleteRolePermission(roleCsid, input);
             }
         }
-        
+                
         logger.debug("createRolePermission with roleCsid=" + roleCsid);
         ensureCSID(roleCsid, ServiceMessages.PUT_FAILED + "permroles role ");
         Response response = null;
         try {
         	Role role = (Role)get(roleCsid, Role.class);
-            // If marked as metadata immutable, do not delete
+        	//
+            // If marked as metadata immutable, do not change
+        	//
             if (RoleClient.IMMUTABLE.equals(role.getPermsProtection())) {
                 response = 
                 	Response.status(Response.Status.FORBIDDEN).entity("Role: "+roleCsid+" is immutable.").type("text/plain").build();
                 return response;
             }
+            //
+            // Create new role-permission relationships
+            //
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
-            String permrolecsid = subResource.createPermissionRole((ServiceContext)null, input, SubjectType.PERMISSION);
+            String permrolecsid = subResource.createPermissionRole((ServiceContext<Role, Role>)null, input, SubjectType.PERMISSION);
             UriBuilder path = UriBuilder.fromResource(RoleResource.class);
             path.path(roleCsid + "/permroles/" + permrolecsid);
             response = Response.created(path.build()).build();
@@ -240,7 +250,7 @@ public class RoleResource extends SecurityResourceBase {
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
             //get relationships for a role
-            result = subResource.getPermissionRole((ServiceContext)null, roleCsid, SubjectType.PERMISSION);
+            result = subResource.getPermissionRole((ServiceContext<Role, Role>)null, roleCsid, SubjectType.PERMISSION);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED, roleCsid);
         }
@@ -262,7 +272,7 @@ public class RoleResource extends SecurityResourceBase {
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
             //get relationships for a role
-            result = subResource.getPermissionRoleRel((ServiceContext)null, roleCsid, SubjectType.PERMISSION, permrolecsid);
+            result = subResource.getPermissionRoleRel((ServiceContext<Role, Role>)null, roleCsid, SubjectType.PERMISSION, permrolecsid);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED, roleCsid);
         }
@@ -287,7 +297,7 @@ public class RoleResource extends SecurityResourceBase {
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
             //delete all relationships for a permission
-            subResource.deletePermissionRole((ServiceContext)null, roleCsid, SubjectType.PERMISSION, input);
+            subResource.deletePermissionRole((ServiceContext<Role, Role>)null, roleCsid, SubjectType.PERMISSION, input);
             result = Response.status(HttpResponseCodes.SC_OK).build();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, roleCsid);
@@ -314,7 +324,7 @@ public class RoleResource extends SecurityResourceBase {
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
             //delete all relationships for a permission
-            subResource.deletePermissionRole((ServiceContext)null, roleCsid, SubjectType.PERMISSION);            
+            subResource.deletePermissionRole((ServiceContext<Role, Role>)null, roleCsid, SubjectType.PERMISSION);            
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, roleCsid);
         }

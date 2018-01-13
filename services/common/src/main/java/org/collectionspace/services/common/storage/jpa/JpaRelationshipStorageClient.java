@@ -66,21 +66,6 @@ import org.slf4j.LoggerFactory;
 public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
 
     private final Logger logger = LoggerFactory.getLogger(JpaRelationshipStorageClient.class);
-
-    public static PermissionValue createPermissionValue(Permission permission) {
-    	PermissionValue result = new PermissionValue();
-    	result.setPermissionId(permission.getCsid());
-    	result.setResourceName(permission.getResourceName());
-    	result.setActionGroup(permission.getActionGroup());
-    	return result;
-    }
-    
-    public static RoleValue createRoleValue(Role role) {
-    	RoleValue result = new RoleValue();
-    	result.setRoleId(role.getCsid());
-    	result.setRoleName(role.getRoleName());
-    	return result;
-    }
     
     public JpaRelationshipStorageClient() {
     	//empty
@@ -107,30 +92,28 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
         try {
             jpaTransactionContext.beginTransaction();
             handler.prepare(Action.CREATE);
-            List<T> rl = new ArrayList<T>();
-            DocumentWrapper<List<T>> wrapDoc =
-                    new DocumentWrapperImpl<List<T>>(rl);
+            List<T> relationshipList = new ArrayList<T>();
+            DocumentWrapper<List<T>> wrapDoc = new DocumentWrapperImpl<List<T>>(relationshipList);
             handler.handle(Action.CREATE, wrapDoc);
-            for (T r : rl) {
-                JaxbUtils.setValue(r, "setCreatedAtItem", Date.class, new Date());
-                jpaTransactionContext.persist(r);
+            for (T relationship : relationshipList) {
+                JaxbUtils.setValue(relationship, "setCreatedAtItem", Date.class, new Date());
+                jpaTransactionContext.persist(relationship);
             }
-            handler.complete(Action.CREATE, wrapDoc);
+            handler.complete(Action.CREATE, wrapDoc); 
             jpaTransactionContext.commitTransaction();
-            result = "-1"; // meaningless result
+            result = "0"; // meaningless result
         } catch (BadRequestException bre) {
-        	jpaTransactionContext.markForRollback();
             throw bre;
         } catch (PersistenceException pe) {
-        	jpaTransactionContext.markForRollback();
         	throw pe;
+        } catch (DocumentException de) {
+        	throw de;
         } catch (Exception e) {
-        	jpaTransactionContext.markForRollback();
-            if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception ", e);
-            }
             throw new DocumentException(e);
         } finally {
+        	if (result == null) {
+            	jpaTransactionContext.markForRollback();  // If result == null, we failed and must mark the current tx for rollback
+        	}
             ctx.closeConnection();
         }
         
@@ -159,7 +142,6 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
 	        }
 	        
 	        String objectId = getObjectId(ctx);
-	        Class objectClass = getObjectClass(ctx);
 	        DocumentFilter docFilter = handler.getDocumentFilter();
 	        if (docFilter == null) {
 	            docFilter = handler.createDocumentFilter();
@@ -193,19 +175,9 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
             try {
                 relList = q.getResultList();
             } catch (NoResultException nre) {
-                String msg = "get(1): " + " could not find relationships for object class="
-                        + objectClass.getName() + " id=" + id;
-                if (logger.isDebugEnabled()) {
-                    logger.debug(msg, nre);
-                }
+            	// Quietly consume.  relList will just be an empty list
             }
-            if (relList.size() == 0) {
-                String msg = "get(2): " + " could not find relationships for object class="
-                        + objectClass.getName() + " id=" + id;
-                if (logger.isDebugEnabled()) {
-                    logger.debug(msg);
-                }
-            }
+
             DocumentWrapper<List<T>> wrapDoc = new DocumentWrapperImpl<List<T>>(relList);
             handler.handle(Action.GET, wrapDoc);
             handler.complete(Action.GET, wrapDoc);
@@ -354,14 +326,14 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
         try {
         	jpaTransactionContext.beginTransaction();
             handler.prepare(Action.DELETE);
-            List<T> rl = new ArrayList<T>();
-            DocumentWrapper<List<T>> wrapDoc = new DocumentWrapperImpl<List<T>>(rl);
+            List<T> relationshipList = new ArrayList<T>();
+            DocumentWrapper<List<T>> wrapDoc = new DocumentWrapperImpl<List<T>>(relationshipList);
             handler.handle(Action.DELETE, wrapDoc);
             //
             //the following could be much more efficient if done with a single sql/jql
             //
-            for (T r : rl) {
-            	jpaTransactionContext.remove(getRelationship(jpaTransactionContext, r));
+            for (T relationship : relationshipList) {
+            	jpaTransactionContext.remove(getRelationship(jpaTransactionContext, relationship));
             }
             handler.complete(Action.DELETE, wrapDoc); // Delete from the Spring Security tables.  Would be better if this was part of the earlier transaction.
             jpaTransactionContext.commitTransaction();

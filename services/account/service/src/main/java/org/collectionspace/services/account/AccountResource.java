@@ -48,6 +48,7 @@ import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.query.UriInfoImpl;
 import org.collectionspace.services.common.storage.StorageClient;
+import org.collectionspace.services.common.storage.TransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.config.tenant.EmailConfig;
 import org.collectionspace.services.config.tenant.TenantBindingType;
@@ -56,12 +57,9 @@ import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -88,7 +86,7 @@ import javax.xml.bind.DatatypeConverter;
 @Path(AccountClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class AccountResource extends SecurityResourceBase {
+public class AccountResource extends SecurityResourceBase<AccountsCommon, AccountsCommon> {
 
 	final Logger logger = LoggerFactory.getLogger(AccountResource.class);
     final StorageClient storageClient = new AccountStorageClient();
@@ -216,9 +214,17 @@ public class AccountResource extends SecurityResourceBase {
 
     @PUT
     @Path("{csid}")
-    public AccountsCommon updateAccount(@Context UriInfo ui, @PathParam("csid") String csid,AccountsCommon theUpdate) {
+    public AccountsCommon updateAccount(@Context UriInfo ui, @PathParam("csid") String csid, AccountsCommon theUpdate) {
         return (AccountsCommon)update(ui, csid, theUpdate, AccountsCommon.class);
     }
+    
+    /*
+     * Use this when you have an existing and active ServiceContext.
+     */
+    public AccountsCommon updateAccount(ServiceContext<AccountsCommon, AccountsCommon> parentContext, UriInfo ui, String csid, AccountsCommon theUpdate) {
+        return (AccountsCommon)update(parentContext, ui, csid, theUpdate, AccountsCommon.class);
+    }
+    
 
     /**
      * Resets an accounts password.
@@ -230,13 +236,12 @@ public class AccountResource extends SecurityResourceBase {
      *
      * @param ui
      * @return
-     * @throws UnsupportedEncodingException 
-     * @throws DocumentNotFoundException 
+     * @throws  
      * @throws IOException 
      */
     @POST
     @Path(PROCESS_PASSWORD_RESET_PATH)
-    synchronized public Response processPasswordReset(Passwordreset passwordreset, @Context UriInfo ui) throws UnsupportedEncodingException, DocumentNotFoundException {
+    synchronized public Response processPasswordReset(Passwordreset passwordreset, @Context UriInfo ui) {
     	Response response = null;
 
     	//
@@ -300,31 +305,45 @@ public class AccountResource extends SecurityResourceBase {
         	response = Response.status(Response.Status.BAD_REQUEST).entity(errMsg).type("text/plain").build();
         	return response;
         }
-
         //
-        //
+        // Finally, try to update the account with the new password.
         //
         String tenantId = token.getTenantId();
     	TenantBindingType tenantBindingType = ServiceMain.getInstance().getTenantBindingConfigReader().getTenantBinding(tenantId);
     	EmailConfig emailConfig = tenantBindingType.getEmailConfig();
     	if (emailConfig != null) {
     		try {
-				if (AuthorizationCommon.hasTokenExpired(emailConfig, token) == false) {
-					AccountsCommon accountUpdate = new AccountsCommon();
-					accountUpdate.setUserId(targetAccount.getUserId());
-					accountUpdate.setPassword(password.getBytes());
-					updateAccount(ui, targetAccount.getCsid(), accountUpdate);
-					TokenStorageClient.update(tokenId, false); // disable the token so it can't be used again.
-					String msg = String.format("Successfully reset password using token ID='%s'.",
-							token.getId());
-		        	response = Response.status(Response.Status.OK).entity(msg).type("text/plain").build();
-		        } else {
-		        	String errMsg = String.format("Could not reset password using token with ID='%s'. Password reset token has expired.",
-							token.getId());
-		        	response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errMsg).type("text/plain").build();
-		        }
-			} catch (NoSuchAlgorithmException e) {
-				String errMsg = String.format("Could not reset password for using token ID='%s'. Error: '%s'",
+	    		ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext((AccountsCommon) null, AccountsCommon.class, ui);
+	            TransactionContext transactionCtx = ctx.openConnection();
+	    		try {
+					if (AuthorizationCommon.hasTokenExpired(emailConfig, token) == false) {
+						transactionCtx.beginTransaction();
+						AccountsCommon accountUpdate = new AccountsCommon();
+						accountUpdate.setUserId(targetAccount.getUserId());
+						accountUpdate.setPassword(password.getBytes());
+						updateAccount(ctx, ui, targetAccount.getCsid(), accountUpdate);
+						TokenStorageClient.update(transactionCtx, tokenId, false); // disable the token so it can't be used again.
+						transactionCtx.commitTransaction();
+						//
+						// Success!
+						//
+						String msg = String.format("Successfully reset password using token ID='%s'.", token.getId());
+			        	response = Response.status(Response.Status.OK).entity(msg).type("text/plain").build();
+			        } else {
+			        	String errMsg = String.format("Could not reset password using token with ID='%s'. Password reset token has expired.",
+								token.getId());
+			        	response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errMsg).type("text/plain").build();
+			        }
+				} catch (Throwable t) {
+					transactionCtx.markForRollback();
+					String errMsg = String.format("Could not reset password using token ID='%s'. Error: '%s'",
+							t.getMessage(), token.getId());
+		        	response = Response.status(Response.Status.BAD_REQUEST).entity(errMsg).type("text/plain").build();
+				} finally {
+					ctx.closeConnection();
+				}
+    		} catch (Exception e) {
+				String errMsg = String.format("Could not reset password using token ID='%s'. Error: '%s'",
 						e.getMessage(), token.getId());
 	        	response = Response.status(Response.Status.BAD_REQUEST).entity(errMsg).type("text/plain").build();
 			}
@@ -440,7 +459,7 @@ public class AccountResource extends SecurityResourceBase {
 
     	return result;
     }
-
+    
 	@DELETE
     @Path("{csid}")
     public Response deleteAccount(@Context UriInfo uriInfo, @PathParam("csid") String csid) {
@@ -449,8 +468,10 @@ public class AccountResource extends SecurityResourceBase {
         
         try {
         	AccountsCommon account = (AccountsCommon)get(csid, AccountsCommon.class);
+        	//
             // If marked as metadata immutable, do not delete
-            if (AccountClient.IMMUTABLE.equals(account.getMetadataProtection())) {
+            //
+        	if (AccountClient.IMMUTABLE.equals(account.getMetadataProtection())) {
                 Response response =
                 	Response.status(Response.Status.FORBIDDEN).entity("Account: "+csid+" is immutable.").type("text/plain").build();
                 return response;
@@ -461,11 +482,22 @@ public class AccountResource extends SecurityResourceBase {
             //
             ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext((AccountsCommon) null,
                     AccountsCommon.class, uriInfo);
-            ctx.openConnection();
+            TransactionContext transactionContext = ctx.openConnection();
             try {
+            	transactionContext.beginTransaction();
+            	//
+            	// Delete all the account-role relationships
+            	//
 	            AccountRoleSubResource subResource = new AccountRoleSubResource("accounts/accountroles");
 	            subResource.deleteAccountRole(ctx, csid, SubjectType.ROLE);
+	            //
+	            // Now delete the account.
+	            //
 	            getStorageClient(ctx).delete(ctx, csid);
+	            transactionContext.commitTransaction();
+            } catch (Throwable t) {
+            	transactionContext.markForRollback();
+            	throw t;
             } finally {
             	ctx.closeConnection();
             }
@@ -476,9 +508,11 @@ public class AccountResource extends SecurityResourceBase {
         return Response.status(HttpResponseCodes.SC_OK).build();        
     }
 
-    @POST
+	@POST
     @Path("{csid}/accountroles")
-    public Response createAccountRole(@QueryParam("_method") String method,
+    public Response createAccountRole(
+    		@Context UriInfo uriInfo,
+    		@QueryParam("_method") String method,
             @PathParam("csid") String accCsid,
             AccountRole input) {
         if (method != null) {
@@ -488,21 +522,29 @@ public class AccountResource extends SecurityResourceBase {
         }
         logger.debug("createAccountRole with accCsid=" + accCsid);
         ensureCSID(accCsid, ServiceMessages.POST_FAILED+ "accountroles account ");
+        
         try {
         	AccountsCommon account = (AccountsCommon)get(accCsid, AccountsCommon.class);
-            // If marked as roles immutable, do not create
+            // If marked as immutable, fail.
             if (AccountClient.IMMUTABLE.equals(account.getRolesProtection())) {
                 Response response =
                 	Response.status(Response.Status.FORBIDDEN).entity("Roles for Account: "+accCsid+" are immutable.").type("text/plain").build();
                 return response;
             }
-            AccountRoleSubResource subResource =
-                    new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
-            String accrolecsid = subResource.createAccountRole((ServiceContext)null, input, SubjectType.ROLE);
-            UriBuilder path = UriBuilder.fromResource(AccountResource.class);
-            path.path(accCsid + "/accountroles/" + accrolecsid);
-            Response response = Response.created(path.build()).build();
-            return response;
+            
+            ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext((AccountsCommon) null, AccountsCommon.class, uriInfo);
+            ctx.openConnection();
+            try {
+	            AccountRoleSubResource subResource =
+	                    new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
+	            String accrolecsid = subResource.createAccountRole(ctx, input, SubjectType.ROLE);
+	            UriBuilder path = UriBuilder.fromResource(AccountResource.class);
+	            path.path(accCsid + "/accountroles/" + accrolecsid);
+	            Response response = Response.created(path.build()).build();
+	            return response;
+            } finally {
+            	ctx.closeConnection();
+            }
          } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.POST_FAILED, accCsid);
         }
@@ -516,15 +558,18 @@ public class AccountResource extends SecurityResourceBase {
         logger.debug("getAccountRole with accCsid=" + accCsid);
         ensureCSID(accCsid, ServiceMessages.GET_FAILED+ "accountroles account ");
         AccountRoleRel result = null;
+        ServiceContext<AccountsCommon, AccountsCommon> ctx = null;
+
         try {
             AccountRoleSubResource subResource =
                     new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
             //get relationships for an account
-            result = subResource.getAccountRoleRel((ServiceContext)null, accCsid, SubjectType.ROLE, accrolecsid);
+            result = subResource.getAccountRoleRel(ctx,	accCsid, SubjectType.ROLE, accrolecsid);
          } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED, accCsid);
         }
         checkResult(result, accCsid, ServiceMessages.GET_FAILED);
+        
         return result;
     }
 
@@ -535,12 +580,13 @@ public class AccountResource extends SecurityResourceBase {
         logger.debug("getAccountRole with accCsid=" + accCsid);
         ensureCSID(accCsid, ServiceMessages.GET_FAILED+ "accountroles account ");
         AccountRole result = null;
+        ServiceContext<AccountsCommon, AccountsCommon> ctx = null;
         
         try {
             AccountRoleSubResource subResource =
                     new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
             //get relationships for an account
-            result = subResource.getAccountRole((ServiceContext)null, accCsid, SubjectType.ROLE);
+            result = subResource.getAccountRole(ctx, accCsid, SubjectType.ROLE);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED, accCsid);
         }
@@ -566,22 +612,30 @@ public class AccountResource extends SecurityResourceBase {
         return result;
     }
 
-    public Response deleteAccountRole(String accCsid, AccountRole input) {
+	public Response deleteAccountRole(String accCsid, AccountRole input) {
         logger.debug("deleteAccountRole with accCsid=" + accCsid);
         ensureCSID(accCsid, ServiceMessages.DELETE_FAILED+ "accountroles account ");
         
         try {
         	AccountsCommon account = (AccountsCommon)get(accCsid, AccountsCommon.class);
             // If marked as roles immutable, do not delete
-            if(AccountClient.IMMUTABLE.equals(account.getRolesProtection())) {
+            if (AccountClient.IMMUTABLE.equals(account.getRolesProtection())) {
                 Response response =
                 	Response.status(Response.Status.FORBIDDEN).entity("Roles for Account: "+accCsid+" are immutable.").type("text/plain").build();
                 return response;
             }
-            AccountRoleSubResource subResource =
-                    new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
-            //delete all relationships for an account
-            subResource.deleteAccountRole((ServiceContext)null, accCsid, SubjectType.ROLE, input);
+            
+            ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext((AccountsCommon) null,
+                    AccountsCommon.class, (UriInfo) null);
+            ctx.openConnection();
+            try {
+	            AccountRoleSubResource subResource =
+	                    new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
+	            //delete all relationships for an account
+	            subResource.deleteAccountRole(ctx, accCsid, SubjectType.ROLE, input);
+            } finally {
+            	ctx.closeConnection();
+            }
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, accCsid);
         }
@@ -591,7 +645,8 @@ public class AccountResource extends SecurityResourceBase {
 
     @DELETE
     @Path("{csid}/accountroles")
-    public Response deleteAccountRole(@PathParam("csid") String accCsid) {
+    public Response deleteAccountRole(@Context UriInfo uriInfo, @PathParam("csid") String accCsid) {
+    	
         logger.debug("deleteAccountRole: All roles related to account with accCsid=" + accCsid);
         ensureCSID(accCsid, ServiceMessages.DELETE_FAILED+ "accountroles account ");
         
@@ -603,10 +658,17 @@ public class AccountResource extends SecurityResourceBase {
                 	Response.status(Response.Status.FORBIDDEN).entity("Roles for Account: "+accCsid+" are immutable.").type("text/plain").build();
                 return response;
             }
-            AccountRoleSubResource subResource =
-                    new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
-            //delete all relationships for an account
-            subResource.deleteAccountRole((ServiceContext)null, accCsid, SubjectType.ROLE);
+            
+            ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext((AccountsCommon) null, AccountsCommon.class, uriInfo);
+            ctx.openConnection();
+            try {
+	            AccountRoleSubResource subResource =
+	                    new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
+	            //delete all relationships for an account
+	            subResource.deleteAccountRole(ctx, accCsid, SubjectType.ROLE);
+            } finally {
+            	ctx.closeConnection();
+            }
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, accCsid);
         }

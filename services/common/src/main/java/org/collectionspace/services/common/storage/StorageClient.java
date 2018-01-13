@@ -161,4 +161,7 @@ public interface StorageClient {
 			throws DocumentNotFoundException, TransactionException,
 			DocumentException;
 
+	boolean delete(ServiceContext ctx, Object entityFound, DocumentHandler handler)
+			throws DocumentNotFoundException, DocumentException;
+
 }

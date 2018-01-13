@@ -2221,4 +2221,13 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
     		repoSession.setTransactionRollbackOnly();
     	}
     }
+
+    /**
+     * Should never get called.
+     */
+	@Override
+	public boolean delete(ServiceContext ctx, Object entityFound, DocumentHandler handler)
+			throws DocumentNotFoundException, DocumentException {
+		throw new UnsupportedOperationException();
+	}
 }

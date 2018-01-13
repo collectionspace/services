@@ -16,6 +16,7 @@ import java.util.*;
  *   See example usage in calling class XmlReplayTest in services/IntegrationTests, and also in main() in this class.
  *   @author Laramie Crocker
  */
+@SuppressWarnings("unchecked")
 public class XmlReplay {
 
     public XmlReplay(String basedir, String reportsDir){
@@ -93,7 +94,8 @@ public class XmlReplay {
         return reportsList;
     }
 
-    public String toString(){
+    @Override
+	public String toString(){
         return "XmlReplay{"+this.basedir+", "+this.defaultAuthsMap+", "+this.dump+", "+this.reportsDir+'}';
     }
 
@@ -151,7 +153,7 @@ public class XmlReplay {
 
     /** Creates new instances of XmlReplay, one for each controlFile specified in the master,
      *  and setting defaults from this instance, but not sharing ServiceResult objects or maps. */
-    public List<List<ServiceResult>> runMaster(String masterFilename, boolean readOptionsFromMaster) throws Exception {
+	public List<List<ServiceResult>> runMaster(String masterFilename, boolean readOptionsFromMaster) throws Exception {
         List<List<ServiceResult>> list = new ArrayList<List<ServiceResult>>();
         org.dom4j.Document document;
         if (readOptionsFromMaster){
@@ -229,8 +231,8 @@ public class XmlReplay {
         return runTests(testGroupID, "");
     }
 
-    public List<ServiceResult>  autoDelete(String logName){
-        return autoDelete(this.serviceResultsMap, logName, 0);
+    public List<ServiceResult> autoDelete(String logName){
+        return autoDelete(this.defaultAuthsMap, this.serviceResultsMap, logName, 0);
     }
 
     /** Use this method to clean up resources created on the server that returned CSIDs, if you have
@@ -238,14 +240,14 @@ public class XmlReplay {
      * @param serviceResultsMap a Map of ServiceResult objects, which will contain ServiceResult.deleteURL.
      * @return a List<String> of debug info about which URLs could not be deleted.
      */
-    private static List<ServiceResult> autoDelete(Map<String, ServiceResult> serviceResultsMap, String logName, int reattempt) {
+    private static List<ServiceResult> autoDelete(AuthsMap defaultAuths, Map<String, ServiceResult> serviceResultsMap, String logName, int reattempt) {
         List<ServiceResult> results = new ArrayList<ServiceResult>();
         HashMap<String, ServiceResult> reattemptList = new HashMap<String, ServiceResult>();
         int deleteFailures = 0;
         for (ServiceResult pr : serviceResultsMap.values()) {
             try {
                 if (pr.autoDelete == true && Tools.notEmpty(pr.deleteURL)){
-                    ServiceResult deleteResult = XmlReplayTransport.doDELETE(pr.deleteURL, pr.auth, pr.testID, "[autodelete:"+logName+"]");
+                    ServiceResult deleteResult = XmlReplayTransport.doDELETE(pr.deleteURL, defaultAuths.getDefaultAuth(), pr.testID, "[autodelete:"+logName+"]");
                     if (deleteResult.gotExpectedResult() == false || deleteResult.responseCode != 200) {
                     	reattemptList.put(REATTEMPT_KEY + deleteFailures++, pr); // We need to try again after our dependents have been deleted. cow()
                     }
@@ -276,7 +278,7 @@ public class XmlReplay {
         // our MAX_REATTEMPTS limit.
         //
         if (reattemptList.size() > 0 && reattempt < MAX_REATTEMPTS) {
-        	return autoDelete(reattemptList, logName, ++reattempt); // recursive call
+        	return autoDelete(defaultAuths, reattemptList, logName, ++reattempt); // recursive call
         }
         
         return results;
@@ -288,7 +290,8 @@ public class XmlReplay {
         public String getDefaultAuth(){
             return map.get(defaultID);
         }
-        public String toString(){
+        @Override
+		public String toString(){
             return "AuthsMap: {default='"+defaultID+"'; "+map.keySet()+'}';
         }
     }
@@ -314,7 +317,8 @@ public class XmlReplay {
         public boolean payloads = false;
         //public static final ServiceResult.DUMP_OPTIONS dumpServiceResultOptions = ServiceResult.DUMP_OPTIONS;
         public ServiceResult.DUMP_OPTIONS dumpServiceResult = ServiceResult.DUMP_OPTIONS.minimal;
-        public String toString(){
+        @Override
+		public String toString(){
             return "payloads: "+payloads+" dumpServiceResult: "+dumpServiceResult;
         }
     }
@@ -426,7 +430,7 @@ public class XmlReplay {
         byte[] b = FileUtils.readFileToByteArray(new File(expectedResponseParts.responseFilename));
         String expectedPartContent = new String(b);
         Map<String,String> vars = expectedResponseParts.varsList.get(0);  //just one part, so just one varsList.  Must be there, even if empty.
-        expectedPartContent = evalStruct.eval(expectedPartContent, serviceResultsMap, vars, evalStruct.jexl, evalStruct.jc);
+        expectedPartContent = XmlReplayEval.eval(expectedPartContent, serviceResultsMap, vars, evalStruct.jexl, evalStruct.jc);
         serviceResult.expectedContentExpanded = expectedPartContent;
         String label = "NOLABEL";
         String leftID  = "{from expected part, label:"+label+" filename: "+expectedResponseParts.responseFilename+"}";
@@ -556,7 +560,7 @@ public class XmlReplay {
             } else {
                 tests = testgroup.selectNodes("test");
             }
-            String authForTest = "";
+            String authForTest = ""; // reset auth for each test group
             int testElementIndex = -1;
 
             for (Node testNode : tests) {
@@ -587,12 +591,10 @@ public class XmlReplay {
                     
                     if (Tools.notEmpty(authIDForTest)){
                         currentAuthForTest = authsMap.map.get(authIDForTest);
-                    }
-                    else {
+                    } else {
                         String tokenAuthExpression = testNode.valueOf("@tokenauth");
-                        
                         if (Tools.notEmpty(tokenAuthExpression)){
-                            currentAuthForTest = "Bearer " + evalStruct.eval(tokenAuthExpression, serviceResultsMap, null, jexl, jc);
+                            currentAuthForTest = "Bearer " + XmlReplayEval.eval(tokenAuthExpression, serviceResultsMap, null, jexl, jc);
                         }
                     }
                     
@@ -604,7 +606,7 @@ public class XmlReplay {
                     }
 
                     if (uri.indexOf("$")>-1){
-                        uri = evalStruct.eval(uri, serviceResultsMap, null, jexl, jc);
+                        uri = XmlReplayEval.eval(uri, serviceResultsMap, null, jexl, jc);
                     }
                     fullURL = fixupFullURL(fullURL, protoHostPort, uri);
 
@@ -723,17 +725,19 @@ public class XmlReplay {
                         hasError = ! serviceResult.gotExpectedResult();
                     }
 
-                    boolean doingAuto = (dump.dumpServiceResult == ServiceResult.DUMP_OPTIONS.auto);
-                    String serviceResultRow = serviceResult.dump(dump.dumpServiceResult, hasError)+"; time:"+(System.currentTimeMillis()-startTime);
-                    String leader = (dump.dumpServiceResult == ServiceResult.DUMP_OPTIONS.detailed) ? "XmlReplay:"+testIDLabel+": ": "";
-
                     report.addTestResult(serviceResult);
 
-                    if (   (dump.dumpServiceResult == ServiceResult.DUMP_OPTIONS.detailed)
-                        || (dump.dumpServiceResult == ServiceResult.DUMP_OPTIONS.full)         ){
+                    if ((dump.dumpServiceResult == ServiceResult.DUMP_OPTIONS.detailed) || (dump.dumpServiceResult == ServiceResult.DUMP_OPTIONS.full)) {
                         System.out.println("\r\n#---------------------#");
                     }
-                    System.out.println(timeString()+" "+leader+serviceResultRow+"\r\n");
+                    
+                    String leader = (dump.dumpServiceResult == ServiceResult.DUMP_OPTIONS.detailed) ? "XmlReplay:" + testIDLabel +": ": "";                    
+                    String serviceResultRow = serviceResult.dump(dump.dumpServiceResult, hasError) + "; time:" + (System.currentTimeMillis()-startTime);                
+                    //System.out.println(timeString() + "\n" + leader + serviceResultRow + "\r\n");
+                    System.out.println(String.format("Time: %s\nLeader: %s\nAuth: %s\nResult: %s\r\n", 
+                    		timeString(), testIDLabel, Tools.notEmpty(authIDForTest) ? authIDForTest : "<inferred>", serviceResultRow));
+                    
+                    boolean doingAuto = (dump.dumpServiceResult == ServiceResult.DUMP_OPTIONS.auto);                    
                     if (dump.payloads || (doingAuto&&hasError) ) {
                         if (Tools.notBlank(serviceResult.requestPayload)){
                             System.out.println("\r\n========== request payload ===============");
@@ -759,7 +763,7 @@ public class XmlReplay {
                 }
             }
             if (Tools.isTrue(autoDeletePOSTS) && param_autoDeletePOSTS){
-                autoDelete(serviceResultsMap, "default", 0);
+                autoDelete(defaultAuths, serviceResultsMap, "default", 0);
             }
         }
 
@@ -823,7 +827,7 @@ public class XmlReplay {
         return result;
     }
 
-    public static void main(String[]args) throws Exception {
+	public static void main(String[]args) throws Exception {
         Options options = createOptions();
         //System.out.println("System CLASSPATH: "+prop.getProperty("java.class.path", null));
         CommandLineParser parser = new GnuParser();

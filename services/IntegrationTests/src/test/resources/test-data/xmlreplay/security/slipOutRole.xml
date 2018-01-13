@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:role xmlns:ns2="http://collectionspace.org/services/authorization">
-    <roleName>xROLE_1_BIRD</roleName>
-    <description>Role for testing batch invoke permissions</description>
+    <roleName>SLIP_OUT_ROLE1</roleName>
+    <permission>
+        <permissionId>${slipOutPerm.CSID}</permissionId>
+    </permission>
 </ns2:role>

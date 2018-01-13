@@ -61,18 +61,18 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
     // Used to create unique identifiers
     static private final Random random = new Random(System.currentTimeMillis());
     
-	private static final String PERM_1_RL_RESOURCE = "ROLE_TEST_PERMVALUE_RESOURCE_1";
+	private static final String PERM_1_RL_RESOURCE = "xROLE_TEST_PERMVALUE_RESOURCE_1";
 	private static final String PERM_1_RL_ACTIONGROUP = "RL";
-	private static final String PERM_2_RL_RESOURCE = "ROLE_TEST_PERMVALUE_RESOURCE_2";
+	private static final String PERM_2_RL_RESOURCE = "xROLE_TEST_PERMVALUE_RESOURCE_2";
 	private static final String PERM_2_RL_ACTIONGROUP = "CRUL";
-	private static final String PERM_3_RL_RESOURCE = "ROLE_TEST_PERMVALUE_RESOURCE_3";
+	private static final String PERM_3_RL_RESOURCE = "xROLE_TEST_PERMVALUE_RESOURCE_3";
 	private static final String PERM_3_RL_ACTIONGROUP = "CRUDL";
 
 
     // Instance variables specific to this test.
     /** The known resource id. */
-    private String knownRoleName = "ROLE_USERS_MOCK-1";
-    private String knownRoleDisplayName = "ROLE_DISPLAYNAME_USERS_MOCK-1";
+    private String knownRoleName = "xROLE_USERS_MOCK-1";
+    private String knownRoleDisplayName = "xROLE_DISPLAYNAME_USERS_MOCK-1";
     private String verifyResourceId = null;
     private String verifyRoleName = "collections_manager_mock-1";
     //
@@ -498,7 +498,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
         	res.close();
         }
 
-        Role role2 = createRoleInstance("ROLE_COLLECTIONS_CURATOR_TEST",
+        Role role2 = createRoleInstance("xROLE_COLLECTIONS_CURATOR_TEST",
                 "collections curator", true);
         res = client.create(role2);
         try {
@@ -512,7 +512,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
         	res.close();
         }
 
-        Role role3 = createRoleInstance("ROLE_MOVINGIMAGE_ADMIN_TEST",
+        Role role3 = createRoleInstance("xROLE_MOVINGIMAGE_ADMIN_TEST",
                 "moving image admin", true);
         res = client.create(role3);
         try {
@@ -615,7 +615,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
 	        Assert.assertNotNull(output);
 	
 	        //FIXME: Tenant ID of "1" should not be hard coded
-	        String roleNameToVerify = "ROLE_" +
+	        String roleNameToVerify = RoleClient.BACKEND_ROLE_PREFIX +
 	        	"1_" +
 	        	verifyRoleName.toUpperCase();
 	        Assert.assertEquals(output.getRoleName(), roleNameToVerify,
@@ -949,7 +949,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in updateRole(), below.
         RoleClient client = new RoleClient();
-        Role role = createRoleInstance("ROLE_XXX",
+        Role role = createRoleInstance("xROLE_XXX",
                 "xxx",
                 true);
         Response res = client.update(NON_EXISTENT_ID, role);

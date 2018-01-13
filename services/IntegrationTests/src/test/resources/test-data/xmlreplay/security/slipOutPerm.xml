@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns3:permission xmlns:ns3="http://collectionspace.org/services/authorization/perms">
+    <resourceName>vocabularies</resourceName>
+    <action>
+        <name>CREATE</name>
+    </action>
+    <action>
+        <name>READ</name>
+    </action>
+    <effect>PERMIT</effect>
+</ns3:permission>

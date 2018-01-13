@@ -41,6 +41,7 @@ import org.collectionspace.services.account.RoleValue;
 import org.collectionspace.services.client.AccountClient;
 import org.collectionspace.services.client.AccountFactory;
 import org.collectionspace.services.client.AccountRoleFactory;
+import org.collectionspace.services.common.storage.TransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -146,13 +147,23 @@ public class AccountDocumentHandler
     }
 
     @Override
+    /**
+     * If the create payload included a list of role, relate them to the account.
+     */
     public void completeCreate(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
     	AccountsCommon accountsCommon = wrapDoc.getWrappedObject();
     	List<RoleValue> roleValueList = account.getRole();
     	if (roleValueList != null && roleValueList.size() > 0) {
+    		//
+    		// To prevent new Accounts being created (especially low-level Spring Security accounts/SIDs), we'll first flush the current
+    		// JPA context to ensure our Account can be successfully persisted.
+    		//
+    		TransactionContext jpaTransactionContext = this.getServiceContext().getCurrentTransactionContext();
+    		jpaTransactionContext.flush();
+
     		AccountRoleSubResource subResource = new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
     		AccountRole accountRole = AccountRoleFactory.createAccountRoleInstance(accountsCommon, roleValueList, true, true);
-			String accountRoleCsid = subResource.createAccountRole(this.getServiceContext(), accountRole, SubjectType.ROLE);
+			subResource.createAccountRole(this.getServiceContext(), accountRole, SubjectType.ROLE);
     	}
     }
     
