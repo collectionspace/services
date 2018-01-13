@@ -193,7 +193,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
         try {
 	        assertStatusCode(res, testName);
 	        PermissionsList list = res.readEntity(PermissionsList.class);
-	        int EXPECTED_ITEMS = 2 + 4; //2 seeded base resource permissions and 4 workflow-related permissions
+	        int EXPECTED_ITEMS = 3 + 4; // 3 seeded base resource permissions (CRUDL, RL, CRUL) and 4 workflow-related permissions
 	        int actual = list.getPermission().size();
 	        if (logger.isDebugEnabled()) {
 	            logger.debug(testName + ": received = " + actual
