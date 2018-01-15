@@ -290,59 +290,19 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
 
     }
 
-    // Failure outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readNonExistent(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
-    public void readNonExistent(String testName) throws Exception {
-        // Perform setup.
-        setupReadNonExistent();
-
-        // Submit the request to the service and store the response.
-        PermissionRoleClient client = new PermissionRoleClient();
-        Response res = null;
-        try {
-            res = client.read(NON_EXISTENT_ID);
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(testRequestType, statusCode));
-            Assert.assertEquals(statusCode, testExpectedStatusCode);
-        } finally {
-            if (res != null) {
-                res.close();
-            }
-        }
-    }
-
     @Test(dataProvider = "testName",
     		dependsOnMethods = {"CRUDTests"})
     public void readNoRelationship(String testName) throws Exception {
         // Perform setup.
-        setupRead();
+    	setupReadNonExistent();
 
         // Submit the request to the service and store the response.
         PermissionRoleClient client = new PermissionRoleClient();
         Response res = null;
         try {
-            res = client.read(
-                    permValues.get(TEST_SERVICE_NAME + TEST_MARKER + NO_REL_SUFFIX).getPermissionId());
-            // Check the status code of the response: does it match
-            // the expected response(s)?
+        	String permId = permValues.get(TEST_SERVICE_NAME + TEST_MARKER + NO_REL_SUFFIX).getPermissionId();
+            res = client.read(permId);
             assertStatusCode(res, testName);
-            PermissionRole output = res.readEntity(PermissionRole.class);
-
-            String sOutput = objectAsXmlString(output, PermissionRole.class);
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + " received " + sOutput);
-            }
         } finally {
             if (res != null) {
                 res.close();
@@ -728,11 +688,10 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl<Permissio
      * refer to this method in their @Test annotation declarations.
      */
     @Override
-    @Test(dataProvider = "testName",
-    		dependsOnMethods = {
+    @Test(dataProvider = "testName", dependsOnMethods = {
         		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
     public void CRUDTests(String testName) {
-    	// Do nothing.  Simply here to for a TestNG execution order for our tests
+    	System.out.println("no-op");
     }
     
 	@Override

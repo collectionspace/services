@@ -35,11 +35,9 @@ import org.collectionspace.services.account.AccountListItem;
 import org.collectionspace.services.account.AccountRoleSubResource;
 import org.collectionspace.services.account.Status;
 import org.collectionspace.services.authorization.AccountRole;
-import org.collectionspace.services.authorization.AccountValue;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.account.RoleValue;
 import org.collectionspace.services.client.AccountClient;
-import org.collectionspace.services.client.AccountFactory;
 import org.collectionspace.services.client.AccountRoleFactory;
 import org.collectionspace.services.common.storage.TransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
@@ -170,8 +168,7 @@ public class AccountDocumentHandler
     @Override
     public void completeUpdate(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
         AccountsCommon upAcc = wrapDoc.getWrappedObject();
-        getServiceContext().setOutput(upAcc);
-        sanitize(upAcc);
+        getServiceContext().setOutput(upAcc);        
     }
 
     @Override
@@ -277,17 +274,23 @@ public class AccountDocumentHandler
      * sanitize removes data not needed to be sent to the consumer
      * @param account
      */
-    private void sanitize(AccountsCommon account) {
+    @Override
+	public void sanitize(DocumentWrapper<AccountsCommon> wrapDoc) {
+    	AccountsCommon account = wrapDoc.getWrappedObject();
+    	sanitize(account);
+    }
+    
+	private void sanitize(AccountsCommon account) {
         account.setPassword(null);
         if (!SecurityUtils.isCSpaceAdmin()) {
             account.setTenants(new ArrayList<AccountTenant>(0));
         }
-    }
+    }    
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#initializeDocumentFilter(org.collectionspace.services.common.context.ServiceContext)
      */
-    public void initializeDocumentFilter(ServiceContext ctx) {
+    public void initializeDocumentFilter(ServiceContext<AccountsCommon, AccountsCommon> ctx) {
         // set a default document filter in this method
     }
 }

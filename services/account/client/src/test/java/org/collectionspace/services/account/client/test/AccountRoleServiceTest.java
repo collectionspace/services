@@ -114,14 +114,14 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
         avc.setAccountId(coAccId);
         accValues.put(avc.getScreenName(), avc);
 
-        String rn1 = "ROLE_CO1";
+        String rn1 = "xROLE_CO1";
         String r1RoleId = createRole(rn1);
         RoleValue rv1 = new RoleValue();
         rv1.setRoleId(r1RoleId);
         rv1.setRoleName(rn1);
         roleValues.put(rv1.getRoleName(), rv1);
 
-        String rn2 = "ROLE_CO2";
+        String rn2 = "xROLE_CO2";
         String r2RoleId = createRole(rn2);
         RoleValue rv2 = new RoleValue();
         rv2.setRoleId(r2RoleId);
@@ -219,7 +219,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
     }
     
     /*
-     * In this test, for setup, we associate both test roles ("ROLE_CO1", "ROLE_CO2") with the test account "acc-role-user2".
+     * In this test, for setup, we associate both test roles ("xROLE_CO1", "xROLE_CO2") with the test account "acc-role-user2".
      * After we've performed this setup, our call to "/role/{csid}/accountroles" should contain an AccountRole that has
      * a list of 1 account -the test user account we associated during setup.
      */
@@ -248,7 +248,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
         }
 
         //
-        // Now read the list of accounts associated with the role "ROLE_CO1".
+        // Now read the list of accounts associated with the role "xROLE_CO1".
         // There should be just the "acc-role-user2" account.
         //
         RoleClient roleClient = new RoleClient();
@@ -256,7 +256,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
         // Submit the request to the service and store the response.
         setupRead();        
         Response res = roleClient.readRoleAccounts(
-        		roleValues.get("ROLE_CO1").getRoleId());
+        		roleValues.get("xROLE_CO1").getRoleId());
         try {
             // Check the status code of the response: does it match
             // the expected response(s)?

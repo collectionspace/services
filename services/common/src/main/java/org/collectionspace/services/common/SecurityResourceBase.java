@@ -1,6 +1,7 @@
 package org.collectionspace.services.common;
 
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.storage.TransactionContext;
@@ -8,6 +9,7 @@ import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.NoResultException;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -84,14 +86,22 @@ public abstract class SecurityResourceBase<IT, OT> extends AbstractCollectionSpa
         logger.debug("get with csid=" + csid);
         ensureCSID(csid, ServiceMessages.GET_FAILED + "csid");
         Object result = null;
+        
         try {
             ServiceContext<IT, OT> ctx = createServiceContext((IT) null, objectClass, ui);            
             DocumentHandler handler = createDocumentHandler(ctx);
             getStorageClient(ctx).get(ctx, csid, handler);
             result = ctx.getOutput();
-        } catch (Exception e) {
+        } catch (DocumentException e) {
+    		Exception cause = (Exception) e.getCause();
+    		if (cause instanceof NoResultException) {
+		        Response response = Response.status(Response.Status.NOT_FOUND).entity(result).type("text/plain").build();
+	            throw new CSWebApplicationException(response);
+    		}
+    	} catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED, csid);
         }
+        
         checkResult(result, csid, ServiceMessages.GET_FAILED);
         return result;
     }

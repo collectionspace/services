@@ -32,6 +32,7 @@ import java.util.Map;
 import javax.persistence.PersistenceException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
@@ -544,7 +545,7 @@ public class JpaStorageUtils {
             q.setParameter(paramName, paramBindings.get(paramName));
         }
         
-        result = q.getSingleResult();
+       	result = q.getSingleResult();
         
         if (result == null) {
         	logger.debug("Call to getEntity() returned empty set.");

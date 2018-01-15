@@ -2,45 +2,78 @@
 <xmlReplay>
     <auths>
         <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
+        <!-- Auth = Base64Encode("username:password") See https://www.base64encode.org/
+                For example:
+                    Username = "grover"
+                    Password = "grover2018"
+                    Token String = "grover:grover2018"
+                    Auth ID = "Z3JvdmVyOmdyb3ZlcjIwMTg="
+        -->
         <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
         <auth ID="user1@museum1">dXNlcjFAbXVzZXVtMS5vcmc6dXNlcjFAbXVzZXVtMS5vcmc=</auth>
         <auth ID="bigbird2010">YmlnYmlyZDIwMTA6YmlnYmlyZDIwMTA=</auth>
         <auth ID="elmo2010">ZWxtbzIwMTA6ZWxtbzIwMTA=</auth>
-        <auth ID="grover2018">Z3JvdmVyMjAxODpncm92ZXIyMDE4</auth>
+        <auth ID="grover">Z3JvdmVyOmdyb3ZlcjIwMTg=</auth>
         
     </auths>
     
-    <testGroup ID="slipOut" autoDeletePOSTS="true">
+    <testGroup ID="SimpleRoles" autoDeletePOSTS="true">
+        <test ID="simpleAccount-1">
+            <method>POST</method>
+            <uri>/cspace-services/accounts</uri>
+            <filename>security/BasicRoles/createSimpleAccount-1.xml</filename>
+        </test>
+        <test ID="simpleRole-1">
+            <method>POST</method>
+            <uri>/cspace-services/authorization/roles</uri>
+            <filename>security/BasicRoles/createSimpleRole-1.xml</filename>
+        </test>
+        <!--
+            Create an account and role(s) with a single payload request
+        -->
+        <test ID="simpleRole_2">
+            <method>POST</method>
+            <uri>/cspace-services/authorization/roles</uri>
+            <filename>security/BasicRoles/createSimpleRole-2.xml</filename>
+        </test>        
+        <test ID="simpleAccount-2">
+            <method>POST</method>
+            <uri>/cspace-services/accounts</uri>
+            <filename>security/BasicRoles/createSimpleAccount-2.xml</filename>
+        </test>
+    </testGroup>
+    
+    <testGroup ID="SlipOut" autoDeletePOSTS="true">
         <test ID="slipOutPerm">
             <method>POST</method>
             <uri>/cspace-services/authorization/permissions</uri>
-            <filename>security/slipOutPerm.xml</filename>
+            <filename>security/SlipOut/slipOutPerm.xml</filename>
         </test>
         <test ID="slipOutRole">
             <method>POST</method>
             <uri>/cspace-services/authorization/roles</uri>
-            <filename>security/slipOutRole.xml</filename>
+            <filename>security/SlipOut/slipOutRole.xml</filename>
         </test>
-        <test ID="accountGrover">
+        <test ID="slipOutAccount">
             <method>POST</method>
             <uri>/cspace-services/accounts</uri>
-            <filename>security/create-account-grover.xml</filename>
+            <filename>security/SlipOut/slipOutAccount-1.xml</filename>
         </test>
-        <test ID="slipOutVocab-1" auth="grover2018">
+        <test ID="slipOutVocab-1" auth="grover">
             <method>POST</method>
             <uri>/cspace-services/vocabularies</uri>
-            <filename>security/slipOutVocab-1.xml</filename>
+            <filename>security/SlipOut/slipOutVocab-1.xml</filename>
         </test>
         <test ID="update-slipOutPerm" auth="admin@core.collectionspace.org">
             <method>PUT</method>
             <uri>/cspace-services/authorization/permissions/${slipOutPerm.CSID}</uri>
-            <filename>security/slipOutPerm-update.xml</filename>
+            <filename>security/SlipOut/slipOutPerm-update.xml</filename>
         </test>
-        <test ID="slipOutVocab-2" auth="grover2018">
+        <test ID="slipOutVocab-2" auth="grover">
             <expectedCodes>403</expectedCodes>
             <method>POST</method>
             <uri>/cspace-services/vocabularies</uri>
-            <filename>security/slipOutVocab-2.xml</filename>
+            <filename>security/SlipOut/slipOutVocab-2.xml</filename>
         </test>
     </testGroup>
     
@@ -60,7 +93,7 @@
         </test>
     </testGroup>
     
-    <testGroup ID="deleteBug" autoDeletePOSTS="false">
+    <testGroup ID="DeleteBug" autoDeletePOSTS="false">
 
         <test ID="permElmo">
             <method>POST</method>

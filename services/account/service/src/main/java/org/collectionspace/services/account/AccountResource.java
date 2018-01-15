@@ -36,6 +36,7 @@ import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.client.AccountClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.RoleClient;
+import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.EmailUtil;
 import org.collectionspace.services.common.SecurityResourceBase;
 import org.collectionspace.services.common.ServiceMain;
@@ -45,6 +46,7 @@ import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.query.UriInfoImpl;
 import org.collectionspace.services.common.storage.StorageClient;
@@ -64,6 +66,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.persistence.NoResultException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -129,7 +132,11 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
     @GET
     @Path("{csid}")
     public AccountsCommon getAccount(@Context UriInfo ui, @PathParam("csid") String csid) {
-        return (AccountsCommon)get(ui, csid, AccountsCommon.class);
+    	AccountsCommon result = null;
+    	
+        result = (AccountsCommon)get(ui, csid, AccountsCommon.class);
+    	
+    	return result;
     }
 
     @GET

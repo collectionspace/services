@@ -61,11 +61,13 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
     // Used to create unique identifiers
     static private final Random random = new Random(System.currentTimeMillis());
     
-	private static final String PERM_1_RL_RESOURCE = "xROLE_TEST_PERMVALUE_RESOURCE_1";
+	private static final String PERM_1_RL_RESOURCE = "intakes";
 	private static final String PERM_1_RL_ACTIONGROUP = "RL";
-	private static final String PERM_2_RL_RESOURCE = "xROLE_TEST_PERMVALUE_RESOURCE_2";
+	
+	private static final String PERM_2_RL_RESOURCE = "dimensions";
 	private static final String PERM_2_RL_ACTIONGROUP = "CRUL";
-	private static final String PERM_3_RL_RESOURCE = "xROLE_TEST_PERMVALUE_RESOURCE_3";
+	
+	private static final String PERM_3_RL_RESOURCE = "loansin";
 	private static final String PERM_3_RL_ACTIONGROUP = "CRUDL";
 
 

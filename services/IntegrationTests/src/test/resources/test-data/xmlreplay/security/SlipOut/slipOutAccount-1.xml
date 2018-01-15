@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:accounts_common xmlns:ns2="http://collectionspace.org/services/account" xmlns:ns3="http://collectionspace.org/services/hyperjaxb">
-    <screenName>grover2018</screenName>
-    <personRefName>grover2018</personRefName>
+    <screenName>grover</screenName>
+    <personRefName>grover</personRefName>
     <email>grover@cspace.org</email>
     <phone>1234567890</phone>
-    <userId>grover2018</userId>
+    <userId>grover</userId>
     <!-- Pass word is grover2018, base64 encoded -->
     <password>Z3JvdmVyMjAxOA==</password>
     <tenants>

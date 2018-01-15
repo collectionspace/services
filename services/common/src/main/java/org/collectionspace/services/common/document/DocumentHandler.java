@@ -19,6 +19,7 @@ package org.collectionspace.services.common.document;
 
 import java.util.Map;
 
+import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
@@ -383,5 +384,7 @@ public interface DocumentHandler<T, TL, WT, WTL> {
 	 * @throws Exception
 	 */
 	void completeSync(DocumentWrapper<Object> wrapDoc) throws Exception;
+
+	public void sanitize(DocumentWrapper<WT> wrapDoc);
 
 }

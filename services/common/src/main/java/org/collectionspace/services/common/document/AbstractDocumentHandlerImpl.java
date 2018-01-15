@@ -266,6 +266,14 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
         
         return result;
     }
+    
+    @Override
+	public void sanitize(DocumentWrapper<WT> wrapDoc) {
+    	//
+    	// By default, do nothing.  Sub-classes can override if they want to.
+    	//
+    }
+
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#handleCreate(org.collectionspace.services.common.document.DocumentWrapper)
