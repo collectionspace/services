@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.vocabulary;
 
+import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.VocabularyClient;
@@ -79,6 +80,14 @@ public class VocabularyResource extends
         	MultivaluedMap<String,String> queryParams = uriInfo.getQueryParameters();
         	String showItemsValue = (String)queryParams.getFirst(VocabularyClient.SHOW_ITEMS_QP);
             boolean showItems = Tools.isTrue(showItemsValue);
+            if (showItems == true) {
+            	//
+            	// We'll honor paging params if we find any; otherwise we'll set the page size to 0 to get ALL the items
+            	//
+            	if (queryParams.containsKey(IClientQueryParams.PAGE_SIZE_PARAM) == false) {
+            		queryParams.add(IClientQueryParams.PAGE_SIZE_PARAM, "0");
+            	}
+            }
 
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(request, uriInfo);
             PoxPayloadOut payloadout = getAuthority(ctx, request, uriInfo, specifier, showItems);

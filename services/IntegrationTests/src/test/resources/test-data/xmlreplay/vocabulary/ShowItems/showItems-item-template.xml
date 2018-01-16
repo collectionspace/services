@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="vocabularyitems">
+  <ns3:vocabularyitems_common xmlns:ns3="http://collectionspace.org/services/vocabulary"
+  xmlns:ns2="http://collectionspace.org/services/jaxb">
+    <displayName>${displayName}</displayName>
+    <shortIdentifier>${itemID}</shortIdentifier>
+    <refName>urn:cspace:org.collectionspace.demo:vocabulary:name(TestOrderVocab):item:name(${itemID})'${displayName}'</refName>
+    <order>${order}</order>
+    <description>This is a test vocabulary item</description>
+    <source>Some mythical book</source>
+    <sourcePage>The page should match the order:${order}</sourcePage>
+  </ns3:vocabularyitems_common>
+</document>
+

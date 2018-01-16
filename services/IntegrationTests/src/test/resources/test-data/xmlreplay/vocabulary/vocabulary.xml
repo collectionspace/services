@@ -5,7 +5,112 @@
 		<auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
 		<auth ID="testAdministator">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
 	</auths>
-	<testGroup ID="TestOrder" autoDeletePOSTS="true">
+    
+    <!-- This test group tests the "showItems" query param that can be sent to the /vocabularies/${id} endpoint.
+        The "showItems=true" query param adds all the vocabularies items to the returned payload.
+    -->
+    <testGroup ID="TestShowItems" autoDeletePOSTS="true">
+        <test ID="createShowItemsVocab">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/</uri>
+            <filename>vocabulary/ShowItems/showItems-vocab.xml</filename>
+        </test>
+        <test ID="createItem1" auth="test">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createShowItemsVocab.CSID}/items/</uri>
+            <filename>vocabulary/ShowItems/showItems-item-template.xml</filename>
+            <vars>
+                <var ID="itemID">ShowItemsItem1</var>
+                <var ID="order">1</var>
+                <var ID="displayName">ShowsItems item ${itemID}</var>
+            </vars>
+        </test>
+        <test ID="createItem2" auth="test">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createShowItemsVocab.CSID}/items/</uri>
+            <filename>vocabulary/ShowItems/showItems-item-template.xml</filename>
+            <vars>
+                <var ID="itemID">ShowItemsItem2</var>
+                <var ID="order">2</var>
+                <var ID="displayName">ShowsItems item ${itemID}</var>
+            </vars>
+        </test>
+        <test ID="createItem3" auth="test">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createShowItemsVocab.CSID}/items/</uri>
+            <filename>vocabulary/ShowItems/showItems-item-template.xml</filename>
+            <vars>
+                <var ID="itemID">ShowItemsItem3</var>
+                <var ID="order">3</var>
+                <var ID="displayName">ShowsItems item ${itemID}</var>
+            </vars>
+        </test>
+        <test ID="getShowItemsVocab">
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies/${createShowItemsVocab.CSID}</uri>
+            <response>
+                <vars>
+                    <var ID="csid">${createShowItemsVocab.CSID}</var>
+                </vars>
+                <expected level="ADDOK" />
+                <label>vocabularies_common</label>
+                <filename>vocabulary/ShowItems/res/showVocab.res.xml</filename>
+            </response>
+        </test>
+        <test ID="getShowItemsVocabWithItems">
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies/${createShowItemsVocab.CSID}?showItems=true</uri>
+            <response>
+                <vars>
+                    <var ID="pgSz">2500</var>
+                    <var ID="itemsInPage">3</var>
+                    <var ID="totalItems">3</var>
+                    <var ID="csid">${createShowItemsVocab.CSID}</var>
+                    <var ID="createItem1">${createItem1.CSID}</var>
+                    <var ID="createItem2">${createItem2.CSID}</var>
+                    <var ID="createItem3">${createItem3.CSID}</var>
+                </vars>
+                <expected level="ADDOK" />
+                <filename>vocabulary/ShowItems/res/showVocabWithItems.res.xml</filename>
+            </response>
+        </test>
+        <test ID="getShowItemsVocabWithItemsPaged">
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies/${createShowItemsVocab.CSID}?showItems=true&amp;pgSz=2</uri>
+            <response>
+                <vars>
+                    <var ID="pgSz">2</var>
+                    <var ID="itemsInPage">2</var>
+                    <var ID="totalItems">3</var>
+                    <var ID="csid">${createShowItemsVocab.CSID}</var>
+                    <var ID="createItem1">${createItem1.CSID}</var>
+                    <var ID="createItem2">${createItem2.CSID}</var>
+                    <var ID="createItem3">${createItem3.CSID}</var>
+                </vars>
+                <expected level="ADDOK" />
+                <filename>vocabulary/ShowItems/res/showVocabWithItemsPaged.res.xml</filename>
+            </response>
+        </test>
+        <test ID="getShowItemsVocabWithItemsLastPage">
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies/${createShowItemsVocab.CSID}?showItems=true&amp;pgSz=2&amp;pgNum=1</uri>
+            <response>
+                <vars>
+                    <var ID="pgSz">2</var>
+                    <var ID="itemsInPage">1</var>
+                    <var ID="totalItems">3</var>
+                    <var ID="csid">${createShowItemsVocab.CSID}</var>
+                    <var ID="createItem1">${createItem1.CSID}</var>
+                    <var ID="createItem2">${createItem2.CSID}</var>
+                    <var ID="createItem3">${createItem3.CSID}</var>
+                </vars>
+                <expected level="ADDOK" />
+                <filename>vocabulary/ShowItems/res/showVocabWithLastPage.res.xml</filename>
+            </response>
+        </test>
+    </testGroup>
+	
+    <testGroup ID="TestOrder" autoDeletePOSTS="true">
 		<!-- The purpose of this testGroup is to test the new "order" field
 	      that was added in http://issues.collectionspace.org/browse/CSPACE-573
 	      and to ensure that this order field is returned in list results, 
