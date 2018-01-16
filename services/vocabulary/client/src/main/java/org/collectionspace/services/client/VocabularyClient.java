@@ -38,6 +38,7 @@ public class VocabularyClient extends AuthorityClientImpl<VocabulariesCommon, Vo
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
     public static final String TERM_INFO_GROUP_XPATH_BASE = "vocabularyTermGroup";
+	public static String SHOW_ITEMS_QP = "showItems"; // query param on GET of vocabulary to get list of items included in the result payload
 	//
 	// Subitem constants
 	//

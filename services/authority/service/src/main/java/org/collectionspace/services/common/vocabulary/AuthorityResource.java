@@ -44,6 +44,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
+import org.collectionspace.services.client.PoxPayload;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.XmlTools;
@@ -102,12 +103,15 @@ import org.slf4j.LoggerFactory;
  * The Class AuthorityResource.
  */
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Consumes("application/xml")
 @Produces("application/xml")
 public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         extends NuxeoBasedResource {
 	
-	final static String SEARCH_TYPE_TERMSTATUS = "ts";
+    final Logger logger = LoggerFactory.getLogger(AuthorityResource.class);
+
+    final static String SEARCH_TYPE_TERMSTATUS = "ts";
     public final static String hierarchy = "hierarchy";
 
     protected Class<AuthCommon> authCommonClass;
@@ -118,9 +122,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         
     final static String FETCH_SHORT_ID = "_fetch_";
     public final static String PARENT_WILDCARD = "_ALL_";
+	protected static final boolean DONT_INCLUDE_ITEMS = false;
+	protected static final boolean INCLUDE_ITEMS = true;
 	
-    final Logger logger = LoggerFactory.getLogger(AuthorityResource.class);
-
     /**
      * Instantiates a new Authority resource.
      */
@@ -383,7 +387,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 	            if (supportsReplicating(ctx.getTenantId(), ctx.getServiceName()) == false) {
 	            	throw new DocumentException(Response.Status.FORBIDDEN.getStatusCode());
 	            }
-	            AuthorityDocumentModelHandler handler = (AuthorityDocumentModelHandler)createDocumentHandler(ctx);
+				AuthorityDocumentModelHandler handler = (AuthorityDocumentModelHandler)createDocumentHandler(ctx);
 	            specifier = Specifier.getSpecifier(identifier, "getAuthority", "GET");
 	            handler.setShouldUpdateRevNumber(AuthorityServiceUtils.DONT_UPDATE_REV); // Never update rev number on sync calls
 	            neededSync = getRepositoryClient(ctx).synchronize(ctx, specifier, handler);
@@ -407,7 +411,20 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 	        
     	return result;
     }
+    
+    /*
+     * Builds a cached JAX-RS response.
+     */
+    protected Response buildResponse(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, PoxPayloadOut payloadOut) {
+    	Response result = null;
         
+    	ResponseBuilder responseBuilder = Response.ok(payloadOut.getBytes());
+        this.setCacheControl(ctx, responseBuilder);
+        result = responseBuilder.build();            
+
+        return result;
+    }
+
     /**
      * Gets the authority.
      * 
@@ -424,29 +441,11 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             @PathParam("csid") String specifier) {
     	Response result = null;
     	uriInfo = new UriInfoWrapper(uriInfo);
-        PoxPayloadOut payloadout = null;
         
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(request, uriInfo);
-            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
-
-            Specifier spec = Specifier.getSpecifier(specifier, "getAuthority", "GET");
-            if (spec.form == SpecifierForm.CSID) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getAuthority with csid=" + spec.value);
-                }
-                getRepositoryClient(ctx).get(ctx, spec.value, handler);
-            } else {
-                String whereClause = RefNameServiceUtils.buildWhereForAuthByName(authorityCommonSchemaName, spec.value);
-                DocumentFilter myFilter = new NuxeoDocumentFilter(whereClause, 0, 1);
-                handler.setDocumentFilter(myFilter);
-                getRepositoryClient(ctx).get(ctx, handler);
-            }
-            
-            payloadout = ctx.getOutput();
-            ResponseBuilder responseBuilder = Response.ok(payloadout.getBytes());
-            this.setCacheControl(ctx, responseBuilder);
-            result = responseBuilder.build();            
+            PoxPayloadOut payloadout = getAuthority(ctx, request, uriInfo, specifier, DONT_INCLUDE_ITEMS);
+            result = buildResponse(ctx, payloadout);            
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED, specifier);
         }
@@ -460,6 +459,38 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 
         return result;
     }
+        
+	protected PoxPayloadOut getAuthority(
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+            Request request,
+            UriInfo uriInfo,
+            String specifier,
+            boolean includeItems) throws Exception {
+    	uriInfo = new UriInfoWrapper(uriInfo);
+        PoxPayloadOut payloadout = null;
+        
+        DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> docHandler = createDocumentHandler(ctx);
+        Specifier spec = Specifier.getSpecifier(specifier, "getAuthority", "GET");
+        if (spec.form == SpecifierForm.CSID) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getAuthority with csid=" + spec.value);
+            }
+            getRepositoryClient(ctx).get(ctx, spec.value, docHandler);
+        } else {
+            String whereClause = RefNameServiceUtils.buildWhereForAuthByName(authorityCommonSchemaName, spec.value);
+            DocumentFilter myFilter = new NuxeoDocumentFilter(whereClause, 0, 1);
+            docHandler.setDocumentFilter(myFilter);
+            getRepositoryClient(ctx).get(ctx, docHandler);
+        }
+
+    	payloadout = ctx.getOutput();
+        if (includeItems == true) {
+        	AbstractCommonList itemsList = this.getAuthorityItemList(ctx, specifier, uriInfo);
+        	payloadout.addPart(PoxPayload.ABSTRACT_COMMON_LIST_ROOT_ELEMENT_LABEL, itemsList);
+        }
+
+        return payloadout;
+    }    
 
     /**
      * Finds and populates the authority list.
@@ -478,7 +509,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
             
-            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
+			DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
             DocumentFilter myFilter = handler.getDocumentFilter();
             // Need to make the default sort order for authority items
             // be on the displayName field
@@ -1332,7 +1363,6 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * @param itemIdentifier
      * @throws Exception
      */
-    @SuppressWarnings("rawtypes")
 	public boolean deleteAuthorityItem(ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
             String parentIdentifier,
             String itemIdentifier,

@@ -1,3 +1,4 @@
+*.out*
 *.iml
 *.org.*.bindings.xml
 *org.eclipse.wst*

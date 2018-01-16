@@ -40,6 +40,10 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	/** The Constant logger. */
 	protected static final Logger logger = LoggerFactory.getLogger(PayloadPart.class);	
 	
+	/** String constant for JAX-B root element labels */
+	public static final String DOCUMENT_ROOT_ELEMENT_LABEL = "document";
+	public static final String ABSTRACT_COMMON_LIST_ROOT_ELEMENT_LABEL = "abstract-common-list";
+	
 	/** The xml text. */
 	private String xmlPayload;
 	
@@ -53,7 +57,8 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	private List<PT> parts = new ArrayList<PT>();
 	
 	// Valid root element labels
-	private static Set<String> validRootElementLabels = new HashSet<String>(Arrays.asList("document", "abstract-common-list"));
+	private static Set<String> validRootElementLabels = new HashSet<String>(Arrays.asList(DOCUMENT_ROOT_ELEMENT_LABEL, 
+			ABSTRACT_COMMON_LIST_ROOT_ELEMENT_LABEL));
 	
 	/**
 	 * Instantiates a new pox payload.

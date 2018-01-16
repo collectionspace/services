@@ -26,16 +26,26 @@ package org.collectionspace.services.vocabulary;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.VocabularyClient;
+import org.collectionspace.services.common.CSWebApplicationException;
+import org.collectionspace.services.common.ServiceMessages;
+import org.collectionspace.services.common.UriInfoWrapper;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
-//import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
-//import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.vocabulary.nuxeo.VocabularyItemDocumentModelHandler;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 @Path("/" + VocabularyClient.SERVICE_PATH_COMPONENT)
 public class VocabularyResource extends 
@@ -55,6 +65,38 @@ public class VocabularyResource extends
 				VOCABULARIES_COMMON, VOCABULARYITEMS_COMMON);
 	}
 
+    @GET
+    @Path("{csid}")
+    @Override
+    public Response get(
+            @Context Request request,
+            @Context UriInfo uriInfo,
+            @PathParam("csid") String specifier) {
+    	Response result = null;
+    	uriInfo = new UriInfoWrapper(uriInfo);
+        
+        try {
+        	MultivaluedMap<String,String> queryParams = uriInfo.getQueryParameters();
+        	String showItemsValue = (String)queryParams.getFirst(VocabularyClient.SHOW_ITEMS_QP);
+            boolean showItems = Tools.isTrue(showItemsValue);
+
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(request, uriInfo);
+            PoxPayloadOut payloadout = getAuthority(ctx, request, uriInfo, specifier, showItems);
+            result = buildResponse(ctx, payloadout);
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.GET_FAILED, specifier);
+        }
+
+        if (result == null) {
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "GET request failed. The requested Authority specifier:" + specifier + ": was not found.").type(
+                    "text/plain").build();
+            throw new CSWebApplicationException(response);
+        }
+
+        return result;
+    }
+    
     @Override
     public String getServiceName() {
         return vocabularyServiceName;
