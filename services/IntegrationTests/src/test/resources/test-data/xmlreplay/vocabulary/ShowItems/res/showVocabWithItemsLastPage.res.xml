@@ -24,7 +24,6 @@
     </ns2:vocabularies_common>
     <ns2:account_permission xmlns:ns2="http://collectionspace.org/services/authorization">
         <account>
-            <accountId>fadf0bcf-7c34-40c3-b6e5-ab1988eba888</accountId>
             <screenName>Administrator</screenName>
             <userId>admin@core.collectionspace.org</userId>
             <tenantId>1</tenantId>
