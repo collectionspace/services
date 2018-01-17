@@ -35,7 +35,7 @@
         <itemsInPage>${itemsInPage}</itemsInPage>
         <totalItems>${totalItems}</totalItems>
         <fieldsReturned>
-            csid|uri|refName|updatedAt|workflowState|rev|sas|proposed|deprecated|termStatus|order|displayName|shortIdentifier
+            csid|uri|refName|updatedAt|workflowState|rev|sourcePage|sas|proposed|deprecated|termStatus|description|source|order|displayName|shortIdentifier
         </fieldsReturned>
         <list-item>
             <csid>${createItem1}</csid>
