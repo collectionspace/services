@@ -8,13 +8,11 @@
     </ns3:vocabularies_common>
     <ns2:abstract-common-list xmlns:ns2="http://collectionspace.org/services/jaxb">
         <list-item>
-            <proposed>true</proposed>
             <order>1</order>
             <displayName>PostWithItems item PostWithItems1</displayName>
             <shortIdentifier>PostWithItems1</shortIdentifier>
         </list-item>
         <list-item>
-            <proposed>true</proposed>
             <order>2</order>
             <displayName>PostWithItems item PostWithItems2</displayName>
             <shortIdentifier>ShowItemsItem2</shortIdentifier>

@@ -24,28 +24,46 @@
 package org.collectionspace.services.vocabulary;
 
 import org.collectionspace.services.client.IClientQueryParams;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PoxPayload;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.VocabularyClient;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.CSWebApplicationException;
+import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.JaxbUtils;
+import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
+import org.collectionspace.services.common.vocabulary.AuthorityServiceUtils;
+import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
+import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 import org.collectionspace.services.vocabulary.nuxeo.VocabularyItemDocumentModelHandler;
-
+import org.collectionspace.services.workflow.WorkflowCommon;
+import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 @Path("/" + VocabularyClient.SERVICE_PATH_COMPONENT)
@@ -66,7 +84,132 @@ public class VocabularyResource extends
 				VOCABULARIES_COMMON, VOCABULARYITEMS_COMMON);
 	}
 
-    @GET
+    @Override
+	@POST
+    public Response createAuthority(
+    		@Context ResourceMap resourceMap,
+    		@Context UriInfo uriInfo,
+    		String xmlPayload) {
+    	//
+    	// Requests to create new authorities come in on new threads. Unfortunately, we need to synchronize those threads on this block because, as of 8/27/2015, we can't seem to get Nuxeo
+    	// transaction code to deal with a database level UNIQUE constraint violations on the 'shortidentifier' column of the vocabularies_common table.
+    	// Therefore, to prevent having multiple authorities with the same shortid, we need to synchronize
+    	// the code that creates new authorities.  The authority document model handler will first check for authorities with the same short id before
+    	// trying to create a new authority.
+    	//
+    	synchronized(AuthorityResource.class) {
+	        try {
+	            PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
+	            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
+				RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient = this.getRepositoryClient(ctx);
+				
+				CoreSessionInterface repoSession = repoClient.getRepositorySession(ctx);
+				try {
+		            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);		            
+		            String csid = repoClient.create(ctx, handler);
+		            handleItemsPayload(repoSession, csid, resourceMap, uriInfo, input);
+		            UriBuilder path = UriBuilder.fromResource(resourceClass);
+		            path.path("" + csid);
+		            Response response = Response.created(path.build()).build();
+		            return response;
+	            } catch (Throwable t) {
+	            	repoSession.setTransactionRollbackOnly();
+	            	throw t;
+	            } finally {
+	            	repoClient.releaseRepositorySession(ctx, repoSession);
+	            }
+	        } catch (Exception e) {
+	            throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
+	        }
+    	}
+    }
+    
+    private void handleItemsPayload(CoreSessionInterface repoSession,
+    		String parentIdentifier,
+    		ResourceMap resourceMap,
+    		UriInfo uriInfo,
+    		PoxPayloadIn input) throws Exception {
+    	PayloadInputPart abstractCommonListPart  = input.getPart(PoxPayload.ABSTRACT_COMMON_LIST_ROOT_ELEMENT_LABEL);
+    	if (abstractCommonListPart != null) {
+    		AbstractCommonList itemsList = (AbstractCommonList) abstractCommonListPart.getBody();
+    		for (ListItem item : itemsList.getListItem()) {
+    			PoxPayloadIn itemXmlPayload = getItemXmlPayload(item);
+    			Response res = this.createAuthorityItem(repoSession, resourceMap, uriInfo, parentIdentifier, itemXmlPayload);
+    		}
+    	}
+    	
+	}
+    
+    /**
+     * This is very brittle.  If the class VocabularyitemsCommon changed with new fields we'd have to
+     * update this method.
+     * 
+     * @param item
+     * @return
+     * @throws DocumentException 
+     */
+	private PoxPayloadIn getItemXmlPayload(ListItem item) throws DocumentException {
+		PoxPayloadIn result = null;
+
+		VocabularyitemsCommon vocabularyItem = new VocabularyitemsCommon();
+		for (Element ele : item.getAny()) {
+			String fieldName = ele.getTagName();
+			String fieldValue = ele.getTextContent();
+			switch (fieldName) {
+				case "displayName":
+					vocabularyItem.setDisplayName(fieldValue);
+					break;
+					
+				case "shortIdentifier":
+					vocabularyItem.setShortIdentifier(fieldValue);
+					break;
+					
+				case "order":
+					vocabularyItem.setOrder(fieldValue);
+					break;
+					
+				case "source":
+					vocabularyItem.setSource(fieldValue);
+					break;
+					
+				case "sourcePage":
+					vocabularyItem.setSourcePage(fieldValue);
+					break;
+					
+				case "description":
+					vocabularyItem.setDescription(fieldValue);
+					
+				default:
+					throw new DocumentException(String.format("Unknown field '%s' in vocabulary item payload.",
+							fieldName));
+			}
+		}
+		
+		result = new PoxPayloadIn(VocabularyClient.SERVICE_ITEM_PAYLOAD_NAME, vocabularyItem, 
+    			VOCABULARYITEMS_COMMON);
+
+		return result;
+	}
+    
+	private Response createAuthorityItem(
+    		CoreSessionInterface repoSession,
+    		ResourceMap resourceMap,
+    		UriInfo uriInfo,
+    		String parentIdentifier, // Either a CSID or a URN form -e.g., a8ad38ec-1d7d-4bf2-bd31 or urn:cspace:name(bugsbunny)
+    		PoxPayloadIn input) throws Exception {
+    	Response result = null;
+    	
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), input, resourceMap, uriInfo);
+        ctx.setCurrentRepositorySession(repoSession);
+        
+        result = createAuthorityItem(ctx, parentIdentifier, AuthorityServiceUtils.UPDATE_REV,
+        		AuthorityServiceUtils.PROPOSED, AuthorityServiceUtils.NOT_SAS_ITEM);
+
+        return result;
+    }
+    
+
+	@GET
     @Path("{csid}")
     @Override
     public Response get(

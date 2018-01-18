@@ -55,7 +55,7 @@ import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
-import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
+import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.vocabulary.VocabularyItemJAXBSchema;
@@ -1009,7 +1009,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	boolean releaseRepoSession = false;
         
     	try {
-    		RepositoryClientImpl repoClient = (RepositoryClientImpl)this.getRepositoryClient(ctx);
+    		NuxeoRepositoryClientImpl repoClient = (NuxeoRepositoryClientImpl)this.getRepositoryClient(ctx);
     		repoSession = this.getRepositorySession();
     		if (repoSession == null) {
     			repoSession = repoClient.getRepositorySession(ctx);
@@ -1140,8 +1140,8 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         String filteredTerm;
         StringBuilder filteredTermBuilder = new StringBuilder(term);
         // Term contains no anchor or wildcard characters.
-        if ( (! term.contains(RepositoryClientImpl.USER_SUPPLIED_ANCHOR_CHAR))
-                && (! term.contains(RepositoryClientImpl.USER_SUPPLIED_WILDCARD)) ) {
+        if ( (! term.contains(NuxeoRepositoryClientImpl.USER_SUPPLIED_ANCHOR_CHAR))
+                && (! term.contains(NuxeoRepositoryClientImpl.USER_SUPPLIED_WILDCARD)) ) {
             filteredTerm = term;
         } else {
             // Term contains at least one such character.
@@ -1149,10 +1149,10 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
                 // Filter the starting anchor or wildcard character, if any.
                 String firstChar = filteredTermBuilder.substring(0,1);
                 switch (firstChar) {
-                    case RepositoryClientImpl.USER_SUPPLIED_ANCHOR_CHAR:
+                    case NuxeoRepositoryClientImpl.USER_SUPPLIED_ANCHOR_CHAR:
                         anchorAtStart = true;
                         break;
-                    case RepositoryClientImpl.USER_SUPPLIED_WILDCARD:
+                    case NuxeoRepositoryClientImpl.USER_SUPPLIED_WILDCARD:
                         filteredTermBuilder.deleteCharAt(0);
                         break;
                 }
@@ -1163,12 +1163,12 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
                 int lastPos = filteredTermBuilder.length() - 1;
                 String lastChar = filteredTermBuilder.substring(lastPos);
                 switch (lastChar) {
-                    case RepositoryClientImpl.USER_SUPPLIED_ANCHOR_CHAR:
+                    case NuxeoRepositoryClientImpl.USER_SUPPLIED_ANCHOR_CHAR:
                         filteredTermBuilder.deleteCharAt(lastPos);
-                        filteredTermBuilder.insert(filteredTermBuilder.length(), RepositoryClientImpl.ENDING_ANCHOR_CHAR);
+                        filteredTermBuilder.insert(filteredTermBuilder.length(), NuxeoRepositoryClientImpl.ENDING_ANCHOR_CHAR);
                         anchorAtEnd = true;
                         break;
-                    case RepositoryClientImpl.USER_SUPPLIED_WILDCARD:
+                    case NuxeoRepositoryClientImpl.USER_SUPPLIED_WILDCARD:
                         filteredTermBuilder.deleteCharAt(lastPos);
                         break;
                 }
@@ -1177,7 +1177,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
                 }
                 filteredTerm = filteredTermBuilder.toString();
                 // Filter all other wildcards, if any.
-                filteredTerm = filteredTerm.replaceAll(RepositoryClientImpl.USER_SUPPLIED_WILDCARD_REGEX, ZERO_OR_MORE_ANY_CHAR_REGEX);
+                filteredTerm = filteredTerm.replaceAll(NuxeoRepositoryClientImpl.USER_SUPPLIED_WILDCARD_REGEX, ZERO_OR_MORE_ANY_CHAR_REGEX);
                 if (logger.isTraceEnabled()) {
                     logger.trace(String.format("After replacing user wildcards = %s", filteredTerm));
                 }

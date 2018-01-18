@@ -360,7 +360,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	    	m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
 	    	//Marshal object into file.
 	    	m.marshal(jaxbObject, outputStream);
-	    	text = outputStream.toString("UTF8");
+	    	text = outputStream.toString("UTF8"); // FIXME: This method could/should be using JaxbUtils.toString() method
 
     		Document doc = DocumentHelper.parseText(text);
     		result = doc.getRootElement(); //FIXME: REM - call .detach() to free the element

@@ -38,6 +38,8 @@ import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.TransactionContext;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.context.ServiceContextProperties;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.lifecycle.TransitionDef;
@@ -586,6 +588,12 @@ public class JpaStorageClientImpl implements StorageClient {
 		// TODO Auto-generated method stub
 		// Do nothing. Subclasses can override if they want/need to.
 		return true;
+	}
+
+	@Override
+	public void releaseRepositorySession(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, Object repoSession)
+			throws TransactionException {
+		// TODO Auto-generated method stub		
 	}
 
 }

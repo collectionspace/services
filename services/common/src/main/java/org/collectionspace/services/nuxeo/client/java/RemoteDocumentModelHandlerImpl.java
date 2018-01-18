@@ -767,7 +767,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         	
         	boolean releaseRepoSession = false;
         	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
-        	RepositoryClientImpl repoClient = (RepositoryClientImpl)this.getRepositoryClient(ctx);
+        	NuxeoRepositoryClientImpl repoClient = (NuxeoRepositoryClientImpl)this.getRepositoryClient(ctx);
         	CoreSessionInterface repoSession = this.getRepositorySession();
         	if (repoSession == null) {
         		repoSession = repoClient.getRepositorySession(ctx);

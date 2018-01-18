@@ -86,7 +86,7 @@ import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentFilter;
-import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
+import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.workflow.WorkflowCommon;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
@@ -162,23 +162,23 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      */
     protected DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> createItemDocumentHandler(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-            String inAuthority, String parentShortIdentifier)
+            String inAuthority, String containerShortIdentifier)
             throws Exception {
         String authorityRefNameBase;
         AuthorityItemDocumentModelHandler<?> docHandler;
 
-        if (parentShortIdentifier == null) {
+        if (containerShortIdentifier == null) {
             authorityRefNameBase = null;
         } else {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext(getServiceName());
-            if (parentShortIdentifier.equals(FETCH_SHORT_ID)) { // We need to fetch this from the repo
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> containerCtx = createServiceContext(getServiceName());
+            if (containerShortIdentifier.equals(FETCH_SHORT_ID)) { // We need to fetch this from the repo
                 if (ctx.getCurrentRepositorySession() != null) {
-                	parentCtx.setCurrentRepositorySession(ctx.getCurrentRepositorySession()); // We need to use the current repo session if one exists
+                	containerCtx.setCurrentRepositorySession(ctx.getCurrentRepositorySession()); // We need to use the current repo session if one exists
                 }
                 // Get from parent document
-                parentShortIdentifier = getAuthShortIdentifier(parentCtx, inAuthority);
+                containerShortIdentifier = getAuthShortIdentifier(containerCtx, inAuthority);
             }
-            authorityRefNameBase = buildAuthorityRefNameBase(parentCtx, parentShortIdentifier);
+            authorityRefNameBase = buildAuthorityRefNameBase(containerCtx, containerShortIdentifier);
         }
 
         docHandler = (AuthorityItemDocumentModelHandler<?>) createDocumentHandler(ctx,
@@ -310,7 +310,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(item.inAuthority.resource);
         
         // HACK - this really must be moved to the doc handler, not here. No Nuxeo specific stuff here!
-        RepositoryClientImpl client = (RepositoryClientImpl)getRepositoryClient(ctx);
+        NuxeoRepositoryClientImpl client = (NuxeoRepositoryClientImpl)getRepositoryClient(ctx);
         String parentcsid = client.findDocCSID(repoSession, ctx, whereClause);
 
         String itemWhereClause = RefNameServiceUtils.buildWhereForAuthItemByName(authorityItemCommonSchemaName, item.getShortIdentifier(), parentcsid);
@@ -322,7 +322,10 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 
 
     @POST
-    public Response createAuthority(String xmlPayload) {
+    public Response createAuthority(
+    		@Context ResourceMap resourceMap,
+    		@Context UriInfo uriInfo,
+    		String xmlPayload) {
     	//
     	// Requests to create new authorities come in on new threads. Unfortunately, we need to synchronize those threads on this block because, as of 8/27/2015, we can't seem to get Nuxeo
     	// transaction code to deal with a database level UNIQUE constraint violations on the 'shortidentifier' column of the vocabularies_common table.
@@ -592,7 +595,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      */
     @DELETE
     @Path("{csid}")
-    public Response deleteAuthority(
+    public Response deleteAuthority( // # Delete this authority and all of it's items.
             @Context Request request,
             @Context UriInfo uriInfo,
             @PathParam("csid") String specifier) {
@@ -1460,6 +1463,10 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     	ServiceDescription result = super.getDescription(ctx);
     	result.setSubresourceDocumentType(this.getItemDocType(ctx.getTenantId()));
     	return result;
-    }    
+    }
+
+	public Response createAuthority(String xmlPayload) {
+		return this.createAuthority(null, null, xmlPayload);
+	}    
     
 }

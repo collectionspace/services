@@ -97,12 +97,12 @@ import org.slf4j.LoggerFactory;
  *
  * $LastChangedRevision: $ $LastChangedDate: $
  */
-public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxPayloadOut> {
+public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxPayloadOut> {
 	
     /**
      * The logger.
      */
-    private final Logger logger = LoggerFactory.getLogger(RepositoryClientImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(NuxeoRepositoryClientImpl.class);
 //    private final Logger profilerLogger = LoggerFactory.getLogger("remperf");
 //    private String foo = Profiler.createLogger();
     public static final String NUXEO_CORE_TYPE_DOMAIN = "Domain";
@@ -120,7 +120,7 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
     /**
      * Instantiates a new repository java client impl.
      */
-    public RepositoryClientImpl() {
+    public NuxeoRepositoryClientImpl() {
         //Empty constructor
     }
 
@@ -2000,6 +2000,7 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
         return workspaceId;
     }
 
+    @Override
     public CoreSessionInterface getRepositorySession(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) throws Exception {
         return getRepositorySession(ctx, ctx.getRepositoryName(), ctx.getTimeoutSecs());
     }
@@ -2075,8 +2076,10 @@ public class RepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxP
      *
      * @param repoSession the repo session
      */
-    public void releaseRepositorySession(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, CoreSessionInterface repoSession) throws TransactionException {
+    @Override
+    public void releaseRepositorySession(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, Object repositorySession) throws TransactionException {
         try {
+        	CoreSessionInterface repoSession = (CoreSessionInterface)repositorySession;
             NuxeoClientEmbedded client = NuxeoConnectorEmbedded.getInstance().getClient();
             // release session
             if (ctx != null) {

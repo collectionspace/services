@@ -893,6 +893,10 @@ public abstract class AbstractServiceContextImpl<IT, OT>
 		if (currentRepoSesssionRefCount == 0) {
 			this.currentRepositorySession = null;
 		}
+		
+		if (currentRepoSesssionRefCount < 0) {
+			throw new RuntimeException("Attempted to clear/close a repository session that has already been cleared/closed.");
+		}
 	}
 	
 	@Override

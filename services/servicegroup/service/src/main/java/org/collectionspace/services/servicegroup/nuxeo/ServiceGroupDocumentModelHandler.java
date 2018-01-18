@@ -35,7 +35,7 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
-import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
+import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.client.CollectionSpaceClient;
@@ -117,7 +117,7 @@ public class ServiceGroupDocumentModelHandler
     	boolean releaseRepoSession = false;
         
     	try { 
-    		RepositoryClientImpl repoClient = (RepositoryClientImpl)this.getRepositoryClient(ctx);
+    		NuxeoRepositoryClientImpl repoClient = (NuxeoRepositoryClientImpl)this.getRepositoryClient(ctx);
     		repoSession = this.getRepositorySession();
     		if (repoSession == null) {
     			repoSession = repoClient.getRepositorySession(ctx);
@@ -185,9 +185,9 @@ public class ServiceGroupDocumentModelHandler
     		List<String> serviceGroupNames,
     		Map<String, ServiceBindingType> queriedServiceBindings,
     		CoreSessionInterface repoSession,
-    		RepositoryClientImpl repoClient) throws Exception {
+    		NuxeoRepositoryClientImpl repoClient) throws Exception {
         
-        RepositoryClientImpl nuxeoRepoClient = (RepositoryClientImpl)repoClient;
+        NuxeoRepositoryClientImpl nuxeoRepoClient = (NuxeoRepositoryClientImpl)repoClient;
         // Get the service bindings for this tenant
         TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
         // We need to get all the procedures, authorities, and objects.
@@ -241,7 +241,7 @@ public class ServiceGroupDocumentModelHandler
 	        list.setPageNum(pageNum);
 	        list.setPageSize(pageSize);
 
-    		RepositoryClientImpl repoClient = (RepositoryClientImpl)this.getRepositoryClient(ctx);
+    		NuxeoRepositoryClientImpl repoClient = (NuxeoRepositoryClientImpl)this.getRepositoryClient(ctx);
     		repoSession = this.getRepositorySession();
     		if (repoSession == null) {
     			repoSession = repoClient.getRepositorySession(ctx);
@@ -307,7 +307,7 @@ public class ServiceGroupDocumentModelHandler
     	
 		String tenantId = ctx.getTenantId();
 		CoreSessionInterface repoSession = null;
-		RepositoryClientImpl repoClient = null;
+		NuxeoRepositoryClientImpl repoClient = null;
 		boolean releaseRepoSession = false;
 		
 		MultivaluedMap<String, String> queryParams = getServiceContext().getQueryParams();
@@ -329,8 +329,8 @@ public class ServiceGroupDocumentModelHandler
 		
 		try {
 			if (markRtSbj != null) {
-				repoClient = (RepositoryClientImpl) this.getRepositoryClient(ctx);
-				RepositoryClientImpl nuxeoRepoClient = (RepositoryClientImpl) repoClient;
+				repoClient = (NuxeoRepositoryClientImpl) this.getRepositoryClient(ctx);
+				NuxeoRepositoryClientImpl nuxeoRepoClient = (NuxeoRepositoryClientImpl) repoClient;
 				repoSession = this.getRepositorySession();
 				if (repoSession == null) {
 					repoSession = repoClient.getRepositorySession(ctx);
