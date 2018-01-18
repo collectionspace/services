@@ -6,10 +6,22 @@
 		<auth ID="testAdministator">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
 	</auths>
     
-    <!-- This test group tests the "showItems" query param that can be sent to the /vocabularies/${id} endpoint.
+    <!--
+	   Test creation of Vocabulary (TermList) that includes (via an abstract-common-list element) term items.
+	-->
+    <testGroup ID="PostWithItems" autoDeletePOSTS="true">
+        <test ID="createPostWithItems">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/</uri>
+            <filename>vocabulary/PostWithItems/postWithItems-vocab.xml</filename>            
+        </test>
+    </testGroup>
+    
+    <!--
+        This test group tests the "showItems" query param that can be sent to the /vocabularies/${id} endpoint.
         The "showItems=true" query param adds all the vocabularies items to the returned payload.
     -->
-    <testGroup ID="TestShowItems" autoDeletePOSTS="true">
+    <testGroup ID="ShowItems" autoDeletePOSTS="true">
         <test ID="createShowItemsVocab">
             <method>POST</method>
             <uri>/cspace-services/vocabularies/</uri>
@@ -110,6 +122,9 @@
         </test>
     </testGroup>
 	
+	<!--
+	   Comments needed to describe this test group.
+	-->
     <testGroup ID="TestOrder" autoDeletePOSTS="true">
 		<!-- The purpose of this testGroup is to test the new "order" field
 	      that was added in http://issues.collectionspace.org/browse/CSPACE-573

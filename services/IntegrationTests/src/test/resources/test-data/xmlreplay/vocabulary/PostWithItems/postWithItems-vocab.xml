@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="vocabularies">
+    <ns3:vocabularies_common xmlns:ns3="http://collectionspace.org/services/vocabulary" xmlns:ns2="http://collectionspace.org/services/jaxb">
+        <displayName>PostWithItems Vocabulary</displayName>
+        <shortIdentifier>postwithitems</shortIdentifier>
+        <description>This is a test vocabulary created in the PostWithItems XMLReplay test group</description>
+        <source>Some mythical book posted with item terms</source>
+    </ns3:vocabularies_common>
+    <ns2:abstract-common-list xmlns:ns2="http://collectionspace.org/services/jaxb">
+        <list-item>
+            <proposed>true</proposed>
+            <order>1</order>
+            <displayName>PostWithItems item PostWithItems1</displayName>
+            <shortIdentifier>PostWithItems1</shortIdentifier>
+        </list-item>
+        <list-item>
+            <proposed>true</proposed>
+            <order>2</order>
+            <displayName>PostWithItems item PostWithItems2</displayName>
+            <shortIdentifier>ShowItemsItem2</shortIdentifier>
+        </list-item>
+        <list-item>
+            <order>3</order>
+            <displayName>PostWithItems item PostWithItems3</displayName>
+            <shortIdentifier>PostWithItems3</shortIdentifier>
+        </list-item>
+    </ns2:abstract-common-list>
+</document>
