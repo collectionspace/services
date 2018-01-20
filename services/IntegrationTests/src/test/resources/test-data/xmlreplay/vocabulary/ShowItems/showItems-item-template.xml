@@ -4,7 +4,6 @@
   xmlns:ns2="http://collectionspace.org/services/jaxb">
     <displayName>${displayName}</displayName>
     <shortIdentifier>${itemID}</shortIdentifier>
-    <refName>urn:cspace:org.collectionspace.demo:vocabulary:name(TestOrderVocab):item:name(${itemID})'${displayName}'</refName>
     <order>${order}</order>
     <description>This is a test vocabulary item</description>
     <source>Some mythical book</source>

@@ -76,12 +76,14 @@ import org.collectionspace.services.common.document.DocumentReferenceException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.Hierarchy;
 import org.collectionspace.services.common.query.QueryManager;
+import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
@@ -98,6 +100,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 
 /**
  * The Class AuthorityResource.
@@ -563,6 +566,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @PUT
     @Path("{csid}")
     public byte[] updateAuthority(
+    		@Context ResourceMap resourceMap,
+    		@Context UriInfo uriInfo,    		
             @PathParam("csid") String specifier,
             String xmlPayload) {
         PoxPayloadOut result = null;
@@ -587,6 +592,46 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     }
     
     /**
+     * Delete all the items in an authority list.
+     * 
+     * @param specifier
+     * @param uriInfo
+     * @return
+     */
+    @DELETE
+    @Path("{csid}/items")
+    public Response deleteAuthorityItemList(@PathParam("csid") String specifier,
+            @Context UriInfo uriInfo) {
+        uriInfo = new UriInfoWrapper(uriInfo);
+
+        try {
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
+			RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient = this.getRepositoryClient(ctx);
+            
+			CoreSessionInterface repoSession = repoClient.getRepositorySession(ctx);
+			try {
+	            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
+	            //
+	            // Delete all the items one by one
+	            //
+	        	AbstractCommonList itemsList = this.getAuthorityItemList(ctx, specifier, uriInfo);
+	        	for (ListItem item : itemsList.getListItem()) {
+	                deleteAuthorityItem(ctx, specifier, getCsid(item), AuthorityServiceUtils.UPDATE_REV);
+	        	}
+			} catch (Throwable t) {
+            	repoSession.setTransactionRollbackOnly();
+            	throw t;
+            } finally {
+            	repoClient.releaseRepositorySession(ctx, repoSession);
+            }
+
+            return Response.status(HttpResponseCodes.SC_OK).build();
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.DELETE_FAILED, specifier);
+        }
+    }
+    
+    /**
      * Delete authority
      * 
      * @param csid the csid or a URN specifier form -e.g., urn:cspace:name(OurMuseumPersonAuthority)
@@ -607,30 +652,64 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
-            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
-
             Specifier spec = Specifier.getSpecifier(specifier, "getAuthority", "GET");
-            if (spec.form == SpecifierForm.CSID) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("deleteAuthority with csid=" + spec.value);
-                }
-                ensureCSID(spec.value, ServiceMessages.DELETE_FAILED, "Authority.csid");
-                getRepositoryClient(ctx).delete(ctx, spec.value, handler);
-            } else {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("deleteAuthority with specifier=" + spec.value);
-                }            	
-                String whereClause = RefNameServiceUtils.buildWhereForAuthByName(authorityCommonSchemaName, spec.value);
-                getRepositoryClient(ctx).deleteWithWhereClause(ctx, whereClause, handler);
-            }
+			RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient = this.getRepositoryClient(ctx);
             
+			CoreSessionInterface repoSession = repoClient.getRepositorySession(ctx);
+			try {
+	            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
+	            //
+	            // First try to delete all the items
+	            //
+	        	AbstractCommonList itemsList = this.getAuthorityItemList(ctx, specifier, uriInfo);
+	        	for (ListItem item : itemsList.getListItem()) {
+	                deleteAuthorityItem(ctx, specifier, getCsid(item), AuthorityServiceUtils.UPDATE_REV);
+	        	}
+
+	            //
+	            // Lastly, delete the parent/container
+	            //
+	            if (spec.form == SpecifierForm.CSID) {
+	                if (logger.isDebugEnabled()) {
+	                    logger.debug("deleteAuthority with csid=" + spec.value);
+	                }
+	                ensureCSID(spec.value, ServiceMessages.DELETE_FAILED, "Authority.csid");
+	                getRepositoryClient(ctx).delete(ctx, spec.value, handler);
+	            } else {
+	                if (logger.isDebugEnabled()) {
+	                    logger.debug("deleteAuthority with specifier=" + spec.value);
+	                }            	
+	                String whereClause = RefNameServiceUtils.buildWhereForAuthByName(authorityCommonSchemaName, spec.value);
+	                getRepositoryClient(ctx).deleteWithWhereClause(ctx, whereClause, handler);
+	            }
+			} catch (Throwable t) {
+            	repoSession.setTransactionRollbackOnly();
+            	throw t;
+            } finally {
+            	repoClient.releaseRepositorySession(ctx, repoSession);
+            }
+
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, specifier);
         }
     }
     
-    /**
+	private String getCsid(ListItem item) {
+		String result = null;
+		
+		for (Element ele : item.getAny()) {
+			String elementName = ele.getTagName().toLowerCase();
+			if (elementName.equals("csid")) {
+				result = ele.getTextContent();
+				break;
+			}
+		}
+		
+		return result;
+	}
+
+	/**
      * 
      * @param ctx
      * @param parentspecifier		- ID of the container. Can be URN or CSID form
@@ -662,6 +741,49 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 
     	return result;
     }
+    
+    public PoxPayloadOut updateAuthorityItem(
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> itemServiceCtx, // Ok to be null.  Will be null on PUT calls, but not on sync calls
+    		ResourceMap resourceMap, 
+            UriInfo uriInfo,
+            String parentspecifier,
+            String itemspecifier,
+            PoxPayloadIn theUpdate,
+            boolean shouldUpdateRevNumber,
+            Boolean isProposed,
+            Boolean isSASItem
+            ) throws Exception {
+        PoxPayloadOut result = null;
+        
+        CsidAndShortIdentifier csidAndShortId = lookupParentCSIDAndShortIdentifer(itemServiceCtx, parentspecifier, "updateAuthorityItem(parent)", "UPDATE_ITEM", null);
+        String parentcsid = csidAndShortId.CSID;
+        String parentShortId = csidAndShortId.shortIdentifier;
+        //
+        // If the itemServiceCtx context is not null, use it.  Otherwise, create a new context
+        //
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = itemServiceCtx;
+        if (ctx == null) {
+        	ctx = createServiceContext(getItemServiceName(), theUpdate, resourceMap, uriInfo);
+        } else {
+        	ctx.setInput(theUpdate); // the update payload
+        }
+        
+        String itemcsid = lookupItemCSID(ctx, itemspecifier, parentcsid, "updateAuthorityItem(item)", "UPDATE_ITEM"); //use itemServiceCtx if it is not null
+
+        // We omit the parentShortId, only needed when doing a create...
+        AuthorityItemDocumentModelHandler handler = (AuthorityItemDocumentModelHandler)createItemDocumentHandler(ctx, parentcsid, parentShortId);
+        handler.setShouldUpdateRevNumber(shouldUpdateRevNumber);
+        if (isProposed != null) {
+        	handler.setIsProposed(isProposed);
+        }
+        if (isSASItem != null) {
+        	handler.setIsSASItem(isSASItem);
+        }
+        getRepositoryClient(ctx).update(ctx, itemcsid, handler);
+        result = ctx.getOutput();
+
+        return result;
+    }    
 
     /**
      * Called with an existing context.
@@ -1282,48 +1404,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         return result.getBytes();
     }
     
-    public PoxPayloadOut updateAuthorityItem(
-    		ServiceContext<PoxPayloadIn, PoxPayloadOut> itemServiceCtx, // Ok to be null.  Will be null on PUT calls, but not on sync calls
-    		ResourceMap resourceMap, 
-            UriInfo uriInfo,
-            String parentspecifier,
-            String itemspecifier,
-            PoxPayloadIn theUpdate,
-            boolean shouldUpdateRevNumber,
-            Boolean isProposed,
-            Boolean isSASItem
-            ) throws Exception {
-        PoxPayloadOut result = null;
-        
-        CsidAndShortIdentifier csidAndShortId = lookupParentCSIDAndShortIdentifer(itemServiceCtx, parentspecifier, "updateAuthorityItem(parent)", "UPDATE_ITEM", null);
-        String parentcsid = csidAndShortId.CSID;
-        String parentShortId = csidAndShortId.shortIdentifier;
-        //
-        // If the itemServiceCtx context is not null, use it.  Otherwise, create a new context
-        //
-        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = itemServiceCtx;
-        if (ctx == null) {
-        	ctx = createServiceContext(getItemServiceName(), theUpdate, resourceMap, uriInfo);
-        } else {
-        	ctx.setInput(theUpdate); // the update payload
-        }
-        
-        String itemcsid = lookupItemCSID(ctx, itemspecifier, parentcsid, "updateAuthorityItem(item)", "UPDATE_ITEM"); //use itemServiceCtx if it is not null
 
-        // We omit the parentShortId, only needed when doing a create...
-        AuthorityItemDocumentModelHandler handler = (AuthorityItemDocumentModelHandler)createItemDocumentHandler(ctx, parentcsid, parentShortId);
-        handler.setShouldUpdateRevNumber(shouldUpdateRevNumber);
-        if (isProposed != null) {
-        	handler.setIsProposed(isProposed);
-        }
-        if (isSASItem != null) {
-        	handler.setIsSASItem(isSASItem);
-        }
-        getRepositoryClient(ctx).update(ctx, itemcsid, handler);
-        result = ctx.getOutput();
-
-        return result;
-    }
 
     /**
      * Delete authorityItem.
@@ -1383,8 +1464,10 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         try {
         	parentcsid = lookupParentCSID(ctx, parentIdentifier, "deleteAuthorityItem(parent)", "DELETE_ITEM", null);
         } catch (DocumentNotFoundException de) {
-        	logger.warn(String.format("Could not find parent with ID='%s' when trying to delete item ID='%s'",
-        			parentIdentifier, itemIdentifier));
+        	String msg = String.format("Could not find parent with ID='%s' when trying to delete item ID='%s'",
+        			parentIdentifier, itemIdentifier);
+        	logger.warn(msg);
+        	throw de;
         }
         String itemCsid = lookupItemCSID(ctx, itemIdentifier, parentcsid, "deleteAuthorityItem(item)", "DELETE_ITEM"); //use itemServiceCtx if it is not null
         

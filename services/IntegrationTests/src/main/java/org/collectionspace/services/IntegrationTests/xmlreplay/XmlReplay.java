@@ -3,6 +3,7 @@ package org.collectionspace.services.IntegrationTests.xmlreplay;
 import org.apache.commons.cli.*;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.JexlEngine;
 import org.collectionspace.services.common.api.Tools;
 import org.dom4j.*;
@@ -247,7 +248,7 @@ public class XmlReplay {
         for (ServiceResult pr : serviceResultsMap.values()) {
             try {
                 if (pr.autoDelete == true && Tools.notEmpty(pr.deleteURL)){
-                    ServiceResult deleteResult = XmlReplayTransport.doDELETE(pr.deleteURL, defaultAuths.getDefaultAuth(), pr.testID, "[autodelete:"+logName+"]");
+                    ServiceResult deleteResult = XmlReplayTransport.doDELETE(pr.deleteURL, pr.adminAuth, pr.testID, "[autodelete:"+logName+"]");
                     if (deleteResult.gotExpectedResult() == false || deleteResult.responseCode != 200) {
                     	reattemptList.put(REATTEMPT_KEY + deleteFailures++, pr); // We need to try again after our dependents have been deleted. cow()
                     }
@@ -347,21 +348,21 @@ public class XmlReplay {
         String startElement = "";
         String label = "";
 
-        public static PartsStruct readParts(Node testNode, final String testID, String xmlReplayBaseDir){
-            PartsStruct resultPartsStruct = new PartsStruct();
-            resultPartsStruct.responseFilename = testNode.valueOf("filename");
-            resultPartsStruct.startElement = testNode.valueOf("startElement");
-            resultPartsStruct.label = testNode.valueOf("label");
-            String responseFilename = testNode.valueOf("filename");
-            if (Tools.notEmpty(responseFilename)){
-                resultPartsStruct.responseFilename = xmlReplayBaseDir + '/' + responseFilename;
-                List<Node> varNodes = testNode.selectNodes("vars/var");
-                readVars(testNode, varNodes, resultPartsStruct);
-            }
-            return resultPartsStruct;
-        }
+		public static PartsStruct readParts(Node testNode, final String testID, String xmlReplayBaseDir) {
+			PartsStruct resultPartsStruct = new PartsStruct();
+			resultPartsStruct.responseFilename = testNode.valueOf("filename");
+			resultPartsStruct.startElement = testNode.valueOf("startElement");
+			resultPartsStruct.label = testNode.valueOf("label");
+			String responseFilename = testNode.valueOf("filename");
+			if (Tools.notEmpty(responseFilename)) {
+				resultPartsStruct.responseFilename = xmlReplayBaseDir + '/' + responseFilename;
+				List<Node> varNodes = testNode.selectNodes("vars/var");
+				readVars(testNode, varNodes, resultPartsStruct);
+			}
+			return resultPartsStruct;
+		}
 
-        private static void readVars(Node testNode, List<Node> varNodes, PartsStruct resultPartsStruct){
+        private static void readVars(Node testNode, List<Node> varNodes, PartsStruct resultPartsStruct) {
             Map<String,String> vars = new HashMap<String,String>();
             resultPartsStruct.varsList.add(vars);
             //System.out.println("### vars: "+vars.size()+" ########");
@@ -476,7 +477,7 @@ public class XmlReplay {
 
     public static List<ServiceResult> runXmlReplayFile(String xmlReplayBaseDir,
                                           String controlFileName,
-                                          String testGroupID,
+                                          String targetedTestGroupID,
                                           String oneTestID,
                                           Map<String, ServiceResult> serviceResultsMap,
                                           boolean param_autoDeletePOSTS,
@@ -519,12 +520,12 @@ public class XmlReplay {
             authsMapINFO = "Using AuthsMap from control file: "+authsMap;
         }
 
-        report.addTestGroup(testGroupID, controlFileName);   //controlFileName is just the short name, without the full path.
+        report.addTestGroup(targetedTestGroupID, controlFileName);   //controlFileName is just the short name, without the full path.
         String xmlReplayHeader = "========================================================================"
                           +"\r\nXmlReplay running:"
                           +"\r\n   controlFile: "+ (new File(controlFile).getCanonicalPath())
                           +"\r\n   protoHostPort: "+protoHostPort
-                          +"\r\n   testGroup: "+testGroupID
+                          +"\r\n   testGroup: "+targetedTestGroupID
                           + (Tools.notEmpty(oneTestID) ? "\r\n   oneTestID: "+oneTestID : "")
                           +"\r\n   AuthsMap: "+authsMapINFO
                           +"\r\n   param_autoDeletePOSTS: "+param_autoDeletePOSTS
@@ -536,9 +537,10 @@ public class XmlReplay {
         System.out.println(xmlReplayHeader);
 
         String autoDeletePOSTS = "";
+        String authIDForCleanup = "";
         List<Node> testgroupNodes;
-        if (Tools.notEmpty(testGroupID)){
-            testgroupNodes = document.selectNodes("//testGroup[@ID='"+testGroupID+"']");
+        if (Tools.notEmpty(targetedTestGroupID)){
+            testgroupNodes = document.selectNodes("//testGroup[@ID='"+targetedTestGroupID+"']");
         } else {
             testgroupNodes = document.selectNodes("//testGroup");
         }
@@ -549,11 +551,25 @@ public class XmlReplay {
         evalStruct.jexl = jexl;
 
         for (Node testgroup : testgroupNodes) {
-
+        	String testGroupID = testgroup.valueOf("@autoDeletePOSTS");
             XmlReplayEval.MapContextWKeys jc = new XmlReplayEval.MapContextWKeys();//MapContext();  //Get a new JexlContext for each test group.
             evalStruct.jc = jc;
-
             autoDeletePOSTS = testgroup.valueOf("@autoDeletePOSTS");
+            //
+            // Decide which auth to use for POST request cleanups
+            //
+            String authForCleanup = null;
+            authIDForCleanup = testgroup.valueOf("@authForCleanup");
+            if (Tools.isEmpty(authIDForCleanup) == false) {
+            	authForCleanup = authsMap.map.get(authIDForCleanup);
+            	if (Tools.isEmpty(authForCleanup)) {
+                	String msg = String.format("The 'authForCleanup' attribute value '%s' declared for test group '%s' is not defined.",
+                			authIDForCleanup, testGroupID);
+                	throw new Exception(msg);
+                }
+            }
+            authForCleanup = authForCleanup != null ? authForCleanup : defaultAuths.getDefaultAuth();            
+            
             List<Node> tests;
             if (Tools.notEmpty(oneTestID)){
                 tests = testgroup.selectNodes("test[@ID='"+oneTestID+"']");
@@ -588,9 +604,13 @@ public class XmlReplay {
                     
                     String currentAuthForTest = null;
                     String authIDForTest = testNode.valueOf("@auth");
-                    
-                    if (Tools.notEmpty(authIDForTest)){
+                    if (Tools.notEmpty(authIDForTest)) {
                         currentAuthForTest = authsMap.map.get(authIDForTest);
+                        if (currentAuthForTest == null) {
+                        	String msg = String.format("The 'auth' attribute value '%s' declared for test '%s' is not defined.",
+                        			authIDForTest, testIDLabel);
+                        	throw new Exception(msg);
+                        }
                     } else {
                         String tokenAuthExpression = testNode.valueOf("@tokenauth");
                         if (Tools.notEmpty(tokenAuthExpression)){
@@ -598,12 +618,12 @@ public class XmlReplay {
                         }
                     }
                     
-                    if (Tools.notEmpty(currentAuthForTest)){
+                    if (Tools.notEmpty(currentAuthForTest)) {
                         authForTest = currentAuthForTest; //else just run with current from last loop;
                     }
-                    if (Tools.isEmpty(authForTest)){
+                    if (Tools.isEmpty(authForTest)) {
                         authForTest = defaultAuths.getDefaultAuth();
-                    }
+                    }                    
 
                     if (uri.indexOf("$")>-1){
                         uri = XmlReplayEval.eval(uri, serviceResultsMap, null, jexl, jc);
@@ -699,6 +719,7 @@ public class XmlReplay {
                     serviceResult.testID = testID;
                     serviceResult.fullURL = fullURL;
                     serviceResult.auth = authForTest;
+                    serviceResult.adminAuth = authForCleanup;
                     serviceResult.method = method;
                     if (expectedCodes.size()>0){
                         serviceResult.expectedCodes = expectedCodes;
@@ -770,24 +791,22 @@ public class XmlReplay {
         //=== Now spit out the HTML report file ===
         File m = new File(controlFileName);
         String localName = m.getName();//don't instantiate, just use File to extract file name without directory.
-        String reportName = localName+'-'+testGroupID+".html";
+        String reportName = localName+'-'+targetedTestGroupID+".html";
 
         File resultFile = report.saveReport(xmlReplayBaseDir, reportsDir, reportName);
         if (resultFile!=null) {
             String toc = report.getTOC(reportName);
             reportsList.add(toc);
         }
-        //================================
 
         return results;
     }
 
-		private static String timeString() {
-			java.util.Date date= new java.util.Date();
-	 		java.sql.Timestamp ts = new java.sql.Timestamp(date.getTime());
-			return ts.toString();
-		}
-		
+	private static String timeString() {
+		java.util.Date date = new java.util.Date();
+		java.sql.Timestamp ts = new java.sql.Timestamp(date.getTime());
+		return ts.toString();
+	}
 
     //======================== MAIN ===================================================================
 
