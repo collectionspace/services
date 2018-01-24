@@ -5,18 +5,18 @@
         <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
     </auths>
    
-    <testGroup ID="makeRelations" autoDeletePOSTS="true">
-         <test ID="oe1"  auth="test">
+    <testGroup ID="makeRelations" autoDeletePOSTS="true" authForCleanup="admin@core.collectionspace.org">
+         <test ID="oe1">
              <method>POST</method>
              <uri>/cspace-services/objectexit/</uri>
              <filename>relation/oe1.xml</filename>
          </test>
-         <test ID="oe2"  auth="test">
+         <test ID="oe2">
              <method>POST</method>
              <uri>/cspace-services/objectexit/</uri>
              <filename>relation/oe1.xml</filename>
          </test>
-         <test ID="relate1"  auth="test">
+         <test ID="relate1">
              <method>POST</method>
              <uri>/cspace-services/relations/</uri>
              <filename>relation/r-1.xml</filename>
@@ -28,7 +28,7 @@
                 <var ID="relationshipType">hasBroader</var>
              </vars>
          </test>
-         <test ID="relate2"  auth="test">
+         <test ID="relate2">
              <method>POST</method>
              <uri>/cspace-services/relations/</uri>
              <filename>relation/r-1.xml</filename>
@@ -41,7 +41,7 @@
                 <var ID="relationshipType">hasBroader</var>
              </vars>
          </test>
-         <test ID="relationsGET"  auth="test">
+         <test ID="relationsGET">
              <method>GET</method>
              <uri>/cspace-services/relations/</uri>
          </test>
@@ -54,18 +54,18 @@
         -->
     </testGroup>
     
-    <testGroup ID="makeRelationsNested" autoDeletePOSTS="true">
-         <test ID="oe1"  auth="test">
+    <testGroup ID="makeRelationsNested" autoDeletePOSTS="true" authForCleanup="admin@core.collectionspace.org">
+         <test ID="oe1">
              <method>POST</method>
              <uri>/cspace-services/objectexit/</uri>
              <filename>relation/oe1.xml</filename>
          </test>
-         <test ID="oe2"  auth="test">
+         <test ID="oe2">
              <method>POST</method>
              <uri>/cspace-services/objectexit/</uri>
              <filename>relation/oe1.xml</filename>
          </test>
-         <test ID="relate1"  auth="test">
+         <test ID="relate1">
              <method>POST</method>
              <uri>/cspace-services/relations/</uri>
              <filename>relation/r-2.xml</filename>
@@ -77,14 +77,14 @@
                 <var ID="relationshipType">hasBroader</var>
              </vars>
          </test>
-         <test ID="relationsGET"  auth="test">
+         <test ID="relationsGET">
              <method>GET</method>
              <uri>/cspace-services/relations/</uri>
          </test>
     </testGroup>
          
     <testGroup ID="r2only" autoDeletePOSTS="true">
-         <test ID="relate"  auth="test">
+         <test ID="relate">
              <method>POST</method>
              <uri>/cspace-services/relations/</uri>
              <filename>relation/r-2.xml</filename>
@@ -96,7 +96,7 @@
                 <var ID="relationshipType">hasBroader</var>
              </vars>
          </test>
-         <test ID="relationsGET"  auth="test">
+         <test ID="relationsGET">
              <method>GET</method>
              <uri>/cspace-services/relations/</uri>
          </test>

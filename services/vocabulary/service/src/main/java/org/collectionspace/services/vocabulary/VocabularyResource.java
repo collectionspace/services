@@ -39,6 +39,7 @@ import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
@@ -57,6 +58,10 @@ import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -84,7 +89,7 @@ public class VocabularyResource extends
     
     private final static String vocabularyItemServiceName = "vocabularyitems";
 	private final static String VOCABULARYITEMS_COMMON = "vocabularyitems_common";
-    
+
     final Logger logger = LoggerFactory.getLogger(VocabularyResource.class);
 
 	public VocabularyResource() {
@@ -115,7 +120,10 @@ public class VocabularyResource extends
 				try {
 		            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);		            
 		            String csid = repoClient.create(ctx, handler);
-		            handleItemsPayload(Method.POST, repoSession, csid, resourceMap, uriInfo, input);
+		            //
+		            // Handle any supplied list of items/terms
+		            //
+		            handleItemsPayload(Method.POST, ctx, csid, resourceMap, uriInfo, input);
 		            UriBuilder path = UriBuilder.fromResource(resourceClass);
 		            path.path("" + csid);
 		            Response response = Response.created(path.build()).build();
@@ -137,14 +145,15 @@ public class VocabularyResource extends
     @Override
     public byte[] updateAuthority(
     		@Context ResourceMap resourceMap,
-    		@Context UriInfo uriInfo,
+    		@Context UriInfo ui,
             @PathParam("csid") String specifier,
             String xmlPayload) {
         PoxPayloadOut result = null;
         try {
+        	UriInfoWrapper uriInfo = new UriInfoWrapper(ui); // We need to make the queryParams maps read-write instead of read-only
             PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
             Specifier spec = Specifier.getSpecifier(specifier, "updateAuthority", "UPDATE");
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate, uriInfo);
 			RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient = this.getRepositoryClient(ctx);
 
 			CoreSessionInterface repoSession = repoClient.getRepositorySession(ctx);
@@ -158,7 +167,7 @@ public class VocabularyResource extends
 	                csid = getRepositoryClient(ctx).findDocCSID(null, ctx, whereClause);
 	            }
 	            getRepositoryClient(ctx).update(ctx, csid, handler);
-	            handleItemsPayload(Method.PUT, repoSession, csid, resourceMap, uriInfo, theUpdate);
+	            handleItemsPayload(Method.PUT, ctx, csid, resourceMap, uriInfo, theUpdate);
 	            result = ctx.getOutput();
             } catch (Throwable t) {
             	repoSession.setTransactionRollbackOnly();
@@ -172,9 +181,175 @@ public class VocabularyResource extends
         return result.getBytes();
     }
     
+    private void updateWithItemsPayload(
+    		AbstractCommonList itemsList,
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
+    		String parentIdentifier,
+    		ResourceMap resourceMap,
+    		UriInfo uriInfo,
+    		PoxPayloadIn input) throws Exception {
+    	
+    	CoreSessionInterface repoSession = (CoreSessionInterface) existingCtx.getCurrentRepositorySession();
+    	//
+    	// First try to update and/or create items in the incoming payload
+    	//
+		for (ListItem item : itemsList.getListItem()) {
+			String errMsg = null;
+			boolean success = true;
+			Response response = null;
+			PoxPayloadOut payloadOut = null;
+			PoxPayloadIn itemXmlPayload = getItemXmlPayload(item);
+			String itemSpecifier = getSpecifier(item);
+			if (itemSpecifier != null) {
+				try {
+					payloadOut = updateAuthorityItem(repoSession, resourceMap, uriInfo, parentIdentifier, itemSpecifier, itemXmlPayload);
+					if (payloadOut == null) {
+    					success = false;
+    					errMsg = String.format("Could not update the term list payload of vocabuary '%s'.", parentIdentifier);
+    				}
+				} catch (DocumentNotFoundException dnf) {
+					//
+					// Since the item doesn't exist, we're being ask to create it
+					//
+        			response = this.createAuthorityItem(repoSession, resourceMap, uriInfo, parentIdentifier, itemXmlPayload);
+        			if (response.getStatus() != Response.Status.CREATED.getStatusCode()) {
+        				success = false;
+    					errMsg = String.format("Could not create the term list payload of vocabuary '%s'.", parentIdentifier);
+        			}
+				}
+			} else {
+				success = false;
+				errMsg = String.format("Could not update the term list payload of vocabuary '%s' because one of the item is missing a CSID or short identifier value.",
+						parentIdentifier);
+			}
+			//
+			// Throw an exception as soon as we have problems with any item
+			//
+			if (success == false) {
+				throw new DocumentException(errMsg);
+			}
+		}
+
+		//
+		// Next, delete the items that were omitted from the incoming payload
+		//
+		if (shouldDeleteOmittedItems(uriInfo) == true) {
+			String omittedItemAction = getOmittedItemAction(uriInfo);
+			Set<String> shortIdsInPayload = getListOfShortIds(itemsList);
+			AbstractCommonList abstractCommonList = this.getAuthorityItemList(existingCtx, parentIdentifier, uriInfo);
+			if (abstractCommonList != null && !Tools.isEmpty(abstractCommonList.getListItem())) {
+				if (omittedItemAction.equalsIgnoreCase(VocabularyClient.DELETE_OMITTED_ITEMS)) {
+					deleteAuthorityItems(existingCtx, abstractCommonList, shortIdsInPayload, parentIdentifier);
+				} else {
+					sotfDeleteAuthorityItems(existingCtx, abstractCommonList, shortIdsInPayload, parentIdentifier);
+				}
+			}
+		}
+	}
+    
+    private void deleteAuthorityItems(
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
+    		AbstractCommonList abstractCommonList,
+    		Set<String> shortIdsInPayload,
+    		String parentIdentifier) throws Exception {
+    	
+		for (ListItem item : abstractCommonList.getListItem()) {
+			String shortId = getShortId(item);
+			if (shortIdsInPayload.contains(shortId) == false) {
+				deleteAuthorityItem(existingCtx, parentIdentifier, getCsid(item), AuthorityServiceUtils.UPDATE_REV);
+			}
+		}    	
+    }
+    
+    private void sotfDeleteAuthorityItems(
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
+    		AbstractCommonList abstractCommonList,
+    		Set<String> shortIdsInPayload,
+    		String parentIdentifier) throws Exception {
+    	
+		for (ListItem item : abstractCommonList.getListItem()) {
+			String shortId = getShortId(item);
+			if (shortIdsInPayload.contains(shortId) == false) {
+				//deleteAuthorityItem(existingCtx, parentIdentifier, getCsid(item), AuthorityServiceUtils.UPDATE_REV);
+				this.updateItemWorkflowWithTransition(existingCtx, parentIdentifier, getCsid(item), 
+						WorkflowClient.WORKFLOWTRANSITION_DELETE, AuthorityServiceUtils.UPDATE_REV);
+			}
+		}    	
+    }
+        
+    private boolean shouldDeleteOmittedItems(UriInfo uriInfo) throws DocumentException {
+    	boolean result = false;
+    	
+		String omittedItemAction = getOmittedItemAction(uriInfo);		
+		if (Tools.isEmpty(omittedItemAction) == false) {
+			switch (omittedItemAction) {
+				case VocabularyClient.DELETE_OMITTED_ITEMS:
+				case VocabularyClient.SOFTDELETE_OMITTED_ITEMS:
+					result = true;
+					break;
+				case VocabularyClient.IGNORE_OMITTED_ITEMS:
+					// do nothing
+					break;
+				default:
+					String msg = String.format("Unknown value '%s' for update on a vocabulary/termlist resource.", omittedItemAction);
+					throw new DocumentException(msg);
+			}
+		}
+		
+		return result;
+	}
+    
+    private String getOmittedItemAction(UriInfo uriInfo) {
+		MultivaluedMap<String,String> queryParams = uriInfo.getQueryParameters();
+		String omittedItemAction = queryParams.getFirst(VocabularyClient.OMITTED_ITEM_ACTION_QP);
+		return omittedItemAction;
+    }
+
+	/*
+     * Returns the set of short identifiers in the abstract common list of authority items
+     */
+    private Set<String> getListOfShortIds(AbstractCommonList itemsList) {
+		HashSet<String> result = new HashSet<String>();
+		
+		for (ListItem item : itemsList.getListItem()) {
+			result.add(getShortId(item));
+		}
+		
+		return result;
+	}
+
+	private void createWithItemsPayload(
+    		AbstractCommonList itemsList,
+    		ServiceContext existingCtx,
+    		String parentIdentifier,
+    		ResourceMap resourceMap,
+    		UriInfo uriInfo,
+    		PoxPayloadIn input) throws Exception {
+    	
+		for (ListItem item : itemsList.getListItem()) {
+			String errMsg = null;
+			boolean success = true;
+			Response response = null;
+			PoxPayloadIn itemXmlPayload = getItemXmlPayload(item);
+
+			CoreSessionInterface repoSession = (CoreSessionInterface) existingCtx.getCurrentRepositorySession();
+			response = this.createAuthorityItem(repoSession, resourceMap, uriInfo, parentIdentifier, itemXmlPayload);
+			if (response.getStatus() != Response.Status.CREATED.getStatusCode()) {
+				success = false;
+				errMsg = String.format("Could not create the term list payload of vocabuary '%s'.", parentIdentifier);
+			}
+			//
+			// Throw an exception as soon as we have problems with any item
+			//
+			if (success == false) {
+				throw new DocumentException(errMsg);
+			}
+		}    	
+	}    
+    
     private boolean handleItemsPayload(
     		Method method,
-    		CoreSessionInterface repoSession,
+    		ServiceContext existingCtx,
     		String parentIdentifier,
     		ResourceMap resourceMap,
     		UriInfo uriInfo,
@@ -184,46 +359,48 @@ public class VocabularyResource extends
     	PayloadInputPart abstractCommonListPart  = input.getPart(PoxPayload.ABSTRACT_COMMON_LIST_ROOT_ELEMENT_LABEL);
     	if (abstractCommonListPart != null) {
     		AbstractCommonList itemsList = (AbstractCommonList) abstractCommonListPart.getBody();
-    		for (ListItem item : itemsList.getListItem()) {
-    			String errMsg = null;
-    			boolean success = true;
-    			Response response = null;
-    			PoxPayloadOut payloadOut = null;
-    			PoxPayloadIn itemXmlPayload = getItemXmlPayload(item);
-    			switch (method) {
-	    			case POST:
-	        			response = this.createAuthorityItem(repoSession, resourceMap, uriInfo, parentIdentifier, itemXmlPayload);
-	        			if (response.getStatus() != Response.Status.CREATED.getStatusCode()) {
-	        				success = false;
-	    					errMsg = String.format("Could not create the term list payload of vocabuary '%s'.", parentIdentifier);
-	        			}
-	        			break;
-	    			case PUT:
-	    				String itemSpecifier = getSpecifier(item);
-	    				if (itemSpecifier != null) {
-	    					payloadOut = updateAuthorityItem(repoSession, resourceMap, uriInfo, parentIdentifier, itemSpecifier, itemXmlPayload);
-	        				if (payloadOut == null) {
-	        					success = false;
-	        					errMsg = String.format("Could not update the term list payload of vocabuary '%s'.", parentIdentifier);
-	        				}
-	    				} else {
-	    					success = false;
-	    					errMsg = String.format("Could not update the term list payload of vocabuary '%s' because one of the item is missing a CSID or short identifier value.",
-	    							parentIdentifier);
-	    				}
-	        			break;	        			
-    			}
-    			//
-    			// Throw an exception as soon as we have problems with any item
-    			//
-    			if (success == false) {
-					throw new DocumentException(errMsg);
-    			}
-    		}
+			switch (method) {
+    			case POST:
+		            createWithItemsPayload(itemsList, existingCtx, parentIdentifier, resourceMap, uriInfo, input);
+        			break;
+    			case PUT:
+		            updateWithItemsPayload(itemsList, existingCtx, parentIdentifier, resourceMap, uriInfo, input);
+        			break;	        			
+			}
     	}
     	
     	return result;
-	}    
+	}
+    
+    private String getCsid(ListItem item) {
+    	String result = null;
+    	
+		for (Element ele : item.getAny()) {
+			String fieldName = ele.getTagName();
+			String fieldValue = ele.getTextContent();
+			if (fieldName.equalsIgnoreCase("csid")) {
+				result = fieldValue;
+				break;
+			}
+		}    	
+    	
+    	return result;
+    }
+    
+    private String getShortId(ListItem item) {
+    	String result = null;
+    	
+    	for (Element ele : item.getAny()) {
+			String fieldName = ele.getTagName();
+			String fieldValue = ele.getTextContent();
+			if (fieldName.equalsIgnoreCase("shortIdentifier")) {
+				result = fieldValue;
+				break;
+			}
+		}
+    	
+    	return result;
+    }
     
     /**
      * We'll return null if we can create a specifier from the list item.
@@ -234,27 +411,9 @@ public class VocabularyResource extends
     private String getSpecifier(ListItem item) {
 		String result = null;
 
-		String csid = null;
-		for (Element ele : item.getAny()) {
-			String fieldName = ele.getTagName();
-			String fieldValue = ele.getTextContent();
-			if (fieldName.equalsIgnoreCase("csid")) {
-				result = csid = fieldValue;
-				break;
-			}
-		}
-		
+		String csid = getCsid(item);		
 		if (csid == null) {
-			String shortId = null;
-			for (Element ele : item.getAny()) {
-				String fieldName = ele.getTagName();
-				String fieldValue = ele.getTextContent();
-				if (fieldName.equalsIgnoreCase("shortIdentifier")) {
-					shortId = fieldValue;
-					break;
-				}
-			}
-			
+			String shortId = getShortId(item);			
 			if (shortId != null) {
 				result = Specifier.createShortIdURNValue(shortId);
 			}

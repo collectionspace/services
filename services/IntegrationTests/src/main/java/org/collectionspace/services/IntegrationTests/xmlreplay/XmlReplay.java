@@ -781,6 +781,10 @@ public class XmlReplay {
                     serviceResult.error = msg;
                     serviceResult.failureReason = " : SYSTEM ERROR; ";
                     results.add(serviceResult);
+                    //
+                    // Fail fast
+                    //
+                    throw t;
                 }
             }
             if (Tools.isTrue(autoDeletePOSTS) && param_autoDeletePOSTS){

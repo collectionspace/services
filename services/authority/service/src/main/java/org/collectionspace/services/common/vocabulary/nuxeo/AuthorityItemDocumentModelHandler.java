@@ -94,6 +94,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     protected String authorityItemCommonSchemaName;
     private String authorityItemTermGroupXPathBase;
     
+    private boolean shouldUpdateSASFields = true;
     private boolean syncHierarchicalRelationships = false;
     private boolean isProposed = false; // used by local authority to propose a new shared item. Allows local deployments to use new terms until they become official
     private boolean isSAS = false; // used to indicate if the authority item originated as a SAS item
@@ -114,6 +115,17 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     }
     
     abstract public String getParentCommonSchemaName();
+    
+    //
+    // Getter and Setter for 'shouldUpdateSASFields'
+    //
+    public boolean getShouldUpdateSASFields() {
+    	return shouldUpdateSASFields;
+    }
+    
+    public void setshouldUpdateSASFields(boolean flag) {
+    	shouldUpdateSASFields = flag;
+    }
     
     //
     // Getter and Setter for 'proposed'
@@ -870,16 +882,19 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	if (this.getShouldUpdateRevNumber() == true && !isMarkedAsSASItem) { // We won't update rev numbers on synchronization with SAS items and on local changes to SAS items
     		updateRevNumbers(wrapDoc);
     	}
-    	//
-    	// If this is a proposed item (not part of the SAS), mark it as such
-    	//
-        documentModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.PROPOSED,
-        		new Boolean(this.getIsProposed()));
-        //
-        // If it is a SAS authority item, mark it as such
-        //
-        documentModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.SAS,
-        		new Boolean(this.getIsSASItem()));
+    	
+    	if (getShouldUpdateSASFields() == true) {
+	    	//
+	    	// If this is a proposed item (not part of the SAS), mark it as such
+	    	//
+	        documentModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.PROPOSED,
+	        		new Boolean(this.getIsProposed()));
+	        //
+	        // If it is a SAS authority item, mark it as such
+	        //
+	        documentModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.SAS,
+	        		new Boolean(this.getIsSASItem()));
+    	}
     }
     
     /**

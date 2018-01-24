@@ -37,7 +37,7 @@
  
     <run controlFile="report/report.xml" />
     <run controlFile="authrefs/authrefs.xml" testGroup="AuthRefs" />
-    <run controlFile="vocabulary/vocabulary.xml" testGroup="TestOrder" />
+    <run controlFile="vocabulary/vocabulary.xml" />
     <run controlFile="authrefs/authrefsSimple.xml" testGroup="AuthRefsSimple" />
     <run controlFile="authrefs/authrefsComplex.xml" testGroup="AuthRefsComplex" />
     <run controlFile="authority/authority.xml" testGroup="TestAuthoritiesMultiVocabSearch" />
