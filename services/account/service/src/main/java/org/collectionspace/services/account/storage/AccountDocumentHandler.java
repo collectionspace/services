@@ -35,12 +35,16 @@ import org.collectionspace.services.account.AccountListItem;
 import org.collectionspace.services.account.AccountRoleSubResource;
 import org.collectionspace.services.account.Status;
 import org.collectionspace.services.authorization.AccountRole;
+import org.collectionspace.services.authorization.PermissionRole;
+import org.collectionspace.services.authorization.PermissionRoleSubResource;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.account.RoleValue;
 import org.collectionspace.services.client.AccountClient;
 import org.collectionspace.services.client.AccountRoleFactory;
+import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.common.storage.TransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
@@ -185,12 +189,23 @@ public class AccountDocumentHandler
         getServiceContext().setOutput(getCommonPartList());
     }
 
-    @Override
-    public AccountsCommon extractCommonPart(
-            DocumentWrapper<AccountsCommon> wrapDoc)
-            throws Exception {
-        return wrapDoc.getWrappedObject();
-    }
+	@SuppressWarnings("unchecked")
+	@Override
+	public AccountsCommon extractCommonPart(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
+		AccountsCommon account = wrapDoc.getWrappedObject();
+		
+		String includeRolesQueryParamValue = (String) getServiceContext().getQueryParams().getFirst(AccountClient.INCLUDE_ROLES_QP);
+		boolean includeRoles = Tools.isTrue(includeRolesQueryParamValue);
+		if (includeRoles) {
+			AccountRoleSubResource accountRoleResource = new AccountRoleSubResource(
+					AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
+			AccountRole accountRole = accountRoleResource.getAccountRole(getServiceContext(), account.getCsid(),
+					SubjectType.ROLE);
+			account.setRole(AccountRoleFactory.convert(accountRole.getRole()));
+		}
+		
+		return wrapDoc.getWrappedObject();
+	}
 
     @Override
     public void fillCommonPart(AccountsCommon obj, DocumentWrapper<AccountsCommon> wrapDoc)

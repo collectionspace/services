@@ -48,6 +48,7 @@ public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList,
     public final static String EMAIL_QUERY_PARAM = "email";
 	public static final String PASSWORD_RESET_TOKEN_QP = "token";
 	public static final String PASSWORD_RESET_PASSWORD_QP = "password";
+	public static final String INCLUDE_ROLES_QP = "showRoles";
 
 	public AccountClient() throws Exception {
 		super();
