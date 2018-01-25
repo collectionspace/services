@@ -12,6 +12,7 @@ import org.collectionspace.services.client.LocationAuthorityClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
@@ -19,7 +20,7 @@ import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
 import org.collectionspace.services.nuxeo.listener.AbstractCSEventListenerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-
+import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
@@ -299,9 +300,10 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
      * @throws ClientException
      * @return the CSIDs of the CollectionObject records, if any, which are
      * related to the Movement record.
+     * @throws DocumentException 
      */
     private Set<String> getCollectionObjectCsidsRelatedToMovement(String movementCsid,
-            CoreSessionInterface coreSession) {
+            CoreSessionInterface coreSession) throws ClientException {
 
         Set<String> csids = new HashSet<>();
 
@@ -326,7 +328,13 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
                 + ACTIVE_DOCUMENT_WHERE_CLAUSE_FRAGMENT,
                 RELATION_DOCTYPE, RELATIONS_COMMON_SCHEMA, movementCsid, COLLECTIONOBJECT_DOCTYPE);
         
-        DocumentModelList relationDocModels = coreSession.query(query);
+        DocumentModelList relationDocModels = null;
+		try {
+			relationDocModels = coreSession.query(query);
+		} catch (DocumentException e) {
+			logger.error(e);
+		}
+		
         if (relationDocModels == null || relationDocModels.isEmpty()) {
             return csids;
         }
@@ -491,10 +499,11 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
      * @throws ClientException
      * @return the most recent Movement record related to the CollectionObject
      * identified by the supplied CSID.
+     * @throws DocumentException 
      */
     protected String getMostRecentLocation(Event event,
     		CoreSessionInterface session, String collectionObjectCsid,
-            boolean isAboutToBeRemovedEvent, String eventMovementCsid) {
+            boolean isAboutToBeRemovedEvent, String eventMovementCsid) throws ClientException {
     	//
     	// Assume we can determine the most recent location by creating an indeterminate result
     	//
@@ -516,7 +525,14 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
                 RELATION_DOCTYPE, RELATIONS_COMMON_SCHEMA, collectionObjectCsid, MOVEMENT_DOCTYPE);
         logger.trace("query=" + query);
 
-        DocumentModelList relationDocModels = session.query(query);
+        DocumentModelList relationDocModels;
+		try {
+			relationDocModels = session.query(query);
+		} catch (DocumentException e) {
+			logger.error(e);
+			return null;
+		}
+		
     	if (isCreatingNewRelationship(event) == true) {
         	DocumentModel newRelation = ((DocumentEventContext)event.getContext()).getSourceDocument();
         	relationDocModels.add(newRelation);

@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
 import org.collectionspace.services.nuxeo.listener.AbstractCSEventListenerImpl;
@@ -81,11 +82,11 @@ public class UpdateRelationsOnDelete extends AbstractCSEventListenerImpl {
             DocumentModelList matchingDocuments;
             try {
                 matchingDocuments = session.query(queryString.toString(), workflowStateFilter);
-            } catch (Exception ce) {
-                logger.warn("Error attempting to retrieve relation records where "
+            } catch (DocumentException ce) {
+                logger.error("Error attempting to retrieve relation records where "
                         + "record of type '" + docModel.getType() + "' with CSID " + csid
                         + " is the subject or object of any relation: " + ce.getMessage());
-                throw ce;
+                return;
             }
 
             // Cycle through the list results, soft deleting each matching relation record
