@@ -196,6 +196,9 @@
             <method>PUT</method>
             <uri>/cspace-services/vocabularies/${createUpdateAddDeleteVocabItems.CSID}?omittedItemAction=delete</uri>
             <filename>vocabulary/UpdateAddDeleteVocabItems/updateAddDeleteWithItems-vocab.xml</filename>
+            <vars>
+                <var ID="item301csid">${createItem301.CSID}</var>
+            </vars>
         </test>
         <test ID="getUpdateAddDeleteVocabItems">
             <method>GET</method>
@@ -386,6 +389,15 @@
             <method>POST</method>
             <uri>/cspace-services/vocabularies/</uri>
             <filename>vocabulary/PostWithItems/postWithItems-vocab.xml</filename>            
+        </test>
+        <test ID="Item4">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createPostWithItems.CSID}/items/</uri>
+            <filename>vocabulary/PostWithItems/vocab-Item-no-shortid.xml</filename>
+            <vars>
+                <var ID="order">4</var>
+                <var ID="displayName">TestOrder item ${itemID} order ${order}</var>
+            </vars>
         </test>
     </testGroup>
     

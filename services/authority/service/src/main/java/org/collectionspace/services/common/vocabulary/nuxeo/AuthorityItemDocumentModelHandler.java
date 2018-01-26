@@ -994,13 +994,12 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
      * 
      * @throws Exception the exception
      */
-    private void handleInAuthority(DocumentModel docModel) throws Exception {
-        if(inAuthority==null) {	// Only happens on queries to wildcarded authorities
-        	throw new IllegalStateException("Trying to Create an object with no inAuthority value!");
-        }
-        docModel.setProperty(authorityItemCommonSchemaName,
-                AuthorityItemJAXBSchema.IN_AUTHORITY, inAuthority);
-    }
+	private void handleInAuthority(DocumentModel docModel) throws Exception {
+		if (inAuthority == null) { // Only happens on queries to wildcarded authorities
+			throw new IllegalStateException("Trying to Create an object with no inAuthority value!");
+		}
+		docModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.IN_AUTHORITY, inAuthority);
+	}
     
     /**
      * Returns a list of records that reference this authority item

@@ -20,7 +20,7 @@
         <list-item>
             <order>3</order>
             <displayName>PostWithItems item PostWithItems3</displayName>
-            <shortIdentifier>PostWithItems3</shortIdentifier>
+            <!-- Intentionally providing no short identifier.  Backend should generate one -->
         </list-item>
     </ns2:abstract-common-list>
 </document>

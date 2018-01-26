@@ -40,7 +40,6 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
-import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.common.vocabulary.AuthorityServiceUtils;
@@ -50,17 +49,15 @@ import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specif
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
-import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 import org.collectionspace.services.vocabulary.nuxeo.VocabularyItemDocumentModelHandler;
-import org.collectionspace.services.workflow.WorkflowCommon;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
+import java.util.Base64;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.GET;
@@ -74,6 +71,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.bind.DatatypeConverter;
 
 @Path("/" + VocabularyClient.SERVICE_PATH_COMPONENT)
 public class VocabularyResource extends 
@@ -190,6 +188,8 @@ public class VocabularyResource extends
     		PoxPayloadIn input) throws Exception {
     	
     	CoreSessionInterface repoSession = (CoreSessionInterface) existingCtx.getCurrentRepositorySession();
+		Set<String> shortIdsInPayload = getListOfShortIds(itemsList); // record the list of existing or new terms/items
+
     	//
     	// First try to update and/or create items in the incoming payload
     	//
@@ -218,9 +218,18 @@ public class VocabularyResource extends
         			}
 				}
 			} else {
-				success = false;
-				errMsg = String.format("Could not update the term list payload of vocabuary '%s' because one of the item is missing a CSID or short identifier value.",
-						parentIdentifier);
+				//
+				// Since the item was supplied with neither a CSID nor a short identifier, we'll assume we're being
+				// asked to create it.
+				//
+    			response = this.createAuthorityItem(repoSession, resourceMap, uriInfo, parentIdentifier, itemXmlPayload);
+    			if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
+    				String shortId = getShortId(itemXmlPayload);
+    				shortIdsInPayload.add(shortId); // add the new short ID to the list of incoming items
+    			} else {
+    				success = false;
+					errMsg = String.format("Could not create the term list payload of vocabuary '%s'.", parentIdentifier);
+    			}
 			}
 			//
 			// Throw an exception as soon as we have problems with any item
@@ -235,7 +244,6 @@ public class VocabularyResource extends
 		//
 		if (shouldDeleteOmittedItems(uriInfo) == true) {
 			String omittedItemAction = getOmittedItemAction(uriInfo);
-			Set<String> shortIdsInPayload = getListOfShortIds(itemsList);
 			AbstractCommonList abstractCommonList = this.getAuthorityItemList(existingCtx, parentIdentifier, uriInfo);
 			if (abstractCommonList != null && !Tools.isEmpty(abstractCommonList.getListItem())) {
 				if (omittedItemAction.equalsIgnoreCase(VocabularyClient.DELETE_OMITTED_ITEMS)) {
@@ -247,7 +255,16 @@ public class VocabularyResource extends
 		}
 	}
     
-    private void deleteAuthorityItems(
+    private String getShortId(PoxPayloadIn itemXmlPayload) {
+		String result = null;
+		
+		VocabularyitemsCommon vocabularyItemsCommon = (VocabularyitemsCommon) itemXmlPayload.getPart(VOCABULARYITEMS_COMMON).getBody();
+		result = vocabularyItemsCommon.getShortIdentifier();
+		
+		return result;
+	}
+
+	private void deleteAuthorityItems(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
     		AbstractCommonList abstractCommonList,
     		Set<String> shortIdsInPayload,
@@ -312,20 +329,24 @@ public class VocabularyResource extends
 		HashSet<String> result = new HashSet<String>();
 		
 		for (ListItem item : itemsList.getListItem()) {
-			result.add(getShortId(item));
+			String shortId = getShortId(item);
+			if (Tools.isEmpty(shortId) == false) {
+				result.add(shortId);
+			}
 		}
 		
 		return result;
 	}
 
 	private void createWithItemsPayload(
-    		AbstractCommonList itemsList,
-    		ServiceContext existingCtx,
-    		String parentIdentifier,
-    		ResourceMap resourceMap,
-    		UriInfo uriInfo,
-    		PoxPayloadIn input) throws Exception {
-    	
+			AbstractCommonList itemsList,
+			ServiceContext<PoxPayloadIn, 
+			PoxPayloadOut> existingCtx, 
+			String parentIdentifier, 
+			ResourceMap resourceMap,
+			UriInfo uriInfo, 
+			PoxPayloadIn input) throws Exception {
+
 		for (ListItem item : itemsList.getListItem()) {
 			String errMsg = null;
 			boolean success = true;
@@ -344,12 +365,12 @@ public class VocabularyResource extends
 			if (success == false) {
 				throw new DocumentException(errMsg);
 			}
-		}    	
-	}    
+		}
+	}   
     
     private boolean handleItemsPayload(
     		Method method,
-    		ServiceContext existingCtx,
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
     		String parentIdentifier,
     		ResourceMap resourceMap,
     		UriInfo uriInfo,
@@ -372,13 +393,13 @@ public class VocabularyResource extends
     	return result;
 	}
     
-    private String getCsid(ListItem item) {
+    private String getFieldValue(ListItem item, String lookingFor) {
     	String result = null;
     	
 		for (Element ele : item.getAny()) {
 			String fieldName = ele.getTagName();
 			String fieldValue = ele.getTextContent();
-			if (fieldName.equalsIgnoreCase("csid")) {
+			if (fieldName.equalsIgnoreCase(lookingFor)) {
 				result = fieldValue;
 				break;
 			}
@@ -387,19 +408,16 @@ public class VocabularyResource extends
     	return result;
     }
     
+    private String getCsid(ListItem item) {
+    	return getFieldValue(item, "csid");
+    }
+    
     private String getShortId(ListItem item) {
-    	String result = null;
-    	
-    	for (Element ele : item.getAny()) {
-			String fieldName = ele.getTagName();
-			String fieldValue = ele.getTextContent();
-			if (fieldName.equalsIgnoreCase("shortIdentifier")) {
-				result = fieldValue;
-				break;
-			}
-		}
-    	
-    	return result;
+    	return getFieldValue(item, "shortIdentifier");
+    }
+    
+    private String getDisplayName(ListItem item) {
+    	return getFieldValue(item, "displayName");
     }
     
     /**
@@ -411,7 +429,7 @@ public class VocabularyResource extends
     private String getSpecifier(ListItem item) {
 		String result = null;
 
-		String csid = getCsid(item);		
+		String csid = result = getCsid(item);
 		if (csid == null) {
 			String shortId = getShortId(item);			
 			if (shortId != null) {
@@ -465,17 +483,30 @@ public class VocabularyResource extends
 				case "csid":
 					vocabularyItem.setCsid(fieldValue);
 					break;
+					
+				case "termStatus":
+					vocabularyItem.setTermStatus(fieldValue);
+					break;
 
 				default:
-					throw new DocumentException(String.format("Unknown field '%s' in vocabulary item payload.",
-							fieldName));
+					// ignore other fields
+					break;
 			}
+		}
+		
+		if (Tools.isEmpty(vocabularyItem.getShortIdentifier())) {
+			//
+			// We need to create a short ID since one wasn't supplied
+			//
+			String value = String.format("%s%d", getDisplayName(item), System.currentTimeMillis());
+			value = DatatypeConverter.printHexBinary(value.getBytes()).toUpperCase();
+			vocabularyItem.setShortIdentifier(value);
 		}
 		
 		result = new PoxPayloadIn(VocabularyClient.SERVICE_ITEM_PAYLOAD_NAME, vocabularyItem, 
     			VOCABULARYITEMS_COMMON);
 
-		return result;
+		return result; 
 	}
     
 	private Response createAuthorityItem(

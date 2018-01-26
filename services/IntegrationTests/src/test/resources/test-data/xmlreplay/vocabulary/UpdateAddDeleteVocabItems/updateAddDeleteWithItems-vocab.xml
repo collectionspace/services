@@ -8,9 +8,11 @@
     </ns3:vocabularies_common>
     <ns2:abstract-common-list xmlns:ns2="http://collectionspace.org/services/jaxb">
         <list-item>
+            <csid>${item301csid}</csid>
             <order>1</order>
             <displayName>Updated createItem301</displayName>
             <shortIdentifier>createItem301</shortIdentifier>
+            <termStatus>inactive</termStatus>
         </list-item>
         <list-item>
             <order>2</order>
@@ -25,7 +27,7 @@
         <list-item>
             <order>4</order>
             <displayName>Added item C</displayName>
-            <shortIdentifier>addeditemc</shortIdentifier>
+            <!-- Test providing no short ID; should get generated. -->
         </list-item>
     </ns2:abstract-common-list>
 </document>

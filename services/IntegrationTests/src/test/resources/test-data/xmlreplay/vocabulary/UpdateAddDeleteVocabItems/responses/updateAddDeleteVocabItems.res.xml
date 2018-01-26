@@ -48,16 +48,12 @@
             <shortIdentifier>addeditemb</shortIdentifier>
         </list-item>
         <list-item>
-            <refName>
-                urn:cspace:testsci.collectionspace.org:vocabularies:name(createUpdateAddDeleteVocabItems):item:name(addeditemc)'Added item C'
-            </refName>
             <workflowState>project</workflowState>
             <rev>0</rev>
             <sas>false</sas>
             <proposed>true</proposed>
             <order>4</order>
             <displayName>Added item C</displayName>
-            <shortIdentifier>addeditemc</shortIdentifier>
         </list-item>
         <list-item>
             <refName>
