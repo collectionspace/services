@@ -46,6 +46,7 @@ import org.collectionspace.services.common.vocabulary.AuthorityServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
+import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityIdentifierUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
@@ -142,6 +143,7 @@ public class VocabularyResource extends
     @Path("{csid}")
     @Override
     public byte[] updateAuthority(
+    		@Context Request request,
     		@Context ResourceMap resourceMap,
     		@Context UriInfo ui,
             @PathParam("csid") String specifier,
@@ -165,8 +167,11 @@ public class VocabularyResource extends
 	                csid = getRepositoryClient(ctx).findDocCSID(null, ctx, whereClause);
 	            }
 	            getRepositoryClient(ctx).update(ctx, csid, handler);
-	            handleItemsPayload(Method.PUT, ctx, csid, resourceMap, uriInfo, theUpdate);
-	            result = ctx.getOutput();
+	            if (handleItemsPayload(Method.PUT, ctx, csid, resourceMap, uriInfo, theUpdate) == true) {
+	            	result = this.getAuthority(ctx, request, uriInfo, specifier, true);
+	            } else {
+	            	result = ctx.getOutput();
+	            }
             } catch (Throwable t) {
             	repoSession.setTransactionRollbackOnly();
             	throw t;
@@ -375,7 +380,7 @@ public class VocabularyResource extends
     		ResourceMap resourceMap,
     		UriInfo uriInfo,
     		PoxPayloadIn input) throws Exception {
-    	boolean result = true;
+    	boolean result = false;
     	
     	PayloadInputPart abstractCommonListPart  = input.getPart(PoxPayload.ABSTRACT_COMMON_LIST_ROOT_ELEMENT_LABEL);
     	if (abstractCommonListPart != null) {
@@ -388,6 +393,7 @@ public class VocabularyResource extends
 		            updateWithItemsPayload(itemsList, existingCtx, parentIdentifier, resourceMap, uriInfo, input);
         			break;	        			
 			}
+			result = true; // mark that we've handled an items-list payload
     	}
     	
     	return result;
@@ -493,14 +499,12 @@ public class VocabularyResource extends
 					break;
 			}
 		}
-		
+		//
+		// We need to create a short ID if one wasn't supplied
+		//
 		if (Tools.isEmpty(vocabularyItem.getShortIdentifier())) {
-			//
-			// We need to create a short ID since one wasn't supplied
-			//
-			String value = String.format("%s%d", getDisplayName(item), System.currentTimeMillis());
-			value = DatatypeConverter.printHexBinary(value.getBytes()).toUpperCase();
-			vocabularyItem.setShortIdentifier(value);
+			vocabularyItem.setShortIdentifier(AuthorityIdentifierUtils.generateShortIdentifierFromDisplayName(
+					vocabularyItem.getDisplayName() , null)); ;
 		}
 		
 		result = new PoxPayloadIn(VocabularyClient.SERVICE_ITEM_PAYLOAD_NAME, vocabularyItem, 

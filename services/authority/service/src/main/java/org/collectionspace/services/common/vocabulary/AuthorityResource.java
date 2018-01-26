@@ -569,6 +569,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @PUT
     @Path("{csid}")
     public byte[] updateAuthority(
+    		@Context Request request,
     		@Context ResourceMap resourceMap,
     		@Context UriInfo uriInfo,    		
             @PathParam("csid") String specifier,
