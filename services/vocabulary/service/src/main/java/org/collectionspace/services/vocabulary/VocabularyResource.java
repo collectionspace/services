@@ -168,6 +168,7 @@ public class VocabularyResource extends
 	            }
 	            getRepositoryClient(ctx).update(ctx, csid, handler);
 	            if (handleItemsPayload(Method.PUT, ctx, csid, resourceMap, uriInfo, theUpdate) == true) {
+	            	ctx.setOutput(new PoxPayloadOut(getServiceName())); // Clear the "vocabularies_common" result since we're going to create a new one with the items-list payload
 	            	result = this.getAuthority(ctx, request, uriInfo, specifier, true);
 	            } else {
 	            	result = ctx.getOutput();
