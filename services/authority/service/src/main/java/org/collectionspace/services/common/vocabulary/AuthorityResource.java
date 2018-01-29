@@ -517,13 +517,13 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     	try {
             MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
-            
+                        
 			DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
             DocumentFilter myFilter = handler.getDocumentFilter();
             // Need to make the default sort order for authority items
             // be on the displayName field
-            String sortBy = queryParams.getFirst(IClientQueryParams.ORDER_BY_PARAM);
-            if (sortBy == null || sortBy.isEmpty()) {
+            String orderBy = queryParams.getFirst(IClientQueryParams.ORDER_BY_PARAM);
+            if (orderBy == null || orderBy.isEmpty()) {
                 String qualifiedDisplayNameField = authorityCommonSchemaName + ":"
                         + AuthorityItemJAXBSchema.DISPLAY_NAME;
                 myFilter.setOrderByClause(qualifiedDisplayNameField);
@@ -532,7 +532,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             if (nameQ != null) {
                 myFilter.setWhereClause(authorityCommonSchemaName + ":refName='" + nameQ + "'");
             }
-            getRepositoryClient(ctx).getFiltered(ctx, handler);
+            //getRepositoryClient(ctx).getFiltered(ctx, handler); # Something here?
+            String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);            
+            result = search(ctx, handler, uriInfo, orderBy, null, advancedSearch, null);
             result = handler.getCommonPartList();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED);

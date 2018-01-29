@@ -551,7 +551,7 @@ public class XmlReplay {
         evalStruct.jexl = jexl;
 
         for (Node testgroup : testgroupNodes) {
-        	String testGroupID = testgroup.valueOf("@autoDeletePOSTS");
+        	String testGroupID = testgroup.valueOf("@ID");
             XmlReplayEval.MapContextWKeys jc = new XmlReplayEval.MapContextWKeys();//MapContext();  //Get a new JexlContext for each test group.
             evalStruct.jc = jc;
             autoDeletePOSTS = testgroup.valueOf("@autoDeletePOSTS");

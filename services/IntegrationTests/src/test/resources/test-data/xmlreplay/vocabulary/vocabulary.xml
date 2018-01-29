@@ -411,6 +411,11 @@
             <uri>/cspace-services/vocabularies/</uri>
             <filename>vocabulary/ShowItems/showItems-vocab.xml</filename>
         </test>
+        <test ID="searchShowItemsVocab">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/</uri>
+            <filename>vocabulary/ShowItems/searchItems-vocab.xml</filename>
+        </test>
         <test ID="createItem1">
             <method>POST</method>
             <uri>/cspace-services/vocabularies/${createShowItemsVocab.CSID}/items/</uri>
@@ -502,6 +507,33 @@
                 </vars>
                 <expected level="ADDOK" />
                 <filename>vocabulary/ShowItems/responses/showVocabWithLastPage.res.xml</filename>
+            </response>
+        </test>
+        <test ID="SearchVocabulariesAdvancedSearch">
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies?as=(vocabularies_common:displayName+ILIKE+%22%25SearchItems%25%22)</uri>
+            <response>
+                <vars>
+                    <var ID="itemsInPage">1</var>
+                    <var ID="totalItems">1</var>
+                    <var ID="csid">${searchShowItemsVocab.CSID}</var>
+                </vars>
+                <expected level="ADDOK" />
+                <filename>vocabulary/ShowItems/responses/searchVocabularyAdvancedSearch.res.xml</filename>
+            </response>
+        </test>
+        <test ID="SearchVocabularyItemsAdvancedSearch">
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies/${createShowItemsVocab.CSID}/items?as=(vocabularyitems_common:displayName+ILIKE+%22%ShowItemsItem2%25%22)</uri>
+            <response>
+                <vars>
+                    <var ID="itemsInPage">1</var>
+                    <var ID="totalItems">1</var>
+                    <var ID="csid">${createShowItemsVocab.CSID}</var>
+                    <var ID="createItem2">${createItem2.CSID}</var>
+                </vars>
+                <expected level="ADDOK" />
+                <filename>vocabulary/ShowItems/responses/searchVocabularyItemsAdvancedSearch.res.xml</filename>
             </response>
         </test>
     </testGroup>

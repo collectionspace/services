@@ -41,6 +41,7 @@ import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.repository.RepositoryClient;
+import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.common.vocabulary.AuthorityServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
@@ -620,7 +621,7 @@ public class VocabularyResource extends
 	protected String getOrderByField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
 		String result = null;
 
-		result = authorityItemCommonSchemaName + ":" + VocabularyItemJAXBSchema.DISPLAY_NAME;
+		result = ctx.getCommonPartLabel() + ":" + AuthorityItemJAXBSchema.DISPLAY_NAME;
 
 		return result;
 	}
