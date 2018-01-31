@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+    <auths>
+        <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
+        <auth ID="admin@testsci.collectionspace.org">YWRtaW5AdGVzdHNjaS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+        <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+    </auths>
+
+    <testGroup ID="StructuredDate" autoDeletePOSTS="true">
+        <test ID="EmptyRequestBad" auth="admin@testsci.collectionspace.org">
+            <expectedCodes>400</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/structureddates/?dateToParse=</uri>
+        </test>
+        <test ID="Malformed - Octo 19, 1821" auth="admin@testsci.collectionspace.org">
+            <expectedCodes>400</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/structureddates/?dateToParse=Octo+19,+1821</uri>
+        </test>
+        <test ID="1977" auth="admin@testsci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/structureddates/?dateToParse=1977</uri>
+            <response>
+                <vars>
+                    <!-- earliestSingleDate -->
+                    <var ID="earliestYear">1977</var>
+                    <var ID="earliestMonth">1</var>
+                    <var ID="earliestDay">1</var>
+                    <var ID="earliestEraShortId">ce</var>
+                    <var ID="earliestEraShortDisplayName">CE</var>
+                    <!-- latestDate -->
+                    <var ID="latestYear">1977</var>
+                    <var ID="latestMonth">12</var>
+                    <var ID="latestDay">31</var>
+                    <var ID="latestEraShortId">ce</var>
+                    <var ID="latestEraShortDisplayName">CE</var>
+                </vars>
+                <expected level="ADDOK"></expected>
+                <filename>structureddate/responses/GetStructuredDate-Both-Template.res.xml</filename>
+            </response>
+        </test>
+        <test ID="53 BC" auth="admin@testsci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/structureddates/?dateToParse=53+BC</uri>
+            <response>
+                <vars>
+                    <!-- earliestSingleDate -->
+                    <var ID="earliestYear">53</var>
+                    <var ID="earliestMonth">1</var>
+                    <var ID="earliestDay">1</var>
+                    <var ID="earliestEraShortId">bce</var>
+                    <var ID="earliestEraShortDisplayName">BCE</var>
+                    <!-- latestDate -->
+                    <var ID="latestYear">53</var>
+                    <var ID="latestMonth">12</var>
+                    <var ID="latestDay">31</var>
+                    <var ID="latestEraShortId">bce</var>
+                    <var ID="latestEraShortDisplayName">BCE</var>
+                </vars>
+                <expected level="ADDOK"></expected>
+                <filename>structureddate/responses/GetStructuredDate-Both-Template.res.xml</filename>
+            </response>
+        </test>
+        <test ID="53 bc" auth="admin@testsci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/structureddates/?dateToParse=53+bc</uri>
+            <response>
+                <vars>
+                    <!-- earliestSingleDate -->
+                    <var ID="earliestYear">53</var>
+                    <var ID="earliestMonth">1</var>
+                    <var ID="earliestDay">1</var>
+                    <var ID="earliestEraShortId">bce</var>
+                    <var ID="earliestEraShortDisplayName">BCE</var>
+                    <!-- latestDate -->
+                    <var ID="latestYear">53</var>
+                    <var ID="latestMonth">12</var>
+                    <var ID="latestDay">31</var>
+                    <var ID="latestEraShortId">bce</var>
+                    <var ID="latestEraShortDisplayName">BCE</var>
+                </vars>
+                <expected level="ADDOK"></expected>
+                <filename>structureddate/responses/GetStructuredDate-Both-Template.res.xml</filename>
+            </response>
+        </test>
+        <test ID="53 B.C." auth="admin@testsci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/structureddates/?dateToParse=53+B.C.</uri>
+            <response>
+                <vars>
+                    <!-- earliestSingleDate -->
+                    <var ID="earliestYear">53</var>
+                    <var ID="earliestMonth">1</var>
+                    <var ID="earliestDay">1</var>
+                    <var ID="earliestEraShortId">bce</var>
+                    <var ID="earliestEraShortDisplayName">BCE</var>
+                    <!-- latestDate -->
+                    <var ID="latestYear">53</var>
+                    <var ID="latestMonth">12</var>
+                    <var ID="latestDay">31</var>
+                    <var ID="latestEraShortId">bce</var>
+                    <var ID="latestEraShortDisplayName">BCE</var>
+                </vars>
+                <expected level="ADDOK"></expected>
+                <filename>structureddate/responses/GetStructuredDate-Both-Template.res.xml</filename>
+            </response>
+        </test>
+        <test ID="53 b.c." auth="admin@testsci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/structureddates/?dateToParse=53+b.c.</uri>
+            <response>
+                <vars>
+                    <!-- earliestSingleDate -->
+                    <var ID="earliestYear">53</var>
+                    <var ID="earliestMonth">1</var>
+                    <var ID="earliestDay">1</var>
+                    <var ID="earliestEraShortId">bce</var>
+                    <var ID="earliestEraShortDisplayName">BCE</var>
+                    <!-- latestDate -->
+                    <var ID="latestYear">53</var>
+                    <var ID="latestMonth">12</var>
+                    <var ID="latestDay">31</var>
+                    <var ID="latestEraShortId">bce</var>
+                    <var ID="latestEraShortDisplayName">BCE</var>
+                </vars>
+                <expected level="ADDOK"></expected>
+                <filename>structureddate/responses/GetStructuredDate-Both-Template.res.xml</filename>
+            </response>
+        </test>
+        <test ID="53 BCE" auth="admin@testsci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/structureddates/?dateToParse=53+BCE</uri>
+            <response>
+                <vars>
+                    <!-- earliestSingleDate -->
+                    <var ID="earliestYear">53</var>
+                    <var ID="earliestMonth">1</var>
+                    <var ID="earliestDay">1</var>
+                    <var ID="earliestEraShortId">bce</var>
+                    <var ID="earliestEraShortDisplayName">BCE</var>
+                    <!-- latestDate -->
+                    <var ID="latestYear">53</var>
+                    <var ID="latestMonth">12</var>
+                    <var ID="latestDay">31</var>
+                    <var ID="latestEraShortId">bce</var>
+                    <var ID="latestEraShortDisplayName">BCE</var>
+                </vars>
+                <expected level="ADDOK"></expected>
+                <filename>structureddate/responses/GetStructuredDate-Both-Template.res.xml</filename>
+            </response>
+        </test>
+        <test ID="53 bce" auth="admin@testsci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/structureddates/?dateToParse=53+bce</uri>
+            <response>
+                <vars>
+                    <!-- earliestSingleDate -->
+                    <var ID="earliestYear">53</var>
+                    <var ID="earliestMonth">1</var>
+                    <var ID="earliestDay">1</var>
+                    <var ID="earliestEraShortId">bce</var>
+                    <var ID="earliestEraShortDisplayName">BCE</var>
+                    <!-- latestDate -->
+                    <var ID="latestYear">53</var>
+                    <var ID="latestMonth">12</var>
+                    <var ID="latestDay">31</var>
+                    <var ID="latestEraShortId">bce</var>
+                    <var ID="latestEraShortDisplayName">BCE</var>
+                </vars>
+                <expected level="ADDOK"></expected>
+                <filename>structureddate/responses/GetStructuredDate-Both-Template.res.xml</filename>
+            </response>
+        </test>
+        <test ID="53 B.C.E." auth="admin@testsci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/structureddates/?dateToParse=53+B.C.E.</uri>
+            <response>
+                <vars>
+                    <!-- earliestSingleDate -->
+                    <var ID="earliestYear">53</var>
+                    <var ID="earliestMonth">1</var>
+                    <var ID="earliestDay">1</var>
+                    <var ID="earliestEraShortId">bce</var>
+                    <var ID="earliestEraShortDisplayName">BCE</var>
+                    <!-- latestDate -->
+                    <var ID="latestYear">53</var>
+                    <var ID="latestMonth">12</var>
+                    <var ID="latestDay">31</var>
+                    <var ID="latestEraShortId">bce</var>
+                    <var ID="latestEraShortDisplayName">BCE</var>
+                </vars>
+                <expected level="ADDOK"></expected>
+                <filename>structureddate/responses/GetStructuredDate-Both-Template.res.xml</filename>
+            </response>
+        </test>
+        <test ID="53 b.c.e." auth="admin@testsci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/structureddates/?dateToParse=53+b.c.e.</uri>
+            <response>
+                <vars>
+                    <!-- earliestSingleDate -->
+                    <var ID="earliestYear">53</var>
+                    <var ID="earliestMonth">1</var>
+                    <var ID="earliestDay">1</var>
+                    <var ID="earliestEraShortId">bce</var>
+                    <var ID="earliestEraShortDisplayName">BCE</var>
+                    <!-- latestDate -->
+                    <var ID="latestYear">53</var>
+                    <var ID="latestMonth">12</var>
+                    <var ID="latestDay">31</var>
+                    <var ID="latestEraShortId">bce</var>
+                    <var ID="latestEraShortDisplayName">BCE</var>
+                </vars>
+                <expected level="ADDOK"></expected>
+                <filename>structureddate/responses/GetStructuredDate-Both-Template.res.xml</filename>
+            </response>
+        </test>
+        <test ID="1974 AD" auth="admin@testsci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/structureddates/?dateToParse=1974+AD</uri>
+            <response>
+                <vars>
+                    <!-- earliestSingleDate -->
+                    <var ID="earliestYear">1974</var>
+                    <var ID="earliestMonth">1</var>
+                    <var ID="earliestDay">1</var>
+                    <var ID="earliestEraShortId">ce</var>
+                    <var ID="earliestEraShortDisplayName">CE</var>
+                    <!-- latestDate -->
+                    <var ID="latestYear">1974</var>
+                    <var ID="latestMonth">12</var>
+                    <var ID="latestDay">31</var>
+                    <var ID="latestEraShortId">ce</var>
+                    <var ID="latestEraShortDisplayName">CE</var>
+                </vars>
+                <expected level="ADDOK"></expected>
+                <filename>structureddate/responses/GetStructuredDate-Both-Template.res.xml</filename>
+            </response>
+        </test>
+        <test ID="1974 ad" auth="admin@testsci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/structureddates/?dateToParse=1974+ad</uri>
+            <response>
+                <vars>
+                    <!-- earliestSingleDate -->
+                    <var ID="earliestYear">1974</var>
+                    <var ID="earliestMonth">1</var>
+                    <var ID="earliestDay">1</var>
+                    <var ID="earliestEraShortId">ce</var>
+                    <var ID="earliestEraShortDisplayName">CE</var>
+                    <!-- latestDate -->
+                    <var ID="latestYear">1974</var>
+                    <var ID="latestMonth">12</var>
+                    <var ID="latestDay">31</var>
+                    <var ID="latestEraShortId">ce</var>
+                    <var ID="latestEraShortDisplayName">CE</var>
+                </vars>
+                <expected level="ADDOK"></expected>
+                <filename>structureddate/responses/GetStructuredDate-Both-Template.res.xml</filename>
+            </response>
+        </test>
+        <test ID="1974 A.D." auth="admin@testsci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/structureddates/?dateToParse=1974+A.D.</uri>
+            <response>
+                <vars>
+                    <!-- earliestSingleDate -->
+                    <var ID="earliestYear">1974</var>
+                    <var ID="earliestMonth">1</var>
+                    <var ID="earliestDay">1</var>
+                    <var ID="earliestEraShortId">ce</var>
+                    <var ID="earliestEraShortDisplayName">CE</var>
+                    <!-- latestDate -->
+                    <var ID="latestYear">1974</var>
+                    <var ID="latestMonth">12</var>
+                    <var ID="latestDay">31</var>
+                    <var ID="latestEraShortId">ce</var>
+                    <var ID="latestEraShortDisplayName">CE</var>
+                </vars>
+                <expected level="ADDOK"></expected>
+                <filename>structureddate/responses/GetStructuredDate-Both-Template.res.xml</filename>
+            </response>
+        </test>
+        <test ID="1974 a.d." auth="admin@testsci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/structureddates/?dateToParse=1974+a.d.</uri>
+            <response>
+                <vars>
+                    <!-- earliestSingleDate -->
+                    <var ID="earliestYear">1974</var>
+                    <var ID="earliestMonth">1</var>
+                    <var ID="earliestDay">1</var>
+                    <var ID="earliestEraShortId">ce</var>
+                    <var ID="earliestEraShortDisplayName">CE</var>
+                    <!-- latestDate -->
+                    <var ID="latestYear">1974</var>
+                    <var ID="latestMonth">12</var>
+                    <var ID="latestDay">31</var>
+                    <var ID="latestEraShortId">ce</var>
+                    <var ID="latestEraShortDisplayName">CE</var>
+                </vars>
+                <expected level="ADDOK"></expected>
+                <filename>structureddate/responses/GetStructuredDate-Both-Template.res.xml</filename>
+            </response>
+        </test>
+        <test ID="1974 c.e." auth="admin@testsci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/structureddates/?dateToParse=1974+c.e.</uri>
+            <response>
+                <vars>
+                    <!-- earliestSingleDate -->
+                    <var ID="earliestYear">1974</var>
+                    <var ID="earliestMonth">1</var>
+                    <var ID="earliestDay">1</var>
+                    <var ID="earliestEraShortId">ce</var>
+                    <var ID="earliestEraShortDisplayName">CE</var>
+                    <!-- latestDate -->
+                    <var ID="latestYear">1974</var>
+                    <var ID="latestMonth">12</var>
+                    <var ID="latestDay">31</var>
+                    <var ID="latestEraShortId">ce</var>
+                    <var ID="latestEraShortDisplayName">CE</var>
+                </vars>
+                <expected level="ADDOK"></expected>
+                <filename>structureddate/responses/GetStructuredDate-Both-Template.res.xml</filename>
+            </response>
+        </test>
+        <test ID="1974 ce" auth="admin@testsci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/structureddates/?dateToParse=1974+ce</uri>
+            <response>
+                <vars>
+                    <!-- earliestSingleDate -->
+                    <var ID="earliestYear">1974</var>
+                    <var ID="earliestMonth">1</var>
+                    <var ID="earliestDay">1</var>
+                    <var ID="earliestEraShortId">ce</var>
+                    <var ID="earliestEraShortDisplayName">CE</var>
+                    <!-- latestDate -->
+                    <var ID="latestYear">1974</var>
+                    <var ID="latestMonth">12</var>
+                    <var ID="latestDay">31</var>
+                    <var ID="latestEraShortId">ce</var>
+                    <var ID="latestEraShortDisplayName">CE</var>
+                </vars>
+                <expected level="ADDOK"></expected>
+                <filename>structureddate/responses/GetStructuredDate-Both-Template.res.xml</filename>
+            </response>
+        </test>
+        <test ID="1800's-1900's" auth="admin@testsci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/structureddates/?dateToParse=1800%27s-1900%27s</uri>
+            <response>
+                <vars>
+                    <!-- earliestSingleDate -->
+                    <var ID="earliestYear">1800</var>
+                    <var ID="earliestMonth">1</var>
+                    <var ID="earliestDay">1</var>
+                    <var ID="earliestEraShortId">ce</var>
+                    <var ID="earliestEraShortDisplayName">CE</var>
+                    <!-- latestDate -->
+                    <var ID="latestYear">1999</var>
+                    <var ID="latestMonth">12</var>
+                    <var ID="latestDay">31</var>
+                    <var ID="latestEraShortId">ce</var>
+                    <var ID="latestEraShortDisplayName">CE</var>
+                </vars>
+                <expected level="ADDOK"></expected>
+                <filename>structureddate/responses/GetStructuredDate-Both-Template.res.xml</filename>
+            </response>
+        </test>
+        <test ID="ca. 1730's" auth="admin@testsci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/structureddates/?dateToParse=ca.+1730%27s</uri>
+            <response>
+                <vars>
+                    <!-- earliestSingleDate -->
+                    <var ID="earliestYear">1711</var>
+                    <var ID="earliestMonth">1</var>
+                    <var ID="earliestDay">1</var>
+                    <var ID="earliestEraShortId">ce</var>
+                    <var ID="earliestEraShortDisplayName">CE</var>
+                    <!-- latestDate -->
+                    <var ID="latestYear">1757</var>
+                    <var ID="latestMonth">12</var>
+                    <var ID="latestDay">31</var>
+                    <var ID="latestEraShortId">ce</var>
+                    <var ID="latestEraShortDisplayName">CE</var>
+                </vars>
+                <expected level="ADDOK"></expected>
+                <filename>structureddate/responses/GetStructuredDate-earliestSingleDate-Template.res.xml</filename>
+            </response>
+        </test>
+        <!--
+            ***
+
+            Adding more tests here - https://github.com/collectionspace/services/blob/master/services/structureddate/src/test/resources/test-dates.yaml
+
+            ***
+        -->
+        <test ID="3/12/2013" auth="admin@testsci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/structureddates/?dateToParse=3%2F12%2F2013</uri>
+            <response>
+                <vars>
+                    <!-- earliestSingleDate -->
+                    <var ID="earliestYear">2013</var>
+                    <var ID="earliestMonth">3</var>
+                    <var ID="earliestDay">12</var>
+                    <var ID="earliestEraShortId">ce</var>
+                    <var ID="earliestEraShortDisplayName">CE</var>
+                </vars>
+                <expected level="ADDOK"></expected>
+                <filename>structureddate/responses/GetStructuredDate-earliestSingleDate-Template.res.xml</filename>
+            </response>
+        </test>
+        <test ID="7-6-1773" auth="admin@testsci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/structureddates/?dateToParse=7-6-1773</uri>
+            <response>
+                <vars>
+                    <!-- earliestSingleDate -->
+                    <var ID="earliestYear">1773</var>
+                    <var ID="earliestMonth">7</var>
+                    <var ID="earliestDay">6</var>
+                    <var ID="earliestEraShortId">ce</var>
+                    <var ID="earliestEraShortDisplayName">CE</var>
+                </vars>
+                <expected level="ADDOK"></expected>
+                <filename>structureddate/responses/GetStructuredDate-earliestSingleDate-Template.res.xml</filename>
+            </response>
+        </test>
+        <test ID="07-06-1773" auth="admin@testsci.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/structureddates/?dateToParse=07-06-1773</uri>
+            <response>
+                <vars>
+                    <!-- earliestSingleDate -->
+                    <var ID="earliestYear">1773</var>
+                    <var ID="earliestMonth">7</var>
+                    <var ID="earliestDay">6</var>
+                    <var ID="earliestEraShortId">ce</var>
+                    <var ID="earliestEraShortDisplayName">CE</var>
+                </vars>
+                <expected level="ADDOK"></expected>
+                <filename>structureddate/responses/GetStructuredDate-earliestSingleDate-Template.res.xml</filename>
+            </response>
+        </test>
+    </testGroup>
+</xmlReplay>

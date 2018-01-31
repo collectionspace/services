@@ -3,13 +3,13 @@
 
     <parent>
         <groupId>org.collectionspace.services</groupId>
-        <artifactId>org.collectionspace.services.loanin</artifactId>        
+        <artifactId>org.collectionspace.services.structureddate</artifactId>        
         <version>5.0-SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.collectionspace.services.loanin.service</artifactId>
-    <name>services.loanin.service</name>
+    <artifactId>org.collectionspace.services.structureddate.service</artifactId>
+    <name>services.structureddate.service</name>
     <packaging>jar</packaging>       
 
     <dependencies>
@@ -19,21 +19,22 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.loanin.jaxb</artifactId>
+            <artifactId>org.collectionspace.services.structureddate.jaxb</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.loanin.client</artifactId>
+            <artifactId>org.collectionspace.services.structureddate.client</artifactId>
             <version>${project.version}</version>
-        </dependency>
+        </dependency>        
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.collectionobject.jaxb</artifactId>
+            <artifactId>org.collectionspace.services.structureddate.structureddate</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
+
         <!-- External dependencies -->
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -74,23 +75,10 @@
             <artifactId>resteasy-multipart-provider</artifactId>
         </dependency>
         
-        <!-- nuxeo -->
-
-        <dependency>
-            <groupId>org.nuxeo.ecm.core</groupId>
-            <artifactId>nuxeo-core-api</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>jboss-remoting</artifactId>
-                    <groupId>jboss</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
     </dependencies>
     
     <build>
-        <finalName>collectionspace-services-loanin</finalName>
+        <finalName>collectionspace-services-structureddate-service</finalName>
     </build>
 </project>
 

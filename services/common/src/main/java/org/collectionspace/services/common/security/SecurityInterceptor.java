@@ -84,6 +84,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 	/** The Constant logger. */
 	private static final Logger logger = LoggerFactory.getLogger(SecurityInterceptor.class);
 	private static final String ACCOUNT_PERMISSIONS = "accounts/*/accountperms";
+	private static final String STRUCTURED_DATE_REQUEST = "structureddate";
 	private static final String PASSWORD_RESET = "accounts/requestpasswordreset";
 	private static final String PROCESS_PASSWORD_RESET = "accounts/processpasswordreset";
 	private static final String NUXEO_ADMIN = null;
@@ -126,11 +127,18 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
     private boolean requiresAuthorization(String resName) {
     	boolean result = true;
 		//
-    	// All active users are allowed to see the *their* (we enforce this) current list of permissions.  If this is not
+    	// ACCOUNT_PERMISSIONS: All active users are allowed to see the *their* (we enforce this) current list of permissions.  If this is not
 		// the request, then we'll do a full AuthZ check.
     	//
-    	if (resName.equalsIgnoreCase(ACCOUNT_PERMISSIONS) == true) {
-    		result = false;
+    	// STRUCTURED_DATE_REQUEST: All user can request the parsing of a structured date string.
+    	//
+    	switch (resName) {
+    		case STRUCTURED_DATE_REQUEST:
+    		case ACCOUNT_PERMISSIONS:
+    			result = false;
+    			break;
+    		default:
+    			result = true;
     	}
     	
     	return result;
