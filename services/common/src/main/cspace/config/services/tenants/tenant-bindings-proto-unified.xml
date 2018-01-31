@@ -160,7 +160,7 @@
 		<!-- begin servicegroup service meta-data -->
 		<!-- Servicegroup is a task service that has no representation in the repo, but provides tools like keyword search across 
 			many types of services. -->
-	    <tenant:serviceBindings id="servicegroups" merge:matcher="id" name="servicegroups" requiresDocumentHandler="false" type="utility" version="1.0">
+	    <tenant:serviceBindings id="servicegroups" merge:matcher="id" name="servicegroups" type="utility" version="1.0">
 			<service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
 			<service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">
 			    org.collectionspace.services.servicegroup.nuxeo.ServiceGroupDocumentModelHandler
@@ -170,7 +170,7 @@
 	    
 	    <!-- begin structureddate service meta-data -->
 	    <!-- structureddate is a task service that has no representation in the repo, but provides a date string parsing service. -->
-	    <tenant:serviceBindings id="structureddates" merge:matcher="id" name="structureddates" type="utility"
+	    <tenant:serviceBindings id="structureddates" merge:matcher="id" name="structureddates" requiresDocumentHandler="false" type="utility"
 	        version="1.0">
 	        <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
 	        <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">
