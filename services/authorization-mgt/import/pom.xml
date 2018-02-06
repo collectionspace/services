@@ -149,7 +149,7 @@
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>postgresql</groupId>
+			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 		</dependency>
 		<dependency>
@@ -313,7 +313,7 @@
 					<!-- <dependency> <groupId>mysql</groupId> <artifactId>mysql-connector-java</artifactId> 
 						<version>${mysql.driver.version}</version> </dependency> -->
 					<dependency>
-						<groupId>postgresql</groupId>
+						<groupId>org.postgresql</groupId>
 						<artifactId>postgresql</artifactId>
 						<version>${postgres.driver.version}</version>
 					</dependency>
