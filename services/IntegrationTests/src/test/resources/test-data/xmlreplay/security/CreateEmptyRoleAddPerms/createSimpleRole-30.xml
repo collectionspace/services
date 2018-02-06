@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:role xmlns:ns2="http://collectionspace.org/services/authorization">
+    <roleName>xROLE_ADDTOEMPTYROLE</roleName>
+    <description>Role for CreateEmptyRoleAddPerms-simpleRole-30 create test.</description>
+</ns2:role>

@@ -173,11 +173,16 @@
 	    <tenant:serviceBindings id="structureddates" merge:matcher="id" name="structureddates" requiresDocumentHandler="false" type="utility"
 	        version="1.0">
 	        <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
-	        <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">
-	            org.collectionspace.services.structureddate.StructureddateDocumentHandler
-	        </service:documentHandler>
 	    </tenant:serviceBindings>
 	    <!-- end structureddate service meta-data -->
+	    
+	    <!-- begin systeminfo service meta-data -->
+	    <!-- systeminfo is a task service that has no representation in the repo, but system meta data and version. -->
+	    <tenant:serviceBindings id="systeminfo" merge:matcher="id" name="systeminfo" requiresDocumentHandler="false" type="utility"
+	        version="1.0">
+	        <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+	    </tenant:serviceBindings>
+	    <!-- end systeminfo service meta-data -->	    
 
 		<!-- begin blob service meta-data -->
 		<!-- This should likely be type="object" -->

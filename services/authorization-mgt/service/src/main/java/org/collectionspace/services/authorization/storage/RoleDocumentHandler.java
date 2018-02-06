@@ -42,6 +42,7 @@ import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.security.SecurityUtils;
@@ -105,9 +106,13 @@ public class RoleDocumentHandler
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
             //
-            // First, delete the existing permroles
+            // First, delete the existing permroles (if any)
             //
-            subResource.deletePermissionRole(ctx, roleFound.getCsid(), SubjectType.PERMISSION);
+            try {
+            	subResource.deletePermissionRole(ctx, roleFound.getCsid(), SubjectType.PERMISSION);
+            } catch (DocumentNotFoundException dnf) {
+            	// Catch and ignore.  Just means the role has no existing relationships
+            }
             //
             // Next, create the new permroles
             //

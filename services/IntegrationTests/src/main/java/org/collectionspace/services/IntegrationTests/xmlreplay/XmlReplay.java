@@ -3,7 +3,6 @@ package org.collectionspace.services.IntegrationTests.xmlreplay;
 import org.apache.commons.cli.*;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.JexlEngine;
 import org.collectionspace.services.common.api.Tools;
 import org.dom4j.*;

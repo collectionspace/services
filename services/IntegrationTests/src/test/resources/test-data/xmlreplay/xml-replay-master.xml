@@ -16,8 +16,8 @@
         <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
     </auths>
     
-    <run controlFile="./security-oauth.xml" />
-    <run controlFile="./security.xml" testGroup="deleteBug" />
+    <run controlFile="security/security-oauth.xml" />
+    <run controlFile="security/security.xml" />
     <run controlFile="objectexit/object-exit.xml" testGroup="makeone" />
     <run controlFile="objectexit/object-exit.xml" testGroup="checkList" />
     <run controlFile="objectexit/object-exit-display.xml" testGroup="refNameDisplayNameOnly" />
@@ -87,14 +87,14 @@
     <!-- run controlFile="relation/relation.xml" testGroup="r2only" / -->
     
     <!-- This used to work, but for check-in, I'm commenting it out as it currently breaks if things are left around in DB. -->
-    <!-- run controlFile="./security.xml" testGroup="security" / -->
+    <!-- run controlFile="security/security.xml" testGroup="security" / -->
 
     <!--
     This was working but is not now because security db hangs onto results from failed tests.
     However, it is more complete than testGroup="security", so is the correct testGroup to run.
     When the DB is cleaned with [ant create_db import] it runs OK.
     -->
-    <!-- run controlFile="./security.xml" testGroup="securityRemovingRoleperms" / -->
+    <!-- run controlFile="security/security.xml" testGroup="securityRemovingRoleperms" / -->
     
 </xmlReplayMaster>
 

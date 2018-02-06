@@ -536,7 +536,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
 		if (children != null && (children.size() > 0)) {
 			for (Property prop : children ) {
 				String propName = prop.getName();
-				logger.debug(propName);
+				logger.trace(propName);
 	            if (prop.isPhantom() == false) {
 	                if (prop.isScalar() == false) {
 	                	setFieldsDirty(prop.getChildren(), fieldNameSet);

@@ -38,6 +38,11 @@
 			<groupId>org.collectionspace.services</groupId>
 			<artifactId>org.collectionspace.services.relation.client</artifactId>
 			<version>${project.version}</version>
+		</dependency>		
+		<dependency>
+			<groupId>org.collectionspace.services</groupId>
+			<artifactId>org.collectionspace.services.systeminfo.client</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.collectionspace.services</groupId>

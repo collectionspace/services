@@ -50,6 +50,7 @@ import org.collectionspace.services.acquisition.AcquisitionResource;
 import org.collectionspace.services.dimension.DimensionResource;
 import org.collectionspace.services.servicegroup.ServiceGroupResource;
 import org.collectionspace.services.structureddate.StructuredDateResource;
+import org.collectionspace.services.systeminfo.SystemInfoResource;
 import org.collectionspace.services.contact.ContactResource;
 import org.collectionspace.services.vocabulary.VocabularyResource;
 import org.collectionspace.services.organization.OrgAuthorityResource;
@@ -108,6 +109,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         singletons.add(new ServiceGroupResource());
         singletons.add(new ImportsResource());
         singletons.add(new StructuredDateResource());
+        singletons.add(new SystemInfoResource());
 
         addResourceToMapAndSingletons(new VocabularyResource());
         addResourceToMapAndSingletons(new PersonAuthorityResource());

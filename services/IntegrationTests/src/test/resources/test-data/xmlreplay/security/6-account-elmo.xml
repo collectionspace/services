@@ -5,12 +5,12 @@
     <email>elmo2018@DeleteBug.accountelemo.org</email>
     <phone>1234567890</phone>
     <userId>elmo2018</userId>
-    <!-- Pass word is grover2018, base64 encoded -->
-    <password>Z3JvdmVyMjAxOA==</password>
+    <!-- Pass word is elmo2018, base64 encoded -->
+    <password>ZWxtbzIwMTg=</password>
     <tenants>
         <tenant_id>1</tenant_id>
     </tenants>
     <role>
-        <roleId>${permElmo.CSID}</roleId> <!-- It should be ok that role name is missing -->
+        <roleId>${simpleRoleId}</roleId> <!-- It should be ok that role name is missing -->
     </role>
 </ns2:accounts_common>
