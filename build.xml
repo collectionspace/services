@@ -34,6 +34,7 @@
 		</copy>
 		<ant antfile="3rdparty/build.xml" target="dist" inheritAll="false" />
 		<ant antfile="services/build.xml" target="dist" inheritAll="false" />
+	    <ant antfile="cspace-ui/build.xml" target="dist" inheritAll="false" />
 
 		<!-- bundle up everything -->
 		<tar destfile="${basedir}/dist/${cspace.services.release}-${jee.release}.tar.gz" compression="gzip">
@@ -281,6 +282,7 @@
 		</copy>
 		<ant antfile="3rdparty/build.xml" target="deploy" inheritAll="false" />
 		<ant antfile="services/build.xml" target="deploy" inheritAll="false" />
+	    <ant antfile="cspace-ui/build.xml" target="deploy" inheritAll="false" />
 	</target>
 
 	<target name="setup_initdb.sql" description="copy init_db scripts, replacing keywords">
@@ -319,6 +321,7 @@
 	<target name="undeploy" description="undeploy services from ${jee.server.cspace}">
 		<ant antfile="services/build.xml" target="undeploy" inheritAll="false" />
 		<ant antfile="3rdparty/build.xml" target="undeploy" inheritAll="false" />
+	    <ant antfile="cspace-ui/build.xml" target="undeploy" inheritAll="false" />
 
 		<delete failonerror="false" dir="${jee.server.cspace}/cspace/services/config" />
 		<delete failonerror="false" dir="${jee.server.cspace}/cspace/services/scripts" />
