@@ -17,7 +17,7 @@
     xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
     xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
     xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
-    xmlns:ns="http://collectionspace.org/services/authorization"
+    xmlns:ans="http://collectionspace.org/services/authorization"
     xmlns="http://collectionspace.org/services/authorization"
     targetNamespace="http://collectionspace.org/services/authorization"
     version="0.1"

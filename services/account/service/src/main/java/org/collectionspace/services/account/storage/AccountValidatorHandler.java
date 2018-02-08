@@ -102,6 +102,10 @@ public class AccountValidatorHandler implements ValidatorHandler {
                     invalid = true;
                     msgBldr.append("\nuserId : missing");
                 }
+                if (account.getPassword() == null || account.getPassword().length == 0) {
+                    invalid = true;
+                    msgBldr.append("\npassword : missing");
+                }                
                 if (account.getEmail() == null || account.getEmail().isEmpty()) {
                     invalid = true;
                     msgBldr.append("\nemail : missing");

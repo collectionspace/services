@@ -26,6 +26,8 @@ package org.collectionspace.services.common.repository;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentHandler;
@@ -193,4 +195,12 @@ public interface RepositoryClient<IT, OT> extends StorageClient {
 	 */
 	boolean delete(ServiceContext ctx, List<String> idList, DocumentHandler handler)
 			throws DocumentNotFoundException, DocumentException, TransactionException;
+
+	/**
+	 * 
+	 * @param ctx
+	 * @return
+	 * @throws Exception 
+	 */
+	public CoreSessionInterface getRepositorySession(ServiceContext<IT, OT> ctx) throws Exception;
 }

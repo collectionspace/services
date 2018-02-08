@@ -90,6 +90,7 @@ public class AuthN {
     
     public static final String ROLE_SPRING_ADMIN_ID = "-1";
     public static final String ROLE_SPRING_ADMIN_NAME = "ROLE_SPRING_ADMIN";
+    public static final String ROLE_SPRING_GROUP_NAME = "Spring Security Administrator";
 
     // Define a special account value for the tenantManager. Yes, this is a hack, but
     // less troublesome than the alternatives.
@@ -99,6 +100,17 @@ public class AuthN {
         //hardcoded initialization of a provider
         //FIXME initialize with the help of configuration meta data
         authnContext = new SpringAuthNContext();
+    }
+    
+    public boolean isSystemAdmin() {
+    	boolean result = false;
+    	
+    	String currentUserId = this.getUserId();
+    	if (currentUserId.equals(AuthN.SPRING_ADMIN_USER) || currentUserId.equals(AuthN.ADMIN_TENANT_NAME)) {
+    		result = true;
+    	}
+    	
+    	return result;
     }
 
     public final static AuthN get() {

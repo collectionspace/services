@@ -333,10 +333,11 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
      * may be expected to be deleted by certain tests.
      * @throws Exception 
      */
-    @AfterClass(alwaysRun=true)
+    @Override
+	@AfterClass(alwaysRun=true)
     public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
-    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+    	if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Skipping Cleanup phase ...");
             }
@@ -345,31 +346,58 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-        // Delete Person resource(s) (before PersonAuthority resources).
-        
-        for (String resourceId : personIdsCreated) {
-            // Note: Any non-success responses are ignored and not reported.
-       		personAuthClient.deleteItem(personAuthCSID, resourceId).close();
+        //
+        // Delete the loansin records before the person items/terms
+        //
+    	LoaninClient loaninClient = new LoaninClient();
+        for (String csid : loaninIdsCreated) {
+        	Response res = null;
+        	try {
+        		res = loaninClient.delete(csid);
+        		if (res.getStatus() != Response.Status.OK.getStatusCode()) {
+        			throw new Exception(String.format("Could not delete loansin record with CSID=%s", csid));
+        		}
+        	} catch (Throwable t) {
+        		if (res != null) res.close();
+        		throw t;
+        	}
         }
-        
-        // Delete PersonAuthority resource(s).
-        // Note: Any non-success response is ignored and not reported.
+        //
+        // Delete Person resource(s) (before PersonAuthority resources).
+        //
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();        
+        for (String csid : personIdsCreated) {
+        	Response res = null;
+        	try {
+        		res = personAuthClient.deleteItem(personAuthCSID, csid);
+        		if (res.getStatus() != Response.Status.OK.getStatusCode()) {
+        			throw new Exception(String.format("Could not delete person item/term record with CSID=%s inside person authority with CSID=%s", 
+        					csid, personAuthCSID));
+        		}
+        	} catch (Throwable t) {
+        		if (res != null) res.close();
+        		throw t;
+        	}
+        }
+        //
+        // Delete the PersonAuthority resource.
+        //
         if (personAuthCSID != null) {
-        	personAuthClient.delete(personAuthCSID);
-	        // Delete Loans In resource(s).
-        	LoaninClient loaninClient = new LoaninClient();
-	        for (String resourceId : loaninIdsCreated) {
-	            // Note: Any non-success responses are ignored and not reported.
-	            loaninClient.delete(resourceId).close();
-	        }
+        	Response res = null;
+        	try {
+        		res = personAuthClient.delete(personAuthCSID);
+        	} catch (Throwable t) {
+        		if (res != null) res.close();
+        		throw t;
+        	}
         }
     }
 
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-    public String getServiceName() {
+    @Override
+	public String getServiceName() {
         return SERVICE_NAME;
     }
 

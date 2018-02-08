@@ -1,0 +1,24 @@
+<ns2:abstract-common-list xmlns:ns2="http://collectionspace.org/services/jaxb">
+    <pageNum>0</pageNum>
+    <itemsInPage>${itemsInPage}</itemsInPage>
+    <totalItems>${totalItems}</totalItems>
+    <list-item>
+        <csid>${createItem2}</csid>
+        <uri>
+            /vocabularies/${csid}/items/${createItem2}
+        </uri>
+        <refName>
+            urn:cspace:core.collectionspace.org:vocabularies:name(ShowItemsVocab):item:name(ShowItemsItem2)'ShowsItems item ShowItemsItem2'
+        </refName>
+        <workflowState>project</workflowState>
+        <rev>0</rev>
+        <sourcePage>The page should match the order:2</sourcePage>
+        <sas>false</sas>
+        <proposed>true</proposed>
+        <description>This is a test vocabulary item</description>
+        <source>Some mythical book</source>
+        <order>2</order>
+        <displayName>ShowsItems item ShowItemsItem2</displayName>
+        <shortIdentifier>ShowItemsItem2</shortIdentifier>
+    </list-item>
+</ns2:abstract-common-list>

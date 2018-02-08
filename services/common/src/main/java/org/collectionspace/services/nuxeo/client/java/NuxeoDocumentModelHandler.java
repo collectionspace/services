@@ -219,7 +219,7 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 	public AbstractCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
 		CommonList commonList = new CommonList();
 		CoreSessionInterface repoSession = null;
-		RepositoryClientImpl repoClient = null;
+		NuxeoRepositoryClientImpl repoClient = null;
 		boolean releaseRepoSession = false;
 
 		AbstractServiceContextImpl ctx = (AbstractServiceContextImpl) getServiceContext();
@@ -245,8 +245,8 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 
 		try {
 			if (markRtSbj != null) {
-				repoClient = (RepositoryClientImpl) this.getRepositoryClient(ctx);
-				RepositoryClientImpl nuxeoRepoClient = (RepositoryClientImpl) repoClient;
+				repoClient = (NuxeoRepositoryClientImpl) this.getRepositoryClient(ctx);
+				NuxeoRepositoryClientImpl nuxeoRepoClient = (NuxeoRepositoryClientImpl) repoClient;
 				repoSession = this.getRepositorySession();
 				if (repoSession == null) {
 					repoSession = repoClient.getRepositorySession(ctx);

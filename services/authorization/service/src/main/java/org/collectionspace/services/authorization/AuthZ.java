@@ -28,18 +28,20 @@ import java.util.HashSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.authentication.CSpaceTenant;
 import org.collectionspace.authentication.CSpaceUser;
-import org.collectionspace.authentication.spi.AuthNContext;
 import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.spi.CSpaceAuthorizationProvider;
+
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.TransactionStatus;
 
 /**
  * AuthZ is the authorization service singleton used by the services runtime
@@ -106,8 +108,7 @@ public class AuthZ {
         if (logger.isDebugEnabled()) {
             logger.debug("reading beanConfig=" + beanConfig);
         }
-        ClassPathXmlApplicationContext appContext = new ClassPathXmlApplicationContext(
-                new String[]{beanConfig});
+        ClassPathXmlApplicationContext appContext = new ClassPathXmlApplicationContext(new String[]{beanConfig}); // FIXME: This is never used.  Keep it for debugging?
         provider = (CSpaceAuthorizationProvider) appContext.getBean("cspaceAuthorizationProvider");
         if (logger.isDebugEnabled()) {
             logger.debug("initialized the authz provider");
@@ -121,9 +122,18 @@ public class AuthZ {
      * @param principals
      *      * @param grant true to grant false to deny
      */
-    public void addPermissions(CSpaceResource res, String[] principals, boolean grant) throws PermissionException {
-        CSpaceAction action = res.getAction();
-        addPermissions(res, action, principals, grant);
+    public void addPermissions(CSpaceResource[] resources, String[] principals, boolean grant) throws PermissionException {
+        TransactionStatus status = provider.beginTransaction("addPermssions");
+        try {
+            for (CSpaceResource res : resources) {
+                CSpaceAction action = res.getAction();
+            	addPermission(res, action, principals, grant);
+            }
+	        provider.commitTransaction(status);
+        } catch (Throwable t) {
+        	provider.rollbackTransaction(status);
+        	throw t;
+        }        
     }
 
     /**
@@ -133,9 +143,9 @@ public class AuthZ {
      * @param principals
      * @param grant true to grant false to deny
      */
-    public void addPermissions(CSpaceResource res, CSpaceAction action, String[] principals, boolean grant)
+    private void addPermission(CSpaceResource res, CSpaceAction action, String[] principals, boolean grant)
             throws PermissionException {
-        provider.getPermissionManager().addPermissions(res, action, principals, grant);
+        provider.getPermissionManager().addPermissionsToRoles(res, action, principals, grant);
         provider.clearAclCache();
     }
 
@@ -146,10 +156,20 @@ public class AuthZ {
      * @param res
      * @param principals
      */
-    public void deletePermissions(CSpaceResource res, String[] principals)
+    public void deletePermissionsFromRoles(CSpaceResource[] resources, String[] principals) // FIXME: # Can tx move one level up?
             throws PermissionNotFoundException, PermissionException {
-        CSpaceAction action = res.getAction();
-        deletePermissions(res, action, principals);
+    	
+        TransactionStatus status = provider.beginTransaction("deletePermssions");
+        try {
+        	for (CSpaceResource res : resources) {
+		        CSpaceAction action = res.getAction();
+		        deletePermissionFromRoles(res, action, principals);
+            }
+	        provider.commitTransaction(status);
+	    } catch (Throwable t) {
+	    	provider.rollbackTransaction(status);
+	    	throw t;
+	    }
     }
 
     /**
@@ -159,9 +179,9 @@ public class AuthZ {
      * @param action
      * @param principals
      */
-    public void deletePermissions(CSpaceResource res, CSpaceAction action, String[] principals)
+    private void deletePermissionFromRoles(CSpaceResource res, CSpaceAction action, String[] principals)
             throws PermissionNotFoundException, PermissionException {
-        provider.getPermissionManager().deletePermissions(res, action, principals);
+        provider.getPermissionManager().deletePermissionFromRoles(res, action, principals);
         provider.clearAclCache();
     }
 
@@ -173,14 +193,23 @@ public class AuthZ {
      * @param res
      * @param principals
      */
-    public void deletePermissions(CSpaceResource res)
+    public void deletePermissions(CSpaceResource[] resources)
             throws PermissionNotFoundException, PermissionException {
-        CSpaceAction action = res.getAction();
-        if (action != null) {
-            deletePermissions(res, action);
-        } else {
-            provider.getPermissionManager().deletePermissions(res);
-            provider.clearAclCache();
+        TransactionStatus status = provider.beginTransaction("deletePermssions");
+        try {
+	        for (CSpaceResource res : resources) {
+		        CSpaceAction action = res.getAction();
+		        if (action != null) {
+		            deletePermissions(res, action);
+		        } else {
+		            provider.getPermissionManager().deletePermissions(res);
+		            provider.clearAclCache();
+		        }
+	        }
+	        provider.commitTransaction(status);
+        } catch (Throwable t) {
+        	provider.rollbackTransaction(status);
+        	throw t;
         }
     }
 
@@ -191,7 +220,7 @@ public class AuthZ {
      * @param action
      * @param principals
      */
-    public void deletePermissions(CSpaceResource res, CSpaceAction action)
+    private void deletePermissions(CSpaceResource res, CSpaceAction action)
             throws PermissionNotFoundException, PermissionException {
         provider.getPermissionManager().deletePermissions(res, action);
         provider.clearAclCache();

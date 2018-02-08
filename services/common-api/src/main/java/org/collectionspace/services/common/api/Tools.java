@@ -25,8 +25,10 @@ package org.collectionspace.services.common.api;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Properties;
 import  java.util.regex.Pattern;
+
 import java.util.regex.Matcher;
 
 /** General utility methods.
@@ -401,5 +403,13 @@ public class Tools {
 		}
 		
 		return result;
+	}
+
+	public static boolean isEmpty(List<?> theList) {
+		if (theList != null && theList.size() > 0) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 }

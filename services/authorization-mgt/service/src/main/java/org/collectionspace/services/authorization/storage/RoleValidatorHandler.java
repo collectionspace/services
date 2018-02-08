@@ -26,6 +26,7 @@
 package org.collectionspace.services.authorization.storage;
 
 import org.collectionspace.services.authorization.Role;
+import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
@@ -38,35 +39,38 @@ import org.slf4j.LoggerFactory;
  * RoleValidatorHandler executes validation rules for role
  * @author 
  */
-public class RoleValidatorHandler implements ValidatorHandler {
+public class RoleValidatorHandler implements ValidatorHandler<Role, Role> {
 
     final Logger logger = LoggerFactory.getLogger(RoleValidatorHandler.class);
 
     @Override
-    public void validate(Action action, ServiceContext ctx)
+    public void validate(Action action, ServiceContext<Role, Role> ctx)
             throws InvalidDocumentException {
         if (logger.isDebugEnabled()) {
             logger.debug("validate() action=" + action.name());
         }
         try {
-            Role role = (Role) ctx.getInput();
+            Role role = ctx.getInput();
             StringBuilder msgBldr = new StringBuilder(ServiceMessages.VALIDATION_FAILURE);
             boolean invalid = false;
 
             if (action.equals(Action.CREATE)) {
-
-                //create specific validation here
                 if (role.getRoleName() == null || role.getRoleName().isEmpty()) {
                     invalid = true;
                     msgBldr.append("\nroleName : missing or empty");
+                } else {
+                	if (role.getRoleName().startsWith(RoleClient.BACKEND_ROLE_PREFIX)) {
+                        invalid = true;
+                        msgBldr.append(String.format("\nroleName : cannot beging with '%s'", RoleClient.BACKEND_ROLE_PREFIX));
+                	}
                 }
             } else if (action.equals(Action.UPDATE)) {
-                //update specific validation here
                 if (role.getRoleName() == null || role.getRoleName().isEmpty()) {
                     invalid = true;
                     msgBldr.append("\nroleName : cannot be missing or empty");
                 }
             }
+            
             if (invalid) {
                 String msg = msgBldr.toString();
                 logger.error(msg);

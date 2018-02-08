@@ -32,8 +32,12 @@ import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,17 +55,42 @@ public class JaxbUtils {
      * @param clazz class of the jaxb object
      * @return
      */
-    public static String toString(Object o, Class clazz) {
+    public static String toString(Object o, Class<?> clazz) {    	
         StringWriter sw = new StringWriter();
+        
         try {
             JAXBContext jc = JAXBContext.newInstance(clazz);
             Marshaller m = jc.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-                    Boolean.TRUE);
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             m.marshal(o, sw);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (javax.xml.bind.MarshalException e) {
+        	//
+        	// If the JAX-B object we're trying to marshal doesn't have an @XmlRootElement, then we need another
+        	// approach.
+        	//
+            return marshalWithoutRoot(o, clazz);
+        } catch (JAXBException e) {
+			logger.error(e.getMessage());
+		}
+        
+        return sw.toString();
+    }
+    
+    /*
+     * Use this to marshal a JAX-B object that has no @XmlRootElement
+     */
+    private static String marshalWithoutRoot(Object o, Class<?> clazz) {
+        StringWriter sw = new StringWriter();
+
+    	try {
+            JAXBContext jc = JAXBContext.newInstance(clazz);
+	    	Marshaller marshaller = jc.createMarshaller();
+	    	marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+	    	marshaller.marshal(new JAXBElement(new QName("uri","local"), clazz, o), sw);
+    	} catch (Exception e) {
+    		logger.debug(e.getMessage());
+    	}
+    	
         return sw.toString();
     }
 

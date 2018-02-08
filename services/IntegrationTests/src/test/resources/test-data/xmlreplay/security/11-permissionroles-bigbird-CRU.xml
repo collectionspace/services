@@ -7,7 +7,7 @@ xmlns:ns2="http://collectionspace.org/services/authorization">
   </permission>
   <role>
     <roleId>${roleTestCM.CSID}</roleId>
-    <roleName>ROLE_TEST_CM</roleName>
+    <roleName>xROLE_TEST_CM</roleName>
   </role>
 </ns2:permission_role>
 

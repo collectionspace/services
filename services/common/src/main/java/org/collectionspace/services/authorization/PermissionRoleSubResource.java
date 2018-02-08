@@ -30,11 +30,14 @@ import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.storage.PermissionRoleDocumentHandler;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
+import org.collectionspace.services.common.authorization_mgt.PermissionRoleUtil;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.storage.StorageClient;
+import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaRelationshipStorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.common.context.ServiceContextProperties;
@@ -46,8 +49,11 @@ import org.slf4j.LoggerFactory;
  * PermissionRoleSubResource is used to manage permission-role relationship
  * @author
  */
+@SuppressWarnings("rawtypes")
 public class PermissionRoleSubResource
         extends AbstractCollectionSpaceResourceImpl<PermissionRole, PermissionRole> {
+    /** The logger. */
+    final Logger logger = LoggerFactory.getLogger(PermissionRoleSubResource.class);
 
     public final static String ROLE_PERMROLE_SERVICE = "authorization/roles/permroles";
     public final static String PERMISSION_PERMROLE_SERVICE = "authorization/permissions/permroles";
@@ -55,8 +61,6 @@ public class PermissionRoleSubResource
     //service name to identify binding
     /** The service name. */
     private String serviceName = "authorization/permroles";
-    /** The logger. */
-    final Logger logger = LoggerFactory.getLogger(PermissionRoleSubResource.class);
     /** The storage client. */
     final StorageClient storageClient = new JpaRelationshipStorageClient<PermissionRole>();
     /**
@@ -97,7 +101,8 @@ public class PermissionRoleSubResource
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.CollectionSpaceResource#getServiceContextFactory()
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public ServiceContextFactory<PermissionRole, PermissionRole> getServiceContextFactory() {
         return RemoteServiceContextFactory.get();
     }
@@ -112,9 +117,21 @@ public class PermissionRoleSubResource
      * 
      * @throws Exception the exception
      */
-    private ServiceContext<PermissionRole, PermissionRole> createServiceContext(PermissionRole input,
+    private ServiceContext<PermissionRole, PermissionRole> createServiceContext(
+    		ServiceContext parentCtx,
+    		PermissionRole input,
             SubjectType subject) throws Exception {
         ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext(input);
+    	JPATransactionContext parentTransactionContext = parentCtx != null ? (JPATransactionContext)parentCtx.getCurrentTransactionContext() : null;
+    	//
+    	// If the parent context has an active JPA connection then we'll use it.
+    	//
+    	if (parentTransactionContext != null) {
+    		ctx.setTransactionContext(parentTransactionContext);
+    	}
+        //
+    	// Set other context values
+    	//
         ctx.setDocumentType(PermissionRole.class.getPackage().getName()); //persistence unit
         ctx.setProperty(ServiceContextProperties.ENTITY_NAME, PermissionRoleRel.class.getName());
         ctx.setProperty(ServiceContextProperties.ENTITY_CLASS, PermissionRoleRel.class);
@@ -154,10 +171,10 @@ public class PermissionRoleSubResource
      * @return
      * @throws Exception
      */
-    public String createPermissionRole(PermissionRole input, SubjectType subject)
+    public String createPermissionRole(ServiceContext parentCtx, PermissionRole input, SubjectType subject)
             throws Exception {
 
-        ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext(input, subject);
+        ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext(parentCtx, input, subject);
         DocumentHandler handler = createDocumentHandler(ctx);
         return getStorageClient(ctx).create(ctx, handler);
     }
@@ -171,28 +188,22 @@ public class PermissionRoleSubResource
      * @return the permission role rel
      * @throws Exception the exception
      */
-    public PermissionRoleRel getPermissionRoleRel(String csid,
+    public PermissionRoleRel getPermissionRoleRel(
+    		ServiceContext parentCtx,
+    		String csid,
     		SubjectType subject,
     		String permissionRoleCsid) throws Exception {
 
         if (logger.isDebugEnabled()) {
             logger.debug("getAccountRole with csid=" + csid);
         }
-//        AccountRolesList result = new AccountRolesList();
-        ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext((PermissionRole) null, subject);
+
+        ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext(parentCtx, (PermissionRole) null, subject);
         PermissionRoleDocumentHandler handler = (PermissionRoleDocumentHandler)createDocumentHandler(ctx);
         handler.setPermissionRoleCsid(permissionRoleCsid);
         //getStorageClient(ctx).get(ctx, csid, handler);
         PermissionRoleRel permissionRoleRel = (PermissionRoleRel)JpaStorageUtils.getEntity(
         		new Long(permissionRoleCsid).longValue(), PermissionRoleRel.class);
-//        List<AccountRoleListItem> accountRoleList = result.getAccountRoleListItems();
-//        AccountRoleListItem listItem = new AccountRoleListItem();
-//        // fill the item
-//        listItem.setCsid(accountRoleRel.getHjid().toString());
-//        listItem.setRoleId(accountRoleRel.getRoleId());
-//        listItem.setRoleName(accountRoleRel.getRoleName());
-        // add item to result list
-//        result = (AccountRolesList) ctx.getOutput();
         
         return permissionRoleRel;
     }
@@ -206,17 +217,19 @@ public class PermissionRoleSubResource
      * @throws Exception
      */
     public PermissionRole getPermissionRole(
-            String csid, SubjectType subject) throws Exception {
+    		ServiceContext parentCtx,
+            String csid, 
+            SubjectType subject) throws Exception {
 
         if (logger.isDebugEnabled()) {
             logger.debug("getPermissionRole with csid=" + csid);
         }
         PermissionRole result = null;
-        ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext((PermissionRole) null, subject);
+        ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext(parentCtx, (PermissionRole) null, subject);
         DocumentHandler handler = createDocumentHandler(ctx);
         getStorageClient(ctx).get(ctx, csid, handler);
         result = (PermissionRole) ctx.getOutput();
-
+        
         return result;
     }
 
@@ -228,16 +241,39 @@ public class PermissionRoleSubResource
      * @return
      * @throws Exception
      */
-    public void deletePermissionRole(String csid,
+    public void deletePermissionRole(ServiceContext parentCtx,
+    		String csid,
             SubjectType subject) throws Exception {
 
         if (logger.isDebugEnabled()) {
             logger.debug("deletePermissionRole with csid=" + csid);
         }
-        PermissionRole permRole = this.getPermissionRole(csid, subject);
-        this.deletePermissionRole(csid, subject, permRole);
+        
+        PermissionRole permRole = getPermissionRole(parentCtx, csid, subject);
+        if (PermissionRoleUtil.isEmpty(permRole) == false) {
+        	deletePermissionRole(parentCtx, csid, subject, permRole);
+        } else {
+        	String msg = String.format("The %s CSID=%s is missing or not related to any objects.",
+        			getInverse(subject).toString().toLowerCase(), csid);
+        	throw new DocumentNotFoundException(msg);
+        }
     }
-
+    
+    /*
+     * Returns the inverse of the subject (the object)
+     */
+    private SubjectType getInverse(SubjectType subject) {
+    	SubjectType result;
+    	
+    	if (subject.equals(SubjectType.PERMISSION)) {
+    		result = SubjectType.ROLE;
+    	} else {
+    		result = SubjectType.PERMISSION;
+    	}
+    	
+    	return result;
+    }
+    
     /**
      * deletePermissionRole deletes permission-role relationships using given
      * csid of object (permission/role) and subject (role/permission)
@@ -247,13 +283,13 @@ public class PermissionRoleSubResource
      * @return
      * @throws Exception
      */
-    public void deletePermissionRole(String csid,
+	public void deletePermissionRole(ServiceContext parentCtx, String csid,
             SubjectType subject, PermissionRole input) throws Exception {
 
         if (logger.isDebugEnabled()) {
             logger.debug("deletePermissionRole(input) with csid=" + csid);
         }
-        ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext(input, subject);
+        ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext(parentCtx, input, subject);
         DocumentHandler handler = createDocumentHandler(ctx);
         getStorageClient(ctx).delete(ctx, csid, handler);
     }

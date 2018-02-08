@@ -76,6 +76,10 @@ public abstract class PayloadPart {
 	}
 	
 	public Element getElementBody() {
+		if (elementBody == null) {
+			elementBody = asElement();
+		}
+		
 		return elementBody;
 	}
 

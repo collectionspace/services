@@ -260,6 +260,16 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
 		        }	        	
 	        }
 	        
+            String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
+	        if (advancedSearch != null && !advancedSearch.isEmpty()) {
+	            DocumentFilter documentFilter = handler.getDocumentFilter();
+	            String whereClause = QueryManager.createWhereClauseFromAdvancedSearch(advancedSearch);
+	            documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
+	            if (logger.isDebugEnabled()) {
+	                logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
+	            }
+	        }
+	        
 	        // make the query
             list = handler.getItemListForGroup(ctx, groupsList);
         } catch (Exception e) {

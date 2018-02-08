@@ -95,17 +95,20 @@ public class ServiceConfigUtils {
     		ServiceBindingType serviceBinding) throws Exception {
     	DocumentHandler docHandler = null;
     	
-        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        Class<?> c = tccl.loadClass(getDocumentHandlerClass(tenantBinding, serviceBinding));
-        if (DocumentHandler.class.isAssignableFrom(c)) {
-            docHandler = (DocumentHandler) c.newInstance();
-            if (logger.isDebugEnabled()) {
-            	logger.debug("Created an instance of the DocumentHandler for: " + getDocumentHandlerClass(tenantBinding, serviceBinding));
-            }
-        } else {
-            throw new IllegalArgumentException("Not of type "
-                    + DocumentHandler.class.getCanonicalName());
-        }
+    	if (serviceBinding.isRequiresDocumentHandler() == true) {
+	        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+	        Class<?> c = tccl.loadClass(getDocumentHandlerClass(tenantBinding, serviceBinding));
+	        if (DocumentHandler.class.isAssignableFrom(c)) {
+	            docHandler = (DocumentHandler) c.newInstance();
+	            if (logger.isDebugEnabled()) {
+	            	logger.debug("Created an instance of the DocumentHandler for: " + getDocumentHandlerClass(tenantBinding, serviceBinding));
+	            }
+	        } else {
+	        	String msg = String.format("Tenant:%s Service:%s - The declared document handler '%s' is not an instance of the '%s' interface.", 
+	        			tenantBinding.getDisplayName(), serviceBinding.getName(), serviceBinding.getDocumentHandler(), DocumentHandler.class.getCanonicalName());
+	            throw new IllegalArgumentException(msg);
+	        }
+    	}
 
         return docHandler;
     }
@@ -117,15 +120,20 @@ public class ServiceConfigUtils {
      */
     private static String getDocumentHandlerClass(TenantBindingType tenantBinding,
     		ServiceBindingType serviceBinding) {
-        if (serviceBinding.getDocumentHandler() == null
-                || serviceBinding.getDocumentHandler().isEmpty()) {
-            String msg = "Missing documentHandler in service binding for service name \""
-                    + serviceBinding.getName() + "\" for tenant id=" + tenantBinding.getId()
-                    + " name=" + tenantBinding.getName();
-            logger.warn(msg);
-            throw new IllegalStateException(msg);
-        }
-        return serviceBinding.getDocumentHandler().trim();
+    	String result = null;
+    	
+    	if (serviceBinding.isRequiresDocumentHandler() == true) {
+	        if (serviceBinding.getDocumentHandler() == null || serviceBinding.getDocumentHandler().isEmpty()) {
+	            String msg = "Missing documentHandler in service binding for service name \""
+	                    + serviceBinding.getName() + "\" for tenant id=" + tenantBinding.getId()
+	                    + " name=" + tenantBinding.getName();
+	            throw new IllegalStateException(msg);
+	        } else {
+	        	result = serviceBinding.getDocumentHandler().trim();
+	        }
+    	}
+        
+        return result;
     }
 
     /**

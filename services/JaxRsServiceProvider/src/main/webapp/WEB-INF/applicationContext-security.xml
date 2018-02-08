@@ -63,6 +63,9 @@
         <!-- Exclude the resource path to account process a password resets from AuthN and AuthZ. Lets us process password resets anonymous access. -->
         <sec:intercept-url pattern="/accounts/processpasswordreset" access="permitAll" />
 
+        <!-- Exclude the resource path to request system info -->
+        <sec:intercept-url pattern="/systeminfo" access="permitAll" />
+
         <!-- All other paths must be authenticated. -->
         <sec:intercept-url pattern="/**" access="isFullyAuthenticated()" />
 

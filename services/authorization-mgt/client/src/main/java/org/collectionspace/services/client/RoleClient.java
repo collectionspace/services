@@ -45,10 +45,11 @@ public class RoleClient extends AbstractServiceClientImpl<RolesList, Role, Role,
 	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
 	public final static String IMMUTABLE = "immutable";
 	public final static String INCLUDE_PERMS_QP = "showPerms";
-	
+
 	//
 	// Used to qualify backend role name
-	private final static String BACKEND_ROLE_PREFIX = "ROLE_";	
+	//
+	public final static String BACKEND_ROLE_PREFIX = "ROLE_";	
 
     public RoleClient() throws Exception {
 		super();
@@ -57,7 +58,7 @@ public class RoleClient extends AbstractServiceClientImpl<RolesList, Role, Role,
     public RoleClient(String clientPropertiesFilename) throws Exception {
 		super(clientPropertiesFilename);
 	}
-    
+        
     /**
      * Creates a backend (Spring Security as of v4.5) role name.
      * @param roleDisplayName

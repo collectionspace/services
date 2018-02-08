@@ -5,7 +5,7 @@ public class DocumentReferenceException extends DocumentException {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	final public static int HTTP_CODE = 500;
+	final public static int HTTP_CODE = 409; // Conflict response.  There may be a dependency issue.  For example, trying to delete a term from an authority that is being referenced in another record.
 
     /**
      * Creates a new instance of <code>DocumentNotFoundException</code> without detail message.

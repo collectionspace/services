@@ -5,15 +5,19 @@
     <!-- legal values for dumpServiceResult=[minimal,detailed,full,auto] -->
     <dump payloads="false" dumpServiceResult="auto" />
     
+    <!-- Auth = Base64Encode("username:password") See https://www.base64encode.org/
+                For example:
+                    Username = "grover"
+                    Password = "grover2018"
+                    Token String = "grover:grover2018"
+                    Auth ID = "Z3JvdmVyOmdyb3ZlcjIwMTg="
+    -->
     <auths default="admin@core.collectionspace.org">
         <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
     </auths>
     
-    
-    
-    
-    <run controlFile="./security-oauth.xml" />
-    <run controlFile="./security.xml" testGroup="deleteBug" />
+    <run controlFile="security/security-oauth.xml" />
+    <run controlFile="security/security.xml" />
     <run controlFile="objectexit/object-exit.xml" testGroup="makeone" />
     <run controlFile="objectexit/object-exit.xml" testGroup="checkList" />
     <run controlFile="objectexit/object-exit-display.xml" testGroup="refNameDisplayNameOnly" />
@@ -33,7 +37,7 @@
  
     <run controlFile="report/report.xml" />
     <run controlFile="authrefs/authrefs.xml" testGroup="AuthRefs" />
-    <run controlFile="vocabulary/vocabulary.xml" testGroup="TestOrder" />
+    <run controlFile="vocabulary/vocabulary.xml" />
     <run controlFile="authrefs/authrefsSimple.xml" testGroup="AuthRefsSimple" />
     <run controlFile="authrefs/authrefsComplex.xml" testGroup="AuthRefsComplex" />
     <run controlFile="authority/authority.xml" testGroup="TestAuthoritiesMultiVocabSearch" />
@@ -83,14 +87,14 @@
     <!-- run controlFile="relation/relation.xml" testGroup="r2only" / -->
     
     <!-- This used to work, but for check-in, I'm commenting it out as it currently breaks if things are left around in DB. -->
-    <!-- run controlFile="./security.xml" testGroup="security" / -->
+    <!-- run controlFile="security/security.xml" testGroup="security" / -->
 
     <!--
     This was working but is not now because security db hangs onto results from failed tests.
     However, it is more complete than testGroup="security", so is the correct testGroup to run.
     When the DB is cleaned with [ant create_db import] it runs OK.
     -->
-    <!-- run controlFile="./security.xml" testGroup="securityRemovingRoleperms" / -->
+    <!-- run controlFile="security/security.xml" testGroup="securityRemovingRoleperms" / -->
     
 </xmlReplayMaster>
 

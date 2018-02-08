@@ -1,7 +1,19 @@
 package org.collectionspace.services.nuxeo.client.java;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.security.Principal;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.collectionspace.services.common.document.DocumentException;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -111,35 +123,85 @@ public class CoreSessionWrapper implements CoreSessionInterface {
 	public Principal getPrincipal() {
 		return repoSession.getPrincipal();
 	}
+	
+	private String toLocalTimestamp(String utcTime, boolean base64Encoded) throws DocumentException {
+		String result = null;
+
+		try {
+			if (base64Encoded == true) {
+				utcTime = URLDecoder.decode(utcTime, java.nio.charset.StandardCharsets.UTF_8.name());
+			}
+			LocalDateTime localTime;
+			try {
+				Instant instant = Instant.parse(utcTime);
+				ZonedDateTime localInstant = instant.atZone(ZoneId.systemDefault()); // DateTimeFormatter.ISO_LOCAL_DATE_TIME
+				localTime = localInstant.toLocalDateTime();
+			} catch (DateTimeParseException e) {
+				localTime = LocalDateTime.parse(utcTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+			}
+			result = localTime.toString();
+			if (base64Encoded == true) {
+				result = URLEncoder.encode(result, java.nio.charset.StandardCharsets.UTF_8.name());
+			}
+		} catch (UnsupportedEncodingException e) {
+			throw new DocumentException(e);
+		}
+		
+		return result;
+	}
+	
+	private String localizeTimestamps(String query) throws DocumentException {
+		String result = query;
+		
+		if (query.contains("TIMESTAMP")) {
+			StringBuffer stringBuffer = new StringBuffer();
+			Pattern pattern = Pattern.compile("\\+TIMESTAMP\\+%22(.+?)%22");
+			Matcher matcher = pattern.matcher(query);
+			while (matcher.find()) {
+				String time = matcher.group(1);
+				String localizedTime = toLocalTimestamp(time, true);
+				matcher.appendReplacement(stringBuffer, String.format("+TIMESTAMP+%%22%s%%22", localizedTime));
+			}
+			matcher.appendTail(stringBuffer);
+			result = stringBuffer.toString();
+		}
+		
+		return result;
+	}
 
 	@Override
 	public IterableQueryResult queryAndFetch(String query, String queryType,
-            Object... params) throws ClientException {
+            Object... params) throws ClientException, DocumentException {
+		query = localizeTimestamps(query);
 		logQuery(query, queryType);
 		return repoSession.queryAndFetch(query, queryType, params);
 	}
 
 	@Override
 	public DocumentModelList query(String query, Filter filter, long limit,
-            long offset, boolean countTotal) throws ClientException {
+            long offset, boolean countTotal) throws ClientException, DocumentException {
+		query = localizeTimestamps(query);
 		logQuery(query, filter, limit, offset, countTotal);
 		return repoSession.query(query, filter, limit, offset, countTotal);
 	}
 
 	@Override
-    public DocumentModelList query(String query, int max) throws ClientException {
+    public DocumentModelList query(String query, int max) throws ClientException, DocumentException {
+		query = localizeTimestamps(query);
 		logQuery(query);
     	return repoSession.query(query, max);
     }
     
 	@Override
-	public DocumentModelList query(String query) throws ClientException {
+	public DocumentModelList query(String query) throws ClientException, DocumentException {
+		query = localizeTimestamps(query);
 		logQuery(query);
 		return repoSession.query(query);
 	}
 	
 	@Override
-	public DocumentModelList query(String query, LifeCycleFilter workflowStateFilter) {
+	public DocumentModelList query(String query, LifeCycleFilter workflowStateFilter) throws DocumentException {
+		query = localizeTimestamps(query);
 		return repoSession.query(query, workflowStateFilter);
 	}
 

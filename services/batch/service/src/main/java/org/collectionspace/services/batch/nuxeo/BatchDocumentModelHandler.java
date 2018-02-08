@@ -39,7 +39,7 @@ import org.collectionspace.services.authorization.URIResourceImpl;
 import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
-import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
+import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 import org.collectionspace.services.batch.BatchCommon;
 import org.collectionspace.services.batch.BatchCommon.ForDocTypes;
 import org.collectionspace.services.batch.BatchCommon.ForRoles;
@@ -222,7 +222,7 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 		CoreSessionInterface repoSession = null;
 		boolean releaseRepoSession = false;
 
-		RepositoryClientImpl repoClient = (RepositoryClientImpl) this.getRepositoryClient(ctx);
+		NuxeoRepositoryClientImpl repoClient = (NuxeoRepositoryClientImpl) this.getRepositoryClient(ctx);
 		if (repoSession == null) {
 			repoSession = repoClient.getRepositorySession(ctx);
 			releaseRepoSession = true;

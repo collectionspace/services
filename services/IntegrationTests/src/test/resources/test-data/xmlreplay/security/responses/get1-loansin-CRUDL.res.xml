@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:permission xmlns:ns2="http://collectionspace.org/services/authorization/perms" csid="1-loansin-CRUDL">
+    <description>Generated admin permission.</description>
+    <resourceName>loansin</resourceName>
+    <actionGroup>CRUDL</actionGroup>
+    <action>
+        <name>CREATE</name>
+        <objectIdentity>1011301984</objectIdentity>
+        <objectIdentityResource>1:loansin#create</objectIdentityResource>
+    </action>
+    <action>
+        <name>READ</name>
+        <objectIdentity>1927741434</objectIdentity>
+        <objectIdentityResource>1:loansin#read</objectIdentityResource>
+    </action>
+    <action>
+        <name>UPDATE</name>
+        <objectIdentity>1524749869</objectIdentity>
+        <objectIdentityResource>1:loansin#update</objectIdentityResource>
+    </action>
+    <action>
+        <name>DELETE</name>
+        <objectIdentity>1028137743</objectIdentity>
+        <objectIdentityResource>1:loansin#delete</objectIdentityResource>
+    </action>
+    <action>
+        <name>SEARCH</name>
+        <objectIdentity>1457259276</objectIdentity>
+        <objectIdentityResource>1:loansin#search</objectIdentityResource>
+    </action>
+    <effect>PERMIT</effect>
+    <metadataProtection>immutable</metadataProtection>
+    <actionsProtection>immutable</actionsProtection>
+    <tenant_id>1</tenant_id>
+</ns2:permission>
+
+

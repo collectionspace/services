@@ -256,9 +256,10 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 
         // Submit the request to the service and store the response.
     	CollectionSpaceClient client = this.getClientInstance();
-        Response res = client.read(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
+        Response res = null;
         try {
+            res = client.read(NON_EXISTENT_ID);
+            int statusCode = res.getStatus();
             // Check the status code of the response: does it match
             // the expected response(s)?
             if (logger.isDebugEnabled()) {
@@ -268,7 +269,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
-            res.close();
+            if (res != null) res.close();
         }
     }
 

@@ -92,7 +92,7 @@ import org.collectionspace.services.blob.MeasuredPartGroupList;
 import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
-import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
+import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 import org.collectionspace.services.nuxeo.extension.thumbnail.ThumbnailConstants;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.config.service.ListResultField;
@@ -633,7 +633,7 @@ public class NuxeoBlobUtils {
 	static private CoreSessionInterface getRepositorySession(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
 			RepositoryClient<PoxPayloadIn, PoxPayloadOut> repositoryClient) {
 		CoreSessionInterface result = null;		
-		RepositoryClientImpl nuxeoClient = (RepositoryClientImpl)repositoryClient;
+		NuxeoRepositoryClientImpl nuxeoClient = (NuxeoRepositoryClientImpl)repositoryClient;
 		
 		try {
 			result = nuxeoClient.getRepositorySession(ctx);
@@ -647,7 +647,7 @@ public class NuxeoBlobUtils {
 	static private void releaseRepositorySession(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
 			RepositoryClient<PoxPayloadIn, PoxPayloadOut> repositoryClient,
 			CoreSessionInterface repoSession) throws TransactionException {
-		RepositoryClientImpl nuxeoClient = (RepositoryClientImpl)repositoryClient;
+		NuxeoRepositoryClientImpl nuxeoClient = (NuxeoRepositoryClientImpl)repositoryClient;
 		nuxeoClient.releaseRepositorySession(ctx, repoSession);
 	}
 	

@@ -104,7 +104,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
     private final static String TENANT_2_USER = "user2@museum2.org";
     private final static String TENANT_1 = "1";
     private final static String TENANT_2 = "2";
-    private final static String TEST_ROLE_NAME = "ROLE_TEST_REGISTRAR";
+    private final static String TEST_ROLE_NAME = "xROLE_TEST_REGISTRAR";
     private final static String TEST_SERVICE_A = "dimensions";
 
     // Instance variables specific to this test.

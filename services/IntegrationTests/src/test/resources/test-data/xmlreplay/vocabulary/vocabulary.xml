@@ -3,20 +3,554 @@
 	<auths>
 		<!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
 		<auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
-		<auth ID="testAdministator">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
+	    <auth ID="admin@testsci.collectionspace.org">YWRtaW5AdGVzdHNjaS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
 	</auths>
-	<testGroup ID="TestOrder" autoDeletePOSTS="true">
-		<!-- The purpose of this testGroup is to test the new "order" field
-	      that was added in http://issues.collectionspace.org/browse/CSPACE-573
-	      and to ensure that this order field is returned in list results, 
-	      and that duplicate values for the order field is accepted.
-	    -->
-		<test ID="Vocabulary1" auth="test">
+    
+    <!--
+        Test adding to a vocabulary's terms with an entirely new set of terms.
+    -->
+    <testGroup ID="UpdateAddSoftDeleteVocabItems" autoDeletePOSTS="true" authForCleanup="admin@testsci.collectionspace.org">
+        <test ID="createUpdateAddSoftDeleteVocabItems" auth="admin@testsci.collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/</uri>
+            <filename>vocabulary/vocab-Template.xml</filename>
+        </test>
+        <test ID="createItem101">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createUpdateAddSoftDeleteVocabItems.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">1</var>
+            </vars>
+        </test>
+        <test ID="createItem201">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createUpdateAddSoftDeleteVocabItems.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">2</var>
+            </vars>
+        </test>
+        <test ID="createItem301">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createUpdateAddSoftDeleteVocabItems.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">3</var>
+            </vars>
+        </test>
+        <test ID="updateUpdateAddSoftDeleteVocabItems" auth="admin@testsci.collectionspace.org">
+            <method>PUT</method>
+            <uri>/cspace-services/vocabularies/${createUpdateAddSoftDeleteVocabItems.CSID}?omittedItemAction=softdelete</uri>
+            <filename>vocabulary/UpdateAddSoftDeleteVocabItems/updateAddSoftDeleteWithItems-vocab.xml</filename>
+        </test>
+        <test ID="getUpdateAddSoftDeleteVocabItems">
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies/${createUpdateAddSoftDeleteVocabItems.CSID}?showItems=true</uri>
+            <response>
+                <vars>
+                    <var ID="csid">${createUpdateAddSoftDeleteVocabItems.CSID}</var>
+                </vars>
+                <expected level="ADDOK" />
+                <filename>vocabulary/UpdateAddSoftDeleteVocabItems/responses/updateAddSoftDeleteVocabItems.res.xml</filename>
+            </response>            
+        </test>
+    </testGroup>
+    
+    <!--
+        Test adding to a vocabulary's terms with an entirely new set of terms.
+    -->
+    <testGroup ID="UpdateAddOnlyVocabItems" autoDeletePOSTS="true" authForCleanup="admin@testsci.collectionspace.org">
+        <test ID="createUpdateAddOnlyVocabItems" auth="admin@testsci.collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/</uri>
+            <filename>vocabulary/vocab-Template.xml</filename>
+        </test>
+        <test ID="createItem101">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createUpdateAddOnlyVocabItems.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">1</var>
+            </vars>
+        </test>
+        <test ID="createItem201">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createUpdateAddOnlyVocabItems.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">2</var>
+            </vars>
+        </test>
+        <test ID="createItem301">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createUpdateAddOnlyVocabItems.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">3</var>
+            </vars>
+        </test>
+        <test ID="updateUpdateAddOnlyVocabItems" auth="admin@testsci.collectionspace.org">
+            <method>PUT</method>
+            <uri>/cspace-services/vocabularies/${createUpdateAddOnlyVocabItems.CSID}</uri>
+            <filename>vocabulary/UpdateAddOnlyVocabItems/updateAddOnlyWithItems-vocab.xml</filename>
+        </test>
+        <test ID="getUpdateAddOnlyVocabItems">
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies/${createUpdateAddOnlyVocabItems.CSID}?showItems=true</uri>
+            <response>
+                <vars>
+                    <var ID="csid">${createUpdateAddOnlyVocabItems.CSID}</var>
+                </vars>
+                <expected level="ADDOK" />
+                <filename>vocabulary/UpdateAddOnlyVocabItems/responses/updateAddOnlyVocabItems.res.xml</filename>
+            </response>            
+        </test>
+    </testGroup>
+    
+    <!--
+        Test replace a vocabulary's terms with an entirely new set of terms.
+    -->
+    <testGroup ID="ReplaceVocabItems" autoDeletePOSTS="true" authForCleanup="admin@testsci.collectionspace.org">
+        <test ID="createReplaceVocabItems" auth="admin@testsci.collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/</uri>
+            <filename>vocabulary/vocab-Template.xml</filename>
+        </test>
+        <test ID="createItem101">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createReplaceVocabItems.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">1</var>
+            </vars>
+        </test>
+        <test ID="createItem201">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createReplaceVocabItems.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">2</var>
+            </vars>
+        </test>
+        <test ID="createItem301">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createReplaceVocabItems.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">3</var>
+            </vars>
+        </test>
+        <test ID="updateReplaceVocabItems" auth="admin@testsci.collectionspace.org">
+            <method>PUT</method>
+            <uri>/cspace-services/vocabularies/${createReplaceVocabItems.CSID}?omittedItemAction=delete</uri>
+            <filename>vocabulary/ReplaceVocabItems/replaceWithItems-vocab.xml</filename>
+        </test>
+        <test ID="getReplaceVocabItems">
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies/${createReplaceVocabItems.CSID}?showItems=true</uri>
+            <response>
+                <vars>
+                    <var ID="csid">${createReplaceVocabItems.CSID}</var>
+                </vars>
+                <expected level="ADDOK" />
+                <filename>vocabulary/ReplaceVocabItems/responses/replaceVocabItems.res.xml</filename>
+            </response>            
+        </test>
+    </testGroup>
+    
+    <!--
+        Test replace a vocabulary's terms with an entirely new set of terms.
+    -->
+    <testGroup ID="UpdateAddDeleteVocabItems" autoDeletePOSTS="true" authForCleanup="admin@testsci.collectionspace.org">
+        <test ID="createUpdateAddDeleteVocabItems" auth="admin@testsci.collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/</uri>
+            <filename>vocabulary/vocab-Template.xml</filename>
+        </test>
+        <test ID="createItem101">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createUpdateAddDeleteVocabItems.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">1</var>
+            </vars>
+        </test>
+        <test ID="createItem201">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createUpdateAddDeleteVocabItems.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">2</var>
+            </vars>
+        </test>
+        <test ID="createItem301">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createUpdateAddDeleteVocabItems.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">3</var>
+            </vars>
+        </test>
+        <test ID="updateUpdateAddDeleteVocabItems" auth="admin@testsci.collectionspace.org">
+            <method>PUT</method>
+            <uri>/cspace-services/vocabularies/${createUpdateAddDeleteVocabItems.CSID}?omittedItemAction=delete</uri>
+            <filename>vocabulary/UpdateAddDeleteVocabItems/updateAddDeleteWithItems-vocab.xml</filename>
+            <vars>
+                <var ID="item301csid">${createItem301.CSID}</var>
+            </vars>
+        </test>
+        <test ID="getUpdateAddDeleteVocabItems">
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies/${createUpdateAddDeleteVocabItems.CSID}?showItems=true</uri>
+            <response>
+                <vars>
+                    <var ID="csid">${createUpdateAddDeleteVocabItems.CSID}</var>
+                </vars>
+                <expected level="ADDOK" />
+                <filename>vocabulary/UpdateAddDeleteVocabItems/responses/updateAddDeleteVocabItems.res.xml</filename>
+            </response>            
+        </test>
+    </testGroup>    
+    
+    <testGroup ID="DeleteVocabJustItems" autoDeletePOSTS="true" authForCleanup="admin@testsci.collectionspace.org">
+        <test ID="createEmptyVocab100" auth="admin@testsci.collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/</uri>
+            <filename>vocabulary/vocab-Template.xml</filename>
+        </test>
+        <test ID="createItem10">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocab100.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">1</var>
+            </vars>
+        </test>
+        <test ID="createItem20">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocab100.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">2</var>
+            </vars>
+        </test>
+        <test ID="createItem30">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocab100.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">3</var>
+            </vars>
+        </test>
+        <test ID="deleteEmptyVocab100">
+            <method>DELETE</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocab100.CSID}/items</uri>
+        </test>
+        <test ID="getEmptyVocab100">
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocab100.CSID}</uri>
+        </test>
+        <test ID="getEmptyVocab100Items">
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocab100.CSID}?showItems=true</uri>
+            <response>
+                <vars>
+                    <var ID="csid">${createEmptyVocab100.CSID}</var>
+                </vars>
+                <expected level="ADDOK" />
+                <label>vocabularies_common</label>
+                <filename>vocabulary/DeleteVocabJustItems/responses/DeleteVocabJustItems.res.xml</filename>
+            </response>            
+        </test>
+    </testGroup>
+    
+    <!--
+        Test trying to delete an authority (and its terms) when one or more of its terms
+        is being reference in another record.
+        
+        1. Create a new authority and add 3 items to it.
+        2. Create an ObjectExit record referencing one of the items
+        3. Try to delete the authority (should fail)
+        4. Delete the ObjectExit record.
+        5. Delete to the authority (should work now).
+    -->
+    <testGroup ID="DeleteVocabWithReferencedItem" autoDeletePOSTS="true">
+        <test ID="createEmptyVocab" auth="admin@testsci.collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/</uri>
+            <filename>vocabulary/vocab-Template.xml</filename>
+        </test>
+        <test ID="createItem1">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocab.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">1</var>
+            </vars>
+        </test>
+        <test ID="createItem2">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocab.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">2</var>
+            </vars>
+        </test>
+        <test ID="createItem3">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocab.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">3</var>
+            </vars>
+        </test>
+        <test ID="createObjectExit">
+            <method>POST</method>
+            <uri>/cspace-services/objectexit</uri>
+            <filename>vocabulary/DeleteVocabWithItems/objectExit.xml</filename>
+            <vars>
+                <var ID="exitNumber">2</var>
+                <var ID="itemRefName">urn:cspace:testsci.collectionspace.org:vocabularies:name(createEmptyVocab):item:name(createItem2)'createItem2'</var>                
+            </vars>
+        </test>        
+        <test ID="deleteEmptyVocab">
+            <expectedCodes>409</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocab.CSID}</uri>
+        </test>
+        <test ID="deleteObjectExit">
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/${createObjectExit.CSID}</uri>
+        </test>
+        <test ID="deleteEmptyVocab">
+            <method>DELETE</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocab.CSID}</uri>
+        </test>
+        <test ID="getEmptyVocab">
+            <expectedCodes>404</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocab.CSID}</uri>
+        </test>
+    </testGroup>
+    
+    <!--
+        1. Create a new vocabulary.
+        2. Add three terms to it.
+        3. Delete the vocabulary (all items should automatically get deleted as well)
+        4. Try to get the deleted vocabulary (expect a 404)
+    -->
+    <testGroup ID="DeleteVocabWithItems" autoDeletePOSTS="false">
+        <test ID="createEmptyVocab" auth="admin@core.collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/</uri>
+            <filename>vocabulary/vocab-Template.xml</filename>
+        </test>
+        <test ID="createItem1">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocab.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">1</var>
+            </vars>
+        </test>
+        <test ID="createItem2">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocab.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">2</var>
+            </vars>
+        </test>
+        <test ID="createItem3">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocab.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">3</var>
+            </vars>
+        </test>
+        <test ID="deleteEmptyVocab">
+            <method>DELETE</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocab.CSID}</uri>
+        </test>
+        <test ID="getEmptyVocab">
+            <expectedCodes>404</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocab.CSID}</uri>
+        </test>
+    </testGroup>
+        
+    <!--
+	   Test creation of Vocabulary (TermList) that includes (via an abstract-common-list element) term items.
+	-->
+    <testGroup ID="PostWithItems" autoDeletePOSTS="true">
+        <test ID="createPostWithItems">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/</uri>
+            <filename>vocabulary/PostWithItems/postWithItems-vocab.xml</filename>            
+        </test>
+        <test ID="Item4">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createPostWithItems.CSID}/items/</uri>
+            <filename>vocabulary/PostWithItems/vocab-Item-no-shortid.xml</filename>
+            <vars>
+                <var ID="order">4</var>
+                <var ID="displayName">TestOrder item ${itemID} order ${order}</var>
+            </vars>
+        </test>
+    </testGroup>
+    
+    <!--
+        This test group tests the "showItems" query param that can be sent to the /vocabularies/${id} endpoint.
+        The "showItems=true" query param adds all the vocabularies items to the returned payload.
+    -->
+    <testGroup ID="ShowItems" autoDeletePOSTS="true">
+        <test ID="createShowItemsVocab">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/</uri>
+            <filename>vocabulary/ShowItems/showItems-vocab.xml</filename>
+        </test>
+        <test ID="searchShowItemsVocab">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/</uri>
+            <filename>vocabulary/ShowItems/searchItems-vocab.xml</filename>
+        </test>
+        <test ID="createItem1">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createShowItemsVocab.CSID}/items/</uri>
+            <filename>vocabulary/ShowItems/showItems-item-template.xml</filename>
+            <vars>
+                <var ID="itemID">ShowItemsItem1</var>
+                <var ID="order">1</var>
+                <var ID="displayName">ShowsItems item ${itemID}</var>
+            </vars>
+        </test>
+        <test ID="createItem2">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createShowItemsVocab.CSID}/items/</uri>
+            <filename>vocabulary/ShowItems/showItems-item-template.xml</filename>
+            <vars>
+                <var ID="itemID">ShowItemsItem2</var>
+                <var ID="order">2</var>
+                <var ID="displayName">ShowsItems item ${itemID}</var>
+            </vars>
+        </test>
+        <test ID="createItem3">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createShowItemsVocab.CSID}/items/</uri>
+            <filename>vocabulary/ShowItems/showItems-item-template.xml</filename>
+            <vars>
+                <var ID="itemID">ShowItemsItem3</var>
+                <var ID="order">3</var>
+                <var ID="displayName">ShowsItems item ${itemID}</var>
+            </vars>
+        </test>
+        <test ID="getShowItemsVocab">
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies/${createShowItemsVocab.CSID}</uri>
+            <response>
+                <vars>
+                    <var ID="csid">${createShowItemsVocab.CSID}</var>
+                </vars>
+                <expected level="ADDOK" />
+                <label>vocabularies_common</label>
+                <filename>vocabulary/ShowItems/responses/showVocab.res.xml</filename>
+            </response>
+        </test>
+        <test ID="getShowItemsVocabWithItems">
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies/${createShowItemsVocab.CSID}?showItems=true</uri>
+            <response>
+                <vars>
+                    <var ID="pgSz">2500</var>
+                    <var ID="itemsInPage">3</var>
+                    <var ID="totalItems">3</var>
+                    <var ID="csid">${createShowItemsVocab.CSID}</var>
+                    <var ID="createItem1">${createItem1.CSID}</var>
+                    <var ID="createItem2">${createItem2.CSID}</var>
+                    <var ID="createItem3">${createItem3.CSID}</var>
+                </vars>
+                <expected level="ADDOK" />
+                <filename>vocabulary/ShowItems/responses/showVocabWithItems.res.xml</filename>
+            </response>
+        </test>
+        <test ID="getShowItemsVocabWithItemsPaged">
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies/${createShowItemsVocab.CSID}?showItems=true&amp;pgSz=2</uri>
+            <response>
+                <vars>
+                    <var ID="pgSz">2</var>
+                    <var ID="itemsInPage">2</var>
+                    <var ID="totalItems">3</var>
+                    <var ID="csid">${createShowItemsVocab.CSID}</var>
+                    <var ID="createItem1">${createItem1.CSID}</var>
+                    <var ID="createItem2">${createItem2.CSID}</var>
+                    <var ID="createItem3">${createItem3.CSID}</var>
+                </vars>
+                <expected level="ADDOK" />
+                <filename>vocabulary/ShowItems/responses/showVocabWithItemsPaged.res.xml</filename>
+            </response>
+        </test>
+        <test ID="getShowItemsVocabWithItemsLastPage">
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies/${createShowItemsVocab.CSID}?showItems=true&amp;pgSz=2&amp;pgNum=1</uri>
+            <response>
+                <vars>
+                    <var ID="pgSz">2</var>
+                    <var ID="itemsInPage">1</var>
+                    <var ID="totalItems">3</var>
+                    <var ID="csid">${createShowItemsVocab.CSID}</var>
+                    <var ID="createItem1">${createItem1.CSID}</var>
+                    <var ID="createItem2">${createItem2.CSID}</var>
+                    <var ID="createItem3">${createItem3.CSID}</var>
+                </vars>
+                <expected level="ADDOK" />
+                <filename>vocabulary/ShowItems/responses/showVocabWithLastPage.res.xml</filename>
+            </response>
+        </test>
+        <test ID="SearchVocabulariesAdvancedSearch">
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies?as=(vocabularies_common:displayName+ILIKE+%22%25SearchItems%25%22)</uri>
+            <response>
+                <vars>
+                    <var ID="itemsInPage">1</var>
+                    <var ID="totalItems">1</var>
+                    <var ID="csid">${searchShowItemsVocab.CSID}</var>
+                </vars>
+                <expected level="ADDOK" />
+                <filename>vocabulary/ShowItems/responses/searchVocabularyAdvancedSearch.res.xml</filename>
+            </response>
+        </test>
+        <test ID="SearchVocabularyItemsAdvancedSearch">
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies/${createShowItemsVocab.CSID}/items?as=(vocabularyitems_common:displayName+ILIKE+%22%ShowItemsItem2%25%22)</uri>
+            <response>
+                <vars>
+                    <var ID="itemsInPage">1</var>
+                    <var ID="totalItems">1</var>
+                    <var ID="csid">${createShowItemsVocab.CSID}</var>
+                    <var ID="createItem2">${createItem2.CSID}</var>
+                </vars>
+                <expected level="ADDOK" />
+                <filename>vocabulary/ShowItems/responses/searchVocabularyItemsAdvancedSearch.res.xml</filename>
+            </response>
+        </test>
+    </testGroup>
+	
+    <!--
+        The purpose of this testGroup is to test the new "order" field
+	    that was added in http://issues.collectionspace.org/browse/CSPACE-573
+	    and to ensure that this order field is returned in list results, 
+	    and that duplicate values for the order field is accepted.
+    -->
+    <testGroup ID="TestOrder" autoDeletePOSTS="true">
+		<test ID="Vocabulary1">
 			<method>POST</method>
 			<uri>/cspace-services/vocabularies/</uri>
 			<filename>vocabulary/1-vocab.xml</filename>
 		</test>
-		<test ID="Item1" auth="test">
+		<test ID="Item1">
 			<method>POST</method>
 			<uri>/cspace-services/vocabularies/${Vocabulary1.CSID}/items/</uri>
 			<filename>vocabulary/2-item.xml</filename>
@@ -26,7 +560,7 @@
 				<var ID="displayName">TestOrder item ${itemID} order ${order}</var>
 			</vars>
 		</test>
-		<test ID="Item2" auth="test">
+		<test ID="Item2">
 			<method>POST</method>
 			<uri>/cspace-services/vocabularies/${Vocabulary1.CSID}/items/</uri>
 			<filename>vocabulary/2-item.xml</filename>
@@ -36,7 +570,7 @@
 				<var ID="displayName">TestOrder item ${itemID} order ${order}</var>
 			</vars>
 		</test>
-		<test ID="Item3DupeOrder" auth="test">
+		<test ID="Item3DupeOrder">
 			<method>POST</method>
 			<uri>/cspace-services/vocabularies/${Vocabulary1.CSID}/items/</uri>
 			<filename>vocabulary/2-item.xml</filename>
@@ -47,17 +581,17 @@
 			</vars>
 		</test>
 
-		<test ID="GetVocabularies" auth="admin@core.collectionspace.org">
+		<test ID="GetVocabularies">
 			<method>GET</method>
 			<uri>/cspace-services/vocabularies/</uri>
 		</test>
 
-		<test ID="GetVocabularyItems" auth="admin@core.collectionspace.org">
+		<test ID="GetVocabularyItems">
 			<method>GET</method>
 			<uri>/cspace-services/vocabularies/${Vocabulary1.CSID}/items/</uri>
 			<response>
 				<expected level="ADDOK"/>
-				<filename>vocabulary/res/GetVocabularyItems.res.xml</filename>
+				<filename>vocabulary/responses/GetVocabularyItems.res.xml</filename>
 				<vars>
 					<var ID="I3displayName">${Item3DupeOrder.displayName}</var>
 				</vars>
@@ -65,12 +599,12 @@
 			</response>
 		</test>
 
-		<test ID="GetVocabularyItem" auth="admin@core.collectionspace.org">
+		<test ID="GetVocabularyItem">
 			<method>GET</method>
 			<uri>/cspace-services/vocabularies/${Vocabulary1.CSID}/items/${Item1.CSID}</uri>
 		</test>
 
-		<test ID="GetVocabularyItemRefObjs" auth="admin@core.collectionspace.org">
+		<test ID="GetVocabularyItemRefObjs">
 			<method>GET</method>
 			<uri>/cspace-services/vocabularies/${Vocabulary1.CSID}/items/${Item1.CSID}/refObjs</uri>
 		</test>

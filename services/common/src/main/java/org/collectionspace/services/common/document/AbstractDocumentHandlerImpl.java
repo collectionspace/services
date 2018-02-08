@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
  * @param <WT> 
  * @param <WTL> 
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
         implements DocumentHandler<T, TL, WT, WTL> {
 
@@ -77,7 +78,7 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#getServiceContext()
      */
-    @Override
+	@Override
     public ServiceContext getServiceContext() {
         return serviceContext;
     }
@@ -265,6 +266,14 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
         
         return result;
     }
+    
+    @Override
+	public void sanitize(DocumentWrapper<WT> wrapDoc) {
+    	//
+    	// By default, do nothing.  Sub-classes can override if they want to.
+    	//
+    }
+
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#handleCreate(org.collectionspace.services.common.document.DocumentWrapper)
@@ -311,7 +320,7 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#complete(org.collectionspace.services.common.document.DocumentHandler.Action, org.collectionspace.services.common.document.DocumentWrapper)
      */
-    @Override
+	@Override
     final public void complete(Action action, DocumentWrapper<?> wrapDoc) throws Exception {
         switch (action) {
             case CREATE:

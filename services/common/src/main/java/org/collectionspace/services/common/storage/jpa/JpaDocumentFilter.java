@@ -76,9 +76,9 @@ public class JpaDocumentFilter extends DocumentFilter {
     protected String addTenant(boolean append, List<ParamBinding> paramList) {
         String whereClause = "";
         if (!append) {
-            whereClause = " WHERE tenantId = :tenantId";
+            whereClause = " WHERE a.tenantId = :tenantId";
         } else {
-            whereClause = " AND tenantId = :tenantId";
+            whereClause = " AND a.tenantId = :tenantId";
         }
         paramList.add(new ParamBinding("tenantId", getTenantId()));
         return whereClause;

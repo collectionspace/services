@@ -36,7 +36,7 @@ import org.collectionspace.services.common.init.AddIndices;
 import org.collectionspace.services.common.init.IInitHandler;
 import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.common.storage.JDBCTools;
-
+import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.config.service.InitHandler.Params.Field;
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.ServiceConfig;
@@ -238,19 +238,23 @@ public class ServiceMain {
         // Create all the tenant records, default user accounts, roles, and permissions.  Since some of our "cspace" database config files
         // for Spring need to be created at build time, the "cspace" database already will be suffixed with the
         // correct 'cspaceInstanceId' so we don't need to pass it to the JDBCTools methods.
-        //        
+        //
+		JPATransactionContext jpaTransactionContext = new JPATransactionContext();
 		try {
+			jpaTransactionContext.beginTransaction();
 			DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType(JDBCTools.CSPACE_DATASOURCE_NAME,
 					cspaceDatabaseName);    	
-
 			AuthorizationCommon.createTenants(tenantBindingConfigReader, databaseProductType, cspaceDatabaseName);
-			AuthorizationCommon.createDefaultWorkflowPermissions(tenantBindingConfigReader, databaseProductType, cspaceDatabaseName);
+			AuthorizationCommon.createDefaultWorkflowPermissions(jpaTransactionContext, tenantBindingConfigReader, databaseProductType, cspaceDatabaseName);
 			AuthorizationCommon.createDefaultAccounts(tenantBindingConfigReader, databaseProductType, cspaceDatabaseName);
 			AuthorizationCommon.persistTenantBindingsMD5Hash(tenantBindingConfigReader, databaseProductType, cspaceDatabaseName);
+			jpaTransactionContext.commitTransaction();
 		} catch (Exception e) {
 			logger.error("Default create/update of tenants, accounts, roles and permissions setup failed with exception(s): " +
 					e.getLocalizedMessage(), e);
 			throw e;
+		} finally {
+			jpaTransactionContext.close();
 		}
 		//
 		// Log tenant status -shows all tenants' info and active status.

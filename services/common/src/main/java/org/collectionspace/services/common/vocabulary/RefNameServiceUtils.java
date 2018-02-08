@@ -68,7 +68,7 @@ import org.collectionspace.services.common.relation.RelationUtils;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
-import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
+import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -406,7 +406,7 @@ public class RefNameServiceUtils {
         Map<String, ServiceBindingType> queriedServiceBindings = new HashMap<String, ServiceBindingType>();
         Map<String, List<AuthRefConfigInfo>> authRefFieldsByService = new HashMap<String, List<AuthRefConfigInfo>>();
 
-        RepositoryClientImpl nuxeoRepoClient = (RepositoryClientImpl) repoClient;
+        NuxeoRepositoryClientImpl nuxeoRepoClient = (NuxeoRepositoryClientImpl) repoClient;
         try {
             // Ignore any provided page size and number query parameters in
             // the following call, as they pertain to the list of authority
@@ -563,7 +563,7 @@ public class RefNameServiceUtils {
         final String ORDER_BY_VALUE = CollectionSpaceClient.CORE_CREATED_AT  // "collectionspace_core:createdAt";
                                           + ", " + IQueryManager.NUXEO_UUID; // CSPACE-6333: Add secondary sort on uuid, in case records have the same createdAt timestamp.
 
-        if (repoClient instanceof RepositoryClientImpl == false) {
+        if (repoClient instanceof NuxeoRepositoryClientImpl == false) {
             throw new InternalError("updateAuthorityRefDocs() called with unknown repoClient type!");
         }
         
@@ -598,7 +598,7 @@ public class RefNameServiceUtils {
                 		queriedServiceBindings, authRefFieldsByService, // Perform the refName updates on the list of document models
                         newRefName);
                 if (nRefsFoundThisPage > 0) {
-                    ((RepositoryClientImpl) repoClient).saveDocListWithoutHandlerProcessing(ctx, repoSession, docList, true); // Flush the document model list out to Nuxeo storage
+                    ((NuxeoRepositoryClientImpl) repoClient).saveDocListWithoutHandlerProcessing(ctx, repoSession, docList, true); // Flush the document model list out to Nuxeo storage
                     nRefsFound += nRefsFoundThisPage;
                 }
 
@@ -675,7 +675,7 @@ public class RefNameServiceUtils {
             query += " AND " + whereClauseAdditions;
         }
         // Now we have to issue the search
-        RepositoryClientImpl nuxeoRepoClient = (RepositoryClientImpl) repoClient;
+        NuxeoRepositoryClientImpl nuxeoRepoClient = (NuxeoRepositoryClientImpl) repoClient;
         DocumentWrapper<DocumentModelList> docListWrapper = nuxeoRepoClient.findDocs(ctx, repoSession,
                 docTypes, query, orderByClause, pageSize, pageNum, computeTotal);
         // Now we gather the info for each document into the list and return

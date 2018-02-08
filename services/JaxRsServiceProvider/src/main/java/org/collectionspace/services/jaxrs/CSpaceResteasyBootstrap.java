@@ -83,6 +83,8 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
     	for (TenantBindingType tenantBindings : tenantBindingsTable.values()) {
 			CSpaceTenant tenant = new CSpaceTenant(tenantBindings.getId(), tenantBindings.getName());
 			if (shouldInitializeAuthorities(tenant, reset) == true) {
+				logger.log(Level.INFO, String.format("Initializing vocabularies and authorities of tenant '%s'.",
+						tenant.getId()));
 	    		for (ServiceBindingType serviceBinding : tenantBindings.getServiceBindings()) {
 	    			AuthorityInstanceList element = serviceBinding.getAuthorityInstanceList();
 	    			if (element != null && element.getAuthorityInstance() != null) {
@@ -181,7 +183,7 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 			logger.log(Level.FINE, String.format("Authority of type '%s' with the short ID of '%s' existed already.",
 					serviceName, authorityInstance.getTitleRef()));
 		} else if (status == Response.Status.CREATED.getStatusCode()) {
-			logger.log(Level.INFO, String.format("Created a new authority of type '%s' with the short ID of '%s'.",
+			logger.log(Level.FINE, String.format("Created a new authority of type '%s' with the short ID of '%s'.",
 					serviceName, authorityInstance.getTitleRef()));
 		} else {
 			logger.log(Level.WARNING, String.format("Unknown status '%d' encountered when creating or fetching authority of type '%s' with the short ID of '%s'.",
@@ -233,8 +235,8 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 	    		String xmlPayload = client.createAuthorityItemInstance(termShortId, termDisplayName);
 	    		try {
 	    			authorityResource.createAuthorityItem(resourceMap, null, authoritySpecifier, xmlPayload);
-	    			logger.log(Level.FINE, String.format("Created a new term '%s:%s' in the authority of type '%s' with the short ID of '%s'.",
-	    					termDisplayName, termShortId, serviceName, authorityInstance.getTitleRef()));
+	    			logger.log(Level.FINE, String.format("Tenant:%s:Created a new term '%s:%s' in the authority of type '%s' with the short ID of '%s'.",
+	    					tenant.getName(), termDisplayName, termShortId, serviceName, authorityInstance.getTitleRef()));
 	    		} catch (CSWebApplicationException e) {
 	    			response = e.getResponse();
 	    			status = response.getStatus();

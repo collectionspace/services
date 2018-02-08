@@ -2,7 +2,7 @@
 <xs:schema 
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-    jaxb:version="1.0" elementFormDefault="unqualified"
+    jaxb:version="2.1" elementFormDefault="unqualified"
     xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
     xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
     xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
@@ -37,14 +37,6 @@
 		</xs:appinfo>
 	</xs:annotation>
     
-    <!--
-    Notes for MySQL
-    MySQL puts key length limit of 1000 bytes
-    username - rolename constraint should be within 1000 bytes
-    hbm2ddl makes column length >= 256 as long text, such as column cannot be used
-    in defining a key (pk, fk or constraint)
-    -->
-
     <xs:element name="role" type="role"/>
     <!-- role type has a name so that it could be referred from roles_list -->
     <xs:complexType name="role">
