@@ -62,7 +62,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
-import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
+import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.dom4j.Element;
 import org.nuxeo.ecm.core.api.ClientException;
@@ -252,7 +252,8 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     }
 
     /**
-     * This method should only be used as part of a SAS synch operation.
+     * This method should ***only*** be used as part of a SAS synch operation.
+     * 
      * @param ctx
      * @param refNameList
      * @return
@@ -735,7 +736,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         CoreSessionInterface repoSession = null;
         boolean releaseSession = false;
 
-    	RepositoryClientImpl nuxeoRepoClient = (RepositoryClientImpl)this.getRepositoryClient(ctx);
+    	NuxeoRepositoryClientImpl nuxeoRepoClient = (NuxeoRepositoryClientImpl)this.getRepositoryClient(ctx);
         try {
         	repoSession = nuxeoRepoClient.getRepositorySession(ctx);
             DocumentWrapper<DocumentModel> wrapDoc = nuxeoRepoClient.getDocFromCsid(ctx, repoSession, authCSID);

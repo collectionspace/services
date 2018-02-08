@@ -32,6 +32,7 @@
             <artifactId>org.collectionspace.services.collectionobject.jaxb</artifactId>
             <version>${project.version}</version>
         </dependency>
+        
         <!-- External dependencies -->
         <dependency>
             <groupId>junit</groupId>

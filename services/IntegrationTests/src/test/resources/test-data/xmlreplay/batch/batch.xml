@@ -6,7 +6,7 @@
 	    <auth ID="bigbird@cspace.org">YmlnYmlyZEBjc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
 	</auths>
 	
-	<testGroup ID="testPermissionsAndRoles" autoDeletePOSTS="true">
+    <testGroup ID="testPermissionsAndRoles" autoDeletePOSTS="true" authForCleanup="admin@core.collectionspace.org">
 	    <!-- 
 	       Setup accounts, roles, and permissions for tests.
 	    -->
@@ -82,18 +82,18 @@
 	    </test>
 	</testGroup>
 	
-	<testGroup ID="testSingle" autoDeletePOSTS="true">
-	    <test ID="TestCreateAndLinkLoanOutBatchJob" auth="test">
+    <testGroup ID="testSingle" autoDeletePOSTS="true" authForCleanup="admin@core.collectionspace.org">
+	    <test ID="TestCreateAndLinkLoanOutBatchJob">
 			<method>POST</method>
 			<uri>/cspace-services/batch/</uri>
 		    <filename>batch/TestCreateAndLinkLoanOutBatchJob.xml</filename>
 		</test>
-		<test ID="createCollObj1" auth="test">
+		<test ID="createCollObj1">
 			<method>POST</method>
 			<uri>/cspace-services/collectionobjects/</uri>
 			<filename>batch/collObj1.xml</filename>
 		</test>
-		<test ID="testInvokeSingle" auth="test" autoDeletePOSTS="false">
+		<test ID="testInvokeSingle" autoDeletePOSTS="false">
 			<method>POST</method>
 		    <uri>/cspace-services/batch/${TestCreateAndLinkLoanOutBatchJob.CSID}</uri>
 		    <filename>batch/batch-invoke-single.xml</filename>
@@ -101,7 +101,7 @@
 				<var ID="CollObj1">${createCollObj1.CSID}</var>
 			</vars>
 		</test>
-		<test ID="testInvokeList" auth="test" autoDeletePOSTS="false">
+		<test ID="testInvokeList" autoDeletePOSTS="false">
 			<method>POST</method>
 			<uri>/cspace-services/batch/${TestCreateAndLinkLoanOutBatchJob.CSID}</uri>
 		    <filename>batch/batch-invoke-list.xml</filename>
@@ -109,7 +109,7 @@
 				<var ID="CollObj1">${createCollObj1.CSID}</var>
 			</vars>
 		</test>
-		<test ID="testBadInvoke" auth="test" autoDeletePOSTS="false">
+		<test ID="testBadInvoke" autoDeletePOSTS="false">
 			<method>POST</method>
 			<expectedCodes>400</expectedCodes>
 			<uri>/cspace-services/batch/${TestCreateAndLinkLoanOutBatchJob.CSID}</uri>
@@ -118,7 +118,7 @@
 				<var ID="CollObj1">${createCollObj1.CSID}</var>
 			</vars>
 		</test>
-		<test ID="testInvokeEmptyList" auth="test" autoDeletePOSTS="false">
+		<test ID="testInvokeEmptyList" autoDeletePOSTS="false">
 			<method>POST</method>
 			<expectedCodes>400</expectedCodes>
 			<uri>/cspace-services/batch/${TestCreateAndLinkLoanOutBatchJob.CSID}</uri>
@@ -127,11 +127,11 @@
 				<var ID="CollObj1">${createCollObj1.CSID}</var>
 			</vars>
 		</test>
-		<test ID="testFilteredList1" auth="test">
+		<test ID="testFilteredList1">
 			<method>GET</method>
 			<uri>/cspace-services/batch?doctype=CollectionObject&amp;inv=single</uri>
 		</test>
-		<test ID="testFilteredList2" auth="test">
+		<test ID="testFilteredList2">
 			<method>GET</method>
 			<uri>/cspace-services/batch?doctype=Intake&amp;inv=group</uri>
 		</test>

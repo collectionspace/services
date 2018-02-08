@@ -595,28 +595,34 @@ public abstract class AbstractServiceContextImpl<IT, OT>
      */
     private DocumentHandler createDocumentHandlerInstance() throws Exception {
         docHandler = ServiceConfigUtils.createDocumentHandlerInstance(tenantBinding, serviceBinding);
+        
         //
-        // Create a default document filter
+        // The docHandler for a Service can be null, but usually is not.
         //
-        docHandler.setServiceContext(this);
-        DocumentFilter docFilter = docHandler.createDocumentFilter();
-        //
-        // If the context was created with query parameters,
-        // reflect the values of those parameters in the document filter
-        // to specify sort ordering, pagination, etc.
-        //
-        MultivaluedMap<String, String> queryParameters = this.getQueryParams();
-        if (queryParameters != null) {
-          docFilter.setSortOrder(queryParameters);
-          docFilter.setPagination(queryParameters);
-          String workflowWhereClause = buildWorkflowWhereClause(queryParameters);
-          if (workflowWhereClause != null) {
-        	  docFilter.appendWhereClause(workflowWhereClause, IQueryManager.SEARCH_QUALIFIER_AND);			
-          }            
-
+        if (docHandler != null) {
+	        //
+	        // Create a default document filter
+	        //
+	        docHandler.setServiceContext(this);
+	        DocumentFilter docFilter = docHandler.createDocumentFilter();
+	        //
+	        // If the context was created with query parameters,
+	        // reflect the values of those parameters in the document filter
+	        // to specify sort ordering, pagination, etc.
+	        //
+	        MultivaluedMap<String, String> queryParameters = this.getQueryParams();
+	        if (queryParameters != null) {
+	          docFilter.setSortOrder(queryParameters);
+	          docFilter.setPagination(queryParameters);
+	          String workflowWhereClause = buildWorkflowWhereClause(queryParameters);
+	          if (workflowWhereClause != null) {
+	        	  docFilter.appendWhereClause(workflowWhereClause, IQueryManager.SEARCH_QUALIFIER_AND);			
+	          }            
+	
+	        }
+	        docHandler.setDocumentFilter(docFilter);
         }
-        docHandler.setDocumentFilter(docFilter);
-
+        
         return docHandler;
     }
 
@@ -892,6 +898,10 @@ public abstract class AbstractServiceContextImpl<IT, OT>
 		
 		if (currentRepoSesssionRefCount == 0) {
 			this.currentRepositorySession = null;
+		}
+		
+		if (currentRepoSesssionRefCount < 0) {
+			throw new RuntimeException("Attempted to clear/close a repository session that has already been cleared/closed.");
 		}
 	}
 	

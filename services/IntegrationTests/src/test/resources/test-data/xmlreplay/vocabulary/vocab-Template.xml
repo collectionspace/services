@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Use this template to create a new vocabulary. Instances of ${Test.ID} will get substituted with the ID of the test using this template.
+-->
+<document name="vocabularies">
+    <ns3:vocabularies_common xmlns:ns3="http://collectionspace.org/services/vocabulary" xmlns:ns2="http://collectionspace.org/services/jaxb">
+        <displayName>${Test.ID} Vocabulary</displayName>
+        <shortIdentifier>${Test.ID}</shortIdentifier>
+        <vocabType>enum</vocabType>
+        <description>This is a test vocabulary for test ${Test.ID}</description>
+        <source>${Test.ID}</source>
+    </ns3:vocabularies_common>
+</document>

@@ -259,7 +259,8 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
      * may be expected to be deleted by certain tests.
      * @throws Exception 
      */
-    @AfterClass(alwaysRun = true)
+    @Override
+	@AfterClass(alwaysRun = true)
     public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
@@ -267,22 +268,30 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
             return;
         }
         logger.debug("Cleaning up temporary resources created for testing ...");
+        //
+        // First delete the referring records
+        //
+        ObjectExitClient objectexitClient = new ObjectExitClient();
+        for (String resourceId : objectexitIdsCreated) {
+            // Note: Any non-success responses are ignored and not reported.
+            objectexitClient.delete(resourceId).close();
+        }
+        //
+        // Next, delete the terms
+        //
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Delete Person resource(s) (before PersonAuthority resources).
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
             personAuthClient.deleteItem(personAuthCSID, resourceId).close();
         }
-        // Delete PersonAuthority resource(s).
+        //
+        // Lastly, delete PersonAuthority resource(s).
         // Note: Any non-success response is ignored and not reported.
+        //
         if (personAuthCSID != null) {
             personAuthClient.delete(personAuthCSID).close();
             // Delete Loans In resource(s).
-            ObjectExitClient objectexitClient = new ObjectExitClient();
-            for (String resourceId : objectexitIdsCreated) {
-                // Note: Any non-success responses are ignored and not reported.
-                objectexitClient.delete(resourceId).close();
-            }
         }
     }
 

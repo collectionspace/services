@@ -2,6 +2,7 @@ package org.collectionspace.services.nuxeo.client.java;
 
 import java.security.Principal;
 
+import org.collectionspace.services.common.document.DocumentException;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -59,12 +60,12 @@ public interface CoreSessionInterface {
     public Principal getPrincipal();
 
     public IterableQueryResult queryAndFetch(String query, String queryType,
-            Object... params) throws ClientException;
+            Object... params) throws ClientException, DocumentException;
 
     public DocumentModelList query(String query, Filter filter, long limit,
-            long offset, boolean countTotal) throws ClientException;
+            long offset, boolean countTotal) throws ClientException, DocumentException;
 
-    public DocumentModelList query(String query) throws ClientException;
+    public DocumentModelList query(String query) throws ClientException, DocumentException;
 
     /**
      * Executes the given NXQL query an returns the result.
@@ -73,8 +74,9 @@ public interface CoreSessionInterface {
      * @param max number of document to retrieve
      * @return the query result
      * @throws ClientException
+     * @throws DocumentException 
      */
-    public DocumentModelList query(String query, int max) throws ClientException;
+    public DocumentModelList query(String query, int max) throws ClientException, DocumentException;
     
     /**
      * Executes the given NXQL query and returns the result that matches the
@@ -83,9 +85,10 @@ public interface CoreSessionInterface {
      * @param query the query to execute
      * @param filter the filter to apply to result
      * @return the query result
+     * @throws DocumentException 
      * @throws ClientException
      */
-    public DocumentModelList query(String query, LifeCycleFilter workflowStateFilter);
+    public DocumentModelList query(String query, LifeCycleFilter workflowStateFilter) throws DocumentException;
 
     /**
      * Gets a document model given its reference.

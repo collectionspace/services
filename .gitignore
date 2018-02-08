@@ -1,3 +1,4 @@
+*.out*
 *.iml
 *.org.*.bindings.xml
 *.edu.*.bindings.xml

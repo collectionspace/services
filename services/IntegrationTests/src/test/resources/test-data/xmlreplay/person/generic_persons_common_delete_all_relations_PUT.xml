@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="persons">
+    <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation" xmlns:ns2="http://collectionspace.org/services/jaxb">
+        <!-- Delete all existing relationships. -->
+    </ns3:relations-common-list>
+</document>

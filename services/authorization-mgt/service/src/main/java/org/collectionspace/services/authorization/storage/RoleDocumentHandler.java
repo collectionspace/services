@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.collectionspace.services.account.AccountsCommonList;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionRoleSubResource;
 import org.collectionspace.services.authorization.PermissionValue;
@@ -40,13 +39,16 @@ import org.collectionspace.services.client.PermissionRoleFactory;
 import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.client.RoleFactory;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.security.SecurityUtils;
+import org.collectionspace.services.common.storage.TransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
-import org.collectionspace.services.jaxb.AbstractCommonList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +56,7 @@ import org.slf4j.LoggerFactory;
  * Document handler for Role
  * @author 
  */
+@SuppressWarnings("unchecked")
 public class RoleDocumentHandler
 		extends JpaDocumentHandler<Role, RolesList, Role, List<Role>> {
     private final Logger logger = LoggerFactory.getLogger(RoleDocumentHandler.class);
@@ -80,26 +83,11 @@ public class RoleDocumentHandler
         role.setCsid(id);
         // We do not allow creation of locked roles through the services.
         role.setMetadataProtection(null);
-        role.setPermsProtection(null);
+        role.setPermsProtection(null);        
     }
     
-    @Override
-    public void completeCreate(DocumentWrapper<Role> wrapDoc) throws Exception {
-    	Role role = wrapDoc.getWrappedObject();
-    	List<PermissionValue> permValueList = role.getPermission();
-    	if (permValueList != null && permValueList.size() > 0) {
-    		// create and persist a permrole instance
-    		// The caller of this method needs to ensure a valid and active EM (EntityManager) instance is in the Service context
-    		RoleValue roleValue = RoleFactory.createRoleValueInstance(role);
-    		PermissionRole permRole = PermissionRoleFactory.createPermissionRoleInstance(SubjectType.PERMISSION, roleValue,
-    				permValueList, true, true);
-            PermissionRoleSubResource subResource =
-                    new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
-            String permrolecsid = subResource.createPermissionRole(permRole, SubjectType.PERMISSION);
-    	}
-    }
-
-    @Override
+    @SuppressWarnings("rawtypes")
+	@Override
 	public void handleUpdate(DocumentWrapper<Role> wrapDoc) throws Exception {
 		Role roleFound = wrapDoc.getWrappedObject();
 		Role roleReceived = getCommonPart();
@@ -112,25 +100,30 @@ public class RoleDocumentHandler
 		//
 		// Update perms is supplied.
 		//
+		ServiceContext ctx = this.getServiceContext();
 		List<PermissionValue> permValueList = roleReceived.getPermission();
-		if (permValueList != null) {
+		if (permValueList != null && permValueList.size() > 0) {
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
             //
-            // First, delete the existing permroles
+            // First, delete the existing permroles (if any)
             //
-            subResource.deletePermissionRole(roleFound.getCsid(), SubjectType.PERMISSION);
+            try {
+            	subResource.deletePermissionRole(ctx, roleFound.getCsid(), SubjectType.PERMISSION);
+            } catch (DocumentNotFoundException dnf) {
+            	// Catch and ignore.  Just means the role has no existing relationships
+            }
             //
             // Next, create the new permroles
             //
     		RoleValue roleValue = RoleFactory.createRoleValueInstance(roleFound);
     		PermissionRole permRole = PermissionRoleFactory.createPermissionRoleInstance(SubjectType.PERMISSION, roleValue,
     				permValueList, true, true);            
-            subResource.createPermissionRole(permRole, SubjectType.PERMISSION);
+            subResource.createPermissionRole(ctx, permRole, SubjectType.PERMISSION);
             //
             // Finally, set the updated perm list in the result
             //
-            PermissionRole newPermRole = subResource.getPermissionRole(roleFound.getCsid(), SubjectType.PERMISSION);
+            PermissionRole newPermRole = subResource.getPermissionRole(ctx, roleFound.getCsid(), SubjectType.PERMISSION);
             roleFound.setPermission(newPermRole.getPermission());
 		}
 	}
@@ -168,6 +161,33 @@ public class RoleDocumentHandler
         
         return to;
     }
+    
+    @Override
+    public void completeCreate(DocumentWrapper<Role> wrapDoc) throws Exception {
+        Role role = wrapDoc.getWrappedObject();
+        //
+        // If there are perms in the payload, create the required role/perm relationships.
+        //
+    	List<PermissionValue> permValueList = role.getPermission();
+    	if (permValueList != null && permValueList.size() > 0) {
+    		//
+    		// To prevent new Permissions being created (especially low-level Spring Security perms), we'll first flush the current
+    		// JPA context to ensure our Role can be successfully persisted.
+    		//
+    		TransactionContext jpaTransactionContext = this.getServiceContext().getCurrentTransactionContext();
+    		jpaTransactionContext.flush();
+    		
+    		// create and persist a permrole instance
+    		// The caller of this method needs to ensure a valid and active EM (EntityManager) instance is in the Service context
+    		RoleValue roleValue = RoleFactory.createRoleValueInstance(role);
+    		PermissionRole permRole = PermissionRoleFactory.createPermissionRoleInstance(SubjectType.PERMISSION, roleValue,
+    				permValueList, true, true);
+            PermissionRoleSubResource subResource =
+                    new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
+            subResource.createPermissionRole(getServiceContext(), permRole, SubjectType.PERMISSION);
+    	}
+
+    }
 
     @Override
     public void completeUpdate(DocumentWrapper<Role> wrapDoc) throws Exception {
@@ -190,7 +210,7 @@ public class RoleDocumentHandler
         getServiceContext().setOutput(getCommonPartList());
     }
 
-    @Override
+	@Override
     public Role extractCommonPart(
             DocumentWrapper<Role> wrapDoc)
             throws Exception {
@@ -201,7 +221,7 @@ public class RoleDocumentHandler
         if (includePerms) {
 	        PermissionRoleSubResource permRoleResource =
 	                new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
-	        PermissionRole permRole = permRoleResource.getPermissionRole(role.getCsid(), SubjectType.PERMISSION);
+	        PermissionRole permRole = permRoleResource.getPermissionRole(getServiceContext(), role.getCsid(), SubjectType.PERMISSION);
 	        role.setPermission(permRole.getPermission());
         }
     

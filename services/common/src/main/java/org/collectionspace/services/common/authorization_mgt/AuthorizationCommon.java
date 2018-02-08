@@ -14,10 +14,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
 import javax.naming.NamingException;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.account.AccountListItem;
@@ -25,6 +22,7 @@ import org.collectionspace.services.account.AccountListItem;
 import org.collectionspace.services.authentication.Token;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceAction;
+import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.PermissionException;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionRoleRel;
@@ -37,7 +35,7 @@ import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.perms.EffectType;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionAction;
-
+import org.collectionspace.services.client.PermissionClient;
 import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
@@ -45,10 +43,12 @@ import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.common.storage.JDBCTools;
+import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 
 import org.collectionspace.services.config.service.ServiceBindingType;
@@ -63,19 +63,16 @@ import org.collectionspace.services.lifecycle.TransitionDefList;
 //import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.acls.model.AlreadyExistsException;
 
 
 public class AuthorizationCommon {
 	
-	final public static String REFRESH_AUTZ_PROP = "refreshAuthZOnStartup";
+	final public static String REFRESH_AUTHZ_PROP = "refreshAuthZOnStartup";
 	
 	//
 	// For token generation and password reset
 	//
 	final private static String DEFAULT_PASSWORD_RESET_EMAIL_MESSAGE = "Hello {{greeting}},\n\r\n\rYou've started the process to reset your CollectionSpace account password. To finish resetting your password, go to the Reset Password page {{link}} on CollectionSpace.\n\r\n\rIf clicking the link doesn't work, copy and paste the following link into your browser address bar and click Go.\n\r\n\r{{link}}\n\r Thanks,\n\r\n\r CollectionSpace Administrator\n\r\n\rPlease do not reply to this email. This mailbox is not monitored and you will not receive a response. For assistance, contact your CollectionSpace Administrator directly.";
-	final private static String tokensalt = "74102328UserDetailsReset";
-	final private static int TIME_SCALAR = 100000;
 	private static final String DEFAULT_PASSWORD_RESET_EMAIL_SUBJECT = "Password reset for CollectionSpace account";
 	
 	//
@@ -87,14 +84,18 @@ public class AuthorizationCommon {
     // ActionGroup labels/constants
     //
 	
-	// for READ-WRITE
+	// for READ-WRITE-DELETE
     final public static String ACTIONGROUP_CRUDL_NAME = "CRUDL";
     final public static ActionType[] ACTIONSET_CRUDL = {ActionType.CREATE, ActionType.READ, ActionType.UPDATE, ActionType.DELETE, ActionType.SEARCH};
+	// for READ-WRITE
+    final public static String ACTIONGROUP_CRUL_NAME = "CRUL";
+    final public static ActionType[] ACTIONSET_CRUL = {ActionType.CREATE, ActionType.READ, ActionType.UPDATE, ActionType.SEARCH};
     // for READ-ONLY
     final public static String ACTIONGROUP_RL_NAME = "RL";
     final public static ActionType[] ACTIONSET_RL = {ActionType.READ, ActionType.SEARCH};
 	
 	static ActionGroup ACTIONGROUP_CRUDL;
+	static ActionGroup ACTIONGROUP_CRUL;
 	static ActionGroup ACTIONGROUP_RL;
 	
 	// A static block to initialize the predefined action groups
@@ -107,7 +108,10 @@ public class AuthorizationCommon {
 		ACTIONGROUP_RL = new ActionGroup();
 		ACTIONGROUP_RL.name = ACTIONGROUP_RL_NAME;
 		ACTIONGROUP_RL.actions = ACTIONSET_RL;
-
+		// For read-write
+		ACTIONGROUP_CRUL = new ActionGroup();
+		ACTIONGROUP_CRUL.name = ACTIONGROUP_CRUL_NAME;
+		ACTIONGROUP_CRUL.actions = ACTIONSET_CRUL;
 	}
 	
     final static Logger logger = LoggerFactory.getLogger(AuthorizationCommon.class);
@@ -161,30 +165,25 @@ public class AuthorizationCommon {
 	public static String setTenantConfigMD5Hash(String tenantId, String md5hash) {
 		return tenantConfigMD5HashTable.put(tenantId, md5hash);
 	}	
-	
-    public static Role getRole(String tenantId, String displayName) {
+	    
+    public static Role getRole(JPATransactionContext jpaTransactionContext, String tenantId, String displayName) {
     	Role role = null;
     	
     	String roleName = AuthorizationCommon.getQualifiedRoleName(tenantId, displayName);
-    	role = AuthorizationStore.getRoleByName(roleName, tenantId);
+    	role = AuthorizationStore.getRoleByName(jpaTransactionContext, roleName, tenantId);
         
         return role;
     }
     
-    public static Role getRole(EntityManager em, String tenantId, String displayName) {
-    	Role role = null;
-    	
-    	String roleName = AuthorizationCommon.getQualifiedRoleName(tenantId, displayName);
-    	role = AuthorizationStore.getRoleByName(em, roleName, tenantId);
-        
-        return role;
-    }
-    
-    
-    public static Role createRole(String tenantId, String name, String description) {
-    	return createRole(tenantId, name, description, false /* mutable by default */);
-    }
-    
+    /**
+     * Create a new role instance to be persisted later.
+     * 
+     * @param tenantId
+     * @param name
+     * @param description
+     * @param immutable
+     * @return
+     */
     public static Role createRole(String tenantId, String name, String description, boolean immutable) {
     	Role role = new Role();
     	
@@ -209,7 +208,8 @@ public class AuthorizationCommon {
      * with assumption that resource is of type URI
      * @param permission configuration
      */
-    public static void addPermissionsForUri(Permission perm,
+    public static void addPermissionsForUri(JPATransactionContext jpaTransactionContext,
+    		Permission perm,
             PermissionRole permRole) throws PermissionException {
     	//
     	// First check the integrity of the incoming arguments.
@@ -225,23 +225,17 @@ public class AuthorizationCommon {
         for (RoleValue roleValue : permRole.getRole()) {
             principals.add(roleValue.getRoleName());
         }
+        
+        boolean grant = perm.getEffect().equals(EffectType.PERMIT) ? true : false;
         List<PermissionAction> permActions = perm.getAction();
+        ArrayList<CSpaceResource> resources = new ArrayList<CSpaceResource>();
         for (PermissionAction permAction : permActions) {
-        	try {
-	            CSpaceAction action = URIResourceImpl.getAction(permAction.getName()); 
-	            URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(),
-	                    perm.getResourceName(), action);
-	            boolean grant = perm.getEffect().equals(EffectType.PERMIT) ? true : false;
-	            AuthZ.get().addPermissions(uriRes, principals.toArray(new String[0]), grant);//CSPACE-4967
-        	} catch (PermissionException e) {
-        		//
-        		// Only throw the exception if it is *not* an already-exists exception
-        		//
-        		if (e.getCause() instanceof AlreadyExistsException == false) {
-        			throw e;
-        		}
-        	}
+            CSpaceAction action = URIResourceImpl.getAction(permAction.getName()); 
+            URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(), perm.getResourceName(), action);
+            resources.add(uriRes);
         }
+        AuthZ.get().addPermissions(resources.toArray(new CSpaceResource[0]), principals.toArray(new String[0]), grant); // CSPACE-4967
+        jpaTransactionContext.setAclTablesUpdateFlag(true); // Tell the containing JPA transaction that we've committed changes to the Spring Tables
     }
     
     private static Connection getConnection(String databaseName) throws NamingException, SQLException {
@@ -271,6 +265,8 @@ public class AuthorizationCommon {
     		result = ACTIONGROUP_CRUDL;
     	} else if (actionGroupStr.equalsIgnoreCase(ACTIONGROUP_RL_NAME)) {
     		result = ACTIONGROUP_RL;
+    	} else if (actionGroupStr.equalsIgnoreCase(ACTIONGROUP_CRUL_NAME)) {
+    		result = ACTIONGROUP_CRUL;
     	}
     	
     	return result;
@@ -279,11 +275,12 @@ public class AuthorizationCommon {
     public static Permission createPermission(String tenantId,
     		String resourceName,
     		String description,
-    		String actionGroupStr) {
+    		String actionGroupStr,
+    		boolean immutable) {
     	Permission result = null;
     	
     	ActionGroup actionGroup = getActionGroup(actionGroupStr);
-    	result = createPermission(tenantId, resourceName, description, actionGroup);
+    	result = createPermission(tenantId, resourceName, description, actionGroup, immutable);
     	
     	return result;
     }
@@ -291,7 +288,8 @@ public class AuthorizationCommon {
     private static Permission createPermission(String tenantId,
     		String resourceName,
     		String description,
-    		ActionGroup actionGroup) {
+    		ActionGroup actionGroup,
+    		boolean immutable) {
         String id = tenantId
         		+ "-" + resourceName.replace('/', '_') // Remove the slashes so the ID can be used in a URI/URL
         		+ "-" + actionGroup.name;
@@ -311,13 +309,19 @@ public class AuthorizationCommon {
         	pas.add(permAction);
         }
         
+        if (immutable) {
+        	perm.setMetadataProtection(PermissionClient.IMMUTABLE);
+        	perm.setActionsProtection(PermissionClient.IMMUTABLE);
+        }
+        
         return perm;
     }
     
     private static Permission createWorkflowPermission(TenantBindingType tenantBinding,
     		ServiceBindingType serviceBinding,
     		String transitionVerb,
-    		ActionGroup actionGroup)
+    		ActionGroup actionGroup,
+    		boolean immutable)
     {
     	Permission result = null;
     	String workFlowServiceSuffix;
@@ -336,7 +340,7 @@ public class AuthorizationCommon {
     			+ workFlowServiceSuffix
     			+ transitionName;
     	String description = "A generated workflow permission for actiongroup " + actionGroup.name;
-    	result = createPermission(tenantId, resourceName, description, actionGroup);
+    	result = createPermission(tenantId, resourceName, description, actionGroup, immutable);
     	
     	if (logger.isDebugEnabled() == true) {
     		logger.debug("Generated a workflow permission: "
@@ -349,18 +353,21 @@ public class AuthorizationCommon {
     	return result;
     }
     
-    private static PermissionRole createPermissionRole(EntityManager em,
+    private static PermissionRole createPermissionRole(
     		Permission permission,
     		Role role,
-    		boolean enforceTenancy) throws Exception
+    		boolean enforceTenancy) throws DocumentException
     {
     	PermissionRole permRole = new PermissionRole();
+    	
+    	//
     	// Check to see if the tenant ID of the permission and the tenant ID of the role match
+    	//
     	boolean tenantIdsMatch = role.getTenantId().equalsIgnoreCase(permission.getTenantId());
     	if (tenantIdsMatch == false && enforceTenancy == false) {
     		tenantIdsMatch = true; // If we don't need to enforce tenancy then we'll just consider them matched.
     	}
-    			
+    	    			
 		if (tenantIdsMatch == true) {
 	    	permRole.setSubject(SubjectType.ROLE);
 	    	//
@@ -386,13 +393,13 @@ public class AuthorizationCommon {
 		} else {
     		String errMsg = "The tenant ID of the role: " + role.getTenantId()
     				+ " did not match the tenant ID of the permission: " + permission.getTenantId();
-    		throw new Exception(errMsg);
+    		throw new DocumentException(errMsg);
 		}
     	
     	return permRole;
     }
     
-    private static Hashtable<String, String> getTenantNamesFromConfig(TenantBindingConfigReaderImpl tenantBindingConfigReader) {
+	private static Hashtable<String, String> getTenantNamesFromConfig(TenantBindingConfigReaderImpl tenantBindingConfigReader) {
 
     	// Note that this only handles tenants not marked as "createDisabled"
     	Hashtable<String, TenantBindingType> tenantBindings =
@@ -668,84 +675,92 @@ public class AuthorizationCommon {
     	}
     }
     
-    
+    /**
+     * Creates the default Admin and Reader roles for all the configured tenants.
+     * 
+     * Returns the CSID of the Spring Admin role.
+     * 
+     * @param conn
+     * @param tenantInfo
+     * @param tenantAdminRoleCSIDs
+     * @param tenantReaderRoleCSIDs
+     * @return
+     * @throws SQLException
+     * @throws Exception
+     */
     private static String findOrCreateDefaultRoles(Connection conn, Hashtable<String, String> tenantInfo,
     		Hashtable<String, String> tenantAdminRoleCSIDs, Hashtable<String, String> tenantReaderRoleCSIDs) 
     		    	throws SQLException, Exception {
-    	// Fifth, fetch and save the default roles
+
 		String springAdminRoleCSID = null;
     	Statement stmt = null;
     	PreparedStatement pstmt = null;
     	try {
-    		final String querySpringRole = 
-    				"SELECT csid from roles WHERE rolename='"+AuthN.ROLE_SPRING_ADMIN_NAME+"'";
+    		//
+    		// Look for the Spring Security admin role.  If not found, create it.
+    		//
+    		final String querySpringRole = String.format("SELECT csid from roles WHERE rolename='%s'", AuthN.ROLE_SPRING_ADMIN_NAME);
     		stmt = conn.createStatement();
     		ResultSet rs = stmt.executeQuery(querySpringRole);
-    		if(rs.next()) {
+    		if (rs.next()) {
     			springAdminRoleCSID = rs.getString(1);
     			if (logger.isDebugEnabled()) {
-    				logger.debug("createDefaultAccounts found Spring Admin role: "
-    						+springAdminRoleCSID);
+    				logger.debug("createDefaultAccounts found Spring Admin role: " + springAdminRoleCSID);
     			}
     		} else {
-    			final String insertSpringAdminRoleSQL =
-    					"INSERT INTO roles (csid, rolename, displayName, rolegroup, created_at, tenant_id) "
-    							+ "VALUES ('-1', 'ROLE_SPRING_ADMIN', 'SPRING_ADMIN', 'Spring Security Administrator', now(), '0')";
+    			final String insertSpringAdminRoleSQL = String.format(
+    					"INSERT INTO roles (csid, rolename, displayName, rolegroup, created_at, tenant_id) VALUES ('%s', '%s', '%s', '%s', now(), '%s')",
+    					AuthN.ROLE_SPRING_ADMIN_ID, AuthN.ROLE_SPRING_ADMIN_NAME, AuthN.SPRING_ADMIN_USER, AuthN.ROLE_SPRING_GROUP_NAME, AuthN.ADMIN_TENANT_ID);
     			stmt.executeUpdate(insertSpringAdminRoleSQL);
-    			springAdminRoleCSID = "-1";
-    			if (logger.isDebugEnabled()) {
-    				logger.debug("createDefaultAccounts CREATED Spring Admin role: "
-    						+springAdminRoleCSID);
-    			}
+    			springAdminRoleCSID = AuthN.ROLE_SPRING_ADMIN_ID;
     		}
     		rs.close();
-    		final String getRoleCSIDSql =
-    				"SELECT csid from roles WHERE tenant_id=? and rolename=?";
-    		pstmt = conn.prepareStatement(getRoleCSIDSql); // create a statement
     		rs = null;
-    		for(String tId : tenantInfo.keySet()) {
-    			pstmt.setString(1, tId);						// set tenant_id param
-    			pstmt.setString(2, getDefaultAdminRole(tId));	// set rolename param
+    		
+    		//
+    		// Look for and save each tenants default Admin and Reader roles
+    		//
+    		final String getRoleCSIDSql = "SELECT csid from roles WHERE tenant_id=? and rolename=?";
+    		pstmt = conn.prepareStatement(getRoleCSIDSql); // create a statement
+    		for (String tenantId : tenantInfo.keySet()) {
+    			//
+    			// Look for the default Admin role
+    			//
+    			pstmt.setString(1, tenantId);
+    			pstmt.setString(2, getDefaultAdminRole(tenantId));
     			rs = pstmt.executeQuery();
     			// extract data from the ResultSet
-    			if(!rs.next()) {
-    				throw new RuntimeException("Cannot find role: "+getDefaultAdminRole(tId)
-    						+" for tenant id: "+tId+" in roles!");
+    			if (!rs.next()) {
+    				throw new RuntimeException("Cannot find role: " + getDefaultAdminRole(tenantId)
+    					+ " for tenant id: " + tenantId + " in roles!");
     			}
-    			String tenantAdminRoleCSID = rs.getString(1);
-    			if (logger.isDebugEnabled()) {
-    				logger.debug("createDefaultAccounts found role: "
-    						+getDefaultAdminRole(tId)+"("+tenantAdminRoleCSID
-    						+") for tenant id: "+tId);
-    			}
-    			tenantAdminRoleCSIDs.put(tId, tenantAdminRoleCSID);
-    			pstmt.setString(1, tId);						// set tenant_id param
-    			pstmt.setString(2, getDefaultReaderRole(tId));	// set rolename param
+    			String tenantAdminRoleCSID = rs.getString(1); // First column (#1) is the CSID
+    			tenantAdminRoleCSIDs.put(tenantId, tenantAdminRoleCSID);
     			rs.close();
+    			rs = null;
+    			//
+    			// Look for the default Reader role
+    			//
+    			pstmt.setString(1, tenantId);						// set tenant_id param
+    			pstmt.setString(2, getDefaultReaderRole(tenantId));	// set rolename param
     			rs = pstmt.executeQuery();
     			// extract data from the ResultSet
-    			if(!rs.next()) {
-    				throw new RuntimeException("Cannot find role: "+getDefaultReaderRole(tId)
-    						+" for tenant id: "+tId+" in roles!");
+    			if (!rs.next()) {
+    				throw new RuntimeException("Cannot find role: " + getDefaultReaderRole(tenantId)
+    						+ " for tenant id: " + tenantId + " in roles!");
     			}
     			String tenantReaderRoleCSID = rs.getString(1);
-    			if (logger.isDebugEnabled()) {
-    				logger.debug("createDefaultAccounts found role: "
-    						+getDefaultReaderRole(tId)+"("+tenantReaderRoleCSID
-    						+") for tenant id: "+tId);
-    			}
-    			tenantReaderRoleCSIDs.put(tId, tenantReaderRoleCSID);
+    			tenantReaderRoleCSIDs.put(tenantId, tenantReaderRoleCSID);
     			rs.close();
     		}
     		pstmt.close();
     	} catch(Exception e) {
     		throw e;
     	} finally {
-        	if(stmt!=null)
-        		stmt.close();
-    		if(pstmt!=null)
-    			pstmt.close();
+        	if (stmt != null) stmt.close();
+    		if (pstmt != null) pstmt.close();
     	}
+    	
     	return springAdminRoleCSID;
     }
 
@@ -790,55 +805,38 @@ public class AuthorizationCommon {
     	PreparedStatement pstmt = null;
     	try {
     		String insertAccountRoleSQL;
-    		if (databaseProductType == DatabaseProductType.MYSQL) {
-    			insertAccountRoleSQL = INSERT_ACCOUNT_ROLE_SQL_MYSQL;
-    		} else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
+    		if (databaseProductType == DatabaseProductType.POSTGRESQL) {
     			insertAccountRoleSQL = INSERT_ACCOUNT_ROLE_SQL_POSTGRES;
     		} else {
     			throw new Exception("Unrecognized database system.");
     		}
-    		if (logger.isDebugEnabled()) {
-    			logger.debug("createDefaultAccounts binding accounts to roles with SQL:\n"
-    					+insertAccountRoleSQL);
-    		}
+    		
     		pstmt = conn.prepareStatement(insertAccountRoleSQL); // create a statement
-    		for(String tId : tenantInfo.keySet()) {
-    			String adminUserId =  getDefaultAdminUserID(tenantInfo.get(tId));
-    			if(!usersInRepo.contains(adminUserId)) {
+    		for (String tId : tenantInfo.keySet()) {
+    			String adminUserId = getDefaultAdminUserID(tenantInfo.get(tId));
+    			if (!usersInRepo.contains(adminUserId)) {
     				String adminAcct = tenantAdminAcctCSIDs.get(tId);
     				String adminRoleId = tenantAdminRoleCSIDs.get(tId);
     				pstmt.setString(1, adminAcct);		// set acct CSID param
     				pstmt.setString(2, adminUserId);	// set user_id param
     				pstmt.setString(3, adminRoleId);	// set role_id param
     				pstmt.setString(4, getDefaultAdminRole(tId));	// set rolename param
-    				if (logger.isDebugEnabled()) {
-    					logger.debug("createDefaultAccounts binding account: "
-    							+adminUserId+" to Admin role("+adminRoleId
-    							+") for tenant id: "+tId);
-    				}
     				pstmt.executeUpdate();
+    				//
     				// Now add the Spring Admin Role to the admin accounts
+    				//
     				pstmt.setString(3, springAdminRoleCSID);	// set role_id param
     				pstmt.setString(4, AuthN.ROLE_SPRING_ADMIN_NAME);		// set rolename param
-    				if (logger.isDebugEnabled()) {
-    					logger.debug("createDefaultAccounts binding account: "
-    							+adminUserId+" to Spring Admin role: "+springAdminRoleCSID);
-    				}
     				pstmt.executeUpdate();
     			}
     			String readerUserId = getDefaultReaderUserID(tenantInfo.get(tId));
-    			if(!usersInRepo.contains(readerUserId)) {
+    			if (!usersInRepo.contains(readerUserId)) {
     				String readerAcct = tenantReaderAcctCSIDs.get(tId);
     				String readerRoleId = tenantReaderRoleCSIDs.get(tId);
     				pstmt.setString(1, readerAcct);		// set acct CSID param
     				pstmt.setString(2, readerUserId);	// set user_id param
     				pstmt.setString(3, readerRoleId);	// set role_id param
     				pstmt.setString(4, getDefaultReaderRole(tId));	// set rolename param
-    				if (logger.isDebugEnabled()) {
-    					logger.debug("createDefaultAccounts binding account: "
-    							+readerUserId+" to Reader role("+readerRoleId
-    							+") for tenant id: "+tId);
-    				}
     				pstmt.executeUpdate();
     			}
     		}
@@ -846,8 +844,9 @@ public class AuthorizationCommon {
     	} catch(Exception e) {
     		throw e;
     	} finally {
-    		if(pstmt!=null)
+    		if (pstmt!=null) {
     			pstmt.close();
+    		}
     	}
     }
     
@@ -873,20 +872,18 @@ public class AuthorizationCommon {
     		pstmt.setString(2, tenantManagerUserID);	// set user_id param
     		pstmt.setString(3, tenantManagerRoleID);	// set role_id param
     		pstmt.setString(4, tenantManagerRoleName);	// set rolename param
-    		if (logger.isDebugEnabled()) {
-    			logger.debug("bindTenantManagerAccountRole binding user: "
-    					+tenantManagerUserID+" to Admin role("+tenantManagerRoleName+")");
-    		}
     		pstmt.executeUpdate();
+    		
     		/* At this point, tenant manager should not need the Spring Admin Role
-    		pstmt.setString(3, springAdminRoleCSID);	// set role_id param
-    		pstmt.setString(4, SPRING_ADMIN_ROLE);		// set rolename param
-    		if (logger.isDebugEnabled()) {
-    			logger.debug("createDefaultAccounts binding account: "
-    					+adminUserId+" to Spring Admin role: "+springAdminRoleCSID);
-    		}
-    		pstmt.executeUpdate();
+	    		pstmt.setString(3, springAdminRoleCSID);	// set role_id param
+	    		pstmt.setString(4, SPRING_ADMIN_ROLE);		// set rolename param
+	    		if (logger.isDebugEnabled()) {
+	    			logger.debug("createDefaultAccounts binding account: "
+	    					+adminUserId+" to Spring Admin role: "+springAdminRoleCSID);
+	    		}
+	    		pstmt.executeUpdate();
     		*/
+    		
     		pstmt.close();
     	} catch(Exception e) {
     		throw e;
@@ -899,6 +896,7 @@ public class AuthorizationCommon {
     /*
      * Using the tenant bindings, ensure there are corresponding Tenant records (db columns).
      */
+    //FIXME: This code should be using JPA objects and JPATransactionContext, not raw SQL.
     public static void createTenants(
     		TenantBindingConfigReaderImpl tenantBindingConfigReader,
     		DatabaseProductType databaseProductType,
@@ -917,8 +915,9 @@ public class AuthorizationCommon {
 			throw e;
 		} finally {
 			try {
-				if (conn != null)
+				if (conn != null) {
 					conn.close();
+				}
 			} catch (SQLException sqle) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("SQL Exception closing statement/connection: " + sqle.getLocalizedMessage());
@@ -927,6 +926,14 @@ public class AuthorizationCommon {
 		}
 	}
     
+    /**
+     * 
+     * @param tenantBindingConfigReader
+     * @param databaseProductType
+     * @param cspaceDatabaseName
+     * @throws Exception
+     */
+    //FIXME: This code should be using the JPA objects and JPATransactionContext, not raw SQL.
     public static void createDefaultAccounts(
     		TenantBindingConfigReaderImpl tenantBindingConfigReader,
     		DatabaseProductType databaseProductType,
@@ -966,7 +973,7 @@ public class AuthorizationCommon {
     				tenantAdminAcctCSIDs, tenantReaderAcctCSIDs);
     		
     		boolean createdTenantMgrAccount = findOrCreateTenantManagerUserAndAccount(conn);
-    		if(createdTenantMgrAccount) {
+    		if (createdTenantMgrAccount) {
     			// If we created the account, we need to create the bindings. Otherwise, assume they
     			// are all set (from previous initialization).
 	    		String tenantManagerRoleCSID = findTenantManagerRole(conn);
@@ -979,8 +986,9 @@ public class AuthorizationCommon {
         	throw e;
 		} finally {
 			try {
-				if (conn != null)
+				if (conn != null) {
 					conn.close();
+				}
 			} catch (SQLException sqle) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("SQL Exception closing statement/connection: " + sqle.getLocalizedMessage());
@@ -990,7 +998,7 @@ public class AuthorizationCommon {
     }
     
     private static String getDefaultAdminRole(String tenantId) {
-    	return ROLE_PREFIX+tenantId+TENANT_ADMIN_ROLE_SUFFIX;
+    	return ROLE_PREFIX + tenantId + TENANT_ADMIN_ROLE_SUFFIX;
     }
     
     private static String getDefaultReaderRole(String tenantId) {
@@ -998,14 +1006,14 @@ public class AuthorizationCommon {
     }
     
     private static String getDefaultAdminUserID(String tenantName) {
-    	return TENANT_ADMIN_ACCT_PREFIX+tenantName;
+    	return TENANT_ADMIN_ACCT_PREFIX + tenantName;
     }
     
     private static String getDefaultReaderUserID(String tenantName) {
-    	return TENANT_READER_ACCT_PREFIX+tenantName;
+    	return TENANT_READER_ACCT_PREFIX + tenantName;
     }
     
-	static public PermissionAction createPermissionAction(Permission perm,
+	static private PermissionAction createPermissionAction(Permission perm,
 			ActionType actionType) {
         PermissionAction pa = new PermissionAction();
 
@@ -1013,18 +1021,6 @@ public class AuthorizationCommon {
 	    URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(),
 	            perm.getResourceName(), action);
 	    pa.setName(actionType);
-	    pa.setObjectIdentity(uriRes.getHashedId().toString());
-	    pa.setObjectIdentityResource(uriRes.getId());
-	    
-	    return pa;
-	}
-
-	static public PermissionAction update(Permission perm, PermissionAction permAction) {
-        PermissionAction pa = new PermissionAction();
-
-	    CSpaceAction action = URIResourceImpl.getAction(permAction.getName());
-	    URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(),
-	            perm.getResourceName(), action);
 	    pa.setObjectIdentity(uriRes.getHashedId().toString());
 	    pa.setObjectIdentityResource(uriRes.getId());
 	    
@@ -1048,7 +1044,9 @@ public class AuthorizationCommon {
 		TransitionDefList result = null;
 		try {
 			String serviceObjectName = serviceBinding.getObject().getName();
-	    	DocumentHandler docHandler = ServiceConfigUtils.createDocumentHandlerInstance(
+			
+	    	@SuppressWarnings("rawtypes")
+			DocumentHandler docHandler = ServiceConfigUtils.createDocumentHandlerInstance(
 	    			tenantBinding, serviceBinding);
 	    	Lifecycle lifecycle = docHandler.getLifecycle(serviceObjectName);
 	    	if (lifecycle != null) {
@@ -1078,26 +1076,24 @@ public class AuthorizationCommon {
 	}
 	
 	/**
+	 * Creates the immutable workflow permission sets for the default admin and reader roles.
 	 * 
 	 * @param tenantBindingConfigReader
 	 * @param databaseProductType
 	 * @param cspaceDatabaseName
 	 * @throws Exception
 	 */
-    public static void createDefaultWorkflowPermissions(TenantBindingConfigReaderImpl tenantBindingConfigReader,
+    public static void createDefaultWorkflowPermissions(
+    		JPATransactionContext jpaTransactionContext,
+    		TenantBindingConfigReaderImpl tenantBindingConfigReader,
     		DatabaseProductType databaseProductType, 
-    		String cspaceDatabaseName) throws Exception //FIXME: REM - 4/11/2012 - Rename to createWorkflowPermissions
+    		String cspaceDatabaseName) throws Exception
     {
     	java.util.logging.Logger logger = java.util.logging.Logger.getAnonymousLogger();
 
     	AuthZ.get().login(); //login to Spring Security manager
     	
-        EntityManagerFactory emf = JpaStorageUtils.getEntityManagerFactory(JpaStorageUtils.CS_PERSISTENCE_UNIT);
-        EntityManager em = null;
-
         try {
-            em = emf.createEntityManager();
-
 	        Hashtable<String, TenantBindingType> tenantBindings = tenantBindingConfigReader.getTenantBindings();
 	        for (String tenantId : tenantBindings.keySet()) {
 	        	logger.info(String.format("Creating/verifying workflow permissions for tenant ID=%s.", tenantId));
@@ -1106,8 +1102,8 @@ public class AuthorizationCommon {
 		        	continue; // skip the rest of the loop and go to the next tenant
 		        }
 		        
-	    		Role adminRole = AuthorizationCommon.getRole(em, tenantBinding.getId(), ROLE_TENANT_ADMINISTRATOR);
-	    		Role readonlyRole = AuthorizationCommon.getRole(em, tenantBinding.getId(), ROLE_TENANT_READER);
+	    		Role adminRole = AuthorizationCommon.getRole(jpaTransactionContext, tenantBinding.getId(), ROLE_TENANT_ADMINISTRATOR);
+	    		Role readonlyRole = AuthorizationCommon.getRole(jpaTransactionContext, tenantBinding.getId(), ROLE_TENANT_READER);
 	    		
 	    		if (adminRole == null || readonlyRole == null) {
 	    			String msg = String.format("One or more of the required default CollectionSpace administrator roles is missing or was never created.  If you're setting up a new instance of CollectionSpace, shutdown the Tomcat server and run the 'ant import' command from the root/top level CollectionSpace 'Services' source directory.  Then try restarting Tomcat.");
@@ -1116,25 +1112,26 @@ public class AuthorizationCommon {
 	    		}
 	    		
 		        for (ServiceBindingType serviceBinding : tenantBinding.getServiceBindings()) {
-		        	String prop = ServiceBindingUtils.getPropertyValue(serviceBinding, REFRESH_AUTZ_PROP);
+		        	String prop = ServiceBindingUtils.getPropertyValue(serviceBinding, REFRESH_AUTHZ_PROP);
 		        	if (prop == null ? true : Boolean.parseBoolean(prop)) {
-			        		try {
-			        		em.getTransaction().begin();
-				        	TransitionDefList transitionDefList = getTransitionDefList(tenantBinding, serviceBinding);
+			        	try {
+			        		jpaTransactionContext.beginTransaction();
 				        	HashSet<String> transitionVerbList = getTransitionVerbList(tenantBinding, serviceBinding);
 				        	for (String transitionVerb : transitionVerbList) {
 				        		//
 				        		// Create the permission for the admin role
-				        		Permission adminPerm = createWorkflowPermission(tenantBinding, serviceBinding, transitionVerb, ACTIONGROUP_CRUDL);
-				        		persist(em, adminPerm, adminRole, true, ACTIONGROUP_CRUDL);
+				        		Permission adminPerm = createWorkflowPermission(tenantBinding, serviceBinding, transitionVerb, ACTIONGROUP_CRUDL, true);
+				        		persist(jpaTransactionContext, adminPerm, adminRole, true, ACTIONGROUP_CRUDL);
 				        		//
 				        		// Create the permission for the read-only role
-				        		Permission readonlyPerm = createWorkflowPermission(tenantBinding, serviceBinding, transitionVerb, ACTIONGROUP_RL);				        		
-				        		persist(em, readonlyPerm, readonlyRole, true, ACTIONGROUP_RL); // Persist/store the permission and permrole records and related Spring Security info
+				        		Permission readonlyPerm = createWorkflowPermission(tenantBinding, serviceBinding, transitionVerb, ACTIONGROUP_RL, true);				        		
+				        		persist(jpaTransactionContext, readonlyPerm, readonlyRole, true, ACTIONGROUP_RL); // Persist/store the permission and permrole records and related Spring Security info
 				        	}
-				        	em.getTransaction().commit();
+				        	jpaTransactionContext.commitTransaction();
 			        	} catch (IllegalStateException e) {
 			        		logger.fine(e.getLocalizedMessage()); //We end up here if there is no document handler for the service -this is ok for some of the services.
+			        	} catch (Exception x) {
+			        		jpaTransactionContext.markForRollback();
 			        	}
 		        	} else {
 		        		logger.warning("AuthZ refresh service binding property is set to FALSE so default permissions will NOT be refreshed for: "
@@ -1142,17 +1139,10 @@ public class AuthorizationCommon {
 		        	}
 		        }
 	        }
-            em.close();
     	} catch (Exception e) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+    		jpaTransactionContext.markForRollback();
             logger.fine("Caught exception and rolling back permission creation: " + e.getMessage());
             throw e;
-        } finally {
-            if (em != null) {
-                JpaStorageUtils.releaseEntityManagerFactory(emf);
-            }
         }
     }
     
@@ -1191,7 +1181,6 @@ public class AuthorizationCommon {
     public static String getPersistedMD5Hash(String tenantId, String cspaceDatabaseName) throws Exception {
     	String result = null;
     	
-    	ArrayList<String> existingTenants = new ArrayList<String>();
     	// First find or create the tenants
     	final String queryTenantSQL = String.format("SELECT id, name, config_md5hash FROM tenants WHERE id = '%s'", tenantId);
     	
@@ -1223,7 +1212,10 @@ public class AuthorizationCommon {
     	return result;
     }
 
-	private static PermissionRoleRel findPermRoleRel(EntityManager em, String permissionId, String RoleId) {
+	private static PermissionRoleRel findPermRoleRel(
+			JPATransactionContext jpaTransactionContext,
+			String permissionId,
+			String RoleId) {
     	PermissionRoleRel result = null;
     	
     	try {
@@ -1232,7 +1224,7 @@ public class AuthorizationCommon {
 	        params.put("id", permissionId);
 	        params.put("roleId", RoleId);        
 	
-	        result = (PermissionRoleRel) JpaStorageUtils.getEntity(em,
+	        result = (PermissionRoleRel) JpaStorageUtils.getEntity(jpaTransactionContext,
 	        		PermissionRoleRel.class.getCanonicalName(), whereClause, params);
     	} catch (Exception e) {
     		//Do nothing. Will return null;
@@ -1244,26 +1236,26 @@ public class AuthorizationCommon {
     /*
      * Persists the Permission, PermissionRoleRel, and Spring Security table entries all in one transaction
      */
-    private static void persist(EntityManager em, Permission permission, Role role, boolean enforceTenancy, ActionGroup actionGroup) throws Exception {
+    private static void persist(JPATransactionContext jpaTransactionContext, Permission permission, Role role, boolean enforceTenancy, ActionGroup actionGroup) throws Exception {
 		AuthorizationStore authzStore = new AuthorizationStore();
 		// First persist the Permission record
-		authzStore.store(em, permission);
+		authzStore.store(jpaTransactionContext, permission);
 		
 		// If the PermRoleRel doesn't already exists then relate the permission and the role in a new PermissionRole (the service payload)
 		// Create a PermissionRoleRel (the database relation table for the permission and role)
-		PermissionRoleRel permRoleRel = findPermRoleRel(em, permission.getCsid(), role.getCsid());
+		PermissionRoleRel permRoleRel = findPermRoleRel(jpaTransactionContext, permission.getCsid(), role.getCsid());
 		if (permRoleRel == null) {
-			PermissionRole permRole = createPermissionRole(em, permission, role, enforceTenancy);
+			PermissionRole permRole = createPermissionRole(permission, role, enforceTenancy);
 	        List<PermissionRoleRel> permRoleRels = new ArrayList<PermissionRoleRel>();
-	        PermissionRoleUtil.buildPermissionRoleRel(em, permRole, SubjectType.ROLE, permRoleRels,
+	        PermissionRoleUtil.buildPermissionRoleRel(jpaTransactionContext, permRole, SubjectType.ROLE, permRoleRels,
 	        		false /*not for delete*/, role.getTenantId());
 	        for (PermissionRoleRel prr : permRoleRels) {
-	            authzStore.store(em, prr);
+	            authzStore.store(jpaTransactionContext, prr);
 	        }
 			Profiler profiler = new Profiler(AuthorizationCommon.class, 2);
 			profiler.start();
 			// Add a corresponding entry in the Spring Security Tables
-			addPermissionsForUri(permission, permRole);
+			addPermissionsForUri(jpaTransactionContext, permission, permRole);
 			profiler.stop();
 			logger.debug("Finished full perm generation for "
 					+ ":" + permission.getTenantId()

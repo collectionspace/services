@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:structureddate_common xmlns:ns2="http://collectionspace.org/services/structureddate">
+    <earliestSingleDate>
+        <year>${earliestYear}</year>
+        <month>${earliestMonth}</month>
+        <day>${earliestDay}</day>
+        <era>urn:cspace:testsci.collectionspace.org:vocabularies:name(dateera):item:name(${earliestEraShortId})'${earliestEraShortDisplayName}'</era>
+    </earliestSingleDate>
+    <latestDate>
+        <year>${latestYear}</year>
+        <month>${latestMonth}</month>
+        <day>${latestDay}</day>
+        <era>urn:cspace:testsci.collectionspace.org:vocabularies:name(dateera):item:name(${latestEraShortId})'${latestEraShortDisplayName}'</era>
+    </latestDate>
+    <scalarValuesComputed>false</scalarValuesComputed>
+</ns2:structureddate_common>

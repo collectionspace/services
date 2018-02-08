@@ -52,7 +52,7 @@ import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
-import org.collectionspace.services.nuxeo.client.java.RepositoryClientImpl;
+import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -397,7 +397,7 @@ public class RelationDocumentModelHandler
             // provided as an alternate identifier.
         }
         if (Tools.notBlank(csid)) {
-        	RepositoryClientImpl nuxeoRepoClient = (RepositoryClientImpl)getRepositoryClient(ctx);
+        	NuxeoRepositoryClientImpl nuxeoRepoClient = (NuxeoRepositoryClientImpl)getRepositoryClient(ctx);
             DocumentWrapper<DocumentModel> docWrapper = nuxeoRepoClient.getDocFromCsid(ctx, repoSession, csid);
             docModel = docWrapper.getWrappedObject();
         } else { //  if (Tools.isBlank(objectCsid)) {

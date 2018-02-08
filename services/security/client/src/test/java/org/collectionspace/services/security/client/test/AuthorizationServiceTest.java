@@ -160,14 +160,14 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
 	}
 
 	private void seedRoles() throws Exception {
-		String rn1 = "ROLE_TEST_CM";
+		String rn1 = "xROLE_TEST_CM";
 		String r1RoleId = createRole(rn1);
 		RoleValue rv1 = new RoleValue();
 		rv1.setRoleId(r1RoleId);
 		rv1.setRoleName(rn1);
 		roleValues.put(rv1.getRoleName(), rv1);
 
-		String rn2 = "ROLE_TEST_INTERN";
+		String rn2 = "xROLE_TEST_INTERN";
 		String r2RoleId = createRole(rn2);
 		RoleValue rv2 = new RoleValue();
 		rv2.setRoleId(r2RoleId);
@@ -204,22 +204,22 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
 	private void seedAccountRoles() throws Exception {
 
 		List<RoleValue> bigbirdRoleValues = new ArrayList<RoleValue>();
-		bigbirdRoleValues.add(roleValues.get("ROLE_TEST_CM"));
+		bigbirdRoleValues.add(roleValues.get("xROLE_TEST_CM"));
 		createAccountRole(accValues.get("bigbird2010"), bigbirdRoleValues);
 
 		List<RoleValue> elmoRoleValues = new ArrayList<RoleValue>();
-		elmoRoleValues.add(roleValues.get("ROLE_TEST_INTERN"));
+		elmoRoleValues.add(roleValues.get("xROLE_TEST_INTERN"));
 		createAccountRole(accValues.get("elmo2010"), elmoRoleValues);
 	}
 
 	private void seedPermissionRoles() throws Exception {
 
 		List<RoleValue> bigbirdRoleValues = new ArrayList<RoleValue>();
-		bigbirdRoleValues.add(roleValues.get("ROLE_TEST_CM"));
+		bigbirdRoleValues.add(roleValues.get("xROLE_TEST_CM"));
 		createPermissionRole(permValues.get(bigbirdPermId), bigbirdRoleValues);
 
 		List<RoleValue> elmoRoleValues = new ArrayList<RoleValue>();
-		elmoRoleValues.add(roleValues.get("ROLE_TEST_INTERN"));
+		elmoRoleValues.add(roleValues.get("xROLE_TEST_INTERN"));
 		createPermissionRole(permValues.get(elmoPermId), elmoRoleValues);
 
 	}
@@ -568,20 +568,20 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
 
 	private void deletePermissionRoles() throws Exception {
 		List<RoleValue> bigbirdRoleValues = new ArrayList<RoleValue>();
-		bigbirdRoleValues.add(roleValues.get("ROLE_TEST_CM"));
+		bigbirdRoleValues.add(roleValues.get("xROLE_TEST_CM"));
 		deletePermissionRole(permValues.get(bigbirdPermId), bigbirdRoleValues);
 
 		List<RoleValue> elmoRoleValues = new ArrayList<RoleValue>();
-		elmoRoleValues.add(roleValues.get("ROLE_TEST_INTERN"));
+		elmoRoleValues.add(roleValues.get("xROLE_TEST_INTERN"));
 		deletePermissionRole(permValues.get(elmoPermId), elmoRoleValues);
 	}
 
 	private void deleteAccountRoles() throws Exception {
 		List<RoleValue> bigbirdRoleValues = new ArrayList<RoleValue>();
-		bigbirdRoleValues.add(roleValues.get("ROLE_TEST_CM"));
+		bigbirdRoleValues.add(roleValues.get("xROLE_TEST_CM"));
 
 		List<RoleValue> elmoRoleValues = new ArrayList<RoleValue>();
-		elmoRoleValues.add(roleValues.get("ROLE_TEST_INTERN"));
+		elmoRoleValues.add(roleValues.get("xROLE_TEST_INTERN"));
 		if (!accountRolesFlipped) {
 			deleteAccountRole(accValues.get("bigbird2010"), bigbirdRoleValues);
 			deleteAccountRole(accValues.get("elmo2010"), elmoRoleValues);
@@ -595,8 +595,8 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
 		if (!accountRolesFlipped) {
 			List<RoleValue> cmRoleValues = new ArrayList<RoleValue>();
 			List<RoleValue> internRoleValues = new ArrayList<RoleValue>();
-			cmRoleValues.add(roleValues.get("ROLE_TEST_CM"));
-			internRoleValues.add(roleValues.get("ROLE_TEST_INTERN"));
+			cmRoleValues.add(roleValues.get("xROLE_TEST_CM"));
+			internRoleValues.add(roleValues.get("xROLE_TEST_INTERN"));
 
 			deleteAccountRole(accValues.get("bigbird2010"), cmRoleValues);
 			deleteAccountRole(accValues.get("elmo2010"), internRoleValues);
@@ -612,8 +612,8 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
 		if (accountRolesFlipped) {
 			List<RoleValue> cmRoleValues = new ArrayList<RoleValue>();
 			List<RoleValue> internRoleValues = new ArrayList<RoleValue>();
-			cmRoleValues.add(roleValues.get("ROLE_TEST_CM"));
-			internRoleValues.add(roleValues.get("ROLE_TEST_INTERN"));
+			cmRoleValues.add(roleValues.get("xROLE_TEST_CM"));
+			internRoleValues.add(roleValues.get("xROLE_TEST_INTERN"));
 
 			deleteAccountRole(accValues.get("bigbird2010"), internRoleValues);
 			deleteAccountRole(accValues.get("elmo2010"), cmRoleValues);

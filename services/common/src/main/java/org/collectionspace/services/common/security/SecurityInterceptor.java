@@ -65,6 +65,7 @@ import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.config.tenant.TenantBindingType;
+import org.collectionspace.services.systeminfo.SystemInfoClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,8 +85,10 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 	/** The Constant logger. */
 	private static final Logger logger = LoggerFactory.getLogger(SecurityInterceptor.class);
 	private static final String ACCOUNT_PERMISSIONS = "accounts/*/accountperms";
+	private static final String STRUCTURED_DATE_REQUEST = "structureddate";
 	private static final String PASSWORD_RESET = "accounts/requestpasswordreset";
 	private static final String PROCESS_PASSWORD_RESET = "accounts/processpasswordreset";
+	private static final String SYSTEM_INFO = SystemInfoClient.SERVICE_NAME;
 	private static final String NUXEO_ADMIN = null;
     //
     // Use this thread specific member instance to hold our login context with Nuxeo
@@ -98,14 +101,17 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
     private static final String ERROR_NUXEO_LOGOUT = "Attempt to logout when Nuxeo login context was null.";
     private static final String ERROR_UNBALANCED_LOGINS = "The number of Logins vs Logouts to the Nuxeo framework was unbalanced.";    
 	    
-    private boolean isAnonymousRequest(HttpRequest request, ResourceMethodInvoker resourceMethodInvoker) {
+    private boolean isAnonymousRequest(HttpRequest request, ResourceMethodInvoker resourceMethodInvoker) { // see C:\dev\src\cspace\services\services\JaxRsServiceProvider\src\main\webapp\WEB-INF\applicationContext-security.xml
     	boolean result = false;
     	
-		String resName = SecurityUtils.getResourceName(request.getUri());
-		if (resName.equalsIgnoreCase(PASSWORD_RESET) || resName.equals(PROCESS_PASSWORD_RESET)) {
-			return true;
+		String resName = SecurityUtils.getResourceName(request.getUri()).toLowerCase();
+		switch (resName) {
+			case PASSWORD_RESET:
+			case PROCESS_PASSWORD_RESET:
+			case SYSTEM_INFO:
+				return true;
 		}
-    	
+		    	
 		Class<?> resourceClass = resourceMethodInvoker.getResourceClass();
 		try {
 			CollectionSpaceResource resourceInstance = (CollectionSpaceResource)resourceClass.newInstance();
@@ -126,11 +132,18 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
     private boolean requiresAuthorization(String resName) {
     	boolean result = true;
 		//
-    	// All active users are allowed to see the *their* (we enforce this) current list of permissions.  If this is not
+    	// ACCOUNT_PERMISSIONS: All active users are allowed to see the *their* (we enforce this) current list of permissions.  If this is not
 		// the request, then we'll do a full AuthZ check.
     	//
-    	if (resName.equalsIgnoreCase(ACCOUNT_PERMISSIONS) == true) {
-    		result = false;
+    	// STRUCTURED_DATE_REQUEST: All user can request the parsing of a structured date string.
+    	//
+    	switch (resName) {
+    		case STRUCTURED_DATE_REQUEST:
+    		case ACCOUNT_PERMISSIONS:
+    			result = false;
+    			break;
+    		default:
+    			result = true;
     	}
     	
     	return result;

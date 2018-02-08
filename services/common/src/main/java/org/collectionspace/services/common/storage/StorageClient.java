@@ -19,6 +19,8 @@ package org.collectionspace.services.common.storage;
 
 import java.util.List;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
@@ -28,6 +30,7 @@ import org.collectionspace.services.common.document.TransactionException;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.lifecycle.TransitionDef;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 
 /**
  *
@@ -160,5 +163,11 @@ public interface StorageClient {
 	boolean synchronizeItem(ServiceContext ctx, AuthorityItemSpecifier itemSpecifier, DocumentHandler handler)
 			throws DocumentNotFoundException, TransactionException,
 			DocumentException;
+
+	boolean delete(ServiceContext ctx, Object entityFound, DocumentHandler handler)
+			throws DocumentNotFoundException, DocumentException;
+
+	void releaseRepositorySession(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, Object repoSession)
+			throws TransactionException;
 
 }

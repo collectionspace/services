@@ -68,7 +68,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl<Permissio
     private final static Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     // Instance variables specific to this test.
     final private static String TEST_MARKER = "_RolePermissionServiceTest";
-    final private static String TEST_ROLE_NAME = "ROLE";
+    final private static String TEST_ROLE_NAME = "xROLE";
     final private static String NO_REL_SUFFIX = "-no-rel";
     /** The perm values. */
     private Hashtable<String, PermissionValue> permValues = new Hashtable<String, PermissionValue>();

@@ -30,21 +30,19 @@ import javax.persistence.PersistenceException;
 
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.account.storage.AccountRoleDocumentHandler;
-//import org.collectionspace.services.authorization.AccountRolesList;
-//import org.collectionspace.services.authorization.AccountRolesList.AccountRoleListItem;
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.AccountRoleRel;
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
 
-import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.storage.StorageClient;
+import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaRelationshipStorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.common.context.ServiceContextProperties;
@@ -56,6 +54,7 @@ import org.slf4j.LoggerFactory;
  * AccountRoleSubResource is used to manage account-role relationship
  * @author
  */
+@SuppressWarnings("rawtypes")
 public class AccountRoleSubResource
 //        extends AbstractCollectionSpaceResourceImpl<AccountRole, AccountRolesList> {
     	extends AbstractCollectionSpaceResourceImpl<AccountRole, AccountRole> {
@@ -108,9 +107,9 @@ public class AccountRoleSubResource
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.CollectionSpaceResource#getServiceContextFactory()
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public ServiceContextFactory<AccountRole, AccountRole> getServiceContextFactory() {
-//    public ServiceContextFactory<AccountRole, AccountRolesList> getServiceContextFactory() {
         return RemoteServiceContextFactory.get();
     }
 
@@ -124,9 +123,21 @@ public class AccountRoleSubResource
      * 
      * @throws Exception the exception
      */
-    private ServiceContext<AccountRole, AccountRole> createServiceContext(AccountRole input,
+    private ServiceContext<AccountRole, AccountRole> createServiceContext(
+    		ServiceContext parentCtx, 
+    		AccountRole input,
             SubjectType subject) throws Exception {
         ServiceContext<AccountRole, AccountRole> ctx = createServiceContext(input);
+    	JPATransactionContext parentTransactionContext = parentCtx != null ? (JPATransactionContext)parentCtx.getCurrentTransactionContext() : null;
+    	//
+    	// If the parent context has an active JPA connection then we'll use it.
+    	//
+    	if (parentTransactionContext != null) {
+    		ctx.setTransactionContext(parentTransactionContext);
+    	}
+        //
+    	// Set other context values
+    	//
         ctx.setDocumentType(AccountRole.class.getPackage().getName()); //persistence unit
         ctx.setProperty(ServiceContextProperties.ENTITY_NAME, AccountRoleRel.class.getName());
         ctx.setProperty(ServiceContextProperties.ENTITY_CLASS, AccountRoleRel.class);
@@ -162,30 +173,30 @@ public class AccountRoleSubResource
      * @return
      * @throws Exception
      */
-    public String createAccountRole(AccountRole input, SubjectType subject)
+    public String createAccountRole(ServiceContext parentCtx, AccountRole input, SubjectType subject)
             throws Exception {
-    	
     	//
     	// We need to associate every new account with the Spring Security Admin role so we can make
     	// changes to the Spring Security ACL tables.  The Spring Security Admin role has NO CollectionSpace
     	// specific permissions.  It is an internal/private role that service consumers and end-users NEVER see.
     	//
     	
-    	//Preserve the original incoming list of roles
+    	// Preserve the original incoming list of roles
     	List<RoleValue> inputRoleValues = input.getRole();
 
-    	//Change the role list to be just the Spring role
-    	List<RoleValue> springRoles = new ArrayList<RoleValue>();
-    	input.setRole(springRoles);
-    	RoleValue springAdminRole = new RoleValue();
-    	springRoles.add(springAdminRole);
-    	springAdminRole.setRoleId(AuthN.ROLE_SPRING_ADMIN_ID);
-    	springAdminRole.setRoleName(AuthN.ROLE_SPRING_ADMIN_NAME);
+    	// Temporarily change the role list to be just the Spring role
+    	List<RoleValue> springRoleValueList = new ArrayList<RoleValue>();
+    	input.setRole(springRoleValueList);
+    	
+    	RoleValue springAdminRoleValue = new RoleValue();
+    	springRoleValueList.add(springAdminRoleValue);
+    	springAdminRoleValue.setRoleId(AuthN.ROLE_SPRING_ADMIN_ID);
+    	springAdminRoleValue.setRoleName(AuthN.ROLE_SPRING_ADMIN_NAME);
 
     	// The Spring role relationship may already exist, if it does then we'll get a PersistenceException that
     	// we'll just ignore.
     	try {
-	        ServiceContext<AccountRole, AccountRole> ctx = createServiceContext(input, subject);
+	        ServiceContext<AccountRole, AccountRole> ctx = createServiceContext(parentCtx, input, subject);
 	        DocumentHandler handler = createDocumentHandler(ctx);        
 	        getStorageClient(ctx).create(ctx, handler);
     	} catch (PersistenceException e) {
@@ -199,10 +210,10 @@ public class AccountRoleSubResource
     	}
     	
     	//
-    	// Now we'll add the account relationships for the original incoming roles.
+    	// Now we'll add the actual account-role relationships for the original incoming payload.
     	//
     	input.setRole(inputRoleValues);
-        ServiceContext<AccountRole, AccountRole> ctx = createServiceContext(input, subject);
+        ServiceContext<AccountRole, AccountRole> ctx = createServiceContext(parentCtx, input, subject);
         DocumentHandler handler = createDocumentHandler(ctx);        
         String bogusCsid = getStorageClient(ctx).create(ctx, handler);
         
@@ -217,14 +228,14 @@ public class AccountRoleSubResource
      * @return
      * @throws Exception
      */
-    public AccountRole getAccountRole(
+    public AccountRole getAccountRole(ServiceContext parentCtx,
             String csid, SubjectType subject) throws Exception {
 
         if (logger.isDebugEnabled()) {
             logger.debug("getAccountRole with csid=" + csid);
         }
         AccountRole result = null;
-        ServiceContext<AccountRole, AccountRole> ctx = createServiceContext((AccountRole) null, subject);
+        ServiceContext<AccountRole, AccountRole> ctx = createServiceContext(parentCtx, (AccountRole) null, subject);
         DocumentHandler handler = createDocumentHandler(ctx);
         getStorageClient(ctx).get(ctx, csid, handler);
         result = (AccountRole) ctx.getOutput();
@@ -241,27 +252,19 @@ public class AccountRoleSubResource
      * @return the account role
      * @throws Exception the exception
      */
-    public AccountRoleRel getAccountRoleRel(String csid,
+    public AccountRoleRel getAccountRoleRel(
+    		ServiceContext parentCtx,
+    		String csid,
     		SubjectType subject,
     		String accountRoleCsid) throws Exception {
 
         if (logger.isDebugEnabled()) {
             logger.debug("getAccountRole with csid=" + csid);
         }
-//        AccountRolesList result = new AccountRolesList();
-        ServiceContext<AccountRole, AccountRole> ctx = createServiceContext((AccountRole) null, subject);
+        ServiceContext<AccountRole, AccountRole> ctx = createServiceContext(parentCtx, (AccountRole)null, subject);
         AccountRoleDocumentHandler handler = (AccountRoleDocumentHandler)createDocumentHandler(ctx);
         handler.setAccountRoleCsid(accountRoleCsid);
-        //getStorageClient(ctx).get(ctx, csid, handler);
         AccountRoleRel accountRoleRel = (AccountRoleRel)JpaStorageUtils.getEntity(new Long(accountRoleCsid).longValue(), AccountRoleRel.class);
-//        List<AccountRoleListItem> accountRoleList = result.getAccountRoleListItems();
-//        AccountRoleListItem listItem = new AccountRoleListItem();
-//        // fill the item
-//        listItem.setCsid(accountRoleRel.getHjid().toString());
-//        listItem.setRoleId(accountRoleRel.getRoleId());
-//        listItem.setRoleName(accountRoleRel.getRoleName());
-        // add item to result list
-//        result = (AccountRolesList) ctx.getOutput();
         
         return accountRoleRel;
     }
@@ -273,14 +276,16 @@ public class AccountRoleSubResource
      * @param subject the subject
      * @throws Exception the exception
      */
-    public void x_deleteAccountRole(String csid,
+    public void x_deleteAccountRole(
+    		ServiceContext parentCtx,
+    		String csid,
             SubjectType subject) throws Exception {
 
         if (logger.isDebugEnabled()) {
             logger.debug("deleteAccountRole with csid=" + csid);
         }
-        AccountRole toDelete = getAccountRole(csid, subject);
-        deleteAccountRole(csid, subject, toDelete);
+        AccountRole toDelete = getAccountRole(parentCtx, csid, subject);
+        deleteAccountRole(parentCtx, csid, subject, toDelete);
     }
     
     /**
@@ -291,13 +296,15 @@ public class AccountRoleSubResource
      * @return
      * @throws Exception
      */
-    public void deleteAccountRole(String csid,
+    public void deleteAccountRole(
+    		ServiceContext parentCtx,
+    		String csid,
             SubjectType subject) throws Exception {
 
         if (logger.isDebugEnabled()) {
             logger.debug("deleteAccountRole with csid=" + csid);
         }
-        ServiceContext<AccountRole, AccountRole> ctx = createServiceContext((AccountRole) null, subject);
+        ServiceContext<AccountRole, AccountRole> ctx = createServiceContext(parentCtx, (AccountRole) null, subject);
         getStorageClient(ctx).delete(ctx, csid);
     }
 
@@ -310,10 +317,12 @@ public class AccountRoleSubResource
      * @return
      * @throws Exception
      */
-    public void deleteAccountRole(String csid, SubjectType subject, AccountRole input)
+	public void deleteAccountRole(
+    		ServiceContext parentCtx,
+    		String csid, SubjectType subject, AccountRole input)
             throws Exception {
 
-        ServiceContext<AccountRole, AccountRole> ctx = createServiceContext(input, subject);
+        ServiceContext<AccountRole, AccountRole> ctx = createServiceContext(parentCtx, input, subject);
         DocumentHandler handler = createDocumentHandler(ctx);
         getStorageClient(ctx).delete(ctx, csid, handler);
     }

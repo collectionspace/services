@@ -44,7 +44,6 @@ import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
-import org.springframework.transaction.TransactionStatus;
 
 /**
  * Manages permissions in Spring Security
@@ -69,17 +68,16 @@ public class SpringPermissionManager implements CSpacePermissionManager {
      * @throws PermissionException
      */
     @Override
-    public void addPermissions(CSpaceResource res, CSpaceAction action, String[] principals, boolean grant)
+    public void addPermissionsToRoles(CSpaceResource res, CSpaceAction action, String[] principals, boolean grant)
             throws PermissionException {
         ObjectIdentity oid = SpringAuthorizationProvider.getObjectIdentity(res);
         Sid[] sids = SpringAuthorizationProvider.getSids(principals);
         Permission p = SpringAuthorizationProvider.getPermission(action);
-        TransactionStatus status = provider.beginTransaction("addPermssions");
 
         //add permission for each sid
         for (Sid sid : sids) {
             try {
-                addPermission(oid, p, sid, grant);
+                addPermissionToRole(oid, p, sid, grant);
                 if (log.isDebugEnabled()) {
                     log.debug("addpermissions(res,action,prin[], grant), success for "
                             + " res=" + res.toString()
@@ -113,14 +111,12 @@ public class SpringPermissionManager implements CSpacePermissionManager {
                     log.debug(msg, ex);
                 }
                 //don't know what might be wrong...stop
-                provider.rollbackTransaction(status);
                 if (ex instanceof PermissionException) {
                     throw (PermissionException) ex;
                 }
                 throw new PermissionException(msg, ex);
             }
         }//rof
-        provider.commitTransaction(status);
         if (log.isDebugEnabled()) {
             log.debug("addpermissions(res,action,prin[], grant), success for "
                     + " res=" + res.toString()
@@ -141,16 +137,15 @@ public class SpringPermissionManager implements CSpacePermissionManager {
      * @throws PermissionException
      */
     @Override
-    public void deletePermissions(CSpaceResource res, CSpaceAction action, String[] principals)
+    public void deletePermissionFromRoles(CSpaceResource res, CSpaceAction action, String[] principals)
             throws PermissionNotFoundException, PermissionException {
         ObjectIdentity oid = SpringAuthorizationProvider.getObjectIdentity(res);
         Sid[] sids = SpringAuthorizationProvider.getSids(principals);
         Permission p = SpringAuthorizationProvider.getPermission(action);
-        TransactionStatus status = provider.beginTransaction("deletePermssions");
         //delete permission for each sid
         for (Sid sid : sids) {
             try {
-                deletePermissions(oid, p, sid);
+                deletePermissionFromRole(oid, p, sid);
                 if (log.isDebugEnabled()) {
                     log.debug("deletedpermissions(res,action,prin[]), success for "
                             + " res=" + res.toString()
@@ -180,21 +175,11 @@ public class SpringPermissionManager implements CSpacePermissionManager {
                     log.debug(msg, ex);
                 }
                 //don't know what might be wrong...stop
-                provider.rollbackTransaction(status);
                 if (ex instanceof PermissionException) {
                     throw (PermissionException) ex;
                 }
                 throw new PermissionException(msg, ex);
             }
-        }
-        provider.commitTransaction(status);
-        if (log.isDebugEnabled()) {
-            log.debug("deletedpermissions(res,action,prin[]), success for "
-                    + " res=" + res.toString()
-                    + " action=" + action.toString()
-                    + " oid=" + oid.toString()
-                    + " perm=" + p.toString()
-                    + " sids=" + sids.toString());
         }
     }
 
@@ -210,12 +195,11 @@ public class SpringPermissionManager implements CSpacePermissionManager {
     @Override
     public void deletePermissions(CSpaceResource res, CSpaceAction action)
             throws PermissionNotFoundException, PermissionException {
+    	
         ObjectIdentity oid = SpringAuthorizationProvider.getObjectIdentity(res);
         Permission p = SpringAuthorizationProvider.getPermission(action);
-        TransactionStatus status = provider.beginTransaction("deletePermssions");
         try {
-            deletePermissions(oid, p, null);
-            provider.commitTransaction(status);
+            deletePermissionFromRole(oid, p, null);
             if (log.isDebugEnabled()) {
                 log.debug("deletepermissions(res,action) success, "
                         + " res=" + res.toString()
@@ -224,7 +208,6 @@ public class SpringPermissionManager implements CSpacePermissionManager {
                         + " perm=" + p.toString());
             }
         } catch (AclDataAccessException aex) {
-            provider.rollbackTransaction(status);
             log.debug("deletepermissions(res,action) failed,"
                     + " oid=" + oid.toString()
                     + " res=" + res.toString()
@@ -233,7 +216,6 @@ public class SpringPermissionManager implements CSpacePermissionManager {
                     + " perm=" + p.toString(), aex);
             throw new PermissionException(aex);
         } catch (Exception ex) {
-            provider.rollbackTransaction(status);
             String msg = "deletepermissions(res,action,prin[]) failed,"
                     + " oid=" + oid.toString()
                     + " res=" + res.toString()
@@ -263,24 +245,20 @@ public class SpringPermissionManager implements CSpacePermissionManager {
     public void deletePermissions(CSpaceResource res)
             throws PermissionNotFoundException, PermissionException {
         ObjectIdentity oid = SpringAuthorizationProvider.getObjectIdentity(res);
-        TransactionStatus status = provider.beginTransaction("deletePermssion");
         try {
             provider.getProviderAclService().deleteAcl(oid, true);
-            provider.commitTransaction(status);
             if (log.isDebugEnabled()) {
                 log.debug("deletepermissions(res) success, "
                         + " res=" + res.toString()
                         + " oid=" + oid.toString());
             }
         } catch (AclDataAccessException aex) {
-            provider.rollbackTransaction(status);
             log.debug("deletepermissions(res) failed,"
                     + " oid=" + oid.toString()
                     + " res=" + res.toString()
                     + " oid=" + oid.toString(), aex);
             throw new PermissionException(aex);
         } catch (Exception ex) {
-            provider.rollbackTransaction(status);
             String msg = "deletepermissions(res) failed,"
                     + " oid=" + oid.toString()
                     + " res=" + res.toString()
@@ -304,7 +282,7 @@ public class SpringPermissionManager implements CSpacePermissionManager {
      * @param grant
      * @throws PermissionException
      */
-    private void addPermission(ObjectIdentity oid, Permission permission,
+    private void addPermissionToRole(ObjectIdentity oid, Permission permission,
             Sid sid, boolean grant) throws PermissionException {
         MutableAcl acl;
 
@@ -323,7 +301,7 @@ public class SpringPermissionManager implements CSpacePermissionManager {
         // Need to see if there is already an entry, so we do not duplicate (e.g., 
         // when we run our permission-roles init more than once.
         List<AccessControlEntry> aceEntries = acl.getEntries();
-        if(aceListHasEntry(aceEntries, permission, sid, grant)) {
+        if (aceListHasEntry(aceEntries, permission, sid, grant)) {
             if (log.isDebugEnabled()) {
                 log.debug("addPermission: Pre-existing acl for oid=" + oid.toString()
                         + " perm=" + permission.toString()
@@ -363,7 +341,7 @@ public class SpringPermissionManager implements CSpacePermissionManager {
      * @param sid
      */
     //non-javadoc NOTE: if sid is null it would remove ACEs for all sid(s)
-    private void deletePermissions(ObjectIdentity oid, Permission permission, Sid sid) /** throws AclDataAccessException */
+    private void deletePermissionFromRole(ObjectIdentity oid, Permission permission, Sid sid) /** throws AclDataAccessException */
     {
         int i = 0;
         MutableAcl acl = getAcl(oid);
@@ -374,7 +352,7 @@ public class SpringPermissionManager implements CSpacePermissionManager {
                     + " found " + aces + " aces");
         }
         ArrayList<Integer> foundAces = new ArrayList<Integer>();
-        Iterator iter = acel.listIterator();
+        Iterator<AccessControlEntry> iter = acel.listIterator();
         //not possible to delete while iterating
         while (iter.hasNext()) {
             AccessControlEntry ace = (AccessControlEntry) iter.next();
@@ -390,11 +368,17 @@ public class SpringPermissionManager implements CSpacePermissionManager {
             }
             i++;
         }
+        
+        boolean updateNeeded = false;
         for (int j = foundAces.size() - 1; j >= 0; j--) {
             //the following operation does not work while iterating in the while loop
             acl.deleteAce(foundAces.get(j)); //autobox
+            updateNeeded = true;
         }
-        provider.getProviderAclService().updateAcl(acl);
+        
+        if (updateNeeded) {
+        	provider.getProviderAclService().updateAcl(acl);
+        }
 
         if (log.isDebugEnabled()) {
             log.debug("deletePermissions: for acl oid=" + oid.toString()

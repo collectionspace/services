@@ -39,6 +39,7 @@ import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.perms.PermissionsList;
 import org.collectionspace.services.authorization.PermissionsRolesList;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
+import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 
 /**
  * AuthorizationSeed seeds authorizations (permission, role) into authz provider database
@@ -55,7 +56,7 @@ public class AuthorizationSeed {
      * @param permRoleFileName permission role file name
      * @throws Exception
      */
-    public void seedPermissions(String permFileName, String permRoleFileName) throws Exception {
+    public void seedPermissions(JPATransactionContext jpaTransactionContext, String permFileName, String permRoleFileName) throws Exception {
         PermissionsRolesList permRoleList =
                 (PermissionsRolesList) fromFile(PermissionsRolesList.class,
                 permRoleFileName);
@@ -69,7 +70,7 @@ public class AuthorizationSeed {
 	        logger.debug("read permissions from " + permFileName);
 	    }
 
-        seedPermissions(permList, permRoleList);
+        seedPermissions(jpaTransactionContext, permList, permRoleList);
     }
 
     /**
@@ -78,10 +79,10 @@ public class AuthorizationSeed {
      * @param permRoleList
      * @throws Exception
      */
-    public void seedPermissions(PermissionsList permList, PermissionsRolesList permRoleList)
+    public void seedPermissions(JPATransactionContext jpaTransactionContext, PermissionsList permList, PermissionsRolesList permRoleList)
             throws Exception {
     	
-    	seedPermissions(permList.getPermission(), permRoleList.getPermissionRole());
+    	seedPermissions(jpaTransactionContext, permList.getPermission(), permRoleList.getPermissionRole());
     }
     
     /**
@@ -90,7 +91,7 @@ public class AuthorizationSeed {
      * @param permRoleList
      * @throws Exception
      */
-    public void seedPermissions(List<Permission> permList, List<PermissionRole> permRoleList)
+    public void seedPermissions(JPATransactionContext jpaTransactionContext, List<Permission> permList, List<PermissionRole> permRoleList)
             throws Exception {
     	if (logger.isInfoEnabled() == true) {
     		logger.info("Started seeding Spring Security Tables...");
@@ -105,7 +106,7 @@ public class AuthorizationSeed {
         	}
             for (PermissionRole pr : permRoleList) {
                 if (pr.getPermission().get(0).getPermissionId().equals(p.getCsid())) {
-                	AuthorizationCommon.addPermissionsForUri(p, pr);
+                	AuthorizationCommon.addPermissionsForUri(jpaTransactionContext, p, pr);
                 }
             }
         }

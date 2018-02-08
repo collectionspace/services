@@ -708,6 +708,13 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     	return getCacheControl(ctx, "default"); // Look for a default one if we couldn't find based on the resource request
     }
     
+    /**
+     * FIXME: This code around cache control needs some documentation.
+     * 
+     * @param ctx
+     * @param cacheKey
+     * @return
+     */
     protected CacheControl getCacheControl(ServiceContext<IT, OT> ctx, String cacheKey) {
     	CacheControl result = null;
     	

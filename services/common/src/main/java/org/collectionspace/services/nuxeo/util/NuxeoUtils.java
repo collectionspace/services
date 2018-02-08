@@ -64,6 +64,7 @@ import org.nuxeo.ecm.core.NXCore;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.Blob;
+import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
@@ -920,7 +921,7 @@ public class NuxeoUtils {
     }
     
     public static boolean documentExists(CoreSessionInterface repoSession,
-    		String csid) {
+    		String csid) throws ClientException, DocumentException {
 		boolean result = false;
 		
 		String statement = String.format(

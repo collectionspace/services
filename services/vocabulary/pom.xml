@@ -14,32 +14,12 @@
     <name>services.vocabulary</name>
     <packaging>pom</packaging>
 
-    <dependencies>
-			<!--
-        <dependency>
-            <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.authority</artifactId>
-            <optional>true</optional>
-            <version>${project.version}</version>
-        </dependency>    
-				-->
-    </dependencies>
-
     <modules>
         <module>jaxb</module>
         <module>service</module>
         <module>3rdparty</module>
         <module>client</module>
     </modules>
-
-    <profiles>
-        <profile>
-            <id>samples</id>
-            <modules>
-                <module>sample</module>
-            </modules>
-        </profile>
-    </profiles>
 
 </project>
 

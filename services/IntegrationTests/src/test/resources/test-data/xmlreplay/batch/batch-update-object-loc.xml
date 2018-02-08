@@ -9,7 +9,7 @@
     <!-- This tests the UpdateObjectLocationBatchJob -->
     <!-- in various invocation modes -->
         
-    <testGroup ID="invocationModeSingle" autoDeletePOSTS="true">
+    <testGroup ID="invocationModeSingle" autoDeletePOSTS="true" authForCleanup="admin@core.collectionspace.org">
         
         <!-- Tests with CollectionObject->Movement relations -->
             
@@ -105,7 +105,7 @@
         
         <!-- This post of a batch job invocation request doesn't create a new record, -->
         <!-- so we need to exclude it from the post-run auto-deletion of records. -->
-        <test ID="invokeBatch" auth="test" autoDeletePOSTS="false">
+        <test ID="invokeBatch" autoDeletePOSTS="false">
             <method>POST</method>
             <uri>/cspace-services/batch/${createBatchRecord.CSID}</uri>
             <filename>batch/batch-invoke-updateobjloc-single.xml</filename>
@@ -166,7 +166,7 @@
             <expectedCodes>201</expectedCodes>
         </test>
         
-        <test ID="invokeBatchAfterAddingReverseRelation" auth="test" autoDeletePOSTS="false">
+        <test ID="invokeBatchAfterAddingReverseRelation" autoDeletePOSTS="false">
             <method>POST</method>
             <uri>/cspace-services/batch/${createBatchRecord.CSID}</uri>
             <filename>batch/batch-invoke-updateobjloc-single.xml</filename>
@@ -207,7 +207,7 @@
             </vars>
         </test>
         
-        <test ID="invokeBatchAfterSoftDeletingMovement" auth="test" autoDeletePOSTS="false">
+        <test ID="invokeBatchAfterSoftDeletingMovement" autoDeletePOSTS="false">
             <method>POST</method>
             <uri>/cspace-services/batch/${createBatchRecord.CSID}</uri>
             <filename>batch/batch-invoke-updateobjloc-single.xml</filename>
@@ -255,7 +255,7 @@
             </vars>
         </test>
         
-        <test ID="invokeBatchAfterSoftDeletingCollectionObject" auth="test" autoDeletePOSTS="false">
+        <test ID="invokeBatchAfterSoftDeletingCollectionObject" autoDeletePOSTS="false">
             <method>POST</method>
             <uri>/cspace-services/batch/${createBatchRecord.CSID}</uri>
             <filename>batch/batch-invoke-updateobjloc-single.xml</filename>
@@ -283,7 +283,7 @@
         
     </testGroup>
     
-    <testGroup ID="invocationModeSingleWithTiebreaker" autoDeletePOSTS="true">
+    <testGroup ID="invocationModeSingleWithTiebreaker" autoDeletePOSTS="true" authForCleanup="admin@core.collectionspace.org">
                     
         <test ID="createBatchRecordWithTiebreaker">
             <method>POST</method>
@@ -382,7 +382,7 @@
             <expectedCodes>200</expectedCodes>
         </test>
  
-        <test ID="invokeBatchAfterMovement1ModificationWithTiebreaker" auth="test" autoDeletePOSTS="false">
+        <test ID="invokeBatchAfterMovement1ModificationWithTiebreaker" autoDeletePOSTS="false">
             <method>POST</method>
             <uri>/cspace-services/batch/${createBatchRecordWithTiebreaker.CSID}</uri>
             <filename>batch/batch-invoke-updateobjloc-single.xml</filename>
@@ -423,7 +423,7 @@
             <expectedCodes>200</expectedCodes>
         </test>
  
-        <test ID="invokeBatchAfterMovement2ModificationWithTiebreaker" auth="test" autoDeletePOSTS="false">
+        <test ID="invokeBatchAfterMovement2ModificationWithTiebreaker" autoDeletePOSTS="false">
             <method>POST</method>
             <uri>/cspace-services/batch/${createBatchRecordWithTiebreaker.CSID}</uri>
             <filename>batch/batch-invoke-updateobjloc-single.xml</filename>
@@ -458,7 +458,7 @@
             <expectedCodes>200</expectedCodes>
         </test>
  
-        <test ID="invokeBatchAfterMovement3ModificationWithTiebreaker" auth="test" autoDeletePOSTS="false">
+        <test ID="invokeBatchAfterMovement3ModificationWithTiebreaker" autoDeletePOSTS="false">
             <method>POST</method>
             <uri>/cspace-services/batch/${createBatchRecordWithTiebreaker.CSID}</uri>
             <filename>batch/batch-invoke-updateobjloc-single.xml</filename>
@@ -484,7 +484,7 @@
             
     </testGroup>
     
-    <testGroup ID="invocationModeList" autoDeletePOSTS="true">
+    <testGroup ID="invocationModeList" autoDeletePOSTS="true" authForCleanup="admin@core.collectionspace.org">
         
         <test ID="createBatchRecord">
             <method>POST</method>
@@ -579,7 +579,7 @@
             <expectedCodes>201</expectedCodes>
         </test>
         
-        <test ID="invokeBatchWithList" auth="test" autoDeletePOSTS="false">
+        <test ID="invokeBatchWithList" autoDeletePOSTS="false">
             <method>POST</method>
             <uri>/cspace-services/batch/${createBatchRecord.CSID}</uri>
             <filename>batch/batch-invoke-updateobjloc-list.xml</filename>
@@ -624,7 +624,7 @@
 
     </testGroup>
     
-    <testGroup ID="invocationModeGroup" autoDeletePOSTS="true">
+    <testGroup ID="invocationModeGroup" autoDeletePOSTS="true" authForCleanup="admin@core.collectionspace.org">
         
         <test ID="createBatchRecord">
             <method>POST</method>
@@ -752,7 +752,7 @@
             <expectedCodes>201</expectedCodes>
         </test>
         
-        <test ID="invokeBatchWithGroup" auth="test" autoDeletePOSTS="false">
+        <test ID="invokeBatchWithGroup" autoDeletePOSTS="false">
             <method>POST</method>
             <uri>/cspace-services/batch/${createBatchRecord.CSID}</uri>
             <filename>batch/batch-invoke-updateobjloc-group.xml</filename>
@@ -799,7 +799,7 @@
     <!-- These tests verify that updates to the computed current location values -->
     <!-- in CollectionObject records succeed, even in tenants where Movement -->
     <!-- records are configured to be versioned. See CSPACE-6188 for more details. -->    
-    <testGroup ID="invocationModeSingleInVersioningEnabledTenant" autoDeletePOSTS="true">
+    <testGroup ID="invocationModeSingleInVersioningEnabledTenant" autoDeletePOSTS="true" authForCleanup="admin@testsci.collectionspace.org">
         
         <test ID="createBatchRecordInVersioningTenant" auth="admin@testsci.collectionspace.org">
             <method>POST</method>
@@ -997,7 +997,7 @@
             <expectedCodes>201</expectedCodes>
         </test>
         
-        <test ID="invokeBatchWithNoContext" auth="test" autoDeletePOSTS="false">
+        <test ID="invokeBatchWithNoContext" autoDeletePOSTS="false">
             <method>POST</method>
             <uri>/cspace-services/batch/${createBatchRecord.CSID}</uri>
             <filename>batch/batch-invoke-updateobjloc-nocontext.xml</filename>

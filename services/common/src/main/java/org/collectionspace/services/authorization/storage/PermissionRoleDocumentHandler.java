@@ -26,8 +26,6 @@ package org.collectionspace.services.authorization.storage;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 
 import org.collectionspace.services.authorization.PermissionRole;
@@ -36,14 +34,21 @@ import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.PermissionsRolesList;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
-import org.collectionspace.services.authorization.perms.Permission;
+
 import org.collectionspace.services.common.authorization_mgt.AuthorizationRoleRel;
 import org.collectionspace.services.common.authorization_mgt.PermissionRoleUtil;
+import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.document.JaxbUtils;
+import org.collectionspace.services.common.document.TransactionException;
+import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentFilter;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,12 +92,12 @@ public class PermissionRoleDocumentHandler
         filterOutExisting(wrapDoc);
     }
     
-    private boolean permRoleRelExists(EntityManager em, PermissionRoleRel permRoleRel) {
+    private boolean permRoleRelExists(JPATransactionContext jpaTransactionContext, PermissionRoleRel permRoleRel) throws TransactionException {
     	boolean result = false;
     	
     	PermissionRoleRel queryResult = null;
     	try {
-	    	queryResult = (PermissionRoleRel) JpaStorageUtils.getEntityByDualKeys(em, 
+	    	queryResult = (PermissionRoleRel) JpaStorageUtils.getEntityByDualKeys(jpaTransactionContext, 
 	    			PermissionRoleRel.class.getName(),
 	    			PermissionStorageConstants.PERMREL_ROLE_ID, permRoleRel.getRoleId(), 
 	    			PermissionStorageConstants.PERMREL_PERM_ID, permRoleRel.getPermissionId());
@@ -112,41 +117,33 @@ public class PermissionRoleDocumentHandler
      * @param wrapDoc
      * @throws Exception
      */
-    private void filterOutExisting(DocumentWrapper<List<PermissionRoleRel>> wrapDoc) throws Exception {
+    @SuppressWarnings("rawtypes")
+	private void filterOutExisting(DocumentWrapper<List<PermissionRoleRel>> wrapDoc) throws Exception {
     	List<PermissionRoleRel> permRoleRelList = wrapDoc.getWrappedObject();
     	
-        EntityManagerFactory emf = null;
-        EntityManager em = null;
+    	ServiceContext ctx = getServiceContext();
+        JPATransactionContext jpaTransactionContext = (JPATransactionContext)ctx.openConnection();
         try {
-            emf = JpaStorageUtils.getEntityManagerFactory(JpaStorageUtils.CS_PERSISTENCE_UNIT);
-            em = emf.createEntityManager();
-            em.getTransaction().begin();
+        	jpaTransactionContext.beginTransaction();
             
             for (PermissionRoleRel permRoleRel : permRoleRelList) {
-            	if (permRoleRelExists(em, permRoleRel) == true) {
+            	if (permRoleRelExists(jpaTransactionContext, permRoleRel) == true) {
             		//
             		// Remove the item from the list since it already exists
             		//
             		permRoleRelList.remove(permRoleRel);
             	}
             }
-            
-            em.getTransaction().commit();
-        	em.close();            
+            jpaTransactionContext.commitTransaction();
         } catch (Exception e) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+        	jpaTransactionContext.markForRollback();
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
             throw e;
         } finally {
-            if (em != null) {
-                JpaStorageUtils.releaseEntityManagerFactory(emf);
-            }
+            ctx.closeConnection();
         }
-
     }
 
     /* (non-Javadoc)
@@ -155,7 +152,7 @@ public class PermissionRoleDocumentHandler
     @Override
     public void completeCreate(DocumentWrapper<List<PermissionRoleRel>> wrapDoc) throws Exception {
         PermissionRole pr = getCommonPart();
-        AuthorizationDelegate.addPermissions(getServiceContext(), pr);
+        AuthorizationDelegate.addRelationships(getServiceContext(), pr);
     }
 
     /* (non-Javadoc)
@@ -177,7 +174,8 @@ public class PermissionRoleDocumentHandler
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#handleGet(org.collectionspace.services.common.document.DocumentWrapper)
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void handleGet(DocumentWrapper<List<PermissionRoleRel>> wrapDoc) throws Exception {
         setCommonPart(extractCommonPart(wrapDoc));
         getServiceContext().setOutput(permissionRole);
@@ -206,53 +204,67 @@ public class PermissionRoleDocumentHandler
     @Override
     public void completeDelete(DocumentWrapper<List<PermissionRoleRel>> wrapDoc) throws Exception {
         PermissionRole pr = getCommonPart();
-        AuthorizationDelegate.deletePermissions(getServiceContext(), pr);
+        AuthorizationDelegate.deletePermissionsFromRoles(getServiceContext(), pr);
     }
 
-    /* (non-Javadoc)
+    /*
+     * Turns a list of permission-role rows from the database into a PermissionRole object.  The list of rows
+     * was the result of a query where the subject was either a Role or a Permission.
+     * 
+     * (non-Javadoc)
      * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#extractCommonPart(org.collectionspace.services.common.document.DocumentWrapper)
      */
     @Override
-    public PermissionRole extractCommonPart(
-            DocumentWrapper<List<PermissionRoleRel>> wrapDoc)
+    public PermissionRole extractCommonPart(DocumentWrapper<List<PermissionRoleRel>> wrapDoc)
             throws Exception {
-        List<PermissionRoleRel> prrl = wrapDoc.getWrappedObject();
-        PermissionRole pr = new PermissionRole();
-        SubjectType subject = PermissionRoleUtil.getRelationSubject(getServiceContext());
-        if (prrl.size() == 0) {
-            return pr;
+        PermissionRole result = new PermissionRole();
+
+        List<PermissionRoleRel> permissionRoleRel = wrapDoc.getWrappedObject();
+        if (permissionRoleRel.size() == 0) {
+            return result;
         }
-        PermissionRoleRel prr0 = prrl.get(0);
+        
+        SubjectType subject = PermissionRoleUtil.getRelationSubject(getServiceContext());
+        result.setSubject(subject);
+        
+        PermissionRoleRel prr0 = permissionRoleRel.get(0);
         if (SubjectType.ROLE.equals(subject)) {
-
-            List<PermissionValue> pvs = new ArrayList<PermissionValue>();
-            pr.setPermission(pvs);
+        	//
+        	// Since ROLE is the subject, they'll be just one Permission
+        	//
+            List<PermissionValue> permissionValueList = new ArrayList<PermissionValue>();
+            result.setPermission(permissionValueList);
             PermissionValue pv = AuthorizationRoleRel.buildPermissionValue(prr0);
-            pvs.add(pv);
-
-            //add roles
-            List<RoleValue> rvs = new ArrayList<RoleValue>();
-            pr.setRole(rvs);
-            for (PermissionRoleRel prr : prrl) {
+            permissionValueList.add(pv);
+            //
+            // Add role values
+            //
+            List<RoleValue> roleValueList = new ArrayList<RoleValue>();
+            result.setRole(roleValueList);
+            for (PermissionRoleRel prr : permissionRoleRel) {
                 RoleValue rv = AuthorizationRoleRel.buildRoleValue(prr);
-                rvs.add(rv);
+                roleValueList.add(rv);
             }
         } else if (SubjectType.PERMISSION.equals(subject)) {
-
-            List<RoleValue> rvs = new ArrayList<RoleValue>();
-            pr.setRole(rvs);
+        	//
+        	// Since PERMISSION is the subject, they'll be just one Role and one or more Permissions
+        	//
+            List<RoleValue> roleValueList = new ArrayList<RoleValue>();
+            result.setRole(roleValueList);
             RoleValue rv = AuthorizationRoleRel.buildRoleValue(prr0);
-            rvs.add(rv);
-
-            //add permssions
-            List<PermissionValue> pvs = new ArrayList<PermissionValue>();
-            pr.setPermission(pvs);
-            for (PermissionRoleRel prr : prrl) {
+            roleValueList.add(rv);
+            //
+            // Add permssions values
+            //
+            List<PermissionValue> permissionValueList = new ArrayList<PermissionValue>();
+            result.setPermission(permissionValueList);
+            for (PermissionRoleRel prr : permissionRoleRel) {
                 PermissionValue pv = AuthorizationRoleRel.buildPermissionValue(prr);
-                pvs.add(pv);
+                permissionValueList.add(pv);
             }
         }
-        return pr;
+        
+        return result;
     }
 
     /**
@@ -263,7 +275,8 @@ public class PermissionRoleDocumentHandler
      * @param handleDelete the handle delete
      * @throws Exception the exception
      */
-    public void fillCommonPart(PermissionRole pr,
+    @SuppressWarnings("rawtypes")
+	public void fillCommonPart(PermissionRole pr,
     			DocumentWrapper<List<PermissionRoleRel>> wrapDoc,
     			boolean handleDelete)
             throws Exception {
@@ -276,8 +289,15 @@ public class PermissionRoleDocumentHandler
             //subject mismatch should have been checked during validation
         }
         
-        String tenantId = this.getServiceContext().getTenantId();
-        PermissionRoleUtil.buildPermissionRoleRel(pr, subject, prrl, handleDelete, tenantId);
+        ServiceContext ctx = this.getServiceContext();
+        String tenantId = ctx.getTenantId();
+        try {
+        	PermissionRoleUtil.buildPermissionRoleRel(ctx, pr, subject, prrl, handleDelete, tenantId);
+        } catch (DocumentNotFoundException dnf) {
+        	String msg = String.format("The following perm-role payload references permissions and/or roles that do not exist: \n%s",
+        			JaxbUtils.toString(pr, PermissionRole.class));
+        	throw new DocumentException(msg);
+        }
     }
     
     /* (non-Javadoc)

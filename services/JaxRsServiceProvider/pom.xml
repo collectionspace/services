@@ -291,6 +291,16 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.structureddate.service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.systeminfo.service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>       
+            <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.media.service</artifactId>
             <version>${project.version}</version>
         </dependency>

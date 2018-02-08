@@ -24,7 +24,6 @@
 package org.collectionspace.services.common.vocabulary.nuxeo;
 
 import org.collectionspace.services.common.api.Tools;
-import org.collectionspace.services.common.api.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +44,7 @@ public class AuthorityIdentifierUtils {
     // FIXME: Verify uniqueness before returning the generated short identifier.
     // FIXME: Consider using a hash of the display name, rather than a timestamp,
     // when it is necessary to add a suffix for uniqueness.
-    protected static String generateShortIdentifierFromDisplayName(String displayName, String shortDisplayName) {
+    public static String generateShortIdentifierFromDisplayName(String displayName, String shortDisplayName) {
         String generatedShortIdentifier = "";
         if (Tools.notEmpty(displayName)) {
             generatedShortIdentifier = displayName + '-' + Tools.now().toString();
@@ -62,6 +61,4 @@ public class AuthorityIdentifierUtils {
         }
         return generatedShortIdentifier;
     }
-
-
 }

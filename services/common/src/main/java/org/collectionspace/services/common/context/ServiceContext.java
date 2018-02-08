@@ -38,7 +38,7 @@ import org.collectionspace.services.common.document.TransactionException;
 import org.collectionspace.services.common.document.ValidatorHandler;
 import org.collectionspace.services.common.security.SecurityContext;
 import org.collectionspace.services.common.storage.TransactionContext;
-import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
+
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.config.service.ServiceBindingType;
@@ -423,17 +423,25 @@ public interface ServiceContext<IT, OT> {
 	/**
 	 * 
 	 */
-	public void releaseConnection() throws TransactionException; // Assumes there's been a call to getConnection.
+	public void closeConnection() throws TransactionException; // Assumes there's been a call to getConnection.
 	
 	/**
+	 * @throws TransactionException 
 	 * 
 	 */
-	public void setTransactionContext(TransactionContext transactionCtx); // For sharing a transaction context with another service context.
+	void setTransactionContext(TransactionContext transactionCtx) throws TransactionException; // For sharing a transaction context with another service context.
 	
 	/**
 	 * 
 	 */
 	public boolean isTransactionContextShared() throws TransactionException;
+
+	/**
+	 * 
+	 * @return
+	 */
+	TransactionContext getCurrentTransactionContext();
+
 }
 
 

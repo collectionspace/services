@@ -36,14 +36,7 @@
             </xs:documentation>
 			<xs:appinfo>
 				<hj:entity>
-					<orm:table name="permissions">
-						<orm:unique-constraint>
-                            <!-- combined length should be < 1000 bytes -->
-                            <orm:column-name>resource_name</orm:column-name>
-                            <orm:column-name>action_group</orm:column-name>
-                            <orm:column-name>tenant_id</orm:column-name>
-	                    </orm:unique-constraint>
-                    </orm:table>
+					<orm:table name="permissions" />
 				</hj:entity>
 			</xs:appinfo>
 		</xs:annotation>
@@ -81,8 +74,7 @@
 					</xs:appinfo>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="actionGroup" type="xs:string" minOccurs="0"
-				maxOccurs="1">
+			<xs:element name="actionGroup" type="xs:string" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
 					<xs:appinfo>
 						<hj:basic>
@@ -91,14 +83,30 @@
 					</xs:appinfo>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="action" type="permission_action"
-				minOccurs="1" maxOccurs="unbounded" />
-			<xs:element name="effect" type="effect_type" minOccurs="1"
-				maxOccurs="1">
+			<xs:element name="action" type="permission_action" minOccurs="1" maxOccurs="unbounded" />
+			<xs:element name="effect" type="effect_type" minOccurs="1" maxOccurs="1">
 				<xs:annotation>
 					<xs:appinfo>
 						<hj:basic>
 							<orm:column name="effect" length="32" nullable="false" />
+						</hj:basic>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		    <xs:element name="metadataProtection" type="xs:string" minOccurs="0" maxOccurs="1">
+	            <xs:annotation>
+	                <xs:appinfo>
+	                    <hj:basic>
+	                        <orm:column name="metadata_protection" nullable="true"/>
+	                    </hj:basic>
+	                </xs:appinfo>
+	            </xs:annotation>
+            </xs:element>
+			<xs:element name="actionsProtection" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:appinfo>
+						<hj:basic>
+							<orm:column name="actions_protection" nullable="true"/>
 						</hj:basic>
 					</xs:appinfo>
 				</xs:annotation>
