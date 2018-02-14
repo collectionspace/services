@@ -21,7 +21,7 @@
     
     <target name="download">
         <exec executable="curl"  failonerror="true">
-            <arg line="-o cspaceUI@${cspace.ui.version}.min.js --fail --remote-name --location https://unpkg.com/cspace-ui@${cspace.ui.version}/dist/cspaceUI.min.js"/>
+            <arg line="-o cspaceUI@${cspace.ui.version}.min.js --fail --insecure --remote-name --location https://unpkg.com/cspace-ui@${cspace.ui.version}/dist/cspaceUI.min.js"/>
         </exec>
     </target>
     
