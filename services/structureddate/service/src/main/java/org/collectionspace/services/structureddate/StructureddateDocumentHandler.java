@@ -127,4 +127,9 @@ public class StructureddateDocumentHandler extends AbstractMultipartDocumentHand
 	public DocumentFilter createDocumentFilter() {
 		throw new RuntimeException("Unimplemented method.");
 	}
+	
+	@Override
+	public boolean supportsWorkflowStates() {
+		return false;
+	}
 }

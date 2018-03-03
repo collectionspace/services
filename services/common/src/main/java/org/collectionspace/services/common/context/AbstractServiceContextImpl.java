@@ -566,14 +566,16 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     /**
      * Helps to filter for queries that either want to include or exclude documents in deleted workflow states.
      * 
+     * By default, we return *all* objects/records.
+     * 
      * @param queryParams
      * @return
      */
 	private static String buildWorkflowWhereClause(MultivaluedMap<String, String> queryParams) {
 		String result = null;
 
-		String includeDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_NONDELETED);
-		String includeOnlyDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_ONLY_DELETED);  // if set to true, it doesn't matter what the value is for 'includeDeleted'
+		String includeDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_DELETED_QP);
+		String includeOnlyDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_ONLY_DELETED_QP);  // if set to true, it doesn't matter what the value is for 'includeDeleted'
 		
 		if (includeOnlyDeleted != null) {			
 			if (Tools.isTrue(includeOnlyDeleted)) {
@@ -581,16 +583,18 @@ public abstract class AbstractServiceContextImpl<IT, OT>
 				// A value of 'true' for 'includeOnlyDeleted' means we're looking *only* for soft-deleted records/documents.
 				//
 				result = String.format("(ecm:currentLifeCycleState = '%s' OR ecm:currentLifeCycleState = '%s' OR ecm:currentLifeCycleState = '%s')",
-						WorkflowClient.WORKFLOWSTATE_DELETED, WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED,
+						WorkflowClient.WORKFLOWSTATE_DELETED, 
+						WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED,
 						WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED);
 			}
-		} else if (!Tools.isTrue(includeDeleted)) {
+		} else if (includeDeleted != null && Tools.isFalse(includeDeleted)) {
 			//
 			// We can only get here if the 'includeOnlyDeleted' query param is missing altogether.
 			// Ensure we don't return soft-deleted records
 			//
 			result = String.format("(ecm:currentLifeCycleState <> '%s' AND ecm:currentLifeCycleState <> '%s' AND ecm:currentLifeCycleState <> '%s')",
-					WorkflowClient.WORKFLOWSTATE_DELETED, WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED,
+					WorkflowClient.WORKFLOWSTATE_DELETED, 
+					WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED,
 					WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED);
 		}
 

@@ -486,11 +486,11 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
            }
        }
 
-    protected CSWebApplicationException bigReThrow(Exception e, String serviceMsg) throws CSWebApplicationException {
+    protected CSWebApplicationException bigReThrow(Throwable e, String serviceMsg) throws CSWebApplicationException {
         return bigReThrow(e, serviceMsg, "");
     }
 
-    protected CSWebApplicationException bigReThrow(Exception e, String serviceMsg, String csid) throws CSWebApplicationException {
+    protected CSWebApplicationException bigReThrow(Throwable e, String serviceMsg, String csid) throws CSWebApplicationException {
     	boolean logException = true;
     	CSWebApplicationException result = null;
         Response response;
