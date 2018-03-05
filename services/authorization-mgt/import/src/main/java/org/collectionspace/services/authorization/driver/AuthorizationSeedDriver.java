@@ -31,6 +31,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
+import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.PermissionRole;
@@ -39,8 +40,11 @@ import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.authorization.importer.AuthorizationGen;
 import org.collectionspace.services.authorization.importer.AuthorizationSeed;
+import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationStore;
 import org.collectionspace.services.common.authorization_mgt.PermissionRoleUtil;
+import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 
 import org.hibernate.exception.ConstraintViolationException;
@@ -52,7 +56,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
@@ -109,12 +113,13 @@ public class AuthorizationSeedDriver {
 
     }
 
-    public void generate() {
+    public void generate(JPATransactionContext jpaTransactionContext) {
         try {
+        	login();
             authzGen = new AuthorizationGen();
             authzGen.initialize(tenantBindingFile);
-            authzGen.createDefaultRoles();
-            authzGen.createDefaultPermissions();
+            authzGen.createDefaultRoles(jpaTransactionContext);
+            authzGen.createDefaultPermissions(jpaTransactionContext);
             authzGen.associateDefaultPermissionsRoles();
             authzGen.exportDefaultRoles(exportDir + File.separator + ROLE_FILE);
             authzGen.exportDefaultPermissions(exportDir + File.separator + PERMISSION_FILE);
@@ -125,21 +130,24 @@ public class AuthorizationSeedDriver {
         } catch (Exception ex) {
             logger.error("AuthorizationSeedDriver caught an exception: ", ex);
             throw new RuntimeException(ex);
+        } finally {
+        	logout();
         }
     }
 
-    public void seed() {
+    public void seed(JPATransactionContext jpaTransactionContext) {
         TransactionStatus status = null;
         try {
+            login();
+            //
         	// Push all the authz info into the cspace DB tables -this include default roles, permissions, and permroles
+            //
             store();
-
-            setupSpring();
+            
+            setupSpringSecurity();
             status = beginTransaction("seedData");
             AuthorizationSeed authzSeed = new AuthorizationSeed();
-            authzSeed.seedPermissions(authzGen.getDefaultPermissions(), authzGen.getDefaultPermissionRoles());
-//            authzSeed.seedPermissions(exportDir + File.separator + PERMISSION_FILE,
-//                    exportDir + File.separator + PERMISSION_ROLE_FILE);
+            authzSeed.seedPermissions(jpaTransactionContext, authzGen.getDefaultPermissions(), authzGen.getDefaultPermissionRoles());
             if (logger.isDebugEnabled()) {
                 logger.debug("Authorization seeding completed.");
             }
@@ -159,23 +167,29 @@ public class AuthorizationSeedDriver {
         }
     }
 
-    private void setupSpring() {
-
+    /**
+     * Setup of Spring Security context
+     */
+    private void setupSpringSecurity() {
         ClassPathXmlApplicationContext appContext = new ClassPathXmlApplicationContext(
                 new String[]{SPRING_SECURITY_METADATA});
-        login();
         System.setProperty("spring-beans-config", SPRING_SECURITY_METADATA);
+        //
         // authZ local not used but call to AuthZ.get() has side-effect of initializing our Spring Security context
+        //
         AuthZ authZ = AuthZ.get();
         txManager = (org.springframework.jdbc.datasource.DataSourceTransactionManager) appContext.getBean("transactionManager");
+        //
+        // debug
+        //
         if (logger.isDebugEnabled()) {
             logger.debug("Spring Security setup complete.");
         }
     }
 
     private void login() {
-        //GrantedAuthority cspace_admin = new GrantedAuthorityImpl("ROLE_ADMINISTRATOR");
-        GrantedAuthority spring_security_admin = new GrantedAuthorityImpl("ROLE_SPRING_ADMIN"); //NOTE: Must match with value in applicationContext-authorization-test.xml (aka SPRING_SECURITY_METADATA)
+        //GrantedAuthority cspace_admin = new SimpleGrantedAuthority("ROLE_ADMINISTRATOR");
+        GrantedAuthority spring_security_admin = new SimpleGrantedAuthority(AuthN.ROLE_SPRING_ADMIN_NAME); //NOTE: Must match with value in applicationContext-authorization-test.xml (aka SPRING_SECURITY_METADATA)
         HashSet<GrantedAuthority> gauths = new HashSet<GrantedAuthority>();
         //gauths.add(cspace_admin);
         gauths.add(spring_security_admin);
@@ -194,25 +208,22 @@ public class AuthorizationSeedDriver {
     }
 
     private void store() throws Exception {
-        EntityManagerFactory emf = JpaStorageUtils.getEntityManagerFactory(JpaStorageUtils.CS_AUTHZ_PERSISTENCE_UNIT);
-        EntityManager em = null;
-
+        JPATransactionContext jpaTransactionContext = new JPATransactionContext((ServiceContext)null);
         try {
-            em = emf.createEntityManager();
-            em.getTransaction().begin();
+        	jpaTransactionContext.beginTransaction();
             
 	        AuthorizationStore authzStore = new AuthorizationStore();
 	        logger.info("Seeding Roles metadata to database.");
 	        for (Role role : authzGen.getDefaultRoles()) {
 	        	try {
-	        		authzStore.store(em, role);
+	        		authzStore.store(jpaTransactionContext, role);
 	        	} catch (Exception e) {
 	        		//
 	        		// If the role already exists, read it in and replace the instance
 	        		// we're trying to import with the exist one.  This will ensure that the rest
 	        		// of import uses the correct CSID.
 	        		if (e.getCause() instanceof ConstraintViolationException) {
-	        			Role existingRole = authzStore.getRoleByName(role.getRoleName(), role.getTenantId());
+	        			Role existingRole = authzStore.getRoleByName(jpaTransactionContext, role.getRoleName(), role.getTenantId());
 	        			//
 	        			role = existingRole;
 	        		}
@@ -221,39 +232,48 @@ public class AuthorizationSeedDriver {
 	
 	        logger.info("Seeding Permissions metadata to database.");
 	        for (Permission perm : authzGen.getDefaultPermissions()) { //FIXME: REM - 3/27/2012 - If we change the CSID of permissions to something like a refname, then we need to check for existing perms just like we did above for roles
-	            authzStore.store(em, perm);
+	            authzStore.store(jpaTransactionContext, perm);
 	        }
 	
 	        logger.info("Seeding Permissions/Roles relationships metadata to database.");
 	        List<PermissionRoleRel> permRoleRels = new ArrayList<PermissionRoleRel>();
 	        for (PermissionRole pr : authzGen.getDefaultPermissionRoles()) {
-	            PermissionRoleUtil.buildPermissionRoleRel(em, pr, SubjectType.ROLE, permRoleRels, false /*not for delete*/);
+	        	String tenantId = getTenantId(pr);
+	            PermissionRoleUtil.buildPermissionRoleRel(jpaTransactionContext, pr, SubjectType.ROLE, permRoleRels, false /*not for delete*/, tenantId);
 	        }
 	        for (PermissionRoleRel permRoleRel : permRoleRels) {
-	            authzStore.store(em, permRoleRel);
+	            authzStore.store(jpaTransactionContext, permRoleRel);
 	        }
 	
-	        em.getTransaction().commit();
-	        em.close();
+	        jpaTransactionContext.commitTransaction();
 	        if (logger.isInfoEnabled()) {
 	            logger.info("All Authorization metadata persisted.");
 	        }
         } catch (Exception e) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+        	jpaTransactionContext.markForRollback();
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception and rolling back permission creation: ", e);
             }
             throw e;
         } finally {
-            if (em != null) {
-                JpaStorageUtils.releaseEntityManagerFactory(emf);
-            }
+        	jpaTransactionContext.close();
         }
     }
 
-    private TransactionStatus beginTransaction(String name) {
+    /*
+     * Find the associated tenant ID for this permission role instance.  Uses the tenant ID found in the first role.  
+     */
+    private String getTenantId(PermissionRole pr) {
+		String result = null;
+		
+		// Since all the role and permission values in a PermissionRole instance *must* have the same tenant ID, we
+		// can just get the tenant ID from the 0th (first) role.
+		result = pr.getRole().get(0).getTenantId();
+		
+		return result;
+	}
+
+	private TransactionStatus beginTransaction(String name) {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         // explicitly setting the transaction name is something that can only be done programmatically
         def.setName(name);

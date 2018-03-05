@@ -8,7 +8,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 
 /**
  * IDProxy.
@@ -27,30 +26,30 @@ public interface IdProxy extends CollectionSpaceProxy<String> {
     @POST
     @Consumes({"application/xml"})
     @Produces({"*/*"})
-    ClientResponse<Response> create(String xmlPayload);
+    Response create(String xmlPayload);
     
     //(R)ead ID Generator
     @GET
     @Path("/{csid}")
     @Produces({"application/xml"})
-    ClientResponse<String> read(@PathParam("csid") String csid);
+    Response read(@PathParam("csid") String csid);
     
     // Read (L)ist of ID Generators
     @GET
     @Produces({"application/xml"})
-    ClientResponse<String> readList();
+    Response readList();
     
     //(D)elete ID Generator
     @DELETE
     @Path("/{csid}")
     @Override
-    ClientResponse<Response> delete(@PathParam("csid") String csid);
+    Response delete(@PathParam("csid") String csid);
     
     // Operations on IDs
     
     //(C)reate ID
     @POST
     @Path("/{csid}/ids")
-    ClientResponse<String> createId(@PathParam("csid") String csid);
+    Response createId(@PathParam("csid") String csid);
  
 }

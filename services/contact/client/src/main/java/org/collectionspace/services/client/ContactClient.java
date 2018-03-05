@@ -16,6 +16,8 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.contact.ContactsCommon;
+
 /**
  * ContactClient.java
  *
@@ -23,7 +25,7 @@ package org.collectionspace.services.client;
  * $LastChangedDate: $
  * 
  */
-public class ContactClient extends AbstractCommonListPoxServiceClientImpl<ContactProxy> {
+public class ContactClient extends AbstractCommonListPoxServiceClientImpl<ContactProxy, ContactsCommon> {
 
     public static final String SERVICE_NAME = "contacts";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
@@ -31,7 +33,15 @@ public class ContactClient extends AbstractCommonListPoxServiceClientImpl<Contac
     public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    @Override
+    public ContactClient() throws Exception {
+		super();
+	}
+
+    public ContactClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
+
+	@Override
     public String getServiceName() {
         return SERVICE_NAME;
     }

@@ -43,11 +43,9 @@ import org.collectionspace.services.person.PersonTermGroupList;
 import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.SchoolOrStyleList;
-import org.jboss.resteasy.client.ClientResponse;
-//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
+import org.collectionspace.services.person.StructuredDateGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.collectionspace.services.person.StructuredDateGroup;
 
 /**
  * The Class PersonAuthorityClientUtils.
@@ -58,17 +56,19 @@ public class PersonAuthorityClientUtils {
     private static final Logger logger =
         LoggerFactory.getLogger(PersonAuthorityClientUtils.class);
 	private static final ServiceRequestType READ_REQ = ServiceRequestType.READ;
+    static private final Random random = new Random(System.currentTimeMillis());
 
     /**
      * @param csid the id of the PersonAuthority
      * @param client if null, creates a new client
      * @return
+     * @throws Exception 
      */
-    public static String getAuthorityRefName(String csid, PersonAuthorityClient client){
+    public static String getAuthorityRefName(String csid, PersonAuthorityClient client) throws Exception{
     	if (client == null) {
     		client = new PersonAuthorityClient();
     	}
-        ClientResponse<String> res = client.read(csid);
+        Response res = client.read(csid);
         try {
 	        int statusCode = res.getStatus();
 	        if(!READ_REQ.isValidStatusCode(statusCode)
@@ -77,7 +77,7 @@ public class PersonAuthorityClientUtils {
 	        }
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	            PersonauthoritiesCommon personAuthority = 
 	            	(PersonauthoritiesCommon) CollectionSpaceClientUtils.extractPart(input,
 	                    client.getCommonPartName(), PersonauthoritiesCommon.class);
@@ -89,7 +89,7 @@ public class PersonAuthorityClientUtils {
 	            throw new RuntimeException(e);
 	        }
         } finally {
-        	res.releaseConnection();
+        	res.close();
         }
     }
 
@@ -97,12 +97,13 @@ public class PersonAuthorityClientUtils {
      * @param csid the id of the PersonAuthority
      * @param client if null, creates a new client
      * @return
+     * @throws Exception 
      */
-    public static String getPersonRefName(String inAuthority, String csid, PersonAuthorityClient client){
+    public static String getPersonRefName(String inAuthority, String csid, PersonAuthorityClient client) throws Exception{
     	if ( client == null) {
     		client = new PersonAuthorityClient();
     	}
-        ClientResponse<String> res = client.readItem(inAuthority, csid);
+        Response res = client.readItem(inAuthority, csid);
         try {
 	        int statusCode = res.getStatus();
 	        if(!READ_REQ.isValidStatusCode(statusCode)
@@ -111,7 +112,7 @@ public class PersonAuthorityClientUtils {
 	        }
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	            PersonsCommon person = 
 	            	(PersonsCommon) CollectionSpaceClientUtils.extractPart(input,
 	                    client.getItemCommonPartName(), PersonsCommon.class);
@@ -123,10 +124,10 @@ public class PersonAuthorityClientUtils {
 	            throw new RuntimeException(e);
 	        }
         } finally {
-        	res.releaseConnection();
+        	res.close();
         }
     }
-
+    
     /**
      * Creates the person authority instance.
      *
@@ -135,8 +136,7 @@ public class PersonAuthorityClientUtils {
      * @param headerLabel the header label
      * @return the multipart output
      */
-    public static PoxPayloadOut createPersonAuthorityInstance(
-    		String displayName, String shortIdentifier, String headerLabel ) {
+    public static PoxPayloadOut createPersonAuthorityInstance(String displayName, String shortIdentifier, String headerLabel ) {
         PersonauthoritiesCommon personAuthority = new PersonauthoritiesCommon();
         personAuthority.setDisplayName(displayName);
         personAuthority.setShortIdentifier(shortIdentifier);
@@ -147,14 +147,27 @@ public class PersonAuthorityClientUtils {
         PayloadOutputPart commonPart = multipart.addPart(personAuthority, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(headerLabel);
 
-        if(logger.isDebugEnabled()){
-        	logger.debug("to be created, personAuthority common ", 
+        if (logger.isDebugEnabled()) {
+        	logger.debug("To be created, personAuthority common: ", 
         				personAuthority, PersonauthoritiesCommon.class);
         }
 
         return multipart;
     }
 
+    /*
+     * Create a very simple Person term -just a short ID and display name.
+     */
+	public static PoxPayloadOut createPersonInstance(String shortIdentifier, String displayName,
+			String headerLabel) {
+		List<PersonTermGroup> terms = getTermGroupInstance(shortIdentifier, displayName);
+		
+		Map<String, String> personInfo = new HashMap<String, String>();
+    	personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortIdentifier);
+
+		return createPersonInstance(null, null, personInfo, terms, null, headerLabel);
+	}    
+    
     /**
      * Creates a person instance.
      *
@@ -164,16 +177,16 @@ public class PersonAuthorityClientUtils {
      * @param headerLabel the header label
      * @return the multipart output
      */
-    public static PoxPayloadOut createPersonInstance(String inAuthority,
+    public static PoxPayloadOut createPersonInstance(
+    		String inAuthority,
     		String personAuthRefName,
     		Map<String, String> personInfo,
-                List<PersonTermGroup> terms,
-    		String headerLabel){
+            List<PersonTermGroup> terms,
+    		String headerLabel) {
         if (terms == null || terms.isEmpty()) {
             terms = getTermGroupInstance(getGeneratedIdentifier());
         }
-        final Map<String, List<String>> EMPTY_PERSON_REPEATABLES_INFO =
-                new HashMap<String, List<String>>();
+        final Map<String, List<String>> EMPTY_PERSON_REPEATABLES_INFO = new HashMap<String, List<String>>();
         return createPersonInstance(inAuthority, null /*personAuthRefName*/,
                 personInfo, terms, EMPTY_PERSON_REPEATABLES_INFO, headerLabel);
     }
@@ -189,10 +202,14 @@ public class PersonAuthorityClientUtils {
      * @param headerLabel the header label
      * @return the multipart output
      */
-    public static PoxPayloadOut createPersonInstance(String inAuthority, 
-    		String personAuthRefName, Map<String, String> personInfo,
-                List<PersonTermGroup> terms,
-                Map<String, List<String>> personRepeatablesInfo, String headerLabel){
+    public static PoxPayloadOut createPersonInstance(
+    		String inAuthority,
+    		String personAuthRefName,
+    		Map<String, String> personInfo,
+            List<PersonTermGroup> terms,
+            Map<String, List<String>> personRepeatablesInfo,
+            String headerLabel) {
+    	
         PersonsCommon person = new PersonsCommon();
         person.setInAuthority(inAuthority);
     	String shortId = personInfo.get(PersonJAXBSchema.SHORT_IDENTIFIER);
@@ -201,29 +218,30 @@ public class PersonAuthorityClientUtils {
     	}      	
     	person.setShortIdentifier(shortId);
     	
-    	String value;
-        List<String> values = null;
+        if (personInfo != null) {
+        	String value;
 
-        if((value = (String)personInfo.get(PersonJAXBSchema.BIRTH_DATE))!=null) {
-            StructuredDateGroup birthDate = new StructuredDateGroup();
-            birthDate.setDateDisplayDate(value);
-            person.setBirthDateGroup(birthDate);
+			if ((value = personInfo.get(PersonJAXBSchema.BIRTH_DATE)) != null) {
+				StructuredDateGroup birthDate = new StructuredDateGroup();
+				birthDate.setDateDisplayDate(value);
+				person.setBirthDateGroup(birthDate);
+			}
+			if ((value = personInfo.get(PersonJAXBSchema.DEATH_DATE)) != null) {
+				StructuredDateGroup deathDate = new StructuredDateGroup();
+				deathDate.setDateDisplayDate(value);
+				person.setDeathDateGroup(deathDate);
+			}
+			if ((value = personInfo.get(PersonJAXBSchema.BIRTH_PLACE)) != null)
+				person.setBirthPlace(value);
+			if ((value = personInfo.get(PersonJAXBSchema.DEATH_PLACE)) != null)
+				person.setDeathPlace(value);
+			if ((value = personInfo.get(PersonJAXBSchema.GENDER)) != null)
+				person.setGender(value);
+			if ((value = personInfo.get(PersonJAXBSchema.BIO_NOTE)) != null)
+				person.setBioNote(value);
+			if ((value = personInfo.get(PersonJAXBSchema.NAME_NOTE)) != null)
+				person.setNameNote(value);
         }
-        if((value = (String)personInfo.get(PersonJAXBSchema.DEATH_DATE))!=null) {
-            StructuredDateGroup deathDate = new StructuredDateGroup();
-            deathDate.setDateDisplayDate(value);
-            person.setDeathDateGroup(deathDate);
-        }
-        if((value = (String)personInfo.get(PersonJAXBSchema.BIRTH_PLACE))!=null)
-        	person.setBirthPlace(value);
-        if((value = (String)personInfo.get(PersonJAXBSchema.DEATH_PLACE))!=null)
-        	person.setDeathPlace(value);
-        if((value = (String)personInfo.get(PersonJAXBSchema.GENDER))!=null)
-        	person.setGender(value);
-         if((value = (String)personInfo.get(PersonJAXBSchema.BIO_NOTE))!=null)
-        	person.setBioNote(value);
-        if((value = (String)personInfo.get(PersonJAXBSchema.NAME_NOTE))!=null)
-        	person.setNameNote(value);
         
         // Set values in the Term Information Group
         PersonTermGroupList termList = new PersonTermGroupList();
@@ -233,41 +251,41 @@ public class PersonAuthorityClientUtils {
         termList.getPersonTermGroup().addAll(terms); 
         person.setPersonTermGroupList(termList);
         
-        if (personRepeatablesInfo != null) {
-            if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.GROUPS))!=null) {
-                    GroupList groupsList = new GroupList();
-                    List<String> groups = groupsList.getGroup();
-                    groups.addAll(values);
-                    person.setGroups(groupsList);
-            }
-            if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.NATIONALITIES))!=null) {
-                    NationalityList nationalitiesList = new NationalityList();
-                    List<String> nationalities = nationalitiesList.getNationality();
-                    nationalities.addAll(values);
-                    person.setNationalities(nationalitiesList);
-            }
+		if (personRepeatablesInfo != null) {
+			List<String> values = null;
 
-            if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.OCCUPATIONS))!=null) {
-                    OccupationList occupationsList = new OccupationList();
-                    List<String> occupations = occupationsList.getOccupation();
-                    occupations.addAll(values);
-                    person.setOccupations(occupationsList);
-            }
-            if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.SCHOOLS_OR_STYLES))!=null) {
-                    SchoolOrStyleList schoolOrStyleList = new SchoolOrStyleList();
-                    List<String> schoolsOrStyles = schoolOrStyleList.getSchoolOrStyle();
-                    schoolsOrStyles.addAll(values);
-                    person.setSchoolsOrStyles(schoolOrStyleList);
-            }        
-        }
+			if ((values = (List<String>) personRepeatablesInfo.get(PersonJAXBSchema.GROUPS)) != null) {
+				GroupList groupsList = new GroupList();
+				List<String> groups = groupsList.getGroup();
+				groups.addAll(values);
+				person.setGroups(groupsList);
+			}
+			if ((values = (List<String>) personRepeatablesInfo.get(PersonJAXBSchema.NATIONALITIES)) != null) {
+				NationalityList nationalitiesList = new NationalityList();
+				List<String> nationalities = nationalitiesList.getNationality();
+				nationalities.addAll(values);
+				person.setNationalities(nationalitiesList);
+			}
 
-        
+			if ((values = (List<String>) personRepeatablesInfo.get(PersonJAXBSchema.OCCUPATIONS)) != null) {
+				OccupationList occupationsList = new OccupationList();
+				List<String> occupations = occupationsList.getOccupation();
+				occupations.addAll(values);
+				person.setOccupations(occupationsList);
+			}
+			if ((values = (List<String>) personRepeatablesInfo.get(PersonJAXBSchema.SCHOOLS_OR_STYLES)) != null) {
+				SchoolOrStyleList schoolOrStyleList = new SchoolOrStyleList();
+				List<String> schoolsOrStyles = schoolOrStyleList.getSchoolOrStyle();
+				schoolsOrStyles.addAll(values);
+				person.setSchoolsOrStyles(schoolOrStyleList);
+			}
+		}
+
         PoxPayloadOut multipart = new PoxPayloadOut(PersonAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = multipart.addPart(person,
-            MediaType.APPLICATION_XML_TYPE);
+        PayloadOutputPart commonPart = multipart.addPart(person, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(headerLabel);
 
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
         	logger.debug("to be created, person common ", person, PersonsCommon.class);
         }
 
@@ -306,7 +324,7 @@ public class PersonAuthorityClientUtils {
     			personMap, terms, personRepeatablesMap, client.getItemCommonPartName());
     	
     	String result = null;
-    	ClientResponse<Response> res = client.createItem(vcsid, multipart);
+    	Response res = client.createItem(vcsid, multipart);
     	try {
 	    	int statusCode = res.getStatus();
 	
@@ -322,7 +340,7 @@ public class PersonAuthorityClientUtils {
 	
 	    	result = extractId(res);
     	} finally {
-    		res.releaseConnection();
+    		res.close();
     	}
     	
     	return result;
@@ -369,7 +387,7 @@ public class PersonAuthorityClientUtils {
      * @param res the res
      * @return the string
      */
-    public static String extractId(ClientResponse<Response> res) {
+    public static String extractId(Response res) {
         MultivaluedMap<String, Object> mvm = res.getMetadata();
         // FIXME: This may throw an NPE if the Location: header isn't present
         String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
@@ -382,7 +400,7 @@ public class PersonAuthorityClientUtils {
         	logger.debug("id=" + id);
         }
         return id;
-    }
+    }    
     
     /**
      * Returns an error message indicating that the status code returned by a
@@ -455,20 +473,32 @@ public class PersonAuthorityClientUtils {
 		return newStr.toString();
     }
     
-    public static List<PersonTermGroup> getTermGroupInstance(String identifier) {
-        if (Tools.isBlank(identifier)) {
-            identifier = getGeneratedIdentifier();
+    private static List<PersonTermGroup> getTermGroupInstance(String shortIdentifier) {
+    	return getTermGroupInstance(shortIdentifier, shortIdentifier);
+    }
+    
+    public static List<PersonTermGroup> getTermGroupInstance(String shortIdentifier, String displayName) {
+        if (Tools.isBlank(shortIdentifier)) {
+        	shortIdentifier = getGeneratedIdentifier();
         }
+        if (Tools.isBlank(shortIdentifier)) {
+            displayName = shortIdentifier;
+        }
+        
         List<PersonTermGroup> terms = new ArrayList<PersonTermGroup>();
         PersonTermGroup term = new PersonTermGroup();
-        term.setTermDisplayName(identifier);
-        term.setTermName(identifier);
+        term.setTermDisplayName(displayName);
+        term.setTermName(shortIdentifier);
         terms.add(term);
         return terms;
     }
     
     private static String getGeneratedIdentifier() {
-        return "id" + new Date().getTime(); 
+        return "id" + createIdentifier();
    }
-
+    
+    private static String createIdentifier() {
+        long identifier = System.currentTimeMillis() + random.nextInt();
+        return Long.toString(identifier);
+    }
 }

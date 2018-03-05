@@ -16,6 +16,8 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.group.GroupsCommon;
+
 /**
  * GroupClient.java
  *
@@ -23,13 +25,21 @@ package org.collectionspace.services.client;
  * $LastChangedDate: 2010-05-17 18:25:37 -0700 (Mon, 17 May 2010) $
  *
  */
-public class GroupClient extends AbstractCommonListPoxServiceClientImpl<GroupProxy> {
+public class GroupClient extends AbstractCommonListPoxServiceClientImpl<GroupProxy, GroupsCommon> {
 	
 	public static final String SERVICE_NAME = "groups";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;	
+
+	public GroupClient() throws Exception {
+		super();
+	}
+
+	public GroupClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
 
 	@Override
 	public String getServiceName() {

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<component	name="org.collectionspace.services.listener.updateimagederivatives.ecm.types">
+	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent"
+		point="listener">
+		<listener name="updateimagederivativeslistener" async="true"
+			postCommit="true"
+			class="org.collectionspace.services.listener.UpdateImageDerivatives">
+			<event>pictureViewsGenerationDone</event>
+		</listener>
+	</extension>
+</component>

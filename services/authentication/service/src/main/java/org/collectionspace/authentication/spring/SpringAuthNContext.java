@@ -23,139 +23,114 @@
  */
 package org.collectionspace.authentication.spring;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Set;
-
-import java.security.acl.Group;
-import javax.security.auth.Subject;
-
+import org.collectionspace.authentication.AuthN;
 import org.collectionspace.authentication.CSpaceTenant;
+import org.collectionspace.authentication.CSpaceUser;
 import org.collectionspace.authentication.spi.AuthNContext;
-
-import org.springframework.security.authentication.jaas.JaasAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
- * SpringAuthNContext provides utilities to CSpace services runtime
- * @author 
+ * Utilities for accessing the Spring Security authentication context.
  */
-final public class SpringAuthNContext extends AuthNContext {
-    //private static final String SUBJECT_CONTEXT_KEY = "javax.security.auth.Subject.container";
+public class SpringAuthNContext implements AuthNContext {
 
-    public String getUserId() {
-    	String result = ANONYMOUS_USER;
-    	
+    /**
+     * Returns the username of the authenticated user.
+     * 
+     * @return the username
+     */
+    @Override
+	public String getUserId() {
         Authentication authToken = SecurityContextHolder.getContext().getAuthentication();
-        if (authToken != null) {
-        	result = authToken.getName();
+        
+        if (authToken == null) {
+            return AuthN.ANONYMOUS_USER;
+        }
+        
+        return authToken.getName();
     }
+
+    /**
+     * Returns the authenticated CSpaceUser user.
+     * 
+     * @return the user
+     */
+    @Override
+	public CSpaceUser getUser() {
+    	CSpaceUser result = null;
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = null;
+        if (authentication != null) {
+            principal = authentication.getPrincipal();
+            if (principal instanceof CSpaceUser ) {
+            	result = (CSpaceUser) principal;
+            }
+        }        
         
         return result;
     }
 
     /**
-     * retrieve tenant ids from Jaas LoginContext
-     * @return
+     * Returns the id of the primary tenant associated with the authenticated user.
+     * 
+     * @return the tenant id
      */
     @Override
-    public String[] getTenantIds() {
-
-        ArrayList<String> tenantList = new ArrayList<String>();
-        CSpaceTenant[] tenants = getTenants();
-        for (CSpaceTenant tenant : tenants) {
-            tenantList.add(tenant.getId());
-        }
-        return tenantList.toArray(new String[0]);
-    }
-
-    @Override
-    public String getCurrentTenantId() {
-    	String result = ANONYMOUS_TENANT_ID;
+	public String getCurrentTenantId() {
+    	String result = null;
     	
-    	String userId = getUserId();
-    	if (userId.equals(ANONYMOUS_USER) == false && userId.equals(SPRING_ADMIN_USER) == false) {
-        String[] tenantIds = getTenantIds();
-        if (tenantIds.length < 1) {
-            throw new IllegalStateException("No tenant associated with user=" + getUserId());
-        }
-	        result = getTenantIds()[0];
-    }
+    	CSpaceUser cspaceUser = getUser();
+    	if (cspaceUser != null) {
+            result = getCurrentTenant().getId();
+    	} else {
+	        String username = getUserId();        
+	        if (username.equals(AuthN.ANONYMOUS_USER)) {
+	            result = AuthN.ANONYMOUS_TENANT_ID;
+	        } else if (username.equals(AuthN.SPRING_ADMIN_USER)) {
+	            result = AuthN.ADMIN_TENANT_ID;
+	        }
+    	}
     	
     	return result;
     }
 
-    public CSpaceTenant[] getTenants() {
-        List<CSpaceTenant> tenants = new ArrayList<CSpaceTenant>();
-        Subject caller = getSubject();
-        if (caller == null) {
-        	if (getUserId().equals(SPRING_ADMIN_USER) == false) {
-	            String msg = String.format("Could not find Subject in SpringAuthNContext for user '%s'!", getUserId()); 
-	            System.err.println(msg);	            
-        	}
-            return tenants.toArray(new CSpaceTenant[0]);
+    /**
+     * Returns the name of the primary tenant associated with the authenticated user.
+     * 
+     * @return the tenant name
+     */
+    @Override
+	public String getCurrentTenantName() {
+        if (getUserId().equals(AuthN.ANONYMOUS_USER)) {
+            return AuthN.ANONYMOUS_TENANT_NAME;
         }
-        
-        Set<Group> groups = null;
-        groups = caller.getPrincipals(Group.class);
-        if (groups != null && groups.size() == 0) {
-            String msg = "no role(s)/tenant(s) found!";
-            //TODO: find out why no roles / tenants found
-            //FIXME: if logger is loaded when authn comes up, use it
-            //logger.warn(msg);
-            System.err.println(msg);
-            return tenants.toArray(new CSpaceTenant[0]);
-        }
-        for (Group g : groups) {
-            if ("Tenants".equals(g.getName())) {
-                Enumeration members = g.members();
-                while (members.hasMoreElements()) {
-                    CSpaceTenant tenant = (CSpaceTenant) members.nextElement();
-                    tenants.add(tenant);
-                    //FIXME: if logger is loaded when authn comes up, use it
-//                    if (logger.isDebugEnabled()) {
-//                        logger.debug("found tenant id=" + tenant.getId()
-//                                + " name=" + tenant.getName());
-//                    }
-                }
-            }
-        }
-        return tenants.toArray(new CSpaceTenant[0]);
+
+        return getCurrentTenant().getName();
     }
 
+    /**
+     * Returns the primary tenant associated with the authenticated user.
+     * 
+     * @return the tenant
+     */
     @Override
-    public String getCurrentTenantName() {
-    	String result = ANONYMOUS_TENANT_NAME;
+	public CSpaceTenant getCurrentTenant() {
+    	CSpaceTenant result = null;
     	
-    	if (getUserId().equals(ANONYMOUS_USER) == false) {
-        CSpaceTenant[] tenants = getTenants();
-        if (tenants.length < 1) {
-            throw new IllegalStateException("No tenant associated with user=" + getUserId());
-        }
-	        result = getTenants()[0].getName();
-    }
+    	CSpaceUser cspaceUser = getUser();
+    	if (cspaceUser != null) {
+    		result = getUser().getPrimaryTenant();
+    	} else {
+    		String username = getUserId();
+	        if (username.equals(AuthN.ANONYMOUS_USER)) {
+	            result = new CSpaceTenant(AuthN.ANONYMOUS_TENANT_ID, AuthN.ANONYMOUS_TENANT_NAME);
+	        } else if (username.equals(AuthN.SPRING_ADMIN_USER)) {
+	            result = new CSpaceTenant(AuthN.ADMIN_TENANT_ID, AuthN.ADMIN_TENANT_NAME);
+	        } 
+    	}
     	
     	return result;
-    }
-
-    public Subject getSubject() {
-        Subject caller = null;
-        //if Spring was not used....
-        //caller = (Subject) PolicyContext.getContext(SUBJECT_CONTEXT_KEY);
-
-        //FIXME the follow call should be protected with a privileged action
-        //and must only be available to users with super privileges
-        //Spring does not offer any easy mechanism
-        //It is a bad idea to ship with a kernel user...kernel user should be
-        //created at startup time perhaps and used it here
-        Authentication authToken = SecurityContextHolder.getContext().getAuthentication();
-        JaasAuthenticationToken jaasToken = null;
-        if (authToken instanceof JaasAuthenticationToken) {
-            jaasToken = (JaasAuthenticationToken) authToken;
-            caller = (Subject) jaasToken.getLoginContext().getSubject();
-        }
-        return caller;
     }
 }

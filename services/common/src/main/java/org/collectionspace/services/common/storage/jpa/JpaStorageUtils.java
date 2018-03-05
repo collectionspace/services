@@ -32,6 +32,7 @@ import java.util.Map;
 import javax.persistence.PersistenceException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
@@ -45,10 +46,14 @@ import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.PermissionRoleRel;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.URIResourceImpl;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationRoleRel;
+import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.document.JaxbUtils;
+import org.collectionspace.services.common.document.TransactionException;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +62,7 @@ import org.slf4j.LoggerFactory;
  * Utilities for JpaStorage
  * @author 
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class JpaStorageUtils {
 
     final private static Logger logger = LoggerFactory.getLogger(JpaStorageUtils.class);
@@ -75,15 +81,22 @@ public class JpaStorageUtils {
     	boolean result = true;
     	
         boolean csAdmin = SecurityUtils.isCSpaceAdmin();
-    	if (csAdmin == true || tenantId == null) {
+        if (csAdmin == true) {
+        	logger.trace("Running as the CSAdmin user.");
+        	//Thread.dumpStack();
+        }
+        
+    	if (tenantId == null) {
     		result = false;
+        	logger.trace("Ignoring tenant ID during .");
+        	//Thread.dumpStack();
     	}
 
     	return result;
     }
-    
-    public static Object getEntity(String id, Class entityClazz)
-    		throws DocumentNotFoundException {
+    	
+	@Deprecated
+	public static Object getEntity(String id, Class entityClazz) {
         EntityManagerFactory emf = null;
         EntityManager em = null;
         Object entityFound = null;
@@ -92,6 +105,8 @@ public class JpaStorageUtils {
             em = emf.createEntityManager();
             //FIXME: it would be nice to verify tenantid as well
             entityFound = em.find(entityClazz, id);
+        } catch (Throwable t) {
+        	throw t;
         } finally {
             if (em != null) {
                 releaseEntityManagerFactory(emf);
@@ -127,6 +142,7 @@ public class JpaStorageUtils {
      * @param entityClazz
      * @return
      */
+    @Deprecated
     public static Object getEntity(EntityManager em, String id, Class entityClazz) throws DocumentNotFoundException {
         if (entityClazz == null) {
             String msg = "Not constructed with JpaStorageClientImpl(entityClazz) ctor";
@@ -136,7 +152,18 @@ public class JpaStorageUtils {
         //FIXME: it would be nice to verify tenantid as well
         return em.find(entityClazz, id);
     }
+        
+    public static Object getEntity(JPATransactionContext jpaTransactionContext, String id, Class entityClazz) throws DocumentNotFoundException {
+        if (entityClazz == null) {
+            String msg = "Not constructed with JpaStorageClientImpl(entityClazz) ctor";
+            logger.error(msg);
+            throw new UnsupportedOperationException(msg);
+        }
+        //FIXME: it would be nice to verify tenantid as well
+        return jpaTransactionContext.find(entityClazz, id);
+    }    
     
+    @Deprecated
     private static String getUserId(String csid)
     		throws DocumentNotFoundException  {
     	String result = null;
@@ -304,58 +331,100 @@ public class JpaStorageUtils {
         return result;
     }
     
-    public static Object getEnityByKey(EntityManager em, String entityName, String key, String value,
-            String tenantId) {
-    	Object result = null;
-    	
-        if (entityName == null) {
-            throw new IllegalArgumentException("entityName is required");
-        }
-        if (key == null) {
-            throw new IllegalArgumentException("id is required");
-        }
-        if (tenantId == null) {
-            throw new IllegalArgumentException("tenantId is required");
+    public static Object getEnityByKey(
+    		JPATransactionContext jpaTransactionContext,
+    		String entityName, 
+    		String key, 
+    		String value,
+            String tenantId) throws TransactionException {
+    	return getEnityByKey(jpaTransactionContext, (DocumentFilter)null, entityName, key, value, tenantId);
+    }
+    
+    public static Object getEnityByKey(
+    		JPATransactionContext jpaTransactionContext,
+    		DocumentFilter docFilter,
+    		String entityName, String key, String value,
+            String tenantId) throws TransactionException {
+        Object result = null;
+        
+        try {
+            boolean useTenantId = useTenantId(tenantId);
+            StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
+            queryStrBldr.append(entityName);
+            queryStrBldr.append(" a");
+            
+            if (docFilter != null) {
+	            String joinFetch = docFilter.getJoinFetchClause();
+	            if (Tools.notBlank(joinFetch)) {
+	            	queryStrBldr.append(" " + joinFetch);
+	            }
+            }
+            
+            queryStrBldr.append(" WHERE a." + key + " = :" + key);
+            if (useTenantId == true) {
+                queryStrBldr.append(" AND a.tenantId = :tenantId");
+            }
+            String queryStr = queryStrBldr.toString(); //for debugging            
+            Query q = jpaTransactionContext.createQuery(queryStr);
+            q.setParameter(key, value);
+            if (useTenantId == true) {
+                q.setParameter("tenantId", tenantId);
+            }
+            result = q.getSingleResult();
+        } catch (NoResultException nre) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Could not find entity with key ={" + key + "=" + value + "}", nre);
+            }
+            //returns null
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Could not find entity with id=" + key, e);
+            }
+            //returns null
         }
         
-        boolean useTenantId = useTenantId(tenantId);
-        StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
-        queryStrBldr.append(entityName);
-        queryStrBldr.append(" a");
-        queryStrBldr.append(" WHERE " + key + " = :" + key);
-        if (useTenantId == true) {
-            queryStrBldr.append(" AND tenantId = :tenantId");
-        }
-        String queryStr = queryStrBldr.toString(); //for debugging
-        Query q = em.createQuery(queryStr);
-        q.setParameter(key, value);
-        if (useTenantId == true) {
-            q.setParameter("tenantId", tenantId);
-        }
-        result = q.getSingleResult();
-
         return result;
     }
-    
-    public static Object getEntityByDualKeys(EntityManager em, String entityName, 
+
+    /**
+     * 
+     * @param em
+     * @param entityName
+     * @param key1
+     * @param value1
+     * @param key2
+     * @param value2
+     * @return
+     * @throws TransactionException 
+     */
+    public static Object getEntityByDualKeys(
+    		JPATransactionContext jpaTransactionContext,
+    		String entityName, 
     		String key1, String value1,
-    		String key2, String value2) {
-    	return getEntityByDualKeys(em, entityName, key1, value1, key2, value2, null);
+    		String key2, String value2) throws TransactionException {
+    	return getEntityByDualKeys(jpaTransactionContext, entityName, key1, value1, key2, value2, null);
     }
     
-    public static Object getEntityByDualKeys(EntityManager em, String entityName, 
+    /**
+     * 
+     * @param em
+     * @param entityName
+     * @param key1
+     * @param value1
+     * @param key2
+     * @param value2
+     * @param tenantId
+     * @return
+     * @throws TransactionException 
+     */
+	public static Object getEntityByDualKeys(
+    		JPATransactionContext jpaTransactionContext,
+    		String entityName, 
     		String key1, String value1,
     		String key2, String value2,
-            String tenantId) {
+            String tenantId) throws TransactionException {
     	Object result = null;
     	
-        if (entityName == null) {
-            throw new IllegalArgumentException("entityName is required");
-        }
-        if (key1 == null || key2 == null) {
-            throw new IllegalArgumentException("key names are required");
-        }
-        
         boolean useTenantId = useTenantId(tenantId);
         StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
         queryStrBldr.append(entityName);
@@ -366,57 +435,36 @@ public class JpaStorageUtils {
             queryStrBldr.append(" AND tenantId = :tenantId");
         }
         String queryStr = queryStrBldr.toString(); //for debugging
-        Query q = em.createQuery(queryStr);
+        Query q = jpaTransactionContext.createQuery(queryStr);
         q.setParameter(key1, value1);
         q.setParameter(key2, value2);
         if (useTenantId == true) {
             q.setParameter("tenantId", tenantId);
         }
+        
         result = q.getSingleResult();
 
         return result;
     }
     
-    public static Object getEnityByKey(String entityName, String key, String value,
-            String tenantId) {
-        EntityManagerFactory emf = null;
-        EntityManager em = null;
-        Object o = null;
-        
-        try {
-            emf = getEntityManagerFactory();
-            em = emf.createEntityManager();
-            o = getEnityByKey(em, entityName, key, value, tenantId);
-        } catch (NoResultException nre) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            if (logger.isDebugEnabled()) {
-                logger.debug("Could not find entity with key ={" + key + "=" + value + "}", nre);
-            }
-            //returns null
-        } catch (Exception e) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            if (logger.isDebugEnabled()) {
-                logger.debug("Could not find entity with id=" + key, e);
-            }
-            //returns null
-        } finally {
-            if (em != null) {
-                releaseEntityManagerFactory(emf);
-            }
-        }
-        
-        return o;
+    /**
+     * 
+     * @param ctx
+     * @param entityName
+     * @param id
+     * @param tenantId
+     * @return
+     * @throws TransactionException 
+     */
+    public static Object getEntity(
+    		JPATransactionContext jpaTransactionContext,
+    		DocumentFilter docFilter,
+    		String entityName,
+    		String id,
+            String tenantId) throws TransactionException {
+    	return getEnityByKey(jpaTransactionContext, docFilter, entityName, CSID_LABEL, id, tenantId);
     }
 
-    public static Object getEntity(String entityName, String id,
-            String tenantId) {
-    	return getEnityByKey(entityName, CSID_LABEL, id, tenantId);
-    }
-    
     /**
      * getEntity 
      * @param entityName fully qualified entity name
@@ -482,17 +530,34 @@ public class JpaStorageUtils {
         return o;
     }
 
+    public static Object getEntity(JPATransactionContext jpaTransactionContext, String entityName,
+            String whereClause, HashMap<String, Object> paramBindings) {
+        Object result = null;
+        
+        StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
+        queryStrBldr.append(entityName);
+        queryStrBldr.append(" a");
+        queryStrBldr.append(" " + whereClause);
+
+        String queryStr = queryStrBldr.toString(); //for debugging
+        Query q = jpaTransactionContext.createQuery(queryStr);
+        for (String paramName : paramBindings.keySet()) {
+            q.setParameter(paramName, paramBindings.get(paramName));
+        }
+        
+       	result = q.getSingleResult();
+        
+        if (result == null) {
+        	logger.debug("Call to getEntity() returned empty set.");
+        }
+        
+        return result;
+    }
+    
     public static Object getEntity(EntityManager em, String entityName,
             String whereClause, HashMap<String, Object> paramBindings) {
         Object result = null;
         
-    	if (entityName == null) {
-            throw new IllegalArgumentException("entityName is required");
-        }
-        if (whereClause == null) {
-            throw new IllegalArgumentException("whereClause is required");
-        }
-
         StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
         queryStrBldr.append(entityName);
         queryStrBldr.append(" a");

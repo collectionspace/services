@@ -37,7 +37,6 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +51,14 @@ public class XmlReplayTransport {
         private static String DD = "--";
         private static String CRLF = "\r\n";
 
+    private static String formatAuth(String authForTest) {
+        if (authForTest.startsWith("Bearer ")) {
+            return authForTest;
+        }
+        
+        return ("Basic " + authForTest);
+    }
+    
     public static ServiceResult doGET(String urlString, String authForTest, String fromTestID) throws Exception {
         ServiceResult pr = new ServiceResult();
         pr.fromTestID = fromTestID;
@@ -65,7 +72,7 @@ public class XmlReplayTransport {
         GetMethod getMethod = new GetMethod(urlString);
         getMethod.addRequestHeader("Accept", "multipart/mixed");
         getMethod.addRequestHeader("Accept", "application/xml");
-        getMethod.setRequestHeader("Authorization", "Basic " + authForTest); //"dGVzdDp0ZXN0");
+        getMethod.setRequestHeader("Authorization", formatAuth(authForTest)); //"dGVzdDp0ZXN0");
         getMethod.setRequestHeader("X-XmlReplay-fromTestID", fromTestID);
         try {
             int statusCode1 = client.executeMethod(getMethod);
@@ -102,8 +109,10 @@ public class XmlReplayTransport {
         DeleteMethod deleteMethod = new DeleteMethod(urlString);
         deleteMethod.setRequestHeader("Accept", "multipart/mixed");
         deleteMethod.addRequestHeader("Accept", "application/xml");
-        deleteMethod.setRequestHeader("Authorization", "Basic " + authForTest);
-        deleteMethod.setRequestHeader("X-XmlReplay-fromTestID", fromTestID);
+        deleteMethod.setRequestHeader("Authorization", formatAuth(authForTest));
+        if (Tools.notBlank(fromTestID)) {
+        	deleteMethod.setRequestHeader("X-XmlReplay-fromTestID", fromTestID);
+        }
         int statusCode1 = 0;
         String res = "";
         try {
@@ -172,23 +181,32 @@ public class XmlReplayTransport {
     */
 
     /** Use this overload for NON-multipart messages, that is, regular POSTs. */
-    public static ServiceResult doPOST_PUTFromXML(String fileName,
-                                                      Map<String,String> vars,
-                                                      String protoHostPort,
-                                                      String uri,
-                                                      String method,
-                                                      String contentType,
-                                                      XmlReplayEval evalStruct,
-                                                      String authForTest,
-                                                      String fromTestID)
-    throws Exception {
-        byte[] b = FileUtils.readFileToByteArray(new File(fileName));
-        String xmlString = new String(b);
-        String contentRaw = xmlString;
-        xmlString = evalStruct.eval(xmlString, evalStruct.serviceResultsMap, vars, evalStruct.jexl, evalStruct.jc);
-        String urlString = protoHostPort+uri;
-        return doPOST_PUT(urlString, xmlString, contentRaw, BOUNDARY, method, contentType, authForTest, fromTestID); //method is POST or PUT.
-    }
+	public static ServiceResult doPOST_PUTFromXML(
+			String fileName, 
+			Map<String, 
+			String> vars, 
+			String protoHostPort,
+			String uri, 
+			String method, 
+			String contentType, 
+			XmlReplayEval evalStruct, 
+			String authForTest,
+			String fromTestID) throws Exception {
+		byte[] b = FileUtils.readFileToByteArray(new File(fileName));
+		String xmlString = new String(b);
+		String contentRaw = xmlString;
+		//
+		// Add the test ID so we can substitute instances of "${testID}" in the
+		// payload with the test ID.
+		//
+		String testId = fromTestID.split("\\.")[1]; // Get the unqualified (without the group ID part) test name
+		vars.put("Test.ID", testId);
+
+		xmlString = evalStruct.eval(xmlString, evalStruct.serviceResultsMap, vars, evalStruct.jexl, evalStruct.jc);
+		String urlString = protoHostPort + uri;
+		
+		return doPOST_PUT(urlString, xmlString, contentRaw, BOUNDARY, method, contentType, authForTest, fromTestID); // method  is POST or PUT.
+	}
 
         //HACK for speed testing in doPOST_PUT.
         //  Result: XmlReplay takes 9ms to process one test
@@ -199,18 +217,21 @@ public class XmlReplayTransport {
         //if (true) return result;
         //END-HACK
 
-    public static ServiceResult doPOST_PUT(String urlString,
-                                                                     String content,
-                                                                     String contentRaw,
-                                                                     String boundary,
-                                                                     String method,
-                                                                     String contentType,
-                                                                     String authForTest,
-                                                                     String fromTestID) throws Exception {
+    private static ServiceResult doPOST_PUT(
+    		String urlString,
+    		String content,
+			String contentRaw,
+			String boundary,
+			String method,
+			String contentType,
+			String authForTest,
+			String fromTestID) throws Exception {
         ServiceResult result = new ServiceResult();
         result.method = method;
+        
         String deleteURL = "";
         String location = "";
+        
         try {
             URL url = new URL(urlString);
             HttpURLConnection conn;
@@ -223,7 +244,7 @@ public class XmlReplayTransport {
                 conn.setRequestProperty("Accept", "application/xml");
                 conn.setRequestProperty("content-type", contentType);
             }
-            conn.setRequestProperty("Authorization", "Basic " + authForTest);  //TODO: remove test user : hard-coded as "dGVzdDp0ZXN0"
+            conn.setRequestProperty("Authorization", formatAuth(authForTest));  //TODO: remove test user : hard-coded as "dGVzdDp0ZXN0"
             conn.setRequestProperty("Connection", "close");
             conn.setRequestProperty("X-XmlReplay-fromTestID", fromTestID);
             conn.setDoOutput(true);
@@ -264,56 +285,83 @@ public class XmlReplayTransport {
         } catch (Throwable t2){
             result.error = "ERROR in XmlReplayTransport: "+t2;
         }
+        
         return result;
     }
 
-    public static ServiceResult doPOST_PUT_PostMethod(String urlString, String content, Map<String,String> contentRaw,
-                                           String boundary, String method, String contentType,
-                                           String authForTest, String fromTestID) throws Exception {
-        ServiceResult result = new ServiceResult();
-        result.method = method;
-        String deleteURL = "";
-        String location = "";
-        try {
-            HttpClient client = new HttpClient();
-            PostMethod postMethod = new PostMethod(urlString);
-            postMethod.setRequestHeader("Accept", "multipart/mixed");
-            postMethod.addRequestHeader("Accept", "application/xml");
-            postMethod.setRequestHeader("Authorization", "Basic " + authForTest);
-            postMethod.setRequestHeader("X-XmlReplay-fromTestID", fromTestID);
-            //this method takes an array of params.  Not sure what they expect us to do with a raw post:
-            //   postMethod.setRequestBody();
-            int statusCode1 = 0;
-            String res = "";
-            try {
-                statusCode1 = client.executeMethod(postMethod);
-                result.responseCode = statusCode1;
-                //System.out.println("statusCode: "+statusCode1+" statusLine ==>" + postMethod.getStatusLine());
-                result.responseMessage = postMethod.getStatusText();
-                res = postMethod.getResponseBodyAsString();
-                Header[] headers = postMethod.getResponseHeaders("Location");
-                if (headers.length>0) {
-                    System.out.println("headers[0]:  "+headers[0]);
-                    String locationZero = headers[0].getValue();
-                    if (locationZero != null){
-                        String[] segments = locationZero.split("/");
-                        location = segments[segments.length - 1];
-                        deleteURL = Tools.glue(urlString, "/", location);
-                    }
-                }
-                postMethod.releaseConnection();
-            } catch (Throwable t){
-                result.error = t.toString();
-            }
-            result.result = res;
-            result.location = location;
-            result.deleteURL = deleteURL;
-            result.CSID = location;
-        } catch (Throwable t2){
-            result.error = "ERROR in XmlReplayTransport: "+t2;
-        }
-        return result;
-    }
+    @Deprecated
+    /**
+     * This method is not used and is a good candidate for removal.
+     * 
+     * @param urlString
+     * @param content
+     * @param contentRaw
+     * @param boundary
+     * @param method
+     * @param contentType
+     * @param authForTest
+     * @param fromTestID
+     * @return
+     * @throws Exception
+     */
+	private static ServiceResult doPOST_PUT_PostMethod(
+			String urlString, 
+			String content, 
+			Map<String, String> contentRaw,
+			String boundary, 
+			String method, 
+			String contentType, 
+			String authForTest, 
+			String fromTestID)
+			throws Exception {
+		ServiceResult result = new ServiceResult();
+		result.method = method;
+		String deleteURL = "";
+		String location = "";
+		
+		try {
+			HttpClient client = new HttpClient();
+			PostMethod postMethod = new PostMethod(urlString);
+			postMethod.setRequestHeader("Accept", "multipart/mixed");
+			postMethod.addRequestHeader("Accept", "application/xml");
+			postMethod.setRequestHeader("Authorization", formatAuth(authForTest));
+			postMethod.setRequestHeader("X-XmlReplay-fromTestID", fromTestID);
+			// this method takes an array of params. Not sure what they expect
+			// us to do with a raw post:
+			// postMethod.setRequestBody();
+			int statusCode1 = 0;
+			String res = "";
+			try {
+				statusCode1 = client.executeMethod(postMethod);
+				result.responseCode = statusCode1;
+				// System.out.println("statusCode: "+statusCode1+" statusLine
+				// ==>" + postMethod.getStatusLine());
+				result.responseMessage = postMethod.getStatusText();
+				res = postMethod.getResponseBodyAsString();
+				Header[] headers = postMethod.getResponseHeaders("Location");
+				if (headers.length > 0) {
+					System.out.println("headers[0]:  " + headers[0]);
+					String locationZero = headers[0].getValue();
+					if (locationZero != null) {
+						String[] segments = locationZero.split("/");
+						location = segments[segments.length - 1];
+						deleteURL = Tools.glue(urlString, "/", location);
+					}
+				}
+				postMethod.releaseConnection();
+			} catch (Throwable t) {
+				result.error = t.toString();
+			}
+			result.result = res;
+			result.location = location;
+			result.deleteURL = deleteURL;
+			result.CSID = location;
+		} catch (Throwable t2) {
+			result.error = "ERROR in XmlReplayTransport: " + t2;
+		}
+		
+		return result;
+	}
 
     private static void readStream(HttpURLConnection  conn, ServiceResult result) throws Throwable {
         BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));

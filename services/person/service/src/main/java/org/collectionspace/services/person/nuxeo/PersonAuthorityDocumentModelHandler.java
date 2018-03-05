@@ -24,24 +24,18 @@
 package org.collectionspace.services.person.nuxeo;
 
 import org.collectionspace.services.person.PersonauthoritiesCommon;
+import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 
 /**
  * PersonAuthorityDocumentModelHandler
  *
- * $LastChangedRevision: $
- * $LastChangedDate: $
  */
 public class PersonAuthorityDocumentModelHandler
 		extends AuthorityDocumentModelHandler<PersonauthoritiesCommon> {
 
-    /**
-     * Common part schema label
-     */
-    private static final String COMMON_PART_LABEL = "personauthorities_common";   
-    
     public PersonAuthorityDocumentModelHandler() {
-    	super(COMMON_PART_LABEL);
+    	super(PersonAuthorityClient.SERVICE_COMMON_PART_NAME, PersonAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 	
     /**

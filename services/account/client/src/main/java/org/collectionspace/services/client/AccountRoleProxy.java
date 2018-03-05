@@ -39,7 +39,6 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.authorization.AccountRole;
-import org.jboss.resteasy.client.ClientResponse;
 
 /**
  * @version $Revision:$
@@ -52,34 +51,34 @@ public interface AccountRoleProxy extends CollectionSpaceProxy<AbstractCommonLis
     //(C)reate
     @POST
     @Path("/{csid}/accountroles")
-    ClientResponse<Response> create(@PathParam("csid") String csid, AccountRole accRole);
+    Response create(@PathParam("csid") String csid, AccountRole accRole);
 
     //(R)ead
     @GET
     @Path("/{csid}/accountroles")
-    ClientResponse<AccountRole> read(@PathParam("csid") String csid);
+    Response read(@PathParam("csid") String csid);
 
     //(R)ead
     @GET
     @Path("/{csid}/accountroles/{arcsid}")
-    ClientResponse<AccountRole> read(@PathParam("csid") String csid,
+    Response read(@PathParam("csid") String csid,
             @PathParam("arcsid") String arcsid);
 
     //(D)elete
     @POST
     @Path("/{csid}/accountroles")
-    ClientResponse<Response> delete(@PathParam("csid") String csid,
+    Response delete(@PathParam("csid") String csid,
             @QueryParam("_method") String method,
             AccountRole accRole);
 
     //(U)pdate
     @PUT
     @Path("/{csid}/accountroles")
-    ClientResponse<AccountRole> update(@PathParam("csid") String csid, AccountRole role);
+    Response update(@PathParam("csid") String csid, AccountRole role);
     
     //(D)elete
     @Override
 	@DELETE
     @Path("/{csid}/accountroles")
-    ClientResponse<Response> delete(@PathParam("csid") String csid);
+    Response delete(@PathParam("csid") String csid);
 }

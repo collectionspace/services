@@ -24,7 +24,7 @@
 package org.collectionspace.services.valuationcontrol;
 
 import org.collectionspace.services.client.ValuationcontrolClient;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ import javax.ws.rs.Produces;
 @Path(ValuationcontrolClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class ValuationcontrolResource extends ResourceBase {
+public class ValuationcontrolResource extends NuxeoBasedResource {
 
     final Logger logger = LoggerFactory.getLogger(ValuationcontrolResource.class);
 

@@ -24,13 +24,13 @@
 package org.collectionspace.services.acquisition.nuxeo;
 
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 
 /** AcquisitionDocumentModelHandler
  *  $LastChangedRevision: $
  *  $LastChangedDate: $
  */
 public class AcquisitionDocumentModelHandler
-        extends DocHandlerBase<AcquisitionsCommon> {
+        extends NuxeoDocumentModelHandler<AcquisitionsCommon> {
 }
 

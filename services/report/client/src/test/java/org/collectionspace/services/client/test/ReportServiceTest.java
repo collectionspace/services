@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.acquisition.AcquisitionSourceList;
@@ -41,12 +40,8 @@ import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.report.ReportsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.client.AcquisitionClient;
-
-import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
-//import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +63,7 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
     // Instance variables specific to this test.    
     private String testDocType = "Acquisition";
 
-    private String createAquisitionResource() {
+    private String createAquisitionResource() throws Exception {
     	String result = null;
     	
     	AcquisitionClient acquisitionClient = new AcquisitionClient();
@@ -88,7 +83,7 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
     	
         PoxPayloadOut poxPayloadOut = new PoxPayloadOut(AcquisitionClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = poxPayloadOut.addPart(acquisitionClient.getCommonPartName(), acquisitionsCommon);
-        ClientResponse<Response> res = acquisitionClient.create(poxPayloadOut);
+        Response res = acquisitionClient.create(poxPayloadOut);
     	try {
             setupCreate();
 	        int statusCode = res.getStatus();
@@ -104,7 +99,7 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
 	        // so they can be deleted after tests have been run.
 	        allResourceIdsCreated.add(result);
     	} finally {
-    		res.releaseConnection();
+    		res.close();
     	}
     	
     	return result;
@@ -128,30 +123,39 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
     	invocationContext.setMode("single");
     	invocationContext.setSingleCSID(acquisitionCsid);
     	
-        ClientResponse<Response> res = client.publishReport(reportCsid, invocationContext);
-        int statusCode = res.getStatus();
-        setupCreate();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.publishReport(reportCsid, invocationContext);
+        try {
+	        int statusCode = res.getStatus();
+	        setupCreate();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        String publicItemCsid = extractId(res);
+	        Assert.assertNotNull(publicItemCsid);
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        String publicItemCsid = extractId(res);
-        Assert.assertNotNull(publicItemCsid);
     }
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new ReportClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new ReportClient(clientPropertiesFilename);
+	}
     
     @Test(dataProvider = "testName",
     		dependsOnMethods = {"CRUDTests"})
@@ -161,16 +165,17 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
 
     	// Submit the request to the service and store the response.
     	ReportClient client = new ReportClient();
-    	ClientResponse<AbstractCommonList> res = client.readListFiltered(testDocType, "single");
+    	Response res = client.readListFiltered(testDocType, "single");
     	AbstractCommonList list = null;
     	try {
     		assertStatusCode(res, testName);
-    		list = res.getEntity();
+    		list = res.readEntity(AbstractCommonList.class);
     	} finally {
     		if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
     	}
+    	
     	List<AbstractCommonList.ListItem> items = list.getListItem();
     	// We must find the basic one we created
     	boolean fFoundBaseItem = false;
@@ -181,7 +186,8 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
 				break;
 			}
 		}
-		if(!fFoundBaseItem) {
+		
+		if (!fFoundBaseItem) {
 			Assert.fail("readListFiltered failed to return base item");
 		}
 		
@@ -189,10 +195,10 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
     	res = client.readListFiltered("Intake", "single");
     	try {
 	        assertStatusCode(res, testName);
-	    	list = res.getEntity();
+	    	list = res.readEntity(AbstractCommonList.class);
     	} finally {
     		if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
     	}
 
@@ -207,10 +213,10 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
     	res = client.readListFiltered(testDocType, "group");
     	try {
 	        assertStatusCode(res, testName);
-	    	list = res.getEntity();
+	    	list = res.readEntity(AbstractCommonList.class);
     	} finally {
     		if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
     	}
 
@@ -264,8 +270,9 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
      *
      * @param identifier the identifier
      * @return the multipart output
+     * @throws Exception 
      */
-    private PoxPayloadOut createReportInstance(String identifier) {
+    private PoxPayloadOut createReportInstance(String identifier) throws Exception {
     	List<String> docTypes = new ArrayList<String>();
     	docTypes.add(testDocType);
         return createReportInstance(
@@ -282,13 +289,14 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
      * @param filename the relative path to the report
      * @param outputMIME the MIME type we will return for this report
      * @return the multipart output
+     * @throws Exception 
      */
     private PoxPayloadOut createReportInstance(String name,
     		List<String> forDocTypeList,
     		boolean supportsSingle, boolean supportsList, 
     		boolean supportsGroup, boolean supportsNoContext, 
             String filename,
-            String outputMIME) {
+            String outputMIME) throws Exception {
         ReportsCommon reportCommon = new ReportsCommon();
         reportCommon.setName(name);
         ReportsCommon.ForDocTypes forDocTypes = new ReportsCommon.ForDocTypes(); 
@@ -318,7 +326,7 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
 
 	@Override
 	protected PoxPayloadOut createInstance(String commonPartName,
-			String identifier) {
+			String identifier) throws Exception {
         PoxPayloadOut result = createReportInstance(identifier);
 		return result;
 	}

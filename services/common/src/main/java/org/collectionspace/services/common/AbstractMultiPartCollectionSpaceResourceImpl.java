@@ -34,6 +34,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.client.PayloadOutputPart;
@@ -42,15 +43,16 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
+import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
 import org.collectionspace.services.lifecycle.Lifecycle;
 import org.collectionspace.services.lifecycle.TransitionDef;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.workflow.WorkflowCommon;
 import org.dom4j.DocumentException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,13 +139,15 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
 
         return docHandler;
     }
-
-    /*
-     * JAX-RS Annotated methods
+    
+    /**
+     * Get the workflow lifecycle description of a resource
+     * @param uriInfo
+     * @return
      */
     @GET
     @Path(WorkflowClient.SERVICE_PATH)
-    public Lifecycle getWorkflow(@Context UriInfo uriInfo) {
+    public Lifecycle getWorkflow(@Context Request jaxRsRequest, @Context UriInfo uriInfo) {
     	Lifecycle result;
 
         String documentType = "undefined";
@@ -163,11 +167,7 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
         
         return result;
     }
-    
-    /*
-     * JAX-RS Annotated methods
-     */
-    
+        
     /*
      * We should change this method.  The RepositoryClient (from call to getRepositoryClient) should support a call getWorkflowTransition() instead.
      */    
@@ -197,25 +197,17 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
     protected TransitionDef getTransitionDef(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String transition) {
     	TransitionDef result = null;
     	
-    	try {
-			Lifecycle lifecycle = ctx.getDocumentHandler().getLifecycle();
-			List<TransitionDef> transitionDefList = lifecycle.getTransitionDefList().getTransitionDef();
-			Iterator<TransitionDef> iter = transitionDefList.iterator();
-			boolean found = false;
-			while (iter.hasNext() && found == false) {
-				TransitionDef transitionDef = iter.next();
-				if (transitionDef.getName().equalsIgnoreCase(transition)) {
-					result = transitionDef;
-					found = true;
-				}
-			}
+		Lifecycle lifecycle;
+		try {
+			lifecycle = ctx.getDocumentHandler().getLifecycle();
+			result = NuxeoUtils.getTransitionDef(lifecycle, transition);
 		} catch (Exception e) {
-			logger.error("Exception trying to retreive life cycle information for: " + ctx.getDocumentType());
+			logger.error("Failed to get transition definition.", e);
 		}
     	
     	return result;
     }
-    
+        
     private PoxPayloadIn synthEmptyWorkflowInput() {
     	PoxPayloadIn result = null;
     	
@@ -233,46 +225,79 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
     	return result;
     }
     
-    /*
-     * We should change this code.  The RepositoryClient (from call to getRepositoryClient) should support a call doWorkflowTransition() instead.
-     */
-    //FIXME: This method is almost identical to the method org.collectionspace.services.common.vocabulary.updateWorkflowWithTransition() so
-    // they should be consolidated -be DRY (don't repeat yourself).
+    public PoxPayloadOut updateWorkflowWithTransition(ServiceContext existingContext,
+    		UriInfo uriInfo,
+    		String csid,
+    		String transition) {
 
+        PoxPayloadOut result = null;
+                
+        try {
+        	MultipartServiceContextImpl workflowCtx = (MultipartServiceContextImpl)createServiceContext(WorkflowClient.SERVICE_NAME, uriInfo);
+        	//
+        	// Get properties out of the existing context if one was passed in
+        	//
+        	if (existingContext != null) {
+        		if (existingContext.getCurrentRepositorySession() != null) {
+        			workflowCtx.setCurrentRepositorySession(existingContext.getCurrentRepositorySession());
+        		}
+        		if (existingContext.getProperties() != null) {
+        			workflowCtx.setProperties(existingContext.getProperties());
+        		}
+        	}
+
+        	//
+        	// Create an empty workflow_commons input part and set it into a new "workflow" sub-resource context
+        	//
+        	PoxPayloadIn input = new PoxPayloadIn(WorkflowClient.SERVICE_PAYLOAD_NAME, new WorkflowCommon(), 
+        			WorkflowClient.SERVICE_COMMONPART_NAME);
+            workflowCtx.setInput(input);
+        	
+            // Create a service context and document handler for the target resource.
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> targetCtx = createServiceContext(workflowCtx.getUriInfo());
+            DocumentHandler targetDocHandler = createDocumentHandler(targetCtx);  
+            workflowCtx.setProperty(WorkflowClient.TARGET_DOCHANDLER, targetDocHandler); //added as a context param for the workflow document handler -it will call the parent's dochandler "prepareForWorkflowTranstion" method
+
+            // When looking for the document, we need to use the parent's workspace name -not the "workflow" workspace name
+            String targetWorkspaceName = targetCtx.getRepositoryWorkspaceName();
+            workflowCtx.setRespositoryWorkspaceName(targetWorkspaceName); //find the document in the parent's workspace
+            
+        	// Get the type of transition we're being asked to make and store it as a context parameter -used by the workflow document handler
+            TransitionDef transitionDef = getTransitionDef(targetCtx, transition);
+            if (transitionDef == null) {
+            	throw new DocumentException(String.format("The document with ID='%s' does not support the workflow transition '%s'.",
+            			csid, transition));
+            }
+            workflowCtx.setProperty(WorkflowClient.TRANSITION_ID, transitionDef);
+
+            WorkflowDocumentModelHandler workflowHandler = createWorkflowDocumentHandler(workflowCtx);
+            getRepositoryClient(workflowCtx).update(workflowCtx, csid, workflowHandler);
+            result = workflowCtx.getOutput();
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, csid);
+        }
+        
+        return result;
+    
+    }
+    
+    /*
+     * We should consider changing this code.  The RepositoryClient (from call to getRepositoryClient) could support a call doWorkflowTransition() instead?
+     */
     @PUT
     @Path("{csid}" + WorkflowClient.SERVICE_PATH + "/" + "{transition}")
     public byte[] updateWorkflowWithTransition(
     		@Context UriInfo uriInfo,
     		@PathParam("csid") String csid,
     		@PathParam("transition") String transition) {
-        PoxPayloadOut result = null;
+    	PoxPayloadOut result = null;
                 
         try {
-        	//
-        	// Create an empty workflow_commons input part and set it into a new "workflow" sub-resource context
-        	PoxPayloadIn input = new PoxPayloadIn(WorkflowClient.SERVICE_PAYLOAD_NAME, new WorkflowCommon(), 
-        			WorkflowClient.SERVICE_COMMONPART_NAME);
-            MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME, input, uriInfo);
-        	
-            // Create a service context and document handler for the parent resource.
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext(uriInfo);
-            DocumentHandler parentDocHandler = this.createDocumentHandler(parentCtx);      
-            ctx.setProperty(WorkflowClient.PARENT_DOCHANDLER, parentDocHandler); //added as a context param for the workflow document handler -it will call the parent's dochandler "prepareForWorkflowTranstion" method
-
-            // When looking for the document, we need to use the parent's workspace name -not the "workflow" workspace name
-            String parentWorkspaceName = parentCtx.getRepositoryWorkspaceName();
-            ctx.setRespositoryWorkspaceName(parentWorkspaceName); //find the document in the parent's workspace
-            
-        	// Get the type of transition we're being asked to make and store it as a context parameter -used by the workflow document handler
-            TransitionDef transitionDef = getTransitionDef(parentCtx, transition);
-            ctx.setProperty(WorkflowClient.TRANSITION_ID, transitionDef);
-
-            WorkflowDocumentModelHandler handler = createWorkflowDocumentHandler(ctx);
-            getRepositoryClient(ctx).update(ctx, csid, handler);
-            result = ctx.getOutput();
+        	result = updateWorkflowWithTransition(NULL_CONTEXT, uriInfo, csid, transition);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, csid);
         }
+        
         return result.getBytes();
     }
     

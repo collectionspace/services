@@ -4,11 +4,10 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.loanin</artifactId>        
-        <version>4.1.1</version>
+        <version>5.0-SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.loanin.service</artifactId>
     <name>services.loanin.service</name>
     <packaging>jar</packaging>       
@@ -17,7 +16,6 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
@@ -34,6 +32,7 @@
             <artifactId>org.collectionspace.services.collectionobject.jaxb</artifactId>
             <version>${project.version}</version>
         </dependency>
+        
         <!-- External dependencies -->
         <dependency>
             <groupId>junit</groupId>
@@ -51,13 +50,6 @@
             <groupId>javax.security</groupId>
             <artifactId>jaas</artifactId>
             <version>1.0.01</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-            <version>1.6.1</version>
             <scope>provided</scope>
         </dependency>
         
@@ -87,7 +79,6 @@
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-api</artifactId>
-            <version>${nuxeo.core.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>jboss-remoting</artifactId>

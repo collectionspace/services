@@ -1,0 +1,1 @@
+The PermissionDocumentHandler.java file has been move to the "org.collectionspace.services.common" module.

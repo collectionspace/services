@@ -28,6 +28,8 @@
 
 package org.collectionspace.services.authorization.spi;
 
+import org.springframework.transaction.TransactionStatus;
+
 /**
  * CSpaceAuthorizationProvider acts as a main interface to access the provider
  * specific information
@@ -44,4 +46,10 @@ public interface CSpaceAuthorizationProvider {
     public CSpacePermissionManager getPermissionManager();
     
     public void clearAclCache();
+
+	public TransactionStatus beginTransaction(String name);
+
+	public void rollbackTransaction(TransactionStatus status);
+
+	public void commitTransaction(TransactionStatus status);
 }

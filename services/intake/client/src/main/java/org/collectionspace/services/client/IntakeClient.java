@@ -22,13 +22,15 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.intake.IntakesCommon;
+
 /**
  * IntakeClient
  * 
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public class IntakeClient extends AbstractCommonListPoxServiceClientImpl<IntakeProxy> {
+public class IntakeClient extends AbstractCommonListPoxServiceClientImpl<IntakeProxy, IntakesCommon> {
 
     public static final String SERVICE_NAME = "intakes";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
@@ -36,7 +38,15 @@ public class IntakeClient extends AbstractCommonListPoxServiceClientImpl<IntakeP
     public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    @Override
+    public IntakeClient() throws Exception {
+		super();
+	}
+
+    public IntakeClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
+
+	@Override
     public String getServiceName() {
         return SERVICE_NAME;
     }

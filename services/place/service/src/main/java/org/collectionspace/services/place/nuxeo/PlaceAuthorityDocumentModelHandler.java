@@ -23,25 +23,19 @@
  */
 package org.collectionspace.services.place.nuxeo;
 
+import org.collectionspace.services.client.PlaceAuthorityClient;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.place.PlaceauthoritiesCommon;
 
 /**
  * PlaceAuthorityDocumentModelHandler
  *
- * $LastChangedRevision: $
- * $LastChangedDate: $
  */
 public class PlaceAuthorityDocumentModelHandler
         extends AuthorityDocumentModelHandler<PlaceauthoritiesCommon> {
 
-    /**
-     * Common part schema label
-     */
-    private static final String COMMON_PART_LABEL = "placeauthorities_common";   
-    
     public PlaceAuthorityDocumentModelHandler() {
-    	super(COMMON_PART_LABEL);
+    	super(PlaceAuthorityClient.SERVICE_COMMON_PART_NAME, PlaceAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 	
     /**

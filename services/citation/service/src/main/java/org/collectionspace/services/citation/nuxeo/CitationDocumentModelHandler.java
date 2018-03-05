@@ -23,37 +23,19 @@
  */
 package org.collectionspace.services.citation.nuxeo;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.collectionspace.services.client.CitationAuthorityClient;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
-import org.collectionspace.services.CitationJAXBSchema;
 import org.collectionspace.services.citation.CitationsCommon;
-import org.nuxeo.ecm.core.api.DocumentModel;
 
 /**
  * CitationDocumentModelHandler
  *
- * $LastChangedRevision: $
- * $LastChangedDate: $
- */
-/**
- * @author pschmitz
- *
  */
 public class CitationDocumentModelHandler
-	extends AuthorityItemDocumentModelHandler<CitationsCommon> {
-
-    /** The logger. */
-    //private final Logger logger = LoggerFactory.getLogger(CitationDocumentModelHandler.class);
-    /**
-     * Common part schema label
-     */
-    private static final String COMMON_PART_LABEL = "citations_common";
+		extends AuthorityItemDocumentModelHandler<CitationsCommon> {
     
     public CitationDocumentModelHandler() {
-    	super(COMMON_PART_LABEL);
+    	super(CitationAuthorityClient.SERVICE_COMMON_PART_NAME, CitationAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 
     @Override
@@ -70,5 +52,11 @@ public class CitationDocumentModelHandler
     public String getQProperty(String prop) {
         return CitationConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
+
+	@Override
+	public String getParentCommonSchemaName() {
+		// TODO Auto-generated method stub
+		return CitationAuthorityClient.SERVICE_COMMON_PART_NAME;
+	}
 }
 

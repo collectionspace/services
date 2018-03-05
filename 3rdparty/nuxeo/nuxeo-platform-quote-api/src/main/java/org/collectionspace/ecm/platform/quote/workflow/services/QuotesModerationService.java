@@ -46,7 +46,7 @@ public interface QuotesModerationService {
      */
     /**
     ProcessInstance getModerationProcess(JbpmService jbpmService,
-            CoreSession session, DocumentModel doc, String commentId)
+            CoreSessionInterface session, DocumentModel doc, String commentId)
             throws ClientException;
             **/
 

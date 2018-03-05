@@ -2,6 +2,9 @@ package org.collectionspace.services.nuxeo.client.java;
 
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.document.DocumentException;
+import org.apache.http.HttpStatus;
+
+import org.nuxeo.ecm.core.api.ConcurrentUpdateException;
 import org.nuxeo.ecm.core.api.WrappedException;
 
 public class NuxeoDocumentException extends DocumentException {
@@ -37,7 +40,9 @@ public class NuxeoDocumentException extends DocumentException {
 
 	public NuxeoDocumentException(Throwable cause) {
 		super(cause);
-		// TODO Auto-generated constructor stub
+		if (cause instanceof ConcurrentUpdateException) {
+			this.setErrorCode(HttpStatus.SC_CONFLICT); // HttpStatus.CONFLICT_409
+		}
 	}
 	
 	private static String getExceptionClassName(Throwable exception) {

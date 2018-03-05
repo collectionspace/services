@@ -5,16 +5,13 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.authorization-mgt</artifactId>
-        <version>4.1.1</version>
+        <version>5.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.collectionspace.services.authorization-mgt.client</artifactId>
     <name>services.authorization-mgt.client</name>
-    <properties>
-        <spring.version>3.0.0.RELEASE</spring.version>
-        <spring.security.version>3.0.2.RELEASE</spring.security.version>
-    </properties>
+
     <dependencies>
         <!-- keep slf4j dependencies on the top -->
         <dependency>
@@ -40,6 +37,11 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authorization.jaxb</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.hyperjaxb</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -76,14 +78,15 @@
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxb-provider</artifactId>
         </dependency>
+        <!-- 
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-multipart-provider</artifactId>
         </dependency>
+         -->
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
         </dependency>
 
         <dependency>
@@ -143,7 +146,6 @@
         <dependency>
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache</artifactId>
-            <version>1.6.2</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -152,7 +154,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>postgresql</groupId>
+            <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>test</scope>
         </dependency>

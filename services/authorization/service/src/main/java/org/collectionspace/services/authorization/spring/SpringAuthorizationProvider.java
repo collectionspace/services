@@ -182,7 +182,8 @@ public class SpringAuthorizationProvider implements CSpaceAuthorizationProvider 
     /**
      * clear the ACL Cache associated with the provider
      */
-    public void clearAclCache() {
+    @Override
+	public void clearAclCache() {
     	if(providerAclCache != null) {
     		providerAclCache.clearCache();
             if (log.isDebugEnabled()) {
@@ -193,7 +194,8 @@ public class SpringAuthorizationProvider implements CSpaceAuthorizationProvider 
     	}
     }
 
-    TransactionStatus beginTransaction(String name) {
+    @Override
+    public TransactionStatus beginTransaction(String name) {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         // explicitly setting the transaction name is something that can only be done programmatically
         def.setName(name);
@@ -201,11 +203,13 @@ public class SpringAuthorizationProvider implements CSpaceAuthorizationProvider 
         return getTxManager().getTransaction(def);
     }
 
-    void rollbackTransaction(TransactionStatus status) {
+    @Override
+    public void rollbackTransaction(TransactionStatus status) {
         getTxManager().rollback(status);
     }
 
-    void commitTransaction(TransactionStatus status) {
+    @Override
+    public void commitTransaction(TransactionStatus status) {
         getTxManager().commit(status);
     }
 }

@@ -27,8 +27,10 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
+
+import org.apache.http.HttpStatus;
 import org.collectionspace.services.authorization.PermissionRole;
+import org.collectionspace.services.description.ServiceDescription;
 
 /**
  * A PermissionRoleClient.
@@ -36,6 +38,15 @@ import org.collectionspace.services.authorization.PermissionRole;
  * @version $Revision:$
  */
 public class PermissionRoleClient extends AbstractServiceClientImpl<PermissionRole, PermissionRole, PermissionRole, PermissionRoleProxy> {
+	
+	public PermissionRoleClient() throws Exception {
+		super();
+	}
+
+	public PermissionRoleClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
+
 	@Override
 	public String getServiceName() {
 		throw new UnsupportedOperationException(); //FIXME: REM - http://issues.collectionspace.org/browse/CSPACE-3497
@@ -66,7 +77,7 @@ public class PermissionRoleClient extends AbstractServiceClientImpl<PermissionRo
      * @return the client response
      * @see
      */
-    public ClientResponse<PermissionRole> read(String csid, String prcsid) {
+    public Response read(String csid, String prcsid) {
         return getProxy().read(csid, prcsid);
     }
 
@@ -78,7 +89,8 @@ public class PermissionRoleClient extends AbstractServiceClientImpl<PermissionRo
      * @return the client response
      * @see
      */
-    public ClientResponse<PermissionRole> read(String csid) {
+    @Override
+    public Response read(String csid) {
         return getProxy().read(csid);
     }
 
@@ -90,7 +102,7 @@ public class PermissionRoleClient extends AbstractServiceClientImpl<PermissionRo
      * @return the client response
      * @see
      */
-    public ClientResponse<Response> create(String csid, PermissionRole permRole) {
+    public Response create(String csid, PermissionRole permRole) {
         return getProxy().create(csid, permRole);
     }
     
@@ -101,23 +113,35 @@ public class PermissionRoleClient extends AbstractServiceClientImpl<PermissionRo
      * @param permRole the perm role
      * @return the client response
      */
-    public ClientResponse<Response> delete(String csid, PermissionRole permRole) {
+    public Response delete(String csid, PermissionRole permRole) {
     	return getProxy().delete(csid, "delete", permRole);
     }
 
 	@Override
-	public ClientResponse<Response> create(PermissionRole payload) {
+	public Response create(PermissionRole payload) {
 		throw new UnsupportedOperationException(); //method not supported nor needed
 	}
 
 	@Override
-	public ClientResponse<PermissionRole> update(String csid,
+	public Response update(String csid,
 			PermissionRole payload) {
 		throw new UnsupportedOperationException(); //method not supported nor needed
 	}
 
 	@Override
-	public ClientResponse<PermissionRole> readList() {
+	public Response readList() {
 		throw new UnsupportedOperationException(); //method not supported nor needed
+	}
+	
+	@Override
+	public ServiceDescription getServiceDescription() {
+		ServiceDescription result = null;
+		
+        Response res = getProxy().getServiceDescription();
+        if (res.getStatus() == HttpStatus.SC_OK) {
+        	result = (ServiceDescription) res.readEntity(ServiceDescription.class);
+        }
+        
+        return result;
 	}
 }

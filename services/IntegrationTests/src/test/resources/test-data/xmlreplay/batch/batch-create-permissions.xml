@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="batch">
+    <ns2:batch_common xmlns:ns2="http://collectionspace.org/services/batch">
+        <name>batch-create-permissions</name>
+        <notes>A batch resource for testing the Batch service's permission enforcement before invoking batch jobs.</notes>
+        <resourceActionGroupList>
+            <resourceActionGroup>
+                <resourceName>blobs</resourceName>
+                <actionGroup>CRUL</actionGroup>
+            </resourceActionGroup>
+            <resourceActionGroup>
+                <resourceName>media</resourceName>
+                <actionGroup>CRUL</actionGroup>
+            </resourceActionGroup>
+            <resourceActionGroup>
+                <resourceName>conceptauthorities</resourceName>
+                <actionGroup>CRL</actionGroup>
+            </resourceActionGroup>
+            <resourceActionGroup>
+                <resourceName>collectionobjects</resourceName>
+                <actionGroup>RL</actionGroup>
+            </resourceActionGroup>
+        </resourceActionGroupList>
+        <supportsNoContext>true</supportsNoContext>
+        <className>org.collectionspace.services.batch.nuxeo.TestBatchJob</className>
+    </ns2:batch_common>
+</document>

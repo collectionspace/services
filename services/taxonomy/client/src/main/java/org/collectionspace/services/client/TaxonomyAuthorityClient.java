@@ -27,11 +27,12 @@
 package org.collectionspace.services.client;
 
 import org.collectionspace.services.taxonomy.TaxonCommon;
+import org.collectionspace.services.taxonomy.TaxonomyauthorityCommon;
 
 /**
  * The Class TaxonomyAuthorityClient.
  */
-public class TaxonomyAuthorityClient extends AuthorityClientImpl<TaxonCommon, TaxonomyAuthorityProxy> {
+public class TaxonomyAuthorityClient extends AuthorityClientImpl<TaxonomyauthorityCommon, TaxonCommon, TaxonomyAuthorityProxy> {
 
     public static final String SERVICE_NAME = "taxonomyauthority";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
@@ -51,6 +52,17 @@ public class TaxonomyAuthorityClient extends AuthorityClientImpl<TaxonCommon, Ta
     public static final String SERVICE_ITEM_COMMON_PART_NAME = SERVICE_ITEM_NAME
             + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
 
+    //
+    // Constructors
+    //
+    public TaxonomyAuthorityClient() throws Exception {
+    	super();
+    }
+    
+    public TaxonomyAuthorityClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
+    
     @Override
     public String getServiceName() {
         return SERVICE_NAME;
@@ -79,5 +91,17 @@ public class TaxonomyAuthorityClient extends AuthorityClientImpl<TaxonCommon, Ta
 	@Override
 	public void setInAuthority(TaxonCommon item, String inAuthorityCsid) {
 		item.setInAuthority(inAuthorityCsid);
+	}
+
+	@Override
+	public String createAuthorityInstance(String shortIdentifier, String displayName) {
+		PoxPayloadOut poxPayloadout = TaxonomyAuthorityClientUtils.createTaxonomyAuthorityInstance(displayName, shortIdentifier, SERVICE_COMMON_PART_NAME);
+		return poxPayloadout.asXML();
+	}
+
+	@Override
+	public String createAuthorityItemInstance(String shortIdentifier, String displayName) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

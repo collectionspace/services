@@ -28,6 +28,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.Response;
+
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -35,16 +37,14 @@ import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
 import org.nuxeo.ecm.core.api.model.impl.primitives.StringProperty;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.StoredValuesUriTemplate;
 import org.collectionspace.services.common.UriTemplateFactory;
@@ -66,9 +66,9 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.relation.RelationUtils;
 import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
-import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
-import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
+import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -81,6 +81,150 @@ import org.collectionspace.services.nuxeo.util.NuxeoUtils;
  * $LastChangedRevision: $ $LastChangedDate: $
  */
 public class RefNameServiceUtils {
+
+    public static enum SpecifierForm {
+        CSID, URN_NAME // Either a CSID or a short ID
+    };
+
+    public static class Specifier {
+        //
+        // URN statics for things like urn:cspace:name(grover)
+        //
+        final static String URN_PREFIX = "urn:cspace:";
+        final static int URN_PREFIX_LEN = URN_PREFIX.length();
+        final static String URN_PREFIX_NAME = "name(";
+        final static int URN_NAME_PREFIX_LEN = URN_PREFIX_LEN + URN_PREFIX_NAME.length();
+        final static String URN_PREFIX_ID = "id(";
+        final static int URN_ID_PREFIX_LEN = URN_PREFIX_LEN + URN_PREFIX_ID.length();
+    	
+        public SpecifierForm form;
+        public String value;
+
+        public Specifier(SpecifierForm form, String value) {
+            this.form = form;
+            this.value = value;
+        }
+        
+        /*
+         *  identifier can be a CSID form like a8ad38ec-1d7d-4bf2-bd31 or a URN form like urn:cspace:name(shortid) or urn:cspace:id(a8ad38ec-1d7d-4bf2-bd31)
+         *
+         */
+        public static Specifier getSpecifier(String identifier) throws CSWebApplicationException {
+        	return getSpecifier(identifier, "NO-OP", "NO-OP");
+        }
+
+        /*
+         *  identifier can be a CSID form like a8ad38ec-1d7d-4bf2-bd31 or a URN form like urn:cspace:name(shortid) or urn:cspace:id(a8ad38ec-1d7d-4bf2-bd31)
+         *
+         */
+        public static Specifier getSpecifier(String identifier, String method, String op) throws CSWebApplicationException {
+        	Specifier result = null;
+
+        	if (identifier != null) {
+                if (!identifier.startsWith(URN_PREFIX)) {
+                    // We'll assume it is a CSID and complain if it does not match
+                    result = new Specifier(SpecifierForm.CSID, identifier);
+                } else {
+                    if (identifier.startsWith(URN_PREFIX_NAME, URN_PREFIX_LEN)) {
+                        int closeParen = identifier.indexOf(')', URN_NAME_PREFIX_LEN);
+                        if (closeParen >= 0) {
+                            result = new Specifier(SpecifierForm.URN_NAME,
+                                    identifier.substring(URN_NAME_PREFIX_LEN, closeParen));
+                        }
+                    } else if (identifier.startsWith(URN_PREFIX_ID, URN_PREFIX_LEN)) {
+                        int closeParen = identifier.indexOf(')', URN_ID_PREFIX_LEN);
+                        if (closeParen >= 0) {
+                            result = new Specifier(SpecifierForm.CSID,
+                                    identifier.substring(URN_ID_PREFIX_LEN, closeParen));
+                        }
+                    } else {
+                        logger.error(method + ": bad or missing specifier!");
+                        Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                                op + " failed on bad or missing Authority specifier").type(
+                                "text/plain").build();
+                        throw new CSWebApplicationException(response);
+                    }
+                }
+            }
+            
+            return result;
+        }
+        
+        /**
+         * Creates a refName in the name / shortIdentifier form.
+         *
+         * @param shortId a shortIdentifier for an authority or one of its terms
+         * @return a refName for that authority or term, in the name / shortIdentifier form.
+         *         If the provided shortIdentifier is null or empty, returns
+         *         the empty string.
+         */
+        public static String createShortIdURNValue(String shortId) {
+        	String result = null;
+        	
+            if (shortId != null || !shortId.trim().isEmpty()) {
+                result = String.format("urn:cspace:name(%s)", shortId);
+            }
+            
+            return result;
+        }        
+        
+        /**
+         * Returns a URN string identifier -e.g., urn:cspace:name(patrick) or urn:cspace:id(579d18a6-b464-4b11-ba3a)
+         * 
+         * @return
+         * @throws Exception
+         */
+        public String getURNValue() throws Exception {
+        	String result = null;
+        	
+        	if (form == SpecifierForm.CSID) {
+        		result = String.format("urn:cspace:id(%s)", value);
+        	} else if (form == SpecifierForm.URN_NAME) {
+        		result = String.format("urn:cspace:name(%s)", value);
+        	} else {
+        		throw new Exception(String.format("Unknown specifier form '%s'.", form));
+        	}
+        	
+        	return result;
+        }
+    }
+    
+    public static class AuthorityItemSpecifier {
+    	private Specifier parentSpecifier;
+    	private Specifier itemSpecifier;
+    	
+    	public AuthorityItemSpecifier(Specifier parentSpecifier, Specifier itemSpecifier) {
+    		this.parentSpecifier = parentSpecifier;
+    		this.itemSpecifier = itemSpecifier;
+    	}
+    	
+    	public AuthorityItemSpecifier(SpecifierForm form, String parentCsidOrShortId, String itemCsidOrShortId) {
+    		this.parentSpecifier = new Specifier(form, parentCsidOrShortId);
+    		this.itemSpecifier = new Specifier(form, itemCsidOrShortId);
+    	}    	
+    	
+    	public Specifier getParentSpecifier() {
+    		return this.parentSpecifier;
+    	}
+    	
+    	public Specifier getItemSpecifier() {
+    		return this.itemSpecifier;
+    	}
+    	
+    	@Override
+    	public String toString() {
+    		String result = "%s/items/%s";
+    		
+    		try {
+				result = String.format(result, this.parentSpecifier.getURNValue(), this.itemSpecifier.getURNValue());
+			} catch (Exception e) {
+				result = "Unknown error trying to get string representation of Specifier.";
+				logger.error(result, e);
+			}
+    		
+    		return result;
+    	}
+    }
 
     public static class AuthRefConfigInfo {
 
@@ -216,7 +360,7 @@ public class RefNameServiceUtils {
     public static void updateRefNamesInRelations(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
-            RepositoryInstanceInterface repoSession,
+            CoreSessionInterface repoSession,
             String oldRefName,
             String newRefName) throws Exception {
     	//
@@ -230,20 +374,19 @@ public class RefNameServiceUtils {
     	RelationUtils.updateRefNamesInRelations(ctx, repoClient, repoSession, IRelationsManager.OBJECT_REFNAME, oldRefName, newRefName);
     }
     
-    public static List<AuthRefConfigInfo> getConfiguredAuthorityRefs(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
-        List<String> authRefFields =
-                ((AbstractServiceContextImpl) ctx).getAllPartsPropertyValues(
-                ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
-        ArrayList<AuthRefConfigInfo> authRefsInfo = new ArrayList<AuthRefConfigInfo>(authRefFields.size());
-        for (String spec : authRefFields) {
-            AuthRefConfigInfo arci = new AuthRefConfigInfo(spec);
-            authRefsInfo.add(arci);
-        }
-        return authRefsInfo;
-    }
+	public static List<AuthRefConfigInfo> getConfiguredAuthorityRefs(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
+		List<String> authRefFields = ((AbstractServiceContextImpl) ctx).getAllPartsPropertyValues(
+				ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
+		ArrayList<AuthRefConfigInfo> authRefsInfo = new ArrayList<AuthRefConfigInfo>(authRefFields.size());
+		for (String spec : authRefFields) {
+			AuthRefConfigInfo arci = new AuthRefConfigInfo(spec);
+			authRefsInfo.add(arci);
+		}
+		return authRefsInfo;
+	}
 
     public static AuthorityRefDocList getAuthorityRefDocs(
-    		RepositoryInstanceInterface repoSession,
+    		CoreSessionInterface repoSession,
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             UriTemplateRegistry uriTemplateRegistry,
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
@@ -263,7 +406,7 @@ public class RefNameServiceUtils {
         Map<String, ServiceBindingType> queriedServiceBindings = new HashMap<String, ServiceBindingType>();
         Map<String, List<AuthRefConfigInfo>> authRefFieldsByService = new HashMap<String, List<AuthRefConfigInfo>>();
 
-        RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl) repoClient;
+        NuxeoRepositoryClientImpl nuxeoRepoClient = (NuxeoRepositoryClientImpl) repoClient;
         try {
             // Ignore any provided page size and number query parameters in
             // the following call, as they pertain to the list of authority
@@ -298,7 +441,7 @@ public class RefNameServiceUtils {
              * <xs:element name="workflowState" type="xs:string" minOccurs="1"
              * />
              */
-            String fieldList = "docType|docId|docNumber|docName|sourceField|uri|refName|updatedAt|workflowState";
+            String fieldList = "docType|docId|docNumber|docName|sourceField|uri|refName|updatedAt|workflowState";  // FIXME: Should not be hard-coded string
             commonList.setFieldsReturned(fieldList);
 
             // As a side-effect, the method called below modifies the value of
@@ -405,7 +548,7 @@ public class RefNameServiceUtils {
     public static int updateAuthorityRefDocs(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
-            RepositoryInstanceInterface repoSession,
+            CoreSessionInterface repoSession,
             String oldRefName,
             String newRefName,
             String refPropName) throws Exception {
@@ -420,7 +563,7 @@ public class RefNameServiceUtils {
         final String ORDER_BY_VALUE = CollectionSpaceClient.CORE_CREATED_AT  // "collectionspace_core:createdAt";
                                           + ", " + IQueryManager.NUXEO_UUID; // CSPACE-6333: Add secondary sort on uuid, in case records have the same createdAt timestamp.
 
-        if (repoClient instanceof RepositoryJavaClientImpl == false) {
+        if (repoClient instanceof NuxeoRepositoryClientImpl == false) {
             throw new InternalError("updateAuthorityRefDocs() called with unknown repoClient type!");
         }
         
@@ -451,11 +594,11 @@ public class RefNameServiceUtils {
 
                 // Only match complete refNames - unless and until we decide how to resolve changes
                 // to NPTs we will defer that and only change PTs or refNames as passed in.
-                int nRefsFoundThisPage = processRefObjsDocListForUpdate(docList, ctx.getTenantId(), oldRefName, 
+                int nRefsFoundThisPage = processRefObjsDocListForUpdate(ctx, docList, ctx.getTenantId(), oldRefName, 
                 		queriedServiceBindings, authRefFieldsByService, // Perform the refName updates on the list of document models
                         newRefName);
                 if (nRefsFoundThisPage > 0) {
-                    ((RepositoryJavaClientImpl) repoClient).saveDocListWithoutHandlerProcessing(ctx, repoSession, docList, true); // Flush the document model list out to Nuxeo storage
+                    ((NuxeoRepositoryClientImpl) repoClient).saveDocListWithoutHandlerProcessing(ctx, repoSession, docList, true); // Flush the document model list out to Nuxeo storage
                     nRefsFound += nRefsFoundThisPage;
                 }
 
@@ -479,7 +622,7 @@ public class RefNameServiceUtils {
     private static DocumentModelList findAllAuthorityRefDocs(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
-            RepositoryInstanceInterface repoSession, List<String> serviceTypes,
+            CoreSessionInterface repoSession, List<String> serviceTypes,
             String refName,
             String refPropName,
             Map<String, ServiceBindingType> queriedServiceBindings,
@@ -497,7 +640,7 @@ public class RefNameServiceUtils {
     protected static DocumentModelList findAuthorityRefDocs(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
-            RepositoryInstanceInterface repoSession, List<String> serviceTypes,
+            CoreSessionInterface repoSession, List<String> serviceTypes,
             String refName,
             String refPropName,
             Map<String, ServiceBindingType> queriedServiceBindings,
@@ -522,7 +665,7 @@ public class RefNameServiceUtils {
 
         ArrayList<String> docTypes = new ArrayList<String>();
 
-        String query = computeWhereClauseForAuthorityRefDocs(refName, refPropName, docTypes, servicebindings, // REM - Side effect that docTypes array gets set.  Any others?
+        String query = computeWhereClauseForAuthorityRefDocs(refName, refPropName, docTypes, servicebindings, // REM - Side effect that docTypes, authRefFieldsByService, and queriedServiceBindings get set/change.  Any others?
                 queriedServiceBindings, authRefFieldsByService);
         if (query == null) { // found no authRef fields - nothing to query
             return null;
@@ -532,7 +675,7 @@ public class RefNameServiceUtils {
             query += " AND " + whereClauseAdditions;
         }
         // Now we have to issue the search
-        RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl) repoClient;
+        NuxeoRepositoryClientImpl nuxeoRepoClient = (NuxeoRepositoryClientImpl) repoClient;
         DocumentWrapper<DocumentModelList> docListWrapper = nuxeoRepoClient.findDocs(ctx, repoSession,
                 docTypes, query, orderByClause, pageSize, pageNum, computeTotal);
         // Now we gather the info for each document into the list and return
@@ -585,7 +728,7 @@ public class RefNameServiceUtils {
                 + " AND " + (authTermInfo.inAuthority.name != null
                 ? authTermInfo.inAuthority.name : authTermInfo.inAuthority.csid)
                 + " AND " + (authTermInfo.name != null
-                ? authTermInfo.name : authTermInfo.csid);
+                ? authTermInfo.name : authTermInfo.csid); // REM - This seems likely to cause trouble?  We should consider searching for the full refname -excluding the display name suffix?
 
         String whereClauseStr = QueryManager.createWhereClauseFromKeywords(keywords);
 
@@ -604,13 +747,21 @@ public class RefNameServiceUtils {
 	}
 
     private static int processRefObjsDocListForUpdate(
+    		ServiceContext ctx,
             DocumentModelList docList,
             String tenantId,
             String refName,
             Map<String, ServiceBindingType> queriedServiceBindings,
             Map<String, List<AuthRefConfigInfo>> authRefFieldsByService,
             String newAuthorityRefName) {
-    	return processRefObjsDocList(docList, tenantId, refName, false, queriedServiceBindings,
+    	boolean matchBaseOnly = false;
+    	
+    	if (ctx.shouldForceUpdateRefnameReferences() == true) {
+    		refName = RefNameUtils.stripAuthorityTermDisplayName(refName);
+    		matchBaseOnly = true;
+    	}
+    	
+    	return processRefObjsDocList(docList, tenantId, refName, matchBaseOnly, queriedServiceBindings,
     			authRefFieldsByService, null, 0, 0, newAuthorityRefName);
     }
     			
@@ -705,7 +856,7 @@ public class RefNameServiceUtils {
                         uri = template.buildUri(additionalValues);
                     } else if (template.getUriTemplateType() == UriTemplateFactory.ITEM) {
                         try {
-                            String inAuthorityCsid = (String) docModel.getPropertyValue("inAuthority"); // AuthorityItemJAXBSchema.IN_AUTHORITY
+                            String inAuthorityCsid = (String) NuxeoUtils.getProperyValue(docModel, "inAuthority"); //docModel.getPropertyValue("inAuthority"); // AuthorityItemJAXBSchema.IN_AUTHORITY
                             additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, inAuthorityCsid);
                             additionalValues.put(UriTemplateFactory.ITEM_IDENTIFIER_VAR, csid);
                             uri = template.buildUri(additionalValues);
@@ -728,7 +879,7 @@ public class RefNameServiceUtils {
                 ilistItem.setUri(uri);
                 try {
                     ilistItem.setWorkflowState(docModel.getCurrentLifeCycleState());
-                    ilistItem.setUpdatedAt(DocHandlerBase.getUpdatedAtAsString(docModel));
+                    ilistItem.setUpdatedAt(NuxeoDocumentModelHandler.getUpdatedAtAsString(docModel));
                 } catch (Exception e) {
                     logger.error("Error getting core values for doc [" + csid + "]: " + e.getLocalizedMessage());
                 }
@@ -738,7 +889,7 @@ public class RefNameServiceUtils {
                 ilistItem.setDocName(
                         ServiceBindingUtils.getMappedFieldInDoc(sb, ServiceBindingUtils.OBJ_NAME_PROP, docModel));
             }
-            // Now, we have to loop over the authRefFieldsByService to figure
+            // Now, we have to loop over the authRefFieldsByService to figure out
             // out which field(s) matched this.
             List<AuthRefConfigInfo> matchingAuthRefFields = authRefFieldsByService.get(docType);
             if (matchingAuthRefFields == null || matchingAuthRefFields.isEmpty()) {
@@ -815,6 +966,13 @@ public class RefNameServiceUtils {
         return nRefsFoundTotal;
     }
 
+    /**
+     * Clone an AuthorityRefDocItem which is a JAX-B generated class.  Be sure we're copying every field defined in the XSD (XML Schema) that is
+     * found here services\jaxb\src\main\resources\authorityrefdocs.xsd
+     * @param ilistItem
+     * @param sourceField
+     * @return
+     */
     private static AuthorityRefDocList.AuthorityRefDocItem cloneAuthRefDocItem(
             AuthorityRefDocList.AuthorityRefDocItem ilistItem, String sourceField) {
         AuthorityRefDocList.AuthorityRefDocItem newlistItem = new AuthorityRefDocList.AuthorityRefDocItem();
@@ -824,24 +982,27 @@ public class RefNameServiceUtils {
         newlistItem.setDocType(ilistItem.getDocType());
         newlistItem.setUri(ilistItem.getUri());
         newlistItem.setSourceField(sourceField);
+        newlistItem.setRefName(ilistItem.getRefName());
+        newlistItem.setUpdatedAt(ilistItem.getUpdatedAt());
+        newlistItem.setWorkflowState(ilistItem.getWorkflowState());
         return newlistItem;
     }
 
     public static List<AuthRefInfo> findAuthRefPropertiesInDoc(
             DocumentModel docModel,
-            List<AuthRefConfigInfo> authRefFieldInfo,
+            List<AuthRefConfigInfo> authRefFieldInfoList,
             String refNameToMatch,
             List<AuthRefInfo> foundProps) {
-    	return findAuthRefPropertiesInDoc(docModel, authRefFieldInfo, 
+    	return findAuthRefPropertiesInDoc(docModel, authRefFieldInfoList, 
     									refNameToMatch, false, foundProps);
     }
     
     public static List<AuthRefInfo> findAuthRefPropertiesInDoc(
             DocumentModel docModel,
-            List<AuthRefConfigInfo> authRefFieldInfo,
+            List<AuthRefConfigInfo> authRefFieldInfoList,
             String refNameToMatch,
             boolean matchBaseOnly,
-            List<AuthRefInfo> foundProps) {
+            List<AuthRefInfo> authRefInfoList) {
         // Assume that authRefFieldInfo is keyed by the field name (possibly mapped for UI)
         // and the values are elPaths to the field, where intervening group structures in
         // lists of complex structures are replaced with "*". Thus, valid paths include
@@ -854,20 +1015,20 @@ public class RefNameServiceUtils {
         // "schemaname:complexlistname/*/complexfieldname/fieldname"
         // "schemaname:complexlistname/*/complexlistname/*/fieldname"
         // etc.
-        for (AuthRefConfigInfo arci : authRefFieldInfo) {
+        for (AuthRefConfigInfo arci : authRefFieldInfoList) {
             try {
                 // Get first property and work down as needed.
                 Property prop = docModel.getProperty(arci.pathEls[0]);
-                findAuthRefPropertiesInProperty(foundProps, prop, arci, 0, refNameToMatch, matchBaseOnly);
+                findAuthRefPropertiesInProperty(authRefInfoList, prop, arci, 0, refNameToMatch, matchBaseOnly);
             } catch (Exception e) {
                 logger.error("Problem fetching property: " + arci.pathEls[0]);
             }
         }
-        return foundProps;
+        return authRefInfoList;
     }
 
     private static List<AuthRefInfo> findAuthRefPropertiesInProperty(
-            List<AuthRefInfo> foundProps,
+            List<AuthRefInfo> authRefInfoList,
             Property prop,
             AuthRefConfigInfo arci,
             int pathStartIndex, // Supports recursion and we work down the path
@@ -879,11 +1040,11 @@ public class RefNameServiceUtils {
         }
         AuthRefInfo ari = null;
         if (prop == null) {
-            return foundProps;
+            return authRefInfoList;
         }
 
         if (prop instanceof StringProperty) {    // scalar string
-            addARIifMatches(refNameToMatch, matchBaseOnly, arci, prop, foundProps);
+            addARIifMatches(refNameToMatch, matchBaseOnly, arci, prop, authRefInfoList); // REM - Side effect that foundProps gets changed/updated
         } else if (prop instanceof List) {
             List<Property> propList = (List<Property>) prop;
             // run through list. Must either be list of Strings, or Complex
@@ -894,12 +1055,12 @@ public class RefNameServiceUtils {
                                 + arci.pathEls.toString());
                         break;
                     } else {
-                        addARIifMatches(refNameToMatch, matchBaseOnly, arci, listItemProp, foundProps);
+                        addARIifMatches(refNameToMatch, matchBaseOnly, arci, listItemProp, authRefInfoList);
                     }
                 } else if (listItemProp.isComplex()) {
                     // Just recurse to handle this. Note that since this is a list of complex, 
                     // which should look like listName/*/... we add 2 to the path start index 
-                    findAuthRefPropertiesInProperty(foundProps, listItemProp, arci,
+                    findAuthRefPropertiesInProperty(authRefInfoList, listItemProp, arci,
                             pathStartIndex + 2, refNameToMatch, matchBaseOnly);
                 } else {
                     logger.error("Configuration for authRefs does not match schema structure: "
@@ -912,7 +1073,7 @@ public class RefNameServiceUtils {
             try {
                 Property localProp = prop.get(localPropName);
                 // Now just recurse, pushing down the path 1 step
-                findAuthRefPropertiesInProperty(foundProps, localProp, arci,
+                findAuthRefPropertiesInProperty(authRefInfoList, localProp, arci,
                         pathStartIndex, refNameToMatch, matchBaseOnly);
             } catch (PropertyNotFoundException pnfe) {
                 logger.error("Could not find property: [" + localPropName + "] in path: "
@@ -925,10 +1086,10 @@ public class RefNameServiceUtils {
         }
 
         if (ari != null) {
-            foundProps.add(ari); //FIXME: REM - This is dead code.  'ari' is never touched after being initalized to null.  Why?
+            authRefInfoList.add(ari); //FIXME: REM - This is dead code.  'ari' is never touched after being initalized to null.  Why?
         }
 
-        return foundProps;
+        return authRefInfoList;
     }
 
     private static void addARIifMatches(
@@ -936,7 +1097,7 @@ public class RefNameServiceUtils {
             boolean matchBaseOnly,
             AuthRefConfigInfo arci,
             Property prop,
-            List<AuthRefInfo> foundProps) {
+            List<AuthRefInfo> authRefInfoList) {
         // Need to either match a passed refName 
         // OR have no refName to match but be non-empty
         try {
@@ -949,12 +1110,41 @@ public class RefNameServiceUtils {
                 // Found a match
                 logger.debug("Found a match on property: " + prop.getPath() + " with value: [" + value + "]");
                 AuthRefInfo ari = new AuthRefInfo(arci, prop);
-                foundProps.add(ari);
+                authRefInfoList.add(ari);
             }
         } catch (PropertyException pe) {
             logger.debug("PropertyException on: " + prop.getPath() + pe.getLocalizedMessage());
         }
     }
+    
+    public static String buildWhereForAuthByName(String authorityCommonSchemaName, String name) {
+        return authorityCommonSchemaName
+                + ":" + AuthorityJAXBSchema.SHORT_IDENTIFIER
+                + "='" + name + "'";
+    }
+
+    /**
+     * Build an NXQL query for finding an item by its short ID
+     * 
+     * @param authorityItemCommonSchemaName
+     * @param shortId
+     * @param parentcsid
+     * @return
+     */
+    public static String buildWhereForAuthItemByName(String authorityItemCommonSchemaName, String shortId, String parentcsid) {
+    	String result = null;
+    	
+        result = String.format("%s:%s='%s'", authorityItemCommonSchemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER, shortId);
+        //
+        // Technically, we don't need the parent CSID since the short ID is unique so it can be null
+        //
+        if (parentcsid != null) {
+        	result = String.format("%s AND %s:%s='%s'",
+        			result, authorityItemCommonSchemaName, AuthorityItemJAXBSchema.IN_AUTHORITY, parentcsid);
+        }
+        
+        return result;
+    }    
 
     /*
      * Identifies whether the refName was found in the supplied field. If passed

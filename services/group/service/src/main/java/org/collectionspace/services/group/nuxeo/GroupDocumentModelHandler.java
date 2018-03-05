@@ -23,10 +23,10 @@
  */
 package org.collectionspace.services.group.nuxeo;
 
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.group.GroupsCommon;
 
 public class GroupDocumentModelHandler 
-	extends DocHandlerBase<GroupsCommon> {
+	extends NuxeoDocumentModelHandler<GroupsCommon> {
 }
 

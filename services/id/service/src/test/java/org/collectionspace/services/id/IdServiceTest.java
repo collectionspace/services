@@ -24,7 +24,7 @@ package org.collectionspace.services.id;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.ws.rs.core.MediaType;
+
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
@@ -33,18 +33,12 @@ import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.client.test.BaseServiceTest;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.common.document.BadRequestException;
-import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.id.IDGeneratorSerializer;
 import org.collectionspace.services.id.NumericIDGeneratorPart;
 import org.collectionspace.services.id.SettableIDGenerator;
 import org.collectionspace.services.id.StringIDGeneratorPart;
-import org.collectionspace.services.jaxb.AbstractCommonList;
-
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,9 +62,14 @@ public class IdServiceTest extends BaseServiceTest {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
-    	return (CollectionSpaceClient) new IdClient();
+    protected CollectionSpaceClient getClientInstance() throws Exception {
+    	return new IdClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+    	return new IdClient(clientPropertiesFilename);
+	}
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
@@ -88,7 +87,7 @@ public class IdServiceTest extends BaseServiceTest {
         
         String xmlPayload = getSampleSerializedIdGenerator();
         logger.debug("payload=\n" + xmlPayload);
-        ClientResponse<Response> res = client.create(xmlPayload);
+        Response res = client.create(xmlPayload);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -128,11 +127,11 @@ public class IdServiceTest extends BaseServiceTest {
 
         // Submit the request to the service and store the response.
         IdClient client = new IdClient();
-        ClientResponse<String> res = client.createId(knownResourceId);
+        Response res = client.createId(knownResourceId);
         String generatedId = null;
         try {
 	        assertStatusCode(res, testName);
-	        generatedId = res.getEntity();
+	        generatedId = res.readEntity(String.class);
 	        Assert.assertNotNull(generatedId);
 	        Assert.assertFalse(generatedId.isEmpty());
 	        if (logger.isDebugEnabled()) {
@@ -140,7 +139,7 @@ public class IdServiceTest extends BaseServiceTest {
 	        }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         // Create a second ID.  Verify that it is different from the first.
@@ -149,7 +148,7 @@ public class IdServiceTest extends BaseServiceTest {
         res = client.createId(knownResourceId);
         try {
 	        assertStatusCode(res, testName);
-	        String secondGeneratedId = res.getEntity();
+	        String secondGeneratedId = res.readEntity(String.class);
 	        Assert.assertNotNull(secondGeneratedId);
 	        Assert.assertFalse(secondGeneratedId.isEmpty());
 	        Assert.assertFalse(secondGeneratedId.equals(generatedId));
@@ -158,7 +157,7 @@ public class IdServiceTest extends BaseServiceTest {
 	        }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -185,7 +184,7 @@ public class IdServiceTest extends BaseServiceTest {
 
         // Submit the request to the service and store the response.
         IdClient client = new IdClient();
-        ClientResponse<String> res = client.read(knownResourceId);
+        Response res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -197,7 +196,7 @@ public class IdServiceTest extends BaseServiceTest {
                 invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, testExpectedStatusCode);
 
-        String entity = res.getEntity();
+        String entity = res.readEntity(String.class);
         Assert.assertNotNull(entity);
         if (logger.isDebugEnabled()) {
             logger.debug("entity body=\r" + entity);
@@ -221,33 +220,36 @@ public class IdServiceTest extends BaseServiceTest {
 
         // Submit the request to the service and store the response.
         IdClient client = new IdClient();
-        ClientResponse<String> res = client.readList();
-        int statusCode = res.getStatus();
+        Response res = client.readList();
+        try {
+        	int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);        
+
+	        String entity = res.readEntity(String.class);
+	        Assert.assertNotNull(entity);
+	        if (logger.isDebugEnabled()) {
+	            logger.debug("entity body=\r" + entity);
+	        }
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        String entity = res.getEntity();
-        Assert.assertNotNull(entity);
-        if (logger.isDebugEnabled()) {
-            logger.debug("entity body=\r" + entity);
-        }
-
     }
 
     // Failure outcomes
@@ -261,7 +263,7 @@ public class IdServiceTest extends BaseServiceTest {
 
         // Submit the request to the service and store the response.
         IdClient client = new IdClient();
-        ClientResponse<Response> res = client.delete(knownResourceId);
+        Response res = client.delete(knownResourceId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -281,7 +283,7 @@ public class IdServiceTest extends BaseServiceTest {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
      */
     @Override
-    public String getServicePathComponent() {
+    public String getServicePathComponent() throws Exception {
         return new IdClient().getServicePathComponent();
     }
 

@@ -19,12 +19,18 @@ package org.collectionspace.services.common.storage;
 
 import java.util.List;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.TransactionException;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.lifecycle.TransitionDef;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 
 /**
  *
@@ -32,6 +38,8 @@ import org.collectionspace.services.lifecycle.TransitionDef;
  */
 public interface StorageClient {
 
+	public static final String SC_TRANSACTION_CONTEXT_KEY = "SC_ACTIVE_TRANSACTION_KEY";
+	
     /**
      * create entity in the persistence store
      * @param ctx service context under which this method is invoked
@@ -50,7 +58,16 @@ public interface StorageClient {
      * @throws DocumentException
      */
     void delete(ServiceContext ctx, String id) throws DocumentNotFoundException, DocumentException;
-
+    
+    /**
+     * Delete with an NXQL 'WHERE' clause.  If multiple documents match the clause, this method delete just
+     * the first document it finds.
+     * @param ctx
+     * @param specifier
+     * @throws DocumentNotFoundException
+     * @throws DocumentException
+     */
+    void deleteWithWhereClause(ServiceContext ctx, String whereClause, DocumentHandler handler) throws DocumentNotFoundException, DocumentException;
 
     /**
      * delete a entity from the persistence store
@@ -60,7 +77,7 @@ public interface StorageClient {
      * @throws DocumentNotFoundException if entity not found
      * @throws DocumentException
      */
-    void delete(ServiceContext ctx, String id, DocumentHandler handler) throws DocumentNotFoundException, DocumentException;
+    boolean delete(ServiceContext ctx, String id, DocumentHandler handler) throws DocumentNotFoundException, DocumentException;
 
 
     /**
@@ -132,5 +149,25 @@ public interface StorageClient {
      */
     void doWorkflowTransition(ServiceContext ctx, String id, DocumentHandler handler, TransitionDef transitionDef) 
     		throws BadRequestException, DocumentNotFoundException, DocumentException;
+
+    /*
+     * Ask a resource to synchronize itself with a shared server resource.  Returns "TRUE" if sync was needed.
+     */
+	boolean synchronize(ServiceContext ctx, Object specifier, DocumentHandler handler)
+			throws DocumentNotFoundException, TransactionException,
+			DocumentException;
+
+    /*
+     * Ask an item resource (e.g., an Authority or Vocabulary items) to synchronize itself with a shared server resource.  Returns "TRUE" if sync was needed.
+     */
+	boolean synchronizeItem(ServiceContext ctx, AuthorityItemSpecifier itemSpecifier, DocumentHandler handler)
+			throws DocumentNotFoundException, TransactionException,
+			DocumentException;
+
+	boolean delete(ServiceContext ctx, Object entityFound, DocumentHandler handler)
+			throws DocumentNotFoundException, DocumentException;
+
+	void releaseRepositorySession(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, Object repoSession)
+			throws TransactionException;
 
 }

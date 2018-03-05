@@ -1,0 +1,12 @@
+{
+  "document": {
+    "@name": "examples",
+    "ns:examples_common": {
+      "@xmlns:ns": "http://collectionspace.org/services/example",
+      "integer": 123,
+      "negInt": -8,
+      "float": 3.14159,
+      "negFloat": -341.24
+    }
+  }
+}

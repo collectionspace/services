@@ -6,7 +6,7 @@
     <parent>
         <artifactId>org.collectionspace.services.3rdparty.nuxeo.listener</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>4.1.1</version>
+        <version>5.0-SNAPSHOT</version>
     </parent>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -30,6 +30,16 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.location.client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.collectionobject.service</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

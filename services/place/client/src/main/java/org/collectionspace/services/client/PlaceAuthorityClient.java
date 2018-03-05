@@ -15,12 +15,13 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.place.PlaceauthoritiesCommon;
 import org.collectionspace.services.place.PlacesCommon;
 
 /**
  * The Class PlaceAuthorityClient.
  */
-public class PlaceAuthorityClient extends AuthorityClientImpl<PlacesCommon, PlaceAuthorityProxy> {
+public class PlaceAuthorityClient extends AuthorityClientImpl<PlaceauthoritiesCommon, PlacesCommon, PlaceAuthorityProxy> {
 
     public static final String SERVICE_NAME = "placeauthorities";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
@@ -40,6 +41,17 @@ public class PlaceAuthorityClient extends AuthorityClientImpl<PlacesCommon, Plac
     public static final String SERVICE_ITEM_COMMON_PART_NAME = SERVICE_ITEM_NAME
             + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
 
+    //
+    // Constructors
+    //
+    public PlaceAuthorityClient() throws Exception {
+    	super();
+    }
+    
+    public PlaceAuthorityClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
+    
     @Override
     public String getServiceName() {
         return SERVICE_NAME;
@@ -69,4 +81,16 @@ public class PlaceAuthorityClient extends AuthorityClientImpl<PlacesCommon, Plac
     public void setInAuthority(PlacesCommon item, String inAuthorityCsid) {
         item.setInAuthority(inAuthorityCsid);
     }
+
+	@Override
+	public String createAuthorityInstance(String shortIdentifier, String displayName) {
+		PoxPayloadOut poxPayloadout = PlaceAuthorityClientUtils.createPlaceAuthorityInstance(displayName, shortIdentifier, SERVICE_COMMON_PART_NAME);
+		return poxPayloadout.asXML();
+	}
+
+	@Override
+	public String createAuthorityItemInstance(String shortIdentifier, String displayName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

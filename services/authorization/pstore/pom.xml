@@ -4,11 +4,10 @@
     <parent>
         <artifactId>org.collectionspace.services.authorization</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>4.1.1</version>
+        <version>5.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.authorization.pstore</artifactId>
     <name>services.authorization.pstore</name>
     <properties>
@@ -26,7 +25,7 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
 			<dependency>
-			<groupId>postgresql</groupId>
+			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
         </dependency>
     </dependencies>
@@ -113,7 +112,7 @@
                                 <artifactId>mysql-connector-java</artifactId>
                             </dependency>
 							<dependency>
-								<groupId>postgresql</groupId>
+								<groupId>org.postgresql</groupId>
 								<artifactId>postgresql</artifactId>
 							</dependency>
                          </dependencies>

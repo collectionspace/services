@@ -33,6 +33,10 @@ public interface AuthorityItemJAXBSchema {
     final static String ORDER = "order";
     final static String SHORT_IDENTIFIER = "shortIdentifier";
     final static String CSID = "csid";
+    final static String REV = "rev";
+    final static String SAS = "sas";
+    final static String DEPRECATED = "deprecated";
+    final static String PROPOSED = "proposed";
     final static String DISPLAY_NAME = "displayName"; // This is the display name element for the Vocabulary service's item	
     final static String TERM_DISPLAY_NAME = "termDisplayName"; // This is the display name element for all Authority services' items
     final static String TERM_NAME = "termName";

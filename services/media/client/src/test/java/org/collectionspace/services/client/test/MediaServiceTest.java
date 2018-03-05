@@ -25,6 +25,7 @@ package org.collectionspace.services.client.test;
 import java.io.File;
 import java.net.URL;
 import java.util.List;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -36,14 +37,10 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.media.LanguageList;
 import org.collectionspace.services.media.MediaCommon;
 import org.collectionspace.services.media.SubjectList;
-
-import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,13 +88,18 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 	}
     
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new MediaClient();
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new MediaClient(clientPropertiesFilename);
+	}
+
     @Override
-    protected AbstractCommonList getCommonList(ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(AbstractCommonList.class);
+    protected AbstractCommonList getCommonList(Response response) {
+        return response.readEntity(AbstractCommonList.class);
     }
 
     /**
@@ -116,14 +118,14 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 		//
 		MediaClient client = new MediaClient();
 		PoxPayloadOut multipart = createMediaInstance(createIdentifier());
-		ClientResponse<Response> mediaRes = client.create(multipart);
+		Response mediaRes = client.create(multipart);
 		String mediaCsid = null;
 		try {
 			assertStatusCode(mediaRes, testName);
 			mediaCsid = extractId(mediaRes);
 		} finally {
 			if (mediaRes != null) {
-				mediaRes.releaseConnection();
+				mediaRes.close();
 			}
 		}
 		//
@@ -154,20 +156,18 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 				//
 				if (blobFile != null) {
 					client = new MediaClient();
-					ClientResponse<Response> res = null;
+					Response res = null;
 					String mimeType = this.getMimeType(blobFile);
 					logger.debug("Processing file URI: " + blobFile.getAbsolutePath());
 					logger.debug("MIME type is: " + mimeType);
 					if (fromUri == true) {
 						URL childUrl = blobFile.toURI().toURL();
-						res = client.createBlobFromUri(mediaCsid,
-								childUrl.toString());
+						res = client.createBlobFromUri(mediaCsid, childUrl.toString());
 					} else {
 						MultipartFormDataOutput formData = new MultipartFormDataOutput();
 						OutputPart outputPart = formData.addFormData("file",
 								blobFile, MediaType.valueOf(mimeType));
-						res = client
-								.createBlobFromFormData(mediaCsid, formData);
+						res = client.createBlobFromFormData(mediaCsid, formData);
 					}
 					try {
 						assertStatusCode(res, testName);
@@ -178,7 +178,7 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 						}
 					} finally {
 						if (res != null) {
-							res.releaseConnection();
+							res.close();
 						}
 					}
 				} else {
@@ -206,7 +206,7 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
     public void createMediaAndBlobWithUri(String testName) throws Exception {
 		MediaClient client = new MediaClient();
 		PoxPayloadOut multipart = createMediaInstance(createIdentifier());
-		ClientResponse<Response> mediaRes = client.createMediaAndBlobWithUri(multipart, PUBLIC_URL_DECK, true); // purge the original
+		Response mediaRes = client.createMediaAndBlobWithUri(multipart, PUBLIC_URL_DECK, true); // purge the original
 		String mediaCsid = null;
 		try {
 			assertStatusCode(mediaRes, testName);
@@ -214,7 +214,7 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 //			allResourceIdsCreated.add(mediaCsid); // Re-enable this and also add code to delete the associated blob
 		} finally {
 			if (mediaRes != null) {
-				mediaRes.releaseConnection();
+				mediaRes.close();
 			}
 		}
     }
@@ -232,7 +232,7 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 //        setupCreate();
 //        MediaClient client = new MediaClient();
 //        PoxPayloadOut multipart = createMediaInstance(createIdentifier());
-//        ClientResponse<Response> res = client.create(multipart);
+//        Response res = client.create(multipart);
 //        assertStatusCode(res, testName);
 //        String csid = extractId(res);
 //        
@@ -245,14 +245,14 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
     // ---------------------------------------------------------------
 
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
     	return createMediaInstance(identifier);
     }
     
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-    private PoxPayloadOut createMediaInstance(String title) {
+    private PoxPayloadOut createMediaInstance(String title) throws Exception {
         String identifier = "media.title-" + title;
         MediaCommon media = new MediaCommon();
         media.setTitle(identifier);
@@ -283,7 +283,7 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 
 	@Override
 	protected PoxPayloadOut createInstance(String commonPartName,
-			String identifier) {
+			String identifier) throws Exception {
 		return createMediaInstance(identifier);
 	}
 

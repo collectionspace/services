@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    SystemInfo schema (XSD)
+    
+    Entity  : SystemInfo
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns:ns="http://collectionspace.org/services/systeminfo"
+  xmlns="http://collectionspace.org/services/systeminfo"
+  targetNamespace="http://collectionspace.org/services/systeminfo"
+  version="0.1"
+>
+
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+
+    <xs:element name="system_info_common">
+		<xs:complexType>
+			<xs:sequence>
+			    <xs:element name="displayName" type="xs:string"/>
+			    <xs:element name="instanceId" type="xs:string"/>
+			    <xs:element name="versionString" type="xs:string"/>
+			    <xs:element name="version" type="version"/>
+			    <xs:element name="javaVersionString" type="xs:string"/>
+			    <xs:element name="nuxeoVersionString" type="xs:string"/>
+			    <xs:element name="postgresVersionString" type="xs:string"/>
+			    <xs:element name="host" type="xs:string"/>
+			    <xs:element name="hostTimezone" type="xs:string"/>
+			    <xs:element name="hostLocale" type="xs:string"/>
+			    <xs:element name="hostCharset" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="version">
+        <xs:sequence>
+            <xs:element name="displayName" type="xs:string"/>
+            <xs:element name="major" type="xs:string"/>
+            <xs:element name="minor" type="xs:string"/>
+            <xs:element name="patch" type="xs:string"/>
+            <xs:element name="build" type="xs:string"/>
+            <xs:element name="buildDate" type="xs:date"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

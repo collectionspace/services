@@ -24,19 +24,15 @@ package org.collectionspace.services.client.test;
 
 //import java.util.ArrayList;
 import java.math.BigDecimal;
-import java.util.List;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.DimensionClient;
 import org.collectionspace.services.client.DimensionFactory;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.dimension.DimensionsCommon;
-import org.collectionspace.services.dimension.DimensionsCommonList;
-
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.testng.Assert;
-//import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: 917 $
  * $LastChangedDate: 2009-11-06 12:20:28 -0800 (Fri, 06 Nov 2009) $
  */
-public class DimensionServiceTest extends AbstractPoxServiceTestImpl<DimensionsCommonList, DimensionsCommon> {
+public class DimensionServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, DimensionsCommon> {
 
     /** The logger. */
     private final String CLASS_NAME = DimensionServiceTest.class.getName();
@@ -71,36 +67,14 @@ public class DimensionServiceTest extends AbstractPoxServiceTestImpl<DimensionsC
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new DimensionClient();
     }
 
-    @Override
-    protected Class<DimensionsCommonList> getCommonListType() {
-    	return DimensionsCommonList.class;
-    }
-
-    /*
-     * This method gets called by the parent's method public void readList(String testName)
-     */
-    protected void printList(String testName, DimensionsCommonList list) {
-        // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = false;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            List<DimensionsCommonList.DimensionListItem> items =
-                    list.getDimensionListItem();
-            int i = 0;
-            for (DimensionsCommonList.DimensionListItem item : items) {
-                logger.debug(testName + ": list-item[" + i + "] csid="
-                        + item.getCsid());
-                logger.debug(testName + ": list-item[" + i + "] objectNumber="
-                        + item.getDimension());
-                logger.debug(testName + ": list-item[" + i + "] URI="
-                        + item.getUri());
-                i++;
-            }
-        }
-    }
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new DimensionClient(clientPropertiesFilename);
+	}	
     
     protected void compareInstances(DimensionsCommon original, DimensionsCommon updated) throws Exception {
         Assert.assertEquals(original.getValueDate(),
@@ -131,7 +105,7 @@ public class DimensionServiceTest extends AbstractPoxServiceTestImpl<DimensionsC
     }
 
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
     	DimensionClient client = new DimensionClient();
     	return createInstance(client.getCommonPartName(), identifier);
     }
@@ -243,7 +217,7 @@ public class DimensionServiceTest extends AbstractPoxServiceTestImpl<DimensionsC
         		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
     public void CRUDTests(String testName) {
     	// Do nothing.  Simply here to for a TestNG execution order for our tests
-    }	
+    }
 
     /*
     @Override

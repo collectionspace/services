@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 <!--
-    Loan Out schema (XSD)
+    Batch common schema (XSD)
     
     Entity  : Batch
     Part    : Common
     Used for: Nuxeo EP core document type
 
-    $LastChangedRevision: 2316 $
-    $LastChangedDate: 2010-06-02 16:03:51 -0700 (Wed, 02 Jun 2010) $
 -->
 
 <xs:schema 
@@ -20,22 +18,43 @@
     
     <!-- See http://wiki.collectionspace.org/display/collectionspace/Loans+Out+Schema -->
 
-    <!--  Batch Information Group -->
-    
-    <xs:element name="name" type="xs:string"/>
-    <xs:element name="notes" type="xs:string"/>
+	<!-- Batch Information Group -->
+	<xs:element name="name" type="xs:string" />
+	<xs:element name="notes" type="xs:string" />
     <xs:element name="forDocTypes">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="forDocType" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+    <xs:element name="forRoles">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="forDocType" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+                <xs:element name="roleDisplayName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="supportsNoContext" type="xs:boolean"/>
-    <xs:element name="supportsSingleDoc" type="xs:boolean"/>
-    <xs:element name="supportsDocList" type="xs:boolean"/>
-    <xs:element name="supportsGroup" type="xs:boolean"/>
-    <!-- NYI <xs:element name="supportsQuery" type="xs:boolean"/>  -->
-    <xs:element name="createsNewFocus" type="xs:boolean"/>
-    <xs:element name="className" type="xs:string"/>
+    <xs:element name="resourceActionGroupList" type="resourceActionGroupList"/>
+	<xs:element name="supportsNoContext" type="xs:boolean" />
+	<xs:element name="supportsSingleDoc" type="xs:boolean" />
+	<xs:element name="supportsDocList" type="xs:boolean" />
+	<xs:element name="supportsGroup" type="xs:boolean" />
+	<!-- Batch specific fields -->
+	<xs:element name="createsNewFocus" type="xs:boolean" />
+	<xs:element name="className" type="xs:string" />
+    
+    <xs:complexType name="resourceActionGroupList">
+        <xs:sequence>
+            <xs:element name="resourceActionGroup" type="resourceActionGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="resourceActionGroup">
+        <xs:sequence>
+            <xs:element name="resourceName" type="xs:string"/>
+            <xs:element name="actionGroup" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
 </xs:schema>
