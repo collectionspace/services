@@ -539,7 +539,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         if (uriInfo == null) {
             uriInfo = createUriInfo();
         }
-        uriInfo.getQueryParameters().add(WorkflowClient.WORKFLOW_QUERY_NONDELETED, Boolean.FALSE.toString());
+        uriInfo.getQueryParameters().add(WorkflowClient.WORKFLOW_QUERY_DELETED_QP, Boolean.FALSE.toString());
         return uriInfo;
     }
     

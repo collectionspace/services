@@ -387,4 +387,10 @@ public interface DocumentHandler<T, TL, WT, WTL> {
 
 	public void sanitize(DocumentWrapper<WT> wrapDoc);
 
+	/**
+	 * Should return true if the document supports workflow states (usually, just Nuxeo documents/records)
+	 * @return
+	 */
+	public boolean supportsWorkflowStates();
+
 }

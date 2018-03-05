@@ -30,6 +30,7 @@ import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.TransactionContext;
@@ -91,7 +92,21 @@ public class RoleResource extends SecurityResourceBase<Role, Role> {
 
     @POST
     public Response createRole(Role input) {
-        return create(input);
+        try {
+            return create(input);
+        } catch (CSWebApplicationException we) {
+            if (we.getCause() instanceof DocumentException) {
+                DocumentException de = (DocumentException)we.getCause();
+                if (de.getErrorCode() == DocumentException.DUPLICATE_RECORD_ERR) {
+                    //
+                    // Replace the generic error message with a Role-specific error message
+                    //
+                    String msg = String.format("There is already a role with the name '%s'.  Please choose a different name.", input.displayName);
+                    throw bigReThrow(new DocumentException(msg, de, de.getErrorCode()), msg);
+                }
+            }
+            throw we;
+        }
     }
 
     @GET

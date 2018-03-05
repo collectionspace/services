@@ -109,9 +109,9 @@ public class WorkflowClient extends AbstractCommonListPoxServiceClientImpl<Workf
 	//
 	// Service Query Params
 	//
-	public static final String WORKFLOW_QUERY_ONLY_DELETED = "wf_only_deleted";
-	public static final String WORKFLOW_QUERY_NONDELETED = "wf_deleted";
-	public static final String WORKFLOWSTATE_QUERY = "wf_deleted";
+	public static final String WORKFLOW_QUERY_ONLY_DELETED_QP = "wf_only_deleted";
+	public static final String WORKFLOW_QUERY_DELETED_QP = "wf_deleted";
+	public static final String WORKFLOWSTATE_QUERY = WORKFLOW_QUERY_DELETED_QP;
 	public static final String TARGET_DOCHANDLER = "wf_dochandler";
 	
 	//

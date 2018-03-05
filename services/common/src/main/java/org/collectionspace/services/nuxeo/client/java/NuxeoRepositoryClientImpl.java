@@ -132,7 +132,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             // docModel is in a non-deleted workflow state.
             //
             String currentState = docModel.getCurrentLifeCycleState();
-            String includeDeletedStr = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_NONDELETED);
+            String includeDeletedStr = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_DELETED_QP);
             boolean includeDeleted = (includeDeletedStr == null) ? true : Boolean.parseBoolean(includeDeletedStr);
             if (includeDeleted == false) {
                 //
@@ -1310,7 +1310,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
         // in the current request
         
         // Restrict the query to filter out deleted records, if requested
-        String includeDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_NONDELETED);
+        String includeDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_DELETED_QP);
         if (includeDeleted != null && includeDeleted.equalsIgnoreCase(Boolean.FALSE.toString())) {
             whereClause = whereClause
                     + "  AND (misc.lifecyclestate <> '" + WorkflowClient.WORKFLOWSTATE_DELETED + "')"
