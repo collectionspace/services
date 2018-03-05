@@ -114,7 +114,7 @@ import org.w3c.dom.Element;
 @Produces("application/xml")
 public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         extends NuxeoBasedResource {
-	
+    
     final Logger logger = LoggerFactory.getLogger(AuthorityResource.class);
 
     final static String SEARCH_TYPE_TERMSTATUS = "ts";
@@ -128,9 +128,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         
     final static String FETCH_SHORT_ID = "_fetch_";
     public final static String PARENT_WILDCARD = "_ALL_";
-	protected static final boolean DONT_INCLUDE_ITEMS = false;
-	protected static final boolean INCLUDE_ITEMS = true;
-	
+    protected static final boolean DONT_INCLUDE_ITEMS = false;
+    protected static final boolean INCLUDE_ITEMS = true;
+    
     /**
      * Instantiates a new Authority resource.
      */
@@ -179,7 +179,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             ServiceContext<PoxPayloadIn, PoxPayloadOut> containerCtx = createServiceContext(getServiceName());
             if (containerShortIdentifier.equals(FETCH_SHORT_ID)) { // We need to fetch this from the repo
                 if (ctx.getCurrentRepositorySession() != null) {
-                	containerCtx.setCurrentRepositorySession(ctx.getCurrentRepositorySession()); // We need to use the current repo session if one exists
+                    containerCtx.setCurrentRepositorySession(ctx.getCurrentRepositorySession()); // We need to use the current repo session if one exists
                 }
                 // Get from parent document
                 containerShortIdentifier = getAuthShortIdentifier(containerCtx, inAuthority);
@@ -220,7 +220,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String shortIdentifier) {
         RefName.Authority authority = RefName.Authority.buildAuthority(ctx.getTenantName(),
                 ctx.getServiceName(), 
-                null,	// Only use shortId form!!!
+                null,    // Only use shortId form!!!
                 shortIdentifier, null);
         return authority.toString();
     }
@@ -230,27 +230,27 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         String shortIdentifier;
     }
 
-	protected String lookupParentCSID(String parentspecifier, String method,
-			String op, UriInfo uriInfo) throws Exception {
-		CsidAndShortIdentifier tempResult = lookupParentCSIDAndShortIdentifer(NULL_CONTEXT,
-				parentspecifier, method, op, uriInfo);
-		return tempResult.CSID;
-	}
-	
-	protected String lookupParentCSID(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String parentspecifier, String method,
-			String op, UriInfo uriInfo) throws Exception {
-		CsidAndShortIdentifier tempResult = lookupParentCSIDAndShortIdentifer(ctx,
-				parentspecifier, method, op, uriInfo);
-		return tempResult.CSID;
-	}
+    protected String lookupParentCSID(String parentspecifier, String method,
+            String op, UriInfo uriInfo) throws Exception {
+        CsidAndShortIdentifier tempResult = lookupParentCSIDAndShortIdentifer(NULL_CONTEXT,
+                parentspecifier, method, op, uriInfo);
+        return tempResult.CSID;
+    }
+    
+    protected String lookupParentCSID(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String parentspecifier, String method,
+            String op, UriInfo uriInfo) throws Exception {
+        CsidAndShortIdentifier tempResult = lookupParentCSIDAndShortIdentifer(ctx,
+                parentspecifier, method, op, uriInfo);
+        return tempResult.CSID;
+    }
 
 
     private CsidAndShortIdentifier lookupParentCSIDAndShortIdentifer(
-    		ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx, // Ok to be null
-    		String parentIdentifier,
-    		String method,
-    		String op,
-    		UriInfo uriInfo)
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx, // Ok to be null
+            String parentIdentifier,
+            String method,
+            String op,
+            UriInfo uriInfo)
             throws Exception {
         CsidAndShortIdentifier result = new CsidAndShortIdentifier();
         Specifier parentSpec = Specifier.getSpecifier(parentIdentifier, method, op);
@@ -269,7 +269,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getServiceName(), uriInfo);
             CoreSessionInterface repoSession = null;
             if (existingCtx != null) {
-            	repoSession = (CoreSessionInterface) existingCtx.getCurrentRepositorySession();  // We want to use the thread's current repo session
+                repoSession = (CoreSessionInterface) existingCtx.getCurrentRepositorySession();  // We want to use the thread's current repo session
             }
             parentcsid = getRepositoryClient(ctx).findDocCSID(repoSession, ctx, whereClause); //FIXME: REM - If the parent has been soft-deleted, should we be looking for the item?
         }
@@ -289,10 +289,10 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             itemcsid = itemSpec.value;
         } else {
             String itemWhereClause = RefNameServiceUtils.buildWhereForAuthItemByName(authorityItemCommonSchemaName, itemSpec.value, parentcsid);
-        	MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(getItemServiceName());
+            MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(getItemServiceName());
             CoreSessionInterface repoSession = null;
             if (existingContext != null) {
-            	repoSession = (CoreSessionInterface) existingContext.getCurrentRepositorySession();  // We want to use the thread's current repo session
+                repoSession = (CoreSessionInterface) existingContext.getCurrentRepositorySession();  // We want to use the thread's current repo session
             }
             itemcsid = getRepositoryClient(ctx).findDocCSID(repoSession, ctx, itemWhereClause); //FIXME: REM - Should we be looking for the 'wf_deleted' query param and filtering on it?
         }
@@ -306,11 +306,11 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * Resource. They then call this method on that resource.
      */
     @Override
-   	public DocumentModel getDocModelForAuthorityItem(CoreSessionInterface repoSession, RefName.AuthorityItem item) 
-   			throws Exception, DocumentNotFoundException {
-    	if (item == null) {
-    		return null;
-    	}
+       public DocumentModel getDocModelForAuthorityItem(CoreSessionInterface repoSession, RefName.AuthorityItem item) 
+               throws Exception, DocumentNotFoundException {
+        if (item == null) {
+            return null;
+        }
         String whereClause = RefNameServiceUtils.buildWhereForAuthByName(authorityCommonSchemaName, item.getParentShortIdentifier());
         // Ensure we have the right context.
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(item.inAuthority.resource);
@@ -329,36 +329,36 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 
     @POST
     public Response createAuthority(
-    		@Context ResourceMap resourceMap,
-    		@Context UriInfo uriInfo,
-    		String xmlPayload) {
-    	//
-    	// Requests to create new authorities come in on new threads. Unfortunately, we need to synchronize those threads on this block because, as of 8/27/2015, we can't seem to get Nuxeo
-    	// transaction code to deal with a database level UNIQUE constraint violations on the 'shortidentifier' column of the vocabularies_common table.
-    	// Therefore, to prevent having multiple authorities with the same shortid, we need to synchronize
-    	// the code that creates new authorities.  The authority document model handler will first check for authorities with the same short id before
-    	// trying to create a new authority.
-    	//
-    	synchronized(AuthorityResource.class) {
-	        try {
-	            PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
-	            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
-	            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
-	            
-	            String csid = getRepositoryClient(ctx).create(ctx, handler);
-	            UriBuilder path = UriBuilder.fromResource(resourceClass);
-	            path.path("" + csid);
-	            Response response = Response.created(path.build()).build();
-	            return response;
-	        } catch (Exception e) {
-	            throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
-	        }
-    	}
+            @Context ResourceMap resourceMap,
+            @Context UriInfo uriInfo,
+            String xmlPayload) {
+        //
+        // Requests to create new authorities come in on new threads. Unfortunately, we need to synchronize those threads on this block because, as of 8/27/2015, we can't seem to get Nuxeo
+        // transaction code to deal with a database level UNIQUE constraint violations on the 'shortidentifier' column of the vocabularies_common table.
+        // Therefore, to prevent having multiple authorities with the same shortid, we need to synchronize
+        // the code that creates new authorities.  The authority document model handler will first check for authorities with the same short id before
+        // trying to create a new authority.
+        //
+        synchronized(AuthorityResource.class) {
+            try {
+                PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
+                ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
+                DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
+                
+                String csid = getRepositoryClient(ctx).create(ctx, handler);
+                UriBuilder path = UriBuilder.fromResource(resourceClass);
+                path.path("" + csid);
+                Response response = Response.created(path.build()).build();
+                return response;
+            } catch (Exception e) {
+                throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
+            }
+        }
     }
 
     protected boolean supportsReplicating(String tenantId, String serviceName) {
-    	boolean result = false;
-    	
+        boolean result = false;
+        
         ServiceBindingType sb = getTenantBindingsReader().getServiceBinding(tenantId, getServiceName());
         result = sb.isSupportsReplicating();
         
@@ -378,56 +378,56 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             @Context Request request,
             @Context UriInfo uriInfo,
             @PathParam("csid") String identifier) {
-    	uriInfo = new UriInfoWrapper(uriInfo);
-    	byte[] result;
-    	boolean neededSync = false;
+        uriInfo = new UriInfoWrapper(uriInfo);
+        byte[] result;
+        boolean neededSync = false;
         PoxPayloadOut payloadOut = null;
         Specifier specifier;
         
         //
         // Prevent multiple SAS synchronizations from occurring simultaneously by synchronizing this method.
         //
-    	synchronized(AuthorityResource.class) {        
-	        try {
-	            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
-	            /*
-	             * Make sure this authority service supports synchronization
-	             */
-	            if (supportsReplicating(ctx.getTenantId(), ctx.getServiceName()) == false) {
-	            	throw new DocumentException(Response.Status.FORBIDDEN.getStatusCode());
-	            }
-				AuthorityDocumentModelHandler handler = (AuthorityDocumentModelHandler)createDocumentHandler(ctx);
-	            specifier = Specifier.getSpecifier(identifier, "getAuthority", "GET");
-	            handler.setShouldUpdateRevNumber(AuthorityServiceUtils.DONT_UPDATE_REV); // Never update rev number on sync calls
-	            neededSync = getRepositoryClient(ctx).synchronize(ctx, specifier, handler);
-	            payloadOut = ctx.getOutput();
-	        } catch (Exception e) {
-	            throw bigReThrow(e, ServiceMessages.SYNC_FAILED, identifier);
-	        }
-	
-	        //
-	        // If a sync was needed and was successful, return a copy of the updated resource.  Acts like an UPDATE.
-	        //
-	        if (neededSync == true) {
-	        	result = payloadOut.getBytes();
-	        } else {
-		        result = String.format("Authority resource '%s' was already in sync with shared authority server.",
-		        		specifier.value).getBytes();
-		        Response response = Response.status(Response.Status.NOT_MODIFIED).entity(result).type("text/plain").build();
-	            throw new CSWebApplicationException(response);
-	        }
-    	}
-	        
-    	return result;
+        synchronized(AuthorityResource.class) {        
+            try {
+                ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
+                /*
+                 * Make sure this authority service supports synchronization
+                 */
+                if (supportsReplicating(ctx.getTenantId(), ctx.getServiceName()) == false) {
+                    throw new DocumentException(Response.Status.FORBIDDEN.getStatusCode());
+                }
+                AuthorityDocumentModelHandler handler = (AuthorityDocumentModelHandler)createDocumentHandler(ctx);
+                specifier = Specifier.getSpecifier(identifier, "getAuthority", "GET");
+                handler.setShouldUpdateRevNumber(AuthorityServiceUtils.DONT_UPDATE_REV); // Never update rev number on sync calls
+                neededSync = getRepositoryClient(ctx).synchronize(ctx, specifier, handler);
+                payloadOut = ctx.getOutput();
+            } catch (Exception e) {
+                throw bigReThrow(e, ServiceMessages.SYNC_FAILED, identifier);
+            }
+    
+            //
+            // If a sync was needed and was successful, return a copy of the updated resource.  Acts like an UPDATE.
+            //
+            if (neededSync == true) {
+                result = payloadOut.getBytes();
+            } else {
+                result = String.format("Authority resource '%s' was already in sync with shared authority server.",
+                        specifier.value).getBytes();
+                Response response = Response.status(Response.Status.NOT_MODIFIED).entity(result).type("text/plain").build();
+                throw new CSWebApplicationException(response);
+            }
+        }
+            
+        return result;
     }
     
     /*
      * Builds a cached JAX-RS response.
      */
     protected Response buildResponse(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, PoxPayloadOut payloadOut) {
-    	Response result = null;
+        Response result = null;
         
-    	ResponseBuilder responseBuilder = Response.ok(payloadOut.getBytes());
+        ResponseBuilder responseBuilder = Response.ok(payloadOut.getBytes());
         this.setCacheControl(ctx, responseBuilder);
         result = responseBuilder.build();            
 
@@ -448,8 +448,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             @Context Request request,
             @Context UriInfo uriInfo,
             @PathParam("csid") String specifier) {
-    	Response result = null;
-    	uriInfo = new UriInfoWrapper(uriInfo);
+        Response result = null;
+        uriInfo = new UriInfoWrapper(uriInfo);
         
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(request, uriInfo);
@@ -469,13 +469,13 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         return result;
     }
         
-	protected PoxPayloadOut getAuthority(
-    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    protected PoxPayloadOut getAuthority(
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             Request request,
             UriInfo uriInfo,
             String specifier,
             boolean includeItems) throws Exception {
-    	uriInfo = new UriInfoWrapper(uriInfo);
+        uriInfo = new UriInfoWrapper(uriInfo);
         PoxPayloadOut payloadout = null;
         
         DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> docHandler = createDocumentHandler(ctx);
@@ -492,10 +492,10 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             getRepositoryClient(ctx).get(ctx, docHandler);
         }
 
-    	payloadout = ctx.getOutput();
+        payloadout = ctx.getOutput();
         if (includeItems == true) {
-        	AbstractCommonList itemsList = this.getAuthorityItemList(ctx, specifier, uriInfo);
-        	payloadout.addPart(PoxPayload.ABSTRACT_COMMON_LIST_ROOT_ELEMENT_LABEL, itemsList);
+            AbstractCommonList itemsList = this.getAuthorityItemList(ctx, specifier, uriInfo);
+            payloadout.addPart(PoxPayload.ABSTRACT_COMMON_LIST_ROOT_ELEMENT_LABEL, itemsList);
         }
 
         return payloadout;
@@ -511,14 +511,14 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @GET
     @Produces("application/xml")
     public AbstractCommonList getAuthorityList(@Context UriInfo uriInfo) { //FIXME - REM 5/3/2012 - This is not reachable from the JAX-RS dispatcher.  Instead the equivalent method in ResourceBase is getting called.
-    	uriInfo = new UriInfoWrapper(uriInfo);
-    	AbstractCommonList result = null;
-    	
-    	try {
+        uriInfo = new UriInfoWrapper(uriInfo);
+        AbstractCommonList result = null;
+        
+        try {
             MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
                         
-			DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
+            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
             DocumentFilter myFilter = handler.getDocumentFilter();
             // Need to make the default sort order for authority items
             // be on the displayName field
@@ -555,7 +555,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         AuthorityDocumentModelHandler handler = (AuthorityDocumentModelHandler) createDocumentHandler(ctx);
         Boolean shouldUpdateRev = (Boolean) ctx.getProperty(AuthorityServiceUtils.SHOULD_UPDATE_REV_PROPERTY);
         if (shouldUpdateRev != null) {
-        	handler.setShouldUpdateRevNumber(shouldUpdateRev);
+            handler.setShouldUpdateRevNumber(shouldUpdateRev);
         }
         getRepositoryClient(ctx).update(ctx, csid, handler);
         return ctx.getOutput();
@@ -571,9 +571,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @PUT
     @Path("{csid}")
     public byte[] updateAuthority(
-    		@Context Request request,
-    		@Context ResourceMap resourceMap,
-    		@Context UriInfo uriInfo,    		
+            @Context Request request,
+            @Context ResourceMap resourceMap,
+            @Context UriInfo uriInfo,            
             @PathParam("csid") String specifier,
             String xmlPayload) {
         PoxPayloadOut result = null;
@@ -612,23 +612,23 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
-			RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient = this.getRepositoryClient(ctx);
+            RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient = this.getRepositoryClient(ctx);
             
-			CoreSessionInterface repoSession = repoClient.getRepositorySession(ctx);
-			try {
-	            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
-	            //
-	            // Delete all the items one by one
-	            //
-	        	AbstractCommonList itemsList = this.getAuthorityItemList(ctx, specifier, uriInfo);
-	        	for (ListItem item : itemsList.getListItem()) {
-	                deleteAuthorityItem(ctx, specifier, getCsid(item), AuthorityServiceUtils.UPDATE_REV);
-	        	}
-			} catch (Throwable t) {
-            	repoSession.setTransactionRollbackOnly();
-            	throw t;
+            CoreSessionInterface repoSession = repoClient.getRepositorySession(ctx);
+            try {
+                DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
+                //
+                // Delete all the items one by one
+                //
+                AbstractCommonList itemsList = this.getAuthorityItemList(ctx, specifier, uriInfo);
+                for (ListItem item : itemsList.getListItem()) {
+                    deleteAuthorityItem(ctx, specifier, getCsid(item), AuthorityServiceUtils.UPDATE_REV);
+                }
+            } catch (Throwable t) {
+                repoSession.setTransactionRollbackOnly();
+                throw t;
             } finally {
-            	repoClient.releaseRepositorySession(ctx, repoSession);
+                repoClient.releaseRepositorySession(ctx, repoSession);
             }
 
             return Response.status(HttpResponseCodes.SC_OK).build();
@@ -659,40 +659,40 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
             Specifier spec = Specifier.getSpecifier(specifier, "getAuthority", "GET");
-			RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient = this.getRepositoryClient(ctx);
+            RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient = this.getRepositoryClient(ctx);
             
-			CoreSessionInterface repoSession = repoClient.getRepositorySession(ctx);
-			try {
-	            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
-	            //
-	            // First try to delete all the items
-	            //
-	        	AbstractCommonList itemsList = this.getAuthorityItemList(ctx, specifier, uriInfo);
-	        	for (ListItem item : itemsList.getListItem()) {
-	                deleteAuthorityItem(ctx, specifier, getCsid(item), AuthorityServiceUtils.UPDATE_REV);
-	        	}
+            CoreSessionInterface repoSession = repoClient.getRepositorySession(ctx);
+            try {
+                DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
+                //
+                // First try to delete all the items
+                //
+                AbstractCommonList itemsList = this.getAuthorityItemList(ctx, specifier, uriInfo);
+                for (ListItem item : itemsList.getListItem()) {
+                    deleteAuthorityItem(ctx, specifier, getCsid(item), AuthorityServiceUtils.UPDATE_REV);
+                }
 
-	            //
-	            // Lastly, delete the parent/container
-	            //
-	            if (spec.form == SpecifierForm.CSID) {
-	                if (logger.isDebugEnabled()) {
-	                    logger.debug("deleteAuthority with csid=" + spec.value);
-	                }
-	                ensureCSID(spec.value, ServiceMessages.DELETE_FAILED, "Authority.csid");
-	                getRepositoryClient(ctx).delete(ctx, spec.value, handler);
-	            } else {
-	                if (logger.isDebugEnabled()) {
-	                    logger.debug("deleteAuthority with specifier=" + spec.value);
-	                }            	
-	                String whereClause = RefNameServiceUtils.buildWhereForAuthByName(authorityCommonSchemaName, spec.value);
-	                getRepositoryClient(ctx).deleteWithWhereClause(ctx, whereClause, handler);
-	            }
-			} catch (Throwable t) {
-            	repoSession.setTransactionRollbackOnly();
-            	throw t;
+                //
+                // Lastly, delete the parent/container
+                //
+                if (spec.form == SpecifierForm.CSID) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("deleteAuthority with csid=" + spec.value);
+                    }
+                    ensureCSID(spec.value, ServiceMessages.DELETE_FAILED, "Authority.csid");
+                    getRepositoryClient(ctx).delete(ctx, spec.value, handler);
+                } else {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("deleteAuthority with specifier=" + spec.value);
+                    }                
+                    String whereClause = RefNameServiceUtils.buildWhereForAuthByName(authorityCommonSchemaName, spec.value);
+                    getRepositoryClient(ctx).deleteWithWhereClause(ctx, whereClause, handler);
+                }
+            } catch (Throwable t) {
+                repoSession.setTransactionRollbackOnly();
+                throw t;
             } finally {
-            	repoClient.releaseRepositorySession(ctx, repoSession);
+                repoClient.releaseRepositorySession(ctx, repoSession);
             }
 
             return Response.status(HttpResponseCodes.SC_OK).build();
@@ -701,39 +701,39 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         }
     }
     
-	private String getCsid(ListItem item) {
-		String result = null;
-		
-		for (Element ele : item.getAny()) {
-			String elementName = ele.getTagName().toLowerCase();
-			if (elementName.equals("csid")) {
-				result = ele.getTextContent();
-				break;
-			}
-		}
-		
-		return result;
-	}
+    private String getCsid(ListItem item) {
+        String result = null;
+        
+        for (Element ele : item.getAny()) {
+            String elementName = ele.getTagName().toLowerCase();
+            if (elementName.equals("csid")) {
+                result = ele.getTextContent();
+                break;
+            }
+        }
+        
+        return result;
+    }
 
-	/**
+    /**
      * 
      * @param ctx
-     * @param parentspecifier		- ID of the container. Can be URN or CSID form
+     * @param parentspecifier        - ID of the container. Can be URN or CSID form
      * @param shouldUpdateRevNumber - Indicates if the revision number should be updated on create -won't do this when synching with SAS
-     * @param isProposed				- In a shared authority context, indicates if this item just a proposed item and not yet part of the SAS authority
+     * @param isProposed                - In a shared authority context, indicates if this item just a proposed item and not yet part of the SAS authority
      * @return
      * @throws Exception
      */
     protected Response createAuthorityItem(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String parentIdentifier,
-    		boolean shouldUpdateRevNumber,
-    		boolean isProposed,
-    		boolean isSasItem) throws Exception {
-    	Response result = null;
-    	
+            boolean shouldUpdateRevNumber,
+            boolean isProposed,
+            boolean isSasItem) throws Exception {
+        Response result = null;
+        
         // Note: must have the parentShortId, to do the create.
         CsidAndShortIdentifier parent = lookupParentCSIDAndShortIdentifer(ctx, parentIdentifier, "createAuthorityItem", "CREATE_ITEM", null);
         AuthorityItemDocumentModelHandler handler = 
-        	(AuthorityItemDocumentModelHandler) createItemDocumentHandler(ctx, parent.CSID, parent.shortIdentifier);
+            (AuthorityItemDocumentModelHandler) createItemDocumentHandler(ctx, parent.CSID, parent.shortIdentifier);
         handler.setShouldUpdateRevNumber(shouldUpdateRevNumber);
         handler.setIsProposed(isProposed);
         handler.setIsSASItem(isSasItem);
@@ -745,12 +745,12 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         path.path(parent.CSID + "/items/" + itemcsid);
         result = Response.created(path.build()).build();
 
-    	return result;
+        return result;
     }
     
     public PoxPayloadOut updateAuthorityItem(
-    		ServiceContext<PoxPayloadIn, PoxPayloadOut> itemServiceCtx, // Ok to be null.  Will be null on PUT calls, but not on sync calls
-    		ResourceMap resourceMap, 
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> itemServiceCtx, // Ok to be null.  Will be null on PUT calls, but not on sync calls
+            ResourceMap resourceMap, 
             UriInfo uriInfo,
             String parentspecifier,
             String itemspecifier,
@@ -769,9 +769,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         //
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = itemServiceCtx;
         if (ctx == null) {
-        	ctx = createServiceContext(getItemServiceName(), theUpdate, resourceMap, uriInfo);
+            ctx = createServiceContext(getItemServiceName(), theUpdate, resourceMap, uriInfo);
         } else {
-        	ctx.setInput(theUpdate); // the update payload
+            ctx.setInput(theUpdate); // the update payload
         }
         
         String itemcsid = lookupItemCSID(ctx, itemspecifier, parentcsid, "updateAuthorityItem(item)", "UPDATE_ITEM"); //use itemServiceCtx if it is not null
@@ -785,13 +785,13 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         boolean updateSASFields = isProposed != null || isSASItem != null;
         handler.setshouldUpdateSASFields(updateSASFields);
         if (updateSASFields == true) {
-	        handler.setshouldUpdateSASFields(true);
-	        if (isProposed != null) {
-	        	handler.setIsProposed(isProposed);
-	        }
-	        if (isSASItem != null) {
-	        	handler.setIsSASItem(isSASItem);
-	        }
+            handler.setshouldUpdateSASFields(true);
+            if (isProposed != null) {
+                handler.setIsProposed(isProposed);
+            }
+            if (isSASItem != null) {
+                handler.setIsSASItem(isSASItem);
+            }
         }
         
         getRepositoryClient(ctx).update(ctx, itemcsid, handler);
@@ -809,21 +809,21 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * @throws Exception
      */
     public Response createAuthorityItemWithParentContext(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
-    		String parentIdentifier,
-    		PoxPayloadIn input,
-    		boolean shouldUpdateRevNumber,
-    		boolean isProposed,
-    		boolean isSASItem) throws Exception {
-    	Response result = null;
-    	
+            String parentIdentifier,
+            PoxPayloadIn input,
+            boolean shouldUpdateRevNumber,
+            boolean isProposed,
+            boolean isSASItem) throws Exception {
+        Response result = null;
+        
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), input,
-        		parentCtx.getResourceMap(), parentCtx.getUriInfo());
+                parentCtx.getResourceMap(), parentCtx.getUriInfo());
         if (parentCtx.getCurrentRepositorySession() != null) {
-        	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession());
+            ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession());
         }
         result = this.createAuthorityItem(ctx, parentIdentifier, shouldUpdateRevNumber, isProposed, isSASItem);
 
-    	return result;
+        return result;
     }
         
     /*************************************************************************
@@ -834,18 +834,18 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @POST
     @Path("{csid}/items")
     public Response createAuthorityItem(
-    		@Context ResourceMap resourceMap,
-    		@Context UriInfo uriInfo,
-    		@PathParam("csid") String parentIdentifier, // Either a CSID or a URN form -e.g., a8ad38ec-1d7d-4bf2-bd31 or urn:cspace:name(bugsbunny)
-    		String xmlPayload) {
-    	uriInfo = new UriInfoWrapper(uriInfo);
-    	Response result = null;
-    	
+            @Context ResourceMap resourceMap,
+            @Context UriInfo uriInfo,
+            @PathParam("csid") String parentIdentifier, // Either a CSID or a URN form -e.g., a8ad38ec-1d7d-4bf2-bd31 or urn:cspace:name(bugsbunny)
+            String xmlPayload) {
+        uriInfo = new UriInfoWrapper(uriInfo);
+        Response result = null;
+        
         try {
             PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), input, resourceMap, uriInfo);
             result = this.createAuthorityItem(ctx, parentIdentifier, AuthorityServiceUtils.UPDATE_REV,
-            		AuthorityServiceUtils.PROPOSED, AuthorityServiceUtils.NOT_SAS_ITEM);
+                    AuthorityServiceUtils.PROPOSED, AuthorityServiceUtils.NOT_SAS_ITEM);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
         }
@@ -884,13 +884,13 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             @PathParam("csid") String parentIdentifier,
             @PathParam("itemcsid") String itemIdentifier,
             @PathParam("transition") String transition) {
-    	uriInfo = new UriInfoWrapper(uriInfo);
+        uriInfo = new UriInfoWrapper(uriInfo);
         PoxPayloadOut result = null;
         
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), uriInfo);
             result = updateItemWorkflowWithTransition(ctx, 
-            		parentIdentifier, itemIdentifier, transition, AuthorityServiceUtils.UPDATE_REV);
+                    parentIdentifier, itemIdentifier, transition, AuthorityServiceUtils.UPDATE_REV);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, parentIdentifier);
         }
@@ -912,23 +912,23 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             String itemIdentifier,
             String transition,
             boolean updateRevNumber) throws DocumentReferenceException {
-    	PoxPayloadOut result = null;
-    	
+        PoxPayloadOut result = null;
+        
         try {
-        	//
-        	// We need CSIDs for both the parent authority and the authority item
-        	//
+            //
+            // We need CSIDs for both the parent authority and the authority item
+            //
             CsidAndShortIdentifier csidAndShortId = lookupParentCSIDAndShortIdentifer(existingContext, parentIdentifier, "updateItemWorkflowWithTransition(parent)", "UPDATE_ITEM", null);
             String itemCsid = lookupItemCSID(existingContext, itemIdentifier, csidAndShortId.CSID, "updateAuthorityItem(item)", "UPDATE_ITEM");
 
             //
-        	// Create an empty workflow_commons input part and set it into a new "workflow" sub-resource context
-        	//
-        	PoxPayloadIn input = new PoxPayloadIn(WorkflowClient.SERVICE_PAYLOAD_NAME, new WorkflowCommon(), 
-        			WorkflowClient.SERVICE_COMMONPART_NAME);
+            // Create an empty workflow_commons input part and set it into a new "workflow" sub-resource context
+            //
+            PoxPayloadIn input = new PoxPayloadIn(WorkflowClient.SERVICE_PAYLOAD_NAME, new WorkflowCommon(), 
+                    WorkflowClient.SERVICE_COMMONPART_NAME);
             MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME, input);
             if (existingContext != null && existingContext.getCurrentRepositorySession() != null) {
-            	ctx.setCurrentRepositorySession(existingContext.getCurrentRepositorySession());// If a repo session is already open, we need to use it and not create a new one
+                ctx.setCurrentRepositorySession(existingContext.getCurrentRepositorySession());// If a repo session is already open, we need to use it and not create a new one
             }
             //
             // Create a service context and document handler for the target resource -not the workflow resource itself.
@@ -943,11 +943,11 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             String targetWorkspaceName = targetCtx.getRepositoryWorkspaceName();
             ctx.setRespositoryWorkspaceName(targetWorkspaceName); //find the document in the parent's workspace
             
-        	// Get the type of transition we're being asked to make and store it as a context parameter -used by the workflow document handler
+            // Get the type of transition we're being asked to make and store it as a context parameter -used by the workflow document handler
             TransitionDef transitionDef = getTransitionDef(targetCtx, transition);
             if (transitionDef == null) {
-            	throw new DocumentException(String.format("The document with ID='%s' does not support the workflow transition '%s'.",
-            			itemIdentifier, transition));
+                throw new DocumentException(String.format("The document with ID='%s' does not support the workflow transition '%s'.",
+                        itemIdentifier, transition));
             }
             ctx.setProperty(WorkflowClient.TRANSITION_ID, transitionDef);
             
@@ -955,20 +955,20 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             getRepositoryClient(ctx).update(ctx, itemCsid, handler);
             result = ctx.getOutput();
         } catch (DocumentReferenceException de) {
-        	throw de;
+            throw de;
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, itemIdentifier);
         }
-    	
-    	return result;
+        
+        return result;
     }
     
     private PoxPayloadOut getAuthorityItem(
-    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             String parentIdentifier,
             String itemIdentifier) throws Exception {
-    	PoxPayloadOut result = null;
-    	
+        PoxPayloadOut result = null;
+        
         String parentcsid = lookupParentCSID(ctx, parentIdentifier, "getAuthorityItem(parent)", "GET_ITEM", null);
         // We omit the parentShortId, only needed when doing a create...
         DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createItemDocumentHandler(ctx, parentcsid, null);
@@ -979,7 +979,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             getRepositoryClient(ctx).get(ctx, itemSpec.value, handler);
         } else {
             String itemWhereClause =
-            		RefNameServiceUtils.buildWhereForAuthItemByName(authorityItemCommonSchemaName, itemSpec.value, parentcsid);
+                    RefNameServiceUtils.buildWhereForAuthItemByName(authorityItemCommonSchemaName, itemSpec.value, parentcsid);
             DocumentFilter myFilter = new NuxeoDocumentFilter(itemWhereClause, 0, 1); // start at page 0 and get 1 item
             handler.setDocumentFilter(myFilter);
             getRepositoryClient(ctx).get(ctx, handler);
@@ -987,30 +987,30 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         
         result = (PoxPayloadOut) ctx.getOutput();
         if (result != null) {
-        	String inAuthority = XmlTools.getElementValue(result.getDOMDocument(), "//" + AuthorityItemJAXBSchema.IN_AUTHORITY);
-        	if (inAuthority.equalsIgnoreCase(parentcsid) == false) {
-        		throw new Exception(String.format("Looked up item = '%s' and found with inAuthority = '%s', but expected inAuthority = '%s'.",
-        				itemSpec.value, inAuthority, parentcsid));
-        	}
+            String inAuthority = XmlTools.getElementValue(result.getDOMDocument(), "//" + AuthorityItemJAXBSchema.IN_AUTHORITY);
+            if (inAuthority.equalsIgnoreCase(parentcsid) == false) {
+                throw new Exception(String.format("Looked up item = '%s' and found with inAuthority = '%s', but expected inAuthority = '%s'.",
+                        itemSpec.value, inAuthority, parentcsid));
+            }
         }
         
-    	return result;
+        return result;
     }
 
     public PoxPayloadOut getAuthorityItemWithExistingContext(
-    		ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
             String parentIdentifier,
             String itemIdentifier) throws Exception {
-    	PoxPayloadOut result = null;
-    	
+        PoxPayloadOut result = null;
+        
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), existingCtx.getResourceMap(), existingCtx.getUriInfo());
         if (existingCtx.getCurrentRepositorySession() != null) {
-        	ctx.setCurrentRepositorySession(existingCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
-        	ctx.setProperties(existingCtx.getProperties());
+            ctx.setCurrentRepositorySession(existingCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
+            ctx.setProperties(existingCtx.getProperties());
         }
         result = getAuthorityItem(ctx, parentIdentifier, itemIdentifier);
-    	
-    	return result;
+        
+        return result;
     }
     
     /**
@@ -1026,14 +1026,14 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     public byte[] getAuthorityItem(
             @Context Request request,
             @Context UriInfo uriInfo,
-    		@Context ResourceMap resourceMap,            
+            @Context ResourceMap resourceMap,            
             @PathParam("csid") String parentIdentifier,
             @PathParam("itemcsid") String itemIdentifier) {
-    	uriInfo = new UriInfoWrapper(uriInfo);
+        uriInfo = new UriInfoWrapper(uriInfo);
         PoxPayloadOut result = null;
         try {
             RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = 
-                	(RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(getItemServiceName(), resourceMap, uriInfo);
+                    (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(getItemServiceName(), resourceMap, uriInfo);
 
             JaxRsContext jaxRsContext = new JaxRsContext(request, uriInfo); // Needed for getting account permissions part of the resource
             ctx.setJaxRsContext(jaxRsContext);
@@ -1053,26 +1053,26 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * different enough that it will have to override this method in it's resource class.
      */
     @Override
-	protected String getOrderByField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
-		String result = null;
+    protected String getOrderByField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
+        String result = null;
 
-		result = NuxeoUtils.getPrimaryElPathPropertyName(
-				authorityItemCommonSchemaName, getItemTermInfoGroupXPathBase(),
-				AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
+        result = NuxeoUtils.getPrimaryElPathPropertyName(
+                authorityItemCommonSchemaName, getItemTermInfoGroupXPathBase(),
+                AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
 
-		return result;
-	}
-	
+        return result;
+    }
+    
     @Override
-	protected String getPartialTermMatchField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
-		String result = null;
-		
-		result = NuxeoUtils.getMultiElPathPropertyName(
-				authorityItemCommonSchemaName, getItemTermInfoGroupXPathBase(),
-				AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
+    protected String getPartialTermMatchField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
+        String result = null;
+        
+        result = NuxeoUtils.getMultiElPathPropertyName(
+                authorityItemCommonSchemaName, getItemTermInfoGroupXPathBase(),
+                AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
 
-		return result;
-	}
+        return result;
+    }
     
     /**
      * Gets the authorityItem list for the specified authority
@@ -1085,15 +1085,15 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      *
      */
     public AbstractCommonList getAuthorityItemList(ServiceContext<PoxPayloadIn, PoxPayloadOut> existingContext,
-    		String authorityIdentifier,
+            String authorityIdentifier,
             UriInfo uriInfo) throws Exception {
-    	AbstractCommonList result = null;
-    	
+        AbstractCommonList result = null;
+        
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), uriInfo);
         MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
         if (existingContext != null && existingContext.getCurrentRepositorySession() != null) { // Merge some of the existing context properties with our new context
-        	ctx.setCurrentRepositorySession(existingContext.getCurrentRepositorySession());
-        	ctx.setProperties(existingContext.getProperties());
+            ctx.setCurrentRepositorySession(existingContext.getCurrentRepositorySession());
+            ctx.setProperties(existingContext.getProperties());
         }
             
         String orderBy = queryParams.getFirst(IClientQueryParams.ORDER_BY_PARAM);
@@ -1105,9 +1105,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         // For the wildcard case, parentcsid is null, but docHandler will deal with this.
         // We omit the parentShortId, only needed when doing a create...
         String parentcsid = PARENT_WILDCARD.equals(authorityIdentifier) ? null :
-			lookupParentCSID(ctx, authorityIdentifier, "getAuthorityItemList", "LIST", uriInfo);
+            lookupParentCSID(ctx, authorityIdentifier, "getAuthorityItemList", "LIST", uriInfo);
         DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler =
-        	createItemDocumentHandler(ctx, parentcsid, null);
+            createItemDocumentHandler(ctx, parentcsid, null);
         
         DocumentFilter myFilter = handler.getDocumentFilter();
         // If we are not wildcarding the parent, add a restriction
@@ -1119,17 +1119,17 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         }
 
         if (Tools.notBlank(termStatus)) {
-        	// Start with the qualified termStatus field
-        	String qualifiedTermStatusField = authorityItemCommonSchemaName + ":"
+            // Start with the qualified termStatus field
+            String qualifiedTermStatusField = authorityItemCommonSchemaName + ":"
                     + AuthorityItemJAXBSchema.TERM_STATUS;
-        	String[] filterTerms = termStatus.trim().split("\\|");
-        	String tsClause = QueryManager.createWhereClauseToFilterFromStringList(qualifiedTermStatusField, filterTerms, IQueryManager.FILTER_EXCLUDE);
+            String[] filterTerms = termStatus.trim().split("\\|");
+            String tsClause = QueryManager.createWhereClauseToFilterFromStringList(qualifiedTermStatusField, filterTerms, IQueryManager.FILTER_EXCLUDE);
             myFilter.appendWhereClause(tsClause, IQueryManager.SEARCH_QUALIFIER_AND);
         }
 
         result = search(ctx, handler, uriInfo, orderBy, keywords, advancedSearch, partialTerm);            
-    	
-    	return result;
+        
+        return result;
     }
     
     /**
@@ -1148,9 +1148,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @Produces("application/xml")
     public AbstractCommonList getAuthorityItemList(@PathParam("csid") String authorityIdentifier,
             @Context UriInfo uriInfo) {
-    	uriInfo = new UriInfoWrapper(uriInfo);
-    	AbstractCommonList result = null;
-    	
+        uriInfo = new UriInfoWrapper(uriInfo);
+        AbstractCommonList result = null;
+        
         try {
             result = getAuthorityItemList(NULL_CONTEXT, authorityIdentifier, uriInfo);    
         } catch (Exception e) {
@@ -1166,7 +1166,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * Some types (like Vocabulary) use a separate property.
      */
     protected String getRefPropName() {
-    	return ServiceBindingUtils.AUTH_REF_PROP;
+        return ServiceBindingUtils.AUTH_REF_PROP;
     }
     
     /**
@@ -1189,7 +1189,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             @PathParam("itemcsid") String itemSpecifier,
             @Context UriTemplateRegistry uriTemplateRegistry,
             @Context UriInfo uriInfo) {
-    	uriInfo = new UriInfoWrapper(uriInfo);
+        uriInfo = new UriInfoWrapper(uriInfo);
         AuthorityRefDocList authRefDocList = null;
         try {
             authRefDocList = getReferencingObjects(null, parentSpecifier, itemSpecifier, uriTemplateRegistry, uriInfo);
@@ -1207,13 +1207,12 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     }
     
     public AuthorityRefDocList getReferencingObjects(
-    		ServiceContext<PoxPayloadIn, PoxPayloadOut> existingContext,
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> existingContext,
             String parentspecifier,
             String itemspecifier,
             UriTemplateRegistry uriTemplateRegistry,
             UriInfo uriInfo) throws Exception {
-    	//uriInfo = new UriInfoWrapper(uriInfo);
-    	AuthorityRefDocList authRefDocList = null;
+        AuthorityRefDocList authRefDocList = null;
  
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), uriInfo);
         MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
@@ -1221,8 +1220,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         // Merge parts of existing context with our new context
         //
         if (existingContext != null && existingContext.getCurrentRepositorySession() != null) {
-        	ctx.setCurrentRepositorySession(existingContext.getCurrentRepositorySession());  // If one exists, use the existing repo session
-        	ctx.setProperties(existingContext.getProperties());
+            ctx.setCurrentRepositorySession(existingContext.getCurrentRepositorySession());  // If one exists, use the existing repo session
+            ctx.setProperties(existingContext.getProperties());
         }
 
         String parentcsid = lookupParentCSID(ctx, parentspecifier, "getReferencingObjects(parent)", "GET_ITEM_REF_OBJS", uriInfo);
@@ -1231,7 +1230,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         // Remove the "type" property from the query params
         List<String> serviceTypes = queryParams.remove(ServiceBindingUtils.SERVICE_TYPE_PROP);        
         if (serviceTypes == null || serviceTypes.isEmpty()) {
-        	serviceTypes = ServiceBindingUtils.getCommonServiceTypes(true); //CSPACE-5359: Should now include objects, procedures, and authorities
+            serviceTypes = ServiceBindingUtils.getCommonServiceTypes(true); //CSPACE-5359: Should now include objects, procedures, and authorities
         }
             
         AuthorityItemDocumentModelHandler handler = (AuthorityItemDocumentModelHandler)createItemDocumentHandler(ctx, parentcsid, null);
@@ -1256,7 +1255,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             @PathParam("csid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier,
             @Context UriInfo uriInfo) {
-    	uriInfo = new UriInfoWrapper(uriInfo);
+        uriInfo = new UriInfoWrapper(uriInfo);
         AuthorityRefList authRefList = null;
         
         try {
@@ -1287,15 +1286,15 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * @throws Exception
      */
     private PoxPayloadOut synchronizeItem(
-    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             String parentIdentifier,
             String itemIdentifier,
             boolean syncHierarchicalRelationships) throws Exception {
-    	PoxPayloadOut result = null;
+        PoxPayloadOut result = null;
         AuthorityItemSpecifier specifier;
-    	boolean neededSync = false;
+        boolean neededSync = false;
 
-    	CsidAndShortIdentifier parent = lookupParentCSIDAndShortIdentifer(ctx, parentIdentifier, "syncAuthorityItem(parent)", "SYNC_ITEM", null);
+        CsidAndShortIdentifier parent = lookupParentCSIDAndShortIdentifer(ctx, parentIdentifier, "syncAuthorityItem(parent)", "SYNC_ITEM", null);
         AuthorityItemDocumentModelHandler handler = (AuthorityItemDocumentModelHandler)createItemDocumentHandler(ctx, parent.CSID, parent.shortIdentifier);
         handler.setIsProposed(AuthorityServiceUtils.NOT_PROPOSED); // In case it was formally locally proposed, clear the proposed flag
         handler.setIsSASItem(AuthorityServiceUtils.SAS_ITEM); // Since we're sync'ing, this is now a SAS controlled item
@@ -1307,10 +1306,10 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         //
         neededSync = getRepositoryClient(ctx).synchronize(ctx, specifier, handler);
         if (neededSync == true) {
-        	result = (PoxPayloadOut) ctx.getOutput();
+            result = (PoxPayloadOut) ctx.getOutput();
         }
-    	
-    	return result;
+        
+        return result;
     }
 
     /**
@@ -1324,23 +1323,23 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * @throws Exception
      */
     public PoxPayloadOut synchronizeItemWithExistingContext(
-    		ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
             String parentIdentifier,
             String itemIdentifier,
             boolean syncHierarchicalRelationships
             ) throws Exception {
-    	PoxPayloadOut result = null;
-    	
+        PoxPayloadOut result = null;
+        
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(),
-        		existingCtx.getResourceMap(),
-        		existingCtx.getUriInfo());
+                existingCtx.getResourceMap(),
+                existingCtx.getUriInfo());
         if (existingCtx.getCurrentRepositorySession() != null) {
-        	ctx.setCurrentRepositorySession(existingCtx.getCurrentRepositorySession());
-        	
+            ctx.setCurrentRepositorySession(existingCtx.getCurrentRepositorySession());
+            
         }
         result = synchronizeItem(ctx, parentIdentifier, itemIdentifier, syncHierarchicalRelationships);
-    	
-    	return result;
+        
+        return result;
     }
     
     /**
@@ -1353,20 +1352,20 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @POST
     @Path("{csid}/items/{itemcsid}/sync")
     public byte[] synchronizeItem(
-    		@Context ResourceMap resourceMap,
+            @Context ResourceMap resourceMap,
             @Context UriInfo uriInfo,
             @PathParam("csid") String parentIdentifier,
             @PathParam("itemcsid") String itemIdentifier) {
-    	uriInfo = new UriInfoWrapper(uriInfo);
-    	byte[] result;
-    	boolean neededSync = false;
+        uriInfo = new UriInfoWrapper(uriInfo);
+        byte[] result;
+        boolean neededSync = false;
         PoxPayloadOut payloadOut = null;
         
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), null, resourceMap, uriInfo);
             payloadOut = this.synchronizeItem(ctx, parentIdentifier, itemIdentifier, true);
             if (payloadOut != null) {
-            	neededSync = true;
+                neededSync = true;
             }
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.SYNC_FAILED, itemIdentifier);
@@ -1376,11 +1375,11 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         // If a sync was needed and was successful, return a copy of the updated resource.  Acts like an UPDATE.
         //
         if (neededSync == true) {
-        	result = payloadOut.getBytes();
+            result = payloadOut.getBytes();
         } else {
-	        result = String.format("Authority item resource '%s' was already in sync with shared authority server.",
-	        		itemIdentifier).getBytes();
-	        Response response = Response.status(Response.Status.NOT_MODIFIED).entity(result).type("text/plain").build();
+            result = String.format("Authority item resource '%s' was already in sync with shared authority server.",
+                    itemIdentifier).getBytes();
+            Response response = Response.status(Response.Status.NOT_MODIFIED).entity(result).type("text/plain").build();
             throw new CSWebApplicationException(response);
         }
         
@@ -1398,20 +1397,20 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @PUT
     @Path("{csid}/items/{itemcsid}")
     public byte[] updateAuthorityItem(
-    		@Context ResourceMap resourceMap, 
+            @Context ResourceMap resourceMap, 
             @Context UriInfo uriInfo,
             @PathParam("csid") String parentSpecifier,
             @PathParam("itemcsid") String itemSpecifier,
             String xmlPayload) {
-    	uriInfo = new UriInfoWrapper(uriInfo);
+        uriInfo = new UriInfoWrapper(uriInfo);
         PoxPayloadOut result = null;
         
         try {
             PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
             result = updateAuthorityItem(null, resourceMap, uriInfo, parentSpecifier, itemSpecifier, theUpdate,
-            		AuthorityServiceUtils.UPDATE_REV,			// passing TRUE so rev num increases, passing
-            		AuthorityServiceUtils.NO_CHANGE,	// don't change the state of the "proposed" field -we could be performing a sync or just a plain update
-            		AuthorityServiceUtils.NO_CHANGE);	// don't change the state of the "sas" field -we could be performing a sync or just a plain update
+                    AuthorityServiceUtils.UPDATE_REV,            // passing TRUE so rev num increases, passing
+                    AuthorityServiceUtils.NO_CHANGE,    // don't change the state of the "proposed" field -we could be performing a sync or just a plain update
+                    AuthorityServiceUtils.NO_CHANGE);    // don't change the state of the "sas" field -we could be performing a sync or just a plain update
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED);
         }
@@ -1435,8 +1434,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             @Context UriInfo uriInfo,
             @PathParam("csid") String parentIdentifier,
             @PathParam("itemcsid") String itemIdentifier) {
-    	uriInfo = new UriInfoWrapper(uriInfo);
-    	Response result = null;
+        uriInfo = new UriInfoWrapper(uriInfo);
+        Response result = null;
 
         ensureCSID(parentIdentifier, ServiceMessages.DELETE_FAILED, "AuthorityItem.parentcsid");
         ensureCSID(itemIdentifier, ServiceMessages.DELETE_FAILED, "AuthorityItem.itemcsid");
@@ -1462,27 +1461,27 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * @param itemIdentifier
      * @throws Exception
      */
-	public boolean deleteAuthorityItem(ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
+    public boolean deleteAuthorityItem(ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
             String parentIdentifier,
             String itemIdentifier,
             boolean shouldUpdateRevNumber
             ) throws Exception {
-    	boolean result = true;
-    	
+        boolean result = true;
+        
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), existingCtx.getUriInfo());
         if (existingCtx != null && existingCtx.getCurrentRepositorySession() != null) {
-        	ctx.setCurrentRepositorySession(existingCtx.getCurrentRepositorySession());
-        	ctx.setProperties(existingCtx.getProperties());
+            ctx.setCurrentRepositorySession(existingCtx.getCurrentRepositorySession());
+            ctx.setProperties(existingCtx.getProperties());
         }
         
         String parentcsid = null;
         try {
-        	parentcsid = lookupParentCSID(ctx, parentIdentifier, "deleteAuthorityItem(parent)", "DELETE_ITEM", null);
+            parentcsid = lookupParentCSID(ctx, parentIdentifier, "deleteAuthorityItem(parent)", "DELETE_ITEM", null);
         } catch (DocumentNotFoundException de) {
-        	String msg = String.format("Could not find parent with ID='%s' when trying to delete item ID='%s'",
-        			parentIdentifier, itemIdentifier);
-        	logger.warn(msg);
-        	throw de;
+            String msg = String.format("Could not find parent with ID='%s' when trying to delete item ID='%s'",
+                    parentIdentifier, itemIdentifier);
+            logger.warn(msg);
+            throw de;
         }
         String itemCsid = lookupItemCSID(ctx, itemIdentifier, parentcsid, "deleteAuthorityItem(item)", "DELETE_ITEM"); //use itemServiceCtx if it is not null
         
@@ -1497,16 +1496,16 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @Path("{csid}/items/{itemcsid}/" + hierarchy)
     @Produces("application/xml")
     public String getHierarchy(
-    		@PathParam("csid") String parentIdentifier,
+            @PathParam("csid") String parentIdentifier,
             @PathParam("itemcsid") String itemIdentifier,
             @Context UriInfo uriInfo) throws Exception {
-    	uriInfo = new UriInfoWrapper(uriInfo);
-    	String result = null;
+        uriInfo = new UriInfoWrapper(uriInfo);
+        String result = null;
 
         try {
-        	//
+            //
             // All items in dive can look at their child uri's to get uri.  So we calculate the very first one.  We could also do a GET and look at the common part uri field, but why...?
-        	//
+            //
             String calledUri = uriInfo.getPath();
             String uri = "/" + calledUri.substring(0, (calledUri.length() - ("/" + hierarchy).length()));
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), uriInfo);
@@ -1557,14 +1556,14 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * 
      */
     @Override
-	public ServiceDescription getDescription(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
-    	ServiceDescription result = super.getDescription(ctx);
-    	result.setSubresourceDocumentType(this.getItemDocType(ctx.getTenantId()));
-    	return result;
+    public ServiceDescription getDescription(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
+        ServiceDescription result = super.getDescription(ctx);
+        result.setSubresourceDocumentType(this.getItemDocType(ctx.getTenantId()));
+        return result;
     }
 
-	public Response createAuthority(String xmlPayload) {
-		return this.createAuthority(null, null, xmlPayload);
-	}    
+    public Response createAuthority(String xmlPayload) {
+        return this.createAuthority(null, null, xmlPayload);
+    }    
     
 }

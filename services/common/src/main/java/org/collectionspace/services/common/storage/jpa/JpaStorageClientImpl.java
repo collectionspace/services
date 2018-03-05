@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityExistsException;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.persistence.RollbackException;
 
@@ -43,7 +44,7 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.lifecycle.TransitionDef;
-
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,20 +95,20 @@ public class JpaStorageClientImpl implements StorageClient {
      * Instantiates a new jpa storage client.
      */
     public JpaStorageClientImpl() {
-    	//intentionally empty
+        //intentionally empty
     }
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.storage.StorageClient#create(org.collectionspace.services.common.context.ServiceContext, org.collectionspace.services.common.document.DocumentHandler)
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-	@Override
+    @Override
     public String create(ServiceContext ctx,
             DocumentHandler handler) throws BadRequestException,
             DocumentException {
-    	String result = null;
+        String result = null;
 
-    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();
+        JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();
         try {
             handler.prepare(Action.CREATE);
             Object entity = handler.getCommonPart();
@@ -115,35 +116,41 @@ public class JpaStorageClientImpl implements StorageClient {
             
             jpaConnectionContext.beginTransaction();
             try {
-            	handler.handle(Action.CREATE, wrapDoc);
-	            JaxbUtils.setValue(entity, "setCreatedAtItem", Date.class, new Date());
-	            jpaConnectionContext.persist(entity);
+                handler.handle(Action.CREATE, wrapDoc);
+                JaxbUtils.setValue(entity, "setCreatedAtItem", Date.class, new Date());
+                jpaConnectionContext.persist(entity);
             } catch (EntityExistsException ee) { // FIXME: No, don't allow duplicates
-            	//
-            	// We found an existing matching entity in the store, so we don't need to create one.  Just update the transient 'entity' instance with the existing persisted entity we found.
-            	// An entity's document handler class will throw this exception only if attempting to create (but not actually creating) duplicate is ok -e.g., Permission records.
-            	//
-            	entity = wrapDoc.getWrappedObject(); // the handler should have reset the wrapped transient object with the existing persisted entity we just found.
+                //
+                // We found an existing matching entity in the store, so we don't need to create one.  Just update the transient 'entity' instance with the existing persisted entity we found.
+                // An entity's document handler class will throw this exception only if attempting to create (but not actually creating) duplicate is ok -e.g., Permission records.
+                //
+                entity = wrapDoc.getWrappedObject(); // the handler should have reset the wrapped transient object with the existing persisted entity we just found.
             }
             handler.complete(Action.CREATE, wrapDoc);
             jpaConnectionContext.commitTransaction();
             
             result = (String)JaxbUtils.getValue(entity, "getCsid");
         } catch (BadRequestException bre) {
-        	jpaConnectionContext.markForRollback();
+            jpaConnectionContext.markForRollback();
             throw bre;
         } catch (DocumentException de) {
-        	jpaConnectionContext.markForRollback();
+            jpaConnectionContext.markForRollback();
             throw de;
         } catch (RollbackException rbe) {
-        	//jpaConnectionContext.markForRollback();
+            //jpaConnectionContext.markForRollback();
             throw DocumentException.createDocumentException(rbe);
+        } catch (PersistenceException pe) {
+            if (pe.getCause() instanceof ConstraintViolationException) {
+                throw new DocumentException(DocumentException.DUPLICATE_RECORD_MSG, pe, DocumentException.DUPLICATE_RECORD_ERR);
+            } else {
+                throw new DocumentException(pe);
+            }
         } catch (Exception e) {
-        	jpaConnectionContext.markForRollback();
+            jpaConnectionContext.markForRollback();
             logger.debug("Caught exception ", e);
             throw DocumentException.createDocumentException(e);
         } finally {
-        	ctx.closeConnection();
+            ctx.closeConnection();
         }
 
         return result;
@@ -153,7 +160,7 @@ public class JpaStorageClientImpl implements StorageClient {
      * @see org.collectionspace.services.common.storage.StorageClient#get(org.collectionspace.services.common.context.ServiceContext, java.util.List, org.collectionspace.services.common.document.DocumentHandler)
      */
     @SuppressWarnings("rawtypes")
-	@Override
+    @Override
     public void get(ServiceContext ctx, List<String> csidList, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
         throw new UnsupportedOperationException();
@@ -163,11 +170,11 @@ public class JpaStorageClientImpl implements StorageClient {
      * @see org.collectionspace.services.common.storage.StorageClient#get(org.collectionspace.services.common.context.ServiceContext, java.lang.String, org.collectionspace.services.common.document.DocumentHandler)
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-	@Override
+    @Override
     public void get(ServiceContext ctx, String id, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
 
-    	JPATransactionContext jpaTransactionContext = (JPATransactionContext)ctx.openConnection();
+        JPATransactionContext jpaTransactionContext = (JPATransactionContext)ctx.openConnection();
         try {
             handler.prepare(Action.GET);
             Object o = null;
@@ -195,7 +202,7 @@ public class JpaStorageClientImpl implements StorageClient {
      * @see org.collectionspace.services.common.storage.StorageClient#getAll(org.collectionspace.services.common.context.ServiceContext, org.collectionspace.services.common.document.DocumentHandler)
      */
     @SuppressWarnings("rawtypes")
-	@Override
+    @Override
     public void getAll(ServiceContext ctx, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
         throw new UnsupportedOperationException("use getFiltered instead");
@@ -205,16 +212,16 @@ public class JpaStorageClientImpl implements StorageClient {
      * @see org.collectionspace.services.common.storage.StorageClient#getFiltered(org.collectionspace.services.common.context.ServiceContext, org.collectionspace.services.common.document.DocumentHandler)
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-	@Override
+    @Override
     public void getFiltered(ServiceContext ctx, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
-    	
+        
         DocumentFilter docFilter = handler.getDocumentFilter();
         if (docFilter == null) {
             docFilter = handler.createDocumentFilter();
         }
 
-    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();        
+        JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();        
         try {
             handler.prepare(Action.GET_ALL);
             StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
@@ -264,9 +271,9 @@ public class JpaStorageClientImpl implements StorageClient {
      * Return the COUNT for a query to find the total number of matches independent of the paging restrictions.
      */
     @SuppressWarnings("rawtypes")
-	private long getTotalItems(JPATransactionContext jpaTransactionContext, ServiceContext ctx, DocumentHandler handler) {
-    	long result = -1;
-    	
+    private long getTotalItems(JPATransactionContext jpaTransactionContext, ServiceContext ctx, DocumentHandler handler) {
+        long result = -1;
+        
         DocumentFilter docFilter = handler.getDocumentFilter();
         StringBuilder queryStrBldr = new StringBuilder("SELECT COUNT(*) FROM ");
         queryStrBldr.append(getEntityName(ctx));
@@ -285,16 +292,16 @@ public class JpaStorageClientImpl implements StorageClient {
         return result;
     }
 
-	/* (non-Javadoc)
+    /* (non-Javadoc)
      * @see org.collectionspace.services.common.storage.StorageClient#update(org.collectionspace.services.common.context.ServiceContext, java.lang.String, org.collectionspace.services.common.document.DocumentHandler)
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-	@Override
+    @Override
     public void update(ServiceContext ctx, String id, DocumentHandler handler)
             throws BadRequestException, DocumentNotFoundException,
             DocumentException {
 
-    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();        
+        JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();        
         try {
             jpaConnectionContext.beginTransaction();
             
@@ -320,7 +327,7 @@ public class JpaStorageClientImpl implements StorageClient {
             }
             throw new DocumentException(e);
         } finally {
-        	ctx.closeConnection();
+            ctx.closeConnection();
         }
     }
 
@@ -334,12 +341,12 @@ public class JpaStorageClientImpl implements StorageClient {
             throws DocumentNotFoundException,
             DocumentException {
 
-    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();    	
+        JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();        
         try {
-        	jpaConnectionContext.beginTransaction();
+            jpaConnectionContext.beginTransaction();
             Object entityFound = getEntity(ctx, id);
             if (entityFound == null) {
-            	jpaConnectionContext.markForRollback();
+                jpaConnectionContext.markForRollback();
                 String msg = "delete(ctx, id): could not find entity with id=" + id;
                 logger.error(msg);
                 throw new DocumentNotFoundException(msg);
@@ -347,7 +354,7 @@ public class JpaStorageClientImpl implements StorageClient {
             jpaConnectionContext.remove(entityFound);
             jpaConnectionContext.commitTransaction();
         } catch (DocumentException de) {
-        	jpaConnectionContext.markForRollback();
+            jpaConnectionContext.markForRollback();
             throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
@@ -372,7 +379,7 @@ public class JpaStorageClientImpl implements StorageClient {
             throws DocumentNotFoundException,
             DocumentException {
 
-    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();    	
+        JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();        
         try {
             StringBuilder deleteStr = new StringBuilder("DELETE FROM ");
             deleteStr.append(getEntityName(ctx));
@@ -387,14 +394,14 @@ public class JpaStorageClientImpl implements StorageClient {
             jpaConnectionContext.beginTransaction();
             rcount = q.executeUpdate();
             if (rcount != 1) {
-            	jpaConnectionContext.markForRollback();
+                jpaConnectionContext.markForRollback();
                 String msg = "deleteWhere(ctx, id) could not find entity with id=" + id;
                 logger.error(msg);
                 throw new DocumentNotFoundException(msg);
             }
             jpaConnectionContext.commitTransaction();
         } catch (DocumentException de) {
-        	jpaConnectionContext.markForRollback();
+            jpaConnectionContext.markForRollback();
             throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
@@ -413,12 +420,12 @@ public class JpaStorageClientImpl implements StorageClient {
      * @see org.collectionspace.services.common.storage.StorageClient#delete(org.collectionspace.services.common.context.ServiceContext, java.lang.String)
      */
     @SuppressWarnings({ "rawtypes" })
-	@Override
+    @Override
     public boolean delete(ServiceContext ctx, String id, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
-    	boolean result = false;
-    	
-    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection(); 
+        boolean result = false;
+        
+        JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection(); 
         try {
             jpaConnectionContext.beginTransaction();
             Object entityFound = getEntity(ctx, id);
@@ -430,8 +437,8 @@ public class JpaStorageClientImpl implements StorageClient {
             result = delete(ctx, entityFound, handler);
             jpaConnectionContext.commitTransaction();
         } catch (DocumentException de) {
-        	jpaConnectionContext.markForRollback();
-        	throw de;
+            jpaConnectionContext.markForRollback();
+            throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("delete(ctx, ix, handler): Caught exception ", e);
@@ -439,19 +446,19 @@ public class JpaStorageClientImpl implements StorageClient {
             jpaConnectionContext.markForRollback();
             throw new DocumentException(e);
         } finally {
-        	ctx.closeConnection();
+            ctx.closeConnection();
         }
         
         return result;
     }
     
     @SuppressWarnings({ "rawtypes", "unchecked" })
-	@Override
+    @Override
     public boolean delete(ServiceContext ctx, Object entity, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
-    	boolean result = false;
-    	
-    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection(); 
+        boolean result = false;
+        
+        JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection(); 
         try {
             jpaConnectionContext.beginTransaction();
             handler.prepare(Action.DELETE);
@@ -462,8 +469,8 @@ public class JpaStorageClientImpl implements StorageClient {
             jpaConnectionContext.commitTransaction();
             result = true;
         } catch (DocumentException de) {
-        	jpaConnectionContext.markForRollback();
-        	throw de;
+            jpaConnectionContext.markForRollback();
+            throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("delete(ctx, ix, handler): Caught exception ", e);
@@ -471,7 +478,7 @@ public class JpaStorageClientImpl implements StorageClient {
             jpaConnectionContext.markForRollback();
             throw new DocumentException(e);
         } finally {
-        	ctx.closeConnection();
+            ctx.closeConnection();
         }
         
         return result;
@@ -528,72 +535,72 @@ public class JpaStorageClientImpl implements StorageClient {
      */
     protected Object getEntity(@SuppressWarnings("rawtypes") ServiceContext ctx, String id, Class<?> entityClazz)
             throws DocumentNotFoundException, TransactionException {
-    	Object entityFound = null;
-    	
-    	JPATransactionContext jpaTransactionContext = (JPATransactionContext)ctx.openConnection();
-    	try {
-	        entityFound = JpaStorageUtils.getEntity(jpaTransactionContext, id, entityClazz); // FIXME: # Should be qualifying with the tenant ID
-	        if (entityFound == null) {
-	            String msg = "could not find entity of type=" + entityClazz.getName()
-	                    + " with id=" + id;
-	            logger.error(msg);
-	            throw new DocumentNotFoundException(msg);
-	        }
-    	} finally {
-    		ctx.closeConnection();
-    	}
-    	
+        Object entityFound = null;
+        
+        JPATransactionContext jpaTransactionContext = (JPATransactionContext)ctx.openConnection();
+        try {
+            entityFound = JpaStorageUtils.getEntity(jpaTransactionContext, id, entityClazz); // FIXME: # Should be qualifying with the tenant ID
+            if (entityFound == null) {
+                String msg = "could not find entity of type=" + entityClazz.getName()
+                        + " with id=" + id;
+                logger.error(msg);
+                throw new DocumentNotFoundException(msg);
+            }
+        } finally {
+            ctx.closeConnection();
+        }
+        
         return entityFound;
     }
     
     @SuppressWarnings("rawtypes")
-	@Override
+    @Override
     public void get(ServiceContext ctx, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
         throw new UnsupportedOperationException();
     }
 
-	@SuppressWarnings("rawtypes")
-	@Override
-	public void doWorkflowTransition(ServiceContext ctx, String id,
-			DocumentHandler handler, TransitionDef transitionDef)
-			throws BadRequestException, DocumentNotFoundException,
-			DocumentException {
-		// Do nothing.  JPA services do not support workflow.
-	}
+    @SuppressWarnings("rawtypes")
+    @Override
+    public void doWorkflowTransition(ServiceContext ctx, String id,
+            DocumentHandler handler, TransitionDef transitionDef)
+            throws BadRequestException, DocumentNotFoundException,
+            DocumentException {
+        // Do nothing.  JPA services do not support workflow.
+    }
 
-	@SuppressWarnings("rawtypes")
-	@Override
-	public void deleteWithWhereClause(ServiceContext ctx, String whereClause,
-			DocumentHandler handler) throws DocumentNotFoundException,
-			DocumentException {
+    @SuppressWarnings("rawtypes")
+    @Override
+    public void deleteWithWhereClause(ServiceContext ctx, String whereClause,
+            DocumentHandler handler) throws DocumentNotFoundException,
+            DocumentException {
         throw new UnsupportedOperationException();
-	}
+    }
 
-	@SuppressWarnings("rawtypes")
-	@Override
-	public boolean synchronize(ServiceContext ctx, Object specifier,
-			DocumentHandler handler) throws DocumentNotFoundException,
-			TransactionException, DocumentException {
-		// TODO Auto-generated method stub
-		// Do nothing. Subclasses can override if they want/need to.
-		return true;
-	}
-	
-	@SuppressWarnings("rawtypes")
-	@Override
-	public boolean synchronizeItem(ServiceContext ctx, AuthorityItemSpecifier itemSpecifier,
-			DocumentHandler handler) throws DocumentNotFoundException,
-			TransactionException, DocumentException {
-		// TODO Auto-generated method stub
-		// Do nothing. Subclasses can override if they want/need to.
-		return true;
-	}
+    @SuppressWarnings("rawtypes")
+    @Override
+    public boolean synchronize(ServiceContext ctx, Object specifier,
+            DocumentHandler handler) throws DocumentNotFoundException,
+            TransactionException, DocumentException {
+        // TODO Auto-generated method stub
+        // Do nothing. Subclasses can override if they want/need to.
+        return true;
+    }
+    
+    @SuppressWarnings("rawtypes")
+    @Override
+    public boolean synchronizeItem(ServiceContext ctx, AuthorityItemSpecifier itemSpecifier,
+            DocumentHandler handler) throws DocumentNotFoundException,
+            TransactionException, DocumentException {
+        // TODO Auto-generated method stub
+        // Do nothing. Subclasses can override if they want/need to.
+        return true;
+    }
 
-	@Override
-	public void releaseRepositorySession(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, Object repoSession)
-			throws TransactionException {
-		// TODO Auto-generated method stub		
-	}
+    @Override
+    public void releaseRepositorySession(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, Object repoSession)
+            throws TransactionException {
+        // TODO Auto-generated method stub        
+    }
 
 }

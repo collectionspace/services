@@ -472,29 +472,8 @@ public class RelationDocumentModelHandler
         }
     }
     
-    /*
-    private String getCommonSchemaNameForDocType(String docType) {
-    	String common_schema = null;
-    	if(docType!=null) {
-    		// HACK - Use startsWith to allow for extension of schemas.
-	    	if(docType.startsWith("Person"))
-	    		common_schema = PersonAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
-	    	else if(docType.startsWith("Citation"))
-	    		common_schema = CitationAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
-	    	else if(docType.startsWith("Organization"))
-	    		common_schema = OrgAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
-	    	else if(docType.startsWith("Locationitem"))
-	    		common_schema = LocationAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
-	    	else if(docType.startsWith("Taxon"))
-	    		common_schema = TaxonomyAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
-    		else if(docType.startsWith("Placeitem"))
-    			common_schema = PlaceAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
-	    	else if(docType.startsWith("Conceptitem"))
-	    		common_schema = ConceptAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
-	    	//else leave it null.
-    	}
-    	return common_schema;
-    }
-    */
-
+    @Override
+	public boolean supportsWorkflowStates() {
+		return true;
+	}
 }

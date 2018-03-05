@@ -1,3 +1,4 @@
+.DS_Store
 *.out*
 *.iml
 *.org.*.bindings.xml
@@ -12,3 +13,4 @@ target
 .project
 .idea/
 .vscode
+.cmax

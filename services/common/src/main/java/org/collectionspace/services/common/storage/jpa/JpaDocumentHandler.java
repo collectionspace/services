@@ -72,5 +72,9 @@ public abstract class JpaDocumentHandler<T, TL, WT, WLT>
 			throws Exception {
 		// Do nothing.  JPA document handlers do not support workflow transitions yet.
 	}
-    
+	
+	@Override
+	public boolean supportsWorkflowStates() {
+		return false;
+	}
 }

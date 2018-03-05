@@ -446,5 +446,10 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 			return new ArrayList();
 		}
 	}
+	
+	@Override
+	public boolean supportsWorkflowStates() {
+		return true;
+	}
 
 }
