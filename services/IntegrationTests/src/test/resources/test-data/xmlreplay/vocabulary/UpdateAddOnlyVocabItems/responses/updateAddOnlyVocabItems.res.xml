@@ -21,7 +21,7 @@
         <itemsInPage>6</itemsInPage>
         <totalItems>6</totalItems>
         <fieldsReturned>
-            csid|uri|refName|updatedAt|workflowState|rev|sourcePage|sas|proposed|deprecated|termStatus|description|source|order|displayName|shortIdentifier
+            csid|uri|refName|updatedAt|workflowState|rev|sourcePage|sas|proposed|referenced|deprecated|termStatus|description|source|order|displayName|shortIdentifier
         </fieldsReturned>
         <list-item>
             <refName>
@@ -61,6 +61,18 @@
         </list-item>
         <list-item>
             <refName>
+                urn:cspace:testsci.collectionspace.org:vocabularies:name(createUpdateAddOnlyVocabItems):item:name(createItem301)'Updated createItem301'
+            </refName>
+            <workflowState>project</workflowState>
+            <rev>1</rev>            
+            <sas>false</sas>
+            <proposed>true</proposed>
+            <order>3</order>
+            <displayName>Updated createItem301</displayName>
+            <shortIdentifier>createItem301</shortIdentifier>
+        </list-item>        
+        <list-item>
+            <refName>
                 urn:cspace:testsci.collectionspace.org:vocabularies:name(createUpdateAddOnlyVocabItems):item:name(createItem101)'createItem101'
             </refName>
             <workflowState>project</workflowState>
@@ -83,17 +95,5 @@
             <displayName>createItem201</displayName>
             <shortIdentifier>createItem201</shortIdentifier>
         </list-item>
-        <list-item>
-            <refName>
-                urn:cspace:testsci.collectionspace.org:vocabularies:name(createUpdateAddOnlyVocabItems):item:name(createItem301)'Updated createItem301'
-            </refName>
-            <workflowState>project</workflowState>
-            <rev>1</rev>            
-            <sas>false</sas>
-            <proposed>true</proposed>
-            <order>3</order>
-            <displayName>Updated createItem301</displayName>
-            <shortIdentifier>createItem301</shortIdentifier>
-        </list-item>        
     </ns2:abstract-common-list>
 </document>

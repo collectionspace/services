@@ -249,7 +249,7 @@ public class XmlReplay {
                 if (pr.autoDelete == true && Tools.notEmpty(pr.deleteURL)){
                     ServiceResult deleteResult = XmlReplayTransport.doDELETE(pr.deleteURL, pr.adminAuth, pr.testID, "[autodelete:"+logName+"]");
                     if (deleteResult.gotExpectedResult() == false || deleteResult.responseCode != 200) {
-                    	reattemptList.put(REATTEMPT_KEY + deleteFailures++, pr); // We need to try again after our dependents have been deleted. cow()
+                    	reattemptList.put(REATTEMPT_KEY + deleteFailures++, pr); // We need to try again after our dependents have been deleted.
                     }
                     results.add(deleteResult);
                 } else {
@@ -550,7 +550,8 @@ public class XmlReplay {
         evalStruct.jexl = jexl;
 
         for (Node testgroup : testgroupNodes) {
-        	String testGroupID = testgroup.valueOf("@ID");
+            boolean expectedCodesStrict = Tools.isTrue(testgroup.valueOf("@expectedCodesStrict"));
+            String testGroupID = testgroup.valueOf("@ID");
             XmlReplayEval.MapContextWKeys jc = new XmlReplayEval.MapContextWKeys();//MapContext();  //Get a new JexlContext for each test group.
             evalStruct.jc = jc;
             autoDeletePOSTS = testgroup.valueOf("@autoDeletePOSTS");
@@ -631,11 +632,11 @@ public class XmlReplay {
 
                     List<Integer> expectedCodes = new ArrayList<Integer>();
                     String expectedCodesStr = testNode.valueOf("expectedCodes");
-                    if (Tools.notEmpty(expectedCodesStr)){
-                         String[] codesArray = expectedCodesStr.split(",");
-                         for (String code : codesArray){
-                             expectedCodes.add(new Integer(code.trim()));
-                         }
+                    if (Tools.notEmpty(expectedCodesStr)) {
+                        String[] codesArray = expectedCodesStr.split(",");
+                        for (String code : codesArray){
+                            expectedCodes.add(new Integer(code.trim()));
+                        }
                     }
 
                     Node responseNode = testNode.selectSingleNode("response");
@@ -682,7 +683,7 @@ public class XmlReplay {
                             serviceResult = XmlReplayTransport.doDELETE(pr.deleteURL, authForTest, testIDLabel, fromTestID);
                             serviceResult.fromTestID = fromTestID;
                             if (expectedCodes.size()>0){
-                                serviceResult.expectedCodes = expectedCodes;
+                                serviceResult.setExpectedCodes(expectedCodes);
                             }
                             results.add(serviceResult);
                             if (serviceResult.codeInSuccessRange(serviceResult.responseCode)){  //gotExpectedResult depends on serviceResult.expectedCodes.
@@ -721,7 +722,8 @@ public class XmlReplay {
                     serviceResult.adminAuth = authForCleanup;
                     serviceResult.method = method;
                     if (expectedCodes.size()>0){
-                        serviceResult.expectedCodes = expectedCodes;
+                        serviceResult.setExpectedCodes(expectedCodes);
+                        serviceResult.expectedCodesStrict = expectedCodesStrict;
                     }
                     if (Tools.isEmpty(serviceResult.testID)) serviceResult.testID = testIDLabel;
                     if (Tools.isEmpty(serviceResult.testGroupID)) serviceResult.testGroupID = testGroupID;

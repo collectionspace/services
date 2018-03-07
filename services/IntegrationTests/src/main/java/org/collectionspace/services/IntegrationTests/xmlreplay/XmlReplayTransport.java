@@ -192,15 +192,21 @@ public class XmlReplayTransport {
 			XmlReplayEval evalStruct, 
 			String authForTest,
 			String fromTestID) throws Exception {
-		byte[] b = FileUtils.readFileToByteArray(new File(fileName));
-		String xmlString = new String(b);
+	    byte[] b = null;
+	    if (fileName != null && fileName.trim().isEmpty() == false) {
+	        b = FileUtils.readFileToByteArray(new File(fileName));
+	        //
+	        // Add the test ID so we can substitute instances of "${testID}" in the
+	        // payload with the test ID.
+	        //
+	        String testId = fromTestID.split("\\.")[1]; // Get the unqualified (without the group ID part) test name
+	        vars.put("Test.ID", testId);
+	    } else {
+	        System.out.println(String.format("WARNING: POST/PUT from test '%s' specified no payload file.", fromTestID));
+	    }
+	    
+		String xmlString = b != null ? new String(b) : "";
 		String contentRaw = xmlString;
-		//
-		// Add the test ID so we can substitute instances of "${testID}" in the
-		// payload with the test ID.
-		//
-		String testId = fromTestID.split("\\.")[1]; // Get the unqualified (without the group ID part) test name
-		vars.put("Test.ID", testId);
 
 		xmlString = evalStruct.eval(xmlString, evalStruct.serviceResultsMap, vars, evalStruct.jexl, evalStruct.jc);
 		String urlString = protoHostPort + uri;

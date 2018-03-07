@@ -257,7 +257,7 @@ public class XmlReplayReport {
                 +s.method+ SP +"<a href='"+s.fullURL+"'>"+s.fullURL+"</a>"                                     +linesep
                 + s.responseCode+ SP +lbl("gotExpected")+s.gotExpectedResult()                                                       +linesep
                 + (Tools.notBlank(s.failureReason) ? s.failureReason +linesep : "" )
-                + ( (s.expectedCodes.size()>0) ? lbl("expectedCodes")+s.expectedCodes+linesep : "" )
+                + ( (s.getExpectedCodes().size()>0) ? lbl("expectedCodes")+s.getExpectedCodes()+linesep : "" )
                 //+ ( Tools.notEmpty(s.testGroupID) ? "testGroupID:"+s.testGroupID+linesep : "" )
                 //THIS WORKS, BUT IS VERBOSE: + ( Tools.notEmpty(s.fromTestID) ? "fromTestID:"+s.fromTestID+linesep : "" )
                 + ( Tools.notEmpty(s.responseMessage) ? lbl("msg")+s.responseMessage+linesep : "" )

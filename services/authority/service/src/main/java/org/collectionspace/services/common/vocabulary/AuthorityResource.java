@@ -579,16 +579,10 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         PoxPayloadOut result = null;
         try {
             PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
-            Specifier spec = Specifier.getSpecifier(specifier, "updateAuthority", "UPDATE");
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate);
             DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
-            String csid;
-            if (spec.form == SpecifierForm.CSID) {
-                csid = spec.value;
-            } else {
-                String whereClause = RefNameServiceUtils.buildWhereForAuthByName(authorityCommonSchemaName, spec.value);
-                csid = getRepositoryClient(ctx).findDocCSID(null, ctx, whereClause);
-            }
+            Specifier spec = Specifier.getSpecifier(specifier, "updateAuthority", "UPDATE");
+            String csid = getCsid(ctx, spec);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = ctx.getOutput();
         } catch (Exception e) {
@@ -875,6 +869,30 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         return result.getBytes();
     }
 
+    /*
+     * We should consider changing this code.  The RepositoryClient (from call to getRepositoryClient) could support a call doWorkflowTransition() instead?
+     */
+    @Override
+    @PUT
+    @Path("{csid}" + WorkflowClient.SERVICE_PATH + "/" + "{transition}")
+    public byte[] updateWorkflowWithTransition(
+            @Context UriInfo uriInfo,
+            @PathParam("csid") String specifier,
+            @PathParam("transition") String transition) {
+        PoxPayloadOut result = null;
+                
+        Specifier spec = Specifier.getSpecifier(specifier, "updateAuthority", "UPDATE");
+        String csid = null;
+        try {
+            csid = getCsid(null, spec);
+            result = updateWorkflowWithTransition(NULL_CONTEXT, uriInfo, csid, transition);
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, csid);
+        }
+        
+        return result.getBytes();
+    }
+    
     //FIXME: This method is almost identical to the method org.collectionspace.services.common.updateWorkflowWithTransition() so
     // they should be consolidated -be DRY (D)on't (R)epeat (Y)ourself.
     @PUT
@@ -1187,12 +1205,11 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     public AuthorityRefDocList getReferencingObjects(
             @PathParam("csid") String parentSpecifier,
             @PathParam("itemcsid") String itemSpecifier,
-            @Context UriTemplateRegistry uriTemplateRegistry,
             @Context UriInfo uriInfo) {
         uriInfo = new UriInfoWrapper(uriInfo);
         AuthorityRefDocList authRefDocList = null;
         try {
-            authRefDocList = getReferencingObjects(null, parentSpecifier, itemSpecifier, uriTemplateRegistry, uriInfo);
+            authRefDocList = getReferencingObjects(null, parentSpecifier, itemSpecifier, uriInfo);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED);
         }
@@ -1210,7 +1227,6 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             ServiceContext<PoxPayloadIn, PoxPayloadOut> existingContext,
             String parentspecifier,
             String itemspecifier,
-            UriTemplateRegistry uriTemplateRegistry,
             UriInfo uriInfo) throws Exception {
         AuthorityRefDocList authRefDocList = null;
  
@@ -1234,7 +1250,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         }
             
         AuthorityItemDocumentModelHandler handler = (AuthorityItemDocumentModelHandler)createItemDocumentHandler(ctx, parentcsid, null);
-        authRefDocList = handler.getReferencingObjects(ctx, uriTemplateRegistry, serviceTypes, getRefPropName(), itemcsid);
+        authRefDocList = handler.getReferencingObjects(ctx, serviceTypes, getRefPropName(), itemcsid);
 
         return authRefDocList;
     }
@@ -1564,6 +1580,23 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 
     public Response createAuthority(String xmlPayload) {
         return this.createAuthority(null, null, xmlPayload);
-    }    
+    }
+    
+    protected String getCsid(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, Specifier specifier) throws Exception {
+        String csid;
+        
+        if (ctx == null) {
+            ctx = createServiceContext(getServiceName());
+        }
+        
+        if (specifier.form == SpecifierForm.CSID) {
+            csid = specifier.value;
+        } else {
+            String whereClause = RefNameServiceUtils.buildWhereForAuthByName(authorityCommonSchemaName, specifier.value);
+            csid = getRepositoryClient(ctx).findDocCSID(null, ctx, whereClause);
+        }
+        
+        return csid;
+    }
     
 }

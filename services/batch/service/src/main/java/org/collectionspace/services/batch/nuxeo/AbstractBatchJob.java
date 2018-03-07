@@ -399,17 +399,14 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	}
 	
 	protected List<AuthorityRefDocList.AuthorityRefDocItem> findReferencingFields(String serviceName, String parentCsid, String csid, String type, int pageNum, int pageSize) throws URISyntaxException {
-		logger.debug("findReferencingFields serviceName=" + serviceName + " parentCsid=" + parentCsid + " csid=" + csid + " type=" + type);
-
 		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
-		UriTemplateRegistry uriTemplateRegistry = ServiceMain.getInstance().getUriTemplateRegistry();
 
 		// The pageNum and pageSize params don't work right for the refobj request.
 		// More items than the pageSize might be returned, and the next page may
 		// contain repeats of items already returned on the previous page. Any
 		// code that uses this function should be aware of this.
 		
-		AuthorityRefDocList refDocList = resource.getReferencingObjects(parentCsid, csid, uriTemplateRegistry, createRefSearchFilterUriInfo(type, pageNum, pageSize));
+		AuthorityRefDocList refDocList = resource.getReferencingObjects(parentCsid, csid, createRefSearchFilterUriInfo(type, pageNum, pageSize));
 		
 		return refDocList.getAuthorityRefDocItem();
 	}
