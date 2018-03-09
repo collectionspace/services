@@ -1,15 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:accounts_common xmlns:ns2="http://collectionspace.org/services/account" xmlns:ns3="http://collectionspace.org/services/hyperjaxb">
+<ns2:accounts_common xmlns:ns2="http://collectionspace.org/services/account" xmlns:ns3="http://collectionspace.org/services/jaxb" csid="bf65a789-5605-43d8-a227-60ebc2a51a92">
     <screenName>simpleAccount-2</screenName>
     <personRefName>simpleAccount-2</personRefName>
     <email>simpleAccount-2@security.simpleroles.org</email>
     <phone>1234567890</phone>
     <userId>simpleAccount-2</userId>
-    <!-- Pass word is elmo2010, base64 encoded -->
-    <password>ZWxtbzIwMTA=</password>
-    <tenants>
-        <tenant_id>1</tenant_id>
-    </tenants>
+    <status>active</status>
     <roleList>
         <role>
             <roleId>9a1fed44-25b0-48f9-8356-d16ac7555cae</roleId>
@@ -17,6 +12,7 @@
         </role>
         <role>
             <roleId>${simpleRole_2.CSID}</roleId>
+            <roleName>ROLE_1_BASICROLES-SIMPLEROLE-2</roleName>
         </role>
     </roleList>
 </ns2:accounts_common>

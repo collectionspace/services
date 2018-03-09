@@ -11,12 +11,5 @@
         <tenant_id>1</tenant_id>
     </tenants>
     <roleList>
-        <role>
-            <roleId>9a1fed44-25b0-48f9-8356-d16ac7555cae</roleId>
-            <roleName>ROLE_1_TENANT_ADMINISTRATOR</roleName>
-        </role>
-        <role>
-            <roleId>${simpleRole_2.CSID}</roleId>
-        </role>
     </roleList>
 </ns2:accounts_common>

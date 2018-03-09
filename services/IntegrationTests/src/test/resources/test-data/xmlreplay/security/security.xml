@@ -46,25 +46,44 @@
         <test ID="simpleAccount-1">
             <method>POST</method>
             <uri>/cspace-services/accounts</uri>
-            <filename>security/BasicRoles/createSimpleAccount-1.xml</filename>
+            <filename>security/SimpleRoles/createSimpleAccount-1.xml</filename>
         </test>
         <test ID="simpleRole-1">
             <method>POST</method>
             <uri>/cspace-services/authorization/roles</uri>
-            <filename>security/BasicRoles/createSimpleRole-1.xml</filename>
+            <filename>security/SimpleRoles/createSimpleRole-1.xml</filename>
         </test>
-        <!--
-            Create an account and role(s) with a single payload request
-        -->
         <test ID="simpleRole_2">
             <method>POST</method>
             <uri>/cspace-services/authorization/roles</uri>
-            <filename>security/BasicRoles/createSimpleRole-2.xml</filename>
+            <filename>security/SimpleRoles/createSimpleRole-2.xml</filename>
         </test>
-        <test ID="simpleAccount-2">
+        <test ID="simpleAccount_2">
             <method>POST</method>
             <uri>/cspace-services/accounts</uri>
-            <filename>security/BasicRoles/createSimpleAccount-2.xml</filename>
+            <filename>security/SimpleRoles/createSimpleAccount-2.xml</filename>
+        </test>
+        <test>
+            <method>GET</method>
+            <uri>/cspace-services/accounts/${simpleAccount_2.CSID}?showRoles=true</uri>
+            <response>
+                <vars>
+                    <var ID="roleCsid">${simpleRole_2.CSID}</var>
+                </vars>
+                <filename>security/SimpleRoles/responses/show-roles.res.xml</filename>
+            </response>
+        </test>        
+        <test ID="removeRoles">
+            <method>PUT</method>
+            <uri>/cspace-services/accounts/${simpleAccount_2.CSID}</uri>
+            <filename>security/SimpleRoles/removeRoles.xml</filename>
+        </test>
+        <test>
+            <method>GET</method>
+            <uri>/cspace-services/accounts/${simpleAccount_2.CSID}?showRoles=true</uri>
+            <response>
+                <filename>security/SimpleRoles/responses/no-roles.res.xml</filename>
+            </response>
         </test>
     </testGroup>
 

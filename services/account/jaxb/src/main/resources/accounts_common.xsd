@@ -175,7 +175,7 @@
                         </xs:appinfo>
                     </xs:annotation>
                 </xs:element>
-                <xs:element name="role" type="role_value" minOccurs="1" maxOccurs="unbounded"/>
+                <xs:element name="roleList" type="roleList" minOccurs="0" maxOccurs="1"/>
             </xs:sequence>
             <xs:attribute name="csid" type="xs:string">
                 <xs:annotation>
@@ -188,11 +188,25 @@
             </xs:attribute>
         </xs:complexType>
     </xs:element>
+    
+    <xs:complexType name="roleList">
+        <xs:annotation>
+            <xs:documentation>
+                RoleList is used relationships
+            </xs:documentation>
+            <xs:appinfo>
+                <hj:ignored/>
+            </xs:appinfo>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="role" type="role_value" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>    
 
     <xs:complexType name="role_value" >
         <xs:annotation>
             <xs:documentation>
-                RoleValue is used relationships
+                RoleValue is used in relationships
             </xs:documentation>
             <xs:appinfo>
                 <hj:ignored/>
