@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.collectionspace.services.account.AccountsCommon;
+import org.collectionspace.services.account.RoleList;
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.AccountValue;
 import org.collectionspace.services.authorization.SubjectType;
@@ -87,21 +88,21 @@ public class AccountRoleFactory {
             Collection<org.collectionspace.services.account.RoleValue> roleValueList,
             boolean useAccountId,
             boolean useRoleId) {
-    	
-    	Collection<RoleValue> authzRoleValueList = new ArrayList<RoleValue>();
-    	if (roleValueList != null && roleValueList.size() > 0) {
-    		for (org.collectionspace.services.account.RoleValue rv : roleValueList) {
-    			RoleValue authzRoleValue = new RoleValue();
-    			authzRoleValue.setDisplayName(rv.getDisplayName());
-    			authzRoleValue.setRoleId(rv.getRoleId());
-    			authzRoleValue.setRoleName(rv.getRoleName());
-    			authzRoleValue.setRoleRelationshipId(rv.getRoleRelationshipId());
-    			authzRoleValue.setTenantId(rv.getTenantId());
-    			authzRoleValueList.add(authzRoleValue);
-    		}
-    	}
+        
+        Collection<RoleValue> authzRoleValueList = new ArrayList<RoleValue>();
+        if (roleValueList != null && roleValueList.size() > 0) {
+            for (org.collectionspace.services.account.RoleValue rv : roleValueList) {
+                RoleValue authzRoleValue = new RoleValue();
+                authzRoleValue.setDisplayName(rv.getDisplayName());
+                authzRoleValue.setRoleId(rv.getRoleId());
+                authzRoleValue.setRoleName(rv.getRoleName());
+                authzRoleValue.setRoleRelationshipId(rv.getRoleRelationshipId());
+                authzRoleValue.setTenantId(rv.getTenantId());
+                authzRoleValueList.add(authzRoleValue);
+            }
+        }
 
-		AccountValue accountValue = AccountFactory.createAccountValue(accountsCommon);
+        AccountValue accountValue = AccountFactory.createAccountValue(accountsCommon);
         return AccountRoleFactory.createAccountRoleInstance(accountValue, authzRoleValueList, useAccountId, useRoleId);
     }
     
@@ -110,21 +111,23 @@ public class AccountRoleFactory {
      * @param roleValueList
      * @return
      */
-    static public List<org.collectionspace.services.account.RoleValue> convert(List<RoleValue> roleValueList) {
-    	List<org.collectionspace.services.account.RoleValue> result = new ArrayList<org.collectionspace.services.account.RoleValue>();
-    	
-    	if (roleValueList != null && roleValueList.size() > 0) {
-    		for (RoleValue rv : roleValueList) {
-    			org.collectionspace.services.account.RoleValue accountRoleValue = new org.collectionspace.services.account.RoleValue();
-    			accountRoleValue.setDisplayName(rv.getDisplayName());
-    			accountRoleValue.setRoleId(rv.getRoleId());
-    			accountRoleValue.setRoleName(rv.getRoleName());
-    			accountRoleValue.setRoleRelationshipId(rv.getRoleRelationshipId());
-    			accountRoleValue.setTenantId(rv.getTenantId());
-    			result.add(accountRoleValue);
-    		}
-    	}
-    	
-    	return result;
+    static public RoleList convert(List<RoleValue> roleValueList) {
+        RoleList result = new RoleList();
+        List<org.collectionspace.services.account.RoleValue> listOfRoleValues = new ArrayList<org.collectionspace.services.account.RoleValue>();
+        
+        if (roleValueList != null && roleValueList.size() > 0) {
+            for (RoleValue rv : roleValueList) {
+                org.collectionspace.services.account.RoleValue accountRoleValue = new org.collectionspace.services.account.RoleValue();
+                accountRoleValue.setDisplayName(rv.getDisplayName());
+                accountRoleValue.setRoleId(rv.getRoleId());
+                accountRoleValue.setRoleName(rv.getRoleName());
+                accountRoleValue.setRoleRelationshipId(rv.getRoleRelationshipId());
+                accountRoleValue.setTenantId(rv.getTenantId());
+                listOfRoleValues.add(accountRoleValue);
+            }
+        }
+
+        result.setRole(listOfRoleValues);
+        return result;
     }
 }

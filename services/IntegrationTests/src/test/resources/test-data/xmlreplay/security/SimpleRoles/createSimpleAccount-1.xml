@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:accounts_common xmlns:ns2="http://collectionspace.org/services/account" xmlns:ns3="http://collectionspace.org/services/hyperjaxb">
+    <screenName>simpleAccount-1</screenName>
+    <personRefName>simpleAccount-1</personRefName>
+    <email>simpleAccount-1@security.simpleroles.org</email>
+    <phone>1234567890</phone>
+    <userId>simpleAccount-1</userId>
+    <!-- Pass word is elmo2010, base64 encoded -->
+    <password>ZWxtbzIwMTA=</password>
+    <tenants>
+        <tenant_id>1</tenant_id>
+    </tenants>
+</ns2:accounts_common>

@@ -83,30 +83,35 @@ public class AccountDocumentHandler
         AccountsCommon accountReceived = getCommonPart();
         // If marked as metadata immutable, do not do update
         if (!AccountClient.IMMUTABLE.equals(accountFound.getMetadataProtection())) {
-        	merge(accountReceived, accountFound);
+            merge(accountReceived, accountFound);
         }
         //
         // Update the accountroles if supplied
         //
-        List<RoleValue> roleValueList = accountReceived.getRole();
-        if (roleValueList != null && roleValueList.size() > 0) {
-			AccountRoleSubResource subResource = 
-					new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
-			//
-			// First, delete the exist accountroles
-			//
-			subResource.deleteAccountRole(getServiceContext(), accountFound.getCsid(), SubjectType.ROLE);
-			//
-			// Next, create the new accountroles
-			//
-			AccountRole accountRole = AccountRoleFactory.createAccountRoleInstance(accountFound, 
-					roleValueList, true, true);
-			String accountRoleCsid = subResource.createAccountRole(getServiceContext(), accountRole, SubjectType.ROLE);
-			//
-			// Finally, set the updated role list in the result
-			//
-			AccountRole newAccountRole = subResource.getAccountRole(getServiceContext(), accountFound.getCsid(), SubjectType.ROLE);
-			accountFound.setRole(AccountRoleFactory.convert(newAccountRole.getRole()));
+        if (accountReceived.getRoleList() != null) { // if null, no <roleList> element was supplied so we don't do anything to the account-role relationships
+            //
+            // First, delete the existing accountroles
+            //
+            AccountRoleSubResource subResource = 
+                    new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);           
+            subResource.deleteAccountRole(getServiceContext(), accountFound.getCsid(), SubjectType.ROLE);
+            //
+            // Check to see if the payload has new roles to relate to the account
+            //
+            List<RoleValue> roleValueList = accountReceived.getRoleList().getRole();
+            if (roleValueList != null && roleValueList.size() > 0) {
+                //
+                // Next, create the new accountroles
+                //
+                AccountRole accountRole = AccountRoleFactory.createAccountRoleInstance(accountFound, 
+                        roleValueList, true, true);
+                String accountRoleCsid = subResource.createAccountRole(getServiceContext(), accountRole, SubjectType.ROLE);
+                //
+                // Finally, set the updated role list in the result
+                //
+                AccountRole newAccountRole = subResource.getAccountRole(getServiceContext(), accountFound.getCsid(), SubjectType.ROLE);
+                accountFound.setRoleList(AccountRoleFactory.convert(newAccountRole.getRole()));
+            }
         }
     }
 
@@ -153,20 +158,20 @@ public class AccountDocumentHandler
      * If the create payload included a list of role, relate them to the account.
      */
     public void completeCreate(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
-    	AccountsCommon accountsCommon = wrapDoc.getWrappedObject();
-    	List<RoleValue> roleValueList = account.getRole();
-    	if (roleValueList != null && roleValueList.size() > 0) {
-    		//
-    		// To prevent new Accounts being created (especially low-level Spring Security accounts/SIDs), we'll first flush the current
-    		// JPA context to ensure our Account can be successfully persisted.
-    		//
-    		TransactionContext jpaTransactionContext = this.getServiceContext().getCurrentTransactionContext();
-    		jpaTransactionContext.flush();
+        AccountsCommon accountsCommon = wrapDoc.getWrappedObject();
+        List<RoleValue> roleValueList = account.getRoleList() != null ? account.getRoleList().getRole() : null;
+        if (roleValueList != null && roleValueList.size() > 0) {
+            //
+            // To prevent new Accounts being created (especially low-level Spring Security accounts/SIDs), we'll first flush the current
+            // JPA context to ensure our Account can be successfully persisted.
+            //
+            TransactionContext jpaTransactionContext = this.getServiceContext().getCurrentTransactionContext();
+            jpaTransactionContext.flush();
 
-    		AccountRoleSubResource subResource = new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
-    		AccountRole accountRole = AccountRoleFactory.createAccountRoleInstance(accountsCommon, roleValueList, true, true);
-			subResource.createAccountRole(this.getServiceContext(), accountRole, SubjectType.ROLE);
-    	}
+            AccountRoleSubResource subResource = new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
+            AccountRole accountRole = AccountRoleFactory.createAccountRoleInstance(accountsCommon, roleValueList, true, true);
+            subResource.createAccountRole(this.getServiceContext(), accountRole, SubjectType.ROLE);
+        }
     }
     
     @Override
@@ -189,23 +194,23 @@ public class AccountDocumentHandler
         getServiceContext().setOutput(getCommonPartList());
     }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public AccountsCommon extractCommonPart(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
-		AccountsCommon account = wrapDoc.getWrappedObject();
-		
-		String includeRolesQueryParamValue = (String) getServiceContext().getQueryParams().getFirst(AccountClient.INCLUDE_ROLES_QP);
-		boolean includeRoles = Tools.isTrue(includeRolesQueryParamValue);
-		if (includeRoles) {
-			AccountRoleSubResource accountRoleResource = new AccountRoleSubResource(
-					AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
-			AccountRole accountRole = accountRoleResource.getAccountRole(getServiceContext(), account.getCsid(),
-					SubjectType.ROLE);
-			account.setRole(AccountRoleFactory.convert(accountRole.getRole()));
-		}
-		
-		return wrapDoc.getWrappedObject();
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public AccountsCommon extractCommonPart(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
+        AccountsCommon account = wrapDoc.getWrappedObject();
+        
+        String includeRolesQueryParamValue = (String) getServiceContext().getQueryParams().getFirst(AccountClient.INCLUDE_ROLES_QP);
+        boolean includeRoles = Tools.isTrue(includeRolesQueryParamValue);
+        if (includeRoles) {
+            AccountRoleSubResource accountRoleResource = new AccountRoleSubResource(
+                    AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
+            AccountRole accountRole = accountRoleResource.getAccountRole(getServiceContext(), account.getCsid(),
+                    SubjectType.ROLE);
+            account.setRoleList(AccountRoleFactory.convert(accountRole.getRole()));
+        }
+        
+        return wrapDoc.getWrappedObject();
+    }
 
     @Override
     public void fillCommonPart(AccountsCommon obj, DocumentWrapper<AccountsCommon> wrapDoc)
@@ -218,7 +223,7 @@ public class AccountDocumentHandler
             DocumentWrapper<List<AccountsCommon>> wrapDoc)
             throws Exception {
 
-    	AccountsCommonList accList = this.extractPagingInfo(new AccountsCommonList(), wrapDoc);
+        AccountsCommonList accList = this.extractPagingInfo(new AccountsCommonList(), wrapDoc);
 //        AccountsCommonList accList = new AccountsCommonList();
         List<AccountListItem> list = accList.getAccountListItem();
 
@@ -290,12 +295,12 @@ public class AccountDocumentHandler
      * @param account
      */
     @Override
-	public void sanitize(DocumentWrapper<AccountsCommon> wrapDoc) {
-    	AccountsCommon account = wrapDoc.getWrappedObject();
-    	sanitize(account);
+    public void sanitize(DocumentWrapper<AccountsCommon> wrapDoc) {
+        AccountsCommon account = wrapDoc.getWrappedObject();
+        sanitize(account);
     }
     
-	private void sanitize(AccountsCommon account) {
+    private void sanitize(AccountsCommon account) {
         account.setPassword(null);
         if (!SecurityUtils.isCSpaceAdmin()) {
             account.setTenants(new ArrayList<AccountTenant>(0));

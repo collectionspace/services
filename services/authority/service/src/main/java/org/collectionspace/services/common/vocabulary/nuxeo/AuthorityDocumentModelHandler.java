@@ -56,6 +56,7 @@ import org.collectionspace.services.common.vocabulary.AuthorityServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
+import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
@@ -772,5 +773,15 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
             objectProps.remove(AuthorityJAXBSchema.SHORT_IDENTIFIER);
             objectProps.remove(AuthorityJAXBSchema.REF_NAME);
         }
-    }    
+    }
+    
+    @Override
+    protected Object getListResultValue(DocumentModel docModel, // REM - CSPACE-5133
+            String schema, ListResultField field) throws DocumentException {
+        Object result = null;
+
+        result = super.getListResultValue(docModel, schema, field);
+        
+        return result;
+    }
 }

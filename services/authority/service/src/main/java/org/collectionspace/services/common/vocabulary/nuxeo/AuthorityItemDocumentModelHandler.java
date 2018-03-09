@@ -417,14 +417,20 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         //
         DocumentModel docModel = wrapDoc.getWrappedObject();
         if (transitionDef.getName().equalsIgnoreCase(WorkflowClient.WORKFLOWTRANSITION_DELETE)) {
-            long refsToAllObjects = hasReferencingObjects(ctx, docModel, false);
-            long refsToSoftDeletedObjects = hasReferencingObjects(ctx, docModel, true);
-            if (refsToAllObjects > 0) {
-                if (refsToAllObjects > refsToSoftDeletedObjects) {
+            AuthorityRefDocList refsToAllObjects = getReferencingObjects(ctx, docModel, RefObjsSearchType.ALL);
+            AuthorityRefDocList refsToSoftDeletedObjects = getReferencingObjects(ctx, docModel, RefObjsSearchType.DELETED_ONLY);
+            if (refsToAllObjects.getTotalItems() > 0) {
+                if (refsToAllObjects.getTotalItems() > refsToSoftDeletedObjects.getTotalItems()) {
                     //
                     // If the number of refs to active objects is greater than the number of refs to
                     // soft deleted objects then we can't delete the item.
                     //
+                    logger.error(String.format("Cannot delete authority item CSID='%s' because it still has records in the system that are referencing it.",
+                            docModel.getName()));
+                    if (logger.isWarnEnabled() == true) {
+                        logReferencingObjects(docModel, refsToAllObjects);
+                    }
+
                     throw new DocumentReferenceException(String.format("Cannot delete authority item '%s' because it still has records in the system that are referencing it.  See the service layer log file for details.",
                             docModel.getName()));
                 }
@@ -704,12 +710,17 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         handleInAuthority(wrapDoc.getWrappedObject());        
     }
 
+    enum RefObjsSearchType {
+        ALL, NON_DELETED, DELETED_ONLY
+    }
+    
     /*
      * This method gets called after the primary update to an authority item has happened.  If the authority item's refName
      * has changed, then we need to updated all the records that use that refname with the new/updated version
      * 
      * (non-Javadoc)
      */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public boolean handleDelete(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         boolean result = true;
@@ -717,14 +728,20 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         ServiceContext ctx = getServiceContext();
         DocumentModel docModel = wrapDoc.getWrappedObject();
         
-        long refsToAllObjects = hasReferencingObjects(ctx, docModel, false);
-        long refsToSoftDeletedObjects = hasReferencingObjects(ctx, docModel, true);
-        if (refsToAllObjects > 0) {
-            if (refsToAllObjects > refsToSoftDeletedObjects) {
+        AuthorityRefDocList refsToAllObjects = getReferencingObjects(ctx, docModel, RefObjsSearchType.ALL);
+        AuthorityRefDocList refsToSoftDeletedObjects = getReferencingObjects(ctx, docModel, RefObjsSearchType.DELETED_ONLY);
+        if (refsToAllObjects.getTotalItems() > 0) {
+            if (refsToAllObjects.getTotalItems() > refsToSoftDeletedObjects.getTotalItems()) {
                 //
                 // If the number of refs to active objects is greater than the number of refs to
                 // soft deleted objects then we can't delete the item.
                 //
+                logger.error(String.format("Cannot delete authority item CSID='%s' because it still has %d records in the system that are referencing it.",
+                        docModel.getName(), refsToSoftDeletedObjects.getTotalItems()));
+                if (logger.isWarnEnabled() == true) {
+                    logReferencingObjects(docModel, refsToAllObjects);
+                }
+
                 throw new DocumentReferenceException(String.format("Cannot delete authority item '%s' because it still has records in the system that are referencing it.  See the service layer log file for details.",
                         docModel.getName()));
             } else {
@@ -758,13 +775,10 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
      * @return
      * @throws Exception
      */
-    private long hasReferencingObjects(ServiceContext ctx, DocumentModel docModel, boolean onlyRefsToDeletedObjects) throws Exception {
-        long result = 0;
+    @SuppressWarnings("rawtypes")
+    private AuthorityRefDocList getReferencingObjects(ServiceContext ctx, DocumentModel docModel, RefObjsSearchType searchType) throws Exception {
+        AuthorityRefDocList result = null;
         
-        String inAuthorityCsid = (String) docModel.getProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.IN_AUTHORITY);
-        AuthorityResource authorityResource = (AuthorityResource)ctx.getResource(getAuthorityServicePath());
-        String itemCsid = docModel.getName();
-        UriTemplateRegistry uriTemplateRegistry = ServiceMain.getInstance().getUriTemplateRegistry();
         if (ctx.getUriInfo() == null) {
             //
             // We need a UriInfo object so we can pass "query" params to the AuthorityResource's getReferencingObjects() method
@@ -778,44 +792,77 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         //
         boolean doesContainValue = ctx.getUriInfo().getQueryParameters().containsKey(WorkflowClient.WORKFLOW_QUERY_DELETED_QP);
         String previousValue = ctx.getUriInfo().getQueryParameters().getFirst(WorkflowClient.WORKFLOW_QUERY_DELETED_QP);
-        AuthorityRefDocList refObjs = null;
         try {
             if (doesContainValue) {
                 ctx.getUriInfo().getQueryParameters().remove(WorkflowClient.WORKFLOW_QUERY_DELETED_QP);
             }
-
-            ctx.getUriInfo().getQueryParameters().addFirst(WorkflowClient.WORKFLOW_QUERY_ONLY_DELETED_QP, Boolean.toString(onlyRefsToDeletedObjects));  // Add the wf_only_deleted query param to the resource call
-            refObjs = authorityResource.getReferencingObjects(ctx, inAuthorityCsid, itemCsid, uriTemplateRegistry, ctx.getUriInfo());
+            AuthorityResource authorityResource = (AuthorityResource)ctx.getResource(getAuthorityServicePath());
+            result = getReferencingObjects(authorityResource, ctx, docModel, searchType);
         } finally {
-            ctx.getUriInfo().getQueryParameters().remove(WorkflowClient.WORKFLOW_QUERY_ONLY_DELETED_QP);  // Need to clear wf_only_deleted values to prevent unexpected side effects
             if (doesContainValue) {
                 ctx.getUriInfo().getQueryParameters().addFirst(WorkflowClient.WORKFLOW_QUERY_DELETED_QP, previousValue);
-            }
-        }
-         
-        result = refObjs.getTotalItems();
-        if (result > 0) {
-            logger.error(String.format("Cannot delete authority item '%s' because it still has %d records in the system that are referencing it.",
-                    itemCsid, refObjs.getTotalItems()));
-            if (logger.isWarnEnabled() == true) {
-                logReferencingObjects(docModel, refObjs);
             }
         }
         
         return result;
     }
     
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private AuthorityRefDocList getReferencingObjects(AuthorityResource authorityResource, ServiceContext ctx, DocumentModel docModel, RefObjsSearchType searchType) throws Exception {
+        AuthorityRefDocList result = null;
+        
+        String inAuthorityCsid = (String) docModel.getProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.IN_AUTHORITY);
+        String itemCsid = docModel.getName();
+        
+        try {
+            switch (searchType) {
+                case ALL:
+                    // By default, get get everything
+                    break;
+                case NON_DELETED:
+                    // Get only non-deleted objects
+                    ctx.getUriInfo().getQueryParameters().addFirst(WorkflowClient.WORKFLOW_QUERY_DELETED_QP, Boolean.FALSE.toString());  // Add the wf_deleted=false query param to exclude soft-deleted items
+                    break;
+                case DELETED_ONLY:
+                    // Get only deleted objects
+                    ctx.getUriInfo().getQueryParameters().addFirst(WorkflowClient.WORKFLOW_QUERY_ONLY_DELETED_QP, Boolean.TRUE.toString());  // Add the wf_only_deleted query param to get only soft-deleted items
+                    break;
+            }
+            result = authorityResource.getReferencingObjects(ctx, inAuthorityCsid, itemCsid, ctx.getUriInfo());
+
+        } finally {
+            //
+            // Cleanup query params
+            //
+            switch (searchType) {
+                case ALL:
+                    break;
+                case NON_DELETED:
+                    ctx.getUriInfo().getQueryParameters().remove(WorkflowClient.WORKFLOWSTATE_DELETED);
+                    break;
+                case DELETED_ONLY:
+                    ctx.getUriInfo().getQueryParameters().remove(WorkflowClient.WORKFLOW_QUERY_ONLY_DELETED_QP);
+                    break;
+            }
+        }
+
+        return result;
+    }    
+    
     private void logReferencingObjects(DocumentModel docModel, AuthorityRefDocList refObjs) {
         List<AuthorityRefDocList.AuthorityRefDocItem> items = refObjs.getAuthorityRefDocItem();
+        logger.warn(String.format("The authority item CSID='%s' has the following references:", docModel.getName()));
         int i = 0;
-        logger.warn(String.format("The authority item '%s' has the following references:", docModel.getName()));
         for (AuthorityRefDocList.AuthorityRefDocItem item : items) {
-            logger.warn(docModel.getName() + " referenced by : list-item[" + i + "] "
-                    + item.getDocType() + "("
-                    + item.getDocId() + ") Name:["
-                    + item.getDocName() + "] Number:["
-                    + item.getDocNumber() + "] in field:["
-                    + item.getSourceField() + "]");
+            if (item.getWorkflowState().contains(WorkflowClient.WORKFLOWSTATE_DELETED) == false) {
+                logger.warn(docModel.getName() + " referenced by : list-item[" + i + "] "
+                        + item.getDocType() + "("
+                        + item.getDocId() + ") Name:["
+                        + item.getDocName() + "] Number:["
+                        + item.getDocNumber() + "] in field:["
+                        + item.getSourceField() + "]");
+                i++;
+            }
         }
     }
 
@@ -1030,7 +1077,6 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
      */
     public AuthorityRefDocList getReferencingObjects(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-                UriTemplateRegistry uriTemplateRegistry, 
             List<String> serviceTypes,
             String propertyName,
             String itemcsid) throws Exception {
@@ -1052,7 +1098,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
                 DocumentModel docModel = wrapper.getWrappedObject();
                 String refName = (String) NuxeoUtils.getProperyValue(docModel, AuthorityItemJAXBSchema.REF_NAME); //docModel.getPropertyValue(AuthorityItemJAXBSchema.REF_NAME);
                 authRefDocList = RefNameServiceUtils.getAuthorityRefDocs(
-                        repoSession, ctx, uriTemplateRegistry, repoClient,
+                        repoSession, ctx, repoClient,
                         serviceTypes,
                         refName,
                         propertyName,
@@ -1262,17 +1308,52 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     protected Object getListResultValue(DocumentModel docModel, // REM - CSPACE-5133
             String schema, ListResultField field) throws DocumentException {
         Object result = null;        
+        String fieldXPath = field.getXpath();
+        
+        if (fieldXPath.equalsIgnoreCase(AuthorityClient.REFERENCED) == false) {
+            result = NuxeoUtils.getXPathValue(docModel, schema, field.getXpath());
+        } else {
+            //
+            // Special case for the 'referenced' list result field.
+            //
+            // Set result value of field 'referenced' to 'true' if item is being referenced; otherwise, 'false'
+            //
+            try {
+                result = Boolean.FALSE.toString();
+                AuthorityRefDocList referenceList = null;
 
-        result = NuxeoUtils.getXPathValue(docModel, schema, field.getXpath());
+                String wf_deletedStr = (String) getServiceContext().getQueryParams().getFirst(WorkflowClient.WORKFLOW_QUERY_DELETED_QP);
+                if (wf_deletedStr != null && Tools.isFalse(wf_deletedStr)) {
+                    //
+                    // if query param 'wf_deleted=false', we won't count references to soft-deleted records
+                    //
+                    referenceList = getReferencingObjects(getServiceContext(), docModel, RefObjsSearchType.NON_DELETED);
+                } else {
+                    //
+                    // if query param 'wf_deleted=true' or missing, we count references to soft-deleted and active records
+                    //
+                    referenceList = getReferencingObjects(getServiceContext(), docModel, RefObjsSearchType.ALL);
+                }
+                
+                if (referenceList.getTotalItems() > 0) {
+                    result = Boolean.TRUE.toString();
+                }
+                
+                return result;
+            } catch (Exception e) {
+                String msg = String.format("Failed while trying to find records referencing term CSID='%s'.", docModel.getName());
+                throw new DocumentException(msg, e);
+            }
+        }
                 
         //
-                // Special handling of list item values for authority items (only)
-                // takes place here:
-                //
+        // Special handling of list item values for authority items (only)
+        // takes place here:
+        //
         // If the list result field is the termDisplayName element,
-                // check whether a partial term matching query was made.
-                // If it was, emit values for both the preferred (aka primary)
-                // term and for all non-preferred terms, if any.
+        // check whether a partial term matching query was made.
+        // If it was, emit values for both the preferred (aka primary)
+        // term and for all non-preferred terms, if any.
         //
         String elName = field.getElement();
         if (isTermDisplayName(elName) == true) {
