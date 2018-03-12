@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.intake.3rdparty</artifactId>
-        <version>5.0-SNAPSHOT</version>
+        <version>5.1-SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
