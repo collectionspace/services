@@ -13,7 +13,7 @@
                 <filter-class>org.apache.catalina.filters.ExpiresFilter</filter-class>
                 <init-param>
                         <param-name>ExpiresDefault</param-name>
-                        <param-value>access plus 12 hours</param-value>
+                        <param-value>access plus 2 hours</param-value>
                 </init-param>
         </filter>
         <filter-mapping>
