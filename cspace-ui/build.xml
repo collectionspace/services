@@ -27,7 +27,7 @@
     
     <target name="deploy" depends="download" description="deploy cspace ui to ${jee.server.cspace}">
         <filter token="UI_VERSION" value="${cspace.ui.version}" />
-        <copy todir="${jee.deploy.cspace}/${cspace.ui.webapp}" filtering="true">
+        <copy todir="${jee.deploy.cspace}/${cspace.ui.webapp}" filtering="true" overwrite="true">
             <fileset dir="${cspace.ui.webapp}"/>
         </copy>
         <move file="cspaceUI@${cspace.ui.version}.min.js" todir="${jee.deploy.cspace.ui.shared}"></move>
