@@ -21,7 +21,7 @@
         <itemsInPage>3</itemsInPage>
         <totalItems>3</totalItems>
         <fieldsReturned>
-            csid|uri|refName|updatedAt|workflowState|rev|sourcePage|sas|proposed|deprecated|termStatus|description|source|order|displayName|shortIdentifier
+            csid|uri|refName|updatedAt|workflowState|rev|sourcePage|sas|proposed|referenced|deprecated|termStatus|description|source|order|displayName|shortIdentifier
         </fieldsReturned>
         <list-item>
             <refName>

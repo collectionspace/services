@@ -13,7 +13,8 @@ public interface AuthorityClient<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P e
 	extends CollectionSpacePoxClient<AbstractCommonList, P> {
 
     /** The uri path element for items in an authority */
-    public static String ITEMS = "items";    //used to construct uri's in service paths for authorities.
+    public static final String ITEMS = "items";    //used to construct uri's in service paths for authorities.
+    public static final String REFERENCED = "referenced";
     public static final String SHORT_IDENTIFIER = "shortIdentifier";
     public static final String IN_AUTHORITY = "inAuthority";
     public static final String TERM_DISPLAY_NAME = "termDisplayName";

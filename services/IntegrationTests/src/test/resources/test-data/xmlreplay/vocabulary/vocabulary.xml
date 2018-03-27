@@ -313,12 +313,44 @@
                 <var ID="exitNumber">2</var>
                 <var ID="itemRefName">urn:cspace:testsci.collectionspace.org:vocabularies:name(createEmptyVocab):item:name(createItem2)'createItem2'</var>                
             </vars>
-        </test>        
+        </test>
+        
+        <!-- Ensure we're not able to delete a refererenced item. -->
+        <test ID="deleteReferencedVocabItem">
+            <expectedCodes>409</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocab.CSID}/items/${createItem2.CSID}</uri>
+        </test>
+        <!-- Ensure we're not able to delete a refererenced item. Even if the caller uses 'wf_deleted=true' query param -->
+        <test ID="deleteReferencedVocabItemSoftTrue">
+            <expectedCodes>409</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocab.CSID}/items/${createItem2.CSID}?wf_deleted=true</uri>
+        </test>
+        <!-- Ensure we're not able to delete a refererenced item. Even if the caller uses 'wf_deleted=false' query param -->
+        <test ID="deleteReferencedVocabItemSoftFalse">
+            <expectedCodes>409</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocab.CSID}/items/${createItem2.CSID}?wf_deleted=false</uri>
+        </test>
+
+        <!-- Ensure we're not able to delete a vocabulary that contains a refererenced item. -->
         <test ID="deleteEmptyVocab">
             <expectedCodes>409</expectedCodes>
             <method>DELETE</method>
             <uri>/cspace-services/vocabularies/${createEmptyVocab.CSID}</uri>
         </test>
+        <test ID="deleteEmptyVocab">
+            <expectedCodes>409</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocab.CSID}?wf_deleted=true</uri>
+        </test>
+        <test ID="deleteEmptyVocab">
+            <expectedCodes>409</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocab.CSID}?wf_deleted=false</uri>
+        </test>
+
         <test ID="deleteObjectExit">
             <method>DELETE</method>
             <uri>/cspace-services/objectexit/${createObjectExit.CSID}</uri>
@@ -331,6 +363,107 @@
             <expectedCodes>404</expectedCodes>
             <method>GET</method>
             <uri>/cspace-services/vocabularies/${createEmptyVocab.CSID}</uri>
+        </test>
+    </testGroup>
+    
+    <!--
+        Test trying to soft delete an authority/vocabulary (and its terms) when one or more of its terms
+        is being referenced in another record.
+        
+        1. Create a new authority and add 3 items to it.
+        2. Create an ObjectExit record referencing one of the items
+        3. Try to soft-delete the authority (should fail)
+        4. Soft-delete the ObjectExit record.
+        5. Soft-delete the authority (should work now).
+    -->
+    <testGroup ID="SoftDeleteVocabWithReferencedItem" autoDeletePOSTS="true" expectedCodesStrict="true">
+        <test ID="createEmptyVocabSoft" auth="admin@testsci.collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/</uri>
+            <filename>vocabulary/vocab-Template.xml</filename>
+        </test>
+        <test ID="createItem1">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocabSoft.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">1</var>
+            </vars>
+        </test>
+        <test ID="createItem2">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocabSoft.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">2</var>
+            </vars>
+        </test>
+        <test ID="createItem3">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocabSoft.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">3</var>
+            </vars>
+        </test>
+        <test ID="createObjectExit">
+            <method>POST</method>
+            <uri>/cspace-services/objectexit</uri>
+            <filename>vocabulary/DeleteVocabWithItems/objectExit.xml</filename>
+            <vars>
+                <var ID="exitNumber">33.123</var>
+                <var ID="itemRefName">urn:cspace:testsci.collectionspace.org:vocabularies:name(createEmptyVocabSoft):item:name(createItem2)'createItem2'</var>                
+            </vars>
+        </test>
+        
+        <!-- Ensure we're not able to soft-delete a refererenced item. -->
+        <test ID="deleteReferencedVocabItem">
+            <expectedCodes>409</expectedCodes>
+            <method>PUT</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocabSoft.CSID}/items/${createItem2.CSID}/workflow/delete</uri>
+        </test>
+        <!-- Ensure we're not able to soft-delete a refererenced item. Even if the caller uses 'wf_deleted=true' query param -->
+        <test ID="deleteReferencedVocabItemSoftTrue">
+            <expectedCodes>409</expectedCodes>
+            <method>PUT</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocabSoft.CSID}/items/${createItem2.CSID}/workflow/delete?wf_deleted=true</uri>
+        </test>
+        <!-- Ensure we're not able to soft-delete a refererenced item. Even if the caller uses 'wf_deleted=false' query param -->
+        <test ID="deleteReferencedVocabItemSoftFalse">
+            <expectedCodes>409</expectedCodes>
+            <method>PUT</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocabSoft.CSID}/items/${createItem2.CSID}/workflow/delete?wf_deleted=false</uri>
+        </test>
+        
+        <!-- Ensure we're not able to soft-delete an entire vocabulary that contains a refererenced item. -->
+        <test ID="deleteEmptyVocab">
+            <expectedCodes>409,200</expectedCodes>
+            <method>PUT</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocabSoft.CSID}/workflow/delete</uri>
+        </test>
+        <test ID="deleteEmptyVocab">
+            <expectedCodes>409,400</expectedCodes>
+            <method>PUT</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocabSoft.CSID}/workflow/delete?wf_deleted=true</uri>
+        </test>
+        <test ID="deleteEmptyVocab">
+            <expectedCodes>409,400</expectedCodes>
+            <method>PUT</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocabSoft.CSID}/workflow/delete?wf_deleted=false</uri>
+        </test>
+        
+        <test ID="deleteObjectExit">
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/${createObjectExit.CSID}</uri>
+        </test>
+        <test ID="deleteEmptyVocab">
+            <method>DELETE</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocabSoft.CSID}</uri>
+        </test>
+        <test ID="getEmptyVocab">
+            <expectedCodes>404</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies/${createEmptyVocabSoft.CSID}</uri>
         </test>
     </testGroup>
     

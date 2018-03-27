@@ -388,7 +388,6 @@ public class RefNameServiceUtils {
     public static AuthorityRefDocList getAuthorityRefDocs(
     		CoreSessionInterface repoSession,
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-            UriTemplateRegistry uriTemplateRegistry,
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
             List<String> serviceTypes,
             String refName,
@@ -427,20 +426,6 @@ public class RefNameServiceUtils {
                 return wrapperList;
             }
 
-            // set the fieldsReturned list. Even though this is a fixed schema, app layer treats
-            // this like other abstract common lists
-            /*
-             * <xs:element name="docType" type="xs:string" minOccurs="1" />
-             * <xs:element name="docId" type="xs:string" minOccurs="1" />
-             * <xs:element name="docNumber" type="xs:string" minOccurs="0" />
-             * <xs:element name="docName" type="xs:string" minOccurs="0" />
-             * <xs:element name="sourceField" type="xs:string" minOccurs="1" />
-             * <xs:element name="uri" type="xs:anyURI" minOccurs="1" />
-             * <xs:element name="refName" type="xs:String" minOccurs="1" />
-             * <xs:element name="updatedAt" type="xs:string" minOccurs="1" />
-             * <xs:element name="workflowState" type="xs:string" minOccurs="1"
-             * />
-             */
             String fieldList = "docType|docId|docNumber|docName|sourceField|uri|refName|updatedAt|workflowState";  // FIXME: Should not be hard-coded string
             commonList.setFieldsReturned(fieldList);
 
@@ -472,53 +457,6 @@ public class RefNameServiceUtils {
             commonList.setPageNum(pageNum);
            	commonList.setTotalItems(nRefsFound);	// Accurate if total was scanned, otherwise, just an estimate
             commonList.setItemsInPage(list.size());
-
-            /* Pagination is now handled in the processing step
-            // Slice the list to return only the specified page of items
-            // in the list results.
-            //
-            // FIXME: There may well be a pattern-based way to do this
-            // in our framework, and if we can eliminate much of the
-            // non-DRY code below, that would be desirable.
-            
-            int startIndex = 0;
-            int endIndex = 0;
-            
-            // Return all results if pageSize is 0.
-            if (pageSize == 0) {
-                startIndex = 0;
-                endIndex = list.size();
-            } else {
-               startIndex = pageNum * pageSize;
-            }
-            
-            // Return an empty list when the start of the requested page is
-            // beyond the last item in the list.
-            if (startIndex > list.size()) {
-                wrapperList.getAuthorityRefDocItem().clear();
-                commonList.setItemsInPage(wrapperList.getAuthorityRefDocItem().size());
-                return wrapperList;
-            }
-
-            // Otherwise, return a list of items from the start of the specified
-            // page through the last item on that page, or otherwise through the
-            // last item in the entire list, if that occurs earlier than the end
-            // of the specified page.
-            if (endIndex == 0) {
-                int pageEndIndex = ((startIndex + pageSize));
-                endIndex = (pageEndIndex > list.size()) ? list.size() : pageEndIndex;
-            }
-            
-            // Slice the list to return only the specified page of results.
-            // Note: the second argument to List.subList(), endIndex, is
-            // exclusive of the item at its index position, reflecting the
-            // zero-index nature of the list.
-            List<AuthorityRefDocList.AuthorityRefDocItem> currentPageList =
-                    new ArrayList<AuthorityRefDocList.AuthorityRefDocItem>(list.subList(startIndex, endIndex));
-            wrapperList.getAuthorityRefDocItem().clear();
-            wrapperList.getAuthorityRefDocItem().addAll(currentPageList);
-            commonList.setItemsInPage(currentPageList.size());
-            */
             
             if (logger.isDebugEnabled() && (nRefsFound < docList.size())) {
                 logger.debug("Internal curiosity: got fewer matches of refs than # docs matched..."); // We found a ref to ourself and have excluded it.

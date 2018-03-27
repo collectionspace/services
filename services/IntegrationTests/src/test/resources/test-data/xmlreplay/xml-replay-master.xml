@@ -24,6 +24,8 @@
  
     <run controlFile="collectionobject/collectionobject-adv-search.xml" testGroup="advSearchCommonSchema" />
     <run controlFile="collectionobject/collectionobject-adv-search.xml" testGroup="advSearchExtensionSchema" />
+    <run controlFile="collectionobject/related/collectionobject-related.xml" />
+    
     <run controlFile="acquisitions/acquisitions.xml" testGroup="makeone" />
     <run controlFile="acquisitions/acquisitions.xml" testGroup="testList" />
     <run controlFile="relation/relation.xml" testGroup="makeRelations" />

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns:accounts_common xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+ xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+ xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
+ xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
+ xmlns:ns="http://collectionspace.org/services/account"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://collectionspace.org/services/account file:/Users/remillet/dev/src/cspace/services/services/account/jaxb/src/main/resources/accounts_common.xsd" csid="csid0">
+    <screenName>screenName0</screenName>
+    <personRefName>personRefName0</personRefName>
+    <email>email0</email>
+    <phone>phone0</phone>
+    <mobile>mobile0</mobile>
+    <userId>userId0</userId>
+    <password>ZGVmYXVsdA==</password>
+    <tenants>
+        <tenant_id>tenant_id0</tenant_id>
+    </tenants>
+    <tenants>
+        <tenant_id>tenant_id1</tenant_id>
+    </tenants>
+    <status>active</status>
+    <metadataProtection>metadataProtection0</metadataProtection>
+    <rolesProtection>rolesProtection0</rolesProtection>
+    <createdAt>2006-05-04T18:13:51.0</createdAt>
+    <updatedAt>2006-05-04T18:13:51.0</updatedAt>
+    <roleList>
+        <role>
+            <roleRelationshipId>roleRelationshipId0</roleRelationshipId>
+            <roleId>roleId0</roleId>
+            <roleName>roleName0</roleName>
+            <displayName>displayName0</displayName>
+            <tenantId>tenantId0</tenantId>
+        </role>
+        <role>
+            <roleRelationshipId>roleRelationshipId1</roleRelationshipId>
+            <roleId>roleId1</roleId>
+            <roleName>roleName1</roleName>
+            <displayName>displayName1</displayName>
+            <tenantId>tenantId1</tenantId>
+        </role>
+    </roleList>
+</ns:accounts_common>
