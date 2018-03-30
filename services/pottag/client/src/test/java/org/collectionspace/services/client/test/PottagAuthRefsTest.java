@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
@@ -39,12 +38,9 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.pottag.PottagsCommon;
 import org.collectionspace.services.person.PersonTermGroup;
-
-import org.jboss.resteasy.client.ClientResponse;
 
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -66,16 +62,11 @@ public class PottagAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     
     // Instance variables specific to this test.
-    final String SERVICE_NAME = "pottags";
-    final String SERVICE_PATH_COMPONENT = "pottags";
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
-    private String knownResourceId = null;
     private List<String> pottagIdsCreated = new ArrayList<String>();
     private List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
-    private final int NUM_AUTH_REFS_EXPECTED = 5;
-    private final static String CURRENT_DATE_UTC =
-            GregorianCalendarDateTimeUtils.currentDateUTC();
+	private String taggedByAuthRef;
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -89,8 +80,7 @@ public class PottagAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getCommonList(
-			ClientResponse<AbstractCommonList> response) {
+	protected AbstractCommonList getCommonList(Response response) {
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
@@ -113,62 +103,48 @@ public class PottagAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         // One or more fields in this resource will be PersonAuthority
         // references, and will refer to Person resources by their refNames.
         PottagClient pottagClient = new PottagClient();
-        PoxPayloadOut multipart = createPottagInstance(
-                "familyName-" + identifier,
-                CURRENT_DATE_UTC);
-        ClientResponse<Response> response = pottagClient.create(multipart);
-        int statusCode = response.getStatus();
+        PoxPayloadOut pottageInstance = createPottagInstance("familyName-" + identifier, this.taggedByAuthRef,
+        		"commonName-" + identifier);
+        Response response = pottagClient.create(pottageInstance);
         try {
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        //
-	        // Specifically:
-	        // Does it fall within the set of valid status codes?
-	        // Does it exactly match the expected status code?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(testRequestType, statusCode));
-	        Assert.assertEquals(statusCode, testExpectedStatusCode);
-	
-	        // Store the ID returned from the first resource created
-	        // for additional tests below.
-	        if (knownResourceId == null){
+        	assertStatusCode(response, testName);	
+	        // Store the ID returned from the first resource created for additional tests below.
+	        if (knownResourceId == null) {
 	            knownResourceId = extractId(response);
-	            if (logger.isDebugEnabled()) {
-	                logger.debug(testName + ": knownResourceId=" + knownResourceId);
-	            }
 	        }
 	        
 	        // Store the IDs from every resource created by tests,
 	        // so they can be deleted after tests have been run.
 	        pottagIdsCreated.add(extractId(response));
         } finally {
-        	response.releaseConnection();
+        	response.close();
         }
     }
     
-    protected void createPersonRefs(){
-
+    protected void createPersonRefs() throws Exception {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding
         // refName by which it can be identified.
     	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
-        ClientResponse<Response> res = personAuthClient.create(multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-        personAuthCSID = extractId(res);
-
-        String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
+        Response res = personAuthClient.create(multipart);
+        try {
+	        int statusCode = res.getStatus();
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode), invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        personAuthCSID = extractId(res);
+        } finally {
+        	res.close();
+        }
+        String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, personAuthClient);
         
+        // Create temporary Person resource, and a corresponding refName from which it can be identified.
+       	String csid = createPerson("Harry", "Potter", "harryPotter", authRefName);
+        this.personIdsCreated.add(csid);
+        this.taggedByAuthRef = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, personAuthClient);
     }
     
-    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
+    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) throws Exception {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
@@ -183,13 +159,17 @@ public class PottagAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     	PoxPayloadOut multipart =
     		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
     				authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
-        ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-    	return extractId(res);
+    	
+        Response res = personAuthClient.createItem(personAuthCSID, multipart);
+        try {
+	        int statusCode = res.getStatus();
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	    	return extractId(res);
+        } finally {
+        	res.close();
+        }
     }
 
     // Success outcomes
@@ -201,47 +181,43 @@ public class PottagAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
         // Submit the request to the service and store the response.
         PottagClient pottagClient = new PottagClient();
-        ClientResponse<String> res = pottagClient.read(knownResourceId);
-        PottagsCommon pottagCommon = null;
+        Response res = pottagClient.read(knownResourceId);
         try {
 	        assertStatusCode(res, testName);
 	        // Extract the common part from the response.
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	        pottagCommon = (PottagsCommon) extractPart(input,
-	            pottagClient.getCommonPartName(), PottagsCommon.class);
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
+	        PottagsCommon pottagCommon = (PottagsCommon) extractPart(input, pottagClient.getCommonPartName(),
+	        		PottagsCommon.class);
 	        Assert.assertNotNull(pottagCommon);
-	        if(logger.isDebugEnabled()){
-	            logger.debug(objectAsXmlString(pottagCommon, PottagsCommon.class));
-	        }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
         // Get the auth refs and check them
-        ClientResponse<AuthorityRefList> res2 = pottagClient.getAuthorityRefs(knownResourceId);
+        res = pottagClient.getAuthorityRefs(knownResourceId);
         AuthorityRefList list = null;
         try {
-	        assertStatusCode(res2, testName);
-	        list = res2.getEntity();
+	        assertStatusCode(res, testName);
+	        list = res.readEntity(AuthorityRefList.class);
 	        Assert.assertNotNull(list);
         } finally {
-        	if (res2 != null) {
-        		res2.releaseConnection();
+        	if (res != null) {
+        		res.close();
             }
         }
         
+        int expectedAuthRefs = personIdsCreated.size();
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
         int numAuthRefsFound = items.size();
-        if(logger.isDebugEnabled()){
-            logger.debug("Expected " + NUM_AUTH_REFS_EXPECTED +
-                " authority references, found " + numAuthRefsFound);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Expected " + expectedAuthRefs + " authority references, found " + numAuthRefsFound);
         }
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
-        if(iterateThroughList && logger.isDebugEnabled()){
+        if (iterateThroughList && logger.isDebugEnabled()) {
             int i = 0;
             for(AuthorityRefList.AuthorityRefItem item : items){
                 logger.debug(testName + ": list-item[" + i + "] Field:" +
@@ -256,10 +232,8 @@ public class PottagAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
             }
         }
 
-        Assert.assertEquals(numAuthRefsFound, NUM_AUTH_REFS_EXPECTED,
-            "Did not find all expected authority references! " +
-            "Expected " + NUM_AUTH_REFS_EXPECTED + ", found " + numAuthRefsFound);
-
+        Assert.assertEquals(numAuthRefsFound, expectedAuthRefs,
+            "Did not find all expected authority references! " + "Expected " + expectedAuthRefs + ", found " + numAuthRefsFound);
     }
 
 
@@ -274,11 +248,12 @@ public class PottagAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
-    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+    	if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Skipping Cleanup phase ...");
             }
@@ -287,28 +262,24 @@ public class PottagAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-        // Delete Person resource(s) (before PersonAuthority resources).
         
-        for (String resourceId : personIdsCreated) {
+        //
+        // Delete all the pottag records we created
+    	PottagClient pottagClient = new PottagClient();
+        for (String resourceId : pottagIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-        	ClientResponse<Response> response = 
-        		personAuthClient.deleteItem(personAuthCSID, resourceId); // alternative to personAuthClient.deleteItem().releaseConnection();
-        	response.releaseConnection();
+            pottagClient.delete(resourceId).close(); // alternative to pottagClient.delete(resourceId).releaseConnection();
         }
         
-        // Delete PersonAuthority resource(s).
-        // Note: Any non-success response is ignored and not reported.
+        //
+        // Delete Person resource(s) (before PersonAuthority resources).     
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        for (String resourceId : personIdsCreated) {
+            // Note: Any non-success responses are ignored and not reported.
+       		personAuthClient.deleteItem(personAuthCSID, resourceId).close();
+        }
         if (personAuthCSID != null) {
-        	personAuthClient.delete(personAuthCSID);
-	        // Delete Loans In resource(s).
-        	PottagClient pottagClient = new PottagClient();
-        	ClientResponse<Response> response = null;
-	        for (String resourceId : pottagIdsCreated) {
-	            // Note: Any non-success responses are ignored and not reported.
-	            response = pottagClient.delete(resourceId); // alternative to pottagClient.delete(resourceId).releaseConnection();
-	            response.releaseConnection();
-	        }
+	        personAuthClient.delete(personAuthCSID).close();
         }
     }
 
@@ -316,19 +287,21 @@ public class PottagAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     // Utility methods used by tests above
     // ---------------------------------------------------------------
     public String getServiceName() {
-        return SERVICE_NAME;
+        return PottagClient.SERVICE_NAME;
     }
 
     @Override
     public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
+        return PottagClient.SERVICE_PATH_COMPONENT;
     }
 
     private PoxPayloadOut createPottagInstance(String familyName,
-    		String returnDate) {
+    		String taggedBy,
+    		String commonName) throws Exception {
     	PottagsCommon pottagCommon = new PottagsCommon();
     	pottagCommon.setFamily(familyName);
-    	pottagCommon.setFamily(returnDate);
+    	pottagCommon.setTaggedBy(taggedBy);
+    	pottagCommon.setCommonName(commonName);
 
     	PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
     	PayloadOutputPart commonPart =
@@ -346,4 +319,10 @@ public class PottagAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     protected Class<AbstractCommonList> getCommonListType() {
     	return AbstractCommonList.class;
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

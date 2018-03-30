@@ -3,72 +3,69 @@
     <auths>
         <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
         <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
-        <auth ID="testAdministator">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
     </auths>
-   
-    <testGroup ID="makeone" autoDeletePOSTS="true">
-       <test ID="ac1"  auth="test">
-             <method>POST</method>
-             <uri>/cspace-services/acquisitions/</uri>
-             <filename>acquisitions/ac1.xml</filename>
-         </test>
+
+    <testGroup ID="makeone" autoDeletePOSTS="true" authForCleanup="admin@core.collectionspace.org">
+        <test ID="ac1" auth="admin@core.collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/acquisitions/</uri>
+            <filename>acquisitions/ac1.xml</filename>
+        </test>
         <test ID="ac1get">
             <method>GET</method>
             <uri>/cspace-services/acquisitions/${ac1.CSID}</uri>
             <response>
-                <expected level="TEXT" />
+                <expected level="TEXT"></expected>
                 <label>acquisitions_common</label>
                 <filename>acquisitions/res/ac1.res.xml</filename>
-             </response>
-         </test>
-    </testGroup>       
+            </response>
+        </test>
+    </testGroup>
 
-    <testGroup ID="testList" autoDeletePOSTS="true">
-         <test ID="ac1"  auth="test">
-             <method>POST</method>
-             <uri>/cspace-services/acquisitions/</uri>
-             <filename>acquisitions/ac1.xml</filename>
-         </test>
-         
-         <test ID="ac1get">
+    <testGroup ID="testList" autoDeletePOSTS="true" authForCleanup="admin@core.collectionspace.org">
+        <test ID="ac1">
+            <method>POST</method>
+            <uri>/cspace-services/acquisitions/</uri>
+            <filename>acquisitions/ac1.xml</filename>
+        </test>
+
+        <test ID="ac1get">
             <method>GET</method>
             <uri>/cspace-services/acquisitions/${ac1.CSID}</uri>
             <response>
-                <expected level="TEXT" />
+                <expected level="TEXT"></expected>
                 <label>acquisitions_common</label>
-				<filename>acquisitions/res/ac1.res.xml</filename>
-             </response>
-         </test>
+                <filename>acquisitions/res/ac1.res.xml</filename>
+            </response>
+        </test>
 
-        <test ID="ac2"  auth="test">
-             <method>POST</method>
-             <uri>/cspace-services/acquisitions/</uri>
-             <filename>acquisitions/ac2.xml</filename>
-         </test>
-         
+        <test ID="ac2">
+            <method>POST</method>
+            <uri>/cspace-services/acquisitions/</uri>
+            <filename>acquisitions/ac2.xml</filename>
+        </test>
+
         <test ID="ac2get">
             <method>GET</method>
             <uri>/cspace-services/acquisitions/${ac2.CSID}</uri>
             <response>
-                <expected level="TEXT" />
+                <expected level="TEXT"></expected>
                 <label>acquisitions_common</label>
-				<filename>acquisitions/res/ac2.res.xml</filename>
-             </response>
+                <filename>acquisitions/res/ac2.res.xml</filename>
+            </response>
         </test>
 
         <test ID="ac3list">
             <method>GET</method>
             <uri>/cspace-services/acquisitions/?sortBy=&amp;pgNum=0&amp;pgSz=10</uri>
             <response>
-                <expected level="TEXT" />
+                <expected level="TEXT"></expected>
                 <label>acquisitions_common</label>
                 <filename>acquisitions/res/ac3list.res.xml</filename>
-             </response>
+            </response>
         </test>
-        
+
     </testGroup>
-     
+
 
 </xmlReplay>
-        
-        

@@ -39,6 +39,7 @@ import org.collectionspace.services.imports.ImportsResource;
 import org.collectionspace.services.location.LocationAuthorityResource;
 import org.collectionspace.services.place.PlaceAuthorityResource;
 import org.collectionspace.services.work.WorkAuthorityResource;
+import org.collectionspace.services.material.MaterialAuthorityResource;
 import org.collectionspace.services.concept.ConceptAuthorityResource;
 import org.collectionspace.services.taxonomy.TaxonomyAuthorityResource;
 import org.collectionspace.services.movement.MovementResource;
@@ -48,6 +49,8 @@ import org.collectionspace.services.report.ReportResource;
 import org.collectionspace.services.acquisition.AcquisitionResource;
 import org.collectionspace.services.dimension.DimensionResource;
 import org.collectionspace.services.servicegroup.ServiceGroupResource;
+import org.collectionspace.services.structureddate.StructuredDateResource;
+import org.collectionspace.services.systeminfo.SystemInfoResource;
 import org.collectionspace.services.contact.ContactResource;
 import org.collectionspace.services.vocabulary.VocabularyResource;
 import org.collectionspace.services.organization.OrgAuthorityResource;
@@ -57,6 +60,7 @@ import org.collectionspace.services.claim.ClaimResource;
 import org.collectionspace.services.exhibition.ExhibitionResource;
 import org.collectionspace.services.conditioncheck.ConditioncheckResource;
 import org.collectionspace.services.conservation.ConservationResource;
+import org.collectionspace.services.authorization.PermissionResource;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Application;
@@ -64,10 +68,11 @@ import javax.ws.rs.core.Application;
 import java.util.HashSet;
 import java.util.Set;
 
+
+
 //import org.collectionspace.services.common.FileUtils;
-import org.collectionspace.services.authorization.PermissionResource;
 import org.collectionspace.services.authorization.RoleResource;
-import org.collectionspace.services.common.ResourceBase;	  	
+import org.collectionspace.services.common.NuxeoBasedResource;	  	
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ResourceMapHolder;
 import org.collectionspace.services.common.ResourceMapImpl;
@@ -103,6 +108,8 @@ public class CollectionSpaceJaxRsApplication extends Application
         singletons.add(new PermissionResource());
         singletons.add(new ServiceGroupResource());
         singletons.add(new ImportsResource());
+        singletons.add(new StructuredDateResource());
+        singletons.add(new SystemInfoResource());
 
         addResourceToMapAndSingletons(new VocabularyResource());
         addResourceToMapAndSingletons(new PersonAuthorityResource());
@@ -113,6 +120,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new TaxonomyAuthorityResource());
         addResourceToMapAndSingletons(new PlaceAuthorityResource());
         addResourceToMapAndSingletons(new WorkAuthorityResource());
+        addResourceToMapAndSingletons(new MaterialAuthorityResource());
         addResourceToMapAndSingletons(new AcquisitionResource());
         addResourceToMapAndSingletons(new ContactResource());
         addResourceToMapAndSingletons(new CollectionObjectResource());
@@ -122,6 +130,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new RelationResource());
         addResourceToMapAndSingletons(new LoaninResource());
         addResourceToMapAndSingletons(new LoanoutResource());
+        addResourceToMapAndSingletons(new ExhibitionResource());
         addResourceToMapAndSingletons(new ConditioncheckResource());
         addResourceToMapAndSingletons(new ConservationResource());
         addResourceToMapAndSingletons(new ValuationcontrolResource());
@@ -133,7 +142,6 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new PropagationResource());
         addResourceToMapAndSingletons(new PottagResource());
         addResourceToMapAndSingletons(new ClaimResource());
-        addResourceToMapAndSingletons(new ExhibitionResource());
         addResourceToMapAndSingletons(new ReportResource());
         addResourceToMapAndSingletons(new PublicItemResource());
 
@@ -146,7 +154,7 @@ public class CollectionSpaceJaxRsApplication extends Application
 //        singletons.add(new PingResource());
     }
     
-    private void addResourceToMapAndSingletons(ResourceBase resource) {
+    private void addResourceToMapAndSingletons(NuxeoBasedResource resource) {
         singletons.add(resource);
         resourceMap.put(resource.getServiceName(), resource);
     }

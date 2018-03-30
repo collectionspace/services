@@ -4,7 +4,7 @@
 			 testGroup ID="person" is not live.  It works, but may not clean up correctly. 
 			 For now, use ID="updatePerson"
 	-->
-	<testGroup ID="AuthRefs" autoDeletePOSTS="true">
+    <testGroup ID="AuthRefs" autoDeletePOSTS="true" authForCleanup="admin@core.collectionspace.org">
 		<test ID="PersonAuth1" auth="admin@core.collectionspace.org">
 			<method>POST</method>
 			<uri>/cspace-services/personauthorities/</uri>
@@ -31,7 +31,7 @@
 			<uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person2.CSID}</uri>
 		</test>
 
-		<test ID="loanout1" auth="test">
+		<test ID="loanout1">
 			<method>POST</method>
 			<uri>/cspace-services/loansout/</uri>
 			<filename>authrefs/loanout.xml</filename>
@@ -41,7 +41,7 @@
 			</vars>
 		</test>
 
-		<test ID="loanout2" auth="test">
+		<test ID="loanout2">
 			<method>POST</method>
 			<uri>/cspace-services/loansout/</uri>
 			<filename>authrefs/loanout.xml</filename>
@@ -51,7 +51,7 @@
 			</vars>
 		</test>
 
-		<test ID="loanout3" auth="test">
+		<test ID="loanout3">
 			<method>POST</method>
 			<uri>/cspace-services/loansout/</uri>
 			<filename>authrefs/loanout.xml</filename>
@@ -61,7 +61,7 @@
 			</vars>
 		</test>
 
-		<test ID="loanout4" auth="test">
+		<test ID="loanout4">
 			<method>POST</method>
 			<uri>/cspace-services/loansout/</uri>
 			<filename>authrefs/loanout.xml</filename>
@@ -71,7 +71,7 @@
 			</vars>
 		</test>
 
-		<test ID="loanout5" auth="test">
+		<test ID="loanout5">
 			<method>POST</method>
 			<uri>/cspace-services/loansout/</uri>
 			<filename>authrefs/loanout.xml</filename>
@@ -81,7 +81,7 @@
 			</vars>
 		</test>
 
-		<test ID="loanout6" auth="test">
+		<test ID="loanout6">
 			<method>POST</method>
 			<uri>/cspace-services/loansout/</uri>
 			<filename>authrefs/loanout.xml</filename>
@@ -91,7 +91,7 @@
 			</vars>
 		</test>
 
-		<test ID="loanout7" auth="test">
+		<test ID="loanout7">
 			<method>POST</method>
 			<uri>/cspace-services/loansout/</uri>
 			<filename>authrefs/loanout.xml</filename>
@@ -101,7 +101,7 @@
 			</vars>
 		</test>
 
-		<test ID="loanout8" auth="test">
+		<test ID="loanout8">
 			<method>POST</method>
 			<uri>/cspace-services/loansout/</uri>
 			<filename>authrefs/loanout.xml</filename>
@@ -111,7 +111,7 @@
 			</vars>
 		</test>
 
-		<test ID="loanout9" auth="test">
+		<test ID="loanout9">
 			<method>POST</method>
 			<uri>/cspace-services/loansout/</uri>
 			<filename>authrefs/loanout.xml</filename>
@@ -121,7 +121,7 @@
 			</vars>
 		</test>
 
-		<test ID="loanout10" auth="test">
+		<test ID="loanout10">
 			<method>POST</method>
 			<uri>/cspace-services/loansout/</uri>
 			<filename>authrefs/loanout.xml</filename>

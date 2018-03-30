@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="objectexit">
+    <ns2:objectexit_common
+            xmlns:ns2="http://collectionspace.org/services/objectexit"
+            xmlns:ns3="http://collectionspace.org/services/jaxb">
+        <exitNumber>${exitNumber}</exitNumber>
+    </ns2:objectexit_common>
+    <ns2:objectexit_testsci
+        xmlns:ns2="http://collectionspace.org/services/objectexit"
+        xmlns:ns3="http://collectionspace.org/services/jaxb">
+        <testField>${itemRefName}</testField>
+    </ns2:objectexit_testsci>
+</document>

@@ -50,7 +50,7 @@ public class RelationsUtils {
      * @param object the object
      * @return the string
      */
-    public static String buildWhereClause(String subject, String subjectType,
+    private static String buildWhereClause(String subject, String subjectType,
     		String predicate,
     		String object, String objectType) {
     	String result = null;
@@ -101,5 +101,27 @@ public class RelationsUtils {
     	
     	return result;
     }
+    
+    public static String buildWhereClause(String subject, String subjectType,
+    		String predicate,
+    		String object, String objectType, boolean viceVersa) {
+    	String result = null;
+    	
+    	result = buildWhereClause(
+    			subject, subjectType,
+    			predicate,
+    			object, objectType);
+    	
+    	if (viceVersa == true) {
+    		String secondClause = buildWhereClause(
+    				object, objectType,
+    				predicate,
+        			subject, subjectType);
+    		result = String.format("(%s) OR (%s)", result, secondClause);
+    	}
+    	
+    	return result;
+    }
+    
 }
 

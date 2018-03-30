@@ -3,17 +3,17 @@ package org.collectionspace.services.listener.botgarden;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.movement.nuxeo.MovementBotGardenConstants;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
-import org.nuxeo.ecm.core.api.ClientException;
+import org.collectionspace.services.nuxeo.listener.AbstractCSEventListenerImpl;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.event.CoreEventConstants;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
-import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 
-public class UpdateLocationListener implements EventListener {
+public class UpdateLocationListener extends AbstractCSEventListenerImpl {
 	final Log logger = LogFactory.getLog(UpdateLocationListener.class);
 
 	/* 
@@ -25,10 +25,11 @@ public class UpdateLocationListener implements EventListener {
 	 * <li>Set the previousLocation field to the previous value of the currentLocation field</li>
 	 * </ui>
 	 */
-	public void handleEvent(Event event) throws ClientException {
+	@Override
+	public void handleEvent(Event event) {
 		EventContext ec = event.getContext();
 
-		if (ec instanceof DocumentEventContext) {
+		if (isRegistered(event) && ec instanceof DocumentEventContext) {
 			DocumentEventContext context = (DocumentEventContext) ec;
 			DocumentModel doc = context.getSourceDocument();
 
@@ -36,7 +37,8 @@ public class UpdateLocationListener implements EventListener {
 					!doc.isVersion() && 
 					!doc.isProxy() && 
 					!doc.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
-				String actionCode = (String) doc.getProperty(MovementConstants.ACTION_CODE_SCHEMA_NAME, MovementConstants.ACTION_CODE_FIELD_NAME);
+				String actionCode = (String) doc.getProperty(MovementBotGardenConstants.ACTION_CODE_SCHEMA_NAME, 
+						MovementBotGardenConstants.ACTION_CODE_FIELD_NAME);
 
 				logger.debug("actionCode=" + actionCode);
 
@@ -49,7 +51,7 @@ public class UpdateLocationListener implements EventListener {
 					 * event to fire, taking us into the other branch of this code, with the current document
 					 * becoming the previous document.
 					 */
-					if (actionCode != null && actionCode.equals(MovementConstants.DEAD_ACTION_CODE)) {
+					if (actionCode != null && actionCode.equals(MovementBotGardenConstants.DEAD_ACTION_CODE)) {
 						context.getCoreSession().saveDocument(doc);
 
 						/*
@@ -60,7 +62,7 @@ public class UpdateLocationListener implements EventListener {
 					}
 				}
 				else {	            	
-					if (actionCode != null && actionCode.equals(MovementConstants.DEAD_ACTION_CODE)) {
+					if (actionCode != null && actionCode.equals(MovementBotGardenConstants.DEAD_ACTION_CODE)) {
 						doc.setProperty(MovementConstants.CURRENT_LOCATION_SCHEMA_NAME, MovementConstants.CURRENT_LOCATION_FIELD_NAME, MovementConstants.NONE_LOCATION);
 					}
 

@@ -4,24 +4,24 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
-import org.nuxeo.ecm.core.api.ClientException;
+import org.collectionspace.services.nuxeo.listener.AbstractCSEventListenerImpl;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.VersioningOption;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
-import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 
-public class CreateVersionListener implements EventListener {
+public class CreateVersionListener extends AbstractCSEventListenerImpl {
 	public static final String SKIP_PROPERTY = "CreateVersionListener.SKIP";
 
 	final Log logger = LogFactory.getLog(CreateVersionListener.class);
 
-	public void handleEvent(Event event) throws ClientException {
+	@Override
+	public void handleEvent(Event event) {
 		EventContext ec = event.getContext();
 
-		if (ec instanceof DocumentEventContext) {
+		if (isRegistered(event) && ec instanceof DocumentEventContext) {
 			DocumentEventContext context = (DocumentEventContext) ec;
 
 			if (ec.hasProperty(SKIP_PROPERTY) && ((Boolean) ec.getProperty(SKIP_PROPERTY))) {

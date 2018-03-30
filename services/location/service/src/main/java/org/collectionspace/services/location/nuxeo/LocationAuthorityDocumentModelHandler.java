@@ -23,25 +23,19 @@
  */
 package org.collectionspace.services.location.nuxeo;
 
+import org.collectionspace.services.client.LocationAuthorityClient;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.location.LocationauthoritiesCommon;
 
 /**
  * LocationAuthorityDocumentModelHandler
  *
- * $LastChangedRevision: $
- * $LastChangedDate: $
  */
 public class LocationAuthorityDocumentModelHandler
         extends AuthorityDocumentModelHandler<LocationauthoritiesCommon> {
-
-    /**
-     * Common part schema label
-     */
-    private static final String COMMON_PART_LABEL = "locationauthorities_common";   
     
     public LocationAuthorityDocumentModelHandler() {
-    	super(COMMON_PART_LABEL);
+    	super(LocationAuthorityClient.SERVICE_COMMON_PART_NAME, LocationAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 	
     /**

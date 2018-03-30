@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:accounts_common xmlns:ns2="http://collectionspace.org/services/account" xmlns:ns3="http://collectionspace.org/services/hyperjaxb">
+    <screenName>${screenName}</screenName>
+    <email>${email}</email>
+    <phone>1234567890</phone>
+    <userId>${userId}</userId>
+    <!-- Password is bigbird2010 base 64 encoded -->
+    <password>${password}</password>
+    <tenants>
+        <tenant_id>1</tenant_id>
+    </tenants>
+</ns2:accounts_common>

@@ -1,0 +1,8 @@
+<document name="examples">
+    <ns:examples_common xmlns:ns="http://collectionspace.org/services/example">
+        <integer>123</integer>
+        <negInt>-8</negInt>
+        <float>3.14159</float>
+        <negFloat>-341.24</negFloat>
+    </ns:examples_common>
+</document>

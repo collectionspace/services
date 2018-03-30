@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns:className xmlns:ns="http://collectionspace.org/batch/"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://collectionspace.org/batch/ file:/C:/dev/src/cspace/services/services/batch/3rdparty/nuxeo-platform-cs-batch/src/main/resources/schemas/batch_common.xsd">className0</ns:className>

@@ -24,7 +24,7 @@
 package org.collectionspace.services.propagation;
 
 import org.collectionspace.services.client.PropagationClient;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ import javax.ws.rs.Produces;
 @Path(PropagationClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class PropagationResource extends ResourceBase {
+public class PropagationResource extends NuxeoBasedResource {
 
     final Logger logger = LoggerFactory.getLogger(PropagationResource.class);
 
@@ -44,7 +44,7 @@ public class PropagationResource extends ResourceBase {
     	final String lastChangeRevision = "$LastChangedRevision$";
     	return lastChangeRevision;
     }
-    
+
     @Override
     public String getServiceName() {
         return PropagationClient.SERVICE_NAME;

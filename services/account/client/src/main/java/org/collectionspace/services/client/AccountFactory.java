@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.UUID;
 import org.collectionspace.services.account.AccountTenant;
 import org.collectionspace.services.account.AccountsCommon;
+import org.collectionspace.services.authorization.AccountValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,4 +103,14 @@ public class AccountFactory {
 
     }
 
+   static public AccountValue createAccountValue(AccountsCommon accountsCommon) {
+   	AccountValue result = new AccountValue();
+   	
+   	result.setAccountId(accountsCommon.getCsid());
+   	result.setScreenName(accountsCommon.getScreenName());
+   	result.setUserId(accountsCommon.getUserId());
+
+   	return result;
+   }
+   
 }

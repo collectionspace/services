@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:role xmlns:ns2="http://collectionspace.org/services/authorization">
+    <roleName>BasicRoles-SimpleRole-2</roleName>
+    <description>Role for BasicRoles-simpleRole-2 create test.</description>
+    <permission>
+        <permissionId>1-vocabularies-RL</permissionId>
+    </permission>
+    <permission>
+        <permissionId>1-groups-RL</permissionId>
+    </permission>
+</ns2:role>

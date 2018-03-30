@@ -14,12 +14,15 @@ import org.collectionspace.services.client.CollectionSpaceClientUtils;
 import org.collectionspace.services.client.LoanoutClient;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectBotGardenConstants;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
+import org.collectionspace.services.loanout.nuxeo.LoanoutBotGardenConstants;
 import org.collectionspace.services.loanout.nuxeo.LoanoutConstants;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
+import org.collectionspace.services.place.nuxeo.PlaceBotGardenConstants;
 import org.collectionspace.services.place.nuxeo.PlaceConstants;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
@@ -32,6 +35,7 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 		setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_SINGLE));
 	}
 
+	@Override
 	public void run() {
 		setCompletionStatus(STATUS_MIN_PROGRESS);
 
@@ -76,7 +80,8 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 		InvocationResults results = new InvocationResults();
 
 		PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(collectionObjectCsid);
-		String collectionObjectWorkflowState = getFieldValue(collectionObjectPayload, CollectionObjectConstants.WORKFLOW_STATE_SCHEMA_NAME, CollectionObjectConstants.WORKFLOW_STATE_FIELD_NAME);
+		String collectionObjectWorkflowState = getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.WORKFLOW_STATE_SCHEMA_NAME, 
+				CollectionObjectBotGardenConstants.WORKFLOW_STATE_FIELD_NAME);
 		
 		if (collectionObjectWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
 			logger.debug("skipping deleted collectionobject: collectionObjectCsid=" + collectionObjectCsid);
@@ -101,7 +106,7 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 					
 			botGardenFields.put("fieldCollectionNote", getFieldCollectionNote(collectionObjectPayload));
 			botGardenFields.put("annotation", getAnnotation(collectionObjectPayload));
-			botGardenFields.put("labelRequested", LoanoutConstants.LABEL_REQUESTED_NO_VALUE);
+			botGardenFields.put("labelRequested", LoanoutBotGardenConstants.LABEL_REQUESTED_NO_VALUE);
 			
 			Map<String, String> naturalHistoryFields = new HashMap<String, String>();
 			naturalHistoryFields.put("numLent", "1");
@@ -129,14 +134,16 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 			placeNote = reverseFieldCollectionPlace;
 		}
 		else {
-			String taxonomicRange = this.getFieldValue(collectionObjectPayload, CollectionObjectConstants.TAXONOMIC_RANGE_SCHEMA_NAME, CollectionObjectConstants.TAXONOMIC_RANGE_FIELD_NAME);
+			String taxonomicRange = this.getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.TAXONOMIC_RANGE_SCHEMA_NAME,
+					CollectionObjectBotGardenConstants.TAXONOMIC_RANGE_FIELD_NAME);
 
 			if (StringUtils.isNotBlank(taxonomicRange)) {
 				placeNote = "Geographic range " + taxonomicRange;
 			}
 		}
 
-		String comment = this.getFieldValue(collectionObjectPayload, CollectionObjectConstants.COMMENT_SCHEMA_NAME, CollectionObjectConstants.COMMENT_FIELD_NAME);
+		String comment = this.getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.COMMENT_SCHEMA_NAME,
+				CollectionObjectBotGardenConstants.COMMENT_FIELD_NAME);
 		String collectionNote = "";		
 		
 		if (StringUtils.isNotBlank(placeNote) && StringUtils.isNotBlank(comment)) {
@@ -154,7 +161,8 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 	
 	private String getReverseFieldCollectionPlace(PoxPayloadOut collectionObjectPayload) throws URISyntaxException, DocumentException {
 		String reverseDisplayName = null;
-		String fieldCollectionPlaceRefName = getFieldValue(collectionObjectPayload, CollectionObjectConstants.FIELD_COLLECTION_PLACE_SCHEMA_NAME, CollectionObjectConstants.FIELD_COLLECTION_PLACE_FIELD_NAME);		
+		String fieldCollectionPlaceRefName = getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.FIELD_COLLECTION_PLACE_SCHEMA_NAME, 
+				CollectionObjectBotGardenConstants.FIELD_COLLECTION_PLACE_FIELD_NAME);		
 
 		if (StringUtils.isNotBlank(fieldCollectionPlaceRefName)) {			
 			PoxPayloadOut placePayload = null;
@@ -170,7 +178,7 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 				List<String> termTypes = getFieldValues(placePayload, PlaceConstants.TERM_TYPE_SCHEMA_NAME, PlaceConstants.TERM_TYPE_FIELD_NAME);
 				List<String> displayNames = getFieldValues(placePayload, PlaceConstants.DISPLAY_NAME_SCHEMA_NAME, PlaceConstants.DISPLAY_NAME_FIELD_NAME);
 				
-				int index = termTypes.indexOf(PlaceConstants.REVERSE_TERM_TYPE);
+				int index = termTypes.indexOf(PlaceBotGardenConstants.REVERSE_TERM_TYPE);
 				
 				if (index < 0) {
 					// There's no reverse term. Just use the primary.
@@ -194,16 +202,20 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 	
 	private String getAnnotation(PoxPayloadOut collectionObjectPayload) {
 		String annotation = "";
-		String determinationKind = getFieldValue(collectionObjectPayload, CollectionObjectConstants.DETERMINATION_KIND_SCHEMA_NAME, CollectionObjectConstants.DETERMINATION_KIND_FIELD_NAME);
+		String determinationKind = getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.DETERMINATION_KIND_SCHEMA_NAME, 
+				CollectionObjectBotGardenConstants.DETERMINATION_KIND_FIELD_NAME);
 
-		if (determinationKind.equals(CollectionObjectConstants.DETERMINATION_KIND_DETERMINATION_VALUE)) {
-			String determinationBy = getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectConstants.DETERMINATION_BY_SCHEMA_NAME, CollectionObjectConstants.DETERMINATION_BY_FIELD_NAME));
+		if (determinationKind.equals(CollectionObjectBotGardenConstants.DETERMINATION_KIND_DETERMINATION_VALUE)) {
+			String determinationBy = getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.DETERMINATION_BY_SCHEMA_NAME, 
+					CollectionObjectBotGardenConstants.DETERMINATION_BY_FIELD_NAME));
 			
 			if (StringUtils.isNotBlank(determinationBy)) {
 				annotation += "det. by " + determinationBy;
 
-				String determinationInstitution = getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectConstants.DETERMINATION_INSTITUTION_SCHEMA_NAME, CollectionObjectConstants.DETERMINATION_INSTITUTION_FIELD_NAME));
-				String determinationDate = getFieldValue(collectionObjectPayload, CollectionObjectConstants.DETERMINATION_DATE_SCHEMA_NAME, CollectionObjectConstants.DETERMINATION_DATE_FIELD_NAME);
+				String determinationInstitution = getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.DETERMINATION_INSTITUTION_SCHEMA_NAME, 
+						CollectionObjectBotGardenConstants.DETERMINATION_INSTITUTION_FIELD_NAME));
+				String determinationDate = getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.DETERMINATION_DATE_SCHEMA_NAME, 
+						CollectionObjectBotGardenConstants.DETERMINATION_DATE_FIELD_NAME);
 
 				if (StringUtils.isNotBlank(determinationInstitution)) {
 					annotation += ", " + determinationInstitution;
@@ -262,7 +274,7 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 				"</ns2:loansout_naturalhistory>" +
 			"</document>";
 
-		ResourceBase resource = getResourceMap().get(LoanoutClient.SERVICE_NAME);
+		NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(LoanoutClient.SERVICE_NAME);
 		Response response = resource.create(getResourceMap(), null, createVoucherPayload);
 
 		if (response.getStatus() == CREATED_STATUS) {

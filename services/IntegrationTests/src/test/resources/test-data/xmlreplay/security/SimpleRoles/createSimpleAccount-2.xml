@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:accounts_common xmlns:ns2="http://collectionspace.org/services/account" xmlns:ns3="http://collectionspace.org/services/hyperjaxb">
+    <screenName>simpleAccount-2</screenName>
+    <personRefName>simpleAccount-2</personRefName>
+    <email>simpleAccount-2@security.simpleroles.org</email>
+    <phone>1234567890</phone>
+    <userId>simpleAccount-2</userId>
+    <!-- Pass word is elmo2010, base64 encoded -->
+    <password>ZWxtbzIwMTA=</password>
+    <tenants>
+        <tenant_id>1</tenant_id>
+    </tenants>
+    <roleList>
+        <role>
+            <roleId>9a1fed44-25b0-48f9-8356-d16ac7555cae</roleId>
+            <roleName>ROLE_1_TENANT_ADMINISTRATOR</roleName>
+        </role>
+        <role>
+            <roleId>${simpleRole_2.CSID}</roleId>
+        </role>
+    </roleList>
+</ns2:accounts_common>

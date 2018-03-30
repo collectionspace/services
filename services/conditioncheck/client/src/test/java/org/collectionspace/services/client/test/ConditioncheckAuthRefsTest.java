@@ -37,18 +37,13 @@ import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.conditioncheck.ConditionchecksCommon;
 import org.collectionspace.services.person.PersonTermGroup;
-
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +59,7 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
     // Instance variables specific to this test.
     final String SERVICE_NAME = "conditionchecks";
     final String SERVICE_PATH_COMPONENT = "conditionchecks";
-    final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
+    final String PERSON_AUTHORITY_NAME = "TestPersonAuthForConditionCheck";
     private String knownResourceId = null;
     private List<String> conditioncheckIdsCreated = new ArrayList<String>();
     private List<String> personIdsCreated = new ArrayList<String>();
@@ -81,13 +76,17 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
     protected CollectionSpaceClient getClientInstance() {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
-    
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+	}
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected AbstractCommonList getCommonList(
-            ClientResponse<AbstractCommonList> response) {
+    protected AbstractCommonList getCommonList(Response response) {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
@@ -113,7 +112,7 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
         PoxPayloadOut multipart = createConditioncheckInstance(
                 "conditionCheckRefNumber-" + identifier,
                 conditionCheckerRefName);
-        ClientResponse<Response> response = conditioncheckClient.create(multipart);
+        Response response = conditioncheckClient.create(multipart);
         int statusCode = response.getStatus();
         try {
             // Check the status code of the response: does it match
@@ -142,27 +141,28 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
             // so they can be deleted after tests have been run.
             conditioncheckIdsCreated.add(extractId(response));
         } finally {
-            response.releaseConnection();
+            response.close();
         }
     }
     
-    protected void createPersonRefs(){
-
+    protected void createPersonRefs() throws Exception{
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding
         // refName by which it can be identified.
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
             PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
-        ClientResponse<Response> res = personAuthClient.create(multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-        personAuthCSID = extractId(res);
+        Response res = personAuthClient.create(multipart);
+        try {
+        	int statusCode = res.getStatus();
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	            invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        personAuthCSID = extractId(res);
+        } finally {
+        	res.close();
+        }
 
         String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
-        
         // Create temporary Person resources, and their corresponding refNames
         // by which they can be identified.
         String csid = createPerson("Carrie", "ConditionChecker1", "carrieConditionChecker", authRefName);
@@ -170,7 +170,9 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
         conditionCheckerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
     }
     
-    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
+    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) throws Exception {
+    	String result = null;
+    	
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
@@ -182,16 +184,21 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
         term.setTermDisplayName(termName);
         term.setTermName(termName);
         personTerms.add(term);
-        PoxPayloadOut multipart =
-            PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
+        PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
                     authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
-        ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
-        int statusCode = res.getStatus();
+      
+        Response res = personAuthClient.createItem(personAuthCSID, multipart);
+        try {
+	        int statusCode = res.getStatus();
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        result = extractId(res);
+        } finally {
+        	res.close();
+        }
 
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-        return extractId(res);
+        return result;
     }
 
     // Success outcomes
@@ -203,12 +210,12 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
 
         // Submit the request to the service and store the response.
         ConditioncheckClient conditioncheckClient = new ConditioncheckClient();
-        ClientResponse<String> res = conditioncheckClient.read(knownResourceId);
+        Response res = conditioncheckClient.read(knownResourceId);
         ConditionchecksCommon conditioncheckCommon = null;
         try {
             assertStatusCode(res, testName);
             // Extract the common part from the response.
-            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
             conditioncheckCommon = (ConditionchecksCommon) extractPart(input,
                 conditioncheckClient.getCommonPartName(), ConditionchecksCommon.class);
             Assert.assertNotNull(conditioncheckCommon);
@@ -217,7 +224,7 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
             }
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         //
@@ -225,15 +232,15 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
         Assert.assertEquals(conditioncheckCommon.getConditionChecker(), conditionCheckerRefName);
         
         // Get the auth refs and check them
-        ClientResponse<AuthorityRefList> res2 = conditioncheckClient.getAuthorityRefs(knownResourceId);
+        Response res2 = conditioncheckClient.getAuthorityRefs(knownResourceId);
         AuthorityRefList list = null;
         try {
             assertStatusCode(res2, testName);
-            list = res2.getEntity();
+            list = res2.readEntity(AuthorityRefList.class);
             Assert.assertNotNull(list);
         } finally {
             if (res2 != null) {
-                res2.releaseConnection();
+                res2.close();
             }
         }
         
@@ -279,9 +286,10 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
         if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
@@ -297,9 +305,7 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
         
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            ClientResponse<Response> response = 
-                personAuthClient.deleteItem(personAuthCSID, resourceId); // alternative to personAuthClient.deleteItem().releaseConnection();
-            response.releaseConnection();
+        	personAuthClient.deleteItem(personAuthCSID, resourceId).close();
         }
         
         // Delete PersonAuthority resource(s).
@@ -308,11 +314,9 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
             personAuthClient.delete(personAuthCSID);
             // Delete Condition Checks resource(s).
             ConditioncheckClient conditioncheckClient = new ConditioncheckClient();
-            ClientResponse<Response> response = null;
             for (String resourceId : conditioncheckIdsCreated) {
                 // Note: Any non-success responses are ignored and not reported.
-                response = conditioncheckClient.delete(resourceId); // alternative to conditioncheckClient.delete(resourceId).releaseConnection();
-                response.releaseConnection();
+                conditioncheckClient.delete(resourceId).close(); 
             }
         }
     }
@@ -330,7 +334,7 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
     }
 
     private PoxPayloadOut createConditioncheckInstance(String conditionCheckRefNumber,
-            String conditionChecker) {
+            String conditionChecker) throws Exception {
         ConditionchecksCommon conditioncheckCommon = new ConditionchecksCommon();
 
         conditioncheckCommon.setConditionCheckRefNumber(conditionCheckRefNumber);

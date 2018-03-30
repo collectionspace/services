@@ -32,7 +32,14 @@ public class DocumentWrapperImpl<T> implements DocumentWrapper<T>{
         this.wrappedObject = obj;
     }
 
-    public T getWrappedObject() {
+    @Override
+	public T getWrappedObject() {
         return wrappedObject;
     }
+
+	@Override
+	public T resetWrapperObject(T newObject) {
+		wrappedObject = newObject;
+		return wrappedObject;
+	}
 }

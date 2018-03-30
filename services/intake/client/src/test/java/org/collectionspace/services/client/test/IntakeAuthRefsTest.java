@@ -44,16 +44,9 @@ import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.InsurerList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.person.PersonTermGroup;
-
-import org.jboss.resteasy.client.ClientResponse;
-
-//import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,9 +74,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     private String conditionCheckerOrAssessorRefName = null;
     private String insurerRefName = null;
     private String valuerRefName = null;
-    private final int NUM_AUTH_REFS_EXPECTED = 5;
-    private final static String CURRENT_DATE_UTC =
-            GregorianCalendarDateTimeUtils.currentDateUTC();
+    private final static String CURRENT_DATE_UTC = GregorianCalendarDateTimeUtils.currentDateUTC();
 
 	@Override
 	protected String getServiceName() {
@@ -97,13 +88,17 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     protected CollectionSpaceClient getClientInstance() {
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+	}
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getCommonList(
-			ClientResponse<AbstractCommonList> response) {
+	protected AbstractCommonList getCommonList(Response response) {
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
@@ -131,27 +126,32 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
                 conditionCheckerOrAssessorRefName,
                 insurerRefName,
                 valuerRefName );
-        ClientResponse<Response> res = intakeClient.create(multipart);
 
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        // Specifically:
-        // Does it fall within the set of valid status codes?
-        // Does it exactly match the expected status code?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        String newId = null;
+        Response res = intakeClient.create(multipart);
+        try {
+	        int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        //
+	        // Specifically:
+	        // Does it fall within the set of valid status codes?
+	        // Does it exactly match the expected status code?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	        newId = extractId(res);
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         // Store the ID returned from the first resource created
         // for additional tests below.
         if (knownResourceId == null){
-            knownResourceId = extractId(res);
+            knownResourceId = newId;
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
@@ -159,23 +159,28 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         
         // Store the IDs from every resource created by tests,
         // so they can be deleted after tests have been run.
-        intakeIdsCreated.add(extractId(res));
+        intakeIdsCreated.add(newId);
     }
     
-    protected void createPersonRefs(){
+    protected void createPersonRefs() throws Exception {
+    	//
+    	// First, create a new person authority
+    	//
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     			PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
-        ClientResponse<Response> res = personAuthClient.create(multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-        personAuthCSID = extractId(res);
+        Response res = personAuthClient.create(multipart);
+        try {
+	        int statusCode = res.getStatus();
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        personAuthCSID = extractId(res);
+        } finally {
+        	res.close();
+        }
         
         String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
-        
         String csid = createPerson("Olivier", "Owner", "olivierOwner", authRefName);
         currentOwnerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         personIdsCreated.add(csid);
@@ -197,7 +202,9 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         personIdsCreated.add(csid);
     }
     
-    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
+    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) throws Exception {
+    	String result = null;
+    	
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
@@ -212,30 +219,34 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         PoxPayloadOut multipart = 
     		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
     				authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
-        ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-    	return extractId(res);
+        
+        Response res = personAuthClient.createItem(personAuthCSID, multipart);
+        try {
+        	int statusCode = res.getStatus();
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        result = extractId(res);
+        } finally {
+        	res.close();
+        }
+        
+    	return result;
     }
 
     // Success outcomes
-    @Test(dataProvider="testName",
-        dependsOnMethods = {"createWithAuthRefs"})
+    @Test(dataProvider="testName", dependsOnMethods = {"createWithAuthRefs"})
     public void readAndCheckAuthRefs(String testName) throws Exception {
         // Perform setup.
         testSetup(STATUS_OK, ServiceRequestType.READ);
 
         // Submit the request to the service and store the response.
         IntakeClient intakeClient = new IntakeClient();
-        ClientResponse<String> res = intakeClient.read(knownResourceId);
+        Response res = intakeClient.read(knownResourceId);
         try {
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	        IntakesCommon intake = (IntakesCommon) extractPart(input,
-	        		intakeClient.getCommonPartName(), IntakesCommon.class);
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
+	        IntakesCommon intake = (IntakesCommon) extractPart(input, intakeClient.getCommonPartName(), IntakesCommon.class);
 	        Assert.assertNotNull(intake);
 	        // Check a couple of fields
 	        Assert.assertEquals(intake.getCurrentOwner(), currentOwnerRefName);
@@ -243,48 +254,46 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 	        Assert.assertEquals(intake.getInsurers().getInsurer().get(0), insurerRefName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
         // Get the auth refs and check them
-        ClientResponse<AuthorityRefList> res2 = intakeClient.getAuthorityRefs(knownResourceId);
+        res = intakeClient.getAuthorityRefs(knownResourceId);
         AuthorityRefList list = null;
         try {
-	        assertStatusCode(res2, testName);
-	        list = res2.getEntity();
+	        assertStatusCode(res, testName);
+	        list = res.readEntity(AuthorityRefList.class);
         } finally {
-        	if (res2 != null) {
-        		res2.releaseConnection();
+        	if (res != null) {
+        		res.close();
             }
         }
         
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
         int numAuthRefsFound = items.size();
-        if(logger.isDebugEnabled()){
-            logger.debug("Expected " + NUM_AUTH_REFS_EXPECTED +
-                " authority references, found " + numAuthRefsFound);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Expected " + personIdsCreated.size() + " authority references, found " + numAuthRefsFound);
         }
-        Assert.assertEquals(numAuthRefsFound, NUM_AUTH_REFS_EXPECTED,
-            "Did not find all expected authority references! " +
-            "Expected " + NUM_AUTH_REFS_EXPECTED + ", found " + numAuthRefsFound);
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
-        if(iterateThroughList && logger.isDebugEnabled()){
+        if (iterateThroughList && logger.isDebugEnabled()) {
             int i = 0;
             for(AuthorityRefList.AuthorityRefItem item : items){
                 logger.debug(testName + ": list-item[" + i + "] Field:" +
                 		item.getSourceField() + "= " +
                         item.getAuthDisplayName() +
                         item.getItemDisplayName());
-                logger.debug(testName + ": list-item[" + i + "] refName=" +
-                        item.getRefName());
-                logger.debug(testName + ": list-item[" + i + "] URI=" +
-                        item.getUri());
+                logger.debug(testName + ": list-item[" + i + "] refName=" + item.getRefName());
+                logger.debug(testName + ": list-item[" + i + "] URI=" + item.getUri());
                 i++;
             }
         }
+        //
+        // Ensure we got the correct number of authRefs
+        Assert.assertEquals(numAuthRefsFound, personIdsCreated.size(),
+        		"Did not find all expected authority references! " + "Expected " + personIdsCreated.size() + ", found " + numAuthRefsFound);
     }
 
 
@@ -299,11 +308,12 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
-    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+    	if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Skipping Cleanup phase ...");
             }
@@ -315,14 +325,15 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         IntakeClient intakeClient = new IntakeClient();
         // Note: Any non-success responses are ignored and not reported.
         for (String resourceId : intakeIdsCreated) {
-            intakeClient.delete(resourceId).releaseConnection();
+            intakeClient.delete(resourceId).close();
         }
+        //
+        // Delete all the person records then the parent resource
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-        // Delete persons before PersonAuth
         for (String resourceId : personIdsCreated) {
-            personAuthClient.deleteItem(personAuthCSID, resourceId).releaseConnection();
+            personAuthClient.deleteItem(personAuthCSID, resourceId).close();
         }
-        personAuthClient.delete(personAuthCSID).releaseConnection();
+        personAuthClient.delete(personAuthCSID).close();
     }
 
     // ---------------------------------------------------------------
@@ -339,7 +350,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 				String depositor,
 				String conditionCheckerAssessor,
 				String insurer,
-				String Valuer ) {
+				String Valuer ) throws Exception {
         IntakesCommon intake = new IntakesCommon();
         intake.setEntryNumber(entryNumber);
         intake.setEntryDate(entryDate);

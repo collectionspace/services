@@ -12,19 +12,20 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.batch.nuxeo.UpdateAccessCodeBatchJob;
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectBotGardenConstants;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
+import org.collectionspace.services.nuxeo.listener.AbstractCSEventListenerImpl;
+import org.collectionspace.services.taxonomy.nuxeo.TaxonBotGardenConstants;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonConstants;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.event.CoreEventConstants;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
-import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 
 /**
@@ -35,7 +36,7 @@ import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
  * @author ray
  *
  */
-public class UpdateAccessCodeListener implements EventListener {
+public class UpdateAccessCodeListener extends AbstractCSEventListenerImpl {
 	final Log logger = LogFactory.getLog(UpdateAccessCodeListener.class);
 
 	public static final String PREVIOUS_DEAD_FLAG_PROPERTY_NAME = "UpdateAccessCodeListener.previousDeadFlag";
@@ -43,14 +44,15 @@ public class UpdateAccessCodeListener implements EventListener {
 	public static final String PREVIOUS_ACCESS_CODE_PROPERTY_NAME = "UpdateAccessCodeListener.previousAccessCode";
 	public static final String DELETED_RELATION_PARENT_CSID_PROPERTY_NAME = "UpdateAccessCodeListener.deletedRelationParentCsid";
 	
-	private static final String[] TAXON_PATH_ELEMENTS = CollectionObjectConstants.TAXON_FIELD_NAME.split("/");
+	private static final String[] TAXON_PATH_ELEMENTS = CollectionObjectBotGardenConstants.TAXON_FIELD_NAME.split("/");
 	private static final String TAXONOMIC_IDENT_GROUP_LIST_FIELD_NAME = TAXON_PATH_ELEMENTS[0];
 	private static final String TAXON_FIELD_NAME = TAXON_PATH_ELEMENTS[2];
 
-	public void handleEvent(Event event) throws ClientException {
+	@Override
+	public void handleEvent(Event event) {
 		EventContext ec = event.getContext();
 		
-		if (ec instanceof DocumentEventContext) {
+		if (isRegistered(event) && ec instanceof DocumentEventContext) {
 			DocumentEventContext context = (DocumentEventContext) ec;
 			DocumentModel doc = context.getSourceDocument();
 
@@ -66,7 +68,8 @@ public class UpdateAccessCodeListener implements EventListener {
 					
 					DocumentModel previousDoc = (DocumentModel) context.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
 
-					String previousDeadFlag = (String) previousDoc.getProperty(CollectionObjectConstants.DEAD_FLAG_SCHEMA_NAME, CollectionObjectConstants.DEAD_FLAG_FIELD_NAME);
+					String previousDeadFlag = (String) previousDoc.getProperty(CollectionObjectBotGardenConstants.DEAD_FLAG_SCHEMA_NAME, 
+							CollectionObjectBotGardenConstants.DEAD_FLAG_FIELD_NAME);
 					context.setProperty(PREVIOUS_DEAD_FLAG_PROPERTY_NAME, previousDeadFlag);
 					
 					List<String> previousTaxonNames = getTaxonNames(previousDoc);
@@ -83,7 +86,8 @@ public class UpdateAccessCodeListener implements EventListener {
 						// update the access codes of referenced taxon records.
 
 						String previousDeadFlag = (String) context.getProperty(PREVIOUS_DEAD_FLAG_PROPERTY_NAME);
-						String currentDeadFlag = (String) doc.getProperty(CollectionObjectConstants.DEAD_FLAG_SCHEMA_NAME, CollectionObjectConstants.DEAD_FLAG_FIELD_NAME);
+						String currentDeadFlag = (String) doc.getProperty(CollectionObjectBotGardenConstants.DEAD_FLAG_SCHEMA_NAME, 
+								CollectionObjectBotGardenConstants.DEAD_FLAG_FIELD_NAME);
 
 						if (previousDeadFlag == null) {
 							previousDeadFlag = "";
@@ -181,7 +185,7 @@ public class UpdateAccessCodeListener implements EventListener {
 					// Stash the previous access code value, so it can be retrieved in the documentModified handler.
 
 					DocumentModel previousDoc = (DocumentModel) context.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
-					String previousAccessCode = (String) previousDoc.getProperty(TaxonConstants.ACCESS_CODE_SCHEMA_NAME, TaxonConstants.ACCESS_CODE_FIELD_NAME);
+					String previousAccessCode = (String) previousDoc.getProperty(TaxonBotGardenConstants.ACCESS_CODE_SCHEMA_NAME, TaxonBotGardenConstants.ACCESS_CODE_FIELD_NAME);
 
 					context.setProperty(PREVIOUS_ACCESS_CODE_PROPERTY_NAME, previousAccessCode);
 				}
@@ -194,7 +198,7 @@ public class UpdateAccessCodeListener implements EventListener {
 						// record if it has.
 
 						String previousAccessCode = (String) context.getProperty(PREVIOUS_ACCESS_CODE_PROPERTY_NAME);
-						String currentAccessCode = (String) doc.getProperty(TaxonConstants.ACCESS_CODE_SCHEMA_NAME, TaxonConstants.ACCESS_CODE_FIELD_NAME);
+						String currentAccessCode = (String) doc.getProperty(TaxonBotGardenConstants.ACCESS_CODE_SCHEMA_NAME, TaxonBotGardenConstants.ACCESS_CODE_FIELD_NAME);
 
 						if (previousAccessCode == null) {
 							previousAccessCode = "";
@@ -295,8 +299,9 @@ public class UpdateAccessCodeListener implements EventListener {
 		}
 	}
 	
-	private List<String> getTaxonNames(DocumentModel doc) throws ClientException {
-		List<Map<String, Object>> taxonomicIdentGroupList = (List<Map<String, Object>>) doc.getProperty(CollectionObjectConstants.TAXON_SCHEMA_NAME, TAXONOMIC_IDENT_GROUP_LIST_FIELD_NAME);
+	private List<String> getTaxonNames(DocumentModel doc) {
+		List<Map<String, Object>> taxonomicIdentGroupList = (List<Map<String, Object>>) doc.getProperty(CollectionObjectBotGardenConstants.TAXON_SCHEMA_NAME, 
+				TAXONOMIC_IDENT_GROUP_LIST_FIELD_NAME);
 		List<String> taxonNames = new ArrayList<String>();
 
 		for (Map<String, Object> taxonomicIdentGroup : taxonomicIdentGroupList) {

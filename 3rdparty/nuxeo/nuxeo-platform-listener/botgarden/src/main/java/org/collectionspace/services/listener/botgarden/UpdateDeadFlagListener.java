@@ -8,26 +8,27 @@ import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConst
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
+import org.collectionspace.services.movement.nuxeo.MovementBotGardenConstants;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
+import org.collectionspace.services.nuxeo.listener.AbstractCSEventListenerImpl;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
-import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 
-public class UpdateDeadFlagListener implements EventListener {
+public class UpdateDeadFlagListener extends AbstractCSEventListenerImpl {
 	final Log logger = LogFactory.getLog(UpdateDeadFlagListener.class);
 
 	/* 
 	 * Set the dead flag and dead date on collectionobjects related to a new or modified movement record.
 	 */
-	public void handleEvent(Event event) throws ClientException {
+	@Override
+	public void handleEvent(Event event) {
 		EventContext ec = event.getContext();
 
-		if (ec instanceof DocumentEventContext) {
+		if (isRegistered(event) && ec instanceof DocumentEventContext) {
 			DocumentEventContext context = (DocumentEventContext) ec;
 			DocumentModel doc = context.getSourceDocument();
 
@@ -72,11 +73,11 @@ public class UpdateDeadFlagListener implements EventListener {
 						!doc.isVersion() && 
 						!doc.isProxy() && 
 						!doc.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
-					String actionCode = (String) doc.getProperty(MovementConstants.ACTION_CODE_SCHEMA_NAME, MovementConstants.ACTION_CODE_FIELD_NAME);           	
+					String actionCode = (String) doc.getProperty(MovementBotGardenConstants.ACTION_CODE_SCHEMA_NAME, MovementBotGardenConstants.ACTION_CODE_FIELD_NAME);           	
 
 					logger.debug("actionCode=" + actionCode);
 
-					if (actionCode != null && (actionCode.equals(MovementConstants.DEAD_ACTION_CODE) || actionCode.equals(MovementConstants.REVIVED_ACTION_CODE))) {
+					if (actionCode != null && (actionCode.equals(MovementBotGardenConstants.DEAD_ACTION_CODE) || actionCode.equals(MovementBotGardenConstants.REVIVED_ACTION_CODE))) {
 						String movementCsid = doc.getName();
 
 						try {

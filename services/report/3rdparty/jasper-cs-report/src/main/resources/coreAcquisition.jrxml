@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="object" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="NoDataSection" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="08c07c03-a97f-496c-ba55-729ff2d71763">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Title" fontName="SansSerif" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="SubTitle" forecolor="#666666" fontName="SansSerif" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="SansSerif" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="SansSerif" fontSize="12"/>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[15]]></defaultValueExpression>
+	</parameter>
+	<parameter name="csid" class="java.lang.String">
+		<defaultValueExpression><![CDATA["7449dce7-68c4-4561-ba00"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+ac.acquisitionreferencenumber acquisitionNumber,
+h1.name AS "csid",
+co.objectnumber AS "objectnumber",
+ong.objectName AS "objectname",
+dg.datedisplaydate AS "acquisitiondate",
+case when (bd.item is not null and bd.item <> '') then
+ regexp_replace(bd.item, '^.*\)''(.*)''$', '\1')
+ when co.objectnumber is null then 'No objects are related to this Acquisition.'
+ else ''
+end AS description,
+case when (oppp.objectproductionpeople is not null and oppp.objectproductionpeople <> '') then
+ regexp_replace(oppp.objectproductionpeople, '^.*\)''(.*)''$', '\1')
+ else ''
+end as productionpeople,
+case when (oppr.objectproductionperson is not null and oppr.objectproductionperson <> '') then
+ regexp_replace(oppr.objectproductionperson, '^.*\)''(.*)''$', '\1')
+ else ''
+end as productionperson,
+case when (opog.objectproductionorganization is not null and opog.objectproductionorganization <> '') then
+ regexp_replace(opog.objectproductionorganization, '^.*\)''(.*)''$', '\1')
+ else ''
+end as productionorg,
+case when (aca.item is not null and aca.item <> '') then
+ regexp_replace(aca.item, '^.*\)''(.*)''$', '\1')
+ else ''
+end as donor
+FROM hierarchy h1
+JOIN acquisitions_common ac ON (ac.id=h1.id)
+LEFT OUTER JOIN relations_common rc1 ON (h1.name=rc1.subjectcsid)
+LEFT OUTER JOIN hierarchy h2 ON (rc1.objectcsid=h2.name)
+left outer JOIN collectionobjects_common co ON (h2.id=co.id)
+LEFT OUTER JOIN hierarchy h3 ON (co.id = h3.parentid AND h3.primarytype='objectNameGroup' AND h3.pos=0)
+LEFT OUTER JOIN objectnamegroup ong ON (ong.id=h3.id)
+LEFT OUTER JOIN collectionobjects_common_briefdescriptions bd ON (bd.id=co.id and bd.pos=0)
+left outer join hierarchy h4 on (co.id=h4.parentid and h4.pos=0 and h4.name='collectionobjects_common:objectProductionPeopleGroupList')
+left outer join objectproductionpeoplegroup oppp on (oppp.id=h4.id)
+left outer join hierarchy h5 on (co.id=h5.parentid and h5.pos=0 and h5.name='collectionobjects_common:objectProductionPersonGroupList')
+left outer join objectproductionpersongroup oppr on (oppr.id=h5.id)
+left outer join hierarchy h6 on (co.id=h6.parentid and h6.pos=0 and h6.name='collectionobjects_common:objectProductionOrganizationGroupList')
+left outer join objectproductionorganizationgroup opog on (opog.id=h6.id)
+left outer join hierarchy h7 on (ac.id=h7.parentid and h7.pos=0and h7.name='acquisitions_common:acquisitionDateGroupList')
+left outer join structureddategroup dg on (dg.id=h7.id)
+LEFT OUTER JOIN acquisitions_common_acquisitionsources aca ON (aca.id=ac.id and aca.pos=0)
+LEFT OUTER JOIN misc m ON (m.id = co.id)
+WHERE m.lifecyclestate != 'deleted'
+AND h1.name = $P{csid}
+ORDER BY objectnumber]]>
+	</queryString>
+	<field name="acquisitionnumber" class="java.lang.String"/>
+	<field name="csid" class="java.lang.String"/>
+	<field name="objectnumber" class="java.lang.String"/>
+	<field name="objectname" class="java.lang.String"/>
+	<field name="acquisitiondate" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="productionpeople" class="java.lang.String"/>
+	<field name="productionperson" class="java.lang.String"/>
+	<field name="productionorg" class="java.lang.String"/>
+	<field name="donor" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="110" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="84aa8fff-608d-4c31-a918-14b813036fd7" style="SubTitle" stretchType="RelativeToTallestObject" x="168" y="50" width="140" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement>
+					<font fontName="SansSerif" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{acquisitionnumber}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="69990504-b50a-48e9-88fc-19a1010bbae4" x="0" y="0" width="263" height="30"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Acquisitions]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d9182f79-7a9e-42d8-84d2-7154e34034fe" stretchType="RelativeToTallestObject" x="0" y="50" width="161" height="20"/>
+				<textElement>
+					<font size="14" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Acquisition number:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2687142f-de8b-4957-b105-5be3a8f5a2fb" stretchType="RelativeToTallestObject" x="0" y="70" width="161" height="20"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[Acquisition date:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement uuid="3da88d0c-9b92-47ee-a807-065f399c2ace" stretchType="RelativeToTallestObject" x="168" y="70" width="140" height="20"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{acquisitiondate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="da8a92a1-bf94-42ec-8f88-8ead64071ae0" stretchType="RelativeToTallestObject" x="0" y="90" width="161" height="20"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[Acquisition source:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="f5fd09dd-780e-42a9-9bc6-0c0e3af4949f" stretchType="RelativeToTallestObject" x="168" y="90" width="581" height="20"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{donor}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="22" splitType="Stretch">
+			<line>
+				<reportElement uuid="1ce943ae-cab4-4309-8e47-305d860c1690" positionType="FixRelativeToBottom" x="0" y="20" width="752" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="92a14667-488b-4088-a178-3b8c005e0932" style="Column header" stretchType="RelativeToTallestObject" x="1" y="2" width="85" height="15"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Identification #]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9865ca77-7ebc-4103-a359-9ed1e9902c36" style="Column header" stretchType="RelativeToTallestObject" x="88" y="2" width="105" height="15"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Object name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2bd24c32-4992-4087-9f7a-326cb0445e52" style="Column header" stretchType="RelativeToTallestObject" x="198" y="2" width="170" height="15"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Brief description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6a1a1a95-9170-4e2f-9d39-5fad0b499eea" style="Column header" stretchType="RelativeToTallestObject" x="513" y="2" width="135" height="15"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Production person]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="60d214ef-d17c-4ceb-86de-b9f7a0c5119e" style="Column header" stretchType="RelativeToTallestObject" x="653" y="2" width="98" height="15"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Production people]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="bd80f668-c43d-4f65-ab98-e3a612201ac9" x="0" y="0" width="752" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="347ab508-9fe0-4afc-9c8b-d7e1d9ee5ea6" style="Column header" stretchType="RelativeToTallestObject" x="373" y="2" width="135" height="15"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Production organization]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="18" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="7cabe161-1233-454c-a786-a51931ff9aa8" style="Detail" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="2" width="85" height="16"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="3919b36e-e625-4915-9fcc-3ac98171d69c" style="Detail" stretchType="RelativeToTallestObject" mode="Transparent" x="88" y="2" width="105" height="16"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{objectname}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="7fd7e2f0-7df3-4c7a-9ef8-4cbb0e79485a" style="Detail" stretchType="RelativeToTallestObject" mode="Transparent" x="513" y="2" width="135" height="16"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{productionperson}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="d1bfe218-b60c-4cd9-aae6-0ea2a9de1b60" style="Detail" stretchType="RelativeToTallestObject" mode="Transparent" x="198" y="2" width="170" height="16"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="cbb7bb13-38c5-4943-822b-851dc5c0e61e" style="Detail" stretchType="RelativeToTallestObject" mode="Transparent" x="653" y="2" width="81" height="16"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{productionpeople}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="cf2f15c9-6bac-462e-88d2-6e3fe1dd35cd" stretchType="RelativeToTallestObject" x="373" y="2" width="135" height="16"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{productionorg}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="14" splitType="Stretch">
+			<line>
+				<reportElement uuid="07724d84-7837-4f5a-9e36-3868854ca40e" positionType="FixRelativeToBottom" x="0" y="7" width="752" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="22" splitType="Stretch">
+			<textField>
+				<reportElement uuid="07372a6b-10f3-46f9-90af-00219d63d73b" style="Column header" x="316" y="3" width="80" height="18"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="d64e5229-e7ff-4bee-bbaa-36efd809998f" style="Column header" x="396" y="3" width="40" height="18"/>
+				<textElement>
+					<font fontName="SansSerif" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="3d1a9a39-7e7a-4ffb-b991-c5a468b58d92" style="Column header" x="0" y="3" width="197" height="18"/>
+				<textElement>
+					<font fontName="SansSerif" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<image onErrorType="Icon">
+				<reportElement uuid="92d4e522-3d77-4464-85f0-face1a366667" x="629" y="2" width="120" height="20"/>
+                                <imageExpression><![CDATA["https://pahma.cspace.berkeley.edu/collectionspace/ui/pahma/images/header-logo-cspace.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement uuid="508adf6d-5e27-489d-b869-f859f4ca2b02" x="550" y="1" width="70" height="17"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[powered by]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+	<noData>
+		<band height="50">
+			<staticText>
+				<reportElement uuid="f449dbd9-0782-4ffc-9296-1c09a978c94b" style="Column header" x="0" y="22" width="375" height="28"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[No related objects found for this Acquisition.]]></text>
+			</staticText>
+		</band>
+	</noData>
+</jasperReport>

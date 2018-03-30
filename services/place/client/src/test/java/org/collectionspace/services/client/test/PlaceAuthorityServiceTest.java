@@ -26,6 +26,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.ws.rs.core.Response;
+
 import org.collectionspace.services.PlaceJAXBSchema;
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.AuthorityClient;
@@ -40,7 +43,6 @@ import org.collectionspace.services.place.PlaceTermGroup;
 import org.collectionspace.services.place.PlaceTermGroupList;
 import org.collectionspace.services.place.PlaceauthoritiesCommon;
 import org.collectionspace.services.place.PlacesCommon;
-import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -57,9 +59,16 @@ import org.testng.annotations.Test;
 public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<PlaceauthoritiesCommon, PlacesCommon> {
 
     /** The logger. */
-    private final String CLASS_NAME = PlaceAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(PlaceAuthorityServiceTest.class);
 
+    /**
+     * Default constructor.  Used to set the short ID for all tests authority items
+     */
+    public PlaceAuthorityServiceTest() {
+    	super();
+        TEST_SHORTID = "sanjose";
+    }
+    
 	@Override
 	public String getServicePathComponent() {
 		return PlaceAuthorityClient.SERVICE_PATH_COMPONENT;
@@ -75,17 +84,9 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
     }	
     
     // Instance variables specific to this test.
-    
-//    /** The SERVICE path component. */
-//    final String SERVICE_PATH_COMPONENT = "placeauthorities";
-//    
-//    /** The ITEM service path component. */
-//    final String ITEM_SERVICE_PATH_COMPONENT = "items";
-//    
-    
+        
     final String TEST_DNAME = "San Jose, CA";
     final String TEST_NAME = "San Jose";
-    final String TEST_SHORTID = "sanjose";
     // TODO Make place type be a controlled vocab term.
     final String TEST_PLACE_TYPE = "City";
     // TODO Make status type be a controlled vocab term.
@@ -95,36 +96,40 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
     final String TEST_SOURCE_PAGE = "p.21";
     final String TEST_DISPLAY_DATE = "This year";
     final String TEST_EARLIEST_SINGLE_YEAR = "2012";
-    
-    /** The known resource id. */
-    private String knownResourceShortIdentifer = null;
-    private String knownResourceRefName = null;
-    
-    private String knownPlaceTypeRefName = null;
-    
+        
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new PlaceAuthorityClient();
     }
 
-    /**
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new PlaceAuthorityClient(clientPropertiesFilename);
+	}
+	
+	@Override
+	protected String createItemInAuthority(AuthorityClient client, String authorityId, String shortId) {
+		return createItemInAuthority(client, authorityId, shortId, null /*refname*/);
+	}
+
+	
+	/**
      * Creates the item in authority.
      *
      * @param vcsid the vcsid
      * @param authRefName the auth ref name
      * @return the string
      */
-    private String createItemInAuthority(String vcsid, String authRefName) {
+    private String createItemInAuthority(AuthorityClient client, String vcsid, String shortId, String authRefName) {
         final String testName = "createItemInAuthority("+vcsid+","+authRefName+")"; 
     
         // Submit the request to the service and store the response.
-        PlaceAuthorityClient client = new PlaceAuthorityClient();
         Map<String, String> sanjoseMap = new HashMap<String,String>();
         // TODO Make place type and status be controlled vocabs.
-        sanjoseMap.put(PlaceJAXBSchema.SHORT_IDENTIFIER, TEST_SHORTID);
+        sanjoseMap.put(PlaceJAXBSchema.SHORT_IDENTIFIER, shortId);
         sanjoseMap.put(PlaceJAXBSchema.PLACE_TYPE, TEST_PLACE_TYPE);
         sanjoseMap.put(PlaceJAXBSchema.NOTE, TEST_NOTE);
         
@@ -138,12 +143,12 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
         terms.add(term);
         
         String newID = PlaceAuthorityClientUtils.createItemInAuthority(vcsid,
-        		authRefName, sanjoseMap, terms, client );    
+        		authRefName, sanjoseMap, terms, (PlaceAuthorityClient) client);    
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
         if (knownItemResourceId == null){
-        	setKnownItemResource(newID, TEST_SHORTID);
+        	setKnownItemResource(newID, shortId);
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownItemResourceId=" + newID);
             }
@@ -170,17 +175,17 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
 
         // Submit the request to the service and store the response.
         PlaceAuthorityClient client = new PlaceAuthorityClient();
-        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
+        Response res = client.readItem(knownResourceId, knownItemResourceId);
         PlacesCommon place= null;
         try {
             assertStatusCode(res, testName);        
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        place = (PlacesCommon) extractPart(input,
 	                client.getItemCommonPartName(), PlacesCommon.class);
 	        Assert.assertNotNull(place);
 	    } finally {
                 if (res != null) {
-                res.releaseConnection();
+                res.close();
 	    }
         }
 
@@ -199,96 +204,16 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
         
         // Submit the updated resource to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(PlaceAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(client.getItemCommonPartName(), place);
         setupUpdateWithInvalidBody(); // we expected a failure here.
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
         try {
 	    	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
-
-    /**
-     * Read item list.
-     */
-    @Test(dataProvider = "testName", groups = {"readList"},
-               dependsOnMethods = {"readList"})
-    public void readItemList(String testName) {
-        readItemList(knownAuthorityWithItems, null);
-    }
-
-    /**
-     * Read item list by authority name.
-     */
-    @Test(dataProvider = "testName", groups = {"readList"},
-    		dependsOnMethods = {"readItemList"})
-    public void readItemListByAuthorityName(String testName) {
-        readItemList(null, READITEMS_SHORT_IDENTIFIER);
-    }
-    
-	/**
-	 * Read item list.
-	 * 
-	 * @param vcsid
-	 *            the vcsid
-	 * @param name
-	 *            the name
-	 */
-	private void readItemList(String vcsid, String shortId) {
-		String testName = "readItemList";
-
-		// Perform setup.
-		setupReadList();
-
-		// Submit the request to the service and store the response.
-		PlaceAuthorityClient client = new PlaceAuthorityClient();
-		ClientResponse<AbstractCommonList> res = null;
-		if (vcsid != null) {
-			res = client.readItemList(vcsid, null, null);
-		} else if (shortId != null) {
-			res = client.readItemListForNamedAuthority(shortId, null, null);
-		} else {
-			Assert.fail("readItemList passed null csid and name!");
-		}
-		
-		AbstractCommonList list = null;
-		try {
-			assertStatusCode(res, testName);
-			list = res.getEntity();
-		} finally {
-			if (res != null) {
-                res.releaseConnection();
-            }
-		}
-		
-		List<AbstractCommonList.ListItem> items = list.getListItem();
-		int nItemsReturned = items.size();
-		// There will be 'nItemsToCreateInList'
-		// items created by the createItemList test,
-		// all associated with the same parent resource.
-		int nExpectedItems = nItemsToCreateInList;
-		if (logger.isDebugEnabled()) {
-			logger.debug(testName + ": Expected " + nExpectedItems
-					+ " items; got: " + nItemsReturned);
-		}
-		Assert.assertEquals(nItemsReturned, nExpectedItems);
-
-		for (AbstractCommonList.ListItem item : items) {
-			String value = AbstractCommonListUtils.ListItemGetElementValue(
-					item, PlaceJAXBSchema.REF_NAME);
-			Assert.assertTrue((null != value), "Item refName is null!");
-			value = AbstractCommonListUtils.ListItemGetElementValue(item,
-					PlaceJAXBSchema.TERM_DISPLAY_NAME);
-			Assert.assertTrue((null != value), "Item termDisplayName is null!");
-		}
-		if (logger.isTraceEnabled()) {
-			AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger,
-					testName);
-		}
-	}
 
     @Override
     public void delete(String testName) throws Exception {
@@ -323,10 +248,11 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
 
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
     	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
@@ -348,13 +274,13 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
             parentResourceId = entry.getValue();
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            client.deleteItem(parentResourceId, itemResourceId).releaseConnection();
+            client.deleteItem(parentResourceId, itemResourceId).close();
         }
         // Clean up parent resources.
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-	    client.delete(resourceId).releaseConnection();
+	    client.delete(resourceId).close();
         }
     }
 
@@ -458,11 +384,6 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
 	//
 	
 	@Override
-	protected String createItemInAuthority(String authorityId) {
-		return createItemInAuthority(authorityId, null /*refname*/);
-	}
-
-	@Override
 	protected PlacesCommon updateItemInstance(PlacesCommon placesCommon) {
                             
             PlaceTermGroupList termList = placesCommon.getPlaceTermGroupList();
@@ -479,7 +400,8 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
 
 	@Override
 	protected void compareUpdatedItemInstances(PlacesCommon original,
-			PlacesCommon updated) throws Exception {
+			PlacesCommon updated,
+			boolean compareRevNumbers) throws Exception {
             
             PlaceTermGroupList originalTermList = original.getPlaceTermGroupList();
             Assert.assertNotNull(originalTermList);
@@ -496,6 +418,10 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
             Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(),
                 originalTerms.get(0).getTermDisplayName(),
                 "Value in updated record did not match submitted data.");
+            
+            if (compareRevNumbers == true) {
+            	Assert.assertEquals(original.getRev(), updated.getRev(), "Revision numbers should match.");
+            }
 	}
 
 	@Override
@@ -518,4 +444,5 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
     			nonexMap, PlaceAuthorityClientUtils.getTermGroupInstance(TEST_NAME), commonPartName);
 		return result;
 	}
+
 }

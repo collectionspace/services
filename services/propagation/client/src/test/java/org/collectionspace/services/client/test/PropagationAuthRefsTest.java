@@ -22,12 +22,12 @@
  */
 package org.collectionspace.services.client.test;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
@@ -45,8 +45,6 @@ import org.collectionspace.services.propagation.PropActivityGroup;
 import org.collectionspace.services.propagation.PropActivityGroupList;
 import org.collectionspace.services.propagation.PropagationsCommon;
 import org.collectionspace.services.person.PersonTermGroup;
-
-import org.jboss.resteasy.client.ClientResponse;
 
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -68,16 +66,13 @@ public class PropagationAuthRefsTest extends BaseServiceTest<AbstractCommonList>
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     
     // Instance variables specific to this test.
-    final String SERVICE_NAME = "propagations";
-    final String SERVICE_PATH_COMPONENT = "propagations";
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
     private String knownResourceId = null;
     private List<String> propagationIdsCreated = new ArrayList<String>();
     private List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
-    private final int NUM_AUTH_REFS_EXPECTED = 5;
-    private final static String CURRENT_DATE_UTC =
-            GregorianCalendarDateTimeUtils.currentDateUTC();
+	private String propagatedByRefName = null; // an authRef field
+    private final static String CURRENT_DATE_UTC = GregorianCalendarDateTimeUtils.currentDateUTC();
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -87,15 +82,6 @@ public class PropagationAuthRefsTest extends BaseServiceTest<AbstractCommonList>
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
     
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
-     */
-    @Override
-	protected AbstractCommonList getCommonList(
-			ClientResponse<AbstractCommonList> response) {
-    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
-    }
-
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
@@ -115,62 +101,67 @@ public class PropagationAuthRefsTest extends BaseServiceTest<AbstractCommonList>
         // One or more fields in this resource will be PersonAuthority
         // references, and will refer to Person resources by their refNames.
         PropagationClient propagationClient = new PropagationClient();
-        PoxPayloadOut multipart = createPropagationInstance(
+        PoxPayloadOut propagationInstance = createPropagationInstance(
                 "propagationNumber-" + identifier,
+                this.propagatedByRefName,
                 CURRENT_DATE_UTC);
-        ClientResponse<Response> response = propagationClient.create(multipart);
-        int statusCode = response.getStatus();
+        Response response = propagationClient.create(propagationInstance);
         try {
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        //
-	        // Specifically:
-	        // Does it fall within the set of valid status codes?
-	        // Does it exactly match the expected status code?
-	        if(logger.isDebugEnabled()){
+        	int statusCode = response.getStatus();
+	        if (logger.isDebugEnabled()) {
 	            logger.debug(testName + ": status = " + statusCode);
 	        }
-	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode), invalidStatusCodeMessage(testRequestType, statusCode));
 	        Assert.assertEquals(statusCode, testExpectedStatusCode);
 	
 	        // Store the ID returned from the first resource created
 	        // for additional tests below.
-	        if (knownResourceId == null){
+	        if (knownResourceId == null) {
 	            knownResourceId = extractId(response);
-	            if (logger.isDebugEnabled()) {
-	                logger.debug(testName + ": knownResourceId=" + knownResourceId);
-	            }
 	        }
 	        
 	        // Store the IDs from every resource created by tests,
 	        // so they can be deleted after tests have been run.
 	        propagationIdsCreated.add(extractId(response));
         } finally {
-        	response.releaseConnection();
+        	response.close();
         }
     }
     
-    protected void createPersonRefs(){
-
+    /**
+     * Create one or more Person records that will be used to create refNames (referenced terms) in our
+     * test propagation records.
+     * 
+     * @throws Exception
+     */
+    protected void createPersonRefs() throws Exception {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding
         // refName by which it can be identified.
     	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
-        ClientResponse<Response> res = personAuthClient.create(multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-        personAuthCSID = extractId(res);
-
-        String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
+        Response res = personAuthClient.create(multipart);
+        try {
+	        int statusCode = res.getStatus();
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	            invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        personAuthCSID = extractId(res);	
+        } finally {
+        	res.close();
+        }
         
+        // Create temporary Person resources, and their corresponding refNames
+        // by which they can be identified.
+        String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, personAuthClient);
+       	String csid = createPerson("Propye", "ThePropagator", "proppy", authRefName);
+        personIdsCreated.add(csid);
+        
+        // Safe the refName for later use -see createWithAuthRefs() method
+        this.propagatedByRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, personAuthClient);
     }
     
-    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
+    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) throws Exception {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
@@ -185,13 +176,18 @@ public class PropagationAuthRefsTest extends BaseServiceTest<AbstractCommonList>
     	PoxPayloadOut multipart =
     		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
     				authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
-        ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-    	return extractId(res);
+        
+    	Response res = personAuthClient.createItem(personAuthCSID, multipart);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	    	return extractId(res);
+        } finally {
+        	res.close();
+        }
     }
 
     // Success outcomes
@@ -201,44 +197,42 @@ public class PropagationAuthRefsTest extends BaseServiceTest<AbstractCommonList>
         // Perform setup.
         testSetup(STATUS_OK, ServiceRequestType.READ);
 
-        // Submit the request to the service and store the response.
         PropagationClient propagationClient = new PropagationClient();
-        ClientResponse<String> res = propagationClient.read(knownResourceId);
-        PropagationsCommon propagationCommon = null;
+        Response res = propagationClient.read(knownResourceId);
         try {
 	        assertStatusCode(res, testName);
 	        // Extract the common part from the response.
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	        propagationCommon = (PropagationsCommon) extractPart(input,
+	        PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(String.class));
+	        PropagationsCommon propagationCommon = (PropagationsCommon) extractPart(input,
 	            propagationClient.getCommonPartName(), PropagationsCommon.class);
 	        Assert.assertNotNull(propagationCommon);
-	        if(logger.isDebugEnabled()){
+	        if (logger.isDebugEnabled()){
 	            logger.debug(objectAsXmlString(propagationCommon, PropagationsCommon.class));
 	        }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
-        // Get the auth refs and check them
-        ClientResponse<AuthorityRefList> res2 = propagationClient.getAuthorityRefs(knownResourceId);
+        // Get the authority references
+        res = propagationClient.getAuthorityRefs(knownResourceId); // AuthorityRefList
         AuthorityRefList list = null;
         try {
-	        assertStatusCode(res2, testName);
-	        list = res2.getEntity();
+	        assertStatusCode(res, testName);
+	        list = (AuthorityRefList)res.readEntity(AuthorityRefList.class);
 	        Assert.assertNotNull(list);
         } finally {
-        	if (res2 != null) {
-        		res2.releaseConnection();
+        	if (res != null) {
+        		res.close();
             }
         }
         
+        int expectedAuthRefs = personIdsCreated.size();
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
         int numAuthRefsFound = items.size();
         if(logger.isDebugEnabled()){
-            logger.debug("Expected " + NUM_AUTH_REFS_EXPECTED +
-                " authority references, found " + numAuthRefsFound);
+            logger.debug("Expected " + expectedAuthRefs + " authority references, found " + numAuthRefsFound);
         }
 
         // Optionally output additional data about list members for debugging.
@@ -258,10 +252,8 @@ public class PropagationAuthRefsTest extends BaseServiceTest<AbstractCommonList>
             }
         }
 
-        Assert.assertEquals(numAuthRefsFound, NUM_AUTH_REFS_EXPECTED,
-            "Did not find all expected authority references! " +
-            "Expected " + NUM_AUTH_REFS_EXPECTED + ", found " + numAuthRefsFound);
-
+        Assert.assertEquals(numAuthRefsFound, expectedAuthRefs,
+            "Did not find all expected authority references! " + "Expected " + expectedAuthRefs + ", found " + numAuthRefsFound);
     }
 
 
@@ -276,11 +268,13 @@ public class PropagationAuthRefsTest extends BaseServiceTest<AbstractCommonList>
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
-    @AfterClass(alwaysRun=true)
-    public void cleanUp() {
+    @Override
+	@AfterClass(alwaysRun=true)
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
-    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+    	if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Skipping Cleanup phase ...");
             }
@@ -289,58 +283,58 @@ public class PropagationAuthRefsTest extends BaseServiceTest<AbstractCommonList>
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
+
+        //
+        // Delete all the propagation records we created
+    	PropagationClient propagationClient = new PropagationClient();
+        for (String resourceId : propagationIdsCreated) {
+            // Note: Any non-success responses are ignored and not reported.
+            propagationClient.delete(resourceId).close(); // alternative to propagationClient.delete(resourceId).releaseConnection();
+        }
+
+        //
+        // Delete Person resource(s) (before PersonAuthority resources). 
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-        // Delete Person resource(s) (before PersonAuthority resources).
-        
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-        	ClientResponse<Response> response = 
-        		personAuthClient.deleteItem(personAuthCSID, resourceId); // alternative to personAuthClient.deleteItem().releaseConnection();
-        	response.releaseConnection();
+        	personAuthClient.deleteItem(personAuthCSID, resourceId).close();
         }
-        
-        // Delete PersonAuthority resource(s).
-        // Note: Any non-success response is ignored and not reported.
         if (personAuthCSID != null) {
-        	personAuthClient.delete(personAuthCSID);
-	        // Delete Loans In resource(s).
-        	PropagationClient propagationClient = new PropagationClient();
-        	ClientResponse<Response> response = null;
-	        for (String resourceId : propagationIdsCreated) {
-	            // Note: Any non-success responses are ignored and not reported.
-	            response = propagationClient.delete(resourceId); // alternative to propagationClient.delete(resourceId).releaseConnection();
-	            response.releaseConnection();
-	        }
+        	personAuthClient.delete(personAuthCSID).close();
         }
     }
 
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-    public String getServiceName() {
-        return SERVICE_NAME;
+    @Override
+	public String getServiceName() {
+        return PropagationClient.SERVICE_NAME;
     }
 
     @Override
     public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
+        return PropagationClient.SERVICE_PATH_COMPONENT;
     }
 
     private PoxPayloadOut createPropagationInstance(String propagationNumber,
-    		String returnDate) {
+    		String propagatedBy,
+    		String returnDate) throws Exception {
     	PropagationsCommon propagationCommon = new PropagationsCommon();
     	propagationCommon.setPropNumber(propagationNumber);
+    	propagationCommon.setPropBy(propagatedBy);
     	propagationCommon.setPropNumber(returnDate);
+    	
     	PropActivityGroupList propActivityGroupList =  new PropActivityGroupList();
     	PropActivityGroup propActivityGroup = new PropActivityGroup();
+    	propActivityGroup.setOrder(BigInteger.valueOf(42));
     	propActivityGroupList.getPropActivityGroup().add(propActivityGroup);
     	propagationCommon.setPropActivityGroupList(propActivityGroupList);
 
     	PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
-    	PayloadOutputPart commonPart =
-    			multipart.addPart(new PropagationClient().getCommonPartName(), propagationCommon);
+    	PayloadOutputPart commonPart = multipart.addPart(new PropagationClient().getCommonPartName(), propagationCommon);
 
-    	if(logger.isDebugEnabled()){
+    	if (logger.isDebugEnabled()) {
     		logger.debug("to be created, propagation common");
     		logger.debug(objectAsXmlString(propagationCommon, PropagationsCommon.class));
     	}
@@ -352,4 +346,10 @@ public class PropagationAuthRefsTest extends BaseServiceTest<AbstractCommonList>
     protected Class<AbstractCommonList> getCommonListType() {
     	return AbstractCommonList.class;
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+	}
 }

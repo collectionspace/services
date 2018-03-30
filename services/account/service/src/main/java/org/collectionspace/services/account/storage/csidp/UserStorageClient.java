@@ -28,13 +28,17 @@
 package org.collectionspace.services.account.storage.csidp;
 
 import java.util.Date;
-import javax.persistence.EntityManager;
 import javax.persistence.Query;
+
 import org.collectionspace.services.authentication.User;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.JaxbUtils;
+import org.collectionspace.services.common.document.TransactionException;
 import org.collectionspace.services.common.security.SecurityUtils;
+import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,18 +71,35 @@ public class UserStorageClient {
      * @param em EntityManager
      * @param userId
      */
-    public User get(EntityManager em, String userId) throws DocumentNotFoundException {
-        User userFound = em.find(User.class, userId);
+    public User get(JPATransactionContext jpaTransactionContext, String userId) throws DocumentNotFoundException {
+        User userFound = (User) jpaTransactionContext.find(User.class, userId);
         if (userFound == null) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            String msg = "could not find user with userId=" + userId;
+            String msg = "Could not find user with userId=" + userId;
             logger.error(msg);
             throw new DocumentNotFoundException(msg);
         }
+        
         return userFound;
     }
+    
+    @SuppressWarnings("rawtypes")
+	public User get(ServiceContext ctx, String userId) throws DocumentNotFoundException, TransactionException {
+    	User userFound = null;
+    	
+    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();
+    	try {
+	        userFound = (User) jpaConnectionContext.find(User.class, userId);
+	        if (userFound == null) {
+	            String msg = "could not find user with userId=" + userId;
+	            logger.error(msg);
+	            throw new DocumentNotFoundException(msg);
+	        }
+    	} finally {
+    		ctx.closeConnection();
+    	}
+        
+        return userFound;
+    }    
 
     /**
      * updateUser for given userId
@@ -86,16 +107,16 @@ public class UserStorageClient {
      * @param userId
      * @param password
      */
-    public void update(EntityManager em, String userId, byte[] password)
+    public void update(JPATransactionContext jpaTransactionContext, String userId, byte[] password)
             throws DocumentNotFoundException, Exception {
-        User userFound = get(em, userId);
+        User userFound = get(jpaTransactionContext, userId);
         if (userFound != null) {
             userFound.setPasswd(getEncPassword(userId, password));
             userFound.setUpdatedAtItem(new Date());
             if (logger.isDebugEnabled()) {
                 logger.debug("updated user=" + JaxbUtils.toString(userFound, User.class));
             }
-            em.persist(userFound);
+            jpaTransactionContext.persist(userFound);
         }
     }
 
@@ -105,7 +126,7 @@ public class UserStorageClient {
      * @param userId
      * @throws Exception if user for given userId not found
      */
-    public void delete(EntityManager em, String userId)
+    public void delete(JPATransactionContext jpaTransactionContext, String userId)
             throws DocumentNotFoundException, Exception {
         //if userid gives any indication about the id provider, it should
         //be used to avoid the following approach
@@ -113,13 +134,10 @@ public class UserStorageClient {
         usrDelStr.append(User.class.getCanonicalName());
         usrDelStr.append(" WHERE username = :username");
         //TODO: add tenant id
-        Query usrDel = em.createQuery(usrDelStr.toString());
+        Query usrDel = jpaTransactionContext.createQuery(usrDelStr.toString());
         usrDel.setParameter("username", userId);
         int usrDelCount = usrDel.executeUpdate();
         if (usrDelCount != 1) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
             String msg = "could not find user with username=" + userId;
             logger.error(msg);
             throw new DocumentNotFoundException(msg);

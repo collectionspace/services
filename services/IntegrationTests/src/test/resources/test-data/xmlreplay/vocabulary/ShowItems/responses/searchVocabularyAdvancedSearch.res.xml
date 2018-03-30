@@ -1,0 +1,16 @@
+<ns2:abstract-common-list xmlns:ns2="http://collectionspace.org/services/jaxb">
+    <pageNum>0</pageNum>
+    <itemsInPage>${itemsInPage}</itemsInPage>
+    <totalItems>${totalItems}</totalItems>
+    <list-item>
+        <csid>${csid}</csid>
+        <uri>/vocabularies/${csid}</uri>
+        <refName>
+            urn:cspace:core.collectionspace.org:vocabularies:name(SearchItemsVocab)'SearchItems Vocabulary'
+        </refName>
+        <workflowState>project</workflowState>
+        <rev>0</rev>
+        <shortIdentifier>SearchItemsVocab</shortIdentifier>
+        <displayName>SearchItems Vocabulary</displayName>
+    </list-item>
+</ns2:abstract-common-list>

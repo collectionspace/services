@@ -3,6 +3,7 @@ package org.collectionspace.services.common.storage.jpa;
 import java.util.List;
 
 import org.collectionspace.services.common.api.RefName;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
@@ -34,7 +35,8 @@ public abstract class JpaDocumentHandler<T, TL, WT, WLT>
      * @return the tL
      * @throws Exception the exception
      */
-    public TL extractPagingInfo(TL theCommonList, DocumentWrapper<WLT> wrapDoc)
+    @Override
+	public TL extractPagingInfo(TL theCommonList, DocumentWrapper<WLT> wrapDoc)
             throws Exception {
         AbstractCommonList commonList = (AbstractCommonList) theCommonList;
 
@@ -48,12 +50,13 @@ public abstract class JpaDocumentHandler<T, TL, WT, WLT>
         // Set num of items in list. this is useful to our testing framework.
         commonList.setItemsInPage(docList.size());
         // set the total result size
-        commonList.setTotalItems(docList.size());
+        commonList.setTotalItems(docFilter.getTotalItemsResult());
 
         return (TL) commonList;
     }
     
-    public Lifecycle getLifecycle(String docTypeName) {
+    @Override
+	public Lifecycle getLifecycle(String docTypeName) {
     	Lifecycle result = new Lifecycle();
     	result.setName("Life cycles are not supported by the JPA-based services.");
     	return result; // NOTE: As of 3/2012, none of the JPA-based services support a life cycle type.
@@ -65,10 +68,13 @@ public abstract class JpaDocumentHandler<T, TL, WT, WLT>
     }
     
 	@Override
-	public void handleWorkflowTransition(
-			DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)
+	public void handleWorkflowTransition(ServiceContext ctx, DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)
 			throws Exception {
 		// Do nothing.  JPA document handlers do not support workflow transitions yet.
 	}
-    
+	
+	@Override
+	public boolean supportsWorkflowStates() {
+		return false;
+	}
 }

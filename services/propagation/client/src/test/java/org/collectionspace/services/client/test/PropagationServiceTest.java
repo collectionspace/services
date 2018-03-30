@@ -24,23 +24,17 @@ package org.collectionspace.services.client.test;
 
 //import java.util.ArrayList;
 import java.util.List;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PropagationClient;
-import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.propagation.PropActivityGroup;
 import org.collectionspace.services.propagation.PropActivityGroupList;
 import org.collectionspace.services.propagation.PropagationsCommon;
 
-import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
 
 import org.slf4j.Logger;
@@ -60,26 +54,13 @@ public class PropagationServiceTest extends AbstractPoxServiceTestImpl<AbstractC
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     // Instance variables specific to this test.
     /** The service path component. */
-    final String SERVICE_NAME = "propagations";
-    final String SERVICE_PATH_COMPONENT = "propagations";
-    private final static String CURRENT_DATE_UTC =
-            GregorianCalendarDateTimeUtils.currentDateUTC();
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new PropagationClient();
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
-     */
-    @Override
-    protected AbstractCommonList getCommonList(
-            ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(AbstractCommonList.class);
     }
 
     // ---------------------------------------------------------------
@@ -104,7 +85,7 @@ public class PropagationServiceTest extends AbstractPoxServiceTestImpl<AbstractC
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createPropagationInstance(identifier);
         String newID = null;
-        ClientResponse<Response> res = client.create(multipart);
+        Response res = client.create(multipart);
         try {
             int statusCode = res.getStatus();
 
@@ -124,7 +105,7 @@ public class PropagationServiceTest extends AbstractPoxServiceTestImpl<AbstractC
             newID = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -141,327 +122,32 @@ public class PropagationServiceTest extends AbstractPoxServiceTestImpl<AbstractC
         // so they can be deleted after tests have been run.
         allResourceIdsCreated.add(newID);
     }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createList(java.lang.String)
-     */
-    @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-//    dependsOnMethods = {"create"})
-    public void createList(String testName) throws Exception {
-        for (int i = 0; i < 3; i++) {
-            create(testName);
-        }
-    }
-
-
-    /*
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-    dependsOnMethods = {"create", "testSubmitRequest"})
-    public void createWithEmptyEntityBody(String testName) throws Exception {
-    
-    if (logger.isDebugEnabled()) {
-    logger.debug(testBanner(testName, CLASS_NAME));
-    }
-    // Perform setup.
-    setupCreateWithEmptyEntityBody();
-    
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getServiceRootURL();
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = "";
-    int statusCode = submitRequest(method, url, mediaType, entity);
-    
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-    logger.debug("createWithEmptyEntityBody url=" + url +
-    " status=" + statusCode);
-    }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-    
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-    dependsOnMethods = {"create", "testSubmitRequest"})
-    public void createWithMalformedXml(String testName) throws Exception {
-    
-    if (logger.isDebugEnabled()) {
-    logger.debug(testBanner(testName, CLASS_NAME));
-    }
-    // Perform setup.
-    setupCreateWithMalformedXml(testName, logger);
-    
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getServiceRootURL();
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = MALFORMED_XML_DATA; // Constant from base class.
-    int statusCode = submitRequest(method, url, mediaType, entity);
-    
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-    logger.debug(testName + ": url=" + url +
-    " status=" + statusCode);
-    }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-    
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-    dependsOnMethods = {"create", "testSubmitRequest"})
-    public void createWithWrongXmlSchema(String testName) throws Exception {
-    
-    if (logger.isDebugEnabled()) {
-    logger.debug(testBanner(testName, CLASS_NAME));
-    }
-    // Perform setup.
-    setupCreateWithWrongXmlSchema(testName, logger);
-    
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getServiceRootURL();
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = WRONG_XML_SCHEMA_DATA;
-    int statusCode = submitRequest(method, url, mediaType, entity);
-    
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-    logger.debug(testName + ": url=" + url +
-    " status=" + statusCode);
-    }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-     */
     
     // ---------------------------------------------------------------
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
     
-    // Success outcomes
-    
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#read(java.lang.String)
-     */
     @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-//    dependsOnMethods = {"create"})
-    public void read(String testName) throws Exception {
-        // Perform setup.
-        setupRead();
-
-        // Submit the request to the service and store the response.
-        PropagationClient client = new PropagationClient();
-        ClientResponse<String> res = client.read(knownResourceId);
-        PoxPayloadIn input = null;
-        try {
-            assertStatusCode(res, testName);
-            input = new PoxPayloadIn(res.getEntity());
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-
-        // Get the common part of the response and verify that it is not null.
-        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
-        PropagationsCommon propagationCommon = null;
-        if (payloadInputPart != null) {
-            propagationCommon = (PropagationsCommon) payloadInputPart.getBody();
-        }
-        Assert.assertNotNull(propagationCommon);
-
-        // Check selected fields.
-        PropActivityGroupList propActivityGroupList = propagationCommon.getPropActivityGroupList();
+	protected void compareReadInstances(PropagationsCommon original, PropagationsCommon fromRead) throws Exception {
+        PropActivityGroupList propActivityGroupList = fromRead.getPropActivityGroupList();
         Assert.assertNotNull(propActivityGroupList);
+        
         List<PropActivityGroup> propActivityGroups = propActivityGroupList.getPropActivityGroup();
         Assert.assertNotNull(propActivityGroups);
         Assert.assertTrue(propActivityGroups.size() > 0);
 
         if (logger.isDebugEnabled()) {
             logger.debug("UTF-8 data sent=" + getUTF8DataFragment() + "\n"
-                    + "UTF-8 data received=" + propagationCommon.getPropComments());
+                    + "UTF-8 data received=" + fromRead.getPropComments());
         }
 
-        Assert.assertEquals(propagationCommon.getPropComments(), getUTF8DataFragment(),
-                "UTF-8 data retrieved '" + propagationCommon.getPropComments()
-                + "' does not match expected data '" + getUTF8DataFragment());
+        Assert.assertEquals(fromRead.getPropComments(), getUTF8DataFragment(),
+                "UTF-8 data retrieved '" + fromRead.getPropComments() + "' does not match expected data '" + getUTF8DataFragment());    	
     }
 
-    // Failure outcomes
-    
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readNonExistent(java.lang.String)
-     */
-    @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-//    dependsOnMethods = {"read"})
-    public void readNonExistent(String testName) throws Exception {
-        // Perform setup.
-        setupReadNonExistent();
-
-        // Submit the request to the service and store the response.
-        PropagationClient client = new PropagationClient();
-        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
-        try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(testRequestType, statusCode));
-            Assert.assertEquals(statusCode, testExpectedStatusCode);
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-    }
-
-    // ---------------------------------------------------------------
-    // CRUD tests : READ_LIST tests
-    // ---------------------------------------------------------------
-    
-    // Success outcomes
-    
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readList(java.lang.String)
-     */
-    @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-//    dependsOnMethods = {"createList", "read"})
-    public void readList(String testName) throws Exception {
-        // Perform setup.
-        setupReadList();
-
-        // Submit the request to the service and store the response.
-        AbstractCommonList list = null;
-        PropagationClient client = new PropagationClient();
-        ClientResponse<AbstractCommonList> res = client.readList();
-        assertStatusCode(res, testName);
-        try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(testRequestType, statusCode));
-            Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-            list = res.getEntity();
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-
-        // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = true;
-        if(iterateThroughList && logger.isDebugEnabled()){
-        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
-        }
-
-    }
-
-    // Failure outcomes
-    // None at present.
-    
-    // ---------------------------------------------------------------
-    // CRUD tests : UPDATE tests
-    // ---------------------------------------------------------------
-    
-    // Success outcomes
-    
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#update(java.lang.String)
-     */
-    @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-//    dependsOnMethods = {"read"})
-    public void update(String testName) throws Exception {
-        // Perform setup.
-        setupRead();
-
-        // Retrieve the contents of a resource to update.
-        PropagationClient client = new PropagationClient();
-        ClientResponse<String> res = client.read(knownResourceId);
-        PoxPayloadIn input = null;
-        try {
-        	assertStatusCode(res, testName);
-            input = new PoxPayloadIn(res.getEntity());
-        	if (logger.isDebugEnabled()) {
-                logger.debug("got object to update with ID: " + knownResourceId);
-            }
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-
-        // Extract the common part from the response.
-        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
-        PropagationsCommon propagationCommon = null;
-        if (payloadInputPart != null) {
-            propagationCommon = (PropagationsCommon) payloadInputPart.getBody();
-        }
-        Assert.assertNotNull(propagationCommon);
-
-        // Update the content of this resource.
-        propagationCommon.setPropNumber("updated-" + propagationCommon.getPropNumber());
-        propagationCommon.setPropComments("updated-" + propagationCommon.getPropComments());
-        if (logger.isDebugEnabled()) {
-            logger.debug("to be updated object");
-            logger.debug(objectAsXmlString(propagationCommon, PropagationsCommon.class));
-        }
-
-        setupUpdate();
-        
-        // Submit the updated common part in an update request to the service
-        // and store the response.
-        PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
-        PayloadOutputPart commonPart = output.addPart(client.getCommonPartName(), propagationCommon);
-        res = client.update(knownResourceId, output);
-        try {
-        	assertStatusCode(res, testName);
-            int statusCode = res.getStatus();
-            // Check the status code of the response: does it match the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(testRequestType, statusCode));
-            Assert.assertEquals(statusCode, testExpectedStatusCode);
-            input = new PoxPayloadIn(res.getEntity());
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-
-        // Extract the updated common part from the response.
-        payloadInputPart = input.getPart(client.getCommonPartName());
-        PropagationsCommon updatedPropagationCommon = null;
-        if (payloadInputPart != null) {
-            updatedPropagationCommon = (PropagationsCommon) payloadInputPart.getBody();
-        }
-        Assert.assertNotNull(updatedPropagationCommon);
-
+	@Override
+	protected void compareUpdatedInstances(PropagationsCommon propagationCommon,
+			PropagationsCommon updatedPropagationCommon) throws Exception {
         // Check selected fields in the updated common part.
         Assert.assertEquals(updatedPropagationCommon.getPropNumber(),
                 propagationCommon.getPropNumber(),
@@ -477,145 +163,15 @@ public class PropagationServiceTest extends AbstractPoxServiceTestImpl<AbstractC
         Assert.assertEquals(updatedPropagationCommon.getPropComments(),
                 propagationCommon.getPropComments(),
                 "Data in updated object did not match submitted data.");
-    }
-
-    @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-//    dependsOnMethods = {"update", "testSubmitRequest"})
-    public void updateNonExistent(String testName) throws Exception {
-        // Perform setup.
-        setupUpdateNonExistent();
-
-        // Submit the request to the service and store the response.
-        // Note: The ID used in this 'create' call may be arbitrary.
-        // The only relevant ID may be the one used in update(), below.
-        PropagationClient client = new PropagationClient();
-        PoxPayloadOut multipart = createPropagationInstance(NON_EXISTENT_ID);
-        ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
-        try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(testRequestType, statusCode));
-            Assert.assertEquals(statusCode, testExpectedStatusCode);
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-    }
-
-    // ---------------------------------------------------------------
-    // CRUD tests : DELETE tests
-    // ---------------------------------------------------------------
+	}
     
-    // Success outcomes
-    
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#delete(java.lang.String)
-     */
-    @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-//    dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
-    public void delete(String testName) throws Exception {
-        // Perform setup.
-        setupDelete();
-
-        // Submit the request to the service and store the response.
-        PropagationClient client = new PropagationClient();
-        ClientResponse<Response> res = client.delete(knownResourceId);
-        try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(testRequestType, statusCode));
-            Assert.assertEquals(statusCode, testExpectedStatusCode);
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-    }
-
-    // Failure outcomes
-    
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#deleteNonExistent(java.lang.String)
-     */
-    @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-//    dependsOnMethods = {"delete"})
-    public void deleteNonExistent(String testName) throws Exception {
-        // Perform setup.
-        setupDeleteNonExistent();
-
-        // Submit the request to the service and store the response.
-        PropagationClient client = new PropagationClient();
-        ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
-        try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(testRequestType, statusCode));
-            Assert.assertEquals(statusCode, testExpectedStatusCode);
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-    }
-
-    // ---------------------------------------------------------------
-    // Utility tests : tests of code used in tests above
-    // ---------------------------------------------------------------
-    
-    /**
-     * Tests the code for manually submitting data that is used by several
-     * of the methods above.
-     */
-//    @Test(dependsOnMethods = {"create", "read"})
-    public void testSubmitRequest() {
-
-        // Expected status code: 200 OK
-        final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
-
-        // Submit the request to the service and store the response.
-        String method = ServiceRequestType.READ.httpMethodName();
-        String url = getResourceURL(knownResourceId);
-        int statusCode = submitRequest(method, url);
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug("testSubmitRequest: url=" + url
-                    + " status=" + statusCode);
-        }
-        Assert.assertEquals(statusCode, EXPECTED_STATUS);
-
-    }
-
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
     
     @Override
     public String getServiceName() {
-        return SERVICE_NAME;
+        return PropagationClient.SERVICE_NAME;
     }
 
     /* (non-Javadoc)
@@ -623,11 +179,11 @@ public class PropagationServiceTest extends AbstractPoxServiceTestImpl<AbstractC
      */
     @Override
     public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
+        return PropagationClient.SERVICE_PATH_COMPONENT;
     }
 
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
         return createPropagationInstance(identifier);
     }
 
@@ -636,8 +192,9 @@ public class PropagationServiceTest extends AbstractPoxServiceTestImpl<AbstractC
      *
      * @param identifier the identifier
      * @return the multipart output
+     * @throws Exception 
      */
-    private PoxPayloadOut createPropagationInstance(String identifier) {
+    private PoxPayloadOut createPropagationInstance(String identifier) throws Exception {
         return createPropagationInstance(
                 "propNumber-" + identifier,
                 "returnDate-" + identifier);
@@ -649,9 +206,9 @@ public class PropagationServiceTest extends AbstractPoxServiceTestImpl<AbstractC
      * @param propNumber the propagation number
      * @param returnDate the return date
      * @return the multipart output
+     * @throws Exception 
      */
-    private PoxPayloadOut createPropagationInstance(String propNumber,
-            String returnDate) {
+    private PoxPayloadOut createPropagationInstance(String propNumber, String returnDate) throws Exception {
 
         PropagationsCommon propagationCommon = new PropagationsCommon();
         propagationCommon.setPropNumber(propNumber);
@@ -663,8 +220,7 @@ public class PropagationServiceTest extends AbstractPoxServiceTestImpl<AbstractC
         propagationCommon.setPropComments(getUTF8DataFragment());
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
-        PayloadOutputPart commonPart =
-                multipart.addPart(new PropagationClient().getCommonPartName(), propagationCommon);
+        PayloadOutputPart commonPart = multipart.addPart(new PropagationClient().getCommonPartName(), propagationCommon);
 
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, propagation common");
@@ -674,29 +230,33 @@ public class PropagationServiceTest extends AbstractPoxServiceTestImpl<AbstractC
         return multipart;
     }
 
+    /*
+     * For convenience and terseness, this test method is the base of the test execution dependency chain.  Other test methods may
+     * refer to this method in their @Test annotation declarations.
+     */    
 	@Override
 	public void CRUDTests(String testName) {
-		// TODO Auto-generated method stub
+		// // Needed for TestNG dependency chain.
 		
 	}
 
 	@Override
-	protected PoxPayloadOut createInstance(String commonPartName,
-			String identifier) {
+	protected PoxPayloadOut createInstance(String commonPartName, String identifier) throws Exception {
         PoxPayloadOut result = createPropagationInstance(identifier);
         return result;
 	}
 
 	@Override
-	protected PropagationsCommon updateInstance(PropagationsCommon commonPartObject) {
-		// TODO Auto-generated method stub
-		return null;
+	protected PropagationsCommon updateInstance(PropagationsCommon propagationCommon) {
+        // Update the content of this resource.
+        propagationCommon.setPropNumber("updated-" + propagationCommon.getPropNumber());
+        propagationCommon.setPropComments("updated-" + propagationCommon.getPropComments());
+        
+        return propagationCommon;
 	}
 
 	@Override
-	protected void compareUpdatedInstances(PropagationsCommon original,
-			PropagationsCommon updated) throws Exception {
-		// TODO Auto-generated method stub
-		
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+		return new PropagationClient();
 	}
 }

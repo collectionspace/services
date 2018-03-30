@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
@@ -35,8 +36,6 @@ import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.person.PersonTermGroup;
-
-import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -107,17 +106,21 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
     	return new PersonAuthorityClient();
     }
-    
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+    	return new PersonAuthorityClient(clientPropertiesFilename);
+	}
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getCommonList(
-			ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(AbstractCommonList.class);
+	protected AbstractCommonList getCommonList(Response response) {
+        return response.readEntity(AbstractCommonList.class);
     }
  
     @BeforeClass
@@ -162,14 +165,14 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
     	    displayName, shortId, client.getCommonPartName());
 
     	String newID = null;
-    	ClientResponse<Response> res = client.create(multipart);
+    	Response res = client.create(multipart);
         try {
             assertStatusCode(res, testName);
             newID = PersonAuthorityClientUtils.extractId(res);
             logger.info("{}: succeeded.", testName);
     	} finally {
     		if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
     	}
         // Store the refname from the first resource created
@@ -219,13 +222,13 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
             		personMap, terms, personRepeatablesMap, client.getItemCommonPartName() );
 
         String newID = null;
-        ClientResponse<Response> res = client.createItem(authId, multipart);
+        Response res = client.createItem(authId, multipart);
         try {
             assertStatusCode(res, "createItem");
             newID = PersonAuthorityClientUtils.extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -263,9 +266,10 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
     
     /**
      * Reads an item list by partial term.
+     * @throws Exception 
      */
     @Test(dataProvider="testName")
-    public void partialTermMatch(String testName) {
+    public void partialTermMatch(String testName) throws Exception {
         for(int i=0; i<partialTerms.length; i++) {
         	long startTime = System.currentTimeMillis();
             int numMatchesFound = readItemListWithFilters(testName, authId, 
@@ -293,9 +297,10 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
      * @param partialTerm A partial term to match item resources.
      * @param partialTerm A keyword list to match item resources.
      * @return The number of item resources matched by the partial term.
+     * @throws Exception 
      */
     private int readItemListWithFilters(String testName, 
-    		String authorityCsid, String partialTerm, String keywords) {
+    		String authorityCsid, String partialTerm, String keywords) throws Exception {
 
         // Perform setup.
         int expectedStatusCode = Response.Status.OK.getStatusCode();
@@ -304,7 +309,7 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<AbstractCommonList> res = null;
+        Response res = null;
         if (authorityCsid != null) {
         	res = client.readItemList(authorityCsid, partialTerm, keywords);
         } else {
@@ -313,10 +318,10 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
         AbstractCommonList list = null;
         try {
             assertStatusCode(res, testName);
-            list = res.getEntity();
+            list = res.readEntity(AbstractCommonList.class);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -333,9 +338,10 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
     	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
@@ -348,10 +354,8 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
         PersonAuthorityClient client = new PersonAuthorityClient();
         // Clean up item resources.
         for (String itemId : allItemIdsCreated) {
-            client.deleteItem(authId, itemId).releaseConnection();
+            client.deleteItem(authId, itemId).close();
         }
-        client.delete(authId).releaseConnection();
+        client.delete(authId).close();
     }
-
-
 }

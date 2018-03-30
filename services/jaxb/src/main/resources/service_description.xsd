@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Service Description Schema (XSD)
+    
+    Entity  : ServiceDescription
+    Used for: JAXB binding between XML and Java objects
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns:ns="http://collectionspace.org/services/description"
+  xmlns="http://collectionspace.org/services/description"
+  targetNamespace="http://collectionspace.org/services/description"
+  version="0.1">
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->    
+    <!-- ServiceDescription -->
+    <xs:element name="service_description">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="documentType" type="xs:string"/>
+                <xs:element name="subresourceDocumentType" type="xs:string"/>
+                <xs:element name="serviceVersion" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>    
+</xs:schema>
+

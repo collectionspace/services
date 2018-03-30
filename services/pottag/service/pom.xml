@@ -3,22 +3,20 @@
 
     <parent>
         <groupId>org.collectionspace.services</groupId>
-        <artifactId>org.collectionspace.services.pottag</artifactId>        
-        <version>4.1.1</version>
+        <artifactId>org.collectionspace.services.pottag</artifactId>
+        <version>5.0</version>
     </parent>
-    
+
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.pottag.service</artifactId>
     <name>services.pottag.service</name>
-    <packaging>jar</packaging>       
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+            </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.pottag.jaxb</artifactId>
@@ -38,14 +36,13 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
         </dependency>
-        
+
       <!-- javax -->
 
         <dependency>
@@ -58,10 +55,9 @@
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
-            <version>1.6.1</version>
             <scope>provided</scope>
         </dependency>
-        
+
         <!-- jboss -->
 
         <dependency>
@@ -82,13 +78,12 @@
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-multipart-provider</artifactId>
         </dependency>
-        
+
         <!-- nuxeo -->
 
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-api</artifactId>
-            <version>${nuxeo.core.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>jboss-remoting</artifactId>
@@ -98,7 +93,7 @@
         </dependency>
 
     </dependencies>
-    
+
     <build>
         <finalName>collectionspace-services-pottag</finalName>
     </build>

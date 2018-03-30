@@ -30,7 +30,10 @@ import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
+import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.storage.StorageClient;
+import org.collectionspace.services.common.storage.TransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
 import org.collectionspace.services.common.CSWebApplicationException;
 
@@ -47,7 +50,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -56,7 +58,8 @@ import javax.ws.rs.core.UriInfo;
 @Path(RoleClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class RoleResource extends SecurityResourceBase {
+@SuppressWarnings("unchecked")
+public class RoleResource extends SecurityResourceBase<Role, Role> {
 
     final Logger logger = LoggerFactory.getLogger(RoleResource.class);
     final StorageClient storageClient = new JpaStorageClientImpl();
@@ -77,25 +80,39 @@ public class RoleResource extends SecurityResourceBase {
     }
 
     @Override
-    public ServiceContextFactory getServiceContextFactory() {
+    public ServiceContextFactory<Role, Role> getServiceContextFactory() {
         return RemoteServiceContextFactory.get();
     }
 
     @Override
-    public StorageClient getStorageClient(ServiceContext ctx) {
+    public StorageClient getStorageClient(ServiceContext<Role, Role> ctx) {
         //FIXME use ctx to identify storage client
         return storageClient;
     }
 
     @POST
     public Response createRole(Role input) {
-        return create(input);
+        try {
+            return create(input);
+        } catch (CSWebApplicationException we) {
+            if (we.getCause() instanceof DocumentException) {
+                DocumentException de = (DocumentException)we.getCause();
+                if (de.getErrorCode() == DocumentException.DUPLICATE_RECORD_ERR) {
+                    //
+                    // Replace the generic error message with a Role-specific error message
+                    //
+                    String msg = String.format("There is already a role with the name '%s'.  Please choose a different name.", input.displayName);
+                    throw bigReThrow(new DocumentException(msg, de, de.getErrorCode()), msg);
+                }
+            }
+            throw we;
+        }
     }
 
     @GET
     @Path("{csid}")
-    public Role getRole(@PathParam("csid") String csid) {
-        return (Role)get(csid, Role.class);
+    public Role getRole(@PathParam("csid") String csid, @Context UriInfo ui) {
+        return (Role)get(ui, csid, Role.class);
     }
     
     /*
@@ -107,16 +124,18 @@ public class RoleResource extends SecurityResourceBase {
             @PathParam("csid") String accCsid) {
         logger.debug("getAccountRole with accCsid=" + accCsid);
         ensureCSID(accCsid, ServiceMessages.GET_FAILED+ "accountroles role ");
+        
         AccountRole result = null;
         try {
             AccountRoleSubResource subResource =
                     new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
             //get relationships for a role
-            result = subResource.getAccountRole(accCsid, SubjectType.ACCOUNT);
+            result = subResource.getAccountRole((ServiceContext<Role, Role>)null, accCsid, SubjectType.ACCOUNT);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED, accCsid);
         }
         checkResult(result, accCsid, ServiceMessages.GET_FAILED);
+        
         return result;
     }
 
@@ -129,81 +148,109 @@ public class RoleResource extends SecurityResourceBase {
     @PUT
     @Path("{csid}")
     public Role updateRole(@PathParam("csid") String csid, Role theUpdate) {
+    	Role result = null;
+    	
         try {
 	    	Role role = (Role)get(csid, Role.class);
 	        // If marked as metadata immutable, do not update
-	        if(RoleClient.IMMUTABLE.equals(role.getMetadataProtection())) {
+	        if (RoleClient.IMMUTABLE.equals(role.getMetadataProtection())) {
 	            Response response = 
 	            	Response.status(Response.Status.FORBIDDEN).entity("Role: "+csid+" is immutable.").type("text/plain").build();
                 throw new CSWebApplicationException(response);
 	        }
-	        return (Role)update(csid, theUpdate, Role.class);
+	        result = (Role)update(csid, theUpdate, Role.class);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED, csid);
         }
+        
+        return result;
     }
 
-    @DELETE
+	@DELETE
     @Path("{csid}")
-    public Response deleteRole(@PathParam("csid") String csid) {
+    public Response deleteRole(@PathParam("csid") String csid, @Context UriInfo ui) throws Exception {
         logger.debug("deleteRole with csid=" + csid);
         ensureCSID(csid, ServiceMessages.DELETE_FAILED + "deleteRole ");
 
+        ServiceContext<Role, Role> ctx = createServiceContext((Role) null, Role.class);
+        TransactionContext transactionContext = ctx.openConnection(); // ensure we do all this in one transaction
         try {
+        	transactionContext.beginTransaction();
         	Role role = (Role)get(csid, Role.class);
             // If marked as metadata immutable, do not delete
-            if(RoleClient.IMMUTABLE.equals(role.getMetadataProtection())) {
+            if (RoleClient.IMMUTABLE.equals(role.getMetadataProtection())) {
                 Response response = 
-                	Response.status(Response.Status.FORBIDDEN).entity("Role: "+csid+" is immutable.").type("text/plain").build();
+                	Response.status(Response.Status.FORBIDDEN).entity("Role: "+csid+" is immutable.").type("text/plain").build(); // FIXME: Should be status code 423 (resource locked)
                 return response;
             }
-            //FIXME ideally the following three operations should be in the same tx CSPACE-658
-            //delete all relationships for this permission
+            //
+            // delete all the permission/role relationships (if any)
+            //
             PermissionRoleSubResource permRoleResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
-            permRoleResource.deletePermissionRole(csid, SubjectType.PERMISSION);
+            try {
+            	permRoleResource.deletePermissionRole(ctx, csid, SubjectType.PERMISSION);
+            } catch (DocumentNotFoundException dnf) {
+            	// consume exception, not a problem.  Just means no relationships exist
+            }
+            //
             //delete all the account/role relationships associate with this role
+            //
             AccountRoleSubResource accountRoleResource =
                 new AccountRoleSubResource(AccountRoleSubResource.ROLE_ACCOUNTROLE_SERVICE);
-            accountRoleResource.deleteAccountRole(csid, SubjectType.ACCOUNT);
+            accountRoleResource.deleteAccountRole(ctx, csid, SubjectType.ACCOUNT);
+            //
             //finally, delete the role itself
-            ServiceContext<Role, Role> ctx = createServiceContext((Role) null, Role.class);
-            ((JpaStorageClientImpl) getStorageClient(ctx)).deleteWhere(ctx, csid);
-            return Response.status(HttpResponseCodes.SC_OK).build();
-        } catch (Exception e) {
+            //
+            ((JpaStorageClientImpl) getStorageClient(ctx)).deleteWhere(ctx, csid); // FIXME: We should/could get rid the SID in Spring Security table as well
+            transactionContext.commitTransaction();
+        } catch(Exception e) {
+        	transactionContext.markForRollback();
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, csid);
+        } finally {
+        	ctx.closeConnection();
         }
+        
+        return Response.status(HttpResponseCodes.SC_OK).build();
     }
 
     @POST
     @Path("{csid}/permroles")
     public Response createRolePermission(@QueryParam("_method") String method, @PathParam("csid") String roleCsid,
             PermissionRole input) {
-        if (method != null) {
+        if (method != null) { // FIXME: Not sure how method could every be "delete"
             if ("delete".equalsIgnoreCase(method)) {
                 return deleteRolePermission(roleCsid, input);
             }
         }
+                
         logger.debug("createRolePermission with roleCsid=" + roleCsid);
         ensureCSID(roleCsid, ServiceMessages.PUT_FAILED + "permroles role ");
+        Response response = null;
         try {
         	Role role = (Role)get(roleCsid, Role.class);
-            // If marked as metadata immutable, do not delete
-            if(RoleClient.IMMUTABLE.equals(role.getPermsProtection())) {
-                Response response = 
+        	//
+            // If marked as metadata immutable, do not change
+        	//
+            if (RoleClient.IMMUTABLE.equals(role.getPermsProtection())) {
+                response = 
                 	Response.status(Response.Status.FORBIDDEN).entity("Role: "+roleCsid+" is immutable.").type("text/plain").build();
                 return response;
             }
+            //
+            // Create new role-permission relationships
+            //
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
-            String permrolecsid = subResource.createPermissionRole(input, SubjectType.PERMISSION);
+            String permrolecsid = subResource.createPermissionRole((ServiceContext<Role, Role>)null, input, SubjectType.PERMISSION);
             UriBuilder path = UriBuilder.fromResource(RoleResource.class);
             path.path(roleCsid + "/permroles/" + permrolecsid);
-            Response response = Response.created(path.build()).build();
-            return response;
+            response = Response.created(path.build()).build();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, roleCsid);
         }
+
+        return response;
     }
 
     @GET
@@ -212,16 +259,18 @@ public class RoleResource extends SecurityResourceBase {
             @PathParam("csid") String roleCsid) {
         logger.debug("getRolePermission with roleCsid=" + roleCsid);
         ensureCSID(roleCsid, ServiceMessages.GET_FAILED + "permroles role ");
+        
         PermissionRole result = null;
         try {
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
             //get relationships for a role
-            result = subResource.getPermissionRole(roleCsid, SubjectType.PERMISSION);
+            result = subResource.getPermissionRole((ServiceContext<Role, Role>)null, roleCsid, SubjectType.PERMISSION);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED, roleCsid);
         }
         checkResult(result, roleCsid, ServiceMessages.GET_FAILED);
+        
         return result;
     }
 
@@ -232,38 +281,44 @@ public class RoleResource extends SecurityResourceBase {
             @PathParam("id") String permrolecsid) {
         logger.debug("getRolePermission with roleCsid=" + roleCsid);
         ensureCSID(roleCsid, ServiceMessages.GET_FAILED + "permroles role ");
+        
         PermissionRoleRel result = null;
         try {
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
             //get relationships for a role
-            result = subResource.getPermissionRoleRel(roleCsid, SubjectType.PERMISSION, permrolecsid);
+            result = subResource.getPermissionRoleRel((ServiceContext<Role, Role>)null, roleCsid, SubjectType.PERMISSION, permrolecsid);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED, roleCsid);
         }
         checkResult(result, roleCsid, ServiceMessages.GET_FAILED);
+        
         return result;
     }
 
     public Response deleteRolePermission(String roleCsid, PermissionRole input) {
         logger.debug("deleteRolePermission with roleCsid=" + roleCsid);
         ensureCSID(roleCsid, ServiceMessages.DELETE_FAILED + "permroles role ");
+        
+        Response result = null;
         try {
         	Role role = (Role)get(roleCsid, Role.class);
             // If marked as metadata immutable, do not delete
-            if(RoleClient.IMMUTABLE.equals(role.getPermsProtection())) {
-                Response response = 
-                	Response.status(Response.Status.FORBIDDEN).entity("Role: "+roleCsid+" is immutable.").type("text/plain").build();
+            if (RoleClient.IMMUTABLE.equals(role.getPermsProtection())) {
+                Response response = Response.status(Response.Status.FORBIDDEN).entity(
+                		"Role: "+roleCsid+" is immutable.").type("text/plain").build();
                 return response;
             }
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
             //delete all relationships for a permission
-            subResource.deletePermissionRole(roleCsid, SubjectType.PERMISSION, input);
-            return Response.status(HttpResponseCodes.SC_OK).build();
+            subResource.deletePermissionRole((ServiceContext<Role, Role>)null, roleCsid, SubjectType.PERMISSION, input);
+            result = Response.status(HttpResponseCodes.SC_OK).build();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, roleCsid);
         }
+        
+        return result;
     }
 
     @DELETE
@@ -272,10 +327,11 @@ public class RoleResource extends SecurityResourceBase {
     		@PathParam("csid") String roleCsid) {
         logger.debug("deleteRolePermission with roleCsid=" + roleCsid);
         ensureCSID(roleCsid, ServiceMessages.DELETE_FAILED + "permroles role ");
+        
         try {
         	Role role = (Role)get(roleCsid, Role.class);
             // If marked as metadata immutable, do not delete
-            if(RoleClient.IMMUTABLE.equals(role.getPermsProtection())) {
+            if (RoleClient.IMMUTABLE.equals(role.getPermsProtection())) {
                 Response response = 
                 	Response.status(Response.Status.FORBIDDEN).entity("Role: "+roleCsid+" is immutable.").type("text/plain").build();
                 return response;
@@ -283,10 +339,11 @@ public class RoleResource extends SecurityResourceBase {
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
             //delete all relationships for a permission
-            subResource.deletePermissionRole(roleCsid, SubjectType.PERMISSION);
-            return Response.status(HttpResponseCodes.SC_OK).build();
+            subResource.deletePermissionRole((ServiceContext<Role, Role>)null, roleCsid, SubjectType.PERMISSION);            
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, roleCsid);
         }
+        
+        return Response.status(HttpResponseCodes.SC_OK).build();
     }
 }

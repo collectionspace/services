@@ -23,12 +23,6 @@
  */
 package org.collectionspace.services.common.document;
 
-
-
-import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * AbstractMultipartDocumentHandler
  *
@@ -42,8 +36,6 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractMultipartDocumentHandlerImpl<T, TL, WT, WTL>
         extends AbstractDocumentHandlerImpl<T, TL, WT, WTL>
         implements MultipartDocumentHandler<T, TL, WT, WTL> {
-
-    private final Logger logger = LoggerFactory.getLogger(AbstractMultipartDocumentHandlerImpl.class);
 
     public AbstractMultipartDocumentHandlerImpl() {
     	//Empty constructor

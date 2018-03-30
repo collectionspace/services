@@ -23,32 +23,24 @@
 package org.collectionspace.services.client.test;
 
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.BatchClient;
 import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.batch.BatchCommon;
-
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-//import org.w3c.dom.Element;
-//import org.w3c.dom.Node;
 
 /**
  * BatchServiceTest, carries out tests against a deployed and running Batch Service. <p/>
  * $LastChangedRevision:  $
  * $LastChangedDate:  $
  */
+@SuppressWarnings("rawtypes")
 public class BatchServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, BatchCommon> {
 
     private final String CLASS_NAME = BatchServiceTest.class.getName();
@@ -65,31 +57,37 @@ public class BatchServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 		return BatchClient.SERVICE_NAME;
 	}
     
-    @Override
-    protected CollectionSpaceClient getClientInstance() {
+	@Override
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new BatchClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new BatchClient(clientPropertiesFilename);
+	}	
 
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
     
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
     	return createBatchInstance(identifier);
     }
     
 	@Override
 	protected PoxPayloadOut createInstance(String commonPartName,
-			String identifier) {
+			String identifier) throws Exception {
 		PoxPayloadOut result = createBatchInstance(identifier);
 		return result;
 	}
 
-    private PoxPayloadOut createBatchInstance(String exitNumber) {
+    private PoxPayloadOut createBatchInstance(String exitNumber) throws Exception {
         String identifier = "batchNumber-" + exitNumber;
         BatchCommon batch = new BatchCommon();
         batch.setName(identifier);
+        batch.setClassName("org.collectionspace.services.batch.nuxeo.TestBatchJob");
         PoxPayloadOut multipart = new PoxPayloadOut(BatchClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(batch, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(new BatchClient().getCommonPartName());
@@ -108,6 +106,7 @@ public class BatchServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 		
 		result.setName("updated-" + batchCommon.getName());
 		result.setNotes("updated-" + batchCommon.getNotes());
+		result.setClassName("org.collectionspace.services.batch.nuxeo.TestBatchJob");
 		
 		return result;
 	}
@@ -129,5 +128,5 @@ public class BatchServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
         		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
     public void CRUDTests(String testName) {
     	// Do nothing.  Simply here to for a TestNG execution order for our tests
-    }	
+    }
 }

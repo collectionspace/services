@@ -21,21 +21,21 @@
 
   <property name="jar.all"
     value="org.collectionspace.services.listener.${listener.module.name}-*.jar"/>
-  
+
   <condition property="osfamily-unix">
     <os family="unix" />
   </condition>
   <condition property="osfamily-windows">
     <os family="windows" />
   </condition>
-  
+
   <target name="init" >
     <!-- Create the time stamp -->
     <tstamp/>
     <!-- Create the build directory structure used by compile -->
     <mkdir dir="${build}"/>
   </target>
-  
+
   <target name="package" depends="package-unix,package-windows"
     description="Package CollectionSpace Services" />
   <target name="package-unix" if="osfamily-unix">
@@ -51,7 +51,7 @@
   <target name="package-windows" if="osfamily-windows">
     <exec executable="cmd" failonerror="true">
       <arg value="/c" />
-      <arg value="mvn.bat" />
+      <arg value="mvn" />
       <arg value="package" />
       <arg value="-Dmaven.test.skip=true" />
       <arg value="-f" />
@@ -60,7 +60,7 @@
       <arg value="${mvn.opts}" />
     </exec>
   </target>
-  
+
   <target name="install" depends="install-unix,install-windows"
     description="Install" />
   <target name="install-unix" if="osfamily-unix">
@@ -76,7 +76,7 @@
   <target name="install-windows" if="osfamily-windows">
     <exec executable="cmd" failonerror="true">
       <arg value="/c" />
-      <arg value="mvn.bat" />
+      <arg value="mvn" />
       <arg value="install" />
       <arg value="-Dmaven.test.skip=true" />
       <arg value="-f" />
@@ -85,13 +85,13 @@
       <arg value="${mvn.opts}" />
     </exec>
   </target>
-  
+
   <target name="deploy" depends="install"
     description="deploy listener in ${jee.server.nuxeo}">
     <copy file="${basedir}/target/${jar.name}"
       todir="${jee.deploy.nuxeo.plugins}"/>
   </target>
-  
+
   <target name="undeploy"
     description="undeploy listener from ${jee.server.nuxeo}">
     <delete>
@@ -100,5 +100,5 @@
       </fileset>
     </delete>
   </target>
-  
+
 </project>

@@ -36,9 +36,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-
 import org.collectionspace.services.authorization.PermissionRole;
-import org.jboss.resteasy.client.ClientResponse;
 
 /**
  * @version $Revision:$
@@ -50,28 +48,28 @@ public interface PermissionRoleProxy extends CollectionSpaceProxy<PermissionRole
     //(C)reate
     @POST
     @Path("/{csid}/permroles")
-    ClientResponse<Response> create(@PathParam("csid") String csid, PermissionRole permRole);
+    Response create(@PathParam("csid") String csid, PermissionRole permRole);
 
     //(R)ead
     @GET
     @Path("/{csid}/permroles")
-    ClientResponse<PermissionRole> read(@PathParam("csid") String csid);
+    Response read(@PathParam("csid") String csid);
 
     //(R)ead
     @GET
     @Path("/{csid}/permroles/{prcsid}")
-    ClientResponse<PermissionRole> read(@PathParam("csid") String csid,
+    Response read(@PathParam("csid") String csid,
             @PathParam("prcsid") String prcsid);
 
     //(D)elete
     @DELETE
     @Path("/{csid}/permroles")
-    ClientResponse<Response> delete(@PathParam("csid") String csid);
+    Response delete(@PathParam("csid") String csid);
     
     //(D)elete - with a payload
     @POST
     @Path("/{csid}/permroles")
-    ClientResponse<Response> delete(@PathParam("csid") String csid,
+    Response delete(@PathParam("csid") String csid,
             @QueryParam("_method") String method,
             PermissionRole permRole);    
 }

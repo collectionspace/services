@@ -61,7 +61,7 @@
     -->
     
     <!-- TODO: this almost works now:
-    <run controlFile="./security.xml" testGroup="security" />
+    <run controlFile="security/security.xml" testGroup="security" />
     --> 
     
     
@@ -69,7 +69,7 @@
 
     
     <!--  These all work with POX: -->
-    <run controlFile="./security.xml" testGroup="deleteBug" />
+    <run controlFile="security/security.xml" testGroup="deleteBug" />
     <run controlFile="objectexit/object-exit.xml" testGroup="makeone" />
     <run controlFile="relation/relation.xml" testGroup="r2only" />
     <run controlFile="person/person.xml" testGroup="postPerson" />

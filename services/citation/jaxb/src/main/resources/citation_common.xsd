@@ -27,6 +27,7 @@
             <xs:sequence>
                 <!--  Common identifier -->
                 <xs:element name="csid" type="xs:string" />
+				<xs:element name="rev" type="xs:integer" /> <!-- Revision number -->
                 
                 <!--  Citation Information Group -->
                 <xs:element name="inAuthority" type="xs:string" />

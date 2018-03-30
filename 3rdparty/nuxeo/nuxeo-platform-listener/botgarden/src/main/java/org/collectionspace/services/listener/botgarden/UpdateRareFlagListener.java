@@ -3,23 +3,23 @@ package org.collectionspace.services.listener.botgarden;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.batch.nuxeo.UpdateRareFlagBatchJob;
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectBotGardenConstants;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.invocable.InvocationResults;
+import org.collectionspace.services.nuxeo.listener.AbstractCSEventListenerImpl;
+import org.collectionspace.services.taxonomy.nuxeo.TaxonBotGardenConstants;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonConstants;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.event.CoreEventConstants;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
-import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 
 /**
@@ -30,20 +30,21 @@ import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
  * @author ray
  *
  */
-public class UpdateRareFlagListener implements EventListener {
+public class UpdateRareFlagListener extends AbstractCSEventListenerImpl {
 	final Log logger = LogFactory.getLog(UpdateRareFlagListener.class);
 
 	public static final String PREVIOUS_TAXON_PROPERTY_NAME = "UpdateRareFlagListener.previousTaxon";
 	public static final String PREVIOUS_HAS_RARE_CONSERVATION_CATEGORY_PROPERTY_NAME = "UpdateRareFlagListener.previousHasRareConservationCategory";
 	
-	private static final String[] CONSERVATION_CATEGORY_PATH_ELEMENTS = TaxonConstants.CONSERVATION_CATEGORY_FIELD_NAME.split("/");
+	private static final String[] CONSERVATION_CATEGORY_PATH_ELEMENTS = TaxonBotGardenConstants.CONSERVATION_CATEGORY_FIELD_NAME.split("/");
 	private static final String PLANT_ATTRIBUTES_GROUP_LIST_FIELD_NAME = CONSERVATION_CATEGORY_PATH_ELEMENTS[0];
 	private static final String CONSERVATION_CATEGORY_FIELD_NAME = CONSERVATION_CATEGORY_PATH_ELEMENTS[2];
 
-	public void handleEvent(Event event) throws ClientException {
+	@Override
+	public void handleEvent(Event event) {
 		EventContext ec = event.getContext();
 
-		if (ec instanceof DocumentEventContext) {
+		if (isRegistered(event) && ec instanceof DocumentEventContext) {
 			DocumentEventContext context = (DocumentEventContext) ec;
 			DocumentModel doc = context.getSourceDocument();
 
@@ -58,7 +59,8 @@ public class UpdateRareFlagListener implements EventListener {
 					// Stash the previous primary taxonomic ident, so it can be retrieved in the documentModified handler.
 					
 					DocumentModel previousDoc = (DocumentModel) context.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
-					String previousTaxon = (String) previousDoc.getProperty(CollectionObjectConstants.TAXON_SCHEMA_NAME, CollectionObjectConstants.PRIMARY_TAXON_FIELD_NAME);
+					String previousTaxon = (String) previousDoc.getProperty(CollectionObjectBotGardenConstants.TAXON_SCHEMA_NAME, 
+							CollectionObjectBotGardenConstants.PRIMARY_TAXON_FIELD_NAME);
 
 					context.setProperty(PREVIOUS_TAXON_PROPERTY_NAME, previousTaxon);
 				}
@@ -70,7 +72,8 @@ public class UpdateRareFlagListener implements EventListener {
 						// of the collectionobject has changed. We only need to update the rare flag if it has.
 
 						String previousTaxon = (String) context.getProperty(PREVIOUS_TAXON_PROPERTY_NAME);
-						String currentTaxon = (String) doc.getProperty(CollectionObjectConstants.TAXON_SCHEMA_NAME, CollectionObjectConstants.PRIMARY_TAXON_FIELD_NAME);
+						String currentTaxon = (String) doc.getProperty(CollectionObjectBotGardenConstants.TAXON_SCHEMA_NAME, 
+								CollectionObjectBotGardenConstants.PRIMARY_TAXON_FIELD_NAME);
 						
 						if (previousTaxon == null) {
 							previousTaxon = "";
@@ -132,10 +135,12 @@ public class UpdateRareFlagListener implements EventListener {
 						boolean currentHasRareConservationCategory = hasRareConservationCategory(doc);
 
 						if (previousHasRareConservationCategory == currentHasRareConservationCategory) {
-							logger.debug("update not required: previousHasRareConservationCategory=" + previousHasRareConservationCategory + " currentHasRareConservationCategory=" + currentHasRareConservationCategory);
+							logger.debug("update not required: previousHasRareConservationCategory=" + previousHasRareConservationCategory + 
+									" currentHasRareConservationCategory=" + currentHasRareConservationCategory);
 						}
 						else {
-							logger.debug("update required: previousHasRareConservationCategory=" + previousHasRareConservationCategory + " currentHasRareConservationCategory=" + currentHasRareConservationCategory);
+							logger.debug("update required: previousHasRareConservationCategory=" + previousHasRareConservationCategory +
+									" currentHasRareConservationCategory=" + currentHasRareConservationCategory);
 							updateRequired = true;
 						}
 					}
@@ -156,8 +161,9 @@ public class UpdateRareFlagListener implements EventListener {
 		}
 	}
 	
-	private boolean hasRareConservationCategory(DocumentModel doc) throws ClientException {
-		List<Map<String, Object>> plantAttributesGroupList = (List<Map<String, Object>>) doc.getProperty(TaxonConstants.CONSERVATION_CATEGORY_SCHEMA_NAME, PLANT_ATTRIBUTES_GROUP_LIST_FIELD_NAME);
+	private boolean hasRareConservationCategory(DocumentModel doc) {
+		List<Map<String, Object>> plantAttributesGroupList = (List<Map<String, Object>>) doc.getProperty(TaxonBotGardenConstants.CONSERVATION_CATEGORY_SCHEMA_NAME,
+				PLANT_ATTRIBUTES_GROUP_LIST_FIELD_NAME);
 		boolean hasRareConservationCategory = false;
 
 		// UCBG-369: Changing this so that it only checks the primary conservation category.

@@ -17,7 +17,7 @@
     xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
     xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
     xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
-    xmlns:ns="http://collectionspace.org/services/authorization"
+    xmlns:ans="http://collectionspace.org/services/authorization"
     xmlns="http://collectionspace.org/services/authorization"
     targetNamespace="http://collectionspace.org/services/authorization"
     version="0.1"
@@ -55,6 +55,7 @@
             <xs:element name="roleId" type="xs:string" minOccurs="1" maxOccurs="1"/>
             <xs:element name="roleName" type="xs:string" minOccurs="1" maxOccurs="1"/>
             <xs:element name="displayName" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="tenantId" type="xs:string" minOccurs="1" maxOccurs="1"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -72,6 +73,7 @@
             <xs:element name="permissionId" type="xs:string" minOccurs="1" maxOccurs="1"/>
             <xs:element name="resourceName" type="xs:string" minOccurs="1" maxOccurs="1"/>
             <xs:element name="actionGroup" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="tenantId" type="xs:string" minOccurs="1" maxOccurs="1"/>
         </xs:sequence>
     </xs:complexType>
 

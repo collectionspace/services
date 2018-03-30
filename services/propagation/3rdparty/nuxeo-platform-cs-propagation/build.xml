@@ -10,13 +10,13 @@
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="-V" />
     <property name="src" location="src"/>
-    
+
     <!-- JAR files used by CollectionSpace 4.0 and later -->
     <property name="nuxeo.propagation.doctype.jars.all"
         value="collectionspace.propagation.doctype.*.jar"/>
     <property name="nuxeo.propagation.schema.jars.all"
         value="collectionspace.propagation.schema.*.jar"/>
-    <!-- Legacy JAR files used by CollectionSpace 3.3 and earlier --> 
+    <!-- Legacy JAR files used by CollectionSpace 3.3 and earlier -->
     <property name="nuxeo.propagation.legacy.jars.all"
         value="org.collectionspace.services.propagation.3rdparty.nuxeo-*.jar"/>
     <property name="nuxeo.propagation.legacy.jar"
@@ -49,7 +49,7 @@
     <target name="package-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="package" />
             <arg value="-Dmaven.test.skip=true" />
             <arg value="-f" />
@@ -74,7 +74,7 @@
     <target name="install-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="install" />
             <arg value="-Dmaven.test.skip=true" />
             <arg value="-f" />
@@ -97,7 +97,7 @@
     <target name="clean-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="clean" />
             <arg value="${mvn.opts}" />
         </exec>
@@ -113,7 +113,7 @@
     <target name="test-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="test" />
             <arg value="${mvn.opts}" />
         </exec>
@@ -122,7 +122,7 @@
     <target name="deploy" depends="install"
         description="deploy propagation doctype in ${jee.server.nuxeo}">
         <!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
-        leaving this only for backwards compatibility reasons. -->  
+        leaving this only for backwards compatibility reasons. -->
         <copy file="${basedir}/target/${nuxeo.propagation.legacy.jar}"
         todir="${jee.deploy.nuxeo.plugins}"/>
     </target>

@@ -9,7 +9,7 @@ xmlns:ns2="http://collectionspace.org/services/authorization">
   </account>
   <role>
     <roleId>${roleIntern.CSID}</roleId>
-    <roleName>ROLE_TEST_INTERN</roleName>
+    <roleName>xROLE_TEST_INTERN</roleName>
   </role>
 </ns2:account_role>
 

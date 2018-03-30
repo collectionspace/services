@@ -1,4 +1,4 @@
-/**	
+/**
  * This document is a part of the source code and related artifacts
  * for CollectionSpace, an open source collections management system
  * for museums and related institutions:
@@ -16,6 +16,8 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.pottag.PottagsCommon;
+
 /**
  * PottagClient.java
  *
@@ -23,13 +25,17 @@ package org.collectionspace.services.client;
  * $LastChangedDate$
  *
  */
-public class PottagClient extends AbstractCommonListPoxServiceClientImpl<PottagProxy> {
+public class PottagClient extends AbstractCommonListPoxServiceClientImpl<PottagProxy, PottagsCommon> {
 
-    public static final String SERVICE_NAME = "pottags";
+	public static final String SERVICE_NAME = "pottags";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
     public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
     public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
+
+    public PottagClient() throws Exception {
+		super();
+	}
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()

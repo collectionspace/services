@@ -2,8 +2,10 @@ package org.collectionspace.services.common.authorization_mgt;
 
 import org.collectionspace.services.authorization.AccountValue;
 import org.collectionspace.services.authorization.PermissionRoleRel;
+import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.authorization.AccountRoleRel;
 import org.collectionspace.services.authorization.PermissionValue;
+import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RoleValue;
 
 public class AuthorizationRoleRel {
@@ -28,9 +30,27 @@ public class AuthorizationRoleRel {
      * @param arr the arr
      * @return the role account value
      */
+    static public RoleValue buildRoleValue(Role role) {
+    	RoleValue rv = null;
+    	
+    	rv = new RoleValue();
+        rv.setRoleId(role.getCsid());
+        rv.setRoleName(role.getRoleName());
+        rv.setDisplayName(role.getDisplayName());
+        rv.setTenantId(role.getTenantId());
+
+        return rv;
+    }
+    
+    /**
+     * Builds the role value.
+     *
+     * @param arr the arr
+     * @return the role account value
+     */
     static public RoleValue buildRoleValue(AccountRoleRel arr) {
     	RoleValue rv = null;
-    	if (arr.getRoleId().equals(AuthorizationCommon.ROLE_SPRING_ADMIN_ID) == false) {
+    	if (arr.getRoleId().equals(AuthN.ROLE_SPRING_ADMIN_ID) == false) {
 	    	rv = new RoleValue();
 	        rv.setRoleId(arr.getRoleId());
 	        rv.setRoleName(arr.getRoleName());

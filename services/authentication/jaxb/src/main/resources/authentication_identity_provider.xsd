@@ -88,6 +88,104 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    
+    <!-- Non-persistent JaxB object for password reset POST requsts -->
+    <xs:element name="passwordreset">
+	    <xs:complexType>
+	        <xs:annotation>
+	            <xs:appinfo>
+	                <hj:ignored/>
+	            </xs:appinfo>
+	        </xs:annotation>
+	        <xs:sequence>
+	            <xs:annotation>
+	                <xs:documentation>The payload for a password reset request</xs:documentation>
+	            </xs:annotation>
+				<xs:element name="token" type="xs:string"/>
+				<xs:element name="password" type="xs:string"/>
+	        </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+    
+    <xs:element name="token">
+        <xs:complexType>
+            <xs:annotation>
+                <xs:documentation>
+                    Definition for creating password reset tockens.
+                </xs:documentation>
+                <xs:appinfo>
+                    <hj:entity>
+                        <orm:table name="tokens"/>
+                    </hj:entity>
+                </xs:appinfo>
+            </xs:annotation>
+            <xs:sequence>
+                <xs:element name="id" type="xs:string" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:id>
+                                <orm:column name="id" length="128" nullable="false"/>
+                            </hj:id>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>            
+                <xs:element name="accountCsid" type="xs:string" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="account_csid" length="128" nullable="false"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="tenantId" type="xs:string" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="tenant_id" length="128" nullable="false"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="expireSeconds" type="xs:integer" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="expire_seconds" nullable="false"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="enabled" type="xs:boolean" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="enabled" nullable="false"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>                
+                <xs:element name="createdAt" type="xs:dateTime">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="created_at" nullable="false"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="updatedAt" type="xs:dateTime">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="updated_at" />
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>    
 
 </xs:schema>
 

@@ -22,21 +22,19 @@
  */
 package org.collectionspace.services.client.test;
 
+import javax.ws.rs.core.Response;
+
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.workflow.WorkflowCommon;
 import org.collectionspace.services.client.DimensionClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.dimension.DimensionsCommon;
-
 import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,9 +60,14 @@ public class WorkflowServiceTest extends AbstractPoxServiceTestImpl<AbstractComm
 	}
     
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new DimensionClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new DimensionClient(clientPropertiesFilename);
+	}
 
     //
     // Test overrides
@@ -82,10 +85,10 @@ public class WorkflowServiceTest extends AbstractPoxServiceTestImpl<AbstractComm
     public void read(String testName) throws Exception {
         setupRead();
         DimensionClient client = new DimensionClient();
-        ClientResponse<String> res = client.getWorkflow(knownResourceId);
+        Response res = client.getWorkflow(knownResourceId);
         try {
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        WorkflowCommon workflowsCommon = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
 	        if (logger.isDebugEnabled() == true) {
 	        	logger.debug("Workflow payload is: " + input.getXmlPayload());
@@ -93,7 +96,7 @@ public class WorkflowServiceTest extends AbstractPoxServiceTestImpl<AbstractComm
 	        Assert.assertNotNull(workflowsCommon);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -163,7 +166,7 @@ public class WorkflowServiceTest extends AbstractPoxServiceTestImpl<AbstractComm
     // ---------------------------------------------------------------
     
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
         String dimensionsCommonPartName = new DimensionClient().getCommonPartName();
     	return createInstance(identifier, dimensionsCommonPartName);
     }    
@@ -177,7 +180,7 @@ public class WorkflowServiceTest extends AbstractPoxServiceTestImpl<AbstractComm
 	/*
 	 * We're using a DimensionsCommon instance to test the workflow service.
 	 */
-    private PoxPayloadOut createDimensionInstance(String dimensionValue) {
+    private PoxPayloadOut createDimensionInstance(String dimensionValue) throws Exception {
         String commonPartName = new DimensionClient().getCommonPartName();
         return createDimensionInstance(commonPartName, dimensionValue);
     }
@@ -200,6 +203,5 @@ public class WorkflowServiceTest extends AbstractPoxServiceTestImpl<AbstractComm
         }
 
         return multipart;
-    }
-	
+    }	
 }

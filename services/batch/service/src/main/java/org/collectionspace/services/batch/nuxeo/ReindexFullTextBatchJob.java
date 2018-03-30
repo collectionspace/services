@@ -8,7 +8,6 @@ package org.collectionspace.services.batch.nuxeo;
 import java.io.File;
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.lang.reflect.Proxy;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +20,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.CollectionSpaceResource;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.StoredValuesUriTemplate;
 import org.collectionspace.services.common.UriTemplateFactory;
 import org.collectionspace.services.common.UriTemplateRegistryKey;
@@ -29,25 +29,25 @@ import org.collectionspace.services.common.invocable.InvocationContext.ListCSIDs
 import org.collectionspace.services.common.invocable.InvocationContext.Params.Param;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
+import org.collectionspace.services.nuxeo.util.ReindexFulltextRoot.ReindexInfo;
 import org.nuxeo.ecm.core.api.AbstractSession;
-import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.IterableQueryResult;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.NuxeoPrincipal;
-import org.nuxeo.ecm.core.api.TransactionalCoreSessionWrapper;
-import org.nuxeo.ecm.core.event.Event;
-import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.EventService;
-import org.nuxeo.ecm.core.event.impl.EventContextImpl;
 import org.nuxeo.ecm.core.query.QueryFilter;
 import org.nuxeo.ecm.core.query.sql.NXQL;
+import org.nuxeo.ecm.core.storage.FulltextConfiguration;
 import org.nuxeo.ecm.core.storage.sql.Model;
-import org.nuxeo.ecm.core.storage.sql.ModelFulltext;
 import org.nuxeo.ecm.core.storage.sql.Node;
 import org.nuxeo.ecm.core.storage.sql.Session;
 import org.nuxeo.ecm.core.storage.sql.SimpleProperty;
-import org.nuxeo.ecm.core.storage.sql.coremodel.BinaryTextListener;
+import org.nuxeo.ecm.core.storage.sql.coremodel.SQLFulltextExtractorWork;
 import org.nuxeo.ecm.core.storage.sql.coremodel.SQLSession;
+import org.nuxeo.ecm.core.work.api.Work;
+import org.nuxeo.ecm.core.work.api.WorkManager;
+import org.nuxeo.ecm.core.work.api.WorkManager.Scheduling;
 import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.runtime.transaction.TransactionHelper;
 import org.slf4j.Logger;
@@ -73,10 +73,10 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 	private String stopFileDirectory;
 
 	private CoreSession coreSession;
-	private Session session;
-	private ModelFulltext fulltextInfo;
+	private Session session = null;
+    protected FulltextConfiguration fulltextConfiguration;
 	
-	private Map<String, ResourceBase> resourcesByDocType;
+	private Map<String, NuxeoBasedResource> resourcesByDocType;
 
 	public ReindexFullTextBatchJob() {
 		setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_NO_CONTEXT, INVOCATION_MODE_SINGLE, INVOCATION_MODE_LIST));
@@ -103,22 +103,22 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		}
 		
 		try {
-			coreSession = getRepoSession().getRepositoryInstance().getSession();
+			coreSession = getRepoSession().getCoreSession();
 
 			if (requestIsForInvocationModeSingle()) {
 				String csid = getInvocationContext().getSingleCSID();
 				
 				if (csid == null) {
-					throw new Exception("no singleCSID was supplied");
+					throw new Exception("No singleCSID was supplied in invocation context.");
 				}
 
 				String docType = getInvocationContext().getDocType();
 				
 				if (StringUtils.isEmpty(docType)) {
-					throw new Exception("no docType was supplied");
+					throw new Exception("No docType was supplied in invocation context.");
 				}
 
-				log.debug("reindexing " + docType + " record with csid: " + csid);
+				log.debug("Reindexing " + docType + " record with csid: " + csid);
 				
 				reindexDocument(docType, csid);
 			}
@@ -133,10 +133,10 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 				String docType = getInvocationContext().getDocType();
 
 				if (StringUtils.isEmpty(docType)) {
-					throw new Exception("no docType was supplied");
+					throw new Exception("No docType was supplied in invocation context.");
 				}
 
-				log.debug("reindexing " + csids.size() + " " + docType + " records with csids: " + csids.get(0) + ", ...");
+				log.debug("Reindexing " + csids.size() + " " + docType + " records with csids: " + csids.get(0) + ", ...");
 				
 				if (log.isTraceEnabled()) {
 					log.trace(StringUtils.join(csids, ", "));
@@ -217,9 +217,9 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 	}
 	
 	private void initResourceMap() {
-		resourcesByDocType = new HashMap<String, ResourceBase>();
+		resourcesByDocType = new HashMap<String, NuxeoBasedResource>();
 
-		for (ResourceBase resource : getResourceMap().values()) {
+		for (CollectionSpaceResource<?, ?> resource : getResourceMap().values()) {
 			Map<UriTemplateRegistryKey, StoredValuesUriTemplate> entries = resource.getUriRegistryEntries();
 			
 			for (UriTemplateRegistryKey key : entries.keySet()) {
@@ -230,8 +230,8 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 					if (resourcesByDocType.containsKey(docType)) {
 						log.warn("multiple resources found for docType " + docType);
 						
-						ResourceBase currentResource = resourcesByDocType.get(docType);
-						ResourceBase candidateResource = resource;
+						NuxeoBasedResource currentResource = resourcesByDocType.get(docType);
+						NuxeoBasedResource candidateResource = (NuxeoBasedResource) resource;
 						
 						// Favor the resource that isn't an AuthorityResource. This
 						// is really just to deal with Contacts, which are handled
@@ -245,7 +245,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 						log.warn("using " + resourcesByDocType.get(docType));
 					}
 					else {
-						resourcesByDocType.put(docType, resource);
+						resourcesByDocType.put(docType, (NuxeoBasedResource) resource);
 					}
 				}				
 			}
@@ -272,7 +272,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		List<String> docTypes = new ArrayList<String>(resourcesByDocType.keySet());
 		Collections.sort(docTypes);
 
-		log.debug("getAllDocTypes found: " + StringUtils.join(docTypes, ", "));
+		log.debug("Call to getAllDocTypes() method found: " + StringUtils.join(docTypes, ", "));
 		
 		return docTypes;
 	}
@@ -286,10 +286,10 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		
 		log.debug("reindexing docType " + docType);
 		
-		ResourceBase resource = resourcesByDocType.get(docType);
+		NuxeoBasedResource resource = resourcesByDocType.get(docType);
 		
 		if (resource == null) {
-			log.warn("no resource found for docType " + docType);
+			log.warn("No service resource found for docType " + docType);
 		}
 		
 		boolean isAuthorityItem = false;
@@ -318,7 +318,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 				int pageNum = startPage;
 				List<String> csids = null;
 
-				log.debug("reindexing vocabulary of " + docType + " with csid " + vocabularyCsid);
+				log.debug("Reindexing vocabulary of " + docType + " with csid " + vocabularyCsid);
 				
 				do {
 					// Check for a stop file before reindexing the batch.
@@ -347,8 +347,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 				}
 				while(csids.size() == pageSize && pageNum <= endPage);
 			}
-		}
-		else {
+		} else {
 			int pageNum = startPage;
 			List<String> csids = null;
 
@@ -394,7 +393,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		}
 		
 		getLowLevelSession();		
-		List<Info> infos = new ArrayList<Info>();
+		List<ReindexInfo> infos = new ArrayList<ReindexInfo>();
 
 		String query = "SELECT ecm:uuid, ecm:primaryType FROM Document " +
 					   "WHERE ecm:name IN (" + StringUtils.join(quoteList(csids), ',') + ") " +
@@ -406,7 +405,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 			for (Map<String, Serializable> map : result) {
 				String id = (String) map.get(NXQL.ECM_UUID);
 				String type = (String) map.get(NXQL.ECM_PRIMARYTYPE);
-				infos.add(new Info(id, type));
+				infos.add(new ReindexInfo(id, type));
 			}
 		} finally {
 			result.close();
@@ -417,7 +416,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		}
 		
 		if (log.isTraceEnabled()) {
-			for (Info info : infos) {
+			for (ReindexInfo info : infos) {
 				log.trace(info.type + " " + info.id);
 			}
 		}
@@ -474,18 +473,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 	 * Contributors:
 	 *	 Florent Guillaume
 	 */
-	
-	protected static class Info {
-		public final String id;
-
-		public final String type;
-
-		public Info(String id, String type) {
-			this.id = id;
-			this.type = type;
-		}
-	}
-	
+		
 	/**
 	 * Launches a fulltext reindexing of the database.
 	 *
@@ -494,70 +482,85 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 	 *			batches; starts at 1
 	 * @return when done, ok + the total number of docs
 	 */
-	public String reindexFulltext(int batchSize, int batch) throws Exception {
-		Principal principal = coreSession.getPrincipal();
-		if (!(principal instanceof NuxeoPrincipal)) {
-			return "unauthorized";
-		}
-		NuxeoPrincipal nuxeoPrincipal = (NuxeoPrincipal) principal;
-		if (!nuxeoPrincipal.isAdministrator()) {
-			return "unauthorized";
-		}
+	public String reindexFulltext(int batchSize, int batch, String query) throws Exception {
+        Principal principal = coreSession.getPrincipal();
+        if (!(principal instanceof NuxeoPrincipal)) {
+            return "unauthorized";
+        }
+        NuxeoPrincipal nuxeoPrincipal = (NuxeoPrincipal) principal;
+        if (!nuxeoPrincipal.isAdministrator()) {
+            return "unauthorized";
+        }
 
-		log("Reindexing starting");
-		if (batchSize <= 0) {
-			batchSize = DEFAULT_BATCH_SIZE;
-		}
-		List<Info> infos = getInfos();
-		int size = infos.size();
-		int numBatches = (size + batchSize - 1) / batchSize;
-		if (batch < 0 || batch > numBatches) {
-			batch = 0; // all
-		}
-		batch--;
+        log("Reindexing starting");
+        if (batchSize <= 0) {
+            batchSize = DEFAULT_BATCH_SIZE;
+        }
+        
+        //
+        // A default query that gets ALL the documents
+        //
+        if (query == null) {
+	        query = "SELECT ecm:uuid, ecm:primaryType FROM Document"
+	                + " WHERE ecm:isProxy = 0"
+	                + " AND ecm:currentLifeCycleState <> 'deleted'"
+	                + " ORDER BY ecm:uuid";
+        }
 
-		log("Reindexing of %s documents, batch size: %s, number of batches: %s",
-				size, batchSize, numBatches);
-		if (batch >= 0) {
-			log("Reindexing limited to batch: %s", batch + 1);
-		}
+        List<ReindexInfo> infos = getInfos(query);
+        int size = infos.size();
+        int numBatches = (size + batchSize - 1) / batchSize;
+        if (batch < 0 || batch > numBatches) {
+            batch = 0; // all
+        }
+        batch--;
 
-		boolean tx = TransactionHelper.isTransactionActive();
-		if (tx) {
-			TransactionHelper.commitOrRollbackTransaction();
-		}
+        log("Reindexing of %s documents, batch size: %s, number of batches: %s",
+                size, batchSize, numBatches);
+        if (batch >= 0) {
+            log("Reindexing limited to batch: %s", batch + 1);
+        }
 
-		int n = 0;
-		int errs = 0;
-		for (int i = 0; i < numBatches; i++) {
-			if (batch >= 0 && batch != i) {
-				continue;
-			}
-			int pos = i * batchSize;
-			int end = pos + batchSize;
-			if (end > size) {
-				end = size;
-			}
-			List<Info> batchInfos = infos.subList(pos, end);
-			log("Reindexing batch %s/%s, first id: %s", i + 1, numBatches,
-					batchInfos.get(0).id);
-			try {
-				doBatch(batchInfos);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-			} catch (Exception e) {
-				log.error("Error processing batch " + i + 1, e);
-				errs++;
-			}
-			n += end - pos;
-		}
+        //
+        // Commit and close the transaction that was started by our standard request lifecycle.
+        //
+        boolean tx = TransactionHelper.isTransactionActive();
+        if (tx) {
+            TransactionHelper.commitOrRollbackTransaction();
+        }
 
-		log("Reindexing done");
-		if (tx) {
-			TransactionHelper.startTransaction();
-		}
-		return "done: " + n + " total: " + size + " batch_errors: " + errs;
-	}
+        int n = 0;
+        int errs = 0;
+        for (int i = 0; i < numBatches; i++) {
+            if (batch >= 0 && batch != i) {
+                continue;
+            }
+            int pos = i * batchSize;
+            int end = pos + batchSize;
+            if (end > size) {
+                end = size;
+            }
+            List<ReindexInfo> batchInfos = infos.subList(pos, end);
+            log("Reindexing batch %s/%s, first id: %s", i + 1, numBatches,
+                    batchInfos.get(0).id);
+            try {
+                doBatch(batchInfos);
+            } catch (NuxeoException e) {
+                log.error("Error processing batch " + i + 1, e);
+                errs++;
+            }
+            n += end - pos;
+        }
+
+        log("Reindexing done");
+        //
+        // Start a new transaction so our standard request lifecycle can complete.
+        //
+        if (tx) {
+            TransactionHelper.startTransaction();
+        }
+        return "done: " + n + " total: " + size + " batch_errors: " + errs;
+    }
 
 	protected void log(String format, Object... args) {
 		log.warn(String.format(format, args));
@@ -567,145 +570,122 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 	 * This has to be called once the transaction has been started.
 	 */
 	protected void getLowLevelSession() throws Exception {
-		CoreSession cs;
-		if (Proxy.isProxyClass(coreSession.getClass())) {
-			TransactionalCoreSessionWrapper w = (TransactionalCoreSessionWrapper) Proxy.getInvocationHandler(coreSession);
-			Field f1 = TransactionalCoreSessionWrapper.class.getDeclaredField("session");
-			f1.setAccessible(true);
-			cs = (CoreSession) f1.get(w);
-		} else {
-			cs = coreSession;
-		}
+        try {
+            SQLSession s = (SQLSession) ((AbstractSession) coreSession).getSession();
+            Field f2 = SQLSession.class.getDeclaredField("session");
+            f2.setAccessible(true);
+            session = (Session) f2.get(s);
+            fulltextConfiguration = session.getModel().getFulltextConfiguration();
+        } catch (ReflectiveOperationException e) {
+            throw new NuxeoException(e);
+        }
+    }
 
-		SQLSession s = (SQLSession) ((AbstractSession) cs).getSession();
-		Field f2 = SQLSession.class.getDeclaredField("session");
-		f2.setAccessible(true);
-		session = (Session) f2.get(s);
-		fulltextInfo = session.getModel().getFulltextInfo();
-	}
+	protected List<ReindexInfo> getInfos(String query) throws Exception {
+        getLowLevelSession();
+        List<ReindexInfo> infos = new ArrayList<ReindexInfo>();
+        IterableQueryResult it = session.queryAndFetch(query, NXQL.NXQL,
+                QueryFilter.EMPTY);
+        try {
+            for (Map<String, Serializable> map : it) {
+                Serializable id = map.get(NXQL.ECM_UUID);
+                String type = (String) map.get(NXQL.ECM_PRIMARYTYPE);
+                infos.add(new ReindexInfo(id, type));
+            }
+        } finally {
+            it.close();
+        }
+        return infos;
+    }
 
-	protected List<Info> getInfos() throws Exception {
-		getLowLevelSession();
-		List<Info> infos = new ArrayList<Info>();
-		String query = "SELECT ecm:uuid, ecm:primaryType FROM Document"
-				+ " WHERE ecm:isProxy = 0"
-				+ " AND ecm:currentLifeCycleState <> 'deleted'"
-				+ " ORDER BY ecm:uuid";
-		IterableQueryResult it = session.queryAndFetch(query, NXQL.NXQL,
-				QueryFilter.EMPTY);
-		try {
-			for (Map<String, Serializable> map : it) {
-				String id = (String) map.get(NXQL.ECM_UUID);
-				String type = (String) map.get(NXQL.ECM_PRIMARYTYPE);
-				infos.add(new Info(id, type));
-			}
-		} finally {
-			it.close();
-		}
-		return infos;
-	}
+	protected void doBatch(List<ReindexInfo> infos) throws Exception {
+        boolean tx;
+        boolean ok;
 
-	protected void doBatch(List<Info> infos) throws Exception {
-		getLowLevelSession(); // for fulltextInfo
-		List<Serializable> ids = new ArrayList<Serializable>(infos.size());
-		Set<Serializable> asyncIds = new HashSet<Serializable>();
-		for (Info info : infos) {
-			ids.add(info.id);
-			if (fulltextInfo.isFulltextIndexable(info.type)) {
-				asyncIds.add(info.id);
-			}
-		}
+        // transaction for the sync batch
+        tx = TransactionHelper.startTransaction();
 
-		boolean tx;
-		boolean ok;
+        getLowLevelSession(); // for fulltextInfo
+        List<Serializable> ids = new ArrayList<Serializable>(infos.size());
+        Set<String> asyncIds = new HashSet<String>();
+        Model model = session.getModel();
+        for (ReindexInfo info : infos) {
+            ids.add(info.id);
+            if (fulltextConfiguration.isFulltextIndexable(info.type)) {
+                asyncIds.add(model.idToString(info.id));
+            }
+        }
+        ok = false;
+        try {
+            runSyncBatch(ids, asyncIds);
+            ok = true;
+        } finally {
+            if (tx) {
+                if (!ok) {
+                    TransactionHelper.setTransactionRollbackOnly();
+                    log.error("Rolling back sync");
+                }
+                TransactionHelper.commitOrRollbackTransaction();
+            }
+        }
 
-		// transaction for the sync batch
-		tx = TransactionHelper.startTransaction();
-		ok = false;
-		try {
-			runSyncBatch(ids, asyncIds);
-			ok = true;
-		} finally {
-			if (tx) {
-				if (!ok) {
-					TransactionHelper.setTransactionRollbackOnly();
-					log.error("Rolling back sync");
-				}
-				TransactionHelper.commitOrRollbackTransaction();
-			}
-		}
+        runAsyncBatch(asyncIds);
 
-		// transaction for the async batch firing (needs session)
-		tx = TransactionHelper.startTransaction();
-		ok = false;
-		try {
-			runAsyncBatch(asyncIds);
-			ok = true;
-		} finally {
-			if (tx) {
-				if (!ok) {
-					TransactionHelper.setTransactionRollbackOnly();
-					log.error("Rolling back async fire");
-				}
-				TransactionHelper.commitOrRollbackTransaction();
-			}
-		}
-
-		// wait for async completion after transaction commit
-		Framework.getLocalService(EventService.class).waitForAsyncCompletion();
-	}
+        // wait for async completion after transaction commit
+        Framework.getLocalService(EventService.class).waitForAsyncCompletion();
+    }
 
 	/*
 	 * Do this at the low-level session level because we may have to modify
 	 * things like versions which aren't usually modifiable, and it's also good
 	 * to bypass all listeners.
 	 */
-	protected void runSyncBatch(List<Serializable> ids,
-			Set<Serializable> asyncIds) throws Exception {
-		getLowLevelSession();
+	protected void runSyncBatch(List<Serializable> ids, Set<String> asyncIds) throws Exception {
+        getLowLevelSession();
 
-		session.getNodesByIds(ids); // batch fetch
+        session.getNodesByIds(ids); // batch fetch
 
-		Map<Serializable, String> titles = new HashMap<Serializable, String>();
-		for (Serializable id : ids) {
-			Node node = session.getNodeById(id);
-			if (asyncIds.contains(id)) {
-				node.setSimpleProperty(Model.FULLTEXT_JOBID_PROP, id);
-			}
-			SimpleProperty prop;
-			try {
-				prop = node.getSimpleProperty(DC_TITLE);
-			} catch (IllegalArgumentException e) {
-				continue;
-			}
-			String title = (String) prop.getValue();
-			titles.put(id, title);
-			prop.setValue(title + " ");
-		}
-		session.save();
+        Map<Serializable, String> titles = new HashMap<Serializable, String>();
+        for (Serializable id : ids) {
+            Node node = session.getNodeById(id);
+            if (asyncIds.contains(id)) {
+                node.setSimpleProperty(Model.FULLTEXT_JOBID_PROP, id);
+            }
+            SimpleProperty prop;
+            try {
+                prop = node.getSimpleProperty(DC_TITLE);
+            } catch (IllegalArgumentException e) {
+                continue;
+            }
+            String title = (String) prop.getValue();
+            titles.put(id, title);
+            prop.setValue(title + " ");
+        }
+        session.save();
 
-		for (Serializable id : ids) {
-			Node node = session.getNodeById(id);
-			SimpleProperty prop;
-			try {
-				prop = node.getSimpleProperty(DC_TITLE);
-			} catch (IllegalArgumentException e) {
-				continue;
-			}
-			prop.setValue(titles.get(id));
-		}
-		session.save();
-	}
+        for (Serializable id : ids) {
+            Node node = session.getNodeById(id);
+            SimpleProperty prop;
+            try {
+                prop = node.getSimpleProperty(DC_TITLE);
+            } catch (IllegalArgumentException e) {
+                continue;
+            }
+            prop.setValue(titles.get(id));
+        }
+        session.save();
+    }
 
-	protected void runAsyncBatch(Set<Serializable> asyncIds)
-			throws ClientException {
-		if (asyncIds.isEmpty()) {
-			return;
-		}
-		EventContext eventContext = new EventContextImpl(asyncIds, fulltextInfo);
-		eventContext.setRepositoryName(coreSession.getRepositoryName());
-		Event event = eventContext.newEvent(BinaryTextListener.EVENT_NAME);
-		EventService eventService = Framework.getLocalService(EventService.class);
-		eventService.fireEvent(event);
-	}
+	protected void runAsyncBatch(Set<String> asyncIds) {
+        if (asyncIds.isEmpty()) {
+            return;
+        }
+        String repositoryName = coreSession.getRepositoryName();
+        WorkManager workManager = Framework.getLocalService(WorkManager.class);
+        for (String id : asyncIds) {
+            Work work = new SQLFulltextExtractorWork(repositoryName, id);
+            // schedule immediately, we're outside a transaction
+            workManager.schedule(work, Scheduling.IF_NOT_SCHEDULED, false);
+        }
+    }
 }

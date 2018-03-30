@@ -173,16 +173,26 @@ public class RefName {
         public String shortIdentifier = "";
         public String displayName = "";
 
-        public static AuthorityItem parse(String urn) {
+        // Returns null value if urn can't be parsed and exceptionOnFail is set to 'false'
+        // Throws exception if urn can't be parsed and exceptionOnFail is set to 'true'
+        public static AuthorityItem parse(String urn, boolean exceptionOnFail) throws IllegalArgumentException {
             AuthorityItem authorityItem = null;
+
             try {
-                RefNameUtils.AuthorityTermInfo termInfo =
-                        RefNameUtils.parseAuthorityTermInfo(urn);
-                authorityItem = authorityItemFromTermInfo(termInfo);
-            } catch (IllegalArgumentException iae) {
-                return null;
+	            RefNameUtils.AuthorityTermInfo termInfo = RefNameUtils.parseAuthorityTermInfo(urn);
+	            authorityItem = authorityItemFromTermInfo(termInfo);
+            } catch (IllegalArgumentException e) {
+            	if (exceptionOnFail == true) {
+            		throw e;
+            	}
             }
+
             return authorityItem;
+        }
+        
+        // Returns null value if urn can't be parsed
+        public static AuthorityItem parse(String urn) {
+        	return parse(urn, false);
         }
 
         public String getDisplayName() {

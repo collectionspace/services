@@ -1,0 +1,20 @@
+{
+  "document": {
+    "@name": "collectionobjects",
+    "ns2:collectionobjects_common": {
+      "@xmlns:ns2": "http://collectionspace.org/services/collectionobject",
+      "objectNameList": {
+        "objectNameGroup": {
+          "objectName": "Test Object"
+        }
+      },
+      "objectNumber": "TEST2000.4.5",
+      "comments": {
+        "comment": [
+          "line 1\nline 2",
+          "åéîøü"
+        ]
+      }
+    }
+  }
+}

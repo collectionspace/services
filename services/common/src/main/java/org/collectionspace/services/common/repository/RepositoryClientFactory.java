@@ -24,6 +24,7 @@
 package org.collectionspace.services.common.repository;
 
 import java.util.Hashtable;
+
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.config.ServicesConfigReaderImpl;
 import org.collectionspace.services.config.RepositoryClientConfigType;
@@ -39,7 +40,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RepositoryClientFactory<IT, OT> {
 
-    private static final RepositoryClientFactory self = new RepositoryClientFactory();
+    private static final RepositoryClientFactory<?, ?> self = new RepositoryClientFactory<Object, Object>();
     final Logger logger = LoggerFactory.getLogger(RepositoryClientFactory.class);
     //clients key=client name, value=repository client
     private Hashtable<String, RepositoryClient<IT, OT>> clients = new Hashtable<String, RepositoryClient<IT, OT>>();
@@ -52,7 +53,7 @@ public class RepositoryClientFactory<IT, OT> {
             String clientName = repositoryClientConfig.getName();
             ClassLoader cloader = Thread.currentThread().getContextClassLoader();
 
-            Class jclazz = cloader.loadClass(clientClassName);
+            Class<?> jclazz = cloader.loadClass(clientClassName);
             RepositoryClient<IT, OT> jclient = (RepositoryClient<IT, OT>)jclazz.newInstance();
             clients.put(clientName, jclient);
 
@@ -61,7 +62,7 @@ public class RepositoryClientFactory<IT, OT> {
         }
     }
 
-    public static RepositoryClientFactory getInstance() {
+    public static RepositoryClientFactory<?, ?> getInstance() {
         return self;
     }
 

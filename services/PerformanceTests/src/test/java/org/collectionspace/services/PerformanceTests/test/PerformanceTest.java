@@ -29,15 +29,11 @@ import java.util.Random;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.jboss.resteasy.util.HttpResponseCodes;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.util.HttpResponseCodes;
-
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.PayloadOutputPart;
@@ -66,9 +62,10 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 
     /**
      * Performance test.
+     * @throws Exception 
      */
     @Test
-    public void performanceTest() {
+    public void performanceTest() throws Exception {
         roundTripOverhead(10);
         deleteCollectionObjects();
         String[] coList = this.createCollectionObjects(MAX_RECORDS);
@@ -83,20 +80,21 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
      *
      * @param numOfCalls the num of calls
      * @return the long
+     * @throws Exception 
      */
-    private long roundTripOverhead(int numOfCalls) {
+    private long roundTripOverhead(int numOfCalls) throws Exception {
         long result = 0;
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
 
         long totalTime = 0;
-        ClientResponse<Response> response;
+        Response response;
         for (int i = 0; i < numOfCalls; i++) {
             Date startTime = new Date();
             response = collectionObjectClient.roundtrip(0);
             try {
                 Assert.assertEquals(response.getStatus(), HttpResponseCodes.SC_OK);
             } finally {
-                response.releaseConnection();
+                response.close();
             }
             Date stopTime = new Date();
             totalTime = totalTime + (stopTime.getTime() - startTime.getTime());
@@ -115,11 +113,12 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
      * Search collection objects.
      *
      * @param numberOfObjects the number of objects
+     * @throws Exception 
      */
-    private void searchCollectionObjects(int numberOfObjects) {
+    private void searchCollectionObjects(int numberOfObjects) throws Exception {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         Random randomGenerator = new Random(System.currentTimeMillis());
-        ClientResponse<AbstractCommonList> searchResults;
+        Response searchResultsResponse;
 
         long totalTime = 0;
         long totalSearchResults = 0;
@@ -132,15 +131,16 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
             for (int i = 0; i < MAX_SEARCHES; i++) {
                 //sandwich the call with timestamps
                 Date startTime = new Date();
-                searchResults = collectionObjectClient.keywordSearchIncludeDeleted(keywords, NOT_INCLUDING_DELETED_RESOURCES);
+                searchResultsResponse = collectionObjectClient.keywordSearchIncludeDeleted(keywords, 
+                		NOT_INCLUDING_DELETED_RESOURCES);
                 Date stopTime = new Date();
 
                 //extract the result list and release the ClientResponse
                 AbstractCommonList coListItem = null;
                 try {
-                    coListItem = searchResults.getEntity();
+                    coListItem = searchResultsResponse.readEntity(AbstractCommonList.class);
                 } finally {
-                    searchResults.releaseConnection();
+                	searchResultsResponse.close();
                 }
 
                 long time = stopTime.getTime() - startTime.getTime();
@@ -149,6 +149,7 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
                 totalSearchResults = totalSearchResults
                         + coListItem.getListItem().size();
             }
+            
             if (logger.isDebugEnabled()) {
                 System.out.println("------------------------------------------------------------------------------");
                 System.out.println("Searched Objects: " + numberOfObjects);
@@ -174,7 +175,7 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
             PoxPayloadOut multipart) {
         String result = null;
         // Make the create call and check the response
-        ClientResponse<Response> response = collectionObjectClient.create(multipart);
+        Response response = collectionObjectClient.create(multipart);
         try {
             int responseStatus = response.getStatus();
             if (logger.isDebugEnabled() == true) {
@@ -187,7 +188,7 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
             Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
             result = extractId(response);
         } finally {
-            response.releaseConnection();
+            response.close();
         }
 
         return result;
@@ -198,8 +199,9 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
      *
      * @param numberOfObjects the number of objects
      * @return the string[]
+     * @throws Exception 
      */
-    public String[] createCollectionObjects(int numberOfObjects) {
+    public String[] createCollectionObjects(int numberOfObjects) throws Exception {
         Random randomGenerator = new Random(System.currentTimeMillis());
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         String[] coList = new String[numberOfObjects];
@@ -253,16 +255,17 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
      */
     private void readCollectionObject(CollectionObjectClient collectionObjectClient,
             String resourceId) {
-        ClientResponse<String> res = collectionObjectClient.read(resourceId);
-        res.releaseConnection();
+        Response res = collectionObjectClient.read(resourceId);
+        res.close();
     }
 
     /**
      * Delete collection objects.
      *
      * @param arrayOfObjects the array of objects
+     * @throws Exception 
      */
-    public void readCollectionObjects(String[] arrayOfObjects) {
+    public void readCollectionObjects(String[] arrayOfObjects) throws Exception {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
 
         Date startTime = new Date();
@@ -280,21 +283,21 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
     /**
      * Delete collection objects.
      * FIXME: Deletes a page at a time until there are no more CollectionObjects.
+     * @throws Exception 
      */
-    public void readCollectionObjects() {
+    public void readCollectionObjects() throws Exception {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        ClientResponse<AbstractCommonList> response;
 
         List<AbstractCommonList.ListItem> coListItems = null;
         do {
-            response = collectionObjectClient.readList(new Long(MAX_RECORDS),
+            Response res = collectionObjectClient.readList(new Long(MAX_RECORDS),
                     new Long(0));
             try {
                 AbstractCommonList commonListElement =
-                        (AbstractCommonList) response.getEntity(AbstractCommonList.class);
+                        (AbstractCommonList) res.readEntity(AbstractCommonList.class);
                 coListItems = commonListElement.getListItem();
             } finally {
-                response.releaseConnection();
+                res.close();
             }
 
             Date startTime = new Date();
@@ -321,16 +324,16 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
      */
     private void deleteCollectionObject(CollectionObjectClient collectionObjectClient,
             String resourceId) {
-        ClientResponse<Response> res = collectionObjectClient.delete(resourceId);
-        res.releaseConnection();
+    	collectionObjectClient.delete(resourceId).close();
     }
 
     /**
      * Delete collection objects.
      *
      * @param arrayOfObjects the array of objects
+     * @throws Exception 
      */
-    private void deleteCollectionObjects(String[] arrayOfObjects) {
+    private void deleteCollectionObjects(String[] arrayOfObjects) throws Exception {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
 
         Date startTime = new Date();
@@ -348,21 +351,21 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
     /**
      * Delete collection objects.
      * FIXME: Deletes a page at a time until there are no more CollectionObjects.
+     * @throws Exception 
      */
-    private void deleteCollectionObjects() {
+    private void deleteCollectionObjects() throws Exception {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        ClientResponse<AbstractCommonList> response;
 
         List<AbstractCommonList.ListItem> coListItems = null;
         do {
-            response = collectionObjectClient.readList(new Long(MAX_RECORDS),
+            Response res = collectionObjectClient.readList(new Long(MAX_RECORDS),
                     new Long(0));
             try {
                 AbstractCommonList commonListElement =
-                        (AbstractCommonList) response.getEntity(AbstractCommonList.class);
+                        (AbstractCommonList) res.readEntity(AbstractCommonList.class);
                 coListItems = commonListElement.getListItem();
             } finally {
-                response.releaseConnection();
+                res.close();
             }
 
             Date startTime = new Date();

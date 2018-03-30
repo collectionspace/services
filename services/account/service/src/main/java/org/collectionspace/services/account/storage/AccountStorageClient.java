@@ -25,8 +25,7 @@ package org.collectionspace.services.account.storage;
 
 import java.util.Date;
 import java.util.HashMap;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.storage.csidp.UserStorageClient;
 import org.collectionspace.services.authentication.User;
@@ -40,6 +39,7 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.document.JaxbUtils;
+import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 
@@ -53,6 +53,7 @@ import org.slf4j.LoggerFactory;
  * are used where possible to permorme the persistence operations atomically.
  * @author 
  */
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class AccountStorageClient extends JpaStorageClientImpl {
 
     private final Logger logger = LoggerFactory.getLogger(AccountStorageClient.class);
@@ -61,63 +62,54 @@ public class AccountStorageClient extends JpaStorageClientImpl {
     public AccountStorageClient() {
     }
 
-    @Override
+	@Override
     public String create(ServiceContext ctx,
             DocumentHandler handler) throws BadRequestException,
             DocumentException {
-
-        if (ctx == null) {
-            throw new IllegalArgumentException(
-                    "AccountStorageClient.create : ctx is missing");
-        }
-        if (handler == null) {
-            throw new IllegalArgumentException(
-                    "AccountStorageClient.create: handler is missing");
-        }
-        EntityManagerFactory emf = null;
-        EntityManager em = null;
-        AccountsCommon account = (AccountsCommon) handler.getCommonPart();
+    	String result = null;
+    	
+    	AccountsCommon account = null;
+    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();    	
         try {
+            account = (AccountsCommon) handler.getCommonPart();
             handler.prepare(Action.CREATE);
-            DocumentWrapper<AccountsCommon> wrapDoc =
-                    new DocumentWrapperImpl<AccountsCommon>(account);
+            DocumentWrapper<AccountsCommon> wrapDoc = new DocumentWrapperImpl<AccountsCommon>(account);
             handler.handle(Action.CREATE, wrapDoc);
-            emf = JpaStorageUtils.getEntityManagerFactory();
-            em = emf.createEntityManager();
-            em.getTransaction().begin();
-            //if userid and password are given, add to default id provider
-            if (account.getUserId() != null &&
-                    isForCSIdP(account.getPassword())) {
-                User user = userStorageClient.create(account.getUserId(),
-                        account.getPassword());
-                em.persist(user);
+            jpaConnectionContext.beginTransaction();
+            //
+            // If userid and password are given, add to default ID provider -i.e., add it to the Spring Security account list
+            //
+            if (account.getUserId() != null && isForCSpaceIdentityProvider(account.getPassword())) {
+                User user = userStorageClient.create(account.getUserId(), account.getPassword());
+	            jpaConnectionContext.persist(user);
             }
-//            if (accountReceived.getTenant() != null) {
-//                UserTenant ut = createTenantAssoc(accountReceived);
-//                em.persist(ut);
-//            }
+            //
+            // Now add the account to the CSpace list of accounts
+            //
             account.setCreatedAtItem(new Date());
-            em.persist(account);
-            em.getTransaction().commit();
+            jpaConnectionContext.persist(account);        	
+            //
+            // Finish creating related resources -e.g., account-role relationships
+            //
             handler.complete(Action.CREATE, wrapDoc);
-            return (String) JaxbUtils.getValue(account, "getCsid");
+            jpaConnectionContext.commitTransaction();
+
+            result = (String)JaxbUtils.getValue(account, "getCsid");
         } catch (BadRequestException bre) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+        	jpaConnectionContext.markForRollback();
             throw bre;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
             boolean uniqueConstraint = false;
-            if (userStorageClient.get(em, account.getUserId()) != null) {
+            if (userStorageClient.get(ctx, account.getUserId()) != null) {
                 //might be unique constraint violation
                 uniqueConstraint = true;
             }
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+            
+        	jpaConnectionContext.markForRollback();
+
             if (uniqueConstraint) {
                 String msg = "UserId exists. Non unique userId=" + account.getUserId();
                 logger.error(msg);
@@ -125,29 +117,21 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             }
             throw new DocumentException(e);
         } finally {
-            if (em != null) {
-                JpaStorageUtils.releaseEntityManagerFactory(emf);
-            }
+            ctx.closeConnection();
         }
+        
+        return result;
     }
 
-        @Override
+    @Override
     public void get(ServiceContext ctx, String id, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
-        if (ctx == null) {
-            throw new IllegalArgumentException(
-                    "get: ctx is missing");
-        }
-        if (handler == null) {
-            throw new IllegalArgumentException(
-                    "get: handler is missing");
-        }
         DocumentFilter docFilter = handler.getDocumentFilter();
         if (docFilter == null) {
             docFilter = handler.createDocumentFilter();
         }
-        EntityManagerFactory emf = null;
-        EntityManager em = null;
+
+        JPATransactionContext jpaTransactionContext = (JPATransactionContext)ctx.openConnection();
         try {
             handler.prepare(Action.GET);
             Object o = null;
@@ -156,12 +140,9 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             params.put("csid", id);
             params.put("tenantId", ctx.getTenantId());
 
-            o = JpaStorageUtils.getEntity(
+            o = JpaStorageUtils.getEntity(jpaTransactionContext, 
                     "org.collectionspace.services.account.AccountsCommon", whereClause, params);
             if (null == o) {
-                if (em != null && em.getTransaction().isActive()) {
-                    em.getTransaction().rollback();
-                }
                 String msg = "could not find entity with id=" + id;
                 throw new DocumentNotFoundException(msg);
             }
@@ -176,67 +157,52 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             }
             throw new DocumentException(e);
         } finally {
-            if (emf != null) {
-                JpaStorageUtils.releaseEntityManagerFactory(emf);
-            }
+        	ctx.closeConnection();
         }
+        
     }
 
     @Override
     public void update(ServiceContext ctx, String id, DocumentHandler handler)
             throws BadRequestException, DocumentNotFoundException,
             DocumentException {
-        if (ctx == null) {
-            throw new IllegalArgumentException(
-                    "AccountStorageClient.update : ctx is missing");
-        }
-        if (handler == null) {
-            throw new IllegalArgumentException(
-                    "AccountStorageClient.update: handler is missing");
-        }
-        EntityManagerFactory emf = null;
-        EntityManager em = null;
+
+    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();        
         try {
+            jpaConnectionContext.beginTransaction();
+
             handler.prepare(Action.UPDATE);
             AccountsCommon accountReceived = (AccountsCommon) handler.getCommonPart();
-            emf = JpaStorageUtils.getEntityManagerFactory();
-            em = emf.createEntityManager();
-            em.getTransaction().begin();
-            AccountsCommon accountFound = getAccount(em, id);
+            AccountsCommon accountFound = getAccount(jpaConnectionContext, id);
             checkAllowedUpdates(accountReceived, accountFound);
             //if userid and password are given, add to default id provider
             // Note that this ignores the immutable flag, as we allow
             // password changes.
-            if (accountReceived.getUserId() != null
-                    && isForCSIdP(accountReceived.getPassword())) {
-                userStorageClient.update(em,
+            if (accountReceived.getUserId() != null && isForCSpaceIdentityProvider(accountReceived.getPassword())) {
+                userStorageClient.update(jpaConnectionContext,
                         accountReceived.getUserId(),
                         accountReceived.getPassword());
             }
             DocumentWrapper<AccountsCommon> wrapDoc =
                     new DocumentWrapperImpl<AccountsCommon>(accountFound);
             handler.handle(Action.UPDATE, wrapDoc);
-            em.getTransaction().commit();
-            handler.complete(Action.UPDATE, wrapDoc);
+            handler.complete(Action.UPDATE, wrapDoc); 
+            jpaConnectionContext.commitTransaction();
+            //
+            // Don't sanitize until we've committed changes to the DB
+            //
+            handler.sanitize(wrapDoc);
         } catch (BadRequestException bre) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+        	jpaConnectionContext.markForRollback();
             throw bre;
         } catch (DocumentException de) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+        	jpaConnectionContext.markForRollback();
             throw de;
         } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception ", e);
-            }
+        	jpaConnectionContext.markForRollback();
             throw new DocumentException(e);
         } finally {
-            if (emf != null) {
-                JpaStorageUtils.releaseEntityManagerFactory(emf);
-            }
+            ctx.closeConnection();
         }
     }
 
@@ -248,54 +214,38 @@ public class AccountStorageClient extends JpaStorageClientImpl {
         if (logger.isDebugEnabled()) {
             logger.debug("deleting entity with id=" + id);
         }
-        if (ctx == null) {
-            throw new IllegalArgumentException(
-                    "AccountStorageClient.delete : ctx is missing");
-        }
-        EntityManagerFactory emf = null;
-        EntityManager em = null;
+        
+    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();        
         try {
-            emf = JpaStorageUtils.getEntityManagerFactory();
-            em = emf.createEntityManager();
-
-            AccountsCommon accountFound = getAccount(em, id);
-            em.getTransaction().begin();
+            AccountsCommon accountFound = getAccount(jpaConnectionContext, id);
+            jpaConnectionContext.beginTransaction();
             //if userid gives any indication about the id provider, it should
             //be used to avoid  delete
-            userStorageClient.delete(em, accountFound.getUserId());
-            em.remove(accountFound);
-            em.getTransaction().commit();
-
+            userStorageClient.delete(jpaConnectionContext, accountFound.getUserId());
+            jpaConnectionContext.remove(accountFound);
+            jpaConnectionContext.commitTransaction();
         } catch (DocumentException de) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+        	jpaConnectionContext.markForRollback();
             throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+            jpaConnectionContext.markForRollback();
             throw new DocumentException(e);
         } finally {
-            if (emf != null) {
-                JpaStorageUtils.releaseEntityManagerFactory(emf);
-            }
+            ctx.closeConnection();
         }
     }
 
-    private AccountsCommon getAccount(EntityManager em, String id) throws DocumentNotFoundException {
-        AccountsCommon accountFound = em.find(AccountsCommon.class, id);
+    private AccountsCommon getAccount(JPATransactionContext jpaConnectionContext, String id) throws DocumentNotFoundException {
+        AccountsCommon accountFound = (AccountsCommon) jpaConnectionContext.find(AccountsCommon.class, id);
         if (accountFound == null) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
             String msg = "could not find account with id=" + id;
             logger.error(msg);
             throw new DocumentNotFoundException(msg);
         }
+        
         return accountFound;
     }
 
@@ -318,7 +268,7 @@ public class AccountStorageClient extends JpaStorageClientImpl {
      * @param bpass
      * @return
      */
-    private boolean isForCSIdP(byte[] bpass) {
+    private boolean isForCSpaceIdentityProvider(byte[] bpass) {
         return bpass != null && bpass.length > 0;
     }
 //    private UserTenant createTenantAssoc(AccountsCommon accountReceived) {

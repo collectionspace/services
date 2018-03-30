@@ -23,25 +23,19 @@
  */
 package org.collectionspace.services.vocabulary.nuxeo;
 
+import org.collectionspace.services.client.VocabularyClient;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.vocabulary.VocabulariesCommon;
 
 /**
  * VocabularyDocumentModelHandler
  *
- * $LastChangedRevision: $
- * $LastChangedDate: $
  */
 public class VocabularyDocumentModelHandler
 		extends AuthorityDocumentModelHandler<VocabulariesCommon> {
-
-    /**
-     * Common part schema label
-     */
-    private static final String COMMON_PART_LABEL = "vocabularies_common";   
     
     public VocabularyDocumentModelHandler() {
-    	super(COMMON_PART_LABEL);
+    	super(VocabularyClient.SERVICE_COMMON_PART_NAME, VocabularyClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 
     /**

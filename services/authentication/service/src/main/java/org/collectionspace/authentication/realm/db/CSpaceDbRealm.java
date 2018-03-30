@@ -49,31 +49,21 @@
  */
 package org.collectionspace.authentication.realm.db;
 
-import java.lang.reflect.Constructor;
 import java.net.ConnectException;
-import java.security.Principal;
-import java.security.acl.Group;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.security.auth.login.FailedLoginException;
-import javax.security.auth.login.LoginException;
+import javax.security.auth.login.AccountException;
+import javax.security.auth.login.AccountNotFoundException;
 import javax.sql.DataSource;
-
-//import org.apache.commons.logging.Log;
-//import org.apache.commons.logging.LogFactory;
-
-
-
-
 
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.authentication.CSpaceTenant;
@@ -86,7 +76,7 @@ import org.slf4j.LoggerFactory;
  * @author 
  */
 public class CSpaceDbRealm implements CSpaceRealm {
-	private Logger logger = LoggerFactory.getLogger(CSpaceDbRealm.class);
+    private Logger logger = LoggerFactory.getLogger(CSpaceDbRealm.class);
     
     private String datasourceName;
     private String principalsQuery;
@@ -95,15 +85,15 @@ public class CSpaceDbRealm implements CSpaceRealm {
     private String tenantsQueryWithDisabled;
     private boolean suspendResume;
 
-	private long maxRetrySeconds = MAX_RETRY_SECONDS;
-	private static final int MAX_RETRY_SECONDS = 5;
+    private long maxRetrySeconds = MAX_RETRY_SECONDS;
+    private static final int MAX_RETRY_SECONDS = 5;
     private static final String MAX_RETRY_SECONDS_STR = "maxRetrySeconds";
 
 	private long delayBetweenAttemptsMillis = DELAY_BETWEEN_ATTEMPTS_MILLISECONDS;
     private static final String DELAY_BETWEEN_ATTEMPTS_MILLISECONDS_STR = "delayBetweenAttemptsMillis";
 	private static final long DELAY_BETWEEN_ATTEMPTS_MILLISECONDS = 200;
 	
-	protected void setMaxRetrySeconds(Map options) {
+	protected void setMaxRetrySeconds(Map<String, ?> options) {
 		Object optionsObj = options.get(MAX_RETRY_SECONDS_STR);
 		if (optionsObj != null) {
 			String paramValue = optionsObj.toString();
@@ -120,7 +110,7 @@ public class CSpaceDbRealm implements CSpaceRealm {
 		return this.maxRetrySeconds;
 	}
 	
-	protected void setDelayBetweenAttemptsMillis(Map options) {
+	protected void setDelayBetweenAttemptsMillis(Map<String, ?> options) {
 		Object optionsObj = options.get(DELAY_BETWEEN_ATTEMPTS_MILLISECONDS_STR);
 		if (optionsObj != null) {
 			String paramValue = optionsObj.toString();
@@ -141,7 +131,7 @@ public class CSpaceDbRealm implements CSpaceRealm {
      * CSpace Database Realm
      * @param datasourceName datasource name
      */
-    public CSpaceDbRealm(Map options) {
+    public CSpaceDbRealm(Map<String, ?> options) {
         datasourceName = (String) options.get("dsJndiName");
         if (datasourceName == null) {
             datasourceName = "java:/DefaultDS";
@@ -180,7 +170,7 @@ public class CSpaceDbRealm implements CSpaceRealm {
     }
 
     @Override
-    public String getUsersPassword(String username) throws LoginException {
+    public String getPassword(String username) throws AccountException {
 
         String password = null;
         Connection conn = null;
@@ -199,21 +189,23 @@ public class CSpaceDbRealm implements CSpaceRealm {
                 if (logger.isDebugEnabled()) {
                     logger.debug(principalsQuery + " returned no matches from db");
                 }
-                throw new FailedLoginException("No matching username found");
+                throw new AccountNotFoundException("No matching username found");
             }
 
             password = rs.getString(1);
         } catch (SQLException ex) {
-        	if (logger.isTraceEnabled() == true) {
-        		logger.error("Could not open database to read AuthN tables.", ex);
-        	}
-            LoginException le = new LoginException("Authentication query failed: " + ex.getLocalizedMessage());
-            le.initCause(ex);
-            throw le;
+            if (logger.isTraceEnabled() == true) {
+                logger.error("Could not open database to read AuthN tables.", ex);
+            }
+            AccountException ae = new AccountException("Authentication query failed: " + ex.getLocalizedMessage());
+            ae.initCause(ex);
+            throw ae;
+        } catch (AccountNotFoundException ex) {
+            throw ex;
         } catch (Exception ex) {
-            LoginException le = new LoginException("Unknown Exception");
-            le.initCause(ex);
-            throw le;
+            AccountException ae = new AccountException("Unknown Exception");
+            ae.initCause(ex);
+            throw ae;
         } finally {
             if (rs != null) {
                 try {
@@ -237,20 +229,15 @@ public class CSpaceDbRealm implements CSpaceRealm {
         return password;
     }
 
-    /**
-     * Execute the rolesQuery against the datasourceName to obtain the roles for
-     * the authenticated user.
-     * @return collection containing the roles
-     */
     @Override
-    public Collection<Group> getRoles(String username, String principalClassName, String groupClassName) throws LoginException {
-
+    public Set<String> getRoles(String username) throws AccountException {
         if (logger.isDebugEnabled()) {
             logger.debug("getRoleSets using rolesQuery: " + rolesQuery + ", username: " + username);
         }
 
+        Set<String> roles = new LinkedHashSet<String>();
+
         Connection conn = null;
-        HashMap<String, Group> groupsMap = new HashMap<String, Group>();
         PreparedStatement ps = null;
         ResultSet rs = null;
 
@@ -272,51 +259,23 @@ public class CSpaceDbRealm implements CSpaceRealm {
                 if (logger.isDebugEnabled()) {
                     logger.debug("No roles found");
                 }
-//                if(aslm.getUnauthenticatedIdentity() == null){
-//                    throw new FailedLoginException("No matching username found in Roles");
-//                }
-                /* We are running with an unauthenticatedIdentity so create an
-                empty Roles set and return.
-                 */
-
-                Group g = createGroup(groupClassName, "Roles");
-                groupsMap.put(g.getName(), g);
-                return groupsMap.values();
+                
+                return roles;
             }
 
             do {
                 String roleName = rs.getString(1);
-                String groupName = rs.getString(2);
-                if (groupName == null || groupName.length() == 0) {
-                    groupName = "Roles";
-                }
-
-                Group group = (Group) groupsMap.get(groupName);
-                if (group == null) {
-                    group = createGroup(groupClassName, groupName);
-                    groupsMap.put(groupName, group);
-                }
-
-                try {
-                    Principal p = createPrincipal(principalClassName, roleName);
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Assign user to role " + roleName);
-                    }
-
-                    group.addMember(p);
-                } catch (Exception e) {
-                    logger.error("Failed to create principal: " + roleName + " " + e.toString());
-                }
-
+                roles.add(roleName);
+                
             } while (rs.next());
         } catch (SQLException ex) {
-            LoginException le = new LoginException("Query failed");
-            le.initCause(ex);
-            throw le;
+            AccountException ae = new AccountException("Query failed");
+            ae.initCause(ex);
+            throw ae;
         } catch (Exception e) {
-            LoginException le = new LoginException("unknown exception");
-            le.initCause(e);
-            throw le;
+            AccountException ae = new AccountException("unknown exception");
+            ae.initCause(e);
+            throw ae;
         } finally {
             if (rs != null) {
                 try {
@@ -339,16 +298,16 @@ public class CSpaceDbRealm implements CSpaceRealm {
 
         }
 
-        return groupsMap.values();
+        return roles;
 
     }
     @Override
-    public Collection<Group> getTenants(String username, String groupClassName) throws LoginException {
-    	return getTenants(username, groupClassName, false);
+    public Set<CSpaceTenant> getTenants(String username) throws AccountException {
+        return getTenants(username, false);
     }
     
     private boolean userIsTenantManager(Connection conn, String username) {
-    	String acctQuery = "SELECT csid FROM accounts_common WHERE userid=?";
+        String acctQuery = "SELECT csid FROM accounts_common WHERE userid=?";
         PreparedStatement ps = null;
         ResultSet rs = null;
         boolean accountIsTenantManager = false;
@@ -390,10 +349,10 @@ public class CSpaceDbRealm implements CSpaceRealm {
     /**
      * Execute the tenantsQuery against the datasourceName to obtain the tenants for
      * the authenticated user.
-     * @return collection containing the roles
+     * @return set containing the roles
      */
     @Override
-    public Collection<Group> getTenants(String username, String groupClassName, boolean includeDisabledTenants) throws LoginException {
+    public Set<CSpaceTenant> getTenants(String username, boolean includeDisabledTenants) throws AccountException {
 
     	String tenantsQuery = getTenantQuery(includeDisabledTenants);
     	
@@ -401,11 +360,11 @@ public class CSpaceDbRealm implements CSpaceRealm {
             logger.debug("getTenants using tenantsQuery: " + tenantsQuery + ", username: " + username);
         }
 
+        Set<CSpaceTenant> tenants = new LinkedHashSet<CSpaceTenant>();
+        
         Connection conn = null;
-        HashMap<String, Group> groupsMap = new HashMap<String, Group>();
         PreparedStatement ps = null;
         ResultSet rs = null;
-    	final String defaultGroupName = "Tenants";
 
         try {
             conn = getConnection();
@@ -418,69 +377,39 @@ public class CSpaceDbRealm implements CSpaceRealm {
             }
             rs = ps.executeQuery();
             if (rs.next() == false) {
-        		Group group = (Group) groupsMap.get(defaultGroupName);
-        		if (group == null) {
-        			group = createGroup(groupClassName, defaultGroupName);
-        			groupsMap.put(defaultGroupName, group);
-        		}
-            	// Check for the tenantManager
-            	if(userIsTenantManager(conn, username)) {
-            		if (logger.isDebugEnabled()) {
-            			logger.debug("GetTenants called with tenantManager - synthesizing the pseudo-tenant");
-            		}
-            		try {
-            			Principal p = createTenant("PseudoTenant", AuthN.TENANT_MANAGER_ACCT_ID);
-            			if (logger.isDebugEnabled()) {
-            				logger.debug("Assign tenantManager to tenant " + AuthN.TENANT_MANAGER_ACCT_ID);
-            			}
-            			group.addMember(p);
-            		} catch (Exception e) {
-            			logger.error("Failed to create pseudo-tenant: " + e.toString());
-            		}
-            	} else {
-            		if (logger.isDebugEnabled()) {
-            			logger.debug("No tenants found");
-            		}
-            		// We are running with an unauthenticatedIdentity so return an
-            		// empty Tenants set.
-            		// FIXME  should this be allowed?
-            	}
-        		return groupsMap.values();
+                // Check for the tenantManager
+                if(userIsTenantManager(conn, username)) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("GetTenants called with tenantManager - synthesizing the pseudo-tenant");
+                    }
+                    
+                    tenants.add(new CSpaceTenant(AuthN.TENANT_MANAGER_ACCT_ID, "PseudoTenant"));
+                } else {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("No tenants found");
+                    }
+                    // We are running with an unauthenticatedIdentity so return an
+                    // empty Tenants set.
+                    // FIXME  should this be allowed?
+                }
+                
+                return tenants;
             }
 
             do {
                 String tenantId = rs.getString(1);
                 String tenantName = rs.getString(2);
-                String groupName = rs.getString(3);
-                if (groupName == null || groupName.length() == 0) {
-                    groupName = defaultGroupName;
-                }
 
-                Group group = (Group) groupsMap.get(groupName);
-                if (group == null) {
-                    group = createGroup(groupClassName, groupName);
-                    groupsMap.put(groupName, group);
-                }
-
-                try {
-                    Principal p = createTenant(tenantName, tenantId);
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Assign user to tenant " + tenantName);
-                    }
-
-                    group.addMember(p);
-                } catch (Exception e) {
-                    logger.error("Failed to create tenant: " + tenantName + " " + e.toString());
-                }
+                tenants.add(new CSpaceTenant(tenantId, tenantName));
             } while (rs.next());
         } catch (SQLException ex) {
-            LoginException le = new LoginException("Query failed");
-            le.initCause(ex);
-            throw le;
+            AccountException ae = new AccountException("Query failed");
+            ae.initCause(ex);
+            throw ae;
         } catch (Exception e) {
-            LoginException le = new LoginException("unknown exception");
-            le.initCause(e);
-            throw le;
+            AccountException ae = new AccountException("unknown exception");
+            ae.initCause(e);
+            throw ae;
         } finally {
             if (rs != null) {
                 try {
@@ -500,28 +429,9 @@ public class CSpaceDbRealm implements CSpaceRealm {
                 } catch (Exception ex) {
                 }
             }
-
         }
 
-        return groupsMap.values();
-    }
-
-    private CSpaceTenant createTenant(String name, String id) throws Exception {
-        return new CSpaceTenant(name, id);
-    }
-
-    private Group createGroup(String groupClassName, String name) throws Exception {
-        return (Group) createPrincipal(groupClassName, name);
-    }
-
-    private Principal createPrincipal(String principalClassName, String name) throws Exception {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        Class clazz = loader.loadClass(principalClassName);
-        Class[] ctorSig = {String.class};
-        Constructor ctor = clazz.getConstructor(ctorSig);
-        Object[] ctorArgs = {name};
-        Principal p = (Principal) ctor.newInstance(ctorArgs);
-        return p;
+        return tenants;
     }
 
     /*
@@ -584,7 +494,7 @@ public class CSpaceDbRealm implements CSpaceRealm {
 	/*
 	 * Don't call this method directly.  Instead, use the getConnection() method that take no arguments.
 	 */
-	private Connection getConnection(String dataSourceName) throws LoginException, SQLException {
+	private Connection getConnection(String dataSourceName) throws AccountException, SQLException {
         InitialContext ctx = null;
         Connection conn = null;
         DataSource ds = null;
@@ -635,9 +545,9 @@ public class CSpaceDbRealm implements CSpaceRealm {
             return conn;
             
         } catch (NamingException ex) {
-            LoginException le = new LoginException("Error looking up DataSource from: " + dataSourceName);
-            le.initCause(ex);
-            throw le;
+            AccountException ae = new AccountException("Error looking up DataSource from: " + dataSourceName);
+            ae.initCause(ex);
+            throw ae;
         } finally {
             if (ctx != null) {
                 try {

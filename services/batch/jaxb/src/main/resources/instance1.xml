@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns:document xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+ xmlns:ns="http://collectionspace.org/services/batch"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://collectionspace.org/services/batch file:/C:/dev/src/cspace/services/services/batch/jaxb/src/main/resources/batch_common_document.xsd">
+    <ns:batch_common>
+        <ns:name>name0</ns:name>
+        <ns:notes>notes0</ns:notes>
+        <ns:forDocTypes>
+            <ns:forDocType>forDocType0</ns:forDocType>
+            <ns:forDocType>forDocType1</ns:forDocType>
+        </ns:forDocTypes>
+        <ns:forRoles>
+            <ns:roleDisplayName>roleDisplayName0</ns:roleDisplayName>
+            <ns:roleDisplayName>roleDisplayName1</ns:roleDisplayName>
+        </ns:forRoles>
+        <ns:resourceActionGroupList>
+            <ns:resourceActionGroup>
+                <ns:resourceName>resourceName0</ns:resourceName>
+                <ns:actionGroup>actionGroup0</ns:actionGroup>
+            </ns:resourceActionGroup>
+            <ns:resourceActionGroup>
+                <ns:resourceName>resourceName1</ns:resourceName>
+                <ns:actionGroup>actionGroup1</ns:actionGroup>
+            </ns:resourceActionGroup>
+        </ns:resourceActionGroupList>
+        <ns:supportsNoContext>false</ns:supportsNoContext>
+        <ns:supportsSingleDoc>false</ns:supportsSingleDoc>
+        <ns:supportsDocList>false</ns:supportsDocList>
+        <ns:supportsGroup>false</ns:supportsGroup>
+        <ns:createsNewFocus>false</ns:createsNewFocus>
+        <ns:className>className0</ns:className>
+    </ns:batch_common>
+</ns:document>

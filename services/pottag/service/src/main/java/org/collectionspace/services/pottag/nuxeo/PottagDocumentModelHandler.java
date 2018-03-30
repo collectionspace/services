@@ -24,13 +24,13 @@
 package org.collectionspace.services.pottag.nuxeo;
 
 import org.collectionspace.services.pottag.PottagsCommon;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 
 /** PottagDocumentModelHandler
  *  $LastChangedRevision$
  *  $LastChangedDate$
  */
 public class PottagDocumentModelHandler
-        extends DocHandlerBase<PottagsCommon> {
+        extends NuxeoDocumentModelHandler<PottagsCommon> {
 }
 

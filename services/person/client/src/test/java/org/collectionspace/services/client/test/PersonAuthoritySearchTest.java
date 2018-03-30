@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
@@ -37,7 +38,6 @@ import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.person.PersonTermGroup;
-import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -148,17 +148,21 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
     	return new PersonAuthorityClient();
     }
-    
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+    	return new PersonAuthorityClient(clientPropertiesFilename);
+	}
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected AbstractCommonList getCommonList(
-                    ClientResponse<AbstractCommonList> response) {
-    return response.getEntity(AbstractCommonList.class);
+    protected AbstractCommonList getCommonList(Response response) {
+    	return response.readEntity(AbstractCommonList.class);
     }
 
     private String getPartialTermCommon() {
@@ -223,9 +227,10 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
 
     /**
      * Reads an item list by partial term.
+     * @throws Exception 
      */
     @Test(dataProvider="testName", groups = {"readListByPartialTerm"})
-    public void partialTermMatch(String testName) {
+    public void partialTermMatch(String testName) throws Exception {
         int numMatchesFound = 0;
         String partialTerm = getPartialTermCommon();
         if (logger.isDebugEnabled()) {
@@ -243,10 +248,11 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
      * Reads an item list by partial term, with a partial term that consists
      * of an all-lowercase variation of the expected match, to test case-insensitive
      * matching.
+     * @throws Exception 
      */
     @Test(dataProvider="testName", groups = {"readListByPartialTerm"},
     		dependsOnMethods = {"partialTermMatch"})
-    public void partialTermMatchCaseInsensitiveLowerCase(String testName) {
+    public void partialTermMatchCaseInsensitiveLowerCase(String testName) throws Exception {
         int numMatchesFound = 0;
 
         final String partialTerm = getPartialTermCommon().toLowerCase();
@@ -266,10 +272,11 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
      * Reads an item list by partial term, with a partial term that consists
      * of an all-uppercase variation of the expected match, to test case-insensitive
      * matching.
+     * @throws Exception 
      */
     @Test(dataProvider="testName",
         groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
-    public void partialTermMatchCaseInsensitiveUpperCase(String testName) {
+    public void partialTermMatchCaseInsensitiveUpperCase(String testName) throws Exception {
         int numMatchesFound = 0;
 
         final String partialTerm = getPartialTermCommon().toUpperCase();
@@ -288,10 +295,11 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
     /**
      * Reads an item list by partial term, with a partial term that is of
      * the minimum character length that may be expected to be matched.
+     * @throws Exception 
      */
     @Test(dataProvider="testName",
         groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
-    public void partialTermMatchMinimumLength(String testName) {
+    public void partialTermMatchMinimumLength(String testName) throws Exception {
         int numMatchesFound = 0;
         String partialTerm = getPartialTermMinimumLength();
         if (logger.isDebugEnabled()) {
@@ -309,10 +317,11 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
     /**
      * Reads an item list by partial term, with a partial term that contains
      * at least one Unicode UTF-8 character (outside the USASCII range).
+     * @throws Exception 
      */
     @Test(dataProvider="testName",
         groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
-    public void partialTermMatchUTF8(String testName) {
+    public void partialTermMatchUTF8(String testName) throws Exception {
         int numMatchesFound = 0;
         String partialTerm = getPartialTermUtf8();
         String ptEncoded;
@@ -337,10 +346,11 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
     /**
      * Reads an item list by partial term, with a partial term that contains
      * at least one Unicode UTF-8 character (outside the USASCII range).
+     * @throws Exception 
      */
     @Test(dataProvider="testName",
         groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
-    public void partialTermMatchQuote(String testName) {
+    public void partialTermMatchQuote(String testName) throws Exception {
         int numMatchesFound = 0;
         String partialTerm = getPartialTermQuote();
         if (logger.isDebugEnabled()) {
@@ -357,9 +367,10 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
 
     /**
      * Finds terms by keywords.
+     * @throws Exception 
      */
     @Test(dataProvider="testName", groups = {"readListByKwdTerm"})
-    public void keywordTermMatch(String testName) {
+    public void keywordTermMatch(String testName) throws Exception {
         int numMatchesFound = 0;
         String kwdTerm = getKwdTerm();
         if (logger.isDebugEnabled()) {
@@ -375,10 +386,11 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
 
     /**
      * Finds terms by keywords.
+     * @throws Exception 
      */
     @Test(dataProvider="testName",
         groups = {"readListByKwdTerm"}, dependsOnMethods = {"keywordTermMatch"})
-    public void keywordTermMatchUTF8(String testName) {
+    public void keywordTermMatchUTF8(String testName) throws Exception {
         int numMatchesFound = 0;
         String kwdTerm = getKwdTermUTF8();
         if (logger.isDebugEnabled()) {
@@ -399,10 +411,11 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
     /**
      * Reads an item list by partial term, with a partial term that is not
      * expected to be matched by any term in any resource.
+     * @throws Exception 
      */
     @Test(dataProvider="testName",
         groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
-    public void partialTermMatchOnNonexistentTerm(String testName) {
+    public void partialTermMatchOnNonexistentTerm(String testName) throws Exception {
         int numMatchesFound = 0;
         int ZERO_MATCHES_EXPECTED = 0;
         String partialTerm = getPartialTermNonExistent();
@@ -421,10 +434,11 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
     /**
      * Reads an item list by partial term, with a partial term that is not
      * expected to be matched by any term in any resource.
+     * @throws Exception 
      */
     @Test(dataProvider="testName", groups = {"readListByKwdTerm"},
     		dependsOnMethods = {"keywordTermMatch"})
-    public void keywordTermMatchOnNonexistentTerm(String testName) {
+    public void keywordTermMatchOnNonexistentTerm(String testName) throws Exception {
         int numMatchesFound = 0;
         int ZERO_MATCHES_EXPECTED = 0;
         String kwdTerm = getKwdTermNonExistent();
@@ -451,9 +465,10 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
      * @param partialTerm A partial term to match item resources.
      * @param partialTerm A keyword list to match item resources.
      * @return The number of item resources matched by the partial term.
+     * @throws Exception 
      */
     private int readItemListWithFilters(String testName, 
-    		String authorityCsid, String partialTerm, String keywords) {
+    		String authorityCsid, String partialTerm, String keywords) throws Exception {
 
         // Perform setup.
         int expectedStatusCode = Response.Status.OK.getStatusCode();
@@ -462,7 +477,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<AbstractCommonList> res = null;
+        Response res = null;
         if (authorityCsid != null) {
         	res = client.readItemList(authorityCsid, partialTerm, keywords);
         } else {
@@ -471,10 +486,10 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
         AbstractCommonList list = null;
         try {
             assertStatusCode(res, testName);
-            list = res.getEntity();
+            list = res.readEntity(AbstractCommonList.class);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -495,9 +510,10 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
     	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
@@ -518,14 +534,13 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
             parentResourceId = entry.getValue();
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            ClientResponse<Response> res =
-                client.deleteItem(parentResourceId, itemResourceId);
-            res.releaseConnection();
+            Response res = client.deleteItem(parentResourceId, itemResourceId);
+            res.close();
         }
         // Clean up authority resources.
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            client.delete(resourceId).releaseConnection();
+            client.delete(resourceId).close();
         }
     }
 
@@ -559,13 +574,13 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
     	    displayName, shortId, client.getCommonPartName());
 
     	String newID = null;
-    	ClientResponse<Response> res = client.create(multipart);
+    	Response res = client.create(multipart);
         try {
             assertStatusCode(res, testName);
             newID = PersonAuthorityClientUtils.extractId(res);
     	} finally {
     		if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
     	}
         // Store the refname from the first resource created
@@ -651,12 +666,12 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
                 partialTermPersonMap, partialTerms, partialTermRepeatablesMap, client.getItemCommonPartName() );
 
         String newID = null;
-        ClientResponse<Response> res = client.createItem(authorityCsid, multipart);
+        Response res = client.createItem(authorityCsid, multipart);
         try {
             newID = PersonAuthorityClientUtils.extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -674,5 +689,4 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
         // can be deleted after all tests have been run.
         allItemResourceIdsCreated.put(newID, authorityCsid);
     }
-
 }

@@ -8,11 +8,12 @@ import java.util.List;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.client.MovementClient;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.movement.MovementResource;
-import org.collectionspace.services.movement.nuxeo.MovementConstants;
+import org.collectionspace.services.movement.nuxeo.MovementBotGardenConstants;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,7 @@ public class ClearLocationLabelRequestBatchJob extends AbstractBatchJob {
 		setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_SINGLE, INVOCATION_MODE_LIST, INVOCATION_MODE_NO_CONTEXT));
 	}
 	
+	@Override
 	public void run() {
 		setCompletionStatus(STATUS_MIN_PROGRESS);
 		
@@ -81,17 +83,17 @@ public class ClearLocationLabelRequestBatchJob extends AbstractBatchJob {
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 			"<document name=\"movements\">" +
 				"<ns2:movements_common xmlns:ns2=\"http://collectionspace.org/services/movement\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-					getFieldXml("reasonForMove", MovementConstants.OTHER_ACTION_CODE) +
+					getFieldXml("reasonForMove", MovementBotGardenConstants.OTHER_ACTION_CODE) +
 				"</ns2:movements_common>" +
 				"<ns2:movements_botgarden xmlns:ns2=\"http://collectionspace.org/services/movement/local/botgarden\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-					getFieldXml("labelRequested", MovementConstants.LABEL_REQUESTED_NO_VALUE) +
+					getFieldXml("labelRequested", MovementBotGardenConstants.LABEL_REQUESTED_NO_VALUE) +
 					getFieldXml("labelSize", "") +
 					getFieldXml("labelStandType", "") +
 					getFieldXml("labelCount", "") +
 				"</ns2:movements_botgarden>" +
 			"</document>";
 				
-		ResourceBase resource = getResourceMap().get(MovementClient.SERVICE_NAME);
+		NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(MovementClient.SERVICE_NAME);
 		resource.update(getResourceMap(), createUriInfo(), movementCsid, updatePayload);
 	}
 	
@@ -113,6 +115,7 @@ public class ClearLocationLabelRequestBatchJob extends AbstractBatchJob {
 	}
 
 	private UriInfo createLabelRequestSearchUriInfo() throws URISyntaxException {
-		return createKeywordSearchUriInfo(MovementConstants.LABEL_REQUESTED_SCHEMA_NAME, MovementConstants.LABEL_REQUESTED_FIELD_NAME, MovementConstants.LABEL_REQUESTED_YES_VALUE);		
+		return createKeywordSearchUriInfo(MovementBotGardenConstants.LABEL_REQUESTED_SCHEMA_NAME, MovementBotGardenConstants.LABEL_REQUESTED_FIELD_NAME,
+				MovementBotGardenConstants.LABEL_REQUESTED_YES_VALUE);		
 	}
 }

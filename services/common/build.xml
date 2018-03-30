@@ -11,6 +11,7 @@
     <property name="mvn.opts" value="-V" />
     <property name="src" location="src"/>
     <property name="build" location="build"/>
+    <property name="common.jar" value="collectionspace-services-common.jar"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -42,7 +43,7 @@
 
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="package" />
             <arg value="-Dmaven.test.skip=true" />
             <arg value="-f" />
@@ -69,7 +70,7 @@
     <target name="install-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
 
             <arg value="install" />
             <arg value="-Dmaven.test.skip=true" />
@@ -94,7 +95,7 @@
     <target name="clean-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="clean" />
             <arg value="${mvn.opts}" />
         </exec>
@@ -111,7 +112,7 @@
         <exec executable="cmd" failonerror="true">
 
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="test" />
             <arg value="${mvn.opts}" />
         </exec>
@@ -121,6 +122,13 @@
             description="deploy spring binaries in ${jee.server.cspace}">
         <copy todir="${jee.server.cspace}/lib">
             <fileset dir="${basedir}/lib/spring"/>
+        </copy>
+    </target>
+	
+	<target name="deploy_aspectj"
+            description="deploy AspectJ binaries in ${jee.server.cspace}">
+        <copy todir="${jee.server.cspace}/lib">
+            <fileset dir="${basedir}/lib/aspectj"/>
         </copy>
     </target>
 
@@ -172,6 +180,9 @@
         <copy todir="${jee.server.cspace}/conf"
               file="${src}/main/cspace/config/log/jboss-log4j-release.xml"/>
 		-->
+        <copy file="${basedir}/target/${common.jar}" todir="${jee.server.cspace}/lib"/>
+
+		<antcall target="deploy_aspectj" />
         <antcall target="deploy_spring" />
         <antcall target="deploy_slf4j" />
         <antcall target="deploy_xmlmerge" />
@@ -180,7 +191,8 @@
 
     <target name="undeploy"
             description="undeploy common elements from ${jee.server.cspace}">
-        <antcall target="undeploy_spring" />
+        <antcall target="undeploy_aspectj" />
+		<antcall target="undeploy_spring" />
 		<antcall target="undeploy_slf4j" />
 		<antcall target="undeploy_xmlmerge" />
 		<!--
@@ -191,14 +203,27 @@
 		<!--
         <delete failonerror="false" file="${jee.server.cspace}/conf/jboss-log4j-release.xml"/>
 		-->
+        <delete failonerror="false" file="${jee.server.cspace}/lib/${common.jar}"/>
         <delete failonerror="false" dir="${jee.server.cspace}/cspace/config/services"/>
     </target>
 
     <target name="undeploy_spring"
             description="undeploy spring binaries from ${jee.server.cspace}">
         <delete>
+            <fileset dir="${jee.server.cspace}/lib" includes="aopalliance-*.jar"/>
+            <fileset dir="${jee.server.cspace}/lib" includes="commons-lang3-*.jar"/>
+            <fileset dir="${jee.server.cspace}/lib" includes="ehcache-*.jar"/>
+            <fileset dir="${jee.server.cspace}/lib" includes="jackson-*.jar"/>
             <fileset dir="${jee.server.cspace}/lib" includes="org.springframework.*.jar"/>
-            <fileset dir="${jee.server.cspace}/lib" includes="spring-security*.jar"/>
+            <fileset dir="${jee.server.cspace}/lib" includes="spring-*.jar"/>
+            <fileset dir="${jee.server.cspace}/lib" includes="stax2-api-*.jar"/>
+        </delete>
+    </target>
+	
+	<target name="undeploy_aspectj"
+            description="undeploy AspectJ binaries from ${jee.server.cspace}">
+        <delete>
+            <fileset dir="${jee.server.cspace}/lib" includes="aspectj*-*.jar"/>
         </delete>
     </target>
 	

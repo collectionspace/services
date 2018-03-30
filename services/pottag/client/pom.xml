@@ -5,14 +5,14 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.pottag</artifactId>
-        <version>4.1.1</version>
+        <version>5.0</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.pottag.client</artifactId>
     <name>services.pottag.client</name>
-    
+
     <dependencies>
         <!-- keep slf4j dependencies on the top -->
         <dependency>
@@ -56,8 +56,8 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authority.jaxb</artifactId>
             <version>${project.version}</version>
-        </dependency>    
-<!-- External dependencies -->        
+        </dependency>
+<!-- External dependencies -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
@@ -87,7 +87,7 @@
             <version>3.1</version>
         </dependency>
     </dependencies>
-    
+
     <build>
         <finalName>collectionspace-services-pottag-client</finalName>
     </build>

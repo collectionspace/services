@@ -24,13 +24,13 @@
 package org.collectionspace.services.propagation.nuxeo;
 
 import org.collectionspace.services.propagation.PropagationsCommon;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 
 /** PropagationDocumentModelHandler
  *  $LastChangedRevision$
  *  $LastChangedDate$
  */
 public class PropagationDocumentModelHandler
-        extends DocHandlerBase<PropagationsCommon> {
+        extends NuxeoDocumentModelHandler<PropagationsCommon> {
 }
 

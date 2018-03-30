@@ -12,11 +12,13 @@ import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectBotGardenConstants;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.invocable.InvocationContext.ListCSIDs;
 import org.collectionspace.services.common.invocable.InvocationResults;
+import org.collectionspace.services.taxonomy.nuxeo.TaxonBotGardenConstants;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonConstants;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
@@ -28,7 +30,7 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 	// All conservation categories are considered rare, except for ones that start with the following prefixes.
 	public static final List<String> NON_RARE_CONSERVATION_CATEGORY_PREFIXES = Arrays.asList("none", "DD ", "LC ", "LR (lc) ");
 
-	private static final String[] TAXON_FIELD_NAME_PARTS = CollectionObjectConstants.TAXON_FIELD_NAME.split("\\/");
+	private static final String[] TAXON_FIELD_NAME_PARTS = CollectionObjectBotGardenConstants.TAXON_FIELD_NAME.split("\\/");
 	private static final String TAXON_FIELD_NAME_WITHOUT_PATH = TAXON_FIELD_NAME_PARTS[TAXON_FIELD_NAME_PARTS.length - 1];
 	
 	public UpdateRareFlagBatchJob() {
@@ -115,7 +117,8 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 		RefName.AuthorityItem item = RefName.AuthorityItem.parse(taxonRefName);
 		String vocabularyShortId = item.getParentShortIdentifier();
 
-		List<String> collectionObjectCsids = findReferencingCollectionObjects(TaxonomyAuthorityClient.SERVICE_NAME, vocabularyShortId, taxonCsid, CollectionObjectConstants.TAXON_SCHEMA_NAME + ":" + TAXON_FIELD_NAME_WITHOUT_PATH);
+		List<String> collectionObjectCsids = findReferencingCollectionObjects(TaxonomyAuthorityClient.SERVICE_NAME, vocabularyShortId, taxonCsid, 
+				CollectionObjectBotGardenConstants.TAXON_SCHEMA_NAME + ":" + TAXON_FIELD_NAME_WITHOUT_PATH);
 	 	long numFound = 0;
 		long numAffected = 0;
 		
@@ -123,7 +126,8 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 			// Filter out results where the taxon is referenced in the correct field, but isn't the primary value.
 			
 			PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(collectionObjectCsid);
-			String primaryTaxonRefName = getFieldValue(collectionObjectPayload, CollectionObjectConstants.TAXON_SCHEMA_NAME, CollectionObjectConstants.TAXON_FIELD_NAME);
+			String primaryTaxonRefName = getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.TAXON_SCHEMA_NAME, 
+					CollectionObjectBotGardenConstants.TAXON_FIELD_NAME);
 						
 			if (primaryTaxonRefName.equals(taxonRefName)) {	
 				numFound++;
@@ -168,18 +172,22 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 	public InvocationResults updateRareFlag(PoxPayloadOut collectionObjectPayload) throws URISyntaxException, DocumentException {
 		InvocationResults results = new InvocationResults();
 
-		String uri = this.getFieldValue(collectionObjectPayload, CollectionObjectConstants.URI_SCHEMA_NAME, CollectionObjectConstants.URI_FIELD_NAME);
+		String uri = this.getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.URI_SCHEMA_NAME, 
+				CollectionObjectBotGardenConstants.URI_FIELD_NAME);
 		String[] uriParts = uri.split("\\/");
 		String collectionObjectCsid = uriParts[uriParts.length-1];
 
-		String workflowState = getFieldValue(collectionObjectPayload, CollectionObjectConstants.WORKFLOW_STATE_SCHEMA_NAME, CollectionObjectConstants.WORKFLOW_STATE_FIELD_NAME);
+		String workflowState = getFieldValue(collectionObjectPayload, CollectionObjectConstants.WORKFLOW_STATE_SCHEMA_NAME, 
+				CollectionObjectConstants.WORKFLOW_STATE_FIELD_NAME);
 		
 		if (workflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
 			logger.debug("skipping deleted collectionobject: " + collectionObjectCsid);
 		}
 		else {
-			String taxonRefName = getFieldValue(collectionObjectPayload, CollectionObjectConstants.TAXON_SCHEMA_NAME, CollectionObjectConstants.TAXON_FIELD_NAME);
-			String oldIsRare = getFieldValue(collectionObjectPayload, CollectionObjectConstants.RARE_FLAG_SCHEMA_NAME, CollectionObjectConstants.RARE_FLAG_FIELD_NAME);
+			String taxonRefName = getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.TAXON_SCHEMA_NAME, 
+					CollectionObjectBotGardenConstants.TAXON_FIELD_NAME);
+			String oldIsRare = getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.RARE_FLAG_SCHEMA_NAME, 
+					CollectionObjectBotGardenConstants.RARE_FLAG_FIELD_NAME);
 			
 			if (oldIsRare == null) {
 				oldIsRare = "";
@@ -200,7 +208,8 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 				if (taxonPayload != null) {
 					// UCBG-369: Changing this so that it only checks the primary conservation category.
 					
-					String conservationCategory = getFieldValue(taxonPayload, TaxonConstants.CONSERVATION_CATEGORY_SCHEMA_NAME, TaxonConstants.CONSERVATION_CATEGORY_FIELD_NAME);
+					String conservationCategory = getFieldValue(taxonPayload, TaxonBotGardenConstants.CONSERVATION_CATEGORY_SCHEMA_NAME, 
+							TaxonBotGardenConstants.CONSERVATION_CATEGORY_FIELD_NAME);
 
 					if (isRare(conservationCategory)) {
 						newIsRare = "true";
@@ -332,7 +341,7 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 				"</ns2:collectionobjects_common>" +					
 			"</document>";
 		
-		ResourceBase resource = getResourceMap().get(CollectionObjectClient.SERVICE_NAME);
+		NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(CollectionObjectClient.SERVICE_NAME);
 		resource.update(getResourceMap(), createUriInfo(), collectionObjectCsid, updatePayload);
 	}
 }

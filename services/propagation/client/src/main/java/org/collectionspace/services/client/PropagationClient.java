@@ -1,4 +1,4 @@
-/**	
+/**
  * This document is a part of the source code and related artifacts
  * for CollectionSpace, an open source collections management system
  * for museums and related institutions:
@@ -23,13 +23,17 @@ package org.collectionspace.services.client;
  * $LastChangedDate$
  *
  */
-public class PropagationClient extends AbstractCommonListPoxServiceClientImpl<PropagationProxy> {
+public class PropagationClient extends AbstractCommonListPoxServiceClientImpl<PropagationProxy, Object> {
 
-    public static final String SERVICE_NAME = "propagations";
+	public static final String SERVICE_NAME = "propagations";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
     public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
     public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
+
+    public PropagationClient() throws Exception {
+		super();
+	}
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()

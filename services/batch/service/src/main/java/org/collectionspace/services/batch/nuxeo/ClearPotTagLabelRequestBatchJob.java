@@ -8,7 +8,7 @@ import java.util.List;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.client.PottagClient;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.pottag.PottagResource;
@@ -23,6 +23,7 @@ public class ClearPotTagLabelRequestBatchJob extends AbstractBatchJob {
 		setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_SINGLE, INVOCATION_MODE_LIST, INVOCATION_MODE_NO_CONTEXT));
 	}
 	
+	@Override
 	public void run() {
 		setCompletionStatus(STATUS_MIN_PROGRESS);
 		
@@ -85,7 +86,7 @@ public class ClearPotTagLabelRequestBatchJob extends AbstractBatchJob {
 				"</ns2:pottags_common>" +
 			"</document>";
 				
-		ResourceBase resource = getResourceMap().get(PottagClient.SERVICE_NAME);
+		NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(PottagClient.SERVICE_NAME);
 		resource.update(getResourceMap(), createUriInfo(), potTagCsid, updatePayload);
 	}
 	

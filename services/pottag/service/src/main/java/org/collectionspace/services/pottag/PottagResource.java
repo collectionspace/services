@@ -24,7 +24,7 @@
 package org.collectionspace.services.pottag;
 
 import org.collectionspace.services.client.PottagClient;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ import javax.ws.rs.Produces;
 @Path(PottagClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class PottagResource extends ResourceBase {
+public class PottagResource extends NuxeoBasedResource {
 
     final Logger logger = LoggerFactory.getLogger(PottagResource.class);
 
@@ -44,7 +44,7 @@ public class PottagResource extends ResourceBase {
     	final String lastChangeRevision = "$LastChangedRevision$";
     	return lastChangeRevision;
     }
-    
+
     @Override
     public String getServiceName() {
         return PottagClient.SERVICE_NAME;

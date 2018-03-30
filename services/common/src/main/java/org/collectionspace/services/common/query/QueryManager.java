@@ -52,6 +52,10 @@ public class QueryManager {
 		return queryManager.createWhereClauseFromAdvancedSearch(keywords);
 	}
 	
+	static public String createWhereClauseFromCsid(String csid) {
+		return queryManager.createWhereClauseFromCsid(csid);
+	}	
+	
 	/**
 	 * Creates the where clause for partial term match.
 	 * 
