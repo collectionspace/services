@@ -44,7 +44,7 @@ public class PropagationResource extends NuxeoBasedResource {
     	final String lastChangeRevision = "$LastChangedRevision$";
     	return lastChangeRevision;
     }
-
+    
     @Override
     public String getServiceName() {
         return PropagationClient.SERVICE_NAME;

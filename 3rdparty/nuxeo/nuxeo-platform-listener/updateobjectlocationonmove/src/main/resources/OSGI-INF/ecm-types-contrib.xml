@@ -1,12 +1,7 @@
 <?xml version="1.0"?>
 <component name="org.collectionspace.services.listener.updateobjectlocationonmove.ecm.types">
     
-	<!-- 
-		The computedCurrentLocation field doesn't work for botgarden, since collectionobjects
-		may have multiple current locations. Other event handlers are used to handle the
-		botgarden workflow, so this can be disabled.
-	-->
-    <!-- <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+    <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
         <listener name="updateobjectlocationonmovelistener" async="true" postCommit="true"
                   class="org.collectionspace.services.listener.UpdateObjectLocationOnMove">
             <event>documentCreated</event>
@@ -14,6 +9,6 @@
             <event>lifecycle_transition_event</event>
             <event>aboutToRemove</event>
         </listener>
-    </extension> -->
+    </extension>
 
 </component>

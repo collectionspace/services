@@ -3,14 +3,14 @@
 
     <parent>
         <groupId>org.collectionspace.services</groupId>
-        <artifactId>org.collectionspace.services.pottag</artifactId>
+        <artifactId>org.collectionspace.services.pottag</artifactId>        
         <version>5.0</version>
     </parent>
-
+    
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.collectionspace.services.pottag.service</artifactId>
     <name>services.pottag.service</name>
-    <packaging>jar</packaging>
+    <packaging>jar</packaging>       
 
     <dependencies>
         <dependency>
@@ -42,7 +42,7 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
         </dependency>
-
+        
       <!-- javax -->
 
         <dependency>
@@ -57,7 +57,7 @@
             <artifactId>dom4j</artifactId>
             <scope>provided</scope>
         </dependency>
-
+        
         <!-- jboss -->
 
         <dependency>
@@ -78,7 +78,7 @@
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-multipart-provider</artifactId>
         </dependency>
-
+        
         <!-- nuxeo -->
 
         <dependency>
@@ -93,7 +93,7 @@
         </dependency>
 
     </dependencies>
-
+    
     <build>
         <finalName>collectionspace-services-pottag</finalName>
     </build>

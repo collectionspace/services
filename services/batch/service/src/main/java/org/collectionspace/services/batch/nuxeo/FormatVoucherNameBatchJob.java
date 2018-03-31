@@ -11,13 +11,15 @@ import org.apache.commons.lang.StringUtils;
 import org.collectionspace.services.client.LoanoutClient;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectBotGardenConstants;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.api.TaxonFormatter;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanout.LoanoutResource;
-import org.collectionspace.services.loanout.nuxeo.LoanoutConstants;
+import org.collectionspace.services.loanout.nuxeo.LoanoutBotGardenConstants;
+
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,7 @@ public class FormatVoucherNameBatchJob extends AbstractBatchJob {
 		this.taxonFormatter = new TaxonFormatter();
 	}
 
+	@Override
 	public void run() {
 		setCompletionStatus(STATUS_MIN_PROGRESS);
 
@@ -132,15 +135,19 @@ public class FormatVoucherNameBatchJob extends AbstractBatchJob {
 		if (collectionObjectPayload != null) {
 			name = new VoucherName();
 			
-			name.setName(getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectConstants.TAXON_SCHEMA_NAME, CollectionObjectConstants.TAXON_FIELD_NAME)));
-			name.setHybrid(getBooleanFieldValue(collectionObjectPayload, CollectionObjectConstants.HYBRID_FLAG_SCHEMA_NAME, CollectionObjectConstants.HYBRID_FLAG_FIELD_NAME));
+			name.setName(getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.TAXON_SCHEMA_NAME,
+					CollectionObjectBotGardenConstants.TAXON_FIELD_NAME)));
+			name.setHybrid(getBooleanFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.HYBRID_FLAG_SCHEMA_NAME, 
+					CollectionObjectBotGardenConstants.HYBRID_FLAG_FIELD_NAME));
 
 			if (name.isHybrid()) {
-				List<String> hybridParents = this.getFieldValues(collectionObjectPayload, CollectionObjectConstants.HYBRID_PARENT_SCHEMA_NAME, CollectionObjectConstants.HYBRID_PARENT_FIELD_NAME);
-				List<String> hybridQualifiers = this.getFieldValues(collectionObjectPayload, CollectionObjectConstants.HYBRID_QUALIFIER_SCHEMA_NAME, CollectionObjectConstants.HYBRID_QUALIFIER_FIELD_NAME);
+				List<String> hybridParents = this.getFieldValues(collectionObjectPayload, CollectionObjectBotGardenConstants.HYBRID_PARENT_SCHEMA_NAME, 
+						CollectionObjectBotGardenConstants.HYBRID_PARENT_FIELD_NAME);
+				List<String> hybridQualifiers = this.getFieldValues(collectionObjectPayload, CollectionObjectBotGardenConstants.HYBRID_QUALIFIER_SCHEMA_NAME, 
+						CollectionObjectBotGardenConstants.HYBRID_QUALIFIER_FIELD_NAME);
 
-				int femaleIndex = hybridQualifiers.indexOf(CollectionObjectConstants.HYBRID_QUALIFIER_FEMALE_VALUE);
-				int maleIndex = hybridQualifiers.indexOf(CollectionObjectConstants.HYBRID_QUALIFIER_MALE_VALUE);
+				int femaleIndex = hybridQualifiers.indexOf(CollectionObjectBotGardenConstants.HYBRID_QUALIFIER_FEMALE_VALUE);
+				int maleIndex = hybridQualifiers.indexOf(CollectionObjectBotGardenConstants.HYBRID_QUALIFIER_MALE_VALUE);
 				
 				if (femaleIndex >= 0) {
 					name.setFemaleParentName(getDisplayNameFromRefName(hybridParents.get(femaleIndex)));
@@ -189,12 +196,13 @@ public class FormatVoucherNameBatchJob extends AbstractBatchJob {
 				"</ns2:loansout_botgarden>" +
 			"</document>";
 			
-		ResourceBase resource = getResourceMap().get(LoanoutClient.SERVICE_NAME);
+		NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(LoanoutClient.SERVICE_NAME);
 		resource.update(getResourceMap(), createUriInfo(), loanoutCsid, updatePayload);		
 	}
 	
 	private UriInfo createLabelRequestSearchUriInfo() throws URISyntaxException {
-		return createKeywordSearchUriInfo(LoanoutConstants.LABEL_REQUESTED_SCHEMA_NAME, LoanoutConstants.LABEL_REQUESTED_FIELD_NAME, LoanoutConstants.LABEL_REQUESTED_YES_VALUE);		
+		return createKeywordSearchUriInfo(LoanoutBotGardenConstants.LABEL_REQUESTED_SCHEMA_NAME, LoanoutBotGardenConstants.LABEL_REQUESTED_FIELD_NAME, 
+				LoanoutBotGardenConstants.LABEL_REQUESTED_YES_VALUE);		
 	}
 	
 	public class VoucherName {		

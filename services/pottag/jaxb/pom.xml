@@ -7,20 +7,20 @@
         <groupId>org.collectionspace.services</groupId>
         <version>5.0</version>
     </parent>
-
+    
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.pottag.jaxb</artifactId>
     <name>services.pottag.jaxb</name>
-
+    
     <dependencies>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.jaxb</artifactId>
             <version>${project.version}</version>
-        </dependency>
+        </dependency>        
     </dependencies>
-
+    
     <build>
         <finalName>collectionspace-services-pottag-jaxb</finalName>
         <defaultGoal>install</defaultGoal>

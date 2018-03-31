@@ -2,8 +2,8 @@
 
 <!--
     Loan In schema (XSD)
-
-    Entity  : Propagation
+    
+    Entity  : Propagation 
     Part    : Common
     Used for: JAXB binding between XML and Java objects
 
@@ -11,7 +11,7 @@
     $LastChangedDate$
 -->
 
-<xs:schema
+<xs:schema 
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
   jaxb:version="1.0" elementFormDefault="unqualified"
@@ -25,12 +25,12 @@
     Avoid XmlRootElement nightmare:
     See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
 -->
-<!-- See http://wiki.collectionspace.org/display/collectionspace/Loans+In+Schema -->
-
+<!-- See http://wiki.collectionspace.org/display/collectionspace/Loans+In+Schema -->    
+    
     <!--  Loan In Information Group -->
     <xs:element name="propagations_common">
         <xs:complexType>
-            <xs:sequence>
+            <xs:sequence>                
                 <xs:element name="propNumber" type="xs:string"/>
                 <xs:element name="propDate" type="structuredDateGroup"/>
                 <xs:element name="propReason" type="xs:string"/>
@@ -53,7 +53,7 @@
 
                 <!-- Living plant material information -->
                 <xs:element name="plantType" type="xs:string"/>
-
+                
                 <xs:element name="propActivityGroupList" type="propActivityGroupList"/>
 
                 <!-- Success of the propagation -->
@@ -68,7 +68,7 @@
             <xs:element name="scarStratGroup" type="scarStratGroup" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-
+    
     <xs:complexType name="scarStratGroup">
         <xs:sequence>
             <xs:element name="scarStrat" type="xs:string"/>
@@ -76,7 +76,7 @@
             <xs:element name="durationUnit" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
-
+    
     <xs:complexType name="propActivityGroupList">
         <xs:sequence>
             <xs:element name="propActivityGroup" type="propActivityGroup" minOccurs="0"
@@ -89,16 +89,16 @@
             <xs:element name="order" type="xs:integer"/>
             <xs:element name="activityDate" type="structuredDateGroup"/>
             <xs:element name="activityType" type="xs:string"/>
-            <xs:element name="propCount" type="xs:integer"/>
+            <xs:element name="propCount" type="xs:integer"/>    
             <xs:element name="medium" type="xs:string"/>
             <xs:element name="potSize" type="xs:string"/>
             <xs:element name="nurseryLocation" type="xs:string"/>
-            <xs:element name="conditions" type="xs:string"/>
+            <xs:element name="conditions" type="xs:string"/>    
             <xs:element name="chemicalApplied" type="xs:string"/>
             <xs:element name="activityComments" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
-
+    
     <xs:complexType name="structuredDateGroup">
 		<xs:sequence>
 			<xs:element name="dateDisplayDate" type="xs:string"/>

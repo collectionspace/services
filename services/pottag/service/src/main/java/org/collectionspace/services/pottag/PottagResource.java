@@ -44,7 +44,7 @@ public class PottagResource extends NuxeoBasedResource {
     	final String lastChangeRevision = "$LastChangedRevision$";
     	return lastChangeRevision;
     }
-
+    
     @Override
     public String getServiceName() {
         return PottagClient.SERVICE_NAME;

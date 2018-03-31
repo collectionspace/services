@@ -6,7 +6,7 @@
         <artifactId>org.collectionspace.services.main</artifactId>
         <version>5.0</version>
     </parent>
-
+    
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.collectionspace.services.pottag</artifactId>
     <name>services.pottag</name>
