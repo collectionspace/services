@@ -5,10 +5,14 @@
 	<body>
 		<div id="cspace"></div>
 		<script src="/cspace-ui/cspaceUI@@UI_VERSION@.min.js"></script>
+		<script src="/cspace-ui/cspaceUIPluginProfilePublicArt@@PLUGIN_VERSION@"></script>
 		<script>
 			cspaceUI({
-				basename: '/cspace/core',
+				basename: '/cspace/publicart',
 				prettyUrls: true,
+				plugins: [
+					cspaceUIPluginProfilePublicArt(),
+				],
 			});
 		</script>
 	</body>
