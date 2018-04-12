@@ -5,9 +5,9 @@
 
     <!-- Add your changes, if any, within the following tag pair. -->
     <!-- The value of the 'id' attribute, below, should match the corresponding -->
-    <!-- value in cspace/config/services/tenants/botgarden-tenant-bindings-proto.xml -->
+    <!-- value in cspace/config/services/tenants/ucbg-tenant-bindings-proto.xml -->
 
-    <tenant:tenantBinding id="3500">
+    <tenant:tenantBinding id="35">
         <tenant:eventListenerConfigurations id="default" merge:matcher="id">
             <tenant:eventListenerConfig id="UpdateObjectLocationOnMove" merge:matcher="id">
                 <tenant:paramList id="default" merge:matcher="id" merge:action="delete"/>
@@ -25,11 +25,11 @@
                 <types:value>425</types:value>
             </types:item>
         </tenant:properties>
-        
+
         <tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
             <service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service" merge:matcher="tag" merge:action="replace">org.collectionspace.services.collectionobject.nuxeo.BotGardenCollectionObjectValidatorHandler</service:validatorHandler>
         </tenant:serviceBindings>
- 
+
         <tenant:serviceBindings merge:matcher="id" id="idgenerators">
             <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
@@ -44,6 +44,6 @@
                 </service:params>
             </service:initHandler>
         </tenant:serviceBindings>
-        
+
     </tenant:tenantBinding>
 </tenant:TenantBindingConfig>
