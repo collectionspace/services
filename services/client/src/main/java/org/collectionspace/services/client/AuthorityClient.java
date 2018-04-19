@@ -24,6 +24,7 @@ public interface AuthorityClient<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P e
     public static final Boolean INCLUDE_DELETED_ITEMS = true;
     public static final Boolean INCLUDE_RELATIONS = true;
     public static final Boolean DONT_INCLUDE_RELATIONS = !INCLUDE_RELATIONS;
+    public static final String MARK_IF_REFERENCED_QP = "markIfReferenced";
 
 	/*
 	 * Basic CRUD operations

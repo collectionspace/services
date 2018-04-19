@@ -58,7 +58,6 @@ import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.StoredValuesUriTemplate;
 import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.UriTemplateFactory;
-import org.collectionspace.services.common.UriTemplateRegistry;
 import org.collectionspace.services.common.UriTemplateRegistryKey;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
@@ -119,6 +118,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 
     final static String SEARCH_TYPE_TERMSTATUS = "ts";
     public final static String hierarchy = "hierarchy";
+    
+    private static final Integer PAGE_NUM_FROM_QUERYPARAMS = null;
+    private static final Integer PAGE_SIZE_FROM_QUERYPARAMS = null;
 
     protected Class<AuthCommon> authCommonClass;
     protected Class<?> resourceClass;
@@ -1209,7 +1211,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         uriInfo = new UriInfoWrapper(uriInfo);
         AuthorityRefDocList authRefDocList = null;
         try {
-            authRefDocList = getReferencingObjects(null, parentSpecifier, itemSpecifier, uriInfo);
+            authRefDocList = getReferencingObjects(null, parentSpecifier, itemSpecifier, uriInfo, PAGE_NUM_FROM_QUERYPARAMS, PAGE_SIZE_FROM_QUERYPARAMS, true, true);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED);
         }
@@ -1227,7 +1229,11 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             ServiceContext<PoxPayloadIn, PoxPayloadOut> existingContext,
             String parentspecifier,
             String itemspecifier,
-            UriInfo uriInfo) throws Exception {
+            UriInfo uriInfo,
+            Integer pageNum,
+            Integer pageSize,
+            boolean useDefaultOrderByClause,
+            boolean computeTotal) throws Exception {
         AuthorityRefDocList authRefDocList = null;
  
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), uriInfo);
@@ -1250,7 +1256,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         }
             
         AuthorityItemDocumentModelHandler handler = (AuthorityItemDocumentModelHandler)createItemDocumentHandler(ctx, parentcsid, null);
-        authRefDocList = handler.getReferencingObjects(ctx, serviceTypes, getRefPropName(), itemcsid);
+        authRefDocList = handler.getReferencingObjects(ctx, serviceTypes, getRefPropName(), itemcsid, pageNum, pageSize, useDefaultOrderByClause, computeTotal);
 
         return authRefDocList;
     }

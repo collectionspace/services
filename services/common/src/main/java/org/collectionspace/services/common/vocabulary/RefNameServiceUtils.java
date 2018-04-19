@@ -392,8 +392,9 @@ public class RefNameServiceUtils {
             List<String> serviceTypes,
             String refName,
             String refPropName, // authRef or termRef, authorities or vocab terms.
-            DocumentFilter filter, boolean computeTotal)
-            throws DocumentException, DocumentNotFoundException {
+            DocumentFilter filter,
+            boolean useDefaultOrderByClause,
+            boolean computeTotal) throws DocumentException, DocumentNotFoundException {
         AuthorityRefDocList wrapperList = new AuthorityRefDocList();
         AbstractCommonList commonList = (AbstractCommonList) wrapperList;
         int pageNum = filter.getStartPage();
@@ -418,9 +419,19 @@ public class RefNameServiceUtils {
             // of possibly referencing documents will be false positives,
             // so use a page size of double the requested page size to
             // account for those.
-            DocumentModelList docList = findAllAuthorityRefDocs(ctx, repoClient, repoSession,
-                    serviceTypes, refName, refPropName, queriedServiceBindings, authRefFieldsByService,
-                    filter.getWhereClause(), null, 2*pageSize, computeTotal);
+            DocumentModelList docList = findAllAuthorityRefDocs(ctx, 
+                    repoClient, 
+                    repoSession,
+                    serviceTypes, 
+                    refName, 
+                    refPropName, 
+                    queriedServiceBindings, 
+                    authRefFieldsByService,
+                    filter.getWhereClause(), 
+                    null, // orderByClause
+                    2*pageSize,
+                    useDefaultOrderByClause,
+                    computeTotal);
 
             if (docList == null) { // found no authRef fields - nothing to process
                 return wrapperList;
@@ -511,9 +522,20 @@ public class RefNameServiceUtils {
             boolean morePages = true;
             while (morePages) {
 
-                docList = findAuthorityRefDocs(ctx, repoClient, repoSession,
-                        getRefNameServiceTypes(), oldRefName, refPropName,
-                        queriedServiceBindings, authRefFieldsByService, WHERE_CLAUSE_ADDITIONS_VALUE, ORDER_BY_VALUE, pageSize, currentPage, false);
+                docList = findAuthorityRefDocs(ctx, 
+                        repoClient, 
+                        repoSession,
+                        getRefNameServiceTypes(), 
+                        oldRefName, 
+                        refPropName,
+                        queriedServiceBindings, 
+                        authRefFieldsByService, 
+                        WHERE_CLAUSE_ADDITIONS_VALUE, 
+                        ORDER_BY_VALUE,
+                        currentPage,
+                        pageSize,
+                        true,       // useDefaultOrderByClause
+                        false);     // computeTotal
 
                 if (docList == null) {
                     logger.debug("updateAuthorityRefDocs: no documents could be found that referenced the old refName");
@@ -568,11 +590,22 @@ public class RefNameServiceUtils {
             String whereClauseAdditions,
             String orderByClause,
             int pageSize,
+            boolean useDefaultOrderByClause,
             boolean computeTotal) throws DocumentException, DocumentNotFoundException {
     	    	
-    	return new LazyAuthorityRefDocList(ctx, repoClient, repoSession,
-    			serviceTypes, refName, refPropName, queriedServiceBindings, authRefFieldsByService,
-    			whereClauseAdditions, orderByClause, pageSize, computeTotal);
+        	return new LazyAuthorityRefDocList(ctx, 
+        	        repoClient, 
+        	        repoSession,
+        			serviceTypes, 
+        			refName, 
+        			refPropName, 
+        			queriedServiceBindings, 
+        			authRefFieldsByService,
+        			whereClauseAdditions, 
+        			orderByClause,
+        			pageSize, 
+        			useDefaultOrderByClause, 
+        			computeTotal);
     }
     
     protected static DocumentModelList findAuthorityRefDocs(
@@ -585,13 +618,14 @@ public class RefNameServiceUtils {
             Map<String, List<AuthRefConfigInfo>> authRefFieldsByService,
             String whereClauseAdditions,
             String orderByClause,
-            int pageSize,
             int pageNum,
+            int pageSize,
+            boolean useDefaultOrderByClause,
             boolean computeTotal) throws DocumentException, DocumentNotFoundException {
 
         // Get the service bindings for this tenant
-        TenantBindingConfigReaderImpl tReader =
-                ServiceMain.getInstance().getTenantBindingConfigReader();
+        TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+        
         // We need to get all the procedures, authorities, and objects.
         List<ServiceBindingType> servicebindings = tReader.getServiceBindingsByType(ctx.getTenantId(), serviceTypes);
         if (servicebindings == null || servicebindings.isEmpty()) {
@@ -614,12 +648,21 @@ public class RefNameServiceUtils {
         }
         // Now we have to issue the search
         NuxeoRepositoryClientImpl nuxeoRepoClient = (NuxeoRepositoryClientImpl) repoClient;
-        DocumentWrapper<DocumentModelList> docListWrapper = nuxeoRepoClient.findDocs(ctx, repoSession,
-                docTypes, query, orderByClause, pageSize, pageNum, computeTotal);
+        DocumentWrapper<DocumentModelList> docListWrapper = nuxeoRepoClient.findDocs(
+                ctx,
+                repoSession,
+                docTypes, 
+                query, 
+                orderByClause, 
+                pageNum, 
+                pageSize, 
+                useDefaultOrderByClause, 
+                computeTotal);
         // Now we gather the info for each document into the list and return
         DocumentModelList docList = docListWrapper.getWrappedObject();
         return docList;
     }
+    
     private static final boolean READY_FOR_COMPLEX_QUERY = true;
 
     private static String computeWhereClauseForAuthorityRefDocs(
