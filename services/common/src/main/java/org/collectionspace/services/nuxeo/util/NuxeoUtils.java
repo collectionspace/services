@@ -670,7 +670,7 @@ public class NuxeoUtils {
      * @param queryContext the query context
      * @return an NXQL query
      */
-    static public final String buildNXQLQuery(List<String> docTypes, QueryContext queryContext) throws Exception {
+    static public final String buildNXQLQuery(List<String> docTypes, QueryContext queryContext, boolean useDefaultOrderByClause) throws Exception {
         StringBuilder query = new StringBuilder(queryContext.getSelectClause()); 
         boolean fFirst = true;
         for (String docType : docTypes) {
@@ -688,13 +688,17 @@ public class NuxeoUtils {
         appendNXQLWhere(query, queryContext);
         if (Tools.notBlank(queryContext.getOrderByClause())) {
             appendNXQLOrderBy(query, queryContext.getOrderByClause(), null);
-        } else {
+        } else if (useDefaultOrderByClause == true) {
             // Across a set of mixed DocTypes, updatedAt is the most sensible default ordering
             appendNXQLOrderBy(query, DocumentFilter.ORDER_BY_LAST_UPDATED, null);
         }
         // FIXME add 'order by' clause here, if appropriate
         return query.toString();
     }
+    
+    static public final String buildNXQLQuery(List<String> docTypes, QueryContext queryContext) throws Exception {
+        return buildNXQLQuery(docTypes, queryContext, true);
+    }    
     
     static public DocumentModel getDocFromCsid(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,

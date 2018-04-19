@@ -156,8 +156,10 @@ public interface RepositoryClient<IT, OT> extends StorageClient {
             ServiceContext<IT, OT> ctx,
             List<String> docTypes,
             String where,
-            int pageSize, int pageNum, boolean computeTotal)
-            throws DocumentNotFoundException, DocumentException;
+            int pageNum,
+            int pageSize,
+            boolean useDefaultOrderByClause,
+            boolean computeTotal) throws DocumentNotFoundException, DocumentException;
 
     /**
      * Reindex a single resource/document.
