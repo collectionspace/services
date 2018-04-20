@@ -172,7 +172,7 @@ public class QueryContext {
      * @return the order by clause
      */
     public String getOrderByClause() {
-    	return this.orderByClause;
+    	    return this.orderByClause;
     }
     
     /**

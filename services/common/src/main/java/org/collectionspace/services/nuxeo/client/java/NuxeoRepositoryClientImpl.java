@@ -652,8 +652,9 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             List<String> docTypes,
             String whereClause,
             String orderByClause,
-            int pageSize,
             int pageNum,
+            int pageSize,
+            boolean useDefaultOrderByClause,
             boolean computeTotal)
             throws DocumentNotFoundException, DocumentException {
         DocumentWrapper<DocumentModelList> wrapDoc = null;
@@ -665,7 +666,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             }
             DocumentModelList docList = null;
             QueryContext queryContext = new QueryContext(ctx, whereClause, orderByClause);
-            String query = NuxeoUtils.buildNXQLQuery(docTypes, queryContext);
+            String query = NuxeoUtils.buildNXQLQuery(docTypes, queryContext, useDefaultOrderByClause);
             if (logger.isDebugEnabled()) {
                 logger.debug("findDocs() NXQL: " + query);
             }
@@ -705,8 +706,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             DocumentHandler handler,
             CoreSessionInterface repoSession,
-            List<String> docTypes)
-            throws DocumentNotFoundException, DocumentException {
+            List<String> docTypes) throws DocumentNotFoundException, DocumentException {
         DocumentWrapper<DocumentModelList> wrapDoc = null;
 
         DocumentFilter filter = handler.getDocumentFilter();
@@ -858,15 +858,24 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             List<String> docTypes,
             String whereClause,
-            int pageSize, int pageNum, boolean computeTotal)
-            throws DocumentNotFoundException, TransactionException, DocumentException {
+            int pageNum,
+            int pageSize,
+            boolean useDefaultOrderByClause,
+            boolean computeTotal) throws DocumentNotFoundException, TransactionException, DocumentException {
     	CoreSessionInterface repoSession = null;
         DocumentWrapper<DocumentModelList> wrapDoc = null;
 
         try {
             repoSession = getRepositorySession(ctx);
-            wrapDoc = findDocs(ctx, repoSession, docTypes, whereClause, null,
-                    pageSize, pageNum, computeTotal);
+            wrapDoc = findDocs(ctx, 
+                    repoSession, 
+                    docTypes, 
+                    whereClause, 
+                    null,
+                    pageNum, 
+                    pageSize,
+                    useDefaultOrderByClause,
+                    computeTotal);
         } catch (IllegalArgumentException iae) {
             throw iae;
         } catch (Exception e) {

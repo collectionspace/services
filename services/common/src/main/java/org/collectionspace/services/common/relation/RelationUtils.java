@@ -39,8 +39,8 @@ public class RelationUtils {
             String refName,
             String targetField,
             String orderByClause,
-            int pageSize,
             int pageNum,
+            int pageSize,
             boolean computeTotal) throws DocumentException, DocumentNotFoundException {
         
         List<String> docTypes = Arrays.asList(IRelationsManager.DOC_TYPE);
@@ -52,8 +52,15 @@ public class RelationUtils {
         String query = String.format("%s:%s = '%s'", IRelationsManager.SERVICE_COMMONPART_NAME, targetField, escapedRefName);
 
         NuxeoRepositoryClientImpl nuxeoRepoClient = (NuxeoRepositoryClientImpl) repoClient;
-        DocumentWrapper<DocumentModelList> docListWrapper = nuxeoRepoClient.findDocs(ctx, repoSession,
-                docTypes, query, orderByClause, pageSize, pageNum, computeTotal);
+        DocumentWrapper<DocumentModelList> docListWrapper = nuxeoRepoClient.findDocs(ctx, 
+                repoSession,
+                docTypes, 
+                query, 
+                orderByClause, 
+                pageNum,
+                pageSize, 
+                true, // useDefaultOrderByClause if 'orderByClause' is null
+                computeTotal);
         DocumentModelList docList = docListWrapper.getWrappedObject();
         
         return docList;
@@ -88,8 +95,8 @@ public class RelationUtils {
                         oldRefName,
                         targetField,
                         ORDER_BY_VALUE,
-                        DEFAULT_PAGE_SIZE,
                         currentPage,
+                        DEFAULT_PAGE_SIZE,
                         true);
     
                 if (docModelList == null) {

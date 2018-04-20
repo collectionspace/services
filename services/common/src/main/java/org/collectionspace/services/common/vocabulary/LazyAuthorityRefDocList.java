@@ -78,6 +78,7 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 	        String whereClauseAdditions,
 	        String orderByClause,
 	        int pageSize,
+	        boolean useDefaultOrderByClause,
 	        boolean computeTotal) throws DocumentException, DocumentNotFoundException {
 
 		this.ctx = ctx;
@@ -97,7 +98,7 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 		// into this initial page fetch. There's no need to compute totals
 		// when fetching subsequent pages.
 		
-		firstPageDocList = fetchPage(0, computeTotal);
+		firstPageDocList = fetchPage(0, computeTotal, useDefaultOrderByClause);
 	}
 
 	/**
@@ -109,10 +110,21 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 	 * @throws DocumentNotFoundException
 	 * @throws DocumentException
 	 */
-	private DocumentModelList fetchPage(int pageNum, boolean computeTotal) throws DocumentNotFoundException, DocumentException {
-		return RefNameServiceUtils.findAuthorityRefDocs(ctx, repoClient, repoSession,
-		        serviceTypes, refName, refPropName, queriedServiceBindings, authRefFieldsByService,
-		        whereClauseAdditions, orderByClause, pageSize, pageNum, computeTotal);
+	private DocumentModelList fetchPage(int pageNum, boolean computeTotal, boolean useDefaultOrderByClause) throws DocumentNotFoundException, DocumentException {
+		return RefNameServiceUtils.findAuthorityRefDocs(ctx, 
+		        repoClient, 
+		        repoSession,
+		        serviceTypes, 
+		        refName, 
+		        refPropName, 
+		        queriedServiceBindings, 
+		        authRefFieldsByService,
+		        whereClauseAdditions, 
+		        orderByClause, 
+		        pageNum, 
+		        pageSize,
+		        useDefaultOrderByClause,
+		        computeTotal);
 	}
 		
 	@Override
@@ -184,7 +196,7 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 			DocumentModelList nextPageDocList = null;
 			
 			try {
-				nextPageDocList = fetchPage(nextPageNum, false);
+				nextPageDocList = fetchPage(nextPageNum, false, true);
 			}
 			catch(DocumentException e) {}
 			
