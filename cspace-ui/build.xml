@@ -1,109 +1,171 @@
-<project name="react.ui" default="package" basedir=".">
-    <description>
-        CollectionSpace UI Component buil
-    </description>
-    <!-- set global properties for this build -->
-    <property name="services.trunk" value=".."/>
-    <!-- enviornment should be declared before reading build.properties -->
-    <property environment="env" />
-    <property file="${services.trunk}/build.properties" />
+<project name="react.ui" default="package" basedir="." xmlns:if="ant:if" xmlns:unless="ant:unless">
+	<description>
+		CollectionSpace UI Component build
+	</description>
 	
+	<!-- set global properties for this build -->
+	<property name="services.trunk" value=".."/>
+	<!-- enviornment should be declared before reading build.properties -->
+	<property environment="env" />
+	<property file="${services.trunk}/build.properties" />
+	
+	<condition property="osfamily-unix">
+		<os family="unix" />
+	</condition>
+	<condition property="osfamily-windows">
+		<os family="windows" />
+	</condition>
+
 	<!--
 		Profile version numbers
 	-->
-    <property name="publicart.profile.plugin.version" value="latest" />
-    <property name="publicart.profile.plugin.name" value="cspaceUIPluginProfilePublicArt" />
-    <property name="publicart.profile.plugin.dir" value="cspace#publicart" />
-    <property name="publicart.profile.plugin.js" value="${publicart.profile.plugin.name}@${publicart.profile.plugin.version}.min.js" />
+	<property name="publicart.profile.plugin.version" value="latest" />
+	<property name="publicart.profile.plugin.name" value="cspaceUIPluginProfilePublicArt" />
+	<property name="publicart.profile.plugin.dir" value="cspace#publicart" />
+	<property name="publicart.profile.plugin.js" value="${publicart.profile.plugin.name}@${publicart.profile.plugin.version}.min.js" />
+	<property name="publicart.profile.plugin.basename" value="/cspace/publicart" />
 
-    <property name="anthro.profile.plugin.version" value="latest" />
-    <property name="anthro.profile.plugin.name" value="cspaceUIPluginProfileAnthro" />
-    <property name="anthro.profile.plugin.dir" value="cspace#anthro" />
-    <property name="anthro.profile.plugin.js" value="${anthro.profile.plugin.name}@${anthro.profile.plugin.version}.min.js" />
-    
-	<property name="dvp.profile.plugin.version" value="latest" />
-	<property name="dvp.profile.plugin.name" value="cspaceUIPluginProfileDartmouthVietnamProject" />
-	<property name="dvp.profile.plugin.dir" value="cspace#dvp" />
-	<property name="dvp.profile.plugin.js" value="${dvp.profile.plugin.name}@${dvp.profile.plugin.version}.min.js" />
+	<property name="anthro.profile.plugin.version" value="latest" />
+	<property name="anthro.profile.plugin.name" value="cspaceUIPluginProfileAnthro" />
+	<property name="anthro.profile.plugin.dir" value="cspace#anthro" />
+	<property name="anthro.profile.plugin.js" value="${anthro.profile.plugin.name}@${anthro.profile.plugin.version}.min.js" />
+	<property name="anthro.profile.plugin.basename" value="/cspace/anthro" />
+	
+	<target name="package" depends="deploy">
+	</target>
+	
+	<target name="set_primary" if="${env.CSPACE_PRIMARY_UIPLUGIN}">
+		<echo>Setting primary vars</echo>
+		<property name="primary.profile.plugin.name" value="${env.CSPACE_PRIMARY_UIPLUGIN_NAME}" />
+		<property name="primary.profile.plugin.version" value="${env.CSPACE_PRIMARY_UIPLUGIN_VERSION}" />
+		<property name="primary.profile.plugin.package" value="${env.CSPACE_PRIMARY_UIPLUGIN_PACKAGE}" /> 
+		<property name="primary.profile.plugin.dir" value="${env.CSPACE_PRIMARY_UIPLUGIN_DIR}" />
+		<property name="primary.profile.plugin.js" value="${primary.profile.plugin.name}@${primary.profile.plugin.version}.min.js" />
+		<property name="primary.profile.plugin.basename" value="${env.CSPACE_PRIMARY_UIPLUGIN_BASENAME}" />
+	</target>
 
-    <condition property="osfamily-unix">
-        <os family="unix" />
-    </condition>
-    <condition property="osfamily-windows">
-        <os family="windows" />
-    </condition>
-    
-    <target name="package" depends="deploy">
-    </target>
-    
-    <target name="download">
-    	<!-- Core UI -->
-        <exec executable="curl"  failonerror="true">
-            <arg line="-o ${cspace.ui.js} --fail --insecure --remote-name --location https://unpkg.com/cspace-ui@${cspace.ui.version}/dist/${cspace.ui.webapp.name}.min.js"/>
-        </exec>
-        
-        <!-- Public Art Profile -->
-        <exec executable="curl"  failonerror="true">
-            <arg line="-o ${publicart.profile.plugin.js} --fail --insecure --remote-name --location https://unpkg.com/cspace-ui-plugin-profile-publicart@${publicart.profile.plugin.version}/dist/${publicart.profile.plugin.name}.min.js"/>
-        </exec>
-        
-        <!-- Anthropology Profile -->
-        <exec executable="curl"  failonerror="true">
-            <arg line="-o ${anthro.profile.plugin.js} --fail --insecure --remote-name --location https://unpkg.com/cspace-ui-plugin-profile-anthro@${anthro.profile.plugin.version}/dist/${anthro.profile.plugin.name}.min.js"/>
-        </exec>
-        
-        <!-- DVP Profile -->
-        <exec executable="curl"  failonerror="true">
-            <arg line="-o ${dvp.profile.plugin.js} --fail --insecure --remote-name --location https://unpkg.com/cspace-ui-plugin-profile-dvp@${dvp.profile.plugin.version}/dist/${dvp.profile.plugin.name}.min.js"/>
-        </exec>
-    </target>
-    
-    <target name="deploy" depends="download" description="deploy cspace ui to ${jee.server.cspace}">
-    	<!-- Core UI Webapp-->
-        <filter token="UI_VERSION" value="${cspace.ui.version}" />
-        <copy todir="${jee.deploy.cspace}/${cspace.ui.webapp}" filtering="true" overwrite="true">
-            <fileset dir="${cspace.ui.webapp}"/>
-        </copy>
-        <move file="${cspace.ui.webapp.name}@${cspace.ui.version}.min.js" todir="${jee.deploy.cspace.ui.shared}"></move>
-        
-        <!-- Public Art Profile -->
+	<!--
+		Primary tenant
+	-->
+	<target name="download_primary" depends="set_primary" if="${env.CSPACE_PRIMARY_UIPLUGIN}">
+		<!-- Default primary tenant -->
+		<exec executable="curl"	 failonerror="true">
+			<arg line="-o ${primary.profile.plugin.js} --fail --insecure --remote-name --location https://unpkg.com/${primary.profile.plugin.package}@${primary.profile.plugin.version}/dist/${primary.profile.plugin.name}.min.js"/>
+		</exec>
+		</target>
+
+	<target name="deploy_primary" depends="download_primary" if="${env.CSPACE_PRIMARY_UIPLUGIN}" description="deploy cspace ui to ${jee.server.cspace}">				
+		<filter token="PLUGIN_VERSION" value="${primary.profile.plugin.version}" />
+		<filter token="PLUGIN_BASENAME" value="${primary.profile.plugin.basename}" />
+		<copy todir="${jee.deploy.cspace}/${primary.profile.plugin.dir}" filtering="true" overwrite="true">
+			<fileset dir="${primary.profile.plugin.dir}"/>
+		</copy>
+		<move file="${primary.profile.plugin.js}" todir="${jee.deploy.cspace.ui.shared}"></move>
+	</target>		 
+		
+	<target name="undeploy_primary" if="${env.CSPACE_PRIMARY_UIPLUGIN}" depends="set_primary" description="undeploy collectionspace ui components from ${jee.server.cspace}">				 
+		<delete dir="${jee.deploy.cspace}/${primary.profile.plugin.dir}" />
+		<delete file="${jee.deploy.cspace.ui.shared}/${primary.profile.plugin.js}" />
+	</target>		 
+		
+	<!--
+		Core UI components
+	-->
+	<target name="download_core">
+		<!-- Core UI -->
+		<exec executable="curl"	 failonerror="true">
+			<arg line="-o ${cspace.ui.js} --fail --insecure --remote-name --location https://unpkg.com/cspace-ui@${cspace.ui.version}/dist/${cspace.ui.webapp.name}.min.js"/>
+		</exec>
+		<move file="${cspace.ui.js}" todir="${jee.deploy.cspace.ui.shared}"></move>
+	</target>
+		
+	<target name="deploy_core" depends="download_core" unless="${env.CSPACE_CORE_CREATE_DISABLED_OPT}">
+		<!-- Core UI Webapp-->
+		<filter token="UI_VERSION" value="${cspace.ui.version}" />
+		<filter token="PLUGIN_BASENAME" value="${cspace.ui.basename}" />
+		<copy todir="${jee.deploy.cspace}/${cspace.ui.webapp}" filtering="true" overwrite="true">
+			<fileset dir="${cspace.ui.webapp}"/>
+		</copy>
+	</target>
+		
+	<target name="undeploy_core" description="undeploy collectionspace ui components from ${jee.server.cspace}">
+		<!-- Core webapp -->
+			<delete dir="${jee.deploy.cspace}/${cspace.ui.webapp}" />
+			<delete file="${jee.deploy.cspace.ui.shared}/${cspace.ui.js}" />				
+	</target>		 
+		
+	<!--
+		Public Art Tenant
+	-->
+	<target name="download_publicart" unless="${env.CSPACE_PUBLICART_CREATE_DISABLED_OPT}">
+		<!-- Public Art Profile -->
+		<exec executable="curl"	 failonerror="true">
+			<arg line="-o ${publicart.profile.plugin.js} --fail --insecure --remote-name --location https://unpkg.com/cspace-ui-plugin-profile-publicart@${publicart.profile.plugin.version}/dist/${publicart.profile.plugin.name}.min.js"/>
+		</exec>
+	</target>
+		
+	<target name="deploy_publicart" depends="download_publicart" unless="${env.CSPACE_PUBLICART_CREATE_DISABLED_OPT}">
+		<!-- Public Art Profile -->
+		<filter token="UI_VERSION" value="${cspace.ui.version}" />		
 		<filter token="PLUGIN_VERSION" value="${publicart.profile.plugin.version}" />
-        <copy todir="${jee.deploy.cspace}/${publicart.profile.plugin.dir}" filtering="true" overwrite="true">
-            <fileset dir="${publicart.profile.plugin.dir}"/>
-        </copy>
-        <move file="${publicart.profile.plugin.name}@${publicart.profile.plugin.version}.min.js" todir="${jee.deploy.cspace.ui.shared}"></move>
-        
-        <!-- Anthropology Profile -->
+		<filter token="PLUGIN_BASENAME" value="${publicart.profile.plugin.basename}" />
+		<copy todir="${jee.deploy.cspace}/${publicart.profile.plugin.dir}" filtering="true" overwrite="true">
+			<fileset dir="${publicart.profile.plugin.dir}"/>
+		</copy>
+		<move file="${publicart.profile.plugin.name}@${publicart.profile.plugin.version}.min.js" todir="${jee.deploy.cspace.ui.shared}"></move>
+	</target>
+
+	<target name="undeploy_publicart" unless="${env.CSPACE_PUBLICART_CREATE_DISABLED_OPT}" description="undeploy collectionspace ui components from ${jee.server.cspace}">
+		<!-- Public Art Profile -->
+		<delete dir="${jee.deploy.cspace}/${publicart.profile.plugin.dir}" />
+		<delete file="${jee.deploy.cspace.ui.shared}/${publicart.profile.plugin.js}" />
+	</target>
+
+	<!--
+		Anthropology Tenant
+	-->
+	<target name="download_anthro" unless="${env.CSPACE_ANTHRO_CREATE_DISABLED_OPT}">
+		<!-- Anthropology Profile -->
+		<exec executable="curl"	 failonerror="true">
+			<arg line="-o ${anthro.profile.plugin.js} --fail --insecure --remote-name --location https://unpkg.com/cspace-ui-plugin-profile-anthro@${anthro.profile.plugin.version}/dist/${anthro.profile.plugin.name}.min.js"/>
+		</exec>
+	</target>
+		
+	<target name="deploy_anthro" unless="${env.CSPACE_ANTHRO_CREATE_DISABLED_OPT}" depends="download_anthro">
+		<!-- Anthropology Profile -->
 		<filter token="PLUGIN_VERSION" value="${anthro.profile.plugin.version}" />
-        <copy todir="${jee.deploy.cspace}/${anthro.profile.plugin.dir}" filtering="true" overwrite="true">
-            <fileset dir="${anthro.profile.plugin.dir}"/>
-        </copy>
-        <move file="${anthro.profile.plugin.name}@${anthro.profile.plugin.version}.min.js" todir="${jee.deploy.cspace.ui.shared}"></move>
-        
-        <!-- Dartmouth Vietname Profile -->
-		<filter token="PLUGIN_VERSION" value="${dvp.profile.plugin.version}" />
-        <copy todir="${jee.deploy.cspace}/${dvp.profile.plugin.dir}" filtering="true" overwrite="true">
-            <fileset dir="${dvp.profile.plugin.dir}"/>
-        </copy>
-        <move file="${dvp.profile.plugin.name}@${dvp.profile.plugin.version}.min.js" todir="${jee.deploy.cspace.ui.shared}"></move>
-    </target>
-    
-    <target name="undeploy" description="undeploy collectionspace ui components from ${jee.server.cspace}">
-    	<!-- Core webapp -->
-        <delete dir="${jee.deploy.cspace}/${cspace.ui.webapp}" />
-        <delete file="${jee.deploy.cspace.ui.shared}/${cspace.ui.js}" />
-        
-        <!-- Public Art Profile -->
-        <delete dir="${jee.deploy.cspace}/${publicart.profile.plugin.dir}" />
-        <delete file="${jee.deploy.cspace.ui.shared}/${publicart.profile.plugin.js}" />
-        
-        <!-- Anthropology Profile -->
-        <delete dir="${jee.deploy.cspace}/${anthro.profile.plugin.dir}" />
-        <delete file="${jee.deploy.cspace.ui.shared}/${anthro.profile.plugin.js}" />
-        
-        <!-- Dartmouth Vietnam Project -->
-        <delete dir="${jee.deploy.cspace}/${dvp.profile.plugin.dir}" />
-        <delete file="${jee.deploy.cspace.ui.shared}/${dvp.profile.plugin.js}" />
-    </target>
-    
+		<filter token="PLUGIN_BASENAME" value="${anthro.profile.plugin.basename}" />
+		<copy todir="${jee.deploy.cspace}/${anthro.profile.plugin.dir}" filtering="true" overwrite="true">
+			<fileset dir="${anthro.profile.plugin.dir}"/>
+		</copy>
+		<move file="${anthro.profile.plugin.js}" todir="${jee.deploy.cspace.ui.shared}"></move>
+	</target>
+		
+	<target name="undeploy_anthro" unless="${env.CSPACE_ANTHRO_CREATE_DISABLED_OPT}" description="undeploy collectionspace ui components from ${jee.server.cspace}">
+		<!-- Anthropology Profile -->
+		<delete dir="${jee.deploy.cspace}/${anthro.profile.plugin.dir}" />
+		<delete file="${jee.deploy.cspace.ui.shared}/${anthro.profile.plugin.js}" />
+	</target>
+
+	<!-- General deploy target -->
+		
+	<target name="deploy_others" unless="${env.CSPACE_PRIMARY_UIPLUGIN}">
+		<antcall target="deploy_publicart" />
+		<antcall target="deploy_anthro" />
+	</target>
+		
+	<target name="deploy" depends="deploy_core, deploy_primary, deploy_others" description="deploy cspace ui to ${jee.server.cspace}">				
+		<!-- Trigger dependencies -->
+	</target>
+		
+	<!-- General undeploy target -->
+
+	<target name="undeploy_others" unless="${env.CSPACE_PRIMARY_UIPLUGIN}">
+		<antcall target="undeploy_publicart" />
+		<antcall target="undeploy_anthro" />
+	</target>
+		
+	<target name="undeploy" depends="undeploy_core, undeploy_primary, undeploy_others" description="undeploy collectionspace ui components from ${jee.server.cspace}">
+	</target>
+
 </project>
