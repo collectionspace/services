@@ -65,7 +65,8 @@
 		</exec>
 		</target>
 
-	<target name="deploy_primary" depends="download_primary" if="${env.CSPACE_PRIMARY_UIPLUGIN}" description="deploy cspace ui to ${jee.server.cspace}">				
+	<target name="deploy_primary" depends="download_primary" if="${env.CSPACE_PRIMARY_UIPLUGIN}" description="deploy cspace ui to ${jee.server.cspace}">
+		<filter token="UI_VERSION" value="${cspace.ui.version}" />				
 		<filter token="PLUGIN_VERSION" value="${primary.profile.plugin.version}" />
 		<filter token="PLUGIN_BASENAME" value="${primary.profile.plugin.basename}" />
 		<filter token="TENANT_ID" value="${primary.profile.plugin.tenantid}" />
