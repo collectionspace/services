@@ -157,7 +157,7 @@
 		
 	<target name="deploy_publicart" depends="download_publicart" unless="${env.CSPACE_PUBLICART_CREATE_DISABLED_OPT}">
 		<!-- Public Art Profile -->
-		<filter token="UI_VERSION" value="${cspace.ui.version}" />		
+		<filter token="UI_VERSION" value="${cspace.ui.version}" />
 		<filter token="PLUGIN_VERSION" value="${publicart.profile.plugin.version}" />
 		<filter token="PLUGIN_BASENAME" value="${publicart.profile.plugin.basename}" />
 		<filter token="TENANT_ID" value="${publicart.profile.plugin.tenantid}" />
@@ -199,8 +199,13 @@
 		
 	<target name="deploy_anthro" unless="${env.CSPACE_ANTHRO_CREATE_DISABLED_OPT}" depends="download_anthro">
 		<!-- Anthropology Profile -->
+		<filter token="UI_VERSION" value="${cspace.ui.version}" />
 		<filter token="PLUGIN_VERSION" value="${anthro.profile.plugin.version}" />
 		<filter token="PLUGIN_BASENAME" value="${anthro.profile.plugin.basename}" />
+		<filter token="TENANT_ID" value="${anthro.profile.plugin.tenantid}" />
+		<filter token="MESSAGE_TITLE" value="${anthro.profile.plugin.message.title}" />
+		<filter token="LOGO" value="${anthro.profile.plugin.logo}" />
+		
 		<copy todir="${jee.deploy.cspace}/${anthro.profile.plugin.dir}" filtering="true" overwrite="true">
 			<fileset dir="${anthro.profile.plugin.dir}"/>
 		</copy>
