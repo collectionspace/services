@@ -90,6 +90,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
 
     private final Logger logger = LoggerFactory.getLogger(AuthorityItemDocumentModelHandler.class);
     
+    private static final Integer PAGE_SIZE_FROM_QUERYPARAMS = null;
+    private static final Integer PAGE_NUM_FROM_QUERYPARAMS = null;
+    
     protected String authorityCommonSchemaName;
     protected String authorityItemCommonSchemaName;
     private String authorityItemTermGroupXPathBase;
@@ -417,8 +420,8 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         //
         DocumentModel docModel = wrapDoc.getWrappedObject();
         if (transitionDef.getName().equalsIgnoreCase(WorkflowClient.WORKFLOWTRANSITION_DELETE)) {
-            AuthorityRefDocList refsToAllObjects = getReferencingObjects(ctx, docModel, RefObjsSearchType.ALL);
-            AuthorityRefDocList refsToSoftDeletedObjects = getReferencingObjects(ctx, docModel, RefObjsSearchType.DELETED_ONLY);
+            AuthorityRefDocList refsToAllObjects = getReferencingObjectsForStateTransitions(ctx, docModel, RefObjsSearchType.ALL);
+            AuthorityRefDocList refsToSoftDeletedObjects = getReferencingObjectsForStateTransitions(ctx, docModel, RefObjsSearchType.DELETED_ONLY);
             if (refsToAllObjects.getTotalItems() > 0) {
                 if (refsToAllObjects.getTotalItems() > refsToSoftDeletedObjects.getTotalItems()) {
                     //
@@ -728,8 +731,8 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         ServiceContext ctx = getServiceContext();
         DocumentModel docModel = wrapDoc.getWrappedObject();
         
-        AuthorityRefDocList refsToAllObjects = getReferencingObjects(ctx, docModel, RefObjsSearchType.ALL);
-        AuthorityRefDocList refsToSoftDeletedObjects = getReferencingObjects(ctx, docModel, RefObjsSearchType.DELETED_ONLY);
+        AuthorityRefDocList refsToAllObjects = getReferencingObjectsForStateTransitions(ctx, docModel, RefObjsSearchType.ALL);
+        AuthorityRefDocList refsToSoftDeletedObjects = getReferencingObjectsForStateTransitions(ctx, docModel, RefObjsSearchType.DELETED_ONLY);
         if (refsToAllObjects.getTotalItems() > 0) {
             if (refsToAllObjects.getTotalItems() > refsToSoftDeletedObjects.getTotalItems()) {
                 //
@@ -776,8 +779,11 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
      * @throws Exception
      */
     @SuppressWarnings("rawtypes")
-    private AuthorityRefDocList getReferencingObjects(ServiceContext ctx, DocumentModel docModel, RefObjsSearchType searchType) throws Exception {
-        AuthorityRefDocList result = null;
+    private AuthorityRefDocList getReferencingObjectsForStateTransitions(
+            ServiceContext ctx, 
+            DocumentModel docModel, 
+            RefObjsSearchType searchType) throws Exception {
+        AuthorityRefDocList referenceList = null;
         
         if (ctx.getUriInfo() == null) {
             //
@@ -792,23 +798,68 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         //
         boolean doesContainValue = ctx.getUriInfo().getQueryParameters().containsKey(WorkflowClient.WORKFLOW_QUERY_DELETED_QP);
         String previousValue = ctx.getUriInfo().getQueryParameters().getFirst(WorkflowClient.WORKFLOW_QUERY_DELETED_QP);
+        
         try {
             if (doesContainValue) {
                 ctx.getUriInfo().getQueryParameters().remove(WorkflowClient.WORKFLOW_QUERY_DELETED_QP);
             }
             AuthorityResource authorityResource = (AuthorityResource)ctx.getResource(getAuthorityServicePath());
-            result = getReferencingObjects(authorityResource, ctx, docModel, searchType);
+            referenceList = getReferencingObjects(authorityResource, ctx, docModel, searchType, PAGE_NUM_FROM_QUERYPARAMS, PAGE_SIZE_FROM_QUERYPARAMS, true, true); // useDefaultOrderByClause=true, computeTotal=true
         } finally {
             if (doesContainValue) {
                 ctx.getUriInfo().getQueryParameters().addFirst(WorkflowClient.WORKFLOW_QUERY_DELETED_QP, previousValue);
             }
         }
         
-        return result;
+        return referenceList;
     }
     
+    @SuppressWarnings("rawtypes")
+    private AuthorityRefDocList getReferencingObjectsForMarkingTerm(
+            ServiceContext ctx, 
+            DocumentModel docModel, 
+            RefObjsSearchType searchType) throws Exception {
+        AuthorityRefDocList referenceList = null;
+        
+        if (ctx.getUriInfo() == null) {
+            //
+            // We need a UriInfo object so we can pass "query" params to the AuthorityResource's getReferencingObjects() method
+            //
+            ctx.setUriInfo(this.getServiceContext().getUriInfo()); // try to get a UriInfo instance from the handler's context
+        }
+        
+        //
+        // Since the call to get referencing objects might indirectly use the WorkflowClient.WORKFLOW_QUERY_NONDELETED query param, we need to
+        // temporarily remove that query param if it is set.  If set, we'll save the value and reset once we're finished.
+        //
+        boolean doesContainValue = ctx.getUriInfo().getQueryParameters().containsKey(WorkflowClient.WORKFLOW_QUERY_DELETED_QP);
+        String previousValue = ctx.getUriInfo().getQueryParameters().getFirst(WorkflowClient.WORKFLOW_QUERY_DELETED_QP);
+        
+        try {
+            if (doesContainValue) {
+                ctx.getUriInfo().getQueryParameters().remove(WorkflowClient.WORKFLOW_QUERY_DELETED_QP);
+            }
+            AuthorityResource authorityResource = (AuthorityResource)ctx.getResource(getAuthorityServicePath());
+            referenceList = getReferencingObjects(authorityResource, ctx, docModel, searchType, 0, 1, false, false);  // pageNum=0, pageSize=1, useDefaultOrderClause=false, computeTotal=false
+        } finally {
+            if (doesContainValue) {
+                ctx.getUriInfo().getQueryParameters().addFirst(WorkflowClient.WORKFLOW_QUERY_DELETED_QP, previousValue);
+            }
+        }
+        
+        return referenceList;
+    }    
+    
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private AuthorityRefDocList getReferencingObjects(AuthorityResource authorityResource, ServiceContext ctx, DocumentModel docModel, RefObjsSearchType searchType) throws Exception {
+    private AuthorityRefDocList getReferencingObjects(
+            AuthorityResource authorityResource,
+            ServiceContext ctx,
+            DocumentModel docModel,
+            RefObjsSearchType searchType,
+            Integer pageNum, 
+            Integer pageSize,
+            boolean useDefaultOrderByClause,
+            boolean computeTotal) throws Exception {
         AuthorityRefDocList result = null;
         
         String inAuthorityCsid = (String) docModel.getProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.IN_AUTHORITY);
@@ -828,7 +879,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
                     ctx.getUriInfo().getQueryParameters().addFirst(WorkflowClient.WORKFLOW_QUERY_ONLY_DELETED_QP, Boolean.TRUE.toString());  // Add the wf_only_deleted query param to get only soft-deleted items
                     break;
             }
-            result = authorityResource.getReferencingObjects(ctx, inAuthorityCsid, itemCsid, ctx.getUriInfo());
+            result = authorityResource.getReferencingObjects(ctx, inAuthorityCsid, itemCsid, ctx.getUriInfo(), pageNum, pageSize, useDefaultOrderByClause, computeTotal);
 
         } finally {
             //
@@ -1079,7 +1130,11 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             List<String> serviceTypes,
             String propertyName,
-            String itemcsid) throws Exception {
+            String itemcsid,
+            Integer pageNum,
+            Integer pageSize,
+            boolean useDefaultOrderByClause,
+            boolean computeTotal) throws Exception {
         AuthorityRefDocList authRefDocList = null;
         CoreSessionInterface repoSession = (CoreSessionInterface) ctx.getCurrentRepositorySession();
         boolean releaseRepoSession = false;
@@ -1092,17 +1147,28 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
                 releaseRepoSession = true;
             }
             DocumentFilter myFilter = getDocumentFilter();
+            if (pageSize != null) {
+                myFilter.setPageSize(pageSize);
+            }
+            if (pageNum != null) {
+                myFilter.setStartPage(pageNum);
+            }
+            myFilter.setUseDefaultOrderByClause(useDefaultOrderByClause);
 
             try {
                 DocumentWrapper<DocumentModel> wrapper = repoClient.getDoc(repoSession, ctx, itemcsid);
                 DocumentModel docModel = wrapper.getWrappedObject();
                 String refName = (String) NuxeoUtils.getProperyValue(docModel, AuthorityItemJAXBSchema.REF_NAME); //docModel.getPropertyValue(AuthorityItemJAXBSchema.REF_NAME);
                 authRefDocList = RefNameServiceUtils.getAuthorityRefDocs(
-                        repoSession, ctx, repoClient,
+                        repoSession, 
+                        ctx, 
+                        repoClient,
                         serviceTypes,
                         refName,
                         propertyName,
-                        myFilter, true /*computeTotal*/);
+                        myFilter, 
+                        useDefaultOrderByClause,
+                        computeTotal /*computeTotal*/);
             } catch (PropertyException pe) {
                 throw pe;
             } catch (DocumentException de) {
@@ -1303,43 +1369,50 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
 
         return result;
     }
+    
+    private boolean isTermReferenced(DocumentModel docModel) throws Exception {
+        boolean result = false;
+        
+        AuthorityRefDocList referenceList = null;
 
+        String wf_deletedStr = (String) getServiceContext().getQueryParams().getFirst(WorkflowClient.WORKFLOW_QUERY_DELETED_QP);
+        if (wf_deletedStr != null && Tools.isFalse(wf_deletedStr)) {
+            //
+            // if query param 'wf_deleted=false', we won't count references to soft-deleted records
+            //
+            referenceList = getReferencingObjectsForMarkingTerm(getServiceContext(), docModel, RefObjsSearchType.NON_DELETED);
+        } else {
+            //
+            // if query param 'wf_deleted=true' or missing, we count references to soft-deleted and active records
+            //
+            referenceList = getReferencingObjectsForMarkingTerm(getServiceContext(), docModel, RefObjsSearchType.ALL);
+        }
+        
+        if (referenceList.getTotalItems() > 0) {
+            result = true;
+        }
+        
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
     protected Object getListResultValue(DocumentModel docModel, // REM - CSPACE-5133
             String schema, ListResultField field) throws DocumentException {
-        Object result = null;        
+        Object result = null;
         String fieldXPath = field.getXpath();
         
         if (fieldXPath.equalsIgnoreCase(AuthorityClient.REFERENCED) == false) {
             result = NuxeoUtils.getXPathValue(docModel, schema, field.getXpath());
         } else {
             //
-            // Special case for the 'referenced' list result field.
+            // Check to see if the request is asking us to mark terms as referenced or not.
             //
-            // Set result value of field 'referenced' to 'true' if item is being referenced; otherwise, 'false'
-            //
-            try {
-                result = Boolean.FALSE.toString();
-                AuthorityRefDocList referenceList = null;
-
-                String wf_deletedStr = (String) getServiceContext().getQueryParams().getFirst(WorkflowClient.WORKFLOW_QUERY_DELETED_QP);
-                if (wf_deletedStr != null && Tools.isFalse(wf_deletedStr)) {
-                    //
-                    // if query param 'wf_deleted=false', we won't count references to soft-deleted records
-                    //
-                    referenceList = getReferencingObjects(getServiceContext(), docModel, RefObjsSearchType.NON_DELETED);
-                } else {
-                    //
-                    // if query param 'wf_deleted=true' or missing, we count references to soft-deleted and active records
-                    //
-                    referenceList = getReferencingObjects(getServiceContext(), docModel, RefObjsSearchType.ALL);
-                }
-                
-                if (referenceList.getTotalItems() > 0) {
-                    result = Boolean.TRUE.toString();
-                }
-                
-                return result;
+            String markIfReferencedStr = (String) getServiceContext().getQueryParams().getFirst(AuthorityClient.MARK_IF_REFERENCED_QP);
+            if (Tools.isTrue(markIfReferencedStr) == false) {
+                return null; // leave the <referenced> element as null since they're not asking for it
+            } else try {
+                return Boolean.toString(isTermReferenced(docModel)); // set the <referenced> element to either 'true' or 'false'
             } catch (Exception e) {
                 String msg = String.format("Failed while trying to find records referencing term CSID='%s'.", docModel.getName());
                 throw new DocumentException(msg, e);

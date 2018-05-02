@@ -54,12 +54,18 @@ public abstract class DocumentFilter {
 
     /** The max page size. */
     protected int pageSizeMax = DEFAULT_PAGE_SIZE_MAX_INIT;		// The largest page size allowed.  Can be overridden in the service-config.xml
+    
     /** The default page size. */
     public static int defaultPageSize = DEFAULT_PAGE_SIZE_INIT; // Default page size if one is specified in the service-config.xml
+    
     /** The start page. */
     protected int startPage;		// Pagination offset for list results
+    
     /** The page size. */
     protected int pageSize;			// Pagination limit for list results
+    
+    /** Flag to see if we should use default orderBy clause */
+    protected boolean useDefaultOrderByClause = true;
     
     /** The total number of items for a query result -independent of paging restrictions.
      * 
@@ -182,6 +188,14 @@ public abstract class DocumentFilter {
         this.orderByClause = theOrderByClause;
         this.startPage = (theStartPage > 0) ? theStartPage : 0;
         this.pageSize = (thePageSize > 0) ? thePageSize : defaultPageSize;
+    }
+    
+    public void setUseDefaultOrderByClause(boolean flag) {
+        this.useDefaultOrderByClause = flag;
+    }
+    
+    public boolean getUseDefaultOrderByClause() {
+        return this.useDefaultOrderByClause;
     }
 
     /**
