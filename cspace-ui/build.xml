@@ -101,13 +101,15 @@
 		Since "core" is a special tenant, we need to do a special check
 	-->
 	<target name="deploy_core_as_generic" if="${is.primary.core}">
-		<antcall target="deploy_core" />
+		<property name="webapp.template.dir" value="cspace#core#template" />
+		<antcall target="deploy_primary" />
 	</target>
 	
 	<!--
 		Since "core" is a special tenant, we need to do a special check
 	-->
 	<target name="deploy_other_as_generic" unless="${is.primary.core}">
+		<property name="webapp.template.dir" value="cspace#template" />	
 		<antcall target="deploy_primary" />	
 	</target>
 	
@@ -137,7 +139,7 @@
 		<filter token="LOGO" value="${primary.profile.plugin.logo}" />
 		
 		<copy todir="${jee.deploy.cspace}/${primary.profile.plugin.dir}" filtering="true" overwrite="true">
-			<fileset dir="cspace#template"/>
+			<fileset dir="${webapp.template.dir}"/>
 		</copy>
 		<move file="${primary.profile.plugin.js}" todir="${jee.deploy.cspace.ui.shared}"></move>
 	</target>		 
