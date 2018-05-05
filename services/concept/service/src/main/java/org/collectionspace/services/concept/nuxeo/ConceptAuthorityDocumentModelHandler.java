@@ -23,25 +23,19 @@
  */
 package org.collectionspace.services.concept.nuxeo;
 
+import org.collectionspace.services.client.ConceptAuthorityClient;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.concept.ConceptauthoritiesCommon;
 
 /**
  * ConceptAuthorityDocumentModelHandler
  *
- * $LastChangedRevision: $
- * $LastChangedDate: $
  */
 public class ConceptAuthorityDocumentModelHandler
         extends AuthorityDocumentModelHandler<ConceptauthoritiesCommon> {
-
-    /**
-     * Common part schema label
-     */
-    private static final String COMMON_PART_LABEL = "conceptauthorities_common";   
     
     public ConceptAuthorityDocumentModelHandler() {
-    	super(COMMON_PART_LABEL);
+    	super(ConceptAuthorityClient.SERVICE_COMMON_PART_NAME, ConceptAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 	
     /**

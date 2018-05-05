@@ -31,6 +31,9 @@ import org.collectionspace.services.common.ServiceException;
  */
 public class DocumentException extends ServiceException {
 
+    public static final int DUPLICATE_RECORD_ERR = 409;
+    public static final String DUPLICATE_RECORD_MSG = "Record already exists.";
+
     static public DocumentException createDocumentException(Throwable ex) {
     	DocumentException result = new DocumentException(ex);
     	
@@ -97,6 +100,11 @@ public class DocumentException extends ServiceException {
     public DocumentException(String message, Throwable cause) {
         super(message, cause);
     }
+        
+    public DocumentException(String message, Throwable cause, int errorCode) {
+        super(message, cause);
+        setErrorCode(errorCode);
+    }
 
     /**
      * Constructs a new exception with the specified cause and a detail
@@ -114,6 +122,11 @@ public class DocumentException extends ServiceException {
      */
     public DocumentException(Throwable cause) {
         super(cause);
+    }
+    
+    public DocumentException(Throwable cause, int errorCode) {
+        super(cause);
+        setErrorCode(errorCode);
     }
      
 	public boolean exceptionChainContainsNetworkError() {

@@ -4,11 +4,10 @@
 	<parent>
 		<artifactId>org.collectionspace.services.account</artifactId>
 		<groupId>org.collectionspace.services</groupId>
-		<version>4.1.1</version>
+		<version>5.0</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.collectionspace.services</groupId>
 	<artifactId>org.collectionspace.services.account.pstore</artifactId>
 	<name>services.account.pstore</name>
 
@@ -20,7 +19,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
+			<artifactId>jaxb-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.jvnet.jaxb2-commons</groupId>
@@ -32,7 +31,7 @@
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>postgresql</groupId>
+			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 		</dependency>
 		<!-- CollectionSpace dependencies -->
@@ -126,7 +125,7 @@
 								<artifactId>mysql-connector-java</artifactId>
 							</dependency>
 							<dependency>
-								<groupId>postgresql</groupId>
+								<groupId>org.postgresql</groupId>
 								<artifactId>postgresql</artifactId>
 							</dependency>
 						</dependencies>

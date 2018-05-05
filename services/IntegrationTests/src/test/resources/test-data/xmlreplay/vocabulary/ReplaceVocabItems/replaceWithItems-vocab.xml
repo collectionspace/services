@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="vocabularies">
+    <ns3:vocabularies_common xmlns:ns3="http://collectionspace.org/services/vocabulary" xmlns:ns2="http://collectionspace.org/services/jaxb">
+        <displayName>Updated createReplaceVocabItems Vocabulary</displayName>
+        <shortIdentifier>createReplaceVocabItems</shortIdentifier>
+        <description>This is an updated test vocabulary created in the createReplaceVocabItems XMLReplay test group</description>
+        <source>Some updated mythical book posted with item terms in createReplaceVocabItems test group</source>
+    </ns3:vocabularies_common>
+    <ns2:abstract-common-list xmlns:ns2="http://collectionspace.org/services/jaxb">
+        <list-item>
+            <order>1</order>
+            <displayName>Replacement item A</displayName>
+            <shortIdentifier>replacementitema</shortIdentifier>
+        </list-item>
+        <list-item>
+            <order>2</order>
+            <displayName>Replacement item B</displayName>
+            <shortIdentifier>replacementitemb</shortIdentifier>
+        </list-item>
+        <list-item>
+            <order>3</order>
+            <displayName>Replacement item C</displayName>
+            <shortIdentifier>replacementitemc</shortIdentifier>
+        </list-item>
+    </ns2:abstract-common-list>
+</document>

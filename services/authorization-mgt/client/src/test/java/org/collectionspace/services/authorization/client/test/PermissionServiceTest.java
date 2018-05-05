@@ -24,10 +24,13 @@ package org.collectionspace.services.authorization.client.test;
 
 //import java.util.ArrayList;
 import java.util.List;
+
 import javax.ws.rs.core.Response;
+
+
+
 //import org.collectionspace.services.authorization.ActionType;
 import org.collectionspace.services.authorization.perms.EffectType;
-
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PermissionClient;
 import org.collectionspace.services.authorization.perms.Permission;
@@ -36,11 +39,8 @@ import org.collectionspace.services.authorization.perms.PermissionsList;
 import org.collectionspace.services.client.PermissionFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.client.test.ServiceRequestType;
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,10 +78,23 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new PermissionClient();
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new PermissionClient(clientPropertiesFilename);
+	}
+
+    /**
+     * The entity type expected from the JAX-RS Response object
+     */
+    @Override
+	public Class<Permission> getEntityResponseType() {
+    	return Permission.class;
+    }
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readPaginatedList(java.lang.String)
      */
@@ -95,6 +108,36 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
     protected String getKnowResourceIdentifier() {
     	return knownResource;
     }
+    
+    /**
+     * Sets up create tests with empty entity body.
+     */
+    @Override
+	protected void setupCreateWithEmptyEntityBody() {
+        testExpectedStatusCode = STATUS_INTERNAL_SERVER_ERROR;  // Empty payload never gets past RESTEasy filter
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }
+    
+    /**
+     * Sets up create tests with malformed xml.
+     */
+    @Override
+	protected void setupCreateWithMalformedXml() {
+        testExpectedStatusCode = STATUS_INTERNAL_SERVER_ERROR;  // Malformed payload never gets past RESTEasy filter
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }
+
+    /**
+     * Sets up create tests with wrong xml schema.
+     */
+    @Override
+	protected void setupCreateWithWrongXmlSchema() {
+        testExpectedStatusCode = STATUS_INTERNAL_SERVER_ERROR;  // Empty payload never gets past RESTEasy filter
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }    
     
     /**
      * Creates the without resource name.
@@ -117,15 +160,19 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
                 true,
                 true);
         PermissionClient client = new PermissionClient();
-        ClientResponse<Response> res = client.create(permission);
-        int statusCode = res.getStatus();
-        // Does it exactly match the expected status code?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.create(permission);
+        try {
+	        int statusCode = res.getStatus();
+	        // Does it exactly match the expected status code?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     /**
@@ -142,11 +189,11 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
 
         // Submit the request to the service and store the response.
         PermissionClient client = new PermissionClient();
-        ClientResponse<PermissionsList> res = client.readSearchList("acquisition");
+        Response res = client.readSearchList("acquisition");
         try {
 	        assertStatusCode(res, testName);
-	        PermissionsList list = res.getEntity(PermissionsList.class);
-	        int EXPECTED_ITEMS = 2 + 4; //2 seeded base resource permissions and 4 workflow-related permissions
+	        PermissionsList list = res.readEntity(PermissionsList.class);
+	        int EXPECTED_ITEMS = 3 + 4; // 3 seeded base resource permissions (CRUDL, RL, CRUL) and 4 workflow-related permissions
 	        int actual = list.getPermission().size();
 	        if (logger.isDebugEnabled()) {
 	            logger.debug(testName + ": received = " + actual
@@ -161,7 +208,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
 	        Assert.assertEquals(list.getPermission().size(), EXPECTED_ITEMS);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -196,7 +243,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
         }
         PermissionClient client = new PermissionClient();
         // Submit the request to the service and store the response.
-        ClientResponse<Permission> res = client.update(knownResourceId, permToUpdate);
+        Response res = client.update(knownResourceId, permToUpdate);
         int statusCode = res.getStatus();
         // Check the status code of the response: does it match the expected response(s)?
         if (logger.isDebugEnabled()) {
@@ -240,7 +287,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
         }
         PermissionClient client = new PermissionClient();
         // Submit the request to the service and store the response.
-        ClientResponse<Permission> res = client.update(knownResourceId, permToUpdate);
+        Response res = client.update(knownResourceId, permToUpdate);
         int statusCode = res.getStatus();
         // Check the status code of the response: does it match the expected response(s)?
         if (logger.isDebugEnabled()) {
@@ -250,7 +297,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
                 invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, testExpectedStatusCode);
 
-        Permission permUpdated = (Permission) res.getEntity();
+        Permission permUpdated = res.readEntity(Permission.class);
         Assert.assertNotNull(permUpdated);
         int updated_actions = permToUpdate.getAction().size();
         if (logger.isDebugEnabled()) {
@@ -285,18 +332,21 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
                 true,
                 true,
                 true);
-        ClientResponse<Permission> res =
-                client.update(NON_EXISTENT_ID, permission);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.update(NON_EXISTENT_ID, permission);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
     
     // ---------------------------------------------------------------
@@ -338,6 +388,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
             logger.debug("to be created, permission");
             logger.debug(objectAsXmlString(permission, Permission.class));
         }
+        
         return permission;
     }
 
@@ -411,21 +462,27 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
     	// Do nothing.  Simply here to for a TestNG execution order for our tests
     }
 
-	@Override
-	public void updateWithEmptyEntityBody(String testName) throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
+//	@Override
+//	public void updateWithEmptyEntityBody(String testName) throws Exception {
+//		// TODO Auto-generated method stub
+//		
+//	}
+//
+//	@Override
+//	public void updateWithMalformedXml(String testName) throws Exception {
+//		// TODO Auto-generated method stub
+//		
+//	}
+//
+//	@Override
+//	public void updateWithWrongXmlSchema(String testName) throws Exception {
+//		// TODO Auto-generated method stub
+//		
+//	}
 
 	@Override
-	public void updateWithMalformedXml(String testName) throws Exception {
+	protected long getSizeOfList(PermissionsList list) {
 		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void updateWithWrongXmlSchema(String testName) throws Exception {
-		// TODO Auto-generated method stub
-		
+		return list.getPermission().size();
 	}
 }

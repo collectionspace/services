@@ -22,25 +22,20 @@
  */
 package org.collectionspace.services.client.test;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.ServiceGroupClient;
 import org.collectionspace.services.client.ServiceGroupProxy;
-import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.servicegroup.ServicegroupsCommon;
 
-import org.jboss.resteasy.client.ClientResponse;
+import javax.ws.rs.core.Response;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,17 +62,22 @@ public class ServiceGroupServiceTest extends BaseServiceTest<AbstractCommonList>
 	}
     
     @Override
-    protected CollectionSpaceClient<AbstractCommonList, PoxPayloadOut, String, ServiceGroupProxy> getClientInstance() {
+    protected CollectionSpaceClient<AbstractCommonList, PoxPayloadOut, String, ServiceGroupProxy> getClientInstance() throws Exception {
         return new ServiceGroupClient();
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new ServiceGroupClient(clientPropertiesFilename);
+	}
+
     @Override
-    protected AbstractCommonList getCommonList(ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(AbstractCommonList.class);
+    protected AbstractCommonList getCommonList(Response response) {
+        return response.readEntity(AbstractCommonList.class);
     }
     
 	public ServicegroupsCommon extractCommonPartValue(CollectionSpaceClient client,
-			ClientResponse<String> res) throws Exception {
+			Response res) throws Exception {
 		
 		ServicegroupsCommon result = null;
 		PayloadInputPart payloadInputPart = extractPart(res, client.getCommonPartName());
@@ -90,12 +90,12 @@ public class ServiceGroupServiceTest extends BaseServiceTest<AbstractCommonList>
 		return result;
 	}
 
-    protected PayloadInputPart extractPart(ClientResponse<String> res, String partLabel)
+    protected PayloadInputPart extractPart(Response res, String partLabel)
             throws Exception {
             if (getLogger().isDebugEnabled()) {
             	getLogger().debug("Reading part " + partLabel + " ...");
             }
-            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
             PayloadInputPart payloadInputPart = input.getPart(partLabel);
             Assert.assertNotNull(payloadInputPart,
                     "Part " + partLabel + " was unexpectedly null.");
@@ -110,7 +110,7 @@ public class ServiceGroupServiceTest extends BaseServiceTest<AbstractCommonList>
 
         // Submit the request to the service and store the response.
     	CollectionSpaceClient client = this.getClientInstance();
-        ClientResponse<String> res = client.read(readGroupName);
+        Response res = client.read(readGroupName);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -140,9 +140,15 @@ public class ServiceGroupServiceTest extends BaseServiceTest<AbstractCommonList>
 
         // Submit the request to the service and store the response.
         CollectionSpaceClient client = this.getClientInstance();
-        ClientResponse<AbstractCommonList> res = client.readList();
-        AbstractCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
+        Response res = client.readList();
+        AbstractCommonList list = res.readEntity(getCommonListType());
+        int statusCode;
+        try {
+        	statusCode = res.getStatus();
+        } finally {
+        	res.close();
+        }
+        
 
         // Check the status code of the response: does it match
         // the expected response(s)?
@@ -159,6 +165,4 @@ public class ServiceGroupServiceTest extends BaseServiceTest<AbstractCommonList>
         	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, getLogger(), testName);
         }
     }
-    
-    
 }

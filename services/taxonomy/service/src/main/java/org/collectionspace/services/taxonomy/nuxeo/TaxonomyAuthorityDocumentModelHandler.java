@@ -23,30 +23,29 @@
  */
 package org.collectionspace.services.taxonomy.nuxeo;
 
+import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.taxonomy.TaxonomyauthorityCommon;
 
 /**
  * TaxonomyAuthorityDocumentModelHandler
  *
- * $LastChangedRevision$
- * $LastChangedDate$
  */
 public class TaxonomyAuthorityDocumentModelHandler
         extends AuthorityDocumentModelHandler<TaxonomyauthorityCommon> {
 
-    /**
-     * Common part schema label
-     */
-    private static final String COMMON_PART_LABEL = "taxonomyauthority_common";   
-    
     public TaxonomyAuthorityDocumentModelHandler() {
-    	super(COMMON_PART_LABEL);
+    	super(TaxonomyAuthorityClient.SERVICE_COMMON_PART_NAME, TaxonomyAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
     
-    public String getCommonPartLabel() {
-        return COMMON_PART_LABEL;
+    /**
+     * getQProperty converts the given property to qualified schema property
+     * @param prop
+     * @return
+     */
+    @Override
+    public String getQProperty(String prop) {
+        return TaxonomyAuthorityConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
-	
 }
 

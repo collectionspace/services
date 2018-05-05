@@ -102,18 +102,28 @@ public class RelationValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn,
         return hasRefName(objectRefName);
     }
 
+    /**
+     * Check to see if the refname is valid.  It can be a refname of either an authority, an authority item, or another record type.
+     * @param refName
+     * @return
+     */
     private boolean hasRefName(String refName) {
-        boolean hasRefname = false;
-        if (Tools.isBlank(refName)) {
-            return hasRefname;
-        } else {
-            Authority authority = Authority.parse(refName);
-            AuthorityItem authItem = AuthorityItem.parse(refName);
-            if (authority != null || authItem != null) {
-                hasRefname = true;
-            }
-            return hasRefname;
+        boolean result = false; // assume it's not a valid refname
+        
+        if (Tools.isBlank(refName) == false) {
+        	try {
+	            Authority authority = Authority.parse(refName); // Will also parse refname to an object or procedure record
+	            if (authority != null) {
+	            	result = true;
+	            } else {
+	            	AuthorityItem authItem = AuthorityItem.parse(refName, true); // See if it is a refname to an authority item or vocabulary term
+	            	result = authItem != null;
+	            }
+        	} catch (IllegalArgumentException e) {
+        		// Ignore exception
+        	}        	
         }
 
+        return result;
     }
 }

@@ -1,55 +1,80 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
 
-import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
-import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /*
  * P - Proxy type
  */
-public abstract class AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
-	extends AbstractPoxServiceClientImpl<AbstractCommonList, P>
-	implements AuthorityClient<AUTHORITY_ITEM_TYPE, P> {
+public abstract class AuthorityClientImpl<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
+	extends AbstractPoxServiceClientImpl<AbstractCommonList, P, AUTHORITY_ITEM_TYPE>
+	implements AuthorityClient<AUTHORITY_COMMON_TYPE, AUTHORITY_ITEM_TYPE, P> {
 
 	private static final String INCLUDE_DELETE_TRUE = Boolean.TRUE.toString();
+	private static final String INCLUDE_RELATIONS_TRUE = Boolean.TRUE.toString();
+	private static final String INCLUDE_RELATIONS_FALSE = Boolean.FALSE.toString();
+	
 	/*
 	 * Basic CRUD proxied methods
 	 */
 
+	public AuthorityClientImpl(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
+
+	public AuthorityClientImpl() throws Exception {
+		super();
+	}
+
 	//(C)reate Item
 	@Override
-    public ClientResponse<Response> createItem(String vcsid, PoxPayloadOut poxPayloadOut) {
+    public Response createItem(String vcsid, PoxPayloadOut poxPayloadOut) {
     	return getProxy().createItem(vcsid, poxPayloadOut.getBytes());
     }
 
     //(R)ead Item
     @Override
-	public ClientResponse<String> readItem(String vcsid, String csid) {
-    	return getProxy().readItem(vcsid, csid, INCLUDE_DELETE_TRUE);
+	public Response readItem(String vcsid, String csid) {
+    	return getProxy().readItem(vcsid, csid, INCLUDE_DELETE_TRUE, INCLUDE_RELATIONS_FALSE);
     }
     
     @Override
-    public ClientResponse<String> readItem(String vcsid, String csid, Boolean includeDeleted) {
-    	return getProxy().readItem(vcsid, csid, includeDeleted.toString());
+    public Response readItem(String vcsid, String csid, Boolean includeDeleted) {
+    	return getProxy().readItem(vcsid, csid, includeDeleted.toString(), INCLUDE_RELATIONS_FALSE);
+    }
+    
+    @Override
+    public Response readItem(String vcsid, String csid, Boolean includeDeleted, Boolean includeRelations) {
+    	return getProxy().readItem(vcsid, csid, includeDeleted.toString(), includeRelations.toString());
     }
 
     //(U)pdate Item
     @Override
-	public ClientResponse<String> updateItem(String vcsid, String csid, PoxPayloadOut poxPayloadOut) {
+	public Response updateItem(String vcsid, String csid, PoxPayloadOut poxPayloadOut) {
     	return getProxy().updateItem(vcsid, csid, poxPayloadOut.getBytes());
+    }
+    
+    @Override
+    public Response updateNamedItemInNamedAuthority(String authShortId, String itemShortId, PoxPayloadOut poxPayloadOut) {
+    	return getProxy().updateNamedItemInNamedAuthority(authShortId, itemShortId, poxPayloadOut.getBytes());
     }
 
     //(D)elete Item
     @Override
-	public ClientResponse<Response> deleteItem(String vcsid, String csid) {
+	public Response deleteItem(String vcsid, String csid) {
     	return getProxy().deleteItem(vcsid, csid);
     }
     
+    //(D)elete Item
+    @Override    
+    public Response deleteNamedItemInNamedAuthority(String authShortId, String itemShortId) {
+    	return getProxy().deleteNamedItemInNamedAuthority(authShortId, itemShortId);
+    }
+    
+    
     @Override
-	public ClientResponse<AuthorityRefDocList> getReferencingObjects(
+	public Response getReferencingObjects( // ClientResponse<AuthorityRefDocList>
             String parentcsid,
             String itemcsid) {
     	return getProxy().getReferencingObjects(parentcsid, itemcsid, Boolean.TRUE.toString());
@@ -63,8 +88,39 @@ public abstract class AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P extends Authori
      * @return the item authority refs
      */
     @Override
-	public ClientResponse<AuthorityRefList> getItemAuthorityRefs(String parentcsid, String csid) {
+	public Response getItemAuthorityRefs(String parentcsid, String csid) {
         return getProxy().getItemAuthorityRefs(parentcsid, csid);
+    }
+    
+    /*
+     * Synchronization methods
+     */
+    
+    @Override
+    public Response syncByName(String name) {
+    	return getProxy().syncByName(name);
+    }
+    
+    @Override
+    public Response sync(String identifier) {
+    	return getProxy().sync(identifier);
+    }
+    
+    @Override
+    public boolean supportsSync() {
+    	boolean result = true;
+    	
+    	Response response = getProxy().sync("-1"); // Check to see if the Authority (in general) supports sync for any of its instances
+    	try {
+	    	int status = response.getStatus();
+	    	if (status == Response.Status.FORBIDDEN.getStatusCode()) {
+	    		result = false;
+	    	}
+    	} finally {
+	    	response.close();
+    	}
+    	
+    	return result;
     }
     
     /*
@@ -72,12 +128,12 @@ public abstract class AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P extends Authori
      */
     
     @Override
-	public ClientResponse<String> readByName(String name) {
+	public Response readByName(String name) {
     	return getProxy().readByName(name, INCLUDE_DELETE_TRUE);
     }
     
     @Override
-	public ClientResponse<String> readByName(String name, Boolean includeDeleted) {
+	public Response readByName(String name, Boolean includeDeleted) {
     	return getProxy().readByName(name, includeDeleted.toString());
     }
     
@@ -93,12 +149,12 @@ public abstract class AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P extends Authori
      * @return the client response
      */
     @Override
-	public ClientResponse<String> readNamedItem(String vcsid, String shortId) {
+	public Response readNamedItem(String vcsid, String shortId) {
         return getProxy().readNamedItem(vcsid, shortId, INCLUDE_DELETE_TRUE);
     }
 
     @Override
-	public ClientResponse<String> readNamedItem(String vcsid, String shortId, Boolean includeDeleted) {
+	public Response readNamedItem(String vcsid, String shortId, Boolean includeDeleted) {
         return getProxy().readNamedItem(vcsid, shortId, includeDeleted.toString());
     }
 
@@ -110,12 +166,12 @@ public abstract class AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P extends Authori
      * @return the client response
      */
     @Override
-	public ClientResponse<String> readItemInNamedAuthority(String authShortId, String csid) {
+	public Response readItemInNamedAuthority(String authShortId, String csid) {
         return getProxy().readItemInNamedAuthority(authShortId, csid, INCLUDE_DELETE_TRUE);
     }
 
     @Override
-	public ClientResponse<String> readItemInNamedAuthority(String authShortId, String csid, Boolean includeDeleted) {
+	public Response readItemInNamedAuthority(String authShortId, String csid, Boolean includeDeleted) {
         return getProxy().readItemInNamedAuthority(authShortId, csid, includeDeleted.toString());
     }
 
@@ -127,13 +183,13 @@ public abstract class AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P extends Authori
      * @return the client response
      */
     @Override
-	public ClientResponse<String> readNamedItemInNamedAuthority(String authShortId, String itemShortId) {
-        return getProxy().readNamedItemInNamedAuthority(authShortId, itemShortId, INCLUDE_DELETE_TRUE);
+	public Response readNamedItemInNamedAuthority(String authShortId, String itemShortId) {
+        return getProxy().readNamedItemInNamedAuthority(authShortId, itemShortId, INCLUDE_DELETE_TRUE, INCLUDE_RELATIONS_FALSE);
     }
 
     @Override
-	public ClientResponse<String> readNamedItemInNamedAuthority(String authShortId, String itemShortId, Boolean includeDeleted) {
-        return getProxy().readNamedItemInNamedAuthority(authShortId, itemShortId, includeDeleted.toString());
+	public Response readNamedItemInNamedAuthority(String authShortId, String itemShortId, Boolean includeDeleted, Boolean includeRelations) {
+        return getProxy().readNamedItemInNamedAuthority(authShortId, itemShortId, includeDeleted.toString(), includeRelations.toString());
     }
 
     /**
@@ -149,16 +205,26 @@ public abstract class AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P extends Authori
      * @return the client response
      */
     @Override
-    public ClientResponse<AbstractCommonList> 
-    		readItemList(String inAuthority, String partialTerm, String keywords) {
+    public Response readItemList(String inAuthority, String partialTerm, String keywords) {
         return getProxy().readItemList(inAuthority, partialTerm, keywords, INCLUDE_DELETE_TRUE);
     }
 
     @Override
-    public ClientResponse<AbstractCommonList> 
-    		readItemList(String inAuthority, String partialTerm, String keywords, Boolean includeDeleted) {
+    public Response readItemList(String inAuthority, String partialTerm, String keywords, long pageSize, long pageNum) {
+        return getProxy().readItemList(inAuthority, partialTerm, keywords, INCLUDE_DELETE_TRUE, pageSize, pageNum);
+    }
+
+    @Override
+    public Response readItemList(String inAuthority, String partialTerm, String keywords, Boolean includeDeleted) {
         return getProxy().readItemList(inAuthority, partialTerm, keywords, includeDeleted.toString());
     }
+    
+    @Override
+    public Response readItemList(String inAuthority, String partialTerm, String keywords, Boolean includeDeleted,
+    		long pageSize, long pageNum) {
+        return getProxy().readItemList(inAuthority, partialTerm, keywords, includeDeleted.toString(), pageSize, pageNum);
+    }
+    
 
     /**
      * Read item list for named vocabulary, filtering by partial term match, or keywords. Only one of
@@ -174,13 +240,13 @@ public abstract class AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P extends Authori
      */
 
 	@Override
-	public ClientResponse<AbstractCommonList> readItemListForNamedAuthority(
+	public Response readItemListForNamedAuthority(
 			String specifier, String partialTerm, String keywords) {
         return getProxy().readItemListForNamedAuthority(specifier, partialTerm, keywords, INCLUDE_DELETE_TRUE);
 	}
 
 	@Override
-	public ClientResponse<AbstractCommonList> readItemListForNamedAuthority(
+	public Response readItemListForNamedAuthority(
 			String specifier, 
 			String partialTerm, 
 			String keywords,
@@ -193,12 +259,12 @@ public abstract class AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P extends Authori
 	 */
 	
 	@Override
-    public ClientResponse<String> readItemWorkflow(String vcsid, String csid) {
+    public Response readItemWorkflow(String vcsid, String csid) {
     	return getProxy().readItemWorkflow(vcsid, csid);
     }
     
 	@Override
-    public ClientResponse<String> updateItemWorkflowWithTransition(String vcsid, String csid, String workflowTransition) {
+    public Response updateItemWorkflowWithTransition(String vcsid, String csid, String workflowTransition) {
     	return getProxy().updateItemWorkflowWithTransition(vcsid, csid, workflowTransition);
     }
 	

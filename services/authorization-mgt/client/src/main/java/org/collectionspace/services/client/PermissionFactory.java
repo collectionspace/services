@@ -25,6 +25,7 @@
 package org.collectionspace.services.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.perms.EffectType;
@@ -62,11 +63,14 @@ public class PermissionFactory {
             boolean useEffect) {
 
         Permission permission = new Permission();
+        
         if (useResourceName) {
             permission.setResourceName(resourceName);
         }
         if (useAction) {
             permission.setAction(actionList);
+            String actionGroup = PermissionClient.getActionGroup(actionList);
+            permission.setActionGroup(actionGroup);
         }
         if (useEffect) {
             permission.setEffect(effect);
@@ -74,28 +78,18 @@ public class PermissionFactory {
         return permission;
     }
 
+	public static String createDefaultActionGroup() {
+    	return "CRUDL";
+    }
 
     public static List<PermissionAction> createDefaultActions() {
         List<PermissionAction> actions = new ArrayList<PermissionAction>();
-        PermissionAction create = new PermissionAction();
-        create.setName(ActionType.CREATE);
-        actions.add(create);
-
-        PermissionAction read = new PermissionAction();
-        read.setName(ActionType.READ);
-        actions.add(read);
-
-        PermissionAction update = new PermissionAction();
-        update.setName(ActionType.UPDATE);
-        actions.add(update);
-
-        PermissionAction delete = new PermissionAction();
-        delete.setName(ActionType.DELETE);
-        actions.add(delete);
-
-        PermissionAction search = new PermissionAction();
-        search.setName(ActionType.SEARCH);
-        actions.add(search);
+        
+        actions.add(PermissionActionFactory.create(ActionType.CREATE));
+        actions.add(PermissionActionFactory.create(ActionType.READ));
+        actions.add(PermissionActionFactory.create(ActionType.UPDATE));
+        actions.add(PermissionActionFactory.create(ActionType.DELETE));
+        actions.add(PermissionActionFactory.create(ActionType.SEARCH));
 
         return actions;
     }

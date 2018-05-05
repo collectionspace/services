@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="vocabularies">
+    <ns3:vocabularies_common xmlns:ns3="http://collectionspace.org/services/vocabulary" xmlns:ns2="http://collectionspace.org/services/jaxb">
+        <displayName>Updated createUpdateAddDeleteVocabItems Vocabulary</displayName>
+        <shortIdentifier>createUpdateAddDeleteVocabItems</shortIdentifier>
+        <description>This is an updated test vocabulary created in the createUpdateAddDeleteVocabItems XMLReplay test group</description>
+        <source>Some updated mythical book posted with item terms in createUpdateAddDeleteVocabItems test group</source>
+    </ns3:vocabularies_common>
+    <ns2:abstract-common-list xmlns:ns2="http://collectionspace.org/services/jaxb">
+        <list-item>
+            <csid>${item301csid}</csid>
+            <order>1</order>
+            <displayName>Updated createItem301</displayName>
+            <shortIdentifier>createItem301</shortIdentifier>
+            <termStatus>inactive</termStatus>
+        </list-item>
+        <list-item>
+            <order>2</order>
+            <displayName>Added item A</displayName>
+            <shortIdentifier>addeditema</shortIdentifier>
+        </list-item>
+        <list-item>
+            <order>3</order>
+            <displayName>Added item B</displayName>
+            <shortIdentifier>addeditemb</shortIdentifier>
+        </list-item>
+        <list-item>
+            <order>4</order>
+            <displayName>Added item C</displayName>
+            <!-- Test providing no short ID; should get generated. -->
+        </list-item>
+    </ns2:abstract-common-list>
+</document>

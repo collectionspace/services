@@ -16,7 +16,7 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.RefNameUtils.AuthorityTermInfo;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
@@ -25,12 +25,13 @@ import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.relation.RelationResource;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.relation.RelationsCommonList;
-import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
+
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Node;
+
 import org.nuxeo.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -334,7 +335,7 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 			String serviceName = uriParts[1];
 			String csid = uriParts[2];
 		
-			ResourceBase resource = (ResourceBase) getResourceMap().get(serviceName);
+			NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(serviceName);
 			
 			resource.update(getResourceMap(), createUriInfo(), csid, payload);
 		}
@@ -410,7 +411,7 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 
 			logger.debug("Soft deleting: docType=" + docType + " inAuthority=" + inAuthority + " csid=" + csid);
 
-			resource.updateItemWorkflowWithTransition(inAuthority, csid, "delete");
+			resource.updateItemWorkflowWithTransition(null, inAuthority, csid, "delete");
 			
 			userNotes.add("The source record with CSID " + csid + " was soft deleted.");
 			numAffected++;

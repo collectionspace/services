@@ -23,33 +23,19 @@
  */
 package org.collectionspace.services.place.nuxeo;
 
-import org.collectionspace.services.PlaceJAXBSchema;
 import org.collectionspace.services.client.PlaceAuthorityClient;
-import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.place.PlacesCommon;
-import org.nuxeo.ecm.core.api.DocumentModel;
 
 /**
  * PlaceDocumentModelHandler
- *
- * $LastChangedRevision: $
- * $LastChangedDate: $
- */
-/**
- * @author pschmitz
  *
  */
 public class PlaceDocumentModelHandler
         extends AuthorityItemDocumentModelHandler<PlacesCommon> {
 
-    /**
-     * Common part schema label
-     */
-    private static final String COMMON_PART_LABEL = "places_common";
-    
     public PlaceDocumentModelHandler() {
-    	super(COMMON_PART_LABEL);
+    	super(PlaceAuthorityClient.SERVICE_COMMON_PART_NAME, PlaceAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 
     @Override
@@ -57,56 +43,6 @@ public class PlaceDocumentModelHandler
         return PlaceAuthorityClient.SERVICE_PATH_COMPONENT;    //  CSPACE-3932
     }
 
-        /**
-     * Handle display name.
-     *
-     * @param docModel the doc model
-     * @throws Exception the exception
-     */
-//    @Override
-//    protected void handleComputedDisplayNames(DocumentModel docModel) throws Exception {
-//        String commonPartLabel = getServiceContext().getCommonPartLabel("places");
-//    	Boolean displayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
-//    			PlaceJAXBSchema.DISPLAY_NAME_COMPUTED);
-//    	Boolean shortDisplayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
-//    			PlaceJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED);
-//    	if(displayNameComputed==null)
-//    		displayNameComputed = true;
-//    	if(shortDisplayNameComputed==null)
-//    		shortDisplayNameComputed = true;
-//    	if (displayNameComputed || shortDisplayNameComputed) {
-//                // Obtain the primary place name from the list of place names, for computing the display name.
-//    		String xpathToPlaceName = PlaceJAXBSchema.PLACE_NAME_GROUP_LIST 
-//                        + "/[0]/" + PlaceJAXBSchema.PLACE_NAME;
-//    		String placeName = getXPathStringValue(docModel, COMMON_PART_LABEL, xpathToPlaceName);
-//    		String displayName = prepareDefaultDisplayName(placeName);
-//    		if (displayNameComputed) {
-//    			docModel.setProperty(commonPartLabel, PlaceJAXBSchema.DISPLAY_NAME,
-//    					displayName);
-//    		}
-//    		if (shortDisplayNameComputed) {
-//    			docModel.setProperty(commonPartLabel, PlaceJAXBSchema.SHORT_DISPLAY_NAME,
-//    					displayName);
-//    		}
-//    	}
-//    }
-	
-    /**
-     * Produces a default displayName from one or more supplied fields.
-     * @see PlaceAuthorityClientUtils.prepareDefaultDisplayName() which
-     * duplicates this logic, until we define a service-general utils package
-     * that is neither client nor service specific.
-     * @param placeName
-     * @return the default display name
-     * @throws Exception
-     */
-    private static String prepareDefaultDisplayName(
-    		String placeName ) throws Exception {
-    	StringBuilder newStr = new StringBuilder();
-			newStr.append(placeName);
-			return newStr.toString();
-    }
-    
     /**
      * getQProperty converts the given property to qualified schema property
      * @param prop
@@ -116,5 +52,11 @@ public class PlaceDocumentModelHandler
     public String getQProperty(String prop) {
         return PlaceConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
+
+	@Override
+	public String getParentCommonSchemaName() {
+		// TODO Auto-generated method stub
+		return PlaceAuthorityClient.SERVICE_COMMON_PART_NAME;
+	}
 }
 

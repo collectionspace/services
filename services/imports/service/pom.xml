@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.imports</artifactId>        
-        <version>4.1.1</version>
+        <version>5.0</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
@@ -21,7 +21,6 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
@@ -68,12 +67,6 @@
             <version>1.0.01</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-            <version>1.6.1</version>
-            <scope>provided</scope>
-        </dependency>
         
         <!-- jboss -->
 
@@ -96,6 +89,7 @@
             <artifactId>resteasy-multipart-provider</artifactId>
         </dependency>
         
+        <!-- Nuxeo -->
 
         <dependency>
             <groupId>org.nuxeo.shell</groupId>
@@ -103,9 +97,19 @@
             <version>${nuxeo.shell.version}</version>
         </dependency>
         <dependency>
+        	<groupId>org.nuxeo.ecm.platform</groupId>
+  			<artifactId>nuxeo-importer-core</artifactId>
+  			<version>${nuxeo.platform.version}</version>
+        </dependency>
+        <dependency>
+        	<groupId>org.nuxeo.ecm.platform</groupId>
+	  		<artifactId>nuxeo-importer-xml-parser</artifactId>
+	  		<version>${nuxeo.platform.version}</version>
+  		</dependency>
+        
+        <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-api</artifactId>
-            <version>${nuxeo.core.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>jboss-remoting</artifactId>

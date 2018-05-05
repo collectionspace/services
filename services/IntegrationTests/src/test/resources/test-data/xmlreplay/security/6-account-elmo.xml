@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:accounts_common
-xmlns:ns2="http://collectionspace.org/services/account"
-xmlns:ns3="http://collectionspace.org/services/hyperjaxb">
-  <screenName>elmo2010</screenName>
-  <personRefName>elmo2010</personRefName>
-  <email>elmo@cspace.org</email>
-  <phone>1234567890</phone>
-  <userId>elmo2010</userId>
-	<!-- Pass word is elmo2010, base64 encoded -->
-  <password>ZWxtbzIwMTA=</password>
-  <tenants>
-    <tenant_id>1</tenant_id>
-  </tenants>
+<ns2:accounts_common xmlns:ns2="http://collectionspace.org/services/account" xmlns:ns3="http://collectionspace.org/services/hyperjaxb">
+    <screenName>elmo2018</screenName>
+    <personRefName>elmo2018</personRefName>
+    <email>elmo2018@DeleteBug.accountelemo.org</email>
+    <phone>1234567890</phone>
+    <userId>elmo2018</userId>
+    <!-- Pass word is elmo2018, base64 encoded -->
+    <password>ZWxtbzIwMTg=</password>
+    <tenants>
+        <tenant_id>1</tenant_id>
+    </tenants>
+    <roleList>
+      <role>
+          <roleId>${simpleRoleId}</roleId> <!-- It should be ok that role name is missing -->
+      </role>
+    </roleList>
 </ns2:accounts_common>
-

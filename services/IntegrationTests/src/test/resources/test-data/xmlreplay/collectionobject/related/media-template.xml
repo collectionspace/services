@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="media">
+  <ns2:media_common xmlns:ns2="http://collectionspace.org/services/media"
+    xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <identificationNumber>${identificationNumber}</identificationNumber>
+  </ns2:media_common>
+  <ns2:media_testsci xmlns:ns2="http://collectionspace.org/services/media/domain/testsci"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <imageNumber>${imageNumber}</imageNumber>
+  </ns2:media_testsci>
+</document>

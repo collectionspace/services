@@ -20,52 +20,52 @@ public interface AuthorityWithContactsProxy extends AuthorityProxy {
     @GET
     @Produces({"application/xml"})
     @Path("/{parentcsid}/items/{itemcsid}/contacts/")
-    public ClientResponse<AbstractCommonList> readContactList(
+    public Response readContactList(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid);
 
     @GET
     @Produces({"application/xml"})
     @Path("/{parentcsid}/items/urn:cspace:name({itemspecifier})/contacts/")
-    ClientResponse<AbstractCommonList> readContactListForNamedItem(
+    Response readContactListForNamedItem(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemspecifier") String itemspecifier);
     
     @GET
     @Produces({"application/xml"})
     @Path("/urn:cspace:name({parentspecifier})/items/{itemcsid}/contacts/")
-    ClientResponse<AbstractCommonList> readContactListForItemInNamedAuthority(
+    Response readContactListForItemInNamedAuthority(
             @PathParam("parentspecifier") String parentspecifier,
             @PathParam("itemcsid") String itemcsid);
     @GET
     @Produces({"application/xml"})
     @Path("/urn:cspace:name({parentspecifier})/items/urn:cspace:name({itemspecifier})/contacts/")
-    ClientResponse<AbstractCommonList> readContactListForNamedItemInNamedAuthority(
+    Response readContactListForNamedItemInNamedAuthority(
             @PathParam("parentspecifier") String parentspecifier,
             @PathParam("itemspecifier") String itemspecifier);
 
     //(C)reate Contact
     @POST
     @Path("/{parentcsid}/items/{itemcsid}/contacts/")
-    ClientResponse<Response> createContact(
+    Response createContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
             byte[] xmlPayload);
     @POST
     @Path("/{parentcsid}/items/urn:cspace:name({itemspecifier})/contacts/")
-    ClientResponse<Response> createContactForNamedItem(
+    Response createContactForNamedItem(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemspecifier") String itemspecifier,
             byte[] xmlPayload);
     @POST
     @Path("/urn:cspace:name({parentspecifier})/items/{itemcsid}/contacts/")
-    ClientResponse<Response> createContactForItemInNamedAuthority(
+    Response createContactForItemInNamedAuthority(
             @PathParam("parentspecifier") String parentspecifier,
             @PathParam("itemcsid") String itemcsid,
             byte[] xmlPayload);
     @POST
     @Path("/urn:cspace:name({parentspecifier})/items/urn:cspace:name({itemspecifier})/contacts/")
-    ClientResponse<Response> createContactForNamedItemInNamedAuthority(
+    Response createContactForNamedItemInNamedAuthority(
             @PathParam("parentspecifier") String parentspecifier,
             @PathParam("itemspecifier") String itemspecifier,
             byte[] xmlPayload);
@@ -73,25 +73,25 @@ public interface AuthorityWithContactsProxy extends AuthorityProxy {
      //(R)ead Contact
     @GET
     @Path("/{parentcsid}/items/{itemcsid}/contacts/{csid}")
-    ClientResponse<String> readContact(
+    Response readContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid);
     @GET
     @Path("/{parentcsid}/items/urn:cspace:name({itemspecifier})/contacts/{csid}")
-    ClientResponse<String> readContactForNamedItem(
+    Response readContactForNamedItem(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemspecifier") String itemspecifier,
             @PathParam("csid") String csid);
     @GET
     @Path("/urn:cspace:name({parentspecifier})/items/{itemcsid}/contacts/{csid}")
-    ClientResponse<String> readContactInNamedAuthority(
+    Response readContactInNamedAuthority(
             @PathParam("parentspecifier") String parentspecifier,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid);
     @GET
     @Path("/urn:cspace:name({parentspecifier})/items/urn:cspace:name({itemspecifier})/contacts/{csid}")
-    ClientResponse<String> readContactForNamedItemInNamedAuthority(
+    Response readContactForNamedItemInNamedAuthority(
             @PathParam("parentspecifier") String parentspecifier,
             @PathParam("itemspecifier") String itemspecifier,
             @PathParam("csid") String csid);
@@ -99,28 +99,28 @@ public interface AuthorityWithContactsProxy extends AuthorityProxy {
     //(U)pdate Contact
     @PUT
     @Path("/{parentcsid}/items/{itemcsid}/contacts/{csid}")
-    ClientResponse<String> updateContact(
+    Response updateContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid,
             byte[] xmlPayload);
     @PUT
     @Path("/{parentcsid}/items/urn:cspace:name({itemspecifier})/contacts/{csid}")
-    ClientResponse<String> updateContactForNamedItem(
+    Response updateContactForNamedItem(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemspecifier") String itemspecifier,
             @PathParam("csid") String csid,
             byte[] xmlPayload);
     @PUT
     @Path("/urn:cspace:name({parentspecifier})/items/{itemcsid}/contacts/{csid}")
-    ClientResponse<String> updateContactInNamedAuthority(
+    Response updateContactInNamedAuthority(
             @PathParam("parentspecifier") String parentspecifier,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid,
             byte[] xmlPayload);
     @PUT
     @Path("/urn:cspace:name({parentspecifier})/items/urn:cspace:name({itemspecifier})/contacts/{csid}")
-    ClientResponse<String> updateContactForNamedItemInNamedAuthority(
+    Response updateContactForNamedItemInNamedAuthority(
             @PathParam("parentspecifier") String parentspecifier,
             @PathParam("itemspecifier") String itemspecifier,
             @PathParam("csid") String csid,
@@ -129,27 +129,27 @@ public interface AuthorityWithContactsProxy extends AuthorityProxy {
     //(D)elete Contact
     @DELETE
     @Path("/{parentcsid}/items/{itemcsid}/contacts/{csid}")
-    ClientResponse<Response> deleteContact(
+    Response deleteContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid);
     
     @DELETE
     @Path("/{parentcsid}/items/urn:cspace:name({itemspecifier})/contacts/{csid}")
-    ClientResponse<Response> deleteContactForNamedItem(
+    Response deleteContactForNamedItem(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemspecifier") String itemspecifier,
             @PathParam("csid") String csid);
     @DELETE
     @Path("/urn:cspace:name({parentspecifier})/items/{itemcsid}/contacts/{csid}")
-    ClientResponse<Response> deleteContactInNamedAuthority(
+    Response deleteContactInNamedAuthority(
             @PathParam("parentspecifier") String parentspecifier,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid);
     
     @DELETE
     @Path("/urn:cspace:name({parentspecifier})/items/urn:cspace:name({itemspecifier})/contacts/{csid}")
-    ClientResponse<Response> deleteContactForNamedItemInNamedAuthority(
+    Response deleteContactForNamedItemInNamedAuthority(
             @PathParam("parentspecifier") String parentspecifier,
             @PathParam("itemspecifier") String itemspecifier,
             @PathParam("csid") String csid);

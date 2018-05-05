@@ -1,0 +1,25 @@
+<document name="vocabularies">
+    <ns2:vocabularies_common xmlns:ns2="http://collectionspace.org/services/vocabulary" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <rev>6</rev>
+        <shortIdentifier>createEmptyVocab100</shortIdentifier>
+        <csid>${csid}</csid>
+        <displayName>createEmptyVocab100 Vocabulary</displayName>
+        <description>
+            This is a test vocabulary for test createEmptyVocab100
+        </description>
+        <source>createEmptyVocab100</source>
+        <refName>
+            urn:cspace:testsci.collectionspace.org:vocabularies:name(createEmptyVocab100)'createEmptyVocab100 Vocabulary'
+        </refName>
+        <vocabType>enum</vocabType>
+    </ns2:vocabularies_common>
+    <ns2:abstract-common-list xmlns:ns2="http://collectionspace.org/services/jaxb">
+        <pageNum>0</pageNum>
+        <pageSize>2500</pageSize>
+        <itemsInPage>0</itemsInPage>
+        <totalItems>0</totalItems>
+        <fieldsReturned>
+            csid|uri|refName|updatedAt|workflowState|rev|sourcePage|sas|proposed|deprecated|termStatus|description|source|order|displayName|shortIdentifier
+        </fieldsReturned>
+    </ns2:abstract-common-list>
+</document>

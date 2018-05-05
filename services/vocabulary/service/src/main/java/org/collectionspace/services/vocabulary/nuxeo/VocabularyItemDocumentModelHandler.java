@@ -35,16 +35,12 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 /**
  * VocabularyItemDocumentModelHandler
  *
- * $LastChangedRevision: $
- * $LastChangedDate: $
  */
 public class VocabularyItemDocumentModelHandler
 		extends AuthorityItemDocumentModelHandler<VocabularyitemsCommon> {
 
-    private static final String COMMON_PART_LABEL = "vocabularyitems_common";   
-    
     public VocabularyItemDocumentModelHandler() {
-    	super(COMMON_PART_LABEL);
+    	super(VocabularyClient.SERVICE_COMMON_PART_NAME, VocabularyClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 
     @Override
@@ -100,6 +96,7 @@ public class VocabularyItemDocumentModelHandler
 		return result;
 	}
     
+    @Override
     protected ListResultField getListResultsTermStatusField() {
 		ListResultField result = new ListResultField();
 
@@ -108,6 +105,12 @@ public class VocabularyItemDocumentModelHandler
 
 		return result;
     }    
+
+	@Override
+	public String getParentCommonSchemaName() {
+		// TODO Auto-generated method stub
+		return VocabularyClient.SERVICE_COMMON_PART_NAME;
+	}
     
 }
 

@@ -32,13 +32,14 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
+
 import javax.ws.rs.core.Response;
+
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.AccountValue;
 import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.perms.EffectType;
-
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionAction;
 import org.collectionspace.services.authorization.PermissionRole;
@@ -64,11 +65,8 @@ import org.collectionspace.services.client.RoleFactory;
 import org.collectionspace.services.client.test.BaseServiceTest;
 import org.collectionspace.services.dimension.DimensionsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
@@ -100,13 +98,13 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
     private final String CLASS_NAME = MultiTenancyTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     private final static String TENANT_1_ADMIN_USER = "admin@core.collectionspace.org";
-    private final static String TENANT_2_ADMIN_USER = "admin@lifesci.collectionspace.org";
+    private final static String TENANT_2_ADMIN_USER = "admin@testsci.collectionspace.org";
     private final static String TENANT_ADMIN_PASS = "Administrator";
     private final static String TENANT_1_USER = "user1@museum1.org";
     private final static String TENANT_2_USER = "user2@museum2.org";
     private final static String TENANT_1 = "1";
     private final static String TENANT_2 = "2";
-    private final static String TEST_ROLE_NAME = "ROLE_TEST_REGISTRAR";
+    private final static String TEST_ROLE_NAME = "xROLE_TEST_REGISTRAR";
     private final static String TEST_SERVICE_A = "dimensions";
 
     // Instance variables specific to this test.
@@ -132,7 +130,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
     }
 
     @BeforeClass(alwaysRun = true)
-    public void seedData() {
+    public void seedData() throws Exception {
         //tenant admin users are used to create accounts, roles and permissions and relationships
         //assumption : two tenant admin users exist before running this test
         tenantAdminUsers.put(TENANT_1, new UserInfo(TENANT_1_ADMIN_USER, TENANT_ADMIN_PASS));
@@ -145,12 +143,12 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         seedPermissionRoles();
     }
 
-    private void seedAccounts() {
+    private void seedAccounts() throws Exception {
         seedAccount(TENANT_1, TENANT_1_USER);
         seedAccount(TENANT_2, TENANT_2_USER);
     }
 
-    private void seedAccount(String tenantId, String userId) {
+    private void seedAccount(String tenantId, String userId) throws Exception {
         //create account using default user in admin role but assign tenant id
         //create username, email and password same for simplicity
         String accId = createAccount(tenantId, userId, userId);
@@ -165,7 +163,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         }
     }
 
-    private void seedPermissions() {
+    private void seedPermissions() throws Exception {
         String resource = TEST_SERVICE_A;
 
         PermissionAction pac = new PermissionAction();
@@ -189,7 +187,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
     }
 
     private void seedPermission(String tenantId,
-            String resource, List<PermissionAction> testActions, EffectType effect) {
+            String resource, List<PermissionAction> testActions, EffectType effect) throws Exception {
         //create permission using default user in admin role but assign tenant id
         String id = createPermission(tenantId, resource, testActions, effect);
         PermissionValue pv = new PermissionValue();
@@ -203,14 +201,14 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         }
     }
 
-    private void seedRoles() {
+    private void seedRoles() throws Exception {
         //create role using default user in admin role but assign tenant id
         //use the same role name to check constraints
         seedRole(TENANT_1, TEST_ROLE_NAME);
         seedRole(TENANT_2, TEST_ROLE_NAME);
     }
 
-    private void seedRole(String tenantId, String roleName) {
+    private void seedRole(String tenantId, String roleName) throws Exception {
         String rid = createRole(tenantId, roleName);
         RoleValue rv = new RoleValue();
         rv.setRoleId(rid);
@@ -221,14 +219,14 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         }
     }
 
-    private void seedAccountRoles() {
+    private void seedAccountRoles() throws Exception {
         for (String tenantId : tenantAccounts.keySet()) {
             AccountValue av = (AccountValue) tenantAccounts.get(tenantId);
             seedAccountRole(tenantId, av.getUserId());
         }
     }
 
-    private void seedAccountRole(String tenantId, String userId) {
+    private void seedAccountRole(String tenantId, String userId) throws Exception {
         List<RoleValue> tenantRoleValues = new ArrayList<RoleValue>();
         tenantRoleValues.add(tenantRoles.get(tenantId));
         createAccountRole(tenantId, userAccounts.get(userId), tenantRoleValues);
@@ -237,14 +235,14 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         }
     }
 
-    private void seedPermissionRoles() {
+    private void seedPermissionRoles() throws Exception {
         for (String tenantId : tenantPermissions.keySet()) {
             PermissionValue pv = tenantPermissions.get(tenantId);
             seedPermissionRole(tenantId, pv.getPermissionId());
         }
     }
 
-    private void seedPermissionRole(String tenantId, String permId) {
+    private void seedPermissionRole(String tenantId, String permId) throws Exception {
         List<RoleValue> tenantRoleValues = new ArrayList<RoleValue>();
         tenantRoleValues.add(tenantRoles.get(tenantId));
         PermissionValue pv = permValues.get(permId);
@@ -262,13 +260,17 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
     protected CollectionSpaceClient getClientInstance() {
         return null;
     }
+    
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+		return null;
+	}
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected AbstractCommonList getCommonList(
-            ClientResponse<AbstractCommonList> response) {
+    protected AbstractCommonList getCommonList(Response response) {
         //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
         throw new UnsupportedOperationException();
     }
@@ -298,7 +300,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         }
     }
 
-    private String create(String testName, String userName, String tenatnId) {
+    private String create(String testName, String userName, String tenatnId) throws Exception {
     	String result = null;
     	
         setupCreate();
@@ -320,13 +322,13 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         //
         PoxPayloadOut multipart = DimensionFactory.createDimensionInstance(client.getCommonPartName(),
                 dimension);
-        ClientResponse<Response> res = client.create(multipart);
+        Response res = client.create(multipart);
         try {
         	assertStatusCode(res, testName);
         	result = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -369,15 +371,15 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         // Submit the request to the service and store the response.
         DimensionClient client = new DimensionClient();
         client.setAuth(true, userName, true, userName, true);
-        ClientResponse<String> res = client.read(id);
+        Response res = client.read(id);
         try {
         	assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        result = (DimensionsCommon) extractPart(input,
 	                client.getCommonPartName(), DimensionsCommon.class);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -412,12 +414,12 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         //
         PoxPayloadOut output = new PoxPayloadOut(DimensionClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = output.addPart(client.getCommonPartName(), dimension);
-        ClientResponse<String> res = client.update(TENANT_RESOURCE_2, output);
+        Response res = client.update(TENANT_RESOURCE_2, output);
         try {
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -447,12 +449,12 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         // Submit the request to the service and store the response.
         DimensionClient client = new DimensionClient();
         client.setAuth(true, userName, true, userName, true);
-        ClientResponse<Response> res = client.delete(id);
+        Response res = client.delete(id);
         try {
         	result = assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -473,7 +475,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         DimensionClient client = new DimensionClient();
         //TENANT_2_USER of TENANT_2 is not allowed to delete the resource of TENANT_1
         client.setAuth(true, TENANT_2_USER, true, TENANT_2_USER, true);
-        ClientResponse<Response> res = client.delete(TENANT_RESOURCE_1);
+        Response res = client.delete(TENANT_RESOURCE_1);
         try {
 	        int statusCode = res.getStatus();
 	        // Check the status code of the response: does it match
@@ -488,7 +490,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
 	        Assert.assertEquals(statusCode, Response.Status.NOT_FOUND.getStatusCode());
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -497,7 +499,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
     // Utility methods used by tests above
     // ---------------------------------------------------------------
     @AfterClass(alwaysRun = true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         setupDelete();
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
@@ -521,7 +523,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         deleteAccounts();
     }
 
-    private void deletePermissionRoles() {
+    private void deletePermissionRoles() throws Exception {
         for (String tenantId : tenantPermissions.keySet()) {
             List<RoleValue> tenantRoleValues = new ArrayList<RoleValue>();
             tenantRoleValues.add(tenantRoles.get(tenantId));
@@ -530,7 +532,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         }
     }
 
-    private void deleteAccountRoles() {
+    private void deleteAccountRoles() throws Exception {
         for (String tenantId : tenantAccounts.keySet()) {
             List<RoleValue> tenantRoleValues = new ArrayList<RoleValue>();
             tenantRoleValues.add(tenantRoles.get(tenantId));
@@ -539,21 +541,21 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         }
     }
 
-    private void deletePermissions() {
+    private void deletePermissions() throws Exception {
         for (String tenantId : tenantPermissions.keySet()) {
             PermissionValue pv = tenantPermissions.get(tenantId);
             deletePermission(tenantId, pv.getPermissionId());
         }
     }
 
-    private void deleteRoles() {
+    private void deleteRoles() throws Exception {
         for (String tenantId : tenantRoles.keySet()) {
             RoleValue rv = tenantRoles.get(tenantId);
             deleteRole(tenantId, rv.getRoleId());
         }
     }
 
-    private void deleteAccounts() {
+    private void deleteAccounts() throws Exception {
         for (String tenantId : tenantAccounts.keySet()) {
             AccountValue av = tenantAccounts.get(tenantId);
             deleteAccount(tenantId, av.getAccountId());
@@ -561,7 +563,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
     }
 
     private String createPermission(String tenantId, String resName,
-            List<PermissionAction> actions, EffectType effect) {
+            List<PermissionAction> actions, EffectType effect) throws Exception {
     	String result = null;
     	
         setupCreate();
@@ -572,35 +574,35 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
                 "default permissions for " + resName,
                 actions, effect, true, true, true);
         permission.setTenantId(tenantId);
-        ClientResponse<Response> res = permClient.create(permission);
+        Response res = permClient.create(permission);
         try {
         	assertStatusCode(res, "CreatePermission");
         	result = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
         return result;
     }
 
-    private void deletePermission(String tenantId, String permId) {
+    private void deletePermission(String tenantId, String permId) throws Exception {
         setupDelete();
         PermissionClient permClient = new PermissionClient();
         UserInfo ui = tenantAdminUsers.get(tenantId);
         permClient.setAuth(true, ui.userName, true, ui.password, true);
-        ClientResponse<Response> res = permClient.delete(permId);
+        Response res = permClient.delete(permId);
         try {
         	assertStatusCode(res, "DeletePermission");
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
 
-    private String createRole(String tenantId, String roleName) {
+    private String createRole(String tenantId, String roleName) throws Exception {
     	String result = null;
     	
         setupCreate();
@@ -609,37 +611,37 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         roleClient.setAuth(true, ui.userName, true, ui.password, true);
         Role role = RoleFactory.createRoleInstance(roleName,
         		roleName, //the display name
-                "role for " + roleName, true);
+                "role for " + roleName, true, RoleFactory.EMPTY_PERMVALUE_LIST);
         role.setTenantId(tenantId);
-        ClientResponse<Response> res = roleClient.create(role);
+        Response res = roleClient.create(role);
         try {
         	assertStatusCode(res, "CreateRole");
         	result = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
         return result;
     }
 
-    private void deleteRole(String tenantId, String roleId) {
+    private void deleteRole(String tenantId, String roleId) throws Exception {
         setupDelete();
         RoleClient roleClient = new RoleClient();
         UserInfo ui = tenantAdminUsers.get(tenantId);
         roleClient.setAuth(true, ui.userName, true, ui.password, true);
-        ClientResponse<Response> res = roleClient.delete(roleId);
+        Response res = roleClient.delete(roleId);
         try {
         	assertStatusCode(res, "DeleteRole");
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
 
-    private String createAccount(String tenantId, String userName, String email) {
+    private String createAccount(String tenantId, String userName, String email) throws Exception {
     	String result = null;
     	
         setupCreate();
@@ -649,36 +651,36 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         AccountsCommon account = AccountFactory.createAccountInstance(
                 userName, userName, userName, email, tenantId,
                 true, false, true, true);
-        ClientResponse<Response> res = accountClient.create(account);
+        Response res = accountClient.create(account);
         try {
         	assertStatusCode(res, "CreateAccount");
         	result = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
         return result;
     }
 
-    private void deleteAccount(String tenantId, String accId) {
+    private void deleteAccount(String tenantId, String accId) throws Exception {
         setupDelete();
         AccountClient accClient = new AccountClient();
         UserInfo ui = tenantAdminUsers.get(tenantId);
         accClient.setAuth(true, ui.userName, true, ui.password, true);
-        ClientResponse<Response> res = accClient.delete(accId);
+        Response res = accClient.delete(accId);
         try {
         	assertStatusCode(res, "DeleteAccount");
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
 
     private String createAccountRole(String tenantId, AccountValue av,
-            Collection<RoleValue> rvs) {
+            Collection<RoleValue> rvs) throws Exception {
     	String result = null;
     	
         setupCreate();
@@ -688,13 +690,13 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         AccountRoleClient client = new AccountRoleClient();
         UserInfo ui = tenantAdminUsers.get(tenantId);
         client.setAuth(true, ui.userName, true, ui.password, true);
-        ClientResponse<Response> res = client.create(av.getAccountId(), accRole);
+        Response res = client.create(av.getAccountId(), accRole);
         try {
         	assertStatusCode(res, "CreateAccountRole");
         	result = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -702,7 +704,7 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
     }
 
     private void deleteAccountRole(String tenantId, AccountValue av,
-            List<RoleValue> rvs) {
+            List<RoleValue> rvs) throws Exception {
         // Perform setup.
         setupDelete();
 
@@ -712,18 +714,18 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         client.setAuth(true, ui.userName, true, ui.password, true);
         AccountRole accRole = AccountRoleFactory.createAccountRoleInstance(
                 av, rvs, true, true);
-        ClientResponse<Response> res = client.delete(av.getAccountId());
+        Response res = client.delete(av.getAccountId());
         try {
         	assertStatusCode(res, "DeleteAccountRole");
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
 
     private String createPermissionRole(String tenantId, PermissionValue pv,
-            Collection<RoleValue> rvs) {
+            Collection<RoleValue> rvs) throws Exception {
     	String result = null;
     	
         setupCreate();
@@ -734,20 +736,20 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         PermissionRoleClient client = new PermissionRoleClient();
         UserInfo ui = tenantAdminUsers.get(tenantId);
         client.setAuth(true, ui.userName, true, ui.password, true);
-        ClientResponse<Response> res = client.create(pv.getPermissionId(), permRole);
+        Response res = client.create(pv.getPermissionId(), permRole);
         try {
         	assertStatusCode(res, "createPermissionRole");
         	result = extractId(res);
         }  finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
         return result;
     }
 
-    private void deletePermissionRole(String tenantId, PermissionValue pv, List<RoleValue> rvls) {
+    private void deletePermissionRole(String tenantId, PermissionValue pv, List<RoleValue> rvls) throws Exception {
         // Perform setup.
         setupDelete();
 
@@ -757,12 +759,12 @@ public class MultiTenancyTest extends BaseServiceTest<AbstractCommonList> {
         client.setAuth(true, ui.userName, true, ui.password, true);
         PermissionRole permRole = PermissionRoleFactory.createPermissionRoleInstance(
                 pv, rvls, true, true);
-        ClientResponse<Response> res = client.delete(pv.getPermissionId());
+        Response res = client.delete(pv.getPermissionId());
         try {
         	assertStatusCode(res, "DeletePermissionRole");
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }

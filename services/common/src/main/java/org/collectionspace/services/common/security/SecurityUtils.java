@@ -32,17 +32,17 @@ import java.util.StringTokenizer;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.URIResourceImpl;
+import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.index.IndexClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.authentication.AuthN;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.authentication.AuthN;
-import org.collectionspace.authentication.spi.AuthNContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.jboss.crypto.digest.DigestCallback;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.security.Base64Encoder;
@@ -54,7 +54,6 @@ import org.jboss.security.Base64Utils;
  */
 public class SecurityUtils {
 
-	private static final String ADMIN_TENANT_ID = "0";
     private static final Logger logger = LoggerFactory.getLogger(SecurityUtils.class);
     public static final String URI_PATH_SEPARATOR = "/";
     public static final int MIN_PASSWORD_LENGTH = 8;
@@ -120,6 +119,37 @@ public class SecurityUtils {
     	return result;
     }
     
+    public static String getIndexResourceName(HttpRequest request) {
+    	String result = null;
+    			
+    	UriInfo uriInfo = request.getUri();
+    	String indexSubResName = SecurityUtils.getResourceName(uriInfo);
+    	String resEntity = SecurityUtils.getResourceEntity(indexSubResName);
+    	
+		MultivaluedMap<String, String> pathParams = uriInfo.getPathParameters();
+		String indexId = pathParams.getFirst(IndexClient.INDEX_ID_PARAM);
+		if (indexId != null  && pathParams.containsKey("csid")) {
+			// e.g., intakes/*/index/fulltext
+	    	result = resEntity + "/*/" + IndexClient.SERVICE_NAME + "/" + indexId;
+		} else if (indexId != null) {
+			// e.g., intakes/index/fulltext
+	    	result = resEntity + "/" + IndexClient.SERVICE_NAME + "/" + indexId;			
+		} else {
+			// e.g., intakes
+			result = resEntity;
+		}
+		
+		//
+		// Overriding the result from above.
+		//
+		// Until we build out more permissions for the index resource,
+		// we're just going to return the index resource name.
+		//
+		result = IndexClient.SERVICE_NAME;
+    	
+    	return result;
+    }    
+    
 	/**
 	 * Gets the resource name.
 	 *
@@ -139,7 +169,7 @@ public class SecurityUtils {
 				uriPath = uriPath.replace(pathParamValue, "*");
 			}
 			if ((pathParamName.toLowerCase().indexOf("predicate") > -1)) {
-				//replace csids with wildcard
+				//replace predicates with wildcard
 				uriPath = uriPath.replace(pathParamValue, "*");
 			}
 			if (pathParamName.toLowerCase().indexOf("specifier") > -1) {
@@ -148,13 +178,17 @@ public class SecurityUtils {
 						+ ")", "*");
 			}
 			if ((pathParamName.toLowerCase().indexOf("ms") > -1)) {
-				//replace csids with wildcard
+				//replace ms with wildcard
 				uriPath = uriPath.replace(pathParamValue, "*");
 			}
+			if ((pathParamName.toLowerCase().indexOf("indexid") > -1)) {
+				//replace indexid with wildcard
+				uriPath = uriPath.replace(pathParamValue, "*");
+			}			
 		}
 		
 		// FIXME: REM
-		// Since the hjid (HyperJaxb3 generated IDs are not unique strings in URIs that also have a CSID,
+		// Since the hjid (HyperJaxb3 generated IDs) are not unique strings in URIs that also have a CSID,
 		// we need to replace hjid last.  We can fix this by having HyperJaxb3 generate UUID.
 		// Assumption : path param name for csid is lowercase
 		//
@@ -164,7 +198,8 @@ public class SecurityUtils {
 			uriPath = uriPath.replace(hjidValue, "*");
 		}
 		
-		uriPath = uriPath.replace("//", "/");
+		uriPath = uriPath.replace("//", "/"); // replace duplicate '/' characters
+		uriPath = uriPath.startsWith("/") ? uriPath.substring(1) : uriPath; // if present, strip the leading '/' character
 		return uriPath;
 	}
     
@@ -201,9 +236,10 @@ public class SecurityUtils {
 	    String pathSegment = null;
 	    while (strTok.hasMoreTokens() == true) {
 	    	pathSegment = strTok.nextToken();
-	    	if (pathSegment.equals("*") == true) {
+	    	if (pathSegment.equals("*") || 
+	    			pathSegment.equals("index") || pathSegment.equals(CollectionSpaceClient.SERVICE_DESCRIPTION_PATH)) {  // Strip off subresource paths since they inherit their parent's permissions
 	    		//
-	    		// leave the loop if we hit a wildcard character
+	    		// leave the loop if we hit a wildcard character or the "index" subresource
 	    		//
 	    		break;
 	    	}
@@ -255,12 +291,12 @@ public class SecurityUtils {
     	try {
     		tenantId = AuthN.get().getCurrentTenantId();
     	} catch (Throwable e) {
-    		tenantId = ADMIN_TENANT_ID;
+    		tenantId = AuthN.ADMIN_TENANT_ID;
     	}
     	
         if (tenantId != null) {
-            if (ADMIN_TENANT_ID.equals(tenantId) == true ||
-            		AuthNContext.ANONYMOUS_TENANT_ID.equals(tenantId)) {
+            if (AuthN.ADMIN_TENANT_ID.equals(tenantId) == true ||
+            		AuthN.ANONYMOUS_TENANT_ID.equals(tenantId)) {
                 result = true;
             }
         }

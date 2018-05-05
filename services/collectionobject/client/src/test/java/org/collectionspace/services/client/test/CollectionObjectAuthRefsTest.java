@@ -55,13 +55,9 @@ import org.collectionspace.services.collectionobject.TitleGroupList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.organization.OrgTermGroup;
 import org.collectionspace.services.person.PersonTermGroup;
-
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,6 +74,11 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
     protected CollectionSpaceClient getClientInstance() {
     	throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    	throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498
+	}
     
 	@Override
 	protected String getServiceName() {
@@ -145,13 +146,9 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
                         + "\r\n ownerRefName: "+ownerRefName
                         + "\r\n fieldCollectionSourceRefName: "+fieldCollectionSourceRefName
                         + "\r\n fieldCollectorRefName: "+fieldCollectorRefName;
-        StringBuffer buff = new StringBuffer();
 
         return result;
     }
-
-    /** The number of authority references expected. */
-    private final int NUM_AUTH_REFS_EXPECTED = 7;
     
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
@@ -190,14 +187,14 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
         // Submit the request to the service and store the response.
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
+        Response res = collectionObjectClient.create(multipart);
         String newCsid = null;
         try {
         	assertStatusCode(res, testName);
         	newCsid = extractId(res);
         } finally {
         	if (res != null) {
-        		res.releaseConnection();
+        		res.close();
         	}
         }
         // Store the ID returned from the first resource created
@@ -219,20 +216,24 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
      *
      * @param displayName the display name of the authority
      * @param shortIdentifier the short identifier for the authority
+     * @throws Exception 
      */
-    private void createPersonAuthority(String displayName, String shortIdentifier) {
+    private void createPersonAuthority(String displayName, String shortIdentifier) throws Exception {
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     			displayName, shortIdentifier, personAuthClient.getCommonPartName());
-        ClientResponse<Response> res = personAuthClient.create(multipart);
+        Response res = personAuthClient.create(multipart);
         int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-        personAuthCSID = extractId(res);
-        personAuthRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
+        try {
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        personAuthCSID = extractId(res);
+	        personAuthRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
+        } finally {
+        	res.close();
+        }
     }
 
     /**
@@ -242,8 +243,11 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
      * @param surName the person's surname
      * @param shortIdentifier the short identifier for the item
      * @return the CSID of the newly-created person record
+     * @throws Exception 
      */
-    protected String createPerson(String firstName, String surName, String shortIdentifier ) {
+    protected String createPerson(String firstName, String surName, String shortIdentifier ) throws Exception {
+    	String result = null;
+    	
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
@@ -255,23 +259,29 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
         term.setTermName(termName);
         personTerms.add(term);
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-    	PoxPayloadOut multipart =
-    		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
+    	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
     				personAuthRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
-        ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-    	return extractId(res);
+        Response res = personAuthClient.createItem(personAuthCSID, multipart);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        result = extractId(res);
+        } finally {
+        	res.close();
+        }
+        
+    	return result;
     }
 
     /**
      * Creates multiple Person items within a Person Authority,
      * and stores the refNames referring to each.
+     * @throws Exception 
      */
-    protected void createPersonRefs(){
+    protected void createPersonRefs() throws Exception{
 
         createPersonAuthority(PERSON_AUTHORITY_NAME_DISPLAY, PERSON_AUTHORITY_NAME);
 
@@ -319,20 +329,25 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
      *
      * @param displayName the display name of the authority
      * @param shortIdentifier the short identifier for the authority
+     * @throws Exception 
      */
-    private void createOrgAuthority(String displayName, String shortIdentifier) {
+    private void createOrgAuthority(String displayName, String shortIdentifier) throws Exception {
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
         PoxPayloadOut multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
     			displayName, shortIdentifier, orgAuthClient.getCommonPartName());
-        ClientResponse<Response> res = orgAuthClient.create(multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-        orgAuthCSID = extractId(res);
-        orgAuthRefName = OrgAuthorityClientUtils.getAuthorityRefName(orgAuthCSID, null);
+        Response res = orgAuthClient.create(multipart);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        orgAuthCSID = extractId(res);
+	        orgAuthRefName = OrgAuthorityClientUtils.getAuthorityRefName(orgAuthCSID, null);
+        } finally {
+        	res.close();
+        }
     }
 
     /**
@@ -342,8 +357,11 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
      * @param foundingPlace the organization's founding place
      * @param shortIdentifier the short identifier for the item
      * @return the CSID of the newly-created organization record
+     * @throws Exception 
      */
-    protected String createOrganization(String shortName, String foundingPlace, String shortIdentifier ) {
+    protected String createOrganization(String shortName, String foundingPlace, String shortIdentifier ) throws Exception {
+    	String result = null;
+    	
         Map<String, String> orgInfo = new HashMap<String,String>();
         orgInfo.put(OrganizationJAXBSchema.FOUNDING_PLACE, foundingPlace);
         orgInfo.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortIdentifier);
@@ -357,25 +375,29 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
     	PoxPayloadOut multipart =
     		OrgAuthorityClientUtils.createOrganizationInstance(orgAuthRefName, orgInfo, orgTerms, orgAuthClient.getItemCommonPartName());
-        ClientResponse<Response> res = orgAuthClient.createItem(orgAuthCSID, multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-    	return extractId(res);
+        Response res = orgAuthClient.createItem(orgAuthCSID, multipart);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        result = extractId(res);
+        } finally {
+        	res.close();
+        }
+        
+    	return result;
     }
     
    /**
      * Creates multiple Organization items within an Organization Authority,
      * and stores the refNames referring to each.
+ * @throws Exception 
      */
-    private void createOrganizationRefs() {
-
+    private void createOrganizationRefs() throws Exception {
         createOrgAuthority(ORG_AUTHORITY_NAME, ORG_AUTHORITY_NAME);
-
         String csid = "";
-
         csid = createOrganization("Content Org", "Content Org Town", "contentOrg");
         contentOrganizationRefName = OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, csid, null);
         orgIdsCreated.add(csid);
@@ -410,69 +432,69 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
         // First read the object
         //
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        ClientResponse<String> res = collectionObjectClient.read(knownResourceId);
-        CollectionobjectsCommon collectionObject = null;
+        Response res = collectionObjectClient.read(knownResourceId);
         try {
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	        collectionObject = (CollectionobjectsCommon) extractPart(input,
+	        PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(String.class));
+	        CollectionobjectsCommon collectionObject = (CollectionobjectsCommon) extractPart(input,
 	        		collectionObjectClient.getCommonPartName(), CollectionobjectsCommon.class);
 	        Assert.assertNotNull(collectionObject);
+	        // Check a sample of one or more person authority ref fields
+	        Assert.assertEquals(collectionObject.getOwners().getOwner().get(0), ownerRefName);
+	        Assert.assertEquals(collectionObject.getFieldCollectionSources().getFieldCollectionSource().get(0), 
+	        		fieldCollectionSourceRefName);
+
+	        // Check a sample of one or more organization authority ref fields
+	        Assert.assertEquals(collectionObject.getContentOrganizations().getContentOrganization().get(0), 
+	        		contentOrganizationRefName);
+	        Assert.assertEquals(collectionObject.getAssocEventOrganizations().getAssocEventOrganization().get(0), 
+	        		assocEventOrganizationRefName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         //
         // Next, get all of the auth refs and check that the expected number is returned
         //
-        ClientResponse<AuthorityRefList> res2 = collectionObjectClient.getAuthorityRefs(knownResourceId);
+        res = collectionObjectClient.getAuthorityRefs(knownResourceId);
         AuthorityRefList list = null;
         try {
-	        assertStatusCode(res2, testName);        
-	        list = res2.getEntity();
+	        assertStatusCode(res, testName);        
+	        list = (AuthorityRefList)res.readEntity(AuthorityRefList.class);
         } finally {
-        	if (res2 != null) {
-        		res2.releaseConnection();
+        	if (res != null) {
+        		res.close();
             }
         }
         
+        int expectAuthRefs = personIdsCreated.size() + orgIdsCreated.size();
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
         int numAuthRefsFound = items.size();
-        if(logger.isDebugEnabled()){
-            logger.debug("Expected " + NUM_AUTH_REFS_EXPECTED +
-                " authority references, found " + numAuthRefsFound);
-        }
-        Assert.assertEquals(numAuthRefsFound, NUM_AUTH_REFS_EXPECTED,
-            "Did not find all expected authority references! " +
-            "Expected " + NUM_AUTH_REFS_EXPECTED + ", found " + numAuthRefsFound);
-               
-        // Check a sample of one or more person authority ref fields
-        // Assert.assertEquals(collectionObject.getAssocPersons().getAssocPerson().get(0), assocPersonRefName);
-        Assert.assertEquals(collectionObject.getOwners().getOwner().get(0), ownerRefName);
-        Assert.assertEquals(collectionObject.getFieldCollectionSources().getFieldCollectionSource().get(0), fieldCollectionSourceRefName);
-
-        // Check a sample of one or more organization authority ref fields
-        Assert.assertEquals(collectionObject.getContentOrganizations().getContentOrganization().get(0), contentOrganizationRefName);
-        Assert.assertEquals(collectionObject.getAssocEventOrganizations().getAssocEventOrganization().get(0), assocEventOrganizationRefName);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Expected " + expectAuthRefs + " authority references, found " + numAuthRefsFound);
+        }               
 
         // Optionally output additional data about list members for debugging.
         logger.info(this.toString());
         boolean iterateThroughList = true;
-        if(iterateThroughList && logger.isDebugEnabled()){;
+        if (iterateThroughList && logger.isDebugEnabled()) {
             int i = 0;
-            for(AuthorityRefList.AuthorityRefItem item : items){
+            for (AuthorityRefList.AuthorityRefItem item : items) {
                 logger.debug(testName + ": list-item[" + i + "] Field:" +
                 		item.getSourceField() + " =" +
                         " item display name = " + item.getAuthDisplayName() +
                         " auth display name = " + item.getItemDisplayName());
-                logger.debug(testName + ": list-item[" + i + "] refName=" +
-                        item.getRefName());
-                logger.debug(testName + ": list-item[" + i + "] URI=" +
-                        item.getUri());
+                logger.debug(testName + ": list-item[" + i + "] refName=" + item.getRefName());
+                logger.debug(testName + ": list-item[" + i + "] URI=" + item.getUri());
                 i++;
             }
         }
+        
+        //
+        // Make sure we saw the correct number of authRefs
+        Assert.assertEquals(numAuthRefsFound, expectAuthRefs,
+                "Did not find all expected authority references! " + "Expected " + expectAuthRefs + ", found " + numAuthRefsFound);
     }
 
 
@@ -487,9 +509,10 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
     	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
@@ -503,24 +526,26 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         for (String resourceId : collectionObjectIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            collectionObjectClient.delete(resourceId).releaseConnection();
+            collectionObjectClient.delete(resourceId).close();
         }
-        // Note: Any non-success response is ignored and not reported.
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        
+        //
         // Delete persons before PersonAuth
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            personAuthClient.deleteItem(personAuthCSID, resourceId).releaseConnection();
+            personAuthClient.deleteItem(personAuthCSID, resourceId).close();
         }
-        personAuthClient.delete(personAuthCSID).releaseConnection();
-        // Note: Any non-success response is ignored and not reported.
-        OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
+        personAuthClient.delete(personAuthCSID).close();
+        
+        //
         // Delete organizations before OrgAuth
+        OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
         for (String resourceId : orgIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            orgAuthClient.deleteItem(orgAuthCSID, resourceId).releaseConnection();
+            orgAuthClient.deleteItem(orgAuthCSID, resourceId).close();
         }
-        orgAuthClient.delete(orgAuthCSID).releaseConnection();
+        orgAuthClient.delete(orgAuthCSID).close();
     }
 
     // ---------------------------------------------------------------
@@ -544,6 +569,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
     * @param contentPerson the content person
     * @param inscriber the inscriber
     * @return the multipart output
+ * @throws Exception 
     */
    private PoxPayloadOut createCollectionObjectInstance(
                 String title,
@@ -554,7 +580,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
                 String assocEventPerson,
                 String owner,
                 String fieldCollectionSource,
-                String fieldCollector ) {
+                String fieldCollector ) throws Exception {
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
         TitleGroupList titleGroupList = new TitleGroupList();
         List<TitleGroup> titleGroups = titleGroupList.getTitleGroup();
@@ -621,5 +647,4 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
 
         return multipart;
     }
-
 }

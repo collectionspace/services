@@ -19,9 +19,9 @@ public class DateUtils {
 
     final static String ISO_8601_DATE_PATTERN = "yyyy-MM-dd";
     final static String UTC_TIMEZONE_IDENTIFIER = "UTC";
-    final static String ISO_8601_UTC_TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    final static String ISO_8601_UTC_TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     final static Locale NULL_LOCALE = null;
-    public final static List<String> isoLanguageCodes = new ArrayList(Arrays.asList(Locale.getISOLanguages()));    
+    public final static List<String> isoLanguageCodes = new ArrayList<String>(Arrays.asList(Locale.getISOLanguages()));    
 
     /**
      * Returns the UTC time zone.

@@ -26,20 +26,17 @@ package org.collectionspace.services.account.storage;
 import java.util.ArrayList;
 import java.util.List;
 
-//import org.collectionspace.services.authorization.AccountRolesList;
-//import org.collectionspace.services.authorization.AccountRolesList.AccountRoleListItem;
-
 import org.collectionspace.services.common.authorization_mgt.AuthorizationRoleRel;
+import org.collectionspace.services.common.authorization_mgt.PermissionRoleUtil;
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.AccountRoleRel;
 import org.collectionspace.services.authorization.AccountValue;
-import org.collectionspace.services.authorization.PermissionsRolesList;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.storage.jpa.JpaDocumentFilter;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
-
-import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.context.ServiceContextProperties;
@@ -110,7 +107,8 @@ public class AccountRoleDocumentHandler
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#handleGet(org.collectionspace.services.common.document.DocumentWrapper)
      */
-    @Override
+    @SuppressWarnings({ "unchecked" })
+	@Override
     public void handleGet(DocumentWrapper<List<AccountRoleRel>> wrapDoc) throws Exception {
     	AccountRole output = extractCommonPart(wrapDoc);
         setCommonPart(output);
@@ -129,8 +127,9 @@ public class AccountRoleDocumentHandler
      * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#handleDelete(org.collectionspace.services.common.document.DocumentWrapper)
      */
     @Override
-    public void handleDelete(DocumentWrapper<List<AccountRoleRel>> wrapDoc) throws Exception {
+    public boolean handleDelete(DocumentWrapper<List<AccountRoleRel>> wrapDoc) throws Exception {
         fillCommonPart(getCommonPart(), wrapDoc, true);
+        return true;
     }
 
     /* (non-Javadoc)
@@ -207,33 +206,59 @@ public class AccountRoleDocumentHandler
 //        return result;
     }
 
-    public void fillCommonPart(AccountRole ar,
+    @Override
+    public void prepareCreate() throws Exception {
+    	// Ensure the roles exist
+    }
+    
+    /**
+     * Populate the incoming wrapDoc (AccountRoleRel) object with account-role data.
+     * 
+     * @param accountRole
+     * @param wrapDoc
+     * @param handleDelete
+     * @throws Exception
+     */
+    public void fillCommonPart(AccountRole accountRole,
     		DocumentWrapper<List<AccountRoleRel>> wrapDoc,
     		boolean handleDelete)
             	throws Exception {
-        List<AccountRoleRel> arrl = wrapDoc.getWrappedObject();
-        SubjectType subject = ar.getSubject();
+        List<AccountRoleRel> accountRoleRelList = wrapDoc.getWrappedObject();
+        SubjectType subject = accountRole.getSubject();
         if (subject == null) {
             //it is not required to give subject as URI determines the subject
             subject = getSubject(getServiceContext());
-        } else {
-            //subject mismatch should have been checked during validation
         }
+        
         if (subject.equals(SubjectType.ROLE)) {
-            //FIXME: potential index out of bounds exception...negative test needed
-            AccountValue av = ar.getAccount().get(0);
-
-            for (RoleValue rv : ar.getRole()) {
-                AccountRoleRel arr = buildAccountRoleRel(av, rv, handleDelete);
-                arrl.add(arr);
-            }
+        	if (accountRole.getAccount() != null &&  accountRole.getAccount().size() == 1) {
+	            AccountValue av = accountRole.getAccount().get(0); // Since ROLE is the subject, they'll be just one account
+	            for (RoleValue rv : accountRole.getRole()) {
+	            	if (rv.getRoleName() == null) { // We need the role name, so get it if the payload just includes the role CSID
+	            		rv = PermissionRoleUtil.fetchRoleValue(getServiceContext(), rv.getRoleId());
+	            	}
+	                AccountRoleRel arr = buildAccountRoleRel(av, rv, handleDelete);
+	                accountRoleRelList.add(arr);
+	            }
+        	} else {
+        		String msg = "There must be one (and only one) account supplied in an account-role relationship where the subject is the role.";
+        		throw new DocumentException(msg);
+        	}
         } else if (SubjectType.ACCOUNT.equals(subject)) {
-            //FIXME: potential index out of bounds exception...negative test needed
-        	RoleValue rv = ar.getRole().get(0);
-            for (AccountValue av : ar.getAccount()) {
-                AccountRoleRel arr = buildAccountRoleRel(av, rv, handleDelete);
-                arrl.add(arr);
-            }
+        	if (accountRole.getRole() != null &&  accountRole.getRole().size() == 1) {        	
+	        	RoleValue rv = accountRole.getRole().get(0);
+	            for (AccountValue av : accountRole.getAccount()) {
+	                AccountRoleRel arr = buildAccountRoleRel(av, rv, handleDelete);
+	                accountRoleRelList.add(arr);
+	            }
+        	} else {
+        		String msg = "There must be one (and only one) role supplied in an account-role relationship where the subject is the account.";
+        		throw new DocumentException(msg);
+        	}
+        } else {
+        	String msg = String.format("Unknown subject '%s' encounted when working with an AccountRole object",
+        			subject.value());
+        	throw new DocumentException(msg);
         }
     }
     
@@ -344,7 +369,7 @@ public class AccountRoleDocumentHandler
      */
     @Override
     public DocumentFilter createDocumentFilter() {
-        return new DocumentFilter(this.getServiceContext());
+        return new JpaDocumentFilter(this.getServiceContext());
     }
 
     /**
@@ -355,18 +380,18 @@ public class AccountRoleDocumentHandler
      * @return the account role rel
      */
     private AccountRoleRel buildAccountRoleRel(AccountValue av, RoleValue rv, boolean handleDelete) {
-        AccountRoleRel arr = new AccountRoleRel();
-        arr.setAccountId(av.getAccountId());
-        arr.setUserId(av.getUserId());
-        arr.setScreenName(av.getScreenName());
-        arr.setRoleId(rv.getRoleId());
-        arr.setRoleName(rv.getRoleName());
+        AccountRoleRel accountRoleRel = new AccountRoleRel();
+        accountRoleRel.setAccountId(av.getAccountId());
+        accountRoleRel.setUserId(av.getUserId());
+        accountRoleRel.setScreenName(av.getScreenName());
+        accountRoleRel.setRoleId(rv.getRoleId());
+        accountRoleRel.setRoleName(rv.getRoleName());
         
         String relationshipId = rv.getRoleRelationshipId();
         if (relationshipId != null && handleDelete == true) {
-        	arr.setHjid(Long.parseLong(relationshipId));  // set this so we can convince JPA to del the relation
+        	accountRoleRel.setHjid(Long.parseLong(relationshipId));  // set this so we can convince JPA to delete the relationship
         }        
-        return arr;
+        return accountRoleRel;
     }
 
     /**
@@ -375,7 +400,7 @@ public class AccountRoleDocumentHandler
      * @param ctx the ctx
      * @return the subject
      */
-    static SubjectType getSubject(ServiceContext ctx) {
+    static SubjectType getSubject(ServiceContext<?, ?> ctx) {
         Object o = ctx.getProperty(ServiceContextProperties.SUBJECT);
         if (o == null) {
             throw new IllegalArgumentException(ServiceContextProperties.SUBJECT

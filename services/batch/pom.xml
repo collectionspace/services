@@ -4,11 +4,10 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.main</artifactId>
-        <version>4.1.1</version>
+        <version>5.0</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.batch</artifactId>
     <name>services.batch</name>
     <packaging>pom</packaging>
@@ -16,7 +15,7 @@
     <modules>
         <module>jaxb</module>
         <module>service</module>
-        <module>3rdparty</module>
+        <!-- <module>3rdparty</module> --> <!-- Now obsolete since the Nuxeo artifact is now created and deployed from config in the Application Layer -->
         <module>client</module>
     </modules>
 

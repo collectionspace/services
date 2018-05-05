@@ -35,7 +35,6 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.config.service.ObjectPartType;
 
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import javax.ws.rs.core.MediaType;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
@@ -43,7 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 /**
- * RemoteDocumentModelHandler
+ * RemoteDocumentModelHandler - This class does not seem to be used, so it has been deprecated.
  *
  * @author pschmitz
  * $LastChangedRevision: $
@@ -51,6 +50,7 @@ import org.w3c.dom.Document;
  * @param <T> The {DocumentType}Common class
  * @param <TL> The {DocumentType}CommonList class
  */
+@Deprecated
 public abstract class RemoteSubItemDocumentModelHandlerImpl<T, TL> extends
 		RemoteDocumentModelHandlerImpl<T, TL> {
 

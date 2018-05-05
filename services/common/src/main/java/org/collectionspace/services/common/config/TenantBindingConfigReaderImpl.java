@@ -27,11 +27,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.common.api.Tools;
@@ -159,7 +164,7 @@ public class TenantBindingConfigReaderImpl extends AbstractConfigReaderImpl<List
 					+ JEEServerDeployment.TENANT_BINDINGS_FILENAME_PREFIX + MERGED_SUFFIX;
 			File mergedOutFile = new File(mergedFileName);
 			try {
-				FileUtils.copyInputStreamToFile(result, mergedOutFile);
+				FileUtils.copyInputStreamToFile(result, mergedOutFile); // Save the merge file for debugging
 			} catch (IOException e) {
 				logger.warn("Could not create a copy of the merged tenant configuration at: " + mergedFileName, e);
 			}
@@ -200,6 +205,8 @@ public class TenantBindingConfigReaderImpl extends AbstractConfigReaderImpl<List
 			if (!tenantBinding.isCreateDisabled()) {
 				enabledTenantBindings.put(tenantBinding.getId(), tenantBinding);
 			} else {
+				logger.warn(String.format("The tenant '%s':'%s' is marked as disabled in its bindings file.",
+						tenantBinding.getName(), tenantBinding.getId()));
 			}
 			readDomains(tenantBinding);
 			readServiceBindings(tenantBinding);
@@ -209,6 +216,13 @@ public class TenantBindingConfigReaderImpl extends AbstractConfigReaderImpl<List
 				if (tenantBinding.isCreateDisabled())
 					logger.info("Tenant tenant id={} is marked createDisabled.", tenantBinding.getId());
 			}
+		}
+		
+		//
+		// Ensure that at least one tenant is enabled, otherwise abort the startup.
+		//
+		if (enabledTenantBindings.isEmpty() == true) {
+			throw new Exception("All of the configured tenants are marked as disabled in their tenant bindings.  At least one tenant needs to be enabled.");
 		}
 	}
 
@@ -284,6 +298,13 @@ public class TenantBindingConfigReaderImpl extends AbstractConfigReaderImpl<List
 					try {
 						tenantBindingConfig = (TenantBindingConfig) parse(tenantBindingsStream,
 								TenantBindingConfig.class);
+						//
+						// Compute the MD5 hash of the tenant's binding file.  We'll persist this a little later during startup.  If the value hasn't
+						// changed since we last startedup, we can skip some of the startup steps.
+						//
+						tenantBindingsStream.reset();
+						String md5hash = new String(Hex.encodeHex(DigestUtils.md5(tenantBindingsStream)));
+						tenantBindingConfig.getTenantBinding().setConfigMD5Hash(md5hash); // use this to compare with the last persisted one and to persist as the new hash
 					} catch (Exception e) {
 						logger.error("Could not parse the merged tenant bindings.", e);
 					}
@@ -493,10 +514,7 @@ public class TenantBindingConfigReaderImpl extends AbstractConfigReaderImpl<List
 		String result = null;
 
 		if (serviceName != null) {
-			if (logger.isDebugEnabled() == true) {
-				logger.debug(String.format(" * tenant:serviceBindings '%s'", serviceName));
-				System.out.println(String.format(" * tenant:serviceBindings '%s'", serviceName)); // Debug only
-			}
+			logger.trace(String.format(" * tenant:serviceBindings '%s'", serviceName));
 			result = getTenantQualifiedIdentifier(tenantId, serviceName.toLowerCase());
 		}
 

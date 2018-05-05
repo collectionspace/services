@@ -12,12 +12,11 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
 import org.collectionspace.services.config.service.ServiceBindingType;
-import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 
 import com.google.common.collect.AbstractIterator;
 
@@ -37,7 +36,7 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 	
 	private ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx;
 	private RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient;
-	private RepositoryInstanceInterface repoSession;
+	private CoreSessionInterface repoSession;
 	private List<String> serviceTypes;
 	private String refName;
 	private String refPropName;
@@ -71,7 +70,7 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 	public LazyAuthorityRefDocList(
 	        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
 	        RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
-	        RepositoryInstanceInterface repoSession, List<String> serviceTypes,
+	        CoreSessionInterface repoSession, List<String> serviceTypes,
 	        String refName,
 	        String refPropName,
 	        Map<String, ServiceBindingType> queriedServiceBindings,
@@ -79,6 +78,7 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 	        String whereClauseAdditions,
 	        String orderByClause,
 	        int pageSize,
+	        boolean useDefaultOrderByClause,
 	        boolean computeTotal) throws DocumentException, DocumentNotFoundException {
 
 		this.ctx = ctx;
@@ -98,7 +98,7 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 		// into this initial page fetch. There's no need to compute totals
 		// when fetching subsequent pages.
 		
-		firstPageDocList = fetchPage(0, computeTotal);
+		firstPageDocList = fetchPage(0, computeTotal, useDefaultOrderByClause);
 	}
 
 	/**
@@ -110,10 +110,21 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 	 * @throws DocumentNotFoundException
 	 * @throws DocumentException
 	 */
-	private DocumentModelList fetchPage(int pageNum, boolean computeTotal) throws DocumentNotFoundException, DocumentException {
-		return RefNameServiceUtils.findAuthorityRefDocs(ctx, repoClient, repoSession,
-		        serviceTypes, refName, refPropName, queriedServiceBindings, authRefFieldsByService,
-		        whereClauseAdditions, orderByClause, pageSize, pageNum, computeTotal);
+	private DocumentModelList fetchPage(int pageNum, boolean computeTotal, boolean useDefaultOrderByClause) throws DocumentNotFoundException, DocumentException {
+		return RefNameServiceUtils.findAuthorityRefDocs(ctx, 
+		        repoClient, 
+		        repoSession,
+		        serviceTypes, 
+		        refName, 
+		        refPropName, 
+		        queriedServiceBindings, 
+		        authRefFieldsByService,
+		        whereClauseAdditions, 
+		        orderByClause, 
+		        pageNum, 
+		        pageSize,
+		        useDefaultOrderByClause,
+		        computeTotal);
 	}
 		
 	@Override
@@ -185,7 +196,7 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 			DocumentModelList nextPageDocList = null;
 			
 			try {
-				nextPageDocList = fetchPage(nextPageNum, false);
+				nextPageDocList = fetchPage(nextPageNum, false, true);
 			}
 			catch(DocumentException e) {}
 			

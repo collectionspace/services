@@ -24,7 +24,8 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
-import org.jboss.resteasy.client.ClientResponse;
+import org.apache.http.HttpStatus;
+import org.collectionspace.services.description.ServiceDescription;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /**
@@ -35,7 +36,11 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 
 public final class TestServiceClient extends AbstractServiceClientImpl<AbstractCommonList, Object, Object, TestServiceProxy> {
 
-    /**
+    public TestServiceClient() throws Exception {
+		super();
+	}
+
+	/**
      *
      * Returning NULL since this class is a base-level client, used (only)
      * to obtain the base service URL.
@@ -58,22 +63,34 @@ public final class TestServiceClient extends AbstractServiceClientImpl<AbstractC
 	}
 
 	@Override
-	public ClientResponse<Response> create(Object payload) {
+	public Response create(Object payload) {
         throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public ClientResponse<Object> update(String csid, Object payload) {
+	public Response update(String csid, Object payload) {
         throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public ClientResponse<Object> read(String csid) {
+	public Response read(String csid) {
         throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public ClientResponse<AbstractCommonList> readList() {
+	public Response readList() {
         throw new UnsupportedOperationException();
-	} 
+	}
+	
+	@Override
+	public ServiceDescription getServiceDescription() {
+		ServiceDescription result = null;
+		
+        Response res = getProxy().getServiceDescription();
+        if (res.getStatus() == HttpStatus.SC_OK) {
+        	result = (ServiceDescription) res.readEntity(ServiceDescription.class);
+        }
+        
+        return result;
+	}
 }

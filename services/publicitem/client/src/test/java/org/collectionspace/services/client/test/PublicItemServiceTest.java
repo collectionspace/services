@@ -31,6 +31,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.collectionspace.services.client.AbstractCommonListUtils;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PublicItemClient;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
@@ -38,10 +39,7 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.publicitem.PublicitemsCommon;
-
-import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,8 +68,13 @@ public class PublicItemServiceTest extends
 	 * ()
 	 */
 	@Override
-	protected PublicItemClient getClientInstance() {
+	protected PublicItemClient getClientInstance() throws Exception {
 		return new PublicItemClient();
+	}
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+		return new PublicItemClient(clientPropertiesFilename);
 	}
 
 	/*
@@ -81,9 +84,8 @@ public class PublicItemServiceTest extends
 	 * getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
 	 */
 	@Override
-	protected AbstractCommonList getCommonList(
-			ClientResponse<AbstractCommonList> response) {
-		return response.getEntity(AbstractCommonList.class);
+	protected AbstractCommonList getCommonList(Response response) {
+		return response.readEntity(AbstractCommonList.class);
 	}
 
 	// ---------------------------------------------------------------
@@ -113,7 +115,7 @@ public class PublicItemServiceTest extends
 		String identifier = createIdentifier();
 		PoxPayloadOut multipart = createPublicItemInstance(identifier);
 		String newID = null;
-		ClientResponse<Response> res = client.create(multipart);
+		Response res = client.create(multipart);
 		try {
 			int statusCode = res.getStatus();
 
@@ -133,7 +135,7 @@ public class PublicItemServiceTest extends
 			newID = extractId(res);
 		} finally {
 			if (res != null) {
-				res.releaseConnection();
+				res.close();
 			}
 		}
 
@@ -189,14 +191,14 @@ public class PublicItemServiceTest extends
 
 		// Submit the request to the service and store the response.
 		PublicItemClient client = new PublicItemClient();
-		ClientResponse<String> res = client.read(knownResourceId);
+		Response res = client.read(knownResourceId);
 		PoxPayloadIn input = null;
 		try {
 			assertStatusCode(res, testName);
-			input = new PoxPayloadIn(res.getEntity());
+			input = new PoxPayloadIn(res.readEntity(String.class));
 		} finally {
 			if (res != null) {
-				res.releaseConnection();
+				res.close();
 			}
 		}
 
@@ -229,7 +231,7 @@ public class PublicItemServiceTest extends
 
 		// Submit the request to the service and store the response.
 		PublicItemClient client = new PublicItemClient();
-		ClientResponse<String> res = client.read(NON_EXISTENT_ID);
+		Response res = client.read(NON_EXISTENT_ID);
 		try {
 			int statusCode = res.getStatus();
 
@@ -243,7 +245,7 @@ public class PublicItemServiceTest extends
 			Assert.assertEquals(statusCode, testExpectedStatusCode);
 		} finally {
 			if (res != null) {
-				res.releaseConnection();
+				res.close();
 			}
 		}
 	}
@@ -272,7 +274,7 @@ public class PublicItemServiceTest extends
 		// Submit the request to the service and store the response.
 		AbstractCommonList list = null;
 		PublicItemClient client = new PublicItemClient();
-		ClientResponse<AbstractCommonList> res = client.readList();
+		Response res = client.readList();
 		assertStatusCode(res, testName);
 		try {
 			int statusCode = res.getStatus();
@@ -286,10 +288,10 @@ public class PublicItemServiceTest extends
 					invalidStatusCodeMessage(testRequestType, statusCode));
 			Assert.assertEquals(statusCode, testExpectedStatusCode);
 
-			list = res.getEntity();
+			list = res.readEntity(getCommonListType());
 		} finally {
 			if (res != null) {
-				res.releaseConnection();
+				res.close();
 			}
 		}
 
@@ -328,17 +330,17 @@ public class PublicItemServiceTest extends
 
 		// Retrieve the contents of a resource to update.
 		PublicItemClient client = new PublicItemClient();
-		ClientResponse<String> res = client.read(knownResourceId);
+		Response res = client.read(knownResourceId);
 		PoxPayloadIn input = null;
 		try {
 			assertStatusCode(res, testName);
-			input = new PoxPayloadIn(res.getEntity());
+			input = new PoxPayloadIn(res.readEntity(String.class));
 			if (logger.isDebugEnabled()) {
 				logger.debug("got object to update with ID: " + knownResourceId);
 			}
 		} finally {
 			if (res != null) {
-				res.releaseConnection();
+				res.close();
 			}
 		}
 
@@ -379,10 +381,10 @@ public class PublicItemServiceTest extends
 			Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
 					invalidStatusCodeMessage(testRequestType, statusCode));
 			Assert.assertEquals(statusCode, testExpectedStatusCode);
-			input = new PoxPayloadIn(res.getEntity());
+			input = new PoxPayloadIn(res.readEntity(String.class));
 		} finally {
 			if (res != null) {
-				res.releaseConnection();
+				res.close();
 			}
 		}
 
@@ -427,7 +429,7 @@ public class PublicItemServiceTest extends
 		// The only relevant ID may be the one used in update(), below.
 		PublicItemClient client = new PublicItemClient();
 		PoxPayloadOut multipart = createPublicItemInstance(NON_EXISTENT_ID);
-		ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
+		Response res = client.update(NON_EXISTENT_ID, multipart);
 		try {
 			int statusCode = res.getStatus();
 
@@ -441,7 +443,7 @@ public class PublicItemServiceTest extends
 			Assert.assertEquals(statusCode, testExpectedStatusCode);
 		} finally {
 			if (res != null) {
-				res.releaseConnection();
+				res.close();
 			}
 		}
 	}
@@ -469,7 +471,7 @@ public class PublicItemServiceTest extends
 
 		// Submit the request to the service and store the response.
 		PublicItemClient client = new PublicItemClient();
-		ClientResponse<Response> res = client.delete(knownResourceId);
+		Response res = client.delete(knownResourceId);
 		try {
 			int statusCode = res.getStatus();
 
@@ -483,7 +485,7 @@ public class PublicItemServiceTest extends
 			Assert.assertEquals(statusCode, testExpectedStatusCode);
 		} finally {
 			if (res != null) {
-				res.releaseConnection();
+				res.close();
 			}
 		}
 	}
@@ -506,7 +508,7 @@ public class PublicItemServiceTest extends
 
 		// Submit the request to the service and store the response.
 		PublicItemClient client = new PublicItemClient();
-		ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
+		Response res = client.delete(NON_EXISTENT_ID);
 		try {
 			int statusCode = res.getStatus();
 
@@ -520,7 +522,7 @@ public class PublicItemServiceTest extends
 			Assert.assertEquals(statusCode, testExpectedStatusCode);
 		} finally {
 			if (res != null) {
-				res.releaseConnection();
+				res.close();
 			}
 		}
 	}
@@ -575,7 +577,7 @@ public class PublicItemServiceTest extends
 	}
 
 	@Override
-	protected PoxPayloadOut createInstance(String identifier) {
+	protected PoxPayloadOut createInstance(String identifier) throws Exception {
 		return createPublicItemInstance(identifier);
 	}
 
@@ -585,8 +587,9 @@ public class PublicItemServiceTest extends
 	 * @param identifier
 	 *            the identifier
 	 * @return the multipart output
+	 * @throws Exception 
 	 */
-	private PoxPayloadOut createPublicItemInstance(String identifier) {
+	private PoxPayloadOut createPublicItemInstance(String identifier) throws Exception {
 		return createPublicItemInstance("itemNumber-" + identifier,
 				"contentCreationJobId-" + identifier);
 	}
@@ -599,9 +602,10 @@ public class PublicItemServiceTest extends
 	 * @param contentCreationJobId
 	 *            the publicitem asynch job ID
 	 * @return the multipart output
+	 * @throws Exception 
 	 */
 	private PoxPayloadOut createPublicItemInstance(String itemNumber,
-			String itemJobId) {
+			String itemJobId) throws Exception {
 
 		PublicitemsCommon publicItemsCommon = new PublicitemsCommon();
 		publicItemsCommon.setItemNumber(itemNumber);
@@ -642,7 +646,7 @@ public class PublicItemServiceTest extends
 
 	@Override
 	protected PoxPayloadOut createInstance(String commonPartName,
-			String identifier) {
+			String identifier) throws Exception {
 		PoxPayloadOut result = createPublicItemInstance(identifier);
 		return result;
 	}

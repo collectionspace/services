@@ -1,12 +1,13 @@
 package org.collectionspace.services.IntegrationTests.xmlreplay;
 
-import org.collectionspace.services.common.XmlTools;
+import org.collectionspace.services.client.XmlTools;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 
 import javax.swing.text.Style;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -256,7 +257,7 @@ public class XmlReplayReport {
                 +s.method+ SP +"<a href='"+s.fullURL+"'>"+s.fullURL+"</a>"                                     +linesep
                 + s.responseCode+ SP +lbl("gotExpected")+s.gotExpectedResult()                                                       +linesep
                 + (Tools.notBlank(s.failureReason) ? s.failureReason +linesep : "" )
-                + ( (s.expectedCodes.size()>0) ? lbl("expectedCodes")+s.expectedCodes+linesep : "" )
+                + ( (s.getExpectedCodes().size()>0) ? lbl("expectedCodes")+s.getExpectedCodes()+linesep : "" )
                 //+ ( Tools.notEmpty(s.testGroupID) ? "testGroupID:"+s.testGroupID+linesep : "" )
                 //THIS WORKS, BUT IS VERBOSE: + ( Tools.notEmpty(s.fromTestID) ? "fromTestID:"+s.fromTestID+linesep : "" )
                 + ( Tools.notEmpty(s.responseMessage) ? lbl("msg")+s.responseMessage+linesep : "" )

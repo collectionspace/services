@@ -36,8 +36,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.invocable.InvocationContext;
-import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.jboss.resteasy.client.ClientResponse;
 
 /**
  * @version $Revision:$
@@ -50,13 +48,13 @@ public interface ReportProxy extends CollectionSpaceCommonListPoxProxy {
 
     @GET
     @Produces({"application/xml"})
-    ClientResponse<AbstractCommonList> readListFiltered(
+    Response readListFiltered(
     		@QueryParam(IQueryManager.SEARCH_TYPE_DOCTYPE) String docType,
     		@QueryParam(IQueryManager.SEARCH_TYPE_INVOCATION_MODE) String mode);
     
     @POST
     @Path("{csid}/publish")
-    ClientResponse<Response> publishReport(@PathParam("csid") String csid,
+    Response publishReport(@PathParam("csid") String csid,
     		InvocationContext invContext);
     
 }

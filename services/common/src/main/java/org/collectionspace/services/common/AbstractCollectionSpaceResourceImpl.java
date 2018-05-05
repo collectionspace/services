@@ -23,18 +23,26 @@
  */
 package org.collectionspace.services.common;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.authorization.PermissionException;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.config.ServiceConfigUtils;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextProperties;
 import org.collectionspace.services.common.document.BadRequestException;
@@ -44,13 +52,17 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.TransactionException;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
+import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
+import org.collectionspace.services.config.service.CacheControlConfig;
+import org.collectionspace.services.config.service.DocHandlerParams.Params.CacheControlConfigElement;
+import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.service.DocHandlerParams.Params;
+import org.collectionspace.services.description.ServiceDescription;
 
-import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.spi.HttpRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,17 +77,17 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
+    protected final ServiceContext<IT, OT> NULL_CONTEXT = null;
     // Fields for default client factory and client
     /** The repository client factory. */
-    private RepositoryClientFactory repositoryClientFactory;
+    private RepositoryClientFactory<IT, OT> repositoryClientFactory;
     
     /** The repository client. */
-    private RepositoryClient repositoryClient;
+    private RepositoryClient<IT, OT> repositoryClient;
     
     /** The storage client. */
     private StorageClient storageClient;
-
+    
     /**
      * Extract id.
      *
@@ -88,13 +100,13 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         String[] segments = uri.split("/");
         String id = segments[segments.length - 1];
         return id;
-    }    
-    
+    }
+            
     /**
      * Instantiates a new abstract collection space resource.
      */
     public AbstractCollectionSpaceResourceImpl() {
-        repositoryClientFactory = RepositoryClientFactory.getInstance();
+        repositoryClientFactory = (RepositoryClientFactory<IT, OT>) RepositoryClientFactory.getInstance();
     }
 
     /* (non-Javadoc)
@@ -108,8 +120,8 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
      * @see org.collectionspace.services.common.CollectionSpaceResource#getRepositoryClient(org.collectionspace.services.common.context.ServiceContext)
      */
     @Override
-    synchronized public RepositoryClient getRepositoryClient(ServiceContext<IT, OT> ctx) {
-        if(repositoryClient != null){
+    synchronized public RepositoryClient<IT, OT> getRepositoryClient(ServiceContext<IT, OT> ctx) {
+        if (repositoryClient != null){
             return repositoryClient;
         }
         repositoryClient = repositoryClientFactory.getClient(ctx.getRepositoryClientName());
@@ -154,6 +166,14 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         return docHandler;
     }    
     
+    protected ServiceContext<IT, OT> createServiceContext(Request requestInfo, UriInfo uriInfo) throws Exception {
+    	ServiceContext<IT, OT> result = this.createServiceContext(uriInfo);
+
+    	result.setRequestInfo(requestInfo);
+
+    	return result;
+	}
+    
     /**
      * Creates the service context.
      * 
@@ -179,7 +199,7 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
      * 
      * @throws Exception the exception
      */
-    protected ServiceContext<IT, OT> createServiceContext(String serviceName) throws Exception {    	
+    public ServiceContext<IT, OT> createServiceContext(String serviceName) throws Exception {    	
         ServiceContext<IT, OT> ctx = createServiceContext(
         		serviceName,
         		(IT)null, // The input part
@@ -405,6 +425,41 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     	
     	return result;
     }
+    
+    /*
+     * Get the service description
+     */
+    @GET
+    @Path(CollectionSpaceClient.SERVICE_DESCRIPTION_PATH)
+    public ServiceDescription getDescription(@Context UriInfo uriInfo) {
+    	ServiceDescription result = null;
+
+    	ServiceContext<IT, OT>  ctx = null;
+        try {
+            ctx = createServiceContext(uriInfo);
+            result = getDescription(ctx);
+        } catch (Exception e) {
+        	String errMsg = String.format("Request to get service description information for the '%s' service failed.",
+        			this.getServiceContextFactory());
+            throw bigReThrow(e, errMsg);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Each resource can override this method if they need to.
+     * 
+     * @param ctx
+     * @return
+     */
+    public ServiceDescription getDescription(ServiceContext<IT, OT> ctx) {
+    	ServiceDescription result = new ServiceDescription();
+    	
+    	result.setDocumentType(getDocType(ctx.getTenantId()));
+    	
+    	return result;
+    }    
 
     public void checkResult(Object resultToCheck, String csid, String serviceMessage) throws CSWebApplicationException {
         if (resultToCheck == null) {
@@ -431,11 +486,11 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
            }
        }
 
-    protected CSWebApplicationException bigReThrow(Exception e, String serviceMsg) throws CSWebApplicationException {
+    protected CSWebApplicationException bigReThrow(Throwable e, String serviceMsg) throws CSWebApplicationException {
         return bigReThrow(e, serviceMsg, "");
     }
 
-    protected CSWebApplicationException bigReThrow(Exception e, String serviceMsg, String csid) throws CSWebApplicationException {
+    protected CSWebApplicationException bigReThrow(Throwable e, String serviceMsg, String csid) throws CSWebApplicationException {
     	boolean logException = true;
     	CSWebApplicationException result = null;
         Response response;
@@ -444,6 +499,10 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         
         if (e instanceof UnauthorizedException) {
             response = Response.status(Response.Status.UNAUTHORIZED).entity(serviceMsg + e.getMessage()).type("text/plain").build();
+            result = new CSWebApplicationException(e, response);
+
+        } else if (e instanceof PermissionException) {
+            response = Response.status(Response.Status.FORBIDDEN).entity(serviceMsg + e.getMessage()).type("text/plain").build();
             result = new CSWebApplicationException(e, response);
 
         } else if (e instanceof DocumentNotFoundException) {
@@ -479,6 +538,10 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
             // return new WebApplicationException(e, code);
             result = new CSWebApplicationException(e, response);
            
+        } else if (e instanceof org.dom4j.DocumentException) {
+            int code = Response.Status.BAD_REQUEST.getStatusCode();
+            response = Response.status(code).entity(serviceMsg + e.getMessage()).type("text/plain").build();
+            result = new CSWebApplicationException(e, response);     
         } else if (e instanceof CSWebApplicationException) {
             // subresource may have already thrown this exception
             // so just pass it on
@@ -505,7 +568,216 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     
 	@Override
 	public boolean allowAnonymousAccess(HttpRequest request,
-			ResourceMethod method) {
+			Class<?> resourceClass) {
 		return false;
-	}    
+	}
+	
+    /**
+     * Returns a UriRegistry entry: a map of tenant-qualified URI templates
+     * for the current resource, for all tenants
+     * 
+     * @return a map of URI templates for the current resource, for all tenants
+     */
+    public Map<UriTemplateRegistryKey,StoredValuesUriTemplate> getUriRegistryEntries() {
+        Map<UriTemplateRegistryKey,StoredValuesUriTemplate> uriRegistryEntriesMap =
+                new HashMap<UriTemplateRegistryKey,StoredValuesUriTemplate>();
+        List<String> tenantIds = getTenantBindingsReader().getTenantIds();
+        for (String tenantId : tenantIds) {
+                uriRegistryEntriesMap.putAll(getUriRegistryEntries(tenantId, getDocType(tenantId), UriTemplateFactory.RESOURCE));
+        }
+        return uriRegistryEntriesMap;
+    }
+    
+    /**
+     * Returns a resource's document type.
+     * 
+     * @param tenantId
+     * @return
+     */
+    @Override
+    public String getDocType(String tenantId) {
+        return getDocType(tenantId, getServiceName());
+    }
+
+    /**
+     * Returns the document type associated with a specified service, within a specified tenant.
+     * 
+     * @param tenantId a tenant ID
+     * @param serviceName a service name
+     * @return the Nuxeo document type associated with that service and tenant.
+     */
+    // FIXME: This method may properly belong in a different services package or class.
+    // Also, we need to check for any existing methods that may duplicate this one.
+    protected String getDocType(String tenantId, String serviceName) {
+        String docType = "";
+        if (Tools.isBlank(tenantId)) {
+            return docType;
+        }
+        ServiceBindingType sb = getTenantBindingsReader().getServiceBinding(tenantId, serviceName);
+        if (sb == null) {
+            return docType;
+        }
+        docType = sb.getObject().getName(); // Reads the Document Type from tenant bindings configuration
+        return docType;
+    }
+
+	/**
+     * Returns a UriRegistry entry: a map of tenant-qualified URI templates
+     * for the current resource, for a specified tenants
+     * 
+     * @return a map of URI templates for the current resource, for a specified tenant
+     */
+    @Override
+    public Map<UriTemplateRegistryKey,StoredValuesUriTemplate> getUriRegistryEntries(String tenantId,
+            String docType, UriTemplateFactory.UriTemplateType type) {
+        Map<UriTemplateRegistryKey,StoredValuesUriTemplate> uriRegistryEntriesMap =
+                new HashMap<UriTemplateRegistryKey,StoredValuesUriTemplate>();
+        UriTemplateRegistryKey key;
+        if (Tools.isBlank(tenantId) || Tools.isBlank(docType)) {
+            return uriRegistryEntriesMap;
+        }
+        key = new UriTemplateRegistryKey();
+        key.setTenantId(tenantId);
+        key.setDocType(docType); 
+        uriRegistryEntriesMap.put(key, getUriTemplate(type));
+        return uriRegistryEntriesMap;
+    }
+    
+    /**
+     * Returns a URI template of the appropriate type, populated with the
+     * current service name as one of its stored values.
+     *      * 
+     * @param type a URI template type
+     * @return a URI template of the appropriate type.
+     */
+    @Override
+    public StoredValuesUriTemplate getUriTemplate(UriTemplateFactory.UriTemplateType type) {
+        Map<String,String> storedValuesMap = new HashMap<String,String>();
+        storedValuesMap.put(UriTemplateFactory.SERVICENAME_VAR, getServiceName());
+        StoredValuesUriTemplate template =
+                UriTemplateFactory.getURITemplate(type, storedValuesMap);
+        return template;
+    }
+
+    /**
+     * Returns a reader for reading values from tenant bindings configuration
+     * 
+     * @return a tenant bindings configuration reader
+     */
+    @Override
+    public TenantBindingConfigReaderImpl getTenantBindingsReader() {
+        return ServiceMain.getInstance().getTenantBindingConfigReader();
+    }
+    
+    /**
+     * Find a named CacheControlConfig instance.
+     * @param element
+     * @param cacheKey
+     * @return
+     */
+    private CacheControlConfig getCacheControl(CacheControlConfigElement element, String cacheKey) {
+    	CacheControlConfig result = null;
+    	
+    	List<CacheControlConfig> list = element.getCacheControlConfigList();
+    	for (CacheControlConfig cacheControlConfig : list) {
+    		if (cacheControlConfig.getKey().equalsIgnoreCase(cacheKey)) {
+    			result = cacheControlConfig;
+    			break;
+    		}
+    	}
+    	
+    	return result;
+    }
+    
+    /*
+     * By default, use the request's URI and HTTP method to form the cache-key to use when looking up the
+     * cache control configuration from the service bindings
+     */
+    protected CacheControl getDefaultCacheControl(ServiceContext<IT, OT> ctx) {
+    	UriInfo uriInfo = ctx.getUriInfo();
+    	Request requestInfo = ctx.getRequestInfo();
+    	
+    	if (uriInfo != null && requestInfo != null) try {
+    		String resName = SecurityUtils.getResourceName(uriInfo);
+    		String requestMethod = requestInfo.getMethod();
+    		return getCacheControl(ctx, String.format("%s/%s", requestMethod, resName));  // example, "GET/blobs/*/content"
+    	} catch (Exception e) {
+    		logger.debug(e.getMessage(), e);
+    	}
+    	
+    	return getCacheControl(ctx, "default"); // Look for a default one if we couldn't find based on the resource request
+    }
+    
+    /**
+     * FIXME: This code around cache control needs some documentation.
+     * 
+     * @param ctx
+     * @param cacheKey
+     * @return
+     */
+    protected CacheControl getCacheControl(ServiceContext<IT, OT> ctx, String cacheKey) {
+    	CacheControl result = null;
+    	
+    	try {
+			Params docHandlerParams = ServiceConfigUtils.getDocHandlerParams(ctx.getTenantId(), ctx.getServiceName());
+			CacheControlConfig cacheControlConfig = getCacheControl(docHandlerParams.getCacheControlConfigElement(), cacheKey);
+			if (cacheControlConfig != null) {
+				result = new CacheControl();
+				
+				if (cacheControlConfig.isPrivate() != null) {
+					result.setPrivate(cacheControlConfig.isPrivate());
+				}
+				
+				if (cacheControlConfig.isNoCache() != null) {
+					result.setNoCache(cacheControlConfig.isNoCache());
+				}
+				
+				if (cacheControlConfig.isProxyRevalidate() != null) {
+					result.setProxyRevalidate(cacheControlConfig.isProxyRevalidate());
+				}
+				
+				if (cacheControlConfig.isMustRevalidate() != null) {
+					result.setMustRevalidate(cacheControlConfig.isMustRevalidate());
+				}
+				
+				if (cacheControlConfig.isNoStore() != null) {
+					result.setNoStore(cacheControlConfig.isNoStore());
+				}
+				
+				if (cacheControlConfig.isNoTransform() != null) {
+					result.setNoTransform(cacheControlConfig.isNoTransform());
+				}
+				
+				if (cacheControlConfig.getMaxAge() != null) { 
+					result.setMaxAge(cacheControlConfig.getMaxAge().intValue());
+				}
+				
+				if (cacheControlConfig.getSMaxAge() != null) {
+					result.setSMaxAge(cacheControlConfig.getSMaxAge().intValue());
+				}
+			}
+		} catch (DocumentException e) {
+			result = null;
+			logger.debug(String.format("Failed to retrieve CacheControlConfig with key '%s' from service bindings '%s'.", cacheKey, ctx.getServiceName()), e);
+		} catch (NullPointerException npe) {
+			result = null;
+			//
+			// NPE might mean optional cache-control config is missing -that's usually ok.
+			logger.trace(npe.getLocalizedMessage(), npe);
+		}
+
+    	return result;
+    }
+    
+    protected Response.ResponseBuilder setCacheControl(ServiceContext<IT, OT> ctx, Response.ResponseBuilder responseBuilder) {
+    	CacheControl cacheControl = getDefaultCacheControl(ctx);
+    	
+    	if (cacheControl != null) {
+			responseBuilder.cacheControl(cacheControl);
+	    	logger.debug(String.format("Setting default CacheControl for service '%s' responses from the service bindings for tenant ID='%s'.",
+	    			ctx.getServiceName(), ctx.getTenantId()));
+    	}
+    	
+    	return responseBuilder;
+    }	
 }

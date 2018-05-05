@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
@@ -42,13 +41,9 @@ import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.blob.BlobsCommon;
 import org.collectionspace.services.person.PersonTermGroup;
-
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,13 +78,18 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     protected CollectionSpaceClient getClientInstance() {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
+    
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+	}    
 
     @Override
-    protected AbstractCommonList getCommonList(ClientResponse<AbstractCommonList> response) {
+    protected AbstractCommonList getCommonList(Response response) {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
-    private PoxPayloadOut createBlobInstance(String depositorRefName) {
+    private PoxPayloadOut createBlobInstance(String depositorRefName) throws Exception {
     	BlobClient blobClient = new BlobClient();
         this.depositorRefName = depositorRefName;
         this.blobName = "testblob-"+createIdentifier();
@@ -110,7 +110,7 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         //    references, and will refer to Person resources by their refNames.
         BlobClient blobClient = new BlobClient();
         PoxPayloadOut multipart = createBlobInstance(depositorRefName);
-        ClientResponse<Response> res = blobClient.create(multipart);
+        Response res = blobClient.create(multipart);
         try {
 	        assertStatusCode(res, testName);
 	        if (knownResourceId == null) {// Store the ID returned from the first resource created for additional tests below.
@@ -119,16 +119,16 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 	        blobIdsCreated.add(extractId(res));// Store the IDs from every resource created; delete on cleanup
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
 
-    protected void createPersonRefs() {
+    protected void createPersonRefs() throws Exception {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding refName by which it can be identified.
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
-        ClientResponse<Response> res = personAuthClient.create(multipart);
+        Response res = personAuthClient.create(multipart);
         try {
 	        assertStatusCode(res, "createPersonRefs (not a surefire test)");
 	        personAuthCSID = extractId(res);
@@ -145,12 +145,12 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 	        depositorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
 
-    protected String createPerson(String firstName, String surName, String shortId, String authRefName) {
+    protected String createPerson(String firstName, String surName, String shortId, String authRefName) throws Exception {
     	String result = null;
     	
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
@@ -166,13 +166,13 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         personTerms.add(term);
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
         		authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
-        ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
+        Response res = personAuthClient.createItem(personAuthCSID, multipart);
         try {
         	assertStatusCode(res, "createPerson (not a surefire test)");
         	result = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -189,17 +189,17 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     public void readAndCheckAuthRefs(String testName) throws Exception {
         testSetup(STATUS_OK, ServiceRequestType.READ);
         BlobClient blobClient = new BlobClient();
-        ClientResponse<String> res = blobClient.read(knownResourceId);
+        Response res = blobClient.read(knownResourceId);
         BlobsCommon blob = null;
         try {
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        blob = (BlobsCommon) extractPart(input, blobClient.getCommonPartName(), BlobsCommon.class);
 	        Assert.assertNotNull(blob);
 	        logger.debug(objectAsXmlString(blob, BlobsCommon.class));
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -207,10 +207,10 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         Assert.assertEquals(blob.getName(), blobName);
 
         // Get the auth refs and check them
-        ClientResponse<AuthorityRefList> res2 = blobClient.getAuthorityRefs(knownResourceId);
+        res = blobClient.getAuthorityRefs(knownResourceId);
         try {
-	        assertStatusCode(res2, testName);
-	        AuthorityRefList list = res2.getEntity();
+	        assertStatusCode(res, testName);
+	        AuthorityRefList list = res.readEntity(AuthorityRefList.class);
 	        List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
 	        int numAuthRefsFound = items.size();
 	        logger.debug("Authority references, found " + numAuthRefsFound);
@@ -227,8 +227,8 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 	            }
 	        }
         } finally {
-        	if (res2 != null) {
-        		res2.releaseConnection();
+        	if (res != null) {
+        		res.close();
             }
         }
     }
@@ -240,9 +240,10 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun = true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             logger.debug("Skipping Cleanup phase ...");
@@ -253,7 +254,7 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         // Delete Person resource(s) (before PersonAuthority resources).
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            personAuthClient.deleteItem(personAuthCSID, resourceId);
+            personAuthClient.deleteItem(personAuthCSID, resourceId).close();
         }
         // Delete PersonAuthority resource(s).
         // Note: Any non-success response is ignored and not reported.
@@ -263,7 +264,7 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
             BlobClient blobClient = new BlobClient();
             for (String resourceId : blobIdsCreated) {
                 // Note: Any non-success responses are ignored and not reported.
-                blobClient.delete(resourceId);
+                blobClient.delete(resourceId).close();
             }
         }
     }

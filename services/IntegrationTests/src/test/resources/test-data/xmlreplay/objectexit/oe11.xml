@@ -1,2 +1,17 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:persons_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:ns3="http://collectionspace.org/services/jaxb"><inAuthority>7f441679-ab83-4832-85f9</inAuthority><shortIdentifier>owenCurOwner</shortIdentifier><refName>urn:cspace:org.collectionspace.demo:personauthority:name(ObjectexitPersonAuth)'ObjectexitPersonAuth':person:name(owenCurOwner)</refName><displayNameComputed>true</displayNameComputed><shortDisplayNameComputed>true</shortDisplayNameComputed><foreName>Owen the Cur</foreName><surName>Owner</surName></ns2:persons_common>
-
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="persons">
+    <ns2:persons_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:ns3="http://collectionspace.org/services/jaxb">
+        <shortIdentifier>owenCurOwner</shortIdentifier>
+        <foreName>Owen the oe11</foreName>
+        <surName>Owneroe11</surName>
+        <personTermGroupList>
+            <personTermGroup>
+                <termName>John Wayneoe11</termName>
+                <termPrefForLang>false</termPrefForLang>
+                <termDisplayName>John Wayneoe11</termDisplayName>
+                <foreName>oe11forename</foreName>
+                <surName>oe11surname</surName>
+            </personTermGroup>
+        </personTermGroupList>
+    </ns2:persons_common>
+</document>

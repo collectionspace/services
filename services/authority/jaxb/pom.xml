@@ -5,18 +5,17 @@
     <parent>
         <artifactId>org.collectionspace.services.authority</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>4.1.1</version>
+        <version>5.0</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.authority.jaxb</artifactId>
     <name>services.authority.jaxb</name>
     
     <dependencies>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
+            <artifactId>jaxb-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jvnet.jaxb2-commons</groupId>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:invocationContext
+xmlns:ns2="http://collectionspace.org/services/common/invocable"
+xmlns:ns3="http://collectionspace.org/services/jaxb">
+  <mode>garbage</mode>
+	<docType>CollectionObject</docType>
+	<listCSIDs>
+		<csids>${CollObj1}</csids>
+	</listCSIDs>
+</ns2:invocationContext>
+
+

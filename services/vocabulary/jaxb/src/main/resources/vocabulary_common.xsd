@@ -7,8 +7,6 @@
     Part    : Common
     Used for: JAXB binding between XML and Java objects
     
-    $LastChangedRevision$
-    $LastChangedDate$
 -->
 
 <xs:schema 
@@ -18,7 +16,7 @@
     xmlns:ns="http://collectionspace.org/services/vocabulary"
     xmlns="http://collectionspace.org/services/vocabulary"
     targetNamespace="http://collectionspace.org/services/vocabulary"
-    version="0.1"
+    version="0.2"
     >
     
     <!--
@@ -41,8 +39,11 @@
                 <xs:element name="vocabType" type="xs:string"/>                
                 <xs:element name="source" type="xs:string"/>
                 <xs:element name="description" type="xs:string"/>
+				<!-- Internal fields -->
+				<xs:element name="rev" type="xs:integer"/> <!-- The revision number of the authority.  Increments with each change including changes to its terms. -->
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
 </xs:schema>
 

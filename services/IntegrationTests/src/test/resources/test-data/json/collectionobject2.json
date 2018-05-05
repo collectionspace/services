@@ -1,0 +1,14 @@
+{
+  "document": {
+    "@name": "collectionobjects",
+    "ns2:collectionobjects_common": {
+      "@xmlns:ns2": "http://collectionspace.org/services/collectionobject",
+      "objectNumber": "TEST2000.4.5-updated",
+      "comments": {
+        "comment": [
+          "™£•"
+        ]
+      }
+    }
+  }
+}

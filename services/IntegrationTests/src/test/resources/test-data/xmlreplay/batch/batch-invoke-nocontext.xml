@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- 
+    Valid modes - {"single", "list", "group", "nocontext"}
+-->
+<ns2:invocationContext xmlns:ns2="http://collectionspace.org/services/common/invocable" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <mode>nocontext</mode>
+</ns2:invocationContext>
