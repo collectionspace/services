@@ -67,6 +67,9 @@
 		<property name="primary.profile.plugin.basename" value="${env.CSPACE_PRIMARY_UIPLUGIN_BASENAME}" />		
 		<property name="primary.profile.plugin.tenantid" value="${env.CSPACE_PRIMARY_UIPLUGIN_TENANTID}" />
 		<property name="primary.profile.plugin.message.title" value="${env.CSPACE_PRIMARY_UIPLUGIN_TITLE_MESSAGE}" />
+		<property name="primary.profile.plugin.message.about" value="${env.CSPACE_PRIMARY_UIPLUGIN_ABOUT_MESSAGE}" />
+		<property name="primary.profile.plugin.logo" value="${env.CSPACE_PRIMARY_UIPLUGIN_LOGO}" />
+
 		<!-- Derived from the other props -->
 		<property name="primary.profile.plugin.js" value="${primary.profile.plugin.name}@${primary.profile.plugin.version}.min.js" />
 		
@@ -81,16 +84,29 @@
 			#		export CSPACE_PRIMARY_UIPLUGIN_LOGO="/images/myimage.png"
 			#
 		-->
-		<condition property="primary.profile.plugin.logo" value="undefined">
-  			<matches pattern="^undefined$" string="${env.CSPACE_PRIMARY_UIPLUGIN_LOGO}"/>
+		<condition property="primary.profile.plugin.logo.final" value="undefined">
+  			<matches pattern="^undefined$" string="${primary.profile.plugin.logo}"/>
 		</condition>		
-		<condition property="primary.profile.plugin.logo" value="undefined">
-  			<matches pattern="^$" string="${env.CSPACE_PRIMARY_UIPLUGIN_LOGO}"/>
+		<condition property="primary.profile.plugin.logo.final" value="undefined">
+  			<matches pattern="^$" string="${primary.profile.plugin.logo}"/>
 		</condition>
-		<condition property="primary.profile.plugin.logo" value="'${env.CSPACE_PRIMARY_UIPLUGIN_LOGO}'">
-  			<matches pattern="^(?!\s*$).+" string="${env.CSPACE_PRIMARY_UIPLUGIN_LOGO}"/>
+		<condition property="primary.profile.plugin.logo.final" value="'${primary.profile.plugin.logo}'">
+  			<matches pattern="^(?!\s*$).+" string="primary.profile.plugin.logo"/>
 		</condition>
 		
+		<!--
+		
+		-->
+		<condition property="primary.profile.plugin.message.about.final" value="undefined">
+  			<matches pattern="^undefined$" string="${primary.profile.plugin.message.about}"/>
+		</condition>		
+		<condition property="primary.profile.plugin.message.about.final" value="undefined">
+  			<matches pattern="^$" string="${primary.profile.plugin.message.about}"/>
+		</condition>
+		<condition property="primary.profile.plugin.message.about.final" value="`${primary.profile.plugin.message.about}`">
+  			<matches pattern="^(?!\s*$).+" string="${primary.profile.plugin.message.about}"/>
+		</condition>
+				
 		<!-- Test to see if "core" tenant is being asked for, since we'll need to do something special for it. -->
 		<condition property="is.primary.core" value="true">
   			<matches pattern="^cspaceUI$" string="${primary.profile.plugin.name}"/>
@@ -136,7 +152,8 @@
 		<filter token="PLUGIN_BASENAME" value="${primary.profile.plugin.basename}" />
 		<filter token="TENANT_ID" value="${primary.profile.plugin.tenantid}" />
 		<filter token="MESSAGE_TITLE" value="${primary.profile.plugin.message.title}" />
-		<filter token="LOGO" value="${primary.profile.plugin.logo}" />
+		<filter token="LOGO" value="${primary.profile.plugin.logo.final}" />
+		<filter token="ABOUT" value="${primary.profile.plugin.message.about.final}" />
 		
 		<copy todir="${jee.deploy.cspace}/${primary.profile.plugin.dir}" filtering="true" overwrite="true">
 			<fileset dir="${webapp.template.dir}"/>
