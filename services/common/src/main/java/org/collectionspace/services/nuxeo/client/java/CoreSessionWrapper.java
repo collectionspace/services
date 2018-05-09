@@ -155,12 +155,12 @@ public class CoreSessionWrapper implements CoreSessionInterface {
 		
 		if (query.contains("TIMESTAMP")) {
 			StringBuffer stringBuffer = new StringBuffer();
-			Pattern pattern = Pattern.compile("\\+TIMESTAMP\\+%22(.+?)%22");
+			Pattern pattern = Pattern.compile("\\sTIMESTAMP\\s\"(.+?)\"");
 			Matcher matcher = pattern.matcher(query);
 			while (matcher.find()) {
 				String time = matcher.group(1);
-				String localizedTime = toLocalTimestamp(time, true);
-				matcher.appendReplacement(stringBuffer, String.format("+TIMESTAMP+%%22%s%%22", localizedTime));
+				String localizedTime = toLocalTimestamp(time, false);
+				matcher.appendReplacement(stringBuffer, String.format(" TIMESTAMP \"%s\"", localizedTime));
 			}
 			matcher.appendTail(stringBuffer);
 			result = stringBuffer.toString();
