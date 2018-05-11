@@ -1,0 +1,74 @@
+<project name="react.ui" default="package" basedir="." xmlns:if="ant:if" xmlns:unless="ant:unless">
+	<description>
+		CollectionSpace UI Component build
+	</description>
+	
+	<!-- set global properties for this build -->
+	<property name="services.trunk" value="../.."/>
+	
+	<!-- Enviornment should be declared before reading build.properties -->
+	<property environment="env" />
+	<property file="${services.trunk}/build.properties" />
+		
+	<condition property="osfamily-unix">
+		<os family="unix" />
+	</condition>
+	<condition property="osfamily-windows">
+		<os family="windows" />
+	</condition>
+	
+	<target name="package" depends="deploy">
+	</target>
+	
+	<!--
+		Dartmouth Vietnam Project - DVP
+	-->
+	<property name="dvp.profile.plugin.tenantid" value="1975" />
+	<property name="dvp.profile.plugin.message.title" value="Dartmouth Vietnam Project" />
+	<property name="dvp.profile.plugin.version" value="latest" />
+	<property name="dvp.profile.plugin.name" value="cspaceUIPluginProfileDartmouthVietnamProject" />
+	<property name="dvp.profile.plugin.dir" value="cspace#dvp" />
+	<property name="dvp.profile.plugin.js" value="${dvp.profile.plugin.name}@${dvp.profile.plugin.version}.min.js" />
+	<property name="dvp.profile.plugin.basename" value="/cspace/dvp" />
+	<!-- Use a value of "undefined" to use the default logo -->
+	<property name="dvp.profile.plugin.logo" value="undefined" />
+
+	<target name="download_dvp" unless="${env.CSPACE_DVP_CREATE_DISABLED_OPT}">
+		<!-- Dartmouth Vietnam Project -->
+		<exec executable="curl"	 failonerror="true">
+			<arg line="-o ${dvp.profile.plugin.js} --fail --insecure --remote-name --location https://unpkg.com/cspace-ui-plugin-profile-dvp@${dvp.profile.plugin.version}/dist/${dvp.profile.plugin.name}.min.js"/>
+		</exec>
+	</target>
+		
+	<target name="deploy_dvp" depends="download_dvp" unless="${env.CSPACE_DVP_CREATE_DISABLED_OPT}">
+		<!-- Dartmouth Vietnam Project -->
+		<filter token="UI_VERSION" value="${cspace.ui.version}" />
+		<filter token="PLUGIN_VERSION" value="${dvp.profile.plugin.version}" />
+		<filter token="PLUGIN_BASENAME" value="${dvp.profile.plugin.basename}" />
+		<filter token="TENANT_ID" value="${dvp.profile.plugin.tenantid}" />
+		<filter token="MESSAGE_TITLE" value="${dvp.profile.plugin.message.title}" />
+		<filter token="LOGO" value="${dvp.profile.plugin.logo}" />
+		
+		<copy todir="${jee.deploy.cspace}/${dvp.profile.plugin.dir}" filtering="true" overwrite="true">
+			<fileset dir="${dvp.profile.plugin.dir}"/>
+		</copy>
+		<move file="${dvp.profile.plugin.name}@${dvp.profile.plugin.version}.min.js" todir="${jee.deploy.cspace.ui.shared}"></move>
+	</target>
+
+	<target name="undeploy_dvp" description="undeploy collectionspace ui components from ${jee.server.cspace}">
+		<!-- Dartmouth Vietnam Project -->
+		<delete dir="${jee.deploy.cspace}/${dvp.profile.plugin.dir}" />
+		<delete file="${jee.deploy.cspace.ui.shared}/${dvp.profile.plugin.js}" />
+	</target>
+
+	<!-- General deploy target -->
+			
+	<target name="deploy" depends="deploy_dvp" description="deploy cspace ui to ${jee.server.cspace}">				
+	</target>
+		
+	<!-- General undeploy target -->
+
+	<target name="undeploy" depends="undeploy_dvp" description="undeploy collectionspace ui components from ${jee.server.cspace}">
+	</target>
+
+</project>

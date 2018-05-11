@@ -1,0 +1,26 @@
+<html>
+	<head>
+		<meta charset="UTF-8" />
+	</head>
+	<body>
+		<div id="cspace"></div>
+		<script src="/cspace-ui/cspaceUI@${cspace.ui.version}.min.js"></script>
+		<script src="/cspace-ui/cspaceUIPluginProfileDartmouthVietnamProject@latest.min.js"></script>
+		<script>
+			cspaceUI({
+				tenantid: '1975',
+				// No quotes for logo value.  Use "undefined" (no quotes) for default logo
+				logo: undefined,
+				messages: {
+				// Override the login page title
+					'about.title': 'Dartmouth Vietnam Project',
+				},
+				basename: '/cspace/dvp',
+				prettyUrls: true,
+				plugins: [
+					cspaceUIPluginProfileDartmouthVietnamProject(),
+				],
+			});
+		</script>
+	</body>
+</html>

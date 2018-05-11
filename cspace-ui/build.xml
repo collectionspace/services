@@ -314,9 +314,9 @@
 	</target>
 		
 	<target name="deploy" depends="deploy_common, deploy_generic, deploy_others" description="deploy cspace ui to ${jee.server.cspace}">				
-		<!-- Trigger dependencies -->
+		<ant antfile="incubator/build.xml" target="deploy" inheritAll="false" />
 	</target>
-		
+			
 	<!-- General undeploy target -->
 
 	<target name="undeploy_others">
@@ -324,6 +324,7 @@
 		<antcall target="undeploy_anthro" />
 		<antcall target="undeploy_core" />
 		<antcall target="undeploy_common" />
+		<ant antfile="incubator/build.xml" target="undeploy" inheritAll="false" />
 	</target>
 		
 	<target name="undeploy" depends="undeploy_common, undeploy_primary, undeploy_others" description="undeploy collectionspace ui components from ${jee.server.cspace}">
