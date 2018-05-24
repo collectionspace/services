@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
@@ -44,8 +45,10 @@ import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.perms.EffectType;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionAction;
+
 import org.collectionspace.services.authorization.storage.PermissionStorageConstants;
 import org.collectionspace.services.authorization.storage.RoleStorageConstants;
+
 import org.collectionspace.services.authorization.PermissionResource;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionRoleRel;
@@ -170,56 +173,78 @@ public class PermissionRoleUtil {
      * Try to find a persisted Permission record using a PermissionValue instance.
      *
      */
-    static private Permission lookupPermission(JPATransactionContext jpaTransactionContext, PermissionValue permissionValue, String tenantId) throws DocumentException {
-    	Permission result = null;
-    	
-    	String actionGroup = permissionValue.getActionGroup() != null ? permissionValue.getActionGroup().trim() : null;
-    	String resourceName = permissionValue.getResourceName() != null ? permissionValue.getResourceName().trim() : null;
-    	String permissionId = permissionValue.getPermissionId() != null ? permissionValue.getPermissionId().trim() : null;
-    	//
-    	// If we have a permission ID, use it to try to lookup the persisted permission
-    	//
-    	if (permissionId != null && !permissionId.isEmpty()) {
-	    	try {
-		    	result = (Permission)JpaStorageUtils.getEntityByDualKeys(
-		    			jpaTransactionContext, 
-		    			Permission.class.getName(),
-		    			PermissionStorageConstants.ID, permissionId, 
-		    			PermissionStorageConstants.TENANT_ID, tenantId);
-	    	} catch (Throwable e) {
-	    		String msg = String.format("Searched for but couldn't find a permission with CSID='%s'.",
-	    				permissionId);
-	    		logger.trace(msg);
-	    	}
-    	} else if (Tools.notBlank(resourceName) && Tools.notBlank(actionGroup)) {
-    		//
-    		// If there was no permission ID, then we can try to find the permission with the resource name and action group tuple
-    		//
-	    	try {
-		    	result = (Permission)JpaStorageUtils.getEntityByDualKeys(
-		    			jpaTransactionContext, 
-		    			Permission.class.getName(),
-		    			PermissionStorageConstants.RESOURCE_NAME, permissionValue.getResourceName(), 
-		    			PermissionStorageConstants.ACTION_GROUP, permissionValue.getActionGroup(),
-		    			tenantId);
-	    	} catch (NoResultException e) {
-	    		String msg = String.format("Searched for but couldn't find a permission for resource='%s', action group='%s', and tenant ID='%s'.",
-	    				permissionValue.getResourceName(), permissionValue.getActionGroup(), tenantId);
-	    		logger.trace(msg);
-	    	}
-    	} else {
-    		String errMsg = String.format("Couldn't perform lookup of permission.  Not enough information provided.  Lookups requires a permission CSID or a resource name and action group tuple.  The provided information was permission ID='%s', resourceName='%s', and actionGroup='%s'.",
-    				permissionId, resourceName, actionGroup);
-    		throw new DocumentException(errMsg);
-    	}
-    	
-    	if (result == null) {
-    		throw new DocumentNotFoundException(String.format("Could not find Permission resource with CSID='%s', actionGroup='%s', resourceName='%s'.", 
-    				permissionId, actionGroup, resourceName));
-    	}
-    	
-    	return result;
-    }
+    @SuppressWarnings("unchecked")
+	static private Permission lookupPermission(JPATransactionContext jpaTransactionContext,
+			PermissionValue permissionValue, String tenantId) throws DocumentException {
+		Permission result = null;
+
+		String actionGroup = permissionValue.getActionGroup() != null ? permissionValue.getActionGroup().trim() : null;
+		String resourceName = permissionValue.getResourceName() != null ? permissionValue.getResourceName().trim() : null;
+		String permissionId = permissionValue.getPermissionId() != null ? permissionValue.getPermissionId().trim() : null;
+		//
+		// If we have a permission ID, use it to try to lookup the persisted permission
+		//
+		if (permissionId != null && !permissionId.isEmpty()) {
+			try {
+				result = (Permission) JpaStorageUtils.getEntityByDualKeys(jpaTransactionContext,
+						Permission.class.getName(), PermissionStorageConstants.ID, permissionId,
+						PermissionStorageConstants.TENANT_ID, tenantId);
+			} catch (Throwable e) {
+				String msg = String.format("Searched for but couldn't find a permission with CSID='%s'.", permissionId);
+				logger.trace(msg);
+			}
+		} else if (Tools.notBlank(resourceName) && Tools.notBlank(actionGroup)) {
+			//
+			// If there was no permission ID, then we can try to find the permission with
+			// the resource name and action group tuple
+			//
+			try {
+				result = (Permission) JpaStorageUtils.getEntityByDualKeys(jpaTransactionContext,
+						Permission.class.getName(), PermissionStorageConstants.RESOURCE_NAME,
+						permissionValue.getResourceName(), PermissionStorageConstants.ACTION_GROUP,
+						permissionValue.getActionGroup(), tenantId);
+			} catch (NonUniqueResultException nue) {
+				//
+				// Duplicates can happen after a CSpace instance has been upgraded from v4.x to v5.0+
+				//
+				List<Permission> resultList = (List<Permission>) JpaStorageUtils.getEntityListByDualKeys(
+						jpaTransactionContext, Permission.class.getName(), PermissionStorageConstants.RESOURCE_NAME,
+						permissionValue.getResourceName(), PermissionStorageConstants.ACTION_GROUP,
+						permissionValue.getActionGroup(), tenantId);
+				logger.warn(String.format("Multiple permissions exist for resource '%s' and action group '%s'",
+						permissionValue.getResourceName(), permissionValue.getActionGroup()));
+				result = resultList.get(0);
+				for (Permission p : resultList) {
+					//
+					// If we find an auto-generated permission, we should use it instead.
+					//
+					if (p.getDescription() != null && p.getDescription().startsWith(AuthN.GENERATED_STR)) {
+						result = p;
+						break;
+					}
+				}
+			} catch (NoResultException e) {
+				String msg = String.format(
+						"Searched for but couldn't find a permission for resource='%s', action group='%s', and tenant ID='%s'.",
+						permissionValue.getResourceName(), permissionValue.getActionGroup(), tenantId);
+				logger.trace(msg);
+			}
+		} else {
+			String errMsg = String.format(
+					"Couldn't perform lookup of permission.  Not enough information provided.  Lookups requires a permission CSID or a resource name and action group tuple.  The provided information was permission ID='%s', resourceName='%s', and actionGroup='%s'.",
+					permissionId, resourceName, actionGroup);
+			throw new DocumentException(errMsg);
+		}
+
+		if (result == null) {
+			throw new DocumentNotFoundException(String.format(
+					"Could not find Permission resource with CSID='%s', actionGroup='%s', resourceName='%s'.",
+					permissionId, actionGroup, resourceName));
+		}
+
+		return result;
+	}
+    
     /**
      * Ensure the Role's permission relationships can be changed.
      * 
