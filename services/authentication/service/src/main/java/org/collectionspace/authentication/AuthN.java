@@ -95,6 +95,9 @@ public class AuthN {
     // Define a special account value for the tenantManager. Yes, this is a hack, but
     // less troublesome than the alternatives.
     public static final String TENANT_MANAGER_ACCT_ID = ALL_TENANTS_MANAGER_TENANT_ID;
+    
+    // Prefix for description of auto-generated permissions
+	public static final String GENERATED_STR = "Generated "; // trailing space is significant
 
     private AuthN() {
         //hardcoded initialization of a provider

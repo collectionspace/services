@@ -446,6 +446,32 @@ public class JpaStorageUtils {
 
         return result;
     }
+	
+	public static List getEntityListByDualKeys(JPATransactionContext jpaTransactionContext, String entityName,
+			String key1, String value1, String key2, String value2, String tenantId) throws TransactionException {
+		List result = null;
+
+		boolean useTenantId = useTenantId(tenantId);
+		StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
+		queryStrBldr.append(entityName);
+		queryStrBldr.append(" a");
+		queryStrBldr.append(" WHERE " + key1 + " = :" + key1);
+		queryStrBldr.append(" AND " + key2 + " = :" + key2);
+		if (useTenantId == true) {
+			queryStrBldr.append(" AND tenantId = :tenantId");
+		}
+		String queryStr = queryStrBldr.toString(); // for debugging
+		Query q = jpaTransactionContext.createQuery(queryStr);
+		q.setParameter(key1, value1);
+		q.setParameter(key2, value2);
+		if (useTenantId == true) {
+			q.setParameter("tenantId", tenantId);
+		}
+
+		result = q.getResultList();
+
+		return result;
+	}
     
     /**
      * 
