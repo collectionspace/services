@@ -85,8 +85,8 @@ public class CollectionObjectSearchTest extends BaseServiceTest<AbstractCommonLi
 	// Ж : Cyrillic capital letter Zhe with breve (U+04C1)
 	// Ŵ : Latin capital letter W with circumflex (U+0174)
 	// Ω : Greek capital letter Omega (U+03A9)
-	final String UTF8_KEYWORD = "to" + '\u0394' + '\u04C1' + '\u0174'
-			+ '\u03A9';
+//	final String UTF8_KEYWORD = "to" + '\u0394' + '\u04C1' + '\u0174' + '\u03A9';
+	final String UTF8_KEYWORD = "A" + "\u00ea" + "\u00f1" + "\u00fc" + "C";
 	// Non-existent term unlikely to be encountered in actual collections
 	// data, consisting of two back-to-back sets of the first letters of
 	// each of the words in a short pangram for the English alphabet.
