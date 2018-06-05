@@ -4,6 +4,12 @@
 	xmlns:tenant="http://collectionspace.org/services/config/tenant">
 	
 	<tenant:tenantBinding id="20">
+		<tenant:eventListenerConfigurations id="default" merge:matcher="id">
+			<tenant:eventListenerConfig id="UpdateFormattedDisplayNameListener" merge:matcher="id">
+				<tenant:className>org.collectionspace.services.listener.naturalhistory.UpdateFormattedDisplayNameListener</tenant:className>
+			</tenant:eventListenerConfig>
+		</tenant:eventListenerConfigurations>
+
 		<tenant:properties>
 			<types:item xmlns:types="http://collectionspace.org/services/config/types" id="ptstartingwildcard" merge:matcher="id" merge:action="replace">
 				<types:key>ptStartingWildcard</types:key>
