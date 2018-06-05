@@ -12,7 +12,6 @@
             <tenant:eventListenerConfig id="UpdateObjectLocationOnMove" merge:matcher="id">
                 <tenant:paramList id="default" merge:matcher="id" merge:action="delete"/>
             </tenant:eventListenerConfig>
-            <tenant:eventListenerConfig id="UpdateObjectLocationAndCrateOnMove" merge:matcher="id" merge:action="delete"/>
         </tenant:eventListenerConfigurations>
 
         <tenant:properties id="default">

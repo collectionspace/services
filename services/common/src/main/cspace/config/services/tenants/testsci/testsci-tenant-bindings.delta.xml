@@ -25,8 +25,6 @@
 		            </tenant:param>
 	            </tenant:paramList>
             </tenant:eventListenerConfig>
-            <tenant:eventListenerConfig id="UpdateObjectLocationAndCrateOnMove" merge:matcher="id" merge:action="delete">
-            </tenant:eventListenerConfig>            
         </tenant:eventListenerConfigurations>	
     </tenant:tenantBinding>
 </tenant:TenantBindingConfig>
