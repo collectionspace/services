@@ -26,27 +26,34 @@ package org.collectionspace.services.authorization.importer;
 import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
-import org.collectionspace.services.authorization.perms.Permission;
+
+import org.collectionspace.services.client.TenantClient;
 import org.collectionspace.authentication.AuthN;
+import org.collectionspace.authentication.AuthN;
+
+import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.perms.PermissionsList;
 import org.collectionspace.services.authorization.PermissionsRolesList;
-import org.collectionspace.services.client.TenantClient;
+
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.RolesList;
 import org.collectionspace.services.authorization.SubjectType;
+
 import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.config.ServicesConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
+
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 
@@ -250,17 +257,17 @@ public class AuthorizationGen {
     }
 
     private Permission buildAdminPermission(String tenantId, String resourceName) {
-    	String description = "Generated admin permission.";
+    	String description = AuthN.GENERATED_STR + "admin permission.";
     	return AuthorizationCommon.createPermission(tenantId, resourceName, description, AuthorizationCommon.ACTIONGROUP_CRUDL_NAME, true);
     }
     
     private Permission buildReaderPermission(String tenantId, String resourceName) {
-    	String description = "Generated read-only (RL) permission.";
+    	String description = AuthN.GENERATED_STR + "read-only (RL) permission.";
     	return AuthorizationCommon.createPermission(tenantId, resourceName, description, AuthorizationCommon.ACTIONGROUP_RL_NAME, true);    	
     }
     
     private Permission buildReadWritePermission(String tenantId, String resourceName) {
-    	String description = "Generated read-write (CRUL) permission.";
+    	String description = AuthN.GENERATED_STR + "read-write (CRUL) permission.";
     	return AuthorizationCommon.createPermission(tenantId, resourceName, description, AuthorizationCommon.ACTIONGROUP_CRUL_NAME, true);    	
     }
 
