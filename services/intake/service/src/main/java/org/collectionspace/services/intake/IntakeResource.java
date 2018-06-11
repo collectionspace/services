@@ -24,7 +24,7 @@
 package org.collectionspace.services.intake;
 
 import org.collectionspace.services.client.IntakeClient;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ import javax.ws.rs.Produces;
 @Path(IntakeClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class IntakeResource extends ResourceBase {
+public class IntakeResource extends NuxeoBasedResource {
     
     final Logger logger = LoggerFactory.getLogger(IntakeResource.class);
 

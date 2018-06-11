@@ -40,6 +40,43 @@
  * initial value is '1').
  */
 
+-- EXHIBITION_NUMBER
+
+INSERT INTO id_generators
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
+  SELECT 
+     '29ff8c5e-597a-41c6-a481-6e92dfe0a59f',
+     'Exhibition Number',
+     'Identifies exhibition activities, in which one
+or more exhibition events occur at an institution.',
+     '9',
+     '',
+'<org.collectionspace.services.id.SettableIDGenerator>
+   <parts>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>EXH</initialValue>
+      <currentValue>EXH</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.YearIDGeneratorPart>
+      <currentValue></currentValue>
+    </org.collectionspace.services.id.YearIDGeneratorPart>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>.</initialValue>
+      <currentValue>.</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.NumericIDGeneratorPart>
+      <maxLength>6</maxLength>
+      <initialValue>1</initialValue>
+      <currentValue>-1</currentValue>
+    </org.collectionspace.services.id.NumericIDGeneratorPart>
+  </parts>
+</org.collectionspace.services.id.SettableIDGenerator>'
+  WHERE '29ff8c5e-597a-41c6-a481-6e92dfe0a59f' NOT IN
+        (
+        SELECT  csid
+        FROM    id_generators
+        );
+        
 -- ACCESSION_LOT_NUMBER
 
 INSERT INTO id_generators

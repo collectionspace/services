@@ -26,23 +26,51 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.vocabulary.VocabulariesCommon;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommon;
 
 /**
  * The Class VocabularyClient.
  */
-public class VocabularyClient extends AuthorityClientImpl<VocabularyitemsCommon, VocabularyProxy> {
+public class VocabularyClient extends AuthorityClientImpl<VocabulariesCommon, VocabularyitemsCommon, VocabularyProxy> {
 	public static final String SERVICE_NAME = "vocabularies";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
     public static final String TERM_INFO_GROUP_XPATH_BASE = "vocabularyTermGroup";
+    
+    //
+    // Request query parameter constants
+    //
+	public static final String SHOW_ITEMS_QP = "showItems"; // query param on GET of vocabulary to get list of items included in the result payload
+	public static final String OMITTED_ITEM_ACTION_QP = "omittedItemAction";  // values can be "delete", "softdelete", "ignore"; the value of "ignore" is the default	
+	public static final String DELETE_OMITTED_ITEMS = "delete";
+	public static final String SOFTDELETE_OMITTED_ITEMS = "softdelete";
+	public static final String IGNORE_OMITTED_ITEMS = "ignore";    
+	
 	//
 	// Subitem constants
 	//
 	public static final String SERVICE_ITEM_NAME = "vocabularyitems";
 	public static final String SERVICE_ITEM_PAYLOAD_NAME = SERVICE_ITEM_NAME;
 	
+    public static final String SERVICE_COMMON_PART_NAME = SERVICE_NAME
+            + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
+    public static final String SERVICE_ITEM_COMMON_PART_NAME = SERVICE_ITEM_NAME
+            + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
+	
+	
+    //
+    // Constructors
+    //
+    public VocabularyClient() throws Exception {
+    	super();
+    }
+    
+    public VocabularyClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
+    
 	@Override
 	public String getServiceName() {
 		return SERVICE_NAME;
@@ -85,5 +113,17 @@ public class VocabularyClient extends AuthorityClientImpl<VocabularyitemsCommon,
 	@Override
 	public String getInAuthority(VocabularyitemsCommon item) {
 		return item.getInAuthority();
+	}
+
+	@Override
+	public String createAuthorityInstance(String shortIdentifier, String displayName) {
+		PoxPayloadOut poxPayloadout = VocabularyClientUtils.createVocabularyInstance(displayName, shortIdentifier, SERVICE_COMMON_PART_NAME);
+		return poxPayloadout.asXML();
+	}
+
+	@Override
+	public String createAuthorityItemInstance(String shortIdentifier, String displayName) {
+		PoxPayloadOut poxPayloadout = VocabularyClientUtils.createVocabularyItemInstance(displayName, shortIdentifier, SERVICE_COMMON_PART_NAME);
+		return poxPayloadout.asXML();
 	}
 }

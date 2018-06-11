@@ -24,10 +24,10 @@
 package org.collectionspace.services.exhibition.nuxeo;
 
 import org.collectionspace.services.exhibition.ExhibitionsCommon;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 
 /** ExhibitionDocumentModelHandler
  */
 public class ExhibitionDocumentModelHandler
-        extends DocHandlerBase<ExhibitionsCommon> {
+        extends NuxeoDocumentModelHandler<ExhibitionsCommon> {
 }

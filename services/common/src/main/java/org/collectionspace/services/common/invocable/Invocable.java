@@ -24,7 +24,11 @@ package org.collectionspace.services.common.invocable;
 
 import org.collectionspace.services.common.invocable.InvocationContext;
 import java.util.List;
+
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.context.ServiceContext;
 
 /**
  * Invocable defines an interface for invocable jobs (batch, reports, exports,
@@ -63,11 +67,13 @@ public interface Invocable {
             return (Tools.notBlank(message)) ? message : "No error message provided";  
         }
     }
+    
     public String INVOCATION_MODE_SINGLE = "single";
     public String INVOCATION_MODE_LIST = "list";
     public String INVOCATION_MODE_GROUP = "group";
     public String INVOCATION_MODE_NO_CONTEXT = "nocontext";
     //public String INVOCATION_MODE_QUERY = "query"; NYI
+    
     public final int STATUS_ERROR = -1;
     public final int STATUS_UNSTARTED = 0;
     public final int STATUS_MIN_PROGRESS = 1;
@@ -108,4 +114,13 @@ public interface Invocable {
      * Will only be called if getCompletionStatus() returns STATUS_ERROR.
      */
     public InvocationError getErrorInfo();
+
+    /*
+     * Save a handle to the JAX-RS related service context
+     */
+	void setServiceContext(ServiceContext<PoxPayloadIn, PoxPayloadOut> context);
+
+	ServiceContext<PoxPayloadIn, PoxPayloadOut> getServiceContext();
+
+	InvocationContext getInvocationContext();
 }

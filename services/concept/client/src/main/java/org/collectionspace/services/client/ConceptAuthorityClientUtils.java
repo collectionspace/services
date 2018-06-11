@@ -10,12 +10,13 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.FileUtils;
+
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.concept.ConceptTermGroup;
 import org.collectionspace.services.concept.ConceptauthoritiesCommon;
+
 import org.dom4j.DocumentException;
-import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +85,7 @@ public class ConceptAuthorityClientUtils {
     	PoxPayloadOut multipart = 
     		createConceptInstance(commonPartXML, client.getItemCommonPartName());
     	String newID = null;
-    	ClientResponse<Response> res = client.createItem(vcsid, multipart);
+    	Response res = client.createItem(vcsid, multipart);
         try {
 	    	int statusCode = res.getStatus();
 	
@@ -99,7 +100,7 @@ public class ConceptAuthorityClientUtils {
 	    	}
 	        newID = extractId(res);
         } finally {
-        	res.releaseConnection();
+        	res.close();
         }
 
     	return newID;
@@ -119,7 +120,7 @@ public class ConceptAuthorityClientUtils {
     	return createItemInAuthority(vcsid, commonPartXML, client );
     }    
 
-    public static String extractId(ClientResponse<Response> res) {
+    public static String extractId(Response res) {
         MultivaluedMap<String, Object> mvm = res.getMetadata();
         String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
         if(logger.isDebugEnabled()){

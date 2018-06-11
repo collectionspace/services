@@ -14,12 +14,13 @@ import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
-import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
+import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
+
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,19 +29,18 @@ public class RelationUtils {
     private static final Logger logger = LoggerFactory.getLogger(RelationUtils.class);
     private static final int DEFAULT_PAGE_SIZE = 1000;
 
-
     /*
      * Performs an NXQL query to find refName references in relationship records.
      */
     private static DocumentModelList findRelationsWithRefName(
-            ServiceContext ctx,
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
-            RepositoryInstanceInterface repoSession,
+            CoreSessionInterface repoSession,
             String refName,
             String targetField,
             String orderByClause,
-            int pageSize,
             int pageNum,
+            int pageSize,
             boolean computeTotal) throws DocumentException, DocumentNotFoundException {
         
         List<String> docTypes = Arrays.asList(IRelationsManager.DOC_TYPE);
@@ -51,9 +51,16 @@ public class RelationUtils {
         // relations_common:subjectRefName = 'urn:cspace:core.collectionspace.org:placeauthorities:name(place):item:name(Amystan1348082103923)\'Amystan\''"
         String query = String.format("%s:%s = '%s'", IRelationsManager.SERVICE_COMMONPART_NAME, targetField, escapedRefName);
 
-        RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl) repoClient;
-        DocumentWrapper<DocumentModelList> docListWrapper = nuxeoRepoClient.findDocs(ctx, repoSession,
-                docTypes, query, orderByClause, pageSize, pageNum, computeTotal);
+        NuxeoRepositoryClientImpl nuxeoRepoClient = (NuxeoRepositoryClientImpl) repoClient;
+        DocumentWrapper<DocumentModelList> docListWrapper = nuxeoRepoClient.findDocs(ctx, 
+                repoSession,
+                docTypes, 
+                query, 
+                orderByClause, 
+                pageNum,
+                pageSize, 
+                true, // useDefaultOrderByClause if 'orderByClause' is null
+                computeTotal);
         DocumentModelList docList = docListWrapper.getWrappedObject();
         
         return docList;
@@ -66,7 +73,7 @@ public class RelationUtils {
     public static void updateRefNamesInRelations(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
-            RepositoryInstanceInterface repoSession,
+            CoreSessionInterface repoSession,
             String targetField,
             String oldRefName,
             String newRefName) throws Exception {
@@ -88,8 +95,8 @@ public class RelationUtils {
                         oldRefName,
                         targetField,
                         ORDER_BY_VALUE,
-                        DEFAULT_PAGE_SIZE,
                         currentPage,
+                        DEFAULT_PAGE_SIZE,
                         true);
     
                 if (docModelList == null) {

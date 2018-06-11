@@ -64,4 +64,5 @@ public class TenantStorageConstants {
     final public static String ID_FIELD = "id";
     final public static String NAME_FIELD = "name";
     final public static String DISABLED_FIELD = "disabled";
+	final public static String AUTHORITIES_INITIALIZED_FIELD = "authoritiesInitialized";
 }

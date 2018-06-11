@@ -5,8 +5,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -15,8 +18,8 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
 import com.sun.xml.bind.api.impl.NameConverter;
-import org.apache.commons.io.FileUtils;
 
+import org.apache.commons.io.FileUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -37,17 +40,25 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	/** The Constant logger. */
 	protected static final Logger logger = LoggerFactory.getLogger(PayloadPart.class);	
 	
+	/** String constant for JAX-B root element labels */
+	public static final String DOCUMENT_ROOT_ELEMENT_LABEL = "document";
+	public static final String ABSTRACT_COMMON_LIST_ROOT_ELEMENT_LABEL = "abstract-common-list";
+	
 	/** The xml text. */
 	private String xmlPayload;
 	
-	private Document domDocument;
+	protected Document domDocument;
 	
 	/** The payload name. */
 	private String payloadName;
 	
 	// The list of POX parts contained in the xmlText payload
 	/** The parts. */
-	private List<PT> parts = new ArrayList<PT>();	
+	private List<PT> parts = new ArrayList<PT>();
+	
+	// Valid root element labels
+	private static Set<String> validRootElementLabels = new HashSet<String>(Arrays.asList(DOCUMENT_ROOT_ELEMENT_LABEL, 
+			ABSTRACT_COMMON_LIST_ROOT_ELEMENT_LABEL));
 	
 	/**
 	 * Instantiates a new pox payload.
@@ -60,16 +71,67 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 		this.payloadName = name;
 	}
 	
+	/**
+	 * Returns a list of valid root element labels for payloads.
+	 * 
+	 * @return
+	 */
+	public Set<String> getValidRootElementLables() {
+		return validRootElementLabels;
+	}
+	
 	private void setDomDocument(Document dom) throws DocumentException {
 		this.domDocument = dom;
-		String label = domDocument.getRootElement().getName();
-		if (label != null) {
+		String label = domDocument.getRootElement().getName().toLowerCase();
+		if (label != null && getValidRootElementLables().contains(label)) {
 			this.payloadName = label;
-		} else if (logger.isWarnEnabled() == true) {
-			logger.warn("Incoming message payload is missing a name/label.");
-			logger.warn(this.xmlPayload);
+		} else {
+			String msg = "The following incoming request payload is missing the root <document> element or is otherwise malformed.  For example valid payloads, see https://wiki.collectionspace.org/display/DOC/Common+Services+REST+API+documentation";
+			throw new DocumentException(msg + '\n' + this.xmlPayload);
 		}
 		parseParts();
+	}
+	
+	/**
+	 * Creates and returns an XML string representation of ourself.
+	 *
+	 * @return the string
+	 */
+	public String toXML() {
+		String result = null;
+        Document document = createDOMFromParts();
+
+        result = document.asXML();
+		
+		if (logger.isTraceEnabled() == true) {
+			logger.trace("\n\n<<<< Payload : BEGIN <<<<\n" + result + "\n<<<< Payload : END   <<<<\n");
+		}
+		
+		return result;
+	}
+	
+	protected Document createDOMFromParts() {
+		Document result = null;
+		
+        Document document = DocumentHelper.createDocument();
+        document.setXMLEncoding("UTF-8");
+        document.setName(getName());
+        Element root = document.addElement( "document" );
+        root.addAttribute("name", getName());        
+		
+		Iterator<PT> it = getParts().iterator();
+		while (it.hasNext() == true) {
+			PT outPart = it.next();
+			Element element = outPart.asElement();			
+			if (element != null) {
+				root.add(element.detach());
+			} else {
+				//Add if (logger.isTraceEnabled() == true) logger.trace("Output part: " + outPart.getLabel() + " was empty.");
+			}
+		}
+		result = document;
+				
+		return result;
 	}
 	
 	/**
@@ -197,6 +259,15 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	public List<PT> getParts() {
 		return parts;
 	}
+	
+	/**
+	 * Set a new set of parts.
+	 * 
+	 * @param newParts
+	 */
+	public void setParts(ArrayList<PT> newParts) {
+		this.parts = newParts;
+	}
 		
 	/**
 	 * Adds a POX part to the list of existing parts with the label 'label'.
@@ -219,7 +290,15 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	public PT addPart(PT entity) {
 		parts.add(entity);
 		return entity;
-	}	
+	}
+	
+	/**
+	 * Removes a POX part from our list of parts
+	 * @param entity
+	 */
+	public void removePart(PT entity) {
+		parts.remove(entity);
+	}
 		
     /**
      * Gets the Java package name from the specified namespace.  This method
@@ -236,7 +315,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
     }
       
     /**
-     * Attempts to marshal a DOM4j element (for a part) into an instance of a JAXB object
+     * Attempts to unmarshal a DOM4j element (for a part) into an instance of a JAXB object
      *
      * @param elementInput the element input
      * @return the object
@@ -251,9 +330,9 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	    	result = um.unmarshal(
 	    			new StreamSource(new StringReader(elementInput.asXML())));	    			
     	} catch (Exception e) {
-    		if (logger.isTraceEnabled() == true) {
-    			logger.trace(e.getMessage());
-    		}
+    		String msg = String.format("Could not unmarshal XML payload '%s' into a JAXB object.", 
+    				elementInput.getName());
+    		logger.warn(msg);
     	}
     	
     	return result;
@@ -281,12 +360,14 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	    	m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
 	    	//Marshal object into file.
 	    	m.marshal(jaxbObject, outputStream);
-	    	text = outputStream.toString("UTF8");
+	    	text = outputStream.toString("UTF8"); // FIXME: This method could/should be using JaxbUtils.toString() method
 
     		Document doc = DocumentHelper.parseText(text);
     		result = doc.getRootElement(); //FIXME: REM - call .detach() to free the element
     	} catch (Exception e) {
-    		e.printStackTrace(); //FIXME: REM - Please use proper logger.isWarning() statement
+    		String msg = String.format("Could not marshal JAXB object '%s' to an XML element.",
+    				jaxbObject.toString());
+    		logger.error(msg);
     	}
     	
     	return result;

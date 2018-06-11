@@ -1,0 +1,9 @@
+<ns2:accounts_common xmlns:ns2="http://collectionspace.org/services/account" xmlns:ns3="http://collectionspace.org/services/jaxb" csid="11b78937-4412-460b-bfca-ad441ec3eeae">
+    <screenName>simpleAccount-2</screenName>
+    <personRefName>simpleAccount-2</personRefName>
+    <email>simpleAccount-2@security.simpleroles.org</email>
+    <phone>1234567890</phone>
+    <userId>simpleAccount-2</userId>
+    <status>active</status>
+    <roleList/>
+</ns2:accounts_common>

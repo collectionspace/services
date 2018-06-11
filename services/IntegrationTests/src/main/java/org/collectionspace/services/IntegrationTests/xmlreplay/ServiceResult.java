@@ -37,6 +37,7 @@ import java.util.Map;
  * $LastChangedDate:  $
  */
 public class ServiceResult {
+	public boolean autoDelete = true;
     public String testID = "";
     public String testGroupID = "";
     public String fullURL = "";
@@ -53,13 +54,23 @@ public class ServiceResult {
     public String error = "";
     public String fromTestID = "";
     public String auth = "";
+    public String adminAuth = "";
     public String boundary = "";
     public String payloadStrictness = "";
     public long contentLength = 0;
     public String failureReason = "";
     public String expectedContentExpanded = "";
     public Header[] responseHeaders = new Header[0];
-    public List<Integer> expectedCodes = new ArrayList<Integer>();
+    
+    private List<Integer> expectedCodes = new ArrayList<Integer>();
+    public List<Integer> getExpectedCodes() {
+        return expectedCodes;
+    }
+    public void setExpectedCodes(List<Integer> codes) {
+        expectedCodes = codes;
+    }
+    
+    public boolean expectedCodesStrict = false;
     public Map<String,String>  vars = new HashMap<String,String>();
     public void addVars(Map<String,String> newVars){
         vars.putAll(newVars);
@@ -169,28 +180,43 @@ public class ServiceResult {
         if (overrideExpectedResult){
             return true;
         }
-        //if (Tools.notEmpty(failureReason)){
-        //    return false;
-        //}
-        for (Integer oneExpected : expectedCodes){
-            if (responseCode == oneExpected){
+        
+        if (expectedCodesStrict && expectedCodes.size() > 0) {
+            //
+            // response code MUST match one of the stated expected response codes
+            //
+            for (Integer expected : expectedCodes) {
+                if (expected == responseCode) {
+                    failureReason = "";
+                    return isDomWalkOK();
+                }
+            }
+            failureReason = " : STATUS CODE UNEXPECTED; ";
+            return false;            
+        }
+
+        for (Integer expected : expectedCodes){
+            if (responseCode == expected){
                 failureReason = "";
                 return isDomWalkOK();
             }
         }
-        if ( expectedCodes.size()>0 && codeInSuccessRange(responseCode)){ //none found, but result expected.
-            for (Integer oneExpected : expectedCodes){
-                if ( ! codeInSuccessRange(oneExpected)){
+        
+        if (expectedCodes.size() > 0 && codeInSuccessRange(responseCode)) { //none found, but result expected.
+            for (Integer expected : expectedCodes) {
+                if (!codeInSuccessRange(expected)) {
                     failureReason = "";
                     return isDomWalkOK();
                 }
             }
         }
+        
         boolean ok = codeInSuccessRange(responseCode);
         if (ok) {
             failureReason = "";
             return isDomWalkOK();
         }
+        
         failureReason = " : STATUS CODE UNEXPECTED; ";
         return false;
     }

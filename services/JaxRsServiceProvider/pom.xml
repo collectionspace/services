@@ -4,7 +4,7 @@
     <parent>
         <artifactId>org.collectionspace.services.main</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>4.1.1</version>
+        <version>5.0</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -14,11 +14,45 @@
 
     <properties>
         <cs.release>0.5</cs.release>
-        <spring.version>3.0.0.RELEASE</spring.version>
-        <spring.security.version>3.0.2.RELEASE</spring.security.version>
     </properties>
 
     <dependencies>
+    	<dependency>
+    		<groupId>commons-collections</groupId>
+  			<artifactId>commons-collections</artifactId>
+  			<version>3.2.2</version>
+    	</dependency>
+  		<dependency>
+  			<artifactId>lucene-analyzers-common</artifactId>
+  			<groupId>org.apache.lucene</groupId>
+  			<scope>provided</scope>
+  			<version>4.7.2</version>
+  		</dependency>
+  		<dependency>
+  			<artifactId>lucene-sandbox</artifactId>
+  			<groupId>org.apache.lucene</groupId>
+  			<scope>provided</scope>
+  			<version>4.7.2</version>
+  		</dependency>
+  		<dependency>
+  			<artifactId>lucene-queries</artifactId>
+  			<groupId>org.apache.lucene</groupId>
+  			<scope>provided</scope>
+  			<version>4.7.2</version>
+  		</dependency>
+  		<dependency>
+  			<artifactId>lucene-core</artifactId>
+  			<groupId>org.apache.lucene</groupId>
+  			<scope>provided</scope>
+  			<version>4.7.2</version>
+  		</dependency>
+  		<dependency>
+  			<artifactId>lucene-queryparser</artifactId>
+  			<groupId>org.apache.lucene</groupId>
+  			<scope>provided</scope>
+  			<version>4.7.2</version>
+  		</dependency>
+    
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -48,22 +82,7 @@
             <version>1.6.1</version>
             <scope>test</scope>
         </dependency>
-        <!-- CollectionSpace dependencies -->
-        <dependency>
-            <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.authority.service</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-            	<exclusion>
-            		<artifactId>nuxeo-core-facade</artifactId>
-            		<groupId>org.nuxeo.ecm.core</groupId>
-            	</exclusion>
-            	<exclusion>
-            		<artifactId>servlet-api-2.5</artifactId>
-            		<groupId>org.mortbay.jetty</groupId>
-            	</exclusion>
-            </exclusions>
-        </dependency>        
+        <!-- CollectionSpace dependencies -->        
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authorization.service</artifactId>
@@ -76,16 +95,110 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.common</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-            	<exclusion>
-            		<artifactId>servlet-api-2.5</artifactId>
-            		<groupId>org.mortbay.jetty</groupId>
-            	</exclusion>
-            </exclusions>
+			<groupId>org.collectionspace.services</groupId>
+        	<artifactId>org.collectionspace.services.authentication.service</artifactId>
+        	<version>${project.version}</version>
+        	<exclusions>
+				<exclusion>
+					<artifactId>servlet-api-2.5</artifactId>
+					<groupId>org.mortbay.jetty</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>spring-core</artifactId>
+					<groupId>org.springframework</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>spring-beans</artifactId>
+					<groupId>org.springframework</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jsp-api-2.1</artifactId>
+					<groupId>org.mortbay.jetty</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jsp-2.1</artifactId>
+					<groupId>org.mortbay.jetty</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jaxb-impl</artifactId>
+					<groupId>com.sun.xml.bind</groupId>
+				</exclusion>
+			</exclusions>
         </dependency>
+		<dependency>
+			<groupId>org.collectionspace.services</groupId>
+			<artifactId>org.collectionspace.services.common</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>servlet-api-2.5</artifactId>
+					<groupId>org.mortbay.jetty</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>spring-core</artifactId>
+					<groupId>org.springframework</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>spring-beans</artifactId>
+					<groupId>org.springframework</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jsf-api</artifactId>
+					<groupId>com.sun.faces</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jersey-server</artifactId>
+					<groupId>com.sun.jersey</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jersey-servlet</artifactId>
+					<groupId>com.sun.jersey</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jersey-core</artifactId>
+					<groupId>com.sun.jersey</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>lucene-sandbox</artifactId>
+					<groupId>org.apache.lucene</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>lucene-queries</artifactId>
+					<groupId>org.apache.lucene</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>lucene-core</artifactId>
+					<groupId>org.apache.lucene</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>lucene-queryparser</artifactId>
+					<groupId>org.apache.lucene</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>lucene-analyzers-common</artifactId>
+					<groupId>org.apache.lucene</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>nuxeo-automation-server</artifactId>
+					<groupId>org.nuxeo.ecm.automation</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>nuxeo-automation-io</artifactId>
+					<groupId>org.nuxeo.ecm.automation</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jsp-api-2.1</artifactId>
+					<groupId>org.mortbay.jetty</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jsp-2.1</artifactId>
+					<groupId>org.mortbay.jetty</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jaxb-impl</artifactId>
+					<groupId>com.sun.xml.bind</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>        
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.account.service</artifactId>
@@ -183,6 +296,16 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.structureddate.service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.systeminfo.service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>       
+            <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.media.service</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -208,6 +331,11 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.material.service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.concept.service</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -219,6 +347,16 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.movement.service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.propagation.service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.pottag.service</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -292,15 +430,17 @@
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
-            <artifactId>jaxrs-api</artifactId>
-        </dependency>        
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxb-provider</artifactId>
+            <exclusions>
+            	<exclusion>
+            		<artifactId>jaxb-impl</artifactId>
+            		<groupId>com.sun.xml.bind</groupId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -321,67 +461,131 @@
             <artifactId>spring-security-core</artifactId>
             <version>${spring.security.version}</version>
             <scope>provided</scope>
+            <exclusions>
+            	<exclusion>
+            		<artifactId>spring-core</artifactId>
+            		<groupId>org.springframework</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>spring-beans</artifactId>
+            		<groupId>org.springframework</groupId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-config</artifactId>
             <version>${spring.security.version}</version>
             <scope>provided</scope>
+            <exclusions>
+            	<exclusion>
+            		<artifactId>spring-core</artifactId>
+            		<groupId>org.springframework</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>spring-beans</artifactId>
+            		<groupId>org.springframework</groupId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
             <version>${spring.security.version}</version>
             <scope>provided</scope>
+            <exclusions>
+            	<exclusion>
+            		<artifactId>spring-core</artifactId>
+            		<groupId>org.springframework</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>spring-beans</artifactId>
+            		<groupId>org.springframework</groupId>
+            	</exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security.oauth</groupId>
+            <artifactId>spring-security-oauth2</artifactId>
+            <version>${spring.security.oauth2.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+            	<exclusion>
+            		<artifactId>spring-core</artifactId>
+            		<groupId>org.springframework</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>spring-beans</artifactId>
+            		<groupId>org.springframework</groupId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>${spring.version}</version>
             <scope>provided</scope>
+            <exclusions>
+            	<exclusion>
+            		<artifactId>spring-core</artifactId>
+            		<groupId>org.springframework</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>spring-beans</artifactId>
+            		<groupId>org.springframework</groupId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
             <version>${spring.version}</version>
             <scope>provided</scope>
+            <exclusions>
+            	<exclusion>
+            		<artifactId>spring-core</artifactId>
+            		<groupId>org.springframework</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>spring-beans</artifactId>
+            		<groupId>org.springframework</groupId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <version>${spring.version}</version>
             <scope>provided</scope>
+            <exclusions>
+            	<exclusion>
+            		<artifactId>spring-core</artifactId>
+            		<groupId>org.springframework</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>spring-beans</artifactId>
+            		<groupId>org.springframework</groupId>
+            	</exclusion>
+            </exclusions>
         </dependency>
-        <!--dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-acl</artifactId>
-            <version>${spring.security.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aop</artifactId>
-            <version>${spring.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>aopalliance</groupId>
-            <artifactId>aopalliance</artifactId>
-            <version>1.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-tx</artifactId>
-            <version>${spring.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache</artifactId>
-            <version>1.6.2</version>
-            <optional>true</optional>
-        </dependency-->
+        
+		<!-- AspectJ dependencies -->
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>${aspectj.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjtools</artifactId>
+			<version>${aspectj.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+			<version>${aspectj.version}</version>
+		</dependency>        
 
         <!-- javax -->
         <dependency>
@@ -402,17 +606,14 @@
         <dependency>
             <groupId>org.nuxeo.common</groupId>
             <artifactId>nuxeo-common</artifactId>
-            <version>${nuxeo.core.version}</version>
         </dependency>
         <dependency>
             <groupId>org.nuxeo.runtime</groupId>
             <artifactId>nuxeo-runtime</artifactId>
-			<version>${nuxeo.core.version}</version>            
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core</artifactId>
-			<version>${nuxeo.core.version}</version>
 			<exclusions>
                 <exclusion>
                     <groupId>xerces</groupId>
@@ -427,55 +628,34 @@
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-convert</artifactId>
-			<version>${nuxeo.core.version}</version>            
         </dependency>
         <dependency>
-            <groupId>org.nuxeo.ecm.core</groupId>
+            <groupId>org.nuxeo.lib.core</groupId>
             <artifactId>nuxeo-core-storage-sql-extensions</artifactId>
 			<version>${nuxeo.core.version}</version>            
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-storage-sql-ra</artifactId>
-			<version>${nuxeo.core.version}</version>            
-        </dependency>
-        <dependency>
-            <groupId>org.nuxeo.ecm.core</groupId>
-            <artifactId>nuxeo-core-client</artifactId>
-			<version>${nuxeo.core.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.jboss.jbossas</groupId>
-                    <artifactId>jboss-as-jbossas-remoting</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-query</artifactId>
-						<version>${nuxeo.core.version}</version>            
+			<version>${nuxeo.core.version}</version>            
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-schema</artifactId>
-						<version>${nuxeo.core.version}</version>            
         </dependency>
+        <!--
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-io</artifactId>
-			<version>${nuxeo.core.version}</version>            
         </dependency>
-<!--         
-        <dependency>
-		  <groupId>org.nuxeo.runtime</groupId>
-		  <artifactId>nuxeo-runtime-scripting</artifactId>
-		  <version>${nuxeo.core.version}</version>		  
-        </dependency>
- -->        
+         -->
         <dependency>
 			<groupId>org.nuxeo.runtime</groupId>
 			<artifactId>nuxeo-runtime-jtajca</artifactId>
-			<version>${nuxeo.core.version}</version>  
 			<!-- Until issue http://issues.collectionspace.org/browse/CSPACE-4639 is resolved, we
 				<version>5.5-NXP-8140</version>
 				need to use this patched Nuxeo artifact that is only available on our public Maven
@@ -499,7 +679,6 @@
         <dependency>
 			<groupId>org.nuxeo.runtime</groupId>
 			<artifactId>nuxeo-runtime-datasource</artifactId>
-			<version>${nuxeo.core.version}</version>
         </dependency>
         <dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
@@ -529,72 +708,26 @@
         </dependency>
         <dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
-			<artifactId>nuxeo-platform-imaging-preview</artifactId>
+			<artifactId>nuxeo-platform-audit-api</artifactId>
 			<version>${nuxeo.core.version}</version>
 			<exclusions>
 				<exclusion>
-					<artifactId>jboss-seam-pdf</artifactId>
-					<groupId>org.jboss.seam</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>jboss-seam-rss</artifactId>
-					<groupId>org.jboss.seam</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>jboss-seam-excel</artifactId>
-					<groupId>org.jboss.seam</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>nuxeo-platform-ui-web</artifactId>
-					<groupId>org.nuxeo.ecm.platform</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>xercesImpl</artifactId>
-					<groupId>xerces</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>servlet-api</artifactId>
-					<groupId>javax.servlet</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>oauth-httpclient3</artifactId>
-					<groupId>net.oauth.core</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>oauth-consumer</artifactId>
-					<groupId>net.oauth.core</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>oauth-provider</artifactId>
-					<groupId>net.oauth.core</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>oauth</artifactId>
-					<groupId>net.oauth.core</groupId>
-				</exclusion>
-				<!-- Exclude google-collections, because we have a dependency on guava (the newer, renamed google-collections) in the batch service, via org.gbif:name-parser -->
-				<exclusion>
-					<artifactId>google-collections</artifactId>
-					<groupId>com.google.collections</groupId>
+					<artifactId>jersey-client</artifactId>
+					<groupId>com.sun.jersey</groupId>
 				</exclusion>
 			</exclusions>
-        </dependency>
-        <dependency>
-			<groupId>org.nuxeo.ecm.platform</groupId>
-			<artifactId>nuxeo-platform-audit-api</artifactId>
-			<version>${nuxeo.core.version}</version>
         </dependency>
         <dependency>
             <groupId>org.nuxeo.runtime</groupId>
             <artifactId>nuxeo-runtime-osgi</artifactId>
 			<version>${nuxeo.core.version}</version>            
         </dependency>
+		
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
             <version>4.1.0</version>
         </dependency>
-
          <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
@@ -625,11 +758,13 @@
 		  <artifactId>qdox</artifactId>
 		  <version>1.6.1</version>
 		</dependency>
+		<!-- 
         <dependency>
 		  <groupId>apache-xerces</groupId>
 		  <artifactId>xml-apis</artifactId>
 		  <version>2.9.1</version>
         </dependency>
+        -->
         <dependency>
 		  <groupId>org.apache</groupId>
 		  <artifactId>xmlsec</artifactId>
@@ -644,6 +779,27 @@
 			<groupId>org.apache.ant</groupId>
 			<artifactId>ant</artifactId>
 			<version>1.7.0</version>
+        </dependency>
+        <dependency>
+        	<groupId>org.collectionspace.services</groupId>
+        	<artifactId>
+        		org.collectionspace.services.authority.service
+        	</artifactId>
+        	<version>${project.version}</version>
+        	<exclusions>
+        		<exclusion>
+        			<artifactId>nuxeo-core-facade</artifactId>
+        			<groupId>org.nuxeo.ecm.core</groupId>
+        		</exclusion>
+        		<exclusion>
+        			<artifactId>servlet-api-2.5</artifactId>
+        			<groupId>org.mortbay.jetty</groupId>
+        		</exclusion>
+        		<exclusion>
+        			<artifactId>jaxb-xjc</artifactId>
+        			<groupId>com.sun.xml.bind</groupId>
+        		</exclusion>
+        	</exclusions>
         </dependency>
     </dependencies>
 

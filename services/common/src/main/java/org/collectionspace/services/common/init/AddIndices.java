@@ -23,15 +23,15 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import javax.sql.DataSource;
-
+import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.config.service.InitHandler.Params.Field;
 import org.collectionspace.services.config.service.InitHandler.Params.Property;
+import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.config.service.ServiceBindingType;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,6 +82,11 @@ public class AddIndices extends InitHandler implements IInitHandler {
     final Logger logger = LoggerFactory.getLogger(AddIndices.class);
     private final static String INDEX_SEP = "_";
     private final static String INDEX_SUFFIX = INDEX_SEP + "idx";
+    private final static String SHORT_ID = AuthorityClient.SHORT_IDENTIFIER.toLowerCase();
+    private final static String IN_AUTHORITY = AuthorityClient.IN_AUTHORITY.toLowerCase();
+    
+    private final static String AUTHORITY_TYPE = ServiceBindingUtils.SERVICE_TYPE_AUTHORITY;
+    private final static String VOCABULARY_TYPE = ServiceBindingUtils.SERVICE_TYPE_VOCABULARY;
 
 
     /** See the class javadoc for this class: it shows the syntax supported in the configuration params.
@@ -94,13 +99,12 @@ public class AddIndices extends InitHandler implements IInitHandler {
     		List<Field> fields, 
     		List<Property> properties) throws Exception {
         //todo: all post-init tasks for services, or delegate to services that override.
-        int rows = 0;
-        String sql = "";
         if (logger.isInfoEnabled() && sbt != null) {
             logger.info("Creating indicies, as needed, for designated fields in " + sbt.getName()
                     + " for repository domain " + sbt.getRepositoryDomain().trim() + "...");
         }
 
+        int rows = 0;
         for (Field field : fields) {
             String tableName = field.getTable();
             String fieldName = field.getCol();
@@ -114,9 +118,216 @@ public class AddIndices extends InitHandler implements IInitHandler {
                 rows = addOneIndex(dataSourceName, repositoryName, cspaceInstanceId, tableName, fieldName);
             }
         }
+        
+        if (logger.isDebugEnabled()) {
+        	logger.debug(String.format("Rows indexed during repository initialization is %d.", rows));
+        }
+        
+        //
+        // Add a uniqueness constraint on the short ID field of authority and authority item tables
+        //
+        if (sbt != null && sbt.isRequiresUniqueShortId()) {
+        	ensureShortIdConstraintOnAuthority(dataSourceName,
+            		repositoryName,
+            		cspaceInstanceId,
+            		sbt);
+        }
+    }
+    
+    /**
+     * Checks to see if the uniqueness constraint already exists on this table.
+     * 
+     * @param dataSourceName
+     * @param repositoryName
+     * @param cspaceInstanceId
+     * @param tableName
+     * @return
+     * @throws Exception
+     */
+    private boolean shortIdConstraintExists(ServiceBindingType sbt,
+    		String dataSourceName,
+    		String repositoryName,
+    		String cspaceInstanceId,
+    		String tableName) throws Exception {
+    	boolean result = false;
+
+    	//
+		// e.g., SELECT constraint_name FROM information_schema.constraint_column_usage WHERE table_name = 'persons_common' AND constraint_name = 'persons_shortid_unique';
+    	//
+        String sql;
+    	DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType(dataSourceName, repositoryName);
+        if (databaseProductType == DatabaseProductType.POSTGRESQL) {
+        	String constraintName = String.format("%s_%s_unique", tableName, SHORT_ID);
+        	sql = String.format("SELECT constraint_name FROM information_schema.constraint_column_usage WHERE table_name = '%s' AND constraint_name = '%s'",
+        			tableName, constraintName);
+        } else {
+            String errorMsg = String.format("Database server type '%s' is not supported by CollectionSpace.  Could not create constraint on column '%s' of table '%s'.",
+            		databaseProductType.getName(), SHORT_ID, tableName);
+            logger.error(errorMsg);
+            throw new Exception(errorMsg);
+        }
+
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;        
+        try {
+            conn = JDBCTools.getConnection(dataSourceName, repositoryName, cspaceInstanceId);
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            if (rs.next()) {
+            	result = true;
+            }
+        } catch (Exception e) {
+            logger.error(String.format("Error when identifying whether constraint on column '%s' exists in table '%s': %s",
+            		SHORT_ID, tableName, e != null ? e : "Unknown error."));
+            throw e; // rethrow it.
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException sqle) {
+                logger.error("SQL Exception closing statement/connection in AddIndices: " + sqle.getLocalizedMessage());
+            }
+        }
+    	
+    	return result;
+    }
+    
+    private boolean createShortIdConstraint(ServiceBindingType sbt,
+    		String dataSourceName,
+    		String repositoryName,
+    		String cspaceInstanceId,
+    		String tableName) {
+    	boolean result = false;
+
+        String errorMsg = null;
+    	try {
+	        String sql;
+	    	DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType(dataSourceName, repositoryName);
+	        if (databaseProductType == DatabaseProductType.POSTGRESQL) {
+	        	String constraintName = String.format("%s_%s_unique", tableName, SHORT_ID);
+	        	//
+	        	// Check if we've got a parent or an item.  Parents need the constraint on the short id, but items
+	        	// have the constraint on the combined shortidentifier and inauthority (parent's CSID) columns
+	        	//
+	        	String serviceType = sbt.getType();
+	        	if (serviceType.equalsIgnoreCase(AUTHORITY_TYPE) || serviceType.equalsIgnoreCase(VOCABULARY_TYPE)) { 
+		        	sql = String.format("ALTER TABLE %s add CONSTRAINT %s UNIQUE (%s, %s)",		// constraint for an item
+		        			tableName, constraintName, SHORT_ID, IN_AUTHORITY);
+	        	} else {
+		        	sql = String.format("ALTER TABLE %s add CONSTRAINT %s UNIQUE (%s)",			// constraint for a parent
+		        			tableName, constraintName, SHORT_ID);     		
+	        	}
+	        } else {
+	            errorMsg = String.format("Database server type '%s' is not supported by CollectionSpace.  Could not create constraint on column '%s' of table '%s'.",
+	            		databaseProductType.getName(), SHORT_ID, tableName);
+	            throw new Exception(errorMsg);
+	        }
+	
+	    	//
+			// e.g., ALTER TABLE persons_common add CONSTRAINT persons_shortid_unique UNIQUE (shortidentifier);
+	    	//
+	        
+	        try {
+	        	int rowsCreated = JDBCTools.executeUpdate(dataSourceName, repositoryName, cspaceInstanceId, sql); // This should return '0' since ALTER statements don't return row counts
+	        	if (rowsCreated != 0) {
+	        		throw new Exception(String.format("No rows created on SQL update: %s", sql));
+	        	} else {
+	        		result = true;
+	        	}
+	        } catch (SQLException sqle) {
+	        	 String errorState = sqle.getSQLState();
+	        	 if (errorState != null && errorState.equals(JDBCTools.POSTGRES_UNIQUE_VIOLATION)) {
+	        		 errorMsg = String.format("*** WARNING *** - The value of the '%s' column in the '%s' table of the '%s' repository should be unique, but is not!  Therefore, "
+	         		 		+ "we cannot create the NECESSARY database constraint.  Please remove the duplicate '%s' value(s) and restart CollectionSpace.",
+	         		 		SHORT_ID, tableName, repositoryName, SHORT_ID);
+	        	 } else {
+	        		 errorMsg = String.format("Unexpected %s error=%s : %s", databaseProductType.getName(), errorState, sqle.getLocalizedMessage());
+	        	 }
+	        } catch (Exception e) {
+	        	errorMsg = e.getLocalizedMessage();
+	        }
+    	} catch (Exception e) {
+        	errorMsg = e.getLocalizedMessage();
+    	}
+        //
+    	// If we failed to create the constraint, log the reason.
+    	//
+        if (result == false) {
+        	if (errorMsg != null) {
+        		logger.error(errorMsg);
+        	}
+            logger.error(String.format("*** ERROR *** Encountered problems when trying to create a uniqueness constraint on column '%s' of table '%s' in repository '%s'.", 
+            		SHORT_ID, tableName, repositoryName));
+        } else {
+        	logger.debug(String.format("Created a uniqueness constraint on column '%s' of table '%s' in repository '%s'.", 
+            		SHORT_ID, tableName, repositoryName));
+        }
+    	
+    	return result;
+    }    
+    
+    /**
+     * 
+     * Ensure a database level uniqueness constraint exists on the "shortIdentifier" column of this service's common part table.
+     * 
+     * @param dataSourceName
+     * @param repositoryName
+     * @param cspaceInstanceId
+     * @param sbt
+     * @throws Exception 
+     */
+    private void ensureShortIdConstraintOnAuthority(String dataSourceName,
+    		String repositoryName,
+    		String cspaceInstanceId,
+    		ServiceBindingType sbt) {
+    	String tableName = null;
+    	String errMessage = null;
+    	
+        try {
+	    	//
+	    	// Find the common part table name for this service.  It's the one with the short ID column
+	    	//
+	        List<ObjectPartType> objectPartTypes = sbt.getObject().getPart();
+	        for (ObjectPartType objectPartType : objectPartTypes) {
+	        	if (objectPartType.getId().equalsIgnoreCase(ServiceBindingUtils.SERVICE_COMMONPART_ID) == true) {
+	        		tableName = objectPartType.getLabel();
+	        		break;
+	        	}
+	        }
+	        
+	        //
+	        // Get an error message ready in case we hit trouble.
+	        //
+	        errMessage = String.format("*** IMPORTANT *** - Encountered problems trying to ensure a uniqueness constraint exists for the '%s' column of table '%s' in repository '%s'.  Check the CollectionSpace services logs for details.",
+	    			SHORT_ID, tableName, repositoryName);
+	        //
+	        // If the constraint doesn't exist, create it.
+	        //
+	        if (shortIdConstraintExists(sbt, dataSourceName, repositoryName, cspaceInstanceId, tableName) == false) {
+	        	if (createShortIdConstraint(sbt, dataSourceName, repositoryName, cspaceInstanceId, tableName) == true) {
+	        		logger.info(String.format("Created uniqueness constraint on '%s' column of table '%s' in repository '%s'.",
+			    			SHORT_ID, tableName, repositoryName));	        	
+	        	} else {
+	        		logger.error(errMessage);
+	        	}
+	        } else {
+        		logger.trace(String.format("Uniqueness constraint already exists on '%s' column of table '%s' in repository '%s'.",
+		    			SHORT_ID, tableName, repositoryName));	        	
+	        }
+        } catch (Exception e) {
+        	logger.error(errMessage);
+        }
     }
 
-    private int addOneIndex(String dataSourceName,
+	private int addOneIndex(String dataSourceName,
     		String repositoryName,
     		String cspaceInstanceId,
     		String tableName, 

@@ -23,147 +23,77 @@
  */
 package org.collectionspace.authentication;
 
-import java.security.Principal;
-import java.security.acl.Group;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
- * A CSpace Principal representing a tenant
- * A class derived (in principle) from JBoss SimpleGroup and SimplePrincipal
- * @author 
+ * A CollectionSpace tenant.
  */
-public class CSpaceTenant implements Group, Cloneable {
-
-    /** The serialVersionUID */
-    private static final long serialVersionUID = 1L;
-    private String name;
-    private String id;
-    private HashMap<Principal, Principal> members = new HashMap<Principal, Principal>();
-
-    public CSpaceTenant(String name, String id) {
-        if(name == null || id == null) {
-            String msg = "CSpaceTenant: invalid argument(s), can't be null" +
-                    "name=" + name + " id=" + id;
-            throw new IllegalArgumentException(msg);
-        }
-        this.name = name;
-        this.id = id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    /** 
-     * Adds the specified member to the tenant.
-     * @param user the principal to add to this tenant.
-     * @return true if the member was successfully added,
-     * false if the principal was already a member.
-     */
-    @Override
-    public boolean addMember(Principal user) {
-        boolean isMember = members.containsKey(user);
-        if (isMember == false) {
-            members.put(user, user);
-        }
-        return isMember == false;
-    }
-
-    /** 
-     * isMember returns true if the passed principal is a member of the tenant.
-     * This method does a recursive search, so if a principal belongs to a
-     * tenant which is a member of this tenant, true is returned.
-     * @param member the principal whose membership is to be checked.
-     * @return true if the principal is a member of this tenant, false otherwise.
-     */
-    @Override
-    public boolean isMember(Principal member) {
-        // First see if there is a key with the member name
-        boolean isMember = members.containsKey(member);
-        if (isMember == false) {   // Check any tenants for membership
-            Collection values = members.values();
-            Iterator iter = values.iterator();
-            while (isMember == false && iter.hasNext()) {
-                Object next = iter.next();
-                if (next instanceof Group) {
-                    Group tenant = (Group) next;
-                    isMember = tenant.isMember(member);
-                }
-            }
-        }
-        return isMember;
-    }
-
-    /** 
-     * members returns an enumeration of the members in the tenant.
-     * The returned objects can be instances of either Principal
-     * or Group (which is a subinterface of Principal).
-     * @return an enumeration of the tenant members.
-     */
-    @Override
-    public Enumeration members() {
-        return Collections.enumeration(members.values());
-    }
-
-    /** 
-     * removeMember removes the specified member from the tenant.
-     * @param user the principal to remove from this tenant.
-     * @return true if the principal was removed, or
-     * false if the principal was not a member.
-     */
-    @Override
-    public boolean removeMember(Principal user) {
-        Object prev = members.remove(user);
-        return prev != null;
-    }
+public class CSpaceTenant {
+    private final String id;
+    private final String name;
 
     /**
-     * Compare this tenant against another tenant
-     * @return true if name equals another.getName();
+     * Creates a CSpaceTenant with a given id and name.
+     * 
+     * @param id the tenant id, e.g. "1"
+     * @param name the tenant name, e.g. "core.collectionspace.org"
      */
-    @Override
-    public boolean equals(Object another) {
-        if (!(another instanceof CSpaceTenant)) {
-            return false;
-        }
-        String anotherName = ((CSpaceTenant) another).getName();
-        String anotherId = ((CSpaceTenant) another).getId();
-        return name.equals(anotherName) && id.equals(anotherId);
+    public CSpaceTenant(String id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
     @Override
     public int hashCode() {
-        return (name + id).hashCode();
+        // The tenant id uniquely identifies the tenant,
+        // regardless of other properties. CSpaceTenants
+        // with the same id should hash identically.
+        
+        return new HashCodeBuilder(83, 61)
+            .append(id)
+            .build();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        // The tenant id uniquely identifies the tenant,
+        // regardless of other properties. CSpaceTenants
+        // with the same id should be equal.
+
+        if (obj == null) {
+            return false;
+        }
+        
+        if (obj == this) {
+            return true;
+        }
+        
+        if (obj.getClass() != getClass()) {
+          return false;
+        }
+        
+        CSpaceTenant rhs = (CSpaceTenant) obj;
+        
+        return new EqualsBuilder()
+           .append(id, rhs.getId())
+           .isEquals();
     }
 
     @Override
     public String toString() {
-        StringBuffer tmp = new StringBuffer(getName());
-        tmp.append("(members:");
-        Iterator iter = members.keySet().iterator();
-        while (iter.hasNext()) {
-            tmp.append(iter.next());
-            tmp.append(',');
-        }
-        tmp.setCharAt(tmp.length() - 1, ')');
-        return tmp.toString();
+        return new ToStringBuilder(this).
+            append("id", id).
+            append("name", name).
+            toString();
+    }
+    
+    public String getId() {
+        return id;
     }
 
-    @Override
-    public synchronized Object clone() throws CloneNotSupportedException {
-        CSpaceTenant clone = (CSpaceTenant) super.clone();
-        if (clone != null) {
-            clone.members = (HashMap) this.members.clone();
-        }
-        return clone;
+    public String getName() {
+        return name;
     }
 }

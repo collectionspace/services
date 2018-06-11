@@ -34,10 +34,14 @@ import java.util.regex.Pattern;
 
 //import org.nuxeo.ecm.core.client.NuxeoClient;
 
+
+
+
 import org.collectionspace.services.jaxb.InvocableJAXBSchema;
 //import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
 //import org.collectionspace.services.nuxeo.client.java.NxConnect;
 
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.common.invocable.InvocableUtils;
 import org.collectionspace.services.common.storage.DatabaseProductType;
@@ -64,6 +68,9 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	private static Pattern kwdSearchProblemChars = Pattern.compile("[\\:\\(\\)\\*\\%\\.]");
 	private static Pattern kwdSearchHyphen = Pattern.compile(" - ");
 	private static Pattern advSearchSqlWildcard = Pattern.compile(".*?[I]*LIKE\\s*\\\"\\%\\\".*?");
+	// Base Nuxeo document type for all CollectionSpace documents/resources
+	public static String COLLECTIONSPACE_DOCUMENT_TYPE = "CollectionSpaceDocument";
+	public static final String NUXEO_DOCUMENT_TYPE = "Document";
 
 
 	private static String getLikeForm(String dataSourceName, String repositoryName, String cspaceInstanceId) {
@@ -352,6 +359,16 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
     		filterClause.append(')');  
     	}
     	return filterClause.toString();
+	}
+
+	@Override
+	public String createWhereClauseFromCsid(String csid) {
+		String trimmed = (csid == null) ? "" : csid.trim();
+		if (trimmed.isEmpty()) {
+			throw new RuntimeException("No CSID specified.");
+		}
+
+		return NuxeoUtils.getByNameWhereClause(csid);
 	}
 
 }

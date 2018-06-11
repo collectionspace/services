@@ -43,7 +43,7 @@
     <target name="package-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="package" />
             <arg value="-Dmaven.test.skip=true" />
             <arg value="-f" />
@@ -68,7 +68,7 @@
     <target name="install-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="install" />
             <arg value="-Dmaven.test.skip=true" />
             <arg value="-f" />
@@ -91,7 +91,7 @@
     <target name="clean-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="clean" />
             <arg value="${mvn.opts}" />
         </exec>
@@ -107,7 +107,7 @@
     <target name="test-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn" />
             <arg value="test" />
             <arg value="${mvn.opts}" />
         </exec>
@@ -117,21 +117,27 @@
             description="deploy nuxeo server libs to ${jee.server.cspace}">
         <ant antfile="updateobjectlocationonmove/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="updaterelationsondelete/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="updateimagederivatives/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="naturalhistory/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="botgarden/build.xml" target="deploy" inheritall="false"/>        
     </target>
 
     <target name="undeploy"
             description="undeploy nuxeo server libs from ${jee.server.cspace}">
         <ant antfile="updateobjectlocationonmove/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="updaterelationsondelete/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="updateimagederivatives/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="naturalhistory/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="botgarden/build.xml" target="undeploy" inheritall="false"/>        
     </target>
 
     <target name="dist"
             description="generate distribution for nuxeo server libs" depends="package">
         <ant antfile="updateobjectlocationonmove/build.xml" target="dist" inheritall="false"/>
         <ant antfile="updaterelationsondelete/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="updateimagederivatives/build.xml" target="dist" inheritall="false"/>
         <ant antfile="naturalhistory/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="botgarden/build.xml" target="dist" inheritall="false"/>        
     </target>
 
 </project>

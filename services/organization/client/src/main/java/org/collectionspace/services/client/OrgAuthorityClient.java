@@ -24,17 +24,19 @@
 package org.collectionspace.services.client;
 
 import org.collectionspace.services.organization.OrganizationsCommon;
+import org.collectionspace.services.organization.OrgauthoritiesCommon;
 
 /**
  * The Class OrgAuthorityClient.
  */
-public class OrgAuthorityClient extends AuthorityWithContactsClientImpl<OrganizationsCommon, OrgAuthorityProxy> {
+public class OrgAuthorityClient extends AuthorityWithContactsClientImpl<OrgauthoritiesCommon, OrganizationsCommon, OrgAuthorityProxy> {
 
     public static final String SERVICE_NAME = "orgauthorities";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
     public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
     public static final String TERM_INFO_GROUP_XPATH_BASE = "orgTermGroupList";
+    
     //
     // Subitem constants
     //
@@ -48,6 +50,21 @@ public class OrgAuthorityClient extends AuthorityWithContactsClientImpl<Organiza
     public static final String SERVICE_ITEM_COMMON_PART_NAME = SERVICE_ITEM_NAME
             + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
 
+    //
+    // Constructors
+    //
+    public OrgAuthorityClient() throws Exception {
+    	super();
+    }
+    
+    public OrgAuthorityClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
+    
+    //
+    // Overrides
+    //
+    
     @Override
     public String getServiceName() {
         return SERVICE_NAME;
@@ -77,4 +94,16 @@ public class OrgAuthorityClient extends AuthorityWithContactsClientImpl<Organiza
     public void setInAuthority(OrganizationsCommon item, String inAuthorityCsid) {
         item.setInAuthority(inAuthorityCsid);
     }
+
+	@Override
+	public String createAuthorityInstance(String shortIdentifier, String displayName) {
+		PoxPayloadOut poxPayloadout = OrgAuthorityClientUtils.createOrgAuthorityInstance(displayName, shortIdentifier, SERVICE_COMMON_PART_NAME);
+		return poxPayloadout.asXML();
+	}
+
+	@Override
+	public String createAuthorityItemInstance(String shortIdentifier, String displayName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

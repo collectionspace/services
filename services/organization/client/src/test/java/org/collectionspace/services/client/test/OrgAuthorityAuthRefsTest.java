@@ -43,13 +43,9 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.organization.OrganizationsCommon;
 import org.collectionspace.services.organization.OrgTermGroup;
 import org.collectionspace.services.person.PersonTermGroup;
-
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +63,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     // Instance variables specific to this test.
-    final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
+    final String PERSON_AUTHORITY_NAME = "TestPersonAuthForOrgTest";
     final String ORG_AUTHORITY_NAME = "TestOrgAuth";
     
 	@Override
@@ -115,12 +111,16 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
     
-    /* (non-Javadoc)
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+	}
+
+	/* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getCommonList(
-			ClientResponse<AbstractCommonList> response) {
+	protected AbstractCommonList getCommonList(Response response) {
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
@@ -148,7 +148,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
             			displayName, shortId, orgAuthClient.getCommonPartName());
 
         // Submit the request to the service and store the response.
-        ClientResponse<Response> res = orgAuthClient.create(multipart);
+        Response res = orgAuthClient.create(multipart);
         try {
 	        int statusCode = res.getStatus();
 	        // Check the status code of the response: does it match
@@ -168,11 +168,11 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
 	        // so they can be deleted after tests have been run.
 	        String newId = extractId(res);
 	        if (knownResourceId == null){
-	        	setKnownResource( newId, null ); //baseRefName );
+	        	setKnownResource(newId, null ); //baseRefName );
 	        }
 	        allResourceIdsCreated.add(newId);
         } finally {
-            res.releaseConnection();
+            res.close();
         }        
 
         // Create all the person refs and entities
@@ -209,15 +209,16 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
     
     /**
      * Creates the person refs.
+     * @throws Exception 
      */
-    protected void createPersonRefs() {
+    protected void createPersonRefs() throws Exception {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding
         // refName by which it can be identified.
     	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         
-    	ClientResponse<Response> res = personAuthClient.create(multipart);
+    	Response res = personAuthClient.create(multipart);
         try {
             int statusCode = res.getStatus();
             Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
@@ -225,20 +226,20 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
             Assert.assertEquals(statusCode, STATUS_CREATED);
             personAuthCSID = extractId(res);
         } finally {
-            res.releaseConnection();
+            res.close();
         }
 
         //String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
         
         // Create temporary Person resources, and their corresponding refNames
         // by which they can be identified.
-       	String csid = createPerson(personAuthCSID, "Charlie", "Orgcontact", "charlieOrgcontact", null ); // authRefName);
+       	String csid = createPerson(personAuthCSID, "Charlie", "Orgcontact", "charlieOrgcontact" + System.currentTimeMillis(), null ); // authRefName);
         personIdsCreated.add(csid);
         organizationContactPersonRefName1 = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
 
         // Create temporary Person resources, and their corresponding refNames
         // by which they can be identified.
-       	csid = createPerson(personAuthCSID, "Chelsie", "Contact", "chelsieContact", null ); // authRefName);
+       	csid = createPerson(personAuthCSID, "Chelsie", "Contact", "chelsieContact" + System.currentTimeMillis(), null ); // authRefName);
         personIdsCreated.add(csid);
         organizationContactPersonRefName2 = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
     }
@@ -251,8 +252,9 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
      * @param shortId
      * @param authRefName
      * @return the string
+     * @throws Exception 
      */
-    protected String createPerson(String personAuthCSID, String firstName, String surName, String shortId, String authRefName ) {
+    protected String createPerson(String personAuthCSID, String firstName, String surName, String shortId, String authRefName ) throws Exception {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
@@ -269,7 +271,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
     	    		null, personInfo, personTerms, personAuthClient.getItemCommonPartName());
         
     	String result = null;
-    	ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
+    	Response res = personAuthClient.createItem(personAuthCSID, multipart);
     	try {
 	        int statusCode = res.getStatus();
 	
@@ -278,7 +280,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
 	        Assert.assertEquals(statusCode, STATUS_CREATED);
 	    	result = extractId(res);
     	} finally {
-    		res.releaseConnection();
+    		res.close();
     	}
     	
     	return result;
@@ -299,11 +301,11 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
-        ClientResponse<String> res = orgAuthClient.readItem(knownResourceId, knownItemResourceId);
+        Response res = orgAuthClient.readItem(knownResourceId, knownItemResourceId);
         OrganizationsCommon organization = null;
         try {
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        organization = (OrganizationsCommon) extractPart(input,
 	            orgAuthClient.getItemCommonPartName(), OrganizationsCommon.class);
 	        Assert.assertNotNull(organization);
@@ -312,9 +314,10 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
 	        }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
+        
         // Check one or more of the authority fields in the Organization item
         Assert.assertEquals(organization.getContactNames().getContactName().get(0),
                 organizationContactPersonRefName1);
@@ -325,15 +328,14 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
         // Get the auth refs and check them
         // FIXME - need to create this method in the client
         // and get the ID for the organization item
-        ClientResponse<AuthorityRefList> res2 =
-           orgAuthClient.getItemAuthorityRefs(knownResourceId, knownItemResourceId);
+        Response res2 = orgAuthClient.getItemAuthorityRefs(knownResourceId, knownItemResourceId);
         AuthorityRefList list = null;
         try {
 	        assertStatusCode(res2, testName);
-	        list = res2.getEntity();
+	        list = res2.readEntity(AuthorityRefList.class);
         } finally {
         	if (res2 != null) {
-        		res2.releaseConnection();
+        		res2.close();
             }
         }
         
@@ -375,31 +377,22 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
-    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+    	if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Skipping Cleanup phase ...");
             }
             return;
     	}
+    	
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-        // Delete Person resource(s) (before PersonAuthority resources).
-        for (String resourceId : personIdsCreated) {
-            // Note: Any non-success responses are ignored and not reported.
-            personAuthClient.deleteItem(personAuthCSID, resourceId).releaseConnection();
-        }
-        // Delete PersonAuthority resource(s).
-        // Note: Any non-success response is ignored and not reported.
-        if(personAuthCSID!=null) {
-        	personAuthClient.delete(personAuthCSID).releaseConnection();
-        }
-        
+                
         String parentResourceId;
         String itemResourceId;
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -409,14 +402,32 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
             parentResourceId = entry.getValue();
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            client.deleteItem(parentResourceId, itemResourceId).releaseConnection();
+            client.deleteItem(parentResourceId, itemResourceId).close();
         }
+        
+        //
+        // Delete the person authority items we created for the authRefs.  Note
+        // that we needed to delete the objects/records referencing these authority items first since
+        // we can't delete authority items that still have records referencing them
+        //
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        // Delete Person resource(s) (before PersonAuthority resources).
+        for (String resourceId : personIdsCreated) {
+            // Note: Any non-success responses are ignored and not reported.
+            personAuthClient.deleteItem(personAuthCSID, resourceId).close();
+        }
+        
+        // Delete PersonAuthority resource(s).
+        // Note: Any non-success response is ignored and not reported.
+        if (personAuthCSID != null) {
+        	personAuthClient.delete(personAuthCSID).close();
+        }        
         
         // Clean up parent resources.
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            client.delete(resourceId).releaseConnection();
+            client.delete(resourceId).close();
         }
     }
 }

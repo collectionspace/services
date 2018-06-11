@@ -36,5 +36,6 @@ public interface DocumentWrapper<T> {
      * @return wrapped object
      */
     public T getWrappedObject();
+    public T resetWrapperObject(T newObject);
 
 }

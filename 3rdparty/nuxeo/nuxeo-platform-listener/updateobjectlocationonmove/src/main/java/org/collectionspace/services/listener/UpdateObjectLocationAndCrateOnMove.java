@@ -20,14 +20,16 @@ public class UpdateObjectLocationAndCrateOnMove extends UpdateObjectLocationOnMo
     private final static String COMPUTED_CRATE_PROPERTY = "computedCrate";
 
     @Override
-    protected DocumentModel updateCollectionObjectValuesFromMovement(DocumentModel collectionObjectDocModel,
-            DocumentModel movementDocModel) throws ClientException {
-        collectionObjectDocModel = updateComputedCurrentLocationValue(collectionObjectDocModel, movementDocModel);
+    protected boolean updateCollectionObjectLocation(DocumentModel collectionObjectDocModel,
+            DocumentModel movementDocModel,
+            String mostRecentLocation) throws ClientException {
+        boolean flag = super.updateCollectionObjectLocation(collectionObjectDocModel, movementDocModel, mostRecentLocation);
         collectionObjectDocModel = updateComputedCrateValue(collectionObjectDocModel, movementDocModel);
-        return collectionObjectDocModel;
+        
+        return flag;
     }
 
-    protected DocumentModel updateComputedCrateValue(DocumentModel collectionObjectDocModel,
+    private DocumentModel updateComputedCrateValue(DocumentModel collectionObjectDocModel,
             DocumentModel movementDocModel)
             throws ClientException {
         

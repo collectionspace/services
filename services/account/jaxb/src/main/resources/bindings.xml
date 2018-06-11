@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<jxb:bindings version="1.0"
+    xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:namespace="http://jaxb2-commons.dev.java.net/namespace-prefix"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd
+    http://jaxb2-commons.dev.java.net/namespace-prefix https://raw.githubusercontent.com/Siggen/jaxb2-namespace-prefix/master/src/main/resources/prefix-namespace-schema.xsd">
+
+    <jxb:bindings schemaLocation="accounts_common.xsd">
+        <jxb:bindings>
+            <namespace:prefix name="act" />
+            <!-- Additional @XmlNs prefix declarations to take effect for this schema/package -->
+            <namespace:prefix name="xsi" namespaceURI="http://www.w3.org/2001/XMLSchema-instance" />
+        </jxb:bindings>
+    </jxb:bindings>
+
+</jxb:bindings>

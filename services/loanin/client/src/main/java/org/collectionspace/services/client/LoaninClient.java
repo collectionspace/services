@@ -16,6 +16,8 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.loanin.LoansinCommon;
+
 /**
  * LoaninClient.java
  *
@@ -23,7 +25,7 @@ package org.collectionspace.services.client;
  * $LastChangedDate$
  *
  */
-public class LoaninClient extends AbstractCommonListPoxServiceClientImpl<LoaninProxy> {
+public class LoaninClient extends AbstractCommonListPoxServiceClientImpl<LoaninProxy, LoansinCommon> {
 
     public static final String SERVICE_NAME = "loansin";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
@@ -31,7 +33,15 @@ public class LoaninClient extends AbstractCommonListPoxServiceClientImpl<LoaninP
     public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    /* (non-Javadoc)
+    public LoaninClient() throws Exception {
+		super();
+	}
+
+    public LoaninClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
+
+	/* (non-Javadoc)
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
      */
     @Override

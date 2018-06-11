@@ -41,11 +41,12 @@
 						 <xs:element name="authority-ref-item" maxOccurs="unbounded">
 							<xs:complexType>
 								<xs:sequence>
-									<xs:element name="sourceField"     type="xs:string" minOccurs="1" />
-									<xs:element name="refName"         type="xs:string" minOccurs="1" />
-									<xs:element name="authDisplayName" type="xs:string" minOccurs="1" />
-									<xs:element name="itemDisplayName" type="xs:string" minOccurs="1" />
-									<xs:element name="uri"             type="xs:anyURI" minOccurs="1" />
+									<xs:element name="csid"				type="xs:string" minOccurs="1" />
+									<xs:element name="sourceField"      type="xs:string" minOccurs="1" />
+									<xs:element name="refName"          type="xs:string" minOccurs="1" />
+									<xs:element name="authDisplayName"  type="xs:string" minOccurs="1" />
+									<xs:element name="itemDisplayName"  type="xs:string" minOccurs="1" />
+									<xs:element name="uri"              type="xs:anyURI" minOccurs="1" />
 								</xs:sequence>
 							</xs:complexType>
 						</xs:element>

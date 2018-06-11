@@ -1,6 +1,5 @@
 package org.collectionspace.services.client;
 
-import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 
 import javax.ws.rs.Consumes;
@@ -24,21 +23,21 @@ public interface MediaProxy extends CollectionSpaceCommonListPoxProxy {
     @POST
     @Path("{csid}")
     @Consumes("multipart/form-data")
-    ClientResponse<Response> createBlobFromFormData(@PathParam("csid") String csid,
+    Response createBlobFromFormData(@PathParam("csid") String csid,
     		MultipartFormDataOutput formDataOutput);
             
     @POST
     @Path("{csid}")
 	@Produces("application/xml")
 	@Consumes("application/xml")
-    ClientResponse<Response>createBlobFromUri(@PathParam("csid") String csid,
+    Response createBlobFromUri(@PathParam("csid") String csid,
     		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri,
     		String emptyXML); //this "emptyXML" param is needed to force RESTEasy to produce a Content-Type header for this POST    
 
     @POST
 	@Produces("application/xml")
 	@Consumes("application/xml")
-    ClientResponse<Response>createMediaAndBlobWithUri(byte[] xmlPayload,
+    Response createMediaAndBlobWithUri(byte[] xmlPayload,
     		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri,
     		@QueryParam(BlobClient.BLOB_PURGE_ORIGINAL) boolean purgeOriginal);    
 }

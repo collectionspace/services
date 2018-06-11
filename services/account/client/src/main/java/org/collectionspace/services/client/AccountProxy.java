@@ -38,7 +38,6 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
-import org.jboss.resteasy.client.ClientResponse;
 
 /**
  * @version $Revision:$
@@ -50,23 +49,23 @@ public interface AccountProxy extends CollectionSpaceProxy<AccountsCommonList> {
 
     @GET
     @Produces({"application/xml"})
-    ClientResponse<AccountsCommonList> readList();
+    Response readList();
 
     @GET
     @Produces({"application/xml"})
-    ClientResponse<AccountsCommonList> readSearchList(@QueryParam("sn") String screenName, @QueryParam("uid") String uid, @QueryParam("email") String email);
+    Response readSearchList(@QueryParam("sn") String screenName, @QueryParam("uid") String uid, @QueryParam("email") String email);
 
     //(C)reate
     @POST
-    ClientResponse<Response> create(AccountsCommon multipart);
+    Response create(AccountsCommon multipart);
 
     //(R)ead
     @GET
     @Path("/{csid}")
-    ClientResponse<AccountsCommon> read(@PathParam("csid") String csid);
+    Response read(@PathParam("csid") String csid);
 
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<AccountsCommon> update(@PathParam("csid") String csid, AccountsCommon multipart);    
+    Response update(@PathParam("csid") String csid, AccountsCommon multipart);    
 }

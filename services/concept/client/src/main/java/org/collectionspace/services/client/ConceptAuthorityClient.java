@@ -23,12 +23,13 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.concept.ConceptauthoritiesCommon;
 import org.collectionspace.services.concept.ConceptsCommon;
 
 /**
  * The Class ConceptAuthorityClient.
  */
-public class ConceptAuthorityClient extends AuthorityClientImpl<ConceptsCommon, ConceptAuthorityProxy> {
+public class ConceptAuthorityClient extends AuthorityClientImpl<ConceptauthoritiesCommon, ConceptsCommon, ConceptAuthorityProxy> {
 
     public static final String SERVICE_NAME = "conceptauthorities";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
@@ -48,6 +49,17 @@ public class ConceptAuthorityClient extends AuthorityClientImpl<ConceptsCommon, 
     public static final String SERVICE_ITEM_COMMON_PART_NAME = SERVICE_ITEM_NAME
             + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
 
+    //
+    // Constructors
+    //
+    public ConceptAuthorityClient() throws Exception {
+    	super();
+    }
+    
+    public ConceptAuthorityClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
+    
     @Override
     public String getServiceName() {
         return SERVICE_NAME;
@@ -77,4 +89,16 @@ public class ConceptAuthorityClient extends AuthorityClientImpl<ConceptsCommon, 
     public void setInAuthority(ConceptsCommon item, String inAuthorityCsid) {
         item.setInAuthority(inAuthorityCsid);
     }
+
+	@Override
+	public String createAuthorityInstance(String shortIdentifier, String displayName) {
+		PoxPayloadOut poxPayloadout = ConceptAuthorityClientUtils.createConceptAuthorityInstance(displayName, shortIdentifier, SERVICE_COMMON_PART_NAME);
+		return poxPayloadout.asXML();
+	}
+
+	@Override
+	public String createAuthorityItemInstance(String shortIdentifier, String displayName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

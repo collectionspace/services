@@ -24,11 +24,18 @@
 
 package org.collectionspace.services.authorization.storage;
 
+import java.util.List;
+
+import javax.xml.bind.JAXBElement;
+
 import org.collectionspace.services.authorization.perms.Permission;
+import org.collectionspace.services.authorization.perms.PermissionAction;
+import org.collectionspace.services.client.PermissionClient;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.InvalidDocumentException;
+import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.document.ValidatorHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,12 +44,12 @@ import org.slf4j.LoggerFactory;
  * PermissionValidatorHandler executes validation rules for permission
  * @author 
  */
-public class PermissionValidatorHandler implements ValidatorHandler {
+public class PermissionValidatorHandler implements ValidatorHandler<Permission, Permission> {
 
     final Logger logger = LoggerFactory.getLogger(PermissionValidatorHandler.class);
 
     @Override
-    public void validate(Action action, ServiceContext ctx)
+    public void validate(Action action, ServiceContext<Permission, Permission> ctx)
             throws InvalidDocumentException {
         if (logger.isDebugEnabled()) {
             logger.debug("validate() action=" + action.name());
@@ -53,19 +60,29 @@ public class PermissionValidatorHandler implements ValidatorHandler {
             boolean invalid = false;
 
             if (action.equals(Action.CREATE)) {
-
-                //create specific validation here
                 if (permission.getResourceName() == null || permission.getResourceName().isEmpty()) {
                     invalid = true;
-                    msgBldr.append("\nresourceName : missing or empty");
+                    msgBldr.append("\nThe resource name for creating a new permission resource is missing or empty.");
                 }
+            	if (validateActionFields(action, permission) == false) {
+                	invalid = true;
+                    msgBldr.append("\nAction info is missing or inconsistent.");
+                }
+            	if (permission.getEffect() == null) {
+            		invalid = true;
+                    msgBldr.append("\n'effect' elment is missing from the payload or is not set to either PERMIT or DENY.");
+            	}
             } else if (action.equals(Action.UPDATE)) {
-                //update specific validation here
                 if (permission.getResourceName() == null || permission.getResourceName().isEmpty()) {
                     invalid = true;
-                    msgBldr.append("\nresourceName : cannot be missing or empty");
+                    msgBldr.append("\nThe resource name for updating an existing permission is missing or empty.");
                 }
+            	if (validateActionFields(action, permission) == false) {
+                	invalid = true;
+                    msgBldr.append("\nAction info is missing or inconsistent.");
+                }                
             }
+            
             if (invalid) {
                 String msg = msgBldr.toString();
                 logger.error(msg);
@@ -77,5 +94,39 @@ public class PermissionValidatorHandler implements ValidatorHandler {
             throw new InvalidDocumentException(e);
         }
     }
+
+	private boolean validateActionFields(Action action, Permission permission) {
+		boolean result = true;
+		
+		List<PermissionAction> permActionList = permission.getAction();
+		boolean isPermActionListSet = (permActionList != null && permActionList.size() > 0);
+		
+		String permActionGroup = permission.getActionGroup();
+		boolean isPermActionGroupSet = (permActionGroup != null && !permActionGroup.trim().isEmpty());
+		
+		if (isPermActionListSet && isPermActionGroupSet) {
+			// the two action fields need to match
+			String derivedActionGroup = PermissionClient.getActionGroup(permActionList);
+			result = derivedActionGroup.equalsIgnoreCase(permActionGroup);
+		} else if (isPermActionListSet && !isPermActionGroupSet) {
+			// if Action list field is set but actionGroup field is not set then set the actionGroup by deriving it from the Action list
+			permission.setActionGroup(PermissionClient.getActionGroup(permActionList));
+		} else if (!isPermActionListSet && isPermActionGroupSet) {
+			// if the action list field is not set, but the action group is set then set the action actionL
+			permission.setAction(PermissionClient.getActionList(permActionGroup));
+		} else {
+			if (action.equals(Action.CREATE)) {
+				result = false;
+				org.collectionspace.services.authorization.perms.ObjectFactory objectFactory = 
+						new org.collectionspace.services.authorization.perms.ObjectFactory();
+				JAXBElement<Permission> permJaxbElement = objectFactory.createPermission(permission);
+				String msg = String.format("Either (or both) the 'action' or 'actiongroup' element needs to be set: %s",
+						JaxbUtils.toString(permJaxbElement, Permission.class));			
+				logger.error(msg);
+			}
+		}
+		
+		return result;
+	}
 
 }

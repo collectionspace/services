@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.MovementJAXBSchema;
@@ -39,14 +40,10 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.movement.MovementsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,12 +83,16 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+	}
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected AbstractCommonList getCommonList(
-            ClientResponse<AbstractCommonList> response) {
+    protected AbstractCommonList getCommonList(Response response) {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
@@ -431,13 +432,12 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
         final String EMPTY_SORT_FIELD_NAME = "";
-        ClientResponse<AbstractCommonList> res =
-                client.readListSortedBy(EMPTY_SORT_FIELD_NAME);
+        Response res = client.readListSortedBy(EMPTY_SORT_FIELD_NAME);
         try {
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -455,13 +455,12 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
 
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
-        ClientResponse<AbstractCommonList> res =
-                client.readListSortedBy(MovementJAXBSchema.LOCATION_DATE);
+        Response res = client.readListSortedBy(MovementJAXBSchema.LOCATION_DATE);
         try {
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -477,14 +476,13 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
         final String INVALID_SORT_ORDER_IDENTIFIER = "NO_DIRECTION";
-        ClientResponse<AbstractCommonList> res =
-                client.readListSortedBy(MovementJAXBSchema.LOCATION_DATE
+        Response res = client.readListSortedBy(MovementJAXBSchema.LOCATION_DATE
                 + " " + INVALID_SORT_ORDER_IDENTIFIER);
         try {
         	assertStatusCode(res, testName);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
     }
@@ -499,9 +497,10 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun = true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
@@ -516,7 +515,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
         MovementClient movementClient = new MovementClient();
         for (String resourceId : movementIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            movementClient.delete(resourceId).releaseConnection();
+            movementClient.delete(resourceId).close();
         }
     }
 
@@ -609,7 +608,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
         PoxPayloadOut multipart = createMovementInstance(createIdentifier(),
                 movementNote, locationDate);
         MovementClient client = new MovementClient();
-        ClientResponse<Response> res = client.create(multipart);
+        Response res = client.create(multipart);
         try {
         	assertStatusCode(res, testName);
             // Store the IDs from every resource created by tests,
@@ -617,7 +616,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
         	result = extractId(res);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -632,19 +631,19 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
 
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
-        ClientResponse<String> res = client.read(csid);
+        Response res = client.read(csid);
         MovementsCommon movementCommon = null;
         try {
         	assertStatusCode(res, testName);
 	        // Extract and return the common part of the record.
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
 	        if (payloadInputPart != null) {
 	        	movementCommon = (MovementsCommon) payloadInputPart.getBody();
 	        }
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -654,7 +653,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
     private PoxPayloadOut createMovementInstance(
             String movementReferenceNumber,
             String movementNote,
-            String locationDate) {
+            String locationDate) throws Exception {
         MovementsCommon movementCommon = new MovementsCommon();
         movementCommon.setMovementReferenceNumber(movementReferenceNumber);
         movementCommon.setMovementNote(movementNote);
@@ -678,14 +677,14 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
 
-        ClientResponse<AbstractCommonList> res = client.readListSortedBy(sortFieldName);
+        Response res = client.readListSortedBy(sortFieldName);
         AbstractCommonList list = null;
         try {
         	assertStatusCode(res, testName);
-        	list = res.getEntity();
+        	list = res.readEntity(AbstractCommonList.class);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }        
 
@@ -703,15 +702,14 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
 
-        ClientResponse<AbstractCommonList> res =
-                client.keywordSearchSortedBy(keywords, sortFieldName);
+        Response res = client.keywordSearchSortedBy(keywords, sortFieldName);
         AbstractCommonList list = null;
         try {
 	        assertStatusCode(res, testName);
-	        list = res.getEntity();
+	        list = res.readEntity(AbstractCommonList.class);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 

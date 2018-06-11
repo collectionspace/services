@@ -3,11 +3,10 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.person</artifactId>
-        <version>4.1.1</version>
+        <version>5.0</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.person.service</artifactId>
     <name>services.person.service</name>
     <packaging>jar</packaging>
@@ -25,7 +24,6 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
@@ -79,14 +77,11 @@
             <version>1.0.01</version>
             <scope>provided</scope>
         </dependency>
-
-        <dependency>
+		<dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
-            <version>1.6.1</version>
-            <scope>provided</scope>
         </dependency>
-        
+
         <!-- jboss -->
 
         <dependency>

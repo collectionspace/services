@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.OrganizationJAXBSchema;
@@ -44,16 +43,9 @@ import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.InsurerList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.organization.OrgTermGroup;
-
-import org.jboss.resteasy.client.ClientResponse;
-
-//import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,13 +91,17 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
     protected CollectionSpaceClient getClientInstance() {
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
+
+    @Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+	}
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getCommonList(
-			ClientResponse<AbstractCommonList> response) {
+	protected AbstractCommonList getCommonList(Response response) {
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
@@ -124,7 +120,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         createOrgRefs();
 
         IntakeClient intakeClient = new IntakeClient();
-        PoxPayloadOut multipart = createIntakeInstance(
+        PoxPayloadOut intakePayload = createIntakeInstance(
                 "entryNumber-" + identifier,
                 CURRENT_DATE_UTC,
                 currentOwnerRefName,
@@ -134,7 +130,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
                 insurerRefName,
                 valuerRefName );
 
-        ClientResponse<Response> res = intakeClient.create(multipart);
+        Response res = intakeClient.create(intakePayload);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -150,40 +146,48 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
 	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
 	                invalidStatusCodeMessage(testRequestType, statusCode));
 	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	        String newIntakeId = extractId(res);
+            Assert.assertNotNull(newIntakeId, "Could not create a new Intake record.");
+
+	        // Store the ID returned from the first resource created
+	        // for additional tests below.            
+	        if (knownIntakeId == null) {
+	            knownIntakeId = newIntakeId;
+	            if (logger.isDebugEnabled()) {
+	                logger.debug(testName + ": knownIntakeId=" + knownIntakeId);
+	            }
+	        }
+	        
+	        // Store the IDs from every resource created by tests,
+	        // so they can be deleted after tests have been run.
+	        intakeIdsCreated.add(newIntakeId);
         } finally {
-        	res.releaseConnection();
+        	res.close();
         }
 
-        // Store the ID returned from the first resource created
-        // for additional tests below.
-        if (knownIntakeId == null){
-            knownIntakeId = extractId(res);
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": knownIntakeId=" + knownIntakeId);
-            }
-        }
-        
-        // Store the IDs from every resource created by tests,
-        // so they can be deleted after tests have been run.
-        intakeIdsCreated.add(extractId(res));
     }
     
     /**
      * Creates the organization refs.
+     * @throws Exception 
      */
-    protected void createOrgRefs(){
+    protected void createOrgRefs() throws Exception{
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
         //orgAuthRefName = 
     	//	OrgAuthorityClientUtils.createOrgAuthRefName(ORGANIZATION_AUTHORITY_NAME, null);
         PoxPayloadOut multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
     			ORGANIZATION_AUTHORITY_NAME, ORGANIZATION_AUTHORITY_NAME, orgAuthClient.getCommonPartName());
-        ClientResponse<Response> res = orgAuthClient.create(multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-        orgAuthCSID = extractId(res);
+        Response res = orgAuthClient.create(multipart);
+        try {
+	        int statusCode = res.getStatus();
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        orgAuthCSID = extractId(res);
+	        Assert.assertNotNull(orgAuthCSID, "Could not create a new Organization authority record.");
+        } finally {
+        	res.close();
+        }
         
 		currentOwnerOrgCSID = createOrganization("olivierOwnerCompany", "Olivier Owner Company", "Olivier Owner Company");
         orgIdsCreated.add(currentOwnerOrgCSID);
@@ -211,7 +215,9 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         orgIdsCreated.add(newOrgCSID);
     }
 
-    protected String createOrganization(String shortId, String shortName, String longName) {
+    protected String createOrganization(String shortId, String shortName, String longName) throws Exception {
+    	String result = null;
+    	
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
         Map<String, String> orgInfo = new HashMap<String,String>();
         orgInfo.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
@@ -226,13 +232,19 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
                 OrgAuthorityClientUtils.createOrganizationInstance(null, //orgAuthRefName
                 orgInfo, orgTerms, orgAuthClient.getItemCommonPartName());
 
-        ClientResponse<Response> res = orgAuthClient.createItem(orgAuthCSID, multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-    	return extractId(res);
+        Response res = orgAuthClient.createItem(orgAuthCSID, multipart);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	    	result = extractId(res);
+        } finally {
+        	res.close();
+        }
+        
+        return result;
     }
 
     // Success outcomes
@@ -244,16 +256,15 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         
         // Get the auth ref docs and check them
        OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
-       ClientResponse<AuthorityRefDocList> refDocListResp =
-        	orgAuthClient.getReferencingObjects(orgAuthCSID, currentOwnerOrgCSID);
+       Response refDocListResp = orgAuthClient.getReferencingObjects(orgAuthCSID, currentOwnerOrgCSID);
        AuthorityRefDocList list = null;
        try {
     	   assertStatusCode(refDocListResp, testName);
-    	   list = refDocListResp.getEntity();
+    	   list = refDocListResp.readEntity(AuthorityRefDocList.class);
     	   Assert.assertNotNull(list);
        } finally {
     	   if (refDocListResp != null) {
-    		   refDocListResp.releaseConnection();
+    		   refDocListResp.close();
            }
        }
 
@@ -294,9 +305,10 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
     	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
@@ -310,17 +322,15 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         IntakeClient intakeClient = new IntakeClient();
         // Note: Any non-success responses are ignored and not reported.
         for (String resourceId : intakeIdsCreated) {
-            ClientResponse<Response> res = intakeClient.delete(resourceId);
-            res.releaseConnection();
+            intakeClient.delete(resourceId).close();
         }
         // Delete persons before PersonAuth
         OrgAuthorityClient personAuthClient = new OrgAuthorityClient();
         for (String resourceId : orgIdsCreated) {
-            ClientResponse<Response> res = personAuthClient.deleteItem(orgAuthCSID, resourceId);
-            res.releaseConnection();
+            personAuthClient.deleteItem(orgAuthCSID, resourceId).close();
         }
         if (orgAuthCSID != null) {
-        	personAuthClient.delete(orgAuthCSID).releaseConnection();
+        	personAuthClient.delete(orgAuthCSID).close();
         }
     }
 
@@ -338,7 +348,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
 				String depositor,
 				String conditionCheckerAssessor,
 				String insurer,
-				String Valuer ) {
+				String Valuer ) throws Exception {
         IntakesCommon intake = new IntakesCommon();
         intake.setEntryNumber(entryNumber);
         intake.setEntryDate(entryDate);

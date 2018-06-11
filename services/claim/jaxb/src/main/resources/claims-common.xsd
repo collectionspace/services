@@ -31,7 +31,7 @@
 			<xs:sequence>
 				<xs:element name="claimNumber" type="xs:string"/>
 				<xs:element name="responsibleDepartments" type="responsibleDepartmentsList"/>
-				<xs:element name="claimClaimantGroupList" type="claimClaimantGroupList"/>
+				<xs:element name="claimantGroupList" type="claimantGroupList"/>
 				<xs:element name="claimReceivedGroupList" type="claimReceivedGroupList"/>
 			</xs:sequence>
 		</xs:complexType>
@@ -44,15 +44,15 @@
 		</xs:sequence>
 	</xs:complexType>
 	
-	<xs:complexType name="claimClaimantGroupList">
+	<xs:complexType name="claimantGroupList">
 		<xs:sequence>
-			<xs:element name="claimClaimantGroup" type="claimClaimantGroup" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="claimantGroup" type="claimantGroup" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="claimClaimantGroup">
+	<xs:complexType name="claimantGroup">
 		<xs:sequence>
-			<xs:element name="filedBy" type="xs:string"/>
-			<xs:element name="filedOnBehalfOf" type="xs:string"/>
+			<xs:element name="claimFiledBy" type="xs:string"/>
+			<xs:element name="claimFiledOnBehalfOf" type="xs:string"/>
 			<xs:element name="claimantNote" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
@@ -69,4 +69,3 @@
 		</xs:sequence>
 	</xs:complexType> 
 </xs:schema>
-

@@ -1,0 +1,15 @@
+<document name="vocabularies">
+    <ns2:vocabularies_common xmlns:ns2="http://collectionspace.org/services/vocabulary" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <rev>3</rev>
+        <shortIdentifier>ShowItemsVocab</shortIdentifier>
+        <csid>${csid}</csid>
+        <displayName>ShowItems Vocabulary</displayName>
+        <description>
+            This is a test vocabulary for the ShowItems XMLReplay test group.
+        </description>
+        <source>XML Replay ShowItems test group.</source>
+        <refName>
+            urn:cspace:core.collectionspace.org:vocabularies:name(ShowItemsVocab)'ShowItems Vocabulary'
+        </refName>
+    </ns2:vocabularies_common>
+</document>

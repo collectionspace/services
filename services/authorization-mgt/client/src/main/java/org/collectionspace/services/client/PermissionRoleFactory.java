@@ -29,6 +29,7 @@ import java.util.List;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.RoleValue;
+import org.collectionspace.services.authorization.SubjectType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,18 +85,28 @@ public class PermissionRoleFactory {
             boolean useRoleId) {
 
         PermissionRole permRole = new PermissionRole();
-        //service consume is not required to provide subject as it is determined
-        //from URI used
-//        permRole.setSubject(SubjectType.ROLE);
         if (useRoleId) {
             ArrayList<RoleValue> rvs = new ArrayList<RoleValue>();
             rvs.add(rv);
             permRole.setRole(rvs);
         }
+        
         if (usePermId) {
             permRole.setPermission(pvs);
         }
 
         return permRole;
     }
+    
+    public static PermissionRole createPermissionRoleInstance(SubjectType subjectType,
+    		RoleValue rv,
+            List<PermissionValue> pvs,
+            boolean usePermId,
+            boolean useRoleId) {
+
+        PermissionRole permRole = createPermissionRoleInstance(rv, pvs, usePermId, useRoleId);
+        permRole.setSubject(subjectType);
+        return permRole;
+    }
+    
 }

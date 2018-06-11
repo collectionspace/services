@@ -3,10 +3,14 @@ package org.collectionspace.services.batch;
 import java.util.Collections;
 import java.util.List;
 import javax.ws.rs.core.Response;
+
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ResourceMap;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
-import org.collectionspace.services.nuxeo.client.java.RepositoryInstanceInterface;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +30,7 @@ import org.slf4j.LoggerFactory;
  * - ADR 2013-01-04
  */
 public abstract class AbstractBatchInvocable implements BatchInvocable {
+    final Logger logger = LoggerFactory.getLogger(AbstractBatchInvocable.class);
 
     public final int OK_STATUS = Response.Status.OK.getStatusCode();
     public final int CREATED_STATUS = Response.Status.CREATED.getStatusCode();
@@ -33,15 +38,15 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
     public final int INT_ERROR_STATUS = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
     protected final String CSID_VALUES_NOT_PROVIDED_IN_INVOCATION_CONTEXT =
             "Could not find required CSID values in the invocation context for this batch job.";
+    
+    private ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx;
     private List<String> invocationModes;
     private ResourceMap resourceMap;
-    private InvocationContext context;
-    private RepositoryInstanceInterface repoSession;
-    private String tenantId;
-    private int completionStatus;
-    private InvocationResults results;
-    private InvocationError errorInfo;
-    final Logger logger = LoggerFactory.getLogger(AbstractBatchInvocable.class);
+
+    protected InvocationContext invocationCtx;
+    protected int completionStatus;
+    protected InvocationResults results;
+    protected InvocationError errorInfo;
 
     public AbstractBatchInvocable() {
         init();
@@ -50,7 +55,7 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
     private void init() {
         this.invocationModes = Collections.emptyList();
         this.resourceMap = null;
-        this.context = null;
+        this.invocationCtx = null;
         this.completionStatus = STATUS_UNSTARTED;
         this.results = new InvocationResults();
         this.errorInfo = null;
@@ -74,31 +79,52 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
         this.resourceMap = resourceMap;
     }
 
+    @Override
+    public void setServiceContext(ServiceContext<PoxPayloadIn, PoxPayloadOut> context) {
+        this.ctx = context;
+    }
+    
+    @Override
+    public ServiceContext<PoxPayloadIn, PoxPayloadOut> getServiceContext() {
+        return ctx;
+    }
+	
+    @Override
+    public CoreSessionInterface getRepoSession() {
+    	CoreSessionInterface result = null;
+    	
+    	if (ctx != null) {
+    		result = (CoreSessionInterface) ctx.getCurrentRepositorySession();
+    	} else {
+    		logger.error(String.format("Batch job '%s' invoked with a null/empty service context.", 
+    				this.getClass().getName()));
+    	}
+    	
+    	return result;
+    }
+    
+    @Override    
+    public String getTenantId() {
+        String result = null;
+        
+        if (ctx != null) {
+        	result = ctx.getTenantId();
+        } else {
+    		logger.error(String.format("Batch job '%s' invoked with a null/empty service context.", 
+    				this.getClass().getName()));
+    	}
+        
+        return result;
+    }
+
+    @Override
     public InvocationContext getInvocationContext() {
-        return context;
+        return invocationCtx;
     }
 
     @Override
     public void setInvocationContext(InvocationContext context) {
-        this.context = context;
-    }
-    
-    @Override
-    public void setRepoSession(RepositoryInstanceInterface repoSession) {
-        this.repoSession = repoSession;
-    }
-    
-    public RepositoryInstanceInterface getRepoSession() {
-        return repoSession;
-    }
-    
-    @Override
-    public void setTenantId(String tenantId) {
-        this.tenantId = tenantId;
-    }
-    
-    public String getTenantId() {
-        return tenantId;
+        this.invocationCtx = context;
     }
 
     @Override

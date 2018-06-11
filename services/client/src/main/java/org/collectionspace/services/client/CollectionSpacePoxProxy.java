@@ -8,7 +8,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
+//import org.jboss.resteasy.client.ClientResponse;
 
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -18,29 +18,29 @@ public interface CollectionSpacePoxProxy<LT extends AbstractCommonList> extends
 
 	// (C)reate
 	@POST
-	ClientResponse<Response> create(byte[] payload);
+	Response create(byte[] payload);
 
 	// (R)ead
 	@GET
 	@Path("/{csid}")
-	ClientResponse<String> read(@PathParam("csid") String csid);
+	Response read(@PathParam("csid") String csid); // Returned entity type in response is String
 
 	// (R)ead
 	@GET
 	@Path("/{csid}")
-	ClientResponse<String> readIncludeDeleted(
+	Response readIncludeDeleted(
 			@PathParam("csid") String csid,
 			@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
 
 	// (U)pdate
 	@PUT
 	@Path("/{csid}")
-	ClientResponse<String> update(@PathParam("csid") String csid, byte[] payload);
+	Response update(@PathParam("csid") String csid, byte[] payload);
 
 	// (L)ist non-deleted items
 	@GET
 	@Produces({ "application/xml" })
-	ClientResponse<LT> readIncludeDeleted(
+	Response readIncludeDeleted(
 			@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
 
 	/**
@@ -53,13 +53,13 @@ public interface CollectionSpacePoxProxy<LT extends AbstractCommonList> extends
 	 */
 	@GET
 	@Produces({ "application/xml" })
-	ClientResponse<LT> keywordSearchIncludeDeleted(
+	Response keywordSearchIncludeDeleted(
 			@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
 			@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
 
 	@GET
 	@Produces({ "application/xml" })
-	ClientResponse<LT> advancedSearchIncludeDeleted(
+	Response advancedSearchIncludeDeleted(
 			@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_AS) String whereClause,
 			@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
 

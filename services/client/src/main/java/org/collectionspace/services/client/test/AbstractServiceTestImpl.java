@@ -27,6 +27,7 @@ import java.io.File;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.workflow.WorkflowCommon;
+import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.CollectionSpacePoxClient;
@@ -34,14 +35,12 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
@@ -59,6 +58,7 @@ import javax.ws.rs.core.Response;
  * $LastChangedDate$
  */
 // FIXME: http://issues.collectionspace.org/browse/CSPACE-1685
+@SuppressWarnings("rawtypes")
 public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_TYPE>
 		extends BaseServiceTest<CLT> implements ServiceTest {
     /** The logger. */
@@ -101,6 +101,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     /*
      * We use this method to force a TestNG execution order for our tests
      */
+	@Override
 	public abstract void CRUDTests(String testName);
     
     /*
@@ -115,17 +116,18 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     /*
      * Sub-classes can override for the workflow tests.
      */
-    protected REQUEST_TYPE createInstance(String identifier) {
+    protected REQUEST_TYPE createInstance(String identifier) throws Exception {
     	String commonPartName = getClientInstance().getCommonPartName();
         return createInstance(commonPartName, identifier);
     }
     
     /**
      * Sub-classes must override this method for the "Create" tests to work properly
+     * @throws Exception 
      */
-    protected abstract REQUEST_TYPE createInstance(String commonPartName, String identifier);
+    protected abstract REQUEST_TYPE createInstance(String commonPartName, String identifier) throws Exception;
     
-    protected REQUEST_TYPE createNonExistenceInstance(String commonPartName, String identifier) {
+    protected REQUEST_TYPE createNonExistenceInstance(String commonPartName, String identifier) throws Exception {
     	return createInstance(commonPartName, identifier);
     }
                     
@@ -153,10 +155,23 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     protected String createResource(String testName, String identifier) throws Exception {
         String result = null;
         
-    	setupCreate();
     	CollectionSpaceClient client = this.getClientInstance();
+        result = createResource(client, testName, identifier, false);
+    	
+    	return result;
+    }
+    
+    protected String createResource(CollectionSpaceClient client, String testName, String identifier, boolean makeUnique) throws Exception {
+        String result = null;
+        
+    	setupCreate();
+    	
+    	if (makeUnique == true) {
+    		identifier = identifier + Math.abs(random.nextInt());
+    	}
+    	
         REQUEST_TYPE payload = createInstance(client.getCommonPartName(), identifier);
-        ClientResponse<Response> res = client.create(payload);
+        Response res = client.create(payload);
     	try {
 	        int statusCode = res.getStatus();
 	        if (logger.isDebugEnabled()) {
@@ -171,13 +186,15 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 	        // so they can be deleted after tests have been run.
 	        allResourceIdsCreated.add(result);
     	} finally {
-    		res.releaseConnection();
+    		res.close();
     	}
     	
     	return result;
-    }
+    }    
     
-    @Override
+	abstract public Class<RESPONSE_TYPE> getEntityResponseType();
+    
+	@Override
     @Test(dataProvider = "testName", dependsOnMethods = {"create"})    
     public void read(String testName) throws Exception {
         // Perform setup.
@@ -185,26 +202,27 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 
         // Submit the request to the service and store the response.
     	CollectionSpaceClient client = this.getClientInstance();
-        ClientResponse<RESPONSE_TYPE> res = client.read(getKnowResourceId());
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        Response res = client.read(getKnowResourceId());
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	        
+	        //
+	        // Now compare with the expected field values
+	        //
+	        REQUEST_TYPE expectedResult = createInstance("read_test");
+	        compareReadInstances(extractCommonPartValue(expectedResult), extractCommonPartValue(res));
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        RESPONSE_TYPE output = (RESPONSE_TYPE) res.getEntity();
-        Assert.assertNotNull(output);
-        
-        //
-        // Now compare with the expected field values
-        //
-        REQUEST_TYPE expectedResult = createInstance("read_test");
-        compareReadInstances(extractCommonPartValue(expectedResult), extractCommonPartValue(res));
     }
     
     @Override
@@ -212,9 +230,14 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     public void delete(String testName) throws Exception {
         setupDelete();
     	CollectionSpaceClient client = this.getClientInstance();
-        ClientResponse<Response> res = client.delete(getKnowResourceId());
-        int statusCode = res.getStatus();
-
+        Response res = client.delete(getKnowResourceId());
+        int statusCode;
+        try {
+        	statusCode = res.getStatus();
+        } finally {
+        	res.close();
+        }
+        
         // Check the status code of the response: does it match
         // the expected response(s)?
         if (logger.isDebugEnabled()) {
@@ -233,9 +256,10 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 
         // Submit the request to the service and store the response.
     	CollectionSpaceClient client = this.getClientInstance();
-        ClientResponse<RESPONSE_TYPE> res = client.read(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
+        Response res = null;
         try {
+            res = client.read(NON_EXISTENT_ID);
+            int statusCode = res.getStatus();
             // Check the status code of the response: does it match
             // the expected response(s)?
             if (logger.isDebugEnabled()) {
@@ -245,7 +269,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
-            res.releaseConnection();
+            if (res != null) res.close();
         }
     }
 
@@ -257,8 +281,13 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 
         // Submit the request to the service and store the response.
     	CollectionSpaceClient client = this.getClientInstance();
-        ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
+        Response res = client.delete(NON_EXISTENT_ID);
+        int statusCode;
+        try {
+        	statusCode = res.getStatus();
+        } finally {
+        	res.close();
+        }
 
         // Check the status code of the response: does it match
         // the expected response(s)?
@@ -278,9 +307,9 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     
 //    protected abstract Class<CPT> getCommonPartTypeClass();
     
-    public CPT extractCommonPartValue(ClientResponse<RESPONSE_TYPE> res) throws Exception {
+    public CPT extractCommonPartValue(Response res) throws Exception {
     	CPT result = null;
-    	result = (CPT) res.getEntity();
+    	result = (CPT) res.readEntity(getEntityResponseType());
     	return result;
     }
     
@@ -288,7 +317,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     	return (CPT)req;
     }
         
-    public REQUEST_TYPE createRequestTypeInstance(CPT commonPartTypeInstance) {
+    public REQUEST_TYPE createRequestTypeInstance(CPT commonPartTypeInstance) throws Exception {
     	return (REQUEST_TYPE)commonPartTypeInstance;
     }
     
@@ -312,18 +341,24 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 
         // Retrieve the contents of a resource to update.
     	CollectionSpaceClient client = this.getClientInstance();
-        ClientResponse<RESPONSE_TYPE> res = client.read(getKnowResourceId());
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": read status = " + res.getStatus());
+        Response res = client.read(getKnowResourceId());
+        CPT commonPartObject = null;
+        try {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": read status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
+	
+	        if (logger.isDebugEnabled()) {
+	            logger.debug("Got object to update with CSID= " + getKnowResourceId());
+	        }
+	
+	        commonPartObject = this.extractCommonPartValue(res);
+	        Assert.assertNotNull(commonPartObject);
+        } finally {
+        	res.close();
         }
-        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Got object to update with CSID= " + getKnowResourceId());
-        }
-
-        CPT commonPartObject = this.extractCommonPartValue(res);
-        Assert.assertNotNull(commonPartObject);
+        
         CPT theUpdate = updateInstance(commonPartObject);
         if (logger.isDebugEnabled()) {
             logger.debug("\n\nTo be updated fields: CSID = "  + getKnowResourceId() + "\n"
@@ -333,17 +368,22 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         // Submit the request to the service and store the response.
         REQUEST_TYPE output = this.createRequestTypeInstance(theUpdate);
         res = client.update(getKnowResourceId(), output);
-        int statusCode = res.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        CPT updatedCommonPartObject = null;
+        try {
+	        int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        updatedCommonPartObject = this.extractCommonPartValue(res);
+	        Assert.assertNotNull(updatedCommonPartObject);
+        } finally {
+        	res.close();
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        CPT updatedCommonPartObject = this.extractCommonPartValue(res);
-        Assert.assertNotNull(updatedCommonPartObject);
 
         compareUpdatedInstances(theUpdate, updatedCommonPartObject);
     }
@@ -409,6 +449,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     protected void printList(String testName, CLT list) {
     	// By default, do nothing.  Tests can override this method to produce additional
     	// output after the "readList" test has run.
+    	AbstractCommonListUtils.ListItemsInAbstractCommonList((AbstractCommonList)list, logger, testName);
     }
         
     @Override
@@ -419,23 +460,28 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 
         // Submit the request to the service and store the response.
         CollectionSpaceClient client = this.getClientInstance();
-        ClientResponse<CLT> res = client.readList();
-        CLT list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = true;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            printList(testName, list);
+        Response res = client.readList();
+        
+        try {
+	        CLT list = res.readEntity(this.getCommonListType());
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        // Optionally output additional data about list members for debugging.
+	        boolean iterateThroughList = true;
+	        if (iterateThroughList && logger.isTraceEnabled()) {
+	            printList(testName, list);
+	        }
+        } finally {
+        	res.close();
         }
     }
     
@@ -544,7 +590,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
             int result = 0;
             while (trials < 30) {
 	            CollectionSpacePoxClient client = this.assertPoxClient();
-	            ClientResponse<String> res = client.readIncludeDeleted(csid, Boolean.FALSE);
+	            Response res = client.readIncludeDeleted(csid, Boolean.FALSE);
 	            result = res.getStatus();
 	            if (result == STATUS_NOT_FOUND) {
 	            	logger.info("Workflow transition to 'deleted' is complete");
@@ -584,8 +630,9 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
             result = 0;
             while (trials < 30) {
 	            CollectionSpacePoxClient client = this.assertPoxClient();
-	            ClientResponse<String> res = client.readIncludeDeleted(csid, Boolean.FALSE);
+	            Response res = client.readIncludeDeleted(csid, Boolean.FALSE);
 	            result = res.getStatus();
+	            res.close();
 	            if (result == STATUS_OK) {
 	            	logger.info("Workflow transition to 'project' is complete");
 	            	break;
@@ -613,7 +660,8 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     /*
      * Test that searches honor the workflow deleted state.
      */
-    @Test(dataProvider = "testName")
+    @Override
+	@Test(dataProvider = "testName")
     public void searchWorkflowDeleted(String testName) throws Exception {
 
         // FIXME: Temporarily avoid running test if client is of an authority service
@@ -629,7 +677,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
             final int OBJECTS_TO_CREATE = 3;
             final String KEYWORD = NON_EXISTENT_KEYWORD + createIdentifier();
             for (int i = 0; i < OBJECTS_TO_CREATE; i++) {
-                this.createWorkflowTarget(testName, KEYWORD);
+                this.createWorkflowTarget(testName, KEYWORD + " " + i);
             }
 
             //
@@ -644,26 +692,35 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
             // Search for the newly-created records, excluding the soft deleted record.
             //
             // Send the search request and receive a response
-            ClientResponse<AbstractCommonList> res = client.keywordSearchIncludeDeleted(KEYWORD, Boolean.FALSE);
-            int result = res.getStatus();
-            Assert.assertEquals(result, STATUS_OK);
-
-            AbstractCommonList list = res.getEntity();
-            long itemsMatchedBySearch = list.getTotalItems();
-            Assert.assertEquals(itemsMatchedBySearch, OBJECTS_TO_CREATE - 1,
-                    "The number of items marked for delete is not correct.");
+            Response res = client.keywordSearchIncludeDeleted(KEYWORD, Boolean.FALSE);
+            try {
+	            int result = res.getStatus();
+	            Assert.assertEquals(result, STATUS_OK);
+	
+	            CLT list = res.readEntity(getCommonListType());
+	            long itemsMatchedBySearch = this.getSizeOfList(list); //list.getTotalItems();
+	            Assert.assertEquals(itemsMatchedBySearch, OBJECTS_TO_CREATE - 1,
+	                    "The number of items marked for delete is not correct.");
+            } finally {
+            	res.close();
+            }
+            
             //
             // Search for the newly-created records, including the soft deleted record.
             //
             // Send the search request and receive a response
             res = client.keywordSearchIncludeDeleted(KEYWORD, Boolean.TRUE);
-            result = res.getStatus();
-            Assert.assertEquals(result, STATUS_OK);
-
-            list = res.getEntity();
-            itemsMatchedBySearch = list.getTotalItems();
-            Assert.assertEquals(itemsMatchedBySearch, OBJECTS_TO_CREATE,
-                    "Deleted item was not returned in list results, even though it was requested to be included.");
+            try {
+	            int result = res.getStatus();
+	            Assert.assertEquals(result, STATUS_OK);
+	
+	            CLT list = res.readEntity(getCommonListType());
+	            long itemsMatchedBySearch = this.getSizeOfList(list); //list.getTotalItems();
+	            Assert.assertEquals(itemsMatchedBySearch, OBJECTS_TO_CREATE,
+	                    "Deleted item was not returned in list results, even though it was requested to be included.");
+            } finally {
+            	res.close();
+            }
 
         } catch (UnsupportedOperationException e) {
             logger.warn(this.getClass().getName() + " did not implement createWorkflowTarget() method.  No workflow tests performed.");
@@ -692,30 +749,6 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     }
 
     /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.ServiceTest#createWithEmptyEntityBody(java.lang.String)
-     */
-    @Override
-    public void createWithEmptyEntityBody(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithMalformedXml(java.lang.String)
-     */
-    @Override
-    public void createWithMalformedXml(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithWrongXmlSchema(java.lang.String)
-     */
-    @Override
-    public void createWithWrongXmlSchema(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.ServiceTest#updateNonExistent(java.lang.String)
      */
     @Override
@@ -730,18 +763,21 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     	// The only relevant ID may be the one used in update(), below.
         CollectionSpaceClient client = this.getClientInstance();
     	REQUEST_TYPE multipart = createNonExistenceInstance(client.getCommonPartName(), NON_EXISTENT_ID);
-    	ClientResponse<String> res =
-    			client.update(NON_EXISTENT_ID, multipart);
-    	int statusCode = res.getStatus();
-
-    	// Check the status code of the response: does it match
-    	// the expected response(s)?
-    	if (logger.isDebugEnabled()) {
-    		logger.debug(testName + ": status = " + statusCode);
+    	Response res = client.update(NON_EXISTENT_ID, multipart);
+    	try {
+	    	int statusCode = res.getStatus();
+	
+	    	// Check the status code of the response: does it match
+	    	// the expected response(s)?
+	    	if (logger.isDebugEnabled()) {
+	    		logger.debug(testName + ": status = " + statusCode);
+	    	}
+	    	Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	    			invalidStatusCodeMessage(testRequestType, statusCode));
+	    	Assert.assertEquals(statusCode, testExpectedStatusCode);
+    	} finally {
+    		res.close();
     	}
-    	Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-    			invalidStatusCodeMessage(testRequestType, statusCode));
-    	Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
     
     // ---------------------------------------------------------------
@@ -787,8 +823,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
             long pageSize,
             long pageNumber,
             int expectedStatus) throws Exception {
-        ClientResponse<CLT> response =
-                client.readList(sortBy, pageSize, pageNumber);
+        Response response = client.readList(sortBy, pageSize, pageNumber);
         CLT result = null;
         try {
             int statusCode = response.getStatus();
@@ -802,7 +837,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 
             result = this.getCommonList(response);
         } finally {
-            response.releaseConnection();
+            response.close();
         }
 
         return result;
@@ -847,29 +882,29 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     
 
     @SuppressWarnings("rawtypes")
-    protected void updateLifeCycleState(String testName, String resourceId, String workflowTransition, String lifeCycleState) throws Exception {
+    protected void updateLifeCycleState(String testName, String resourceId, String workflowTransition, String expectedLifeCycleState) throws Exception {
         //
         // Read the existing object
         //
         CollectionSpaceClient client = this.getClientInstance();
-        ClientResponse<String> res = client.getWorkflow(resourceId);
+        Response res = client.getWorkflow(resourceId);
         WorkflowCommon workflowCommons = null;
         try {
 	        assertStatusCode(res, testName);
 	        logger.debug("Got object to update life cycle state with ID: " + resourceId);
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(String.class));
 	        workflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
 	        Assert.assertNotNull(workflowCommons);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         //
         // Mark it for a soft delete.
         //
         logger.debug("Current workflow state:" + objectAsXmlString(workflowCommons, WorkflowCommon.class));
-        workflowCommons.setCurrentLifeCycleState(lifeCycleState);
+        workflowCommons.setCurrentLifeCycleState(expectedLifeCycleState);
         PoxPayloadOut output = new PoxPayloadOut(WorkflowClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = output.addPart(WorkflowClient.SERVICE_COMMONPART_NAME, workflowCommons);
         //
@@ -879,12 +914,12 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         res = client.updateWorkflowWithTransition(resourceId, workflowTransition);
         try {
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(String.class));
 	        updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
 	        Assert.assertNotNull(updatedWorkflowCommons);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         //
@@ -896,17 +931,17 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 	        try {
 		        assertStatusCode(res, testName);
 		        logger.debug("Got workflow state of updated object with ID: " + resourceId);
-		        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+		        PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(String.class));
 		        updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
 		        Assert.assertNotNull(workflowCommons);
 		        String currentWorkflowState = updatedWorkflowCommons.getCurrentLifeCycleState();
-		        if (currentWorkflowState.equalsIgnoreCase(lifeCycleState)) {
-		        	logger.debug("Expected workflow state found: " + lifeCycleState);
+		        if (currentWorkflowState.equalsIgnoreCase(expectedLifeCycleState)) {
+		        	logger.debug("Expected workflow state found: " + expectedLifeCycleState);
 		        	break;
 		        }
 	        } finally {
 	        	if (res != null) {
-                    res.releaseConnection();
+                    res.close();
                 }
 	        }
 	        trials++;
@@ -914,11 +949,11 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         //
         // Finally, assert the state change happened as expected.
         //
-        Assert.assertEquals(updatedWorkflowCommons.getCurrentLifeCycleState(), lifeCycleState);
+        Assert.assertEquals(updatedWorkflowCommons.getCurrentLifeCycleState(), expectedLifeCycleState);
     }
 
-    private CollectionSpacePoxClient assertPoxClient() {
-        CollectionSpaceClient clientCandidate = this.getClientInstance();
+    private CollectionSpacePoxClient assertPoxClient() throws Exception {
+		CollectionSpaceClient clientCandidate = this.getClientInstance();
         if (CollectionSpacePoxClient.class.isInstance(clientCandidate) != true) {  //FIXME: REM - We should remove this check and instead make CollectionSpaceClient support the readIncludeDeleted() method.
             String clientCandidateName = "Unknown";
             if (clientCandidate != null) {
@@ -931,8 +966,16 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         }
         return (CollectionSpacePoxClient) clientCandidate;
     }
+    
+    /*
+     * Must be overridden for CTL param
+     */
+    abstract protected long getSizeOfList(CLT list);
 
-    protected long readIncludeDeleted(String testName, Boolean includeDeleted) {
+    /*
+     * Return the number of items including those soft-deleted.
+     */
+    protected long readIncludeDeleted(String testName, Boolean includeDeleted) throws Exception {
     	long result = 0;
     	// Perform setup.
     	setupReadList();
@@ -941,28 +984,28 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     	// Ask for a list of all resources filtered by the incoming 'includeDeleted' workflow param
     	//
     	CollectionSpacePoxClient client = assertPoxClient();
-    	ClientResponse<AbstractCommonList> res = client.readIncludeDeleted(includeDeleted);
+    	Response res = client.readIncludeDeleted(includeDeleted);
     	try {
 	    	//
 	    	// Check the status code of the response: does it match
 	    	// the expected response(s)?
 	    	//
 	    	assertStatusCode(res, testName);
-	    	AbstractCommonList list = res.getEntity();
+	    	CLT list = res.readEntity(getCommonListType());
 	    	//
 	    	// Now check that list size is correct
 	    	//
-	    	result = list.getTotalItems();
+	    	result = getSizeOfList(list); //list.getTotalItems();
     	} finally {
     		if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
     	}
 
     	return result;
     }
 
-    protected long readItemsIncludeDeleted(String testName, String parentCsid, Boolean includeDeleted) {
+    protected long readItemsIncludeDeleted(String testName, String parentCsid, Boolean includeDeleted) throws Exception {
         long result = 0;
         // Perform setup.
         setupReadList();
@@ -970,17 +1013,17 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         // Ask for a list of all resources filtered by the incoming 'includeDeleted' workflow param
         //
         AuthorityClient client = (AuthorityClient) this.getClientInstance();
-        ClientResponse<AbstractCommonList> res = client.readItemList(parentCsid,
+        Response res = client.readItemList(parentCsid,
                 null, /* partial terms */
                 null, /* keywords */
                 includeDeleted);
         try {
 	        assertStatusCode(res, testName);
-	        AbstractCommonList list = res.getEntity();
+	        AbstractCommonList list = res.readEntity(AbstractCommonList.class);
 	        result = list.getTotalItems();
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
@@ -999,13 +1042,16 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 
         CollectionSpaceClient client = getClientInstance();
         REQUEST_TYPE payload = createInstance(identifier);
-        ClientResponse<Response> res = client.create(payload);
-
-        int statusCode = res.getStatus();
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-
-        result = extractId(res);
-        allResourceIdsCreated.add(result);
+        Response res = client.create(payload);
+        try {
+	        int statusCode = res.getStatus();
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	
+	        result = extractId(res);
+	        allResourceIdsCreated.add(result);
+        } finally {
+        	res.close();
+        }
 
         return result;
     }
@@ -1022,7 +1068,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         return result;
     }
 
-    protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) {
+    protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) throws Exception {
         logger.warn("Sub-class test clients should override this method");
         throw new UnsupportedOperationException();
     }
@@ -1039,13 +1085,16 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         AuthorityClient client = (AuthorityClient) getClientInstance();
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createItemInstance(parentCsid, identifier);
-        ClientResponse<Response> res = client.createItem(parentCsid, multipart);
-
-        int statusCode = res.getStatus();
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-
-        result = extractId(res);
-        allResourceItemIdsCreated.put(result, parentCsid);
+        Response res = client.createItem(parentCsid, multipart);
+        try {
+	        int statusCode = res.getStatus();
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	
+	        result = extractId(res);
+	        allResourceItemIdsCreated.put(result, parentCsid);
+        } finally {
+        	res.close();
+        }
 
         return result;
     }
@@ -1065,7 +1114,8 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
                 //
                 // Get the total count of non-deleted existing records
                 //
-                String parentCsid = this.createTestObject("REM_" + testName);
+            	String identifier = String.format("Test_Workflow_%d", System.currentTimeMillis());
+                String parentCsid = this.createTestObject(identifier);
 
                 //
                 // Create 3 new items
@@ -1094,10 +1144,13 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
                 // Next, test that a GET with WorkflowClient.WORKFLOWSTATE_DELETED query param set to 'false' returns a 404
                 //
                 AuthorityClient client = (AuthorityClient) this.getClientInstance();
-                ClientResponse<String> res = client.readItem(parentCsid, csid, Boolean.FALSE);
-
-                int result = res.getStatus();
-                Assert.assertEquals(result, STATUS_NOT_FOUND);
+                Response res = client.readItem(parentCsid, csid, Boolean.FALSE);
+                try {
+	                int result = res.getStatus();
+	                Assert.assertEquals(result, STATUS_NOT_FOUND);
+                } finally {
+                	res.close();
+                }
 
             } catch (UnsupportedOperationException e) {
                 logger.warn(this.getClass().getName() + " did not implement createWorkflowTarget() method.  No workflow tests performed.");
@@ -1106,30 +1159,30 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         }
     }
 
-    @SuppressWarnings("unchecked")
-	protected void updateItemLifeCycleState(String testName, String parentCsid, String itemCsid, String workflowTransition, String lifeCycleState) throws Exception {
+    protected String updateItemLifeCycleState(String testName, String parentCsid, String itemCsid, String workflowTransition, String expectedLifeCycleState) throws Exception {
         //
         // Read the existing object
         //
         AuthorityClient client = (AuthorityClient) this.getClientInstance();
-        ClientResponse<String> res = client.readItemWorkflow(parentCsid, itemCsid);
+        Response res = client.readItemWorkflow(parentCsid, itemCsid);
         WorkflowCommon workflowCommons = null;
         try {
+        	setupRead();
 	        assertStatusCode(res, testName);
 	        logger.debug("Got object to update life cycle state with ID: " + itemCsid);
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        workflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
 	        Assert.assertNotNull(workflowCommons);
 	        logger.debug("Current workflow state:" + objectAsXmlString(workflowCommons, WorkflowCommon.class));
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         //
         // Mark it for a state change.
         //
-        workflowCommons.setCurrentLifeCycleState(lifeCycleState);
+        workflowCommons.setCurrentLifeCycleState(expectedLifeCycleState);
         PoxPayloadOut output = new PoxPayloadOut(WorkflowClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = output.addPart(WorkflowClient.SERVICE_COMMONPART_NAME, workflowCommons);
         //
@@ -1138,18 +1191,20 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         res = client.updateItemWorkflowWithTransition(parentCsid, itemCsid, workflowTransition);
         WorkflowCommon updatedWorkflowCommons = null;
         try {
+        	setupUpdate();
 	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 	        updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
 	        Assert.assertNotNull(updatedWorkflowCommons);
         } finally {
         	if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
         
         int trials = 0;
         boolean passed = false;
+        setupRead();
         while (trials < 30) { //wait to see if the lifecycle transition will happen
 	        //
 	        // Read the updated object and make sure it was updated correctly.
@@ -1159,19 +1214,19 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 		        assertStatusCode(res, testName);
 		        logger.debug(
 		                "Got workflow state of updated object with ID: " + itemCsid);
-		        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+		        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
 		        updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
 		        Assert.assertNotNull(workflowCommons);
 		        String currentState = updatedWorkflowCommons.getCurrentLifeCycleState();
-		        if (currentState.equalsIgnoreCase(lifeCycleState)) {
-		        	logger.debug("Expected workflow state found: " + lifeCycleState);
+		        if (currentState.equalsIgnoreCase(expectedLifeCycleState)) {
+		        	logger.debug("Expected workflow state found: " + expectedLifeCycleState);
 		        	break;
 		        }
 		        logger.debug("Workflow state not yet updated for object with id: " + itemCsid + " state is=" +
 		        		currentState);
 	        } finally {
 	        	if (res != null) {
-                    res.releaseConnection();
+                    res.close();
                 }
 	        }
 	        trials++;
@@ -1179,9 +1234,123 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         //
         // Finally check to see if the state change was updated as expected.
         //
-        Assert.assertEquals(updatedWorkflowCommons.getCurrentLifeCycleState(), lifeCycleState);
+        Assert.assertEquals(updatedWorkflowCommons.getCurrentLifeCycleState(), expectedLifeCycleState);
+        return updatedWorkflowCommons.getCurrentLifeCycleState();
+    }
+    
+    //
+    // Generic tests applicable to all services.
+    //
+    
+    @Override
+    @Test(dataProvider="testName", dataProviderClass=AbstractPoxServiceTestImpl.class, dependsOnMethods = {"create", "testSubmitRequest"})
+	public void createWithEmptyEntityBody(String testName) throws Exception {
+		// Perform setup.
+		setupCreateWithEmptyEntityBody();
+
+		// Submit the request to the service and store the response.
+		String method = testRequestType.httpMethodName();
+		String url = getServiceRootURL();
+		String mediaType = MediaType.APPLICATION_XML;
+		final String entity = "";
+		int statusCode = submitRequest(method, url, mediaType, entity);
+
+		// Check the status code of the response: does it match
+		// the expected response(s)?
+		if (logger.isDebugEnabled()) {
+			logger.debug("createWithEmptyEntityBody url=" + url + " status=" + statusCode);
+		}
+		Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+				invalidStatusCodeMessage(testRequestType, statusCode));
+		Assert.assertEquals(statusCode, testExpectedStatusCode);
+	}
+    
+    @Override
+    @Test(dataProvider="testName", dataProviderClass=AbstractPoxServiceTestImpl.class, dependsOnMethods = {"create", "testSubmitRequest"})
+    public void createWithMalformedXml(String testName) throws Exception {
+	    // Perform setup.
+	    setupCreateWithMalformedXml();
+	    
+	    // Submit the request to the service and store the response.
+	    String method = testRequestType.httpMethodName();
+	    String url = getServiceRootURL();
+	    String mediaType = MediaType.APPLICATION_XML;
+	    final String entity = MALFORMED_XML_DATA; // Constant from base class.
+	    int statusCode = submitRequest(method, url, mediaType, entity);
+	    
+	    // Check the status code of the response: does it match
+	    // the expected response(s)?
+	    if (logger.isDebugEnabled()) {
+	    	logger.debug(testName + ": url=" + url + " status=" + statusCode);
+	    }
+	    Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	    invalidStatusCodeMessage(testRequestType, statusCode));
+	    Assert.assertEquals(statusCode, testExpectedStatusCode);
+    }
+    
+    @Override
+    @Test(dataProvider="testName", dataProviderClass=AbstractPoxServiceTestImpl.class, dependsOnMethods = {"create", "testSubmitRequest"})
+    public void createWithWrongXmlSchema(String testName) throws Exception {
+	    // Perform setup.
+	    setupCreateWithWrongXmlSchema();
+	    
+	    // Submit the request to the service and store the response.
+	    String method = testRequestType.httpMethodName();
+	    String url = getServiceRootURL();
+	    String mediaType = MediaType.APPLICATION_XML;
+	    final String entity = WRONG_XML_SCHEMA_DATA;
+	    int statusCode = submitRequest(method, url, mediaType, entity);
+	    
+	    // Check the status code of the response: does it match
+	    // the expected response(s)?
+	    if(logger.isDebugEnabled()){
+	    	logger.debug(testName + ": url=" + url + " status=" + statusCode);
+	    }
+	    Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	    invalidStatusCodeMessage(testRequestType, statusCode));
+	    Assert.assertEquals(statusCode, testExpectedStatusCode);
+    }
+    
+    /**
+     * Sets up create tests with empty entity body.
+     */
+    @Override
+	protected void setupCreateWithEmptyEntityBody() {
+        testExpectedStatusCode = STATUS_INTERNAL_SERVER_ERROR;
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
     }
 
+    /**
+     * Sets up create tests with empty entity body.
+     */
+    @Override
+	protected void setupCreateWithInvalidBody() {
+        testExpectedStatusCode = STATUS_INTERNAL_SERVER_ERROR;
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }
+    
+    /**
+     * Sets up create tests with malformed xml.
+     */
+    @Override
+	protected void setupCreateWithMalformedXml() {
+        testExpectedStatusCode = STATUS_INTERNAL_SERVER_ERROR;
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }
+
+    /**
+     * Sets up create tests with wrong xml schema.
+     */
+    @Override
+	protected void setupCreateWithWrongXmlSchema() {
+        testExpectedStatusCode = STATUS_INTERNAL_SERVER_ERROR;
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
+    }
+    
 }
 
 

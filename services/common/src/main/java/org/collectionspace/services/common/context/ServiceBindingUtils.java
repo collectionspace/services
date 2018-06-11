@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.collectionspace.services.common.config.PropertyItemUtils;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.service.ServiceObjectType;
@@ -16,7 +17,9 @@ import org.collectionspace.services.config.types.PropertyType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
+
 import java.lang.IndexOutOfBoundsException;
+
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.slf4j.Logger;
@@ -34,8 +37,10 @@ public class ServiceBindingUtils {
 	public static final String SERVICE_TYPE_OBJECT = "object";
 	public static final String SERVICE_TYPE_PROCEDURE = "procedure";
 	public static final String SERVICE_TYPE_AUTHORITY = "authority";
+	public static final String SERVICE_TYPE_VOCABULARY = "vocabulary";
 	public static final String SERVICE_TYPE_UTILITY = "utility";
 	public static final String SERVICE_TYPE_SECURITY = "security";
+	public static final String SERVICE_COMMONPART_ID = "1";
 	
 	private static final String TENANT_EXTENSION_PATTERN = "(.*)"+ServiceContext.TENANT_SUFFIX+"[\\d]+$";
 	private static final String TENANT_REPLACEMENT_PATTERN = "$1";
@@ -165,10 +170,11 @@ public class ServiceBindingUtils {
 				propName, value, onlyIfNotSet);
     }
     
-    public static String getMappedFieldInDoc( ServiceBindingType sb,
+    public static String getMappedFieldInDoc(ServiceBindingType sb,
     		String logicalFieldName, DocumentModel docModel ) {
     	// Now we have to get the number, which is configured as some field
     	// on each docType
+    	
     	/* If we go to qualified field names, we'll need this
     	String[] strings = qPropName.split(":");
     	if(strings.length!=2) {
@@ -177,31 +183,55 @@ public class ServiceBindingUtils {
     				+logicalFieldName+" field for: "+docModel.getDocumentType().getName());
     	}
     	*/
+    	
     	String propName = getPropertyValue(sb, logicalFieldName);
-    	if(Tools.isBlank(propName)) {
+    	if (Tools.isBlank(propName)) {
                 logger.warn("Property name is empty for property " + logicalFieldName + " in service " + sb.getName());
                 logger.warn("This may be due to an improperly configured or missing "
                         + "generic property (objectNameProperty, objectNumberProperty ...) in tenant bindings configuration");
     		return "";
         }
-    	try {
-            Object obj = docModel.getPropertyValue(propName);
-            return DocumentUtils.propertyValueAsString(obj, docModel, propName);
-    	} catch(IndexOutOfBoundsException ioobe) {
-				// Should not happen, but may with certain array forms
-				if(logger.isTraceEnabled()) {
-					logger.trace("SBUtils.getMappedField caught OOB exc, for Prop: "+propName
-						+ " in: " + docModel.getDocumentType().getName()
-						+ " csid: " + NuxeoUtils.getCsid(docModel));
-				}
-				return null;
-    	} catch(ClientException ce) {
-    		throw new RuntimeException(
-    				"getMappedFieldInDoc: Problem fetching: "+propName+" logicalfieldName: "+logicalFieldName+" docModel: "+docModel, ce);
-    	}
+    	//
+    	// Try to get a value from the Nuxeo document for the property name.
+    	//
+    	String result = null;
+		try {
+			Object obj = NuxeoUtils.getProperyValue(docModel, propName);
+			result = DocumentUtils.propertyValueAsString(obj, docModel, propName);
+		} catch (IndexOutOfBoundsException ioobe) {
+			// Should not happen, but may with certain array forms
+			logger.trace("SBUtils.getMappedField caught OOB exc, for Prop: "
+					+ propName + " in: " + docModel.getDocumentType().getName()
+					+ " csid: " + NuxeoUtils.getCsid(docModel));
+		} catch (ClientException ce) {
+			throw new RuntimeException(
+					"getMappedFieldInDoc: Problem fetching: " + propName
+							+ " logicalfieldName: " + logicalFieldName
+							+ " docModel CSID: " + docModel.getName(), ce);
+		} catch (Exception e) {
+			logger.warn(String.format("Could not get a value for the property '%s' in Nuxeo document with CSID '%s'.",
+					propName, docModel.getName()));
+		}
+    	
+    	return result;
     } 
     
     private static ArrayList<String> commonProcedureServiceTypes = null;
+    
+    /**
+     * Get the service name (service resource path) from the object name (Nuxeo document type)
+     * @param serviceName
+     * @param sb
+     * @return
+     */
+    public static String getServiceNameFromObjectName(TenantBindingConfigReaderImpl bindingReader, String tenantId, String docType) {
+    	String result = null;
+    	
+    	ServiceBindingType bindingType = bindingReader.getServiceBindingForDocType(tenantId, docType);
+    	result = bindingType.getName().toLowerCase();
+    	
+    	return result;
+    }
    
     public static ArrayList<String> getCommonServiceTypes(boolean includeAuthorities) {
         ArrayList<String> commonServiceTypes = new ArrayList<String>();

@@ -16,10 +16,12 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.valuationcontrol.ValuationcontrolsCommon;
+
 /**
  * ValuationcontrolClient.java
  */
-public class ValuationcontrolClient extends AbstractCommonListPoxServiceClientImpl<ValuationcontrolProxy> {
+public class ValuationcontrolClient extends AbstractCommonListPoxServiceClientImpl<ValuationcontrolProxy, ValuationcontrolsCommon> {
 
     public static final String SERVICE_NAME = "valuationcontrols";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
@@ -27,7 +29,15 @@ public class ValuationcontrolClient extends AbstractCommonListPoxServiceClientIm
     public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    /* (non-Javadoc)
+    public ValuationcontrolClient() throws Exception {
+		super();
+	}
+
+    public ValuationcontrolClient(String clientPropertiesFilename) throws Exception {
+		super(clientPropertiesFilename);
+	}
+
+	/* (non-Javadoc)
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
      */
     @Override

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="vocabularies">
+  <ns3:vocabularies_common xmlns:ns3="http://collectionspace.org/services/vocabulary"
+  xmlns:ns2="http://collectionspace.org/services/jaxb">
+    <displayName>TestOrder Vocabulary</displayName>
+    <shortIdentifier>TestOrderVocab</shortIdentifier>
+    <refName>
+    urn:cspace:org.collectionspace.demo:vocabulary:name(TestOrderVocab)'TestOrder Vocabulary'</refName>
+    <vocabType>enum</vocabType>
+    <description>This is a test vocabulary</description>
+    <source>Some mythical book</source>
+ </ns3:vocabularies_common>
+</document>
+

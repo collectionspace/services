@@ -72,7 +72,7 @@ public class RefNameUtils {
         public String domain;
         public String resource;
         public String csid;
-        public String name;
+        public String name; // Is this the short ID?
         public String displayName;
         
         public AuthorityInfo(String refNameTokens[]) throws IllegalArgumentException {
@@ -111,7 +111,7 @@ public class RefNameUtils {
         
         public String getRelativeUri() {
         	StringBuilder uri = new StringBuilder();
-        	// FIXME This should not be hard-coded.
+        	// FIXME This should not be hard-coded -see https://issues.collectionspace.org/browse/CSPACE-5987
         	if(resource.equals("vocabulary")) {
         		uri.append("/vocabularies/");
         	} else if(resource.equals("personauthority")) {
@@ -124,7 +124,7 @@ public class RefNameUtils {
         			|| resource.equals("locationauthorities")
         			|| resource.equals("placeauthorities")
         			|| resource.equals("vocabularies"))) {	
-        			logger.error("Unrecognized Authority Type: " + resource);
+        			logger.warn("Unrecognized Authority Type: " + resource);
         		}
         		uri.append("/"+resource+"/");
         	}
@@ -203,13 +203,13 @@ public class RefNameUtils {
     	return new AuthorityInfo(refNameTokens);
     }
 
-    public static AuthorityTermInfo parseAuthorityTermInfo(String refName)
-            throws IllegalArgumentException {
-    	if(refName==null || !refName.startsWith(URN_PREFIX))
-    		throw new IllegalArgumentException( "Null or invalid refName syntax");
-    	String[] refNameTokens = refName.substring(URN_PREFIX_LEN).split(SEPARATOR, AUTH_ITEM_REFNAME_TOKENS);
-    	return new AuthorityTermInfo(refNameTokens);
-    }
+	public static AuthorityTermInfo parseAuthorityTermInfo(String refName) throws IllegalArgumentException {
+		if (refName == null || !refName.startsWith(URN_PREFIX)) {
+			throw new IllegalArgumentException("Null or invalid refName syntax");
+		}
+		String[] refNameTokens = refName.substring(URN_PREFIX_LEN).split(SEPARATOR, AUTH_ITEM_REFNAME_TOKENS);
+		return new AuthorityTermInfo(refNameTokens);
+	}
 
     public static String stripAuthorityTermDisplayName(String refName)
             throws IllegalArgumentException {
@@ -276,23 +276,6 @@ public class RefNameUtils {
     	}
     	
     	return displayName;
-    }
-
-    /**
-     * Creates a refName in the name / shortIdentifier form.
-     *
-     * @param shortId a shortIdentifier for an authority or one of its terms
-     * @return a refName for that authority or term, in the name / shortIdentifier form.
-     *         If the provided shortIdentifier is null or empty, returns
-     *         the empty string.
-     */
-    public static String createShortIdRefName(String shortId) {
-        if (shortId == null || shortId.trim().isEmpty()) {
-            return "";
-        } else {
-            return "urn:cspace:name("+shortId+")";
-        }
-    }
-    
+    }    
 }
 

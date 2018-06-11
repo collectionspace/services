@@ -23,7 +23,6 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,6 +34,7 @@ import javax.security.auth.login.LoginException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.nuxeo.common.utils.IdUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.ClientRuntimeException;
@@ -103,16 +103,19 @@ public class QuoteManagerImpl implements QuoteManager {
 
     protected CoreSession openCoreSession(String repositoryName)
             throws ClientException {
+    	CoreSession result = null;
+    	
         try {
-            RepositoryManager repoMgr = Framework.getService(RepositoryManager.class);
-            return repoMgr.getRepository(repositoryName).open();
+        	result = CoreInstance.openCoreSession(repositoryName);
         } catch (Exception e) {
             throw new ClientException(e);
         }
+        
+        return result;
     }
 
     protected void closeCoreSession(LoginContext loginContext,
-            CoreSession session) throws ClientException {
+    		CoreSession session) throws ClientException {
         if (loginContext != null) {
             try {
                 loginContext.logout();
@@ -121,7 +124,7 @@ public class QuoteManagerImpl implements QuoteManager {
             }
         }
         if (session != null) {
-            CoreInstance.getInstance().close(session);
+        	session.close();
         }
     }
 
@@ -132,8 +135,8 @@ public class QuoteManagerImpl implements QuoteManager {
     public List<DocumentModel> getQuotes(DocumentModel docModel)
             throws ClientException {
         RelationManager relationManager;
-        Map<String, Serializable> ctxMap = new HashMap<String, Serializable>();
-        ctxMap.put(ResourceAdapter.CORE_SESSION_ID_CONTEXT_KEY, docModel.getSessionId());
+        Map<String, Object> ctxMap = new HashMap<String, Object>();
+        ctxMap.put(ResourceAdapter.CORE_SESSION_CONTEXT_KEY, docModel.getSessionId());
         try {
             relationManager = getRelationManager();
         } catch (Exception e) {
@@ -570,8 +573,8 @@ public class QuoteManagerImpl implements QuoteManager {
     public List<DocumentModel> getDocumentsForQuote(DocumentModel comment)
             throws ClientException {
         RelationManager relationManager;
-        Map<String, Serializable> ctxMap = new HashMap<String, Serializable>();
-        ctxMap.put(ResourceAdapter.CORE_SESSION_ID_CONTEXT_KEY, comment.getSessionId());
+        Map<String, Object> ctxMap = new HashMap<String, Object>();
+        ctxMap.put(ResourceAdapter.CORE_SESSION_CONTEXT_KEY, comment.getSessionId());
         try {
             relationManager = getRelationManager();
         } catch (Exception e) {

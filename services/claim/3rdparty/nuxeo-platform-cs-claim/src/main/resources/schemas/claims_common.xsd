@@ -28,40 +28,31 @@
 	
 	<xs:element name="claimNumber" type="xs:string"/>
 	
-	<xs:element name="responsibleDepartments"> <!-- CORE: Responsible department -->
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="responsibleDepartment" type="xs:string"
-					minOccurs="0" maxOccurs="unbounded"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
+	<xs:element name="claimantGroupList" type="claimantGroupList"/>
+	<xs:element name="claimReceivedGroupList" type="claimReceivedGroupList"/>
 	
-	<xs:element name="claimClaimantGroupList" type="claimClaimantGroupList"/> <!-- CORE: Filed by; On behalf of -->
-	<xs:element name="claimReceivedGroupList" type="claimReceivedGroupList"/> <!-- CORE: Date filed -->
-	
-	<xs:complexType name="claimClaimantGroupList"> <!-- CORE: Filed by; On behalf of -->
+	<xs:complexType name="claimantGroupList">
 		<xs:sequence>
-			<xs:element name="claimClaimantGroup" type="claimClaimantGroup" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="claimantGroup" type="claimantGroup" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="claimClaimantGroup"> <!-- CORE: Filed by; On behalf of -->
+	<xs:complexType name="claimantGroup">
 		<xs:sequence>
-			<xs:element name="filedBy" type="xs:string"/> <!-- CORE: Filed by -->
-			<xs:element name="filedOnBehalfOf" type="xs:string"/> <!-- CORE: On behalf of -->
-			<xs:element name="claimantNote" type="xs:string"/> <!-- SUGGESTED CORE -->
+			<xs:element name="claimFiledBy" type="xs:string"/>
+			<xs:element name="claimFiledOnBehalfOf" type="xs:string"/>
+			<xs:element name="claimantNote" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
 	
-	<xs:complexType name="claimReceivedGroupList"> <!-- CORE: Date filed -->
+	<xs:complexType name="claimReceivedGroupList">
 		<xs:sequence>
 			<xs:element name="claimReceivedGroup" type="claimReceivedGroup" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="claimReceivedGroup"> <!-- CORE: Date filed -->
+	<xs:complexType name="claimReceivedGroup">
 		<xs:sequence>
-			<xs:element name="claimReceivedDate" type="xs:date"/> <!-- CORE: Date filed -->
-			<xs:element name="claimReceivedNote" type="xs:string"/> <!-- SUGGESTED CORE -->
+			<xs:element name="claimReceivedDate" type="xs:date"/>
+			<xs:element name="claimReceivedNote" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
 </xs:schema>

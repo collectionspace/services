@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns:document xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:ns="http://collectionspace.org/services/batch"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://collectionspace.org/services/batch file:../../../../../../../batch/jaxb/src/main/resources/batch_common_document.xsd">
+    <batch_common xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:ns="http://collectionspace.org/services/batch" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <name>name0</name>
+        <notes>notes0</notes>
+        <forDocTypes>
+            <forDocType>CollectionObject</forDocType>
+            <forDocType>Intake</forDocType>
+        </forDocTypes>
+        <forRoles>
+            <roleDisplayName>TENANT_READER</roleDisplayName>
+            <roleDisplayName>TENANT_ADMINISTRATOR</roleDisplayName>
+        </forRoles>
+        <resourceActionGroupList>
+            <resourceActionGroup>
+                <resourceName>blobs</resourceName>
+                <actionGroup>CRUL</actionGroup>
+            </resourceActionGroup>
+            <resourceActionGroup>
+                <resourceName>media</resourceName>
+                <actionGroup>CRUL</actionGroup>
+            </resourceActionGroup>
+            <resourceActionGroup>
+                <resourceName>concepts</resourceName>
+                <actionGroup>RL</actionGroup>
+            </resourceActionGroup>
+            <resourceActionGroup>
+                <resourceName>collectionobjects</resourceName>
+                <actionGroup>RL</actionGroup>
+            </resourceActionGroup>
+        </resourceActionGroupList>
+        <supportsNoContext>false</supportsNoContext>
+        <supportsSingleDoc>false</supportsSingleDoc>
+        <supportsDocList>false</supportsDocList>
+        <supportsGroup>false</supportsGroup>
+        <createsNewFocus>false</createsNewFocus>
+        <className>className0</className>
+    </batch_common>
+</ns:document>

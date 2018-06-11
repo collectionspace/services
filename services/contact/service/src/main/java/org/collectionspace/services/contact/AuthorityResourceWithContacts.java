@@ -123,7 +123,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
             String parentcsid = lookupParentCSID(parentspecifier, "createContact(authority)", "CREATE_ITEM_CONTACT", null);
 
             ServiceContext itemCtx = createServiceContext(getItemServiceName());
-            String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "createContact(item)", "CREATE_ITEM_CONTACT", itemCtx);
+            String itemcsid = lookupItemCSID(itemCtx, itemspecifier, parentcsid, "createContact(item)", "CREATE_ITEM_CONTACT");
 
             // Note that we have to create the service context and document
             // handler for the Contact service, not the main service.
@@ -166,7 +166,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
         	
             String parentcsid = lookupParentCSID(parentspecifier, "getContactList(parent)", "GET_CONTACT_LIST", null);
             ServiceContext itemCtx = createServiceContext(getItemServiceName());
-            String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "getContactList(item)", "GET_CONTACT_LIST", itemCtx);
+            String itemcsid = lookupItemCSID(itemCtx, itemspecifier, parentcsid, "getContactList(item)", "GET_CONTACT_LIST");
 
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid, uriInfo);
             DocumentFilter myFilter = handler.getDocumentFilter(); //new DocumentFilter();
@@ -209,14 +209,14 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
         try {
             String parentcsid = lookupParentCSID(parentspecifier, "getContact(parent)", "GET_ITEM_CONTACT", null);
 
-            ServiceContext itemCtx = createServiceContext(getItemServiceName());
-            String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "getContact(item)", "GET_ITEM_CONTACT", itemCtx);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> itemCtx = createServiceContext(getItemServiceName());
+            String itemcsid = lookupItemCSID(itemCtx, itemspecifier, parentcsid, "getContact(item)", "GET_ITEM_CONTACT");
 
             // Note that we have to create the service context and document handler for the Contact service, not the main service.
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getContactServiceName());
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
             getRepositoryClient(ctx).get(ctx, csid, handler);
-            result = ctx.getOutput();
+            result = (PoxPayloadOut) ctx.getOutput();
         } catch (Exception e) {
             throw bigReThrow(e, "Get failed, the requested Contact CSID:" + csid
                     + ": or one of the specifiers for authority:" + parentspecifier
@@ -251,15 +251,15 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
             PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
             String parentcsid = lookupParentCSID(parentspecifier, "updateContact(authority)", "UPDATE_CONTACT", null);
 
-            ServiceContext itemCtx = createServiceContext(getItemServiceName());
-            String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "updateContact(item)", "UPDATE_CONTACT", itemCtx);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> itemCtx = createServiceContext(getItemServiceName());
+            String itemcsid = lookupItemCSID(itemCtx, itemspecifier, parentcsid, "updateContact(item)", "UPDATE_CONTACT");
 
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
             // Note that we have to create the service context and document handler for the Contact service, not the main service.
             ctx = createServiceContext(getContactServiceName(), theUpdate);
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
             getRepositoryClient(ctx).update(ctx, csid, handler);
-            result = ctx.getOutput();
+            result = (PoxPayloadOut) ctx.getOutput();
         } catch (Exception e) {
             throw bigReThrow(e, "Update failed, the requested Contact CSID:" + csid
                     + ": or one of the specifiers for authority:" + parentspecifier
@@ -287,8 +287,8 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
         try {
             String parentcsid = lookupParentCSID(parentspecifier, "deleteContact(authority)", "DELETE_CONTACT", null);
 
-            ServiceContext itemCtx = createServiceContext(getItemServiceName());
-            String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "deleteContact(item)", "DELETE_CONTACT", itemCtx);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> itemCtx = createServiceContext(getItemServiceName());
+            String itemcsid = lookupItemCSID(itemCtx, itemspecifier, parentcsid, "deleteContact(item)", "DELETE_CONTACT");
             //NOTE: itemcsid is not used below.  Leaving the above call in for possible side effects???       CSPACE-3175
 
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;

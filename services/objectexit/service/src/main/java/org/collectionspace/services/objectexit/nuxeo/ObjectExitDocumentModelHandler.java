@@ -23,10 +23,10 @@
  */
 package org.collectionspace.services.objectexit.nuxeo;
 
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.objectexit.ObjectexitCommon;
 
 public class ObjectExitDocumentModelHandler 
-	extends DocHandlerBase<ObjectexitCommon> {
+	extends NuxeoDocumentModelHandler<ObjectexitCommon> {
 }
 

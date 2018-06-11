@@ -24,24 +24,18 @@
 package org.collectionspace.services.citation.nuxeo;
 
 import org.collectionspace.services.citation.CitationauthoritiesCommon;
+import org.collectionspace.services.client.CitationAuthorityClient;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 
 /**
  * CitationAuthorityDocumentModelHandler
  *
- * $LastChangedRevision: $
- * $LastChangedDate: $
  */
 public class CitationAuthorityDocumentModelHandler
 		extends AuthorityDocumentModelHandler<CitationauthoritiesCommon> {
-
-    /**
-     * Common part schema label
-     */
-    private static final String COMMON_PART_LABEL = "citationauthorities_common";   
     
     public CitationAuthorityDocumentModelHandler() {
-    	super(COMMON_PART_LABEL);
+    	super(CitationAuthorityClient.SERVICE_COMMON_PART_NAME, CitationAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 	
     /**

@@ -1,19 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-
-<!--
-    CollectionSpace default (security) authorization provider schema (XSD)
-
-    Entity(s)  : role
-    Used for:
-
-    $LastChangedRevision: 916 $
-    $LastChangedDate: 2009-11-05 16:59:20 -0800 (Thu, 05 Nov 2009) $
--->
-
 <xs:schema 
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-    jaxb:version="1.0" elementFormDefault="unqualified"
+    jaxb:version="2.1" elementFormDefault="unqualified"
     xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
     xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
     xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
@@ -23,6 +12,8 @@
 		version="0.1"
 		jaxb:extensionBindingPrefixes="hj orm xjc"
     >
+
+    <xs:include schemaLocation="authorization_common.xsd"/>
 
     <!--
     see http://weblogs.java.net/blog/2006/03/03/why-does-jaxb-put-xmlrootelement-sometimes-not-always
@@ -41,19 +32,11 @@
 	<xs:annotation>
 		<xs:appinfo>
 			<jaxb:globalBindings generateIsSetMethod="true" localScoping="toplevel">
-				<jaxb:serializable/>
+				<jaxb:serializable uid="1966"/>
 			</jaxb:globalBindings>
 		</xs:appinfo>
 	</xs:annotation>
     
-    <!--
-    Notes for MySQL
-    MySQL puts key length limit of 1000 bytes
-    username - rolename constraint should be within 1000 bytes
-    hbm2ddl makes column length >= 256 as long text, such as column cannot be used
-    in defining a key (pk, fk or constraint)
-    -->
-
     <xs:element name="role" type="role"/>
     <!-- role type has a name so that it could be referred from roles_list -->
     <xs:complexType name="role">
@@ -120,24 +103,24 @@
                     </xs:appinfo>
                 </xs:annotation>
             </xs:element>
-						<xs:element name="metadataProtection" type="xs:string" minOccurs="0" maxOccurs="1">
-								<xs:annotation>
-										<xs:appinfo>
-												<hj:basic>
-														<orm:column name="metadata_protection"  nullable="true"/>
-												</hj:basic>
-										</xs:appinfo>
-								</xs:annotation>
-						</xs:element>
-						<xs:element name="permsProtection" type="xs:string" minOccurs="0" maxOccurs="1">
-								<xs:annotation>
-										<xs:appinfo>
-												<hj:basic>
-														<orm:column name="perms_protection"  nullable="true"/>
-												</hj:basic>
-										</xs:appinfo>
-								</xs:annotation>
-						</xs:element>
+			<xs:element name="metadataProtection" type="xs:string" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+							<xs:appinfo>
+									<hj:basic>
+											<orm:column name="metadata_protection"  nullable="true"/>
+									</hj:basic>
+							</xs:appinfo>
+					</xs:annotation>
+			</xs:element>
+			<xs:element name="permsProtection" type="xs:string" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+							<xs:appinfo>
+									<hj:basic>
+											<orm:column name="perms_protection"  nullable="true"/>
+									</hj:basic>
+							</xs:appinfo>
+					</xs:annotation>
+			</xs:element>
             <xs:element name="createdAt" type="xs:dateTime">
                 <xs:annotation>
                     <xs:appinfo>
@@ -156,6 +139,7 @@
                     </xs:appinfo>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="permission" type="ns:permission_value" minOccurs="1" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="csid" type="xs:string">
             <xs:annotation>
@@ -166,6 +150,7 @@
                 </xs:appinfo>
             </xs:annotation>
         </xs:attribute>
+        
     </xs:complexType>
 </xs:schema>
 

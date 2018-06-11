@@ -36,7 +36,7 @@ public class CSWebApplicationException extends WebApplicationException {
 	}
 
 	public CSWebApplicationException(Throwable cause, Response response) {
-		super(cause);
+		super(cause, response);
 		this.response = getFinalResponse(cause, response);
 	}
 

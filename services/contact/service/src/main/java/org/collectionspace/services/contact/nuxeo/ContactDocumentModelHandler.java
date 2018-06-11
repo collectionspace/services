@@ -30,7 +30,7 @@ import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.contact.ContactJAXBSchema;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.contact.ContactsCommon;
 
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * The Class ContactDocumentModelHandler.
  */
 public class ContactDocumentModelHandler
-        extends DocHandlerBase<ContactsCommon> {
+        extends NuxeoDocumentModelHandler<ContactsCommon> {
 
     private final Logger logger = LoggerFactory.getLogger(ContactDocumentModelHandler.class);
     private static final String COMMON_PART_LABEL = "contacts_common";

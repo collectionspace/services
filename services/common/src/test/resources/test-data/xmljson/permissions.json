@@ -1,0 +1,127 @@
+{
+  "ns2:permissions_list": {
+    "@xmlns:ns2": "http://collectionspace.org/services/authorization/perms",
+    "permission": [
+      {
+        "@csid": "15-idgenerators-CRUDL",
+        "description": "Generated admin permission.",
+        "resourceName": "idgenerators",
+        "actionGroup": "CRUDL",
+        "action": [
+          {
+            "@Hjid": "1",
+            "name": "CREATE",
+            "objectIdentity": "1159431374",
+            "objectIdentityResource": "15:idgenerators#create"
+          },
+          {
+            "@Hjid": "2",
+            "name": "READ",
+            "objectIdentity": "-615118360",
+            "objectIdentityResource": "15:idgenerators#read"
+          },
+          {
+            "@Hjid": "3",
+            "name": "UPDATE",
+            "objectIdentity": "1672879259",
+            "objectIdentityResource": "15:idgenerators#update"
+          },
+          {
+            "@Hjid": "4",
+            "name": "DELETE",
+            "objectIdentity": "1176267133",
+            "objectIdentityResource": "15:idgenerators#delete"
+          },
+          {
+            "@Hjid": "5",
+            "name": "SEARCH",
+            "objectIdentity": "1605388666",
+            "objectIdentityResource": "15:idgenerators#search"
+          }
+        ],
+        "effect": "PERMIT",
+        "createdAt": "2012-06-11T23:19:09.066"
+      },
+      {
+        "@csid": "15-id-CRUDL",
+        "description": "Generated admin permission.",
+        "resourceName": "id",
+        "actionGroup": "CRUDL",
+        "action": [
+          {
+            "@Hjid": "6",
+            "name": "CREATE",
+            "objectIdentity": "-203156594",
+            "objectIdentityResource": "15:id#create"
+          },
+          {
+            "@Hjid": "7",
+            "name": "READ",
+            "objectIdentity": "1551059112",
+            "objectIdentityResource": "15:id#read"
+          },
+          {
+            "@Hjid": "8",
+            "name": "UPDATE",
+            "objectIdentity": "310291291",
+            "objectIdentityResource": "15:id#update"
+          },
+          {
+            "@Hjid": "9",
+            "name": "DELETE",
+            "objectIdentity": "-186320835",
+            "objectIdentityResource": "15:id#delete"
+          },
+          {
+            "@Hjid": "10",
+            "name": "SEARCH",
+            "objectIdentity": "242800698",
+            "objectIdentityResource": "15:id#search"
+          }
+        ],
+        "effect": "PERMIT",
+        "createdAt": "2012-06-11T23:19:09.068"
+      },
+      {
+        "@csid": "15-servicegroups-CRUDL",
+        "description": "Generated admin permission.",
+        "resourceName": "servicegroups",
+        "actionGroup": "CRUDL",
+        "action": [
+          {
+            "@Hjid": "11",
+            "name": "CREATE",
+            "objectIdentity": "1035471244",
+            "objectIdentityResource": "15:servicegroups#create"
+          },
+          {
+            "@Hjid": "12",
+            "name": "READ",
+            "objectIdentity": "1042851366",
+            "objectIdentityResource": "15:servicegroups#read"
+          },
+          {
+            "@Hjid": "13",
+            "name": "UPDATE",
+            "objectIdentity": "1548919129",
+            "objectIdentityResource": "15:servicegroups#update"
+          },
+          {
+            "@Hjid": "14",
+            "name": "DELETE",
+            "objectIdentity": "1052307003",
+            "objectIdentityResource": "15:servicegroups#delete"
+          },
+          {
+            "@Hjid": "15",
+            "name": "SEARCH",
+            "objectIdentity": "1481428536",
+            "objectIdentityResource": "15:servicegroups#search"
+          }
+        ],
+        "effect": "PERMIT",
+        "createdAt": "2012-06-11T23:19:09.068"
+      }
+    ]
+  }
+}

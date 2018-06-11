@@ -26,7 +26,6 @@ package org.collectionspace.services.common.document;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import java.util.StringTokenizer;
 
 import org.collectionspace.services.common.api.RefName;
@@ -46,6 +45,7 @@ import org.slf4j.LoggerFactory;
  * @param <WT> 
  * @param <WTL> 
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
         implements DocumentHandler<T, TL, WT, WTL> {
 
@@ -78,7 +78,7 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#getServiceContext()
      */
-    @Override
+	@Override
     public ServiceContext getServiceContext() {
         return serviceContext;
     }
@@ -161,7 +161,20 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
                 validate(action);
                 prepareDelete();
                 break;
-
+                
+            case SYNC:
+                prepareSync();
+                break;
+                
+			case WORKFLOW:
+				logger.error("Should never get to this code path.  If you did, there is a bug in the code.");
+				Thread.dumpStack();
+				break;
+				
+			default:
+				logger.error("Should never get to this code path.  If you did, there is a bug in the code.");
+				Thread.dumpStack();
+				break;
         }
     }
 
@@ -201,10 +214,20 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     }
 
     /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#prepareDelete()
+     */
+    @Override
+    public void prepareSync() throws Exception {
+    	// Do nothing. Subclasses can override if they want/need to.
+    }
+
+    /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#handle(org.collectionspace.services.common.document.DocumentHandler.Action, org.collectionspace.services.common.document.DocumentWrapper)
      */
     @Override
-    final public void handle(Action action, DocumentWrapper<?> wrapDoc) throws Exception {
+    final public boolean handle(Action action, DocumentWrapper<?> wrapDoc) throws Exception {
+    	boolean result = true;
+    	
         switch (action) {
             case CREATE:
                 handleCreate((DocumentWrapper<WT>) wrapDoc);
@@ -223,11 +246,34 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
                 break;
 
             case DELETE:
-                handleDelete((DocumentWrapper<WT>) wrapDoc);
+                result = handleDelete((DocumentWrapper<WT>) wrapDoc);
                 break;
-
+                
+            case SYNC:
+                result = handleSync((DocumentWrapper<Object>) wrapDoc);
+                break;                
+                
+			case WORKFLOW:
+				logger.error("Should never get to this code path.  If you did, there is a bug in the code.");
+				Thread.dumpStack();
+				break;
+				
+			default:
+				logger.error("Should never get to this code path.  If you did, there is a bug in the code.");
+				Thread.dumpStack();
+				break;
         }
+        
+        return result;
     }
+    
+    @Override
+	public void sanitize(DocumentWrapper<WT> wrapDoc) {
+    	//
+    	// By default, do nothing.  Sub-classes can override if they want to.
+    	//
+    }
+
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#handleCreate(org.collectionspace.services.common.document.DocumentWrapper)
@@ -257,14 +303,24 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
      * @see org.collectionspace.services.common.document.DocumentHandler#handleDelete(org.collectionspace.services.common.document.DocumentWrapper)
      */
     @Override
-    public void handleDelete(DocumentWrapper<WT> wrapDoc) throws Exception {
-        
+    public boolean handleDelete(DocumentWrapper<WT> wrapDoc) throws Exception {
+        return true;
     }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#handleDelete(org.collectionspace.services.common.document.DocumentWrapper)
+     */
+    @Override
+    public boolean handleSync(DocumentWrapper<Object> wrapDoc) throws Exception {
+    	// Do nothing. Subclasses can override if they want/need to.
+    	return true;
+    }
+    
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#complete(org.collectionspace.services.common.document.DocumentHandler.Action, org.collectionspace.services.common.document.DocumentWrapper)
      */
-    @Override
+	@Override
     final public void complete(Action action, DocumentWrapper<?> wrapDoc) throws Exception {
         switch (action) {
             case CREATE:
@@ -286,6 +342,20 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
             case DELETE:
                 completeDelete((DocumentWrapper<WT>) wrapDoc);
                 break;
+                
+            case SYNC:
+                completeSync((DocumentWrapper<Object>) wrapDoc);
+                break;
+                
+			case WORKFLOW:
+				logger.error("Should never get to this code path.  If you did, there is a bug in the code.");
+				Thread.dumpStack();
+				break;
+				
+			default:
+				logger.error("Should never get to this code path.  If you did, there is a bug in the code.");
+				Thread.dumpStack();
+				break;                
         }
     }
 
@@ -324,6 +394,13 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     @Override
     public void completeDelete(DocumentWrapper<WT> wrapDoc) throws Exception {
     }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#completeDelete(org.collectionspace.services.common.document.DocumentWrapper)
+     */
+    @Override
+    public void completeSync(DocumentWrapper<Object> wrapDoc) throws Exception {
+    }    
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#extractCommonPart(org.collectionspace.services.common.document.DocumentWrapper)
@@ -400,6 +477,16 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
         }
         tkz.nextToken(); //skip
         return tkz.nextToken();
+    }
+    
+    /**
+     * Should return
+     * @throws Exception 
+     * @throws DocumentException 
+     */
+    @Override
+    public String getDocumentsToIndexQuery(String indexId, String csid) throws DocumentException, Exception {
+    	return null;
     }
 
     /* (non-Javadoc)

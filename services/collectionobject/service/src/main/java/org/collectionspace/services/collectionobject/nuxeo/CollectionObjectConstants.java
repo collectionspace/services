@@ -23,6 +23,8 @@
  */
 package org.collectionspace.services.collectionobject.nuxeo;
 
+import org.collectionspace.services.client.CollectionSpaceClient;
+
 /**
  * CollectionObjectConstants processes CollectionObject document
  *
@@ -33,4 +35,6 @@ public class CollectionObjectConstants {
     public final static String NUXEO_SCHEMA_NAME = "collectionobject";
     public final static String NUXEO_DC_TITLE = "CollectionSpace-CollectionObject";
     
+	public static final String WORKFLOW_STATE_SCHEMA_NAME = CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA;
+	public static final String WORKFLOW_STATE_FIELD_NAME = CollectionSpaceClient.COLLECTIONSPACE_CORE_WORKFLOWSTATE; //"workflowState";    
 }

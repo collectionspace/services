@@ -24,24 +24,18 @@
 package org.collectionspace.services.organization.nuxeo;
 
 import org.collectionspace.services.organization.OrgauthoritiesCommon;
+import org.collectionspace.services.client.OrgAuthorityClient;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 
 /**
  * OrgAuthorityDocumentModelHandler
  *
- * $LastChangedRevision$
- * $LastChangedDate$
  */
 public class OrgAuthorityDocumentModelHandler
         extends AuthorityDocumentModelHandler<OrgauthoritiesCommon> {
-
-    /**
-     * Common part schema label
-     */
-    private static final String COMMON_PART_LABEL = "orgauthorities_common";   
     
     public OrgAuthorityDocumentModelHandler() {
-    	super(COMMON_PART_LABEL);
+    	super(OrgAuthorityClient.SERVICE_COMMON_PART_NAME, OrgAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 	
     /**

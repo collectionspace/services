@@ -23,7 +23,11 @@ package org.collectionspace.services.common.document;
  */
 public class DocumentNotFoundException extends DocumentException {
 
-    final public static int HTTP_CODE = 404;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5407333605837770866L;
+	final public static int HTTP_CODE = 404;
 
     /**
      * Creates a new instance of <code>DocumentNotFoundException</code> without detail message.
