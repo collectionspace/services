@@ -325,9 +325,9 @@
         <ant antfile="loanin/build.xml" target="dist_installer" inheritAll="false"/>
         <ant antfile="acquisition/build.xml" target="dist_installer" inheritAll="false"/>
         <ant antfile="JaxRsServiceProvider/build.xml" target="dist_installer" inheritAll="false"/>
--->
+-->        
     </target>
-
+    
    <target name="generate-dependencies-reports"
             description="Generate a report of dependencies, including their licensing information.">
         <exec executable="mvn" failonerror="true">
@@ -336,7 +336,7 @@
         </exec>
     </target>
 
-    <target name="copy-dependencies-reports"
+    <target name="copy-dependencies-reports" 
             description="Copy dependencies reports to a single directory.">
         <property name="dependencies-reports-dir" value="${basedir}/target/dependencies"/>
         <mkdir dir="${dependencies-reports-dir}"/>
