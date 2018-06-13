@@ -36,7 +36,6 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.osteology.OsteologyCommon;
 
-import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
 
 import org.slf4j.Logger;
@@ -60,17 +59,21 @@ public class OsteologyServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new OsteologyClient();
+    }
+
+    @Override
+    protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new OsteologyClient(clientPropertiesFilename);
     }
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected AbstractCommonList getCommonList(
-            ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(AbstractCommonList.class);
+    protected AbstractCommonList getCommonList(Response response) {
+        return response.readEntity(AbstractCommonList.class);
     }
 
     // ---------------------------------------------------------------
@@ -87,7 +90,7 @@ public class OsteologyServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
     public void create(String testName) throws Exception {
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
-        // its associated HTTP method name (e.g. POST, DELETE).
+        // its associated HTTP method name (e.g. POST, DELETE). 
         setupCreate();
 
         // Submit the request to the service and store the response.
@@ -95,7 +98,7 @@ public class OsteologyServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createOsteologyInstance(identifier);
         String newID = null;
-        ClientResponse<Response> res = client.create(multipart);
+        Response res = client.create(multipart);
         try {
             int statusCode = res.getStatus();
 
@@ -114,9 +117,7 @@ public class OsteologyServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
 
             newID = extractId(res);
         } finally {
-            if (res != null) {
-                res.releaseConnection();
-            }
+            res.close();
         }
 
         // Store the ID returned from the first resource created
@@ -253,14 +254,14 @@ public class OsteologyServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
 
         // Submit the request to the service and store the response.
         OsteologyClient client = new OsteologyClient();
-        ClientResponse<String> res = client.read(knownResourceId);
+        Response res = client.read(knownResourceId);
         PoxPayloadIn input = null;
         try {
             assertStatusCode(res, testName);
-            input = new PoxPayloadIn(res.getEntity());
+            input = new PoxPayloadIn(res.readEntity(String.class));
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -301,7 +302,7 @@ public class OsteologyServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
 
         // Submit the request to the service and store the response.
         OsteologyClient client = new OsteologyClient();
-        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
+        Response res = client.read(NON_EXISTENT_ID);
         try {
             int statusCode = res.getStatus();
 
@@ -314,9 +315,7 @@ public class OsteologyServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
-            if (res != null) {
-                res.releaseConnection();
-            }
+            res.close();
         }
     }
 
@@ -339,9 +338,9 @@ public class OsteologyServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
         // Submit the request to the service and store the response.
         AbstractCommonList list = null;
         OsteologyClient client = new OsteologyClient();
-        ClientResponse<AbstractCommonList> res = client.readList();
-        assertStatusCode(res, testName);
+        Response res = client.readList();
         try {
+            assertStatusCode(res, testName);
             int statusCode = res.getStatus();
 
             // Check the status code of the response: does it match
@@ -353,10 +352,10 @@ public class OsteologyServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
 
-            list = res.getEntity();
+            list = res.readEntity(getCommonListType());
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -389,17 +388,17 @@ public class OsteologyServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
 
         // Retrieve the contents of a resource to update.
         OsteologyClient client = new OsteologyClient();
-        ClientResponse<String> res = client.read(knownResourceId);
+        Response res = client.read(knownResourceId);
         PoxPayloadIn input = null;
         try {
             assertStatusCode(res, testName);
-            input = new PoxPayloadIn(res.getEntity());
+            input = new PoxPayloadIn(res.readEntity(String.class));
             if (logger.isDebugEnabled()) {
                 logger.debug("got object to update with ID: " + knownResourceId);
             }
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -439,10 +438,10 @@ public class OsteologyServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
             Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
-            input = new PoxPayloadIn(res.getEntity());
+            input = new PoxPayloadIn(res.readEntity(String.class));
         } finally {
             if (res != null) {
-                res.releaseConnection();
+                res.close();
             }
         }
 
@@ -487,7 +486,7 @@ public class OsteologyServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
         // The only relevant ID may be the one used in update(), below.
         OsteologyClient client = new OsteologyClient();
         PoxPayloadOut multipart = createOsteologyInstance(NON_EXISTENT_ID);
-        ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
+        Response res = client.update(NON_EXISTENT_ID, multipart);
         try {
             int statusCode = res.getStatus();
 
@@ -500,9 +499,7 @@ public class OsteologyServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
-            if (res != null) {
-                res.releaseConnection();
-            }
+            res.close();
         }
     }
 
@@ -524,7 +521,7 @@ public class OsteologyServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
 
         // Submit the request to the service and store the response.
         OsteologyClient client = new OsteologyClient();
-        ClientResponse<Response> res = client.delete(knownResourceId);
+        Response res = client.delete(knownResourceId);
         try {
             int statusCode = res.getStatus();
 
@@ -537,9 +534,7 @@ public class OsteologyServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
-            if (res != null) {
-                res.releaseConnection();
-            }
+            res.close();
         }
     }
 
@@ -557,7 +552,7 @@ public class OsteologyServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
 
         // Submit the request to the service and store the response.
         OsteologyClient client = new OsteologyClient();
-        ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
+        Response res = client.delete(NON_EXISTENT_ID);
         try {
             int statusCode = res.getStatus();
 
@@ -570,9 +565,7 @@ public class OsteologyServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
                     invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
-            if (res != null) {
-                res.releaseConnection();
-            }
+            res.close();
         }
     }
 
@@ -623,7 +616,7 @@ public class OsteologyServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
     }
 
     @Override
-    protected PoxPayloadOut createInstance(String identifier) {
+    protected PoxPayloadOut createInstance(String identifier) throws Exception {
         return createOsteologyInstance(identifier);
     }
 
@@ -642,8 +635,9 @@ public class OsteologyServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
      *
      * @param osteologyNumber the osteology number
      * @return the multipart output
+     * @throws Exception 
      */
-    private PoxPayloadOut createOsteologyInstance(String osteologyNumber) {
+    private PoxPayloadOut createOsteologyInstance(String osteologyNumber) throws Exception {
 
         OsteologyCommon osteologyCommon = new OsteologyCommon();
         osteologyCommon.setOsteologyNumber(osteologyNumber);
@@ -669,7 +663,7 @@ public class OsteologyServiceTest extends AbstractPoxServiceTestImpl<AbstractCom
 
     @Override
     protected PoxPayloadOut createInstance(String commonPartName,
-            String identifier) {
+            String identifier) throws Exception {
         PoxPayloadOut result = createOsteologyInstance(identifier);
         return result;
     }

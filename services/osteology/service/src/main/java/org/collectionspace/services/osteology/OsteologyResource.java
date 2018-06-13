@@ -24,7 +24,7 @@
 package org.collectionspace.services.osteology;
 
 import org.collectionspace.services.client.OsteologyClient;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ import javax.ws.rs.Produces;
 @Path(OsteologyClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class OsteologyResource extends ResourceBase {
+public class OsteologyResource extends NuxeoBasedResource {
 
     final Logger logger = LoggerFactory.getLogger(OsteologyResource.class);
 

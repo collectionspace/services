@@ -24,10 +24,10 @@
 package org.collectionspace.services.osteology.nuxeo;
 
 import org.collectionspace.services.osteology.OsteologyCommon;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 
 /** OsteologyDocumentModelHandler
  */
 public class OsteologyDocumentModelHandler
-        extends DocHandlerBase<OsteologyCommon> {
+        extends NuxeoDocumentModelHandler<OsteologyCommon> {
 }

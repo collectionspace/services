@@ -16,10 +16,12 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.osteology.OsteologyCommon;
+
 /**
  * OsteologyClient.java
  */
-public class OsteologyClient extends AbstractCommonListPoxServiceClientImpl<OsteologyProxy> {
+public class OsteologyClient extends AbstractCommonListPoxServiceClientImpl<OsteologyProxy, OsteologyCommon> {
 
     public static final String SERVICE_NAME = "osteology";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
@@ -27,9 +29,14 @@ public class OsteologyClient extends AbstractCommonListPoxServiceClientImpl<Oste
     public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
-     */
+    public OsteologyClient() throws Exception {
+        super();
+    }
+
+    public OsteologyClient(String clientPropertiesFilename) throws Exception {
+        super(clientPropertiesFilename);
+    }
+
     @Override
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;

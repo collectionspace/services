@@ -10,7 +10,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.common.invocable.InvocationResults;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
 import org.nuxeo.runtime.transaction.TransactionHelper;
@@ -109,7 +109,7 @@ public class SetPrimaryDisplayBatchJob extends AbstractBatchJob {
                 	"</ns2:media_pahma>" +
                 "</document>";
 
-        ResourceBase resource = getResourceMap().get(MediaClient.SERVICE_NAME);
+        NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(MediaClient.SERVICE_NAME);
         resource.update(getResourceMap(), createUriInfo(), mediaCsid, updatePayload);
 	}
 }

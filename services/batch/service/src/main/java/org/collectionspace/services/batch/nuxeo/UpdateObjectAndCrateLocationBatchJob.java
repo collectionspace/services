@@ -3,7 +3,7 @@ package org.collectionspace.services.batch.nuxeo;
 import java.net.URISyntaxException;
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -49,9 +49,9 @@ public class UpdateObjectAndCrateLocationBatchJob extends UpdateObjectLocationBa
     // Note: any such values must first be exposed in Movement list items,
     // in turn via configuration in Services tenant bindings ("listResultsField").
     @Override
-    protected int updateCollectionObjectValues(ResourceBase collectionObjectResource,
+    protected long updateCollectionObjectValues(NuxeoBasedResource collectionObjectResource,
             String collectionObjectCsid, AbstractCommonList.ListItem mostRecentMovement,
-            ResourceMap resourcemap, int numUpdated)
+            ResourceMap resourcemap, long numUpdated)
             throws DocumentException, URISyntaxException {
         PoxPayloadOut collectionObjectPayload;
         String computedCrate;
