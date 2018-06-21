@@ -21,7 +21,13 @@
     <target name="plugininfo">
         <mkdir dir="target" />
         <property name="plugininfo.filename" value="target/plugininfo.json" />
-        <get src="${cspace.profile.plugin.dist.url}/?meta" dest="${plugininfo.filename}" />
+
+        <!-- The ant get task returns a 403 for some reason. Use curl instead. -->
+        <!-- <get src="${cspace.profile.plugin.dist.url}/?meta" dest="${plugininfo.filename}" /> -->
+
+        <exec executable="curl" failonerror="true">
+            <arg line="--silent --fail --insecure --location ${cspace.profile.plugin.dist.url}/?meta -o ${plugininfo.filename}"/>
+        </exec>
 
         <loadfile srcfile="${plugininfo.filename}" property="cspace.profile.plugin.lib.name">
             <filterchain>
@@ -42,13 +48,23 @@
         <property name="cspace.profile.plugin.lib.file" value="${cspace.profile.plugin.lib.name}@${cspace.profile.version}.min.js" />
         <property name="cspace.profile.plugin.lib.download.file" value="target/${cspace.profile.plugin.lib.file}" />
 
-        <get src="${cspace.profile.plugin.lib.url}" dest="${cspace.profile.plugin.lib.download.file}" />
+        <!-- The ant get task returns a 403 for some reason. Use curl instead. -->
+        <!-- <get src="${cspace.profile.plugin.lib.url}" dest="${cspace.profile.plugin.lib.download.file}" /> -->
+
+        <exec executable="curl" failonerror="true">
+            <arg line="--silent --fail --insecure --location ${cspace.profile.plugin.lib.url} -o ${cspace.profile.plugin.lib.download.file}"/>
+        </exec>
 
         <property name="cspace.ui.lib.url" value="https://unpkg.com/cspace-ui@${cspace.ui.version}/dist/cspaceUI.min.js" />
         <property name="cspace.ui.lib.file" value="cspaceUI@${cspace.ui.version}.min.js" />
         <property name="cspace.ui.lib.download.file" value="target/${cspace.ui.lib.file}" />
 
-        <get src="${cspace.ui.lib.url}" dest="${cspace.ui.lib.download.file}" />
+        <!-- The ant get task returns a 403 for some reason. Use curl instead. -->
+        <!-- <get src="${cspace.ui.lib.url}" dest="${cspace.ui.lib.download.file}" /> -->
+
+        <exec executable="curl" failonerror="true">
+            <arg line="--silent --fail --insecure --location ${cspace.ui.lib.url} -o ${cspace.ui.lib.download.file}"/>
+        </exec>
     </target>
 
     <target name="deploylib" depends="downloadlib">
