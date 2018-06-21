@@ -7,35 +7,38 @@
     <!-- enviornment should be declared before reading build.properties -->
     <property environment="env" />
     <property file="${services.trunk}/build.properties" />
-    
+
     <condition property="osfamily-unix">
         <os family="unix" />
     </condition>
     <condition property="osfamily-windows">
         <os family="windows" />
     </condition>
-    
+
     <target name="package" depends="deploy">
-        
+
     </target>
-    
-    <target name="download">
+
+    <!-- Disabled for UCB -->
+    <target name="download" if="false">
         <exec executable="curl"  failonerror="true">
             <arg line="-o cspaceUI@${cspace.ui.version}.min.js --fail --insecure --remote-name --location https://unpkg.com/cspace-ui@${cspace.ui.version}/dist/cspaceUI.min.js"/>
         </exec>
     </target>
-    
-    <target name="deploy" depends="download" description="deploy cspace ui to ${jee.server.cspace}">
+
+    <!-- Disabled for UCB -->
+    <target name="deploy" depends="download" description="deploy cspace ui to ${jee.server.cspace}" if="false">
         <filter token="UI_VERSION" value="${cspace.ui.version}" />
         <copy todir="${jee.deploy.cspace}/${cspace.ui.webapp}" filtering="true" overwrite="true">
             <fileset dir="${cspace.ui.webapp}"/>
         </copy>
         <move file="cspaceUI@${cspace.ui.version}.min.js" todir="${jee.deploy.cspace.ui.shared}"></move>
     </target>
-    
-    <target name="undeploy" description="undeploy collectionspace ui components from ${jee.server.cspace}">
+
+    <!-- Disabled for UCB -->
+    <target name="undeploy" description="undeploy collectionspace ui components from ${jee.server.cspace}" if="false">
         <delete dir="${jee.deploy.cspace}/${cspace.ui.webapp}" />
         <delete file="${jee.deploy.cspace.ui.shared}/cspaceUI@${cspace.ui.version}.min.js" />
     </target>
-    
+
 </project>
