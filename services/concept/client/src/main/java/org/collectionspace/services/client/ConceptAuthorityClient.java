@@ -98,7 +98,7 @@ public class ConceptAuthorityClient extends AuthorityClientImpl<Conceptauthoriti
 
 	@Override
 	public String createAuthorityItemInstance(String shortIdentifier, String displayName) {
-		// TODO Auto-generated method stub
-		return null;
+	    PoxPayloadOut conceptItemInstance = ConceptAuthorityClientUtils.createConceptInstance(shortIdentifier, displayName, SERVICE_ITEM_COMMON_PART_NAME);
+        return conceptItemInstance.asXML();
 	}
 }
