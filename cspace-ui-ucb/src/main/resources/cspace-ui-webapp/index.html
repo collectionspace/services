@@ -1,0 +1,20 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <div id="cspace"></div>
+    <script src="@CSPACE_UI_LIB_URL@"></script>
+    <script src="@CSPACE_PROFILE_PLUGIN_LIB_URL@"></script>
+    <script>
+        cspaceUI({
+            messages: {
+                'footer.release': 'Release {version} (@UCB_RELEASE@)',
+            },
+            plugins: [
+                @CSPACE_PROFILE_PLUGIN_LIB_NAME@(),
+            ],
+        });
+    </script>
+</body>
+</html>
