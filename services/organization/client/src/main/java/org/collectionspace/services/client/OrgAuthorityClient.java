@@ -103,7 +103,7 @@ public class OrgAuthorityClient extends AuthorityWithContactsClientImpl<Orgautho
 
 	@Override
 	public String createAuthorityItemInstance(String shortIdentifier, String displayName) {
-		// TODO Auto-generated method stub
-		return null;
+	    PoxPayloadOut orgAuthorityInstance = OrgAuthorityClientUtils.createOrganizationInstance(shortIdentifier, displayName, SERVICE_ITEM_COMMON_PART_NAME);
+        return orgAuthorityInstance.asXML();
 	}
 }

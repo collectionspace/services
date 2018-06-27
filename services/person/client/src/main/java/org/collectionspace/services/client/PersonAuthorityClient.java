@@ -104,7 +104,7 @@ public class PersonAuthorityClient extends AuthorityWithContactsClientImpl<Perso
 
 	@Override
 	public String createAuthorityItemInstance(String shortIdentifier, String displayName) {
-		PoxPayloadOut personAuthorityInstance = PersonAuthorityClientUtils.createPersonInstance(shortIdentifier, displayName, SERVICE_COMMON_PART_NAME);
+		PoxPayloadOut personAuthorityInstance = PersonAuthorityClientUtils.createPersonInstance(shortIdentifier, displayName, SERVICE_ITEM_COMMON_PART_NAME);
 		return personAuthorityInstance.asXML();
 	}
 }

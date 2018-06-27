@@ -66,7 +66,8 @@ public class PersonValidatorHandler extends ValidatorHandlerImpl {
             try {
                 String shortId = person.getShortIdentifier();
                 if (shortId != null) {
-                    CS_ASSERT(shortIdentifierContainsOnlyValidChars(shortId), SHORT_ID_BAD_CHARS_ERROR);
+                    String msg = String.format("%s: %s", SHORT_ID_BAD_CHARS_ERROR, shortId);
+                    CS_ASSERT(shortIdentifierContainsOnlyValidChars(shortId), msg);
                 }
                 CS_ASSERT(containsAtLeastOneTerm(person), HAS_NO_TERMS_ERROR);
                 CS_ASSERT(allTermsContainDisplayName(person), TERM_HAS_EMPTY_DISPLAYNAME_ERROR);

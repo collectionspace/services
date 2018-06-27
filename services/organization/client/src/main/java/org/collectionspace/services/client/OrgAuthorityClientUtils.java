@@ -29,6 +29,8 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.common.api.Tools;
+
+import org.collectionspace.services.organization.StructuredDateGroup;
 import org.collectionspace.services.organization.ContactNameList;
 import org.collectionspace.services.organization.FunctionList;
 import org.collectionspace.services.organization.GroupList;
@@ -37,10 +39,10 @@ import org.collectionspace.services.organization.OrganizationsCommon;
 import org.collectionspace.services.organization.OrgauthoritiesCommon;
 import org.collectionspace.services.organization.OrgTermGroup;
 import org.collectionspace.services.organization.OrgTermGroupList;
+
 import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.collectionspace.services.organization.StructuredDateGroup;
 
 /**
  * OrgAuthorityClientUtils.
@@ -204,6 +206,37 @@ public class OrgAuthorityClientUtils {
     	
     	return result;
     }
+    
+    public static List<OrgTermGroup> getTermGroupInstance(String shortIdentifier, String displayName) {
+        if (Tools.isBlank(shortIdentifier)) {
+            shortIdentifier = getGeneratedIdentifier();
+        }
+        if (Tools.isBlank(shortIdentifier)) {
+            displayName = shortIdentifier;
+        }
+        
+        List<OrgTermGroup> terms = new ArrayList<OrgTermGroup>();
+        OrgTermGroup term = new OrgTermGroup();
+        term.setTermDisplayName(displayName);
+        term.setTermName(shortIdentifier);
+        terms.add(term);
+        return terms;
+    }
+    
+    /*
+     * Create a very simple Organization term -just a short ID and display name.
+     */
+    public static PoxPayloadOut createOrganizationInstance(String shortIdentifier, String displayName,
+            String headerLabel) {
+        List<OrgTermGroup> terms = getTermGroupInstance(shortIdentifier, displayName);
+        
+        Map<String, String> orgInfo = new HashMap<String, String>();
+        orgInfo.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortIdentifier);
+        
+        final Map<String, List<String>> EMPTY_ORG_REPEATABLES_INFO = new HashMap<String, List<String>>();
+
+        return createOrganizationInstance(null, orgInfo, terms, EMPTY_ORG_REPEATABLES_INFO, headerLabel);
+    }      
 
     /**
      * Creates the organization instance.
@@ -234,14 +267,18 @@ public class OrgAuthorityClientUtils {
      * @return the multipart output
      */
     public static PoxPayloadOut createOrganizationInstance( 
-    		String orgAuthRefName, Map<String, String> orgInfo, List<OrgTermGroup> terms,
-                Map<String, List<String>> orgRepeatablesInfo, String headerLabel){
+        		String orgAuthRefName, 
+        		Map<String, String> orgInfo, 
+        		List<OrgTermGroup> terms,
+        		Map<String, List<String>> orgRepeatablesInfo,
+        		String headerLabel) {
+        
         OrganizationsCommon organization = new OrganizationsCommon();
-    	String shortId = orgInfo.get(OrganizationJAXBSchema.SHORT_IDENTIFIER);
-    	if (shortId == null || shortId.isEmpty()) {
-    		throw new IllegalArgumentException("shortIdentifier cannot be null or empty");
-    	}      	
-    	organization.setShortIdentifier(shortId);
+        	String shortId = orgInfo.get(OrganizationJAXBSchema.SHORT_IDENTIFIER);
+        	if (shortId == null || shortId.isEmpty()) {
+        		throw new IllegalArgumentException("shortIdentifier cannot be null or empty");
+        	}      	
+        	organization.setShortIdentifier(shortId);
        	String value = null;
         List<String> values = null;
         
@@ -253,23 +290,23 @@ public class OrgAuthorityClientUtils {
         termList.getOrgTermGroup().addAll(terms); 
         organization.setOrgTermGroupList(termList);
         
-        if((values = (List<String>)orgRepeatablesInfo.get(OrganizationJAXBSchema.CONTACT_NAMES))!=null) {
+        if ((values = (List<String>)orgRepeatablesInfo.get(OrganizationJAXBSchema.CONTACT_NAMES))!=null) {
                 ContactNameList contactsList = new ContactNameList();
                 List<String> contactNames = contactsList.getContactName();
         	contactNames.addAll(values);
                 organization.setContactNames(contactsList);
         }
-        if((value = (String)orgInfo.get(OrganizationJAXBSchema.FOUNDING_DATE))!=null) {
+        if ((value = (String)orgInfo.get(OrganizationJAXBSchema.FOUNDING_DATE))!=null) {
             StructuredDateGroup foundingDate = new StructuredDateGroup();
             foundingDate.setDateDisplayDate(value);
             organization.setFoundingDateGroup(foundingDate);
         }
-        if((value = (String)orgInfo.get(OrganizationJAXBSchema.DISSOLUTION_DATE))!=null) {
+        if ((value = (String)orgInfo.get(OrganizationJAXBSchema.DISSOLUTION_DATE))!=null) {
             StructuredDateGroup dissolutionDate = new StructuredDateGroup();
             dissolutionDate.setDateDisplayDate(value);
             organization.setDissolutionDateGroup(dissolutionDate);
         }
-        if((value = (String)orgInfo.get(OrganizationJAXBSchema.FOUNDING_PLACE))!=null)
+        if ((value = (String)orgInfo.get(OrganizationJAXBSchema.FOUNDING_PLACE))!=null)
         	organization.setFoundingPlace(value);
         if((values = (List<String>)orgRepeatablesInfo.get(OrganizationJAXBSchema.GROUPS))!=null) {
                 GroupList groupsList = new GroupList();
@@ -277,13 +314,13 @@ public class OrgAuthorityClientUtils {
         	groups.addAll(values);
                 organization.setGroups(groupsList);
         }
-        if((values = (List<String>)orgRepeatablesInfo.get(OrganizationJAXBSchema.FUNCTIONS))!=null) {
+        if ((values = (List<String>)orgRepeatablesInfo.get(OrganizationJAXBSchema.FUNCTIONS))!=null) {
                 FunctionList functionsList = new FunctionList();
                 List<String> functions = functionsList.getFunction();
         	functions.addAll(values);
                 organization.setFunctions(functionsList);
         }
-        if((values = (List<String>)orgRepeatablesInfo.get(OrganizationJAXBSchema.HISTORY_NOTES))!=null) {
+        if ((values = (List<String>)orgRepeatablesInfo.get(OrganizationJAXBSchema.HISTORY_NOTES))!=null) {
                 HistoryNoteList historyNotesList = new HistoryNoteList();
                 List<String> historyNotes = historyNotesList.getHistoryNote();
         	historyNotes.addAll(values);
@@ -296,7 +333,7 @@ public class OrgAuthorityClientUtils {
         commonPart.setLabel(headerLabel);
 
         if(logger.isDebugEnabled()){
-        	logger.debug("to be created, organization common ", organization, OrganizationsCommon.class);
+        	    logger.debug("to be created, organization common ", organization, OrganizationsCommon.class);
         }
 
         return multipart;
