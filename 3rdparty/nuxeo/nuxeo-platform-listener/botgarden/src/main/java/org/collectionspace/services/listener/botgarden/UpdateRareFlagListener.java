@@ -5,15 +5,22 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.collectionspace.services.batch.BatchResource;
 import org.collectionspace.services.batch.nuxeo.UpdateRareFlagBatchJob;
+import org.collectionspace.services.client.BatchClient;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectBotGardenConstants;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceMap;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
 import org.collectionspace.services.nuxeo.listener.AbstractCSEventListenerImpl;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonBotGardenConstants;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonConstants;
+import org.collectionspace.services.taxonomy.nuxeo.TaxonomyAuthorityConstants;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.event.CoreEventConstants;
@@ -47,10 +54,11 @@ public class UpdateRareFlagListener extends AbstractCSEventListenerImpl {
 		if (isRegistered(event) && ec instanceof DocumentEventContext) {
 			DocumentEventContext context = (DocumentEventContext) ec;
 			DocumentModel doc = context.getSourceDocument();
+			String docType = doc.getType();
 
-			logger.debug("docType=" + doc.getType());
+			logger.debug("docType=" + docType);
 
-			if (doc.getType().startsWith(CollectionObjectConstants.NUXEO_DOCTYPE) &&
+			if (docType.startsWith(CollectionObjectConstants.NUXEO_DOCTYPE) &&
 					!doc.isVersion() &&
 					!doc.isProxy() &&
 					!doc.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
@@ -101,7 +109,7 @@ public class UpdateRareFlagListener extends AbstractCSEventListenerImpl {
 						String collectionObjectCsid = doc.getName();
 
 						try {
-							InvocationResults results = createUpdater().updateRareFlag(collectionObjectCsid);
+							InvocationResults results = createUpdater(context).updateRareFlag(collectionObjectCsid);
 
 							logger.debug("updateRareFlag complete: numAffected=" + results.getNumAffected() + " userNote=" + results.getUserNote());
 						} catch (Exception e) {
@@ -110,7 +118,8 @@ public class UpdateRareFlagListener extends AbstractCSEventListenerImpl {
 					}
 				}
 			}
-			else if (doc.getType().startsWith(TaxonConstants.NUXEO_DOCTYPE) &&
+			else if (docType.startsWith(TaxonConstants.NUXEO_DOCTYPE) &&
+					!docType.startsWith(TaxonomyAuthorityConstants.NUXEO_DOCTYPE) &&
 					!doc.isVersion() &&
 					!doc.isProxy() &&
 					!doc.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
@@ -150,7 +159,7 @@ public class UpdateRareFlagListener extends AbstractCSEventListenerImpl {
 						String vocabularyCsid = (String) doc.getProperty(TaxonConstants.IN_AUTHORITY_SCHEMA_NAME, TaxonConstants.IN_AUTHORITY_FIELD_NAME);
 
 						try {
-							InvocationResults results = createUpdater().updateReferencingRareFlags(taxonCsid, vocabularyCsid);
+							InvocationResults results = createUpdater(context).updateReferencingRareFlags(taxonCsid, vocabularyCsid);
 
 							logger.debug("updateReferencingRareFlags complete: numAffected=" + results.getNumAffected() + " userNote=" + results.getUserNote());
 						} catch (Exception e) {
@@ -190,10 +199,15 @@ public class UpdateRareFlagListener extends AbstractCSEventListenerImpl {
 		return hasRareConservationCategory;
 	}
 
-	private UpdateRareFlagBatchJob createUpdater() {
+	private UpdateRareFlagBatchJob createUpdater(DocumentEventContext context) throws Exception {
 		ResourceMap resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
+		BatchResource batchResource = (BatchResource) resourceMap.get(BatchClient.SERVICE_NAME);
+		ServiceContext<PoxPayloadIn, PoxPayloadOut> serviceContext = batchResource.createServiceContext(batchResource.getServiceName());
+
+		serviceContext.setCurrentRepositorySession(new CoreSessionWrapper(context.getCoreSession()));
 
 		UpdateRareFlagBatchJob updater = new UpdateRareFlagBatchJob();
+		updater.setServiceContext(serviceContext);
 		updater.setResourceMap(resourceMap);
 
 		return updater;
