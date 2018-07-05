@@ -58,7 +58,7 @@ import javax.ws.rs.core.UriInfo;
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
 public class BatchResource extends NuxeoBasedResource {
-	
+
 	protected final String COMMON_SCHEMA = "batch_common";
 
     @Override
@@ -77,12 +77,15 @@ public class BatchResource extends NuxeoBasedResource {
     public Class getCommonPartClass() {
     	return BatchCommon.class;
     }
-    
+
 	// other resource methods and use the getRepositoryClient() methods.
 	@Override
-    protected AbstractCommonList getCommonList(UriInfo ui) {
+    protected AbstractCommonList getCommonList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, UriInfo ui) {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
+            if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
+                ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
+            }
             MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
             DocumentHandler handler = createDocumentHandler(ctx);
             String docType = queryParams.getFirst(IQueryManager.SEARCH_TYPE_DOCTYPE);
@@ -90,25 +93,25 @@ public class BatchResource extends NuxeoBasedResource {
             String whereClause = null;
             DocumentFilter documentFilter = null;
             String common_part = ctx.getCommonPartLabel();
-			
+
             if (docType != null && !docType.isEmpty()) {
                 whereClause = QueryManager.createWhereClauseForInvocableByDocType(
                 		common_part, docType);
                 documentFilter = handler.getDocumentFilter();
                 documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }
-			
+
             if (mode != null && !mode.isEmpty()) {
                 whereClause = QueryManager.createWhereClauseForInvocableByMode(
                 		common_part, mode);
                 documentFilter = handler.getDocumentFilter();
                 documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }
-			
+
             if (whereClause !=null && logger.isDebugEnabled()) {
                 logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
             }
-			
+
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             AbstractCommonList list = (AbstractCommonList) handler.getCommonPartList();
             return list;
@@ -116,16 +119,16 @@ public class BatchResource extends NuxeoBasedResource {
             throw bigReThrow(e, ServiceMessages.LIST_FAILED);
         }
     }
-	
+
 	/**
 	 * Gets the authorityItem list for the specified authority
 	 * If partialPerm is specified, keywords will be ignored.
-	 * 
+	 *
 	 * @param specifier either a CSID or one of the urn forms
 	 * @param partialTerm if non-null, matches partial terms
 	 * @param keywords if non-null, matches terms in the keyword index for items
 	 * @param ui passed to include additional parameters, like pagination controls
-	 * 
+	 *
 	 * @return the authorityItem list
 	 */
 	@GET
@@ -166,9 +169,9 @@ public class BatchResource extends NuxeoBasedResource {
             throw bigReThrow(e, ServiceMessages.SEARCH_FAILED);
         }
     }
-    
+
 	private String createWhereClauseForDocType(String docType) {
-		String trimmed = (docType == null)?"":docType.trim(); 
+		String trimmed = (docType == null)?"":docType.trim();
 		if (trimmed.isEmpty()) {
 			throw new RuntimeException("No docType specified.");
 		}
@@ -179,7 +182,7 @@ public class BatchResource extends NuxeoBasedResource {
 	}
 
 	private String createWhereClauseForMode(String mode) throws BadRequestException {
-		String trimmed = (mode == null)?"":mode.trim(); 
+		String trimmed = (mode == null)?"":mode.trim();
 		if (trimmed.isEmpty()) {
 			throw new RuntimeException("No mode specified.");
 		}
@@ -195,18 +198,18 @@ public class BatchResource extends NuxeoBasedResource {
 		}
 		return ptClause;
 	}
-    
+
 	private BatchCommon getBatchCommon(String csid) throws Exception {
 		BatchCommon result = null;
-    	
+
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
 		PoxPayloadOut ppo = get(csid, ctx);
 		PayloadPart batchCommonPart = ppo.getPart(BatchClient.SERVICE_COMMON_PART_NAME);
 		result = (BatchCommon)batchCommonPart.getBody();
-		
+
     	return result;
     }
-	
+
     @POST
     @Path("{csid}")
     public InvocationResults invokeBatchJob(
@@ -220,7 +223,7 @@ public class BatchResource extends NuxeoBasedResource {
             BatchDocumentModelHandler handler = (BatchDocumentModelHandler)createDocumentHandler(ctx);
             return handler.invokeBatchJob(ctx, csid, resourceMap, invContext, getBatchCommon(csid));
         } catch (Exception e) {
-        	String msg = String.format("%s Could not invoke batch job with CSID='%s'.", 
+        	String msg = String.format("%s Could not invoke batch job with CSID='%s'.",
         			ServiceMessages.POST_FAILED, csid);
             throw bigReThrow(e, msg);
         }
