@@ -20,23 +20,9 @@
 		            </tenant:param>
 	            </tenant:paramList>
 	        </tenant:eventListenerConfig>
-	        <tenant:eventListenerConfig id="UpdateObjectLocationAndCrateOnMove">
-	            <tenant:className>org.collectionspace.services.listener.UpdateObjectLocationAndCrateOnMove</tenant:className>
-	            <tenant:paramList id="default">
-	                <tenant:param>
-	                    <tenant:key>crate-key0</tenant:key>
-	                    <tenant:value>value0</tenant:value>
-		            </tenant:param>
-	                <tenant:param>
-	                    <tenant:key>crate-key1</tenant:key>
-	                    <tenant:value>value1</tenant:value>
-		            </tenant:param>
-	                <tenant:param>
-	                    <tenant:key>crate-key2</tenant:key>
-	                    <tenant:value>value2</tenant:value>
-		            </tenant:param>
-	            </tenant:paramList>
-	        </tenant:eventListenerConfig>
+	    	<tenant:eventListenerConfig id="UpdateRelationsOnDelete">
+	    		<tenant:className>org.collectionspace.services.listener.UpdateRelationsOnDelete</tenant:className>
+	    	</tenant:eventListenerConfig>
 	    </tenant:eventListenerConfigurations>
 		<tenant:properties>
 			<!-- Controls whether term completion (aka partial term matching, aka autocomplete) searches will automatically insert 
