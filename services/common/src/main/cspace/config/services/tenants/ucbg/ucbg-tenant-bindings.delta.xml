@@ -12,27 +12,27 @@
             <tenant:eventListenerConfig id="UpdateObjectLocationOnMove" merge:matcher="id" merge:action="delete" />
 
             <tenant:eventListenerConfig id="updatelocationlistener" merge:matcher="id">
-	            <tenant:className>org.collectionspace.services.listener.botgarden.UpdateLocationListener</tenant:className>
+                <tenant:className>org.collectionspace.services.listener.botgarden.UpdateLocationListener</tenant:className>
             </tenant:eventListenerConfig>
 
-            <!-- <tenant:eventListenerConfig id="updatedeadflaglistener" merge:matcher="id">
-	            <tenant:className>org.collectionspace.services.listener.botgarden.UpdateDeadFlagListener</tenant:className>
-            </tenant:eventListenerConfig> -->
+            <tenant:eventListenerConfig id="updatedeadflaglistener" merge:matcher="id">
+                <tenant:className>org.collectionspace.services.listener.botgarden.UpdateDeadFlagListener</tenant:className>
+            </tenant:eventListenerConfig>
 
             <tenant:eventListenerConfig id="updateformatteddisplaynamelistener" merge:matcher="id">
-	            <tenant:className>org.collectionspace.services.listener.naturalhistory.UpdateFormattedDisplayNameListener</tenant:className>
+                <tenant:className>org.collectionspace.services.listener.naturalhistory.UpdateFormattedDisplayNameListener</tenant:className>
             </tenant:eventListenerConfig>
 
-            <!-- <tenant:eventListenerConfig id="updaterareflaglistener" merge:matcher="id">
-	            <tenant:className>org.collectionspace.services.listener.botgarden.UpdateRareFlagListener</tenant:className>
-            </tenant:eventListenerConfig> -->
+            <tenant:eventListenerConfig id="updaterareflaglistener" merge:matcher="id">
+                <tenant:className>org.collectionspace.services.listener.botgarden.UpdateRareFlagListener</tenant:className>
+            </tenant:eventListenerConfig>
 
-            <!-- <tenant:eventListenerConfig id="updateaccesscodelistener" merge:matcher="id">
-	            <tenant:className>org.collectionspace.services.listener.botgarden.UpdateAccessCodeListener</tenant:className>
-            </tenant:eventListenerConfig> -->
+            <tenant:eventListenerConfig id="updateaccesscodelistener" merge:matcher="id">
+                <tenant:className>org.collectionspace.services.listener.botgarden.UpdateAccessCodeListener</tenant:className>
+            </tenant:eventListenerConfig>
 
             <tenant:eventListenerConfig id="createversionlistener" merge:matcher="id">
-	            <tenant:className>org.collectionspace.services.listener.botgarden.CreateVersionListener</tenant:className>
+                <tenant:className>org.collectionspace.services.listener.botgarden.CreateVersionListener</tenant:className>
             </tenant:eventListenerConfig>
         </tenant:eventListenerConfigurations>
 
