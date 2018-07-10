@@ -28,9 +28,8 @@ import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
+import org.collectionspace.services.common.CollectionSpaceResource;
 import org.collectionspace.services.common.NuxeoBasedResource;
-import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.UriTemplateRegistry;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
@@ -357,7 +356,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 			authorityServiceNamesByDocType = new HashMap<String, String>();
 
 			for (String serviceName : getResourceMap().keySet()) {
-				AuthorityResource resource = (AuthorityResource) getResourceMap().get(serviceName);
+				CollectionSpaceResource<?, ?> resource = (CollectionSpaceResource<?, ?>) getResourceMap().get(serviceName);
 
 				if (resource instanceof AuthorityResource) {
 					AuthorityResource<?, ?> authorityResource = (AuthorityResource<?, ?>) resource;
