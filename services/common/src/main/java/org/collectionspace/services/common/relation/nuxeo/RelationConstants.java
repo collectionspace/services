@@ -36,7 +36,7 @@ public class RelationConstants {
     public final static String NUXEO_SCHEMA_NAME = "relations_common";
     /** The Constant REL_NUXEO_SCHEMA_ROOT_ELEMENT. */
     final public static String NUXEO_SCHEMA_ROOT_ELEMENT = "relationtype";
-    
+
     public final static String COMMON_SCHEMA_NAME = IRelationsManager.SERVICE_COMMONPART_NAME;
 
     public final static String SUBJECT_CSID_SCHEMA_NAME = COMMON_SCHEMA_NAME;
@@ -50,10 +50,10 @@ public class RelationConstants {
 
     public final static String OBJECT_DOCTYPE_SCHEMA_NAME = COMMON_SCHEMA_NAME;
     public final static String OBJECT_DOCTYPE_FIELD_NAME = IRelationsManager.OBJECT_DOCTYPE;
-    
+
     public final static String TYPE_SCHEMA_NAME = COMMON_SCHEMA_NAME;
     public final static String TYPE_FIELD_NAME = IRelationsManager.RELATIONSHIP_TYPE;
-    
-    public final static String AFFECTS_TYPE = RelationshipType.AFFECTS.toString();
-    public final static String BROADER_TYPE = RelationshipType.HAS_BROADER.toString();
+
+    public final static String AFFECTS_TYPE = RelationshipType.AFFECTS.value();
+    public final static String BROADER_TYPE = RelationshipType.HAS_BROADER.value();
 }

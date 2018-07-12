@@ -75,10 +75,10 @@ import javax.ws.rs.core.UriInfo;
 public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<PoxPayloadIn, PoxPayloadOut> {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-    
+
     private final static boolean EXCLUDE_AUTHORITIES = false;
     private final static boolean INCLUDE_AUTHORITIES = true;
-    
+
     @Override
     public String getServiceName(){
         return ServiceGroupClient.SERVICE_NAME;
@@ -122,7 +122,7 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
 	    	svcGroups.add("authority");
 	    	// Fetch the list of groups from the tenant-bindings config, and prepare a list item
 	    	// for each one.
-	        // We always declare this a full list, of the size that we are returning. 
+	        // We always declare this a full list, of the size that we are returning.
 	    	// Not quite in the spirit of what paging means, but tells callers not to ask for more.
 	    	list.setPageNum(0);
 	    	list.setPageSize(svcGroups.size());
@@ -144,12 +144,12 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.LIST_FAILED);
         }
-        
+
     }
 
-    
+
     //======================= GET ====================================================
-    // NOTE that csid is not a good name for the specifier, but if we name it anything else, 
+    // NOTE that csid is not a good name for the specifier, but if we name it anything else,
     // our AuthZ gets confused!!!
     @GET
     @Path("{csid}")
@@ -163,7 +163,7 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
             TenantBindingConfigReaderImpl tReader =
                     ServiceMain.getInstance().getTenantBindingConfigReader();
             // We need to get all the procedures, authorities, and objects.
-	        ArrayList<String> groupsList = null;  
+	        ArrayList<String> groupsList = null;
 	        if("common".equalsIgnoreCase(groupname)) {
 	        	groupsList = ServiceBindingUtils.getCommonServiceTypes(INCLUDE_AUTHORITIES);
 	        } else {
@@ -184,7 +184,7 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
             common.setUri(uri);
             result = new PoxPayloadOut(getServicePathComponent());
             result.addPart("ServicegroupsCommon", common);
-            
+
         	ServicegroupsCommon.HasDocTypes wrapper = common.getHasDocTypes();
         	if(wrapper==null) {
         		wrapper = new ServicegroupsCommon.HasDocTypes();
@@ -217,14 +217,14 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
 	        ServiceGroupDocumentModelHandler handler = (ServiceGroupDocumentModelHandler)
 	        				createDocumentHandler(ctx);
-	        ArrayList<String> groupsList = null;  
+	        ArrayList<String> groupsList = null;
 	        if("common".equalsIgnoreCase(serviceGroupName)) {
 	        	groupsList = ServiceBindingUtils.getCommonServiceTypes(INCLUDE_AUTHORITIES);
 	        } else {
 	        	groupsList = new ArrayList<String>();
 	        	groupsList.add(serviceGroupName);
 	        }
-	        
+
 	        // check first for a csid query parameter
             MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
 	        String csid = queryParams.getFirst(IQueryManager.CSID_QUERY_PARAM);
@@ -257,9 +257,9 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
 			                logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
 			            }
 		            }
-		        }	        	
+		        }
 	        }
-	        
+
             String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
 	        if (advancedSearch != null && !advancedSearch.isEmpty()) {
 	            DocumentFilter documentFilter = handler.getDocumentFilter();
@@ -269,7 +269,7 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
 	                logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
 	            }
 	        }
-	        
+
 	        // make the query
             list = handler.getItemListForGroup(ctx, groupsList);
         } catch (Exception e) {
@@ -289,23 +289,23 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
     	UriInfoWrapper ui = new UriInfoWrapper(uriInfo);
         ensureCSID(serviceGroupName, NuxeoBasedResource.READ);
         PoxPayloadOut result = null;
-        
+
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
 	        ServiceGroupDocumentModelHandler handler = (ServiceGroupDocumentModelHandler)
 	        				createDocumentHandler(ctx);
-	        ArrayList<String> groupsList = null;  
+	        ArrayList<String> groupsList = null;
 	        if("common".equalsIgnoreCase(serviceGroupName)) {
 	        	groupsList = ServiceBindingUtils.getCommonServiceTypes(INCLUDE_AUTHORITIES);
 	        } else {
 	        	groupsList = new ArrayList<String>();
 	        	groupsList.add(serviceGroupName);
 	        }
-	        
+
             String whereClause = QueryManager.createWhereClauseFromCsid(specifier);
             DocumentFilter myFilter = new NuxeoDocumentFilter(whereClause, 0, 1);
-            handler.setDocumentFilter(myFilter);    
-	        
+            handler.setDocumentFilter(myFilter);
+
             result = handler.getResourceItemForCsid(ctx, groupsList, specifier);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.READ_FAILED, serviceGroupName);
