@@ -88,19 +88,19 @@ public abstract class NuxeoBasedResource
             System.out.println("Static initializer failed in ResourceBase because not running from deployment.  OK to use Resource classes statically for tests.");
         }
     }
-    
+
     //======================= REINDEX ====================================================
     @GET
     @Path("{csid}/index/{indexid}")
     public Response reindex(
-            @Context Request request,    		
+            @Context Request request,
             @Context UriInfo uriInfo,
             @PathParam("csid") String csid,
             @PathParam("indexid") String indexid) {
     	uriInfo = new UriInfoWrapper(uriInfo);
        	Response result = Response.status(Response.Status.OK).entity("Reindex complete.").type("text/plain").build();
        	boolean success = false;
-       	
+
         ensureCSID(csid, READ);
         try {
             RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(uriInfo);
@@ -109,16 +109,16 @@ public abstract class NuxeoBasedResource
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.REINDEX_FAILED, csid);
         }
-        
+
         if (success == false) {
             Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
                     ServiceMessages.REINDEX_FAILED + ServiceMessages.resourceNotReindexedMsg(csid)).type("text/plain").build();
             throw new CSWebApplicationException(response);
         }
-       	
+
        	return result;
     }
-    
+
     //======================= REINDEX ====================================================
     @GET
     @Path("index/{indexid}")
@@ -130,7 +130,7 @@ public abstract class NuxeoBasedResource
        	Response result = Response.noContent().build();
        	boolean success = false;
        	String docType = null;
-       	
+
         try {
             RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(uriInfo);
             docType = ctx.getTenantQualifiedDoctype(); // this will used in the error message if an error occurs
@@ -139,19 +139,19 @@ public abstract class NuxeoBasedResource
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.REINDEX_FAILED);
         }
-        
+
         if (success == false) {
             Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
                     ServiceMessages.REINDEX_FAILED + ServiceMessages.resourceNotReindexedMsg(docType)).type("text/plain").build();
             throw new CSWebApplicationException(response);
         }
-       	
+
        	return result;
     }
-    
-    
+
+
     //======================= CREATE ====================================================
-    
+
     @POST
     public Response create(
     		@Context ResourceMap resourceMap,
@@ -160,28 +160,28 @@ public abstract class NuxeoBasedResource
     	uriInfo = new UriInfoWrapper(uriInfo);
         return this.create(null, resourceMap, uriInfo, xmlPayload);
     }
-    
+
     public Response create(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, // REM: 8/13/2012 - Some sub-classes will override this method -e.g., MediaResource does.
     		ResourceMap resourceMap,
     		UriInfo uriInfo,
             String xmlPayload) {
     	Response result = null;
-    	
+
         try {
             PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input, resourceMap, uriInfo);
             ctx.setResourceMap(resourceMap);
             if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
             	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
-            }            
+            }
             result = create(input, ctx);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
         }
-        
+
         return result;
-    }    
-    
+    }
+
     protected Response create(PoxPayloadIn input, ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
         try {
             DocumentHandler<PoxPayloadIn, PoxPayloadOut, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
@@ -212,11 +212,11 @@ public abstract class NuxeoBasedResource
     		@PathParam("csid") String csid,
     		String xmlPayload) {
     	uriInfo = new UriInfoWrapper(uriInfo);
-        return this.update(null, resourceMap, uriInfo, csid, xmlPayload); 
+        return this.update(null, resourceMap, uriInfo, csid, xmlPayload);
     }
 
     /**
-     * 
+     *
      * @param parentCtx
      * @param resourceMap
      * @param uriInfo
@@ -230,7 +230,7 @@ public abstract class NuxeoBasedResource
     		@PathParam("csid") String csid,
     		String xmlPayload) {
         PoxPayloadOut result = null;
-        
+
         ensureCSID(csid, UPDATE);
         try {
             PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
@@ -238,13 +238,13 @@ public abstract class NuxeoBasedResource
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED, csid);
         }
-        
+
         return result.getBytes();
     }
-    
+
     /**
      * This method is used to synchronize data with the SAS (Shared Authority Server).
-     * 
+     *
      * @param parentCtx
      * @param resourceMap
      * @param uriInfo
@@ -259,15 +259,15 @@ public abstract class NuxeoBasedResource
     		String csid,
     		PoxPayloadIn theUpdate) throws Exception {
     	PoxPayloadOut result = null;
-    	
+
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate, uriInfo);
         ctx.setResourceMap(resourceMap);
         if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
         	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
         	ctx.setProperties(parentCtx.getProperties()); // transfer all the parent properties to the current context
-        }            
+        }
         result = update(csid, theUpdate, ctx); //==> CALL implementation method, which subclasses may override.
-    	
+
     	return result;
     }
 
@@ -312,7 +312,7 @@ public abstract class NuxeoBasedResource
         getRepositoryClient(ctx).delete(ctx, csid, handler);
         return Response.status(HttpResponseCodes.SC_OK).build();
     }
-    
+
     public Response deleteWithParentCtx(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
     		String csid)
             throws Exception {
@@ -326,7 +326,7 @@ public abstract class NuxeoBasedResource
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, csid);
         }
-    }    
+    }
 
     //======================= GET ====================================================
     @GET
@@ -337,40 +337,40 @@ public abstract class NuxeoBasedResource
             @PathParam("csid") String csid) {
     	uriInfo = new UriInfoWrapper(uriInfo);
         PoxPayloadOut result = null;
-        
+
         try {
             result = getResourceFromCsid(request, uriInfo, csid);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);
         }
-        
+
         if (result == null) {
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
             throw new CSWebApplicationException(response);
-        }        
+        }
 
         return Response.ok(result.getBytes()).build();
     }
-    
+
     public PoxPayloadOut getResourceFromCsid(
             Request request,
             UriInfo uriInfo,
             String csid) throws Exception {
         PoxPayloadOut result = null;
-        
+
         ensureCSID(csid, READ);
-        RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = 
+        RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx =
         		(RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(request, uriInfo);
         result = get(csid, ctx);// ==> CALL an implementation method, which subclasses may override.
 
         return result;
-    }    
-    
+    }
+
     /**
      * Call this method only from other resources (like the Service Groups resource) obtained from the global resource map (ResourceMap).  If the a parent
      * context exists and it has an open Nuxeo repository session, we will use it; otherwise, we will create a new one.
-     * 
+     *
      * @param parentCtx
      * @param csid
      * @return
@@ -378,16 +378,16 @@ public abstract class NuxeoBasedResource
     public PoxPayloadOut getWithParentCtx(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
     		String csid) {
     	PoxPayloadOut result = null;
-    	
+
         ensureCSID(csid, READ);
         try {
             RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext();
             if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
             	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
             }
-            
+
             result = get(csid, ctx);// ==> CALL implementation method, which subclasses may override.
-            
+
             if (result == null) {
                 Response response = Response.status(Response.Status.NOT_FOUND).entity(
                         ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
@@ -427,18 +427,18 @@ public abstract class NuxeoBasedResource
         getRepositoryClient(ctx).get(ctx, csid, handler);
         return ctx.getOutput();
     }
-    
+
     protected boolean isGetAllRequest(MultivaluedMap<String, String> queryParams) {
     	boolean result = false;
-    	
+
         String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
         String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
         String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
-        
+
         if (Tools.isBlank(keywords) && Tools.isBlank(advancedSearch) && Tools.isBlank(partialTerm)) {
         	result = true;
         }
-        
+
     	return result;
     }
 
@@ -446,25 +446,36 @@ public abstract class NuxeoBasedResource
     @GET
     public AbstractCommonList getList(@Context UriInfo uriInfo) {
     	uriInfo = new UriInfoWrapper(uriInfo);
+        return this.getList(null, uriInfo);
+    }
+
+    public AbstractCommonList getList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, UriInfo uriInfo) {
         AbstractCommonList list = null;
-        
+
         MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
         if (isGetAllRequest(queryParams) == false) {
             String orderBy = queryParams.getFirst(IClientQueryParams.ORDER_BY_PARAM);
             String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
             String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
             String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
-            list = search(uriInfo, orderBy, keywords, advancedSearch, partialTerm);
+            list = search(parentCtx, uriInfo, orderBy, keywords, advancedSearch, partialTerm);
         } else {
-            list = getCommonList(uriInfo);
+            list = getCommonList(parentCtx, uriInfo);
         }
-        
+
         return list;
     }
-    
+
     protected AbstractCommonList getCommonList(UriInfo uriInfo) {
+        return getCommonList(null, uriInfo);
+    }
+
+    protected AbstractCommonList getCommonList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, UriInfo uriInfo) {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
+            if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
+                ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
+            }
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             AbstractCommonList list = (AbstractCommonList) handler.getCommonPartList();
@@ -473,8 +484,7 @@ public abstract class NuxeoBasedResource
             throw bigReThrow(e, ServiceMessages.LIST_FAILED);
         }
     }
-
-    protected AbstractCommonList finish_getList(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, 
+    protected AbstractCommonList finish_getList(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
     		DocumentHandler handler) {
         try {
             getRepositoryClient(ctx).getFiltered(ctx, handler); // REM - Side effect of this call sets the handler's common part list value
@@ -486,18 +496,18 @@ public abstract class NuxeoBasedResource
 
     protected AbstractCommonList search(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-    		DocumentHandler handler, 
+    		DocumentHandler handler,
     		UriInfo ui,
     		String orderBy,
     		String keywords,
     		String advancedSearch,
     		String partialTerm) throws Exception {
-        DocumentFilter docFilter = handler.getDocumentFilter();      
+        DocumentFilter docFilter = handler.getDocumentFilter();
         if (orderBy == null || orderBy.isEmpty()) {
             String orderByField = getOrderByField(ctx);
             docFilter.setOrderByClause(orderByField);
         }
-        
+
         //
         // NOTE: Partial-term (PT) queries are mutually exclusive to keyword and
         // partial-term queries trump keyword queries.
@@ -520,7 +530,7 @@ public abstract class NuxeoBasedResource
                 }
             }
         }
-                
+
         //
         // Add an advance search clause if one was specified -even if PT search was requested?
         //
@@ -531,31 +541,35 @@ public abstract class NuxeoBasedResource
                 logger.debug("The WHERE clause is: " + docFilter.getWhereClause());
             }
         }
-        
-        getRepositoryClient(ctx).getFiltered(ctx, handler);        
+
+        getRepositoryClient(ctx).getFiltered(ctx, handler);
         return (AbstractCommonList) handler.getCommonPartList();
     }
 
     private AbstractCommonList search(
-    		UriInfo uriInfo,
-    		String orderBy,
-    		String keywords,
-    		String advancedSearch,
-    		String partialTerm) {
-    	AbstractCommonList result = null;
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
+            UriInfo uriInfo,
+            String orderBy,
+            String keywords,
+            String advancedSearch,
+            String partialTerm) {
+        AbstractCommonList result = null;
 
-    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx;
-    	try {
-    		ctx = createServiceContext(uriInfo);
-    		DocumentHandler handler = createDocumentHandler(ctx);
-    		result = search(ctx, handler, uriInfo, orderBy, keywords, advancedSearch, partialTerm);
-    	} catch (Exception e) {
-    		throw bigReThrow(e, ServiceMessages.SEARCH_FAILED);
-    	}
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx;
+        try {
+            ctx = createServiceContext(uriInfo);
+            if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
+            	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
+            }
+            DocumentHandler handler = createDocumentHandler(ctx);
+            result = search(ctx, handler, uriInfo, orderBy, keywords, advancedSearch, partialTerm);
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.SEARCH_FAILED);
+        }
 
-    	return result;
+        return result;
     }
-    
+
     //FIXME: REM - This should not be @Deprecated since we may want to implement this -it has been on the wish list.
     @Deprecated
     public AbstractCommonList getList(List<String> csidList) {
@@ -588,19 +602,19 @@ public abstract class NuxeoBasedResource
         }
         return authRefList;
     }
-    
+
     //======================== UTILITY : getDocModelForRefName ========================================
 
     /*
      * Used get the order by field for list results if one is not specified with an HTTP query param.
-     * 
+     *
      * (non-Javadoc)
      * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#getOrderByField()
      */
     @Override
     protected String getOrderByField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
     	String result = null;
-    	
+
     	// We only want to use the partial term field to order the results if a PT query param exists
         String partialTerm = ctx.getQueryParams().getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
         if (Tools.notBlank(partialTerm) == true) {
@@ -616,14 +630,14 @@ public abstract class NuxeoBasedResource
 				}
 	    	}
         }
-    	    	
+
     	return result;
     }
 
     @Override
 	protected String getPartialTermMatchField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
     	String result = null;
-    	
+
     	DocHandlerParams.Params params = null;
     	try {
 			params = ServiceConfigUtils.getDocHandlerParams(ctx);
@@ -638,38 +652,38 @@ public abstract class NuxeoBasedResource
 				logger.warn(String.format("Call failed to getPartialTermMatchField() for class %s", this.getClass().getName()));
 			}
     	}
-    	
+
     	return result;
 	}
-    
+
     @Override
     public ServiceDescription getDescription(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
     	ServiceDescription result = new ServiceDescription();
-    	
+
     	result.setDocumentType(getDocType(ctx.getTenantId()));
-    	
+
     	return result;
     }
-	
+
     /*
      * ResourceBase create and update calls will set the resourceMap into the service context
      * for all inheriting resource classes. Just use ServiceContext.getResourceMap() to get
      * the map, and pass it in.
      */
-    public static DocumentModel getDocModelForRefName(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String refName, ResourceMap resourceMap) 
+    public static DocumentModel getDocModelForRefName(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String refName, ResourceMap resourceMap)
    			throws Exception, DocumentNotFoundException {
     	return NuxeoUtils.getDocModelForRefName(ctx, refName, resourceMap);
     }
 
     // This is ugly, but prevents us parsing the refName twice. Once we make refName a little more
     // general, and less Authority(Item) specific, this will look better.
-   	public DocumentModel getDocModelForAuthorityItem(CoreSessionInterface repoSession, RefName.AuthorityItem item) 
+   	public DocumentModel getDocModelForAuthorityItem(CoreSessionInterface repoSession, RefName.AuthorityItem item)
    			throws Exception, DocumentNotFoundException {
    		logger.warn("Default (ResourceBase) getDocModelForAuthorityItem called - should not happen!");
    		return null;
    	}
 
-    public DocumentModel getDocModelForRefName(CoreSessionInterface repoSession, String refName) 
+    public DocumentModel getDocModelForRefName(CoreSessionInterface repoSession, String refName)
    			throws Exception, DocumentNotFoundException {
     	return getDocModelForAuthorityItem(repoSession, RefName.AuthorityItem.parse(refName, true));
     }
