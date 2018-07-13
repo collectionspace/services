@@ -34,7 +34,7 @@
 		</copy>
 		<ant antfile="3rdparty/build.xml" target="dist" inheritAll="false" />
 		<ant antfile="services/build.xml" target="dist" inheritAll="false" />
-	    <ant antfile="cspace-ui/build.xml" target="dist" inheritAll="false" />
+	    <ant antfile="cspace-ui-ucb/build.xml" target="dist" inheritAll="false" />
 
 		<!-- bundle up everything -->
 		<tar destfile="${basedir}/dist/${cspace.services.release}-${jee.release}.tar.gz" compression="gzip">
@@ -192,18 +192,18 @@
 	</target>
 
 	<!--
-		Top-level target to create (or recreate) CollectionSpace related databases.  Checks the 
+		Top-level target to create (or recreate) CollectionSpace related databases.  Checks the
 		'recreate_db' property or environment variable.
 	-->
 	<target name="create_db" depends="-create_db, -create_db_erase, -create_db_warn"
 		description="Creates or recreates CollectionSpace database(s), invoke subtasks for indexes, etc.">
 	</target>
-	
+
 	<!--
 		This target sets the Ant property 'create_db.recreate' based on the value of the Ant environment variable 'recreate_db'
 		and the command line property 'recreate_db'.  A command line value of 'true' for the 'recreate_db' property will override
 		the environment variable 'recreate_db' value.
-		
+
 		If the environment variable 'recreate_db' is set to true then the Ant property 'create_db.recreate' will get set to true; otherwise,
 		it will get set to the current value of the Ant property 'recreate_db' -which will be null if not set on the command line.
 	-->
@@ -212,7 +212,7 @@
 		<condition property="create_db.recreate" else="${recreate_db}" value="true">
 			<equals arg1="${env.recreate_db}" arg2="true"/>
 		</condition>
-	</target>	
+	</target>
 
 	<!--
 		This target sends the 'create_nuxeo_db' and 'create_nuxeo_db' targets to all the Ant sub-modules/directories
@@ -221,7 +221,7 @@
 		<antcall target="create_nuxeo_db" />
 		<antcall target="create_cspace_db" />
 	</target>
-	
+
 	<!--
 		Outputs a warning to the user that existing CollectionSpace databases will be replaced/overridden.
 	-->
@@ -233,7 +233,7 @@
 		<echo message="*** WARNING!      'ant create_db -Drecreate_db=true'."/>
 		<echo message="*** WARNING!"/>
 		<echo message="*** WARNING!  Optionally, you can set an environment variable named recreate_db=true as well."/>
-	</target>	
+	</target>
 
 	<target name="create_db-unix" if="osfamily-unix">
 		<exec executable="mvn" failonerror="true">
@@ -241,7 +241,7 @@
 			<arg value="${mvn.opts}" />
 		</exec>
 	</target>
-	
+
 	<target name="create_db-windows" if="osfamily-windows">
 		<exec executable="cmd" failonerror="true">
 			<arg value="/c" />
@@ -250,7 +250,7 @@
 			<arg value="${mvn.opts}" />
 		</exec>
 	</target>
-	
+
 
 	<target name="create_nuxeo_db" description="create nuxeo database">
 		<sql driver="${db.jdbc.driver.class}" url="${db.jdbc.csadmin.url}" userid="${db.csadmin.user}" password="${db.csadmin.user.password}" autocommit="true" src="${db.script.dir}/init_nuxeo_db.sql">
@@ -282,7 +282,7 @@
 		</copy>
 		<ant antfile="3rdparty/build.xml" target="deploy" inheritAll="false" />
 		<ant antfile="services/build.xml" target="deploy" inheritAll="false" />
-	    <ant antfile="cspace-ui/build.xml" target="deploy" inheritAll="false" />
+	    <ant antfile="cspace-ui-ucb/build.xml" target="deploy" inheritAll="false" />
 	</target>
 
 	<target name="setup_initdb.sql" description="copy init_db scripts, replacing keywords">
@@ -321,7 +321,7 @@
 	<target name="undeploy" description="undeploy services from ${jee.server.cspace}">
 		<ant antfile="services/build.xml" target="undeploy" inheritAll="false" />
 		<ant antfile="3rdparty/build.xml" target="undeploy" inheritAll="false" />
-	    <ant antfile="cspace-ui/build.xml" target="undeploy" inheritAll="false" />
+	    <ant antfile="cspace-ui-ucb/build.xml" target="undeploy" inheritAll="false" />
 
 		<delete failonerror="false" dir="${jee.server.cspace}/cspace/services/config" />
 		<delete failonerror="false" dir="${jee.server.cspace}/cspace/services/scripts" />
@@ -356,11 +356,11 @@
 			<arg value="${mvn.opts}" />
 		</exec>
 	</target>
-  
+
   <!-- ################################################
        Tenant management-related properties and targets
        ################################################ -->
-  
+
   <!-- Location of the 'tenants' directory for this CollectionSpace source code layer. -->
   <property name="src.dir" value="${basedir}" />
   <property name="tenants.dir" value="${src.dir}/services/common/src/main/cspace/config/services/tenants"/>
@@ -369,12 +369,12 @@
        from a separate Ant buildfile.
        See http://wiki.apache.org/ant/NewAntFeaturesInDetail/Import -->
   <import file="./tenant-utils-build.xml"/>
-  
+
   <!-- Locations of the tenant folders for the
        template tenant and newly-cloned tenant. -->
   <property name="template.tenant.dir" value="${tenants.dir}/${template.tenant.shortname}"/>
   <property name="tenant.dir" value="${tenants.dir}/${tenant.shortname}"/>
-  
+
   <!-- Location of the tenant bindings delta files for the
        template tenant and newly-cloned tenant. -->
   <property name="tenant.bindings.delta.suffix" value="-tenant-bindings.delta.xml"/>
@@ -382,7 +382,7 @@
     value="${template.tenant.dir}/${template.tenant.shortname}${tenant.bindings.delta.suffix}"/>
   <property name="tenant.bindings.delta.file"
     value="${tenant.dir}/${tenant.shortname}${tenant.bindings.delta.suffix}"/>
-  
+
    <!-- This target inherits from an existing target in the imported
         utility routines buildfile, and adds its own behavior specific to this
         CollectionSpace source code layer. -->
@@ -392,7 +392,7 @@
        <mapper type="regexp" from="^(.*?)${template.tenant.shortname}(.*)$" to="\1${tenant.shortname}\2"/>
      </move>
    </target>
-   
+
   <!-- This target inherits from an (essentially empty) target in the imported
       utility routines buildfile, and adds its own behavior specific to this
       CollectionSpace source code layer. -->
@@ -419,19 +419,19 @@
     depends="tenant-utils.update-text-in-cloned-tenant,
     update-text-in-tenant-bindings-delta">
   </target>
-  
+
   <target name="update-text-in-tenant-bindings-delta"
     depends="update-tenant-id-in-tenant-bindings-delta,
     remove-enclosing-xml-comments-in-tenant-bindings-delta">
   </target>
-  
+
   <target name="update-tenant-id-in-tenant-bindings-delta">
     <replaceregexp
       file="${tenant.bindings.delta.file}"
       match="&lt;tenant:tenantBinding id=&quot;(.*)&quot;&gt;"
       replace="&lt;tenant:tenantBinding id=&quot;${tenant.id}&quot;&gt;"/>
   </target>
-  
+
   <!-- Remove opening and closing XML comment tags, when found
        on lines by themselves: the convention currently used
        in the tenant bindings delta file. -->
@@ -449,11 +449,11 @@
       byline="true"
       flags="gm"/>
   </target>
-  
+
   <!-- This target inherits from an (essentially empty) target in the imported
        utility routines buildfile, and adds its own behavior specific to this
        CollectionSpace source code layer. -->
-  <target name="check-tenant-extended-properties" 
+  <target name="check-tenant-extended-properties"
     depends="tenant-utils.check-tenant-extended-properties">
     <!-- ID of the new tenant to create -->
     <antcall target="check-property-is-defined">

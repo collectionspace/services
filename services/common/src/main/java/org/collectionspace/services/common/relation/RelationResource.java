@@ -1,4 +1,4 @@
-/**	
+/**
  * RelationResource.java
  *
  * {Purpose of This Class}
@@ -66,7 +66,7 @@ import javax.ws.rs.core.UriInfo;
 public class RelationResource extends NuxeoBasedResource {
 	public final static String serviceName = "relations";
 	final Logger logger = LoggerFactory.getLogger(RelationResource.class);
-	
+
 	@Override
 	protected String getVersionString() {
 		final String lastChangeRevision = "$LastChangedRevision$";
@@ -80,7 +80,7 @@ public class RelationResource extends NuxeoBasedResource {
     public Class<RelationsCommon> getCommonPartClass() {
     	return RelationsCommon.class;
     }
-	
+
 	@Override
 	@GET
 	@Produces("application/xml")
@@ -91,10 +91,10 @@ public class RelationResource extends NuxeoBasedResource {
 	public RelationsCommonList getList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx) {
 		return this.getList(parentCtx, parentCtx.getUriInfo());
 	}
-	
-	private RelationsCommonList getList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, UriInfo uriInfo) {
+
+	public RelationsCommonList getList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, UriInfo uriInfo) {
 		MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
-		
+
 		String subjectCsid = queryParams.getFirst(IRelationsManager.SUBJECT_QP);
 		String subjectType = queryParams.getFirst(IRelationsManager.SUBJECT_TYPE_QP);
 		String predicate = queryParams.getFirst(IRelationsManager.PREDICATE_QP);
@@ -103,7 +103,7 @@ public class RelationResource extends NuxeoBasedResource {
 		String viceVersaValue = queryParams.getFirst(IRelationsManager.RECIPROCAL_QP);
 
 		RelationsCommonList resultList = this.getRelationList(parentCtx, uriInfo, subjectCsid, subjectType, predicate, objectCsid, objectType, Tools.isTrue(viceVersaValue));
-		
+
 		return resultList;
 	}
 
@@ -121,19 +121,19 @@ public class RelationResource extends NuxeoBasedResource {
             if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) { // If the parent context has a non-null and open repository session then use it
             	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession());
             }
-            
+
             DocumentHandler handler = createDocumentHandler(ctx);
             String relationClause = RelationsUtils.buildWhereClause(subjectCsid, subjectType, predicate, objectCsid, objectType, viceVersa);
             handler.getDocumentFilter().appendWhereClause(relationClause, IQueryManager.SEARCH_QUALIFIER_AND);
             //
             // Handle keyword clause
             //
-            String keywords = uriInfo.getQueryParameters().getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);            
+            String keywords = uriInfo.getQueryParameters().getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
             if (keywords != null && keywords.isEmpty() == false) {
             	String keywordClause = QueryManager.createWhereClauseFromKeywords(keywords);
             	handler.getDocumentFilter().appendWhereClause(keywordClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }
-            
+
             return (RelationsCommonList)finish_getList(ctx, handler);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.LIST_FAILED);
@@ -143,14 +143,14 @@ public class RelationResource extends NuxeoBasedResource {
     @DELETE
     public Response delete(@Context UriInfo uriInfo) {
     	Response result = Response.status(HttpResponseCodes.SC_OK).build();
-    	
+
     	List<String> csidList = new ArrayList<String>();
         try {
 	    	RelationsCommonList relationsList = this.getList(null, uriInfo);
 	    	for (RelationListItem relation : relationsList.getRelationListItem()) {
 	    		csidList.add(relation.getCsid());
 	    	}
-	    	
+
 	    	if (csidList.isEmpty() == false) {
 	            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
 	        	DocumentHandler<PoxPayloadIn, PoxPayloadOut, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
