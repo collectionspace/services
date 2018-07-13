@@ -22,16 +22,16 @@ public class ClearVoucherLabelRequestBatchJob extends AbstractBatchJob {
 	public ClearVoucherLabelRequestBatchJob() {
 		this.setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_SINGLE, INVOCATION_MODE_LIST, INVOCATION_MODE_NO_CONTEXT));
 	}
-	
+
 	@Override
 	public void run() {
 		setCompletionStatus(STATUS_MIN_PROGRESS);
-		
+
 		try {
 			/*
 			 * For now, treat any mode as if it were no context.
 			 */
-			
+
 			setResults(clearLabelRequests());
 			setCompletionStatus(STATUS_COMPLETE);
 		}
@@ -44,7 +44,7 @@ public class ClearVoucherLabelRequestBatchJob extends AbstractBatchJob {
 	public InvocationResults clearLabelRequests() throws URISyntaxException  {
 		List<String> loanoutCsids = findLabelRequests();
 		InvocationResults results = null;
-		
+
 		if (loanoutCsids.size() > 0) {
 			results = clearLabelRequests(loanoutCsids);
 		}
@@ -52,48 +52,48 @@ public class ClearVoucherLabelRequestBatchJob extends AbstractBatchJob {
 			results = new InvocationResults();
 			results.setUserNote("No label requests found");
 		}
-		
+
 		return results;
 	}
-	
+
 	public InvocationResults clearLabelRequests(String loanoutCsid) throws URISyntaxException  {
 		return clearLabelRequests(Arrays.asList(loanoutCsid));
 	}
-	
+
 	public InvocationResults clearLabelRequests(List<String> loanoutCsids) throws URISyntaxException  {
 		InvocationResults results = new InvocationResults();
 		long numAffected = 0;
-				
+
 		for (String loanoutCsid : loanoutCsids) {
 			clearLabelRequest(loanoutCsid);
 			numAffected = numAffected + 1;
 		}
-		
+
 		results.setNumAffected(numAffected);
 		results.setUserNote("Removed " + numAffected + " label " + (numAffected == 1 ? "request" : "requests"));
 
 		return results;
 	}
-	
+
 	private void clearLabelRequest(String loanoutCsid) throws URISyntaxException {
 		logger.debug("clear label request: loanoutCsid=" + loanoutCsid);
 
-		final String updatePayload = 
+		final String updatePayload =
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 			"<document name=\"loansout\">" +
 				"<ns2:loansout_botgarden xmlns:ns2=\"http://collectionspace.org/services/loanout/local/botgarden\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
 					getFieldXml("labelRequested", LoanoutBotGardenConstants.LABEL_REQUESTED_NO_VALUE) +
 				"</ns2:loansout_botgarden>" +
 			"</document>";
-				
+
 		NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(LoanoutClient.SERVICE_NAME);
-		resource.update(getResourceMap(), createUriInfo(), loanoutCsid, updatePayload);
+		resource.update(getServiceContext(), getResourceMap(), createUriInfo(), loanoutCsid, updatePayload);
 	}
-	
+
 	private List<String> findLabelRequests() throws URISyntaxException {
 		List<String> csids = new ArrayList<String>();
 		LoanoutResource loanoutResource = (LoanoutResource) getResourceMap().get(LoanoutClient.SERVICE_NAME);
-		AbstractCommonList loanoutList = loanoutResource.getList(createLabelRequestSearchUriInfo());
+		AbstractCommonList loanoutList = loanoutResource.getList(getServiceContext(), createLabelRequestSearchUriInfo());
 
 		for (AbstractCommonList.ListItem item : loanoutList.getListItem()) {
 			for (org.w3c.dom.Element element : item.getAny()) {
@@ -109,6 +109,6 @@ public class ClearVoucherLabelRequestBatchJob extends AbstractBatchJob {
 
 	private UriInfo createLabelRequestSearchUriInfo() throws URISyntaxException {
 		return createKeywordSearchUriInfo(LoanoutBotGardenConstants.LABEL_REQUESTED_SCHEMA_NAME, LoanoutBotGardenConstants.LABEL_REQUESTED_FIELD_NAME,
-				LoanoutBotGardenConstants.LABEL_REQUESTED_YES_VALUE);		
+				LoanoutBotGardenConstants.LABEL_REQUESTED_YES_VALUE);
 	}
 }
