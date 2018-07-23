@@ -99,7 +99,7 @@ public class UpdateObjectAndCrateLocationBatchJob extends UpdateObjectLocationBa
         }
 
         // Otherwise, update one or both locations.
-        // (Updated location values can legitimately be blank, to 'null out' existing locations.)  
+        // (Updated location values can legitimately be blank, to 'null out' existing locations.)
         if (computedCurrentLocation == null) {
             computedCurrentLocation = "";
         }
@@ -123,7 +123,7 @@ public class UpdateObjectAndCrateLocationBatchJob extends UpdateObjectLocationBa
         if (logger.isTraceEnabled()) {
             logger.trace("Update payload: " + "\n" + collectionObjectUpdatePayload);
         }
-        byte[] response = collectionObjectResource.update(resourcemap, null, collectionObjectCsid,
+        byte[] response = collectionObjectResource.update(getServiceContext(), resourcemap, null, collectionObjectCsid,
                 collectionObjectUpdatePayload);
         numUpdated++;
         if (logger.isTraceEnabled()) {
