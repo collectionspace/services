@@ -5,7 +5,9 @@
 
 	<tenant:tenantBinding id="15">
 		<tenant:eventListenerConfigurations id="default" merge:matcher="id">
-			<tenant:eventListenerConfig id="UpdateObjectLocationOnMove" merge:matcher="id">
+			<tenant:eventListenerConfig id="UpdateObjectLocationOnMove" merge:matcher="id" merge:action="delete" />
+
+			<tenant:eventListenerConfig id="UpdateObjectLocationAndCrateOnMove" merge:matcher="id">
 				<tenant:className>org.collectionspace.services.listener.UpdateObjectLocationAndCrateOnMove</tenant:className>
 			</tenant:eventListenerConfig>
 		</tenant:eventListenerConfigurations>
@@ -35,13 +37,13 @@
 				</service:params>
 			</service:initHandler>
 		</tenant:serviceBindings>
-		
+
 		<!-- CSPACE-6185: Contacts extension service bindings are not being generated from app layer config, so put them here for now. -->
 		<tenant:serviceBindings merge:matcher="id" id="Contacts">
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
 				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="contacts_anthropology" updated="" order="3">
 					<service:content contentType="application/xml">
-						<service:xmlContent namespaceURI="http://collectionspace.org/services/contact/domain/anthropology" 
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/contact/domain/anthropology"
 							schemaLocation="http://collectionspace.org/services/contact/domain/anthropology http://collectionspace.org/services/contact/domain/contacts_anthropology.xsd" />
 					</service:content>
 				</service:part>
