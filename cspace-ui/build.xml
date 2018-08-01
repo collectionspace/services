@@ -302,6 +302,46 @@
 		<delete dir="${jee.deploy.cspace}/${anthro.profile.plugin.dir}" />
 		<delete file="${jee.deploy.cspace.ui.shared}/${anthro.profile.plugin.js}" />
 	</target>
+	
+	<!--
+		Fine and Contemporary Art Tenant
+	-->
+	<property name="fcart.profile.plugin.tenantid" value="${cspace.profile.fcart.default.id}" />
+	<property name="fcart.profile.plugin.message.title" value="Default Fine and Contemporary Art" />
+	<property name="fcart.profile.plugin.logo" value="undefined" />
+	<property name="fcart.profile.plugin.version" value="latest" />
+	<property name="fcart.profile.plugin.name" value="cspaceUIPluginProfileFCart" />
+	<property name="fcart.profile.plugin.dir" value="cspace#fcart" />
+	<property name="fcart.profile.plugin.js" value="${fcart.profile.plugin.name}@${fcart.profile.plugin.version}.min.js" />
+	<property name="fcart.profile.plugin.basename" value="/cspace/fcart" />
+	
+	<target name="download_fcart" unless="${env.CSPACE_FCART_CREATE_DISABLED_OPT}">
+		<!-- FCart Profile -->
+		<exec executable="curl"	 failonerror="true">
+			<arg line="-o ${fcart.profile.plugin.js} --fail --insecure --remote-name --location https://unpkg.com/cspace-ui-plugin-profile-fcart@${fcart.profile.plugin.version}/dist/${fcart.profile.plugin.name}.min.js"/>
+		</exec>
+	</target>
+	
+	<target name="deploy_fcart" unless="${env.CSPACE_FCART_CREATE_DISABLED_OPT}" depends="download_fcart">
+		<!-- FCart Profile -->
+		<filter token="UI_VERSION" value="${cspace.ui.version}" />
+		<filter token="PLUGIN_VERSION" value="${fcart.profile.plugin.version}" />
+		<filter token="PLUGIN_BASENAME" value="${fcart.profile.plugin.basename}" />
+		<filter token="TENANT_ID" value="${fcart.profile.plugin.tenantid}" />
+		<filter token="MESSAGE_TITLE" value="${fcart.profile.plugin.message.title}" />
+		<filter token="LOGO" value="${fcart.profile.plugin.logo}" />
+		
+		<copy todir="${jee.deploy.cspace}/${fcart.profile.plugin.dir}" filtering="true" overwrite="true">
+			<fileset dir="${fcart.profile.plugin.dir}"/>
+		</copy>
+		<move file="${fcart.profile.plugin.js}" todir="${jee.deploy.cspace.ui.shared}"></move>
+	</target>
+	
+	<target name="undeploy_fcart" description="undeploy collectionspace ui components from ${jee.server.cspace}">
+		<!-- FCart Profile -->
+		<delete dir="${jee.deploy.cspace}/${fcart.profile.plugin.dir}" />
+		<delete file="${jee.deploy.cspace.ui.shared}/${fcart.profile.plugin.js}" />
+	</target>
 
 	<!--
 		General deploy target 
@@ -311,6 +351,7 @@
 		<antcall target="deploy_core" />		
 		<antcall target="deploy_publicart" />
 		<antcall target="deploy_anthro" />
+		<antcall target="deploy_fcart" />
 	</target>
 		
 	<target name="deploy" depends="deploy_common, deploy_generic, deploy_others" description="deploy cspace ui to ${jee.server.cspace}">				
@@ -320,8 +361,9 @@
 	<!-- General undeploy target -->
 
 	<target name="undeploy_others">
-		<antcall target="undeploy_publicart" />
+		<antcall target="undeploy_fcart" />
 		<antcall target="undeploy_anthro" />
+		<antcall target="undeploy_publicart" />
 		<antcall target="undeploy_core" />
 		<antcall target="undeploy_common" />
 		<ant antfile="incubator/build.xml" target="undeploy" inheritAll="false" />
