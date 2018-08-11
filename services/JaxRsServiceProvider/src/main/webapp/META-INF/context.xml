@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
-  license agreements. See the NOTICE file distributed with this work for additional 
-  information regarding copyright ownership. The ASF licenses this file to You under 
-  the Apache License, Version 2.0 (the "License"); you may not use this file except 
-  in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
-  Unless required by applicable law or agreed to in writing, software distributed under 
-  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
-  OF ANY KIND, either express or implied. See the License for the specific language 
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor
+  license agreements. See the NOTICE file distributed with this work for additional
+  information regarding copyright ownership. The ASF licenses this file to You under
+  the Apache License, Version 2.0 (the "License"); you may not use this file except
+  in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software distributed under
+  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS
+  OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License. -->
 <Context antiResourceLocking="false" privileged="true" path="/cspace-services"
     docBase="cspace-services">
@@ -16,10 +16,10 @@
 
     <!-- define custom loader that is responsible to start nuxeo runtime (it extends the default one) -->
 
-    <!-- Disabled since these are specific to the default Nuxeo DM webapp	
+    <!-- Disabled since these are specific to the default Nuxeo DM webapp
   <Loader className="org.nuxeo.runtime.tomcat.NuxeoWebappLoader"
     loaderClass="org.nuxeo.runtime.tomcat.NuxeoWebappClassLoader" />
-    
+
   <Listener className="org.nuxeo.runtime.tomcat.NuxeoLauncher" home="${catalina.base}/nxserver" />
   -->
 
@@ -27,7 +27,7 @@
     For example java:comp/env/jdbc/nxsqldirectory This means you need to update corresponding
     JNDI bindings in nuxeo data source definitions in the config directory -->
 
-<!-- 
+<!--
     <ResourceLink name="jdbc/nxsqldirectory" global="jdbc/nuxeo" type="javax.sql.DataSource"/>
     <ResourceLink name="jdbc/nxrelations-default-jena" global="jdbc/nuxeo" type="javax.sql.DataSource"/>
     <ResourceLink name="jdbc/comment-relations" global="jdbc/nuxeo" type="javax.sql.DataSource"/>
@@ -40,12 +40,12 @@
 
   <Listener className="org.nuxeo.runtime.tomcat.ContextSecurityGrabber" />
 
-<!-- 
+<!--
     <Resource name="TransactionManager" auth="Container" type="javax.transaction.TransactionManager"
         factory="org.nuxeo.runtime.jtajca.NuxeoTransactionManagerFactory"
         transactionTimeoutSeconds="86400"/>
     <Transaction factory="org.nuxeo.runtime.jtajca.NuxeoUserTransactionFactory"/>
-    
+
     <Resource name="NuxeoConnectionManager" auth="Container"
         type="javax.resource.spi.ConnectionManager"
         factory="org.nuxeo.runtime.jtajca.NuxeoConnectionManagerFactory" minPoolSize="0"
@@ -60,13 +60,13 @@
 
   <Resource name="TransactionManager" auth="Container"
     type="javax.transaction.TransactionManager" factory="org.nuxeo.runtime.jtajca.NuxeoTransactionManagerFactory"
-    transactionTimeoutSeconds="300" />
+    transactionTimeoutSeconds="86400" />
   <Transaction factory="org.nuxeo.runtime.jtajca.NuxeoUserTransactionFactory" />
 
-    <!-- 
+    <!--
 		For CollectionSpace services
 	 -->
-	 
+
 	<Resource name="jdbc/CspaceDS"
 		auth="Container"
 		type="javax.sql.DataSource"
@@ -79,7 +79,7 @@
 		testWhileIdle="true"
 		validationQuery="SELECT 1"
 		logAbandoned="true"/>
-		
+
 	<Resource name="jdbc/NuxeoDS_CS"
 		auth="Container"
 		type="javax.sql.DataSource"
@@ -105,7 +105,7 @@
 		testWhileIdle="true"
 		validationQuery="SELECT 1"
 		logAbandoned="true"/>
-  
+
   <Resource name="jdbc/NuxeoReaderDS"
 		auth="Container"
 		type="javax.sql.DataSource"
