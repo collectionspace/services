@@ -2,12 +2,20 @@
 <tenant:TenantBindingConfig
 	xmlns:merge='http://xmlmerge.el4j.elca.ch'
 	xmlns:tenant='http://collectionspace.org/services/config/tenant'>
-    
+
 	<tenant:tenantBinding id="55">
+		<tenant:eventListenerConfigurations id="default" merge:matcher="id">
+			<tenant:eventListenerConfig id="UpdateObjectLocationOnMove" merge:matcher="id" merge:action="delete" />
+
+			<tenant:eventListenerConfig id="UpdateObjectLocationAndCrateOnMove" merge:matcher="id">
+				<tenant:className>org.collectionspace.services.listener.UpdateObjectLocationAndCrateOnMove</tenant:className>
+			</tenant:eventListenerConfig>
+		</tenant:eventListenerConfigurations>
+
 		<tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
 			<service:validatorHandler merge:matcher="tag" merge:action="replace" xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.collectionobject.nuxeo.BAMPFACollectionObjectValidatorHandler</service:validatorHandler>
 		</tenant:serviceBindings>
-		
+
 		<tenant:serviceBindings merge:matcher="id" id="idgenerators">
 			<service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
 				<service:params>
@@ -22,7 +30,7 @@
 				</service:params>
 			</service:initHandler>
 		</tenant:serviceBindings>
-		
+
 		<!-- An attempt to add a local schema extension to Dimensions. Neither the services, app, or UI layers handle this properly. -->
 		<!-- <tenant:serviceBindings merge:matcher="id" id="Dimensions">
 			<service:object xmlns:service="http://collectionspace.org/services/config/service">
