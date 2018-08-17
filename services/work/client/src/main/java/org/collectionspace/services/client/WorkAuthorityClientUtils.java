@@ -3,12 +3,14 @@ package org.collectionspace.services.client;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import org.apache.commons.io.FileUtils;
+
 import org.collectionspace.services.WorkJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.common.api.Tools;
@@ -16,6 +18,7 @@ import org.collectionspace.services.work.WorkTermGroup;
 import org.collectionspace.services.work.WorkTermGroupList;
 import org.collectionspace.services.work.WorkauthoritiesCommon;
 import org.collectionspace.services.work.WorksCommon;
+
 import org.dom4j.DocumentException;
 import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
@@ -287,8 +290,66 @@ public class WorkAuthorityClientUtils {
         return terms;
     }
     
+    private static List<WorkTermGroup> getTermGroupInstance(String shortIdentifier, String displayName) {
+        if (Tools.isBlank(shortIdentifier)) {
+            shortIdentifier = getGeneratedIdentifier();
+        }
+        if (Tools.isBlank(shortIdentifier)) {
+            displayName = shortIdentifier;
+        }
+        
+        List<WorkTermGroup> terms = new ArrayList<WorkTermGroup>();
+        WorkTermGroup term = new WorkTermGroup();
+        term.setTermDisplayName(displayName);
+        term.setTermName(shortIdentifier);
+        terms.add(term);
+        return terms;
+    }
+    
     private static String getGeneratedIdentifier() {
         return "id" + new Date().getTime(); 
    }
+    
+    public static PoxPayloadOut createWorkInstance(String shortIdentifier, String displayName,
+            String serviceItemCommonPartName) {
+        List<WorkTermGroup> terms = getTermGroupInstance(shortIdentifier, displayName);
+        
+        Map<String, String> workInfo = new HashMap<String, String>();
+        workInfo.put(WorkJAXBSchema.SHORT_IDENTIFIER, shortIdentifier);
+        
+        final Map<String, List<String>> EMPTY_WORK_REPEATABLES_INFO = new HashMap<String, List<String>>();
+
+        return createWorkInstance(null, workInfo, terms, EMPTY_WORK_REPEATABLES_INFO, serviceItemCommonPartName);
+    }
+
+    private static PoxPayloadOut createWorkInstance(Object object, Map<String, String> orgInfo,
+            List<WorkTermGroup> terms, Map<String, List<String>> workRepeatablesInfo,
+            String serviceItemCommonPartName) {
+        
+        WorksCommon work = new WorksCommon();
+        String shortId = orgInfo.get(WorkJAXBSchema.SHORT_IDENTIFIER);
+        if (shortId == null || shortId.isEmpty()) {
+            throw new IllegalArgumentException("shortIdentifier cannot be null or empty");
+        }       
+        work.setShortIdentifier(shortId);
+        
+        // Set values in the Term Information Group
+        WorkTermGroupList termList = new WorkTermGroupList();
+        if (terms == null || terms.isEmpty()) {
+            terms = getTermGroupInstance(getGeneratedIdentifier());
+        }
+        termList.getWorkTermGroup().addAll(terms); 
+        work.setWorkTermGroupList(termList);
+        
+        PoxPayloadOut multipart = new PoxPayloadOut(WorkAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = multipart.addPart(work, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(serviceItemCommonPartName);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("to be created, organization common ", work, WorksCommon.class);
+        }
+
+        return multipart;
+    }
     
 }

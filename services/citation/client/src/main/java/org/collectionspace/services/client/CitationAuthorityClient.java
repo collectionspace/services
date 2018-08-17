@@ -97,7 +97,7 @@ public class CitationAuthorityClient extends AuthorityClientImpl<Citationauthori
 
 	@Override
 	public String createAuthorityItemInstance(String shortIdentifier, String displayName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        PoxPayloadOut citationAuthorityInstance = CitationAuthorityClientUtils.createCitationInstance(shortIdentifier, displayName, SERVICE_ITEM_COMMON_PART_NAME);
+        return citationAuthorityInstance.asXML();
+    }
 }
