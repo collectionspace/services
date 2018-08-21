@@ -7,7 +7,7 @@ import javax.ws.rs.Produces;
 /**
  * @version $Revision:$
  */
-@Path(PersonAuthorityClient.SERVICE_PATH + "/")
+@Path(PersonClient.SERVICE_PATH + "/")
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
 public interface PersonAuthorityProxy extends AuthorityWithContactsProxy {

@@ -34,10 +34,10 @@ import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.OrgAuthorityClient;
+import org.collectionspace.services.client.OrganizationClient;
 import org.collectionspace.services.client.OrgAuthorityClientUtils;
 import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PersonAuthorityClient;
+import org.collectionspace.services.client.PersonClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -220,7 +220,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
      */
     private void createPersonAuthority(String displayName, String shortIdentifier) throws Exception {
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
     	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     			displayName, shortIdentifier, personAuthClient.getCommonPartName());
         Response res = personAuthClient.create(multipart);
@@ -258,7 +258,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
         term.setTermDisplayName(termName);
         term.setTermName(termName);
         personTerms.add(term);
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
     	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
     				personAuthRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
         Response res = personAuthClient.createItem(personAuthCSID, multipart);
@@ -333,7 +333,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
      */
     private void createOrgAuthority(String displayName, String shortIdentifier) throws Exception {
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
-        OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
+        OrganizationClient orgAuthClient = new OrganizationClient();
         PoxPayloadOut multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
     			displayName, shortIdentifier, orgAuthClient.getCommonPartName());
         Response res = orgAuthClient.create(multipart);
@@ -372,7 +372,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
         term.setTermName(shortName);
         orgTerms.add(term);
         
-        OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
+        OrganizationClient orgAuthClient = new OrganizationClient();
     	PoxPayloadOut multipart =
     		OrgAuthorityClientUtils.createOrganizationInstance(orgAuthRefName, orgInfo, orgTerms, orgAuthClient.getItemCommonPartName());
         Response res = orgAuthClient.createItem(orgAuthCSID, multipart);
@@ -531,7 +531,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
         
         //
         // Delete persons before PersonAuth
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
             personAuthClient.deleteItem(personAuthCSID, resourceId).close();
@@ -540,7 +540,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
         
         //
         // Delete organizations before OrgAuth
-        OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
+        OrganizationClient orgAuthClient = new OrganizationClient();
         for (String resourceId : orgIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
             orgAuthClient.deleteItem(orgAuthCSID, resourceId).close();
