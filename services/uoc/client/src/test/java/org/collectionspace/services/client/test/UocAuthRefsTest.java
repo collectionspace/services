@@ -32,7 +32,7 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.UocClient;
-import org.collectionspace.services.client.PersonAuthorityClient;
+import org.collectionspace.services.client.PersonClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -154,7 +154,7 @@ public class UocAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
     protected void createPersonRefs() throws Exception {
 
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         // Create a temporary PersonAuthority resource, and its corresponding
         // refName by which it can be identified.
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(PERSON_AUTHORITY_NAME,
@@ -212,7 +212,7 @@ public class UocAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
             throws Exception {
         String result = null;
 
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         Map<String, String> personInfo = new HashMap<String, String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
@@ -356,7 +356,7 @@ public class UocAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         //
         // Delete Person resource(s) (before PersonAuthority resources).
         //
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         for (String csid : personIdsCreated) {
             Response res = null;
             try {

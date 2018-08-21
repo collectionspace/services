@@ -21,9 +21,8 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.collectionspace.services.contact;
+package org.collectionspace.services.common.vocabulary;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +34,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -130,6 +128,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
             ServiceContext ctx = createServiceContext(getContactServiceName(), input);
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid, ui);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
+
             UriBuilder path = UriBuilder.fromResource(resourceClass);
             path.path("" + parentcsid + "/items/" + itemcsid + "/contacts/" + csid);
             Response response = Response.created(path.build()).build();
@@ -140,6 +139,23 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
                     + parentspecifier + ": and item:" + itemspecifier + ": was not found.",
                     itemspecifier);
         }
+    }
+    
+    public String createContact(ServiceContext existingCtx, String parentCsid, String itemCsid, PoxPayloadIn input,
+            UriInfo ui) throws Exception {
+        ServiceContext ctx = createServiceContext(getContactServiceName(), input);
+        if (existingCtx != null) {
+            Object repoSession = existingCtx.getCurrentRepositorySession();
+            if (repoSession != null) {
+                ctx.setCurrentRepositorySession(repoSession);
+                ctx.setProperties(existingCtx.getProperties());
+            }
+        }
+        
+        DocumentHandler handler = createContactDocumentHandler(ctx, parentCsid, itemCsid, ui);
+        String csid = getRepositoryClient(ctx).create(ctx, handler);
+
+        return csid;
     }
 
     /**

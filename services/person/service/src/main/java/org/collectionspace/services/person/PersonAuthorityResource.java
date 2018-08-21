@@ -25,8 +25,8 @@ package org.collectionspace.services.person;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import org.collectionspace.services.client.PersonAuthorityClient;
-import org.collectionspace.services.contact.AuthorityResourceWithContacts;
+import org.collectionspace.services.client.PersonClient;
+import org.collectionspace.services.common.vocabulary.AuthorityResourceWithContacts;
 import org.collectionspace.services.person.nuxeo.PersonDocumentModelHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * Handles, dispatches, and returns responses to RESTful requests related to
  * Person authority-related resources.
  */
-@Path(PersonAuthorityClient.SERVICE_PATH)
+@Path(PersonClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
 public class PersonAuthorityResource extends AuthorityResourceWithContacts<PersonauthoritiesCommon, PersonDocumentModelHandler> {
@@ -46,22 +46,22 @@ public class PersonAuthorityResource extends AuthorityResourceWithContacts<Perso
 
     public PersonAuthorityResource() {
         super(PersonauthoritiesCommon.class, PersonAuthorityResource.class,
-                PersonAuthorityClient.SERVICE_COMMON_PART_NAME, PersonAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
+                PersonClient.SERVICE_COMMON_PART_NAME, PersonClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 
     @Override
     public String getServiceName() {
-        return PersonAuthorityClient.SERVICE_NAME;
+        return PersonClient.SERVICE_NAME;
     }
 
     @Override
     public String getItemServiceName() {
-        return PersonAuthorityClient.SERVICE_ITEM_NAME;
+        return PersonClient.SERVICE_ITEM_NAME;
     }
 
     @Override
     public String getItemTermInfoGroupXPathBase() {
-        return PersonAuthorityClient.TERM_INFO_GROUP_XPATH_BASE;
+        return PersonClient.TERM_INFO_GROUP_XPATH_BASE;
     }
 
     @Override

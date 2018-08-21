@@ -32,7 +32,7 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ConditioncheckClient;
-import org.collectionspace.services.client.PersonAuthorityClient;
+import org.collectionspace.services.client.PersonClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -146,7 +146,7 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
     }
     
     protected void createPersonRefs() throws Exception{
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         // Create a temporary PersonAuthority resource, and its corresponding
         // refName by which it can be identified.
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
@@ -173,7 +173,7 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
     protected String createPerson(String firstName, String surName, String shortId, String authRefName ) throws Exception {
     	String result = null;
     	
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
@@ -300,7 +300,7 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         // Delete Person resource(s) (before PersonAuthority resources).
         
         for (String resourceId : personIdsCreated) {

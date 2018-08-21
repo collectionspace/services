@@ -60,9 +60,9 @@ public class OrgAuthorityClientUtils {
      * @return
      * @throws Exception 
      */
-    public static String getAuthorityRefName(String csid, OrgAuthorityClient client) throws Exception{
+    public static String getAuthorityRefName(String csid, OrganizationClient client) throws Exception{
     	if (client==null) {
-    		client = new OrgAuthorityClient();
+    		client = new OrganizationClient();
     	}
     	
         Response res = client.read(csid);
@@ -96,9 +96,9 @@ public class OrgAuthorityClientUtils {
      * @return
      * @throws Exception 
      */
-    public static String getOrgRefName(String inAuthority, String csid, OrgAuthorityClient client) throws Exception{
+    public static String getOrgRefName(String inAuthority, String csid, OrganizationClient client) throws Exception{
     	if (client == null) {
-    		client = new OrgAuthorityClient();
+    		client = new OrganizationClient();
     	}
     	
         Response res = client.readItem(inAuthority, csid);
@@ -142,7 +142,7 @@ public class OrgAuthorityClientUtils {
         //String refName = createOrgAuthRefName(shortIdentifier, displayName);
         //orgAuthority.setRefName(refName);
         orgAuthority.setVocabType("OrgAuthority");
-        PoxPayloadOut multipart = new PoxPayloadOut(OrgAuthorityClient.SERVICE_PAYLOAD_NAME);
+        PoxPayloadOut multipart = new PoxPayloadOut(OrganizationClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(orgAuthority, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(headerLabel);
 
@@ -165,7 +165,7 @@ public class OrgAuthorityClientUtils {
      */
     public static String createItemInAuthority( String inAuthority,
     		String orgAuthorityRefName, Map<String, String> orgInfo, List<OrgTermGroup> terms,
-                Map<String, List<String>> orgRepeatablesInfo, OrgAuthorityClient client) {
+                Map<String, List<String>> orgRepeatablesInfo, OrganizationClient client) {
     	// Expected status code: 201 Created
     	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
     	// Type of service request being tested
@@ -327,7 +327,7 @@ public class OrgAuthorityClientUtils {
                 organization.setHistoryNotes(historyNotesList);
         }
 
-        PoxPayloadOut multipart = new PoxPayloadOut(OrgAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
+        PoxPayloadOut multipart = new PoxPayloadOut(OrganizationClient.SERVICE_ITEM_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(organization,
             MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(headerLabel);

@@ -15,6 +15,11 @@
 	<dependencies>
 		<!-- CollectionSpace dependencies -->
 		<dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.contact.service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+		<dependency>
 			<groupId>org.collectionspace.services</groupId>
 			<artifactId>org.collectionspace.services.config</artifactId>
 			<version>${project.version}</version>

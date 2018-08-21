@@ -17,13 +17,13 @@
             <artifactId>org.collectionspace.services.config</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
+<!--         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authority.service</artifactId>
             <optional>true</optional>
             <version>${project.version}</version>
         </dependency>        
-        <dependency>
+ -->        <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
         </dependency>
