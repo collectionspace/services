@@ -47,8 +47,11 @@ import org.collectionspace.services.common.UriTemplateFactory;
 import org.collectionspace.services.common.UriTemplateRegistryKey;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.contact.ContactResource;
 import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.contact.ContactJAXBSchema;
@@ -176,10 +179,28 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
             @Context UriInfo uriInfo) {
         AbstractCommonList contactObjectList = new AbstractCommonList();
 
+        contactObjectList = getContactList(null, parentspecifier, itemspecifier, uriInfo);
+        
+        return contactObjectList;
+    }
+    
+    public AbstractCommonList getContactList(
+            ServiceContext existingCtx,
+            String parentspecifier,
+            String itemspecifier,
+            UriInfo uriInfo) {
+        AbstractCommonList contactObjectList = new AbstractCommonList();
+
         try {
             ServiceContext ctx = createServiceContext(getContactServiceName(), uriInfo);
-            MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
-        	
+            if (existingCtx != null) {
+                Object repoSession = existingCtx.getCurrentRepositorySession();
+                if (repoSession != null) {
+                    ctx.setCurrentRepositorySession(repoSession);
+                    ctx.setProperties(existingCtx.getProperties());
+                }
+            }
+            
             String parentcsid = lookupParentCSID(parentspecifier, "getContactList(parent)", "GET_CONTACT_LIST", null);
             ServiceContext itemCtx = createServiceContext(getItemServiceName());
             String itemcsid = lookupItemCSID(itemCtx, itemspecifier, parentcsid, "getContactList(item)", "GET_CONTACT_LIST");
@@ -204,7 +225,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
         }
         
         return contactObjectList;
-    }
+    }    
 
     /**
      * Gets the contact.
@@ -282,8 +303,30 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
                     + ": and item:" + itemspecifier + ": was not found.",
                     csid);
         }
+        
         return result.toXML();
     }
+    
+    public void updateContact(ServiceContext existingCtx, String parentCsid, String itemCsid, String csid,
+            PayloadInputPart theUpdate) throws Exception {
+        PoxPayloadOut result = null;
+        
+        String payloadTemplate = "<?xml version='1.0' encoding='UTF-8'?><document>%s</document>";
+        String xmlPayload = String.format(payloadTemplate, theUpdate.asXML());
+        PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
+        
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getContactServiceName(), input);
+        if (existingCtx != null) {
+            Object repoSession = existingCtx.getCurrentRepositorySession();
+            if (repoSession != null) {
+                ctx.setCurrentRepositorySession(repoSession);
+                ctx.setProperties(existingCtx.getProperties());
+            }
+        }
+        
+        DocumentHandler handler = createContactDocumentHandler(ctx, parentCsid, itemCsid);
+        getRepositoryClient(ctx).update(ctx, csid, handler);
+    }    
 
     /**
      * Delete contact.
