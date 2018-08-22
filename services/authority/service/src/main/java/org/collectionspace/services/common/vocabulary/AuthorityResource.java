@@ -697,7 +697,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         }
     }
     
-    private String getCsid(ListItem item) {
+    protected String getCsid(ListItem item) {
         String result = null;
         
         for (Element ele : item.getAny()) {
