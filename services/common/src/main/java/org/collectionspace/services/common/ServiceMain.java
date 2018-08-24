@@ -101,6 +101,7 @@ public class ServiceMain {
     private static final String DROP_USER_SQL_CMD = "DROP USER";
     private static final String DROP_USER_IF_EXISTS_SQL_CMD = DROP_USER_SQL_CMD + " IF EXISTS %s;";
     private static final String DROP_OBJECTS_SQL_COMMENT = "-- drop all the objects before dropping roles";
+	private static final String CSPACE_JEESERVER_HOME = "CSPACE_JEESERVER_HOME";
 
     private ServiceMain() {
     	// Intentionally blank
@@ -1437,5 +1438,15 @@ public class ServiceMain {
 			throw e;
 		}
 
+	}
+
+	public static String getJeeContainPath() throws Exception {
+		String result = System.getenv(CSPACE_JEESERVER_HOME);
+		
+		if (result == null) {
+			throw new Exception();
+		}
+		
+		return result;
 	}
 }
