@@ -88,9 +88,10 @@ public class PlaceAuthorityClient extends AuthorityClientImpl<PlaceauthoritiesCo
 		return poxPayloadout.asXML();
 	}
 
-	@Override
-	public String createAuthorityItemInstance(String shortIdentifier, String displayName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String createAuthorityItemInstance(String shortIdentifier, String displayName) {
+        PoxPayloadOut placeAuthorityInstance = PlaceAuthorityClientUtils.createPlaceInstance(shortIdentifier,
+                displayName, SERVICE_ITEM_COMMON_PART_NAME);
+        return placeAuthorityInstance.asXML();
+    }
 }
