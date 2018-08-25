@@ -158,18 +158,6 @@ public class CitationAuthorityClientUtils {
                 requestType.validStatusCodesAsString();
     }
     
-     public static List<CitationTermGroup> getTermGroupInstance(String identifier) {
-        if (Tools.isBlank(identifier)) {
-            identifier = getGeneratedIdentifier();
-        }
-        List<CitationTermGroup> terms = new ArrayList<CitationTermGroup>();
-        CitationTermGroup term = new CitationTermGroup();
-        term.setTermDisplayName(identifier);
-        term.setTermName(identifier);
-        terms.add(term);
-        return terms;
-    }
-    
     private static String getGeneratedIdentifier() {
         return "id" + new Date().getTime(); 
    }
@@ -183,10 +171,10 @@ public class CitationAuthorityClientUtils {
         
         final Map<String, List<String>> EMPTY_CITATION_REPEATABLES_INFO = new HashMap<String, List<String>>();
 
-        return createCitationInstance(null, citationInfo, terms, EMPTY_CITATION_REPEATABLES_INFO, serviceItemCommonPartName);
+        return createCitationInstance(citationInfo, terms, EMPTY_CITATION_REPEATABLES_INFO, serviceItemCommonPartName);
     }
 
-    private static PoxPayloadOut createCitationInstance(Object object, Map<String, String> citationInfo,
+    private static PoxPayloadOut createCitationInstance(Map<String, String> citationInfo,
             List<CitationTermGroup> terms, Map<String, List<String>> citationRepeatablesInfo,
             String serviceItemCommonPartName) {
         
@@ -220,7 +208,7 @@ public class CitationAuthorityClientUtils {
         if (Tools.isBlank(shortIdentifier)) {
             shortIdentifier = getGeneratedIdentifier();
         }
-        if (Tools.isBlank(shortIdentifier)) {
+        if (Tools.isBlank(displayName)) {
             displayName = shortIdentifier;
         }
         
@@ -231,5 +219,9 @@ public class CitationAuthorityClientUtils {
         terms.add(term);
         return terms;
     }
+    
+    private static List<CitationTermGroup> getTermGroupInstance(String identifier) {
+        return getTermGroupInstance(identifier, null);
+    }    
 
 }
