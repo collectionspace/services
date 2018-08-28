@@ -93,22 +93,32 @@ public abstract class AuthorityItemWithContactsDocumentModelHandler<AICommon> ex
         List<PayloadInputPart> contactPartList = input.getParts(contactClient.getCommonPartName());
 
         //
-        // If there are no update payloads, then return
+        // If there are no update contact payloads, then return
         //
         if (contactPartList.isEmpty()) {
             return;
         }
         
         //
-        // If there are no existing contacts and we're given an update payload then fail with
-        // an exception
+        // If there are no existing contacts and we're given contact payloads then we'll
+        // assume the requester wants us to create new contact records
         //
         if (existingContactList.getTotalItems() == 0 && !contactPartList.isEmpty()) {
-            throw new DocumentException("There was a request to update a contact that does not exist.");
+            String payloadTemplate = "<?xml version='1.0' encoding='UTF-8'?><document>%s</document>";
+            for (PayloadInputPart contactPart: contactPartList) {
+                String xmlPayload = String.format(payloadTemplate, contactPart.asXML());
+                PoxPayloadIn contactInput = new PoxPayloadIn(xmlPayload);
+                contactResource.createContact(getServiceContext(), authorityCsid, itemCsid, contactInput, null);                
+            }
+            
+            return;
         }
         
         //
-        // If there are more update payloads than existing contacts then fail with an exception
+        // If there are more update payloads than existing contacts then fail with an exception.
+        //
+        // TODO: We could try to find the existing ones and perform updates and assume additional
+        // contact payloads need to be used to create new contacts.
         //
         if (existingContactList.getTotalItems() < contactPartList.size()) {
             throw new DocumentException("There are more update payloads than existing contacts.");
@@ -117,7 +127,8 @@ public abstract class AuthorityItemWithContactsDocumentModelHandler<AICommon> ex
         //
         // If there is only one existing contact and only 1 update payload being sent then
         // update the existing contact -assuming the CSID (if any) in the update payload matches
-        // the CSID of the existing contact
+        // the CSID of the existing contact.  If the incoming payload has no CSID specified then
+        // we'll use the payload to update the existing contact record.
         //
         if (existingContactList.getTotalItems() == 1 && contactPartList.size() == 1) {
             String existingContactCsid = this.getCsid(existingContactList.getListItem().get(0));
