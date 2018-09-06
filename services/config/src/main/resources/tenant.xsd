@@ -51,6 +51,7 @@
             <xs:element name="properties" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
         	<xs:element name="remoteClientConfigurations" type="RemoteClientConfigurations" minOccurs="0" maxOccurs="1"/>
         	<xs:element name="emailConfig" type="EmailConfig" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="elasticSearchIndexConfig" type="ElasticSearchIndexConfig" minOccurs="0" maxOccurs="1"/>
             <xs:element name="serviceBindings" type="service:ServiceBindingType" minOccurs="0" maxOccurs="unbounded"/>
 			<!--
 				Processing all of the tenant bindings at startup involves several sub-tasks and is expensive (slow), so we'll compute the MD5 hash of the config and persist it in the corresponding tenant record.
@@ -118,7 +119,17 @@
 			<xs:element name="passwordResetConfig" type="PasswordResetConfig" minOccurs="1" maxOccurs="1"/>			
 		</xs:sequence>
 	</xs:complexType>
-	
+
+	<xs:complexType name="ElasticSearchIndexConfig">
+		<xs:annotation>
+			<xs:documentation>Configuration of a tenant's Elasticsearch index</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="settings" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="mapping" type="xs:string" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
 	<xs:complexType name="SMTPConfig">
 		<xs:annotation>
 			<xs:documentation>SMTP config for sending emails.</xs:documentation>
