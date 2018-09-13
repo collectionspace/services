@@ -190,6 +190,8 @@
 	-->
 	<target name="download_core">
 		<!-- Core UI -->
+		<echo>Downloading from https://unpkg.com/cspace-ui@${cspace.ui.version}/dist/${cspace.ui.webapp.name}.min.js</echo>
+		
 		<exec executable="curl"	 failonerror="true">
 			<arg line="-o ${cspace.ui.js} --fail --insecure --remote-name --location https://unpkg.com/cspace-ui@${cspace.ui.version}/dist/${cspace.ui.webapp.name}.min.js"/>
 		</exec>

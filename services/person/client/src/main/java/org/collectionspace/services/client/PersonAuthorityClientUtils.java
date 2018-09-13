@@ -166,7 +166,7 @@ public class PersonAuthorityClientUtils {
     	personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortIdentifier);
 
 		return createPersonInstance(null, null, personInfo, terms, null, headerLabel);
-	}    
+	}
     
     /**
      * Creates a person instance.
