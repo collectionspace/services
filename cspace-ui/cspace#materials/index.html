@@ -1,0 +1,26 @@
+<html>
+	<head>
+		<meta charset="UTF-8" />
+	</head>
+	<body>
+		<div id="cspace"></div>
+		<script src="/cspace-ui/cspaceUI@@UI_VERSION@.min.js"></script>
+		<script src="/cspace-ui/cspaceUIPluginProfileMaterials@@PLUGIN_VERSION@.min.js"></script>
+		<script>
+			cspaceUI({
+				tenantid: '@TENANT_ID@',
+				// No quotes for logo value.  Use "undefined" (no quotes) for default logo
+				logo: @LOGO@,
+				messages: {
+				// Override the login page title
+					'about.title': '@MESSAGE_TITLE@',
+				},
+				basename: '@PLUGIN_BASENAME@',
+				prettyUrls: true,
+				plugins: [
+					cspaceUIPluginProfileMaterials(),
+				],
+			});
+		</script>
+	</body>
+</html>

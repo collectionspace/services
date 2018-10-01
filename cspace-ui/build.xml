@@ -346,6 +346,46 @@
 	</target>
 
 	<!--
+		Materials Authority Tenant
+	-->
+	<property name="materials.profile.plugin.tenantid" value="${cspace.profile.materials.default.id}" />
+	<property name="materials.profile.plugin.message.title" value="Default Materials Authority" />
+	<property name="materials.profile.plugin.logo" value="undefined" />
+	<property name="materials.profile.plugin.version" value="latest" />
+	<property name="materials.profile.plugin.name" value="cspaceUIPluginProfileMaterials" />
+	<property name="materials.profile.plugin.dir" value="cspace#materials" />
+	<property name="materials.profile.plugin.js" value="${materials.profile.plugin.name}@${materials.profile.plugin.version}.min.js" />
+	<property name="materials.profile.plugin.basename" value="/cspace/materials" />
+	
+	<target name="download_materials" unless="${env.CSPACE_MATERIALS_CREATE_DISABLED_OPT}">
+		<!-- Materials Authority Profile -->
+		<exec executable="curl"	 failonerror="true">
+			<arg line="-o ${materials.profile.plugin.js} --fail --insecure --remote-name --location https://unpkg.com/cspace-ui-plugin-profile-materials@${materials.profile.plugin.version}/dist/${materials.profile.plugin.name}.min.js"/>
+		</exec>
+	</target>
+	
+	<target name="deploy_materials" unless="${env.CSPACE_MATERIALS_CREATE_DISABLED_OPT}" depends="download_materials">
+		<!-- Materials Authority Profile -->
+		<filter token="UI_VERSION" value="${cspace.ui.version}" />
+		<filter token="PLUGIN_VERSION" value="${materials.profile.plugin.version}" />
+		<filter token="PLUGIN_BASENAME" value="${materials.profile.plugin.basename}" />
+		<filter token="TENANT_ID" value="${materials.profile.plugin.tenantid}" />
+		<filter token="MESSAGE_TITLE" value="${materials.profile.plugin.message.title}" />
+		<filter token="LOGO" value="${materials.profile.plugin.logo}" />
+		
+		<copy todir="${jee.deploy.cspace}/${materials.profile.plugin.dir}" filtering="true" overwrite="true">
+			<fileset dir="${materials.profile.plugin.dir}"/>
+		</copy>
+		<move file="${materials.profile.plugin.js}" todir="${jee.deploy.cspace.ui.shared}"></move>
+	</target>
+	
+	<target name="undeploy_materials" description="undeploy collectionspace ui components from ${jee.server.cspace}">
+		<!-- Materials Authority Profile -->
+		<delete dir="${jee.deploy.cspace}/${materials.profile.plugin.dir}" />
+		<delete file="${jee.deploy.cspace.ui.shared}/${materials.profile.plugin.js}" />
+	</target>
+
+	<!--
 		General deploy target 
 	-->		
 	<target name="deploy_others" unless="${primary.profile.plugin.enabled}">
@@ -354,6 +394,7 @@
 		<antcall target="deploy_publicart" />
 		<antcall target="deploy_anthro" />
 		<antcall target="deploy_fcart" />
+		<antcall target="deploy_materials" />
 	</target>
 		
 	<target name="deploy" depends="deploy_common, deploy_generic, deploy_others" description="deploy cspace ui to ${jee.server.cspace}">				
@@ -363,6 +404,7 @@
 	<!-- General undeploy target -->
 
 	<target name="undeploy_others">
+		<antcall target="undeploy_materials" />
 		<antcall target="undeploy_fcart" />
 		<antcall target="undeploy_anthro" />
 		<antcall target="undeploy_publicart" />
