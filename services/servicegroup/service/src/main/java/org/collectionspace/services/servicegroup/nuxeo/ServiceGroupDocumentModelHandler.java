@@ -127,7 +127,7 @@ public class ServiceGroupDocumentModelHandler
     	        Map<String, ServiceBindingType> queriedServiceBindings = new HashMap<String, ServiceBindingType>();
     	        DocumentModelList docList = this.getDocListForGroup(ctx, serviceGroupNames, queriedServiceBindings,
     	        		repoSession, repoClient);
-    	        if (docList == null) { // found no authRef fields - nothing to process
+    	        if (docList == null || docList.isEmpty()) { // found no authRef fields - nothing to process
     	            throw new DocumentNotFoundException();
     	        }
     	        DocumentModel docModel = docList.get(0);
