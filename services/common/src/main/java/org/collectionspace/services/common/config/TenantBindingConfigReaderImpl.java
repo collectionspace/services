@@ -40,6 +40,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.service.ServiceObjectType;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
@@ -463,7 +464,7 @@ public class TenantBindingConfigReaderImpl extends AbstractConfigReaderImpl<List
 	 * @return
 	 */
 	public ServiceBindingType getServiceBindingForDocType(String tenantId, String docType) {
-		String key = getTenantQualifiedIdentifier(tenantId, docType);
+		String key = getTenantQualifiedIdentifier(tenantId, ServiceBindingUtils.getUnqualifiedTenantDocType(docType)); // REM - must use unqualified document type
 		return docTypes.get(key);
 	}
 
