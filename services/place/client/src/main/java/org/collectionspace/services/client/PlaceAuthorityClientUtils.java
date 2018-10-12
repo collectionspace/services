@@ -283,7 +283,7 @@ public class PlaceAuthorityClientUtils {
         if (Tools.isBlank(shortIdentifier)) {
             shortIdentifier = getGeneratedIdentifier();
         }
-        if (Tools.isBlank(shortIdentifier)) {
+        if (Tools.isBlank(displayName)) {
             displayName = shortIdentifier;
         }
         
