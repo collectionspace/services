@@ -369,16 +369,42 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitNumDayInMonthRange(NumDayInMonthRangeContext ctx) {
 		if (ctx.exception != null) return;
 
-		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
-		Integer year = (Integer) stack.pop();
-		Integer dayOfMonthEnd = (Integer) stack.pop();
-		Integer dayOfMonthStart = (Integer) stack.pop();
-		Integer numMonth = (Integer) stack.pop();
+		Era era = (Era) stack.pop();
+		Integer num1 = (Integer) stack.pop();
+		Integer num2 = (Integer) stack.pop();
+		Integer num3 = (Integer) stack.pop();
+		Integer num4 = (Integer) stack.pop();
 
-		stack.push(new Date(year, numMonth, dayOfMonthStart, era));
-		stack.push(new Date(year, numMonth, dayOfMonthStart, era));
-		stack.push(new Date(year, numMonth, dayOfMonthEnd, era));
-		stack.push(new Date(year, numMonth, dayOfMonthEnd, era));
+		/* We can distinguish whether it is M/D-D/Y (Case 1) or M/Y-M/Y (Case 2) by checking if
+			The num1, num4, num2 and num1, num4, num3 are valid dates, since this would equate to
+			a set of two ranges. For examples: 04/13-19/1995 would be 04/13/1995-04/19/1995. If both these
+			dates are valid, we know that it shouldn't be interpreted as 04/01/13 - 19/31/1995 since these arent valid dates!
+		*/
+
+
+		Integer lateYear = num1;
+		Integer earlyMonth = num4;
+		Integer dayOfMonthEnd = num2;
+		Integer dayOfMonthStart = num3;
+
+		if (DateUtils.isValidDate(num1, num4, num2, era) && DateUtils.isValidDate(num1, num4, num3, era)) {
+			// No need to alter the arguments, so just push to the stack
+			stack.push(new Date(lateYear, earlyMonth, dayOfMonthStart, era));
+			stack.push(new Date(lateYear, earlyMonth, dayOfMonthStart, era));
+			stack.push(new Date(lateYear, earlyMonth, dayOfMonthEnd, era));
+			stack.push(new Date(lateYear, earlyMonth, dayOfMonthEnd, era));
+
+		} else {
+			// Separated these by case, since it makes the code more legible
+			Integer latestMonth = num2;
+			Integer earliestYear = num3;
+
+			stack.push(new Date(earliestYear, earlyMonth, 1, era)); // Earliest Early Date
+			stack.push(new Date(earliestYear, earlyMonth, DateUtils.getDaysInMonth(earlyMonth, earliestYear, era), era)); // Latest Early Date
+			stack.push(new Date(lateYear, latestMonth, 1, era)); // Earliest Latest Date
+			stack.push(new Date(lateYear, latestMonth, DateUtils.getDaysInMonth(latestMonth, lateYear, era), era)); // Latest Late Date
+			
+		}
 	}
 
 	@Override

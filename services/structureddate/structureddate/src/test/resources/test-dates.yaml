@@ -1186,7 +1186,16 @@
   "after april 13 1995":
                                          earliestSingleDate: [1995,  4, 13, CE]
                                          latestDate:         [2018,  10, 17, CE]
+  
+  "10/2005-12/2006":
+                                         earliestSingleDate: [2005,  10, 1, CE]
+                                         latestDate:         [2006,  12, 31, CE]
 
+  "04/1995-04/2018":
+                                         earliestSingleDate: [1995,  4, 1, CE]
+                                         latestDate:         [2018,  4, 30, CE] 
+  # "unknown":
+  #                                        earliestSingleDate: []
 
 # -------------------------------------------------------------------------------------------------------
 # Invalid dates
