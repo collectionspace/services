@@ -460,7 +460,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitInvStrDate(InvStrDateContext ctx) {
 		if (ctx.exception != null) return;
-
+	
 		// Reorder the stack into a canonical ordering,
 		// year-month-day-era.
 
@@ -1155,6 +1155,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		stack.push(num);
 	}
+
 
 	protected String getErrorMessage(RecognitionException re) {
 		String message = "";
