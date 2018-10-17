@@ -91,7 +91,8 @@ century:               ( strCentury | numCentury ) era ;
 millennium:            nth MILLENNIUM era ;
 
 strDate:               strMonth ( numDayOfMonth | nth ) COMMA? numYear era;
-invStrDate:            era numYear COMMA? strMonth numDayOfMonth ;
+invStrDate:            era num COMMA? strMonth num
+|                      ( num | nth ) strMonth COMMA? num era ;
 strDayInMonthRange:    strMonth numDayOfMonth ( HYPHEN | DASH ) numDayOfMonth COMMA? numYear era ;
 monthInYearRange:      strMonth ( HYPHEN | DASH ) strMonth COMMA? numYear era ;
 nthQuarterInYearRange: nthQuarter ( HYPHEN | DASH ) nthQuarter COMMA? numYear era ;
