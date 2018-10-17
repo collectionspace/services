@@ -1180,8 +1180,6 @@
                                          earliestSingleDate: [1995,  4, 1, CE]
                                          latestDate:         [2018,  4, 30, CE]
 
-  "unknown":                            # Unknown date: Should result in empty fields
-                                         earliestSingleDate: []
 
   "13 april 15":                        # oneDisplayDate - ambiguous day and year, intepreted as year month day
                                          earliestSingleDate: [13,  4, 15, CE]
