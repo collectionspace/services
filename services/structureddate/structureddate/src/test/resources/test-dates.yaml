@@ -1177,12 +1177,15 @@
                                          latestDate:         [2017,  6, 10, CE]
 
 
-  # "after 13 april 1995":
-  #                                        earliestSingleDate: [1995,  4, 13, CE]
-  #                                        latestDate:         [2018,  10, 17, CE]
+  "after 13 april 1995":
+                                         earliestSingleDate: [1995,  4, 13, CE]
+                                         latestDate:         [2018,  10, 17, CE]
 
   "unknown":
                                          earliestSingleDate: []
+  "after april 13 1995":
+                                         earliestSingleDate: [1995,  4, 13, CE]
+                                         latestDate:         [2018,  10, 17, CE]
 
 
 # -------------------------------------------------------------------------------------------------------
