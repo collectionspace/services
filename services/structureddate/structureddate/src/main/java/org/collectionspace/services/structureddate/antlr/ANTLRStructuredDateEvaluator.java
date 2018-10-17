@@ -465,17 +465,16 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer num2;
 		Integer num3;
 
-		if (eraLast) {
-			// Si		
-			num1 = (Integer) stack.pop(); // year or day
-			num2 = (Integer) stack.pop(); // month
-			num3 = (Integer) stack.pop(); // year or day
-			era = (Era) stack.pop(); // era...
-		} else {
+		if (!eraLast) {
 			era = (Era) stack.pop(); // damn eras
-			num1 = (Integer) stack.pop(); // year or day
-			num2 = (Integer) stack.pop(); // month
-			num3 = (Integer) stack.pop(); //  day
+		}
+
+		num1 = (Integer) stack.pop(); // year or day
+		num2 = (Integer) stack.pop(); // month
+		num3 = (Integer) stack.pop(); //  day
+		
+		if (eraLast) {
+			era =  (Era) stack.pop();
 		}
 
 		Integer dayOfMonth = num1;
@@ -483,8 +482,9 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer year = num3;
 		
 		if (DateUtils.isValidDate(num3, num2, num1, era)) {
-			// Do nothing, already in the right format
+			// Do nothing, already in the right format (Era Year Month Day)
 		} else if (DateUtils.isValidDate(num1, num2, num3, era)) {
+			// Use other format: Day Month Year Era
 			dayOfMonth = num3;
 			year = num1;
 		}
