@@ -32,6 +32,7 @@ hyphenatedRange:       singleInterval ( HYPHEN | DASH ) singleInterval
 |                      quarterInYearRange
 |                      strDayInMonthRange
 |                      numDayInMonthRange
+// |                      numMonthInYearsRange
 ;
 
 singleInterval:        yearSpanningWinter
