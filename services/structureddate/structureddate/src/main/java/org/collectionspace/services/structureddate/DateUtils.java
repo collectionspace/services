@@ -1,5 +1,7 @@
 package org.collectionspace.services.structureddate;
 
+import java.util.Calendar;
+
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
@@ -1063,7 +1065,8 @@ public class DateUtils {
 	 */
 	public static Date getEarliestBeforeDate(Date startDate, Date endDate) {
 		// TODO
-		return null;
+		// Return an empty date to be used in before date cases
+		return new Date();
 		
 		/*
 		// This algorithm is inherited from the XDB fuzzydate parser,
