@@ -8,8 +8,9 @@ grammar StructuredDate;
 /*
  * Parser rules
  */
+// unknownDisplayDate:    
 
-oneDisplayDate:        displayDate ( DOT | QUESTION )? EOF ; 
+oneDisplayDate:        displayDate ( DOT | QUESTION )? EOF ;
 
 displayDate:           uncertainDate
 |                      certainDate

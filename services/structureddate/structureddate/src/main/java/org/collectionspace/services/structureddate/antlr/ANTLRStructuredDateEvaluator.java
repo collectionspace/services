@@ -486,7 +486,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitInvStrDate(InvStrDateContext ctx) {
 		if (ctx.exception != null) return;
-
+	
 		// Reorder the stack into a canonical ordering,
 		// year-month-day-era.
 
@@ -494,11 +494,19 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer numMonth = (Integer) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
+		
 
 		stack.push(year);
 		stack.push(numMonth);
 		stack.push(dayOfMonth);
 		stack.push(era);
+	
+		if (dayOfMonth > 31 || dayOfMonth <= 0) {
+			throw new StructuredDateFormatException("unexpected day of month '" + Integer.toString(dayOfMonth) + "'");
+		}
+		if (year == 0) {
+			throw new StructuredDateFormatException("unexpected year '" + Integer.toString(year) + "'");
+		}
 	}
 
 	@Override
