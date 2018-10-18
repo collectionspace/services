@@ -1116,12 +1116,16 @@ public class DateUtils {
 	 */
 	public static Date getLatestAfterDate(Date startDate, Date endDate) {
 		// TODO
+		return getCurrentDate();
+
+	}
+
+	public static Date getCurrentDate() {
 		LocalDate localDate = new LocalDate();
 		Integer year = (Integer) localDate.getYear();
 		Integer month = (Integer) localDate.getMonthOfYear();
 		Integer dayOfMonth = (Integer) localDate.getDayOfMonth();
 		return new Date(year, month, dayOfMonth, Date.DEFAULT_ERA);
-
 	}
 
 	public static int getYearsBetween(Date startDate, Date endDate) {

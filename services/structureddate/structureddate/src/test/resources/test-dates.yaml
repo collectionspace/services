@@ -1155,45 +1155,46 @@
   "13 april 15":                        # oneDisplayDate - ambigous day and year - should be Year month day
                                          earliestSingleDate: [13,  4,  15, CE]
 
-  "13 april 1995":                           # oneDisplayDate - with question mark
+  "13 april 1995":                       # oneDisplayDate - with question mark
                                          earliestSingleDate: [1995,  4,  13, CE]
 
-  "13 apr 1995":                           # oneDisplayDate - with question mark
+  "13 apr 1995":                         # oneDisplayDate - with question mark
                                          earliestSingleDate: [1995,  4,  13, CE]
 
-  "13th APRIL 1995":                           # oneDisplayDate - with question mark
+  "13th APRIL 1995":                     # oneDisplayDate - with question mark
                                          earliestSingleDate: [1995,  4,  13, CE]
 
-  "13 april 1995 - 13 april 2018":    
+  "13 april 1995 - 13 april 2018":       # Hyphenated range - with Day Month Year format
                                          earliestSingleDate: [1995,  4, 13, CE]
                                          latestDate:         [2018,  4, 13, CE]
 
-  "before 13 april 1995":
+  "before 13 april 1995":                # beforeAfterDate - Empty earliestSingleDate - Day Month Year Format
                                          earliestSingleDate: []
                                          latestDate:         [1995,  4, 13, CE]
 
-  "before june 10 2017":
+  "before june 10 2017":                 # beforeAfterDate - Empty earliestSingleDate -  Month Day Year Format
                                          earliestSingleDate: []
                                          latestDate:         [2017,  6, 10, CE]
 
 
-  "after 13 april 1995":
+  "after 13 april 1995":                # beforeAfterDate - Empty latestDate calculated as current date - Day Month Year Format
                                          earliestSingleDate: [1995,  4, 13, CE]
-                                         latestDate:         [2018,  10, 17, CE]
+                                         latestDate:         "current date"
 
   "unknown":
                                          earliestSingleDate: []
-  "after april 13 1995":
+
+  "after april 13 1995":                # beforeAfterDate - Empty latestDate calculated as current date -  Month Day Year Format
                                          earliestSingleDate: [1995,  4, 13, CE]
-                                         latestDate:         [2018,  10, 17, CE]
+                                         latestDate:         "current date"
   
-  "10/2005-12/2006":
+  "10/2005-12/2006":                    # Month/Year - Month/Year date
                                          earliestSingleDate: [2005,  10, 1, CE]
                                          latestDate:         [2006,  12, 31, CE]
 
-  "04/1995-04/2018":
+  "04/1995-04/2018":                    # Month/Year - Month/Year date
                                          earliestSingleDate: [1995,  4, 1, CE]
-                                         latestDate:         [2018,  4, 30, CE] 
+                                         latestDate:         [2018,  4, 30, CE]
   # "unknown":
   #                                        earliestSingleDate: []
 
