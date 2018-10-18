@@ -1180,7 +1180,6 @@
                                          earliestSingleDate: [1995,  4, 1, CE]
                                          latestDate:         [2018,  4, 30, CE]
 
-
   "13 april 15":                        # oneDisplayDate - ambiguous day and year, intepreted as year month day
                                          earliestSingleDate: [13,  4, 15, CE]
 
