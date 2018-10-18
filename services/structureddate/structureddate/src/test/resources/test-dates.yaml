@@ -1195,8 +1195,9 @@
   "04/1995-04/2018":                    # Month/Year - Month/Year date
                                          earliestSingleDate: [1995,  4, 1, CE]
                                          latestDate:         [2018,  4, 30, CE]
-  # "unknown":
-  #                                        earliestSingleDate: []
+
+  "unknown":                            # Unknown date: Should result in empty fields
+                                         earliestSingleDate: []
 
 # -------------------------------------------------------------------------------------------------------
 # Invalid dates
