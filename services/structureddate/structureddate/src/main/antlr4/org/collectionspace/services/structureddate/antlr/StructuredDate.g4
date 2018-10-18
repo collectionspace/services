@@ -8,9 +8,7 @@ grammar StructuredDate;
 /*
  * Parser rules
  */
-// unknownDisplayDate:    
-
-oneDisplayDate:        displayDate ( DOT | QUESTION )? EOF ;
+oneDisplayDate:        displayDate ( DOT | QUESTION )? EOF;
 
 displayDate:           uncertainDate
 |                      certainDate
@@ -32,7 +30,6 @@ hyphenatedRange:       singleInterval ( HYPHEN | DASH ) singleInterval
 |                      quarterInYearRange
 |                      strDayInMonthRange
 |                      numDayInMonthRange
-// |                      numMonthInYearsRange
 ;
 
 singleInterval:        yearSpanningWinter
@@ -131,7 +128,6 @@ numMonth:              NUMBER ;
 numDayOfMonth:         NUMBER ;
 num:                   NUMBER ;
 unknownDate:           UNKNOWN ;
-
 
 /*
  * Lexer rules

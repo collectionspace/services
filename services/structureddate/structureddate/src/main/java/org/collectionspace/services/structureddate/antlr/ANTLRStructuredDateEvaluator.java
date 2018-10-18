@@ -167,6 +167,14 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		result.setEarliestSingleDate(earliestDate);
 		result.setLatestDate(latestDate);
 	}
+	@Override
+	public void exitUnknownDate(UnknownDateContext ctx) {
+		if (ctx.exception != null) return;
+
+		// Dummy dates
+		stack.push(new Date());
+		stack.push(new Date());
+	}
 
 	@Override
 	public void exitBeforeOrAfterDate(BeforeOrAfterDateContext ctx) {
@@ -1188,15 +1196,6 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer num = new Integer(ctx.NUMBER().getText());
 
 		stack.push(num);
-	}
-
-	@Override
-	public void exitUnknownDate(UnknownDateContext ctx) {
-		if (ctx.exception != null) return;
-
-		// Dummy dates
-		stack.push(new Date());
-		stack.push(new Date());
 	}
 
 	protected String getErrorMessage(RecognitionException re) {
