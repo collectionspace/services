@@ -1,6 +1,8 @@
 package org.collectionspace.services.structureddate;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -51,6 +53,19 @@ public class StructuredDateEvaluatorTest {
 
 	private StructuredDateInternal createStructuredDateFromYamlSpec(String displayDate, Map<String, Object> structuredDateFields) {
 		StructuredDateInternal structuredDate = null;
+
+		// Can and should we calculate today's date for the "AFTER" dates?
+		if (structuredDateFields != null && structuredDateFields.containsKey("latestDate")) {
+			if (structuredDateFields.get("latestDate").toString().equals("current date")) {
+				ArrayList items = new ArrayList<>();
+				Date currentDate = DateUtils.getCurrentDate();
+				items.add(currentDate.getYear());
+				items.add(currentDate.getMonth());
+				items.add(currentDate.getDay());
+				items.add(Date.DEFAULT_ERA.toString().toUpperCase());
+				structuredDateFields.put("latestDate", items);
+			}
+		}
 
 		if (structuredDateFields != null) {
 			structuredDate = new StructuredDateInternal();
