@@ -294,6 +294,26 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			((DeferredDate) latestEndDate).resolveDate();
 		}
 
+		// Check if they are reversed
+		if (latestEndDate.getEra() == Era.BCE && earliestStartDate.getEra() == Era.BCE) {
+			if (earliestStartDate.getYear() < latestEndDate.getYear()) {
+				Date tmp = earliestStartDate;
+				earliestStartDate = latestEndDate;
+				latestEndDate = tmp;
+
+				// This is probably bad technique, but right now, if the month and days were calculated
+				// Chances are that the EarliestStart date has the LatestStart date
+				// And the latestEnd date has the earliestEnd date. So we set them accordingly.
+				if ((earliestStartDate.getMonth() == 12 && earliestStartDate.getDay() == 31) &&
+					(latestEndDate.getMonth() == 1 && latestEndDate.getDay() == 1)) {
+						earliestStartDate.setMonth(1);
+						earliestStartDate.setDay(1);
+						latestEndDate.setMonth(12);
+						latestEndDate.setDay(31);
+				}
+			}
+		}
+
 		stack.push(earliestStartDate);
 		stack.push(latestEndDate);
 	}

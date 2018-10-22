@@ -925,8 +925,8 @@
                                          latestDate:         [2013,  4,  5, CE]
 
   '5/3/1962-4/5/2013 BC':                # hyphenatedRange, date
-                                         earliestSingleDate: [1962,  5,  3, BCE]
-                                         latestDate:         [2013,  4,  5, BCE]
+                                         earliestSingleDate:  [2013,  4,  5, BCE]
+                                         latestDate:          [1962,  5,  3, BCE]
 
   '5/3/1962 BC-4/5/2013':                # hyphenatedRange, date
                                          earliestSingleDate: [1962,  5,  3, BCE]
@@ -1214,13 +1214,25 @@
                                          earliestSingleDate: [1232,  1, 1, BCE]
                                          latestDate:         [932,  12, 31, BCE]
 
-  "3,100+/-150 years BP":                 # Uncalibrated date with 'years' in it
+  "3,100+/-150 years BP":                 # Uncalibrated date with 'years' in it as well as with a comma
                                          earliestSingleDate: [1232,  1, 1, BCE]
                                          latestDate:         [932,  12, 31, BCE]
 
   "2000±100 BP":                         # Uncalibrated date with BCE and AD mix
                                          earliestSingleDate: [82,  1, 1, BCE]
                                          latestDate:         [118,  12, 31, CE]
+
+  "5,580-5,460 BC":                      #Calibrated date with commas
+                                         earliestSingleDate: [5580,  1, 1, BCE]
+                                         latestDate:         [5460,  12, 31, BCE]
+
+  "5,580 - 5,460 BC":                      #Calibrated date with commas and spaces
+                                         earliestSingleDate: [5580,  1, 1, BCE]
+                                         latestDate:         [5460,  12, 31, BCE]
+
+  "5460-5580 BC":                        #Calibrated date with dates reversed
+                                         earliestSingleDate: [5580,  1, 1, BCE]
+                                         latestDate:         [5460,  12, 31, BCE]
 # -------------------------------------------------------------------------------------------------------
 # Invalid dates
 # -------------------------------------------------------------------------------------------------------
