@@ -1069,8 +1069,8 @@
   #                                      latestDate:         [  10, 12, 31, BCE, null, PLUS,  106, YEARS]
 
   'Circa 10 BC':                         # uncertainDate, year - calculating the uncertainty into the year field
-                                         earliestSingleDate: [ 115,  1,  1, BCE]
-                                         latestDate:         [  96, 12, 31, CE]
+                                         earliestSingleDate: [ 20,  1,  1, BCE]
+                                         latestDate:         [  1, 12, 31, CE]
 
   # 'Circa 10':                          # uncertainDate, year - using qualifier/value/unit fields
   #                                      earliestSingleDate: [  10,  1,  1, CE, null, MINUS, 105, YEARS]
@@ -1226,13 +1226,29 @@
                                          earliestSingleDate: [5580,  1, 1, BCE]
                                          latestDate:         [5460,  12, 31, BCE]
 
-  "5,580 - 5,460 BC":                      #Calibrated date with commas and spaces
+  "5,580 - 5,460 BC":                    #Calibrated date with commas and spaces
                                          earliestSingleDate: [5580,  1, 1, BCE]
                                          latestDate:         [5460,  12, 31, BCE]
 
   "5460-5580 BC":                        #Calibrated date with dates reversed
                                          earliestSingleDate: [5580,  1, 1, BCE]
                                          latestDate:         [5460,  12, 31, BCE]
+
+  "c. 69 BC":                            # Circa date, ± 10 years
+                                         earliestSingleDate: [74, 1, 1, BCE]
+                                         latestDate:         [64, 12, 31, BCE]
+
+  "ca. 60 BC":                           # Circa date, ± 5 years
+                                         earliestSingleDate: [70, 1, 1, BCE]
+                                         latestDate:         [50, 12, 31, BCE]
+
+  "circa 200 BC":                        # Circa date, ± 50 years
+                                         earliestSingleDate: [250, 1, 1, BCE]
+                                         latestDate:         [150, 12, 31, BCE]
+
+  "circa 1000 BC":                       # Circa date, ± 500 years
+                                         earliestSingleDate: [1500, 1, 1, BCE]
+                                         latestDate:         [500, 12, 31, BCE]
 # -------------------------------------------------------------------------------------------------------
 # Invalid dates
 # -------------------------------------------------------------------------------------------------------

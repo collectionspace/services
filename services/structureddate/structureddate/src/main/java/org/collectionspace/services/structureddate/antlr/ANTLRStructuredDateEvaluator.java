@@ -221,6 +221,26 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		int earliestInterval = DateUtils.getCircaIntervalYears(earliestDate.getYear(), earliestDate.getEra());
 		int latestInterval = DateUtils.getCircaIntervalYears(latestDate.getYear(), latestDate.getEra());
 
+		if (earliestDate.getEra() == Era.BCE && latestDate.getEra() == Era.BCE) {
+			// Improved precision for BC dates
+			if ((latestDate.getMonth() == 12 && latestDate.getDay() == 31) &&
+				(earliestDate.getMonth() == 1 && earliestDate.getDay() == 1)) {
+				int year = earliestDate.getYear(); // Should be the same year...
+				int interval = 0;
+
+				if (year % 1000 == 0) {
+					interval = 500;
+				} else if (year % 100 == 0) {
+					interval = 50;
+				} else if (year % 10 == 0) {
+					interval = 10;
+				} else if (year % 10 > 0 && year % 10 < 10) {
+					interval = 5;
+				}
+				earliestInterval = interval;
+				latestInterval = interval;
+			}
+		}
 		// Express the circa interval as a qualifier.
 
 		// stack.push(earliestDate.withQualifier(QualifierType.MINUS, earliestInterval, QualifierUnit.YEARS));
