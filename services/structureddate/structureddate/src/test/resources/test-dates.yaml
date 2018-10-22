@@ -1214,6 +1214,10 @@
                                          earliestSingleDate: [1232,  1, 1, BCE]
                                          latestDate:         [932,  12, 31, BCE]
 
+  "3,100+/-150 years BP":                 # Uncalibrated date with 'years' in it
+                                         earliestSingleDate: [1232,  1, 1, BCE]
+                                         latestDate:         [932,  12, 31, BCE]
+
   "2000±100 BP":                         # Uncalibrated date with BCE and AD mix
                                          earliestSingleDate: [82,  1, 1, BCE]
                                          latestDate:         [118,  12, 31, CE]

@@ -120,8 +120,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		result.setDisplayDate(displayDate);
 
 		// Instantiate a parser from the lowercased display date, so that parsing will be
-		// case insensitive.
-		ANTLRInputStream inputStream = new ANTLRInputStream(displayDate.toLowerCase());
+		// case insensitive. Also remove commas so that numbers with commas are parsed correctly
+		ANTLRInputStream inputStream = new ANTLRInputStream(displayDate.toLowerCase().replaceAll(",", ""));
 		StructuredDateLexer lexer = new StructuredDateLexer(inputStream);
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 		StructuredDateParser parser = new StructuredDateParser(tokenStream);
