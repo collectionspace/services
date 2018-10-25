@@ -1106,13 +1106,13 @@
   "3/4/2000?":                           # oneDisplayDate - with question mark
                                          earliestSingleDate: [2000,  3,  4, CE]
 
-  "13 april 1995":                           # oneDisplayDate - with question mark
+  "13 april 1995":                       # oneDisplayDate: - SingleInterval with Day (cardinal) Month Year Format 
                                          earliestSingleDate: [1995,  4,  13, CE]
 
-  "13 apr 1995":                           # oneDisplayDate - with question mark
+  "13 apr 1995":                         # oneDisplayDate: - SingleInterval with Day (cardinal) Month Year Format
                                          earliestSingleDate: [1995,  4,  13, CE]
 
-  "13th APRIL 1995":                           # oneDisplayDate - with question mark
+  "13th APRIL 1995":                     # oneDisplayDate: - SingleInterval with Day (ordinal) Month Year Format
                                          earliestSingleDate: [1995,  4,  13, CE]
 
 # -------------------------------------------------------------------------------------------------------
