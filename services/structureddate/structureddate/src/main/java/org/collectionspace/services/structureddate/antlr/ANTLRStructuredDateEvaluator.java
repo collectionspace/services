@@ -53,10 +53,13 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.In
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MillenniumContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthInYearRangeContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthCenturyRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthHalfContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthQuarterContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthQuarterInYearRangeContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NthQuarterYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumCenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.NumDateContext;
@@ -77,9 +80,12 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.St
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrDayInMonthRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrMonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrSeasonContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrSeasonInYearRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.UncertainDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearSpanningWinterContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.SeasonYearContext;
+
 
 /**
  * A StructuredDateEvaluator that uses an ANTLR parser to parse the display date,
@@ -292,7 +298,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitNthCenturyRange(NthCenturyRangeContext ctx) {
 		if (ctx.exception != null) return;
 
-		Era era = (Era) stack.pop();
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer endN = (Integer) stack.pop();
 		Part endPart = (Part) stack.pop();
 		Integer startN = (Integer) stack.pop();
@@ -315,7 +321,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitMonthInYearRange(MonthInYearRangeContext ctx) {
 		if (ctx.exception != null) return;
 
-		Era era = (Era) stack.pop();
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer numMonthEnd = (Integer) stack.pop();
 		Integer numMonthStart = (Integer) stack.pop();
@@ -345,7 +351,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitStrDayInMonthRange(StrDayInMonthRangeContext ctx) {
 		if (ctx.exception != null) return;
 
-		Era era = (Era) stack.pop();
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer dayOfMonthEnd = (Integer) stack.pop();
 		Integer dayOfMonthStart = (Integer) stack.pop();
@@ -361,7 +367,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitNumDayInMonthRange(NumDayInMonthRangeContext ctx) {
 		if (ctx.exception != null) return;
 
-		Era era = (Era) stack.pop();
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer dayOfMonthEnd = (Integer) stack.pop();
 		Integer dayOfMonthStart = (Integer) stack.pop();
@@ -393,7 +399,6 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		stack.push(new Date(year, numMonth, dayOfMonth, era));
 	}
 
-
 	@Override
 	public void exitNumDate(NumDateContext ctx) {
 		if (ctx.exception != null) return;
@@ -403,7 +408,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// and reorder the stack into the canonical
 		// year-month-day-era ordering.
 
-		Era era = (Era) stack.pop();
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer num3 = (Integer) stack.pop();
 		Integer num2 = (Integer) stack.pop();
 		Integer num1 = (Integer) stack.pop();
@@ -439,7 +444,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// Reorder the stack into a canonical ordering,
 		// year-month-day-era.
 
-		Era era = (Era) stack.pop();
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer dayOfMonth = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
@@ -456,52 +461,70 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		// Reorder the stack into a canonical ordering,
 		// year-month-day-era.
-		Era era = null;
 
-		boolean eraLast = stack.peek() instanceof Integer;
-
-		// Declare nums
-		Integer num1;
-		Integer num2;
-		Integer num3;
-
-		if (!eraLast) {
-			era = (Era) stack.pop(); // damn eras
-		}
-
-		num1 = (Integer) stack.pop(); // year or day
-		num2 = (Integer) stack.pop(); // month
-		num3 = (Integer) stack.pop(); //  day
-		
-		if (eraLast) {
-			era =  (Era) stack.pop();
-		}
-
-		Integer dayOfMonth = num1;
-		Integer numMonth = num2;
-		Integer year = num3;
-		
-		if (DateUtils.isValidDate(num3, num2, num1, era)) {
-			// Do nothing, already in the right format (Era Year Month Day)
-		} else if (DateUtils.isValidDate(num1, num2, num3, era)) {
-			// Use other format: Day Month Year Era
-			dayOfMonth = num3;
-			year = num1;
-		}
-
+		Integer dayOfMonth = (Integer) stack.pop();
+		Integer numMonth = (Integer) stack.pop();
+		Integer year = (Integer) stack.pop();
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 
 		stack.push(year);
 		stack.push(numMonth);
 		stack.push(dayOfMonth);
 		stack.push(era);
-
-		if (dayOfMonth > 31 || dayOfMonth <= 0) {
-			throw new StructuredDateFormatException("unexpected day of month '" + Integer.toString(dayOfMonth) + "'");
-		}
-		if (year == 0) {
-			throw new StructuredDateFormatException("unexpected year '" + Integer.toString(year) + "'");
-		}
 	}
+
+	// @Override
+	// public void exitInvStrDate(InvStrDateContext ctx) {
+	// 	if (ctx.exception != null) return;
+
+	// 	// Reorder the stack into a canonical ordering,
+	// 	// year-month-day-era.
+	// 	Era era = null;
+
+	// 	boolean eraLast = stack.peek() instanceof Integer;
+
+	// 	// Declare nums
+	// 	Integer num1;
+	// 	Integer num2;
+	// 	Integer num3;
+
+	// 	if (!eraLast) {
+	// 		era = (Era) stack.pop(); // damn eras
+	// 	}
+
+	// 	num1 = (Integer) stack.pop(); // year or day
+	// 	num2 = (Integer) stack.pop(); // month
+	// 	num3 = (Integer) stack.pop(); //  day
+		
+	// 	if (eraLast) {
+	// 		era =  (Era) stack.pop();
+	// 	}
+
+	// 	Integer dayOfMonth = num1;
+	// 	Integer numMonth = num2;
+	// 	Integer year = num3;
+		
+	// 	if (DateUtils.isValidDate(num3, num2, num1, era)) {
+	// 		// Do nothing, already in the right format (Era Year Month Day)
+	// 	} else if (DateUtils.isValidDate(num1, num2, num3, era)) {
+	// 		// Use other format: Day Month Year Era
+	// 		dayOfMonth = num3;
+	// 		year = num1;
+	// 	}
+
+
+	// 	stack.push(year);
+	// 	stack.push(numMonth);
+	// 	stack.push(dayOfMonth);
+	// 	stack.push(era);
+
+	// 	if (dayOfMonth > 31 || dayOfMonth <= 0) {
+	// 		throw new StructuredDateFormatException("unexpected day of month '" + Integer.toString(dayOfMonth) + "'");
+	// 	}
+	// 	if (year == 0) {
+	// 		throw new StructuredDateFormatException("unexpected year '" + Integer.toString(year) + "'");
+	// 	}
+	// }
 
 	@Override
 	public void exitMonth(MonthContext ctx) {
@@ -516,6 +539,15 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	}
 
 	@Override
+	public void exitMonthYear(MonthYearContext ctx) {
+		if (ctx.exception != null) return;
+
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
+
+		stack.push(era);
+	}
+
+	@Override
 	public void exitInvMonthYear(InvMonthYearContext ctx) {
 		if (ctx.exception != null) return;
 
@@ -523,7 +555,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		Integer numMonth = (Integer) stack.pop();
 		Integer year = (Integer) stack.pop();
-		Era era = (Era) stack.pop();
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 
 		stack.push(numMonth);
 		stack.push(year);
@@ -534,7 +566,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitYearSpanningWinter(YearSpanningWinterContext ctx) {
 		if (ctx.exception != null) return;
 
-		Era era = (Era) stack.pop();
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer endYear = (Integer) stack.pop();
 		Integer startYear = (Integer) stack.pop();
 
@@ -546,7 +578,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitPartialYear(PartialYearContext ctx) {
 		if (ctx.exception != null) return;
 
-		Era era = (Era) stack.pop();
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Part part = (Part) stack.pop();
 
@@ -570,7 +602,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitHalfYear(HalfYearContext ctx) {
 		if (ctx.exception != null) return;
 
-		Era era = (Era) stack.pop();
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer half = (Integer) stack.pop();
 
@@ -586,18 +618,27 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		Integer quarter = (Integer) stack.pop();
 		Integer year = (Integer) stack.pop();
-		Era era = (Era) stack.pop();
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 
 		stack.push(quarter);
 		stack.push(year);
 		stack.push(era);
 	}
 
+	@Override 
+	public void exitSeasonYear(SeasonYearContext ctx) {
+		if (ctx.exception != null) return;
+
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
+		stack.push(era);
+
+	}
+
 	@Override
 	public void exitYear(YearContext ctx) {
 		if (ctx.exception != null) return;
 
-		Era era = (Era) stack.pop();
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 
 		stack.push(new Date(year, 1, 1, era));
@@ -608,7 +649,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitPartialDecade(PartialDecadeContext ctx) {
 		if (ctx.exception != null) return;
 
-		Era era = (Era) stack.pop();
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Part part = (Part) stack.pop();
 
@@ -636,7 +677,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitDecade(DecadeContext ctx) {
 		if (ctx.exception != null) return;
 
-		Era era = (Era) stack.pop();
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 
 		// Calculate the start and end year of the decade, which depends on the era.
@@ -665,7 +706,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitPartialCentury(PartialCenturyContext ctx) {
 		if (ctx.exception != null) return;
 
-		Era era = (Era) stack.pop();
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Part part = (Part) stack.pop();
 
@@ -693,7 +734,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitQuarterCentury(QuarterCenturyContext ctx) {
 		if (ctx.exception != null) return;
 
-		Era era = (Era) stack.pop();
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer quarter = (Integer) stack.pop();
 
@@ -721,7 +762,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitHalfCentury(HalfCenturyContext ctx) {
 		if (ctx.exception != null) return;
 
-		Era era = (Era) stack.pop();
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer half = (Integer) stack.pop();
 
@@ -749,7 +790,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitCentury(CenturyContext ctx) {
 		if (ctx.exception != null) return;
 
-		Era era = (Era) stack.pop();
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 
 		if (era != null) {
@@ -776,7 +817,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitMillennium(MillenniumContext ctx) {
 		if (ctx.exception != null) return;
 
-		Era era = (Era) stack.pop();
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer n = (Integer) stack.pop();
 
 		if (era != null) {
@@ -898,6 +939,34 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		if (n < 1 || n > 2) {
 			throw new StructuredDateFormatException("unexpected half '" + n + "'");
 		}
+	}
+	
+
+	@Override
+	public void exitNthQuarterInYearRange(NthQuarterInYearRangeContext ctx) {
+		if (ctx.exception != null) return;
+
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
+
+		stack.push(era);
+	}
+
+	@Override
+	public void exitStrSeasonInYearRange(StrSeasonInYearRangeContext ctx) {
+		if (ctx.exception != null) return;
+
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
+
+		stack.push(era);
+
+	}
+
+	@Override
+	public void exitNthQuarterYear(NthQuarterYearContext ctx) {
+		
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
+
+		stack.push(era);
 	}
 
 	@Override
