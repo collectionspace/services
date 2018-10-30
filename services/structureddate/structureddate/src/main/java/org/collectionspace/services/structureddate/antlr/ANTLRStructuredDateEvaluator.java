@@ -167,14 +167,6 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		result.setEarliestSingleDate(earliestDate);
 		result.setLatestDate(latestDate);
 	}
-	@Override
-	public void exitUnknownDate(UnknownDateContext ctx) {
-		if (ctx.exception != null) return;
-
-		// Dummy dates
-		stack.push(new Date());
-		stack.push(new Date());
-	}
 
 	@Override
 	public void exitBeforeOrAfterDate(BeforeOrAfterDateContext ctx) {
@@ -378,7 +370,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitNumDayInMonthRange(NumDayInMonthRangeContext ctx) {
 		if (ctx.exception != null) return;
 
-		Era era = (Era) stack.pop();
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer num1 = (Integer) stack.pop();
 		Integer num2 = (Integer) stack.pop();
 		Integer num3 = (Integer) stack.pop();
@@ -389,7 +381,6 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			a set of two ranges. For examples: 04/13-19/1995 would be 04/13/1995-04/19/1995. If both these
 			dates are valid, we know that it shouldn't be interpreted as 04/01/13 - 19/31/1995 since these arent valid dates!
 		*/
-
 
 		Integer lateYear = num1;
 		Integer earlyMonth = num4;
@@ -495,7 +486,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitInvStrDate(InvStrDateContext ctx) {
 		if (ctx.exception != null) return;
-	
+
 		// Reorder the stack into a canonical ordering,
 		// year-month-day-era.
 
@@ -548,6 +539,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		stack.push(year);
 		stack.push(numMonth);
 		stack.push(dayOfMonth);
+		stack.push(era);
 
 		if (dayOfMonth > 31 || dayOfMonth <= 0) {
 			throw new StructuredDateFormatException("unexpected day of month '" + Integer.toString(dayOfMonth) + "'");
@@ -1189,6 +1181,15 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer num = new Integer(ctx.NUMBER().getText());
 
 		stack.push(num);
+	}
+
+	@Override
+	public void exitUnknownDate(UnknownDateContext ctx) {
+		if (ctx.exception != null) return;
+
+		// Dummy dates
+		stack.push(new Date());
+		stack.push(new Date());
 	}
 
 	protected String getErrorMessage(RecognitionException re) {

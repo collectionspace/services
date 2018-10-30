@@ -8,7 +8,8 @@ grammar StructuredDate;
 /*
  * Parser rules
  */
-oneDisplayDate:        displayDate ( DOT | QUESTION )? EOF;
+
+oneDisplayDate:        displayDate ( DOT | QUESTION )? EOF ; 
 
 displayDate:           uncertainDate
 |                      certainDate
@@ -91,21 +92,26 @@ century:               ( strCentury | numCentury ) era? ;
 
 millennium:            nth MILLENNIUM era? ;
 
-strDate:               strMonth ( numDayOfMonth | nth ) COMMA? numYear era;
+strDate:               strMonth ( numDayOfMonth | nth ) COMMA? numYear era?;
 invStrDate:            era num COMMA? strMonth num
-|                      ( num | nth ) strMonth COMMA? num era ;
-strDayInMonthRange:    strMonth numDayOfMonth ( HYPHEN | DASH ) numDayOfMonth COMMA? numYear era ;
-monthInYearRange:      strMonth ( HYPHEN | DASH ) strMonth COMMA? numYear era ;
-nthQuarterInYearRange: nthQuarter ( HYPHEN | DASH ) nthQuarter COMMA? numYear era ;
-strSeasonInYearRange:  strSeason ( HYPHEN | DASH ) strSeason COMMA? numYear era ;
-numDayInMonthRange:    numMonth SLASH num ( HYPHEN | DASH ) num SLASH numYear era ;
-numDate:               num SLASH num SLASH num era
-|                      num HYPHEN num HYPHEN num era ;
-monthYear:             strMonth COMMA? numYear era ;
-invMonthYear:          era numYear COMMA? strMonth ;
-seasonYear:            strSeason COMMA? numYear era ;
-invSeasonYear:         era numYear COMMA? strSeason ;
-nthQuarterYear:        nthQuarter numYear era ;
+|                      era? num COMMA strMonth num ;
+dayFirstDate:          num strMonth COMMA? num era
+|                      num strMonth COMMA num era?
+|                      nth strMonth COMMA? num era? ;
+dayOrYearFirstDate:    num strMonth num ;
+invStrDateEraLastDate: num COMMA strMonth num era? ;
+strDayInMonthRange:    strMonth numDayOfMonth ( HYPHEN | DASH ) numDayOfMonth COMMA? numYear era? ;
+monthInYearRange:      strMonth ( HYPHEN | DASH ) strMonth COMMA? numYear era? ;
+nthQuarterInYearRange: nthQuarter ( HYPHEN | DASH ) nthQuarter COMMA? numYear era? ;
+strSeasonInYearRange:  strSeason ( HYPHEN | DASH ) strSeason COMMA? numYear era? ;
+numDayInMonthRange:    numMonth SLASH num ( HYPHEN | DASH ) num SLASH numYear era? ;
+numDate:               num SLASH num SLASH num era?
+|                      num HYPHEN num HYPHEN num era? ;
+monthYear:             strMonth COMMA? numYear era? ;
+invMonthYear:          era? numYear COMMA? strMonth ;
+seasonYear:            strSeason COMMA? numYear era? ;
+invSeasonYear:         era? numYear COMMA? strSeason ;
+nthQuarterYear:        nthQuarter numYear era? ;
 nthQuarter:            ( nth | LAST ) QUARTER ;
 nthHalf:               ( nth | LAST ) HALF ;
 numDecade:             TENS ;
@@ -123,6 +129,7 @@ numMonth:              NUMBER ;
 numDayOfMonth:         NUMBER ;
 num:                   NUMBER ;
 unknownDate:           UNKNOWN ;
+
 
 /*
  * Lexer rules
@@ -163,5 +170,5 @@ SLASH:          '/' ;
 DOT:            '.' ;
 QUESTION:       '?' ;
 OTHER:          . ;
-UNKNOWN:        'unknown';
+UNKNOWN:		'unknown' | 'UNKNOWN' ;
 STRING:         [a-z]+ ;
