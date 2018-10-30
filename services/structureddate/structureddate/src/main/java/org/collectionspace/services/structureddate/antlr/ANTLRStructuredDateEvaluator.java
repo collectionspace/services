@@ -41,6 +41,8 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Be
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.CenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.CertainDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DateContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DayFirstDateContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DayOrYearFirstDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DecadeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DisplayDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.EraContext;
@@ -50,6 +52,7 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Hy
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.InvMonthYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.InvSeasonYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.InvStrDateContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.InvStrDateEraLastDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MillenniumContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.MonthInYearRangeContext;
@@ -75,6 +78,7 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Pa
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterCenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterInYearRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterYearContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.SeasonYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrCenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrDayInMonthRangeContext;
@@ -84,8 +88,6 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.St
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.UncertainDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearSpanningWinterContext;
-import org.collectionspace.services.structureddate.antlr.StructuredDateParser.SeasonYearContext;
-
 
 /**
  * A StructuredDateEvaluator that uses an ANTLR parser to parse the display date,
@@ -473,58 +475,68 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		stack.push(era);
 	}
 
-	// @Override
-	// public void exitInvStrDate(InvStrDateContext ctx) {
-	// 	if (ctx.exception != null) return;
-
-	// 	// Reorder the stack into a canonical ordering,
-	// 	// year-month-day-era.
-	// 	Era era = null;
-
-	// 	boolean eraLast = stack.peek() instanceof Integer;
-
-	// 	// Declare nums
-	// 	Integer num1;
-	// 	Integer num2;
-	// 	Integer num3;
-
-	// 	if (!eraLast) {
-	// 		era = (Era) stack.pop(); // damn eras
-	// 	}
-
-	// 	num1 = (Integer) stack.pop(); // year or day
-	// 	num2 = (Integer) stack.pop(); // month
-	// 	num3 = (Integer) stack.pop(); //  day
+	@Override
+	public void exitDayFirstDate(DayFirstDateContext ctx) {
+		if (ctx.exception != null) return ;
 		
-	// 	if (eraLast) {
-	// 		era =  (Era) stack.pop();
-	// 	}
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
+		Integer year = (Integer) stack.pop();
+		Integer month = (Integer) stack.pop();
+		Integer dayOfMonth = (Integer) stack.pop();
 
-	// 	Integer dayOfMonth = num1;
-	// 	Integer numMonth = num2;
-	// 	Integer year = num3;
-		
-	// 	if (DateUtils.isValidDate(num3, num2, num1, era)) {
-	// 		// Do nothing, already in the right format (Era Year Month Day)
-	// 	} else if (DateUtils.isValidDate(num1, num2, num3, era)) {
-	// 		// Use other format: Day Month Year Era
-	// 		dayOfMonth = num3;
-	// 		year = num1;
-	// 	}
+		stack.push(year);
+		stack.push(month);
+		stack.push(dayOfMonth);
+		stack.push(era);
+	}
 
+	@Override
+	public void exitDayOrYearFirstDate(DayOrYearFirstDateContext ctx) {
+		if (ctx.exception != null) return;
 
-	// 	stack.push(year);
-	// 	stack.push(numMonth);
-	// 	stack.push(dayOfMonth);
-	// 	stack.push(era);
+		Era era = (stack.size() == 3) ? null : (Era) stack.pop();
+		Integer year = (Integer) stack.pop();
+		Integer numMonth = (Integer) stack.pop();
+		Integer dayOfMonth = (Integer) stack.pop();
 
-	// 	if (dayOfMonth > 31 || dayOfMonth <= 0) {
-	// 		throw new StructuredDateFormatException("unexpected day of month '" + Integer.toString(dayOfMonth) + "'");
-	// 	}
-	// 	if (year == 0) {
-	// 		throw new StructuredDateFormatException("unexpected year '" + Integer.toString(year) + "'");
-	// 	}
-	// }
+		Integer num1 = year;
+		Integer num2 = dayOfMonth;
+
+		if (DateUtils.isValidDate(num1, numMonth, num2, era)) {
+			// Do nothing, it is already In the right format
+		} else if (DateUtils.isValidDate(num2, numMonth, num1, era)) {
+			// Then the first number is a year. Fix:
+			year = num2;
+			dayOfMonth = num1;
+		}
+
+		stack.push(year);
+		stack.push(numMonth);
+		stack.push(dayOfMonth);
+		stack.push(era);
+
+		if (dayOfMonth > 31 || dayOfMonth <= 0) {
+			throw new StructuredDateFormatException("unexpected day of month '" + Integer.toString(dayOfMonth) + "'");
+		}
+		if (year == 0) {
+			throw new StructuredDateFormatException("unexpected year '" + Integer.toString(year) + "'");
+		}
+	}
+
+	@Override
+	public void exitInvStrDateEraLastDate(InvStrDateEraLastDateContext ctx) {
+		if (ctx.exception != null) return;
+
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
+		Integer dayOfMonth = (Integer) stack.pop();
+		Integer month = (Integer) stack.pop();
+		Integer year = (Integer) stack.pop();
+
+		stack.push(year);
+		stack.push(month);
+		stack.push(dayOfMonth);
+		stack.push(era);
+	}
 
 	@Override
 	public void exitMonth(MonthContext ctx) {
