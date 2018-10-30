@@ -57,66 +57,74 @@ quarterInYearRange:    nthQuarterInYearRange
 date:                  numDate
 |                      strDate
 |                      invStrDate
+|                      dayFirstDate
+|                      dayOrYearFirstDate
+|                      invStrDateEraLastDate
 ;
 
 month:                 monthYear
 |                      invMonthYear
 ;
 
-yearSpanningWinter:    WINTER COMMA? numYear SLASH numYear era ;
+yearSpanningWinter:    WINTER COMMA? numYear SLASH numYear era? ;
 
-partialYear:           partOf numYear era ;
+partialYear:           partOf numYear era? ;
 
 quarterYear:           seasonYear
 |                      invSeasonYear
 |                      nthQuarterYear
 ;
 
-halfYear:              nthHalf numYear era ;
+halfYear:              nthHalf numYear era? ;
 
-year:                  numYear era ;
+year:                  numYear era? ;
 
-partialDecade:         partOf numDecade era ;
+partialDecade:         partOf numDecade era? ;
 
-decade:                numDecade era ;
+decade:                numDecade era? ;
 
-partialCentury:        partOf ( strCentury | numCentury ) era ;
+partialCentury:        partOf ( strCentury | numCentury ) era? ;
 
-quarterCentury:        nthQuarter ( strCentury | numCentury ) era ;
+quarterCentury:        nthQuarter ( strCentury | numCentury ) era? ;
 
-halfCentury:           nthHalf ( strCentury | numCentury ) era ;
+halfCentury:           nthHalf ( strCentury | numCentury ) era? ;
 
-century:               ( strCentury | numCentury ) era ;
+century:               ( strCentury | numCentury ) era? ;
 
-millennium:            nth MILLENNIUM era ;
+millennium:            nth MILLENNIUM era? ;
 
-strDate:               strMonth ( numDayOfMonth | nth ) COMMA? numYear era;
+strDate:               strMonth ( numDayOfMonth | nth ) COMMA? numYear era?;
 invStrDate:            era num COMMA? strMonth num
-|                      ( num | nth ) strMonth COMMA? num era ;
-strDayInMonthRange:    strMonth numDayOfMonth ( HYPHEN | DASH ) numDayOfMonth COMMA? numYear era ;
-monthInYearRange:      strMonth ( HYPHEN | DASH ) strMonth COMMA? numYear era ;
-nthQuarterInYearRange: nthQuarter ( HYPHEN | DASH ) nthQuarter COMMA? numYear era ;
-strSeasonInYearRange:  strSeason ( HYPHEN | DASH ) strSeason COMMA? numYear era ;
-numDayInMonthRange:    numMonth SLASH numDayOfMonth ( HYPHEN | DASH ) numDayOfMonth SLASH numYear era ;
-numDate:               num SLASH num SLASH num era
-|                      num HYPHEN num HYPHEN num era ;
-monthYear:             strMonth COMMA? numYear era ;
-invMonthYear:          era numYear COMMA? strMonth ;
-seasonYear:            strSeason COMMA? numYear era ;
-invSeasonYear:         era numYear COMMA? strSeason ;
-nthQuarterYear:        nthQuarter numYear era ;
+|                      era? num COMMA strMonth num ;
+dayFirstDate:          num strMonth COMMA? num era
+|                      num strMonth COMMA num era?
+|                      nth strMonth COMMA? num era? ;
+dayOrYearFirstDate:    num strMonth num ;
+invStrDateEraLastDate: num COMMA strMonth num era? ;
+strDayInMonthRange:    strMonth numDayOfMonth ( HYPHEN | DASH ) numDayOfMonth COMMA? numYear era? ;
+monthInYearRange:      strMonth ( HYPHEN | DASH ) strMonth COMMA? numYear era? ;
+nthQuarterInYearRange: nthQuarter ( HYPHEN | DASH ) nthQuarter COMMA? numYear era? ;
+strSeasonInYearRange:  strSeason ( HYPHEN | DASH ) strSeason COMMA? numYear era? ;
+numDayInMonthRange:    numMonth SLASH numDayOfMonth ( HYPHEN | DASH ) numDayOfMonth SLASH numYear era? ;
+numDate:               num SLASH num SLASH num era?
+|                      num HYPHEN num HYPHEN num era? ;
+monthYear:             strMonth COMMA? numYear era? ;
+invMonthYear:          era? numYear COMMA? strMonth ;
+seasonYear:            strSeason COMMA? numYear era? ;
+invSeasonYear:         era? numYear COMMA? strSeason ;
+nthQuarterYear:        nthQuarter numYear era? ;
 nthQuarter:            ( nth | LAST ) QUARTER ;
 nthHalf:               ( nth | LAST ) HALF ;
 numDecade:             TENS ;
 strCentury:            nth CENTURY ;
 numCentury:            HUNDREDS ;
-nthCenturyRange:       allOrPartOf nth ( HYPHEN | DASH ) allOrPartOf nth CENTURY era ;
+nthCenturyRange:       allOrPartOf nth ( HYPHEN | DASH ) allOrPartOf nth CENTURY era? ;
 strSeason:             SPRING | SUMMER | FALL | WINTER ;
 allOrPartOf:           partOf | ;
 partOf:                EARLY | MIDDLE | LATE ; 
 nth:                   NTHSTR | FIRST | SECOND | THIRD | FOURTH ;
 strMonth:              MONTH | SHORTMONTH DOT? ;
-era:                   BC | AD | ;
+era:                   BC | AD ;
 numYear:               NUMBER ;
 numMonth:              NUMBER ;
 numDayOfMonth:         NUMBER ;
