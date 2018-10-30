@@ -8,7 +8,8 @@ grammar StructuredDate;
 /*
  * Parser rules
  */
-oneDisplayDate:        displayDate ( DOT | QUESTION )? EOF;
+
+oneDisplayDate:        displayDate ( DOT | QUESTION )? EOF ; 
 
 displayDate:           uncertainDate
 |                      certainDate
@@ -128,6 +129,7 @@ numMonth:              NUMBER ;
 numDayOfMonth:         NUMBER ;
 num:                   NUMBER ;
 unknownDate:           UNKNOWN ;
+
 
 /*
  * Lexer rules
