@@ -1106,14 +1106,52 @@
   "3/4/2000?":                           # oneDisplayDate - with question mark
                                          earliestSingleDate: [2000,  3,  4, CE]
 
-  "13 april 1995":                       # oneDisplayDate: - SingleInterval with Day (cardinal) Month Year Format 
+  "13 april 1995":                       # Rule 6 oneDisplayDate: - SingleInterval with Day (cardinal) Month Year Format 
                                          earliestSingleDate: [1995,  4,  13, CE]
 
   "13 apr 1995":                         # oneDisplayDate: - SingleInterval with Day (cardinal) Month Year Format
                                          earliestSingleDate: [1995,  4,  13, CE]
 
-  "13th APRIL 1995":                     # oneDisplayDate: - SingleInterval with Day (ordinal) Month Year Format
+  "13th APRIL 1995":                     # oneDisplayDate: - SingleInterval with Day (ordinal) Month (all caps) Year Format
                                          earliestSingleDate: [1995,  4,  13, CE]
+
+  "bc 1995 april 13":                    # oneDisplayDate: - SingleInterval - With Era Year Month Day format  
+                                         earliestSingleDate: [1995,  4,  13, BCE]
+
+  "bc 1995, april 13":                   # oneDisplayDate: - SingleInterval - With Era Year Month Day format  
+                                         earliestSingleDate: [1995,  4,  13, BCE]
+
+  "13th april 1995":                     # oneDisplayDate: - SingleInterval with Day (ordinal) Month (all caps) Year Format
+                                         earliestSingleDate: [1995,  4,  13, CE]
+
+  "1995, april 13":                      # oneDisplayDate: - SingleInterval - Year COMMA month day format (no era)
+                                         earliestSingleDate: [1995,  4,  13, CE]
+
+  "1995, april 13 AD":                   # oneDisplayDate: - SingleInterval - Year COMMA month day era format 
+                                         earliestSingleDate: [1995,  4,  13, CE]
+
+  "1995 april 13":                       # oneDisplayDate -  singleInterval - dayOrYearFirstDate - Year month day, no era
+                                         earliestSingleDate: [1995,  4,  13, CE]
+
+  "13 april 1995":                       # oneDisplayDate -  singleInterval - dayOrYearFirstDate - Day month year, no era
+                                         earliestSingleDate: [1995,  4,  13, CE]
+
+  "13 april, 1995":                      # oneDisplayDate -  singleInterval - dayFirstDate - Day Month Year
+                                         earliestSingleDate: [1995,  4,  13, CE]
+
+  "13 april, 1995 AD":                   # oneDisplayDate -  singleInterval - dayFirstDate - Day Month Year  with comma and era
+                                         earliestSingleDate: [1995,  4,  13, CE]
+
+  "13 april 1995 AD":                    # oneDisplayDate -  singleInterval - dayFirstDate - Day Month Year with era, no comma
+                                         earliestSingleDate: [1995,  4,  13, CE]
+
+  "13th april, 1995":                    # oneDisplayDate -  singleInterval - dayFirstDate - Day (ordinal) Month Year
+                                         earliestSingleDate: [1995,  4,  13, CE]
+
+  "13th april, 1995 - 5th may 1999":    # oneDisplayDate -  hyphenatedRange - dayFirstDate - Day (ordinal) Month Year
+                                         earliestSingleDate: [1995,  4,  13, CE]
+                                         latestDate:         [1999,  5,  5, CE]
+
 
 # -------------------------------------------------------------------------------------------------------
 # Invalid dates
