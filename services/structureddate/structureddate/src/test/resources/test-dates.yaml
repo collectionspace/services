@@ -1152,6 +1152,9 @@
                                          earliestSingleDate: [1995,  4,  13, CE]
                                          latestDate:         [1999,  5,  5, CE]
 
+  "13 april 15":                        # oneDisplayDate - ambigous day and year - should be Year month day
+                                         earliestSingleDate: [13,  4,  15, CE]
+
 
 # -------------------------------------------------------------------------------------------------------
 # Invalid dates

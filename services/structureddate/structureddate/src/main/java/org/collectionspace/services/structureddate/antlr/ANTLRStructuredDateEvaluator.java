@@ -388,7 +388,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// Expect the canonical year-month-day-era ordering
 		// to be on the stack.
 
-		Era era = (Era) stack.pop();
+		Era era = (stack.size() == 3) ? null : (Era) stack.pop();
 		Integer dayOfMonth = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
 		Integer year = (Integer) stack.pop();
@@ -494,18 +494,18 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitDayOrYearFirstDate(DayOrYearFirstDateContext ctx) {
 		if (ctx.exception != null) return;
 
-		Era era = (stack.size() == 3) ? null : (Era) stack.pop();
-		Integer year = (Integer) stack.pop();
+		Era era = null;
+		Integer num2 = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
-		Integer dayOfMonth = (Integer) stack.pop();
+		Integer num1 = (Integer) stack.pop();
 
-		Integer num1 = year;
-		Integer num2 = dayOfMonth;
+		Integer year = num1;
+		Integer dayOfMonth = num2;
 
-		if (DateUtils.isValidDate(num1, numMonth, num2, era)) {
-			// Do nothing, it is already In the right format
+ 		if (DateUtils.isValidDate(num1, numMonth, num2, era)) {
+			// The first number is a year. Already correct
 		} else if (DateUtils.isValidDate(num2, numMonth, num1, era)) {
-			// Then the first number is a year. Fix:
+			// The second number is a year.
 			year = num2;
 			dayOfMonth = num1;
 		}
@@ -513,7 +513,6 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		stack.push(year);
 		stack.push(numMonth);
 		stack.push(dayOfMonth);
-		stack.push(era);
 
 		if (dayOfMonth > 31 || dayOfMonth <= 0) {
 			throw new StructuredDateFormatException("unexpected day of month '" + Integer.toString(dayOfMonth) + "'");
