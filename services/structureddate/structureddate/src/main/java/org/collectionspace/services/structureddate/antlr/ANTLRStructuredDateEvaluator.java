@@ -527,7 +527,6 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitDayOrYearFirstDate(DayOrYearFirstDateContext ctx) {
 		if (ctx.exception != null) return;
-
 		Era era = null;
 		Integer num2 = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
