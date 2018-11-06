@@ -1155,19 +1155,6 @@
   "13 april 15":                        # oneDisplayDate - ambigous day and year - should be Year month day
                                          earliestSingleDate: [13,  4,  15, CE]
 
-  "13 april 1995":                       # oneDisplayDate - with question mark
-                                         earliestSingleDate: [1995,  4,  13, CE]
-
-  "13 apr 1995":                         # oneDisplayDate - with question mark
-                                         earliestSingleDate: [1995,  4,  13, CE]
-
-  "13th APRIL 1995":                     # oneDisplayDate - with question mark
-                                         earliestSingleDate: [1995,  4,  13, CE]
-
-  "13 april 1995 - 13 april 2018":       # Hyphenated range - with Day Month Year format
-                                         earliestSingleDate: [1995,  4, 13, CE]
-                                         latestDate:         [2018,  4, 13, CE]
-
   "before 13 april 1995":                # beforeAfterDate - Empty earliestSingleDate - Day Month Year Format
                                          earliestSingleDate: []
                                          latestDate:         [1995,  4, 13, CE]
@@ -1180,9 +1167,6 @@
   "after 13 april 1995":                # beforeAfterDate - Empty latestDate calculated as current date - Day Month Year Format
                                          earliestSingleDate: [1995,  4, 13, CE]
                                          latestDate:         "current date"
-
-  "unknown":
-                                         earliestSingleDate: []
 
   "after april 13 1995":                # beforeAfterDate - Empty latestDate calculated as current date -  Month Day Year Format
                                          earliestSingleDate: [1995,  4, 13, CE]
@@ -1198,6 +1182,9 @@
 
   "unknown":                            # Unknown date: Should result in empty fields
                                          earliestSingleDate: []
+
+  "13 april 15":                        # oneDisplayDate - ambiguous day and year, intepreted as year month day
+                                         earliestSingleDate: [13,  4, 15, CE]
 
 # -------------------------------------------------------------------------------------------------------
 # Invalid dates
