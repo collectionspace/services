@@ -13,9 +13,8 @@ oneDisplayDate:        displayDate ( DOT | QUESTION )? EOF ;
 
 displayDate:           uncertainDate
 |                      certainDate
-/* TODO: Need to decide what "before" and "after" actually mean
 |                      beforeOrAfterDate
-*/
+|                      unknownDate
 ;
 
 uncertainDate:         CIRCA certainDate ;
@@ -105,7 +104,7 @@ strDayInMonthRange:    strMonth numDayOfMonth ( HYPHEN | DASH ) numDayOfMonth CO
 monthInYearRange:      strMonth ( HYPHEN | DASH ) strMonth COMMA? numYear era? ;
 nthQuarterInYearRange: nthQuarter ( HYPHEN | DASH ) nthQuarter COMMA? numYear era? ;
 strSeasonInYearRange:  strSeason ( HYPHEN | DASH ) strSeason COMMA? numYear era? ;
-numDayInMonthRange:    numMonth SLASH numDayOfMonth ( HYPHEN | DASH ) numDayOfMonth SLASH numYear era? ;
+numDayInMonthRange:    numMonth SLASH num ( HYPHEN | DASH ) num SLASH numYear era? ;
 numDate:               num SLASH num SLASH num era?
 |                      num HYPHEN num HYPHEN num era? ;
 monthYear:             strMonth COMMA? numYear era? ;
@@ -129,6 +128,7 @@ numYear:               NUMBER ;
 numMonth:              NUMBER ;
 numDayOfMonth:         NUMBER ;
 num:                   NUMBER ;
+unknownDate:           UNKNOWN ;
 
 
 /*
@@ -169,5 +169,6 @@ DASH:           [—–] ; /* EM DASH, EN DASH */
 SLASH:          '/' ;
 DOT:            '.' ;
 QUESTION:       '?' ;
-STRING:         [a-z]+ ;
 OTHER:          . ;
+UNKNOWN:        'unknown' ;
+STRING:         [a-z]+ ;

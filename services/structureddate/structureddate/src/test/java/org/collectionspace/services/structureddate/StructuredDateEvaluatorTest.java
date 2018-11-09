@@ -1,6 +1,8 @@
 package org.collectionspace.services.structureddate;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -51,6 +53,21 @@ public class StructuredDateEvaluatorTest {
 
 	private StructuredDateInternal createStructuredDateFromYamlSpec(String displayDate, Map<String, Object> structuredDateFields) {
 		StructuredDateInternal structuredDate = null;
+
+		if (structuredDateFields != null && structuredDateFields.containsKey("latestDate")) {
+			Object latestDate = structuredDateFields.get("latestDate");
+			if (latestDate instanceof String) {
+				if (latestDate.equals("current date")) {
+					ArrayList items = new ArrayList<>();
+					Date currentDate = DateUtils.getCurrentDate();
+					items.add(currentDate.getYear());
+					items.add(currentDate.getMonth());
+					items.add(currentDate.getDay());
+					items.add(currentDate.getEra() == Era.BCE ? "BCE" : "CE");
+					structuredDateFields.put("latestDate", items);
+				}
+			}
+		}
 
 		if (structuredDateFields != null) {
 			structuredDate = new StructuredDateInternal();
