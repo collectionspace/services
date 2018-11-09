@@ -1108,16 +1108,26 @@ public class DateUtils {
 	
 	/**
 	 * Calculates the latest date that may be considered to be "after"
-	 * a given date range. We define "after" as the current date.
+	 * a given date range. 
 	 * 
 	 * @param startDate The first date in the range
 	 * @param endDate   The last date in the range
 	 * @return          The latest date "after" the range
 	 */
 	public static Date getLatestAfterDate(Date startDate, Date endDate) {
-		// TODO
-		return getCurrentDate();
+		Date currentDate = getCurrentDate();
+		if (endDate == null) {
+			return currentDate;
+		}
 
+		MutableDateTime currentDateTime = convertToDateTime(currentDate);
+		MutableDateTime endDateTime = convertToDateTime(endDate);
+		
+		int comparisonResult = currentDateTime.compareTo(endDateTime);
+		if (comparisonResult == 1 || comparisonResult == 0) {
+			return currentDate;
+		}
+		return null;
 	}
 
 	public static Date getCurrentDate() {
@@ -1125,7 +1135,8 @@ public class DateUtils {
 		Integer year = (Integer) localDate.getYear();
 		Integer month = (Integer) localDate.getMonthOfYear();
 		Integer dayOfMonth = (Integer) localDate.getDayOfMonth();
-		return new Date(year, month, dayOfMonth, Date.DEFAULT_ERA);
+		Era era = (localDate.getEra() == DateTimeConstants.BC) ? Era.BCE : Era.CE;
+		return new Date(year, month, dayOfMonth, era);
 	}
 
 	public static int getYearsBetween(Date startDate, Date endDate) {

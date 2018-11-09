@@ -54,16 +54,18 @@ public class StructuredDateEvaluatorTest {
 	private StructuredDateInternal createStructuredDateFromYamlSpec(String displayDate, Map<String, Object> structuredDateFields) {
 		StructuredDateInternal structuredDate = null;
 
-		// Can and should we calculate today's date for the "AFTER" dates?
 		if (structuredDateFields != null && structuredDateFields.containsKey("latestDate")) {
-			if (structuredDateFields.get("latestDate").toString().equals("current date")) {
-				ArrayList items = new ArrayList<>();
-				Date currentDate = DateUtils.getCurrentDate();
-				items.add(currentDate.getYear());
-				items.add(currentDate.getMonth());
-				items.add(currentDate.getDay());
-				items.add(Date.DEFAULT_ERA.toString().toUpperCase());
-				structuredDateFields.put("latestDate", items);
+			Object latestDate = structuredDateFields.get("latestDate");
+			if (latestDate instanceof String) {
+				if (latestDate.equals("current date")) {
+					ArrayList items = new ArrayList<>();
+					Date currentDate = DateUtils.getCurrentDate();
+					items.add(currentDate.getYear());
+					items.add(currentDate.getMonth());
+					items.add(currentDate.getDay());
+					items.add(currentDate.getEra() == Era.BCE ? "BCE" : "CE");
+					structuredDateFields.put("latestDate", items);
+				}
 			}
 		}
 

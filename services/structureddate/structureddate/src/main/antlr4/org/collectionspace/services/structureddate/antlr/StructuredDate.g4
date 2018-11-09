@@ -170,5 +170,5 @@ SLASH:          '/' ;
 DOT:            '.' ;
 QUESTION:       '?' ;
 OTHER:          . ;
-UNKNOWN:		'unknown' | 'UNKNOWN' ;
+UNKNOWN:        'unknown' ;
 STRING:         [a-z]+ ;

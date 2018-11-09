@@ -1186,6 +1186,17 @@
   "13 april 15":                        # oneDisplayDate - ambiguous day and year, intepreted as year month day
                                          earliestSingleDate: [13,  4, 15, CE]
 
+  "04/5-6/2018":                        # Month/Day - Day/Year date
+                                         earliestSingleDate: [2018,  4, 5, CE]
+                                         latestDate:         [2018,  4, 6, CE]
+  
+  "04/03-07/09":                        # Ambigious NumDayInMonthRange - should be interpreted as Month/Day - Day/Year date
+                                         earliestSingleDate: [9,  4, 3, CE]
+                                         latestDate:         [9,  4, 7, CE] 
+
+  '04/1996-07/09':                       # Semi-ambigious NumDayInMonthRange - should be interpreted as Month/Year - Month/Year date
+                                         earliestSingleDate: [1996,  4,  1, CE]
+                                         latestDate:         [9,     7, 31, CE] 
 # -------------------------------------------------------------------------------------------------------
 # Invalid dates
 # -------------------------------------------------------------------------------------------------------
@@ -1229,9 +1240,8 @@
   '3/4?/2005':                           # question mark
                                          null
 
-  '100 June 2010': 
+  '100 June 2010':                       # invalid day
                                           null
 
-  '13 June 0': 
+  '13 June 0':                           # year 0
                                           null
-                                          
