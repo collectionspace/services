@@ -1155,7 +1155,48 @@
   "13 april 15":                        # oneDisplayDate - ambigous day and year - should be Year month day
                                          earliestSingleDate: [13,  4,  15, CE]
 
+  "before 13 april 1995":                # beforeAfterDate - Empty earliestSingleDate - Day Month Year Format
+                                         earliestSingleDate: []
+                                         latestDate:         [1995,  4, 13, CE]
 
+  "before june 10 2017":                 # beforeAfterDate - Empty earliestSingleDate -  Month Day Year Format
+                                         earliestSingleDate: []
+                                         latestDate:         [2017,  6, 10, CE]
+
+
+  "after 13 april 1995":                # beforeAfterDate - Empty latestDate calculated as current date - Day Month Year Format
+                                         earliestSingleDate: [1995,  4, 13, CE]
+                                         latestDate:         "current date"
+
+  "after april 13 1995":                # beforeAfterDate - Empty latestDate calculated as current date -  Month Day Year Format
+                                         earliestSingleDate: [1995,  4, 13, CE]
+                                         latestDate:         "current date"
+  
+  "10/2005-12/2006":                    # Month/Year - Month/Year date
+                                         earliestSingleDate: [2005,  10, 1, CE]
+                                         latestDate:         [2006,  12, 31, CE]
+
+  "04/1995-04/2018":                    # Month/Year - Month/Year date
+                                         earliestSingleDate: [1995,  4, 1, CE]
+                                         latestDate:         [2018,  4, 30, CE]
+
+  "unknown":                            # Unknown date: Should result in empty fields
+                                         earliestSingleDate: []
+
+  "13 april 15":                        # oneDisplayDate - ambiguous day and year, intepreted as year month day
+                                         earliestSingleDate: [13,  4, 15, CE]
+
+  "04/5-6/2018":                        # Month/Day - Day/Year date
+                                         earliestSingleDate: [2018,  4, 5, CE]
+                                         latestDate:         [2018,  4, 6, CE]
+  
+  "04/03-07/09":                        # Ambigious NumDayInMonthRange - should be interpreted as Month/Day - Day/Year date
+                                         earliestSingleDate: [9,  4, 3, CE]
+                                         latestDate:         [9,  4, 7, CE] 
+
+  '04/1996-07/09':                       # Semi-ambigious NumDayInMonthRange - should be interpreted as Month/Year - Month/Year date
+                                         earliestSingleDate: [1996,  4,  1, CE]
+                                         latestDate:         [9,     7, 31, CE] 
 # -------------------------------------------------------------------------------------------------------
 # Invalid dates
 # -------------------------------------------------------------------------------------------------------
@@ -1199,9 +1240,8 @@
   '3/4?/2005':                           # question mark
                                          null
 
-  '100 June 2010': 
+  '100 June 2010':                       # invalid day
                                           null
 
-  '13 June 0': 
+  '13 June 0':                           # year 0
                                           null
-                                          
