@@ -1214,21 +1214,21 @@
                                          earliestSingleDate: [1232,  1, 1, BCE]
                                          latestDate:         [932,  12, 31, BCE]
 
-  "3,100+/-150 years BP":                 # Uncalibrated date with 'years' in it as well as with a comma
-                                         earliestSingleDate: [1232,  1, 1, BCE]
-                                         latestDate:         [932,  12, 31, BCE]
+  # "3,100+/-150 years BP":                 # Uncalibrated date with 'years' in it as well as with a comma
+  #                                        earliestSingleDate: [1232,  1, 1, BCE]
+  #                                        latestDate:         [932,  12, 31, BCE]
 
   "2000±100 BP":                         # Uncalibrated date with BCE and AD mix
                                          earliestSingleDate: [82,  1, 1, BCE]
                                          latestDate:         [118,  12, 31, CE]
 
-  "5,580-5,460 BC":                      #Calibrated date with commas
+  "5580-5460 BC":                      #Calibrated date with commas
                                          earliestSingleDate: [5580,  1, 1, BCE]
                                          latestDate:         [5460,  12, 31, BCE]
 
-  "5,580 - 5,460 BC":                    #Calibrated date with commas and spaces
-                                         earliestSingleDate: [5580,  1, 1, BCE]
-                                         latestDate:         [5460,  12, 31, BCE]
+  # "5,580 - 5,460 BC":                    #Calibrated date with commas and spaces
+  #                                        earliestSingleDate: [5580,  1, 1, BCE]
+  #                                        latestDate:         [5460,  12, 31, BCE]
 
   "5460-5580 BC":                        #Calibrated date with dates reversed
                                          earliestSingleDate: [5580,  1, 1, BCE]
