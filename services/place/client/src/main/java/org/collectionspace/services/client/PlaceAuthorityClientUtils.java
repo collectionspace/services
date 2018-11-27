@@ -279,7 +279,7 @@ public class PlaceAuthorityClientUtils {
 		return newStr.toString();
     }
     
-    private static List<PlaceTermGroup> getTermGroupInstance(String shortIdentifier, String displayName) {
+    public static List<PlaceTermGroup> getTermGroupInstance(String shortIdentifier, String displayName) {
         if (Tools.isBlank(shortIdentifier)) {
             shortIdentifier = getGeneratedIdentifier();
         }
