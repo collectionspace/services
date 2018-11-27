@@ -119,9 +119,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		result = new StructuredDateInternal();
 		result.setDisplayDate(displayDate);
 
-		// Instantiate a parser from the lowercased display date, so that parsing will be
-		// case insensitive. Also remove commas so that numbers with commas are parsed correctly
-		ANTLRInputStream inputStream = new ANTLRInputStream(displayDate.toLowerCase()); //.replaceAll(",", ""));
+		// Instantiate a parser from the lowercased display date, so that parsing will be case insensitive 
 		StructuredDateLexer lexer = new StructuredDateLexer(inputStream);
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 		StructuredDateParser parser = new StructuredDateParser(tokenStream);
@@ -454,7 +452,6 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		// Expect the canonical year-month-day-era ordering
 		// to be on the stack.
-		System.out.println("whyyyyy");
 
 		Era era = (stack.size() == 3) ? null : (Era) stack.pop();
 		Integer dayOfMonth = (Integer) stack.pop();
@@ -546,7 +543,6 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitDayFirstDate(DayFirstDateContext ctx) {
 		if (ctx.exception != null) return ;
-		System.out.println("hgfhghfgjf ");
 		
 		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
@@ -594,7 +590,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitInvStrDateEraLastDate(InvStrDateEraLastDateContext ctx) {
 		if (ctx.exception != null) return;
-		System.out.println("yeeeet");
+
 		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer dayOfMonth = (Integer) stack.pop();
 		Integer month = (Integer) stack.pop();

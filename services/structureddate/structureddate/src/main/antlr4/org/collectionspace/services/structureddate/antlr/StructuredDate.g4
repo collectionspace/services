@@ -137,8 +137,8 @@ unknownDate:           UNKNOWN ;
 /*
  * Lexer rules
  */
-PLUSMINUS:      '±' | '+/-' ;
 WS:             [ \t\r\n]+ -> skip;
+PLUSMINUS:      '±' | '+/-' ;
 CIRCA:          ('c' | 'ca') DOT? | 'circa' ;
 SPRING:         'spring' | 'spr' ;
 SUMMER:         'summer' | 'sum' ;
@@ -160,8 +160,8 @@ CENTURY:        'century' ;
 MILLENNIUM:     'millennium' ;
 MONTH:          'january' | 'february' | 'march' | 'april' | 'may' | 'june' | 'july' | 'august' | 'september' | 'october' | 'november' | 'december' ;
 SHORTMONTH:     'jan' | 'feb' | 'mar' | 'apr' | 'jun' | 'jul' | 'aug' | 'sep' | 'sept' | 'oct' | 'nov' | 'dec' ;
-BC:             'bc' | 'bce' |  'b.c.' | 'b.c.e.';
-AD:             'ad' | 'a.d.' | 'ce' | 'c.e.';
+BC:             'bc' | 'bce' |  'b.c.' | 'b.c.e.' ;
+AD:             'ad' | 'a.d.' | 'ce' | 'c.e.' ;
 BP:             'bp' | 'b.p.' | 'b.p' ;
 NTHSTR:         [0-9]*? ([0456789] 'th' | '1st' | '2nd' | '3rd' | '11th' | '12th' | '13th') ;
 HUNDREDS:       [0-9]*? '00' '\''? 's';
@@ -174,6 +174,6 @@ SLASH:          '/' ;
 DOT:            '.' ;
 QUESTION:       '?' ;
 OTHER:          . ;
-UNKNOWN:        'unknown';
-YEARSSTRING:    'years' | 'year';
+UNKNOWN:        'unknown' ;
+YEARSSTRING:    'years' | 'year' ;
 STRING:         [a-z]+ ;
