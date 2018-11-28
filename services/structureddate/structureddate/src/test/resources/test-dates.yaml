@@ -1195,8 +1195,8 @@
                                          latestDate:         [9,  4, 7, CE] 
 
   '04/1996-07/09':                       # Semi-ambigious NumDayInMonthRange - should be interpreted as Month/Year - Month/Year date
-                                         earliestSingleDate: [1996,  4,  1, CE]
-                                         latestDate:         [9,     7, 31, CE] 
+                                         earliestSingleDate: [9,     7, 31, CE]
+                                         latestDate:         [1996,  4,  1, CE]
 
   "1200±50 BP":                          # Uncalibrated date with ± symbol, with CE
                                          earliestSingleDate: [768,  1, 1, CE]

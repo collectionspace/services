@@ -120,6 +120,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		result.setDisplayDate(displayDate);
 
 		// Instantiate a parser from the lowercased display date, so that parsing will be case insensitive 
+		ANTLRInputStream inputStream = new ANTLRInputStream(displayDate.toLowerCase());
 		StructuredDateLexer lexer = new StructuredDateLexer(inputStream);
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 		StructuredDateParser parser = new StructuredDateParser(tokenStream);
@@ -155,6 +156,17 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		Date latestDate = (Date) stack.pop();
 		Date earliestDate = (Date) stack.pop();
+
+		System.out.println(latestDate);
+		System.out.println(earliestDate);
+
+		int compareResult = DateUtils.compareDates(earliestDate, latestDate);
+		if (compareResult == 1) {
+			Date temp;
+			temp = earliestDate;
+			earliestDate = latestDate;
+			latestDate = temp;
+		}
 
 		// If the earliest date and the latest date are the same, it's just a "single" date.
 		// There's no need to have the latest, so set it to null.
@@ -216,35 +228,9 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Date latestDate = (Date) stack.pop();
 		Date earliestDate = (Date) stack.pop();
 
+
 		int earliestInterval = DateUtils.getCircaIntervalYears(earliestDate.getYear(), earliestDate.getEra());
 		int latestInterval = DateUtils.getCircaIntervalYears(latestDate.getYear(), latestDate.getEra());
-
-		if (earliestDate.getEra() == Era.BCE && latestDate.getEra() == Era.BCE) {
-			// Improved precision for BC dates
-			if ((latestDate.getMonth() == 12 && latestDate.getDay() == 31) &&
-				(earliestDate.getMonth() == 1 && earliestDate.getDay() == 1)) {
-				int year = earliestDate.getYear(); // Should be the same year...
-				int interval = 0;
-
-				if (year % 1000 == 0) {
-					interval = 500;
-				} else if (year % 100 == 0) {
-					interval = 50;
-				} else if (year % 10 == 0) {
-					interval = 10;
-				} else if (year % 10 > 0 && year % 10 < 10) {
-					interval = 5;
-				}
-				earliestInterval = interval;
-				latestInterval = interval;
-			}
-		}
-		// Express the circa interval as a qualifier.
-
-		// stack.push(earliestDate.withQualifier(QualifierType.MINUS, earliestInterval, QualifierUnit.YEARS));
-		// stack.push(latestDate.withQualifier(QualifierType.PLUS, latestInterval, QualifierUnit.YEARS));
-
-		// OR:
 
 		// Express the circa interval as an offset calculated into the year.
 
