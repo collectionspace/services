@@ -1332,6 +1332,42 @@ public class DateUtils {
 		
 		return isValid;
 	}
+
+	/** 
+	 * Converts Roman numeral to integer. Currently only supports 1-12.
+	 * @param romanNum The Roman number string that needs to be transformed into decimal
+	 * @return decimal representation of Roman number
+	 * Credit: https://www.geeksforgeeks.org/converting-roman-numerals-decimal-lying-1-3999/
+	*/
+	public static int romanToDecimal(String romanNum) {
+		int length = romanNum.length();
+		int sum = 0;
+		int pre = 0;
+
+		for (int i = length - 1; i >= 0; i--) {
+			int cur = getRomanValue(romanNum.charAt(i));
+			
+			if (i == length - 1) {
+				sum = sum + cur;
+			} else {
+			   if (cur < pre) {
+				   sum = sum - cur;
+			   } else {
+				   sum = sum + cur;
+			   }
+			}
+			pre = cur;
+		}
+		
+		return sum;
+	}
+
+	private static int getRomanValue(char c) {
+		if (c == 'i') return 1;
+		else if (c == 'v') return 5;
+		else if (c == 'x') return 10;
+		return -1;
+	}
 	
 	/**
 	 * Converts a Date to a joda-time DateTime.
