@@ -78,6 +78,7 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Pa
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterCenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterInYearRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterYearContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.RomanNumContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.SeasonYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrCenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrDateContext;
@@ -457,6 +458,11 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			year = num1;
 			numMonth = num2;
 			dayOfMonth = num3;
+		}
+		else if (DateUtils.isValidDate(num3, num2, num1, era)) {
+			// The date was of format day-month-year
+			numMonth = num2;
+			dayOfMonth = num1;
 		}
 
 		stack.push(year);
@@ -1178,6 +1184,18 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// and push on the stack.
 
 		Integer num = new Integer(ctx.NUMBER().getText());
+
+		stack.push(num);
+	}
+
+	@Override
+	public void exitRomanNum(RomanNumContext ctx) {
+		
+		int num = DateUtils.romanToDecimal(ctx.ROMANNUMBER().getText());
+
+		if (num < 1 || num > 12) {
+			throw new StructuredDateFormatException("unexpected month '" + Integer.toString(num) + "'");
+		}
 
 		stack.push(num);
 	}
