@@ -1,5 +1,7 @@
 package org.collectionspace.services.structureddate.antlr;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.Stack;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -119,8 +121,13 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		result = new StructuredDateInternal();
 		result.setDisplayDate(displayDate);
 
+		// Remove commas if they are found between two numbers
+		String regex = "(?<=[\\d])(,)(?=[\\d])";
+        Pattern p = Pattern.compile(regex);
+        Matcher displayDateMatcher = p.matcher(displayDate.toLowerCase());
+
 		// Instantiate a parser from the lowercased display date, so that parsing will be case insensitive 
-		ANTLRInputStream inputStream = new ANTLRInputStream(displayDate.toLowerCase());
+		ANTLRInputStream inputStream = new ANTLRInputStream(displayDateMatcher.replaceAll(""));
 		StructuredDateLexer lexer = new StructuredDateLexer(inputStream);
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 		StructuredDateParser parser = new StructuredDateParser(tokenStream);
@@ -156,9 +163,6 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		Date latestDate = (Date) stack.pop();
 		Date earliestDate = (Date) stack.pop();
-
-		System.out.println(latestDate);
-		System.out.println(earliestDate);
 
 		int compareResult = DateUtils.compareDates(earliestDate, latestDate);
 		if (compareResult == 1) {
