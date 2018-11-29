@@ -1253,6 +1253,22 @@
   '5/13/54,962 BC-4/5/2,019':            # hyphenatedRange, date with comma'd numbers
                                          earliestSingleDate: [54962,  5,  13, BCE]
                                          latestDate:         [2019,  4,  5, CE]
+
+  '17-X-13':                            # Day-Month-Year with roman numeral as month, makes sure ambiguities resolved as they were before
+                                         earliestSingleDate: [17,  10,  13, CE]
+
+  '01-I-2017 BCE':                       # Day-Month-Year with roman numeral as month 
+                                         earliestSingleDate: [2017,  1,  1, BCE]
+
+  '19-XI-2018':                          # Day-Month-Year with roman numeral as month 
+                                         earliestSingleDate: [2018,  11,  19, CE]
+
+  '27-III-1843 BCE':                     # Day-Month-Year with roman numeral as month 
+                                         earliestSingleDate: [1843,  3,  27, BCE]
+
+  '29-IV-2018':                          # Day-Month-Year with roman numeral as month 
+                                         earliestSingleDate: [2018,  4,  29, CE]
+
 # -------------------------------------------------------------------------------------------------------
 # Invalid dates
 # -------------------------------------------------------------------------------------------------------
@@ -1300,4 +1316,7 @@
                                           null
 
   '13 June 0':                           # year 0
+                                          null
+
+  '29-XX-2018':                          # invalid month
                                           null
