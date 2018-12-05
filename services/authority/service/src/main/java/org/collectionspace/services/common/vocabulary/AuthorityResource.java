@@ -983,7 +983,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         return result;
     }
     
-    private PoxPayloadOut getAuthorityItem(
+    protected PoxPayloadOut getAuthorityItem(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             String parentIdentifier,
             String itemIdentifier) throws Exception {
