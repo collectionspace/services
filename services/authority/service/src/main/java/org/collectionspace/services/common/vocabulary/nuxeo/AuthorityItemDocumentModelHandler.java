@@ -549,7 +549,8 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
      * @return
      * @throws Exception
      */
-    protected boolean handlePayloadSync(DocumentWrapper<Object> wrapDoc) throws Exception {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	protected boolean handlePayloadSync(DocumentWrapper<Object> wrapDoc) throws Exception {
         boolean result = false;
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
         
