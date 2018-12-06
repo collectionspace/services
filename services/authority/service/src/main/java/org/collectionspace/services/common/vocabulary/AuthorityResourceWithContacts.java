@@ -260,17 +260,17 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
             //
             
             //FIXME: Need to support paging
-            AbstractCommonList contactObjectList = getContactList(null, parentIdentifier, itemIdentifier, uriInfo);
+            AbstractCommonList contactObjectList = getContactList(ctx, parentIdentifier, itemIdentifier, uriInfo);
             if (contactObjectList.getTotalItems() > 1) {
             		String errMsg = String.format("Can't get complete list of contacts for authority term '%s' in authority '%s'.", parentIdentifier, itemIdentifier);
             		logger.warn(errMsg);
             }
             
-            if (contactObjectList.getTotalItems() > 1) {
+            if (contactObjectList.getTotalItems() > 0) {
             		ListItem item = contactObjectList.getListItem().get(0);
             		String csid = this.getCsid(item);
             		PoxPayloadOut contactPayloadOut = getContactPayload(parentIdentifier, itemIdentifier, csid);
-            		PayloadOutputPart contactCommonPart = contactPayloadOut.getPart(ContactClient.PART_COMMON_LABEL);
+            		PayloadOutputPart contactCommonPart = contactPayloadOut.getPart(ContactClient.SERVICE_COMMON_PART_NAME);
             		result.addPart(contactCommonPart);
             }
             
