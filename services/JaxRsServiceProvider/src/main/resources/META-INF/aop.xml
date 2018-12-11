@@ -3,6 +3,7 @@
 <aspectj>
     <weaver>
         <!-- only weave classes in our application-specific packages -->
+        <include within="org.nuxeo..*"/>
         <include within="org.collectionspace.services..*"/>
         <include within="org.collectionspace.services.aspect.*"/>
     </weaver>
@@ -10,5 +11,6 @@
     <aspects>        
         <!-- weave in just this aspect --> 
         <aspect name="org.collectionspace.services.aspect.JaxbXMLGregorianCalendarMarshal"/>
+        <aspect name="org.collectionspace.services.aspect.BlobProfileAspect"/>
     </aspects>
 </aspectj>
