@@ -178,7 +178,6 @@ public class BlobInput {
 	// FIXME: REM - The callers of this method are sending us a multipart form-data post, so why
 	// are we also receiving the blobUri?
 	//
-	@YourAnnotation
 	public void createBlobFile(HttpServletRequest req, String blobUri) throws Exception {
     	File tmpFile = org.collectionspace.services.common.FileUtilities.createTmpFile(req);
     	this.setIsTemporaryFile(true);
