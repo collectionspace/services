@@ -48,8 +48,8 @@ public class BlobProfileAspect {
 	/**
 	 * Setup a pointcut for all the Blob methods related to creating a new blob
 	 */
-	@Pointcut("execution(* org.nuxeo.ecm.platform.filemanager.service.extension.AbstractFileImporter.create(..))")
-    public void nuxeoImagePluginCutPoint() {}
+//	@Pointcut("execution(org.nuxeo.ecm.platform.filemanager.service.FileManagerService getFileManagerService(..))")
+//    public void nuxeoImagePluginCutPoint() {}
 	
 	@Pointcut("execution(* org.collectionspace.services.common.imaging.nuxeo.NuxeoBlobUtils.createDocumentFromBlob(..))")
     public void createDocumentFromBlobCutPoint() {}
@@ -66,8 +66,8 @@ public class BlobProfileAspect {
     @Pointcut("createDocumentFromBlobCutPoint()"
     		+ " || blobResourceCreateCutPoint()"
     		+ " || blobResourceCreatBlobCutPoint()"
-    		+ " || blobUtilCreatBlobFile()"
-    		+ " || nuxeoImagePluginCutPoint()")
+    		+ " || blobUtilCreatBlobFile()")
+//    		+ " || nuxeoImagePluginCutPoint()")
     public void blobResourceCreateMethods() {}
 
 }
