@@ -48,7 +48,8 @@ public class CSJsonESDocumentWriter extends JsonESDocumentWriter {
 
             if (StringUtils.isNotEmpty(refName)) {
                 String escapedRefName = refName.replace("'", "\\'");
-                String mediaQuery = String.format("SELECT * FROM Media WHERE media_common:coverage = '%s' AND ecm:currentLifeCycleState = 'project' AND collectionspace_core:tenantId = '2000' ORDER BY media_common:identificationNumber", escapedRefName);
+                String tenantId = (String) doc.getProperty("collectionspace_core", "tenantId");
+                String mediaQuery = String.format("SELECT * FROM Media WHERE media_common:coverage = '%s' AND ecm:currentLifeCycleState = 'project' AND collectionspace_core:tenantId = '%s' ORDER BY media_common:identificationNumber", escapedRefName, tenantId);
 
                 DocumentModelList mediaDocs = session.query(mediaQuery);
                 List<JsonNode> mediaCsids = new ArrayList<JsonNode>();
