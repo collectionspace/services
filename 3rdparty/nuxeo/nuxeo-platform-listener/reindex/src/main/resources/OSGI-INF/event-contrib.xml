@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.services.listener.reindex">
+    <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+        <listener name="reindexlistener" async="true" postCommit="true"
+                  class="org.collectionspace.services.listener.Reindex">
+            <event>documentCreated</event>
+            <event>documentModified</event>
+            <event>documentRemoved</event>
+        </listener>
+    </extension>
+    <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+        <listener name="reindexsupportlistener" async="false" postCommit="false"
+                  class="org.collectionspace.services.listener.ReindexSupport">
+            <event>aboutToCreate</event>
+            <event>aboutToRemove</event>
+            <event>beforeDocumentModification</event>
+        </listener>
+    </extension>
+</component>
