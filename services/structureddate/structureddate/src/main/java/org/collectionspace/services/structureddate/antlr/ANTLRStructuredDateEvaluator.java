@@ -164,23 +164,28 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Date latestDate = (Date) stack.pop();
 		Date earliestDate = (Date) stack.pop();
 
-		int compareResult = DateUtils.compareDates(earliestDate, latestDate);
-		if (compareResult == 1) {
-			Date temp;
-			temp = earliestDate;
-			earliestDate = latestDate;
-			latestDate = temp;
+		System.out.println(latestDate.getYear() == null);
+		System.out.println(earliestDate.getYear() == null);
 
-			// Check to see if the dates were reversed AND calculated. If they were
-			// Then this probably means the absolute earliestDate should have month and day as "1"
-			// and the latestDate momth 12, day 31.
-			if ((earliestDate.getMonth() == 12 && earliestDate.getDay() == 31) &&
-				(latestDate.getMonth() == 1 && latestDate.getDay() == 1)) {
-					earliestDate.setMonth(1);
-					earliestDate.setDay(1);
-					latestDate.setMonth(12);
-					latestDate.setDay(31);
-				}
+		if (earliestDate.getYear() != null || earliestDate.getYear() != null) {
+			int compareResult = DateUtils.compareDates(earliestDate, latestDate);
+			if (compareResult == 1) {
+				Date temp;
+				temp = earliestDate;
+				earliestDate = latestDate;
+				latestDate = temp;
+	
+				// Check to see if the dates were reversed AND calculated. If they were
+				// Then this probably means the absolute earliestDate should have month and day as "1"
+				// and the latestDate momth 12, day 31.
+				if ((earliestDate.getMonth() == 12 && earliestDate.getDay() == 31) &&
+					(latestDate.getMonth() == 1 && latestDate.getDay() == 1)) {
+						earliestDate.setMonth(1);
+						earliestDate.setDay(1);
+						latestDate.setMonth(12);
+						latestDate.setDay(31);
+					}
+			}
 		}
 
 		// If the earliest date and the latest date are the same, it's just a "single" date.

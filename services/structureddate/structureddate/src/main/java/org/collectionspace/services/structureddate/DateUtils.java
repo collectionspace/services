@@ -1131,12 +1131,11 @@ public class DateUtils {
 	 * Wrapper function for MutableDateTime's comparator.
 	 * @param startDate The first date in the range
 	 * @param endDate   The last date in the range
-	 * @return          -2 if either are null, -1 if startDate is before,
-	 * 					0 if they are equal, 1 if startDate is after endDate
+	 * @return          -1 if startDate is before, 0 if they are equal, 1 if startDate is after endDate
 	 */
 	public static int compareDates(Date startDate, Date endDate) {
 		if (startDate.getYear() == null || endDate.getYear() == null) {
-			return -2;
+			throw new IllegalArgumentException("Must provide a start and end date to compare.");
 		}
 
 		MutableDateTime startDateTime = convertToDateTime(startDate);
