@@ -170,6 +170,17 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			temp = earliestDate;
 			earliestDate = latestDate;
 			latestDate = temp;
+
+			// Check to see if the dates were reversed AND calculated. If they were
+			// Then this probably means the absolute earliestDate should have month and day as "1"
+			// and the latestDate momth 12, day 31.
+			if ((earliestDate.getMonth() == 12 && earliestDate.getDay() == 31) &&
+				(latestDate.getMonth() == 1 && latestDate.getDay() == 1)) {
+					earliestDate.setMonth(1);
+					earliestDate.setDay(1);
+					latestDate.setMonth(12);
+					latestDate.setDay(31);
+				}
 		}
 
 		// If the earliest date and the latest date are the same, it's just a "single" date.
@@ -236,6 +247,13 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		int earliestInterval = DateUtils.getCircaIntervalYears(earliestDate.getYear(), earliestDate.getEra());
 		int latestInterval = DateUtils.getCircaIntervalYears(latestDate.getYear(), latestDate.getEra());
 
+		// Express the circa interval as a qualifier.	
+
+ 		// stack.push(earliestDate.withQualifier(QualifierType.MINUS, earliestInterval, QualifierUnit.YEARS));	
+		// stack.push(latestDate.withQualifier(QualifierType.PLUS, latestInterval, QualifierUnit.YEARS));	
+
+ 		// OR:	
+		 
 		// Express the circa interval as an offset calculated into the year.
 
 		DateUtils.subtractYears(earliestDate, earliestInterval);
@@ -300,26 +318,6 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		if (latestEndDate instanceof DeferredDate) {
 			((DeferredDate) latestEndDate).resolveDate();
-		}
-
-		// Check if they are reversed
-		if (latestEndDate.getEra() == Era.BCE && earliestStartDate.getEra() == Era.BCE) {
-			if (earliestStartDate.getYear() < latestEndDate.getYear()) {
-				Date tmp = earliestStartDate;
-				earliestStartDate = latestEndDate;
-				latestEndDate = tmp;
-
-				// This is probably bad technique, but right now, if the month and days were calculated
-				// Chances are that the EarliestStart date has the LatestStart date
-				// And the latestEnd date has the earliestEnd date. So we set them accordingly.
-				if ((earliestStartDate.getMonth() == 12 && earliestStartDate.getDay() == 31) &&
-					(latestEndDate.getMonth() == 1 && latestEndDate.getDay() == 1)) {
-						earliestStartDate.setMonth(1);
-						earliestStartDate.setDay(1);
-						latestEndDate.setMonth(12);
-						latestEndDate.setDay(31);
-				}
-			}
 		}
 
 		stack.push(earliestStartDate);
