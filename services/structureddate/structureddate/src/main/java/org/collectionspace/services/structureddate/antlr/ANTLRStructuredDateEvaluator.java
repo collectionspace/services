@@ -121,13 +121,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		result = new StructuredDateInternal();
 		result.setDisplayDate(displayDate);
 
-		// Remove commas if they are found between two numbers
-		String regex = "(?<=[\\d])(,)(?=[\\d])";
-        Pattern p = Pattern.compile(regex);
-        Matcher displayDateMatcher = p.matcher(displayDate.toLowerCase());
-
 		// Instantiate a parser from the lowercased display date, so that parsing will be case insensitive 
-		ANTLRInputStream inputStream = new ANTLRInputStream(displayDateMatcher.replaceAll(""));
+		ANTLRInputStream inputStream = new ANTLRInputStream(displayDate.toLowerCase());
 		StructuredDateLexer lexer = new StructuredDateLexer(inputStream);
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 		StructuredDateParser parser = new StructuredDateParser(tokenStream);
@@ -163,9 +158,6 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		Date latestDate = (Date) stack.pop();
 		Date earliestDate = (Date) stack.pop();
-
-		System.out.println(latestDate.getYear() == null);
-		System.out.println(earliestDate.getYear() == null);
 
 		if (earliestDate.getYear() != null || earliestDate.getYear() != null) {
 			int compareResult = DateUtils.compareDates(earliestDate, latestDate);
@@ -962,7 +954,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// Convert the string to a number,
 		// and push on the stack.
 
-		Integer year = new Integer(ctx.NUMBER().getText());
+		Integer year = new Integer(ctx.getText().replaceAll(",", ""));
 
 		if (year == 0) {
 			throw new StructuredDateFormatException("unexpected year '" + ctx.NUMBER().getText() + "'");
@@ -1209,7 +1201,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// Convert the numeric string to an Integer,
 		// and push on the stack.
 
-		Integer num = new Integer(ctx.NUMBER().getText());
+		Integer num = new Integer(ctx.getText().replaceAll(",", ""));
 
 		stack.push(num);
 	}
@@ -1226,8 +1218,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitUncalibratedDate(UncalibratedDateContext ctx) {
 		if (ctx.exception != null) return;
 
-		Integer mainYear = Integer.parseInt(ctx.numYear().getText());
-		Integer adjustmentDate = Integer.parseInt(ctx.NUMBER().getText());
+		Integer adjustmentDate = (Integer) stack.pop();
+		Integer mainYear = (Integer) stack.pop();
 
 		Integer upperBound = mainYear + adjustmentDate;
 		Integer lowerBound = mainYear - adjustmentDate;

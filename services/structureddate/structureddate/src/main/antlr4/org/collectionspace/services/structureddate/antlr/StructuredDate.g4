@@ -26,7 +26,7 @@ certainDate:           hyphenatedRange
 
 beforeOrAfterDate:     ( BEFORE | AFTER ) singleInterval ;
 
-uncalibratedDate:      numYear PLUSMINUS NUMBER YEARSSTRING? BP; 
+uncalibratedDate:      numYear PLUSMINUS num YEARSSTRING? BP ;
 
 hyphenatedRange:       singleInterval ( HYPHEN | DASH ) singleInterval
 |                      nthCenturyRange
@@ -166,7 +166,7 @@ BP:             'bp' | 'b.p.' | 'b.p' ;
 NTHSTR:         [0-9]*? ([0456789] 'th' | '1st' | '2nd' | '3rd' | '11th' | '12th' | '13th') ;
 HUNDREDS:       [0-9]*? '00' '\''? 's';
 TENS:           [0-9]*? '0' '\''? 's';
-NUMBER:         [0-9]+ ;
+NUMBER:         ([0-9,]+)*[0-9] ;
 COMMA:          ',' ;
 HYPHEN:         '-' ;
 DASH:           [—–] ; /* EM DASH, EN DASH */
