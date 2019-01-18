@@ -30,8 +30,6 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.UriTemplateRegistry;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
@@ -1211,7 +1209,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
 
         return unQObjectProperties;
     }
-
+    
     /**
      * Filters out selected values supplied in an update request.
      * 
@@ -1229,7 +1227,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         if (partMeta.getLabel().equalsIgnoreCase(commonPartLabel)) {
             objectProps.remove(AuthorityItemJAXBSchema.IN_AUTHORITY);
             objectProps.remove(AuthorityItemJAXBSchema.CSID);
-            objectProps.remove(AuthorityJAXBSchema.SHORT_IDENTIFIER);
+            if (getServiceContext().shouldForceUpdateRefnameReferences() == false) {
+            	objectProps.remove(AuthorityJAXBSchema.SHORT_IDENTIFIER);
+            }
             objectProps.remove(AuthorityItemJAXBSchema.REF_NAME);
         }
     }
