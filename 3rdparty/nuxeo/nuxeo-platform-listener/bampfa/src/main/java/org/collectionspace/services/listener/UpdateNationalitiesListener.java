@@ -17,6 +17,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.event.CoreEventConstants;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.model.impl.ListProperty;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.EventListener;
@@ -92,14 +93,87 @@ public class UpdateNationalitiesListener implements EventListener {
             }
         } else if (documentMatchesType(docModel, COLLECTIONOBJECT_DOCTYPE)) {
 
+            if (event.getName().equals("documentCreated")) {
+                // Trigger the before thingy
+                docModel.getCoreSession().saveDocument(docModel);
+
+                return;
+            }
+
             // Obtain the previous document
+
             DocumentModel previousDoc = (DocumentModel) docEventContext.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
-            String field = "bampfaObjectProductionPerson";
+            String fieldRequested = "bampfaObjectProductionPersonGroupList/bampfaObjectProductionPersonGroup[0]/bampfaObjectProductionPerson";
 
-            // String previousLabel = (String) previous
+            // We now have the RefNames of the person!
+            String newField = (String) docModel.getProperty(COLLECTIONOBJECTS_BAMPFA_SCHEMA, fieldRequested);
+            String oldField = (String) previousDoc.getProperty(COLLECTIONOBJECTS_BAMPFA_SCHEMA, fieldRequested);
+
+            String desiredField;
+
+//            if (oldField != null && newField != null && oldField.equals(newField)) {
+//                return;
+//            }
 
 
-            // We want to know if this type of event involves the Artist 
+//            String q = "SELECT pn.id, pn.item, pc.refname, pc.shortidentifier FROM persons_common_nationalities pn JOIN persons_common pc ON pc.id=pn.id";
+            String q = "SELECT * FROM Person WHERE persons_common:refName=\"" + newField + '"';
+            CoreSession coreSession = docEventContext.getCoreSession();
+
+            List nationalities = (List) coreSession.query(q).get(0).getProperty(PERSONS_SCHEMA, "nationalities");
+
+            docModel.setProperty(COLLECTIONOBJECTS_BAMPFA_SCHEMA, "nationalities", nationalities);
+
+//            coreSession.saveDocument(docModel);
+//            coreSession.save();
+//            return;
+
+
+
+//            System.out.println(coreSession.query(q));
+            // St
+
+            // coreSession.query("SELECT * FROM Person WHERE persons_common:refName=\"" + newField + '"').get(0).getProperty("nationalities").getValue().get(0)
+
+            // Otherwise, get the nationality of the new term
+            /*
+            coreSession.query("SELECT * FROM Person WHERE persons_common:personTermGroupList/personTermGroup[0]/termDisplayName='Cesar'")
+
+
+            DocumentPartImpl(persons_common, {persons_common:inAuthority=StringProperty(persons_common:inAuthority=1e3308ba-9d64-49e7-9541),
+            persons_common:deprecated=BooleanProperty(persons_common:deprecated=null),
+            persons_common:nameNote=StringProperty(persons_common:nameNote=null),
+             persons_common:personRecordTypes=ListProperty(/persons_common:personRecordTypes),
+             persons_common:occupations=ListProperty(/persons_common:occupations),
+             persons_common:groups=ListProperty(/persons_common:groups), persons_common:birthDateGroup=MapProperty(/persons_common:birthDateGroup),
+             persons_common:nationalities=ListProperty(/persons_common:nationalities),
+             persons_common:refName=StringProperty(persons_common:refName=urn:cspace:bampfa.cspace.berkeley.edu:personauthorities:name(person):item:name(Cesar1547840867748)'Cesar'),
+             persons_common:shortIdentifier=StringProperty(persons_common:shortIdentifier=Cesar1547840867748),
+             persons_common:proposed=BooleanProperty(persons_common:proposed=true),
+             persons_common:bioNote=StringProperty(persons_common:bioNote=null),
+             persons_common:deathPlace=StringProperty(persons_common:deathPlace=null),
+             persons_common:sas=BooleanProperty(persons_common:sas=false),
+             persons_common:gender=StringProperty(persons_common:gender=null),
+             persons_common:rev=LongProperty(persons_common:rev=5),
+             persons_common:schoolsOrStyles=ListProperty(/persons_common:schoolsOrStyles),
+             persons_common:personTermGroupList=ListProperty(/persons_common:personTermGroupList),
+             persons_common:birthPlace=StringProperty(persons_common:birthPlace=null),
+             persons_common:deathDateGroup=MapProperty(/persons_common:deathDateGroup)})
+            * */
+            // SELECT pn.id, pn.item, pc.refname, pc.shortidentifier FROM persons_common_nationalities pn JOIN persons_common pc ON pc.id=pn.id;
+
+
+            System.out.println(oldField);
+            System.out.println(newField);
+
+//            System.out.println(previousDoc.getContextData());
+//            System.out.println(previousDoc.getParts());
+//            System.out.println(docModel.getParts());
+//
+//            // String previousLabel = (String) previous
+
+
+            // We want to know if this type of event involves the Artist
 
             // Then we're adding a term,
             // 1. Need to obtain the change

@@ -2,7 +2,7 @@
 <component name="org.collectionspace.services.listener.bampfa.ecm.types">
 
     <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
-        <listener name="updatenationalitieslistener" async="true" postCommit="true"
+        <listener name="updatenationalitieslistener" async="false" postCommit="false"
                   class="org.collectionspace.services.listener.bampfa.UpdateNationalitiesListener">
             <!--<event>documentCreated</event>-->
             <!--<event>documentModified</event>-->
