@@ -82,15 +82,58 @@ public class UpdateNationalitiesListener implements EventListener {
         // Either one Person record is being added to the document, or one from the dropdown is
 
 
-        if (documentMatchesType(docModel, PERSON_DOCTYPE)) {
-            logger.trace("Person document was received");
+        // if (documentMatchesType(docModel, PERSON_DOCTYPE)) {
+        //     logger.trace("Person document was received");
 
-            personCsid = NuxeoUtils.getCsid(docModel);
-            if (Tools.isBlank(personCsid)) {
-                logger.warn("Could not obtain CSID for Person record from document event.");
-                logger.warn(NO_FURTHER_PROCESSING_MESSAGE);
-                return;
+        //     personCsid = NuxeoUtils.getCsid(docModel);
+        //     if (Tools.isBlank(personCsid)) {
+        //         logger.warn("Could not obtain CSID for Person record from document event.");
+        //         logger.warn(NO_FURTHER_PROCESSING_MESSAGE);
+        //         return;
+        //     }
+        String docType = docModel.getType();
+
+        if (docType.startsWith("Person") &&
+					!docType.startsWith("Personauthority") &&
+					!docModel.isVersion() &&
+					!docModel.isProxy() &&
+					!docModel.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+
+            // Do stuff here
+            int x = 1;
+            boolean updateRequired = false;
+            if (event.getName().equals(DocumentEventTypes.DOCUMENT_CREATED)) {
+                updateRequired = true;
+            } else if (event.getName().equals(DocumentEventTypes.BEFORE_DOC_UPDATE)) {
+                // Do we need to update it?
+                DocumentModel previousDoc = (DocumentModel) docEventContext.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
+                ArrayList<String> oldNationalities = previousDoc.getProperty(PERSONS_SCHEMA, "nationality");
+                ArrayList<String> newNationalities = docModel.getProperty(PERSONS_SCHEMA, "nationality");
+
+                Collections.sort(oldNationalities);
+                Collections.sort(newNationalities);
+
+                // if they are equal, we don't need to update the lists
+                if (newNationalities.equals(oldNationalities)) {
+                    return;
+                }
+                updateRequired = true;
             }
+            if (updateRequired) {
+                ArrayList<String> newNationalities = docModel.getProperty(PERSONS_SCHEMA, "nationality");
+
+                // 
+                String refName = docModel.getProperty(PERSONS_SCHEMA, "refName");
+                String personCsid = doc.getName();
+                try { 
+                InvocationResults results = createUpdater(context).updateParentNationalities(personCsid, false);
+
+                logger.debug("updateParentAccessCode complete: numAffected=" + results.getNumAffected() + " userNote=" + results.getUserNote());
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+
         } else if (documentMatchesType(docModel, COLLECTIONOBJECT_DOCTYPE)) {
 
             if (event.getName().equals("documentCreated")) {
@@ -106,39 +149,42 @@ public class UpdateNationalitiesListener implements EventListener {
 
             CoreSession coreSession = docEventContext.getCoreSession();
 
-            List<Object> nationalities = getNationalities(docModel, coreSession);
+            List<String> nationalities = getNationalities(docModel, coreSession);
 
             docModel.setProperty(COLLECTIONOBJECTS_BAMPFA_SCHEMA, "nationalities", nationalities);
 
             return;
         } else {
-            logger.trace("No pesons record was involved");
+            logger.trace("No persons or collection object record was involved.");
             return;
         }
-
-//        personCsid = getCsidForDesiredDocTypeFromRelation(docModel, PERSON_DOCTYPE, COLLECTIONOBJECT_DOCTYPE);
     }
 
-    public List<Object> getNationalities(DocumentModel docModel, CoreSession coreSession) {
+    public List<String> getNationalities(DocumentModel docModel, CoreSession coreSession) {
         String fieldRequested = "bampfaObjectProductionPersonGroupList";
         List<Map<String, Object>> bampfaObjectProductionPersonGroupList = (List<Map<String, Object>>) docModel.getProperty(COLLECTIONOBJECTS_BAMPFA_SCHEMA, fieldRequested);
 
-        Set allNationalities = new HashSet<String>();
+        List<String> allNationalities = new ArrayList<String>();
 
         for (Map<String, Object> bampfaObjectProductionGroup : bampfaObjectProductionPersonGroupList) {
             String currRefName = (String) bampfaObjectProductionGroup.get("bampfaObjectProductionPerson");
 
             String query = "SELECT * FROM Person WHERE persons_common:refName=\"" + currRefName + '"';
 
-            List nationalities = (List) coreSession.query(query).get(0).getProperty(PERSONS_SCHEMA, "nationalities");
+            List<String> nationalities = (List) coreSession.query(query).get(0).getProperty(PERSONS_SCHEMA, "nationalities");
 
-            allNationalities.addAll(nationalities);
+
+            for (Object n : nationalities) {
+                String nationality = (String) n;
+                if (!allNationalities.contains(nationality)) {
+                    allNationalities.add(nationality);
+                }
+            }
         }
 
-        return Arrays.asList(allNationalities.toArray());
+        return allNationalities;
 
     }
-
 
     protected static boolean documentMatchesType(DocumentModel docModel, String docType) {
         if (docModel == null || Tools.isBlank(docType)) {
