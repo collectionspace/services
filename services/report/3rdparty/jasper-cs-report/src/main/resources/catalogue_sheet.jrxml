@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.1.1.final using JasperReports Library version 6.1.1  -->
+<!-- 2018-11-07T11:53:32 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Catalogue_Sheet" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="49deb333-ed02-49e3-a02f-c3b297ba6472">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Mcgill 5344"/>
+	<parameter name="csid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["341e66cc-4848-4211-afe2"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select co_c.objectnumber, co_c.numberofobjects, co_c.collection, ltg.termname,
+		 co_c.editionnumber, vic.displayname, co_fa.materialtechniquedescription, tg.title, dg.datedisplaydate, string_agg(distinct oppeepg.objectproductionpeople,', '),
+		 string_agg(distinct ptg.termdisplayname,', '), string_agg(distinct oporgg.objectproductionorganization,', '), string_agg(distinct mg.material,', '), string_agg(distinct tqg.technique,', '),
+		 co_c2.objectnumber, concat(mpg.measuredpart, ' -- ',string_agg(distinct concat(dsg.dimension, ': ',dsg.value, ' ', dsg.measurementunit), '; '))
+		 from collectionobjects_common as co_c
+		JOIN hierarchy as h0 ON (co_c.id = h0.id)
+left join collectionobjects_fineart as co_fa on (co_fa.id = h0.id)
+left join locations_common as lc on (co_c.computedcurrentlocation = lc.refname)
+left join hierarchy as h9 on (lc.id = h9.parentid and h9.primarytype = 'locTermGroup')
+left join loctermgroup as ltg on (h9.id = ltg.id)
+left join hierarchy as h2 on (co_c.id = h2.parentid and h2.primarytype = 'titleGroup')
+left join titlegroup as tg on (h2.id = tg.id)
+left join hierarchy as h3 on (co_c.id = h3.parentid and h3.primarytype = 'structuredDateGroup' AND h3.name = 'collectionobjects_common:objectProductionDateGroupList' AND h3.pos = 0)
+left join structureddategroup as dg on (h3.id = dg.id)
+left join hierarchy as h4 on (co_c.id = h4.parentid and h4.primarytype = 'objectProductionPeopleGroup')
+left join objectproductionpeoplegroup as oppeepg on (h4.id = oppeepg.id)
+left  join hierarchy as h5 on (co_c.id = h5.parentid and h5.primarytype = 'objectProductionPersonGroup')
+left join objectproductionpersongroup as oppersg on (h5.id = oppersg.id)
+left join persons_common as pc on (oppersg.objectproductionperson = pc.refname)
+left join hierarchy as h10 on (pc.id = h10.parentid and h10.primarytype = 'personTermGroup')
+left join persontermgroup as ptg on (h10.id = ptg.id)
+left join hierarchy as h6 on (co_c.id = h6.parentid and h6.primarytype = 'objectProductionOrganizationGroup')
+left join objectproductionorganizationgroup as oporgg on (h6.id = oporgg.id)
+left join organizations_common as oc on (oporgg.objectproductionorganization = oc.refname)
+left join hierarchy as h11 on (oc.id = h11.parentid and h11.primarytype = 'orgTermGroup')
+left join orgtermgroup as otg on (h11.id = otg.id)
+left join hierarchy as h7 on (co_c.id = h7.parentid and h7.primarytype = 'materialGroup')
+left join materialgroup as mg on (h7.id = mg.id)
+left join hierarchy as h8 on (co_c.id = h8.parentid and h8.primarytype = 'techniqueGroup')
+left join techniquegroup as tqg on (h8.id = tqg.id)
+left join vocabularyitems_common as vic on (co_fa.cataloglevel = vic.refname)
+left join relations_common as r1 on (h0.name = r1.subjectcsid and r1.relationshiptype = 'hasBroader')
+left join hierarchy as h12 on (r1.objectcsid = h12.name)
+left join collectionobjects_common as co_c2 on (h12.id = co_c2.id)
+left join hierarchy as h13 on (co_c.id = h13.parentid and h13.primarytype = 'measuredPartGroup' and h13.pos = 0)
+left join measuredpartgroup as mpg on (mpg.id = h13.id)
+left join hierarchy as h14 on (h13.id = h14.parentid and h14.primarytype = 'dimensionSubGroup')
+left join dimensionsubgroup as dsg on (h14.id = dsg.id)
+WHERE h0.name = $P{csid}
+GROUP BY co_c.objectnumber, co_c.numberofobjects, co_c.collection, ltg.termname,
+		 co_c.editionnumber, co_fa.cataloglevel, tg.title, dg.datedisplaydate, oppeepg.objectproductionpeople, co_fa.materialtechniquedescription, vic.displayname,
+		 co_c2.objectnumber, mpg.measuredpart]]>
+	</queryString>
+	<field name="objectnumber" class="java.lang.String"/>
+	<field name="numberofobjects" class="java.lang.Long"/>
+	<field name="collection" class="java.lang.String"/>
+	<field name="termname" class="java.lang.String"/>
+	<field name="editionnumber" class="java.lang.String"/>
+	<field name="displayname" class="java.lang.String"/>
+	<field name="materialtechniquedescription" class="java.lang.String"/>
+	<field name="title" class="java.lang.String"/>
+	<field name="datedisplaydate" class="java.lang.String"/>
+	<field name="string_agg" class="java.lang.String"/>
+	<field name="COLUMN_11" class="java.lang.String"/>
+	<field name="COLUMN_12" class="java.lang.String"/>
+	<field name="COLUMN_13" class="java.lang.String"/>
+	<field name="COLUMN_14" class="java.lang.String"/>
+	<field name="COLUMN_15" class="java.lang.String"/>
+	<field name="COLUMN_16" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="60">
+			<staticText>
+				<reportElement x="160" y="10" width="290" height="40" uuid="b2962c71-1e1a-4303-be61-9f53bc359839"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[Catalogue Sheet]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="492" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="170" y="0" width="390" height="30" uuid="3d4dd527-8277-4242-8986-c495fc32db3f"/>
+				<textElement verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="170" y="30" width="390" height="30" uuid="9c87b536-f11c-4205-9358-0e638d1aaffd">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA[$F{numberofobjects}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="170" y="60" width="390" height="30" uuid="fccaf126-d1f0-4cbb-9da3-522ed426f36c">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA[$F{collection}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="170" y="90" width="390" height="30" uuid="8368b78f-f253-49c5-be30-e92a91e08e9e">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA[$F{termname}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="170" y="120" width="390" height="30" uuid="1cd314ed-e971-427b-acf7-bd312a6bf09a">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="170" y="150" width="390" height="30" uuid="909986e2-aa63-477c-8ba1-f902da54f867">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA[$F{displayname}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="170" y="180" width="390" height="30" uuid="a96e11a7-1757-4496-963a-95aab88e2d2c">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA[$F{materialtechniquedescription}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="170" y="210" width="390" height="30" uuid="8e4e8112-7aff-4535-9495-208d1658616b">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA[$F{editionnumber}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="170" y="240" width="390" height="30" uuid="55dfbacd-90f2-420d-bca2-ec8e4709a5ae">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA[$F{datedisplaydate}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="170" y="270" width="390" height="30" uuid="2e9a8f57-c43e-44dc-9ebe-c941ad7dad4d">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA[$F{string_agg}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="170" y="300" width="390" height="30" uuid="3ca00746-c800-49d7-9f5e-5eb158cd7ab5">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA[$F{COLUMN_11}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="170" y="330" width="390" height="30" uuid="600c6b75-4160-47e2-a91f-676ace8fa2dd">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA[$F{COLUMN_12}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="170" y="360" width="390" height="30" uuid="96509617-2654-4f18-af71-bdd3d4015dbc">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA[$F{COLUMN_13}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="170" y="390" width="390" height="30" uuid="8bb5b8f8-236e-460e-ba04-2bad9293f80c">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA[$F{COLUMN_14}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="170" y="450" width="390" height="30" uuid="31999461-8ff4-4072-89aa-59e7a2842a73">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA[$F{COLUMN_15}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="50" y="0" width="100" height="30" uuid="5926b040-ff45-42a7-8433-6f1afc19b5b4"/>
+				<textElement verticalAlignment="Top"/>
+				<text><![CDATA[Identification Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="50" y="30" width="100" height="30" uuid="ddcab055-231a-4c13-aca5-5fb668ca9ea8">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<text><![CDATA[Number of Objects]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="50" y="60" width="100" height="30" uuid="ce73f956-0520-41c1-8457-a64f39a15738">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<text><![CDATA[Collection]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="50" y="90" width="100" height="30" uuid="b1427d63-fb63-4576-a542-962cae2df154">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<text><![CDATA[Computed Current Location]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="50" y="120" width="100" height="30" uuid="2bd39bf1-0bf4-4e8f-a7be-5208d0e19e67">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<text><![CDATA[Title]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="50" y="150" width="100" height="30" uuid="7407111a-4308-4c95-a577-dccdc702338f">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<text><![CDATA[Cataloging Level]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="50" y="180" width="100" height="30" uuid="9d4eb135-2786-46b9-8660-7e7d57cd3c31">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<text><![CDATA[Material/Technique Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="50" y="210" width="100" height="30" uuid="2e09ec43-7707-40d7-b653-81ae65e965fd">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<text><![CDATA[Edition Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="50" y="240" width="100" height="30" uuid="34234079-057a-4adc-8b26-e3391b0868df">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<text><![CDATA[Creation Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="50" y="270" width="100" height="30" uuid="ecc4fb6d-f4f0-492f-85b1-2e820eb797b1">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<text><![CDATA[Production People]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="50" y="300" width="100" height="30" uuid="82006ecf-00d2-4978-a72f-7874cd169885">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<text><![CDATA[Production Person]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="50" y="330" width="100" height="30" uuid="c1cde126-76c8-468b-babe-d485f07f8b95">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<text><![CDATA[Production Organization]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="50" y="360" width="100" height="30" uuid="a34255d7-e41f-42cc-9e36-42da4ba0742c">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<text><![CDATA[Material]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="50" y="390" width="100" height="30" uuid="3692993d-05e5-44d1-9f36-60b6228d48db">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<text><![CDATA[Technique]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="50" y="450" width="100" height="30" uuid="34a39665-c295-4535-b22e-cb5469391e0e">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<text><![CDATA[Parent Object]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="170" y="420" width="390" height="30" uuid="790c94a3-a5a9-44d3-9bc3-bb60caf9c1e9"/>
+				<textElement verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA[$F{COLUMN_16}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="50" y="420" width="100" height="30" uuid="4d2b2d9d-4311-4d08-8c82-ea8f61ca4317"/>
+				<textElement textAlignment="Left" verticalAlignment="Top"/>
+				<text><![CDATA[Dimensions]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="63" splitType="Stretch">
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="470" y="20" width="100" height="30" uuid="53e78232-c7aa-479a-8142-d833e9f9e09d"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>
