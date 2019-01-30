@@ -75,7 +75,7 @@ public class UpdateObjectNationalitiesFromPersonBatchJob extends AbstractBatchJo
 
     public void updateNationalities(List<String> collectionObjNationalities, Map<String, List> nationalitiesToUpdate, String objCsid) throws URISyntaxException {
         List nationalitiesToAdd = nationalitiesToUpdate.get("add");
-        List nationalitiesToDelete = nationalitiesToUpdate.get("delete");
+        List nationalitiesToDelete = nationalitiesToUpdate.get("del");
 
         collectionObjNationalities.addAll(nationalitiesToAdd);
         collectionObjNationalities.removeAll(nationalitiesToDelete);
@@ -111,8 +111,7 @@ public class UpdateObjectNationalitiesFromPersonBatchJob extends AbstractBatchJo
 
         byte[] responseBytes = collectionObjectResource.update(getServiceContext(), resourcemap, createUriInfo(), objCsid, updatePayload);
 
-
-
+        // String s = new String(responseBytes);
     
 		// AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get("personauthorities");
 		// resource.updateAuthorityItem(getServiceContext(), getResourceMap(), createUriInfo(), authorityCsid, objCsid, , updatePayload);

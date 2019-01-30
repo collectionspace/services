@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Collections;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.batch.BatchResource;
@@ -136,7 +135,7 @@ public class UpdateNationalitiesListener implements EventListener {
             List<String> nationalities = getNationalitiesFromPersonAuthority(docModel, coreSession);
 
             docModel.setProperty(COLLECTIONOBJECTS_BAMPFA_SCHEMA, "nationalities", nationalities);
-            logger.trace("Updated collection object with csid=" docModel.getName())
+            logger.trace("Updated collection object with csid=" + docModel.getName());
             return;
         } else {
             logger.trace("No persons or collection object record was involved.");
