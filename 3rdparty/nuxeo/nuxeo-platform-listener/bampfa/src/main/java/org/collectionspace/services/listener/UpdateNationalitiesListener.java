@@ -198,8 +198,7 @@ public class UpdateNationalitiesListener implements EventListener {
             String currRefName = (String) bampfaObjectProductionGroup.get("bampfaObjectProductionPerson");
 
             String query = String.format(
-                            "SELECT * FROM %1$s WHERE %2$s:refName=%3$s" 
-                            + PERSON_DOCTYPE, PERSONS_SCHEMA, currRefName); 
+                            "SELECT * FROM %1$s WHERE %2$s:refName='%3$s'", PERSON_DOCTYPE, PERSONS_SCHEMA, currRefName); 
 
             List<String> nationalities = (List) coreSession.query(query).get(0).getProperty(PERSONS_SCHEMA, NATIONALITIES_FIELD);
 
