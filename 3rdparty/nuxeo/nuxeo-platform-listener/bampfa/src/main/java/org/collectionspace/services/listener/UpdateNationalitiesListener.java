@@ -13,9 +13,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.batch.BatchResource;
 import org.collectionspace.services.batch.nuxeo.UpdateObjectNationalitiesFromPersonBatchJob;
-import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
-import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectBAMPFAConstants;
-import org.collectionspace.services.person.nuxeo.PersonAuthorityConstants;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.client.BatchClient;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -44,6 +41,13 @@ public class UpdateNationalitiesListener implements EventListener {
     private final static String NO_FURTHER_PROCESSING_MESSAGE =
             "This event listener will not continue processing this event ...";
 
+    private final static String COLLECTIONOBJECT_DOCTYPE = "CollectionObject";
+    private final static String COLLECTIONOBJECTS_BAMPFA_SCHEMA = "collectionobjects_bampfa";
+
+    private final static String PERSON_DOCTYPE = "Person";
+    private final static String PERSONS_SCHEMA = "persons_common";
+    private final static String NATIONALITIES_FIELD = "nationalities";
+
     public static final String PREVIOUS_NATIONALITIES_PROPERTY_NAME = "UpdateNationalitiesListener.prevousNationalities";
 
 
@@ -62,8 +66,8 @@ public class UpdateNationalitiesListener implements EventListener {
         String docType = docModel.getType();
 
         // Check if the event involves a person authority, a collection object, or neither
-        if (documentMatchesType(docModel, PersonAuthorityConstants.PERSON_DOCTYPE) &&
-					!documentMatchesType(docModel, PersonAuthorityConstants.PERSON_AUTHORITY_DOCTYPE) &&
+        if (documentMatchesType(docModel, PERSON_DOCTYPE) &&
+					!documentMatchesType(docModel, "Personauthority") &&
 					!docModel.isVersion() &&
 					!docModel.isProxy() &&
 					!docModel.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
@@ -82,11 +86,11 @@ public class UpdateNationalitiesListener implements EventListener {
                 // Store the previous nationalities in order to retrieve them in the after the document is created. 
 
                 DocumentModel previousDoc = (DocumentModel) docEventContext.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
-                ArrayList previousNationalities = (ArrayList) previousDoc.getProperty(PersonAuthorityConstants.PERSONS_COMMON_SCHEMA, PersonAuthorityConstants.PERSON_NATIONALITIES_FIELD);
+                ArrayList previousNationalities = (ArrayList) previousDoc.getProperty(PERSONS_SCHEMA, NATIONALITIES_FIELD);
                 docEventContext.setProperty(PREVIOUS_NATIONALITIES_PROPERTY_NAME, previousNationalities);
             } else {
                 List previousNationalities = (List) docEventContext.getProperty(PREVIOUS_NATIONALITIES_PROPERTY_NAME);
-                List newNationalities = (List) docModel.getProperty(PersonAuthorityConstants.PERSONS_COMMON_SCHEMA, PersonAuthorityConstants.PERSON_NATIONALITIES_FIELD);
+                List newNationalities = (List) docModel.getProperty(PERSONS_SCHEMA, NATIONALITIES_FIELD);
                 List newNationalitiesCopy = newNationalities;
                 
                 if (previousNationalities.size() == 0 || newNationalities.size() == 0) {
@@ -119,8 +123,8 @@ public class UpdateNationalitiesListener implements EventListener {
                 }
             }
 
-        } else if (documentMatchesType(docModel, CollectionObjectConstants.NUXEO_DOCTYPE)) {
-            if (event.getName().equals("documentCreated")) {
+        } else if (documentMatchesType(docModel, COLLECTIONOBJECT_DOCTYPE)) {
+            if (event.getName().equals((DocumentEventTypes.DOCUMENT_CREATED))) {
                 // If the document is created, we simply call saveDocument in order to trigger the beforeDocumentSaved event
                 docModel.getCoreSession().saveDocument(docModel);
                 return;
@@ -129,7 +133,7 @@ public class UpdateNationalitiesListener implements EventListener {
             CoreSession coreSession = docEventContext.getCoreSession();
             List<String> nationalities = getNationalitiesFromPersonAuthority(docModel, coreSession);
 
-            docModel.setProperty(CollectionObjectBAMPFAConstants.COLLECTIONOBJECTS_BAMPFA_SCHEMA, PersonAuthorityConstants.PERSON_NATIONALITIES_FIELD, nationalities);
+            docModel.setProperty(COLLECTIONOBJECTS_BAMPFA_SCHEMA, NATIONALITIES_FIELD, nationalities);
             if (logger.isTraceEnabled()) {
                 logger.trace("Updated collection object with csid=" + docModel.getName());
             }
@@ -185,16 +189,19 @@ public class UpdateNationalitiesListener implements EventListener {
      * @return A list of nationalities that are to be inserted into this collection object record.
      */
     public List<String> getNationalitiesFromPersonAuthority(DocumentModel docModel, CoreSession coreSession) {
-        List<Map<String, Object>> bampfaObjectProductionPersonGroupList = (List<Map<String, Object>>) docModel.getProperty(CollectionObjectBAMPFAConstants.COLLECTIONOBJECTS_BAMPFA_SCHEMA, CollectionObjectBAMPFAConstants.BAMPFA_COLLECTIONOBJECTS_PRODUCTION_PERSON_GROUPLIST);
+        String fieldRequested = "bampfaObjectProductionPersonGroupList";
+        List<Map<String, Object>> bampfaObjectProductionPersonGroupList = (List<Map<String, Object>>) docModel.getProperty(COLLECTIONOBJECTS_BAMPFA_SCHEMA, fieldRequested);
 
         List<String> allNationalities = new ArrayList<String>();
 
         for (Map<String, Object> bampfaObjectProductionGroup : bampfaObjectProductionPersonGroupList) {
-            String currRefName = (String) bampfaObjectProductionGroup.get(CollectionObjectBAMPFAConstants.BAMPFA_COLLECTIONOBJECTS_PRODUCTION_PERSON);
+            String currRefName = (String) bampfaObjectProductionGroup.get("bampfaObjectProductionPerson");
 
-            String query = "SELECT * FROM Person WHERE persons_common:refName=\"" + currRefName + '"';
+            String query = String.format(
+                            "SELECT * FROM %1$s WHERE %2$s:refName=%3$s" 
+                            + PERSON_DOCTYPE, PERSONS_SCHEMA, currRefName); 
 
-            List<String> nationalities = (List) coreSession.query(query).get(0).getProperty(PersonAuthorityConstants.PERSONS_COMMON_SCHEMA, PersonAuthorityConstants.PERSON_NATIONALITIES_FIELD);
+            List<String> nationalities = (List) coreSession.query(query).get(0).getProperty(PERSONS_SCHEMA, NATIONALITIES_FIELD);
 
 
             for (Object n : nationalities) {

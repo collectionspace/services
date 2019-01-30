@@ -32,9 +32,4 @@ public class PersonAuthorityConstants {
     public final static String NUXEO_DOCTYPE = "PersonAuthority";
     public final static String NUXEO_SCHEMA_NAME = "personauthority";
     public final static String NUXEO_DC_TITLE = "CollectionSpace-PersonAuthority";
-    public final static String PERSONS_COMMON_SCHEMA = "persons_common";
-
-    public final static String PERSON_DOCTYPE = "Person";
-    public final static String PERSON_AUTHORITY_DOCTYPE = "Personauthority";
-    public final static String PERSON_NATIONALITIES_FIELD = "nationalities";
 }
