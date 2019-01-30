@@ -8,6 +8,8 @@ import java.util.Map;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.NuxeoBasedResource;
@@ -17,7 +19,13 @@ import org.dom4j.DocumentException;
 import java.net.URISyntaxException;
 import javax.ws.rs.core.UriInfo;
 
-
+/**
+ * This batch job updates the nationalities of all collection objects records that use the person record with personCsid.
+ * The only current use case is when called by UpdateNationalitiesListener.java to update the above mentioned collection objects.
+ *
+ * @author Cesar Villalobos
+ *
+ */
 public class UpdateObjectNationalitiesFromPersonBatchJob extends AbstractBatchJob {
     
     public UpdateObjectNationalitiesFromPersonBatchJob() {
@@ -25,72 +33,75 @@ public class UpdateObjectNationalitiesFromPersonBatchJob extends AbstractBatchJo
     }
     
     @Override
+    /** 
+     * The only context during which this batch handler is called is through the UpdateNationalitiesListener, thus this
+     * method is not implemented.
+    */
     public void run() {
-        setCompletionStatus(STATUS_MIN_PROGRESS);
-        setCompletionStatus(STATUS_COMPLETE);
-
+        return;
     }
 
 
     public InvocationResults updateNationalitiesFromPerson(String personCsid, Map<String, List> nationalitiesToUpdate) throws URISyntaxException, DocumentException, Exception {
+        InvocationResults results = new InvocationResults();
+
         String sourceField = "collectionobjects_bampfa:bampfaObjectProductionPerson";
         String serviceName = "personauthorities";
 
         List<String> collectionObjectsList =  findReferencingCollectionObjects(serviceName, personCsid, sourceField);
 
-        int numAffected = 0;
+        long numAffected = 0;
 
         // These are the CSIDs of all the documents that we need to update
         for (String csid : collectionObjectsList) {
             PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(csid);
-            // String inAuthority = getFieldValue(collectionObjectPayload, "collectionobjects_common", "inAuthority");
 
+            // Make sure you skip over soft deleted records
+            String workflowState = getFieldValue(collectionObjectPayload, CollectionObjectConstants.WORKFLOW_STATE_SCHEMA_NAME, CollectionObjectConstants.WORKFLOW_STATE_FIELD_NAME);
 
-            // TO DO: Make sure you skip over soft deleted records
+			if (workflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+				continue;
+			}
 
-
-
-            // Why is this a String??
-            // collectionObjectPayload.getPart("collectionobjects_bampfa").asElement().selectNodes("nationalities/nationality").getText()
+            numAffected++;
             List<String> oldNationalities = getFieldValues(collectionObjectPayload, "collectionobjects_bampfa", "nationalities/nationality");
             try {
-            updateNationalities(oldNationalities, nationalitiesToUpdate, csid);
+                updateNationalities(oldNationalities, nationalitiesToUpdate, csid);
             } catch (Exception e) {
-
+                logger.error(e.getMessage(), e);
             }
-
         }
-
-        // These are the CSIDs of all the documents that we need to update
-
-        // getFieldValue
-
-
-
-
-
-
-        return null;
+        results.setNumAffected(numAffected);
+        return results;
     }
 
     public void updateNationalities(List<String> collectionObjNationalities, Map<String, List> nationalitiesToUpdate, String objCsid) throws URISyntaxException {
+        if (logger.isTraceEnabled()) {
+            logger.trace("Updating collection object record with csid=" + objCsid);
+        }
+
+        // Assemble a list of what the new nationalities repeating field should look like for this collection object
         List nationalitiesToAdd = nationalitiesToUpdate.get("add");
         List nationalitiesToDelete = nationalitiesToUpdate.get("del");
 
         collectionObjNationalities.addAll(nationalitiesToAdd);
         collectionObjNationalities.removeAll(nationalitiesToDelete);
+        
+        if (logger.isTraceEnabled()) {
+            logger.trace("Adding the following nationalities to the collection object=" + nationalitiesToAdd.toString() + 
+                ". And removing the following nationalities from it=" 
+                + nationalitiesToDelete.toString());
+        }
 
-        // So now collectionObjNationalities is the most updated version of what we need to have. Time to assemble them
+        // So now collectionObjNationalities is the most updated version of what we need to have. Time to assemble them into an XML-friendly string
         String nationalitiesString = "";
         for (String n : collectionObjNationalities) {
             nationalitiesString += "<nationality>" + n + "</nationality>\n";
         }
-
         
-        String nationalitiesGroupString  = "<nationalities>" + 
-                                    nationalitiesString + 
-                                    "</nationalities>";
-
+        String nationalitiesGroupString  =  "<nationalities>\n" + 
+                                            nationalitiesString + 
+                                            "</nationalities>";
 
         String updatePayload = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
@@ -99,49 +110,24 @@ public class UpdateObjectNationalitiesFromPersonBatchJob extends AbstractBatchJo
             nationalitiesGroupString + 
             "</ns2:collectionobjects_bampfa>" +
             "</document>";
+        
+        logger.trace("Updating record with the following payload: \n" + updatePayload);
 
-
-
-
-        // Now update????
+        // Perform the update.
         ResourceMap resourcemap = getResourceMap();
         NuxeoBasedResource collectionObjectResource = (NuxeoBasedResource) resourcemap.get(CollectionObjectClient.SERVICE_NAME);
-        // UriInfo uriInfo = setupQueryParamForUpdateRecords();
-
 
         byte[] responseBytes = collectionObjectResource.update(getServiceContext(), resourcemap, createUriInfo(), objCsid, updatePayload);
 
-        // String s = new String(responseBytes);
-    
-		// AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get("personauthorities");
-		// resource.updateAuthorityItem(getServiceContext(), getResourceMap(), createUriInfo(), authorityCsid, objCsid, , updatePayload);
-		// resource.updateAuthorityItem(getServiceContext(), getResourceMap(), createUriInfo(), objCsid, objCsid, updatePayload);
-
-
-    }
-
-    protected UriInfo setupQueryParamForUpdateRecords() throws URISyntaxException {
-    	UriInfo result = null;
-
-    	//
-    	// Check first to see if we've got a query param.  It will override any invocation context value
-    	//
-    	String updateCoreValues = (String) getServiceContext().getQueryParams().getFirst(IClientQueryParams.UPDATE_CORE_VALUES);
-    	if (Tools.isBlank(updateCoreValues)) {
-    		//
-    		// Since there is no query param, let's check the invocation context
-    		//
-    		updateCoreValues = getInvocationContext().getUpdateCoreValues();
-    	}
-
-    	//
-    	// If we found a value, then use it to create a query parameter
-    	//
-    	if (Tools.notBlank(updateCoreValues)) {
-        	result = createUriInfo(IClientQueryParams.UPDATE_CORE_VALUES + "=" + updateCoreValues);
+        if (logger.isDebugEnabled()) {
+	        logger.debug(String.format("Batch resource: Resonse from collectionobject (cataloging record) update: %s", new String(responseBytes)));
         }
-        
-    	return result;
+
+        if (logger.isTraceEnabled()) {
+            logger.trace("Computed current location value for CollectionObject nationalities was set to " + collectionObjNationalities.toString());
+
+        }
+
     }
 }
 

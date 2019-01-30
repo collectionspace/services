@@ -80,11 +80,15 @@ public class UpdateNationalitiesListener implements EventListener {
 					!docModel.isProxy() &&
 					!docModel.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
             
-            logger.trace("The update involved a person authority record. Now checking if updating a collection object is required");
+            if (logger.isTraceEnabled()) {
+                logger.trace("The update involved a person authority record. Now checking if updating a collection object is required");
+            }
 
             if (event.getName().equals(DocumentEventTypes.DOCUMENT_CREATED)) {
                 // If the document has just beeen created, it will definitely not be used by any collection object record
-                logger.trace("It is not necessary to update any collection objects. " + NO_FURTHER_PROCESSING_MESSAGE);
+                if (logger.isTraceEnabled()) {
+                    logger.trace("It is not necessary to update any collection objects. " + NO_FURTHER_PROCESSING_MESSAGE);
+                }
                 return;
             } else if (event.getName().equals(DocumentEventTypes.BEFORE_DOC_UPDATE)) {
                 // Store the previous nationalities in order to retrieve them in the after the document is created. 
@@ -107,7 +111,9 @@ public class UpdateNationalitiesListener implements EventListener {
 
                 // if they are equal, we don't need to update the lists
                 if (newNationalities.equals(previousNationalities)) {
-                    logger.trace("There are no changes to the nationalities field in this record. No updates to any collection object required. " + NO_FURTHER_PROCESSING_MESSAGE);
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("There are no changes to the nationalities field in this record. No updates to any collection object required. " + NO_FURTHER_PROCESSING_MESSAGE);
+                    }
                     return;
                 }
                 
@@ -117,8 +123,9 @@ public class UpdateNationalitiesListener implements EventListener {
                 try {
                     String personCsid = (String) docModel.getName();
                     InvocationResults results = updateCollectionObjectsFromPerson(docEventContext).updateNationalitiesFromPerson(personCsid, nationalitiesToUpdate);
-
+                    if (logger.isDebugEnabled()) {
                     logger.debug("updateParentAccessCode complete: numAffected=" + results.getNumAffected() + " userNote=" + results.getUserNote());
+                    }
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 }
@@ -135,10 +142,14 @@ public class UpdateNationalitiesListener implements EventListener {
             List<String> nationalities = getNationalitiesFromPersonAuthority(docModel, coreSession);
 
             docModel.setProperty(COLLECTIONOBJECTS_BAMPFA_SCHEMA, "nationalities", nationalities);
-            logger.trace("Updated collection object with csid=" + docModel.getName());
+            if (logger.isTraceEnabled()) {
+                logger.trace("Updated collection object with csid=" + docModel.getName());
+            }
             return;
         } else {
-            logger.trace("No persons or collection object record was involved.");
+            if (logger.isTraceEnabled()) {
+                logger.trace("No persons or collection object record was involved.");
+            }
             return;
         }
     }
