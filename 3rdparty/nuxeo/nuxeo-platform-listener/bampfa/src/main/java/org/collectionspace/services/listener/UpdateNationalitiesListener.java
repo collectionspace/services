@@ -2,33 +2,29 @@ package org.collectionspace.services.listener.bampfa;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Collections;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.batch.BatchResource;
-import org.collectionspace.services.batch.nuxeo.UpdateAccessCodeBatchJob;
-import org.collectionspace.services.batch.nuxeo.UpdateAccessCodeBatchJob.UpdateAccessCodeResults;
+import org.collectionspace.services.batch.nuxeo.UpdateObjectNationalitiesFromPersonBatchJob;
+import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
+import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectBAMPFAConstants;
+import org.collectionspace.services.person.nuxeo.PersonAuthorityConstants;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.client.BatchClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectBotGardenConstants;
-import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
-import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
-import org.collectionspace.services.nuxeo.listener.AbstractCSEventListenerImpl;
-import org.collectionspace.services.taxonomy.nuxeo.TaxonBotGardenConstants;
-import org.collectionspace.services.taxonomy.nuxeo.TaxonConstants;
-import org.collectionspace.services.taxonomy.nuxeo.TaxonomyAuthorityConstants;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.event.CoreEventConstants;
@@ -36,12 +32,10 @@ import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
-import org.collectionspace.services.common.api.Tools;
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.event.EventListener;
-import org.collectionspace.services.batch.nuxeo.UpdateObjectNationalitiesFromPersonBatchJob;
+
 
 
 public class UpdateNationalitiesListener implements EventListener {
@@ -49,12 +43,6 @@ public class UpdateNationalitiesListener implements EventListener {
     private final static Log logger = LogFactory.getLog(UpdateNationalitiesListener.class);
     private final static String NO_FURTHER_PROCESSING_MESSAGE =
             "This event listener will not continue processing this event ...";
-
-    private final static String COLLECTIONOBJECT_DOCTYPE = "CollectionObject";
-    private final static String COLLECTIONOBJECTS_BAMPFA_SCHEMA = "collectionobjects_bampfa";
-
-    private final static String PERSON_DOCTYPE = "Person";
-    private final static String PERSONS_SCHEMA = "persons_common";
 
     public static final String PREVIOUS_NATIONALITIES_PROPERTY_NAME = "UpdateNationalitiesListener.prevousNationalities";
 
@@ -74,8 +62,8 @@ public class UpdateNationalitiesListener implements EventListener {
         String docType = docModel.getType();
 
         // Check if the event involves a person authority, a collection object, or neither
-        if (documentMatchesType(docModel, PERSON_DOCTYPE) &&
-					!documentMatchesType(docModel, "Personauthority") &&
+        if (documentMatchesType(docModel, PersonAuthorityConstants.PERSON_DOCTYPE) &&
+					!documentMatchesType(docModel, PersonAuthorityConstants.PERSON_AUTHORITY_DOCTYPE) &&
 					!docModel.isVersion() &&
 					!docModel.isProxy() &&
 					!docModel.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
@@ -94,11 +82,11 @@ public class UpdateNationalitiesListener implements EventListener {
                 // Store the previous nationalities in order to retrieve them in the after the document is created. 
 
                 DocumentModel previousDoc = (DocumentModel) docEventContext.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
-                ArrayList previousNationalities = (ArrayList) previousDoc.getProperty(PERSONS_SCHEMA, "nationalities");
+                ArrayList previousNationalities = (ArrayList) previousDoc.getProperty(PersonAuthorityConstants.PERSONS_COMMON_SCHEMA, PersonAuthorityConstants.PERSON_NATIONALITIES_FIELD);
                 docEventContext.setProperty(PREVIOUS_NATIONALITIES_PROPERTY_NAME, previousNationalities);
             } else {
                 List previousNationalities = (List) docEventContext.getProperty(PREVIOUS_NATIONALITIES_PROPERTY_NAME);
-                List newNationalities = (List) docModel.getProperty(PERSONS_SCHEMA, "nationalities");
+                List newNationalities = (List) docModel.getProperty(PersonAuthorityConstants.PERSONS_COMMON_SCHEMA, PersonAuthorityConstants.PERSON_NATIONALITIES_FIELD);
                 List newNationalitiesCopy = newNationalities;
                 
                 if (previousNationalities.size() == 0 || newNationalities.size() == 0) {
@@ -131,7 +119,7 @@ public class UpdateNationalitiesListener implements EventListener {
                 }
             }
 
-        } else if (documentMatchesType(docModel, COLLECTIONOBJECT_DOCTYPE)) {
+        } else if (documentMatchesType(docModel, CollectionObjectConstants.NUXEO_DOCTYPE)) {
             if (event.getName().equals("documentCreated")) {
                 // If the document is created, we simply call saveDocument in order to trigger the beforeDocumentSaved event
                 docModel.getCoreSession().saveDocument(docModel);
@@ -141,7 +129,7 @@ public class UpdateNationalitiesListener implements EventListener {
             CoreSession coreSession = docEventContext.getCoreSession();
             List<String> nationalities = getNationalitiesFromPersonAuthority(docModel, coreSession);
 
-            docModel.setProperty(COLLECTIONOBJECTS_BAMPFA_SCHEMA, "nationalities", nationalities);
+            docModel.setProperty(CollectionObjectBAMPFAConstants.COLLECTIONOBJECTS_BAMPFA_SCHEMA, PersonAuthorityConstants.PERSON_NATIONALITIES_FIELD, nationalities);
             if (logger.isTraceEnabled()) {
                 logger.trace("Updated collection object with csid=" + docModel.getName());
             }
@@ -197,17 +185,16 @@ public class UpdateNationalitiesListener implements EventListener {
      * @return A list of nationalities that are to be inserted into this collection object record.
      */
     public List<String> getNationalitiesFromPersonAuthority(DocumentModel docModel, CoreSession coreSession) {
-        String fieldRequested = "bampfaObjectProductionPersonGroupList";
-        List<Map<String, Object>> bampfaObjectProductionPersonGroupList = (List<Map<String, Object>>) docModel.getProperty(COLLECTIONOBJECTS_BAMPFA_SCHEMA, fieldRequested);
+        List<Map<String, Object>> bampfaObjectProductionPersonGroupList = (List<Map<String, Object>>) docModel.getProperty(CollectionObjectBAMPFAConstants.COLLECTIONOBJECTS_BAMPFA_SCHEMA, CollectionObjectBAMPFAConstants.BAMPFA_COLLECTIONOBJECTS_PRODUCTION_PERSON_GROUPLIST);
 
         List<String> allNationalities = new ArrayList<String>();
 
         for (Map<String, Object> bampfaObjectProductionGroup : bampfaObjectProductionPersonGroupList) {
-            String currRefName = (String) bampfaObjectProductionGroup.get("bampfaObjectProductionPerson");
+            String currRefName = (String) bampfaObjectProductionGroup.get(CollectionObjectBAMPFAConstants.BAMPFA_COLLECTIONOBJECTS_PRODUCTION_PERSON);
 
             String query = "SELECT * FROM Person WHERE persons_common:refName=\"" + currRefName + '"';
 
-            List<String> nationalities = (List) coreSession.query(query).get(0).getProperty(PERSONS_SCHEMA, "nationalities");
+            List<String> nationalities = (List) coreSession.query(query).get(0).getProperty(PersonAuthorityConstants.PERSONS_COMMON_SCHEMA, PersonAuthorityConstants.PERSON_NATIONALITIES_FIELD);
 
 
             for (Object n : nationalities) {
