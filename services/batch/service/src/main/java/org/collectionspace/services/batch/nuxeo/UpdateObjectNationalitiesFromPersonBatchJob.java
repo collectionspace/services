@@ -41,7 +41,13 @@ public class UpdateObjectNationalitiesFromPersonBatchJob extends AbstractBatchJo
         return;
     }
 
-
+    /**
+     * This method finds and updates the nationalities field of any record that references the record with csid equal to personCsid.
+     *
+     * @param personCsid The persons authority record csid whose persons_common:nationalities field was changed. Used to find all collection objects affected
+     * @param nationalitiesToUpdate A Map<String, List> containing the keys "add" and "del", each corresponding to a list of nationalities
+     * that need to be either added or deleted.
+     */
     public InvocationResults updateNationalitiesFromPerson(String personCsid, Map<String, List> nationalitiesToUpdate) throws URISyntaxException, DocumentException, Exception {
         InvocationResults results = new InvocationResults();
 
@@ -75,6 +81,15 @@ public class UpdateObjectNationalitiesFromPersonBatchJob extends AbstractBatchJo
         return results;
     }
 
+    /**
+     * Helper method. This method compiles a list of the nationalities that need to be included in a given collection object and updates the document.
+     * 
+     * @param collectionObjNationalities A List containing the nationalities that are currently associated with the collection object record with csid equal to
+     * objCsid.
+     * @param nationalitiesToUpdate A Map<String, List> containing the keys "add" and "del", each corresponding to a list of nationalities
+     * that need to be either added or deleted.
+     * @param objCsid The csid of the collection object record that is to be updated.
+     */
     public void updateNationalities(List<String> collectionObjNationalities, Map<String, List> nationalitiesToUpdate, String objCsid) throws URISyntaxException {
         if (logger.isTraceEnabled()) {
             logger.trace("Updating collection object record with csid=" + objCsid);

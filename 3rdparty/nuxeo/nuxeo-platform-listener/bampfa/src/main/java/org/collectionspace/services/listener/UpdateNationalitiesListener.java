@@ -34,7 +34,15 @@ import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.event.EventListener;
 
 
-
+/**
+ * This listener updates the collectionobjects_bampfa:nationalities field whenever either 1) A new bampfaObjectProductionPerson is
+ * added to a collection object record, or 2) A persons authority is updated, and there are changes to the persons_common:nationalities
+ * field. In the first case, it simply fetches the nationalities belonging to the persons found in the collectionobjects_bampfa:bampfaObjectProductionPerson 
+ * field. In the second case, a batch job is run in order to update any collection objects records that are affected by changes to 
+ * the persons_common:nationalities field.
+ *
+ * @author Cesar Villalobos
+ */
 public class UpdateNationalitiesListener implements EventListener {
 
     private final static Log logger = LogFactory.getLog(UpdateNationalitiesListener.class);
@@ -150,10 +158,10 @@ public class UpdateNationalitiesListener implements EventListener {
      * In the case that one or more collection objects need to have their nationalities list updated, this
      * method is called to determine which fields need to be added, and which need to be deleted.
      * 
-     * @param oldNationalities
-     * @param newNationalities
-     * @return A Map<String, List> contains the keys "add" and "del", each corresponding to a list of nationalities
-     * that need to be updated.
+     * @param oldNationalities The nationalities found in the persons authority before it was altered.
+     * @param newNationalities The nationalities found in the persons authority after it was altered.
+     * @return A Map<String, List> containing the keys "add" and "del", each corresponding to a list of nationalities
+     * that need to be either added or deleted.
      */
     public Map<String, List> findNationalitiesToUpdate(List oldNationalities, List newNationalities) {
         Map<String, List> nationalities =  new HashMap<String, List>();
@@ -181,10 +189,10 @@ public class UpdateNationalitiesListener implements EventListener {
     }
 
     /**
-     * This method fiends the nationalities related to all of the artists that are involved in the bampfaObjectProductionPersonGroupList.
+     * This method finds the nationalities related to all of the artists that are involved in the bampfaObjectProductionPersonGroupList.
      * 
-     * @param docModel The current document model
-     * @param coreSession A session to allow us to retrieve the nationalities from person authority records
+     * @param docModel The current document model.
+     * @param coreSession A session that allows us to retrieve the nationalities from person authority records.
      * 
      * @return A list of nationalities that are to be inserted into this collection object record.
      */
@@ -197,6 +205,7 @@ public class UpdateNationalitiesListener implements EventListener {
         for (Map<String, Object> bampfaObjectProductionGroup : bampfaObjectProductionPersonGroupList) {
             String currRefName = (String) bampfaObjectProductionGroup.get("bampfaObjectProductionPerson");
 
+            // String query = "SELECT * FROM Person WHERE persons_common:refName=\"" + currRefName + '"';
             String query = String.format(
                             "SELECT * FROM %1$s WHERE %2$s:refName=\"%3$s\"", PERSON_DOCTYPE, PERSONS_SCHEMA, currRefName); 
 
@@ -228,6 +237,10 @@ public class UpdateNationalitiesListener implements EventListener {
     /**
      * Creates an UpdateObjectNationalitiesFromPersonBatchJob that can be called to update any collection objects
      * affected by adding/removing a nationality from a person record.
+     * 
+     * @param context The document event context associated with this event
+     * @return An UpdateObjectNationalitiesFromPersonBatchJob object that can be used to propagate changes
+     * to collection object records.
      */
     private UpdateObjectNationalitiesFromPersonBatchJob updateCollectionObjectsFromPerson(DocumentEventContext context) throws Exception {
 
