@@ -62,6 +62,7 @@ date:                  numDate
 |                      dayFirstDate
 |                      dayOrYearFirstDate
 |                      invStrDateEraLastDate
+|                      romanDate
 ;
 
 month:                 monthYear
@@ -95,6 +96,7 @@ century:               ( strCentury | numCentury ) era? ;
 
 millennium:            nth MILLENNIUM era? ;
 
+romanDate:             num (HYPHEN | SLASH) romanMonth (HYPHEN | SLASH) numYear era? ;
 strDate:               strMonth ( numDayOfMonth | nth ) COMMA? numYear era?;
 invStrDate:            era num COMMA? strMonth num
 |                      era? num COMMA strMonth num ;
@@ -108,8 +110,8 @@ monthInYearRange:      strMonth ( HYPHEN | DASH ) strMonth COMMA? numYear era? ;
 nthQuarterInYearRange: nthQuarter ( HYPHEN | DASH ) nthQuarter COMMA? numYear era? ;
 strSeasonInYearRange:  strSeason ( HYPHEN | DASH ) strSeason COMMA? numYear era? ;
 numDayInMonthRange:    numMonth SLASH num ( HYPHEN | DASH ) num SLASH numYear era? ;
-numDate:               num SLASH ( num | romanNum ) SLASH num era?
-|                      num HYPHEN ( num | romanNum ) HYPHEN num era? ;
+numDate:               num SLASH num SLASH num era?
+|                      num HYPHEN num HYPHEN num era? ;
 monthYear:             strMonth COMMA? numYear era? ;
 invMonthYear:          era? numYear COMMA? strMonth ;
 seasonYear:            strSeason COMMA? numYear era? ;
@@ -132,7 +134,7 @@ numMonth:              NUMBER ;
 numDayOfMonth:         NUMBER ;
 num:                   NUMBER ;
 unknownDate:           UNKNOWN ;
-romanNum:              ROMANNUMBER ; 
+romanMonth:            ROMANMONTH ; 
 
 /*
  * Lexer rules
@@ -167,7 +169,7 @@ NTHSTR:         [0-9]*? ([0456789] 'th' | '1st' | '2nd' | '3rd' | '11th' | '12th
 HUNDREDS:       [0-9]*? '00' '\''? 's';
 TENS:           [0-9]*? '0' '\''? 's';
 NUMBER:         ([0-9,]+)*[0-9] ;
-ROMANNUMBER:    [ivx]+ ;
+ROMANMONTH:     'i' | 'ii' | 'iii' | 'iv' | 'v' | 'vi' | 'vii' | 'viii' | 'ix' | 'x' | 'xi' | 'xii' ;
 COMMA:          ',' ;
 HYPHEN:         '-' ;
 DASH:           [—–] ; /* EM DASH, EN DASH */
