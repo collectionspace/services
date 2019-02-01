@@ -1254,9 +1254,6 @@
                                          earliestSingleDate: [54962,  5,  13, BCE]
                                          latestDate:         [2019,  4,  5, CE]
 
-  '17-X-13':                            # Day-Month-Year with roman numeral as month, makes sure ambiguities resolved as they were before
-                                         earliestSingleDate: [17,  10,  13, CE]
-
   '01-I-2017 BCE':                       # Day-Month-Year with roman numeral as month 
                                          earliestSingleDate: [2017,  1,  1, BCE]
 
@@ -1268,6 +1265,9 @@
 
   '29-IV-2018':                          # Day-Month-Year with roman numeral as month 
                                          earliestSingleDate: [2018,  4,  29, CE]
+
+  '01-IV-2017 BCE':                          # Day-Month-Year with roman numeral as month, with Era
+                                          earliestSingleDate: [2017, 4, 1, BCE]  
 
 # -------------------------------------------------------------------------------------------------------
 # Invalid dates

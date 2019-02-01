@@ -77,10 +77,11 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Pa
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartialCenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartialDecadeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartialYearContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.RomanDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterCenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterInYearRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterYearContext;
-import org.collectionspace.services.structureddate.antlr.StructuredDateParser.RomanNumContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.RomanMonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.SeasonYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrCenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrDateContext;
@@ -482,11 +483,6 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			year = num1;
 			numMonth = num2;
 			dayOfMonth = num3;
-		}
-		else if (DateUtils.isValidDate(num3, num2, num1, era)) {
-			// The date was of format day-month-year
-			numMonth = num2;
-			dayOfMonth = num1;
 		}
 
 		stack.push(year);
@@ -1213,15 +1209,26 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	}
 
 	@Override
-	public void exitRomanNum(RomanNumContext ctx) {
-		
-		int num = DateUtils.romanToDecimal(ctx.ROMANNUMBER().getText());
-
-		if (num < 1 || num > 12) {
-			throw new StructuredDateFormatException("unexpected month '" + Integer.toString(num) + "'");
-		}
+	public void exitRomanMonth(RomanMonthContext ctx) {
+		int num = DateUtils.romanToDecimal(ctx.ROMANMONTH().getText());
 
 		stack.push(num);
+	}
+
+	@Override
+	public void exitRomanDate(RomanDateContext ctx) {
+		if (ctx.exception != null) return;
+		System.out.println("I am going in here");
+		
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
+		Integer year = (Integer) stack.pop();
+		Integer month = (Integer) stack.pop();
+		Integer day = (Integer) stack.pop();
+
+		stack.push(year);
+		stack.push(month);
+		stack.push(day);
+		stack.push(era);
 	}
 
 	@Override
