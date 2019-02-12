@@ -50,6 +50,7 @@ import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
+import org.collectionspace.services.config.tenant.RepositoryDomainType;
 import org.collectionspace.services.lifecycle.Lifecycle;
 import org.collectionspace.services.lifecycle.State;
 import org.collectionspace.services.lifecycle.StateList;
@@ -58,6 +59,7 @@ import org.collectionspace.services.lifecycle.TransitionDefList;
 import org.collectionspace.services.lifecycle.TransitionList;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentException;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
 import org.nuxeo.ecm.core.NXCore;
@@ -94,7 +96,7 @@ public class NuxeoUtils {
     // Base document type in Nuxeo is "Document"
     //
     public static final String BASE_DOCUMENT_TYPE = "Document";
-    public static final String WORKSPACE_DOCUMENT_TYPE = "Workspace";
+    public static final String WORKSPACE_DOCUMENT_TYPE = "Workspace"; // public static final String WORKSPACE_FOLDER_TYPE = "Folder";
     
     public static final String Workspaces = "Workspaces";
     public static final String workspaces = "workspaces"; // to make it easier to migrate older versions of the CollectionSpace services -i.e., pre v2.0.
@@ -163,6 +165,33 @@ public class NuxeoUtils {
     	return result;
     }
     
+    /**
+     * Create a Nuxeo 'Folder' inside the passed in 'parentDoc'.
+     * 
+     * @param parentDoc
+     * @param folderName
+     * @return
+     * @throws Exception
+     */
+    static public DocumentModel createFolder(DocumentModel parentDoc, String folderName) throws Exception {
+    	CoreSessionInterface repoSession = new CoreSessionWrapper(parentDoc.getCoreSession());
+
+        DocumentModel folder = repoSession.createDocumentModel(parentDoc.getPathAsString(),
+                folderName, NuxeoUtils.WORKSPACE_DOCUMENT_TYPE);
+        folder.setPropertyValue("dc:title", folderName);
+        folder.setPropertyValue("dc:description", "A CollectionSpace folder of "
+                + parentDoc.getName());
+        folder = repoSession.createDocument(folder);
+
+        repoSession.save();
+        
+        if (logger.isDebugEnabled()) {
+            logger.debug("Created folder name=" + folderName
+                    + " Nuxeo ID=" + folder.getId());
+        }
+
+        return folder;
+    }
     
     /*
      * Map Nuxeo's life cycle object to our JAX-B based life cycle object
@@ -873,6 +902,7 @@ public class NuxeoUtils {
     }
     */
 
+    
     /**
      * createPathRef creates a PathRef for given service context using given id
      * @param ctx
