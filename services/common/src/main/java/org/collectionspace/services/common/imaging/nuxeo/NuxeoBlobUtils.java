@@ -40,6 +40,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.ecm.platform.picture.api.ImageInfo;
@@ -766,7 +767,6 @@ public class NuxeoBlobUtils {
 			// We'll store the blob inside the workspace directory of the calling service
 			String nuxeoWspaceId = ctx.getRepositoryWorkspaceId();
 			DocumentRef nuxeoWspace = new IdRef(nuxeoWspaceId);
-			DocumentModel wspaceDoc = repoSession.getDocument(nuxeoWspace);
 			//
 			// If the original file's name contains "illegal" characters, then we create a copy of the file to give Nuxeo.
 			//
@@ -779,9 +779,12 @@ public class NuxeoBlobUtils {
 				}
 			}			
 			
+			DocumentModel wspaceDoc = repoSession.getDocument(nuxeoWspace);
+			DocumentModel newBlobFolder = NuxeoUtils.createFolder(wspaceDoc, UUID.randomUUID().toString());
+			
 			result = createBlobInRepository(ctx,
 					repoSession,
-					wspaceDoc,
+					newBlobFolder,
 					purgeOriginal,
 					targetFile,
 					blobInput.isTemporaryFile(),
