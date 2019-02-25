@@ -999,7 +999,7 @@ public class NuxeoBlobUtils {
 		if (blob != null) {
 			try {
 				InputStream blobStream = blob.getStream(); // By default, the result will be whatever stream Nuxeo returns to us.
-				int blobSize = blobsCommon.getLength() != null ? Integer.parseInt(blobsCommon.getLength()) : 0;
+				long blobSize = blobsCommon.getLength() != null ? Long.parseLong(blobsCommon.getLength()) : 0;
 				if (blobSize > 0 && blobSize < MAX_IMAGE_BUFFER) {
 					byte[] bytes = IOUtils.toByteArray(blobStream);
 					blobStream.close(); // Close the InputStream that we got from Nuxeo since it's usually a FileInputStream -we definitely want FileInputStreams closed.
