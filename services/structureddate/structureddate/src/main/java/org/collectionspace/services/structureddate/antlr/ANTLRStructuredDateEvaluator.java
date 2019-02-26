@@ -1,5 +1,7 @@
 package org.collectionspace.services.structureddate.antlr;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.Stack;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -85,6 +87,7 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.St
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrMonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrSeasonContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrSeasonInYearRangeContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.UncalibratedDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.UncertainDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.UnknownDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearContext;
@@ -118,8 +121,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		result = new StructuredDateInternal();
 		result.setDisplayDate(displayDate);
 
-		// Instantiate a parser from the lowercased display date, so that parsing will be
-		// case insensitive.
+		// Instantiate a parser from the lowercased display date, so that parsing will be case insensitive 
 		ANTLRInputStream inputStream = new ANTLRInputStream(displayDate.toLowerCase());
 		StructuredDateLexer lexer = new StructuredDateLexer(inputStream);
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
@@ -156,6 +158,27 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		Date latestDate = (Date) stack.pop();
 		Date earliestDate = (Date) stack.pop();
+
+		if (earliestDate.getYear() != null || earliestDate.getYear() != null) {
+			int compareResult = DateUtils.compareDates(earliestDate, latestDate);
+			if (compareResult == 1) {
+				Date temp;
+				temp = earliestDate;
+				earliestDate = latestDate;
+				latestDate = temp;
+	
+				// Check to see if the dates were reversed AND calculated. If they were
+				// Then this probably means the absolute earliestDate should have month and day as "1"
+				// and the latestDate momth 12, day 31.
+				if ((earliestDate.getMonth() == 12 && earliestDate.getDay() == 31) &&
+					(latestDate.getMonth() == 1 && latestDate.getDay() == 1)) {
+						earliestDate.setMonth(1);
+						earliestDate.setDay(1);
+						latestDate.setMonth(12);
+						latestDate.setDay(31);
+					}
+			}
+		}
 
 		// If the earliest date and the latest date are the same, it's just a "single" date.
 		// There's no need to have the latest, so set it to null.
@@ -217,16 +240,17 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Date latestDate = (Date) stack.pop();
 		Date earliestDate = (Date) stack.pop();
 
+
 		int earliestInterval = DateUtils.getCircaIntervalYears(earliestDate.getYear(), earliestDate.getEra());
 		int latestInterval = DateUtils.getCircaIntervalYears(latestDate.getYear(), latestDate.getEra());
 
-		// Express the circa interval as a qualifier.
+		// Express the circa interval as a qualifier.	
 
-		// stack.push(earliestDate.withQualifier(QualifierType.MINUS, earliestInterval, QualifierUnit.YEARS));
-		// stack.push(latestDate.withQualifier(QualifierType.PLUS, latestInterval, QualifierUnit.YEARS));
+ 		// stack.push(earliestDate.withQualifier(QualifierType.MINUS, earliestInterval, QualifierUnit.YEARS));	
+		// stack.push(latestDate.withQualifier(QualifierType.PLUS, latestInterval, QualifierUnit.YEARS));	
 
-		// OR:
-
+ 		// OR:	
+		 
 		// Express the circa interval as an offset calculated into the year.
 
 		DateUtils.subtractYears(earliestDate, earliestInterval);
@@ -930,7 +954,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// Convert the string to a number,
 		// and push on the stack.
 
-		Integer year = new Integer(ctx.NUMBER().getText());
+		Integer year = new Integer(ctx.getText().replaceAll(",", ""));
 
 		if (year == 0) {
 			throw new StructuredDateFormatException("unexpected year '" + ctx.NUMBER().getText() + "'");
@@ -1177,7 +1201,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// Convert the numeric string to an Integer,
 		// and push on the stack.
 
-		Integer num = new Integer(ctx.NUMBER().getText());
+		Integer num = new Integer(ctx.getText().replaceAll(",", ""));
 
 		stack.push(num);
 	}
@@ -1189,6 +1213,29 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// Dummy dates
 		stack.push(new Date());
 		stack.push(new Date());
+	}
+
+	public void exitUncalibratedDate(UncalibratedDateContext ctx) {
+		if (ctx.exception != null) return;
+
+		Integer adjustmentDate = (Integer) stack.pop();
+		Integer mainYear = (Integer) stack.pop();
+
+		Integer upperBound = mainYear + adjustmentDate;
+		Integer lowerBound = mainYear - adjustmentDate;
+
+		Integer currentYear = DateUtils.getCurrentDate().getYear();
+
+		Integer earliestYear = currentYear - upperBound;
+		Integer latestYear = currentYear - lowerBound ;
+
+		// If negative, then BC, else AD
+		Era earliestEra = earliestYear < 0 ? Era.BCE : Era.CE;
+		Era latestEra = latestYear < 0 ? Era.BCE : Era.CE;
+
+		stack.push(new Date(Math.abs(earliestYear), 1, 1, earliestEra)); // Earliest Early Date
+		stack.push(new Date(Math.abs(latestYear), 12, DateUtils.getDaysInMonth(12, Math.abs(latestYear), latestEra), latestEra)); // Latest Late Date
+
 	}
 
 	protected String getErrorMessage(RecognitionException re) {
