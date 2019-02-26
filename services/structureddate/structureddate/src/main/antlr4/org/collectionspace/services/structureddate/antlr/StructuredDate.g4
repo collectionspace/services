@@ -15,6 +15,7 @@ displayDate:           uncertainDate
 |                      certainDate
 |                      beforeOrAfterDate
 |                      unknownDate
+|                      uncalibratedDate
 ;
 
 uncertainDate:         CIRCA certainDate ;
@@ -24,6 +25,8 @@ certainDate:           hyphenatedRange
 ;
 
 beforeOrAfterDate:     ( BEFORE | AFTER ) singleInterval ;
+
+uncalibratedDate:      numYear PLUSMINUS num YEARSSTRING? BP ;
 
 hyphenatedRange:       singleInterval ( HYPHEN | DASH ) singleInterval
 |                      nthCenturyRange
@@ -134,8 +137,8 @@ unknownDate:           UNKNOWN ;
 /*
  * Lexer rules
  */
-
 WS:             [ \t\r\n]+ -> skip;
+PLUSMINUS:      '±' | '+/-' ;
 CIRCA:          ('c' | 'ca') DOT? | 'circa' ;
 SPRING:         'spring' | 'spr' ;
 SUMMER:         'summer' | 'sum' ;
@@ -158,11 +161,12 @@ MILLENNIUM:     'millennium' ;
 MONTH:          'january' | 'february' | 'march' | 'april' | 'may' | 'june' | 'july' | 'august' | 'september' | 'october' | 'november' | 'december' ;
 SHORTMONTH:     'jan' | 'feb' | 'mar' | 'apr' | 'jun' | 'jul' | 'aug' | 'sep' | 'sept' | 'oct' | 'nov' | 'dec' ;
 BC:             'bc' | 'bce' |  'b.c.' | 'b.c.e.' ;
-AD:             'ad' | 'a.d.' | 'ce' | 'c.e.';
+AD:             'ad' | 'a.d.' | 'ce' | 'c.e.' ;
+BP:             'bp' | 'b.p.' | 'b.p' ;
 NTHSTR:         [0-9]*? ([0456789] 'th' | '1st' | '2nd' | '3rd' | '11th' | '12th' | '13th') ;
 HUNDREDS:       [0-9]*? '00' '\''? 's';
 TENS:           [0-9]*? '0' '\''? 's';
-NUMBER:         [0-9]+ ;
+NUMBER:         ([0-9,]+)*[0-9] ;
 COMMA:          ',' ;
 HYPHEN:         '-' ;
 DASH:           [—–] ; /* EM DASH, EN DASH */
@@ -171,4 +175,5 @@ DOT:            '.' ;
 QUESTION:       '?' ;
 OTHER:          . ;
 UNKNOWN:        'unknown' ;
+YEARSSTRING:    'years' | 'year' ;
 STRING:         [a-z]+ ;
