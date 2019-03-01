@@ -26,4 +26,18 @@
 			<schema name="subitem" />
 		</doctype>
 	</extension>
+	
+	<!--
+		Register new MIME types that are not in the default set
+	-->
+	<extension target="org.nuxeo.ecm.platform.mimetype.service.MimetypeRegistryService" point="mimetype">
+		<mimetype normalized="model/x3d+xml" binary="false" iconPath="text.png">
+			<mimetypes>
+				<mimetype>model/x3d+xml</mimetype>
+			</mimetypes>
+			<extensions>
+				<extension>x3d</extension>
+			</extensions>
+		</mimetype>
+	</extension>
 </component>
