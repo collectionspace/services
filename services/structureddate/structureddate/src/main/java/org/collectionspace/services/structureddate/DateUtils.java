@@ -1120,16 +1120,33 @@ public class DateUtils {
 			return currentDate;
 		}
 
-		MutableDateTime currentDateTime = convertToDateTime(currentDate);
-		MutableDateTime endDateTime = convertToDateTime(endDate);
-		
-		int comparisonResult = currentDateTime.compareTo(endDateTime);
+		int comparisonResult = compareDates(currentDate, endDate);
 		if (comparisonResult == 1 || comparisonResult == 0) {
 			return currentDate;
 		}
 		return null;
 	}
 
+	/**
+	 * Wrapper function for MutableDateTime's comparator.
+	 * @param startDate The first date in the range
+	 * @param endDate   The last date in the range
+	 * @return          -1 if startDate is before, 0 if they are equal, 1 if startDate is after endDate
+	 */
+	public static int compareDates(Date startDate, Date endDate) {
+		if (startDate.getYear() == null || endDate.getYear() == null) {
+			throw new IllegalArgumentException("Must provide a start and end date to compare.");
+		}
+
+		MutableDateTime startDateTime = convertToDateTime(startDate);
+		MutableDateTime endDateTime = convertToDateTime(endDate);
+		
+		return startDateTime.compareTo(endDateTime);
+	}
+
+	/**
+	 * Returns a Date object based on the local date.
+	 */
 	public static Date getCurrentDate() {
 		LocalDate localDate = new LocalDate();
 		Integer year = (Integer) localDate.getYear();
@@ -1190,6 +1207,22 @@ public class DateUtils {
 		if (era == null) {
 			era = Date.DEFAULT_ERA;
 		}
+
+		if (era == Era.BCE) {
+			// Improved precision for BC dates
+			int interval = 0;
+
+			if (year % 1000 == 0) {
+				interval = 500;
+			} else if (year % 100 == 0) {
+				interval = 50;
+			} else if (year % 10 == 0) {
+				interval = 10;
+			} else if (year % 10 > 0 && year % 10 < 10) {
+				interval = 5;
+			}
+			return interval;
+		}
 		
 		MutableDateTime dateTime = new MutableDateTime(chronology);
 		dateTime.era().set((era == Era.BCE) ? DateTimeConstants.BC : DateTimeConstants.AD);
@@ -1200,6 +1233,8 @@ public class DateUtils {
 		
 		int years = Years.yearsBetween(dateTime, circaBaseDateTime).getYears();
 
+
+		// return interval;
 		return ((int) Math.round(years * 0.05));
 	}
 	
@@ -1296,6 +1331,42 @@ public class DateUtils {
 		}
 		
 		return isValid;
+	}
+
+	/** 
+	 * Converts Roman numeral to integer. Currently only supports 1-12.
+	 * @param romanNum The Roman number string that needs to be transformed into decimal
+	 * @return decimal representation of Roman number
+	 * Credit: https://www.geeksforgeeks.org/converting-roman-numerals-decimal-lying-1-3999/
+	*/
+	public static int romanToDecimal(String romanNum) {
+		int length = romanNum.length();
+		int sum = 0;
+		int pre = 0;
+
+		for (int i = length - 1; i >= 0; i--) {
+			int cur = getRomanValue(romanNum.charAt(i));
+			
+			if (i == length - 1) {
+				sum = sum + cur;
+			} else {
+			   if (cur < pre) {
+				   sum = sum - cur;
+			   } else {
+				   sum = sum + cur;
+			   }
+			}
+			pre = cur;
+		}
+		
+		return sum;
+	}
+
+	private static int getRomanValue(char c) {
+		if (c == 'i') return 1;
+		else if (c == 'v') return 5;
+		else if (c == 'x') return 10;
+		return -1;
 	}
 	
 	/**
