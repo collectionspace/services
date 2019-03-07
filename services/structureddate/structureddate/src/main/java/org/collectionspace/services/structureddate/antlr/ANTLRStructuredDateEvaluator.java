@@ -77,9 +77,11 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Pa
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartialCenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartialDecadeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartialYearContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.RomanDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterCenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterInYearRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterYearContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.RomanMonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.SeasonYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrCenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrDateContext;
@@ -1204,6 +1206,29 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer num = new Integer(ctx.getText().replaceAll(",", ""));
 
 		stack.push(num);
+	}
+
+	@Override
+	public void exitRomanMonth(RomanMonthContext ctx) {
+		int num = DateUtils.romanToDecimal(ctx.ROMANMONTH().getText());
+
+		stack.push(num);
+	}
+
+	@Override
+	public void exitRomanDate(RomanDateContext ctx) {
+		if (ctx.exception != null) return;
+		System.out.println("I am going in here");
+		
+		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
+		Integer year = (Integer) stack.pop();
+		Integer month = (Integer) stack.pop();
+		Integer day = (Integer) stack.pop();
+
+		stack.push(year);
+		stack.push(month);
+		stack.push(day);
+		stack.push(era);
 	}
 
 	@Override
