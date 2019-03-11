@@ -58,12 +58,12 @@ public class SystemInfoResource extends AbstractCollectionSpaceResourceImpl<Syst
     	try {
     		result = new SystemInfoCommon();
     		result.setInstanceId("_default");
-    		result.setDisplayName("CollectionSpace Services v5.0 - remillet");
+    		result.setDisplayName("CollectionSpace Services v5.0-28 @ UCB");
     		Version ver = new Version();
     		ver.setMajor("5");
     		ver.setMinor("0");
     		ver.setPatch("0");
-    		ver.setBuild("1");
+    		ver.setBuild("28");
     		result.setVersion(ver);
     		
     		result.setHostTimezone(TimeZone.getDefault().getID());
