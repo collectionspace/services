@@ -423,6 +423,10 @@
 							<service:element>name</service:element>
 							<service:xpath>name</service:xpath>
 						</service:ListResultField>
+						<service:ListResultField>
+							<service:element>filename</service:element>
+							<service:xpath>filename</service:xpath>
+						</service:ListResultField>
 					</service:ListResultsFields>
 				</service:params>
 			</service:DocHandlerParams>
