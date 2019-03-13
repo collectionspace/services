@@ -1198,29 +1198,29 @@
                                          earliestSingleDate: [9,     7, 31, CE]
                                          latestDate:         [1996,  4,  1, CE]
 
-  "1200±50 BP":                          # Uncalibrated date with ± symbol, with CE
-                                         earliestSingleDate: "uncalibrated earliest date"
-                                         latestDate:         "uncalibrated latest date"
+  "1200±50 BP":                          # Uncalibrated date with ± symbol
+                                         earliestSingleDate: [700, 1, 1, CE]
+                                         latestDate:         [800, 12, 31, CE ]
 
   "3100 +/- 150 BP":                     # Uncalibrated date with +/- instead of ± symbol
-                                         earliestSingleDate: "uncalibrated earliest date"
-                                         latestDate:         "uncalibrated latest date"
+                                         earliestSingleDate: [1300, 1, 1, BCE]
+                                         latestDate:         [1000, 12, 31, BCE]
 
   "3100+/-150 BP":                       # Uncalibrated date with +/- instead of ± symbol, no spaces
-                                         earliestSingleDate: "uncalibrated earliest date"
-                                         latestDate:         "uncalibrated latest date"
+                                         earliestSingleDate: [1300, 1, 1, BCE]
+                                         latestDate:         [1000, 12, 31, BCE]
 
   "3100+/-150 years BP":                 # Uncalibrated date with 'years' in it
-                                         earliestSingleDate: "uncalibrated earliest date"
-                                         latestDate:         "uncalibrated latest date"
+                                         earliestSingleDate: [1300, 1, 1, BCE]
+                                         latestDate:         [1000, 12, 31, BCE]
 
   "3,100+/-150 years BP":                # Uncalibrated date with 'years' in it as well as with a comma
-                                         earliestSingleDate: "uncalibrated earliest date"
-                                         latestDate:         "uncalibrated latest date"
+                                         earliestSingleDate: [1300, 1, 1, BCE]
+                                         latestDate:         [1000, 12, 31, BCE]
 
   "2000±100 BP":                         # Uncalibrated date with BCE and AD mix
-                                         earliestSingleDate: "uncalibrated earliest date"
-                                         latestDate:         "uncalibrated latest date"
+                                         earliestSingleDate: [150, 1, 1, BCE]
+                                         latestDate:         [50, 12, 31, CE]
 
   "5580-5460 BC":                        # Calibrated date with commas
                                          earliestSingleDate: [5580,  1, 1, BCE]
@@ -1268,6 +1268,10 @@
 
   '01-IV-2017 BCE':                          # Day-Month-Year with roman numeral as month, with Era
                                           earliestSingleDate: [2017, 4, 1, BCE]  
+  
+  # '12 june 1942 - 13 june 1943':            # hyphenatedRange, date with comma'd numbers
+  #                                        earliestSingleDate: [1942,  6,  12, CE]
+  #                                        latestDate:         [1942,  6,  13, CE]
 
 # -------------------------------------------------------------------------------------------------------
 # Invalid dates
