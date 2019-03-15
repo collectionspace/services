@@ -105,6 +105,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	 * The result of the evaluation.
 	 */
 	protected StructuredDateInternal result;
+	private final int BP_ZERO_YEAR = 1950;
 
 	/**
 	 * The operation stack. The parse listener methods that are implemented here
@@ -1244,15 +1245,10 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		if (ctx.exception != null) return;
 
 		Integer adjustmentDate = (Integer) stack.pop();
-		Integer mainYear = (Integer) stack.pop();
+		Integer mainYear = (Integer) stack.pop(); 
 
-		Integer upperBound = mainYear + adjustmentDate;
-		Integer lowerBound = mainYear - adjustmentDate;
-
-		Integer currentYear = DateUtils.getCurrentDate().getYear();
-
-		Integer earliestYear = currentYear - upperBound;
-		Integer latestYear = currentYear - lowerBound ;
+		Integer earliestYear = (BP_ZERO_YEAR - mainYear) - adjustmentDate;
+		Integer latestYear = (BP_ZERO_YEAR - mainYear) + adjustmentDate;
 
 		// If negative, then BC, else AD
 		Era earliestEra = earliestYear < 0 ? Era.BCE : Era.CE;
