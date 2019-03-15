@@ -67,11 +67,6 @@ public class StructuredDateEvaluatorTest {
 					latestDateItems.add(currentDate.getEra() == Era.BCE ? "BCE" : "CE");
 					structuredDateFields.put("latestDate", latestDateItems);
 				}
-				if (latestDate.equals("uncalibrated latest date")) {
-					Stack<ArrayList> results = calculateUncalibratedDate(displayDate, currentDate.getYear());
-					structuredDateFields.put("latestDate", results.pop());
-					structuredDateFields.put("earliestSingleDate", results.pop());
-				}
 			}
 		}
 
@@ -107,59 +102,6 @@ public class StructuredDateEvaluatorTest {
 		}
 
 		return structuredDate;
-	}
-
-
-	/** 
-	 * Calculates the uncalibrated date, since the yalm expected dates need to be dynamic
-	 * as they will change from year to year. 
-	 * @param displayDate The current test's display date
-	 * @param currentYear The current year
-	 * 
-	 * @return a stack consisting of two ArrayLists, each containing the expected dates
-	*/
-	public Stack<ArrayList> calculateUncalibratedDate(String displayDate, Integer currentYear) {
-		Stack<ArrayList> stack = new Stack<ArrayList>();
-		ArrayList latestDate = new ArrayList<>();
-		ArrayList earliestDate = new ArrayList<>();
-
-
-		String reg = "±|\\+/-";
-		String[] splitDateTokens = displayDate.split(reg);
-		String[] tokensPartTwo = splitDateTokens[1].split(" ");
-
-		Integer mainYear = Integer.parseInt(splitDateTokens[0].replaceAll("\\s|,", ""));
-		Integer offset;
-
-		try {
-			offset = Integer.parseInt(tokensPartTwo[0]);
-		} catch (Exception e) {
-			offset = Integer.parseInt(tokensPartTwo[1].replaceAll("\\s|,", ""));
-		}
-
-		Integer earliestYear = currentYear - (mainYear + offset);
-		Integer latestYear   = currentYear - (mainYear - offset);
-		
-		String earliestEra = earliestYear < 0 ? "BCE" : "CE";
-		String latestEra = latestYear < 0 ? "BCE" : "CE";
-		
-		earliestYear = Math.abs(earliestYear);
-		latestYear = Math.abs(latestYear);
-
-		latestDate.add(latestYear);
-		latestDate.add(12);
-		latestDate.add(DateUtils.getDaysInMonth(12, latestYear, null));
-		latestDate.add(latestEra);
-
-		earliestDate.add(earliestYear);
-		earliestDate.add(1);
-		earliestDate.add(1);
-		earliestDate.add(earliestEra);
-
-		stack.push(earliestDate);
-		stack.push(latestDate);
-
-		return stack;
 	}
 
 	private Date createDateFromYamlSpec(List<Object> dateFields) {
