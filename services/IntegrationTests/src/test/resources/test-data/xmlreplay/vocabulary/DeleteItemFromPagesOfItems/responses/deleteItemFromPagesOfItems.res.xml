@@ -1,0 +1,49 @@
+<document name="vocabularies">
+    <ns2:vocabularies_common xmlns:ns2="http://collectionspace.org/services/vocabulary" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <shortIdentifier>createDeleteItemFromPagesOfItems</shortIdentifier>
+        <csid>${csid}</csid>
+        <displayName>Updated createDeleteItemFromPagesOfItems Vocabulary</displayName>
+        <description>
+            This is an updated test vocabulary created in the createDeleteItemFromPagesOfItems XMLReplay test group
+        </description>
+        <source>
+            Some updated mythical book posted with item terms in createDeleteItemFromPagesOfItems test group
+        </source>
+        <refName>
+            urn:cspace:testsci.collectionspace.org:vocabularies:name(createDeleteItemFromPagesOfItems)'createDeleteItemFromPagesOfItems Vocabulary'
+        </refName>
+        <vocabType>enum</vocabType>
+    </ns2:vocabularies_common>
+    <ns2:abstract-common-list xmlns:ns2="http://collectionspace.org/services/jaxb">
+        <pageNum>0</pageNum>
+        <itemsInPage>2</itemsInPage>
+        <totalItems>2</totalItems>
+        <fieldsReturned>
+            csid|uri|refName|updatedAt|workflowState|rev|sourcePage|sas|proposed|referenced|deprecated|termStatus|description|source|order|displayName|shortIdentifier
+        </fieldsReturned>
+        <list-item>
+            <refName>
+                urn:cspace:testsci.collectionspace.org:vocabularies:name(createDeleteItemFromPagesOfItems):item:name(createItem101)'createItem101'
+            </refName>
+            <workflowState>project</workflowState>
+            <rev>1</rev>
+            <sas>false</sas>
+            <proposed>true</proposed>
+            <order>1</order>
+            <displayName>createItem101</displayName>
+            <shortIdentifier>createItem101</shortIdentifier>
+        </list-item>
+        <list-item>
+            <refName>
+                urn:cspace:testsci.collectionspace.org:vocabularies:name(createDeleteItemFromPagesOfItems):item:name(createItem201)'createItem201'
+            </refName>
+            <workflowState>project</workflowState>
+            <rev>1</rev>
+            <sas>false</sas>
+            <proposed>true</proposed>
+            <order>2</order>
+            <displayName>createItem201</displayName>
+            <shortIdentifier>createItem201</shortIdentifier>
+        </list-item>
+    </ns2:abstract-common-list>
+</document>
