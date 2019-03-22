@@ -5,6 +5,57 @@
 		<auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
 	    <auth ID="admin@testsci.collectionspace.org">YWRtaW5AdGVzdHNjaS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
 	</auths>
+
+    <!--
+        Test deleting a vocabulary item from a list with multiple pages of items.
+    -->
+    <testGroup ID="DeleteItemFromPagesOfItems" autoDeletePOSTS="true" authForCleanup="admin@testsci.collectionspace.org">
+        <test ID="createDeleteItemFromPagesOfItems" auth="admin@testsci.collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/</uri>
+            <filename>vocabulary/vocab-Template.xml</filename>
+        </test>
+        <test ID="createItem101">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createDeleteItemFromPagesOfItems.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">1</var>
+            </vars>
+        </test>
+        <test ID="createItem201">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createDeleteItemFromPagesOfItems.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">2</var>
+            </vars>
+        </test>
+        <test ID="createItem301">
+            <method>POST</method>
+            <uri>/cspace-services/vocabularies/${createDeleteItemFromPagesOfItems.CSID}/items/</uri>
+            <filename>vocabulary/vocab-Item-template.xml</filename>
+            <vars>
+                <var ID="order">3</var>
+            </vars>
+        </test>
+        <test ID="deleteItemFromSecondPage" auth="admin@testsci.collectionspace.org">
+            <method>PUT</method>
+            <uri>/cspace-services/vocabularies/${createDeleteItemFromPagesOfItems.CSID}?omittedItemAction=delete&amp;pgSz=2</uri>
+            <filename>vocabulary/DeleteItemFromPagesOfItems/deleteItemFromSecondPage-vocab.xml</filename>
+        </test>
+        <test ID="xgetUpdatedVocabItems">
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies/${createDeleteItemFromPagesOfItems.CSID}?showItems=true</uri>
+            <response>
+                <vars>
+                    <var ID="csid">${createDeleteItemFromPagesOfItems.CSID}</var>
+                </vars>
+                <expected level="ADDOK" />
+                <filename>vocabulary/DeleteItemFromPagesOfItems/responses/deleteItemFromPagesOfItems.res.xml</filename>
+            </response>            
+        </test>
+    </testGroup>
     
     <!--
         Test adding to a vocabulary's terms with an entirely new set of terms.
