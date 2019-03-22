@@ -58,6 +58,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashSet;
 import java.util.Set;
@@ -250,14 +251,26 @@ public class VocabularyResource extends
 		// Next, delete the items that were omitted from the incoming payload
 		//
 		if (shouldDeleteOmittedItems(uriInfo) == true) {
-			String omittedItemAction = getOmittedItemAction(uriInfo);
-			AbstractCommonList abstractCommonList = this.getAuthorityItemList(existingCtx, parentIdentifier, uriInfo);
-			if (abstractCommonList != null && !Tools.isEmpty(abstractCommonList.getListItem())) {
-				if (omittedItemAction.equalsIgnoreCase(VocabularyClient.DELETE_OMITTED_ITEMS)) {
-					deleteAuthorityItems(existingCtx, abstractCommonList, shortIdsInPayload, parentIdentifier);
-				} else {
-					sotfDeleteAuthorityItems(existingCtx, abstractCommonList, shortIdsInPayload, parentIdentifier);
+			UriInfo uriInfoCopy = new UriInfoWrapper(uriInfo);
+			String omittedItemAction = getOmittedItemAction(uriInfoCopy);
+			long itemsProcessed = 0;
+			long currentPage = 0;
+			while (true) {
+				AbstractCommonList abstractCommonList = this.getAuthorityItemList(existingCtx, parentIdentifier, uriInfoCopy);
+				if (abstractCommonList != null && !Tools.isEmpty(abstractCommonList.getListItem())) {
+					if (omittedItemAction.equalsIgnoreCase(VocabularyClient.DELETE_OMITTED_ITEMS)) {
+						deleteAuthorityItems(existingCtx, abstractCommonList, shortIdsInPayload, parentIdentifier);
+					} else {
+						sotfDeleteAuthorityItems(existingCtx, abstractCommonList, shortIdsInPayload, parentIdentifier);
+					}
 				}
+				itemsProcessed = itemsProcessed + abstractCommonList.getItemsInPage();
+				if (itemsProcessed >= abstractCommonList.getTotalItems()) {
+					break;
+				}
+				ArrayList<String> pageNum = new ArrayList<String>();
+				pageNum.add(Long.toString(++currentPage));
+				uriInfoCopy.getQueryParameters().put(IClientQueryParams.START_PAGE_PARAM, pageNum);
 			}
 		}
 	}

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="vocabularies">
+    <ns3:vocabularies_common xmlns:ns3="http://collectionspace.org/services/vocabulary" xmlns:ns2="http://collectionspace.org/services/jaxb">
+        <displayName>Updated createDeleteItemFromPagesOfItems Vocabulary</displayName>
+        <shortIdentifier>createDeleteItemFromPagesOfItems</shortIdentifier>
+        <description>This is an updated test vocabulary created in the createDeleteItemFromPagesOfItems XMLReplay test group</description>
+        <source>Some updated mythical book posted with item terms in createDeleteItemFromPagesOfItems test group</source>
+    </ns3:vocabularies_common>
+    <ns2:abstract-common-list xmlns:ns2="http://collectionspace.org/services/jaxb">
+        <list-item>
+            <order>1</order>
+            <displayName>createItem101</displayName>
+            <shortIdentifier>createItem101</shortIdentifier>
+        </list-item>
+        <list-item>
+            <order>2</order>
+            <displayName>createItem201</displayName>
+            <shortIdentifier>createItem201</shortIdentifier>
+        </list-item>
+    </ns2:abstract-common-list>
+</document>
