@@ -95,6 +95,9 @@ public class UpdateNationalitiesListener implements EventListener {
 
                 DocumentModel previousDoc = (DocumentModel) docEventContext.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
                 ArrayList previousNationalities = (ArrayList) previousDoc.getProperty(PERSONS_SCHEMA, NATIONALITIES_FIELD);
+                if (previousNationalities.size() == 0) {
+                    return;
+                }
                 docEventContext.setProperty(PREVIOUS_NATIONALITIES_PROPERTY_NAME, previousNationalities);
             } else {
                 List previousNationalities = (List) docEventContext.getProperty(PREVIOUS_NATIONALITIES_PROPERTY_NAME);
@@ -213,16 +216,17 @@ public class UpdateNationalitiesListener implements EventListener {
         for (Map<String, Object> bampfaObjectProductionGroup : bampfaObjectProductionPersonGroupList) {
             String currRefName = (String) bampfaObjectProductionGroup.get("bampfaObjectProductionPerson");
 
-            // String query = "SELECT * FROM Person WHERE persons_common:refName=\"" + currRefName + '"';
             String query = String.format(
                             "SELECT * FROM %1$s WHERE %2$s:refName=\"%3$s\"", PERSON_DOCTYPE, PERSONS_SCHEMA, currRefName); 
 
+            if (coreSession.query(query).size() == 0) {
+                continue;
+            }
             List<String> nationalities = (List) coreSession.query(query).get(0).getProperty(PERSONS_SCHEMA, NATIONALITIES_FIELD);
-
-
+            
             for (Object n : nationalities) {
                 String nationality = (String) n;
-                if (!allNationalities.contains(nationality)) {
+                if (n != null && !allNationalities.contains(nationality)) {
                     allNationalities.add(nationality);
                 }
             }
