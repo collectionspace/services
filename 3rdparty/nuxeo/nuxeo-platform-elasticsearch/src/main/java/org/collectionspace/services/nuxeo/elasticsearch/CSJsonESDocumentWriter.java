@@ -2,9 +2,12 @@ package org.collectionspace.services.nuxeo.elasticsearch;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.core.HttpHeaders;
 
@@ -62,7 +65,7 @@ public class CSJsonESDocumentWriter extends JsonESDocumentWriter {
 
                         if (isMediaPublished(mediaDoc)) {
                             String mediaCsid = (String) mediaDoc.getName();
-                        
+
                             mediaCsids.add(new TextNode(mediaCsid));
                         }
                     }
@@ -79,7 +82,7 @@ public class CSJsonESDocumentWriter extends JsonESDocumentWriter {
             if (title != null) {
                 denormValues.put("title", title);
             }
-            
+
             List<Map<String, Object>> termGroups = (List<Map<String, Object>>) doc.getProperty("materials_common", "materialTermGroupList");
             List<String> commercialNames = findTermDisplayNamesWithFlag(termGroups, "commercial");
             List<String> commonNames = findTermDisplayNamesWithFlag(termGroups, "common");
@@ -93,6 +96,18 @@ public class CSJsonESDocumentWriter extends JsonESDocumentWriter {
 
             if (commonNames.size() > 0) {
                 denormValues.putArray("commonNames").addAll(jsonNodes(commonNames));
+            }
+
+            // Combine term creator organizations and term editor organizations into a holding
+            // institutions field.
+
+            Set<String> holdingInstitutions = new HashSet<String>();
+
+            holdingInstitutions.addAll(getTermAttributionContributors(doc));
+            holdingInstitutions.addAll(getTermAttributionEditors(doc));
+
+            if (holdingInstitutions.size() > 0) {
+                denormValues.putArray("holdingInstitutions").addAll(jsonNodes(holdingInstitutions));
             }
         }
 
@@ -238,10 +253,38 @@ public class CSJsonESDocumentWriter extends JsonESDocumentWriter {
         return termDisplayNames;
     }
 
+    private Set<String> getTermAttributionContributors(DocumentModel doc) {
+        Set orgs = new HashSet<String>();
+
+        List<Map<String, Object>> groups = (List<Map<String, Object>>) doc.getProperty("materials_common", "materialTermAttributionContributingGroupList");
+
+        for (Map<String, Object> group : groups) {
+            String org = (String) group.get("materialTermAttributionContributingOrganization");
+
+            orgs.add(org);
+        }
+
+        return orgs;
+    }
+
+    private Set<String> getTermAttributionEditors(DocumentModel doc) {
+        Set orgs = new HashSet<String>();
+
+        List<Map<String, Object>> groups = (List<Map<String, Object>>) doc.getProperty("materials_common", "materialTermAttributionEditingGroupList");
+
+        for (Map<String, Object> group : groups) {
+            String org = (String) group.get("materialTermAttributionEditingOrganization");
+
+            orgs.add(org);
+        }
+
+        return orgs;
+    }
+
     private boolean isMediaPublished(DocumentModel mediaDoc) {
         List<String> publishToValues = (List<String>) mediaDoc.getProperty("media_materials", "publishToList");
         boolean isPublished = false;
-        
+
         for (int i=0; i<publishToValues.size(); i++) {
             String value = publishToValues.get(i);
             String shortId = RefNameUtils.getItemShortId(value);
@@ -255,7 +298,7 @@ public class CSJsonESDocumentWriter extends JsonESDocumentWriter {
         return isPublished;
     }
 
-    private List<JsonNode> jsonNodes(List<String> values) {
+    private List<JsonNode> jsonNodes(Collection<String> values) {
         List<JsonNode> nodes = new ArrayList<JsonNode>();
         Iterator<String> iterator = values.iterator();
 

@@ -125,6 +125,15 @@
                     "analyzer" : "fulltext",
                     "include_in_all": "false"
                   },
+                  "collectionspace_denorm:holdingInstitutions": {
+                    "type": "string",
+                    "fields": {
+                      "displayName": {
+                        "type": "string",
+                        "analyzer": "refname_displayname_analyzer"
+                      }
+                    }
+                  },
 
                   "collectionspace_core:createdAt": {
                     "type": "date",
