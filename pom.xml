@@ -91,8 +91,8 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-		<repository> <id>maven1-repository.dev.java.net</id> <name>Java.net 
-			Maven 1 Repository</name> <url>http://download.java.net/maven/1</url> <layout>legacy</layout> 
+		<repository> <id>maven1-repository.dev.java.net</id> <name>Java.net
+			Maven 1 Repository</name> <url>http://download.java.net/maven/1</url> <layout>legacy</layout>
 			<snapshots> <enabled>false</enabled> </snapshots> </repository> -->
 
 		<repository>
@@ -102,7 +102,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-		<!-- some security binaries available under .com only perhaps due to licensing 
+		<!-- some security binaries available under .com only perhaps due to licensing
 			issues -->
 		<repository>
 			<id>jboss.com</id>
@@ -134,7 +134,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-		
+
 		<repository>
 			<id>public-snapshot</id>
 			<url>http://maven.nuxeo.org/public-snapshot</url>
@@ -181,23 +181,11 @@
 			<releases>
 				<enabled>true</enabled>
 			</releases>
-			<id>el4jReleaseRepositoryExternal</id>
-			<name>External release repository of the EL4J project</name>
-			<url>http://public-el4.elca-services.ch/el4j/maven2repository</url>
-		</repository>
-
-		<repository>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
 			<id>Apache</id>
 			<name>External release repository of the Apache projects</name>
 			<url>https://repository.apache.org/content/groups/public/</url>
 		</repository>
-	    
+
 	    <!-- Global Biodiversity Information Facility - http://www.gbif.org/ -->
 	    <repository>
 	        <snapshots>
@@ -205,11 +193,11 @@
 	        </snapshots>
 	        <releases>
 	            <enabled>true</enabled>
-	        </releases>	        
+	        </releases>
 	        <id>gbif-all</id>
 	        <name>gbif-all</name>
 	        <url>http://repository.gbif.org/content/groups/gbif</url>
-	    </repository>	    
+	    </repository>
 
 	</repositories>
 
@@ -293,9 +281,9 @@
 					<configuration>
 					</configuration>
 				</plugin>
-				<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-site-plugin</artifactId> 
-					<configuration> <dependencyLocationEnabled>false</dependencyLocationEnabled> 
-					<unzipCommand>/usr/bin/unzip -o &gt; err.txt</unzipCommand> </configuration> 
+				<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-site-plugin</artifactId>
+					<configuration> <dependencyLocationEnabled>false</dependencyLocationEnabled>
+					<unzipCommand>/usr/bin/unzip -o &gt; err.txt</unzipCommand> </configuration>
 					</plugin> -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -333,7 +321,7 @@
 					</executions>
 				</plugin>
 
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
+				<!--This plugin's configuration is used to store Eclipse m2e settings
 					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
@@ -369,7 +357,7 @@
 		</pluginManagement>
 
 		<plugins>
-			<!-- This plugin ensures that the required environment variables are set 
+			<!-- This plugin ensures that the required environment variables are set
 				before we perform any build related tasks. -->
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
@@ -513,8 +501,8 @@
 					</reportSet>
 				</reportSets>
 			</plugin>
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-javadoc-plugin</artifactId> 
-				<version>2.6.1</version> <configuration> <show>public</show> </configuration> 
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.6.1</version> <configuration> <show>public</show> </configuration>
 				</plugin> -->
 		</plugins>
 	</reporting>
