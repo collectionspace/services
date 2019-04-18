@@ -3,14 +3,14 @@
 
     <parent>
         <groupId>org.collectionspace.services</groupId>
-        <artifactId>org.collectionspace.services.uoc</artifactId>        
+        <artifactId>org.collectionspace.services.uoc</artifactId>
         <version>5.2-SNAPSHOT</version>
     </parent>
-    
+
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.collectionspace.services.uoc.service</artifactId>
     <name>services.uoc.service</name>
-    <packaging>jar</packaging>       
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
@@ -32,7 +32,7 @@
             <artifactId>org.collectionspace.services.collectionobject.jaxb</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
+
         <!-- External dependencies -->
         <dependency>
             <groupId>junit</groupId>
@@ -43,7 +43,7 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
         </dependency>
-        
+
       <!-- javax -->
 
         <dependency>
@@ -52,18 +52,12 @@
             <version>1.0.01</version>
             <scope>provided</scope>
         </dependency>
-        
+
         <!-- jboss -->
 
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>tjws</groupId>
-                    <artifactId>webserver</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -73,7 +67,7 @@
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-multipart-provider</artifactId>
         </dependency>
-        
+
         <!-- nuxeo -->
 
         <dependency>
@@ -88,9 +82,8 @@
         </dependency>
 
     </dependencies>
-    
+
     <build>
         <finalName>collectionspace-services-uoc</finalName>
     </build>
 </project>
-

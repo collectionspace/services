@@ -12,7 +12,7 @@
     <artifactId>org.collectionspace.services.acquisition.client</artifactId>
     <name>services.acquisition.client</name>
     <packaging>jar</packaging>
-    
+
     <dependencies>
         <!-- keep slf4j dependencies on the top -->
         <dependency>
@@ -31,7 +31,7 @@
             <artifactId>org.collectionspace.services.authority.jaxb</artifactId>
             <optional>true</optional>
             <version>${project.version}</version>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.jaxb</artifactId>
@@ -60,12 +60,6 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>tjws</groupId>
-                    <artifactId>webserver</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -80,7 +74,7 @@
             <artifactId>commons-httpclient</artifactId>
         </dependency>
     </dependencies>
-    
+
     <build>
         <finalName>collectionspace-services-acquisition-client</finalName>
         <plugins>
@@ -99,4 +93,3 @@
         </plugins>
     </build>
 </project>
-

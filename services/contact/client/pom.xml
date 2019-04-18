@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.collectionspace.services.contact.client</artifactId>
     <name>services.contact.client</name>
-    
+
     <dependencies>
         <!-- keep slf4j dependencies on the top -->
         <dependency>
@@ -32,7 +32,7 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.client</artifactId>
             <version>${project.version}</version>
-            <!-- 
+            <!--
             <exclusions>
             	<exclusion>
             		<artifactId>xml-apis</artifactId>
@@ -55,13 +55,6 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
-            <!-- filter out unwanted jars -->
-            <exclusions>
-                <exclusion>
-                    <groupId>tjws</groupId>
-                    <artifactId>webserver</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -76,9 +69,8 @@
             <artifactId>commons-httpclient</artifactId>
         </dependency>
     </dependencies>
-    
+
     <build>
         <finalName>collectionspace-services-contact-client</finalName>
     </build>
 </project>
-

@@ -7,17 +7,17 @@
 			<schema name="dublincore" />
 			<schema name="collectionspace_core" />
 		</doctype>
-		
+
 		<!-- A facet for marking blobs/images that came from extern URLs -->
 	    <facet name="URLSourcedPicture">
-	    </facet>		
+	    </facet>
 	</extension>
-	
+
 	<!-- A schema def and doctype def for the "Subitem" document type. -->
 	<extension target="org.nuxeo.ecm.core.schema.TypeService" point="schema">
 		<schema name="subitem" prefix="subitem" src="schemas/subitem.xsd" />
 	</extension>
-	
+
 	<extension target="org.nuxeo.ecm.core.schema.TypeService" point="doctype">
 		<doctype name="Subitem" extends="CollectionSpaceDocument">
 			<schema name="common" />
@@ -26,7 +26,17 @@
 			<schema name="subitem" />
 		</doctype>
 	</extension>
-	
+
+	<!--
+		As of Nuxeo 9.3, Nuxeo does not do sparse updates by default.
+		Set clearComplexPropertyBeforeSet to false to restore this behavior.
+	-->
+	<extension target="org.nuxeo.ecm.core.schema.TypeService" point="configuration">
+		<configuration>
+			<clearComplexPropertyBeforeSet>false</clearComplexPropertyBeforeSet> <!-- false is DEPRECATED since 9.3 -->
+		</configuration>
+	</extension>
+
 	<!--
 		Register new MIME types that are not in the default set
 	-->

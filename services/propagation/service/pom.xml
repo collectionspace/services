@@ -3,14 +3,14 @@
 
     <parent>
         <groupId>org.collectionspace.services</groupId>
-        <artifactId>org.collectionspace.services.propagation</artifactId>        
+        <artifactId>org.collectionspace.services.propagation</artifactId>
         <version>5.2-SNAPSHOT</version>
     </parent>
-    
+
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.collectionspace.services.propagation.service</artifactId>
     <name>services.propagation.service</name>
-    <packaging>jar</packaging>       
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
@@ -47,7 +47,7 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
         </dependency>
-        
+
       <!-- javax -->
 
         <dependency>
@@ -62,18 +62,12 @@
             <artifactId>dom4j</artifactId>
             <scope>provided</scope>
         </dependency>
-        
+
         <!-- jboss -->
 
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>tjws</groupId>
-                    <artifactId>webserver</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -83,7 +77,7 @@
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-multipart-provider</artifactId>
         </dependency>
-        
+
         <!-- nuxeo -->
 
         <dependency>
@@ -98,9 +92,8 @@
         </dependency>
 
     </dependencies>
-    
+
     <build>
         <finalName>collectionspace-services-propagation</finalName>
     </build>
 </project>
-

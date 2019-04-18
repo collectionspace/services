@@ -3,14 +3,14 @@
 
     <parent>
         <groupId>org.collectionspace.services</groupId>
-        <artifactId>org.collectionspace.services.systeminfo</artifactId>        
+        <artifactId>org.collectionspace.services.systeminfo</artifactId>
         <version>5.2-SNAPSHOT</version>
     </parent>
-    
+
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.collectionspace.services.systeminfo.service</artifactId>
     <name>services.systeminfo.service</name>
-    <packaging>jar</packaging>       
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
@@ -26,7 +26,7 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.systeminfo.client</artifactId>
             <version>${project.version}</version>
-        </dependency>        
+        </dependency>
 
         <!-- External dependencies -->
 
@@ -39,7 +39,7 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
         </dependency>
-        
+
       <!-- javax -->
 
         <dependency>
@@ -48,18 +48,12 @@
             <version>1.0.01</version>
             <scope>provided</scope>
         </dependency>
-        
+
         <!-- jboss -->
 
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>tjws</groupId>
-                    <artifactId>webserver</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -69,11 +63,10 @@
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-multipart-provider</artifactId>
         </dependency>
-        
+
     </dependencies>
-    
+
     <build>
         <finalName>collectionspace-services-systeminfo-service</finalName>
     </build>
 </project>
-

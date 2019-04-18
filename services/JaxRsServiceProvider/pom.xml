@@ -52,7 +52,7 @@
   			<scope>provided</scope>
   			<version>4.7.2</version>
   		</dependency>
-    
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -82,7 +82,7 @@
             <version>1.6.1</version>
             <scope>test</scope>
         </dependency>
-        <!-- CollectionSpace dependencies -->        
+        <!-- CollectionSpace dependencies -->
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authorization.service</artifactId>
@@ -146,18 +146,6 @@
 					<groupId>com.sun.faces</groupId>
 				</exclusion>
 				<exclusion>
-					<artifactId>jersey-server</artifactId>
-					<groupId>com.sun.jersey</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>jersey-servlet</artifactId>
-					<groupId>com.sun.jersey</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>jersey-core</artifactId>
-					<groupId>com.sun.jersey</groupId>
-				</exclusion>
-				<exclusion>
 					<artifactId>lucene-sandbox</artifactId>
 					<groupId>org.apache.lucene</groupId>
 				</exclusion>
@@ -198,7 +186,7 @@
 					<groupId>com.sun.xml.bind</groupId>
 				</exclusion>
 			</exclusions>
-		</dependency>        
+		</dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.account.service</artifactId>
@@ -217,7 +205,7 @@
                     <groupId>org.collectionspace.services</groupId>
                     <artifactId>org.collectionspace.services.authorization-mgt.import</artifactId>
                 </exclusion>
-            </exclusions> 
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
@@ -304,7 +292,7 @@
             <artifactId>org.collectionspace.services.systeminfo.service</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>       
+        <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.media.service</artifactId>
             <version>${project.version}</version>
@@ -568,7 +556,7 @@
             	</exclusion>
             </exclusions>
         </dependency>
-        
+
 		<!-- AspectJ dependencies -->
 		<dependency>
 			<groupId>org.aspectj</groupId>
@@ -585,12 +573,13 @@
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjweaver</artifactId>
 			<version>${aspectj.version}</version>
-		</dependency>        
+		</dependency>
 
         <!-- javax -->
         <dependency>
-			<artifactId>servlet-api</artifactId>
-			<groupId>javax.servlet</groupId>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-servlet-api</artifactId>
+			<version>${tomcat.version}</version>
 			<scope>provided</scope>
         </dependency>
 
@@ -601,8 +590,8 @@
             <version>2.2.2.SP8</version>
             <scope>provided</scope>
         </dependency>
-        
-        <!-- nuxeo -->        
+
+        <!-- nuxeo -->
         <dependency>
             <groupId>org.nuxeo.common</groupId>
             <artifactId>nuxeo-common</artifactId>
@@ -619,7 +608,7 @@
                     <groupId>xerces</groupId>
                     <artifactId>xercesImpl</artifactId>
                 </exclusion>
-            </exclusions> 
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
@@ -630,18 +619,9 @@
             <artifactId>nuxeo-core-convert</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.nuxeo.lib.core</groupId>
-            <artifactId>nuxeo-core-storage-sql-extensions</artifactId>
-			<version>${nuxeo.core.version}</version>            
-        </dependency>
-        <dependency>
-            <groupId>org.nuxeo.ecm.core</groupId>
-            <artifactId>nuxeo-core-storage-sql-ra</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-query</artifactId>
-			<version>${nuxeo.core.version}</version>            
+			<version>${nuxeo.core.version}</version>
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
@@ -660,7 +640,7 @@
 				<version>5.5-NXP-8140</version>
 				need to use this patched Nuxeo artifact that is only available on our public Maven
 				repository -see http://nightly.collectionspace.org:8081/artifactory
-				
+
 				Once the issue is resolved and a public version of the artifact becomes available, we
 				should revert this dependency's version to be the following:
 			<version>${nuxeo.core.version}</version>
@@ -704,25 +684,20 @@
         <dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-platform-imaging-core</artifactId>
-			<version>${nuxeo.core.version}</version>
+			<version>${nuxeo.platform.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-platform-audit-api</artifactId>
 			<version>${nuxeo.core.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>jersey-client</artifactId>
-					<groupId>com.sun.jersey</groupId>
-				</exclusion>
-			</exclusions>
         </dependency>
         <dependency>
             <groupId>org.nuxeo.runtime</groupId>
             <artifactId>nuxeo-runtime-osgi</artifactId>
-			<version>${nuxeo.core.version}</version>            
+			<version>${nuxeo.core.version}</version>
         </dependency>
-		
+
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
@@ -758,7 +733,7 @@
 		  <artifactId>qdox</artifactId>
 		  <version>1.6.1</version>
 		</dependency>
-		<!-- 
+		<!--
         <dependency>
 		  <groupId>apache-xerces</groupId>
 		  <artifactId>xml-apis</artifactId>
@@ -947,4 +922,3 @@
         </pluginManagement>
     </build>
 </project>
-

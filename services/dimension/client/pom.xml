@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.collectionspace.services.dimension.client</artifactId>
     <name>services.dimension.client</name>
-    
+
     <dependencies>
         <!-- keep slf4j dependencies on the top -->
         <dependency>
@@ -38,14 +38,14 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
             </dependency>
-        <!-- 
+        <!--
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.IntegrationTests</artifactId>
             <version>${project.version}</version>
         </dependency>
         -->
-        
+
         <!-- External dependencies -->
         <dependency>
             <groupId>org.testng</groupId>
@@ -55,13 +55,6 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
-            <!-- filter out unwanted jars -->
-            <exclusions>
-                <exclusion>
-                    <groupId>tjws</groupId>
-                    <artifactId>webserver</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -76,9 +69,8 @@
             <artifactId>commons-httpclient</artifactId>
         </dependency>
     </dependencies>
-    
+
     <build>
         <finalName>collectionspace-services-dimension-client</finalName>
     </build>
 </project>
-

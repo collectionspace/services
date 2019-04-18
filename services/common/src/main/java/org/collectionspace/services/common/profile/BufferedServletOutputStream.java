@@ -3,6 +3,8 @@ package org.collectionspace.services.common.profile;
 import java.io.*;
 import javax.servlet.*;
 
+import org.apache.commons.lang.NotImplementedException;
+
 public class BufferedServletOutputStream extends ServletOutputStream {
     // the actual buffer
     private ByteArrayOutputStream bos = new ByteArrayOutputStream( );
@@ -35,5 +37,15 @@ public class BufferedServletOutputStream extends ServletOutputStream {
     public void setBufferSize(int size) {
         // no way to resize an existing ByteArrayOutputStream
         this.bos = new ByteArrayOutputStream(size);
+    }
+
+    @Override
+    public boolean isReady() {
+        return false;
+    }
+
+    @Override
+    public void setWriteListener(WriteListener listener) {
+        throw new NotImplementedException();
     }
 }

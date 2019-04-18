@@ -13,7 +13,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<cspace.services.version>5.2-SNAPSHOT</cspace.services.version>
 		<cspace.services.client.version>5.2-SNAPSHOT</cspace.services.client.version>
-		<nuxeo.general.release>7.10-HF17</nuxeo.general.release>
+		<nuxeo.general.release>9.10</nuxeo.general.release>
 		<nuxeo.shell.version>${nuxeo.general.release}</nuxeo.shell.version>
 		<nuxeo.platform.version>${nuxeo.general.release}</nuxeo.platform.version>
 		<nuxeo.core.version>${nuxeo.general.release}</nuxeo.core.version>
@@ -137,20 +137,31 @@
 
 		<repository>
 			<id>public-snapshot</id>
-			<url>http://maven.nuxeo.org/public-snapshot</url>
+			<url>https://maven-eu.nuxeo.org/nexus/content/repositories/public-snapshots</url>
 			<!-- Nuxeo Snapshots Repository is disabled. -->
 			<releases>
 				<enabled>false</enabled>
 			</releases>
 			<snapshots>
-				<enabled>false</enabled>
 				<!--<updatePolicy>never</updatePolicy> -->
 			</snapshots>
 		</repository>
 
 		<repository>
 			<id>public</id>
-			<url>http://maven.nuxeo.org/public</url>
+			<url>https://maven-eu.nuxeo.org/nexus/content/repositories/public-releases</url>
+			<!-- Nuxeo Releases Repository is disabled. -->
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+
+		<repository>
+			<id>vendor-releases</id>
+			<url>https://maven-eu.nuxeo.org/nexus/content/repositories/vendor-releases</url>
 			<!-- Nuxeo Releases Repository is disabled. -->
 			<releases>
 				<enabled>true</enabled>
@@ -482,6 +493,170 @@
 				<version>3.0</version>
 				<scope>provided</scope>
 			</dependency>
+
+			<!-- Start of Nuxeo dependencies -->
+			<dependency>
+				<groupId>org.nuxeo.ecm.automation</groupId>
+				<artifactId>nuxeo-automation-io</artifactId>
+				<version>${nuxeo.core.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>com.sun.jersey</groupId>
+						<artifactId>jersey-core</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.sun.jersey</groupId>
+						<artifactId>jersey-server</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.sun.jersey</groupId>
+						<artifactId>jersey-servlet</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.nuxeo.ecm.core</groupId>
+				<artifactId>nuxeo-core</artifactId>
+				<version>${nuxeo.core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.nuxeo.ecm.core</groupId>
+				<artifactId>nuxeo-core-api</artifactId>
+				<version>${nuxeo.core.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>com.sun.jersey</groupId>
+						<artifactId>jersey-servlet</artifactId>
+					</exclusion>
+					<!-- <exclusion>
+							<artifactId>jboss-remoting</artifactId>
+							<groupId>jboss</groupId>
+					</exclusion> -->
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.nuxeo.common</groupId>
+				<artifactId>nuxeo-common</artifactId>
+				<version>${nuxeo.core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.nuxeo.ecm.platform</groupId>
+				<artifactId>nuxeo-platform-imaging-core</artifactId>
+				<version>${nuxeo.platform.version}</version>
+				<scope>provided</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>com.sun.jersey</groupId>
+						<artifactId>jersey-core</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.sun.jersey</groupId>
+						<artifactId>jersey-server</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.sun.jersey</groupId>
+						<artifactId>jersey-servlet</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.nuxeo.runtime</groupId>
+				<artifactId>nuxeo-runtime</artifactId>
+				<version>${nuxeo.core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.nuxeo.ecm.core</groupId>
+				<artifactId>nuxeo-core-schema</artifactId>
+				<version>${nuxeo.core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.nuxeo.ecm.core</groupId>
+				<artifactId>nuxeo-core-storage-sql</artifactId>
+				<version>${nuxeo.core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.nuxeo.ecm.core</groupId>
+				<artifactId>nuxeo-core-storage-sql-ra</artifactId>
+				<version>${nuxeo.core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.nuxeo.ecm.core</groupId>
+				<artifactId>nuxeo-core-io</artifactId>
+				<version>${nuxeo.core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.nuxeo.ecm.core</groupId>
+				<artifactId>nuxeo-core-convert</artifactId>
+				<version>${nuxeo.core.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>com.sun.jersey</groupId>
+						<artifactId>jersey-core</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.nuxeo.ecm.core</groupId>
+				<artifactId>nuxeo-opencmis-impl</artifactId>
+				<version>${nuxeo.core.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>com.sun.jersey</groupId>
+						<artifactId>jersey-core</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.sun.jersey</groupId>
+						<artifactId>jersey-server</artifactId>
+					</exclusion>
+					<exclusion>
+						<artifactId>jersey-servlet</artifactId>
+						<groupId>com.sun.jersey</groupId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.nuxeo.ecm.core</groupId>
+				<artifactId>nuxeo-opencmis-bindings</artifactId>
+				<version>${nuxeo.core.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>com.sun.jersey</groupId>
+						<artifactId>jersey-core</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.nuxeo.runtime</groupId>
+				<artifactId>nuxeo-runtime-jtajca</artifactId>
+				<version>${nuxeo.core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.nuxeo.runtime</groupId>
+				<artifactId>nuxeo-runtime-datasource</artifactId>
+				<version>${nuxeo.core.version}</version>
+			</dependency>
+			<!-- End of Nuxeo dependencies -->
+
+			<!-- Tomcat -->
+			<dependency>
+				<groupId>org.apache.tomcat</groupId>
+				<artifactId>tomcat-dbcp</artifactId>
+				<version>${tomcat.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.tomcat</groupId>
+				<artifactId>tomcat-catalina</artifactId>
+				<version>${tomcat.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.tomcat</groupId>
+				<artifactId>tomcat-servlet-api</artifactId>
+				<version>${tomcat.version}</version>
+				<scope>provided</scope>
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 

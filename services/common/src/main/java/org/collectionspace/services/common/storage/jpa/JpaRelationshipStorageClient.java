@@ -50,7 +50,6 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.document.JaxbUtils;
-import org.hsqldb.lib.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,13 +59,13 @@ import org.slf4j.LoggerFactory;
  * create/post inserts multiple tuples between the given object and subjects
  * get retrieves all subjects for the given object in relationship
  * delete deletes all subjects for the given object in relationship
- * @author 
+ * @author
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
 
     private final Logger logger = LoggerFactory.getLogger(JpaRelationshipStorageClient.class);
-    
+
     public JpaRelationshipStorageClient() {
     	//empty
     }
@@ -87,8 +86,8 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
             DocumentHandler handler) throws BadRequestException,
             DocumentException {
     	String result = null;
-    	
-    	JPATransactionContext jpaTransactionContext = (JPATransactionContext)ctx.openConnection();    	
+
+    	JPATransactionContext jpaTransactionContext = (JPATransactionContext)ctx.openConnection();
         try {
             jpaTransactionContext.beginTransaction();
             handler.prepare(Action.CREATE);
@@ -99,7 +98,7 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
                 JaxbUtils.setValue(relationship, "setCreatedAtItem", Date.class, new Date());
                 jpaTransactionContext.persist(relationship);
             }
-            handler.complete(Action.CREATE, wrapDoc); 
+            handler.complete(Action.CREATE, wrapDoc);
             jpaTransactionContext.commitTransaction();
             result = "0"; // meaningless result
         } catch (BadRequestException bre) {
@@ -116,7 +115,7 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
         	}
             ctx.closeConnection();
         }
-        
+
         return result;
     }
 
@@ -140,18 +139,18 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
 	            logger.error(msg);
 	            throw new DocumentNotFoundException(msg);
 	        }
-	        
+
 	        String objectId = getObjectId(ctx);
 	        DocumentFilter docFilter = handler.getDocumentFilter();
 	        if (docFilter == null) {
 	            docFilter = handler.createDocumentFilter();
 	        }
-        
+
             handler.prepare(Action.GET);
             StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
             queryStrBldr.append(getEntityName(ctx));
             queryStrBldr.append(" a");
-            
+
             String joinFetch = docFilter.getJoinFetchClause();
             if (Tools.notBlank(joinFetch)) {
                 queryStrBldr.append(" " + joinFetch);
@@ -198,7 +197,7 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
             ctx.closeConnection();
         }
     }
-    
+
     /**
      * Gets the id.
      *
@@ -207,7 +206,7 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
      */
     private Long getId(T relationship) {
     	Long result = null;
-    	
+
     	if (relationship != null) {
 	    	if (relationship instanceof AccountRoleRel) {
 	    		AccountRoleRel accountRoleRel = (AccountRoleRel)relationship;
@@ -217,10 +216,10 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
 	    		result = permissionRoleRel.getHjid();
 	    	}
     	}
-    	
+
     	return result;
     }
-    
+
     /**
      * Gets the relationship.
      *
@@ -232,7 +231,7 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
     private T getRelationship(JPATransactionContext jpaTransactionContext, T relationship)
     		throws DocumentNotFoundException {
     	Long id = getId(relationship);
-    	
+
         T relationshipFound = (T)jpaTransactionContext.find(relationship.getClass(), id);
         if (relationshipFound == null) {
             String msg = "Could not find relationship with id=" + id;
@@ -241,7 +240,7 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
             }
             throw new DocumentNotFoundException(msg);
         }
-        
+
         return relationshipFound;
     }
 
@@ -263,7 +262,7 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
             logger.error(msg);
             throw new DocumentNotFoundException(msg);
         }
-        
+
         String objectId = getObjectId(ctx);
         if (logger.isDebugEnabled()) {
             logger.debug("delete: using objectId=" + objectId);
@@ -272,8 +271,8 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
         if (logger.isDebugEnabled()) {
             logger.debug("delete: using object class=" + objectClass.getName());
         }
-        
-    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();    	
+
+    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();
         try {
             StringBuilder deleteStr = new StringBuilder("DELETE FROM ");
             String entityName = getEntityName(ctx);
@@ -321,8 +320,8 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
     public boolean delete(ServiceContext ctx, String id, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
     	boolean result = true;
-    	
-    	JPATransactionContext jpaTransactionContext = (JPATransactionContext)ctx.openConnection();    	
+
+    	JPATransactionContext jpaTransactionContext = (JPATransactionContext)ctx.openConnection();
         try {
         	jpaTransactionContext.beginTransaction();
             handler.prepare(Action.DELETE);
@@ -349,7 +348,7 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
         } finally {
         	ctx.closeConnection();
         }
-        
+
         return result;
     }
 
@@ -360,7 +359,7 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
      */
     protected String getObjectId(ServiceContext ctx) {
         String objectId = (String) ctx.getProperty(ServiceContextProperties.OBJECT_ID);
-        
+
         if (objectId == null) {
             String msg = ServiceContextProperties.OBJECT_ID + " property is missing in the context";
             logger.error(msg);
@@ -377,13 +376,13 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
      */
     protected Class getObjectClass(ServiceContext ctx) {
         Class objectClass = (Class) ctx.getProperty(ServiceContextProperties.OBJECT_CLASS);
-        
+
         if (objectClass == null) {
             String msg = ServiceContextProperties.OBJECT_CLASS + " property is missing in the context";
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }
-        
+
         return objectClass;
     }
 
