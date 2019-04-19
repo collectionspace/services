@@ -1266,12 +1266,16 @@
   '29-IV-2018':                          # Day-Month-Year with roman numeral as month 
                                          earliestSingleDate: [2018,  4,  29, CE]
 
-  '01-IV-2017 BCE':                          # Day-Month-Year with roman numeral as month, with Era
-                                          earliestSingleDate: [2017, 4, 1, BCE]  
+  '01-IV-2017 BCE':                      # Day-Month-Year with roman numeral as month, with Era
+                                         earliestSingleDate: [2017, 4, 1, BCE]  
   
-  # '12 june 1942 - 13 june 1943':            # hyphenatedRange, date with comma'd numbers
-  #                                        earliestSingleDate: [1942,  6,  12, CE]
-  #                                        latestDate:         [1942,  6,  13, CE]
+  '12 june 1942 BCE - 13 june 1943':     # hyphenatedRange range with era only in first interval, mixed eras
+                                         earliestSingleDate: [1942,  6,  12, BCE]
+                                         latestDate:         [1943,  6,  13, CE]
+
+  '13 april 1995 CE - 18 april 2019':    # hyphenatedRange range with era only in first interval
+                                         earliestSingleDate: [1995, 4, 13, CE]
+                                         latestDate:         [2019, 4, 18, CE]
 
 # -------------------------------------------------------------------------------------------------------
 # Invalid dates
