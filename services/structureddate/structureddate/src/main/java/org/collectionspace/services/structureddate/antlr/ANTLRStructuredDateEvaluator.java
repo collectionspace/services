@@ -76,6 +76,7 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Nu
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartOfContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartialCenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartialDecadeContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartialEraRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartialYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.RomanDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterCenturyContext;
@@ -1198,6 +1199,23 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	}
 
 	@Override
+	public void exitPartialEraRange(PartialEraRangeContext ctx) {
+		if (ctx.exception != null) return;
+
+		Integer secondYear = (Integer) stack.pop();
+		Integer secondMonth = (Integer) stack.pop();
+		Integer secondDay = (Integer) stack.pop();
+
+		Era era = (Era) stack.pop();
+		Integer firstYear = (Integer) stack.pop();
+		Integer firstMonth = (Integer) stack.pop();
+		Integer firstDay = (Integer) stack.pop();
+
+		stack.push(new Date(secondYear, secondMonth, secondDay, null));
+		stack.push(new Date(firstYear, firstMonth, firstDay, era));
+	}
+
+	@Override
 	public void exitNum(NumContext ctx) {
 		if (ctx.exception != null) return;
 
@@ -1219,7 +1237,6 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitRomanDate(RomanDateContext ctx) {
 		if (ctx.exception != null) return;
-		System.out.println("I am going in here");
 		
 		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer year = (Integer) stack.pop();

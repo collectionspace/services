@@ -20,7 +20,8 @@ displayDate:           uncertainDate
 
 uncertainDate:         CIRCA certainDate ;
 
-certainDate:           hyphenatedRange
+certainDate:           partialEraRange
+|                      hyphenatedRange
 |                      singleInterval
 ;
 
@@ -96,6 +97,7 @@ century:               ( strCentury | numCentury ) era? ;
 
 millennium:            nth MILLENNIUM era? ;
 
+partialEraRange:      num strMonth num era (DASH|HYPHEN) num strMonth num ;
 romanDate:             num (HYPHEN | SLASH) romanMonth (HYPHEN | SLASH) numYear era? ;
 strDate:               strMonth ( numDayOfMonth | nth ) COMMA? numYear era?;
 invStrDate:            era num COMMA? strMonth num
