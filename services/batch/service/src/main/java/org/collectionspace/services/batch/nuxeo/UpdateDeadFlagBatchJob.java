@@ -71,7 +71,7 @@ public class UpdateDeadFlagBatchJob extends AbstractBatchJob {
 		String actionCode = getFieldValue(payload, MovementBotGardenConstants.ACTION_CODE_SCHEMA_NAME, MovementBotGardenConstants.ACTION_CODE_FIELD_NAME);
 		logger.debug("actionCode=" + actionCode);
 
-		if (actionCode.contains(MovementBotGardenConstants.DEAD_ACTION_CODE) || actionCode.contains(MovementBotGardenConstants.REVIVED_ACTION_CODE)) {
+		if (actionCode != null) {
 			String actionDate = getFieldValue(payload, MovementBotGardenConstants.ACTION_DATE_SCHEMA_NAME,
 					MovementBotGardenConstants.ACTION_DATE_FIELD_NAME);
 			logger.debug("actionDate=" + actionDate);
@@ -117,7 +117,7 @@ public class UpdateDeadFlagBatchJob extends AbstractBatchJob {
 				MovementBotGardenConstants.ACTION_CODE_FIELD_NAME);
 		logger.debug("actionCode=" + actionCode);
 
-		if (actionCode.contains(MovementBotGardenConstants.DEAD_ACTION_CODE) || actionCode.contains(MovementBotGardenConstants.REVIVED_ACTION_CODE)) {
+		if (actionCode != null) {
 			String actionDate = getFieldValue(payload, MovementBotGardenConstants.ACTION_DATE_SCHEMA_NAME,
 					MovementBotGardenConstants.ACTION_DATE_FIELD_NAME);
 			logger.debug("actionDate=" + actionDate);
@@ -157,7 +157,7 @@ public class UpdateDeadFlagBatchJob extends AbstractBatchJob {
 
 			logger.debug("updating dead flag: collectionObjectCsid=" + collectionObjectCsid + " actionCode=" + actionCode + " isDead=" + isDead);
 
-			if (actionCode.contains(MovementBotGardenConstants.REVIVED_ACTION_CODE)) {
+			if (!actionCode.contains(MovementBotGardenConstants.DEAD_ACTION_CODE)) {
 				if (isDead) {
 					/*
 					 * The object is dead, but a location was revived. Unset the dead flag and date on the object.
