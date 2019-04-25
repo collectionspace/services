@@ -178,6 +178,12 @@ public class VocabularyResource extends
             	repoSession.setTransactionRollbackOnly();
             	throw t;
             } finally {
+				try {
+					Thread.sleep(120000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
             	repoClient.releaseRepositorySession(ctx, repoSession);
             }
         } catch (Exception e) {

@@ -395,7 +395,7 @@
 			<dependency>
 				<groupId>org.nuxeo.runtime</groupId>
 				<artifactId>nuxeo-runtime-datasource</artifactId>
-				<version>${nuxeo.core.version}</version>
+				<version>7.10-HF48-SNAPSHOT</version>
 			</dependency>
 			<!-- End of Nuxeo dependencies -->
 

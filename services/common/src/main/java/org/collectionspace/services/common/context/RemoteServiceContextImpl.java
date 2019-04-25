@@ -164,7 +164,7 @@ public class RemoteServiceContextImpl<IT, OT>
      */
     @Override
     public void setInput(IT input) {
-    	if (logger.isDebugEnabled()) {
+    	if (logger.isTraceEnabled()) {
 	        if (this.input != null) {
 	            String msg = "\n#\n# Resetting or changing an context's input is not advised.\n#";
 	            logger.warn(msg);

@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.security.Principal;
 
+import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.repository.RepositoryInstanceWrapperAdvice;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
@@ -34,6 +35,7 @@ import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.NuxeoPrincipal;
 import org.nuxeo.ecm.core.api.SystemPrincipal;
 import org.nuxeo.ecm.core.api.repository.RepositoryManager;
+import org.nuxeo.ecm.core.api.security.SecurityConstants;
 import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.runtime.jtajca.NuxeoContainer;
 import org.nuxeo.runtime.transaction.TransactionHelper;
@@ -53,7 +55,7 @@ public final class NuxeoClientEmbedded {
 
 	private Logger logger = LoggerFactory.getLogger(NuxeoClientEmbedded.class);
 	
-    private final HashMap<String, CoreSessionInterface> repositoryInstances;
+    private static final HashMap<String, CoreSessionInterface> repositoryInstances = new HashMap<String, CoreSessionInterface>();
 
     private RepositoryManager repositoryMgr;
 
@@ -66,7 +68,7 @@ public final class NuxeoClientEmbedded {
      * of this constructor is recommended.
      */
     private NuxeoClientEmbedded() {
-        repositoryInstances = new HashMap<String, CoreSessionInterface>();
+    	// Intentionally left blank
     }
     
     public static NuxeoClientEmbedded getInstance() {
@@ -75,6 +77,18 @@ public final class NuxeoClientEmbedded {
 
     public synchronized void tryDisconnect() throws Exception {
         doDisconnect();
+    }
+    
+    synchronized private void addToRepositoryInstances(String key, CoreSessionInterface value) throws Exception {
+    	if (repositoryInstances.containsKey(key) == false) {
+    		repositoryInstances.put(key, value);
+    	} else {
+    		throw new Exception(String.format("Attempted to add an existing Nuxeo repo instance '%s' to our list of open sessions.", key));
+    	}
+    }
+    
+    synchronized private CoreSessionInterface removeFromRepositoryInstances(String key) {
+    	return repositoryInstances.remove(key);
     }
 
     private void doDisconnect() throws Exception {
@@ -236,10 +250,11 @@ public final class NuxeoClientEmbedded {
         if (repository != null) {
             result = getCoreSessionWrapper(repository);
             if (result != null) {
-	        	logger.trace(String.format("A new transaction was started on thread '%d' : %s.",
-	        			Thread.currentThread().getId(), startedTransaction ? "true" : "false"));
-	        	logger.trace(String.format("Added a new repository instance to our repo list.  Current count is now: %d",
-	        			repositoryInstances.size()));
+            	String currentThreadName = Thread.currentThread().getName() + ":" + Thread.currentThread().getId();
+	        	logger.trace(String.format("Thread '%s': A new transaction was started '%s'.",
+	        			currentThreadName, startedTransaction ? "true" : "false"));
+	        	logger.trace(String.format("Thread '%s' added a new repository instance to our repo list.  Current count is now: %d",
+	        			currentThreadName, repositoryInstances.size()));
             }
         }
         
@@ -289,22 +304,33 @@ public final class NuxeoClientEmbedded {
      * Nuxeo repository and check for network related failures.  We will retry all calls to the Nuxeo repo that fail because
      * of network erros.
      */
-    private CoreSessionInterface getCoreSessionWrapper(Repository repository) {
+    private CoreSessionInterface getCoreSessionWrapper(Repository repository) throws Exception {
     	CoreSessionInterface result = null;
-    	    	
+
+//    	public static CoreSession openCoreSessionSystem(String repositoryName, String originatingUsername) {
+//            NuxeoPrincipal principal = getPrincipal((SecurityConstants.SYSTEM_USERNAME));
+//            principal.setOriginatingUser(originatingUsername);
+//            return openCoreSession(repositoryName, principal);
+//        }
     	CoreSession coreSession = null;
-    	try {
-    		coreSession = CoreInstance.openCoreSession(repository.getName(), getSystemPrincipal());  // A Nuxeo repo instance handler proxy
-    	} catch (Exception e) {
-    		logger.warn(String.format("Could not open a session to the '%s' repository.  The current request to the CollectionSpace services API will fail.",
-    				repository != null ? repository.getName() : "not specified"), e);
-    	}
+		try {
+			String originatingUser = AuthN.get().getUserId();
+			coreSession = CoreInstance.openCoreSessionSystem(repository.getName(), originatingUser); // A Nuxeo repo
+																									// instance handler
+																									// proxy
+		} catch (Exception e) {
+			String currentThreadName = Thread.currentThread().getName() + ":" + Thread.currentThread().getId();
+			logger.warn(String.format(
+					"Thread '%s' could not open a session to the '%s' repository.  The current request to the CollectionSpace services API will fail.",
+					currentThreadName, repository != null ? repository.getName() : "not specified"),
+					e);
+		}
     	
         if (coreSession != null) {
         	result = this.getAOPProxy(coreSession);  // This is our AOP proxy
         	if (result != null) {
 		    	String key = result.getSessionId();
-		        repositoryInstances.put(key, result);
+		        addToRepositoryInstances(key, result);
         	} else {
         		//
         		// Since we couldn't get an AOP proxy, we need to close the core session.
@@ -335,14 +361,15 @@ public final class NuxeoClientEmbedded {
         	throw e;
         } finally {
         	repoSession.close();
-        	CoreSessionInterface wasRemoved = repositoryInstances.remove(key);
+        	CoreSessionInterface wasRemoved = removeFromRepositoryInstances(key);
+        	String currentThreadName = Thread.currentThread().getName() + ":" + Thread.currentThread().getId();
             if (logger.isTraceEnabled()) {
             	if (wasRemoved != null) {
-	            	logger.trace("Removed a repository instance from our repo list.  Current count is now: "
-	            			+ repositoryInstances.size());
+	            	logger.trace(String.format("Thread '%s' removed a repository instance from our list.  Current count is now: %d",
+	            			currentThreadName, repositoryInstances.size()));
             	} else {
-            		logger.trace("Could not remove a repository instance from our repo list.  Current count is now: "
-	            			+ repositoryInstances.size());
+            		logger.trace(String.format("Thread '%s' could ***NOT*** remove a repository instance from our list.  Current count is now: ",
+            				currentThreadName, repositoryInstances.size()));
             	}
             }            
             //
@@ -350,10 +377,11 @@ public final class NuxeoClientEmbedded {
             //
             if (TransactionHelper.isTransactionActiveOrMarkedRollback() == true) {
             	TransactionHelper.commitOrRollbackTransaction();
-            	logger.trace(String.format("Transaction closed on thread '%d'", Thread.currentThread().getId()));
+            	logger.trace(String.format("Thread '%s': Transaction closed.",
+            			currentThreadName));
             } else {
-            	String warnMsg = String.format("Closed a Nuxeo repository session on thread '%d' without closing the containing transaction.",
-            			Thread.currentThread().getId());
+            	String warnMsg = String.format("Thread '%s': Closed a Nuxeo repository session without closing the containing transaction.",
+            			currentThreadName);
             	logger.warn(warnMsg);
             }
         }
