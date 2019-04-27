@@ -1,5 +1,7 @@
 package org.collectionspace.services.jaxrs;
 
+import static org.nuxeo.elasticsearch.ElasticSearchConstants.ES_ENABLED_PROPERTY;
+
 import javax.servlet.ServletContextEvent;
 import javax.ws.rs.core.Response;
 
@@ -86,6 +88,12 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 	}
 
 	public void resetElasticSearchIndex() throws Exception {
+		boolean isEnabled = Boolean.parseBoolean(Framework.getProperty(ES_ENABLED_PROPERTY, "true"));
+
+		if (!isEnabled) {
+			return;
+		}
+
 		ElasticSearchComponent es = (ElasticSearchComponent) Framework.getService(ElasticSearchService.class);
 
 		for (String repositoryName : es.getRepositoryNames()) {
