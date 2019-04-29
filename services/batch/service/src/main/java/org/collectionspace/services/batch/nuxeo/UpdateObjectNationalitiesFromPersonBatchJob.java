@@ -144,6 +144,67 @@ public class UpdateObjectNationalitiesFromPersonBatchJob extends AbstractBatchJo
         }
 
     }
+
+    public void UpdateComputedDisplayName(String personCsid, String newDisplayName) throws URISyntaxException, DocumentException, Exception {
+        InvocationResults results = new InvocationResults();
+
+        String sourceField = "collectionobjects_bampfa:bampfaObjectProductionPerson";
+        String serviceName = "personauthorities";
+
+        List<String> collectionObjectsList =  findReferencingCollectionObjects(serviceName, personCsid, sourceField);
+
+        long numAffected = 0;
+
+        // These are the CSIDs of all the documents that we need to update
+        for (String csid : collectionObjectsList) {
+            PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(csid);
+
+            // Make sure you skip over soft deleted records
+            String workflowState = getFieldValue(collectionObjectPayload, CollectionObjectConstants.WORKFLOW_STATE_SCHEMA_NAME, CollectionObjectConstants.WORKFLOW_STATE_FIELD_NAME);
+
+			if (workflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+				continue;
+			}
+
+            numAffected++;
+
+            // List<String> oldNationalities = getFieldValues(collectionObjectPayload, "collectionobjects_bampfa", "nationalities/nationality");
+            try {
+                updateDisplayName(newDisplayName, csid);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
+        results.setNumAffected(numAffected);
+        return results;
+    }
+
+    public void updateDisplayName(String displayName, String objCsid) throws URISyntaxException {
+        if (logger.isTraceEnabled()) {
+            logger.trace("Updating collection object record with csid=" + objCsid);
+        }
+
+        String updatePayload = 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+            "<document name=\"collectionobjects\">" +
+            "<ns2:collectionobjects_bampfa xmlns:ns2=\"http://collectionspace.org/services/collectionobject/local/bampfa\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
+            "<computedArtistName>\n" + 
+            displayName + 
+            "</computedArtistName>" +
+            "</ns2:collectionobjects_bampfa>" +
+            "</document>";
+        
+        // Perform the update.
+        ResourceMap resourcemap = getResourceMap();
+        NuxeoBasedResource collectionObjectResource = (NuxeoBasedResource) resourcemap.get(CollectionObjectClient.SERVICE_NAME);
+
+        byte[] responseBytes = collectionObjectResource.update(getServiceContext(), resourcemap, createUriInfo(), objCsid, updatePayload);
+
+        if (logger.isDebugEnabled()) {
+	        logger.debug(String.format("Batch resource: Resonse from collectionobject (cataloging record) update: %s", new String(responseBytes)));
+        }
+
+    }
 }
 
 
