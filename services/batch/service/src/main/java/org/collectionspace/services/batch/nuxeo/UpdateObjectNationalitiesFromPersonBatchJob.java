@@ -145,7 +145,7 @@ public class UpdateObjectNationalitiesFromPersonBatchJob extends AbstractBatchJo
 
     }
 
-    public void UpdateComputedDisplayName(String personCsid, String newDisplayName) throws URISyntaxException, DocumentException, Exception {
+    public InvocationResults UpdateComputedDisplayName(String personCsid, String newDisplayName) throws URISyntaxException, DocumentException, Exception {
         InvocationResults results = new InvocationResults();
 
         String sourceField = "collectionobjects_bampfa:bampfaObjectProductionPerson";
