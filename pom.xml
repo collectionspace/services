@@ -495,6 +495,7 @@
 			</dependency>
 
 			<!-- Start of Nuxeo dependencies -->
+
 			<dependency>
 				<groupId>org.nuxeo.ecm.automation</groupId>
 				<artifactId>nuxeo-automation-io</artifactId>
@@ -523,6 +524,7 @@
 				<groupId>org.nuxeo.ecm.core</groupId>
 				<artifactId>nuxeo-core-api</artifactId>
 				<version>${nuxeo.core.version}</version>
+				<scope>provided</scope>
 				<exclusions>
 					<exclusion>
 						<groupId>com.sun.jersey</groupId>
@@ -594,6 +596,12 @@
 						<artifactId>jersey-core</artifactId>
 					</exclusion>
 				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.nuxeo.ecm.core</groupId>
+				<artifactId>nuxeo-core-storage</artifactId>
+				<version>${nuxeo.core.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.nuxeo.ecm.core</groupId>
