@@ -26,9 +26,9 @@ import javax.ws.rs.core.UriInfo;
  * @author Cesar Villalobos
  *
  */
-public class UpdateObjectNationalitiesFromPersonBatchJob extends AbstractBatchJob {
+public class UpdateObjectFromPersonsAuthorityBatchJob extends AbstractBatchJob {
     
-    public UpdateObjectNationalitiesFromPersonBatchJob() {
+    public UpdateObjectFromPersonsAuthorityBatchJob() {
 		this.setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_GROUP));
     }
     

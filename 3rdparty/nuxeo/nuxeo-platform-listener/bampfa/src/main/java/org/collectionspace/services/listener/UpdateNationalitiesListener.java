@@ -12,7 +12,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.batch.BatchResource;
-import org.collectionspace.services.batch.nuxeo.UpdateObjectNationalitiesFromPersonBatchJob;
+import org.collectionspace.services.batch.nuxeo.UpdateObjectFromPersonsAuthorityBatchJob;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.client.BatchClient;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -247,14 +247,14 @@ public class UpdateNationalitiesListener implements EventListener {
     }
     
     /**
-     * Creates an UpdateObjectNationalitiesFromPersonBatchJob that can be called to update any collection objects
+     * Creates an UpdateObjectFromPersonsAuthorityBatchJob that can be called to update any collection objects
      * affected by adding/removing a nationality from a person record.
      * 
      * @param context The document event context associated with this event
-     * @return An UpdateObjectNationalitiesFromPersonBatchJob object that can be used to propagate changes
+     * @return An UpdateObjectFromPersonsAuthorityBatchJob object that can be used to propagate changes
      * to collection object records.
      */
-    private UpdateObjectNationalitiesFromPersonBatchJob updateCollectionObjectsFromPerson(DocumentEventContext context) throws Exception {
+    private UpdateObjectFromPersonsAuthorityBatchJob updateCollectionObjectsFromPerson(DocumentEventContext context) throws Exception {
 
         ResourceMap resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
 		BatchResource batchResource = (BatchResource) resourceMap.get(BatchClient.SERVICE_NAME);
@@ -262,7 +262,7 @@ public class UpdateNationalitiesListener implements EventListener {
 
 		serviceContext.setCurrentRepositorySession(new CoreSessionWrapper(context.getCoreSession()));
 
-        UpdateObjectNationalitiesFromPersonBatchJob updater = new UpdateObjectNationalitiesFromPersonBatchJob();
+        UpdateObjectFromPersonsAuthorityBatchJob updater = new UpdateObjectFromPersonsAuthorityBatchJob();
 
 		updater.setServiceContext(serviceContext);
         updater.setResourceMap(resourceMap);
