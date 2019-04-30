@@ -188,8 +188,8 @@ public class UpdateObjectNationalitiesFromPersonBatchJob extends AbstractBatchJo
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<document name=\"collectionobjects\">" +
             "<ns2:collectionobjects_bampfa xmlns:ns2=\"http://collectionspace.org/services/collectionobject/local/bampfa\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-            "<computedArtistName>\n" + 
-            displayName + 
+            "<computedArtistName>" +
+            displayName +
             "</computedArtistName>" +
             "</ns2:collectionobjects_bampfa>" +
             "</document>";
