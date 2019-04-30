@@ -54,7 +54,7 @@ public class UpdateArtistDisplayNameListener implements EventListener {
 
     public static final String PREVIOUS_DISPLAYNAME_PROPERTY = "UpdateArtistDisplayNameListener.previousName";
 
-    public static final String DISPLAYNAME_FIELD = "termDisplayName";
+    public static final String DISPLAYNAME_FIELD = "personTermGroupList";
 
     @Override
     public void handleEvent(Event event) throws ClientException {
