@@ -99,12 +99,12 @@ public class UpdateArtistDisplayNameListener implements EventListener {
                  */
                 
                 // if they are equal, we don't need to update the lists
-                // if (previousDisplayName.equals(newDisplayName)) {
-                //     if (logger.isTraceEnabled()) {
-                //         logger.trace("There are no changes to the display field in this record. No updates to any collection object required. " + NO_FURTHER_PROCESSING_MESSAGE);
-                //     }
-                //     return;
-                // }
+                if (previousDisplayName.equals(newDisplayName)) {
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("There are no changes to the display field in this record. No updates to any collection object required. " + NO_FURTHER_PROCESSING_MESSAGE);
+                    }
+                    return;
+                }
               
                 
                 try {
