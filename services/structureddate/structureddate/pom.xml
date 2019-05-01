@@ -5,12 +5,12 @@
 	    <artifactId>org.collectionspace.services.structureddate</artifactId>
 	    <version>5.2-SNAPSHOT</version>
 	</parent>
-	
+
 	<modelVersion>4.0.0</modelVersion>
     <artifactId>org.collectionspace.services.structureddate.structureddate</artifactId>
     <name>services.structureddate.structureddate</name>
 	<packaging>jar</packaging>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -54,18 +54,8 @@
 			<artifactId>antlr4-runtime</artifactId>
 			<version>4.1</version>
 		</dependency>
-		<dependency>
-  			<groupId>org.antlr</groupId>
-			<artifactId>antlr4-maven-plugin</artifactId>
-  			<version>4.6</version>
-		</dependency>
-		<dependency>
-    		<groupId>org.sonatype.m2e.extras</groupId>
-    		<artifactId>org.sonatype.m2e.antlr</artifactId>
-    		<version>0.13.0.20110622-1538</version>
-		</dependency>
 	</dependencies>
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -81,7 +71,7 @@
 				</executions>
 			</plugin>
 		</plugins>
-		
+
 		<pluginManagement>
 			<plugins>
 				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
