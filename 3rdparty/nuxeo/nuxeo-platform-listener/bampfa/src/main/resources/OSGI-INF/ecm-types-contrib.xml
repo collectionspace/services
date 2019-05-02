@@ -14,4 +14,17 @@
         </listener>
     </extension>
 
+    <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+        <listener name="updateartistdisplaynamelistener" async="false" postCommit="false"
+                  class="org.collectionspace.services.listener.bampfa.UpdateArtistDisplayNameListener">
+            <!--<event>documentCreated</event>-->
+            <!--<event>documentModified</event>-->
+            <event>beforeDocumentModification</event>
+            <event>documentModified</event>
+            <!-- <event>documentCreated</event> -->
+            <event>lifecycle_transition_event</event>
+            <event>aboutToRemove</event>
+        </listener>
+    </extension>
+
 </component>
