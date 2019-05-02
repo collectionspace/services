@@ -83,7 +83,7 @@ public class UpdateDeadFlagListener extends AbstractCSEventListenerImpl {
 
 					logger.debug("actionCode=" + actionCode);
 
-					if (actionCode != null && (actionCode.contains(MovementBotGardenConstants.DEAD_ACTION_CODE) || actionCode.contains(MovementBotGardenConstants.REVIVED_ACTION_CODE))) {
+					if (actionCode != null) {
 						String movementCsid = doc.getName();
 
 						try {
