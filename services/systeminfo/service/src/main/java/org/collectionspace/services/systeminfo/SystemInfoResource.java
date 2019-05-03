@@ -1,7 +1,11 @@
 package org.collectionspace.services.systeminfo;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.TimeZone;
 
 import javax.ws.rs.Consumes;
@@ -19,11 +23,13 @@ import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.URIResourceImpl;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.CSWebApplicationException;
+import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.security.UnauthorizedException;
+import org.nuxeo.runtime.api.Framework;
 
 @Path(SystemInfoClient.SERVICE_PATH)
 @Produces({"application/xml"})
@@ -46,18 +52,18 @@ public class SystemInfoResource extends AbstractCollectionSpaceResourceImpl<Syst
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	//
 	// API Endpoints
 	//
-	
+
     @GET
     public SystemInfoCommon get(@Context UriInfo ui) {
     	SystemInfoCommon result = null;
 
     	try {
     		result = new SystemInfoCommon();
-    		result.setInstanceId("_default");
+    		result.setInstanceId(ServiceMain.getInstance().getCspaceInstanceId());
     		result.setDisplayName("CollectionSpace Services v5.1");
     		Version ver = new Version();
     		ver.setMajor("5");
@@ -65,7 +71,7 @@ public class SystemInfoResource extends AbstractCollectionSpaceResourceImpl<Syst
     		ver.setPatch("0");
     		ver.setBuild("1");
     		result.setVersion(ver);
-    		
+
     		result.setHostTimezone(TimeZone.getDefault().getID());
     		result.setHostLocale(Locale.getDefault().toLanguageTag());
     		result.setHostCharset(Charset.defaultCharset().name());
@@ -76,11 +82,30 @@ public class SystemInfoResource extends AbstractCollectionSpaceResourceImpl<Syst
     			ServiceContext<SystemInfoCommon, SystemInfoCommon> ctx = createServiceContext(getServiceName(), ui);
     			CSpaceResource res = new URIResourceImpl(ctx.getTenantId(), SystemInfoClient.SERVICE_NAME, HttpMethod.DELETE);
     			if (AuthZ.get().isAccessAllowed(res)) {
-    	    		result.setNuxeoVersionString("7.10-HF17");
-    	    		result.setHost(String.format("Architecture:%s Name:%s Version:%s",
-    	    				System.getProperty("os.arch"), System.getProperty("os.name"), System.getProperty("os.version")));
-    	    		result.setJavaVersionString(System.getProperty("java.version"));
-    	    		result.setPostgresVersionString("9.5.7");
+						// TODO: Stop hardcoding this!
+						// result.setNuxeoVersionString("7.10-HF17");
+						result.setHost(String.format("Architecture:%s Name:%s Version:%s",
+								System.getProperty("os.arch"), System.getProperty("os.name"), System.getProperty("os.version")));
+						result.setJavaVersionString(System.getProperty("java.version"));
+
+						// TODO: Stop hardcoding this!
+						// result.setPostgresVersionString("9.5.7");
+
+						Properties properties = Framework.getProperties();
+						List<String> names = new ArrayList<String>(properties.stringPropertyNames());
+						PropertyList nuxeoPropertyList = new PropertyList();
+
+						Collections.sort(names);
+
+						for (String name : names) {
+							Property p = new Property();
+							p.setKey(name);
+							p.setValue(properties.getProperty(name));
+
+							nuxeoPropertyList.getProperty().add(p);
+						}
+
+						result.setNuxeoPropertyList(nuxeoPropertyList);
     			}
     		} catch (UnauthorizedException e) {
     			e.printStackTrace();
@@ -93,7 +118,7 @@ public class SystemInfoResource extends AbstractCollectionSpaceResourceImpl<Syst
 
     	return result;
     }
-    
+
 	@Override
 	public ServiceContextFactory<SystemInfoCommon, SystemInfoCommon> getServiceContextFactory() {
         return (ServiceContextFactory<SystemInfoCommon, SystemInfoCommon>) RemoteServiceContextFactory.get();

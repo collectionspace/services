@@ -2,14 +2,14 @@
 
 <!--
     SystemInfo schema (XSD)
-    
+
     Entity  : SystemInfo
     Part    : Common
     Used for: JAXB binding between XML and Java objects
 
 -->
 
-<xs:schema 
+<xs:schema
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
   jaxb:version="1.0" elementFormDefault="unqualified"
@@ -25,21 +25,22 @@
 -->
 
     <xs:element name="system_info_common">
-		<xs:complexType>
-			<xs:sequence>
-			    <xs:element name="displayName" type="xs:string"/>
-			    <xs:element name="instanceId" type="xs:string"/>
-			    <xs:element name="versionString" type="xs:string"/>
-			    <xs:element name="version" type="version"/>
-			    <xs:element name="javaVersionString" type="xs:string"/>
-			    <xs:element name="nuxeoVersionString" type="xs:string"/>
-			    <xs:element name="postgresVersionString" type="xs:string"/>
-			    <xs:element name="host" type="xs:string"/>
-			    <xs:element name="hostTimezone" type="xs:string"/>
-			    <xs:element name="hostLocale" type="xs:string"/>
-			    <xs:element name="hostCharset" type="xs:string"/>
-			</xs:sequence>
-		</xs:complexType>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="displayName" type="xs:string"/>
+                <xs:element name="instanceId" type="xs:string"/>
+                <xs:element name="versionString" type="xs:string"/>
+                <xs:element name="version" type="version"/>
+                <xs:element name="javaVersionString" type="xs:string"/>
+                <xs:element name="nuxeoVersionString" type="xs:string"/>
+                <xs:element name="postgresVersionString" type="xs:string"/>
+                <xs:element name="host" type="xs:string"/>
+                <xs:element name="hostTimezone" type="xs:string"/>
+                <xs:element name="hostLocale" type="xs:string"/>
+                <xs:element name="hostCharset" type="xs:string"/>
+                <xs:element name="nuxeoPropertyList" type="propertyList"/>
+            </xs:sequence>
+        </xs:complexType>
     </xs:element>
 
     <xs:complexType name="version">
@@ -53,4 +54,17 @@
         </xs:sequence>
     </xs:complexType>
 
+    <xs:complexType name="propertyList">
+        <xs:sequence>
+            <xs:element name="property" type="property" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="property">
+        <xs:sequence>
+            <xs:element name="key" type="xs:string"/>
+            <xs:element name="value" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
 </xs:schema>
