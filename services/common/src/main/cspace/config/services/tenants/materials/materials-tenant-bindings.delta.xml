@@ -25,11 +25,8 @@
                 // index as small as possible. We may want to turn this on in the future, to support arbitrary
                 // searches through Elasticsearch, e.g. NXQL queries for ad hoc reporting in the CSpace UI.
                 "dynamic": false,
-                "_size" : {
-                  "enabled" : true
-                },
                 "_all" : {
-                  "analyzer" : "fulltext"
+                  "enabled": false
                 },
                 "_source": {
                   "includes": [
@@ -96,40 +93,40 @@
                   ]
                 },
                 "properties" : {
+                  "all_field": {
+                    "type": "text",
+                    "analyzer": "fulltext"
+                  },
+
                   "ecm:currentLifeCycleState": {
-                    "type": "string",
-                    "include_in_all": "false"
+                    "type": "keyword"
                   },
                   "ecm:name": {
-                    "type": "string",
-                    "include_in_all": "false"
+                    "type": "keyword"
                   },
                   "ecm:primaryType": {
-                    "type": "string",
-                    "analyzer" : "doctype_analyzer",
-                    "include_in_all": "false"
+                    "type": "text",
+                    "analyzer" : "doctype_analyzer"
                   },
 
                   "collectionspace_denorm:title": {
-                    "type": "string",
-                    "analyzer" : "sorting_analyzer",
-                    "include_in_all": "false"
+                    "type": "text",
+                    "analyzer": "sorting_analyzer"
                   },
                   "collectionspace_denorm:commercialNames": {
-                    "type": "string",
-                    "analyzer" : "fulltext",
-                    "include_in_all": "false"
+                    "type": "text",
+                    "analyzer": "fulltext"
                   },
                   "collectionspace_denorm:commonNames": {
-                    "type": "string",
-                    "analyzer" : "fulltext",
-                    "include_in_all": "false"
+                    "type": "text",
+                    "analyzer": "fulltext"
                   },
                   "collectionspace_denorm:holdingInstitutions": {
-                    "type": "string",
+                    "type": "keyword",
+                    "copy_to": "all_field",
                     "fields": {
                       "displayName": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "refname_displayname_analyzer"
                       }
                     }
@@ -139,27 +136,27 @@
                     "type": "date",
                     // Sometimes the timestamp only has a two digit fractional second, instead of three.
                     // From imported data??
-                    "format" : "date_time||yyyy-MM-dd'T'HH:mm:ss.SSZZ",
-                    "include_in_all": "false"
+                    "format" : "date_time||yyyy-MM-dd'T'HH:mm:ss.SSZZ"
                   },
 
                   "materials_common:shortIdentifier": {
-                    "type": "string"
+                    "type": "keyword",
+                    "copy_to": "all_field"
                   },
                   "materials_common:materialTermGroupList": {
                     "type": "object",
                     "properties": {
                       "termDisplayName": {
-                        "type": "string"
+                        "type": "text",
+                        "copy_to": "all_field"
                       }
                     }
                   },
                   "materials_common:publishToList": {
-                    "type": "string",
-                    "include_in_all": "false",
+                    "type": "keyword",
                     "fields": {
                       "shortid": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "refname_shortid_analyzer"
                       }
                     }
@@ -168,28 +165,31 @@
                     "type": "object",
                     "properties": {
                       "materialCompositionFamilyName": {
-                        "type": "string",
+                        "type": "keyword",
+                        "copy_to": "all_field",
                         "fields": {
                           "displayName": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
                       },
                       "materialCompositionClassName": {
-                        "type": "string",
+                        "type": "keyword",
+                        "copy_to": "all_field",
                         "fields": {
                           "displayName": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
                       },
                       "materialCompositionGenericName": {
-                        "type": "string",
+                        "type": "keyword",
+                        "copy_to": "all_field",
                         "fields": {
                           "displayName": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -197,14 +197,16 @@
                     }
                   },
                   "materials_common:description": {
-                    "type": "string",
-                    "analyzer" : "fulltext"
+                    "type": "text",
+                    "analyzer" : "fulltext",
+                    "copy_to": "all_field"
                   },
                   "materials_common:typicalUses": {
-                    "type": "string",
+                    "type": "keyword",
+                    "copy_to": "all_field",
                     "fields": {
                       "displayName": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "refname_displayname_analyzer"
                       }
                     }
@@ -213,10 +215,11 @@
                     "type": "object",
                     "properties": {
                       "materialProductionOrganization": {
-                        "type": "string",
+                        "type": "keyword",
+                        "copy_to": "all_field",
                         "fields": {
                           "displayName": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refname_displayname_fulltext_analyzer"
                           }
                         }
@@ -227,10 +230,11 @@
                     "type": "object",
                     "properties": {
                       "materialProductionPerson": {
-                        "type": "string",
+                        "type": "keyword",
+                        "copy_to": "all_field",
                         "fields": {
                           "displayName": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refname_displayname_fulltext_analyzer"
                           }
                         }
@@ -241,10 +245,11 @@
                     "type": "object",
                     "properties": {
                       "materialProductionPlace": {
-                        "type": "string",
+                        "type": "keyword",
+                        "copy_to": "all_field",
                         "fields": {
                           "displayName": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refname_displayname_fulltext_analyzer"
                           }
                         }
@@ -255,10 +260,11 @@
                     "type": "object",
                     "properties": {
                       "featuredApplication": {
-                        "type": "string",
+                        "type": "keyword",
+                        "copy_to": "all_field",
                         "fields": {
                           "displayName": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -266,10 +272,11 @@
                     }
                   },
                   "materials_common:commonForm": {
-                    "type": "string",
+                    "type": "keyword",
+                    "copy_to": "all_field",
                     "fields": {
                       "displayName": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "refname_displayname_analyzer"
                       }
                     }
@@ -278,10 +285,11 @@
                     "type": "object",
                     "properties": {
                       "formType": {
-                        "type": "string",
+                        "type": "keyword",
+                        "copy_to": "all_field",
                         "fields": {
                           "displayName": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -293,10 +301,11 @@
                     "type": "object",
                     "properties": {
                       "acousticalPropertyType": {
-                        "type": "string",
+                        "type": "keyword",
+                        "copy_to": "all_field",
                         "fields": {
                           "displayName": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -307,10 +316,11 @@
                     "type": "object",
                     "properties": {
                       "durabilityPropertyType": {
-                        "type": "string",
+                        "type": "keyword",
+                        "copy_to": "all_field",
                         "fields": {
                           "displayName": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -321,10 +331,11 @@
                     "type": "object",
                     "properties": {
                       "electricalPropertyType": {
-                        "type": "string",
+                        "type": "keyword",
+                        "copy_to": "all_field",
                         "fields": {
                           "displayName": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -335,10 +346,11 @@
                     "type": "object",
                     "properties": {
                       "hygrothermalPropertyType": {
-                        "type": "string",
+                        "type": "keyword",
+                        "copy_to": "all_field",
                         "fields": {
                           "displayName": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -349,10 +361,11 @@
                     "type": "object",
                     "properties": {
                       "mechanicalPropertyType": {
-                        "type": "string",
+                        "type": "keyword",
+                        "copy_to": "all_field",
                         "fields": {
                           "displayName": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -363,10 +376,11 @@
                     "type": "object",
                     "properties": {
                       "opticalPropertyType": {
-                        "type": "string",
+                        "type": "keyword",
+                        "copy_to": "all_field",
                         "fields": {
                           "displayName": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -377,10 +391,11 @@
                     "type": "object",
                     "properties": {
                       "sensorialPropertyType": {
-                        "type": "string",
+                        "type": "keyword",
+                        "copy_to": "all_field",
                         "fields": {
                           "displayName": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -391,10 +406,11 @@
                     "type": "object",
                     "properties": {
                       "smartMaterialPropertyType": {
-                        "type": "string",
+                        "type": "keyword",
+                        "copy_to": "all_field",
                         "fields": {
                           "displayName": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -405,10 +421,11 @@
                     "type": "object",
                     "properties": {
                       "additionalPropertyType": {
-                        "type": "string",
+                        "type": "keyword",
+                        "copy_to": "all_field",
                         "fields": {
                           "displayName": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -420,10 +437,11 @@
                     "type": "object",
                     "properties": {
                       "recycledContentQualifier": {
-                        "type": "string",
+                        "type": "keyword",
+                        "copy_to": "all_field",
                         "fields": {
                           "displayName": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -434,10 +452,11 @@
                     "type": "object",
                     "properties": {
                       "lifecycleComponent": {
-                        "type": "string",
+                        "type": "keyword",
+                        "copy_to": "all_field",
                         "fields": {
                           "displayName": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -449,10 +468,11 @@
                     "type": "object",
                     "properties": {
                       "certificationProgram": {
-                        "type": "string",
+                        "type": "keyword",
+                        "copy_to": "all_field",
                         "fields": {
                           "displayName": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -461,64 +481,71 @@
                   },
                   // Process
                   "materials_common:castingProcesses": {
-                    "type": "string",
+                    "type": "keyword",
+                    "copy_to": "all_field",
                     "fields": {
                       "displayName": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "refname_displayname_analyzer"
                       }
                     }
                   },
                   "materials_common:joiningProcesses": {
-                    "type": "string",
+                    "type": "keyword",
+                    "copy_to": "all_field",
                     "fields": {
                       "displayName": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "refname_displayname_analyzer"
                       }
                     }
                   },
                   "materials_common:moldingProcesses": {
-                    "type": "string",
+                    "type": "keyword",
+                    "copy_to": "all_field",
                     "fields": {
                       "displayName": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "refname_displayname_analyzer"
                       }
                     }
                   },
                   "materials_common:surfacingProcesses": {
-                    "type": "string",
+                    "type": "keyword",
+                    "copy_to": "all_field",
                     "fields": {
                       "displayName": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "refname_displayname_analyzer"
                       }
                     }
                   },
                   "materials_common:deformingProcesses": {
-                    "type": "string",
+                    "type": "keyword",
+                    "copy_to": "all_field",
                     "fields": {
                       "displayName": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "refname_displayname_analyzer"
                       }
                     }
                   },
                   "materials_common:machiningProcesses": {
-                    "type": "string",
+                    "type": "keyword",
+                    "copy_to": "all_field",
                     "fields": {
                       "displayName": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "refname_displayname_analyzer"
                       }
                     }
                   },
                   "materials_common:rapidPrototypingProcesses": {
-                    "type": "string",
+                    "type": "keyword",
+                    "copy_to": "all_field",
                     "fields": {
                       "displayName": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "refname_displayname_analyzer"
                       }
                     }
@@ -527,10 +554,11 @@
                     "type": "object",
                     "properties": {
                       "additionalProcess": {
-                        "type": "string",
+                        "type": "keyword",
+                        "copy_to": "all_field",
                         "fields": {
                           "displayName": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -539,14 +567,14 @@
                   },
 
                   "collectionobjects_common:objectNumber": {
-                    "type": "string"
+                    "type": "keyword",
+                    "copy_to": "all_field"
                   },
                   "collectionobjects_common:publishToList": {
-                    "type": "string",
-                    "include_in_all": "false",
+                    "type": "keyword",
                     "fields": {
                       "shortid": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "refname_shortid_analyzer"
                       }
                     }
@@ -555,10 +583,11 @@
                     "type": "object",
                     "properties": {
                       "material": {
-                        "type": "string",
+                        "type": "keyword",
+                        "copy_to": "all_field",
                         "fields": {
                           "displayName": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -567,11 +596,10 @@
                   },
 
                   "media_materials:publishToList": {
-                    "type": "string",
-                    "include_in_all": "false",
+                    "type": "keyword",
                     "fields": {
                       "shortid": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "refname_shortid_analyzer"
                       }
                     }

@@ -10,102 +10,101 @@
       {
         "analysis" : {
           "char_filter" : {
-            "refname_displayname" : {
+            "refname_displayname_char_filter" : {
               "type" : "pattern_replace",
               "pattern" : "^.*?'(.*)'$",
               "replacement" : "$1"
             },
-            "refname_shortid" : {
+            "refname_shortid_char_filter" : {
               "type" : "pattern_replace",
               "pattern" : "^.*:item:name\\((.*)\\).*$",
               "replacement" : "$1"
             },
-            "doctype_tenant_unqualified" : {
+            "doctype_tenant_unqualified_char_filter" : {
               "type" : "pattern_replace",
               "pattern" : "^(.*?)(Tenant.*)?$",
               "replacement" : "$1"
             }
           },
           "filter" : {
-            "en_stem_filter" : {
-              "name" : "minimal_english",
-              "type" : "stemmer"
+            "truncate_filter": {
+              "length": 256,
+              "type": "truncate"
             },
-            "en_stop_filter" : {
-              "stopwords" : [
+            "en_stem_filter": {
+              "name": "minimal_english",
+              "type": "stemmer"
+            },
+            "en_stop_filter": {
+              "stopwords": [
                 "_english_"
               ],
-              "type" : "stop"
+              "type": "stop"
             },
-            "fr_elision_filter" : {
-              "articles" : [
-                "c",
-                "l",
-                "m",
-                "t",
-                "qu",
-                "n",
-                "s",
-                "j"
-              ],
-              "type" : "elision"
+            "word_delimiter_filter": {
+              "type": "word_delimiter",
+              "preserve_original": true
             },
-            "fr_stem_filter" : {
-              "name" : "minimal_french",
-              "type" : "stemmer"
-            },
-            "fr_stop_filter" : {
-              "stopwords" : [
-                "_french_"
-              ],
-              "type" : "stop"
+            "asciifolding_filter": {
+              "type": "asciifolding",
+              "preserve_original": true
             }
           },
           "tokenizer" : {
-            "path_tokenizer" : {
-              "delimiter" : "/",
-              "type" : "path_hierarchy"
+            "path_tokenizer": {
+              "delimiter": "/",
+              "type": "path_hierarchy"
+            },
+            "ngram_tokenizer": {
+              "type": "nGram",
+              "min_gram": 3,
+              "max_gram": 12
             }
           },
           "analyzer" : {
-            "en_analyzer" : {
-              "alias" : "fulltext",
-              "filter" : [
+            "fulltext": {
+              "filter": [
+                "word_delimiter_filter",
                 "lowercase",
                 "en_stop_filter",
                 "en_stem_filter",
+                "asciifolding_filter"
+              ],
+              "type": "custom",
+              "tokenizer": "standard"
+            },
+            "path_analyzer": {
+              "type": "custom",
+              "tokenizer": "path_tokenizer"
+            },
+            "lowercase_analyzer": {
+              "type": "custom",
+              "filter": [
+                "lowercase",
                 "asciifolding"
               ],
-              "type" : "custom",
-              "tokenizer" : "standard"
+              "tokenizer": "keyword"
             },
-            "fr_analyzer" : {
-              "filter" : [
-                "lowercase",
-                "fr_stop_filter",
-                "fr_stem_filter",
-                "asciifolding",
-                "fr_elision_filter"
+            "ngram_analyzer": {
+              "type": "custom",
+              "filter": [
+                "lowercase"
               ],
-              "type" : "custom",
-              "tokenizer" : "standard"
-            },
-            "path_analyzer" : {
-              "type" : "custom",
-              "tokenizer" : "path_tokenizer"
+              "tokenizer": "ngram_tokenizer"
             },
             "refname_displayname_analyzer" : {
               "type" : "custom",
               "tokenizer" : "keyword",
-              "char_filter" : ["refname_displayname"]
+              "char_filter" : ["refname_displayname_char_filter"]
             },
             "refname_displayname_fulltext_analyzer" : {
-              "char_filter" : ["refname_displayname"],
+              "char_filter" : ["refname_displayname_char_filter"],
               "filter" : [
+                "word_delimiter_filter",
                 "lowercase",
                 "en_stop_filter",
                 "en_stem_filter",
-                "asciifolding"
+                "asciifolding_filter"
               ],
               "type" : "custom",
               "tokenizer" : "standard"
@@ -113,12 +112,12 @@
             "refname_shortid_analyzer" : {
               "type" : "custom",
               "tokenizer" : "keyword",
-              "char_filter" : ["refname_shortid"]
+              "char_filter" : ["refname_shortid_char_filter"]
             },
             "doctype_analyzer" : {
               "type" : "custom",
               "tokenizer" : "keyword",
-              "char_filter" : ["doctype_tenant_unqualified"]
+              "char_filter" : ["doctype_tenant_unqualified_char_filter"]
             },
             "sorting_analyzer" : {
               "filter" : [
@@ -128,9 +127,12 @@
               "type" : "custom",
               "tokenizer" : "keyword"
             },
-            "default" : {
-              "type" : "custom",
-              "tokenizer" : "keyword"
+            "default": {
+              "type": "custom",
+              "tokenizer": "keyword",
+              "filter": [
+                "truncate_filter"
+              ]
             }
           }
         }
@@ -139,21 +141,24 @@
 
     <mapping>
       {
-        "_size" : {
-          "enabled" : true
-        },
+        // For now, don't index a field unless there's a mapping explicitly defined. This keeps the
+        // index as small as possible. We may want to turn this on in the future, to support arbitrary
+        // searches through Elasticsearch, e.g. NXQL queries for ad hoc reporting in the CSpace UI.
+        "dynamic": false,
         "_all" : {
-          "analyzer" : "fulltext"
+          "enabled": false
         },
         "properties" : {
+          "all_field": {
+            "type": "text",
+            "analyzer": "fulltext"
+          },
           "ecm:currentLifeCycleState": {
-            "type": "string",
-            "include_in_all": "false"
+            "type": "keyword"
           },
           "ecm:primaryType": {
-            "type": "string",
-            "analyzer" : "doctype_analyzer",
-            "include_in_all": "false"
+            "type": "text",
+            "analyzer" : "doctype_analyzer"
           }
         }
       }
