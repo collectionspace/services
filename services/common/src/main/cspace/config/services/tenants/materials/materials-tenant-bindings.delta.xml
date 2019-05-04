@@ -111,6 +111,7 @@
 
                   "collectionspace_denorm:title": {
                     "type": "text",
+                    "fielddata": true,
                     "analyzer": "sorting_analyzer"
                   },
                   "collectionspace_denorm:commercialNames": {
@@ -127,6 +128,7 @@
                     "fields": {
                       "displayName": {
                         "type": "text",
+                        "fielddata": true,
                         "analyzer": "refname_displayname_analyzer"
                       }
                     }
@@ -170,6 +172,7 @@
                         "fields": {
                           "displayName": {
                             "type": "text",
+                            "fielddata": true,
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -180,6 +183,7 @@
                         "fields": {
                           "displayName": {
                             "type": "text",
+                            "fielddata": true,
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -190,6 +194,7 @@
                         "fields": {
                           "displayName": {
                             "type": "text",
+                            "fielddata": true,
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -207,6 +212,7 @@
                     "fields": {
                       "displayName": {
                         "type": "text",
+                        "fielddata": true,
                         "analyzer": "refname_displayname_analyzer"
                       }
                     }
@@ -265,6 +271,7 @@
                         "fields": {
                           "displayName": {
                             "type": "text",
+                            "fielddata": true,
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -277,6 +284,7 @@
                     "fields": {
                       "displayName": {
                         "type": "text",
+                        "fielddata": true,
                         "analyzer": "refname_displayname_analyzer"
                       }
                     }
@@ -290,6 +298,7 @@
                         "fields": {
                           "displayName": {
                             "type": "text",
+                            "fielddata": true,
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -306,6 +315,7 @@
                         "fields": {
                           "displayName": {
                             "type": "text",
+                            "fielddata": true,
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -321,6 +331,7 @@
                         "fields": {
                           "displayName": {
                             "type": "text",
+                            "fielddata": true,
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -336,6 +347,7 @@
                         "fields": {
                           "displayName": {
                             "type": "text",
+                            "fielddata": true,
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -351,6 +363,7 @@
                         "fields": {
                           "displayName": {
                             "type": "text",
+                            "fielddata": true,
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -366,6 +379,7 @@
                         "fields": {
                           "displayName": {
                             "type": "text",
+                            "fielddata": true,
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -381,6 +395,7 @@
                         "fields": {
                           "displayName": {
                             "type": "text",
+                            "fielddata": true,
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -396,6 +411,7 @@
                         "fields": {
                           "displayName": {
                             "type": "text",
+                            "fielddata": true,
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -411,6 +427,7 @@
                         "fields": {
                           "displayName": {
                             "type": "text",
+                            "fielddata": true,
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -426,6 +443,7 @@
                         "fields": {
                           "displayName": {
                             "type": "text",
+                            "fielddata": true,
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -442,6 +460,7 @@
                         "fields": {
                           "displayName": {
                             "type": "text",
+                            "fielddata": true,
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -457,6 +476,7 @@
                         "fields": {
                           "displayName": {
                             "type": "text",
+                            "fielddata": true,
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -473,6 +493,7 @@
                         "fields": {
                           "displayName": {
                             "type": "text",
+                            "fielddata": true,
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -486,6 +507,7 @@
                     "fields": {
                       "displayName": {
                         "type": "text",
+                        "fielddata": true,
                         "analyzer": "refname_displayname_analyzer"
                       }
                     }
@@ -496,6 +518,7 @@
                     "fields": {
                       "displayName": {
                         "type": "text",
+                        "fielddata": true,
                         "analyzer": "refname_displayname_analyzer"
                       }
                     }
@@ -506,6 +529,7 @@
                     "fields": {
                       "displayName": {
                         "type": "text",
+                        "fielddata": true,
                         "analyzer": "refname_displayname_analyzer"
                       }
                     }
@@ -516,6 +540,7 @@
                     "fields": {
                       "displayName": {
                         "type": "text",
+                        "fielddata": true,
                         "analyzer": "refname_displayname_analyzer"
                       }
                     }
@@ -526,6 +551,7 @@
                     "fields": {
                       "displayName": {
                         "type": "text",
+                        "fielddata": true,
                         "analyzer": "refname_displayname_analyzer"
                       }
                     }
@@ -536,6 +562,7 @@
                     "fields": {
                       "displayName": {
                         "type": "text",
+                        "fielddata": true,
                         "analyzer": "refname_displayname_analyzer"
                       }
                     }
@@ -546,6 +573,7 @@
                     "fields": {
                       "displayName": {
                         "type": "text",
+                        "fielddata": true,
                         "analyzer": "refname_displayname_analyzer"
                       }
                     }
@@ -559,6 +587,7 @@
                         "fields": {
                           "displayName": {
                             "type": "text",
+                            "fielddata": true,
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
@@ -588,6 +617,7 @@
                         "fields": {
                           "displayName": {
                             "type": "text",
+                            "fielddata": true,
                             "analyzer": "refname_displayname_analyzer"
                           }
                         }
