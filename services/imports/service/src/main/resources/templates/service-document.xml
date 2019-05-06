@@ -33,7 +33,6 @@
   <schema xmlns="http://www.nuxeo.org/ecm/schemas/common/" name="common">
     <icon/>
     <icon-expanded/>
-    <size/>
   </schema>
   <schema xmlns:collectionspace_core="http://collectionspace.org/collectionspace_core/" name="collectionspace_core">
     <collectionspace_core:createdAt>${createdAt}</collectionspace_core:createdAt>
@@ -46,4 +45,3 @@
   </schema>
   ${Schema}
 </document>
-
