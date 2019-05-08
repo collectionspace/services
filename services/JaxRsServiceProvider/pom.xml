@@ -26,31 +26,31 @@
   			<artifactId>lucene-analyzers-common</artifactId>
   			<groupId>org.apache.lucene</groupId>
   			<scope>provided</scope>
-  			<version>4.7.2</version>
+  			<version>6.6.1</version>
   		</dependency>
   		<dependency>
   			<artifactId>lucene-sandbox</artifactId>
   			<groupId>org.apache.lucene</groupId>
   			<scope>provided</scope>
-  			<version>4.7.2</version>
+  			<version>6.6.1</version>
   		</dependency>
   		<dependency>
   			<artifactId>lucene-queries</artifactId>
   			<groupId>org.apache.lucene</groupId>
   			<scope>provided</scope>
-  			<version>4.7.2</version>
+  			<version>6.6.1</version>
   		</dependency>
   		<dependency>
   			<artifactId>lucene-core</artifactId>
   			<groupId>org.apache.lucene</groupId>
   			<scope>provided</scope>
-  			<version>4.7.2</version>
+  			<version>6.6.1</version>
   		</dependency>
   		<dependency>
   			<artifactId>lucene-queryparser</artifactId>
   			<groupId>org.apache.lucene</groupId>
   			<scope>provided</scope>
-  			<version>4.7.2</version>
+  			<version>6.6.1</version>
   		</dependency>
 
         <dependency>
