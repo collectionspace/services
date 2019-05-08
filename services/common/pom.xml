@@ -38,7 +38,7 @@
 			<groupId>org.collectionspace.services</groupId>
 			<artifactId>org.collectionspace.services.relation.client</artifactId>
 			<version>${project.version}</version>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>org.collectionspace.services</groupId>
 			<artifactId>org.collectionspace.services.systeminfo.client</artifactId>
@@ -59,7 +59,7 @@
 			<artifactId>org.collectionspace.services.publicitem.jaxb</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- <dependency> <groupId>org.collectionspace.services</groupId> <artifactId>org.collectionspace.services.3rdparty.nuxeo.quote-api</artifactId> 
+		<!-- <dependency> <groupId>org.collectionspace.services</groupId> <artifactId>org.collectionspace.services.3rdparty.nuxeo.quote-api</artifactId>
 			<version>${project.version}</version> </dependency> -->
 		<dependency>
 			<groupId>org.collectionspace.services</groupId>
@@ -103,13 +103,13 @@
 			<artifactId>org.collectionspace.services.authorization.service</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-<!-- 
+<!--
 		<dependency>
 			<groupId>org.collectionspace.services</groupId>
 			<artifactId>org.collectionspace.services.authorization-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
- -->		
+ -->
 
 		<!-- Utilities -->
 		<!-- For NuxeoRESTClient.java class -->
@@ -169,20 +169,19 @@
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-dbcp</artifactId>
-			<version>7.0.64</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-catalina</artifactId>
-			<version>7.0.64</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<!-- javax -->
 		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-servlet-api</artifactId>
+			<version>${tomcat.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -217,12 +216,6 @@
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
 			<artifactId>resteasy-jaxrs</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>tjws</groupId>
-					<artifactId>webserver</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
@@ -269,11 +262,13 @@
 			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-platform-imaging-core</artifactId>
 			<version>${nuxeo.platform.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-platform-imaging-api</artifactId>
 			<version>${nuxeo.platform.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
@@ -306,11 +301,7 @@
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-storage-sql</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.nuxeo.ecm.core</groupId>
-			<artifactId>nuxeo-core-storage-sql-ra</artifactId>
-		</dependency>
-		<!-- 
+		<!--
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-io</artifactId>
@@ -382,13 +373,13 @@
 			<artifactId>spring-aop</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
+			<artifactId>jackson-core</artifactId>
 			<version>2.8.0</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymock</artifactId>
@@ -414,4 +405,3 @@
 		</plugins>
 	</build>
 </project>
-

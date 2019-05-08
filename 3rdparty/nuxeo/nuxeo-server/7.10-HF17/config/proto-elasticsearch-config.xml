@@ -13,8 +13,8 @@
       httpEnabled="true" />
   </extension>
   -->
-  
-  <extension target="org.nuxeo.elasticsearch.ElasticSearchComponent"
+
+  <!-- <extension target="org.nuxeo.elasticsearch.ElasticSearchComponent"
     point="elasticSearchRemote">
     <elasticSearchRemote
       clusterName="elasticsearch"
@@ -23,9 +23,16 @@
       clientTransportIgnoreClusterName="false"
       clientTransportPingTimeout="5s"
       clientTransportNodesSamplerInterval="5s" />
-  </extension>
+  </extension> -->
+
+  <!-- <extension target="org.nuxeo.elasticsearch.ElasticSearchComponent" point="elasticSearchClient">
+    <elasticSearchClient class="org.nuxeo.elasticsearch.client.ESRestClientFactory">
+      <option name="addressList">http://localhost:9200</option>
+      <option name="connection.timeout.ms">5000</option>
+      <option name="socket.timeout.ms">20000</option>
+    </elasticSearchClient>
+  </extension> -->
 
   %elasticSearchIndex_extensions%
 
   </component>
-

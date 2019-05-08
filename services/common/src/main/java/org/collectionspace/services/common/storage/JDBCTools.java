@@ -43,7 +43,7 @@ import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetFactory;
 import javax.sql.rowset.RowSetProvider;
 
-import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
+import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 
 /**
  * User: laramie
@@ -74,62 +74,45 @@ public class JDBCTools {
     final static Logger logger = LoggerFactory.getLogger(JDBCTools.class);
 	private static final CharSequence URL_DATABASE_NAME = "${DatabaseName}";
     private static String JDBC_URL_DATABASE_SEPARATOR = "\\/";
-        
+
 	//
 	// As a side-effect of calling JDBCTools.getDataSource(...), the DataSource instance will be
 	// cached in a static hash map of the JDBCTools class.  This will speed up lookups as well as protect our
 	// code from JNDI lookup problems -for example, if the JNDI context gets stepped on or corrupted.
-	//    
+	//
     public static DataSource getDataSource(String dataSourceName) throws NamingException {
     	DataSource result = null;
-    	
+
     	//
     	// First, see if we already have this DataSource instance cached
     	//
     	result = cachedDataSources.get(dataSourceName);
-    	if (result == null) {    	
+    	if (result == null) {
         	InitialContext ctx = new InitialContext();
         	Context envCtx = null;
 
         	if (logger.isDebugEnabled() == true) {
 	        	logger.debug("Looking up DataSource instance in JNDI with name: " + dataSourceName);
 	        }
-	            	
-	    	try {
-		        envCtx = (Context) ctx.lookup("java:comp/env");
-		        DataSource ds = (DataSource) envCtx.lookup("jdbc/" + dataSourceName);
-		        if (ds == null) {
-		            throw new IllegalArgumentException("DataSource instance not found: " + dataSourceName);
-		        } else {
-		        	result = ds;
-		        	// now cache this DataSource instance for future references
-		        	cachedDataSources.put(dataSourceName, result);
-		        }
-	    	} finally {
-	            if (ctx != null) {
-	                try {
-	                    ctx.close();
-	                } catch (Exception e) {
-	                	logger.error("Error getting DataSource for: " + dataSourceName, e);
-	                }
-	            }
-	            if (envCtx != null) {
-	                try {
-	                	envCtx.close();
-	                } catch (Exception e) {
-	                	logger.error("Error getting DataSource for: " + dataSourceName, e);
-	                }
-	            }
-	    	}
+
+            envCtx = (Context) ctx.lookup("java:comp/env");
+            DataSource ds = (DataSource) envCtx.lookup("jdbc/" + dataSourceName);
+            if (ds == null) {
+                throw new IllegalArgumentException("DataSource instance not found: " + dataSourceName);
+            } else {
+                result = ds;
+                // now cache this DataSource instance for future references
+                cachedDataSources.put(dataSourceName, result);
+            }
     	}
-    	
+
     	if (result != null) {
 //    		DataSource resultClone = result.
     	}
-    	
+
     	return result;
     }
-    
+
     //
     // Use this version of the getConnection() method when you don't want to qualify the database name
     // with a CollectionSpace instance ID.
@@ -138,25 +121,25 @@ public class JDBCTools {
     		String databaseName) throws NamingException, SQLException {
     	return getConnection(dataSourceName, databaseName, null);
     }
-    
+
     public static Connection getConnection(String dataSourceName,
     		String repositoryName,
     		String cspaceInstanceId) throws NamingException, SQLException {
     	Connection result = null;
-    	
+
     	if (Tools.isEmpty(dataSourceName) || Tools.isEmpty(repositoryName)) {
     		String errMsg = String.format(
-    				"The getConnection() method was called with an empty or null repository name = '%s' and/or data source name = '%s'.", 
+    				"The getConnection() method was called with an empty or null repository name = '%s' and/or data source name = '%s'.",
     				dataSourceName, repositoryName);
             logger.error(errMsg);
             throw new NamingException(errMsg);
         }
-    	        
+
     	/*
     	 * We synch this block as a workaround to not have separate DataSource instances for
     	 * each Nuxeo repo/DB.  Ideally, we should replace the need for this synch block by
     	 * registering a separate DataSource for each repo/db at init/start-up time.
-    	 * 
+    	 *
     	 * We need to sync because we're changing the URL of the datasource inorder to get the correct
     	 * connection.  The synch prevents different threads from getting the incorrect connection -i.e., one pointing
     	 * to the wrong URL.
@@ -173,11 +156,11 @@ public class JDBCTools {
 	        // Turns out the Tomcat BasicDataSource used a connection pool, so changing the url does not
 	        // get you a corresponding connection. Use the more basic implementation for now, unless
 	        // and until we do things right by creating additional JNDI data sources.
-	        
+
         	//dataSource.setUrl(connectionUrl);
 	        String user = dataSource.getUsername();
 	        String password = dataSource.getPassword();
-	        
+
 	        try {
 	        	//conn = dataSource.getConnection();
 	        	conn = DriverManager.getConnection(connectionUrl, user, password);
@@ -189,7 +172,7 @@ public class JDBCTools {
 	        	dataSource.setUrl(urlTemplate); // Reset the data source URL value back to the template value
 	        }
     	}
-    	        
+
         return result;
     }
 
@@ -199,7 +182,7 @@ public class JDBCTools {
         try {
             conn = getConnection(dataSourceName, repositoryName, cspaceInstanceId);
             stmt = conn.createStatement();
-             
+
             RowSetFactory rowSetFactory = RowSetProvider.newFactory();
             CachedRowSet crs = rowSetFactory.createCachedRowSet();
 
@@ -229,7 +212,7 @@ public class JDBCTools {
             }
         }
     }
-    
+
     public static CachedRowSet executePreparedQuery(final PreparedStatementBuilder builder,
             String dataSourceName, String repositoryName, String cspaceInstanceId) throws Exception {
         Connection conn = null;
@@ -268,7 +251,7 @@ public class JDBCTools {
             }
         }
     }
-    
+
     // FIXME: This method's code significantly overlaps that of executePrepareQuery(), above,
     // and the two could be refactored into a single method, if desired.
     public static List<CachedRowSet> executePreparedQueries(final List<PreparedStatementBuilder> builders,
@@ -334,8 +317,8 @@ public class JDBCTools {
     }
 
     public static int executeUpdate(String dataSourceName,
-    		String repositoryName, 
-    		String cspaceInstanceId, 
+    		String repositoryName,
+    		String cspaceInstanceId,
     		String sql) throws Exception {
         Connection conn = null;
         Statement stmt = null;
@@ -379,20 +362,20 @@ public class JDBCTools {
     /**
      * Returns the database product name, from the metadata for a
      * JDBC connection to the default repository.
-     * 
+     *
      * Assumes that the database product name will be the same for the
      * default repository and for all other repositories to which JDBC
      * connections will be made, through the methods of this class.
-     * 
+     *
      * @return the database product name
      */
     public static String getDatabaseProductName(String dataSourceName,
     		String repositoryName,
     		String cspaceInstanceId) throws Exception {
-    	
+
     	@SuppressWarnings("unused")
 		Object driver = Class.forName("org.postgresql.Driver"); // For some reason, we need to make sure the org.postgresql.Driver class in on the classpath
-    	
+
     	if (DBProductName == null) {
 	        Connection conn = null;
 	        try {
@@ -415,22 +398,22 @@ public class JDBCTools {
 	            }
 	        }
     	}
-    	
+
         return DBProductName;
     }
 
     /**
      * Returns an enumerated value uniquely identifying the database product type;
      * e.g. MySQL, PostgreSQL, based on the database product name.
-     * 
+     *
      * @return an enumerated value identifying the database product type
-     * @throws Exception 
+     * @throws Exception
      */
     public static DatabaseProductType getDatabaseProductType(String dataSourceName,
     		String repositoryName,
     		String cspaceInstanceId) throws Exception {
     	DatabaseProductType result = DatabaseProductType.UNRECOGNIZED;
-    	
+
         String productName = getDatabaseProductName(dataSourceName, repositoryName, cspaceInstanceId);
         if (productName.matches("(?i).*mysql.*")) {
         	result = DatabaseProductType.MYSQL;
@@ -439,17 +422,17 @@ public class JDBCTools {
         } else {
             throw new Exception("Unrecognized database system " + productName);
         }
-    	
+
         return result;
     }
-    
+
     //
     // Same as method above except the cspace instance ID is not needed.
     //
     public static DatabaseProductType getDatabaseProductType(String dataSourceName,
     		String repositoryName) throws Exception {
     	DatabaseProductType result = DatabaseProductType.UNRECOGNIZED;
-    	
+
         String productName = getDatabaseProductName(dataSourceName, repositoryName, null);
         if (productName.matches("(?i).*mysql.*")) {
         	result = DatabaseProductType.MYSQL;
@@ -458,17 +441,17 @@ public class JDBCTools {
         } else {
             throw new Exception("Unrecognized database system " + productName);
         }
-    	
+
         return result;
     }
-    
+
     /*
      * By convention, the repository name and database name are the same.  However, this
      * call encapulates that convention and allows overrides.
      */
     public static String getDatabaseName(String repoName, String cspaceInstanceId) {
     	String result = repoName;
-    	
+
     	//
     	// Insert code here if you want to map the repo name to a database name -otherwise
     	// we'll assume they are the same thing.
@@ -476,7 +459,7 @@ public class JDBCTools {
     	if (repoName.equalsIgnoreCase(DEFAULT_NUXEO_REPOSITORY_NAME)) {
     		result = DEFAULT_NUXEO_DATABASE_NAME;
     	}
-    	
+
     	//
     	// If we have a non-null 'cspaceInstanceId' instance ID then we need to append it
     	// as a suffix to the database name.
@@ -486,27 +469,27 @@ public class JDBCTools {
     			result = result + cspaceInstanceId;
     		}
     	}
-    	
+
     	return result;
     }
-        
+
     /**
      * Returns the catalog/database name for an open JDBC connection.
-     * 
+     *
      * @param conn an open JDBC Connection
      * @return the catalog name.
-     * @throws SQLException 
+     * @throws SQLException
      */
     public static String getDatabaseName(String dataSourceName,
     		String repositoryName,
     		String cspaceInstanceId,
     		Connection conn) throws Exception {
         String databaseName = null;
-        
+
         if (conn != null) {
 	        DatabaseMetaData metadata = conn.getMetaData();
 	        String urlStr = metadata.getURL();
-	        
+
 	        // Format of the PostgreSQL JDBC URL:
 	        // http://jdbc.postgresql.org/documentation/80/connect.html
 	        if (getDatabaseProductType(dataSourceName, repositoryName, cspaceInstanceId) == DatabaseProductType.POSTGRESQL) {
@@ -520,14 +503,14 @@ public class JDBCTools {
 	            databaseName = tokens[tokens.length - 1];
 	        }
         }
-        
+
         return databaseName;
     }
-    
+
     /**
      * Grant a specified privilege to a database user. This privilege will
      * be applied to all 'public' schema tables within the specified repository.
-     * 
+     *
      * @param dataSourceName a JDBC datasource name.
      * @param repositoryName a repository (e.g. RDBMS database) name.
      * @param cspaceInstanceId a CollectionSpace instance identifier.
@@ -552,11 +535,11 @@ public class JDBCTools {
                 if (hasDatabaseUser(dataSourceName, repositoryName, cspaceInstanceId,
                         databaseProductType, databaseUserName)) {
                     conn = getConnection(dataSourceName, repositoryName, cspaceInstanceId);
-                    stmt = conn.createStatement();                
+                    stmt = conn.createStatement();
                     stmt.execute(sql);
                 }
             }
-            
+
         } catch (SQLException sqle) {
             SQLException tempException = sqle;
             // SQLExceptions can be chained. Loop to log all.
@@ -582,10 +565,10 @@ public class JDBCTools {
             }
         }
     }
-    
+
     /**
      * Create a database user, if that user doesn't already exist.
-     * 
+     *
      * @param conn a database connection.
      * @param dbType a database product type.
      * @param username the name of the database user to create.
@@ -629,10 +612,10 @@ public class JDBCTools {
             }
         }
     }
-    
+
     /**
      * Identify whether a database exists.
-     * 
+     *
      * @param dbType a database product type.
      * @param dbName a database product name.
      * @return true if a database with that name exists, false if that database does not exit.
@@ -676,10 +659,10 @@ public class JDBCTools {
            }
         }
     }
-    
+
     /**
      * Identify whether a database user exists.
-     * 
+     *
      * @param dataSourceName a JDBC datasource name.
      * @param repositoryName a repository (e.g. RDBMS database) name.
      * @param cspaceInstanceId a CollectionSpace instance identifier.
@@ -726,8 +709,8 @@ public class JDBCTools {
            }
         }
     }
-    
-    
+
+
     // -----------------------------
     // Utility methods for debugging
     // -----------------------------
@@ -736,9 +719,9 @@ public class JDBCTools {
      * Prints metadata, such as database username and connection URL,
      * for an open JDBC connection.  This is a utility method for use
      * during debugging.
-     * 
+     *
      * @param conn an open JDBC Connection
-     * @throws SQLException 
+     * @throws SQLException
      */
     private static void printConnectionMetaData(Connection conn) throws SQLException {
         if (conn != null) {
@@ -749,13 +732,13 @@ public class JDBCTools {
             System.out.println("database url=" + metadata.getURL());
         }
     }
-    
+
     /**
      * Prints metadata related to a JDBC ResultSet, such as column names.
      * This is a utility method for use during debugging.
-     * 
+     *
      * @param rs a ResultSet.
-     * @throws SQLException 
+     * @throws SQLException
      */
     public static void printResultSetMetaData(ResultSet rs) throws SQLException {
         if (rs == null) {
@@ -771,5 +754,5 @@ public class JDBCTools {
             // Insert other debug statements to retrieve additional per-column metadata here ...
         }
     }
-		
+
 }

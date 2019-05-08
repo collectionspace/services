@@ -5,12 +5,12 @@
         <artifactId>org.collectionspace.services.location</artifactId>
         <version>5.2-SNAPSHOT</version>
     </parent>
-    
+
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.collectionspace.services.location.service</artifactId>
     <name>services.location.service</name>
     <packaging>jar</packaging>
-    
+
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -20,7 +20,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
         </dependency>
-<!-- CollectionSpace dependencies -->        
+<!-- CollectionSpace dependencies -->
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
@@ -45,7 +45,7 @@
             <artifactId>org.collectionspace.services.contact.service</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- External dependencies -->        
+        <!-- External dependencies -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -55,7 +55,7 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
         </dependency>
-        
+
         <!-- apache -->
         <dependency>
             <groupId>commons-beanutils</groupId>
@@ -77,18 +77,12 @@
             <version>1.0.01</version>
             <scope>provided</scope>
         </dependency>
-        
+
         <!-- jboss -->
 
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>tjws</groupId>
-                    <artifactId>webserver</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -98,7 +92,7 @@
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-multipart-provider</artifactId>
         </dependency>
-        
+
         <!-- nuxeo -->
 
         <dependency>
@@ -113,11 +107,10 @@
         </dependency>
 
     </dependencies>
-    
+
     <build>
         <finalName>collectionspace-services-location</finalName>
         <plugins>
         </plugins>
     </build>
 </project>
-

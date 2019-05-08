@@ -22,9 +22,9 @@
             <artifactId>slf4j-log4j12</artifactId>
             <scope>provided</scope>
         </dependency>
-        
+
         <!-- CollectionSpace Dependencies -->
-        
+
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
@@ -54,10 +54,10 @@
 			<artifactId>org.collectionspace.services.authentication.service</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
-		</dependency>        
+		</dependency>
 
         <!-- External dependencies -->
-        
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -94,12 +94,6 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>tjws</groupId>
-                    <artifactId>webserver</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -118,4 +112,3 @@
         </plugins>
     </build>
 </project>
-

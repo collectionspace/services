@@ -31,7 +31,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!-- Jasper Reports fonts are still at 4.0.0, but are compatible with later 
+		<!-- Jasper Reports fonts are still at 4.0.0, but are compatible with later
 			software releases - ADR 2012-06-05 -->
 		<!-- http://jasperforge.org/plugins/espforum/view.php?group_id=102&forumid=103&topicid=97145 -->
 		<dependency>
@@ -40,7 +40,7 @@
 			<version>4.0.0</version>
 		</dependency>
 		<!-- For some reason, have to declare this dependency explicitly, ot it does not find it.
-			It is a dependency of jasperreports 5.0.1 
+			It is a dependency of jasperreports 5.0.1
 			-->
 		<dependency>
 			<groupId>com.lowagie</groupId>
@@ -52,7 +52,7 @@
 		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
 			<artifactId>groovy-all</artifactId>
-			<version>2.4.0</version>
+			<version>2.4.12</version>
 		</dependency>
 	</dependencies>
 
@@ -65,4 +65,3 @@
 	</modules>
 
 </project>
-

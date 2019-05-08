@@ -18,44 +18,44 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
 	private static Map<String, List<String>> mapOfrepositoryNames = new HashMap<String, List<String>>(); // <className, repositoryName>
 	private static Map<String, Map<String, Map<String, String>>> eventListenerParamsMap = new HashMap<String, Map<String, Map<String, String>>>();  // <repositoryName, Map<EventListenerId, Map<key, value>>>
 	private static Map<String, String> nameMap = new HashMap<String, String>();
-	
-	static final String DOCMODEL_CONTEXT_PROPERTY_PREFIX = ScopeType.DEFAULT.getScopePrefix();
-	
+
+	public static final String DOCMODEL_CONTEXT_PROPERTY_PREFIX = ScopeType.DEFAULT.getScopePrefix();
+
 	public AbstractCSEventListenerImpl() {
 		// Intentionally left blank
 	}
-	
+
 	/**
 	 * Find out if we (the event listener) are registered (via tenant bindings config) to respond events.
 	 */
 	@Override
 	public boolean isRegistered(Event event) {
 		boolean result = false;
-		
+
 		if (event != null && event.getContext() != null) {
 			result = getRepositoryNameList().contains(event.getContext().getRepositoryName());
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * An event listener can be registered by multiple tenants, so we keep track of that here.
-	 * 
+	 *
 	 * @return - the list of tenants/repositories that an event listener is registered with.
 	 */
 	protected List<String> getRepositoryNameList() {
 		String key = this.getClass().getName();
 		List<String> result = mapOfrepositoryNames.get(key);
-		
+
 		if (result == null) synchronized(this) {
 			result = new ArrayList<String>();
 			mapOfrepositoryNames.put(key, result);
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * The list of parameters (specified in a tenant's bindings) for event listeners
 	 * @return
@@ -65,20 +65,20 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
 	}
 
 	/**
-	 * Returns 'true' if this collection changed as a result of the call. 
+	 * Returns 'true' if this collection changed as a result of the call.
 	 */
 	@Override
 	public boolean register(String respositoryName, EventListenerConfig eventListenerConfig) {
 		boolean result = false;
-		
+
 		// Using the repositoryName as a qualifier, register this event listener's name as specified in the tenant bindings.
 		setName(respositoryName, eventListenerConfig.getId());
-		
+
 		// Register this event listener with the given repository name
 		if (getRepositoryNameList().add(respositoryName)) {
 			result = true;
 		}
-		
+
 		if (eventListenerConfig.getParamList() != null) {
 			// Set this event listeners parameters, if any.  Params are qualified with the repositoryName since multiple tenants might be registering the same event listener but with different params.
 			List<Param> paramList = eventListenerConfig.getParamList().getParam(); // values from the tenant bindings that we need to copy into the event listener
@@ -111,10 +111,10 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
 				}
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	protected void setName(String repositoryName, String eventListenerName) {
 		nameMap.put(repositoryName, eventListenerName);
 	}
@@ -130,28 +130,28 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public String getName(String repositoryName) {
 		return nameMap.get(repositoryName);
 	}
-	
+
 	//
 	// Set a property in the document model's transient context.
 	//
 	@Override
     public void setDocModelContextProperty(DocumentModel collectionObjectDocModel, String key, Serializable value) {
     	ScopedMap contextData = collectionObjectDocModel.getContextData();
-    	contextData.putIfAbsent(DOCMODEL_CONTEXT_PROPERTY_PREFIX + key, value);        
+    	contextData.putIfAbsent(DOCMODEL_CONTEXT_PROPERTY_PREFIX + key, value);
     }
-	
+
     //
     // Clear a property from the docModel's context
 	//
 	@Override
 	public void clearDocModelContextProperty(DocumentModel docModel, String key) {
     	ScopedMap contextData = docModel.getContextData();
-    	contextData.remove(DOCMODEL_CONTEXT_PROPERTY_PREFIX + key);	
+    	contextData.remove(DOCMODEL_CONTEXT_PROPERTY_PREFIX + key);
 	}
 
 }

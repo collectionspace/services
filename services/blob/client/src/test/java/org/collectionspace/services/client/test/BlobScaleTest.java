@@ -27,7 +27,7 @@ import org.testng.annotations.Test;
 public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 
     private final Logger logger = LoggerFactory.getLogger(BlobScaleTest.class);
-	
+
 	private static final int IMAGE_SIZE = 1000;
 	private static final int IMAGE_EDGE = -15;
 	private static final int MIN_FONTSIZE = 15;
@@ -39,7 +39,7 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
     private List<String> allGeneratedImages = new ArrayList<String>();
 
 	private static Random generator = new Random(System.currentTimeMillis());
-	
+
 	@Override
 	protected CollectionSpaceClient getClientInstance() throws Exception {
         return new BlobClient();
@@ -62,7 +62,7 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 
 	private int getImagesToCreate() {
 		int result = DEFAULT_IMAGES_TO_CREATE;
-		
+
         String imagesToCreate = System.getProperty(IMAGES_TO_CREATE_PROP);
         try {
         	result = Integer.parseInt(imagesToCreate);
@@ -75,31 +75,31 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
         			+ result
         			+ " images.");
         }
-        
+
         return result;
 	}
-	
+
 	@Test(dataProvider = "testName", dependsOnMethods = {"scaleTest"})
 	public void scaleGETTest(String testName) throws Exception {
 		this.setupRead();
         BlobClient client = new BlobClient();
-        
+
         // We seem to sometimes need a delay before Nuxeo finishes creating all the derivatives, so
         // we'll put our thread to sleep for 3 seconds before checking
         Thread.sleep(3000); // sleep for 3 seconds
-        
+
         for (int i = 0; i < allGeneratedImages.size(); i++) {
 	        Response res = client.getDerivativeContent(allGeneratedImages.get(i), "Thumbnail");
 	        try {
 		        assertStatusCode(res, testName);
-		        logger.debug(String.format("Performed GET operation on Thumbnail derivative of image blob ID = '%s'.", 
+		        logger.debug(String.format("Performed GET operation on Thumbnail derivative of image blob ID = '%s'.",
 		        		allGeneratedImages.get(i)));
 	        } finally {
 	        	res.close();
 	        }
-        }        
+        }
 	}
-	
+
 	@Test(dataProvider = "testName")
 	public void scaleTest(String testName) throws Exception {
 		this.createDirectory(GENERATED_IMAGES);
@@ -107,13 +107,13 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 		int imagesToCreate = getImagesToCreate();
         BlobClient client = new BlobClient();
 		Profiler profiler = new Profiler(this, 1);
-        
+
         for (int i = 0; i < imagesToCreate; i++, profiler.reset()) {
-			File jpegFile = createJpeg(GENERATED_IMAGES);	
+			File jpegFile = createJpeg(GENERATED_IMAGES);
 			URL url = jpegFile.toURI().toURL();
-			
+
 	    	profiler.start();
-			Response res = client.createBlobFromURI("http://farm6.static.flickr.com/5289/5688023100_15e00cde47_o.jpg");//url.toString());
+			Response res = client.createBlobFromURI("https://farm6.static.flickr.com/5289/5688023100_15e00cde47_o.jpg");//url.toString());
 			try {
 				profiler.stop();
 		        assertStatusCode(res, testName);
@@ -125,7 +125,7 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 						+ " - "
 						+ " : "
 						+ jpegFile.getAbsolutePath());
-				
+
 		        String csid = extractId(res);
 		        this.knownResourceId = csid;
 		        allResourceIdsCreated.add(csid);
@@ -137,20 +137,20 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 			}
         }
 	}
-	
+
 	private void createDirectory(String dirName) {
 		boolean success = (
 				new File(dirName)).mkdir();
 		if (success) {
-			logger.debug("Directory: " 
+			logger.debug("Directory: "
 					+ dirName + " created");
-		} 
+		}
 	}
-	
+
 	public File createJpeg(String destDir) {
 		File result = null;
 
-		BufferedImage image = new BufferedImage(IMAGE_SIZE, IMAGE_SIZE, BufferedImage.TYPE_INT_RGB);   
+		BufferedImage image = new BufferedImage(IMAGE_SIZE, IMAGE_SIZE, BufferedImage.TYPE_INT_RGB);
 		Graphics g = image.getGraphics();
 		for (int i = 0; i < IMAGE_SIZE; i = i + 10) {
 			int x = random(IMAGE_EDGE, IMAGE_SIZE);
@@ -164,14 +164,14 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 					random(MIN_FONTSIZE, MAX_FONTSIZE));
 			g.setFont(newFont);
 		}
-		try {    
+		try {
 			ImageIO.write(image, "jpg", result = new File(destDir
 					+ File.separator
 					+ System.currentTimeMillis()
 					+ ".jpg"));
-		} catch (IOException e) {    
-			e.printStackTrace();   
-		} 
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		return result;
 	}

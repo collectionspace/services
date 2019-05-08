@@ -5,7 +5,7 @@
         <groupId>org.collectionspace.services</groupId>
         <version>5.2-SNAPSHOT</version>
     </parent>
-    
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.note.service</artifactId>
@@ -32,7 +32,7 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-        </dependency>        
+        </dependency>
 
       <!-- javax -->
 
@@ -42,18 +42,12 @@
             <version>1.0.01</version>
             <scope>provided</scope>
         </dependency>
-        
+
         <!-- jboss -->
 
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>tjws</groupId>
-                    <artifactId>webserver</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -63,7 +57,7 @@
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-multipart-provider</artifactId>
         </dependency>
-        
+
         <!-- nuxeo -->
 
         <dependency>
@@ -78,9 +72,8 @@
         </dependency>
 
     </dependencies>
-    
+
     <build>
         <finalName>collectionspace-services-note</finalName>
     </build>
 </project>
-

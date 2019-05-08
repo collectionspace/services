@@ -22,7 +22,7 @@
             <artifactId>slf4j-log4j12</artifactId>
             <scope>provided</scope>
         </dependency>
-        
+
 <!-- CollectionSpace dependencies -->
 
         <dependency>
@@ -35,7 +35,7 @@
 		    <artifactId>org.collectionspace.services.common-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
+
 <!-- External dependencies -->
 
         <dependency>
@@ -55,22 +55,16 @@
         <dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			<version>4.3.3</version>
+			<version>4.5.3</version>
         </dependency>
         <dependency>
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
 			<version>2.11.0</version>
-  		</dependency>        
+  		</dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>tjws</groupId>
-                    <artifactId>webserver</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -84,7 +78,7 @@
 			<groupId>org.jboss.logging</groupId>
 			<artifactId>jboss-logging</artifactId>
 			<version>3.1.4.GA</version>
-			<scope>runtime</scope>    	
+			<scope>runtime</scope>
         </dependency>
         <!-- Set TestNG scope to default (compile), rather than test -->
         <!-- to allow import(s) in AbstractServiceTest class -->
@@ -110,7 +104,7 @@
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
-        </dependency>  
+        </dependency>
     </dependencies>
 
     <build>
@@ -130,4 +124,3 @@
         </plugins>
     </build>
 </project>
-
