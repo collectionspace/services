@@ -1323,7 +1323,8 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
         if (includeDeleted != null && includeDeleted.equalsIgnoreCase(Boolean.FALSE.toString())) {
             whereClause = whereClause
                     + "  AND (misc.lifecyclestate <> '" + WorkflowClient.WORKFLOWSTATE_DELETED + "')"
-            		+ "  AND (misc.lifecyclestate <> '" + WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED + "')";
+                    + "  AND (misc.lifecyclestate <> '" + WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED + "')"
+                    + "  AND (misc.lifecyclestate <> '" + WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED + "')";
         }
 
         // If a particular authority is specified, restrict the query further
