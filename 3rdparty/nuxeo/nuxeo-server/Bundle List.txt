@@ -28,7 +28,7 @@ nuxeo-platform-types-api-${version}.jar
 nuxeo-platform-types-core-${version}.jar
 nuxeo-platform-usermanager-api-${version}.jar
 nuxeo-runtime-${version}.jar
-nuxeo-runtime-datasource-7.10-HF48-SNAPSHOT.jar
+nuxeo-runtime-datasource-${version}.jar
 nuxeo-runtime-jtajca-${version}.jar
 nuxeo-runtime-management-${version}.jar
 nuxeo-runtime-osgi-${version}.jar
