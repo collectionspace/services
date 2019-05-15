@@ -2,6 +2,7 @@
 *.out*
 *.iml
 *.org.*.bindings.xml
+*.edu.*.bindings.xml
 *org.eclipse.wst*
 dev-master.xml
 .metadata/
