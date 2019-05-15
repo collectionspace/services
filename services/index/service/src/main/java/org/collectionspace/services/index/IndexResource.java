@@ -24,10 +24,13 @@
 package org.collectionspace.services.index;
 
 import org.collectionspace.services.client.index.IndexClient;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import javax.ws.rs.Consumes;
@@ -67,11 +70,11 @@ public class IndexResource extends NuxeoBasedResource {
             return null;
         }
     }
-    
+
 	/*
 	 * HTTP Methods
 	 */
-    
+
 	@Override
 	@POST
 	public Response create(@Context ResourceMap resourceMap, @Context UriInfo ui, String xmlPayload) {
@@ -79,7 +82,7 @@ public class IndexResource extends NuxeoBasedResource {
 				.entity(ServiceMessages.POST_UNSUPPORTED).type("text/plain").build();
 		return response;
 	}
-	
+
     @Override
 	@DELETE
     @Path("{csid}")
@@ -89,11 +92,11 @@ public class IndexResource extends NuxeoBasedResource {
 				.build();
 		return response;
     }
-    
-    
+
+
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.common.ResourceBase#getList(javax.ws.rs.core.UriInfo, java.lang.String)
-	 * 
+	 *
 	 * The index sub-resource does not support a getList operation.
 	 */
 	@Override
@@ -104,5 +107,9 @@ public class IndexResource extends NuxeoBasedResource {
 				.build();
 		throw new CSWebApplicationException(response);
 	}
-    
+
+	@Override
+	public AbstractCommonList getList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, UriInfo uriInfo) {
+		throw new UnsupportedOperationException();
+	}
 }
