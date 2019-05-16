@@ -619,6 +619,10 @@
                             "type": "text",
                             "fielddata": true,
                             "analyzer": "refname_displayname_analyzer"
+                          },
+                          "shortid": {
+                            "type": "text",
+                            "analyzer": "refname_shortid_analyzer"
                           }
                         }
                       }
