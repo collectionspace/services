@@ -560,6 +560,10 @@
                           "displayName": {
                             "type": "string",
                             "analyzer": "refname_displayname_analyzer"
+                          },
+                          "shortid": {
+                            "type": "text",
+                            "analyzer": "refname_shortid_analyzer"
                           }
                         }
                       }
