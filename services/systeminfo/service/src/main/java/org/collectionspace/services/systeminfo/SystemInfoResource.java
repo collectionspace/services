@@ -83,7 +83,7 @@ public class SystemInfoResource extends AbstractCollectionSpaceResourceImpl<Syst
     	    		result.setPostgresVersionString("9.5.7");
     			}
     		} catch (UnauthorizedException e) {
-    			e.printStackTrace();
+    			logger.trace(e.getMessage(), e);
     		}
 
     	} catch(Exception e) {
