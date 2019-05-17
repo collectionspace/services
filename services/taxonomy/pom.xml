@@ -4,7 +4,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.main</artifactId>
-        <version>5.0</version>
+        <version>5.1</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
