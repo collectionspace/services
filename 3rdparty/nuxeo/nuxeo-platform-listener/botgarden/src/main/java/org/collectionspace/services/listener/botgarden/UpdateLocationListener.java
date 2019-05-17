@@ -71,7 +71,7 @@ public class UpdateLocationListener extends AbstractCSEventListenerImpl {
 
 					logger.debug("previousLocation=" + previousLocation);
 
-					doc.setProperty(MovementBotGardenConstants.PREVIOUS_LOCATION_SCHEMA_NAME, MovementBotGardenConstants.PREVIOUS_LOCATION_FIELD_NAME, previousLocation);
+					doc.setProperty(MovementConstants.PREVIOUS_LOCATION_SCHEMA_NAME, MovementConstants.PREVIOUS_LOCATION_FIELD_NAME, previousLocation);
 				}
 			}
 		}
