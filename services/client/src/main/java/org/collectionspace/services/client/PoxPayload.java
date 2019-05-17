@@ -251,6 +251,21 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 		return result;
 	}
 	
+    public List<PT> getParts(String label) {
+        List<PT> result = new ArrayList<PT>();
+        if (parts != null) {
+            Iterator<PT> it = parts.iterator();
+            while (it.hasNext() == true) {
+                PT part = it.next();
+                if (part.getLabel().equalsIgnoreCase(label) == true) {
+                    result.add(part);
+                }
+            }
+        }
+        
+        return result;
+    }	
+	
 	/**
 	 * Gets a list of the POX parts.
 	 *
