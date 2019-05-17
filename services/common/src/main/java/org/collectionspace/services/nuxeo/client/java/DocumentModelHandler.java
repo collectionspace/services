@@ -100,15 +100,22 @@ public abstract class DocumentModelHandler<T, TL>
     	
     	String docTypeName = null;
     	try {
-	    	docTypeName = this.getServiceContext().getDocumentType();
+	    	docTypeName = this.getServiceContext().getTenantQualifiedDoctype();
 	    	result = getLifecycle(docTypeName);
+	    	if (result == null) {
+	    	    //
+	    	    // Get the lifecycle of the generic type if one for the tenant qualified type doesn't exist
+	    	    //
+            docTypeName = this.getServiceContext().getDocumentType();
+            result = getLifecycle(docTypeName);
+	    	}
     	} catch (Exception e) {
     		if (logger.isTraceEnabled() == true) {
     			logger.trace("Could not retrieve lifecycle definition for Nuxeo doctype: " + docTypeName);
     		}
     	}
     	
-    	return result;
+    	    return result;
     }
     
     /*
