@@ -33,7 +33,7 @@ import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IntakeClient;
 import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PersonAuthorityClient;
+import org.collectionspace.services.client.PersonClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
@@ -170,7 +170,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
      * @throws Exception 
      */
     protected void createPersonRefs() throws Exception {
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
                 PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         Response res = personAuthClient.create(multipart);
@@ -226,7 +226,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
     protected String createPerson(String firstName, String surName, String shortId, String authRefName) throws Exception {
     	String result = null;
     	
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         Map<String, String> personInfo = new HashMap<String, String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
@@ -263,7 +263,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
 
         // Get the auth ref docs and check them
 
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         Response res = personAuthClient.getReferencingObjects(personAuthCSID, currentOwnerPersonCSID);
         AuthorityRefDocList list = null;
         try {
@@ -303,7 +303,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         //
         // Get the referencing objects
         //
-        personAuthClient = new PersonAuthorityClient();
+        personAuthClient = new PersonClient();
         res = personAuthClient.getReferencingObjects(personAuthCSID, depositorPersonCSID);
         try {
 	        assertStatusCode(res, testName);
@@ -354,7 +354,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         // Get the auth ref docs and check them
 
         // Single scalar field
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         Response res = personAuthClient.getReferencingObjects(personAuthCSID, insurerPersonCSID);
         AuthorityRefDocList list = null;
         try {
@@ -425,7 +425,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
             intakeClient.delete(resourceId).close();
         }
         // Delete persons before PersonAuth
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         for (String resourceId : personIdsCreated) {
             personAuthClient.deleteItem(personAuthCSID, resourceId).close();
         }

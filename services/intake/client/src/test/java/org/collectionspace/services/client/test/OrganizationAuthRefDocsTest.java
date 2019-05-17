@@ -32,7 +32,7 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IntakeClient;
-import org.collectionspace.services.client.OrgAuthorityClient;
+import org.collectionspace.services.client.OrganizationClient;
 import org.collectionspace.services.client.OrgAuthorityClientUtils;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -172,7 +172,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
      * @throws Exception 
      */
     protected void createOrgRefs() throws Exception{
-        OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
+        OrganizationClient orgAuthClient = new OrganizationClient();
         //orgAuthRefName = 
     	//	OrgAuthorityClientUtils.createOrgAuthRefName(ORGANIZATION_AUTHORITY_NAME, null);
         PoxPayloadOut multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
@@ -218,7 +218,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
     protected String createOrganization(String shortId, String shortName, String longName) throws Exception {
     	String result = null;
     	
-        OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
+        OrganizationClient orgAuthClient = new OrganizationClient();
         Map<String, String> orgInfo = new HashMap<String,String>();
         orgInfo.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
         
@@ -255,7 +255,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         testSetup(STATUS_OK, ServiceRequestType.READ);
         
         // Get the auth ref docs and check them
-       OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
+       OrganizationClient orgAuthClient = new OrganizationClient();
        Response refDocListResp = orgAuthClient.getReferencingObjects(orgAuthCSID, currentOwnerOrgCSID);
        AuthorityRefDocList list = null;
        try {
@@ -325,7 +325,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
             intakeClient.delete(resourceId).close();
         }
         // Delete persons before PersonAuth
-        OrgAuthorityClient personAuthClient = new OrgAuthorityClient();
+        OrganizationClient personAuthClient = new OrganizationClient();
         for (String resourceId : orgIdsCreated) {
             personAuthClient.deleteItem(orgAuthCSID, resourceId).close();
         }
