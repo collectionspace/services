@@ -21,9 +21,8 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.collectionspace.services.contact;
+package org.collectionspace.services.common.vocabulary;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,31 +34,41 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.client.*;
 import org.collectionspace.services.common.CSWebApplicationException;
+import org.collectionspace.services.common.ResourceMap;
+import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.StoredValuesUriTemplate;
+import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.UriTemplateFactory;
 import org.collectionspace.services.common.UriTemplateRegistryKey;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
+import org.collectionspace.services.common.context.JaxRsContext;
+import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.contact.ContactResource;
 import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.contact.ContactJAXBSchema;
 import org.collectionspace.services.contact.nuxeo.ContactConstants;
 import org.collectionspace.services.contact.nuxeo.ContactDocumentModelHandler;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 
 /**
  * The Class AuthorityResourceWithContacts.
@@ -130,6 +139,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
             ServiceContext ctx = createServiceContext(getContactServiceName(), input);
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid, ui);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
+
             UriBuilder path = UriBuilder.fromResource(resourceClass);
             path.path("" + parentcsid + "/items/" + itemcsid + "/contacts/" + csid);
             Response response = Response.created(path.build()).build();
@@ -140,6 +150,23 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
                     + parentspecifier + ": and item:" + itemspecifier + ": was not found.",
                     itemspecifier);
         }
+    }
+    
+    public String createContact(ServiceContext existingCtx, String parentCsid, String itemCsid, PoxPayloadIn input,
+            UriInfo ui) throws Exception {
+        ServiceContext ctx = createServiceContext(getContactServiceName(), input);
+        if (existingCtx != null) {
+            Object repoSession = existingCtx.getCurrentRepositorySession();
+            if (repoSession != null) {
+                ctx.setCurrentRepositorySession(repoSession);
+                ctx.setProperties(existingCtx.getProperties());
+            }
+        }
+        
+        DocumentHandler handler = createContactDocumentHandler(ctx, parentCsid, itemCsid, ui);
+        String csid = getRepositoryClient(ctx).create(ctx, handler);
+
+        return csid;
     }
 
     /**
@@ -160,10 +187,28 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
             @Context UriInfo uriInfo) {
         AbstractCommonList contactObjectList = new AbstractCommonList();
 
+        contactObjectList = getContactList(null, parentspecifier, itemspecifier, uriInfo);
+        
+        return contactObjectList;
+    }
+    
+    public AbstractCommonList getContactList(
+            ServiceContext existingCtx,
+            String parentspecifier,
+            String itemspecifier,
+            UriInfo uriInfo) {
+        AbstractCommonList contactObjectList = new AbstractCommonList();
+
         try {
             ServiceContext ctx = createServiceContext(getContactServiceName(), uriInfo);
-            MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
-        	
+            if (existingCtx != null) {
+                Object repoSession = existingCtx.getCurrentRepositorySession();
+                if (repoSession != null) {
+                    ctx.setCurrentRepositorySession(repoSession);
+                    ctx.setProperties(existingCtx.getProperties());
+                }
+            }
+            
             String parentcsid = lookupParentCSID(parentspecifier, "getContactList(parent)", "GET_CONTACT_LIST", null);
             ServiceContext itemCtx = createServiceContext(getItemServiceName());
             String itemcsid = lookupItemCSID(itemCtx, itemspecifier, parentcsid, "getContactList(item)", "GET_CONTACT_LIST");
@@ -188,8 +233,56 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
         }
         
         return contactObjectList;
-    }
+    }    
 
+    @GET
+    @Path("{csid}/items/{itemcsid}")
+    public byte[] getAuthorityItem(
+            @Context Request request,
+            @Context UriInfo uriInfo,
+            @Context ResourceMap resourceMap,            
+            @PathParam("csid") String parentIdentifier,
+            @PathParam("itemcsid") String itemIdentifier) {
+        uriInfo = new UriInfoWrapper(uriInfo);
+        PoxPayloadOut result = null;
+        try {
+            RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = 
+                    (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(getItemServiceName(), resourceMap, uriInfo);
+
+            JaxRsContext jaxRsContext = new JaxRsContext(request, uriInfo); // Needed for getting account permissions part of the resource
+            ctx.setJaxRsContext(jaxRsContext);
+            
+            result = getAuthorityItem(ctx, parentIdentifier, itemIdentifier);
+            
+            //
+            // Include the Contact subresource(s) as part of the payload.  The current UI supports a single contact resource only, so
+            // this code will return only the first contact resource
+            //
+            
+            //FIXME: Need to support paging
+            AbstractCommonList contactObjectList = getContactList(ctx, parentIdentifier, itemIdentifier, uriInfo);
+            if (contactObjectList.getTotalItems() > 1) {
+            		String errMsg = String.format("Can't get complete list of contacts for authority term '%s' in authority '%s'.", parentIdentifier, itemIdentifier);
+            		logger.warn(errMsg);
+            }
+            
+            if (contactObjectList.getTotalItems() > 0) {
+            		ListItem item = contactObjectList.getListItem().get(0);
+            		String csid = this.getCsid(item);
+            		PoxPayloadOut contactPayloadOut = getContactPayload(parentIdentifier, itemIdentifier, csid);
+            		PayloadOutputPart contactCommonPart = contactPayloadOut.getPart(ContactClient.SERVICE_COMMON_PART_NAME);
+            		result.addPart(contactCommonPart);
+            }
+            
+        } catch (DocumentNotFoundException dnf) {
+            throw bigReThrow(dnf, ServiceMessages.resourceNotFoundMsg(itemIdentifier));
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.GET_FAILED);
+        }
+                
+        return result.getBytes();
+    }
+    
     /**
      * Gets the contact.
      * 
@@ -207,16 +300,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
             @PathParam("csid") String csid) {
         PoxPayloadOut result = null;
         try {
-            String parentcsid = lookupParentCSID(parentspecifier, "getContact(parent)", "GET_ITEM_CONTACT", null);
-
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> itemCtx = createServiceContext(getItemServiceName());
-            String itemcsid = lookupItemCSID(itemCtx, itemspecifier, parentcsid, "getContact(item)", "GET_ITEM_CONTACT");
-
-            // Note that we have to create the service context and document handler for the Contact service, not the main service.
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getContactServiceName());
-            DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
-            getRepositoryClient(ctx).get(ctx, csid, handler);
-            result = (PoxPayloadOut) ctx.getOutput();
+            result = getContactPayload(parentspecifier, itemspecifier, csid);
         } catch (Exception e) {
             throw bigReThrow(e, "Get failed, the requested Contact CSID:" + csid
                     + ": or one of the specifiers for authority:" + parentspecifier
@@ -228,6 +312,26 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
             throw new CSWebApplicationException(response);
         }
         return result.toXML();
+    }
+    
+    protected PoxPayloadOut getContactPayload(
+            String parentspecifier,
+            String itemspecifier,
+            String csid) throws Exception {
+        PoxPayloadOut result = null;
+
+        String parentcsid = lookupParentCSID(parentspecifier, "getContact(parent)", "GET_ITEM_CONTACT", null);
+
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> itemCtx = createServiceContext(getItemServiceName());
+        String itemcsid = lookupItemCSID(itemCtx, itemspecifier, parentcsid, "getContact(item)", "GET_ITEM_CONTACT");
+
+        // Note that we have to create the service context and document handler for the Contact service, not the main service.
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getContactServiceName());
+        DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
+        getRepositoryClient(ctx).get(ctx, csid, handler);
+        result = (PoxPayloadOut) ctx.getOutput();
+
+        return result;
     }
 
     /**
@@ -266,8 +370,30 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
                     + ": and item:" + itemspecifier + ": was not found.",
                     csid);
         }
+        
         return result.toXML();
     }
+    
+    public void updateContact(ServiceContext existingCtx, String parentCsid, String itemCsid, String csid,
+            PayloadInputPart theUpdate) throws Exception {
+        PoxPayloadOut result = null;
+        
+        String payloadTemplate = "<?xml version='1.0' encoding='UTF-8'?><document>%s</document>";
+        String xmlPayload = String.format(payloadTemplate, theUpdate.asXML());
+        PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
+        
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getContactServiceName(), input);
+        if (existingCtx != null) {
+            Object repoSession = existingCtx.getCurrentRepositorySession();
+            if (repoSession != null) {
+                ctx.setCurrentRepositorySession(repoSession);
+                ctx.setProperties(existingCtx.getProperties());
+            }
+        }
+        
+        DocumentHandler handler = createContactDocumentHandler(ctx, parentCsid, itemCsid);
+        getRepositoryClient(ctx).update(ctx, csid, handler);
+    }    
 
     /**
      * Delete contact.
