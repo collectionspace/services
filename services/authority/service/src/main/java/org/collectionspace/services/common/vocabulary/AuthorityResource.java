@@ -703,7 +703,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         }
     }
 
-    private String getCsid(ListItem item) {
+    protected String getCsid(ListItem item) {
         String result = null;
 
         for (Element ele : item.getAny()) {
@@ -1019,7 +1019,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         return result;
     }
 
-    private PoxPayloadOut getAuthorityItem(
+    protected PoxPayloadOut getAuthorityItem(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             String parentIdentifier,
             String itemIdentifier) throws Exception {
