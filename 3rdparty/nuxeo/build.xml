@@ -150,6 +150,7 @@
 		
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-listener/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-elasticsearch/build.xml" target="deploy" inheritall="false"/>
         <!-- Disabled due to integration issues between ImageMagick and Ghostscript on Linux systems        
         <ant antfile="nuxeo-platform-thumbnail/build.xml" target="deploy" inheritall="false"/>
         -->
@@ -163,6 +164,7 @@
         <delete file="${jee.server.cspace}/cspace/config/services/proto-datasource-config.xml" failonerror="false"/>
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-listener/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-elasticsearch/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-quote/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-quote-api/build.xml" target="undeploy" inheritall="false"/>
         <!-- Disabled due to integration issues between ImageMagick and Ghostscript on Linux systems
