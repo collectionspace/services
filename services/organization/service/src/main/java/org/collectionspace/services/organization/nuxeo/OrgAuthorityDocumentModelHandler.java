@@ -24,7 +24,7 @@
 package org.collectionspace.services.organization.nuxeo;
 
 import org.collectionspace.services.organization.OrgauthoritiesCommon;
-import org.collectionspace.services.client.OrgAuthorityClient;
+import org.collectionspace.services.client.OrganizationClient;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 
 /**
@@ -35,7 +35,7 @@ public class OrgAuthorityDocumentModelHandler
         extends AuthorityDocumentModelHandler<OrgauthoritiesCommon> {
     
     public OrgAuthorityDocumentModelHandler() {
-    	super(OrgAuthorityClient.SERVICE_COMMON_PART_NAME, OrgAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
+    	super(OrganizationClient.SERVICE_COMMON_PART_NAME, OrganizationClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 	
     /**

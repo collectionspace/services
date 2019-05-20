@@ -29,6 +29,7 @@ import java.net.HttpURLConnection;
 
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ServiceException;
 import org.collectionspace.services.common.ServiceMain;
@@ -122,12 +123,26 @@ public class RelationDocumentModelHandler
 	 * 
 	 * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#handleWorkflowTransition(org.collectionspace.services.common.document.DocumentWrapper, org.collectionspace.services.lifecycle.TransitionDef)
 	 */
-	public void handleWorkflowTransition(ServiceContext ctx, DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)
-			throws Exception {		
+	public void handleWorkflowTransition(ServiceContext ctx, DocumentWrapper<DocumentModel> wrapDoc,
+			TransitionDef transitionDef) throws Exception {
 		if (subjectOrObjectInWorkflowState(wrapDoc, WorkflowClient.WORKFLOWSTATE_LOCKED) == true) {
-    		throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
-                    "Cannot change a relationship if either end of it is in the workflow state: " + WorkflowClient.WORKFLOWSTATE_LOCKED);
+			throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
+					"Cannot change a relationship if either end of it is in the workflow state: "
+							+ WorkflowClient.WORKFLOWSTATE_LOCKED);
+		} else {
+			//
+			// Toggle the 'active' flag of the relationship record -needed to correctly apply a uniqueness constrain on rows in the relations_common table
+			//
+			String transitionName = transitionDef.getName();
+			if (transitionName.equalsIgnoreCase(WorkflowClient.WORKFLOWTRANSITION_UNDELETE)) {
+				DocumentModel doc = wrapDoc.getWrappedObject();
+				doc.setProperty(RelationClient.SERVICE_COMMONPART_NAME, RelationJAXBSchema.RELATIONSHIP_ACTIVE, Boolean.TRUE);
+			} else if (transitionName.equalsIgnoreCase(WorkflowClient.WORKFLOWTRANSITION_DELETE)) {
+				DocumentModel doc = wrapDoc.getWrappedObject();
+				doc.setProperty(RelationClient.SERVICE_COMMONPART_NAME, RelationJAXBSchema.RELATIONSHIP_ACTIVE, Boolean.FALSE);
+			}
 		}
+		
 	}
 
     @Override

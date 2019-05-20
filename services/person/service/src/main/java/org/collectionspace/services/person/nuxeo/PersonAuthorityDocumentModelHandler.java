@@ -24,7 +24,7 @@
 package org.collectionspace.services.person.nuxeo;
 
 import org.collectionspace.services.person.PersonauthoritiesCommon;
-import org.collectionspace.services.client.PersonAuthorityClient;
+import org.collectionspace.services.client.PersonClient;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 
 /**
@@ -35,7 +35,7 @@ public class PersonAuthorityDocumentModelHandler
 		extends AuthorityDocumentModelHandler<PersonauthoritiesCommon> {
 
     public PersonAuthorityDocumentModelHandler() {
-    	super(PersonAuthorityClient.SERVICE_COMMON_PART_NAME, PersonAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
+    	super(PersonClient.SERVICE_COMMON_PART_NAME, PersonClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 	
     /**

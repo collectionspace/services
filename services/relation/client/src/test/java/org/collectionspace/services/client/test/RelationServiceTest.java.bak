@@ -32,7 +32,7 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PersonAuthorityClient;
+import org.collectionspace.services.client.PersonClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.RelationClient;
@@ -103,7 +103,7 @@ public class RelationServiceTest extends AbstractPoxServiceTestImpl<RelationsCom
     private void createPersonRefs() throws Exception {
         setupCreate();
 
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
         		personAuthDisplayName, personAuthShortId, personAuthClient.getCommonPartName());
         Response res = personAuthClient.create(multipart);
@@ -136,7 +136,7 @@ public class RelationServiceTest extends AbstractPoxServiceTestImpl<RelationsCom
     
     @AfterSuite
     private void deletePersonRefs() throws Exception {
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         for (String csid:personIdsCreated) {
 	        Response res = personAuthClient.deleteItem(personAuthCSID, csid);
 	        try {
@@ -168,7 +168,7 @@ public class RelationServiceTest extends AbstractPoxServiceTestImpl<RelationsCom
     private String createPerson(String firstName, String surName, String shortId, String authRefName) throws Exception {
     	String result = null;
     	
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         Map<String, String> personInfo = new HashMap<String, String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
