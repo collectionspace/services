@@ -134,6 +134,7 @@
         <copy todir="${jee.server.cspace}/cspace/config/services" overwrite="true">
             <fileset file="${basedir}/nuxeo-server/${nuxeo.release}/config/proto-datasource-config.xml"/>
             <filterset>
+                <filter token="JDBC_DEFAULT_DATASOURCE" value="${db.jdbc.default.datasource}"/>
                 <filter token="DB_SERVER_HOSTNAME" value="${db.host}"/>
                 <filter token="DB_PORT" value="${db.port}"/>
                 <filter token="DB_JDBC_OPTIONS" value="${db.jdbc.urloptions.encoded}"/>
