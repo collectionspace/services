@@ -13,17 +13,17 @@
 	<!--
 		These links need to be moved into the context.xml file and become <Resource> instead of <link>
 	-->
-    <link name="jdbc/repository_default" global="jdbc/default" type="javax.sql.DataSource" />
-    <link name="jdbc/repository_default" global="jdbc/default" type="javax.sql.DataSource"/>
-    <link name="jdbc/NuxeoDS" global="jdbc/default" type="javax.sql.DataSource" />
-    <link name="jdbc/nxsqldirectory" global="jdbc/default" type="javax.sql.DataSource" />
-    <link name="jdbc/nxrelations-default-jena" global="jdbc/default" type="javax.sql.DataSource" />
-    <link name="jdbc/comment-relations" global="jdbc/default" type="javax.sql.DataSource" />
-    <link name="jdbc/nxaudit-logs" global="jdbc/default" type="javax.sql.DataSource" />
-    <link name="jdbc/nxjbpm" global="jdbc/default" type="javax.sql.DataSource" />
-    <link name="jdbc/placeful_service_ds" global="jdbc/default" type="javax.sql.DataSource" />
-    <link name="jdbc/nxwebwidgets" global="jdbc/default" type="javax.sql.DataSource" />
-    <link name="jdbc/nxuidsequencer" global="jdbc/default" type="javax.sql.DataSource" />
+    <link name="jdbc/repository_default" global="@JDBC_DEFAULT_DATASOURCE@" type="javax.sql.DataSource" />
+    <link name="jdbc/repository_default" global="@JDBC_DEFAULT_DATASOURCE@" type="javax.sql.DataSource"/>
+    <link name="jdbc/NuxeoDS" global="@JDBC_DEFAULT_DATASOURCE@" type="javax.sql.DataSource" />
+    <link name="jdbc/nxsqldirectory" global="@JDBC_DEFAULT_DATASOURCE@" type="javax.sql.DataSource" />
+    <link name="jdbc/nxrelations-default-jena" global="@JDBC_DEFAULT_DATASOURCE@" type="javax.sql.DataSource" />
+    <link name="jdbc/comment-relations" global="@JDBC_DEFAULT_DATASOURCE@" type="javax.sql.DataSource" />
+    <link name="jdbc/nxaudit-logs" global="@JDBC_DEFAULT_DATASOURCE@" type="javax.sql.DataSource" />
+    <link name="jdbc/nxjbpm" global="@JDBC_DEFAULT_DATASOURCE@" type="javax.sql.DataSource" />
+    <link name="jdbc/placeful_service_ds" global="@JDBC_DEFAULT_DATASOURCE@" type="javax.sql.DataSource" />
+    <link name="jdbc/nxwebwidgets" global="@JDBC_DEFAULT_DATASOURCE@" type="javax.sql.DataSource" />
+    <link name="jdbc/nxuidsequencer" global="@JDBC_DEFAULT_DATASOURCE@" type="javax.sql.DataSource" />
 	
 	<!-- These properties are passed into the CSpace code that generates the final version
 	of this Nuxeo configuration file.
