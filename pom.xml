@@ -11,8 +11,8 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<cspace.services.version>5.0</cspace.services.version>
-		<cspace.services.client.version>5.0</cspace.services.client.version>
+		<cspace.services.version>5.1</cspace.services.version>
+		<cspace.services.client.version>5.1</cspace.services.client.version>
 		<nuxeo.general.release>7.10-HF17</nuxeo.general.release>
 		<nuxeo.shell.version>${nuxeo.general.release}</nuxeo.shell.version>
 		<nuxeo.platform.version>${nuxeo.general.release}</nuxeo.platform.version>
@@ -160,6 +160,7 @@
 			</snapshots>
 		</repository>
 
+<!--
 		<repository>
 			<id>nightly-staging</id>
 			<name>nuxeo-nightly-staging</name>
@@ -170,7 +171,8 @@
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
-		</repository>		
+		</repository>
+-->	
 
 		<repository>
 			<snapshots>

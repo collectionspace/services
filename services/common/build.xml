@@ -124,7 +124,7 @@
             <fileset dir="${basedir}/lib/spring"/>
         </copy>
     </target>
-	
+
 	<target name="deploy_aspectj"
             description="deploy AspectJ binaries in ${jee.server.cspace}">
         <copy todir="${jee.server.cspace}/lib">
@@ -138,14 +138,14 @@
             <fileset dir="${basedir}/lib/slf4j"/>
         </copy>
     </target>
-	
+
     <target name="deploy_xmlmerge"
             description="deploy XMLMerge binaries in ${jee.server.cspace}">
         <copy todir="${jee.server.cspace}/lib">
             <fileset dir="${basedir}/lib/xmlmerge"/>
         </copy>
     </target>
-	
+
     <target name="deploy_tenantconfig"
             description="deploy tenant configuration">
         <copy todir="${jee.server.cspace}/cspace/config/services">
@@ -165,7 +165,7 @@
 		-->
         <copy todir="${jee.server.cspace}/cspace/config/services/resources">
             <fileset dir="${basedir}/src/main/cspace/config/services/resources"/>
-        </copy>		
+        </copy>
     </target>
 
     <target name="deploy" depends="install"
@@ -213,34 +213,35 @@
             <fileset dir="${jee.server.cspace}/lib" includes="aopalliance-*.jar"/>
             <fileset dir="${jee.server.cspace}/lib" includes="commons-lang3-*.jar"/>
             <fileset dir="${jee.server.cspace}/lib" includes="ehcache-*.jar"/>
+            <fileset dir="${jee.server.cspace}/lib" includes="groovy-*.jar"/>
             <fileset dir="${jee.server.cspace}/lib" includes="jackson-*.jar"/>
             <fileset dir="${jee.server.cspace}/lib" includes="org.springframework.*.jar"/>
             <fileset dir="${jee.server.cspace}/lib" includes="spring-*.jar"/>
             <fileset dir="${jee.server.cspace}/lib" includes="stax2-api-*.jar"/>
         </delete>
     </target>
-	
+
 	<target name="undeploy_aspectj"
             description="undeploy AspectJ binaries from ${jee.server.cspace}">
         <delete>
             <fileset dir="${jee.server.cspace}/lib" includes="aspectj*-*.jar"/>
         </delete>
     </target>
-	
+
     <target name="undeploy_slf4j"
             description="undeploy SLF4J binaries from ${jee.server.cspace}">
         <delete>
             <fileset dir="${jee.server.cspace}/lib" includes="slf4j*.jar"/>
         </delete>
     </target>
-	
+
     <target name="undeploy_xmlmerge"
             description="undeploy XMLMerge binaries from ${jee.server.cspace}">
         <delete>
             <fileset dir="${jee.server.cspace}/lib" includes="module-xml_merge*.jar"/>
         </delete>
     </target>
-	
+
     <target name="dist_spring"
             description="dist spring binaries in ${dist.server.cspace}">
         <copy todir="${services.trunk}/${dist.server.cspace}/lib">
@@ -253,7 +254,7 @@
         <antcall target="dist_spring" />
         <copy todir="${services.trunk}/${dist.server.cspace}/cspace/config/services">
             <fileset dir="${basedir}/src/main/cspace/config/services"/>
-        </copy>		
+        </copy>
     </target>
 
 </project>
