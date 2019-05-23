@@ -3,19 +3,24 @@ package org.collectionspace.services.client;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.io.FileUtils;
-
+import org.collectionspace.services.ConceptJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.common.api.Tools;
-import org.collectionspace.services.concept.ConceptTermGroup;
-import org.collectionspace.services.concept.ConceptauthoritiesCommon;
 
+import org.collectionspace.services.concept.ConceptTermGroup;
+import org.collectionspace.services.concept.ConceptTermGroupList;
+import org.collectionspace.services.concept.ConceptauthoritiesCommon;
+import org.collectionspace.services.concept.ConceptsCommon;
+
+import org.apache.commons.io.FileUtils;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +53,41 @@ public class ConceptAuthorityClientUtils {
 
         return multipart;
     }
+    
+    /**
+     * Creates a concept instance.
+     *
+     */
+    public static PoxPayloadOut createConceptInstance(
+            Map<String, String> conceptInfo,
+            List<ConceptTermGroup> terms,
+            String headerLabel) {
+        
+        ConceptsCommon concept = new ConceptsCommon();
+        String shortId = conceptInfo.get(ConceptJAXBSchema.SHORT_IDENTIFIER);
+        if (shortId == null || shortId.isEmpty()) {
+            throw new IllegalArgumentException("shortIdentifier cannot be null or empty");
+        }       
+        concept.setShortIdentifier(shortId);
+                
+        // Set values in the Term Information Group
+        ConceptTermGroupList termList = new ConceptTermGroupList();
+        if (terms == null || terms.isEmpty()) {
+            terms = getTermGroupInstance(getGeneratedIdentifier());
+        }
+        termList.getConceptTermGroup().addAll(terms); 
+        concept.setConceptTermGroupList(termList);
+        
+        PoxPayloadOut multipart = new PoxPayloadOut(ConceptAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = multipart.addPart(concept, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(headerLabel);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("to be created, concept common ", concept, ConceptsCommon.class);
+        }
+
+        return multipart;
+    }    
 
     /**
      * @param commonPartXML the XML payload for the common part.
@@ -73,6 +113,35 @@ public class ConceptAuthorityClientUtils {
 
         return multipart;
     }
+
+    public static List<ConceptTermGroup> getTermGroupInstance(String shortIdentifier, String displayName) {
+        if (Tools.isBlank(shortIdentifier)) {
+            shortIdentifier = getGeneratedIdentifier();
+        }
+        if (Tools.isBlank(shortIdentifier)) {
+            displayName = shortIdentifier;
+        }
+        
+        List<ConceptTermGroup> terms = new ArrayList<ConceptTermGroup>();
+        ConceptTermGroup term = new ConceptTermGroup();
+        term.setTermDisplayName(displayName);
+        term.setTermName(shortIdentifier);
+        terms.add(term);
+        return terms;
+    }
+    
+    /*
+     * Create a very simple Concept term -just a short ID and display name.
+     */
+    public static PoxPayloadOut createConceptInstance(String shortIdentifier, String displayName,
+            String headerLabel) {
+        List<ConceptTermGroup> terms = getTermGroupInstance(shortIdentifier, displayName);
+        
+        Map<String, String> conceptInfo = new HashMap<String, String>();
+        conceptInfo.put(ConceptJAXBSchema.SHORT_IDENTIFIER, shortIdentifier);
+
+        return createConceptInstance(conceptInfo, terms, headerLabel);
+    }       
     
     public static String createItemInAuthority(String vcsid,
     		String commonPartXML,

@@ -25,6 +25,8 @@
             <xs:sequence>
             	<xs:element name="csid" type="xs:string" />
                         
+                <xs:element name="active" type="xs:boolean" default="true" minOccurs="1" maxOccurs="1"/>     <!-- true=active false=soft-deleted -->
+                        
                 <xs:element name="subjectCsid" type="xs:string"  minOccurs="1" maxOccurs="1"/>     <!-- new name for documentId1 -->
                 <xs:element name="subjectDocumentType" type="xs:string"  minOccurs="1" maxOccurs="1"/>     <!-- new name for documentType1 -->
                 <xs:element name="subjectUri" type="xs:string" minOccurs="1"/>

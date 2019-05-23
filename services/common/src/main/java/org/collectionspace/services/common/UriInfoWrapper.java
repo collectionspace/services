@@ -71,7 +71,10 @@ public class UriInfoWrapper implements UriInfo {
 
 	@Override
 	public String getPath() {
-		return uriInfo.getPath();
+		if (uriInfo != null)
+			return uriInfo.getPath();
+		else
+			return null;
 	}
 
 	@Override

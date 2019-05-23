@@ -98,7 +98,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: $ $LastChangedDate: $
  */
 public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxPayloadOut> {
-
+	
     /**
      * The logger.
      */
@@ -116,7 +116,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
     public static final String ENDING_ANCHOR_CHAR = "$";
     public static final String ENDING_ANCHOR_CHAR_REGEX = BACKSLASH + ENDING_ANCHOR_CHAR;
 
-
+    
     /**
      * Instantiates a new repository java client impl.
      */
@@ -205,7 +205,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             doc = repoSession.createDocument(doc);
             repoSession.save();
 			// TODO for sub-docs need to call into the handler to let it deal with subitems. Pass in the id,
-			// and assume the handler has the state it needs (doc fragments).
+			// and assume the handler has the state it needs (doc fragments). 
             handler.complete(Action.CREATE, wrapDoc);
             return id;
         } catch (BadRequestException bre) {
@@ -223,20 +223,20 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             }
         }
     }
-
+    
 	@Override
     public boolean reindex(DocumentHandler handler, String indexid) throws DocumentNotFoundException, DocumentException
     {
     	return reindex(handler, null, indexid);
     }
-
+    
     @Override
     public boolean reindex(DocumentHandler handler, String csid, String indexid) throws DocumentNotFoundException, DocumentException
     {
     	boolean result = true;
         CoreSessionInterface repoSession = null;
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = handler.getServiceContext();
-
+        
         try {
             String queryString = handler.getDocumentsToIndexQuery(indexid, csid);
             repoSession = getRepositorySession(ctx);
@@ -256,15 +256,15 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
                 releaseRepositorySession(ctx, repoSession);
             }
         }
-
+        
     	return result;
     }
-
+    
     @Override
     public boolean synchronize(ServiceContext ctx, Object specifier, DocumentHandler handler)
             throws DocumentNotFoundException, TransactionException, DocumentException {
     	boolean result = false;
-
+    	
         if (handler == null) {
             throw new IllegalArgumentException("RepositoryJavaClient.get: handler is missing");
         }
@@ -294,15 +294,15 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
                 releaseRepositorySession(ctx, repoSession);
             }
         }
-
+        
         return result;
     }
-
+    
     @Override
     public boolean synchronizeItem(ServiceContext ctx, AuthorityItemSpecifier itemSpecifier, DocumentHandler handler)
             throws DocumentNotFoundException, TransactionException, DocumentException {
     	boolean result = false;
-
+    	
         if (handler == null) {
             throw new IllegalArgumentException(
                     "RepositoryJavaClient.get: handler is missing");
@@ -330,10 +330,10 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
                 releaseRepositorySession(ctx, repoSession);
             }
         }
-
+        
         return result;
     }
-
+    
     /**
      * get document from the Nuxeo repository
      *
@@ -753,11 +753,11 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
     private DocumentModelList getFilteredCMISForSubjectOrObject(CoreSessionInterface repoSession,
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, DocumentHandler handler, QueryContext queryContext) throws DocumentNotFoundException, DocumentException {
     	DocumentModelList result = null;
-
+    	
     	if (isSubjectOrObjectQuery(ctx) == true) {
     		MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
         	String asEitherCsid = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_EITHER);
-
+        	
     		queryParams.remove(IQueryManager.SEARCH_RELATED_TO_CSID_AS_SUBJECT);
     		queryParams.remove(IQueryManager.SEARCH_RELATED_TO_CSID_AS_OBJECT);
 
@@ -767,7 +767,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
     		queryParams.addFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_SUBJECT, asEitherCsid);
             DocumentModelList subjectDocList = getFilteredCMIS(repoSession, ctx, handler, queryContext);
             queryParams.remove(IQueryManager.SEARCH_RELATED_TO_CSID_AS_SUBJECT);
-
+            
         	//
         	// Next query for objectCsid results.
         	//
@@ -780,31 +780,31 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             //
             result = mergeDocumentModelLists(subjectDocList, objectDocList);
     	}
-
+    	
 		return result;
 	}
 
 	private DocumentModelList mergeDocumentModelLists(DocumentModelList subjectDocList,
 			DocumentModelList objectDocList) {
 		DocumentModelList result = null;
-
+		
 		if (subjectDocList == null || subjectDocList.isEmpty()) {
 			return objectDocList;
 		}
-
+		
 		if (objectDocList == null || objectDocList.isEmpty()) {
 			return subjectDocList;
 		}
-
+		
         result = new DocumentModelListImpl();
-
+        
         // Add the subject list
 		Iterator<DocumentModel> iterator = subjectDocList.iterator();
 		while (iterator.hasNext()) {
 			DocumentModel dm = iterator.next();
 			addToResults(result, dm);
 		}
-
+		
 		// Add the object list
 		iterator = objectDocList.iterator();
 		while (iterator.hasNext()) {
@@ -823,7 +823,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
 	private void addToResults(DocumentModelList result, DocumentModel dm) {
 		Iterator<DocumentModel> iterator = result.iterator();
 		boolean found = false;
-
+		
 		while (iterator.hasNext()) {
 			DocumentModel existingDm = iterator.next();
 			if (existingDm.getId().equals(dm.getId())) {
@@ -831,7 +831,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
 				break;
 			}
 		}
-
+		
 		if (found == false) {
 			result.add(dm);
 		}
@@ -867,12 +867,12 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
 
         try {
             repoSession = getRepositorySession(ctx);
-            wrapDoc = findDocs(ctx,
-                    repoSession,
-                    docTypes,
-                    whereClause,
+            wrapDoc = findDocs(ctx, 
+                    repoSession, 
+                    docTypes, 
+                    whereClause, 
                     null,
-                    pageNum,
+                    pageNum, 
                     pageSize,
                     useDefaultOrderByClause,
                     computeTotal);
@@ -1013,7 +1013,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
      * A method to find a CollectionSpace document (of any type) given just a service context and
      * its CSID.  A search across *all* service workspaces (within a given tenant context) is performed to find
      * the document
-     *
+     * 
      * This query searches Nuxeo's Hierarchy table where our CSIDs are stored in the "name" column.
      */
     @Override
@@ -1060,7 +1060,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
         IterableQueryResult result = null;
         /** Threshold over which temporary files are not kept in memory. */
         final int THRESHOLD = 1024 * 1024;
-
+        
         try {
             logger.debug(String.format("Performing a CMIS query on Nuxeo repository named %s",
             		repoSession.getRepositoryName()));
@@ -1077,7 +1077,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
                     new NuxeoCmisServiceFactory(),
                     streamFactory);
             callContext.put(CallContext.USERNAME, repoSession.getPrincipal().getName());
-
+            
             NuxeoCmisService cmisService = new NuxeoCmisService(repoSession.getCoreSession());
             result = repoSession.queryAndFetch(query, "CMISQL", cmisService);
         } catch (ClientException e) {
@@ -1125,7 +1125,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
                 if (isSubjectOrObjectQuery(ctx)) {
                 	docList = getFilteredCMISForSubjectOrObject(repoSession, ctx, handler, queryContext);
                 } else {
-                    docList = getFilteredCMIS(repoSession, ctx, handler, queryContext);
+                    docList = getFilteredCMIS(repoSession, ctx, handler, queryContext); 
                 }
             // NXQL query
             } else {
@@ -1170,21 +1170,21 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
     /**
      * Perform a database query, via JDBC and SQL, to retrieve matching records
      * based on filter criteria.
-     *
+     * 
      * Although this method currently has a general-purpose name, it is
      * currently dedicated to a specific task: that of improving performance
      * for partial term matching queries on authority items / terms, via
      * the use of a hand-tuned SQL query, rather than via the generated SQL
      * produced by Nuxeo from an NXQL query.  (See CSPACE-6361 for a task
      * to generalize this method.)
-     *
+     * 
      * @param repoSession a repository session.
      * @param ctx the service context.
      * @param handler a relevant document handler.
      * @return a list of document models matching the search criteria.
-     * @throws Exception
+     * @throws Exception 
      */
-    private DocumentModelList getFilteredJDBC(CoreSessionInterface repoSession, ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    private DocumentModelList getFilteredJDBC(CoreSessionInterface repoSession, ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, 
             DocumentHandler handler) throws Exception {
         DocumentModelList result = new DocumentModelListImpl();
 
@@ -1197,11 +1197,11 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
         final String IN_AUTHORITY_PARAM = "IN_AUTHORITY";
         // Get this from a constant in AuthorityResource or equivalent
         final String PARENT_WILDCARD = "_ALL_";
-
+        
         // Build two SQL statements, to be executed within a single transaction:
         // the first statement to control join order, and the second statement
         // representing the actual 'get filtered' query
-
+        
         // Build the join control statement
         //
         // Per http://www.postgresql.org/docs/9.2/static/runtime-config-query.html#GUC-JOIN-COLLAPSE-LIMIT
@@ -1216,14 +1216,14 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
         // in consistently slower-than-desired query performance where zero or
         // very few records were retrieved. See notes on CSPACE-5945. - ADR 2013-04-09
         // String joinControlSql = "SET LOCAL join_collapse_limit TO 1;";
-
+        
         // Build the query statement
         //
         // Start with the default query
         String selectStatement =
                 "SELECT DISTINCT commonschema.id"
                 + " FROM " + handler.getServiceContext().getCommonPartLabel() + " commonschema";
-
+        
         String joinClauses =
                 " INNER JOIN misc"
                 + "  ON misc.id = commonschema.id"
@@ -1245,7 +1245,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
            whereClause =
                 " WHERE (termgroup.termdisplayname ILIKE ?)";
         }
-
+        
         // At present, results are ordered in code, below, rather than in SQL,
         // and the orderByClause below is thus intentionally blank.
         //
@@ -1253,7 +1253,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
         // 'ORDER BY termgroup.termdisplayname', the relevant column
         // must be returned by the SELECT statement.
         String orderByClause = "";
-
+        
         String limitClause;
         TenantBindingConfigReaderImpl tReader =
                 ServiceMain.getInstance().getTenantBindingConfigReader();
@@ -1262,15 +1262,15 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
                 IQueryManager.MAX_LIST_ITEMS_RETURNED_LIMIT_ON_JDBC_QUERIES);
         limitClause =
                 " LIMIT " + getMaxItemsLimitOnJdbcQueries(maxListItemsLimit); // implicit int-to-String conversion
-
+        
         // After building the individual parts of the query, set the values
         // of replaceable parameters that will be inserted into that query
         // and optionally add restrictions
-
+        
         List<String> params = new ArrayList<>();
-
+        
         if (Tools.notBlank(whereClause)) {
-
+                        
             // Read tenant bindings configuration to determine whether
             // to automatically insert leading, as well as trailing, wildcards
             // into the term matching string.
@@ -1314,10 +1314,10 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             }
             params.add(partialTerm);
         }
-
+        
         // Optionally add restrictions to the default query, based on variables
         // in the current request
-
+        
         // Restrict the query to filter out deleted records, if requested
         String includeDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_DELETED_QP);
         if (includeDeleted != null && includeDeleted.equalsIgnoreCase(Boolean.FALSE.toString())) {
@@ -1339,14 +1339,14 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
                 params.add(inAuthorityValue); // Value for replaceable parameter 2 in the query
             }
         }
-
+        
         // Restrict the query further to return only records pertaining to
         // the current tenant, unless:
         // * Data for this service, in this tenant, is stored in its own,
         //   separate repository, rather than being intermingled with other
         //   tenants' data in the default repository; or
         // * Restriction by tenant ID in JDBC queries has been disabled,
-        //   via configuration for this tenant,
+        //   via configuration for this tenant, 
         if (restrictJDBCQueryByTenantID(tenantBinding, ctx)) {
                 joinClauses = joinClauses
                     + " INNER JOIN collectionspace_core core"
@@ -1355,10 +1355,10 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
                     + "  AND (core.tenantid = ?)";
                 params.add(ctx.getTenantId()); // Value for replaceable parameter 3 in the query
         }
-
+        
         // Piece together the SQL query from its parts
         String querySql = selectStatement + joinClauses + whereClause + orderByClause + limitClause;
-
+        
         // Note: PostgreSQL 9.2 introduced a change that may improve performance
         // of certain queries using JDBC PreparedStatements.  See comments on
         // CSPACE-5943 for details.
@@ -1389,7 +1389,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             // out as per comments above) will not return results, so query results
             // will be the first set of results (rowSet) returned in the list
             CachedRowSet queryResults = resultsList.get(0);
-
+            
             // If the result from executing the query is null or contains zero rows,
             // return an empty list of document models
             if (queryResults == null) {
@@ -1412,7 +1412,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
         } catch (SQLException sqle) {
             logger.warn("Could not obtain document IDs via SQL query '" + querySql + "': " + sqle.getMessage());
             return result; // return an empty list of document models
-        }
+        } 
 
         // Get a list of document models, using the list of IDs obtained from the query
         //
@@ -1428,7 +1428,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
                 result.add(docModel);
             }
         }
-
+        
         // Order the results
         final String COMMON_PART_SCHEMA = handler.getServiceContext().getCommonPartLabel();
         final String DISPLAY_NAME_XPATH =
@@ -1450,9 +1450,9 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
 
         return result;
     }
+    
 
-
-    private DocumentModelList getFilteredCMIS(CoreSessionInterface repoSession,
+    private DocumentModelList getFilteredCMIS(CoreSessionInterface repoSession, 
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, DocumentHandler handler, QueryContext queryContext)
             throws DocumentNotFoundException, DocumentException {
 
@@ -1580,7 +1580,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             }
             // Check for a versioned document, and check In and Out before we proceed.
             if (((DocumentModelHandler) handler).supportsVersioning()) {
-                /* Once we advance to 5.5 or later, we can add this.
+                /* Once we advance to 5.5 or later, we can add this. 
                  * See also https://jira.nuxeo.com/browse/NXP-8506
                  if(!doc.isVersionable()) {
                  throw new NuxeoDocumentException("Configuration for: "
@@ -1607,9 +1607,6 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             handler.handle(Action.UPDATE, wrapDoc);
             repoSession.saveDocument(doc);
             repoSession.save();
-            // Refresh the doc after save, in case a documentModified event handler has modified
-            // the document post-save. We want those changes to be reflected in the returned document.
-            doc.refresh();
             handler.complete(Action.UPDATE, wrapDoc);
         } catch (BadRequestException bre) {
         	rollbackTransaction(repoSession);
@@ -1696,8 +1693,8 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
     }
 
     @Override
-	public void deleteWithWhereClause(@SuppressWarnings("rawtypes") ServiceContext ctx, String whereClause,
-			@SuppressWarnings("rawtypes") DocumentHandler handler) throws
+	public void deleteWithWhereClause(@SuppressWarnings("rawtypes") ServiceContext ctx, String whereClause, 
+			@SuppressWarnings("rawtypes") DocumentHandler handler) throws 
 			DocumentNotFoundException, DocumentException {
         if (ctx == null) {
             throw new IllegalArgumentException(
@@ -1706,7 +1703,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
         if (logger.isDebugEnabled()) {
             logger.debug("Deleting document with whereClause=" + whereClause);
         }
-
+        
         DocumentWrapper<DocumentModel> foundDocWrapper = this.findDoc(ctx, whereClause);
         if (foundDocWrapper != null) {
         	DocumentModel docModel = foundDocWrapper.getWrappedObject();
@@ -1714,7 +1711,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
         	this.delete(ctx, csid, handler);
         }
     }
-
+    
     /**
      * delete a document from the Nuxeo repository
      *
@@ -1726,7 +1723,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
     public boolean delete(ServiceContext ctx, List<String> idList, DocumentHandler handler) throws DocumentNotFoundException,
             DocumentException, TransactionException {
     	boolean result = true;
-
+    	
         if (ctx == null) {
             throw new IllegalArgumentException(
                     "delete(ctx, ix, handler): ctx is missing");
@@ -1735,12 +1732,12 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             throw new IllegalArgumentException(
                     "delete(ctx, ix, handler): handler is missing");
         }
-
+                
         CoreSessionInterface repoSession = null;
         try {
             handler.prepare(Action.DELETE);
             repoSession = getRepositorySession(ctx);
-
+            
             for (String id : idList) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Deleting document with CSID=" + id);
@@ -1764,7 +1761,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
 	                }
 	            } catch (org.nuxeo.ecm.core.api.DocumentNotFoundException ce) {
 	                String msg = logException(ce,
-	                		String.format("Could not find %s resource/record to delete with CSID=%s", ctx.getDocumentType(), id));
+	                		String.format("Could not find %s resource/record to delete with CSID=%s", ctx.getDocumentType(), id));                
 	                throw new DocumentNotFoundException(msg, ce);
 	            }
 	            repoSession.save();
@@ -1781,10 +1778,10 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
                 releaseRepositorySession(ctx, repoSession);
             }
         }
-
+        
         return result;
     }
-
+    
     /**
      * delete a document from the Nuxeo repository
      *
@@ -1795,12 +1792,12 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
     @Override
     public boolean delete(ServiceContext ctx, String id, DocumentHandler handler) throws DocumentNotFoundException,
             DocumentException, TransactionException {
-    	boolean result;
-
+    	boolean result;    	
+        
     	List<String> idList = new ArrayList<String>();
     	idList.add(id);
     	result = delete(ctx, idList, handler);
-
+    	
         return result;
     }
 
@@ -2048,7 +2045,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             logger.error(errMsg);
             throw new Exception(errMsg);
         }
-
+        
         if (repoSession == null) {
             //
             // If we couldn't find a repoSession from the service context (or the context was null) then we need to create a new one using
@@ -2108,14 +2105,14 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
         	if (cause != null) {
         		causeMsg = cause.getMessage();
         	}
-
+        	
             TransactionException te; // a CollectionSpace specific tx exception
             if (causeMsg != null) {
             	te = new TransactionException(causeMsg, tre);
             } else {
             	te = new TransactionException(tre);
             }
-
+            
             logger.error(te.getMessage(), tre); // Log the standard transaction exception message, plus an exception-specific stack trace
             throw te;
         } catch (Exception e) {
@@ -2142,14 +2139,14 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
         }
         return partialTerm;
     }
-
+    
     /**
      * Replaces user-supplied wildcards with SQL wildcards, in a partial term
      * matching search expression.
-     *
+     * 
      * The scope of this replacement excludes the beginning character
      * in that search expression, as that character is treated specially.
-     *
+     * 
      * @param partialTerm
      * @return the partial term, with any user-supplied wildcards replaced
      * by SQL wildcards.
@@ -2202,7 +2199,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
     /**
      * Identifies whether a restriction on tenant ID - to return only records
      * pertaining to the current tenant - is required in a JDBC query.
-     *
+     * 
      * @param tenantBinding a tenant binding configuration.
      * @param ctx a service context.
      * @return true if a restriction on tenant ID is required in the query;
@@ -2230,7 +2227,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
         }
         return restrict;
     }
-
+    
     private void rollbackTransaction(CoreSessionInterface repoSession) {
     	if (repoSession != null) {
     		repoSession.setTransactionRollbackOnly();
