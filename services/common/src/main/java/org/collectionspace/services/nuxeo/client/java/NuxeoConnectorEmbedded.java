@@ -7,6 +7,7 @@ import java.util.Iterator;
 
 import javax.servlet.ServletContext;
 
+import org.apache.catalina.util.ServerInfo;
 import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.config.RepositoryClientConfigType;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
@@ -18,8 +19,9 @@ import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.SystemPrincipal;
 import org.nuxeo.ecm.core.api.repository.Repository;
 import org.nuxeo.ecm.core.api.repository.RepositoryManager;
-import org.nuxeo.osgi.application.FrameworkBootstrap;
+import org.nuxeo.osgi.application.MutableClassLoaderDelegate;
 import org.nuxeo.runtime.api.Framework;
+import org.nuxeo.runtime.transaction.TransactionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,15 +35,15 @@ public class NuxeoConnectorEmbedded {
 	public final static String NUXEO_CLIENT_DIR = JEEServerDeployment.NUXEO_CLIENT_DIR;
 	public final static String NUXEO_SERVER_DIR = JEEServerDeployment.NUXEO_SERVER_DIR;
 	private final static String ERROR_CONNECTOR_NOT_INITIALIZED = "NuxeoConnector is not initialized!";
-		
+
 	private final static String CSPACE_NUXEO_HOME = "CSPACE_NUXEO_HOME";
-	
+
 	private static final NuxeoConnectorEmbedded self = new NuxeoConnectorEmbedded();
 	private NuxeoClientEmbedded client;
 	private volatile boolean initialized = false; // use volatile for lazy
 													// initialization in
 													// singleton
-	public FrameworkBootstrap fb;
+	public NuxeoFrameworkBootstrap fb;
 	private ServletContext servletContext;
 	private RepositoryClientConfigType repositoryClientConfig;
 
@@ -52,7 +54,7 @@ public class NuxeoConnectorEmbedded {
 	public final static NuxeoConnectorEmbedded getInstance() {
 		return self;
 	}
-	
+
 	private String getNuxeoServerPath(String serverRootPath) throws IOException {
 		String result = null;
 		//
@@ -68,14 +70,14 @@ public class NuxeoConnectorEmbedded {
 			//
 			result = serverRootPath + "/" + NUXEO_SERVER_DIR;
 		}
-		
+
 		return result;
 	}
-	
+
 	private File getNuxeoServerDir(String serverRootPath) throws IOException {
 		File result = null;
 		String errMsg = null;
-		
+
 		String path = getNuxeoServerPath(serverRootPath);
 		if (path != null) {
 			File temp = new File(path);
@@ -85,7 +87,7 @@ public class NuxeoConnectorEmbedded {
 				errMsg = "The Nuxeo EP configuration directory is missing or inaccessible at: '" + path + "'.";
 			}
 		}
-		
+
 		if (result == null) {
 			if (errMsg == null) {
 				path = path != null ? path : "<empty>";
@@ -95,7 +97,7 @@ public class NuxeoConnectorEmbedded {
 			}
 			throw new IOException(errMsg);
 		}
-		
+
 		return result;
 	}
 
@@ -109,17 +111,25 @@ public class NuxeoConnectorEmbedded {
 			logger.info("Starting Nuxeo EP server from configuration at: "
 					+ nuxeoHomeDir.getCanonicalPath());
 		}
-		
-		fb = new FrameworkBootstrap(NuxeoConnectorEmbedded.class.getClassLoader(),
-				nuxeoHomeDir);
+
+		ClassLoader cl = NuxeoConnectorEmbedded.class.getClassLoader();
+
+		fb = new NuxeoFrameworkBootstrap(cl, nuxeoHomeDir);
 		fb.setHostName("Tomcat");
-		fb.setHostVersion("7.0.64"); //FIXME: Should not be hard coded.
-		
+		fb.setHostVersion(ServerInfo.getServerNumber());
+
 		fb.initialize();
-		fb.start();
-		
+		fb.start(new MutableClassLoaderDelegate(cl));
+
 		// Test to see if we can connect to the default repository
+		boolean transactionStarted = false;
+
+		if (!TransactionHelper.isTransactionActiveOrMarkedRollback()) {
+				transactionStarted = TransactionHelper.startTransaction();
+		}
+
 		CoreSession coreSession = null;
+
 		try {
 			Repository defaultRepo = Framework.getService(RepositoryManager.class).getDefaultRepository();
 			coreSession = CoreInstance.openCoreSession(defaultRepo.getName(), new SystemPrincipal(null));
@@ -130,12 +140,16 @@ public class NuxeoConnectorEmbedded {
 			if (coreSession != null) {
 				CoreInstance.closeCoreSession(coreSession);
 			}
+
+			if (transactionStarted) {
+				TransactionHelper.commitOrRollbackTransaction();
+			}
 		}
 	}
 
 	/**
 	 * release releases resources occupied by Nuxeo remoting client runtime
-	 * 
+	 *
 	 * @throws java.lang.Exception
 	 */
 	public void release() throws Exception {
@@ -164,10 +178,10 @@ public class NuxeoConnectorEmbedded {
 			}
 		}
 	}
-	
+
 	/**
 	 * releaseRepositorySession releases given repository session
-	 * 
+	 *
 	 * @param repoSession
 	 * @throws java.lang.Exception
 	 */
@@ -184,23 +198,23 @@ public class NuxeoConnectorEmbedded {
 
 	/**
 	 * getRepositorySession get session to default repository
-	 * 
+	 *
 	 * @return RepositoryInstance
 	 * @throws java.lang.Exception
 	 */
 	public CoreSessionInterface getRepositorySession(RepositoryDomainType repoDomain) throws Exception {
 		CoreSessionInterface repoSession = getClient().openRepository(repoDomain);
-		
+
 		if (logger.isDebugEnabled() && repoSession != null) {
 			String repoName = repoDomain.getRepositoryName();
-			logger.debug("getRepositorySession() opened repository session on: %s repo", 
-					repoName != null ? repoName : "unknown");			
+			logger.debug("getRepositorySession() opened repository session on: %s repo",
+					repoName != null ? repoName : "unknown");
 		}
-		
+
 		return repoSession;
 	}
 
-    
+
 // TODO: Remove after CSPACE-6375 issue is resolved.
 //    public List<RepositoryDescriptor> getRepositoryDescriptor(String name) throws Exception {
 //    	RepositoryDescriptor repo = null;
@@ -214,11 +228,11 @@ public class NuxeoConnectorEmbedded {
 //
 //        return repo;
 //    }
-	
+
 	/**
 	 * getClient get Nuxeo client for accessing Nuxeo services remotely using
 	 * Nuxeo Java (EJB) Remote APIS
-	 * 
+	 *
 	 * @return NuxeoClient
 	 * @throws java.lang.Exception
 	 */
@@ -232,7 +246,7 @@ public class NuxeoConnectorEmbedded {
 		logger.error(ERROR_CONNECTOR_NOT_INITIALIZED);
 		throw new IllegalStateException(ERROR_CONNECTOR_NOT_INITIALIZED);
 	}
-	
+
 	void releaseClient() throws Exception {
 		if (initialized == true) {
 			// Do nothing.
@@ -247,7 +261,7 @@ public class NuxeoConnectorEmbedded {
 
 	/**
 	 * retrieveWorkspaceIds retrieves all workspace ids from default repository
-	 * 
+	 *
 	 * @param repoDomain
 	 *            a repository domain for a given tenant - see the tenant bindings XML file for details
 	 * @return
@@ -275,7 +289,7 @@ public class NuxeoConnectorEmbedded {
 				Iterator<DocumentModel> witer = domainChildrenList.iterator();
 				while (witer.hasNext()) {
 					DocumentModel childNode = witer.next();
-					if (NuxeoUtils.Workspaces.equalsIgnoreCase(childNode.getName())) { 
+					if (NuxeoUtils.Workspaces.equalsIgnoreCase(childNode.getName())) {
 						DocumentModelList workspaceList = repoSession
 								.getChildren(childNode.getRef());
 						Iterator<DocumentModel> wsiter = workspaceList
@@ -303,7 +317,7 @@ public class NuxeoConnectorEmbedded {
 				releaseRepositorySession(repoSession);
 			}
 		}
-		
+
 		return workspaceIds;
-	}    	
+	}
 }

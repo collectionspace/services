@@ -19,6 +19,7 @@ import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.URIResourceImpl;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.CSWebApplicationException;
+import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -46,26 +47,26 @@ public class SystemInfoResource extends AbstractCollectionSpaceResourceImpl<Syst
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	//
 	// API Endpoints
 	//
-	
+
     @GET
     public SystemInfoCommon get(@Context UriInfo ui) {
     	SystemInfoCommon result = null;
 
     	try {
     		result = new SystemInfoCommon();
-    		result.setInstanceId("_default");
-    		result.setDisplayName("CollectionSpace Services v5.1");
+    		result.setInstanceId(ServiceMain.getInstance().getCspaceInstanceId());
+    		result.setDisplayName("CollectionSpace Services v5.2");
     		Version ver = new Version();
     		ver.setMajor("5");
-    		ver.setMinor("1");
+    		ver.setMinor("2");
     		ver.setPatch("0");
     		ver.setBuild("1");
     		result.setVersion(ver);
-    		
+
     		result.setHostTimezone(TimeZone.getDefault().getID());
     		result.setHostLocale(Locale.getDefault().toLanguageTag());
     		result.setHostCharset(Charset.defaultCharset().name());
@@ -76,14 +77,16 @@ public class SystemInfoResource extends AbstractCollectionSpaceResourceImpl<Syst
     			ServiceContext<SystemInfoCommon, SystemInfoCommon> ctx = createServiceContext(getServiceName(), ui);
     			CSpaceResource res = new URIResourceImpl(ctx.getTenantId(), SystemInfoClient.SERVICE_NAME, HttpMethod.DELETE);
     			if (AuthZ.get().isAccessAllowed(res)) {
-    	    		result.setNuxeoVersionString("7.10-HF17");
-    	    		result.setHost(String.format("Architecture:%s Name:%s Version:%s",
-    	    				System.getProperty("os.arch"), System.getProperty("os.name"), System.getProperty("os.version")));
-    	    		result.setJavaVersionString(System.getProperty("java.version"));
-    	    		result.setPostgresVersionString("9.5.7");
-    			}
-    		} catch (UnauthorizedException e) {
-    			logger.trace(e.getMessage(), e);
+							// TODO: Stop hardcoding this!
+							// result.setNuxeoVersionString("7.10-HF17");
+							result.setHost(String.format("Architecture:%s Name:%s Version:%s",
+									System.getProperty("os.arch"), System.getProperty("os.name"), System.getProperty("os.version")));
+							result.setJavaVersionString(System.getProperty("java.version"));
+							// TODO: Stop hardcoding this!
+							// result.setPostgresVersionString("9.5.7");
+					}
+				} catch (UnauthorizedException e) {
+					e.printStackTrace();
     		}
 
     	} catch(Exception e) {
@@ -93,7 +96,7 @@ public class SystemInfoResource extends AbstractCollectionSpaceResourceImpl<Syst
 
     	return result;
     }
-    
+
 	@Override
 	public ServiceContextFactory<SystemInfoCommon, SystemInfoCommon> getServiceContextFactory() {
         return (ServiceContextFactory<SystemInfoCommon, SystemInfoCommon>) RemoteServiceContextFactory.get();

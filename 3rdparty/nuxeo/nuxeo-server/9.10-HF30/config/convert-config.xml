@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<component name="org.nuxeo.ecm.core.convert.config">
+    <extension target="org.nuxeo.ecm.core.convert.service.ConversionServiceImpl"
+        point="configuration">
+        <configuration>
+            <!-- define directory location for caching : As of Nuxeo 7, defaults to ${NUXEO_HOME}/data/convertcache  -->
+            <!-- <cachingDirectory>full-path-to-a-directory</cachingDirectory> -->
+            
+            <!-- GC (garbage collection) interval in minutes (default = 10 minutes ) -->
+            <!-- Garbage collector will empty the dir and sub-dirs of all files -->
+            <gcInterval>60</gcInterval>
+            
+            <!-- maximum size for disk cache in KB (default to 10*1024) -->
+            <diskCacheSize>10240</diskCacheSize>
+            
+            <!-- Enables or disables caching (default = true)-->
+            <enableCache>true</enableCache>
+        </configuration>
+    </extension>
+</component>

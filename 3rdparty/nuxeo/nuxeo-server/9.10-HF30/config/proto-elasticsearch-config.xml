@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<component name="org.nuxeo.elasticsearch.defaultConfig">
+  <require>org.nuxeo.elasticsearch.ElasticSearchComponent</require>
+
+  <!--
+  <extension target="org.nuxeo.elasticsearch.ElasticSearchComponent"
+    point="elasticSearchEmbeddedServer">
+    <elasticSearchLocal
+      clusterName="elasticsearch"
+      nodeName="nuxeoNode"
+      pathData="/usr/local/share/apache-tomcat-8.5.40/nuxeo-server/data/elasticsearch"
+      pathLogs="/usr/local/share/apache-tomcat-8.5.40/nuxeo-server/log/elasticsearch"
+      httpEnabled="true" />
+  </extension>
+  -->
+
+  <extension target="org.nuxeo.elasticsearch.ElasticSearchComponent" point="elasticSearchClient">
+    <elasticSearchClient class="org.nuxeo.elasticsearch.client.ESRestClientFactory">
+      <option name="addressList">http://localhost:9200</option>
+    </elasticSearchClient>
+  </extension>
+
+  %elasticSearchIndex_extensions%
+
+  </component>

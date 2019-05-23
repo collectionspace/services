@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.collectionspace.services.report.client</artifactId>
     <name>services.report.client</name>
-    
+
     <dependencies>
         <!-- keep slf4j dependencies on the top -->
         <dependency>
@@ -29,12 +29,12 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.jaxb</artifactId>
             <version>${project.version}</version>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
             <optional>true</optional>
-            </dependency>        
+            </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.report.jaxb</artifactId>
@@ -65,7 +65,7 @@
             <artifactId>org.collectionspace.services.organization.client</artifactId>
             <version>${project.version}</version>
         </dependency>
-<!-- External dependencies -->        
+<!-- External dependencies -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
@@ -73,13 +73,6 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
-            <!-- filter out unwanted jars -->
-            <exclusions>
-                <exclusion>
-                    <groupId>tjws</groupId>
-                    <artifactId>webserver</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -94,9 +87,8 @@
             <artifactId>commons-httpclient</artifactId>
         </dependency>
     </dependencies>
-    
+
     <build>
         <finalName>collectionspace-services-report-client</finalName>
     </build>
 </project>
-

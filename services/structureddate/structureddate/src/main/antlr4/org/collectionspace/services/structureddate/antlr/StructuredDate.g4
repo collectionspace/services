@@ -13,18 +13,21 @@ oneDisplayDate:        displayDate ( DOT | QUESTION )? EOF ;
 
 displayDate:           uncertainDate
 |                      certainDate
-/* TODO: Need to decide what "before" and "after" actually mean
 |                      beforeOrAfterDate
-*/
+|                      unknownDate
+|                      uncalibratedDate
 ;
 
 uncertainDate:         CIRCA certainDate ;
 
-certainDate:           hyphenatedRange
+certainDate:           partialEraRange
+|                      hyphenatedRange
 |                      singleInterval
 ;
 
 beforeOrAfterDate:     ( BEFORE | AFTER ) singleInterval ;
+
+uncalibratedDate:      numYear PLUSMINUS num YEARSSTRING? BP ;
 
 hyphenatedRange:       singleInterval ( HYPHEN | DASH ) singleInterval
 |                      nthCenturyRange
@@ -57,76 +60,89 @@ quarterInYearRange:    nthQuarterInYearRange
 date:                  numDate
 |                      strDate
 |                      invStrDate
+|                      dayFirstDate
+|                      dayOrYearFirstDate
+|                      invStrDateEraLastDate
+|                      romanDate
 ;
 
 month:                 monthYear
 |                      invMonthYear
 ;
 
-yearSpanningWinter:    WINTER COMMA? numYear SLASH numYear era ;
+yearSpanningWinter:    WINTER COMMA? numYear SLASH numYear era? ;
 
-partialYear:           partOf numYear era ;
+partialYear:           partOf numYear era? ;
 
 quarterYear:           seasonYear
 |                      invSeasonYear
 |                      nthQuarterYear
 ;
 
-halfYear:              nthHalf numYear era ;
+halfYear:              nthHalf numYear era? ;
 
-year:                  numYear era ;
+year:                  numYear era? ;
 
-partialDecade:         partOf numDecade era ;
+partialDecade:         partOf numDecade era? ;
 
-decade:                numDecade era ;
+decade:                numDecade era? ;
 
-partialCentury:        partOf ( strCentury | numCentury ) era ;
+partialCentury:        partOf ( strCentury | numCentury ) era? ;
 
-quarterCentury:        nthQuarter ( strCentury | numCentury ) era ;
+quarterCentury:        nthQuarter ( strCentury | numCentury ) era? ;
 
-halfCentury:           nthHalf ( strCentury | numCentury ) era ;
+halfCentury:           nthHalf ( strCentury | numCentury ) era? ;
 
-century:               ( strCentury | numCentury ) era ;
+century:               ( strCentury | numCentury ) era? ;
 
-millennium:            nth MILLENNIUM era ;
+millennium:            nth MILLENNIUM era? ;
 
-strDate:               strMonth ( numDayOfMonth | nth ) COMMA? numYear era;
-invStrDate:            era numYear COMMA? strMonth numDayOfMonth ;
-strDayInMonthRange:    strMonth numDayOfMonth ( HYPHEN | DASH ) numDayOfMonth COMMA? numYear era ;
-monthInYearRange:      strMonth ( HYPHEN | DASH ) strMonth COMMA? numYear era ;
-nthQuarterInYearRange: nthQuarter ( HYPHEN | DASH ) nthQuarter COMMA? numYear era ;
-strSeasonInYearRange:  strSeason ( HYPHEN | DASH ) strSeason COMMA? numYear era ;
-numDayInMonthRange:    numMonth SLASH numDayOfMonth ( HYPHEN | DASH ) numDayOfMonth SLASH numYear era ;
-numDate:               num SLASH num SLASH num era
-|                      num HYPHEN num HYPHEN num era ;
-monthYear:             strMonth COMMA? numYear era ;
-invMonthYear:          era numYear COMMA? strMonth ;
-seasonYear:            strSeason COMMA? numYear era ;
-invSeasonYear:         era numYear COMMA? strSeason ;
-nthQuarterYear:        nthQuarter numYear era ;
+partialEraRange:      num strMonth num era (DASH|HYPHEN) num strMonth num ;
+romanDate:             num (HYPHEN | SLASH) romanMonth (HYPHEN | SLASH) numYear era? ;
+strDate:               strMonth ( numDayOfMonth | nth ) COMMA? numYear era?;
+invStrDate:            era num COMMA? strMonth num
+|                      era? num COMMA strMonth num ;
+dayFirstDate:          num strMonth COMMA? num era
+|                      num strMonth COMMA num era?
+|                      nth strMonth COMMA? num era? ;
+dayOrYearFirstDate:    num strMonth num ;
+invStrDateEraLastDate: num COMMA strMonth num era? ;
+strDayInMonthRange:    strMonth numDayOfMonth ( HYPHEN | DASH ) numDayOfMonth COMMA? numYear era? ;
+monthInYearRange:      strMonth ( HYPHEN | DASH ) strMonth COMMA? numYear era? ;
+nthQuarterInYearRange: nthQuarter ( HYPHEN | DASH ) nthQuarter COMMA? numYear era? ;
+strSeasonInYearRange:  strSeason ( HYPHEN | DASH ) strSeason COMMA? numYear era? ;
+numDayInMonthRange:    numMonth SLASH num ( HYPHEN | DASH ) num SLASH numYear era? ;
+numDate:               num SLASH num SLASH num era?
+|                      num HYPHEN num HYPHEN num era? ;
+monthYear:             strMonth COMMA? numYear era? ;
+invMonthYear:          era? numYear COMMA? strMonth ;
+seasonYear:            strSeason COMMA? numYear era? ;
+invSeasonYear:         era? numYear COMMA? strSeason ;
+nthQuarterYear:        nthQuarter numYear era? ;
 nthQuarter:            ( nth | LAST ) QUARTER ;
 nthHalf:               ( nth | LAST ) HALF ;
 numDecade:             TENS ;
 strCentury:            nth CENTURY ;
 numCentury:            HUNDREDS ;
-nthCenturyRange:       allOrPartOf nth ( HYPHEN | DASH ) allOrPartOf nth CENTURY era ;
+nthCenturyRange:       allOrPartOf nth ( HYPHEN | DASH ) allOrPartOf nth CENTURY era? ;
 strSeason:             SPRING | SUMMER | FALL | WINTER ;
 allOrPartOf:           partOf | ;
 partOf:                EARLY | MIDDLE | LATE ; 
 nth:                   NTHSTR | FIRST | SECOND | THIRD | FOURTH ;
 strMonth:              MONTH | SHORTMONTH DOT? ;
-era:                   BC | AD | ;
+era:                   BC | AD ;
 numYear:               NUMBER ;
 numMonth:              NUMBER ;
 numDayOfMonth:         NUMBER ;
 num:                   NUMBER ;
-
+unknownDate:           UNKNOWN ;
+romanMonth:            ROMANMONTH ; 
 
 /*
  * Lexer rules
  */
-
 WS:             [ \t\r\n]+ -> skip;
+PLUSMINUS:      '±' | '+/-' ;
 CIRCA:          ('c' | 'ca') DOT? | 'circa' ;
 SPRING:         'spring' | 'spr' ;
 SUMMER:         'summer' | 'sum' ;
@@ -149,16 +165,20 @@ MILLENNIUM:     'millennium' ;
 MONTH:          'january' | 'february' | 'march' | 'april' | 'may' | 'june' | 'july' | 'august' | 'september' | 'october' | 'november' | 'december' ;
 SHORTMONTH:     'jan' | 'feb' | 'mar' | 'apr' | 'jun' | 'jul' | 'aug' | 'sep' | 'sept' | 'oct' | 'nov' | 'dec' ;
 BC:             'bc' | 'bce' |  'b.c.' | 'b.c.e.' ;
-AD:             'ad' | 'a.d.' | 'ce' | 'c.e.';
+AD:             'ad' | 'a.d.' | 'ce' | 'c.e.' ;
+BP:             'bp' | 'b.p.' | 'b.p' ;
 NTHSTR:         [0-9]*? ([0456789] 'th' | '1st' | '2nd' | '3rd' | '11th' | '12th' | '13th') ;
 HUNDREDS:       [0-9]*? '00' '\''? 's';
 TENS:           [0-9]*? '0' '\''? 's';
-NUMBER:         [0-9]+ ;
+NUMBER:         ([0-9,]+)*[0-9] ;
+ROMANMONTH:     'i' | 'ii' | 'iii' | 'iv' | 'v' | 'vi' | 'vii' | 'viii' | 'ix' | 'x' | 'xi' | 'xii' ;
 COMMA:          ',' ;
 HYPHEN:         '-' ;
 DASH:           [—–] ; /* EM DASH, EN DASH */
 SLASH:          '/' ;
 DOT:            '.' ;
 QUESTION:       '?' ;
-STRING:         [a-z]+ ;
 OTHER:          . ;
+UNKNOWN:        'unknown' ;
+YEARSSTRING:    'years' | 'year' ;
+STRING:         [a-z]+ ;

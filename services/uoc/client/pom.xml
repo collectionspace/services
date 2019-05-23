@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.collectionspace.services.uoc.client</artifactId>
     <name>services.uoc.client</name>
-    
+
     <dependencies>
         <!-- keep slf4j dependencies on the top -->
         <dependency>
@@ -54,8 +54,8 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authority.jaxb</artifactId>
             <version>${project.version}</version>
-        </dependency>    
-<!-- External dependencies -->        
+        </dependency>
+<!-- External dependencies -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
@@ -63,13 +63,6 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
-            <!-- filter out unwanted jars -->
-            <exclusions>
-                <exclusion>
-                    <groupId>tjws</groupId>
-                    <artifactId>webserver</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -84,7 +77,7 @@
             <artifactId>commons-httpclient</artifactId>
             </dependency>
     </dependencies>
-    
+
     <build>
         <finalName>collectionspace-services-uoc-client</finalName>
     </build>

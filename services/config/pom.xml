@@ -10,7 +10,7 @@
     <artifactId>org.collectionspace.services.config</artifactId>
     <name>services.config</name>
     <packaging>jar</packaging>
-    
+
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -29,6 +29,12 @@
             <artifactId>module-xml_merge-common</artifactId>
             <version>3.1</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -40,7 +46,7 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
-        
+
 		<dependency>
 			<groupId>org.jvnet.jaxb2_commons</groupId>
 			<artifactId>jaxb2-basics</artifactId>
@@ -72,4 +78,3 @@
     </build>
 
 </project>
-

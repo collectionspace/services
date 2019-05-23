@@ -12,7 +12,7 @@
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.claim.client</artifactId>
     <name>services.claim.client</name>
-    
+
     <dependencies>
         <!-- keep slf4j dependencies on the top -->
         <dependency>
@@ -31,7 +31,7 @@
             <artifactId>org.collectionspace.services.authority.jaxb</artifactId>
             <optional>true</optional>
             <version>${project.version}</version>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.jaxb</artifactId>
@@ -59,7 +59,7 @@
             <artifactId>org.collectionspace.services.person.client</artifactId>
             <version>${project.version}</version>
         </dependency>
-<!-- External dependencies -->        
+<!-- External dependencies -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
@@ -68,13 +68,6 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
-            <!-- filter out unwanted jars -->
-            <exclusions>
-                <exclusion>
-                    <groupId>tjws</groupId>
-                    <artifactId>webserver</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -90,7 +83,7 @@
             <version>3.1</version>
         </dependency>
     </dependencies>
-    
+
     <build>
         <finalName>collectionspace-services-claim-client</finalName>
     </build>

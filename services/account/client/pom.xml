@@ -33,7 +33,7 @@
 			<groupId>org.collectionspace.services</groupId>
 			<artifactId>org.collectionspace.services.hyperjaxb</artifactId>
 			<version>${project.version}</version>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authorization.jaxb</artifactId>
@@ -73,12 +73,6 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>tjws</groupId>
-                    <artifactId>webserver</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -125,8 +119,7 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-		
+
     </build>
 
 </project>
-

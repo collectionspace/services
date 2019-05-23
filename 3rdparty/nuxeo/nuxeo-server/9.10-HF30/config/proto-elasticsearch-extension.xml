@@ -1,0 +1,167 @@
+<extension target="org.nuxeo.elasticsearch.ElasticSearchComponent" point="elasticSearchIndex">
+  <elasticSearchIndex name="index_name_placeholder" type="doc" repository="repository_name_placeholder">
+    <fetchFromSource>
+      <include>ecm:*</include>
+      <include>dc:*</include>
+      <exclude>ecm:binarytext</exclude>
+    </fetchFromSource>
+
+    <settings>
+      {
+        "analysis" : {
+          "char_filter" : {
+            "refname_displayname_char_filter" : {
+              "type" : "pattern_replace",
+              "pattern" : "^.*?'(.*)'$",
+              "replacement" : "$1"
+            },
+            "refname_shortid_char_filter" : {
+              "type" : "pattern_replace",
+              "pattern" : "^.*:item:name\\((.*)\\).*$",
+              "replacement" : "$1"
+            },
+            "doctype_tenant_unqualified_char_filter" : {
+              "type" : "pattern_replace",
+              "pattern" : "^(.*?)(Tenant.*)?$",
+              "replacement" : "$1"
+            }
+          },
+          "filter" : {
+            "truncate_filter": {
+              "length": 256,
+              "type": "truncate"
+            },
+            "en_stem_filter": {
+              "name": "minimal_english",
+              "type": "stemmer"
+            },
+            "en_stop_filter": {
+              "stopwords": [
+                "_english_"
+              ],
+              "type": "stop"
+            },
+            "word_delimiter_filter": {
+              "type": "word_delimiter",
+              "preserve_original": true
+            },
+            "asciifolding_filter": {
+              "type": "asciifolding",
+              "preserve_original": true
+            }
+          },
+          "tokenizer" : {
+            "path_tokenizer": {
+              "delimiter": "/",
+              "type": "path_hierarchy"
+            },
+            "ngram_tokenizer": {
+              "type": "nGram",
+              "min_gram": 3,
+              "max_gram": 12
+            }
+          },
+          "analyzer" : {
+            "fulltext": {
+              "filter": [
+                "word_delimiter_filter",
+                "lowercase",
+                "en_stop_filter",
+                "en_stem_filter",
+                "asciifolding_filter"
+              ],
+              "type": "custom",
+              "tokenizer": "standard"
+            },
+            "path_analyzer": {
+              "type": "custom",
+              "tokenizer": "path_tokenizer"
+            },
+            "lowercase_analyzer": {
+              "type": "custom",
+              "filter": [
+                "lowercase",
+                "asciifolding"
+              ],
+              "tokenizer": "keyword"
+            },
+            "ngram_analyzer": {
+              "type": "custom",
+              "filter": [
+                "lowercase"
+              ],
+              "tokenizer": "ngram_tokenizer"
+            },
+            "refname_displayname_analyzer" : {
+              "type" : "custom",
+              "tokenizer" : "keyword",
+              "char_filter" : ["refname_displayname_char_filter"]
+            },
+            "refname_displayname_fulltext_analyzer" : {
+              "char_filter" : ["refname_displayname_char_filter"],
+              "filter" : [
+                "word_delimiter_filter",
+                "lowercase",
+                "en_stop_filter",
+                "en_stem_filter",
+                "asciifolding_filter"
+              ],
+              "type" : "custom",
+              "tokenizer" : "standard"
+            },
+            "refname_shortid_analyzer" : {
+              "type" : "custom",
+              "tokenizer" : "keyword",
+              "char_filter" : ["refname_shortid_char_filter"]
+            },
+            "doctype_analyzer" : {
+              "type" : "custom",
+              "tokenizer" : "keyword",
+              "char_filter" : ["doctype_tenant_unqualified_char_filter"]
+            },
+            "sorting_analyzer" : {
+              "filter" : [
+                "lowercase",
+                "asciifolding"
+              ],
+              "type" : "custom",
+              "tokenizer" : "keyword"
+            },
+            "default": {
+              "type": "custom",
+              "tokenizer": "keyword",
+              "filter": [
+                "truncate_filter"
+              ]
+            }
+          }
+        }
+      }
+    </settings>
+
+    <mapping>
+      {
+        // For now, don't index a field unless there's a mapping explicitly defined. This keeps the
+        // index as small as possible. We may want to turn this on in the future, to support arbitrary
+        // searches through Elasticsearch, e.g. NXQL queries for ad hoc reporting in the CSpace UI.
+        "dynamic": false,
+        "_all" : {
+          "enabled": false
+        },
+        "properties" : {
+          "all_field": {
+            "type": "text",
+            "analyzer": "fulltext"
+          },
+          "ecm:currentLifeCycleState": {
+            "type": "keyword"
+          },
+          "ecm:primaryType": {
+            "type": "text",
+            "analyzer" : "doctype_analyzer"
+          }
+        }
+      }
+    </mapping>
+  </elasticSearchIndex>
+</extension>

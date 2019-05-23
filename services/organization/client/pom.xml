@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.collectionspace.services.organization.client</artifactId>
     <name>services.organization.client</name>
-    
+
     <dependencies>
         <!-- keep slf4j dependencies on the top -->
         <dependency>
@@ -34,7 +34,7 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
             <optional>true</optional>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.client</artifactId>
@@ -42,7 +42,7 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.contact.client</artifactId>            
+            <artifactId>org.collectionspace.services.contact.client</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -58,13 +58,6 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
-            <!-- filter out unwanted jars -->
-            <exclusions>
-                <exclusion>
-                    <groupId>tjws</groupId>
-                    <artifactId>webserver</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -79,9 +72,8 @@
             <artifactId>commons-httpclient</artifactId>
             </dependency>
     </dependencies>
-    
+
     <build>
         <finalName>collectionspace-services-organization-client</finalName>
     </build>
 </project>
-

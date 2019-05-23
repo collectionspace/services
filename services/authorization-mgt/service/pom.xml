@@ -26,7 +26,7 @@
 
         <!-- utilities -->
 
-        <!-- slf4j not available due to classloading issues running in system classpath 
+        <!-- slf4j not available due to classloading issues running in system classpath
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
@@ -81,12 +81,6 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>tjws</groupId>
-                    <artifactId>webserver</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -164,7 +158,7 @@
             <artifactId>org.collectionspace.services.authentication.service</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authorization.jaxb</artifactId>

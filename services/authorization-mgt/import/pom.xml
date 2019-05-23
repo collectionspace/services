@@ -131,7 +131,7 @@
 			<version>1.0</version>
 			<scope>provided</scope>
 		</dependency>
-		<!--dependency> <groupId>org.springframework</groupId> <artifactId>spring-tx</artifactId> 
+		<!--dependency> <groupId>org.springframework</groupId> <artifactId>spring-tx</artifactId>
 			<version>${spring.version}</version> <scope>provided</scope> </dependency -->
 		<dependency>
 			<groupId>org.jboss.security</groupId>
@@ -160,6 +160,10 @@
 				<exclusion>
 					<groupId>commons-codec</groupId>
 					<artifactId>commons-codec</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -310,7 +314,7 @@
 					</systemProperties>
 				</configuration>
 				<dependencies>
-					<!-- <dependency> <groupId>mysql</groupId> <artifactId>mysql-connector-java</artifactId> 
+					<!-- <dependency> <groupId>mysql</groupId> <artifactId>mysql-connector-java</artifactId>
 						<version>${mysql.driver.version}</version> </dependency> -->
 					<dependency>
 						<groupId>org.postgresql</groupId>
@@ -322,4 +326,3 @@
 		</plugins>
 	</build>
 </project>
-
