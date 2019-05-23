@@ -437,11 +437,12 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
         Map<String, String> nonexMap = new HashMap<String,String>();
         nonexMap.put(PlaceJAXBSchema.PLACE_NAME, TEST_NAME);
         nonexMap.put(PlaceJAXBSchema.SHORT_IDENTIFIER, "nonEx");
+        nonexMap.put(PlaceJAXBSchema.DISPLAY_NAME, "nonEx-displayName");
         nonexMap.put(PlaceJAXBSchema.PLACE_TYPE, TEST_PLACE_TYPE);
         final String EMPTY_REFNAME = "";
         PoxPayloadOut result = 
                 PlaceAuthorityClientUtils.createPlaceInstance(EMPTY_REFNAME, 
-    			nonexMap, PlaceAuthorityClientUtils.getTermGroupInstance(TEST_NAME), commonPartName);
+    			nonexMap, PlaceAuthorityClientUtils.getTermGroupInstance(TEST_NAME, nonexMap.get(PlaceJAXBSchema.DISPLAY_NAME)), commonPartName);
 		return result;
 	}
 

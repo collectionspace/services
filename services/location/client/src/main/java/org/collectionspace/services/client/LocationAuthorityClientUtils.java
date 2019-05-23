@@ -3,16 +3,21 @@ package org.collectionspace.services.client;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import org.apache.commons.io.FileUtils;
+
 import org.collectionspace.services.LocationJAXBSchema;
+import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.location.*;
+
+import org.apache.commons.io.FileUtils;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,8 +62,10 @@ public class LocationAuthorityClientUtils {
      * @return	The PoxPayloadOut payload for the create call
      */
     public static PoxPayloadOut createLocationInstance( 
-    		String locationAuthRefName, Map<String, String> locationInfo, 
-				List<LocTermGroup> terms, String headerLabel){
+    		String locationAuthRefName,
+    		Map<String, String> locationInfo, 
+		List<LocTermGroup> terms, 
+		String headerLabel) {
         LocationsCommon location = new LocationsCommon();
     	String shortId = locationInfo.get(LocationJAXBSchema.SHORT_IDENTIFIER);
     	String displayName = locationInfo.get(LocationJAXBSchema.DISPLAY_NAME);
@@ -313,5 +320,31 @@ public class LocationAuthorityClientUtils {
     private static String getGeneratedIdentifier() {
         return "id" + new Date().getTime(); 
    }
+
+    public static PoxPayloadOut createLocationInstance(String shortIdentifier, String displayName,
+            String serviceItemCommonPartName) {
+        List<LocTermGroup> terms = getTermGroupInstance(shortIdentifier, displayName);
+        
+        Map<String, String> locationInfo = new HashMap<String, String>();
+        locationInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortIdentifier);
+
+        return createLocationInstance(null, locationInfo, terms, serviceItemCommonPartName);
+    }
+
+    private static List<LocTermGroup> getTermGroupInstance(String shortIdentifier, String displayName) {
+        if (Tools.isBlank(shortIdentifier)) {
+            shortIdentifier = getGeneratedIdentifier();
+        }
+        if (Tools.isBlank(shortIdentifier)) {
+            displayName = shortIdentifier;
+        }
+        
+        List<LocTermGroup> terms = new ArrayList<LocTermGroup>();
+        LocTermGroup term = new LocTermGroup();
+        term.setTermDisplayName(displayName);
+        term.setTermName(shortIdentifier);
+        terms.add(term);
+        return terms;
+    }
 
 }

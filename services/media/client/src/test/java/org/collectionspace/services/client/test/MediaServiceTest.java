@@ -53,10 +53,10 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 
     private final String CLASS_NAME = MediaServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(MediaServiceTest.class);
-    private final static String PUBLIC_URL_DECK = "http://farm8.staticflickr.com/7231/6962564226_4bdfc17599_k_d.jpg";
+    private final static String PUBLIC_URL_DECK = "https://farm8.staticflickr.com/7231/6962564226_4bdfc17599_k_d.jpg";
 
     private boolean mediaCleanup = true;
-    
+
     /**
      * Sets up create tests.
      */
@@ -71,12 +71,12 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
             this.mediaCleanup = false;
     	}
     }
-    
+
     private boolean isMediaCleanup() {
     	return mediaCleanup;
     }
 
-    
+
     @Override
 	public String getServicePathComponent() {
 		return MediaClient.SERVICE_PATH_COMPONENT;
@@ -86,7 +86,7 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 	protected String getServiceName() {
 		return MediaClient.SERVICE_NAME;
 	}
-    
+
     @Override
     protected CollectionSpaceClient getClientInstance() throws Exception {
         return new MediaClient();
@@ -110,7 +110,7 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
      * @param fromUri - if 'true' then send the service a URI from which to create the blob.
      * @param fromUri - if 'false' then send the service a multipart/form-data POST from which to create the blob.
      * @throws Exception the exception
-     */    
+     */
 	public void createBlob(String testName, boolean fromUri) throws Exception {
 		setupCreate();
 		//
@@ -194,14 +194,14 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 					+ " is missing or cannot be read.");
 		}
 	}
-    
-    @Test(dataProvider = "testName", 
+
+    @Test(dataProvider = "testName",
     		dependsOnMethods = {"CRUDTests"})
     public void createWithBlobUri(String testName) throws Exception {
         createBlob(testName, true /*with URI*/);
     }
-    
-    @Test(dataProvider = "testName", 
+
+    @Test(dataProvider = "testName",
     		dependsOnMethods = {"createWithBlobUri"})
     public void createMediaAndBlobWithUri(String testName) throws Exception {
 		MediaClient client = new MediaClient();
@@ -218,14 +218,14 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 			}
 		}
     }
-    
-    
-    @Test(dataProvider = "testName", 
+
+
+    @Test(dataProvider = "testName",
     		dependsOnMethods = {"createWithBlobUri"})
     public void createWithBlobPost(String testName) throws Exception {
         createBlob(testName, false /*with POST*/);
     }
-    
+
 //    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"update"})
 //    public void updateWithBlob(String testName) throws Exception {
 //        logger.debug(testBanner(testName, CLASS_NAME));
@@ -235,8 +235,8 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 //        Response res = client.create(multipart);
 //        assertStatusCode(res, testName);
 //        String csid = extractId(res);
-//        
-//        
+//
+//
 //        allResourceIdsCreated.add(extractId(res)); // Store the IDs from every resource created by tests so they can be deleted after tests have been run.
 //    }
 
@@ -248,7 +248,7 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
     protected PoxPayloadOut createInstance(String identifier) throws Exception {
     	return createMediaInstance(identifier);
     }
-    
+
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
@@ -290,7 +290,7 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 	@Override
 	protected MediaCommon updateInstance(final MediaCommon original) {
 		MediaCommon result = new MediaCommon();
-		
+
 		result.setTitle("updated-" + original.getTitle());
 
 		return result;
@@ -305,9 +305,9 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 	@Override
     @Test(dataProvider = "testName",
 	dependsOnMethods = {
-		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})	
+		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})
 	public void CRUDTests(String testName) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

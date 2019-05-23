@@ -3,12 +3,15 @@ package org.collectionspace.services.client;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import org.apache.commons.io.FileUtils;
+
 import org.collectionspace.services.PlaceJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.common.api.Tools;
@@ -16,6 +19,7 @@ import org.collectionspace.services.place.PlaceTermGroup;
 import org.collectionspace.services.place.PlaceTermGroupList;
 import org.collectionspace.services.place.PlaceauthoritiesCommon;
 import org.collectionspace.services.place.PlacesCommon;
+
 import org.dom4j.DocumentException;
 import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
@@ -275,20 +279,38 @@ public class PlaceAuthorityClientUtils {
 		return newStr.toString();
     }
     
-    public static List<PlaceTermGroup> getTermGroupInstance(String identifier) {
-        if (Tools.isBlank(identifier)) {
-            identifier = getGeneratedIdentifier();
+    public static List<PlaceTermGroup> getTermGroupInstance(String shortIdentifier, String displayName) {
+        if (Tools.isBlank(shortIdentifier)) {
+            shortIdentifier = getGeneratedIdentifier();
         }
+        if (Tools.isBlank(shortIdentifier)) {
+            displayName = shortIdentifier;
+        }
+        
         List<PlaceTermGroup> terms = new ArrayList<PlaceTermGroup>();
         PlaceTermGroup term = new PlaceTermGroup();
-        term.setTermDisplayName(identifier);
-        term.setTermName(identifier);
+        term.setTermDisplayName(displayName);
+        term.setTermName(shortIdentifier);
         terms.add(term);
         return terms;
+    }    
+    
+    public static List<PlaceTermGroup> getTermGroupInstance(String identifier) {
+        return getTermGroupInstance(identifier, null);
     }
     
     private static String getGeneratedIdentifier() {
         return "id" + new Date().getTime(); 
-   }
+    }
+    
+    public static PoxPayloadOut createPlaceInstance(String shortIdentifier, String displayName,
+            String serviceItemCommonPartName) {
+        List<PlaceTermGroup> terms = getTermGroupInstance(shortIdentifier, displayName);
+        
+        Map<String, String> placeInfo = new HashMap<String, String>();
+        placeInfo.put(PlaceJAXBSchema.SHORT_IDENTIFIER, shortIdentifier);
+
+        return createPlaceInstance(null, placeInfo, terms, serviceItemCommonPartName);
+    }
     
 }

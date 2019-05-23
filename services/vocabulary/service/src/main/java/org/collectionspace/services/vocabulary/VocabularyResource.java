@@ -429,7 +429,7 @@ public class VocabularyResource extends
     	return result;
     }
     
-    private String getCsid(ListItem item) {
+    public String getCsid(ListItem item) {
     	return getFieldValue(item, "csid");
     }
     
