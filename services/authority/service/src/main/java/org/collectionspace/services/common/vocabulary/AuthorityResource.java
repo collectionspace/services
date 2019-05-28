@@ -60,6 +60,8 @@ import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.UriTemplateFactory;
 import org.collectionspace.services.common.UriTemplateRegistryKey;
 import org.collectionspace.services.common.api.RefName;
+import org.collectionspace.services.common.api.RefNameUtils;
+import org.collectionspace.services.common.api.RefNameUtils.AuthorityTermInfo;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
@@ -448,15 +450,27 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @Override
     public Response get(
             @Context Request request,
+            @Context ResourceMap resourceMap,
             @Context UriInfo uriInfo,
             @PathParam("csid") String specifier) {
         Response result = null;
         uriInfo = new UriInfoWrapper(uriInfo);
+        PoxPayloadOut payloadout = null;
 
-        try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(request, uriInfo);
-            PoxPayloadOut payloadout = getAuthority(ctx, request, uriInfo, specifier, DONT_INCLUDE_ITEMS);
-            result = buildResponse(ctx, payloadout);
+        try {      
+            //
+            // If the specifier is a fully qualified authority term refname, then return the term payload in the response
+            //
+            if (RefNameUtils.isTermRefname(specifier)) {
+            	AuthorityTermInfo authorityTermInfo = RefNameUtils.parseAuthorityTermInfo(specifier);
+            	String parentIdentifier = Specifier.createShortIdURNValue(authorityTermInfo.inAuthority.name);
+            	String itemIdentifier = Specifier.createShortIdURNValue(authorityTermInfo.name);
+            	result = this.getAuthorityItemResponse(request, uriInfo, resourceMap, parentIdentifier, itemIdentifier);
+            } else {
+                ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(request, uriInfo);
+            	payloadout = getAuthority(ctx, request, uriInfo, specifier, DONT_INCLUDE_ITEMS);
+                result = buildResponse(ctx, payloadout);
+            }
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED, specifier);
         }
@@ -1096,6 +1110,21 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             @PathParam("itemcsid") String itemIdentifier) {
         uriInfo = new UriInfoWrapper(uriInfo);
         PoxPayloadOut result = null;
+
+        result = this.getAuthorityItemPayload(request, uriInfo, resourceMap, parentIdentifier, itemIdentifier);
+                
+        return result.getBytes();
+    }
+    
+    
+    public PoxPayloadOut getAuthorityItemPayload(
+            @Context Request request,
+            @Context UriInfo uriInfo,
+            @Context ResourceMap resourceMap,            
+            @PathParam("csid") String parentIdentifier,
+            @PathParam("itemcsid") String itemIdentifier) {
+        uriInfo = new UriInfoWrapper(uriInfo);
+        PoxPayloadOut result = null;
         try {
             RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx =
                     (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(getItemServiceName(), resourceMap, uriInfo);
@@ -1109,9 +1138,36 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED);
         }
-
-        return result.getBytes();
+                
+        return result;
     }
+    
+    public Response getAuthorityItemResponse(
+            @Context Request request,
+            @Context UriInfo uriInfo,
+            @Context ResourceMap resourceMap,            
+            @PathParam("csid") String parentIdentifier,
+            @PathParam("itemcsid") String itemIdentifier) {
+        uriInfo = new UriInfoWrapper(uriInfo);
+        PoxPayloadOut payloadout = null;
+        RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
+        
+        try {
+            ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(getItemServiceName(), resourceMap, uriInfo);
+
+            JaxRsContext jaxRsContext = new JaxRsContext(request, uriInfo); // Needed for getting account permissions part of the resource
+            ctx.setJaxRsContext(jaxRsContext);
+            
+            payloadout = getAuthorityItem(ctx, parentIdentifier, itemIdentifier);
+        } catch (DocumentNotFoundException dnf) {
+            throw bigReThrow(dnf, ServiceMessages.resourceNotFoundMsg(itemIdentifier));
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.GET_FAILED);
+        }
+                
+        return buildResponse(ctx, payloadout);
+    }
+
 
     /*
      * Most of the authority child classes will/should use this implementation.  However, the Vocabulary service's item schema is

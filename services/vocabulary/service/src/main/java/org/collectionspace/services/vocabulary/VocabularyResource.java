@@ -34,6 +34,8 @@ import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.UriInfoWrapper;
+import org.collectionspace.services.common.api.RefNameUtils;
+import org.collectionspace.services.common.api.RefNameUtils.AuthorityTermInfo;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -570,6 +572,7 @@ public class VocabularyResource extends
     @Override
     public Response get(
             @Context Request request,
+            @Context ResourceMap resourceMap, 
             @Context UriInfo uriInfo,
             @PathParam("csid") String specifier) {
     	Response result = null;
@@ -587,10 +590,16 @@ public class VocabularyResource extends
             		queryParams.add(IClientQueryParams.PAGE_SIZE_PARAM, "0");
             	}
             }
-
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(request, uriInfo);
-            PoxPayloadOut payloadout = getAuthority(ctx, request, uriInfo, specifier, showItems);
-            result = buildResponse(ctx, payloadout);
+            if (RefNameUtils.isTermRefname(specifier)) {
+            	AuthorityTermInfo authorityTermInfo = RefNameUtils.parseAuthorityTermInfo(specifier);
+            	String parentIdentifier = Specifier.createShortIdURNValue(authorityTermInfo.inAuthority.name);
+            	String itemIdentifier = Specifier.createShortIdURNValue(authorityTermInfo.name);
+            	result = this.getAuthorityItemResponse(request, uriInfo, resourceMap, parentIdentifier, itemIdentifier);
+            } else {
+				ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(request, uriInfo);
+				PoxPayloadOut payloadout = getAuthority(ctx, request, uriInfo, specifier, showItems);
+				result = buildResponse(ctx, payloadout);
+            }
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED, specifier);
         }
