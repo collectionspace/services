@@ -208,7 +208,7 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 		//
 		AuthorityResource authorityResource = (AuthorityResource) resourceMap.get(serviceName.toLowerCase());
 		try {
-			response = authorityResource.get(null, null, authoritySpecifier);
+			response = authorityResource.get(null, null, null, authoritySpecifier);
 		} catch (CSWebApplicationException e) {
 			response = e.getResponse();  // If the authority doesn't exist, we expect a 404 error
 		}
