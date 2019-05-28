@@ -234,6 +234,18 @@ public class RefNameUtils {
     		return sb.toString();
     	}
     }
+    
+    public static boolean isTermRefname(String specifier) {
+    	boolean result = true;
+    	
+    	try {
+    		AuthorityTermInfo authorityTermInfo = RefNameUtils.parseAuthorityTermInfo(specifier);
+    	} catch (Exception e) {
+    		result = false;
+    	}
+
+    	return result;
+    }
 
     /*
      * Returns the name / shortIdentifier value of an authority item in a refName
