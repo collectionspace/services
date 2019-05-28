@@ -220,7 +220,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 
 	protected PoxPayloadOut findByCsid(String serviceName, String csid) throws URISyntaxException, DocumentException {
 		NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(serviceName);
-		byte[] outputBytes = (byte[]) resource.get(null, createUriInfo(), csid).getEntity();
+		byte[] outputBytes = (byte[]) resource.get(null, null, createUriInfo(), csid).getEntity();
 
 		PoxPayloadOut payload = new PoxPayloadOut(outputBytes);
 

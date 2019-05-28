@@ -333,6 +333,7 @@ public abstract class NuxeoBasedResource
     @Path("{csid}")
     public Response get(
             @Context Request request,
+            @Context ResourceMap resourceMap,
             @Context UriInfo uriInfo,
             @PathParam("csid") String csid) {
     	uriInfo = new UriInfoWrapper(uriInfo);
