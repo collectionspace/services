@@ -78,6 +78,7 @@ public class BatchValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, Po
 		boolean result = false;
 		
 		try {
+			className = className.trim();
 			ClassLoader tccl = Thread.currentThread().getContextClassLoader();
 			Class<?> c = tccl.loadClass(className);
 			tccl.setClassAssertionStatus(className, true);

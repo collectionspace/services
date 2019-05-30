@@ -10,6 +10,7 @@ import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectBotGardenConstants;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.api.RefName;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonBotGardenConstants;
@@ -167,15 +168,22 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 
 		for (String taxonRefName : taxonRefNames) {
 			PoxPayloadOut taxonPayload = findTaxonByRefName(taxonRefName);
-			UpdateAccessCodeResults updateResults = updateAccessCode(taxonPayload, false, isAlive);
-
-			if (updateResults.isChanged()) {
-				numAffected += updateResults.getNumAffected();
-
-				if (propagate) {
-					UpdateAccessCodeResults parentUpdateResults = updateParentAccessCode(getCsid(taxonPayload), updateResults.getAccessCode(), true);
-
-					numAffected += parentUpdateResults.getNumAffected();
+			if (taxonPayload != null) {
+				UpdateAccessCodeResults updateResults = updateAccessCode(taxonPayload, false, isAlive);
+				if (updateResults.isChanged()) {
+					numAffected += updateResults.getNumAffected();
+	
+					if (propagate) {
+						UpdateAccessCodeResults parentUpdateResults = updateParentAccessCode(getCsid(taxonPayload), updateResults.getAccessCode(), true);
+	
+						numAffected += parentUpdateResults.getNumAffected();
+					}
+				}
+			} else {
+				if (Tools.isBlank(taxonRefName) == false) {
+					String msg = String.format("%s found that cataloging/object record CSID=%s references taxon '%s' which could not be found.",
+							getClass().getName(), collectionObjectCsid, taxonRefName);
+					logger.warn(msg);
 				}
 			}
 		}

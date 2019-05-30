@@ -379,14 +379,17 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 
 	protected PoxPayloadOut findAuthorityItemByShortId(String serviceName, String vocabularyShortId, String itemShortId) throws URISyntaxException, DocumentException, Exception {
 		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
-		PoxPayloadOut payload = resource.getAuthorityItemWithExistingContext(getServiceContext(), createDeleteFilterUriInfo(), getResourceMap(), "urn:cspace:name(" + vocabularyShortId + ")", "urn:cspace:name(" + itemShortId + ")");
+		PoxPayloadOut payload = resource.getAuthorityItemWithExistingContext(getServiceContext(), createDeleteFilterUriInfo(), getResourceMap(), 
+				"urn:cspace:name(" + vocabularyShortId + ")", "urn:cspace:name(" + itemShortId + ")");
 
 		return payload;
 	}
 
 	protected PoxPayloadOut findAuthorityItemByRefName(String serviceName, String refName) throws URISyntaxException, DocumentException, Exception {
 		RefName.AuthorityItem item = RefName.AuthorityItem.parse(refName);
-
+		if (item == null) {
+			return null;
+		}
 		String vocabularyShortId = item.getParentShortIdentifier();
 		String itemShortId = item.getShortIdentifier();
 
