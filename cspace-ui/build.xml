@@ -271,7 +271,7 @@
 	<property name="anthro.profile.plugin.tenantid" value="${cspace.profile.anthro.default.id}" />
 	<property name="anthro.profile.plugin.message.title" value="Default Anthropology Profile" />
 	<property name="anthro.profile.plugin.logo" value="undefined" />
-	<property name="anthro.profile.plugin.version" value="^1.0.0" />
+	<property name="anthro.profile.plugin.version" value="^2.0.0" />
 	<property name="anthro.profile.plugin.name" value="cspaceUIPluginProfileAnthro" />
 	<property name="anthro.profile.plugin.dir" value="cspace#anthro" />
 	<property name="anthro.profile.plugin.js" value="${anthro.profile.plugin.name}@${anthro.profile.plugin.version}.min.js" />
