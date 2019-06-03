@@ -36,6 +36,7 @@
                     "collectionspace_denorm:*",
                     "collectionspace_core:*",
                     "ecm:currentLifeCycleState",
+                    "ecm:name",
                     "ecm:primaryType",
                     "materials_common:shortIdentifier",
                     "materials_common:publishToList",
