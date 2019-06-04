@@ -33,7 +33,7 @@ import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.BlobClient;
 import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PersonAuthorityClient;
+import org.collectionspace.services.client.PersonClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -125,7 +125,7 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     }
 
     protected void createPersonRefs() throws Exception {
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         // Create a temporary PersonAuthority resource, and its corresponding refName by which it can be identified.
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         Response res = personAuthClient.create(multipart);
@@ -153,7 +153,7 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     protected String createPerson(String firstName, String surName, String shortId, String authRefName) throws Exception {
     	String result = null;
     	
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         Map<String, String> personInfo = new HashMap<String, String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
@@ -250,7 +250,7 @@ public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
             return;
         }
         logger.debug("Cleaning up temporary resources created for testing ...");
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         // Delete Person resource(s) (before PersonAuthority resources).
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.

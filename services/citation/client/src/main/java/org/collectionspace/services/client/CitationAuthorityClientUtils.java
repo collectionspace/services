@@ -3,17 +3,24 @@ package org.collectionspace.services.client;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.FileUtils;
+
+import org.collectionspace.services.CitationJAXBSchema;
 import org.collectionspace.services.citation.CitationTermGroup;
+import org.collectionspace.services.citation.CitationTermGroupList;
 import org.collectionspace.services.citation.CitationauthoritiesCommon;
+import org.collectionspace.services.citation.CitationsCommon;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.common.api.Tools;
+
 import org.dom4j.DocumentException;
 import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
@@ -151,20 +158,70 @@ public class CitationAuthorityClientUtils {
                 requestType.validStatusCodesAsString();
     }
     
-     public static List<CitationTermGroup> getTermGroupInstance(String identifier) {
-        if (Tools.isBlank(identifier)) {
-            identifier = getGeneratedIdentifier();
+    private static String getGeneratedIdentifier() {
+        return "id" + new Date().getTime(); 
+   }
+
+    public static PoxPayloadOut createCitationInstance(String shortIdentifier, String displayName,
+            String serviceItemCommonPartName) {
+        List<CitationTermGroup> terms = getTermGroupInstance(shortIdentifier, displayName);
+        
+        Map<String, String> citationInfo = new HashMap<String, String>();
+        citationInfo.put(CitationJAXBSchema.SHORT_IDENTIFIER, shortIdentifier);
+        
+        final Map<String, List<String>> EMPTY_CITATION_REPEATABLES_INFO = new HashMap<String, List<String>>();
+
+        return createCitationInstance(citationInfo, terms, EMPTY_CITATION_REPEATABLES_INFO, serviceItemCommonPartName);
+    }
+
+    private static PoxPayloadOut createCitationInstance(Map<String, String> citationInfo,
+            List<CitationTermGroup> terms, Map<String, List<String>> citationRepeatablesInfo,
+            String serviceItemCommonPartName) {
+        
+        CitationsCommon citation = new CitationsCommon();
+        String shortId = citationInfo.get(CitationJAXBSchema.SHORT_IDENTIFIER);
+        if (shortId == null || shortId.isEmpty()) {
+            throw new IllegalArgumentException("shortIdentifier cannot be null or empty");
+        }       
+        citation.setShortIdentifier(shortId);
+        
+        // Set values in the Term Information Group
+        CitationTermGroupList termList = new CitationTermGroupList();
+        if (terms == null || terms.isEmpty()) {
+            terms = getTermGroupInstance(getGeneratedIdentifier());
         }
+        termList.getCitationTermGroup().addAll(terms); 
+        citation.setCitationTermGroupList(termList);
+
+        PoxPayloadOut multipart = new PoxPayloadOut(CitationAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = multipart.addPart(citation, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(serviceItemCommonPartName);
+
+        if (logger.isDebugEnabled()){
+                logger.debug("to be created, organization common ", citation, CitationsCommon.class);
+        }
+
+        return multipart;
+    }
+
+    private static List<CitationTermGroup> getTermGroupInstance(String shortIdentifier, String displayName) {
+        if (Tools.isBlank(shortIdentifier)) {
+            shortIdentifier = getGeneratedIdentifier();
+        }
+        if (Tools.isBlank(displayName)) {
+            displayName = shortIdentifier;
+        }
+        
         List<CitationTermGroup> terms = new ArrayList<CitationTermGroup>();
         CitationTermGroup term = new CitationTermGroup();
-        term.setTermDisplayName(identifier);
-        term.setTermName(identifier);
+        term.setTermDisplayName(displayName);
+        term.setTermName(shortIdentifier);
         terms.add(term);
         return terms;
     }
     
-    private static String getGeneratedIdentifier() {
-        return "id" + new Date().getTime(); 
-   }
+    private static List<CitationTermGroup> getTermGroupInstance(String identifier) {
+        return getTermGroupInstance(identifier, null);
+    }    
 
 }

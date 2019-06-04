@@ -55,19 +55,19 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
 
     private final String CLASS_NAME = BlobServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    
+
     private final static String KNOWN_IMAGE_FILENAME = "01-03-09_1546.jpg";
     private final static int WIDTH_DIMENSION_INDEX = 0;
     private final static int HEIGHT_DIMENSION_INDEX = 1;
-    
+
     private final static String KNOWN_IMAGE_SIZE = "56261";
     private final static BigDecimal KNOWN_IMAGE_WIDTH = new BigDecimal(640.0);
     private final static BigDecimal KNOWN_IMAGE_HEIGHT = new BigDecimal(480.0);
-    
-    private final static String PUBLIC_URL_BIRD = "http://farm6.static.flickr.com/5289/5688023100_15e00cde47_o.jpg";
-    private final static String PUBLIC_URL_DECK = "http://farm8.staticflickr.com/7231/6962564226_4bdfc17599_k_d.jpg";
-    
-    
+
+    private final static String PUBLIC_URL_BIRD = "https://farm6.static.flickr.com/5289/5688023100_15e00cde47_o.jpg";
+    private final static String PUBLIC_URL_DECK = "https://farm8.staticflickr.com/7231/6962564226_4bdfc17599_k_d.jpg";
+
+
     private boolean blobCleanup = true;
 
     @Override
@@ -79,7 +79,7 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
 	protected String getServiceName() {
 		return BlobClient.SERVICE_NAME;
 	}
-    
+
     @Override
     protected CollectionSpaceClient getClientInstance() throws Exception {
         return new BlobClient();
@@ -109,11 +109,11 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
             this.blobCleanup = false;
     	}
     }
-    
+
     private boolean isBlobCleanup() {
     	return blobCleanup;
     }
-        
+
     /**
      * Looks in the .../src/test/resources/blobs directory for files from which to create Blob
      * instances.
@@ -126,7 +126,7 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
     protected void createBlob(String testName, boolean fromUri, String uri) throws Exception {
         setupCreate();
         BlobClient client = new BlobClient();
-        
+
         String currentDir = this.getResourceDir();
         String blobsDirPath = currentDir + File.separator + BLOBS_DIR;
         File blobsDir = new File(blobsDirPath);
@@ -171,14 +171,14 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
         	logger.debug("Directory: " + blobsDirPath + " is missing or cannot be read.");
         }
     }
-    
+
     /*
      * For a known image file, make sure we're getting back the correct metadata about it.
      */
     @Test(dataProvider = "testName", dependsOnMethods = {"createBlobWithURI"})
     public void testImageDimensions(String testName) throws Exception {
         setupCreate();
-        
+
         String currentDir = this.getResourceDir();
         String blobsDirPath = currentDir
         		+ File.separator + BLOBS_DIR + File.separator + KNOWN_IMAGE_FILENAME;
@@ -193,7 +193,7 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
 		res = client.createBlobFromURI(uri);
 		String blobCsid = null;
 		try {
-	        assertStatusCode(res, testName);	        
+	        assertStatusCode(res, testName);
 	        blobCsid = extractId(res);
 	        if (isBlobCleanup() == true) {
 	        	allResourceIdsCreated.add(blobCsid);
@@ -218,40 +218,40 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
         		readResponse.close();
             }
         }
-        
+
         Assert.assertEquals(blobsCommon.getLength(), KNOWN_IMAGE_SIZE, "The known image blob was not the expected size of " + KNOWN_IMAGE_SIZE);
-        
+
         MeasuredPartGroup measuredImagePart = blobsCommon.getMeasuredPartGroupList().getMeasuredPartGroup().get(0);
         Assert.assertEquals(measuredImagePart.getMeasuredPart(), BlobClient.IMAGE_MEASURED_PART_LABEL, "First measured part of the image blob was not the image itself.");
-        
+
         List<DimensionSubGroup> dimensionSubGroupList = measuredImagePart.getDimensionSubGroupList().getDimensionSubGroup();
         DimensionSubGroup widthDimension = dimensionSubGroupList.get(WIDTH_DIMENSION_INDEX);
         Assert.assertEquals(widthDimension.getDimension(), BlobClient.IMAGE_WIDTH_LABEL, "First dimension item of the image blob was not the width.");
         Assert.assertTrue(widthDimension.getValue().compareTo(KNOWN_IMAGE_WIDTH) == 0);
-        
+
         DimensionSubGroup heightDimension = dimensionSubGroupList.get(HEIGHT_DIMENSION_INDEX);
         Assert.assertEquals(heightDimension.getDimension(), BlobClient.IMAGE_HEIGHT_LABEL, "Second dimension item of the image blob was not the height.");
         Assert.assertTrue(heightDimension.getValue().compareTo(KNOWN_IMAGE_HEIGHT) == 0);
     }
-    
+
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     		dependsOnMethods = {"CRUDTests"})
     public void createBlobWithURI(String testName) throws Exception {
     	createBlob(testName, true /*with URI*/, null);
     }
-    
+
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     		dependsOnMethods = {"CRUDTests"})
     public void createBlobWithURL1(String testName) throws Exception {
     	createBlob(testName, true /*with URI*/, PUBLIC_URL_BIRD);
-    }    
-    
+    }
+
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     		dependsOnMethods = {"CRUDTests"})
     public void createBlobWithURL2(String testName) throws Exception {
     	createBlob(testName, true /*with URI*/, PUBLIC_URL_DECK);
-    }    
-    
+    }
+
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     		dependsOnMethods = {"createBlobWithURI"})
     public void createBlobWithPost(String testName) throws Exception {
@@ -261,12 +261,12 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-    
+
     @Override
     protected PoxPayloadOut createInstance(String identifier) throws Exception {
     	return createBlobInstance(identifier);
-    }    
-    
+    }
+
     private PoxPayloadOut createBlobInstance(String exitNumber) throws Exception {
     	BlobClient client = new BlobClient();
         String identifier = "blobNumber-" + exitNumber;
@@ -296,7 +296,7 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
     @Override
     @Test(dataProvider = "testName",
     		dependsOnMethods = {
-        		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
+        		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})
     public void CRUDTests(String testName) {
     	// Do nothing.  Simply here to for a TestNG execution order for our tests
     }
@@ -304,9 +304,9 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
 	@Override
 	protected BlobsCommon updateInstance(BlobsCommon blobsCommon) {
 		BlobsCommon result = new BlobsCommon();
-		
+
         result.setName("updated-" + blobsCommon.getName());
-		
+
 		return result;
 	}
 
