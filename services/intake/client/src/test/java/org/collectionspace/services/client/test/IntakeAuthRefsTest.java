@@ -33,7 +33,7 @@ import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IntakeClient;
 import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PersonAuthorityClient;
+import org.collectionspace.services.client.PersonClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -166,7 +166,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     	//
     	// First, create a new person authority
     	//
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
     	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     			PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         Response res = personAuthClient.create(multipart);
@@ -205,7 +205,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     protected String createPerson(String firstName, String surName, String shortId, String authRefName ) throws Exception {
     	String result = null;
     	
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
@@ -329,7 +329,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         }
         //
         // Delete all the person records then the parent resource
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         for (String resourceId : personIdsCreated) {
             personAuthClient.deleteItem(personAuthCSID, resourceId).close();
         }
