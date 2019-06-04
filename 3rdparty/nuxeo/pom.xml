@@ -16,6 +16,7 @@
     <modules>
 		<module>nuxeo-platform-collectionspace</module>
 		<module>nuxeo-platform-listener</module>
+		<module>nuxeo-platform-elasticsearch</module>
 		<!-- disabled in v4.2 build do to test failures during upgrade to Nuxeo 6 
 		<module>nuxeo-platform-quote-api</module>
 		<module>nuxeo-platform-quote</module>
