@@ -1355,6 +1355,8 @@ public class DocumentUtils {
 			result = loadSchema(schema, document, ctx);
 		} catch (IllegalArgumentException iae) {
 			throw iae;
+		} catch (DocumentException de) {
+		    throw de;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1519,9 +1521,16 @@ public class DocumentUtils {
 				while (it.hasNext()) {
 					org.dom4j.Element el = it.next();
 					String name = el.getName();
-					Object value = getElementData(el,
-							ctype.getField(el.getName()).getType(), ctx);
-					map.put(name, value);
+					String elementText = el.getTextTrim();
+					Field field = ctype.getField(el.getName());
+					if (field != null) {
+					    Object value = getElementData(el, field.getType(), ctx); // Break this up and check for null -i.e., does the field exist
+	                    map.put(name, value);
+					} else {
+					    String msg = String.format("Unknown field '%s' in group '%s' with the value '%s'.",
+					            name, ctype.getName(), elementText);
+					    throw new DocumentException(msg);
+					}
 				}
 				result = map;
 			}

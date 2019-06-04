@@ -67,7 +67,8 @@ public class ConceptValidatorHandler extends ValidatorHandlerImpl {
             try {
                 String shortId = concept.getShortIdentifier();
                 if (shortId != null) {
-                    CS_ASSERT(shortIdentifierContainsOnlyValidChars(shortId), SHORT_ID_BAD_CHARS_ERROR);
+                    String msg = String.format("%s: %s", SHORT_ID_BAD_CHARS_ERROR, shortId);
+                    CS_ASSERT(shortIdentifierContainsOnlyValidChars(shortId), msg);
                 }
                 CS_ASSERT(containsAtLeastOneTerm(concept), HAS_NO_TERMS_ERROR);
                 CS_ASSERT(allTermsContainDisplayName(concept), TERM_HAS_EMPTY_DISPLAYNAME_ERROR);

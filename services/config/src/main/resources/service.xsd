@@ -29,23 +29,23 @@
     >
 
     <xs:import namespace="http://collectionspace.org/services/config/types" schemaLocation="types.xsd" />
-    
-    
+
+
     <xs:element name="root" type="ServiceBindingType"></xs:element>
-    
+
 
     <xs:complexType name="ServiceBindingType">
         <xs:sequence>
             <!-- other URI paths using which this service binding could be accessed -->
             <xs:element name="uriPath" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            
+
             <!-- object representation served by the service -->
             <xs:element name="object" type="ServiceObjectType" minOccurs="1" maxOccurs="1"/>
-            
+
             <!-- document handler to be used to process the content (need to be in classpath) -->
             <xs:element name="documentHandler" type="xs:string" minOccurs="1" maxOccurs="1"/>
             <xs:element name="DocHandlerParams" type="DocHandlerParams" minOccurs="0" maxOccurs="1"/>
-            
+
             <!-- optional instances definitions -->
             <xs:element name="AuthorityInstanceList">
                 <xs:complexType>
@@ -70,11 +70,12 @@
             <xs:element name="repositoryWorkspaceId" type="xs:string" minOccurs="0" maxOccurs="1"/>
             <xs:element name="properties" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
-        
+
         <!-- name of the service, this is also the default URI path to access this service binding -->
         <xs:attribute name="name" type="xs:string" use="required"/>
         <xs:attribute name="type" type="xs:string" use="optional"/>
         <xs:attribute name="version" type="types:VersionType" use="required"/>
+        <xs:attribute name="elasticsearchIndexed" type="xs:boolean" default="false"/>
         <xs:attribute name="requiresDocumentHandler" type="xs:boolean" default="true"/>
         <xs:attribute name="supportsReplicating" type="xs:boolean" default="false"/>
         <xs:attribute name="remoteClientConfigName" type="xs:string"/>
@@ -90,7 +91,7 @@
             <xs:element ref="termList"/>
         </xs:sequence>
     </xs:complexType>
-        
+
     <xs:element name="termList">
         <xs:complexType>
             <xs:sequence>
@@ -103,7 +104,7 @@
             <xs:attribute name="id" use="required" type="xs:NCName"/>
         </xs:complexType>
     </xs:element>
-    
+
     <!--
         ServiceObjectType defines the manifest for a collectionspace
         object.  includes properties of the object as well as manifests
@@ -327,7 +328,7 @@
             <xs:element name="public" type="xs:boolean" minOccurs="0" maxOccurs="1" default="true"/>			<!-- any entity in the chain can cache this -->
             <xs:element name="noCache" type="xs:boolean" minOccurs="0" maxOccurs="1" default="false"/>			<!-- should not be cached in any way/method -->
             <xs:element name="mustRevalidate" type="xs:boolean" minOccurs="0" maxOccurs="1" default="false"/>	<!-- See http://bit.ly/2mnCwIi -->
-            <xs:element name="proxyRevalidate" type="xs:boolean" minOccurs="0" maxOccurs="1" default="false"/>	
+            <xs:element name="proxyRevalidate" type="xs:boolean" minOccurs="0" maxOccurs="1" default="false"/>
             <xs:element name="noStore" type="xs:boolean" minOccurs="0" maxOccurs="1" default="false"/>			<!-- can be cached but should not be stored on disk (most browsers will hold the resources in memory until they will be quit) -->
             <xs:element name="noTransform" type="xs:boolean" minOccurs="0" maxOccurs="1" default="false"/>		<!-- the resource should not be modified (for example shrink image by proxy) -->
             <xs:element name="maxAge" type="xs:integer" minOccurs="0" maxOccurs="1" default="86400"/>			<!-- how long the resource is valid (measured in seconds) -->
