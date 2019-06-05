@@ -31,7 +31,7 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.PersonAuthorityClient;
+import org.collectionspace.services.client.PersonClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -94,12 +94,12 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
     
 	@Override
 	public String getServicePathComponent() {
-		return PersonAuthorityClient.SERVICE_PATH_COMPONENT;
+		return PersonClient.SERVICE_PATH_COMPONENT;
 	}
 
 	@Override
 	protected String getServiceName() {
-		return PersonAuthorityClient.SERVICE_NAME;
+		return PersonClient.SERVICE_NAME;
 	}
     
     /* (non-Javadoc)
@@ -107,12 +107,12 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
      */
     @Override
     protected CollectionSpaceClient getClientInstance() throws Exception {
-    	return new PersonAuthorityClient();
+    	return new PersonClient();
     }
 
 	@Override
 	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
-    	return new PersonAuthorityClient(clientPropertiesFilename);
+    	return new PersonClient(clientPropertiesFilename);
 	}
 
     /* (non-Javadoc)
@@ -156,7 +156,7 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
         testSetup(expectedStatusCode, requestType);
 
         // Submit the request to the service and store the response.
-        PersonAuthorityClient client = new PersonAuthorityClient();
+        PersonClient client = new PersonClient();
         String shortId = "perfTestPersons";
     	String displayName = "Perf Test Person Auth";
     	//String baseRefName = PersonAuthorityClientUtils.createPersonAuthRefName(shortId, null);
@@ -189,7 +189,7 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
      * @param authorityCsid The CSID of the Authority in which the term will be created.
      * @param authRefName The refName of the Authority in which the term will be created.
      */
-    private void createItem(String firstName, String lastName, PersonAuthorityClient client )
+    private void createItem(String firstName, String lastName, PersonClient client )
         throws Exception {
             
         int expectedStatusCode = Response.Status.CREATED.getStatusCode();
@@ -197,7 +197,7 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
         testSetup(expectedStatusCode, requestType);
         
         if(client==null) {
-            client = new PersonAuthorityClient();
+            client = new PersonClient();
         }
 
         // Submit the request to the service and store the response.
@@ -240,7 +240,7 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
 
     private void createItems()
     	throws Exception {
-        PersonAuthorityClient client = new PersonAuthorityClient();
+        PersonClient client = new PersonClient();
         String fullTest = System.getProperty("runFullItemsTest");
         runFullTest = Boolean.TRUE.toString().equalsIgnoreCase(fullTest); 
 		int maxSuff = shortTestLimit;
@@ -308,7 +308,7 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
         testSetup(expectedStatusCode, requestType);
 
         // Submit the request to the service and store the response.
-        PersonAuthorityClient client = new PersonAuthorityClient();
+        PersonClient client = new PersonClient();
         Response res = null;
         if (authorityCsid != null) {
         	res = client.readItemList(authorityCsid, partialTerm, keywords);
@@ -351,7 +351,7 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
     	}
         // Note: Any non-success responses from the delete operations
         // below are ignored and not reported.
-        PersonAuthorityClient client = new PersonAuthorityClient();
+        PersonClient client = new PersonClient();
         // Clean up item resources.
         for (String itemId : allItemIdsCreated) {
             client.deleteItem(authId, itemId).close();

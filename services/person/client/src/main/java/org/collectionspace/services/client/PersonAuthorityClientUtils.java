@@ -64,9 +64,9 @@ public class PersonAuthorityClientUtils {
      * @return
      * @throws Exception 
      */
-    public static String getAuthorityRefName(String csid, PersonAuthorityClient client) throws Exception{
+    public static String getAuthorityRefName(String csid, PersonClient client) throws Exception{
     	if (client == null) {
-    		client = new PersonAuthorityClient();
+    		client = new PersonClient();
     	}
         Response res = client.read(csid);
         try {
@@ -99,9 +99,9 @@ public class PersonAuthorityClientUtils {
      * @return
      * @throws Exception 
      */
-    public static String getPersonRefName(String inAuthority, String csid, PersonAuthorityClient client) throws Exception{
+    public static String getPersonRefName(String inAuthority, String csid, PersonClient client) throws Exception{
     	if ( client == null) {
-    		client = new PersonAuthorityClient();
+    		client = new PersonClient();
     	}
         Response res = client.readItem(inAuthority, csid);
         try {
@@ -143,7 +143,7 @@ public class PersonAuthorityClientUtils {
         //String refName = createPersonAuthRefName(shortIdentifier, displayName);
         //personAuthority.setRefName(refName);
         personAuthority.setVocabType("PersonAuthority");
-        PoxPayloadOut multipart = new PoxPayloadOut(PersonAuthorityClient.SERVICE_PAYLOAD_NAME);
+        PoxPayloadOut multipart = new PoxPayloadOut(PersonClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(personAuthority, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(headerLabel);
 
@@ -166,7 +166,7 @@ public class PersonAuthorityClientUtils {
     	personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortIdentifier);
 
 		return createPersonInstance(null, null, personInfo, terms, null, headerLabel);
-	}    
+	}
     
     /**
      * Creates a person instance.
@@ -281,7 +281,7 @@ public class PersonAuthorityClientUtils {
 			}
 		}
 
-        PoxPayloadOut multipart = new PoxPayloadOut(PersonAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
+        PoxPayloadOut multipart = new PoxPayloadOut(PersonClient.SERVICE_ITEM_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(person, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(headerLabel);
 
@@ -304,7 +304,7 @@ public class PersonAuthorityClientUtils {
     public static String createItemInAuthority(String vcsid, 
     		String personAuthorityRefName, Map<String,String> personMap,
                 List<PersonTermGroup> terms, Map<String, List<String>> personRepeatablesMap,
-                PersonAuthorityClient client ) {
+                PersonClient client ) {
     	// Expected status code: 201 Created
     	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
     	// Type of service request being tested
