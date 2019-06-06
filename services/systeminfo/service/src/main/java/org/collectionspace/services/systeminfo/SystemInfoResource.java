@@ -58,12 +58,12 @@ public class SystemInfoResource extends AbstractCollectionSpaceResourceImpl<Syst
     	try {
     		result = new SystemInfoCommon();
     		result.setInstanceId("_default");
-    		result.setDisplayName("CollectionSpace Services v5.0-28 @ UCB");
+    		result.setDisplayName("CollectionSpace Services v5.1-1 @ UCB");
     		Version ver = new Version();
     		ver.setMajor("5");
-    		ver.setMinor("0");
+    		ver.setMinor("1");
     		ver.setPatch("0");
-    		ver.setBuild("28");
+    		ver.setBuild("1");
     		result.setVersion(ver);
     		
     		result.setHostTimezone(TimeZone.getDefault().getID());
@@ -78,7 +78,7 @@ public class SystemInfoResource extends AbstractCollectionSpaceResourceImpl<Syst
     			if (AuthZ.get().isAccessAllowed(res)) {
     	    		result.setNuxeoVersionString("7.10-HF17");
     	    		result.setHost(String.format("Architecture:%s Name:%s Version:%s",
-    	    				System.getProperty("os.arch"), System.getProperty("os.name"), System.getProperty("os.version")));
+    	    			System.getProperty("os.arch"), System.getProperty("os.name"), System.getProperty("os.version")));
     	    		result.setJavaVersionString(System.getProperty("java.version"));
     	    		result.setPostgresVersionString("9.5.7");
     			}
