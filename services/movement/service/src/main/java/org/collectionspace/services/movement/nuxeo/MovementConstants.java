@@ -35,15 +35,18 @@ public class MovementConstants {
     public final static String NUXEO_DOCTYPE = "Movement";
     public final static String NUXEO_SCHEMA_NAME = "movement";
     public final static String NUXEO_DC_TITLE = "CollectionSpace-Movement";
-
+    
     public final static String CORE_SCHEMA_NAME = CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA;
 	public static final String COMMON_SCHEMA_NAME = MovementClient.SERVICE_NAME + CollectionSpaceClient.PART_LABEL_SEPARATOR + CollectionSpaceClient.PART_COMMON_LABEL;
-
+		
 	public static final String CURRENT_LOCATION_SCHEMA_NAME = COMMON_SCHEMA_NAME;
 	public static final String CURRENT_LOCATION_FIELD_NAME = "currentLocation";
-
+	
+	public static final String PREVIOUS_LOCATION_SCHEMA_NAME = COMMON_SCHEMA_NAME;
+	public static final String PREVIOUS_LOCATION_FIELD_NAME = "previousLocation";
+	
 	public static final String WORKFLOW_STATE_SCHEMA_NAME = MovementConstants.CORE_SCHEMA_NAME;
 	public static final String WORKFLOW_STATE_FIELD_NAME = CollectionSpaceClient.COLLECTIONSPACE_CORE_WORKFLOWSTATE;
-
-	public static final String NONE_LOCATION = null;
+	
+	public static final String NONE_LOCATION = null;		
 }

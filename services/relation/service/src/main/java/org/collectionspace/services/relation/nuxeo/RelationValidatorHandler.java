@@ -29,39 +29,39 @@ public class RelationValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn,
     }
     
     @Override
-    protected void handleCreate()
-    		throws InvalidDocumentException{
-    	try {
-	    	RelationsCommon relationsCommon = (RelationsCommon)getCommonPart();
-	    	CS_ASSERT(relationsCommon != null);
-    		if (logger.isTraceEnabled() == true) {
-    			logger.trace(relationsCommon.toString());
-    		}
-	    	
+    protected void handleCreate() throws InvalidDocumentException {
+        try {
+            RelationsCommon relationsCommon = (RelationsCommon) getCommonPart();
+            CS_ASSERT(relationsCommon != null);
+            if (logger.isTraceEnabled() == true) {
+                logger.trace(relationsCommon.toString());
+            }
+
             String subjectCsid = relationsCommon.getSubjectCsid();
             String objectCsid = relationsCommon.getObjectCsid();
-	    	
+
             // If no CSID for a subject or object is included in the create payload,
-            // a refName must be provided for that subject or object as an alternate identifier.
+            // a refName must be provided for that subject or object as an alternate
+            // identifier.
             CS_ASSERT(hasCsid(subjectCsid) || hasSubjectRefname(relationsCommon));
             CS_ASSERT(hasCsid(objectCsid) || hasObjectRefname(relationsCommon));
-	    	
+
             // The Subject identifier and Object ID must not be identical:
             // that is, a resource cannot be related to itself.
             if (hasCsid(subjectCsid) && hasCsid(objectCsid)) {
-            	CS_ASSERT (subjectCsid.trim().equalsIgnoreCase(objectCsid.trim()) == false,
-                        SUBJECT_EQUALS_OBJECT_ERROR);
+                CS_ASSERT(subjectCsid.trim().equalsIgnoreCase(objectCsid.trim()) == false, SUBJECT_EQUALS_OBJECT_ERROR);
             }
 
-            // A relationship type must be provided.
+            // A relationship type must be provided.  Set the redundant "predicate" field to be the same
             CS_ASSERT(relationsCommon.getRelationshipType() != null);
+            relationsCommon.setPredicate(relationsCommon.getRelationshipType());
 
-    	} catch (AssertionError e) {
-    		if (logger.isErrorEnabled() == true) {
-    			logger.error(e.getMessage(), e);
-    		}
-    		throw new InvalidDocumentException(VALIDATION_ERROR, e);
-    	}
+        } catch (AssertionError e) {
+            if (logger.isErrorEnabled() == true) {
+                logger.error(e.getMessage(), e);
+            }
+            throw new InvalidDocumentException(VALIDATION_ERROR, e);
+        }
     }
 
 	@Override

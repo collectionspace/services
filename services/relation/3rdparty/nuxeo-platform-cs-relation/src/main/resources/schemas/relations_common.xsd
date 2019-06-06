@@ -24,6 +24,8 @@
 	<!-- document-id-2 would be the id of the contained (or child) collectionobject -->
 	<!-- document-type-2 would be the doc-type of the collectionobejct -->
 	
+	<xs:element name="active" type="xs:boolean" default="true" minOccurs="1" maxOccurs="1"/>     <!-- true=active false=soft-deleted -->
+	
 	<xs:element name="subjectCsid" type="xs:string" minOccurs="1"
 		maxOccurs="1" />     <!-- new name for documentId1 -->
 	<xs:element name="subjectDocumentType" type="xs:string"
