@@ -1607,6 +1607,9 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             handler.handle(Action.UPDATE, wrapDoc);
             repoSession.saveDocument(doc);
             repoSession.save();
+            // Refresh the doc after save, in case a documentModified event handler has modified
+            // the document post-save. We want those changes to be reflected in the returned document.
+            doc.refresh();
             handler.complete(Action.UPDATE, wrapDoc);
         } catch (BadRequestException bre) {
         	rollbackTransaction(repoSession);
