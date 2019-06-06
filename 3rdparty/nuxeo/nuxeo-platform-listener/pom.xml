@@ -13,6 +13,7 @@
     <name>services.3rdparty.nuxeo.listener</name>
 
     <modules>
+    	<module>reindex</module>
         <module>updateobjectlocationonmove</module>
         <module>updaterelationsondelete</module>
         <module>updateimagederivatives</module>

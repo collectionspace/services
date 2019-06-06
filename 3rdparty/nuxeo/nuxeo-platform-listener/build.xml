@@ -115,6 +115,7 @@
 
     <target name="deploy" depends="package"
             description="deploy nuxeo server libs to ${jee.server.cspace}">
+        <ant antfile="reindex/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="updateobjectlocationonmove/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="updaterelationsondelete/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="updateimagederivatives/build.xml" target="deploy" inheritall="false"/>
@@ -124,6 +125,7 @@
 
     <target name="undeploy"
             description="undeploy nuxeo server libs from ${jee.server.cspace}">
+        <ant antfile="reindex/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="updateobjectlocationonmove/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="updaterelationsondelete/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="updateimagederivatives/build.xml" target="undeploy" inheritall="false"/>
@@ -133,6 +135,7 @@
 
     <target name="dist"
             description="generate distribution for nuxeo server libs" depends="package">
+        <ant antfile="reindex/build.xml" target="dist" inheritall="false"/>
         <ant antfile="updateobjectlocationonmove/build.xml" target="dist" inheritall="false"/>
         <ant antfile="updaterelationsondelete/build.xml" target="dist" inheritall="false"/>
         <ant antfile="updateimagederivatives/build.xml" target="dist" inheritall="false"/>
