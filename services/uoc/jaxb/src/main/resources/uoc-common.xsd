@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    UOC schema (XSD)
+    
+    Entity  : Use of Collections
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+
+    $LastChangedRevision: 2316 $
+    $LastChangedDate: 2018-05-02 16:03:51 -0700 (Wed, 02 Jun 2010) $
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns:ns="http://collectionspace.org/services/uoc"
+  xmlns="http://collectionspace.org/services/uoc"
+  targetNamespace="http://collectionspace.org/services/uoc"
+  version="0.1"
+>
+
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+    
+    <!-- UOC -->
+    <xs:element name="uoc_common">
+        <xs:complexType>
+            <xs:sequence>
+                <!--  UOC Information Group -->
+                <xs:element name="title" type="xs:string"/>
+                <xs:element name="referenceNumber" type="xs:string"/>
+                <xs:element name="methodList" type="methodList"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="methodList">
+        <xs:sequence>
+            <xs:element name="method" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
+
