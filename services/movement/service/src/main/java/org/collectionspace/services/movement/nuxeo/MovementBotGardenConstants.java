@@ -12,6 +12,9 @@ public class MovementBotGardenConstants {
 	public static final String BOTGARDEN_PROFILE_NAME = MovementClient.BOTGARDEN_PROFILE_NAME;
 	public static final String BOTGARDEN_SCHEMA_NAME = MovementClient.SERVICE_NAME + CollectionSpaceClient.PART_LABEL_SEPARATOR + BOTGARDEN_PROFILE_NAME;
 	
+	public static final String PREVIOUS_LOCATION_SCHEMA_NAME = BOTGARDEN_SCHEMA_NAME;
+	public static final String PREVIOUS_LOCATION_FIELD_NAME = "previousLocation";
+	
 	public static final String ACTION_CODE_SCHEMA_NAME = MovementConstants.COMMON_SCHEMA_NAME;
 	public static final String ACTION_CODE_FIELD_NAME = "reasonForMove";
 
