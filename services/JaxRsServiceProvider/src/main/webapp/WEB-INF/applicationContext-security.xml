@@ -199,6 +199,7 @@
                         <property name="exposedHeaders">
                             <list>
                                 <value>Location</value>
+                                <value>Content-Disposition</value>
                             </list>
                         </property>
                         <property name="maxAge" value="86400" />
