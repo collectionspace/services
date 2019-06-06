@@ -193,7 +193,7 @@ public class ContactDocumentModelHandler
     public String getUri(DocumentModel docModel) {
         String uri = "";
         UriInfo ui = getServiceContext().getUriInfo();
-        if (ui != null) {
+        if (ui != null && ui.getPath() != null) {
             uri = '/' + getAuthorityPathComponent(ui) + '/' + inAuthority
                     + '/' + AuthorityClient.ITEMS + '/' + inItem
                     + getServiceContextPath() + getCsid(docModel);

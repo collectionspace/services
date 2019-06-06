@@ -53,6 +53,7 @@ import org.collectionspace.services.common.relation.nuxeo.RelationsUtils;
 import org.collectionspace.services.config.service.DocHandlerParams;
 import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
@@ -61,6 +62,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 
 /**
  * This class is generified by the marker type T,
@@ -109,6 +111,20 @@ public abstract class NuxeoDocumentModelHandler<T> extends RemoteDocumentModelHa
 		this.commonPart = commonPart;
 	}
 
+	protected String getCsid(ListItem item) {
+        String result = null;
+        
+        for (Element ele : item.getAny()) {
+            String elementName = ele.getTagName().toLowerCase();
+            if (elementName.equals("csid")) {
+                result = ele.getTextContent();
+                break;
+            }
+        }
+        
+        return result;
+    }
+	
     /**
      * The entity type expected from the JAX-RS Response object.  By default it is of type String.  Child classes
      * can override this if they need to.
