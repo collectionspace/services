@@ -41,6 +41,7 @@ import org.collectionspace.services.config.service.InitHandler.Params.Field;
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.ServiceConfig;
 import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.ElasticSearchIndexConfig;
 import org.collectionspace.services.config.tenant.EventListenerConfig;
 import org.collectionspace.services.config.tenant.EventListenerConfigurations;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
@@ -101,6 +102,7 @@ public class ServiceMain {
     private static final String DROP_USER_SQL_CMD = "DROP USER";
     private static final String DROP_USER_IF_EXISTS_SQL_CMD = DROP_USER_SQL_CMD + " IF EXISTS %s;";
     private static final String DROP_OBJECTS_SQL_COMMENT = "-- drop all the objects before dropping roles";
+	private static final String CSPACE_JEESERVER_HOME = "CSPACE_JEESERVER_HOME";
 
     private ServiceMain() {
     	// Intentionally blank
@@ -1108,7 +1110,7 @@ public class ServiceMain {
 						logger.debug(String.format("Repository name is %s", repositoryName));
 						Document protoElasticsearchExtensionDoc = XmlTools.fileToXMLDocument(protoElasticsearchExtensionFile);
 						
-						protoElasticsearchExtensionDoc = updateElasticSearchExtensionDoc(protoElasticsearchExtensionDoc, repositoryName, this.getCspaceInstanceId());
+						protoElasticsearchExtensionDoc = updateElasticSearchExtensionDoc(protoElasticsearchExtensionDoc, repositoryName, this.getCspaceInstanceId(), tbt.getElasticSearchIndexConfig());
 						if (logger.isDebugEnabled()) {
 							String extension = protoElasticsearchExtensionDoc.asXML();
 							logger.trace(String.format("Updated Elasticsearch extension for '%s' repository: contents=\n", repositoryName, extension));
@@ -1325,7 +1327,7 @@ public class ServiceMain {
      * This method is filling out the elasticsearch-config.xml file with tenant specific repository information.
      */
     private Document updateElasticSearchExtensionDoc(Document elasticsearchConfigDoc, String repositoryName,
-    		String cspaceInstanceId) {
+    		String cspaceInstanceId, ElasticSearchIndexConfig elasticSearchIndexConfig) {
         
         // Set the <elasticSearchIndex> element's  name attribute
         String indexName = getElasticsearchIndexName(elasticsearchConfigDoc, repositoryName, cspaceInstanceId);
@@ -1335,6 +1337,19 @@ public class ServiceMain {
         // Set the <elasticSearchIndex> element's repository attribute
         elasticsearchConfigDoc = XmlTools.setAttributeValue(elasticsearchConfigDoc,
         		ConfigUtils.ELASTICSEARCH_INDEX_EXTENSION_XPATH + "/elasticSearchIndex", "repository", repositoryName);
+        
+        if (elasticSearchIndexConfig != null) {
+            String settings = elasticSearchIndexConfig.getSettings();
+            String mapping = elasticSearchIndexConfig.getMapping();
+
+            if (settings != null) {
+                XmlTools.setElementValue(elasticsearchConfigDoc, ConfigUtils.ELASTICSEARCH_INDEX_EXTENSION_XPATH + "/elasticSearchIndex/settings", settings);
+            }
+
+            if (mapping != null) {
+                XmlTools.setElementValue(elasticsearchConfigDoc, ConfigUtils.ELASTICSEARCH_INDEX_EXTENSION_XPATH + "/elasticSearchIndex/mapping", mapping);
+            }
+        }
         
         return elasticsearchConfigDoc;
     }
@@ -1437,5 +1452,15 @@ public class ServiceMain {
 			throw e;
 		}
 
+	}
+
+	public static String getJeeContainPath() throws Exception {
+		String result = System.getenv(CSPACE_JEESERVER_HOME);
+		
+		if (result == null) {
+			throw new Exception();
+		}
+		
+		return result;
 	}
 }

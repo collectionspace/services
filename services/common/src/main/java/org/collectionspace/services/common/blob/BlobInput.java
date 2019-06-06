@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.common.Download;
+import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.imaging.nuxeo.NuxeoBlobUtils;
 
@@ -218,7 +221,14 @@ public class BlobInput {
 				throw new DocumentException(msg);
 			}
 		} else if (blobUrl.getProtocol().equalsIgnoreCase("file")) {
-			theBlobFile = FileUtils.toFile(blobUrl);
+			if (blobUrl.getPath().startsWith("/")) {
+				// full path
+				theBlobFile = FileUtils.toFile(blobUrl);			
+			} else {
+				// relative to JEE container (e.g. Apache Tomcat) path
+				Path theBlobFilePath = Paths.get(ServiceMain.getJeeContainPath(), blobUrl.getPath());
+				theBlobFile = new File(theBlobFilePath.toAbsolutePath().toString());
+			}
 			if (theBlobFile.exists() == false || theBlobFile.canRead() == false) {
 				String msg = FILE_ACCESS_ERROR + theBlobFile.getAbsolutePath();
 				logger.error(msg);
