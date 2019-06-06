@@ -27,3 +27,14 @@ SELECT constraint_name FROM information_schema.constraint_column_usage WHERE tab
 
 #IF: emptyResult
 ALTER TABLE batch_common add CONSTRAINT batchname_unique UNIQUE (name);
+
+#
+# Add constraint to the relations table to prevent duplicate relationships
+#
+#LOG.INFO Adding constraint to the relations table to prevent duplicate relationships
+
+#TEST:
+SELECT constraint_name FROM information_schema.constraint_column_usage WHERE table_name = 'relations_common' AND constraint_name = 'relations_unique';
+
+#IF: emptyResult
+ALTER TABLE relations_common add CONSTRAINT relations_unique UNIQUE (subjectcsid, subjectrefname, relationshiptype, objectcsid, objectrefname, active);
