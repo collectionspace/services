@@ -51,7 +51,7 @@ public class UpdateLocationListener extends AbstractCSEventListenerImpl {
 					 * event to fire, taking us into the other branch of this code, with the current document
 					 * becoming the previous document.
 					 */
-					if (actionCode != null && actionCode.contains(MovementBotGardenConstants.DEAD_ACTION_CODE)) {
+					if (actionCode != null && actionCode.equals(MovementBotGardenConstants.DEAD_ACTION_CODE)) {
 						context.getCoreSession().saveDocument(doc);
 
 						/*
@@ -62,7 +62,7 @@ public class UpdateLocationListener extends AbstractCSEventListenerImpl {
 					}
 				}
 				else {
-					if (actionCode != null && actionCode.contains(MovementBotGardenConstants.DEAD_ACTION_CODE)) {
+					if (actionCode != null && actionCode.equals(MovementBotGardenConstants.DEAD_ACTION_CODE)) {
 						doc.setProperty(MovementConstants.CURRENT_LOCATION_SCHEMA_NAME, MovementConstants.CURRENT_LOCATION_FIELD_NAME, MovementConstants.NONE_LOCATION);
 					}
 
