@@ -41,6 +41,7 @@ import org.collectionspace.services.config.service.InitHandler.Params.Field;
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.ServiceConfig;
 import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.ElasticSearchIndexConfig;
 import org.collectionspace.services.config.tenant.EventListenerConfig;
 import org.collectionspace.services.config.tenant.EventListenerConfigurations;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
@@ -101,6 +102,7 @@ public class ServiceMain {
     private static final String DROP_USER_SQL_CMD = "DROP USER";
     private static final String DROP_USER_IF_EXISTS_SQL_CMD = DROP_USER_SQL_CMD + " IF EXISTS %s;";
     private static final String DROP_OBJECTS_SQL_COMMENT = "-- drop all the objects before dropping roles";
+	private static final String CSPACE_JEESERVER_HOME = "CSPACE_JEESERVER_HOME";
 
     private ServiceMain() {
     	// Intentionally blank
@@ -721,6 +723,11 @@ public class ServiceMain {
                             JDBCTools.createNewDatabaseUser(JDBCTools.CSADMIN_DATASOURCE_NAME, repositoryName, cspaceInstanceId, dbType, readerUser, readerPW);
                         }
                         // Create the database
+                        if (logger.isInfoEnabled()) {
+                			DataSource csadminDataSource = JDBCTools.getDataSource(JDBCTools.CSADMIN_DATASOURCE_NAME);
+                        	logger.info(String.format("Using datasource connected '%s', attempting to create database named '%s' with ownder '%s'",
+                        			JDBCTools.CSADMIN_DATASOURCE_NAME, dbName, nuxeoUser));
+                        }
                         createDatabaseWithRights(dbType, dbName, nuxeoUser, nuxeoPW, readerUser, readerPW);
                     }
                     nuxeoDBsChecked.add(dbName);
@@ -750,13 +757,14 @@ public class ServiceMain {
 			String ownerPW, String readerName, String readerPW) throws Exception {
                 Connection conn = null;
 		Statement stmt = null;
+		String sql = null;
 		try {
 			DataSource csadminDataSource = JDBCTools.getDataSource(JDBCTools.CSADMIN_DATASOURCE_NAME);
 			conn = csadminDataSource.getConnection();
 			stmt = conn.createStatement();
 			if (dbType == DatabaseProductType.POSTGRESQL) {
 				// PostgreSQL does not need passwords in grant statements.
-				String sql = "CREATE DATABASE " + dbName + " ENCODING 'UTF8' OWNER " + ownerName;
+				sql = "CREATE DATABASE " + dbName + " ENCODING 'UTF8' OWNER " + ownerName;
 				stmt.executeUpdate(sql);
 				if (logger.isDebugEnabled()) {
 					logger.debug("Created db: '" + dbName + "' with owner: '" + ownerName + "'");
@@ -771,7 +779,7 @@ public class ServiceMain {
 				// Note that select rights for reader must be granted after
 				// Nuxeo startup.
 			} else if (dbType == DatabaseProductType.MYSQL) {
-				String sql = "CREATE database " + dbName + " DEFAULT CHARACTER SET utf8";
+				sql = "CREATE database " + dbName + " DEFAULT CHARACTER SET utf8";
 				stmt.executeUpdate(sql);
 				sql = "GRANT ALL PRIVILEGES ON " + dbName + ".* TO '" + ownerName + "'@'localhost' IDENTIFIED BY '"
 						+ ownerPW + "' WITH GRANT OPTION";
@@ -791,7 +799,10 @@ public class ServiceMain {
 				throw new UnsupportedOperationException("createDatabaseWithRights only supports PSQL - MySQL NYI!");
 			}
 		} catch (Exception e) {
+			String errMsg = String.format("The following SQL statement failed using credentials from datasource '%s': %s",
+					JDBCTools.CSADMIN_DATASOURCE_NAME, sql);
 			logger.error("createDatabaseWithRights failed on exception: " + e.getLocalizedMessage());
+			logger.error(errMsg);
 			throw e; // propagate
 		} finally { // close resources
 			try {
@@ -1108,7 +1119,7 @@ public class ServiceMain {
 						logger.debug(String.format("Repository name is %s", repositoryName));
 						Document protoElasticsearchExtensionDoc = XmlTools.fileToXMLDocument(protoElasticsearchExtensionFile);
 						
-						protoElasticsearchExtensionDoc = updateElasticSearchExtensionDoc(protoElasticsearchExtensionDoc, repositoryName, this.getCspaceInstanceId());
+						protoElasticsearchExtensionDoc = updateElasticSearchExtensionDoc(protoElasticsearchExtensionDoc, repositoryName, this.getCspaceInstanceId(), tbt.getElasticSearchIndexConfig());
 						if (logger.isDebugEnabled()) {
 							String extension = protoElasticsearchExtensionDoc.asXML();
 							logger.trace(String.format("Updated Elasticsearch extension for '%s' repository: contents=\n", repositoryName, extension));
@@ -1325,7 +1336,7 @@ public class ServiceMain {
      * This method is filling out the elasticsearch-config.xml file with tenant specific repository information.
      */
     private Document updateElasticSearchExtensionDoc(Document elasticsearchConfigDoc, String repositoryName,
-    		String cspaceInstanceId) {
+    		String cspaceInstanceId, ElasticSearchIndexConfig elasticSearchIndexConfig) {
         
         // Set the <elasticSearchIndex> element's  name attribute
         String indexName = getElasticsearchIndexName(elasticsearchConfigDoc, repositoryName, cspaceInstanceId);
@@ -1335,6 +1346,19 @@ public class ServiceMain {
         // Set the <elasticSearchIndex> element's repository attribute
         elasticsearchConfigDoc = XmlTools.setAttributeValue(elasticsearchConfigDoc,
         		ConfigUtils.ELASTICSEARCH_INDEX_EXTENSION_XPATH + "/elasticSearchIndex", "repository", repositoryName);
+        
+        if (elasticSearchIndexConfig != null) {
+            String settings = elasticSearchIndexConfig.getSettings();
+            String mapping = elasticSearchIndexConfig.getMapping();
+
+            if (settings != null) {
+                XmlTools.setElementValue(elasticsearchConfigDoc, ConfigUtils.ELASTICSEARCH_INDEX_EXTENSION_XPATH + "/elasticSearchIndex/settings", settings);
+            }
+
+            if (mapping != null) {
+                XmlTools.setElementValue(elasticsearchConfigDoc, ConfigUtils.ELASTICSEARCH_INDEX_EXTENSION_XPATH + "/elasticSearchIndex/mapping", mapping);
+            }
+        }
         
         return elasticsearchConfigDoc;
     }
@@ -1437,5 +1461,15 @@ public class ServiceMain {
 			throw e;
 		}
 
+	}
+
+	public static String getJeeContainPath() throws Exception {
+		String result = System.getenv(CSPACE_JEESERVER_HOME);
+		
+		if (result == null) {
+			throw new Exception();
+		}
+		
+		return result;
 	}
 }

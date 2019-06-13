@@ -24,7 +24,7 @@ public class ConfigUtils {
     
     // public static String DEFAULT_CSPACE_DATABASE_NAME = "cspace";
     public static String DEFAULT_NUXEO_REPOSITORY_NAME = "default";
-    public static String DEFAULT_NUXEO_DATABASE_NAME = "nuxeo";
+    public static String DEFAULT_NUXEO_DATABASE_NAME = "core_domain";
     public static String DEFAULT_ELASTICSEARCH_INDEX_NAME = "nuxeo";
     
     /*

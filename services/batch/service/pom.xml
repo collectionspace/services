@@ -144,7 +144,6 @@
             <artifactId>org.collectionspace.services.vocabulary.service</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
         <!-- External dependencies -->        
         <dependency>
             <groupId>junit</groupId>

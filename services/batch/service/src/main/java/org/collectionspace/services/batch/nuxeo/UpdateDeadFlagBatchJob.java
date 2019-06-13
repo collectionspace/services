@@ -71,7 +71,7 @@ public class UpdateDeadFlagBatchJob extends AbstractBatchJob {
 		String actionCode = getFieldValue(payload, MovementBotGardenConstants.ACTION_CODE_SCHEMA_NAME, MovementBotGardenConstants.ACTION_CODE_FIELD_NAME);
 		logger.debug("actionCode=" + actionCode);
 
-		if (actionCode != null) {
+		if (actionCode.equals(MovementBotGardenConstants.DEAD_ACTION_CODE) || actionCode.equals(MovementBotGardenConstants.REVIVED_ACTION_CODE)) {
 			String actionDate = getFieldValue(payload, MovementBotGardenConstants.ACTION_DATE_SCHEMA_NAME,
 					MovementBotGardenConstants.ACTION_DATE_FIELD_NAME);
 			logger.debug("actionDate=" + actionDate);
@@ -117,7 +117,7 @@ public class UpdateDeadFlagBatchJob extends AbstractBatchJob {
 				MovementBotGardenConstants.ACTION_CODE_FIELD_NAME);
 		logger.debug("actionCode=" + actionCode);
 
-		if (actionCode != null) {
+		if (actionCode.equals(MovementBotGardenConstants.DEAD_ACTION_CODE) || actionCode.equals(MovementBotGardenConstants.REVIVED_ACTION_CODE)) {
 			String actionDate = getFieldValue(payload, MovementBotGardenConstants.ACTION_DATE_SCHEMA_NAME,
 					MovementBotGardenConstants.ACTION_DATE_FIELD_NAME);
 			logger.debug("actionDate=" + actionDate);
@@ -157,7 +157,7 @@ public class UpdateDeadFlagBatchJob extends AbstractBatchJob {
 
 			logger.debug("updating dead flag: collectionObjectCsid=" + collectionObjectCsid + " actionCode=" + actionCode + " isDead=" + isDead);
 
-			if (!actionCode.contains(MovementBotGardenConstants.DEAD_ACTION_CODE)) {
+			if (actionCode.equals(MovementBotGardenConstants.REVIVED_ACTION_CODE)) {
 				if (isDead) {
 					/*
 					 * The object is dead, but a location was revived. Unset the dead flag and date on the object.
@@ -168,7 +168,7 @@ public class UpdateDeadFlagBatchJob extends AbstractBatchJob {
 					results.setUserNote(collectionObjectCsid + " set to alive");
 				}
 			}
-			else if (actionCode.contains(MovementBotGardenConstants.DEAD_ACTION_CODE)) {
+			else if (actionCode.equals(MovementBotGardenConstants.DEAD_ACTION_CODE)) {
 				if (!isDead) {
 					/*
 					 * The object is not dead, but a location was marked dead. If there are no remaining live locations,
