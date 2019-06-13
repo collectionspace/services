@@ -33,7 +33,7 @@ import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.AcquisitionClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PersonAuthorityClient;
+import org.collectionspace.services.client.PersonClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -155,7 +155,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 	}
 
 	protected void createPersonRefs() throws Exception{
-		PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+		PersonClient personAuthClient = new PersonClient();
 		PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
 				PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
 		Response res = personAuthClient.create(multipart);
@@ -212,7 +212,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
                 personTerms.add(term);
         String result = null;
         
-		PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+		PersonClient personAuthClient = new PersonClient();
 		PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
 					authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
 		Response res = personAuthClient.createItem(personAuthCSID, multipart);
@@ -356,7 +356,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 			// Note: Any non-success responses are ignored and not reported.
 			acquisitionClient.delete(resourceId).close();
 		}
-		PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+		PersonClient personAuthClient = new PersonClient();
 		// Delete persons before PersonAuth
 		for (String resourceId : personIdsCreated) {
 			// Note: Any non-success responses are ignored and not reported.
