@@ -32,9 +32,9 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.OrgAuthorityClient;
+import org.collectionspace.services.client.OrganizationClient;
 import org.collectionspace.services.client.OrgAuthorityClientUtils;
-import org.collectionspace.services.client.PersonAuthorityClient;
+import org.collectionspace.services.client.PersonClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -68,12 +68,12 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
     
 	@Override
 	public String getServicePathComponent() {
-		return OrgAuthorityClient.SERVICE_PATH_COMPONENT;
+		return OrganizationClient.SERVICE_PATH_COMPONENT;
 	}
 
 	@Override
 	protected String getServiceName() {
-		return OrgAuthorityClient.SERVICE_NAME;
+		return OrganizationClient.SERVICE_NAME;
 	}
 
     protected String knownItemResourceId = null;
@@ -139,7 +139,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
 
         // Create a new Organization Authority resource.
-        OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
+        OrganizationClient orgAuthClient = new OrganizationClient();
         String shortId = createIdentifier();
         String displayName = "TestOrgAuth-" + shortId;
     	//String baseRefName = OrgAuthorityClientUtils.createOrgAuthRefName(shortId, null);
@@ -212,7 +212,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
      * @throws Exception 
      */
     protected void createPersonRefs() throws Exception {
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         // Create a temporary PersonAuthority resource, and its corresponding
         // refName by which it can be identified.
     	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
@@ -255,7 +255,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
      * @throws Exception 
      */
     protected String createPerson(String personAuthCSID, String firstName, String surName, String shortId, String authRefName ) throws Exception {
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
         List<PersonTermGroup> personTerms = new ArrayList<PersonTermGroup>();
@@ -300,7 +300,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
         testSetup(STATUS_OK, ServiceRequestType.READ);
 
         // Submit the request to the service and store the response.
-        OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
+        OrganizationClient orgAuthClient = new OrganizationClient();
         Response res = orgAuthClient.readItem(knownResourceId, knownItemResourceId);
         OrganizationsCommon organization = null;
         try {
@@ -395,7 +395,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
                 
         String parentResourceId;
         String itemResourceId;
-        OrgAuthorityClient client = new OrgAuthorityClient();
+        OrganizationClient client = new OrganizationClient();
         // Clean up item resources.
         for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
             itemResourceId = entry.getKey();
@@ -410,7 +410,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
         // that we needed to delete the objects/records referencing these authority items first since
         // we can't delete authority items that still have records referencing them
         //
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PersonClient personAuthClient = new PersonClient();
         // Delete Person resource(s) (before PersonAuthority resources).
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.

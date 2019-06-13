@@ -49,7 +49,6 @@
 				<!-- NYI <xs:element name="supportsQuery" type="xs:boolean"/> -->
 				<xs:element name="filename" type="xs:string" />
 				<xs:element name="outputMIME" type="xs:string" />
-				<xs:element name="description" type="xs:string" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>

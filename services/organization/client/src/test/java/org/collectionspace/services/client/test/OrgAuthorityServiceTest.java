@@ -42,7 +42,7 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.contact.AddressGroup;
 import org.collectionspace.services.contact.AddressGroupList;
 import org.collectionspace.services.contact.ContactsCommon;
-import org.collectionspace.services.client.OrgAuthorityClient;
+import org.collectionspace.services.client.OrganizationClient;
 import org.collectionspace.services.client.OrgAuthorityClientUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.organization.OrgauthoritiesCommon;
@@ -78,12 +78,12 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
     
     @Override
     public String getServicePathComponent() {
-        return OrgAuthorityClient.SERVICE_PATH_COMPONENT;
+        return OrganizationClient.SERVICE_PATH_COMPONENT;
     }
 
     @Override
     protected String getServiceName() {
-        return OrgAuthorityClient.SERVICE_NAME;
+        return OrganizationClient.SERVICE_NAME;
     }
     
     private final String TEST_ORG_NAME = "Test Org";
@@ -113,17 +113,17 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      */
     @Override
     protected CollectionSpaceClient getClientInstance() throws Exception {
-        return new OrgAuthorityClient();
+        return new OrganizationClient();
     }
 
 	@Override
 	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
-        return new OrgAuthorityClient(clientPropertiesFilename);
+        return new OrganizationClient(clientPropertiesFilename);
 	}
 
     @Override
     protected PoxPayloadOut createInstance(String identifier) throws Exception {
-        OrgAuthorityClient client = new OrgAuthorityClient();
+        OrganizationClient client = new OrganizationClient();
         String displayName = "displayName-" + identifier;
         PoxPayloadOut multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
                 displayName, identifier, client.getCommonPartName());
@@ -132,7 +132,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
     @Override
     protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) throws Exception {
-        String headerLabel = new OrgAuthorityClient().getItemCommonPartName();
+        String headerLabel = new OrganizationClient().getItemCommonPartName();
         
         String shortId = TEST_SHORTID + identifier;
         Map<String, String> testOrgMap = new HashMap<String, String>();
@@ -188,7 +188,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         testOrgRepeatablesMap.put(OrganizationJAXBSchema.CONTACT_NAMES, testOrgContactNames);
 
         String newID = OrgAuthorityClientUtils.createItemInAuthority(
-                vcsid, authRefName, testOrgMap, terms, testOrgRepeatablesMap, (OrgAuthorityClient) client);
+                vcsid, authRefName, testOrgMap, terms, testOrgRepeatablesMap, (OrganizationClient) client);
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
@@ -237,7 +237,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         setupCreate();
 
         // Submit the request to the service and store the response.
-        OrgAuthorityClient client = new OrgAuthorityClient();
+        OrganizationClient client = new OrganizationClient();
         String identifier = createIdentifier();
         PoxPayloadOut multipart =
                 ContactClientUtils.createContactInstance(parentcsid,
@@ -317,7 +317,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         setupRead();
 
         // Submit the request to the service and store the response.
-        OrgAuthorityClient client = new OrgAuthorityClient();
+        OrganizationClient client = new OrganizationClient();
         Response res = null;
         if (CSID != null) {
             res = client.read(CSID);
@@ -332,7 +332,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             try {
                 PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
                 OrgauthoritiesCommon orgAuthority = (OrgauthoritiesCommon) extractPart(input,
-                        new OrgAuthorityClient().getCommonPartName(), OrgauthoritiesCommon.class);
+                        new OrganizationClient().getCommonPartName(), OrgauthoritiesCommon.class);
                 if (logger.isDebugEnabled()) {
                     logger.debug(objectAsXmlString(orgAuthority, OrgauthoritiesCommon.class));
                 }
@@ -405,7 +405,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         setupRead();
 
         // Submit the request to the service and store the response.
-        OrgAuthorityClient client = new OrgAuthorityClient();
+        OrganizationClient client = new OrganizationClient();
         Response res = null;
         if (authCSID != null) {
             if (itemCSID != null) {
@@ -475,7 +475,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         //
         // First read our known resource.
         //
-        OrgAuthorityClient client = new OrgAuthorityClient();
+        OrganizationClient client = new OrganizationClient();
         Response res = client.readItem(knownResourceId, knownItemResourceId);
         OrganizationsCommon organization = null;
         try {
@@ -504,7 +504,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         
         setupUpdateWithInvalidBody(); // we expect a failure
         // Submit the updated resource to the service and store the response.
-        PoxPayloadOut output = new PoxPayloadOut(OrgAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
+        PoxPayloadOut output = new PoxPayloadOut(OrganizationClient.SERVICE_ITEM_PAYLOAD_NAME);
         PayloadOutputPart commonPart = output.addPart(client.getItemCommonPartName(),
         		organization);
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
@@ -530,7 +530,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         setupRead();
 
         // Submit the request to the service and store the response.
-        OrgAuthorityClient client = new OrgAuthorityClient();
+        OrganizationClient client = new OrganizationClient();
         Response res =client.readContact(knownResourceId, knownItemResourceId,
                 knownContactResourceId);
         try {
@@ -567,7 +567,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         setupReadNonExistent();
 
         // Submit the request to the service and store the response.
-        OrgAuthorityClient client = new OrgAuthorityClient();
+        OrganizationClient client = new OrganizationClient();
         Response res = client.readContact(knownResourceId, knownItemResourceId, NON_EXISTENT_ID);
         try {
             int statusCode = res.getStatus();
@@ -622,7 +622,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         setupReadList();
 
         // Submit the request to the service and store the response.
-        OrgAuthorityClient client = new OrgAuthorityClient();
+        OrganizationClient client = new OrganizationClient();
         Response res = null;
         if (vcsid != null) {
             res = client.readItemList(vcsid, null, null);
@@ -690,7 +690,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         setupReadList();
 
         // Submit the request to the service and store the response.
-        OrgAuthorityClient client = new OrgAuthorityClient();
+        OrganizationClient client = new OrganizationClient();
         Response res = client.readContactList(parentcsid, itemcsid);
         AbstractCommonList list = null;
         try {
@@ -738,7 +738,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         setupUpdate();
 
         // Retrieve the contents of a resource to update.
-        OrgAuthorityClient client = new OrgAuthorityClient();
+        OrganizationClient client = new OrganizationClient();
         Response res = client.readContact(knownResourceId, knownItemResourceId, knownContactResourceId);
         ContactsCommon contact = null;
         try {
@@ -840,7 +840,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         }
 
         // Submit the request to the service and store the response.
-        OrgAuthorityClient client = new OrgAuthorityClient();
+        OrganizationClient client = new OrganizationClient();
         Response res = client.deleteContact(knownResourceId, knownItemResourceId, knownContactResourceId);
         try {
             assertStatusCode(res, testName);
@@ -886,7 +886,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         setupDeleteNonExistent();
 
         // Submit the request to the service and store the response.
-        OrgAuthorityClient client = new OrgAuthorityClient();
+        OrganizationClient client = new OrganizationClient();
         Response res = client.deleteContact(knownResourceId, knownItemResourceId, NON_EXISTENT_ID);
         try {
             assertStatusCode(res, testName);
@@ -953,7 +953,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         String contactResourceId;
         // Clean up contact resources.
         parentResourceId = knownResourceId;
-        OrgAuthorityClient client = new OrgAuthorityClient();
+        OrganizationClient client = new OrganizationClient();
         for (Map.Entry<String, String> entry : allContactResourceIdsCreated.entrySet()) {
             contactResourceId = entry.getKey();
             itemResourceId = entry.getValue();

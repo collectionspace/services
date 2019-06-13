@@ -90,7 +90,7 @@ public class WorkAuthorityClient extends AuthorityClientImpl<WorkauthoritiesComm
 
 	@Override
 	public String createAuthorityItemInstance(String shortIdentifier, String displayName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        PoxPayloadOut workAuthorityInstance = WorkAuthorityClientUtils.createWorkInstance(shortIdentifier, displayName, SERVICE_ITEM_COMMON_PART_NAME);
+        return workAuthorityInstance.asXML();
+    }
 }

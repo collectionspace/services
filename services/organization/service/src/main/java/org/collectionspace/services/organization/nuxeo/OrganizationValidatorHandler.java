@@ -67,7 +67,8 @@ public class OrganizationValidatorHandler extends ValidatorHandlerImpl {
             try {
                 String shortId = organization.getShortIdentifier();
                 if (shortId != null) {
-                    CS_ASSERT(shortIdentifierContainsOnlyValidChars(shortId), SHORT_ID_BAD_CHARS_ERROR);
+                    String msg = String.format("%s: %s", SHORT_ID_BAD_CHARS_ERROR, shortId);
+                    CS_ASSERT(shortIdentifierContainsOnlyValidChars(shortId), msg);
                 }
                 CS_ASSERT(containsAtLeastOneTerm(organization), HAS_NO_TERMS_ERROR);
                 CS_ASSERT(allTermsContainDisplayName(organization), TERM_HAS_EMPTY_DISPLAYNAME_ERROR);

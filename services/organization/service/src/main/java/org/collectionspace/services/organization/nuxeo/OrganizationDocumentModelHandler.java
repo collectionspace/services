@@ -23,9 +23,8 @@
  */
 package org.collectionspace.services.organization.nuxeo;
 
-import org.collectionspace.services.client.OrgAuthorityClient;
-import org.collectionspace.services.client.PersonAuthorityClient;
-import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
+import org.collectionspace.services.client.OrganizationClient;
+import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemWithContactsDocumentModelHandler;
 import org.collectionspace.services.organization.OrganizationsCommon;
 
 /**
@@ -33,15 +32,15 @@ import org.collectionspace.services.organization.OrganizationsCommon;
  *
  */
 public class OrganizationDocumentModelHandler
-		extends AuthorityItemDocumentModelHandler<OrganizationsCommon> {
+		extends AuthorityItemWithContactsDocumentModelHandler<OrganizationsCommon> {
 
     public OrganizationDocumentModelHandler() {
-    	super(OrgAuthorityClient.SERVICE_COMMON_PART_NAME, OrgAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
+    	super(OrganizationClient.SERVICE_COMMON_PART_NAME, OrganizationClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 
     @Override
     public String getAuthorityServicePath(){
-        return OrgAuthorityClient.SERVICE_PATH_COMPONENT;    //  CSPACE-3932
+        return OrganizationClient.SERVICE_PATH_COMPONENT;    //  CSPACE-3932
     }
 	
     /**
@@ -57,7 +56,7 @@ public class OrganizationDocumentModelHandler
 	@Override
 	public String getParentCommonSchemaName() {
 		// TODO Auto-generated method stub
-		return OrgAuthorityClient.SERVICE_COMMON_PART_NAME;
+		return OrganizationClient.SERVICE_COMMON_PART_NAME;
 	}	
 }
 
