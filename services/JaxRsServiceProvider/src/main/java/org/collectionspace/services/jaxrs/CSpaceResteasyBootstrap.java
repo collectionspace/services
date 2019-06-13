@@ -16,6 +16,7 @@ import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.api.RefName;
+import org.collectionspace.services.common.config.ConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 
@@ -25,6 +26,11 @@ import org.collectionspace.services.config.service.ServiceBindingType.AuthorityI
 import org.collectionspace.services.config.service.Term;
 import org.collectionspace.services.config.service.TermList;
 import org.collectionspace.services.config.tenant.TenantBindingType;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+
+import org.nuxeo.elasticsearch.ElasticSearchComponent;
+import org.nuxeo.elasticsearch.api.ElasticSearchService;
+import org.nuxeo.runtime.api.Framework;
 
 import java.lang.reflect.Constructor;
 import java.util.Date;
@@ -33,11 +39,12 @@ import java.util.List;
 import java.util.logging.Level;
 
 public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
-	
+
 	java.util.logging.Logger logger = java.util.logging.Logger.getAnonymousLogger();
 	static final String RESET_AUTHORITIES_PROPERTY = "org.collectionspace.services.authorities.reset";
+	private static final String RESET_ELASTICSEARCH_INDEX_PROPERTY = "org.collectionspace.services.elasticsearch.reset";
 	private static final String QUICK_BOOT_PROPERTY = "org.collectionspace.services.quickboot";
-	
+
 	@Override
 	public void  contextInitialized(ServletContextEvent event) {
 		try {
@@ -50,27 +57,67 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 			CollectionSpaceJaxRsApplication app = (CollectionSpaceJaxRsApplication)deployment.getApplication();
 			Dispatcher disp = deployment.getDispatcher();
 			disp.getDefaultContextObjects().put(ResourceMap.class, app.getResourceMap());
-			
+
 			String quickBoot = System.getProperty(QUICK_BOOT_PROPERTY, Boolean.FALSE.toString()); // Property can be set in the tomcat/bin/setenv.sh (or setenv.bat) file
 			if (Boolean.valueOf(quickBoot) == false) {
 				String resetAuthsString = System.getProperty(RESET_AUTHORITIES_PROPERTY, Boolean.FALSE.toString()); // Property can be set in the tomcat/bin/setenv.sh (or setenv.bat) file
 				initializeAuthorities(app.getResourceMap(), Boolean.valueOf(resetAuthsString));
+
+				String resetElasticsearchIndexString = System.getProperty(RESET_ELASTICSEARCH_INDEX_PROPERTY, Boolean.FALSE.toString()); // Property can be set in the tomcat/bin/setenv.sh (or setenv.bat) file
+
+				if (Boolean.valueOf(resetElasticsearchIndexString) == true) {
+					resetElasticSearchIndex();
+				}
 			}
-			
+
 			logger.log(Level.INFO, String.format("%tc [INFO] CollectionSpace Services' JAX-RS application started.", new Date()));
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
-    @Override
-    public void contextDestroyed(ServletContextEvent event) {
-    	logger.log(Level.INFO, "[INFO] Shutting down the CollectionSpace Services' JAX-RS application.");
-    	//Do something if needed.
-    	logger.log(Level.INFO, "[INFO] CollectionSpace Services' JAX-RS application stopped.");
-    }	
+
+
+	@Override
+	public void contextDestroyed(ServletContextEvent event) {
+		logger.log(Level.INFO, "[INFO] Shutting down the CollectionSpace Services' JAX-RS application.");
+		//Do something if needed.
+		logger.log(Level.INFO, "[INFO] CollectionSpace Services' JAX-RS application stopped.");
+	}
+
+	public void resetElasticSearchIndex() throws Exception {
+		ElasticSearchComponent es = (ElasticSearchComponent) Framework.getService(ElasticSearchService.class);
+
+		for (String repositoryName : es.getRepositoryNames()) {
+			logger.log(Level.INFO, String.format("%tc [INFO] Rebuilding Elasticsearch index for repository %s", new Date(), repositoryName));
+
+			es.dropAndInitRepositoryIndex(repositoryName);
+		}
+
+		TenantBindingConfigReaderImpl tenantBindingConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+		Hashtable<String, TenantBindingType> tenantBindingsTable = tenantBindingConfigReader.getTenantBindings(false);
+
+		for (TenantBindingType tenantBinding : tenantBindingsTable.values()) {
+			CSpaceTenant tenant = new CSpaceTenant(tenantBinding.getId(), tenantBinding.getName());
+
+			AuthZ.get().login(tenant);
+
+			for (ServiceBindingType serviceBinding : tenantBinding.getServiceBindings()) {
+				Boolean isElasticsearchIndexed = serviceBinding.isElasticsearchIndexed();
+				String servicesRepoDomainName = serviceBinding.getRepositoryDomain();
+
+				if (isElasticsearchIndexed && servicesRepoDomainName != null && servicesRepoDomainName.trim().isEmpty() == false) {
+					String repositoryName = ConfigUtils.getRepositoryName(tenantBinding, servicesRepoDomainName);
+					String docType = serviceBinding.getObject().getName();
+					String tenantQualifiedDocType = NuxeoUtils.getTenantQualifiedDocType(tenantBinding.getId(), docType);
+
+					logger.log(Level.INFO, String.format("%tc [INFO] Starting Elasticsearch reindexing for docType %s in repository %s", new Date(), tenantQualifiedDocType, repositoryName));
+
+					es.runReindexingWorker(repositoryName, String.format("SELECT ecm:uuid FROM %s", tenantQualifiedDocType));
+				}
+			}
+		}
+	}
 
     /**
      * Initialize all authorities and vocabularies defined in the service bindings.
@@ -78,7 +125,7 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
      * @throws Exception
      */
     public void initializeAuthorities(ResourceMap resourceMap, boolean reset) throws Exception {
-    	TenantBindingConfigReaderImpl tenantBindingConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();    	
+    	TenantBindingConfigReaderImpl tenantBindingConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();
     	Hashtable<String, TenantBindingType> tenantBindingsTable = tenantBindingConfigReader.getTenantBindings(false);
     	for (TenantBindingType tenantBindings : tenantBindingsTable.values()) {
 			CSpaceTenant tenant = new CSpaceTenant(tenantBindings.getId(), tenantBindings.getName());
@@ -107,7 +154,7 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 			}
     	}
 	}
-    
+
     @SuppressWarnings("rawtypes")
 	private AuthorityClient getAuthorityClient(String classname) throws Exception {
         Class clazz = Class.forName(classname.trim());
@@ -115,7 +162,7 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
         Object classInstance = co.newInstance(null);
         return (AuthorityClient) classInstance;
     }
-    
+
     private boolean shouldInitializeAuthorities(CSpaceTenant cspaceTenant, boolean reset) {
 		AuthZ.get().login(); // login as super admin
 		TenantResource tenantResource = new TenantResource();
@@ -128,7 +175,7 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 		//
 		return tenantState.isAuthoritiesInitialized() == false || reset == true;
     }
-    
+
     private void setAuthoritiesInitialized(CSpaceTenant cspaceTenant, boolean initState) {
 		AuthZ.get().login(); // login as super admin
 		TenantResource tenantResource = new TenantResource();
@@ -142,15 +189,15 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
     /*
      * Check to see if an an authority instance and its corresponding terms exist.  If not, try to create them.
      */
-    private void initializeAuthorityInstance(ResourceMap resourceMap, 
-    		AuthorityInstanceType authorityInstance, 
-    		ServiceBindingType serviceBinding, 
+    private void initializeAuthorityInstance(ResourceMap resourceMap,
+    		AuthorityInstanceType authorityInstance,
+    		ServiceBindingType serviceBinding,
     		CSpaceTenant cspaceTenant,
     		boolean reset) throws Exception {
     	int status = -1;
     	Response response = null;
 		String serviceName = serviceBinding.getName();
-		
+
 		AuthZ.get().login(cspaceTenant);
 		String clientClassName = serviceBinding.getClientHandler();
 		AuthorityClient client = getAuthorityClient(clientClassName);
@@ -165,7 +212,7 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 		} catch (CSWebApplicationException e) {
 			response = e.getResponse();  // If the authority doesn't exist, we expect a 404 error
 		}
-		
+
 		//
 		// If it doesn't exist (status is not 200), then try to create the authority instance
 		//
@@ -175,10 +222,10 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 			response = authorityResource.createAuthority(xmlPayload);
 			status = response.getStatus();
 			if (status != Response.Status.CREATED.getStatusCode()) {
-				throw new CSWebApplicationException(response); 
+				throw new CSWebApplicationException(response);
 			}
 		}
-		
+
 		if (status == Response.Status.OK.getStatusCode()) {
 			logger.log(Level.FINE, String.format("Authority of type '%s' with the short ID of '%s' existed already.",
 					serviceName, authorityInstance.getTitleRef()));
@@ -188,23 +235,23 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 		} else {
 			logger.log(Level.WARNING, String.format("Unknown status '%d' encountered when creating or fetching authority of type '%s' with the short ID of '%s'.",
 					serviceName, authorityInstance.getTitleRef()));
-		}		
-		
+		}
+
 		//
 		// Next, try to create or verify the authority terms.
 		//
-		initializeAuthorityInstanceTerms(authorityResource, client, authoritySpecifier, resourceMap, authorityInstance, serviceName, cspaceTenant);		
+		initializeAuthorityInstanceTerms(authorityResource, client, authoritySpecifier, resourceMap, authorityInstance, serviceName, cspaceTenant);
 	}
-    
+
     private void initializeAuthorityInstanceTerms(
     		AuthorityResource authorityResource,
-    		AuthorityClient client, 
-    		String authoritySpecifier, 
-    		ResourceMap resourceMap, 
-    		AuthorityInstanceType authorityInstance, 
+    		AuthorityClient client,
+    		String authoritySpecifier,
+    		ResourceMap resourceMap,
+    		AuthorityInstanceType authorityInstance,
     		String serviceName,
     		CSpaceTenant tenant) throws Exception {
-    	
+
     	int status = -1;
     	Response response = null;
 
@@ -212,20 +259,20 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
     	if (termListElement == null) {
     		return;
     	}
-    	
+
     	for (Term term : termListElement.getTerm()) {
     		//
     		// Check to see if the term already exists
     		//
     		try {
-    			String termSpecifier = RefName.shortIdToPath(term.getId());    			
+    			String termSpecifier = RefName.shortIdToPath(term.getId());
     			authorityResource.getAuthorityItem(null, null, resourceMap, authoritySpecifier, termSpecifier);
     			status = Response.Status.OK.getStatusCode();
     		} catch (CSWebApplicationException e) {
     			response = e.getResponse();  // If the authority doesn't exist, we expect a 404 error
     			status = response.getStatus();
     		}
-    		
+
     		//
     		// If the term doesn't exist, create it.
     		//
@@ -241,7 +288,7 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 	    			response = e.getResponse();
 	    			status = response.getStatus();
 	    			if (status != Response.Status.CREATED.getStatusCode()) {
-	    				throw new CSWebApplicationException(response); 
+	    				throw new CSWebApplicationException(response);
 	    			}
 	    		}
     		}
