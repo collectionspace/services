@@ -1,4 +1,4 @@
-/**	
+/**
  * QueryManagerNuxeoImpl.java
  *
  * {Purpose of This Class}
@@ -26,26 +26,23 @@
  */
 package org.collectionspace.services.common.query.nuxeo;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//import org.nuxeo.ecm.core.client.NuxeoClient;
-
-
-
+import org.apache.commons.lang3.StringUtils;
 
 import org.collectionspace.services.jaxb.InvocableJAXBSchema;
-//import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
-//import org.collectionspace.services.nuxeo.client.java.NxConnect;
-
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.common.invocable.InvocableUtils;
 import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.common.storage.JDBCTools;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class QueryManagerNuxeoImpl implements IQueryManager {
 
@@ -64,7 +61,7 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	private static Pattern unescapedDblQuotes = Pattern.compile("(?<!\\\\)\"");
 	private static Pattern unescapedSingleQuote = Pattern.compile("(?<!\\\\)'");
 	//private static Pattern kwdSearchProblemChars = Pattern.compile("[\\:\\(\\)\\*\\%]");
-	// HACK to work around Nuxeo regression that tokenizes on '.'. 
+	// HACK to work around Nuxeo regression that tokenizes on '.'.
 	private static Pattern kwdSearchProblemChars = Pattern.compile("[\\:\\(\\)\\*\\%\\.]");
 	private static Pattern kwdSearchHyphen = Pattern.compile(" - ");
 	private static Pattern advSearchSqlWildcard = Pattern.compile(".*?[I]*LIKE\\s*\\\"\\%\\\".*?");
@@ -93,13 +90,13 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	public String getDatasourceName() {
 		return JDBCTools.NUXEO_DATASOURCE_NAME;
 	}
-	
+
 	// TODO: This is currently just an example fixed query. This should
 	// eventually be
 	// removed or replaced with a more generic method.
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.collectionspace.services.common.query.IQueryManager#execQuery(java
 	 * .lang.String)
@@ -126,13 +123,13 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 					advancedSearch);
 			result = advancedSearchWhereClause.toString();
 		}
-		
+
 		return result;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.collectionspace.services.common.query.IQueryManager#
 	 * createWhereClauseFromKeywords(java.lang.String)
 	 */
@@ -154,7 +151,7 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 		boolean newWordSet = true;
 		while (regexMatcher.find()) {
 			String phrase = regexMatcher.group();
-			// Not needed - already trimmed by split: 
+			// Not needed - already trimmed by split:
 			// String trimmed = phrase.trim();
 			// Ignore empty strings from match, or goofy input
 			if (phrase.isEmpty())
@@ -167,7 +164,7 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 				continue;
 			}
 			// Next comment block of questionable value...
-			
+
 			// ignore the special chars except single quote here - can't hurt
 			// TODO this should become a special function that strips things the
 			// fulltext will ignore, including non-word chars and too-short
@@ -207,7 +204,7 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 				addNOT = false;
 			}
 			fullTextWhereClause.append(escapedAndTrimmed);
-			
+
 			if (logger.isTraceEnabled() == true) {
 				logger.trace("Current built whereClause is: "
 						+ fullTextWhereClause.toString());
@@ -231,7 +228,7 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.collectionspace.services.common.query.IQueryManager#
 	 * createWhereClauseFromKeywords(java.lang.String)
 	 */
@@ -264,7 +261,7 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 		if (field == null || field.isEmpty()) {
 			throw new RuntimeException("No match field specified.");
 		}
-			
+
 		StringBuilder ptClause = new StringBuilder(trimmed.length()+field.length()+20);
 		ptClause.append(field);
 		ptClause.append(getLikeForm(dataSourceName, repositoryName, cspaceInstanceId));
@@ -276,10 +273,10 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 
 	/**
 	 * Creates a filtering where clause from docType, for invocables.
-	 * 
+	 *
 	 * @param docType
 	 *            the docType
-	 * 
+	 *
 	 * @return the string
 	 */
 	@Override
@@ -299,24 +296,46 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 
 	/**
 	 * Creates a filtering where clause from invocation mode, for invocables.
-	 * 
+	 *
 	 * @param mode
 	 *            the mode
-	 * 
+	 *
 	 * @return the string
 	 */
 	@Override
 	public String createWhereClauseForInvocableByMode(String schema, String mode) {
-		String trimmed = (mode == null) ? "" : mode.trim();
-		if (trimmed.isEmpty()) {
-			throw new RuntimeException("No docType specified.");
-		}
+		return createWhereClauseForInvocableByMode(schema, Arrays.asList(mode));
+	}
+
+	@Override
+	public String createWhereClauseForInvocableByMode(String schema, List<String> modes) {
 		if (schema == null || schema.isEmpty()) {
 			throw new RuntimeException("No match schema specified.");
 		}
-		String wClause = InvocableUtils.getPropertyNameForInvocationMode(
-				schema, trimmed) + " != 0";
-		return wClause;
+
+		if (modes == null || modes.isEmpty()) {
+			throw new RuntimeException("No mode specified.");
+		}
+
+		List<String> whereClauses = new ArrayList<String>();
+
+		for (String mode : modes) {
+			String propName = InvocableUtils.getPropertyNameForInvocationMode(schema, mode.trim());
+
+			if (propName != null && !propName.isEmpty()) {
+				whereClauses.add(propName + " != 0");
+			}
+		}
+
+		if (whereClauses.size() > 1) {
+			return ("(" + StringUtils.join(whereClauses, " OR ") + ")");
+		}
+
+		if (whereClauses.size() > 0) {
+			return whereClauses.get(0);
+		}
+
+		return "";
 	}
 
 	/**
@@ -329,9 +348,9 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 
 		return fFilteredChars;
 	}
-	
+
 	/**
-	 * Creates a query to filter a qualified (string) field according to a list of string values. 
+	 * Creates a query to filter a qualified (string) field according to a list of string values.
 	 * @param qualifiedField The schema-qualified field to filter on
 	 * @param filterTerms the list of one or more strings to filter on
 	 * @param fExclude If true, will require qualifiedField NOT match the filters strings.
@@ -345,18 +364,18 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
     	if (filterTerms.length == 1) {
     		filterClause.append(fExclude?" <> '":" = '");
     		filterClause.append(filterTerms[0]);
-    		filterClause.append('\'');  
+    		filterClause.append('\'');
     	} else {
     		filterClause.append(fExclude?" NOT IN (":" IN (");
     		for(int i=0; i<filterTerms.length; i++) {
     			if(i>0) {
     				filterClause.append(',');
     			}
-    			filterClause.append('\'');  
+    			filterClause.append('\'');
     			filterClause.append(filterTerms[i]);
-    			filterClause.append('\'');  
+    			filterClause.append('\'');
     		}
-    		filterClause.append(')');  
+    		filterClause.append(')');
     	}
     	return filterClause.toString();
 	}
