@@ -13,6 +13,7 @@
     <xs:element name="invocationContext">
         <xs:complexType>
             <xs:sequence>
+                <xs:element name="outputMIME" type="xs:string"></xs:element>
                 <xs:element name="mode" type="xs:string"></xs:element>
                 <xs:element name="updateCoreValues" type="xs:string"></xs:element>
                 <xs:element name="docType" type="xs:string"></xs:element>
