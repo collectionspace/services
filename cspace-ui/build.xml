@@ -229,7 +229,7 @@
 	-->
 	<property name="publicart.profile.plugin.tenantid" value="${cspace.profile.publicart.default.id}" />
 	<property name="publicart.profile.plugin.message.title" value="Default Public Art Profile Tenant" />
-	<property name="publicart.profile.plugin.version" value="latest" />
+	<property name="publicart.profile.plugin.version" value="^1.0.0" />
 	<property name="publicart.profile.plugin.name" value="cspaceUIPluginProfilePublicArt" />
 	<property name="publicart.profile.plugin.dir" value="cspace#publicart" />
 	<property name="publicart.profile.plugin.js" value="${publicart.profile.plugin.name}@${publicart.profile.plugin.version}.min.js" />
@@ -271,7 +271,7 @@
 	<property name="anthro.profile.plugin.tenantid" value="${cspace.profile.anthro.default.id}" />
 	<property name="anthro.profile.plugin.message.title" value="Default Anthropology Profile" />
 	<property name="anthro.profile.plugin.logo" value="undefined" />
-	<property name="anthro.profile.plugin.version" value="latest" />
+	<property name="anthro.profile.plugin.version" value="^2.0.0" />
 	<property name="anthro.profile.plugin.name" value="cspaceUIPluginProfileAnthro" />
 	<property name="anthro.profile.plugin.dir" value="cspace#anthro" />
 	<property name="anthro.profile.plugin.js" value="${anthro.profile.plugin.name}@${anthro.profile.plugin.version}.min.js" />
@@ -311,7 +311,7 @@
 	<property name="bonsai.profile.plugin.tenantid" value="${cspace.profile.bonsai.default.id}" />
 	<property name="bonsai.profile.plugin.message.title" value="Default Bonsai Profile" />
 	<property name="bonsai.profile.plugin.logo" value="undefined" />
-	<property name="bonsai.profile.plugin.version" value="latest" />
+	<property name="bonsai.profile.plugin.version" value="^1.0.0" />
 	<property name="bonsai.profile.plugin.name" value="cspaceUIPluginProfileBonsai" />
 	<property name="bonsai.profile.plugin.dir" value="cspace#bonsai" />
 	<property name="bonsai.profile.plugin.js" value="${bonsai.profile.plugin.name}@${bonsai.profile.plugin.version}.min.js" />
@@ -351,7 +351,7 @@
 	<property name="fcart.profile.plugin.tenantid" value="${cspace.profile.fcart.default.id}" />
 	<property name="fcart.profile.plugin.message.title" value="Default Fine and Contemporary Art" />
 	<property name="fcart.profile.plugin.logo" value="undefined" />
-	<property name="fcart.profile.plugin.version" value="latest" />
+	<property name="fcart.profile.plugin.version" value="^1.0.0" />
 	<property name="fcart.profile.plugin.name" value="cspaceUIPluginProfileFCart" />
 	<property name="fcart.profile.plugin.dir" value="cspace#fcart" />
 	<property name="fcart.profile.plugin.js" value="${fcart.profile.plugin.name}@${fcart.profile.plugin.version}.min.js" />
@@ -391,7 +391,7 @@
 	<property name="lhmc.profile.plugin.tenantid" value="${cspace.profile.lhmc.default.id}" />
 	<property name="lhmc.profile.plugin.message.title" value="Default Local History and Material Culture Profile" />
 	<property name="lhmc.profile.plugin.logo" value="undefined" />
-	<property name="lhmc.profile.plugin.version" value="latest" />
+	<property name="lhmc.profile.plugin.version" value="^1.0.0" />
 	<property name="lhmc.profile.plugin.name" value="cspaceUIPluginProfileLHMC" />
 	<property name="lhmc.profile.plugin.dir" value="cspace#lhmc" />
 	<property name="lhmc.profile.plugin.js" value="${lhmc.profile.plugin.name}@${lhmc.profile.plugin.version}.min.js" />
@@ -431,7 +431,7 @@
 	<property name="materials.profile.plugin.tenantid" value="${cspace.profile.materials.default.id}" />
 	<property name="materials.profile.plugin.message.title" value="Default Materials Authority" />
 	<property name="materials.profile.plugin.logo" value="undefined" />
-	<property name="materials.profile.plugin.version" value="latest" />
+	<property name="materials.profile.plugin.version" value="^1.0.0" />
 	<property name="materials.profile.plugin.name" value="cspaceUIPluginProfileMaterials" />
 	<property name="materials.profile.plugin.dir" value="cspace#materials" />
 	<property name="materials.profile.plugin.js" value="${materials.profile.plugin.name}@${materials.profile.plugin.version}.min.js" />
