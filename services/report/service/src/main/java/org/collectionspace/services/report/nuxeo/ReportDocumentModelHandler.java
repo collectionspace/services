@@ -124,10 +124,10 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			modeProperty = InvocableJAXBSchema.SUPPORTS_DOC_LIST;
 			List<String> csids = null;
 			InvocationContext.ListCSIDs listThing = invContext.getListCSIDs();
-				if(listThing!=null) {
+				if (listThing!=null) {
 					csids = listThing.getCsid();
 				}
-				if(csids==null||csids.isEmpty()){
+				if (csids==null||csids.isEmpty()){
 	    			throw new BadRequestException(
 	    					"ReportResource: Report invoked in list mode, with no csids in list." );
 				}
@@ -180,12 +180,21 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 	        	}
 	    	}
 	    	reportFileNameProperty = (String) NuxeoUtils.getProperyValue(docModel, ReportJAXBSchema.FILENAME); //docModel.getPropertyValue(ReportJAXBSchema.FILENAME)); // Set the outgoing param with the report file name
-			String reportOutputMime = (String) NuxeoUtils.getProperyValue(docModel, ReportJAXBSchema.OUTPUT_MIME); //docModel.getPropertyValue(ReportJAXBSchema.OUTPUT_MIME);
-			if(!Tools.isEmpty(reportOutputMime)) {
-				outMimeType.append(reportOutputMime);
-			} else {
-				outMimeType.append(ReportClient.DEFAULT_REPORT_OUTPUT_MIME);
-			}
+			//
+	    	// If the invocation context contains a MIME type then use it.  Otherwise, look in the report resource.  If no MIME type in the report resource,
+	    	// use the default MIME type.
+	    	//
+	    	if (!Tools.isEmpty(invContext.getOutputMIME())) {
+	    		outMimeType.append(invContext.getOutputMIME());
+	    	}
+	    	if (outMimeType == null || Tools.isEmpty(outMimeType.toString())) {
+    	    	String reportOutputMime = (String) NuxeoUtils.getProperyValue(docModel, ReportJAXBSchema.OUTPUT_MIME); //docModel.getPropertyValue(ReportJAXBSchema.OUTPUT_MIME);
+    			if (!Tools.isEmpty(reportOutputMime)) {
+    				outMimeType.append(reportOutputMime);
+    			} else {
+    				outMimeType.append(ReportClient.DEFAULT_REPORT_OUTPUT_MIME);
+    			}
+	    	}
 		} catch (PropertyException pe) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Property exception getting batch values: ", pe);
