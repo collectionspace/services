@@ -30,8 +30,10 @@ package org.collectionspace.services.authorization.storage;
  */
 public class RoleStorageConstants {
 
+    final public static String Q_DISPLAY_NAME = "dn";
     final public static String Q_ROLE_NAME = "r";
 
+    final public static String DISPLAY_NAME = "displayName";
     final public static String ROLE_NAME = "roleName";
     final public static String ROLE_ID = "csid";
     final public static String ROLE_TENANT_ID = "tenant_id";

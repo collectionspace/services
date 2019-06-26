@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * RoleJpaFilter is to build where clause for role queries
- * @author 
+ * @author
  */
 public class RoleJpaFilter extends JpaDocumentFilter {
 
@@ -49,14 +49,15 @@ public class RoleJpaFilter extends JpaDocumentFilter {
     public List<ParamBinding> buildWhereForSearch(StringBuilder queryStrBldr) {
 
         List<ParamBinding> paramList = new ArrayList<ParamBinding>();
+        boolean csAdmin = SecurityUtils.isCSpaceAdmin();
+        if (!csAdmin) {
+            queryStrBldr.append(addTenant(false, paramList));
+        }
+
         String roleName = null;
         List<String> rn = getQueryParam(RoleStorageConstants.Q_ROLE_NAME);
         if (null != rn && rn.size() > 0) {
             roleName = rn.get(0);
-        }
-        boolean csAdmin = SecurityUtils.isCSpaceAdmin();
-        if (!csAdmin) {
-            queryStrBldr.append(addTenant(false, paramList));
         }
         if (null != roleName && !roleName.isEmpty()) {
             if (!csAdmin) {
@@ -72,6 +73,24 @@ public class RoleJpaFilter extends JpaDocumentFilter {
             queryStrBldr.append(addTenant(true, paramList));
         }
 
+        String displayName = null;
+        List<String> dn = getQueryParam(RoleStorageConstants.Q_DISPLAY_NAME);
+        if (null != dn && dn.size() > 0) {
+            displayName = dn.get(0);
+        }
+        if (null != displayName && !displayName.isEmpty()) {
+            if (!csAdmin) {
+                queryStrBldr.append(" AND");
+            } else {
+                queryStrBldr.append(" WHERE");
+            }
+            queryStrBldr.append(" UPPER(a." + RoleStorageConstants.DISPLAY_NAME+ ")");
+            queryStrBldr.append(" LIKE");
+            queryStrBldr.append(" :" + RoleStorageConstants.Q_DISPLAY_NAME);
+            paramList.add(new ParamBinding(RoleStorageConstants.Q_DISPLAY_NAME, "%"
+                    + displayName.toUpperCase() + "%"));
+            queryStrBldr.append(addTenant(true, paramList));
+        }
 
         if (logger.isDebugEnabled()) {
             String query = queryStrBldr.toString();

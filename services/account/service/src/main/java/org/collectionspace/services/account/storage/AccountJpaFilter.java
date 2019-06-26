@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author 
+ * @author
  */
 public class AccountJpaFilter extends JpaDocumentFilter {
 
@@ -48,14 +48,15 @@ public class AccountJpaFilter extends JpaDocumentFilter {
     public List<ParamBinding> buildWhereForSearch(StringBuilder queryStrBldr) {
 
         List<ParamBinding> paramList = new ArrayList<ParamBinding>();
+        boolean csAdmin = SecurityUtils.isCSpaceAdmin();
+        if (!csAdmin) {
+            queryStrBldr.append(addTenant(false, paramList));
+        }
+
         String screenName = null;
         List<String> snvals = getQueryParam(AccountStorageConstants.Q_SCREEN_NAME);
         if (null != snvals && snvals.size() > 0) {
             screenName = snvals.get(0);
-        }
-        boolean csAdmin = SecurityUtils.isCSpaceAdmin();
-        if (!csAdmin) {
-            queryStrBldr.append(addTenant(false, paramList));
         }
         if (null != screenName && !screenName.isEmpty()) {
             if (!csAdmin) {
@@ -128,7 +129,7 @@ public class AccountJpaFilter extends JpaDocumentFilter {
         paramList.add(new ParamBinding("tenantId", tenantId));
         return whereClause;
     }
-    
+
     public String replaceSpacesWithQueryWildcards(String str) {
         if (null == str || str.trim().isEmpty()) {
             return str;
