@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 public class ServiceBindingUtils {
 	public static final boolean QUALIFIED_PROP_NAMES = true;
 	public static final boolean UNQUALIFIED_PROP_NAMES = false;
+	public static final String OUTPUT_MIME_PROP = "outputMIME";
 	public static final String AUTH_REF_PROP = "authRef";
 	public static final String TERM_REF_PROP = "termRef";
 	public static final String OBJ_NUMBER_PROP = "objectNumberProperty";
@@ -133,6 +134,15 @@ public class ServiceBindingUtils {
     	}
 		List<PropertyType> servicePropList = service.getProperties();
 		return PropertyItemUtils.getPropertyValueByNameFromNodeList(servicePropList, propName );
+    }
+    
+    public static List<PropertyItemType> getPropertyValueList(ServiceBindingType service,
+    		String propName) {
+    	if (propName == null || propName.trim().isEmpty()) {
+    		throw new IllegalArgumentException("ServiceBindingUtils.getPropertyValues: null property name!");
+    	}
+		List<PropertyType> servicePropList = service.getProperties();
+		return PropertyItemUtils.getPropertyValueListByNameFromNodeList(servicePropList, propName);
     }
     
     /**

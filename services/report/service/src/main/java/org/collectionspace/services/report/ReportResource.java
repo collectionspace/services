@@ -127,6 +127,20 @@ public class ReportResource extends NuxeoBasedResource {
         }
     }
 
+    @GET
+    @Path("mimetypes")
+    public ReportsOuputMimeList getSupportMimeTypes(
+    		@Context UriInfo ui) {
+    	try {
+	        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+	        ReportDocumentModelHandler handler = (ReportDocumentModelHandler)createDocumentHandler(ctx);
+	
+	    	return handler.getSupportMIMETypes(ctx);
+    	} catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.LIST_MIMETYPES_FAILED);
+        } 
+    }
+    
     /*
      * TODO: provide a static utility that will load a report, interrogate it
      * for information about the properties, and return that information.
@@ -143,9 +157,9 @@ public class ReportResource extends NuxeoBasedResource {
      * @param csid the csid
      * @return the report
      */
-    @GET
-    @Path("{csid}/output")
-    @Produces("application/pdf")
+//    @GET
+//    @Path("{csid}/output")
+//    @Produces("application/pdf")
     public Response invokeReport(
     		@Context UriInfo ui,
             @PathParam("csid") String csid) {
