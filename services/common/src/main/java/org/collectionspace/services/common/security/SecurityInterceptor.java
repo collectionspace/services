@@ -84,6 +84,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 
 	/** The Constant logger. */
 	private static final Logger logger = LoggerFactory.getLogger(SecurityInterceptor.class);
+	private static final String REPORTS_MIME_OUTPUTS = "reports/mimetypes";
 	private static final String ACCOUNT_PERMISSIONS = "accounts/*/accountperms";
 	private static final String STRUCTURED_DATE_REQUEST = "structureddate";
 	private static final String PASSWORD_RESET = "accounts/requestpasswordreset";
@@ -140,6 +141,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
     	switch (resName) {
     		case STRUCTURED_DATE_REQUEST:
     		case ACCOUNT_PERMISSIONS:
+    		case REPORTS_MIME_OUTPUTS:
     			result = false;
     			break;
     		default:
