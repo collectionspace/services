@@ -30,6 +30,7 @@
     <xs:complexType name="PropertyItemType">
         <xs:sequence>
             <xs:element name="key" type="xs:string"/>
+            <xs:element name="displayName" minOccurs="0" type="xs:string"/>
             <xs:element name="value" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>

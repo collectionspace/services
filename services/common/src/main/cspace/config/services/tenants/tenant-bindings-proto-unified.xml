@@ -435,12 +435,61 @@
 			<service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
 				<service:classname>org.collectionspace.services.report.nuxeo.ReportPostInitHandler</service:classname>
 				<service:params>
-                                    <service:property>
-                                            <service:key>readerRoleName</service:key>
-                                            <service:value>reader</service:value>
-                                    </service:property>
+                   <service:property>
+                           <service:key>readerRoleName</service:key>
+                           <service:value>reader</service:value>
+                   </service:property>
 				</service:params>
 			</service:initHandler>
+			<service:properties xmlns:service="http://collectionspace.org/services/config/service">
+		        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+		          <types:key>outputMIME</types:key>
+		          <types:displayName>XML</types:displayName>
+		          <types:value>application/xml</types:value>
+		        </types:item>
+		        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+		          <types:key>outputMIME</types:key>
+		          <types:displayName>HTML</types:displayName>
+		          <types:value>text/html</types:value>
+		        </types:item>
+		        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+		          <types:key>outputMIME</types:key>
+		          <types:displayName>PDF</types:displayName>
+		          <types:value>application/pdf</types:value>
+		        </types:item>
+		        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+		          <types:key>outputMIME</types:key>
+		          <types:value>text/csv</types:value>
+		        </types:item>
+		        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+		          <types:key>outputMIME</types:key>
+		          <types:value>text/tab-separated-values</types:value>
+		        </types:item>
+		        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+		          <types:key>outputMIME</types:key>
+		          <types:value>application/msword</types:value>
+		        </types:item>
+		        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+		          <types:key>outputMIME</types:key>
+		          <types:value>application/vnd.openxmlformats-officedocument.wordprocessingml.document</types:value>
+		        </types:item>
+		        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+		          <types:key>outputMIME</types:key>
+		          <types:value>application/vnd.ms-excel</types:value>
+		        </types:item>
+		        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+		          <types:key>outputMIME</types:key>
+		          <types:value>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</types:value>
+		        </types:item>
+		        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+		          <types:key>outputMIME</types:key>
+		          <types:value>application/vnd.ms-powerpoint</types:value>
+		        </types:item>
+		        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+		          <types:key>outputMIME</types:key>
+		          <types:value>application/vnd.openxmlformats-officedocument.presentationml.presentation</types:value>
+		        </types:item>
+	      	</service:properties>
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" name="Report"
 				version="1.0">
 				<service:part id="0" control_group="Managed" versionable="true" auditable="false" label="reports-system"

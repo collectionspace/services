@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    SystemInfo schema (XSD)
+    
+    Entity  : Reports Ouput MIME types
+    Used for: JAXB binding between XML and Java objects
+
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns:ns="http://collectionspace.org/services/report"
+  xmlns="http://collectionspace.org/services/report"
+  targetNamespace="http://collectionspace.org/services/report"
+  version="0.1"
+>
+
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+
+    <xs:element name="reports_ouput_mime_list">
+		<xs:complexType>
+			<xs:sequence>
+			    <xs:element name="MIMETypeList" type="MIMEType" minOccurs="0" maxOccurs="1"/>
+			</xs:sequence>
+		</xs:complexType>
+    </xs:element>
+    
+    <xs:complexType name="MIMEType">
+        <xs:sequence>
+            <xs:element name="MIMEType" type="MIMETypeItemType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="MIMETypeItemType">
+        <xs:sequence>
+            <xs:element name="key" type="xs:string"/>
+            <xs:element name="value" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+</xs:schema>
