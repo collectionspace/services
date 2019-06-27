@@ -56,7 +56,10 @@ import net.sf.jasperreports.engine.export.ooxml.JRPptxExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 
 import org.collectionspace.services.ReportJAXBSchema;
+import org.collectionspace.services.report.MIMEType;
+import org.collectionspace.services.report.MIMETypeItemType;
 import org.collectionspace.services.report.ReportsCommon;
+import org.collectionspace.services.report.ReportsOuputMimeList;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.ReportClient;
@@ -65,6 +68,8 @@ import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
@@ -72,14 +77,19 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.invocable.Invocable;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.storage.JDBCTools;
+import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.types.PropertyItemType;
 import org.collectionspace.services.jaxb.InvocableJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+
 import org.jfree.util.Log;
-import org.nuxeo.ecm.core.api.DocumentModel;
+
 import org.nuxeo.ecm.core.api.model.PropertyException;
+import org.nuxeo.ecm.core.api.DocumentModel;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,6 +108,46 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
     private static String REPORTS_STD_GROUPCSID_PARAM = "groupcsid";
     private static String REPORTS_STD_CSIDLIST_PARAM = "csidlist";
     private static String REPORTS_STD_TENANTID_PARAM = "tenantid";
+    
+    //
+    // Map the MIME types from the service bindings to our payload output
+    //
+    public ReportsOuputMimeList getSupportMIMETypes(
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
+    	//
+    	// Create a new payload response instance and initialize it
+    	//
+    	ReportsOuputMimeList result = new ReportsOuputMimeList();
+    	MIMEType resultMIMEType = result.getMIMETypeList();
+    	if (resultMIMEType == null) {
+    		result.setMIMETypeList(resultMIMEType = new MIMEType());
+    	}
+    	List<MIMETypeItemType> resultMIMETypeItemList = resultMIMEType.getMIMEType();
+    	
+    	//
+    	// Read the MIME type values from the service bindings and put into our response payload
+    	//
+        TenantBindingConfigReaderImpl tReader =
+                ServiceMain.getInstance().getTenantBindingConfigReader();
+        ServiceBindingType reportServiceBinding = tReader.getServiceBinding(ctx.getTenantId(), ctx.getServiceName());
+        List<PropertyItemType> bindingsMIMETypeList = ServiceBindingUtils.getPropertyValueList(reportServiceBinding, ServiceBindingUtils.OUTPUT_MIME_PROP);
+        
+        if (bindingsMIMETypeList != null) {
+        	for (PropertyItemType bindingItemMimeType : bindingsMIMETypeList) {
+        		MIMETypeItemType resultMimeTypeItem = new MIMETypeItemType();
+        		String displayName = bindingItemMimeType.getDisplayName();
+        		if (displayName != null && displayName.trim().isEmpty() == false) {
+            		resultMimeTypeItem.setKey(displayName);
+        		} else {
+            		resultMimeTypeItem.setKey(bindingItemMimeType.getValue());
+        		}
+        		resultMimeTypeItem.setValue(bindingItemMimeType.getValue());
+        		resultMIMETypeItemList.add(resultMimeTypeItem);
+        	}
+        }
+
+        return result;
+    }
     
 	public InputStream invokeReport(
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,

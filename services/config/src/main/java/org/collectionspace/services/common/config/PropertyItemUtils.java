@@ -20,7 +20,22 @@ public class PropertyItemUtils {
 		}
 		return getPropertyValueByName(propNodeList.get(0).getItem(), propName);
     }
-    	
+    
+    public static List<PropertyItemType> getPropertyValueListByNameFromNodeList(List<PropertyType> propNodeList,
+    		String propName) {
+		if (propNodeList == null || propNodeList.isEmpty()) {
+			return null;
+		}
+
+		ArrayList<PropertyItemType> result = new ArrayList<PropertyItemType>();
+		for (PropertyItemType propItem :  propNodeList.get(0).getItem()) {
+    		if (propName.equals(propItem.getKey())) {
+    			result.add(propItem);
+    		}
+		}
+
+		return result;
+    }
 	
 	/**
      * @param propList the list of properties.
