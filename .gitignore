@@ -18,3 +18,4 @@ target
 m2-settings.xml
 *.log
 services/JaxRsServiceProvider/logs/
+cspace-app-perflog.csv
