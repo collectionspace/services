@@ -23,11 +23,16 @@
  */
 package org.collectionspace.services.index;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.index.IndexClient;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
+import org.collectionspace.services.common.UriInfoWrapper;
+import org.collectionspace.services.common.context.RemoteServiceContext;
+import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import javax.ws.rs.Consumes;
@@ -37,8 +42,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
@@ -90,6 +95,34 @@ public class IndexResource extends NuxeoBasedResource {
 		return response;
     }
     
+	@POST
+    @Path("{indexid}")
+	public Response reindex(
+            @Context Request request,
+            @Context UriInfo uriInfo,
+            @PathParam("indexid") String indexid) {
+    	uriInfo = new UriInfoWrapper(uriInfo);
+       	Response result = Response.noContent().build();
+       	boolean success = false;
+       	String docType = null;
+       	
+        try {
+            RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(uriInfo);
+            docType = ctx.getTenantQualifiedDoctype(); // this will used in the error message if an error occurs
+            DocumentHandler handler = createDocumentHandler(ctx);
+            success = getRepositoryClient(ctx).reindex(handler, indexid);
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.REINDEX_FAILED);
+        }
+        
+        if (success == false) {
+            Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.REINDEX_FAILED + ServiceMessages.resourceNotReindexedMsg(docType)).type("text/plain").build();
+            throw new CSWebApplicationException(response);
+        }
+       	
+       	return result;
+    }
     
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.common.ResourceBase#getList(javax.ws.rs.core.UriInfo, java.lang.String)

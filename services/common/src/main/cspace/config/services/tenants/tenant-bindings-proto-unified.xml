@@ -379,10 +379,16 @@
 		<tenant:serviceBindings id="Index" merge:matcher="id" name="Index" type="utility"
 			version="1.0">
 			<service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
-			<service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.common.index.service.nuxeo.WorkflowDocumentModelHandler
+			<service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.index.nuxeo.IndexDocumentModelHandler
 			</service:documentHandler>
-			<service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.index.nuxeo.WorkflowValidatorHandler
+			<service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.index.nuxeo.IndexValidatorHandler
 			</service:validatorHandler>
+			<service:properties xmlns:service="http://collectionspace.org/services/config/service">
+				<types:item xmlns:types="http://collectionspace.org/services/config/types">
+		          <types:key>fulltextquery</types:key>
+		          <types:value>SELECT ecm:uuid, ecm:primaryType FROM Document WHERE ecm:isProxy = 0 AND ecm:currentLifeCycleState &lt;&gt; 'deleted' ORDER BY ecm:uuid</types:value>
+		        </types:item>
+			</service:properties>
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" name="Index"
 				version="1.0">
 				<service:part id="0" control_group="Managed" versionable="true" auditable="false" label="index-system"

@@ -20,6 +20,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 
 import java.lang.IndexOutOfBoundsException;
 
+import org.collectionspace.services.client.index.IndexClient;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.slf4j.Logger;
@@ -29,6 +30,8 @@ import org.slf4j.LoggerFactory;
 public class ServiceBindingUtils {
 	public static final boolean QUALIFIED_PROP_NAMES = true;
 	public static final boolean UNQUALIFIED_PROP_NAMES = false;
+	public static final String FULLTEXT_QUERY = IndexClient.FULLTEXT_ID;
+	public static final String ELASTICSEARCH_QUERY = IndexClient.ELASTICSEARCH_ID;
 	public static final String AUTH_REF_PROP = "authRef";
 	public static final String TERM_REF_PROP = "termRef";
 	public static final String OBJ_NUMBER_PROP = "objectNumberProperty";
@@ -41,18 +44,18 @@ public class ServiceBindingUtils {
 	public static final String SERVICE_TYPE_UTILITY = "utility";
 	public static final String SERVICE_TYPE_SECURITY = "security";
 	public static final String SERVICE_COMMONPART_ID = "1";
-	
+
 	private static final String TENANT_EXTENSION_PATTERN = "(.*)"+ServiceContext.TENANT_SUFFIX+"[\\d]+$";
 	private static final String TENANT_REPLACEMENT_PATTERN = "$1";
 	private static Pattern tenantSuffixPattern = null;
 
 	private static final Logger logger = LoggerFactory.getLogger(ServiceBindingUtils.class);
-	
+
     public static String getTenantQualifiedDocType(String tenantId, String docType) {
     	String result = docType + ServiceContext.TENANT_SUFFIX + tenantId;
     	return result;
     }
-    	
+
     public static String getUnqualifiedTenantDocType(String docType) {
         try {
             if(tenantSuffixPattern == null ) {
@@ -67,13 +70,13 @@ public class ServiceBindingUtils {
         }
     	return docType;
     }
-    	
+
 	// TODO consider building up a hashTable of the properties for each
 	// service binding. There will be generic properties, as well as
-	// properties on each part. Could build up a key from tenant id, 
+	// properties on each part. Could build up a key from tenant id,
 	// servicename, (partname for those props), propName
 
-    public static void getPartsMetadata(ServiceBindingType serviceBinding, 
+    public static void getPartsMetadata(ServiceBindingType serviceBinding,
     		Map<String, ObjectPartType> objectPartMap) {
         ServiceObjectType objectType = serviceBinding.getObject();
         List<ObjectPartType> objectPartTypes = objectType.getPart();
@@ -81,7 +84,7 @@ public class ServiceBindingUtils {
             objectPartMap.put(objectPartType.getLabel(), objectPartType);
         }
     }
-    
+
     private static List<PropertyItemType> getPropertiesForPart(ServiceBindingType serviceBinding,
     		String partLabel) {
         ServiceObjectType objectType = serviceBinding.getObject();
@@ -98,7 +101,7 @@ public class ServiceBindingUtils {
     public static List<String> getPropertyValuesForPart(ServiceBindingType serviceBinding,
     		String partLabel, String propName, boolean qualify) {
     	List<PropertyItemType> partProps = getPropertiesForPart(serviceBinding, partLabel);
-    	return PropertyItemUtils.getPropertyValuesByName(partProps, propName, 
+    	return PropertyItemUtils.getPropertyValuesByName(partProps, propName,
     													(qualify?(partLabel+":"):null));
     }
 
@@ -115,7 +118,7 @@ public class ServiceBindingUtils {
         List<ObjectPartType> objectPartTypes = objectType.getPart();
         for (ObjectPartType objectPartType : objectPartTypes) {
         	List<PropertyType> propNodeList = objectPartType.getProperties();
-        	PropertyItemUtils.getPropertyValuesByNameInNodeList(propNodeList, 
+        	PropertyItemUtils.getPropertyValuesByNameInNodeList(propNodeList,
         			propName, (qualify?(objectPartType.getLabel()+":"):null), values);
         }
     	return values;
@@ -134,7 +137,16 @@ public class ServiceBindingUtils {
 		List<PropertyType> servicePropList = service.getProperties();
 		return PropertyItemUtils.getPropertyValueByNameFromNodeList(servicePropList, propName );
     }
-    
+
+		public static List<PropertyItemType> getPropertyValueList(ServiceBindingType service,
+				String propName) {
+			if (propName == null || propName.trim().isEmpty()) {
+				throw new IllegalArgumentException("ServiceBindingUtils.getPropertyValues: null property name!");
+			}
+			List<PropertyType> servicePropList = service.getProperties();
+			return PropertyItemUtils.getPropertyValueListByNameFromNodeList(servicePropList, propName);
+		}
+
     /**
      * @param service
      * @param propName the property to set
@@ -151,7 +163,7 @@ public class ServiceBindingUtils {
     	return setPropertyValue(service, prop.getKey(), prop.getValue(),
     								onlyIfNotSet);
     }
-    
+
     /**
      * @param service
      * @param propName the property to set
@@ -169,12 +181,12 @@ public class ServiceBindingUtils {
 		return PropertyItemUtils.setPropertyValueInNodeList(servicePropertiesNode,
 				propName, value, onlyIfNotSet);
     }
-    
+
     public static String getMappedFieldInDoc(ServiceBindingType sb,
     		String logicalFieldName, DocumentModel docModel ) {
     	// Now we have to get the number, which is configured as some field
     	// on each docType
-    	
+
     	/* If we go to qualified field names, we'll need this
     	String[] strings = qPropName.split(":");
     	if(strings.length!=2) {
@@ -183,7 +195,7 @@ public class ServiceBindingUtils {
     				+logicalFieldName+" field for: "+docModel.getDocumentType().getName());
     	}
     	*/
-    	
+
     	String propName = getPropertyValue(sb, logicalFieldName);
     	if (Tools.isBlank(propName)) {
                 logger.warn("Property name is empty for property " + logicalFieldName + " in service " + sb.getName());
@@ -212,12 +224,12 @@ public class ServiceBindingUtils {
 			logger.warn(String.format("Could not get a value for the property '%s' in Nuxeo document with CSID '%s'.",
 					propName, docModel.getName()));
 		}
-    	
+
     	return result;
-    } 
-    
+    }
+
     private static ArrayList<String> commonProcedureServiceTypes = null;
-    
+
     /**
      * Get the service name (service resource path) from the object name (Nuxeo document type)
      * @param serviceName
@@ -226,13 +238,13 @@ public class ServiceBindingUtils {
      */
     public static String getServiceNameFromObjectName(TenantBindingConfigReaderImpl bindingReader, String tenantId, String docType) {
     	String result = null;
-    	
+
     	ServiceBindingType bindingType = bindingReader.getServiceBindingForDocType(tenantId, docType);
     	result = bindingType.getName().toLowerCase();
-    	
+
     	return result;
     }
-   
+
     public static ArrayList<String> getCommonServiceTypes(boolean includeAuthorities) {
         ArrayList<String> commonServiceTypes = new ArrayList<String>();
 		if (includeAuthorities == true) {
@@ -240,10 +252,10 @@ public class ServiceBindingUtils {
 		}
 		commonServiceTypes.add(SERVICE_TYPE_OBJECT);
 		commonServiceTypes.add(SERVICE_TYPE_PROCEDURE);
-		
+
     	return commonServiceTypes;
     }
-    
+
     // Temporary workaround for CSPACE-4983, to help reduce the
     // number of service types searched for authority references
     // in AuthorityResource.getReferencingObjects(), to in turn
@@ -260,7 +272,7 @@ public class ServiceBindingUtils {
         }
     	return commonProcedureServiceTypes;
     }
-    
+
 
 
 }

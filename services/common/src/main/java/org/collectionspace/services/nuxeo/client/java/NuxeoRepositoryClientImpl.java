@@ -40,6 +40,7 @@ import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.Profiler;
+import org.collectionspace.services.client.index.IndexClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.QueryContext;
@@ -83,9 +84,13 @@ import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.PathRef;
+import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.runtime.transaction.TransactionRuntimeException;
 import org.nuxeo.ecm.core.opencmis.bindings.NuxeoCmisServiceFactory;
 import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoCmisService;
+import org.nuxeo.elasticsearch.api.ElasticSearchAdmin;
+import org.nuxeo.elasticsearch.api.ElasticSearchIndexing;
+import org.nuxeo.elasticsearch.api.ElasticSearchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -234,6 +239,34 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
     public boolean reindex(DocumentHandler handler, String csid, String indexid) throws DocumentNotFoundException, DocumentException
     {
     	boolean result = true;
+        
+    	switch (indexid) {
+		case IndexClient.FULLTEXT_ID:
+			result = reindexFulltext(handler, csid, indexid);
+			break;
+		case IndexClient.ELASTICSEARCH_ID:
+			result = reindexElasticsearch(handler, csid, indexid);
+			break;
+		default:
+			throw new NuxeoDocumentException(String.format("Unknown index '%s'.  Reindex request failed.",
+					indexid));
+    	}
+
+    	return result;
+    }
+    
+    /**
+     * Reindex Nuxeo's fulltext index.
+     * 
+     * @param handler
+     * @param csid
+     * @param indexid
+     * @return
+     * @throws NuxeoDocumentException
+     * @throws TransactionException
+     */
+    private boolean reindexFulltext(DocumentHandler handler, String csid, String indexid) throws NuxeoDocumentException, TransactionException {
+    	boolean result = true;
         CoreSessionInterface repoSession = null;
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = handler.getServiceContext();
 
@@ -242,9 +275,6 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             repoSession = getRepositorySession(ctx);
             CSReindexFulltextRoot indexer = new CSReindexFulltextRoot(repoSession);
             indexer.reindexFulltext(0, 0, queryString);
-            //
-            // Set repository session to handle the document
-            //
         } catch (Throwable e) {
         	rollbackTransaction(repoSession);
             if (logger.isDebugEnabled()) {
@@ -258,6 +288,46 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
         }
 
     	return result;
+    }
+    
+    /**
+     * Reindex Nuxeo's Elasticsearch index.
+     * 
+     * @param handler
+     * @param csid
+     * @param indexid
+     * @return
+     * @throws NuxeoDocumentException
+     * @throws TransactionException
+     */
+    private boolean reindexElasticsearch(DocumentHandler handler, String csid, String indexid) throws NuxeoDocumentException, TransactionException {
+    	boolean result = false;
+        CoreSessionInterface repoSession = null;
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = handler.getServiceContext();
+        
+        try {
+            ElasticSearchIndexing esi = Framework.getService(ElasticSearchIndexing.class);
+            ElasticSearchAdmin esa = Framework.getService(ElasticSearchAdmin.class);
+
+            String queryString = handler.getDocumentsToIndexQuery(indexid, csid);
+            esa.initIndexes(true);
+            esa.refresh();
+            repoSession = getRepositorySession(ctx);
+            esi.runReindexingWorker(repoSession.getRepositoryName(), queryString);
+            result = true;
+        } catch (Throwable e) {
+        	rollbackTransaction(repoSession);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception trying to reindex Nuxeo repository ", e);
+            }
+            throw new NuxeoDocumentException(e);
+        } finally {
+            if (repoSession != null) {
+                releaseRepositorySession(ctx, repoSession);
+            }
+        }
+        
+        return result;
     }
 
     @Override
