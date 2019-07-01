@@ -15,7 +15,7 @@ public class IndexValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, Po
     private final Logger logger = LoggerFactory.getLogger(IndexValidatorHandler.class);
     
     /** Error Messages **/
-    private static final String VALIDATION_ERROR = "The intake record payload was invalid. See log file for more details.";
+    private static final String VALIDATION_ERROR = "The index record payload was invalid. See log file for more details.";
     
 	
     @Override
@@ -26,8 +26,8 @@ public class IndexValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, Po
 	@Override
 	protected void handleCreate() throws InvalidDocumentException {
 		try {
-			IndexCommon intakesCommon = (IndexCommon)getCommonPart();
-			assert(intakesCommon != null);
+			IndexCommon indexCommon = (IndexCommon)getCommonPart();
+			assert(indexCommon != null);
     	} catch (AssertionError e) {
     		if (logger.isErrorEnabled() == true) {
     			logger.error(e.getMessage(), e);

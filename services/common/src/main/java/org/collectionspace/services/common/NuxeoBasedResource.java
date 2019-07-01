@@ -90,7 +90,7 @@ public abstract class NuxeoBasedResource
     }
     
     //======================= REINDEX ====================================================
-    @GET
+    @POST
     @Path("{csid}/index/{indexid}")
     public Response reindex(
             @Context Request request,    		
@@ -120,7 +120,7 @@ public abstract class NuxeoBasedResource
     }
     
     //======================= REINDEX ====================================================
-    @GET
+    @POST
     @Path("index/{indexid}")
     public Response reindex(
             @Context Request request,

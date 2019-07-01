@@ -30,6 +30,7 @@ import org.collectionspace.services.id.IDResource;
 import org.collectionspace.services.media.MediaResource;
 import org.collectionspace.services.group.GroupResource;
 import org.collectionspace.services.intake.IntakeResource;
+import org.collectionspace.services.index.IndexResource;
 import org.collectionspace.services.loanin.LoaninResource;
 import org.collectionspace.services.loanout.LoanoutResource;
 import org.collectionspace.services.uoc.UocResource;
@@ -111,6 +112,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         singletons.add(new ImportsResource());
         singletons.add(new StructuredDateResource());
         singletons.add(new SystemInfoResource());
+        singletons.add(new IndexResource());
 
         addResourceToMapAndSingletons(new VocabularyResource());
         addResourceToMapAndSingletons(new PersonAuthorityResource());
