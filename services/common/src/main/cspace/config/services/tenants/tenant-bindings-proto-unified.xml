@@ -385,8 +385,12 @@
 			</service:validatorHandler>
 			<service:properties xmlns:service="http://collectionspace.org/services/config/service">
 				<types:item xmlns:types="http://collectionspace.org/services/config/types">
-		          <types:key>fulltextquery</types:key>
-		          <types:value>SELECT ecm:uuid, ecm:primaryType FROM Document WHERE ecm:isProxy = 0 AND ecm:currentLifeCycleState &lt;&gt; 'deleted' ORDER BY ecm:uuid</types:value>
+		          <types:key>fulltext</types:key>
+		          <types:value>SELECT ecm:uuid, ecm:primaryType FROM Document WHERE ecm:isProxy = 0 ORDER BY ecm:uuid</types:value>
+		        </types:item>
+		        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+		          <types:key>elasticsearch</types:key>
+		          <types:value>SELECT ecm:uuid, ecm:primaryType FROM Document WHERE ecm:isProxy = 0 ORDER BY ecm:uuid</types:value>
 		        </types:item>
 			</service:properties>
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" name="Index"

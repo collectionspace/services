@@ -302,9 +302,14 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
      */
     private boolean reindexElasticsearch(DocumentHandler handler, String csid, String indexid) throws NuxeoDocumentException, TransactionException {
     	boolean result = false;
+        if (!Framework.isBooleanPropertyTrue("elasticsearch.enabled")) {
+        	logger.info("Request to reindex Elasticsearch failed because Elasticsearch is not enabled.");
+        	return result;
+        }
+        
         CoreSessionInterface repoSession = null;
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = handler.getServiceContext();
-        
+
         try {
             ElasticSearchIndexing esi = Framework.getService(ElasticSearchIndexing.class);
             ElasticSearchAdmin esa = Framework.getService(ElasticSearchAdmin.class);
