@@ -102,7 +102,7 @@ public class IndexResource extends NuxeoBasedResource {
             @Context UriInfo uriInfo,
             @PathParam("indexid") String indexid) {
     	uriInfo = new UriInfoWrapper(uriInfo);
-       	Response result = Response.noContent().build();
+       	Response result = Response.ok().build();
        	boolean success = false;
        	String docType = null;
        	
@@ -117,7 +117,7 @@ public class IndexResource extends NuxeoBasedResource {
         
         if (success == false) {
             Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    ServiceMessages.REINDEX_FAILED + ServiceMessages.resourceNotReindexedMsg(docType)).type("text/plain").build();
+                    ServiceMessages.REINDEX_FAILED + ServiceMessages.indexResourceNotFoundMsg(indexid)).type("text/plain").build();
             throw new CSWebApplicationException(response);
         }
        	
