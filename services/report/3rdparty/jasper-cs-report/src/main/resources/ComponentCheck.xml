@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="report">
+  <ns2:reports_common xmlns:ns2="http://collectionspace.org/services/report">
+    <notes></notes>
+    <filename>ComponentCheck.jrxml</filename>
+    <forDocTypes>
+      <forDocType/>
+    </forDocTypes>
+    <supportsGroup>false</supportsGroup>
+    <name>Component Check</name>
+    <supportsSingleDoc>true</supportsSingleDoc>
+    <outputMIME>application/pdf</outputMIME>
+    <supportsDocList>false</supportsDocList>
+    <supportsNoContext>true</supportsNoContext>
+    <supportsParams>true</supportsParams>
+  </ns2:reports_common>
+</document>

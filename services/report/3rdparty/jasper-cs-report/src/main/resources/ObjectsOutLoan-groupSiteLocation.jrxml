@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4de45c02-325c-4de9-9b9f-ce349eef1453">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="csid" class="java.lang.String">
+		<defaultValueExpression><![CDATA["0cca1640-6014-4b3e-8453"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT  loc.loanoutnumber loanOutNumber,
+        case when (loc.borrower is not null and loc.borrower <> '') then
+        regexp_replace(loc.borrower, '^.*\)''(.*)''$', '\1')
+        else ''
+        end AS borrower,
+        h1.name AS "csid",
+        co.objectnumber AS "Museum No.",
+        cp.sortableobjectnumber AS "sort",
+        ong.objectName AS "Name",
+        bd.item AS "Description",
+        CASE WHEN (fcp.item IS NOT NULL AND fcp.item <> '')
+          THEN regexp_replace(fcp.item, '^.*\)''(.*)''$', '\1') END AS "Site",
+        case when ca.computedcrate is null then regexp_replace(co.computedcurrentlocation, '^.*\)''(.*)''$', '\1')
+	  else regexp_replace(co.computedcurrentlocation, '^.*\)''(.*)''$', '\1')||' '||regexp_replace(ca.computedcrate, '^.*\)''(.*)''$', '\1')
+	end as "Currentlocation"
+FROM loansout_common loc
+JOIN hierarchy h1 ON (loc.id=h1.id)
+JOIN relations_common rc1 ON (h1.name=rc1.subjectcsid)
+JOIN hierarchy h2 ON (rc1.objectcsid=h2.name)
+JOIN collectionobjects_common co ON (h2.id=co.id)
+JOIN collectionobjects_pahma cp ON (co.id=cp.id)
+join collectionobjects_anthropology ca on (co.id=ca.id)
+
+LEFT OUTER JOIN hierarchy h3 ON (co.id = h3.parentid AND h3.primarytype='objectNameGroup' AND h3.pos=0)
+LEFT OUTER JOIN objectnamegroup ong ON (ong.id=h3.id)
+
+LEFT OUTER JOIN collectionobjects_common_briefdescriptions bd ON (bd.id=co.id and bd.pos=0)
+
+LEFT OUTER JOIN collectionobjects_pahma_pahmafieldcollectionplacelist fcp ON (co.id=fcp.id AND fcp.pos=0)
+
+WHERE rc1.subjectcsid = $P{csid}
+
+ORDER BY sort]]>
+	</queryString>
+	<field name="loanoutnumber" class="java.lang.String"/>
+	<field name="borrower" class="java.lang.String"/>
+	<field name="csid" class="java.lang.String"/>
+	<field name="Museum No." class="java.lang.String"/>
+	<field name="sort" class="java.lang.String"/>
+	<field name="Name" class="java.lang.String"/>
+	<field name="Description" class="java.lang.String"/>
+	<field name="Site" class="java.lang.String"/>
+	<field name="Currentlocation" class="java.lang.String"/>
+	<group name="Currentlocation">
+		<groupExpression><![CDATA[$F{Currentlocation}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="92" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="315cb7c5-69e8-4a2e-be10-42a3cdaa6fbe" x="0" y="0" width="373" height="30"/>
+				<textElement>
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Out Loan Objects]]></text>
+			</staticText>
+			<image>
+				<reportElement uuid="8a524ecd-083c-4aa6-81e0-42de58a13cb3" x="481" y="2" width="270" height="51"/>
+				<imageExpression><![CDATA["https://pahma.cspace.berkeley.edu/collectionspace/ui/pahma/images/logored100.png"]]></imageExpression>
+			</image>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="c67bc2bf-0792-4680-93d2-71fe01a8f1c7" stretchType="RelativeToTallestObject" x="2" y="62" width="269" height="24"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{loanoutnumber}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="2ad7ef7e-a384-448d-9c5f-a6c359198fa0" stretchType="RelativeToTallestObject" x="273" y="62" width="479" height="24"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{borrower}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="2d5696fa-a4ed-4e63-874e-9abdc5d08a10" x="0" y="1" width="86" height="18" forecolor="#666666"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Museum no.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b9de38d4-40b9-403a-8293-8094cebd5215" x="88" y="1" width="85" height="18" forecolor="#666666"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Object name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="7b4b190e-3fee-4f92-b7f5-31a798f97cd1" x="209" y="1" width="100" height="18" forecolor="#666666"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="7a3b5258-7b05-4099-929a-c697fa6f6e44" x="373" y="2" width="100" height="18" forecolor="#666666"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Field collection place]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6d55139e-b67b-4b7c-8b91-307eb4e488ea" x="565" y="2" width="100" height="18" forecolor="#666666"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Current location]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="28" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="93e2869d-a019-4151-b235-7cd1332f8468" stretchType="RelativeToBandHeight" x="0" y="6" width="86" height="18" isPrintWhenDetailOverflows="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Museum No.}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="3282969a-e7aa-4d6f-924d-e413691e0ab4" stretchType="RelativeToBandHeight" x="88" y="6" width="111" height="18" isPrintWhenDetailOverflows="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Name}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="37941031-7b61-4f3e-b63e-10538bfe27db" stretchType="RelativeToBandHeight" x="565" y="6" width="187" height="18" isPrintWhenDetailOverflows="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Currentlocation}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="8846d652-92b8-4eb7-8c92-6864f18b90e1" stretchType="RelativeToBandHeight" x="209" y="6" width="156" height="18" isPrintWhenDetailOverflows="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Description}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="96da5af3-7c77-4553-8150-3f89afe9b205" stretchType="RelativeToBandHeight" x="373" y="6" width="182" height="18" isPrintWhenDetailOverflows="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Site}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="fd27534c-cac9-4569-be58-a154c601dc39" x="0" y="1" width="749" height="1"/>
+				<graphicElement>
+					<pen lineColor="#CCCCCC"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="22" splitType="Stretch">
+			<line>
+				<reportElement uuid="9ba0b76f-cdf3-4a20-9aea-9abfa615eaf0" x="0" y="1" width="752" height="1"/>
+			</line>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="5a80fd2c-6364-4c1e-b95d-22fa0e24ab47" x="0" y="3" width="180" height="18"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="464de907-e190-405c-94c6-a035dc70a484" x="316" y="3" width="80" height="18"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="928495cf-f1f5-4616-9069-c4eecb01bf60" x="396" y="3" width="40" height="18"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement uuid="04a9db7d-a51f-40b2-b563-be0f1c6784dc" x="629" y="3" width="120" height="19"/>
+				<imageExpression><![CDATA["https://pahma.cspace.berkeley.edu/collectionspace/ui/pahma/images/header-logo-cspace.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement uuid="e1b8ab9b-fe2c-4db0-be59-bcc919c1dd12" x="550" y="3" width="70" height="17"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="12"/>
+				</textElement>
+				<text><![CDATA[powered by]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="7" splitType="Stretch"/>
+	</summary>
+</jasperReport>

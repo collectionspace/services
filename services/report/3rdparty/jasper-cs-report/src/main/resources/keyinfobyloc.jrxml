@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="inventory" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Title" fontName="SansSerif" fontSize="26" isBold="true" pdfFontName="Helvetica"/>
+	<style name="SubTitle" forecolor="#666666" fontName="SansSerif" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="SansSerif" fontSize="12" isBold="true"/>
+	<style name="Location Header" fontName="SansSerif" fontSize="12"/>
+	<style name="Detail" fontName="SansSerif" fontSize="12"/>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[15]]></defaultValueExpression>
+	</parameter>
+	<parameter name="Start Location" class="java.lang.String">
+		<defaultValueExpression><![CDATA["Kroeber, 20A, AA  1,  1"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="End Location" class="java.lang.String">
+		<defaultValueExpression><![CDATA["Kroeber, 20A, AA  1, 10"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+case when ca.computedcrate is null then regexp_replace(c.computedcurrentlocation, '^.*\)''(.*)''$', '\1')
+  else regexp_replace(c.computedcurrentlocation, '^.*\)''(.*)''$', '\1')||' '||regexp_replace(ca.computedcrate, '^.*\)''(.*)''$', '\1')
+end as storageLocation,
+case when ca.computedcrate is null then replace(regexp_replace(c.computedcurrentlocation, '^.*\)''(.*)''$', '\1'), ' ', '0')
+  else replace(regexp_replace(c.computedcurrentlocation, '^.*\)''(.*)''$', '\1'), ' ', '0')||'0'||replace(regexp_replace(ca.computedcrate, '^.*\)''(.*)''$', '\1'), ' ', '0')
+end as locationkey,
+c.objectnumber objectNumber,
+cp.sortableobjectnumber,
+c.numberofobjects objectCount,
+ong.objectName objectName,
+case when (pfc.item is not null and pfc.item <> '') then
+  regexp_replace(pfc.item, '^.*\)''(.*)''$', '\1')
+end AS fieldcollectionplace,
+case when (apg.assocpeople is not null and apg.assocpeople <> '') then
+  regexp_replace(apg.assocpeople, '^.*\)''(.*)''$', '\1')
+end as culturalgroup,
+case when (pef.item is not null and pef.item <> '') then
+  regexp_replace(pef.item, '^.*\)''(.*)''$', '\1')
+end as ethnographicfilecode
+FROM collectionobjects_common c
+left outer join collectionobjects_pahma cp on (c.id=cp.id)
+left outer join collectionobjects_anthropology ca on (c.id=ca.id)
+
+left outer join hierarchy h5 on (c.id = h5.parentid  and h5.pos=0 and h5.name='collectionobjects_common:objectNameList')
+left outer join objectnamegroup ong on (ong.id=h5.id)
+
+left outer join collectionobjects_pahma_pahmafieldcollectionplacelist pfc on (pfc.id=c.id and pfc.pos=0)
+left outer join hierarchy h3 on (c.id=h3.parentid and h3.pos=0 and h3.name='collectionobjects_common:assocPeopleGroupList')
+
+left outer join assocpeoplegroup apg on (apg.id=h3.id)
+left outer join collectionobjects_pahma_pahmaethnographicfilecodelist pef on (pef.id=c.id and pef.pos=0)
+
+JOIN misc ms ON (c.id=ms.id AND ms.lifecyclestate <> 'deleted')
+WHERE replace(regexp_replace(c.computedcurrentlocation, '^.*\)''(.*)''$', '\1'), ' ', '0') >= replace($P{Start Location}, ' ', '0')
+  and replace(regexp_replace(c.computedcurrentlocation, '^.*\)''(.*)''$', '\1'), ' ', '0') <= replace($P{End Location}, ' ', '0')
+order by locationkey, sortableobjectnumber, objectName desc]]>
+	</queryString>
+	<field name="storagelocation" class="java.lang.String"/>
+	<field name="locationkey" class="java.lang.String"/>
+	<field name="objectnumber" class="java.lang.String"/>
+	<field name="sortableobjectnumber" class="java.lang.String"/>
+	<field name="objectcount" class="java.lang.Long"/>
+	<field name="objectname" class="java.lang.String"/>
+	<field name="fieldcollectionplace" class="java.lang.String"/>
+	<field name="culturalgroup" class="java.lang.String"/>
+	<field name="ethnographicfilecode" class="java.lang.String"/>
+	<group name="storageLocation" isReprintHeaderOnEachPage="true">
+		<groupExpression><![CDATA[$F{storagelocation}]]></groupExpression>
+		<groupHeader>
+			<band height="21">
+				<textField>
+					<reportElement style="Detail" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2" y="3" width="705" height="15" isPrintInFirstWholeBand="true" printWhenGroupChanges="storageLocation" forecolor="#FFFFFF" backcolor="#660000"/>
+					<textElement>
+						<font fontName="SansSerif" size="11" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{storagelocation}]]></textFieldExpression>
+				</textField>
+				<rectangle>
+					<reportElement x="718" y="3" width="15" height="15"/>
+				</rectangle>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="53" splitType="Stretch">
+			<image onErrorType="Blank">
+				<reportElement x="482" y="0" width="270" height="51"/>
+				<imageExpression class="java.lang.String"><![CDATA["https://pahma.cspace.berkeley.edu/collectionspace/ui/pahma/images/logored100.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement style="Title" x="0" y="0" width="263" height="24"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="18"/>
+				</textElement>
+				<text><![CDATA[Key Information Review]]></text>
+			</staticText>
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="52" width="740" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement style="SubTitle" x="152" y="29" width="16" height="16"/>
+				<textElement>
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<text><![CDATA[to:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Detail" positionType="Float" stretchType="RelativeToTallestObject" x="31" y="28" width="115" height="16"/>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{Start Location}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Detail" positionType="Float" stretchType="RelativeToTallestObject" x="171" y="28" width="129" height="16"/>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{End Location}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="SubTitle" x="0" y="29" width="28" height="16"/>
+				<textElement>
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<text><![CDATA[from:]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="23" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="18" width="740" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement style="Column header" x="0" y="1" width="96" height="15"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Museum #]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="101" y="1" width="91" height="15"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Object name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="221" y="1" width="32" height="15"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Count]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="259" y="1" width="100" height="15" forecolor="#666666"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Collected]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="452" y="1" width="100" height="15" forecolor="#666666"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cultural Group]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="573" y="1" width="113" height="15" forecolor="#666666"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ethnographic File Code]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="26" splitType="Stretch">
+			<textField>
+				<reportElement style="Detail" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2" y="1" width="94" height="16" backcolor="#FFFFFF"/>
+				<textElement>
+					<font fontName="SansSerif" size="11" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{objectnumber}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Detail" stretchType="RelativeToTallestObject" mode="Opaque" x="101" y="1" width="118" height="16"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{objectname}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Detail" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="221" y="1" width="29" height="16"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{objectcount}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="20" width="740" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="259" y="1" width="193" height="16"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{fieldcollectionplace}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="452" y="1" width="116" height="16"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{culturalgroup}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="573" y="1" width="160" height="16"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{ethnographicfilecode}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="63" splitType="Stretch">
+			<textField>
+				<reportElement style="Column header" x="606" y="47" width="80" height="16"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement style="Column header" x="686" y="47" width="40" height="16"/>
+				<textElement>
+					<font fontName="SansSerif" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement style="Column header" x="0" y="47" width="197" height="16"/>
+				<textElement>
+					<font fontName="SansSerif" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Column header" x="346" y="47" width="80" height="16"/>
+				<textElement textAlignment="Left">
+					<font fontName="SansSerif" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["By: "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" mode="Transparent" x="0" y="1" width="552" height="46"/>
+				<textElement textAlignment="Left">
+					<font fontName="SansSerif" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Additional notes: "]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

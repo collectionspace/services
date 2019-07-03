@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="location subquery" language="groovy" pageWidth="612" pageHeight="792" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="39c10e49-8593-4841-9117-ad3f82430594">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="object_csid" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT REGEXP_REPLACE(mc.currentlocation, '^.*\)''(.*)''$', '\1') AS "location",
+   CASE WHEN ma.crate IS NULL THEN REGEXP_REPLACE(mc.currentlocation, '^.*\)''(.*)''$', '\1')
+      ELSE REGEXP_REPLACE(mc.currentlocation, '^.*\)''(.*)''$', '\1')||': '||REGEXP_REPLACE(ma.crate, '^.*\)''(.*)''$', '\1')
+      END AS crate,
+DATE(mc.locationdate) AS "location date"
+FROM relations_common rc
+JOIN hierarchy h ON (h.name = rc.objectcsid)
+JOIN movements_common mc ON (mc.id = h.id)
+LEFT OUTER JOIN movements_anthropology ma ON (ma.id=mc.id)
+WHERE rc.subjectcsid = $P{object_csid}
+AND REGEXP_REPLACE(mc.currentlocation, '^.*\)''(.*)''$', '\1') IS NOT NULL
+AND REGEXP_REPLACE(mc.currentlocation, '^.*\)''(.*)''$', '\1') <> ''
+AND REGEXP_REPLACE(mc.currentlocation, '^.*\)''(.*)''$', '\1') <> 'No location entered'
+AND REGEXP_REPLACE(mc.currentlocation, '^.*\)''(.*)''$', '\1') <> 'Not located'
+ORDER BY mc.locationdate DESC]]>
+	</queryString>
+	<field name="location" class="java.lang.String"/>
+	<field name="location date" class="java.lang.String"/>
+	<field name="crate" class="java.lang.String"/>
+	<detail>
+		<band height="14">
+			<textField>
+				<reportElement x="0" y="1" width="56" height="13" uuid="73d68258-f8cd-4f10-8206-6b25b4ef1f26"/>
+				<textElement>
+					<font fontName="Arial Narrow" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{location date}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="56" y="1" width="556" height="13" uuid="e20a5c10-e0b5-4e5a-93bf-719260620349"/>
+				<textElement>
+					<font fontName="Arial Narrow" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{crate}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
