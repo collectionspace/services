@@ -214,7 +214,7 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         		serviceName,
         		(IT)null, // The input part
         		null, // The resource map
-        		(UriInfo)null, // The queryParams
+        		ui, // The queryParams
         		(Class<?>)null  /*input type's Class*/);
         ctx.setUriInfo(ui);
         return ctx;
