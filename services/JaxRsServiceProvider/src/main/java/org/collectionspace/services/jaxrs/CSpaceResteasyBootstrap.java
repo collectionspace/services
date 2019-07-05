@@ -116,12 +116,11 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 
 				if (isElasticsearchIndexed && servicesRepoDomainName != null && servicesRepoDomainName.trim().isEmpty() == false) {
 					String repositoryName = ConfigUtils.getRepositoryName(tenantBinding, servicesRepoDomainName);
-					String docType = serviceBinding.getObject().getName();
-					String tenantQualifiedDocType = NuxeoUtils.getTenantQualifiedDocType(tenantBinding.getId(), docType);
+					String docType = NuxeoUtils.getTenantQualifiedDocType(tenantBinding.getId(), serviceBinding.getObject().getName());
 
-					logger.log(Level.INFO, String.format("%tc [INFO] Starting Elasticsearch reindexing for docType %s in repository %s", new Date(), tenantQualifiedDocType, repositoryName));
+					logger.log(Level.INFO, String.format("%tc [INFO] Starting Elasticsearch reindexing for docType %s in repository %s", new Date(), docType, repositoryName));
 
-					es.runReindexingWorker(repositoryName, String.format("SELECT ecm:uuid FROM %s", tenantQualifiedDocType));
+					es.runReindexingWorker(repositoryName, String.format("SELECT ecm:uuid FROM %s", docType));
 				}
 			}
 		}

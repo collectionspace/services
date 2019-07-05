@@ -50,9 +50,9 @@ public interface DocumentHandler<T, TL, WT, WTL> {
     public enum Action {
         CREATE, GET, GET_ALL, UPDATE, DELETE, WORKFLOW, SYNC
     }
-    
+
     public Lifecycle getLifecycle();
-    
+
     public Lifecycle getLifecycle(String serviceObjectName);
 
     /**
@@ -75,7 +75,7 @@ public interface DocumentHandler<T, TL, WT, WTL> {
 
     /**
      * prepare is called by the client for preparation of stuff before
-     * invoking repository operation. this is mainly useful for create and 
+     * invoking repository operation. this is mainly useful for create and
      * update kind of actions
      * @param action
      * @throws Exception
@@ -86,7 +86,7 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * updateWorkflowTransition - prepare for a workflow transition
      */
     public void handleWorkflowTransition(ServiceContext ctx, DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef) throws Exception;
-    
+
     /**
      * prepareCreate processes documents before creating document in repository
 
@@ -122,7 +122,7 @@ public interface DocumentHandler<T, TL, WT, WTL> {
 
     /**
      * prepare is called by the client to hand over the document processing task
-     * @param action 
+     * @param action
      * @param doc wrapped doc
      * @throws Exception
      */
@@ -236,7 +236,7 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * @throws Exception
      */
     public TL extractCommonPartList(DocumentWrapper<WTL> docWrap) throws Exception;
-    
+
 
     /**
      * Extract paging info.
@@ -246,7 +246,7 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * @return the tL
      * @throws Exception the exception
      */
-    public TL extractPagingInfo(TL theCommonList, DocumentWrapper<WTL> wrapDoc)	throws Exception;    
+    public TL extractPagingInfo(TL theCommonList, DocumentWrapper<WTL> wrapDoc)	throws Exception;
 
     /**
      * fillCommonPartList sets list common part of CS object into given document
@@ -275,7 +275,7 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * createDocumentFilter is a factory method to create a document
      * filter that is relevant to be used with this document handler
      * and corresponding storage client
-     * 
+     *
      * @return
      */
     public DocumentFilter createDocumentFilter();
@@ -323,7 +323,7 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * getQProperty get qualified property (useful for mapping to repository document property)
      * @param prop
      * @return
-     * @throws DocumentException 
+     * @throws DocumentException
      */
     public String getQProperty(String prop) throws DocumentException;
 
@@ -333,21 +333,28 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * @return unqualified property
      */
     public String getUnQProperty(String qProp);
-    
+
     /**
      * get a query string that will be used to return a set of documents that should be indexed/re-index
-     * @throws Exception 
-     * @throws DocumentException 
+     * @throws Exception
+     * @throws DocumentException
      */
     public String getDocumentsToIndexQuery(String indexId, String csid) throws DocumentException, Exception;
-    
+
+    /**
+     * get a query string that will be used to return a set of documents that should be indexed/re-index
+     * @throws Exception
+     * @throws DocumentException
+     */
+    public String getDocumentsToIndexQuery(String indexId, String documentType, String csid) throws DocumentException, Exception;
+
     /**
      * Creates the CMIS query from the service context.  Each document handler is responsible for returning a valid CMIS query using the
      * information in the current service context -which includes things like the query parameters, etc.
-     * @throws DocumentException 
+     * @throws DocumentException
      */
     public String getCMISQuery(QueryContext queryContext) throws DocumentException;
-    
+
     /**
      * Returns TRUE if a CMIS query should be used (instead of an NXQL query)
      */
@@ -357,29 +364,29 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * Returns TRUE if a JDBC/SQL query should be used (instead of an NXQL query)
      */
     public boolean isJDBCQuery();
-    
+
     /**
      * Returns parameter values, relevant to this document handler, that can be used in JDBC/SQL queries
-     * 
+     *
      * @return a set of zero or more parameter values relevant to this handler
      */
     public Map<String,String> getJDBCQueryParams();
 
     /**
-     * 
+     *
      * @throws Exception
      */
 	void prepareSync() throws Exception;
 
 	/**
-	 * 
+	 *
 	 * @param wrapDoc
 	 * @throws Exception
 	 */
 	boolean handleSync(DocumentWrapper<Object> wrapDoc) throws Exception;
 
 	/**
-	 * 
+	 *
 	 * @param wrapDoc
 	 * @throws Exception
 	 */
