@@ -64,6 +64,7 @@ import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingUtils;
 import org.collectionspace.services.common.storage.PreparedStatementBuilder;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
+import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
 
@@ -91,6 +92,7 @@ import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoCmisService;
 import org.nuxeo.elasticsearch.api.ElasticSearchAdmin;
 import org.nuxeo.elasticsearch.api.ElasticSearchIndexing;
 import org.nuxeo.elasticsearch.api.ElasticSearchService;
+import org.nuxeo.elasticsearch.ElasticSearchComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -239,7 +241,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
     public boolean reindex(DocumentHandler handler, String csid, String indexid) throws DocumentNotFoundException, DocumentException
     {
     	boolean result = true;
-        
+
     	switch (indexid) {
 		case IndexClient.FULLTEXT_ID:
 			result = reindexFulltext(handler, csid, indexid);
@@ -254,10 +256,10 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
 
     	return result;
     }
-    
+
     /**
      * Reindex Nuxeo's fulltext index.
-     * 
+     *
      * @param handler
      * @param csid
      * @param indexid
@@ -289,10 +291,10 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
 
     	return result;
     }
-    
+
     /**
      * Reindex Nuxeo's Elasticsearch index.
-     * 
+     *
      * @param handler
      * @param csid
      * @param indexid
@@ -301,24 +303,43 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
      * @throws TransactionException
      */
     private boolean reindexElasticsearch(DocumentHandler handler, String csid, String indexid) throws NuxeoDocumentException, TransactionException {
-    	boolean result = false;
+        boolean result = false;
+
         if (!Framework.isBooleanPropertyTrue("elasticsearch.enabled")) {
-        	logger.info("Request to reindex Elasticsearch failed because Elasticsearch is not enabled.");
-        	return result;
+            throw new NuxeoDocumentException("Request to reindex Elasticsearch failed because Elasticsearch is not enabled.");
         }
-        
+
         CoreSessionInterface repoSession = null;
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = handler.getServiceContext();
 
         try {
-            ElasticSearchIndexing esi = Framework.getService(ElasticSearchIndexing.class);
-            ElasticSearchAdmin esa = Framework.getService(ElasticSearchAdmin.class);
-
-            String queryString = handler.getDocumentsToIndexQuery(indexid, csid);
-            esa.initIndexes(true);
-            esa.refresh();
             repoSession = getRepositorySession(ctx);
-            esi.runReindexingWorker(repoSession.getRepositoryName(), queryString);
+
+            ElasticSearchComponent es = (ElasticSearchComponent) Framework.getService(ElasticSearchService.class);
+            String repositoryName = repoSession.getRepositoryName();
+
+            logger.info(String.format("Rebuilding Elasticsearch index for repository %s", repositoryName));
+
+            es.dropAndInitRepositoryIndex(repositoryName);
+
+            TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+            TenantBindingType tenantBinding = tReader.getTenantBinding(ctx.getTenantId());
+
+            for (ServiceBindingType serviceBinding : tenantBinding.getServiceBindings()) {
+                Boolean isElasticsearchIndexed = serviceBinding.isElasticsearchIndexed();
+                String servicesRepoDomainName = serviceBinding.getRepositoryDomain();
+
+                if (isElasticsearchIndexed && servicesRepoDomainName != null && servicesRepoDomainName.trim().isEmpty() == false) {
+                    String docType = NuxeoUtils.getTenantQualifiedDocType(tenantBinding.getId(), serviceBinding.getObject().getName());
+                    String queryString = handler.getDocumentsToIndexQuery(indexid, docType, csid);
+
+                    logger.info(String.format("Starting Elasticsearch reindexing for docType %s in repository %s", docType, repositoryName));
+                    logger.debug(queryString);
+
+                    es.runReindexingWorker(repositoryName, queryString);
+                }
+            }
+
             result = true;
         } catch (Throwable e) {
         	rollbackTransaction(repoSession);
@@ -331,7 +352,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
                 releaseRepositorySession(ctx, repoSession);
             }
         }
-        
+
         return result;
     }
 

@@ -50,21 +50,25 @@ public class IndexDocumentModelHandler
         extends NuxeoDocumentModelHandler<IndexCommon> {
 	private final Logger logger = LoggerFactory.getLogger(IndexDocumentModelHandler.class);
 
-	
 	@Override
-    public String getDocumentsToIndexQuery(String indexId, String csid) throws DocumentException, Exception {
+	public String getDocumentsToIndexQuery(String indexId, String csid) throws DocumentException, Exception {
+		return getDocumentsToIndexQuery(indexId, "Document", csid);
+	}
+
+	@Override
+    public String getDocumentsToIndexQuery(String indexId, String documentType, String csid) throws DocumentException, Exception {
 		String result = null;
-		
+
     	switch (indexId) {
     		case IndexClient.FULLTEXT_ID:
-    			result = getReindexQuery(indexId, csid);
+    			result = getReindexQuery(indexId, documentType, csid);
     			break;
     		case IndexClient.ELASTICSEARCH_ID:
-    			result = getReindexQuery(indexId, csid);
-    			
+    			result = getReindexQuery(indexId, documentType, csid);
+
     			break;
     	}
-    	
+
     	if (Tools.isEmpty(result) == true) {
     		String msg = String.format("There is no reindex query in the Index service bindings for index '%s', so we'll use this default query: '%s'",
     				indexId, IndexClient.DEFAULT_REINDEX_QUERY);
@@ -74,41 +78,42 @@ public class IndexDocumentModelHandler
 
     	return result;
     }
-	
+
 	/**
 	 * Reads the Index service bindings to get the query that will be used to find all documents needing
 	 * reindexing.
-	 * 
+	 *
 	 * @param indexId
+	 * @param documentType
 	 * @param csid
 	 * @return
 	 * @throws DocumentException
 	 * @throws Exception
-	 * 
+	 *
 	 * TODO: Use the incoming CSID param to qualify the returned query.
 	 */
-	private String getReindexQuery(String indexId, String csid) throws DocumentException, Exception {
+	private String getReindexQuery(String indexId, String documentType, String csid) throws DocumentException, Exception {
 		String result = null;
-		
-    	//
-    	// Read in the NXQL query to use when performing a full 
-    	//
-        TenantBindingConfigReaderImpl tReader =
-                ServiceMain.getInstance().getTenantBindingConfigReader();
-        ServiceContext ctx = this.getServiceContext();
-        
-        ServiceBindingType reportServiceBinding = tReader.getServiceBinding(ctx.getTenantId(), ctx.getServiceName());
-        List<PropertyItemType> queryTypeList = ServiceBindingUtils.getPropertyValueList(reportServiceBinding, indexId);
-        
-        if (queryTypeList != null && queryTypeList.isEmpty() == false) {
-	        PropertyItemType propertyItemType = queryTypeList.get(0);
-	        if (propertyItemType != null) {
-	        	result = propertyItemType.getValue();
-	        }
-        }
-        
-        return result;
-    }
+
+		//
+		// Read in the NXQL query to use when performing a full
+		//
+		TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+		ServiceContext ctx = this.getServiceContext();
+
+		ServiceBindingType serviceBinding = tReader.getServiceBinding(ctx.getTenantId(), ctx.getServiceName());
+		List<PropertyItemType> queryTypeList = ServiceBindingUtils.getPropertyValueList(serviceBinding, indexId);
+
+		if (queryTypeList != null && queryTypeList.isEmpty() == false) {
+			PropertyItemType propertyItemType = queryTypeList.get(0);
+			if (propertyItemType != null) {
+				String query = propertyItemType.getValue();
+
+				result = String.format(query, documentType);
+			}
+		}
+
+		return result;
+	}
 
 }
-

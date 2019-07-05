@@ -25,25 +25,25 @@
 	        </tenant:eventListenerConfig>
 	    </tenant:eventListenerConfigurations>
 		<tenant:properties>
-			<!-- Controls whether term completion (aka partial term matching, aka autocomplete) searches will automatically insert 
-				a leading wildcard. The default value is 'true', which will cause your search expression to be matched when found anywhere 
-				within a term. If this value is set to 'false', searches will only find terms which begin with your search expression. However, 
-				even with a setting of 'false', you can manually add an asterisk (*) as a wildcard at the beginning of any search; e.g. "*atrick" 
-				(without quotes) will match the string "atrick" anywhere, not just at the beginning of a term. See the tenant-bindings.delta.xml 
+			<!-- Controls whether term completion (aka partial term matching, aka autocomplete) searches will automatically insert
+				a leading wildcard. The default value is 'true', which will cause your search expression to be matched when found anywhere
+				within a term. If this value is set to 'false', searches will only find terms which begin with your search expression. However,
+				even with a setting of 'false', you can manually add an asterisk (*) as a wildcard at the beginning of any search; e.g. "*atrick"
+				(without quotes) will match the string "atrick" anywhere, not just at the beginning of a term. See the tenant-bindings.delta.xml
 				file for the 'testsci' tenant, for examples of how to override this value, and other, similar values below, in your own tenant. -->
 			<types:item id="ptstartingwildcard" merge:matcher="skip" merge:action="insert" xmlns:types="http://collectionspace.org/services/config/types">
 				<types:key>ptStartingWildcard</types:key>
 				<types:value>true</types:value>
 			</types:item>
-			<!-- By default, term completion searches return a maximum number of terms in their search results. The default value 
+			<!-- By default, term completion searches return a maximum number of terms in their search results. The default value
 				is 40 terms. -->
 			<types:item id="maxlistitemsjdbc" merge:matcher="skip" merge:action="insert" xmlns:types="http://collectionspace.org/services/config/types">
 				<types:key>maxListItemsReturnedLimitOnJdbcQueries</types:key>
 				<types:value>40</types:value>
 			</types:item>
-			<!-- By default, term completion searches are restricted (constrained) to the current tenant. On a system where a tenant's 
-				data is isolated within its own repository, or on a shared repository system where only one tenant has data, this restriction 
-				can be removed by setting the value below to 'false'. That will remove one SQL JOIN from the query, potentially improving 
+			<!-- By default, term completion searches are restricted (constrained) to the current tenant. On a system where a tenant's
+				data is isolated within its own repository, or on a shared repository system where only one tenant has data, this restriction
+				can be removed by setting the value below to 'false'. That will remove one SQL JOIN from the query, potentially improving
 				search performance. -->
 			<types:item id="jdbcqueriestenantrestricted" merge:matcher="skip" merge:action="insert" xmlns:types="http://collectionspace.org/services/config/types">
 				<types:key>jdbcQueriesAreTenantIdRestricted</types:key>
@@ -141,10 +141,10 @@
                 </service:part>
             </service:object>
         </tenant:serviceBindings>
-        <!-- end PublicItem service meta-data -->    
+        <!-- end PublicItem service meta-data -->
 
 		<!-- begin servicegroup service meta-data -->
-		<!-- Servicegroup is a task service that has no representation in the repo, but provides tools like keyword search across 
+		<!-- Servicegroup is a task service that has no representation in the repo, but provides tools like keyword search across
 			many types of services. -->
 	    <tenant:serviceBindings id="servicegroups" merge:matcher="id" name="servicegroups" type="utility" version="1.0">
 			<service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
@@ -153,7 +153,7 @@
 			</service:documentHandler>
 		</tenant:serviceBindings>
 		<!-- end servicegroup service meta-data -->
-	    
+
 	    <!-- begin structureddate service meta-data -->
 	    <!-- structureddate is a task service that has no representation in the repo, but provides a date string parsing service. -->
 	    <tenant:serviceBindings id="structureddates" merge:matcher="id" name="structureddates" requiresDocumentHandler="false" type="utility"
@@ -161,14 +161,14 @@
 	        <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
 	    </tenant:serviceBindings>
 	    <!-- end structureddate service meta-data -->
-	    
+
 	    <!-- begin systeminfo service meta-data -->
 	    <!-- systeminfo is a task service that has no representation in the repo, but system meta data and version. -->
 	    <tenant:serviceBindings id="systeminfo" merge:matcher="id" name="systeminfo" requiresDocumentHandler="false" type="utility"
 	        version="1.0">
 	        <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
 	    </tenant:serviceBindings>
-	    <!-- end systeminfo service meta-data -->	    
+	    <!-- end systeminfo service meta-data -->
 
 		<!-- begin blob service meta-data -->
 		<!-- This should likely be type="object" -->
@@ -374,7 +374,7 @@
 			</service:object>
 		</tenant:serviceBindings>
 		<!-- end Workflow service meta-data -->
-		
+
 		<!-- begin Index service meta-data -->
 		<tenant:serviceBindings id="Index" merge:matcher="id" name="Index" type="utility"
 			version="1.0">
@@ -385,13 +385,14 @@
 			</service:validatorHandler>
 			<service:properties xmlns:service="http://collectionspace.org/services/config/service">
 				<types:item xmlns:types="http://collectionspace.org/services/config/types">
-		          <types:key>fulltext</types:key>
-		          <types:value>SELECT ecm:uuid, ecm:primaryType FROM Document WHERE ecm:isProxy = 0 ORDER BY ecm:uuid</types:value>
-		        </types:item>
-		        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-		          <types:key>elasticsearch</types:key>
-		          <types:value>SELECT ecm:uuid, ecm:primaryType FROM Document WHERE ecm:isProxy = 0 ORDER BY ecm:uuid</types:value>
-		        </types:item>
+					<types:key>fulltext</types:key>
+					<types:value>SELECT ecm:uuid, ecm:primaryType FROM Document WHERE ecm:isProxy = 0 ORDER BY ecm:uuid</types:value>
+				</types:item>
+				<types:item xmlns:types="http://collectionspace.org/services/config/types">
+					<types:key>elasticsearch</types:key>
+					<!-- %s in value will be substituted with the appropriate doc type -->
+					<types:value>SELECT ecm:uuid FROM %s</types:value>
+				</types:item>
 			</service:properties>
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" name="Index"
 				version="1.0">
@@ -411,7 +412,7 @@
 				</service:part>
 			</service:object>
 		</tenant:serviceBindings>
-		<!-- end Index service meta-data -->		
+		<!-- end Index service meta-data -->
 
 		<!-- begin report service meta-data -->
 		<tenant:serviceBindings id="Reports" merge:matcher="id" name="Reports" type="utility" version="1.0">
@@ -477,17 +478,17 @@
 			</service:documentHandler>
 			<!-- Configuration of list results fields for relation items is commented out for now, -->
 			<!-- pending resolution of how to specify nested elements in list results. -->
-			<!-- <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service"> <service:params> <service:ListResultsFields> 
-				<service:ListResultField> <service:element>subjectCsid</service:element> <service:xpath>subjectCsid</service:xpath> </service:ListResultField> 
-				<service:ListResultField> <service:element>subjectRefName</service:element> <service:xpath>subjectRefName</service:xpath> 
-				</service:ListResultField> <service:ListResultField> <service:element>relationshipType</service:element> <service:xpath>relationshipType</service:xpath> 
-				</service:ListResultField> <service:ListResultField> <service:element>predicate</service:element> <service:xpath>predicate</service:xpath> 
-				</service:ListResultField> <service:ListResultField> <service:element>predicateDisplayName</service:element> <service:xpath>predicateDisplayName</service:xpath> 
-				</service:ListResultField> <service:ListResultField> <service:element>objectCsid</service:element> <service:xpath>objectCsid</service:xpath> 
-				</service:ListResultField> <service:ListResultField> <service:element>objectRefName</service:element> <service:xpath>objectRefName</service:xpath> 
-				</service:ListResultField> <service:ListResultField> <service:element>relationshipType</service:element> <service:xpath>relationshipType</service:xpath> 
+			<!-- <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service"> <service:params> <service:ListResultsFields>
+				<service:ListResultField> <service:element>subjectCsid</service:element> <service:xpath>subjectCsid</service:xpath> </service:ListResultField>
+				<service:ListResultField> <service:element>subjectRefName</service:element> <service:xpath>subjectRefName</service:xpath>
+				</service:ListResultField> <service:ListResultField> <service:element>relationshipType</service:element> <service:xpath>relationshipType</service:xpath>
+				</service:ListResultField> <service:ListResultField> <service:element>predicate</service:element> <service:xpath>predicate</service:xpath>
+				</service:ListResultField> <service:ListResultField> <service:element>predicateDisplayName</service:element> <service:xpath>predicateDisplayName</service:xpath>
+				</service:ListResultField> <service:ListResultField> <service:element>objectCsid</service:element> <service:xpath>objectCsid</service:xpath>
+				</service:ListResultField> <service:ListResultField> <service:element>objectRefName</service:element> <service:xpath>objectRefName</service:xpath>
+				</service:ListResultField> <service:ListResultField> <service:element>relationshipType</service:element> <service:xpath>relationshipType</service:xpath>
 				</service:ListResultField> </service:ListResultsFields> </service:params> </service:DocHandlerParams> -->
-			<!-- Relation list items can include two additional fields, 'subject' and 'object', each of which are parent elements 
+			<!-- Relation list items can include two additional fields, 'subject' and 'object', each of which are parent elements
 				of, and hence containers for, as many as eight child fields. See services/jaxb/src/main/resources/relations_common.xsd -->
 			<service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.relation.nuxeo.RelationValidatorHandler
 			</service:validatorHandler>
@@ -586,8 +587,8 @@
 		<tenant:serviceBindings id="Contacts" merge:matcher="id" name="Contacts" type="utility"
 			version="1.0">
 			<!-- other URI paths through which this service could be accessed -->
-			<!-- <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'> /personauthorities/*/items/*/contacts 
-				</service:uriPath> <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'> /orgauthorities/*/items/*/contacts 
+			<!-- <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'> /personauthorities/*/items/*/contacts
+				</service:uriPath> <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'> /orgauthorities/*/items/*/contacts
 				</service:uriPath> -->
 			<service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
 			<service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.contact.nuxeo.ContactDocumentModelHandler
@@ -623,9 +624,9 @@
 							<types:key>authRef</types:key>
 							<types:value>addressGroupList/*/addressStateOrProvince</types:value>
 						</types:item>
-						<!-- Per CSPACE-5080: This field is configured as a term list, rather than being tied to Place authority as described 
+						<!-- Per CSPACE-5080: This field is configured as a term list, rather than being tied to Place authority as described
 							in wiki schema -->
-						<!--<types:item xmlns:types="http://collectionspace.org/services/config/types"> <types:key>authRef</types:key> <types:value>addressGroupList/*/addressCountry</types:value> 
+						<!--<types:item xmlns:types="http://collectionspace.org/services/config/types"> <types:key>authRef</types:key> <types:value>addressGroupList/*/addressCountry</types:value>
 							</types:item> -->
 						<!-- Fields containing term list / controlled vocabulary references -->
 						<types:item xmlns:types="http://collectionspace.org/services/config/types">
@@ -731,11 +732,11 @@
 		<tenant:serviceBindings id="authorization/permissions/permroles" merge:matcher="id"
 			name="authorization/permissions/permroles" type="security" version="1.0">
 			<!-- other URI paths through which this service could be accessed -->
-			<!-- <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'> /authorization/permissions/*/permroles/ 
+			<!-- <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'> /authorization/permissions/*/permroles/
 				</service:uriPath> -->
 			<service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.authorization.storage.PermissionRoleDocumentHandler
 			</service:documentHandler>
-			<!-- <service:validatorHandler xmlns:service='http://collectionspace.org/services/config/service'> org.collectionspace.services.authorization.storage.PermissionRoleValidatorHandler 
+			<!-- <service:validatorHandler xmlns:service='http://collectionspace.org/services/config/service'> org.collectionspace.services.authorization.storage.PermissionRoleValidatorHandler
 				</service:validatorHandler> -->
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" name="PermissionRole"
 				version="1.0">
@@ -764,7 +765,7 @@
 			<!-- <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'> /accounts/*/accountroles/ </service:uriPath> -->
 			<service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.account.storage.AccountRoleDocumentHandler
 			</service:documentHandler>
-			<!-- <service:validatorHandler xmlns:service='http://collectionspace.org/services/config/service'> org.collectionspace.services.account.storage.AccountRoleDocumentHandler 
+			<!-- <service:validatorHandler xmlns:service='http://collectionspace.org/services/config/service'> org.collectionspace.services.account.storage.AccountRoleDocumentHandler
 				</service:validatorHandler> -->
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" name="AccountRole"
 				version="1.0">
@@ -792,11 +793,11 @@
 		<tenant:serviceBindings id="authorization/roles/permroles" merge:matcher="id"
 			name="authorization/roles/permroles" type="security" version="1.0">
 			<!-- other URI paths through which this service could be accessed -->
-			<!-- <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'> /authorization/roles/*/permroles/ 
+			<!-- <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'> /authorization/roles/*/permroles/
 				</service:uriPath> -->
 			<service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.authorization.storage.PermissionRoleDocumentHandler
 			</service:documentHandler>
-			<!-- <service:validatorHandler xmlns:service='http://collectionspace.org/services/config/service'> org.collectionspace.services.authorization.storage.PermissionRoleValidatorHandler 
+			<!-- <service:validatorHandler xmlns:service='http://collectionspace.org/services/config/service'> org.collectionspace.services.authorization.storage.PermissionRoleValidatorHandler
 				</service:validatorHandler> -->
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" name="PermissionRole"
 				version="1.0">
@@ -824,11 +825,11 @@
 		<tenant:serviceBindings id="authorization/roles/accountroles" merge:matcher="id"
 			name="authorization/roles/accountroles" type="security" version="1.0">
 			<!-- other URI paths through which this service could be accessed -->
-			<!-- <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'> /authorization/roles/*/accountroles/ 
+			<!-- <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'> /authorization/roles/*/accountroles/
 				</service:uriPath> -->
 			<service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.account.storage.AccountRoleDocumentHandler
 			</service:documentHandler>
-			<!-- <service:validatorHandler xmlns:service='http://collectionspace.org/services/config/service'> org.collectionspace.services.authorization.storage.PermissionRoleValidatorHandler 
+			<!-- <service:validatorHandler xmlns:service='http://collectionspace.org/services/config/service'> org.collectionspace.services.authorization.storage.PermissionRoleValidatorHandler
 				</service:validatorHandler> -->
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" name="AccountRole"
 				version="1.0">

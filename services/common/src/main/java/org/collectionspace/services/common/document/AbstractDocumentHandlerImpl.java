@@ -40,10 +40,10 @@ import org.slf4j.LoggerFactory;
  *
  * $LastChangedRevision: $
  * $LastChangedDate: $
- * @param <T> 
- * @param <TL> 
- * @param <WT> 
- * @param <WTL> 
+ * @param <T>
+ * @param <TL>
+ * @param <WT>
+ * @param <WTL>
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
@@ -51,13 +51,13 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
 
     /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(AbstractDocumentHandlerImpl.class);
-    
+
     /** The properties. */
     private Map<String, Object> properties = new HashMap<String, Object>();
-    
+
     /** The doc filter. */
     private DocumentFilter docFilter = null;
-    
+
     /** The service context. */
     private ServiceContext serviceContext;
 
@@ -69,12 +69,12 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     }
 
     abstract protected String getRefnameDisplayName(DocumentWrapper<WT> docWrapper);
-        
+
     /*
      * Should return a reference name for the wrapper object
      */
     abstract protected RefName.RefNameInterface getRefName(DocumentWrapper<WT> docWrapper, String tenantName, String serviceName);
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#getServiceContext()
      */
@@ -161,16 +161,16 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
                 validate(action);
                 prepareDelete();
                 break;
-                
+
             case SYNC:
                 prepareSync();
                 break;
-                
+
 			case WORKFLOW:
 				logger.error("Should never get to this code path.  If you did, there is a bug in the code.");
 				Thread.dumpStack();
 				break;
-				
+
 			default:
 				logger.error("Should never get to this code path.  If you did, there is a bug in the code.");
 				Thread.dumpStack();
@@ -227,7 +227,7 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     @Override
     final public boolean handle(Action action, DocumentWrapper<?> wrapDoc) throws Exception {
     	boolean result = true;
-    	
+
         switch (action) {
             case CREATE:
                 handleCreate((DocumentWrapper<WT>) wrapDoc);
@@ -248,25 +248,25 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
             case DELETE:
                 result = handleDelete((DocumentWrapper<WT>) wrapDoc);
                 break;
-                
+
             case SYNC:
                 result = handleSync((DocumentWrapper<Object>) wrapDoc);
-                break;                
-                
+                break;
+
 			case WORKFLOW:
 				logger.error("Should never get to this code path.  If you did, there is a bug in the code.");
 				Thread.dumpStack();
 				break;
-				
+
 			default:
 				logger.error("Should never get to this code path.  If you did, there is a bug in the code.");
 				Thread.dumpStack();
 				break;
         }
-        
+
         return result;
     }
-    
+
     @Override
 	public void sanitize(DocumentWrapper<WT> wrapDoc) {
     	//
@@ -306,7 +306,7 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     public boolean handleDelete(DocumentWrapper<WT> wrapDoc) throws Exception {
         return true;
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#handleDelete(org.collectionspace.services.common.document.DocumentWrapper)
      */
@@ -315,7 +315,7 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     	// Do nothing. Subclasses can override if they want/need to.
     	return true;
     }
-    
+
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#complete(org.collectionspace.services.common.document.DocumentHandler.Action, org.collectionspace.services.common.document.DocumentWrapper)
@@ -342,20 +342,20 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
             case DELETE:
                 completeDelete((DocumentWrapper<WT>) wrapDoc);
                 break;
-                
+
             case SYNC:
                 completeSync((DocumentWrapper<Object>) wrapDoc);
                 break;
-                
+
 			case WORKFLOW:
 				logger.error("Should never get to this code path.  If you did, there is a bug in the code.");
 				Thread.dumpStack();
 				break;
-				
+
 			default:
 				logger.error("Should never get to this code path.  If you did, there is a bug in the code.");
 				Thread.dumpStack();
-				break;                
+				break;
         }
     }
 
@@ -394,13 +394,13 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     @Override
     public void completeDelete(DocumentWrapper<WT> wrapDoc) throws Exception {
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#completeDelete(org.collectionspace.services.common.document.DocumentWrapper)
      */
     @Override
     public void completeSync(DocumentWrapper<Object> wrapDoc) throws Exception {
-    }    
+    }
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#extractCommonPart(org.collectionspace.services.common.document.DocumentWrapper)
@@ -461,7 +461,7 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     @Override
     public abstract String getQProperty(String prop) throws DocumentException;
 
-    /* 
+    /*
      * Strip Nuxeo's schema name from the start of the field / element name.
      * (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#getUnQProperty(java.lang.String)
@@ -478,14 +478,19 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
         tkz.nextToken(); //skip
         return tkz.nextToken();
     }
-    
+
     /**
      * Should return
-     * @throws Exception 
-     * @throws DocumentException 
+     * @throws Exception
+     * @throws DocumentException
      */
     @Override
     public String getDocumentsToIndexQuery(String indexId, String csid) throws DocumentException, Exception {
+    	return null;
+    }
+
+    @Override
+    public String getDocumentsToIndexQuery(String indexId, String documentType, String csid) throws DocumentException, Exception {
     	return null;
     }
 
@@ -509,11 +514,11 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
             handler.validate(action, serviceContext);
         }
     }
-    
+
     /**
      * Creates the CMIS query from the service context.  Each document handler is responsible for returning a valid CMIS query using the
      * information in the current service context -which includes things like the query parameters, etc.
-     * @throws DocumentException 
+     * @throws DocumentException
      */
     @Override
     public String getCMISQuery(QueryContext queryContext) throws DocumentException {
@@ -522,20 +527,20 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     	//
     	return null;
     }
-    
+
     @Override
     public boolean isCMISQuery() {
     	return false;
     }
-    
+
     @Override
     public boolean isJDBCQuery() {
     	return false;
     }
-    
+
     @Override
     public Map<String,String> getJDBCQueryParams() {
         return new HashMap<>();
     }
-    
+
 }
