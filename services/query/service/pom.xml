@@ -14,14 +14,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
         </dependency>
@@ -36,13 +28,6 @@
             <artifactId>commons-beanutils</artifactId>
             <version>1.6.1</version>
         </dependency>
-        <!-- use explict 1.1 version to prevent errors coming from Nuxeo client -->
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.1</version>
-        </dependency>
-
         <!-- RESTEasy -->
 
         <dependency>

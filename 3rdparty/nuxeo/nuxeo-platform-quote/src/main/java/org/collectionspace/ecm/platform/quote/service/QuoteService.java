@@ -19,10 +19,11 @@
 
 package org.collectionspace.ecm.platform.quote.service;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.nuxeo.runtime.model.ComponentInstance;
 import org.nuxeo.runtime.model.DefaultComponent;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.collectionspace.ecm.platform.quote.api.QuoteManager;
 import org.collectionspace.ecm.platform.quote.impl.QuoteManagerImpl;
@@ -37,7 +38,7 @@ public class QuoteService extends DefaultComponent {
 
     public static final String VERSIONING_EXTENSION_POINT_RULES = "rules";
 
-    private static final Log log = LogFactory.getLog(QuoteService.class);
+    private static final Logger logger = LoggerFactory.getLogger(QuoteService.class);
 
     private QuoteManager quoteManager;
 

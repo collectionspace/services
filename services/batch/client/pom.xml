@@ -13,17 +13,6 @@
     <name>services.batch.client</name>
 
     <dependencies>
-        <!-- keep slf4j dependencies on the top -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <scope>test</scope>
-        </dependency>
 <!-- CollectionSpace dependencies -->
         <dependency>
             <groupId>org.collectionspace.services</groupId>

@@ -19,9 +19,6 @@
 
 package org.collectionspace.ecm.platform.quote.listener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
@@ -35,9 +32,12 @@ import org.nuxeo.runtime.api.Framework;
 import org.collectionspace.ecm.platform.quote.service.QuoteServiceConfig;
 import org.collectionspace.ecm.platform.quote.service.QuoteServiceHelper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class AbstractQuoteListener {
 
-     private static final Log log = LogFactory.getLog(AbstractQuoteListener.class);
+     private static final Logger logger = LoggerFactory.getLogger(AbstractQuoteListener.class);
 
         public void handleEvent(EventBundle events) {
             for (Event event : events) {

@@ -21,9 +21,6 @@ package org.collectionspace.ecm.platform.quote.listener;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -33,12 +30,15 @@ import org.nuxeo.ecm.platform.relations.api.Resource;
 import org.nuxeo.ecm.platform.relations.api.Statement;
 import org.nuxeo.ecm.platform.relations.api.impl.StatementImpl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.collectionspace.ecm.platform.quote.service.QuoteServiceConfig;
 
 public class QuoteRemovedEventListener extends AbstractQuoteListener
         implements EventListener {
 
-    private static final Log log = LogFactory.getLog(QuoteRemovedEventListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(QuoteRemovedEventListener.class);
 
     @Override
     protected void doProcess(CoreSession coreSession,

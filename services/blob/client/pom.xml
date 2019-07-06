@@ -14,22 +14,17 @@
 
     <dependencies>
         <dependency>
-			<groupId>org.nuxeo.ecm.core</groupId>
-			<artifactId>nuxeo-core-storage-sql-management</artifactId>
-			<version>${nuxeo.general.release}</version>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-storage-sql-management</artifactId>
+            <version>${nuxeo.general.release}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
-        <!-- keep slf4j dependencies on the top -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <scope>test</scope>
-        </dependency>
 <!-- CollectionSpace dependencies -->
         <dependency>
             <groupId>org.collectionspace.services</groupId>

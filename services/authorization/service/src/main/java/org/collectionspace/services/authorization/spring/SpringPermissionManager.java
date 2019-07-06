@@ -27,14 +27,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.collectionspace.services.authorization.CSpaceAction;
 import org.collectionspace.services.authorization.spi.CSpacePermissionManager;
 import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.PermissionException;
 import org.collectionspace.services.authorization.PermissionNotFoundException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.security.acls.model.AccessControlEntry;
 import org.springframework.security.acls.model.AclDataAccessException;
@@ -47,11 +47,11 @@ import org.springframework.security.acls.model.Sid;
 
 /**
  * Manages permissions in Spring Security
- * @author 
+ * @author
  */
 public class SpringPermissionManager implements CSpacePermissionManager {
 
-    final Log log = LogFactory.getLog(SpringPermissionManager.class);
+    final Logger log = LoggerFactory.getLogger(SpringPermissionManager.class);
     private SpringAuthorizationProvider provider;
 
     SpringPermissionManager(SpringAuthorizationProvider provider) {
@@ -195,7 +195,7 @@ public class SpringPermissionManager implements CSpacePermissionManager {
     @Override
     public void deletePermissions(CSpaceResource res, CSpaceAction action)
             throws PermissionNotFoundException, PermissionException {
-    	
+
         ObjectIdentity oid = SpringAuthorizationProvider.getObjectIdentity(res);
         Permission p = SpringAuthorizationProvider.getPermission(action);
         try {
@@ -298,7 +298,7 @@ public class SpringPermissionManager implements CSpacePermissionManager {
             }
             acl = provider.getProviderAclService().createAcl(oid);
         }
-        // Need to see if there is already an entry, so we do not duplicate (e.g., 
+        // Need to see if there is already an entry, so we do not duplicate (e.g.,
         // when we run our permission-roles init more than once.
         List<AccessControlEntry> aceEntries = acl.getEntries();
         if (aceListHasEntry(aceEntries, permission, sid, grant)) {
@@ -308,7 +308,7 @@ public class SpringPermissionManager implements CSpacePermissionManager {
                         + " sid=" + sid.toString()
                         + " grant=" + grant);
             }
-        	
+
         } else {
             acl.insertAce(acl.getEntries().size(), permission, sid, grant);
             provider.getProviderAclService().updateAcl(acl);
@@ -321,7 +321,7 @@ public class SpringPermissionManager implements CSpacePermissionManager {
             }
         }
     }
-    
+
     private boolean aceListHasEntry(List<AccessControlEntry> aceEntries, Permission permission,
             Sid sid, boolean grant) {
     	for(AccessControlEntry entry : aceEntries) {
@@ -368,14 +368,14 @@ public class SpringPermissionManager implements CSpacePermissionManager {
             }
             i++;
         }
-        
+
         boolean updateNeeded = false;
         for (int j = foundAces.size() - 1; j >= 0; j--) {
             //the following operation does not work while iterating in the while loop
             acl.deleteAce(foundAces.get(j)); //autobox
             updateNeeded = true;
         }
-        
+
         if (updateNeeded) {
         	provider.getProviderAclService().updateAcl(acl);
         }

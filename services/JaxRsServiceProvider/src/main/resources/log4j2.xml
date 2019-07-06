@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+	<Appenders>
+		<Console name="ConsoleAppender" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d %-5p [%t] [%c:%L] %m%n" />
+		</Console>
+	</Appenders>
+
+	<Loggers>
+		<Root level="ERROR">
+			<AppenderRef ref="ConsoleAppender"/>
+		</Root>
+
+		<Logger name="org.collectionspace" level="DEBUG" additivity="false">
+			<AppenderRef ref="ConsoleAppender" />
+		</Logger>
+
+		<Logger name="org.collectionspace.services.authorization.spring.SpringPermissionManager" level="ERROR" />
+		<Logger name="org.collectionspace.services.listener.AbstractUpdateObjectLocationValues" level="INFO" />
+		<Logger name="org.collectionspace.services.common.context.AbstractServiceContextImpl" level="ERROR" />
+		<Logger name="org.collectionspace.services.common.ServiceMain" level="INFO" />
+		<Logger name="org.collectionspace.authentication.realm.db.CSpaceDbRealm" level="ERROR" />
+		<Logger name="org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper" level="ERROR" />
+		<Logger name="org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded" level="ERROR" />
+		<Logger name="org.collectionspace.services.common.authorization_mgt.AuthorizationCommon" level="ERROR" />
+		<Logger name="org.collectionspace.services.nuxeo.client.java.TenantRepository" level="ERROR" />
+		<Logger name="org.collectionspace.services.common.init" level="ERROR" />
+		<Logger name="org.collectionspace.services.common.config.ServiceConfigUtils" level="ERROR" />
+		<Logger name="org.collectionspace.services.report.nuxeo.ReportPostInitHandler" level="ERROR" />
+		<Logger name="org.collectionspace.services.client.AbstractServiceClientImpl" level="ERROR" />
+		<Logger name="org.collectionspace.services.common.security.SecurityInterceptor" level="ERROR" />
+		<Logger name="org.collectionspace.services.common.storage.JDBCTools" level="ERROR" />
+
+		<Logger name="org.nuxeo" level="WARN" />
+		<Logger name="org.nuxeo.elasticsearch" level="INFO" />
+
+		<Logger name="org.apache" level="WARN" />
+		<Logger name="httpclient" level="WARN" />
+		<Logger name="org.jboss.resteasy" level="ERROR" />
+		<Logger name="org.apache.catalina.core" level="WARN" />
+		<Logger name="org.springframework" level="ERROR" />
+		<Logger name="org.springframework.security" level="ERROR" />
+		<Logger name="org.jboss.security" level="ERROR" />
+		<Logger name="org.apache.catalina.realm" level="ERROR" />
+		<Logger name="org.hibernate" level="ERROR" />
+		<Logger name="ch.elca.el4j.services.xmlmerge" level="WARN" />
+		<Logger name="net.sf.jmimemagic.MagicParser" level="WARN" />
+		<Logger name="com.mchange.v2.resourcepool.BasicResourcePool" level="ERROR" />
+	</Loggers>
+</Configuration>

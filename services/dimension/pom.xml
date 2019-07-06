@@ -13,24 +13,11 @@
     <name>services.dimension</name>
     <packaging>pom</packaging>
 
-    <dependencies>
-        <!-- keep slf4j dependencies on the top -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-    </dependencies>
-    
     <modules>
         <module>jaxb</module>
         <module>service</module>
         <module>3rdparty</module>
         <module>client</module>
     </modules>
-    
-</project>
 
+</project>

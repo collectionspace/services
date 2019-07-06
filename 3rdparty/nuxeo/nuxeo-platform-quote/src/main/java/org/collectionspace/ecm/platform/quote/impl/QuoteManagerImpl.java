@@ -32,9 +32,6 @@ import java.util.Map;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.nuxeo.common.utils.IdUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.ClientRuntimeException;
@@ -70,13 +67,16 @@ import org.collectionspace.ecm.platform.quote.api.QuoteEvents;
 import org.collectionspace.ecm.platform.quote.api.QuoteManager;
 import org.collectionspace.ecm.platform.quote.service.QuoteServiceConfig;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author <a href="mailto:glefter@nuxeo.com">George Lefter</a>
  *
  */
 public class QuoteManagerImpl implements QuoteManager {
 
-    private static final Log log = LogFactory.getLog(QuoteManagerImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(QuoteManagerImpl.class);
 
     final SimpleDateFormat timeFormat = new SimpleDateFormat("dd-HHmmss.S");
 
@@ -104,13 +104,13 @@ public class QuoteManagerImpl implements QuoteManager {
     protected CoreSession openCoreSession(String repositoryName)
             throws ClientException {
     	CoreSession result = null;
-    	
+
         try {
         	result = CoreInstance.openCoreSession(repositoryName);
         } catch (Exception e) {
             throw new ClientException(e);
         }
-        
+
         return result;
     }
 

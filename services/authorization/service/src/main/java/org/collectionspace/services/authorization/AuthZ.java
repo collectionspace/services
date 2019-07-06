@@ -26,14 +26,14 @@ package org.collectionspace.services.authorization;
 
 import java.util.HashSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.authentication.CSpaceTenant;
 import org.collectionspace.authentication.CSpaceUser;
 import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.spi.CSpaceAuthorizationProvider;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -45,7 +45,7 @@ import org.springframework.transaction.TransactionStatus;
 
 /**
  * AuthZ is the authorization service singleton used by the services runtime
- * @author 
+ * @author
  */
 public class AuthZ {
 
@@ -54,7 +54,7 @@ public class AuthZ {
      */
     private static volatile AuthZ self = new AuthZ();
     private CSpaceAuthorizationProvider provider;
-    final Log logger = LogFactory.getLog(AuthZ.class);
+    final Logger logger = LoggerFactory.getLogger(AuthZ.class);
 
     private AuthZ() {
         setupProvider();
@@ -67,10 +67,10 @@ public class AuthZ {
     public final static AuthZ get() {
         return self;
     }
-    
+
     public static String getMethod(ActionType actionType) {
     	String result = null;
-    	
+
     	switch (actionType) {
     	case CREATE:
     		result = "POST";
@@ -94,10 +94,10 @@ public class AuthZ {
     		throw new RuntimeException(String.format("Encountered unexpected action type '%s'.",
     				actionType.value()));
     	}
-    	
+
     	return result;
     }
-    
+
     private void setupProvider() {
         String beanConfig = "applicationContext-authorization.xml";
         //system property is only set in test environment
@@ -133,7 +133,7 @@ public class AuthZ {
         } catch (Throwable t) {
         	provider.rollbackTransaction(status);
         	throw t;
-        }        
+        }
     }
 
     /**
@@ -158,7 +158,7 @@ public class AuthZ {
      */
     public void deletePermissionsFromRoles(CSpaceResource[] resources, String[] principals) // FIXME: # Can tx move one level up?
             throws PermissionNotFoundException, PermissionException {
-    	
+
         TransactionStatus status = provider.beginTransaction("deletePermssions");
         try {
         	for (CSpaceResource res : resources) {
@@ -247,38 +247,38 @@ public class AuthZ {
     public boolean isAccessAllowed(CSpaceResource res, CSpaceAction action) {
         return provider.getPermissionEvaluator().hasPermission(res, action);
     }
-    
+
     //
     // Login as the admin of no specific tenant
     //
     public void login() {
     	String user = AuthN.SPRING_ADMIN_USER;
     	String password = AuthN.SPRING_ADMIN_PASSWORD;
-    	
+
         HashSet<GrantedAuthority> gauths = new HashSet<GrantedAuthority>();
         gauths.add(new SimpleGrantedAuthority(AuthN.ROLE_SPRING_ADMIN_NAME)); //NOTE: Must match with value in applicationContext-authorization-test.xml (aka SPRING_SECURITY_METADATA));
-        
+
         Authentication authRequest = new UsernamePasswordAuthenticationToken(user, password, gauths);
         SecurityContextHolder.getContext().setAuthentication(authRequest);
         if (logger.isDebugEnabled()) {
             logger.debug("Spring Security login successful for user=" + user);
         }
     }
-    
+
     //
     // Login as the admin for a specific tenant
     //
     public void login(CSpaceTenant tenant) {
     	String user = AuthN.SPRING_ADMIN_USER;
     	String password = AuthN.SPRING_ADMIN_PASSWORD;
-    	    	
+
     	HashSet<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>();
     	grantedAuthorities.add(new SimpleGrantedAuthority(AuthN.ROLE_SPRING_ADMIN_NAME));
-    	
+
     	HashSet<CSpaceTenant> tenantSet = new HashSet<CSpaceTenant>();
     	tenantSet.add(tenant);
     	CSpaceUser principal = new CSpaceUser(user, password, null, tenantSet, grantedAuthorities);
-    	
+
         Authentication authRequest = new UsernamePasswordAuthenticationToken(principal, password, grantedAuthorities);
         SecurityContextHolder.getContext().setAuthentication(authRequest);
         if (logger.isDebugEnabled()) {

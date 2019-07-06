@@ -81,8 +81,8 @@ import org.xml.sax.InputSource;
 @Produces({ "application/xml" })
 @Consumes({ "application/xml" })
 public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayloadIn, PoxPayloadOut> {
-    
-	private final static Logger logger = LoggerFactory.getLogger(TemplateExpander.class);
+
+	private final static Logger logger = LoggerFactory.getLogger(ImportsResource.class);
 
 	public static final String SERVICE_NAME = "imports";
 	public static final String SERVICE_PATH = "/" + SERVICE_NAME;
@@ -92,7 +92,7 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 	 * ASSUMPTION: All Nuxeo services of a given tenancy store their stuff in
 	 * a repository domain, under a "Workspaces" space within that domain.
          * (See http://doc.nuxeo.com/display/USERDOC/Document+Management+concepts)
-	 * 
+	 *
 	 * Using the tenant associated with the currently authenticated user, this
 	 * method returns a delimited path to the Workspaces space for that tenancy.
 	 */
@@ -102,7 +102,7 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 		if (repositoryDomainList.size() == 1) {
 			String domainName = repositoryDomainList.get(0).getStorageName()
 					.trim();
-			result = NUXEO_SPACES_PATH_DELIMITER + domainName 
+			result = NUXEO_SPACES_PATH_DELIMITER + domainName
                                 + NUXEO_SPACES_PATH_DELIMITER + NuxeoUtils.Workspaces;
 		} else {
                         // Currently, the Imports service places all documents
@@ -117,7 +117,7 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 		}
 		return result;
 	}
-        
+
         private static String getRepoName() throws ConfigurationException {
 		String repoName = null;
 		List<RepositoryDomainType> repositoryDomainList = getRepositoryDomainList();
@@ -130,7 +130,7 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 		}
 		return repoName;
 	}
-        
+
         private static List<RepositoryDomainType> getRepositoryDomainList() throws ConfigurationException {
             TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance()
 				.getTenantBindingConfigReader();
@@ -140,7 +140,7 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 				.getRepositoryDomain();
                 return repositoryDomainList;
         }
-        
+
 
 	@Override
 	public String getServiceName() {
@@ -172,7 +172,7 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 			_templateDir = tReader.getResourcesDir() + File.separator
 					+ "templates";
 		}
-		
+
 		File templateDir = new File(_templateDir);  // We need to make sure the 'templates' directory is not missing
 		if (templateDir.exists() == false) {
 			throw new FileNotFoundException("The Import service's template directory is missing: " + _templateDir);
@@ -204,11 +204,11 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 			String xmlPayload) {
 		String result = null;
 		ResponseBuilder rb = Response.serverError(); // Assume we'll fail to successfully fulfill the request.
-		
+
 		try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
 			int timeout = ctx.getTimeoutSecs(); // gets it from query param 'impTimout' or uses default if no query param specified
-			
+
 			// InputSource inputSource = payloadToInputSource(xmlPayload);
 			// result = createFromInputSource(inputSource);
 			String inputFilename = payloadToFilename(xmlPayload);
@@ -221,7 +221,7 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 	        result = e.getMessage();
 	        logger.error(result);
 		}
-		
+
         return rb.build();
 	}
 
@@ -337,18 +337,18 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 	/**
 	 * Encodes each ampersand ('&') in the incoming XML payload by replacing it
 	 * with the predefined XML entity for an ampersand ('&amp;').
-	 * 
+	 *
 	 * This is a workaround for the issue described in CSPACE-3911. Its intended
 	 * effect is to have these added ampersand XML entities being resolved to
 	 * 'bare' ampersands during the initial parse, thus preserving any XML
 	 * entities in the payload, which will then be resolved correctly during the
 	 * second parse.
-	 * 
+	 *
 	 * (This is not designed to compensate for instances where the incoming XML
 	 * payload contains 'bare' ampersands - that is, used in any other context
 	 * than as the initial characters in XML entities. In those cases, the
 	 * payload may not be a legal XML document.)
-	 * 
+	 *
 	 * @param xmlPayload
 	 * @return The original XML payload, with each ampersand replaced by the
 	 *         predefined XML entity for an ampersand.
@@ -374,7 +374,7 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 	/**
 	 * This method may be called statically from outside this class; there is a
 	 * test call in org.collectionspace.services.test.ImportsServiceTest
-	 * 
+	 *
 	 * @param inputSource
 	 *            A wrapper around a request file, either a local file or a
 	 *            stream; the file has a specific format, you can look at:
@@ -412,15 +412,15 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 			@Context HttpServletRequest req, MultipartFormDataInput partFormData) {
 		Response response = null;
 		StringBuffer resultBuf = new StringBuffer();
-		
+
 		try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
 			int timeout = ctx.getTimeoutSecs(); // gets it from query param 'impTimout' or uses default if no query param specified
-			
+
 			InputStream fileStream = null;
 			String preamble = partFormData.getPreamble();
 			logger.trace("Preamble type is:" + preamble);
-                        
+
 			Map<String, List<InputPart>> partsMap = partFormData.getFormDataMap();
 			List<InputPart> fileParts = partsMap.get("file");
 			for (InputPart part : fileParts) {
@@ -470,14 +470,14 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 					continue;
 				}
 			}
-			
+
 			Response.ResponseBuilder rb = Response.ok();
 			rb.entity(resultBuf.toString());
 			response = rb.build();
 		} catch (Exception e) {
 			throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
 		}
-		
+
 		return response;
 	}
 

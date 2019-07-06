@@ -18,17 +18,12 @@
  */
 
 /*
- * An example Nuxeo event listener. 
+ * An example Nuxeo event listener.
  */
 
 package org.collectionspace.ecm.platform.quote.listener;
 
-
-
 import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.CoreSession;
@@ -40,11 +35,13 @@ import org.nuxeo.ecm.platform.relations.api.RelationManager;
 import org.nuxeo.ecm.platform.relations.api.Resource;
 import org.nuxeo.ecm.platform.relations.api.Statement;
 import org.nuxeo.ecm.platform.relations.api.impl.StatementImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DocumentRemovedQuoteEventListener extends
         AbstractQuoteListener implements PostCommitEventListener {
 
-    private static final Log log = LogFactory.getLog(DocumentRemovedQuoteEventListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(DocumentRemovedQuoteEventListener.class);
 
     @Override
     protected void doProcess(CoreSession coreSession,

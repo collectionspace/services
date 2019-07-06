@@ -2,16 +2,16 @@
 
 <!--
  pom.xml
- 
+
  A Maven 2 project file for the ID Service project.
 
  This document is a part of the source code and related artifacts
  for CollectionSpace, an open source collections management system
  for museums and related institutions:
- 
+
  http://www.collectionspace.org
  http://wiki.collectionspace.org
- 
+
  $LastChangedRevision: 302 $
  $LastChangedDate: 2009-06-29 15:36:29 -0700 (Mon, 29 Jun 2009) $
 -->
@@ -25,25 +25,12 @@
     <artifactId>org.collectionspace.services.main</artifactId>
     <version>${revision}</version>
   </parent>
-  
+
   <modelVersion>4.0.0</modelVersion>
   <artifactId>org.collectionspace.services.id</artifactId>
   <name>services.id</name>
   <packaging>pom</packaging>
-  
-	<dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-			<scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-			<scope>provided</scope>
-        </dependency>
-	</dependencies>
-  
+
   <modules>
     <!--module>3rdparty</module-->
     <!--module>jaxb</module-->
@@ -52,5 +39,3 @@
   </modules>
 
 </project>
-
-

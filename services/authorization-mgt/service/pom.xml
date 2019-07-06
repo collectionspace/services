@@ -26,28 +26,6 @@
 
         <!-- utilities -->
 
-        <!-- slf4j not available due to classloading issues running in system classpath
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.14</version>
-            <scope>provided</scope>
-        </dependency> -->
-
-        <!-- slf4j used for testing only -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -67,11 +45,6 @@
         </dependency>
 
         <!-- jboss -->
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging-log4j</artifactId>
-            <version>2.1.0.GA</version>
-        </dependency>
         <dependency>
             <groupId>jboss</groupId>
             <artifactId>jbosssx</artifactId>

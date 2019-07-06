@@ -24,7 +24,6 @@
         <dependency>
             <groupId>org.nuxeo.ecm.automation</groupId>
             <artifactId>nuxeo-automation-io</artifactId>
-            <version>${nuxeo.core.version}</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>

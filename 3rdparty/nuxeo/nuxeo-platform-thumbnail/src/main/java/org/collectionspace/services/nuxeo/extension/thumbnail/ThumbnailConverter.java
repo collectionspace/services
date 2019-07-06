@@ -4,9 +4,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.blobholder.BlobHolder;
 import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
@@ -26,8 +23,11 @@ import org.nuxeo.runtime.api.Framework;
 //import org.nuxeo.runtime.services.streaming.FileSource;
 //import org.nuxeo.runtime.services.streaming.StreamSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ThumbnailConverter extends IMImageUtils implements Converter {
-	private static final Log logger = LogFactory.getLog(ThumbnailConverter.class);
+	private static final Logger logger = LoggerFactory.getLogger(ThumbnailConverter.class);
 
 	@Override
 	public BlobHolder convert(BlobHolder blobHolder,
@@ -59,7 +59,7 @@ public class ThumbnailConverter extends IMImageUtils implements Converter {
 //				StreamSource source = streamingBlob.getStreamSource();
 //				inputFile = ((FileSource) source).getFile();
 //			}
-			
+
 			if (inputFile == null) {
 				logger.error("Blob from blob holder was null.");
 				return null; // Add a log message here

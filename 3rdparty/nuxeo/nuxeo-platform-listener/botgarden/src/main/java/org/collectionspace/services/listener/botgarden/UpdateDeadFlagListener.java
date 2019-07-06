@@ -1,7 +1,5 @@
 package org.collectionspace.services.listener.botgarden;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.batch.nuxeo.UpdateDeadFlagBatchJob;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
@@ -17,11 +15,13 @@ import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UpdateDeadFlagListener extends AbstractCSEventListenerImpl {
-	final Log logger = LogFactory.getLog(UpdateDeadFlagListener.class);
+	final Logger logger = LoggerFactory.getLogger(UpdateDeadFlagListener.class);
 
-	/* 
+	/*
 	 * Set the dead flag and dead date on collectionobjects related to a new or modified movement record.
 	 */
 	@Override
@@ -38,10 +38,10 @@ public class UpdateDeadFlagListener extends AbstractCSEventListenerImpl {
 				/*
 				 * Handle the case where a new movement is created with action code revive, and then related
 				 * to a collectionobject. The movement won't have any relations at the time it's created,
-				 * so we need to capture the creation of the relation. 
+				 * so we need to capture the creation of the relation.
 				 */
 				if (doc.getType().equals(RelationConstants.NUXEO_DOCTYPE) &&
-						!doc.isVersion() && 
+						!doc.isVersion() &&
 						!doc.isProxy()) {
 					String subjectDocType = (String) doc.getProperty(RelationConstants.SUBJECT_DOCTYPE_SCHEMA_NAME, RelationConstants.SUBJECT_DOCTYPE_FIELD_NAME);
 					String objectDocType = (String) doc.getProperty(RelationConstants.OBJECT_DOCTYPE_SCHEMA_NAME, RelationConstants.OBJECT_DOCTYPE_FIELD_NAME);;
@@ -58,22 +58,22 @@ public class UpdateDeadFlagListener extends AbstractCSEventListenerImpl {
 							logger.debug("updateDeadFlag complete: numAffected=" + results.getNumAffected() + " userNote=" + results.getUserNote());
 						} catch (Exception e) {
 							logger.error(e.getMessage(), e);
-						}            		
+						}
 					}
 				}
 			}
 			else {
 				/*
-				 * Handle document modification. If the modified document was a movement record, and 
+				 * Handle document modification. If the modified document was a movement record, and
 				 * its action code is dead or revived, update the dead flag. We don't actually have to
 				 * check the action code here, since it will be checked inside UpdateDeadFlagBatchJob.updateRelatedDeadFlags,
 				 * but it is an optimization.
 				 */
 				if (doc.getType().startsWith(MovementConstants.NUXEO_DOCTYPE) &&
-						!doc.isVersion() && 
-						!doc.isProxy() && 
+						!doc.isVersion() &&
+						!doc.isProxy() &&
 						!doc.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
-					String actionCode = (String) doc.getProperty(MovementBotGardenConstants.ACTION_CODE_SCHEMA_NAME, MovementBotGardenConstants.ACTION_CODE_FIELD_NAME);           	
+					String actionCode = (String) doc.getProperty(MovementBotGardenConstants.ACTION_CODE_SCHEMA_NAME, MovementBotGardenConstants.ACTION_CODE_FIELD_NAME);
 
 					logger.debug("actionCode=" + actionCode);
 

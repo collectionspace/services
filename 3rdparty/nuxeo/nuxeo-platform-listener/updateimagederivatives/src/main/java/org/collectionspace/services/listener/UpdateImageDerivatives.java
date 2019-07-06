@@ -2,8 +2,6 @@ package org.collectionspace.services.listener;
 
 import java.io.Serializable;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.common.api.CommonAPI;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
@@ -19,6 +17,8 @@ import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 //import org.nuxeo.ecm.platform.picture.api.ImagingDocumentConstants;
 import org.nuxeo.ecm.platform.picture.api.ImagingDocumentConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UpdateImageDerivatives extends AbstractCSEventListenerImpl {
 
@@ -27,9 +27,7 @@ public class UpdateImageDerivatives extends AbstractCSEventListenerImpl {
 	// 		CoreSessionInterface coreSession = new
 	// 		CoreSessionWrapper(docEventContext.getCoreSession());
 
-	// FIXME: We might experiment here with using log4j instead of Apache
-	// Commons Logging; am using the latter to follow Ray's pattern for now
-	private final static Log logger = LogFactory.getLog(UpdateImageDerivatives.class);
+	private final static Logger logger = LoggerFactory.getLogger(UpdateImageDerivatives.class);
 
 	@Override
 	public void handleEvent(Event event) {
@@ -74,7 +72,7 @@ public class UpdateImageDerivatives extends AbstractCSEventListenerImpl {
 		// just disassociates the blob content (aka, the original image) from the document.
 		//
 		docModel.setPropertyValue("file:content", (Serializable) null);
-		
+
 		//
 		// Removing this facet ensures the original derivatives are unchanged when
 		// we call the save method.  If we didn't remove the face, then all the
@@ -88,12 +86,12 @@ public class UpdateImageDerivatives extends AbstractCSEventListenerImpl {
 		// Nuxeo will still tread this document as a Picture document.
 		//
 		NuxeoUtils.addFacet(docModel, ImagingDocumentConstants.PICTURE_FACET);
-		
+
 		//
 		// Finally, we need to remove the actual blob/image bits that are store on disk.
 		//
 		DocumentBlobHolder docBlobHolder = (DocumentBlobHolder) docModel.getAdapter(BlobHolder.class);
-		Blob blob = docBlobHolder.getBlob();		
+		Blob blob = docBlobHolder.getBlob();
 		if (blob == null) {
 			logger.error(String.format("Could not get blob for original image. Trying to delete original for: '%s'",
 							docModel.getTitle()));
@@ -102,12 +100,12 @@ public class UpdateImageDerivatives extends AbstractCSEventListenerImpl {
 			logger.debug(String.format("Started thread '%s' to delete file of blob '%s'.",
 					thread.getId(), blob.getFilename()));
 		}
-		
+
 		if (logger.isTraceEnabled()) {
-			logger.trace(String.format("Exiting handleEvent in '%s'.", getClass().getName()));			
-		}	
+			logger.trace(String.format("Exiting handleEvent in '%s'.", getClass().getName()));
+		}
 	}
-	
+
 	private boolean shouldProcessEvent(Event event) {
 		boolean result = false;
 

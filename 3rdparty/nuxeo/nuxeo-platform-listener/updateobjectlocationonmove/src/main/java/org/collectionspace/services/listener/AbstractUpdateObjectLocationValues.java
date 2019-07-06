@@ -5,9 +5,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.collectionspace.services.client.LocationAuthorityClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
@@ -27,12 +24,11 @@ import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEventListenerImpl {
-
-    // FIXME: We might experiment here with using log4j instead of Apache Commons Logging;
-    // am using the latter to follow Ray's pattern for now
-    private final static Log logger = LogFactory.getLog(AbstractUpdateObjectLocationValues.class);
+    private final static Logger logger = LoggerFactory.getLogger(AbstractUpdateObjectLocationValues.class);
 
     // FIXME: Make the following message, or its equivalent, a constant usable by all event listeners
     private final static String NO_FURTHER_PROCESSING_MESSAGE =
@@ -332,7 +328,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
 		try {
 			relationDocModels = coreSession.query(query);
 		} catch (DocumentException e) {
-			logger.error(e);
+			logger.error(e.getMessage());
 		}
 
         if (relationDocModels == null || relationDocModels.isEmpty()) {
@@ -529,7 +525,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
 		try {
 			relationDocModels = session.query(query);
 		} catch (DocumentException e) {
-			logger.error(e);
+			logger.error(e.getMessage());
 			return null;
 		}
 

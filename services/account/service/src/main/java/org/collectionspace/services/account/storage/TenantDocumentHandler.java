@@ -46,12 +46,12 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author 
+ * @author
  */
 public class TenantDocumentHandler
         extends JpaDocumentHandler<Tenant, TenantsList, Tenant, List> {
 
-    private final Logger logger = LoggerFactory.getLogger(AccountDocumentHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(TenantDocumentHandler.class);
     private Tenant tenant;
     private TenantsList tenantList;
 
@@ -66,7 +66,7 @@ public class TenantDocumentHandler
         // If marked as metadata immutable, do not do update
        	merge(tenantReceived, tenantFound);
     }
-    
+
     /**
      * merge manually merges the from account to the to account
      * -this method is created due to inefficiency of JPA EM merge

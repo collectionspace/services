@@ -15,15 +15,6 @@
 	</properties>
 
 	<dependencies>
-		<!-- keep slf4j dependencies on the top -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-		</dependency>
 		<!-- CollectionSpace dependencies -->
 		<dependency>
 			<groupId>org.collectionspace.services</groupId>
@@ -155,17 +146,6 @@
 		<dependency>
 			<groupId>ch.elca.el4j.modules</groupId>
 			<artifactId>module-xml_merge-common</artifactId>
-			<version>3.1</version>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-codec</groupId>
-					<artifactId>commons-codec</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>xml-apis</groupId>
-					<artifactId>xml-apis</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.collectionspace.services</groupId>

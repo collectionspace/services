@@ -23,6 +23,7 @@
 		<spring.security.version>4.1.1.RELEASE</spring.security.version>
 		<spring.security.oauth2.version>2.0.10.RELEASE</spring.security.oauth2.version>
 		<aspectj.version>1.7.4</aspectj.version>
+		<log4j.version>2.12.0</log4j.version>
 	</properties>
 
 	<distributionManagement>
@@ -460,6 +461,59 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<!-- Ensure transitive dependencies on slf4j and log4j libraries all use the same version. -->
+			<!-- These jars are all provided, in services/common/lib/slf4j. -->
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>1.7.21</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-slf4j-impl</artifactId>
+				<version>${log4j.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-api</artifactId>
+				<version>${log4j.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-core</artifactId>
+				<version>${log4j.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<!-- commons-logging is provided by jcl-over-slf4j, in services/common/lib/slf4j. -->
+			<dependency>
+				<groupId>commons-logging</groupId>
+				<artifactId>commons-logging</artifactId>
+				<scope>provided</scope>
+			</dependency>
+			<!-- End of logging dependencies. -->
+			<dependency>
+				<groupId>ch.elca.el4j.modules</groupId>
+				<artifactId>module-xml_merge-common</artifactId>
+				<version>3.1</version>
+				<scope>provided</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>commons-codec</groupId>
+						<artifactId>commons-codec</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-log4j12</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xml-apis</groupId>
+						<artifactId>xml-apis</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
 			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
@@ -467,20 +521,9 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-api</artifactId>
-				<version>1.6.1</version>
-			</dependency>
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-log4j12</artifactId>
-				<version>1.6.1</version>
-			</dependency>
-			<dependency>
 				<groupId>org.testng</groupId>
 				<artifactId>testng</artifactId>
 				<version>6.1.1</version>
-				<!-- <version>5.6</version> -->
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -553,12 +596,26 @@
 						<groupId>com.sun.jersey</groupId>
 						<artifactId>jersey-servlet</artifactId>
 					</exclusion>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-log4j12</artifactId>
+					</exclusion>
 				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.nuxeo.ecm.core</groupId>
 				<artifactId>nuxeo-core</artifactId>
 				<version>${nuxeo.core.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-log4j12</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xerces</groupId>
+						<artifactId>xercesImpl</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.nuxeo.ecm.core</groupId>
@@ -569,10 +626,6 @@
 						<groupId>com.sun.jersey</groupId>
 						<artifactId>jersey-servlet</artifactId>
 					</exclusion>
-					<!-- <exclusion>
-							<artifactId>jboss-remoting</artifactId>
-							<groupId>jboss</groupId>
-					</exclusion> -->
 				</exclusions>
 			</dependency>
 			<dependency>
@@ -614,6 +667,12 @@
 				<groupId>org.nuxeo.ecm.core</groupId>
 				<artifactId>nuxeo-core-storage-sql</artifactId>
 				<version>${nuxeo.core.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-log4j12</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.nuxeo.ecm.core</groupId>
@@ -652,6 +711,10 @@
 					<exclusion>
 						<artifactId>jersey-servlet</artifactId>
 						<groupId>com.sun.jersey</groupId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-log4j12</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>

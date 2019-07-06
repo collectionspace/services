@@ -35,51 +35,51 @@ import org.slf4j.LoggerFactory;
  *
  * @param <PT> the generic type
  */
-public abstract class PoxPayload<PT extends PayloadPart> {	
-	
+public abstract class PoxPayload<PT extends PayloadPart> {
+
 	/** The Constant logger. */
-	protected static final Logger logger = LoggerFactory.getLogger(PayloadPart.class);	
-	
+	protected static final Logger logger = LoggerFactory.getLogger(PoxPayload.class);
+
 	/** String constant for JAX-B root element labels */
 	public static final String DOCUMENT_ROOT_ELEMENT_LABEL = "document";
 	public static final String ABSTRACT_COMMON_LIST_ROOT_ELEMENT_LABEL = "abstract-common-list";
-	
+
 	/** The xml text. */
 	private String xmlPayload;
-	
+
 	protected Document domDocument;
-	
+
 	/** The payload name. */
 	private String payloadName;
-	
+
 	// The list of POX parts contained in the xmlText payload
 	/** The parts. */
 	private List<PT> parts = new ArrayList<PT>();
-	
+
 	// Valid root element labels
-	private static Set<String> validRootElementLabels = new HashSet<String>(Arrays.asList(DOCUMENT_ROOT_ELEMENT_LABEL, 
+	private static Set<String> validRootElementLabels = new HashSet<String>(Arrays.asList(DOCUMENT_ROOT_ELEMENT_LABEL,
 			ABSTRACT_COMMON_LIST_ROOT_ELEMENT_LABEL));
-	
+
 	/**
 	 * Instantiates a new pox payload.
 	 */
 	protected PoxPayload() {
 		//empty
 	}
-	
+
 	final protected void setPayloadName(String name) {
 		this.payloadName = name;
 	}
-	
+
 	/**
 	 * Returns a list of valid root element labels for payloads.
-	 * 
+	 *
 	 * @return
 	 */
 	public Set<String> getValidRootElementLables() {
 		return validRootElementLabels;
 	}
-	
+
 	private void setDomDocument(Document dom) throws DocumentException {
 		this.domDocument = dom;
 		String label = domDocument.getRootElement().getName().toLowerCase();
@@ -91,7 +91,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 		}
 		parseParts();
 	}
-	
+
 	/**
 	 * Creates and returns an XML string representation of ourself.
 	 *
@@ -102,27 +102,27 @@ public abstract class PoxPayload<PT extends PayloadPart> {
         Document document = createDOMFromParts();
 
         result = document.asXML();
-		
+
 		if (logger.isTraceEnabled() == true) {
 			logger.trace("\n\n<<<< Payload : BEGIN <<<<\n" + result + "\n<<<< Payload : END   <<<<\n");
 		}
-		
+
 		return result;
 	}
-	
+
 	protected Document createDOMFromParts() {
 		Document result = null;
-		
+
         Document document = DocumentHelper.createDocument();
         document.setXMLEncoding("UTF-8");
         document.setName(getName());
         Element root = document.addElement( "document" );
-        root.addAttribute("name", getName());        
-		
+        root.addAttribute("name", getName());
+
 		Iterator<PT> it = getParts().iterator();
 		while (it.hasNext() == true) {
 			PT outPart = it.next();
-			Element element = outPart.asElement();			
+			Element element = outPart.asElement();
 			if (element != null) {
 				root.add(element.detach());
 			} else {
@@ -130,10 +130,10 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 			}
 		}
 		result = document;
-				
+
 		return result;
 	}
-	
+
 	/**
 	 * Instantiates a new PoxPayload by parsing the payload into a DOM4j
 	 * Document instance
@@ -146,7 +146,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 		Document dom  = reader.read(new StringReader(xmlPayload));
 		setDomDocument(dom);
 	}
-	
+
     /**
      * Instantiates a new payload, saves the original xml, creates a DOM and parses it into parts
      *
@@ -159,8 +159,8 @@ public abstract class PoxPayload<PT extends PayloadPart> {
         SAXReader reader = new SAXReader();
         Document dom = reader.read(file);
 		setDomDocument(dom);
-    }	
-	
+    }
+
 	/**
 	 * Creates the part -either an PayloadOutputPart or a PayloadInputPart
 	 *
@@ -170,7 +170,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	 * @return the pT
 	 */
 	abstract protected PT createPart(String label, Object jaxbObject, Element element);
-	
+
 	/**
 	 * Creates the part -either an PayloadOutputPart or a PayloadInputPart
 	 *
@@ -178,8 +178,8 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	 * @param element the DOM4j element
 	 * @return the pT
 	 */
-	abstract protected PT createPart(String label, Element element);	
-	
+	abstract protected PT createPart(String label, Element element);
+
 	/**
 	 * Parse the DOM object into schema parts.
 	 *
@@ -191,7 +191,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 		while (it.hasNext() == true) {
 			Element element = (Element) it.next();
 			String label = element.getName();
-			Object jaxbObject = PoxPayload.toObject(element);			
+			Object jaxbObject = PoxPayload.toObject(element);
 			if (jaxbObject != null) {
 				payloadPart = createPart(label, jaxbObject, element);
 			} else {
@@ -202,7 +202,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 			}
 		}
 	}
-	
+
 	/**
 	 * Gets the name of the payload.
 	 *
@@ -211,7 +211,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	public String getName() {
 		return payloadName;
 	}
-	
+
 	/**
 	 * Gets the DOM object that we created at init time.  This should never be null;
 	 *
@@ -220,7 +220,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	public Document getDOMDocument() {
 		return this.domDocument;
 	}
-		
+
 	/**
 	 * Gets the xml text.
 	 *
@@ -229,7 +229,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	public String getXmlPayload() {
 		return xmlPayload;
 	}
-	
+
 	/**
 	 * Gets the POX part with name match 'label'.
 	 *
@@ -250,7 +250,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 		}
 		return result;
 	}
-	
+
     public List<PT> getParts(String label) {
         List<PT> result = new ArrayList<PT>();
         if (parts != null) {
@@ -262,10 +262,10 @@ public abstract class PoxPayload<PT extends PayloadPart> {
                 }
             }
         }
-        
+
         return result;
-    }	
-	
+    }
+
 	/**
 	 * Gets a list of the POX parts.
 	 *
@@ -274,16 +274,16 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	public List<PT> getParts() {
 		return parts;
 	}
-	
+
 	/**
 	 * Set a new set of parts.
-	 * 
+	 *
 	 * @param newParts
 	 */
 	public void setParts(ArrayList<PT> newParts) {
 		this.parts = newParts;
 	}
-		
+
 	/**
 	 * Adds a POX part to the list of existing parts with the label 'label'.
 	 *
@@ -295,7 +295,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 		parts.add(entity);
 		return entity;
 	}
-	
+
 	/**
 	 * Adds a POX part -assuming the part already has a label name.
 	 *
@@ -306,7 +306,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 		parts.add(entity);
 		return entity;
 	}
-	
+
 	/**
 	 * Removes a POX part from our list of parts
 	 * @param entity
@@ -314,7 +314,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	public void removePart(PT entity) {
 		parts.remove(entity);
 	}
-		
+
     /**
      * Gets the Java package name from the specified namespace.  This method
      * assumes the Namespace is a xjc (JAXB compiler) generate namespace from
@@ -328,7 +328,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 		String namespaceURI = namespace.getURI();
         return nc.toPackageName(namespaceURI);
     }
-      
+
     /**
      * Attempts to unmarshal a DOM4j element (for a part) into an instance of a JAXB object
      *
@@ -338,21 +338,21 @@ public abstract class PoxPayload<PT extends PayloadPart> {
     public static Object toObject(Element elementInput) {
     	Object result = null;
     	try {
-    		Namespace namespace = elementInput.getNamespace();    		
+    		Namespace namespace = elementInput.getNamespace();
     		String thePackage = getPackage(namespace);
 	    	JAXBContext jc = JAXBContext.newInstance(thePackage);
 	    	Unmarshaller um = jc.createUnmarshaller();
 	    	result = um.unmarshal(
-	    			new StreamSource(new StringReader(elementInput.asXML())));	    			
+	    			new StreamSource(new StringReader(elementInput.asXML())));
     	} catch (Exception e) {
-    		String msg = String.format("Could not unmarshal XML payload '%s' into a JAXB object.", 
+    		String msg = String.format("Could not unmarshal XML payload '%s' into a JAXB object.",
     				elementInput.getName());
     		logger.warn(msg);
     	}
-    	
+
     	return result;
     }
-	
+
     /**
      * Attempts to unmarshal a JAXB object (for a part) to a DOM4j element.
      *
@@ -384,10 +384,10 @@ public abstract class PoxPayload<PT extends PayloadPart> {
     				jaxbObject.toString());
     		logger.error(msg);
     	}
-    	
+
     	return result;
     }
-    
+
     /**
      * Attempts to unmarshal a JAXB object (for a part) to a DOM4j element.
      *
@@ -399,7 +399,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 		Document doc = DocumentHelper.parseText(xmlPayload);
 		result = doc.getRootElement(); //FIXME: REM - .detach();
     	return result;
-    }	
-    
-	
+    }
+
+
 }

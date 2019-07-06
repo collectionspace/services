@@ -26,11 +26,11 @@ package org.collectionspace.services.authorization.spring;
 import java.util.List;
 import java.io.Serializable;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.authorization.CSpaceAction;
 import org.collectionspace.services.authorization.spi.CSpacePermissionEvaluator;
 import org.collectionspace.services.authorization.CSpaceResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
@@ -39,11 +39,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * SpringPermissionEvaluator evaluates permissions in Spring Security
- * @author 
+ * @author
  */
 public class SpringPermissionEvaluator implements CSpacePermissionEvaluator {
 
-    final Log log = LogFactory.getLog(SpringPermissionEvaluator.class);  //FIXEME: REM - Use SLF4J interfaces instead of directly using Apache Commons Logging.
+    final Logger log = LoggerFactory.getLogger(SpringPermissionEvaluator.class);
     private SpringAuthorizationProvider provider;
 
     SpringPermissionEvaluator(SpringAuthorizationProvider provider) {
@@ -53,14 +53,14 @@ public class SpringPermissionEvaluator implements CSpacePermissionEvaluator {
     @Override
     public boolean hasPermission(CSpaceResource res, CSpaceAction action) {
     	boolean result = false;
-    	
+
     	try {
 	        Permission perm = SpringAuthorizationProvider.getPermission(action);
 	        Authentication authToken = SecurityContextHolder.getContext().getAuthentication();
 	        Serializable objectIdId = SpringAuthorizationProvider.getObjectIdentityIdentifier(res);
 	        String objectIdType = SpringAuthorizationProvider.getObjectIdentityType(res);
 	        PermissionEvaluator eval = provider.getProviderPermissionEvaluator();
-	        
+
 	        debug(res, authToken, objectIdId, objectIdType, perm);
 	        result = eval.hasPermission(authToken,
 	                objectIdId, objectIdType, perm);
@@ -73,10 +73,10 @@ public class SpringPermissionEvaluator implements CSpacePermissionEvaluator {
     		}
     		log.error("Unexpected exception encountered while evaluating permissions.", e);
     	}
-        
+
         return result;
     }
-    
+
     private void debug(CSpaceResource res,
     		Authentication authToken,
     		Serializable objectIdId,
@@ -95,7 +95,7 @@ public class SpringPermissionEvaluator implements CSpacePermissionEvaluator {
 	    	System.out.println("");
     	}
     }
-    
+
 	public static boolean exceptionChainContainsNetworkError(Throwable exceptionChain) {
 		boolean result = false;
 		Throwable cause = exceptionChain;
@@ -105,13 +105,13 @@ public class SpringPermissionEvaluator implements CSpacePermissionEvaluator {
 				result = true;
 				break;
 			}
-			
+
 			cause = cause.getCause();
 		}
 
 		return result;
 	}
-	
+
 	private static boolean isCauseNetworkRelated(Throwable cause) {
 		boolean result = false;
 
@@ -122,5 +122,5 @@ public class SpringPermissionEvaluator implements CSpacePermissionEvaluator {
 
 		return result;
 	}
-    
+
 }

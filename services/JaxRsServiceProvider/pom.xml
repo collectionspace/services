@@ -53,46 +53,11 @@
   			<version>6.6.1</version>
   		</dependency>
 
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.14</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- somewhere dependency is added 1.6.1 unnecessarily -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.6.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <version>1.6.1</version>
-            <scope>test</scope>
-        </dependency>
         <!-- CollectionSpace dependencies -->
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authorization.service</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-            	<exclusion>
-            		<artifactId>jboss-logging-log4j</artifactId>
-            		<groupId>org.jboss.logging</groupId>
-            	</exclusion>
-            </exclusions>
         </dependency>
         <dependency>
 			<groupId>org.collectionspace.services</groupId>
@@ -197,10 +162,6 @@
             <artifactId>org.collectionspace.services.authorization-mgt.service</artifactId>
             <version>${project.version}</version>
 			<exclusions>
-            	<exclusion>
-            		<artifactId>jboss-logging-log4j</artifactId>
-            		<groupId>org.jboss.logging</groupId>
-            	</exclusion>
                 <exclusion>
                     <groupId>org.collectionspace.services</groupId>
                     <artifactId>org.collectionspace.services.authorization-mgt.import</artifactId>
@@ -613,12 +574,6 @@
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core</artifactId>
-			<exclusions>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>

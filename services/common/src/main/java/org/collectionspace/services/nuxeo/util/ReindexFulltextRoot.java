@@ -1,9 +1,9 @@
 /*
  * (C) Copyright 2012 Nuxeo SA (http://nuxeo.com/) and others.
- * 
+ *
  * This code was moved into CollectionSpace to be compatible with the
  * Nuxeo 6.0-HF21 jar files.  The original code can be found on
- * 
+ *
  * GitHub.com here: https://github.com/nuxeo/nuxeo-reindex-fulltext
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,8 +39,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.AbstractSession;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.IterableQueryResult;
@@ -62,6 +60,8 @@ import org.nuxeo.ecm.core.work.api.WorkManager.Scheduling;
 import org.nuxeo.ecm.webengine.jaxrs.session.SessionFactory;
 import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.runtime.transaction.TransactionHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * JAX-RS component used to do fulltext reindexing of the whole database.
@@ -71,7 +71,7 @@ import org.nuxeo.runtime.transaction.TransactionHelper;
 @Path("reindexFulltext")
 public class ReindexFulltextRoot {
 
-    public static Log log = LogFactory.getLog(ReindexFulltextRoot.class);
+    public static Logger log = LoggerFactory.getLogger(ReindexFulltextRoot.class);
 
     protected static final String DC_TITLE = "dc:title";
 
@@ -110,7 +110,7 @@ public class ReindexFulltextRoot {
      * @param batch if present, the batch number to process instead of all
      *            batches; starts at 1
      * @return when done, ok + the total number of docs
-     * @throws StorageException 
+     * @throws StorageException
      */
     public String reindexFulltext(int batchSize, int batch, String query) throws NuxeoException {
         Principal principal = coreSession.getPrincipal();
@@ -126,7 +126,7 @@ public class ReindexFulltextRoot {
         if (batchSize <= 0) {
             batchSize = DEFAULT_BATCH_SIZE;
         }
-        
+
         //
         // A default query that gets ALL the documents
         //
@@ -198,7 +198,7 @@ public class ReindexFulltextRoot {
 
     /**
      * This has to be called once the transaction has been started.
-     * @throws StorageException 
+     * @throws StorageException
      */
     protected void getLowLevelSession() throws NuxeoException {
         try {

@@ -1,7 +1,5 @@
 package org.collectionspace.services.listener.botgarden;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 import org.collectionspace.services.batch.nuxeo.FormatVoucherNameBatchJob;
@@ -16,11 +14,13 @@ import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UpdateStyledNameListener extends AbstractCSEventListenerImpl {
 	public static final String RUN_AFTER_MODIFIED_PROPERTY = "UpdateStyledNameListener.RUN_AFTER_MODIFIED";
 
-	final Log logger = LogFactory.getLog(UpdateStyledNameListener.class);
+	final Logger logger = LoggerFactory.getLogger(UpdateStyledNameListener.class);
 
 	@Override
 	public void handleEvent(Event event) {
@@ -31,23 +31,23 @@ public class UpdateStyledNameListener extends AbstractCSEventListenerImpl {
 			DocumentModel doc = context.getSourceDocument();
 
 			logger.debug("docType=" + doc.getType());
-			
-			if (doc.getType().startsWith(LoanoutConstants.NUXEO_DOCTYPE) && 
-					!doc.isVersion() && 
-					!doc.isProxy() && 
+
+			if (doc.getType().startsWith(LoanoutConstants.NUXEO_DOCTYPE) &&
+					!doc.isVersion() &&
+					!doc.isProxy() &&
 					!doc.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
-				
+
 				if (event.getName().equals(DocumentEventTypes.BEFORE_DOC_UPDATE)) {
-					DocumentModel previousDoc = (DocumentModel) context.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);	            	
-	
+					DocumentModel previousDoc = (DocumentModel) context.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
+
 					String previousLabelRequested = (String) previousDoc.getProperty(LoanoutBotGardenConstants.LABEL_REQUESTED_SCHEMA_NAME,
 							LoanoutBotGardenConstants.LABEL_REQUESTED_FIELD_NAME);
 					String labelRequested = (String) doc.getProperty(LoanoutBotGardenConstants.LABEL_REQUESTED_SCHEMA_NAME,
 							LoanoutBotGardenConstants.LABEL_REQUESTED_FIELD_NAME);
-					
+
 					logger.debug("previousLabelRequested=" + previousLabelRequested + " labelRequested=" + labelRequested);
-					
-					if ((previousLabelRequested == null || previousLabelRequested.equals(LoanoutBotGardenConstants.LABEL_REQUESTED_NO_VALUE)) && 
+
+					if ((previousLabelRequested == null || previousLabelRequested.equals(LoanoutBotGardenConstants.LABEL_REQUESTED_NO_VALUE)) &&
 							labelRequested.equals(LoanoutBotGardenConstants.LABEL_REQUESTED_YES_VALUE)) {
 						// The label request is changing from no to yes, so we should update the styled name.
 						ec.setProperty(RUN_AFTER_MODIFIED_PROPERTY, true);
@@ -55,21 +55,21 @@ public class UpdateStyledNameListener extends AbstractCSEventListenerImpl {
 				}
 				else {
 					boolean doUpdate = false;
-					
+
 					if (event.getName().equals(DocumentEventTypes.DOCUMENT_CREATED)) {
-						String labelRequested = (String) doc.getProperty(LoanoutBotGardenConstants.LABEL_REQUESTED_SCHEMA_NAME, 
+						String labelRequested = (String) doc.getProperty(LoanoutBotGardenConstants.LABEL_REQUESTED_SCHEMA_NAME,
 								LoanoutBotGardenConstants.LABEL_REQUESTED_FIELD_NAME);
-						
+
 						doUpdate = (labelRequested != null && labelRequested.equals(LoanoutBotGardenConstants.LABEL_REQUESTED_YES_VALUE));
 					} else {
 						doUpdate = ec.hasProperty(RUN_AFTER_MODIFIED_PROPERTY) && ((Boolean) ec.getProperty(RUN_AFTER_MODIFIED_PROPERTY));
 					}
-					
+
 					if (doUpdate) {
 						logger.debug("Updating styled name");
-	
+
 						String voucherCsid = doc.getName();
-						
+
 						try {
 							createFormatter().formatVoucherName(voucherCsid);
 						} catch (Exception e) {
@@ -80,7 +80,7 @@ public class UpdateStyledNameListener extends AbstractCSEventListenerImpl {
 			}
 		}
 	}
-	
+
 	private FormatVoucherNameBatchJob createFormatter() {
 		ResourceMap resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
 

@@ -1,7 +1,5 @@
 package org.collectionspace.services.listener.botgarden;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
 import org.collectionspace.services.nuxeo.listener.AbstractCSEventListenerImpl;
@@ -11,11 +9,13 @@ import org.nuxeo.ecm.core.api.VersioningOption;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CreateVersionListener extends AbstractCSEventListenerImpl {
 	public static final String SKIP_PROPERTY = "CreateVersionListener.SKIP";
 
-	final Log logger = LogFactory.getLog(CreateVersionListener.class);
+	final Logger logger = LoggerFactory.getLogger(CreateVersionListener.class);
 
 	@Override
 	public void handleEvent(Event event) {
@@ -32,12 +32,12 @@ public class CreateVersionListener extends AbstractCSEventListenerImpl {
 
 				logger.debug("docType=" + doc.getType());
 
-				if (doc.getType().startsWith(MovementConstants.NUXEO_DOCTYPE) && 
-						!doc.isVersion() && 
+				if (doc.getType().startsWith(MovementConstants.NUXEO_DOCTYPE) &&
+						!doc.isVersion() &&
 						!doc.isProxy() &&
 						!doc.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
 					// Version the document
-					DocumentRef versionRef = doc.checkIn(VersioningOption.MINOR, null);        	
+					DocumentRef versionRef = doc.checkIn(VersioningOption.MINOR, null);
 					DocumentModel versionDoc = context.getCoreSession().getDocument(versionRef);
 
 					logger.debug("created version: id=" + versionDoc.getId() + " csid=" + versionDoc.getName());

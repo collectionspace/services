@@ -1,17 +1,14 @@
 package org.collectionspace.services.listener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValues {
-
-    // FIXME: We might experiment here with using log4j instead of Apache Commons Logging;
-    // am using the latter to follow Ray's pattern for now
-    private final Log logger = LogFactory.getLog(UpdateObjectLocationOnMove.class);
+    private final Logger logger = LoggerFactory.getLogger(UpdateObjectLocationOnMove.class);
 
     @Override
     protected boolean updateCollectionObjectLocation(DocumentModel collectionObjectDocModel,
@@ -31,7 +28,7 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
             		movementRecordsLocation));
             return result;
         }
-        
+
         // Get the computed current location value of the CollectionObject.
         String existingComputedCurrentLocation = (String) collectionObjectDocModel.getProperty(COLLECTIONOBJECTS_COMMON_SCHEMA,
                 COMPUTED_CURRENT_LOCATION_PROPERTY);
@@ -42,7 +39,7 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
             		COMPUTED_CURRENT_LOCATION_PROPERTY, movementRecordsLocation);
             result = true; // We've updated the location field.
         }
-        
+
         return result;
     }
 }

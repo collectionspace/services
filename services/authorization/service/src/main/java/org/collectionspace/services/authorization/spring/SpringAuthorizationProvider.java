@@ -24,13 +24,13 @@
 package org.collectionspace.services.authorization.spring;
 
 import java.util.ArrayList;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.authorization.CSpaceAction;
 import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.spi.CSpaceAuthorizationProvider;
 import org.collectionspace.services.authorization.spi.CSpacePermissionEvaluator;
 import org.collectionspace.services.authorization.spi.CSpacePermissionManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.security.access.PermissionEvaluator;
@@ -48,11 +48,11 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 /**
  * SpringAuthorizationProvider Spring Security provider
- * @author 
+ * @author
  */
 public class SpringAuthorizationProvider implements CSpaceAuthorizationProvider {
 
-    final Log log = LogFactory.getLog(SpringAuthorizationProvider.class);
+    final Logger log = LoggerFactory.getLogger(SpringAuthorizationProvider.class);
     @Autowired
     private MutableAclService providerAclService;
     @Autowired

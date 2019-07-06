@@ -67,11 +67,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author 
+ * @author
  */
 public class TenantValidatorHandler implements ValidatorHandler {
 
-    final Logger logger = LoggerFactory.getLogger(AccountValidatorHandler.class);
+    final Logger logger = LoggerFactory.getLogger(TenantValidatorHandler.class);
 
     @Override
     public void validate(Action action, ServiceContext ctx)
