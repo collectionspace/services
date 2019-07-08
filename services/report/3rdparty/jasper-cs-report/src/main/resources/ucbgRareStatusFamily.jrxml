@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="object" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="720" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="36" uuid="386adf0d-a79f-4e48-97b3-4b3555d4f4c5">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Title" fontName="SansSerif" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="SubTitle" forecolor="#666666" fontName="SansSerif" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="SansSerif" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="SansSerif" fontSize="12"/>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[35]]></defaultValueExpression>
+	</parameter>
+	<parameter name="family" class="java.lang.String">
+		<parameterDescription><![CDATA[Use form %FAMILYNAME% (e.g., %ARAUCARIACEAE%)
+or %'FAMILYNAME' to avoid homonyms]]></parameterDescription>
+		<defaultValueExpression><![CDATA["%ARAUCARIACEAE%"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select co1.objectnumber,
+findhybridaffinname(tig.id) determination,
+case when (tn.family is not null and tn.family <> '')
+     then regexp_replace(tn.family, '^.*\)''(.*)''$', '\1')
+end as family,
+case when (mc.currentlocation is not null and mc.currentlocation <> '')
+     then regexp_replace(mc.currentlocation, '^.*\)''(.*)''$', '\1')
+end as gardenlocation,
+co1.recordstatus dataQuality,
+case when (lg.fieldlocplace is not null and lg.fieldlocplace <> '') then regexp_replace(lg.fieldlocplace, '^.*\)''(.*)''$', '\1')
+     when (lg.fieldlocplace is null and lg.taxonomicrange is not null) then 'Geographic range: '||lg.taxonomicrange
+end as locality
+
+from collectionobjects_common co1
+join hierarchy h1 on co1.id=h1.id
+join relations_common r1 on (h1.name=r1.subjectcsid and objectdocumenttype='Movement')
+join hierarchy h2 on (r1.objectcsid=h2.name and h2.isversion is not true)
+join movements_common mc on (mc.id=h2.id)
+
+join collectionobjects_naturalhistory con on (co1.id = con.id)
+
+join collectionobjects_botgarden cob on (co1.id=cob.id)
+
+left outer join hierarchy htig
+     on (co1.id = htig.parentid and htig.pos = 0 and htig.name = 'collectionobjects_naturalhistory:taxonomicIdentGroupList')
+left outer join taxonomicIdentGroup tig on (tig.id = htig.id)
+
+left outer join hierarchy hlg
+     on (co1.id = hlg.parentid and hlg.pos = 0 and hlg.name='collectionobjects_naturalhistory:localityGroupList')
+left outer join localitygroup lg on (lg.id = hlg.id)
+
+join collectionspace_core core on (core.id=co1.id and core.tenantid=35)
+join misc misc1 on (mc.id=misc1.id and misc1.lifecyclestate <> 'deleted')   -- movement not deleted
+join misc misc2 on (misc2.id = co1.id and misc2.lifecyclestate <> 'deleted') -- object not deleted
+
+left outer join taxon_common tc on (tig.taxon=tc.refname)
+left outer join taxon_naturalhistory tn on (tc.id=tn.id)
+
+where cob.deadflag = 'false'
+and con.rare = 'true'
+-- and tig.taxon like '%Araucaria%'
+and tn.family like $P{family}]]>
+	</queryString>
+	<field name="objectnumber" class="java.lang.String"/>
+	<field name="determination" class="java.lang.String"/>
+	<field name="family" class="java.lang.String"/>
+	<field name="gardenlocation" class="java.lang.String"/>
+	<field name="dataquality" class="java.lang.String"/>
+	<field name="locality" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="25" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="29aaffd5-d4b7-49a6-9c28-479d0633a397" x="250" y="0" width="220" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[UC Botanical Garden at Berkeley]]></text>
+			</staticText>
+			<textField pattern="dd-MMM-yyyy">
+				<reportElement uuid="6f42212c-0707-4d67-a63f-c35549bfd21c" style="Column header" x="575" y="0" width="145" height="20" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="42" splitType="Stretch">
+			<line>
+				<reportElement uuid="8053f266-44b1-472e-8490-d4f8bd06d58f" positionType="FixRelativeToBottom" x="0" y="40" width="720" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement uuid="89381e8d-e080-4c55-949a-b4bdbb411c2f" x="3" y="0" width="717" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Rare Status by Family: " + $P{family}.replaceAll( "%", "" )]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="3cadefb5-7f8c-4b76-baff-893fc4476790" x="24" y="22" width="60" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Accession]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c427a447-4114-4a8f-9873-85e7f3187b96" x="84" y="22" width="139" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Full Taxonomic Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0d1c4283-7066-46e5-9dcd-308e58148796" x="359" y="22" width="140" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Location]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="610dc87b-b611-4068-bd46-7ec2fe51febd" x="504" y="22" width="150" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Geographic Location]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="22" splitType="Prevent">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="d6e74dcc-cb40-4a70-b045-fb04de2fc6ad" x="24" y="0" width="60" height="15"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="792b55f2-c785-439e-be75-a1ff101f1710" x="84" y="0" width="270" height="15"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$F{determination}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="c712c673-c5f1-4838-b3d4-5bdb414cf82c" positionType="FixRelativeToBottom" x="0" y="18" width="720" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="d6f50010-4305-4dfc-9799-413ef2df70f7" x="359" y="0" width="140" height="15"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{gardenlocation}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="f33df2b8-d635-4f4c-882f-8329c398b6e8" x="504" y="0" width="212" height="15"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{locality}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement uuid="521df409-fb14-4909-9931-71c4c150bf29" x="600" y="0" width="80" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="687a8a69-cf7b-4e5d-bf79-e5f70fba10f0" x="680" y="0" width="40" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="object" language="groovy" pageWidth="612" pageHeight="792" columnWidth="540" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="36">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Title" fontName="SansSerif" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="SubTitle" forecolor="#666666" fontName="SansSerif" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="SansSerif" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="SansSerif" fontSize="12"/>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[35]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+case when (tig.taxon is not null and tig.taxon <> '')
+     then regexp_replace(tig.taxon, '^.*\)''(.*)''$', '\1')
+end as Determination,
+case when tt.termdisplayname is not null then tt.termdisplayname
+     when (tig.taxon is not null and tig.taxon <> '') then regexp_replace(tig.taxon, '^.*\)''(.*)''$', '\1')
+end as shortTaxonomicName,
+case when (tn.family is not null and tn.family <> '')
+     then regexp_replace(tn.family, '^.*\)''(.*)''$', '\1')
+end as family,
+co1.objectnumber,
+case when (mc.currentlocation is not null and mc.currentlocation <> '')
+     then regexp_replace(mc.currentlocation, '^.*\)''(.*)''$', '\1')
+end as gardenlocation,
+co1.recordstatus
+from collectionobjects_common co1
+left outer join hierarchy h1 on co1.id=h1.id
+left outer join relations_common r1 on (h1.name=r1.subjectcsid and objectdocumenttype='Movement')
+left outer join hierarchy h2 on (r1.objectcsid=h2.name and h2.isversion is not true)
+left outer join movements_common mc on (mc.id=h2.id)
+inner join misc misc1 on (mc.id=misc1.id and misc1.lifecyclestate <> 'deleted')
+
+join collectionobjects_botgarden cob on (co1.id=cob.id)
+
+left outer join hierarchy htig
+     on (co1.id = htig.parentid and htig.pos = 0 and htig.name = 'collectionobjects_naturalhistory:taxonomicIdentGroupList')
+left outer join taxonomicIdentGroup tig on (tig.id = htig.id)
+
+join collectionspace_core core on (core.id=co1.id and core.tenantid='35')
+join misc misc2 on (misc2.id = co1.id and misc2.lifecyclestate <> 'deleted')
+
+left outer join taxon_common tc on (tig.taxon=tc.refname)
+left outer join taxon_naturalhistory tn on (tc.id=tn.id)
+
+left outer join hierarchy htt
+    on (tc.id=htt.parentid and htt.name='taxon_common:taxonTermGroupList' and htt.pos=1)
+left outer join taxontermgroup tt on (tt.id=htt.id and tt.termtype='Taxon No Author Name')
+
+where deadflag='false'
+-- and mc.currentlocation='urn:cspace:botgarden.cspace.berkeley.edu:locationauthorities:name(location):item:name(garden96)''170A, Asian'''
+order by shortTaxonomicName, objectnumber, gardenlocation]]>
+	</queryString>
+	<field name="determination" class="java.lang.String"/>
+	<field name="shorttaxonomicname" class="java.lang.String"/>
+	<field name="family" class="java.lang.String"/>
+	<field name="objectnumber" class="java.lang.String"/>
+	<field name="gardenlocation" class="java.lang.String"/>
+	<field name="recordstatus" class="java.lang.String"/>
+	<group name="shorttaxonomicname" isReprintHeaderOnEachPage="true">
+		<groupExpression><![CDATA[$F{shorttaxonomicname}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="43" splitType="Stretch">
+			<staticText>
+				<reportElement x="73" y="0" width="371" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[University of California Botanical Garden at Berkeley]]></text>
+			</staticText>
+			<textField pattern="dd-MMM-yyyy">
+				<reportElement style="Column header" x="395" y="0" width="145" height="20" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="22" width="540" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[List of Living Accessions]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="23" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="16" y="21" width="520" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="16" y="9" width="100" height="12"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="212" y="9" width="100" height="12"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Family]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="314" y="9" width="50" height="12"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Accn #]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="364" y="9" width="91" height="12"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Garden Location]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="13" splitType="Prevent">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="212" y="0" width="100" height="11" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" printWhenGroupChanges="shorttaxonomicname"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{family}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" x="314" y="0" width="50" height="11" isPrintWhenDetailOverflows="true" printWhenGroupChanges="shorttaxonomicname"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{objectnumber}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="364" y="0" width="172" height="11" isPrintWhenDetailOverflows="true" printWhenGroupChanges="shorttaxonomicname"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{gardenlocation}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" x="18" y="0" width="188" height="11" isPrintWhenDetailOverflows="true" printWhenGroupChanges="shorttaxonomicname"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{shorttaxonomicname}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="403" y="0" width="80" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression class="java.lang.String"><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="483" y="0" width="40" height="20"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

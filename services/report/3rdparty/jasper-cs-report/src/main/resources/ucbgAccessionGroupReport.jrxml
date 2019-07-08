@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="object" language="groovy" pageWidth="595" pageHeight="842" columnWidth="523" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="36" uuid="66bea5cf-f33a-4c96-b75b-cc62a61ba2f7">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Title" fontName="SansSerif" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="SubTitle" forecolor="#666666" fontName="SansSerif" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="SansSerif" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="SansSerif" fontSize="12"/>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[35]]></defaultValueExpression>
+	</parameter>
+	<parameter name="csid" class="java.lang.String">
+		<defaultValueExpression><![CDATA["64d89988-dcde-467c-a91d"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select g.title groupTitle,
+g.scopeNote, -- iReport has a checkbox for handling nulls (since they print the word null for some silly reason)
+co1.id objectid,
+co1.objectnumber objectNumber,
+date(con.accessiondate + interval '8 hours') accessiondate, -- only used on Accession report
+findhybridaffinname(tig.id) Determination,
+case when cob.deadflag = 'true' then 'DEAD' end as deadflag,
+case when (fc.item is not null and fc.item <> '')
+     then regexp_replace(fc.item, '^.*\)''(.*)''$', '\1')
+end as Collector,
+case when (lg.fieldlocplace is not null and lg.fieldlocplace <> '') then regexp_replace(lg.fieldlocplace, '^.*\)''(.*)''$', '\1')
+     when (lg.fieldlocplace is null and lg.taxonomicrange is not null) then 'Geographic range: '||lg.taxonomicrange
+end as Locality, -- proxy for collection site information for now
+bd.item materialType, -- iReport has a checkbox for handling nulls (since they print the word null for some silly reason)
+case when (tn.family is not null and tn.family <> '')
+     then regexp_replace(tn.family, '^.*\)''(.*)''$', '\1')
+end as family,
+con.source,
+case when (con.requestedby is not null and con.requestedby <> '' and con.requestedby not like '%name(0)%')
+     then regexp_replace(con.requestedby, '^.*\)''(.*)''$', '\1') end as requestedBy,
+sdg.datedisplaydate CollectionDate,
+co1.fieldcollectionnumber,
+com.item accessionNotes,
+misc.lifecyclestate lifecyclestate,
+case when con.rare = 'true' then 'rare' end as rareStatus,
+case when fc.item is not null and co1.fieldcollectionnumber is not null and sdg.datedisplaydate is not null
+    then regexp_replace(fc.item, '^.*\)''(.*)''$', '\1')||' '||co1.fieldcollectionnumber||', '||sdg.datedisplaydate
+  when fc.item is not null and co1.fieldcollectionnumber is not null and sdg.datedisplaydate is null
+        then regexp_replace(fc.item, '^.*\)''(.*)''$', '\1')||' '||co1.fieldcollectionnumber
+  when fc.item is not null and co1.fieldcollectionnumber is null and sdg.datedisplaydate is not null
+        then regexp_replace(fc.item, '^.*\)''(.*)''$', '\1')||', '||sdg.datedisplaydate
+  when fc.item is not null and co1.fieldcollectionnumber is null and sdg.datedisplaydate is null
+        then regexp_replace(fc.item, '^.*\)''(.*)''$', '\1')
+  when fc.item is null and co1.fieldcollectionnumber is not null and sdg.datedisplaydate is not null
+    then co1.fieldcollectionnumber||', '||sdg.datedisplaydate
+  when fc.item is null and co1.fieldcollectionnumber is not null and sdg.datedisplaydate is null
+    then co1.fieldcollectionnumber
+  when fc.item is null and co1.fieldcollectionnumber is null and sdg.datedisplaydate is not null
+    then sdg.datedisplaydate
+end as collectioninfo
+
+from groups_common g
+
+join hierarchy h1 on (g.id = h1.id)
+join relations_common r on (h1.name = r.objectcsid)
+join hierarchy h2 on (r.subjectcsid = h2.name)
+join collectionobjects_common co1 on (h2.id = co1.id)
+
+left outer join collectionobjects_common_briefdescriptions bd on (co1.id = bd.id)
+
+left outer join collectionobjects_naturalhistory con on (co1.id = con.id)
+
+left outer join collectionobjects_botgarden cob on (co1.id=cob.id)
+
+left outer join hierarchy htig
+     on (co1.id = htig.parentid and htig.pos = 0 and htig.name = 'collectionobjects_naturalhistory:taxonomicIdentGroupList')
+left outer join taxonomicIdentGroup tig on (tig.id = htig.id)
+
+left outer join collectionobjects_common_fieldCollectors fc on (co1.id = fc.id and fc.pos = 0)
+
+left outer join hierarchy hlg
+     on (co1.id = hlg.parentid and hlg.pos = 0 and hlg.name='collectionobjects_naturalhistory:localityGroupList')
+left outer join localitygroup lg on (lg.id = hlg.id)
+
+join collectionspace_core core on core.id=co1.id
+join misc on misc.id = co1.id
+
+left outer join taxon_common tc on (tig.taxon=tc.refname)
+left outer join taxon_naturalhistory tn on (tc.id=tn.id)
+
+left outer join hierarchy hfcdg on (co1.id = hfcdg.parentid  and hfcdg.name='collectionobjects_common:fieldCollectionDateGroup')
+left outer join structureddategroup sdg on (sdg.id = hfcdg.id)
+
+left outer join collectionobjects_common_comments com on (co1.id = com.id and com.pos = 0)
+
+where misc.lifecyclestate <> 'deleted'
+AND core.tenantid=$P{tenantid}
+AND h1.name=$P{csid}
+
+order by objectNumber]]>
+	</queryString>
+	<field name="grouptitle" class="java.lang.String"/>
+	<field name="scopenote" class="java.lang.String"/>
+	<field name="objectid" class="java.lang.String"/>
+	<field name="objectnumber" class="java.lang.String"/>
+	<field name="accessiondate" class="java.sql.Date"/>
+	<field name="determination" class="java.lang.String"/>
+	<field name="deadflag" class="java.lang.String"/>
+	<field name="collector" class="java.lang.String"/>
+	<field name="locality" class="java.lang.String"/>
+	<field name="materialtype" class="java.lang.String"/>
+	<field name="family" class="java.lang.String"/>
+	<field name="source" class="java.lang.String"/>
+	<field name="requestedby" class="java.lang.String"/>
+	<field name="collectiondate" class="java.lang.String"/>
+	<field name="fieldcollectionnumber" class="java.lang.String"/>
+	<field name="accessionnotes" class="java.lang.String"/>
+	<field name="lifecyclestate" class="java.lang.String"/>
+	<field name="rarestatus" class="java.lang.String"/>
+	<field name="collectioninfo" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="25" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="b8096fe7-6f34-4d5b-ab4b-fbfbe61a5a81" x="-1" y="0" width="115" height="20"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Accession Report]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="31769d39-6dee-483f-980e-e4002954e234" x="151" y="0" width="216" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[UC Botanical Garden at Berkeley]]></text>
+			</staticText>
+			<textField pattern="dd-MMM-yyyy">
+				<reportElement uuid="a22ffab7-1422-4871-ba71-8185034df7ab" style="Column header" x="378" y="0" width="145" height="20" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="4" splitType="Stretch">
+			<line>
+				<reportElement uuid="9ce54e17-7ce5-4f16-8149-b791ccfae97f" positionType="FixRelativeToBottom" x="0" y="1" width="520" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="152" splitType="Prevent">
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="bbe8f461-b0e6-421d-8394-062a29521a35" style="Detail" stretchType="RelativeToBandHeight" x="2" y="43" width="75" height="15"/>
+				<textElement>
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="c7ae9bc8-9117-4e17-a47a-9f1dc03421a9" stretchType="RelativeToBandHeight" x="81" y="43" width="231" height="15" isPrintWhenDetailOverflows="true"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{determination}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="eb4b71f2-b9ac-4a3b-92b0-41c4a718a208" stretchType="RelativeToBandHeight" x="323" y="43" width="129" height="15"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{family}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="98f2a172-126b-42f5-8887-1f41cb31a909" x="2" y="84" width="53" height="15"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{deadflag}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="d82afdbc-c091-4d09-a320-bc56b9d4309d" x="81" y="83" width="442" height="15" isPrintWhenDetailOverflows="true"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{locality}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="c5a0843c-0dd2-45e3-a088-59d8904d0b3b" x="2" y="2" width="72" height="15"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Source: ]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="e01ff01e-4d09-433c-9b46-01723a70dc54" stretchType="RelativeToBandHeight" x="80" y="2" width="333" height="15" isPrintWhenDetailOverflows="true"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{source}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="4ffec893-00bf-4842-a9bf-a9c1bf51d883" stretchType="RelativeToBandHeight" x="81" y="22" width="332" height="15" isPrintWhenDetailOverflows="true"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{requestedby}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="e8fac3dd-8450-4709-a04c-1a9e51b3f686" x="2" y="22" width="72" height="15"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Requested by:]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="b3300dc5-710a-467f-87b0-c09d334b3140" positionType="Float" x="-1" y="150" width="520" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<textField pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement uuid="3c45ed3a-a668-42fe-a915-9bd8852c7b8f" x="423" y="2" width="100" height="15"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{accessiondate}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="ddc3003b-4af4-44b9-8ed5-1c5061d5fcc8" x="452" y="43" width="71" height="15"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{materialtype}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="8b62d4f4-c0bf-4ec5-bea4-9610c70f9cf4" stretchType="RelativeToBandHeight" x="81" y="105" width="442" height="15" isPrintWhenDetailOverflows="true"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{accessionnotes}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="0cfd4d29-b7e7-41c5-af73-1ae3c1a70e39" x="2" y="64" width="53" height="15" isRemoveLineWhenBlank="true"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{rarestatus}.equals("rare")? "\"rare\"" : null]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="daab812a-daf5-426d-8ab9-4868f88279a4" x="81" y="64" width="442" height="15" isPrintWhenDetailOverflows="true"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{collectioninfo}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="20" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

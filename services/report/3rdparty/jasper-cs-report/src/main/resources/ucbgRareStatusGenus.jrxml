@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="object" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="720" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="36" uuid="2bc97724-453f-442f-9df4-e15500b98f4e">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Title" fontName="SansSerif" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="SubTitle" forecolor="#666666" fontName="SansSerif" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="SansSerif" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="SansSerif" fontSize="12"/>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[35]]></defaultValueExpression>
+	</parameter>
+	<parameter name="genus" class="java.lang.String">
+		<parameterDescription><![CDATA[Use form %Genus% (e.g., %Agathis%)]]></parameterDescription>
+		<defaultValueExpression><![CDATA["%Agathis%"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select co1.objectnumber,
+findhybridaffinname(tig.id) determination,
+case when (tn.family is not null and tn.family <> '')
+     then regexp_replace(tn.family, '^.*\)''(.*)''$', '\1')
+end as family,
+case when (mc.currentlocation is not null and mc.currentlocation <> '')
+     then regexp_replace(mc.currentlocation, '^.*\)''(.*)''$', '\1')
+end as gardenlocation,
+co1.recordstatus dataQuality,
+case when (lg.fieldlocplace is not null and lg.fieldlocplace <> '') then regexp_replace(lg.fieldlocplace, '^.*\)''(.*)''$', '\1')
+     when (lg.fieldlocplace is null and lg.taxonomicrange is not null) then 'Geographic range: '||lg.taxonomicrange
+end as locality
+
+from collectionobjects_common co1
+join hierarchy h1 on co1.id=h1.id
+join relations_common r1 on (h1.name=r1.subjectcsid and objectdocumenttype='Movement')
+join hierarchy h2 on (r1.objectcsid=h2.name and h2.isversion is not true)
+join movements_common mc on (mc.id=h2.id)
+
+join collectionobjects_naturalhistory con on (co1.id = con.id)
+
+join collectionobjects_botgarden cob on (co1.id=cob.id)
+
+left outer join hierarchy htig
+     on (co1.id = htig.parentid and htig.pos = 0 and htig.name = 'collectionobjects_naturalhistory:taxonomicIdentGroupList')
+left outer join taxonomicIdentGroup tig on (tig.id = htig.id)
+
+left outer join hierarchy hlg
+     on (co1.id = hlg.parentid and hlg.pos = 0 and hlg.name='collectionobjects_naturalhistory:localityGroupList')
+left outer join localitygroup lg on (lg.id = hlg.id)
+
+join collectionspace_core core on (core.id=co1.id and core.tenantid=35)
+join misc misc1 on (mc.id=misc1.id and misc1.lifecyclestate <> 'deleted')   -- movement not deleted
+join misc misc2 on (misc2.id = co1.id and misc2.lifecyclestate <> 'deleted') -- object not deleted
+
+left outer join taxon_common tc on (tig.taxon=tc.refname)
+left outer join taxon_naturalhistory tn on (tc.id=tn.id)
+
+where cob.deadflag = 'false'
+and con.rare = 'true'
+and tig.taxon like $P{genus}]]>
+	</queryString>
+	<field name="objectnumber" class="java.lang.String"/>
+	<field name="determination" class="java.lang.String"/>
+	<field name="family" class="java.lang.String"/>
+	<field name="gardenlocation" class="java.lang.String"/>
+	<field name="dataquality" class="java.lang.String"/>
+	<field name="locality" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="25" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="16afd47b-5add-4d84-b226-39c3e081f383" x="250" y="0" width="220" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[UC Botanical Garden at Berkeley]]></text>
+			</staticText>
+			<textField pattern="dd-MMM-yyyy">
+				<reportElement uuid="e9654801-d0c0-4ff9-ac76-3167248316e5" style="Column header" x="575" y="0" width="145" height="20" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="42" splitType="Stretch">
+			<line>
+				<reportElement uuid="028245ac-a169-4bb1-9e8f-cbc927ed5fd7" positionType="FixRelativeToBottom" x="0" y="40" width="720" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement uuid="f9d7e185-1582-4f5d-9168-2100a0935249" x="3" y="0" width="717" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Rare Status by Genus: " + $P{genus}.replaceAll( "%", "" )]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="19649ec3-e766-4789-b087-5dddee22875a" x="21" y="22" width="60" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Accession]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2f80158f-ccf7-4479-88ac-b77fe1fd973b" x="84" y="22" width="125" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Full Taxonomic Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="be2bd456-c87b-4df3-bc76-29ce707c2809" x="357" y="22" width="100" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Location]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="609a7482-eaff-41f3-baa6-b56d8a0b4944" x="500" y="22" width="150" height="15"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Geographic Location]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="22" splitType="Prevent">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="09273351-c4bc-49af-8065-0f3d1c5b8fb5" x="21" y="0" width="60" height="15"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="1766bd55-b45f-4ed5-b00f-9f3f6484d8ea" x="84" y="0" width="270" height="15"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$F{determination}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="f130f92c-9089-4f56-80f9-5c2acf2ffdb5" positionType="FixRelativeToBottom" x="0" y="18" width="720" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="13b67f76-394e-4cdd-9810-0d7620df4bcd" x="357" y="0" width="140" height="15"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{gardenlocation}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="699f6467-850e-4503-9a1e-704745f14bff" x="500" y="0" width="220" height="15"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{locality}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement uuid="e4a33862-d98a-44bc-b55b-b42164fb23e8" x="600" y="0" width="80" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="1f6f9a02-dc16-4c84-830c-0940b9781116" x="680" y="0" width="40" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

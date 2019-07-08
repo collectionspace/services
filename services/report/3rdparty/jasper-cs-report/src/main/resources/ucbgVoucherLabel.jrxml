@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.1.0.final using JasperReports Library version 6.1.0  -->
+<!-- 2015-06-16T23:18:53 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ucbgVoucherLabel46" language="groovy" columnCount="2" pageWidth="612" pageHeight="792" columnWidth="270" columnSpacing="36" leftMargin="18" rightMargin="18" topMargin="0" bottomMargin="0" whenResourceMissingType="Empty" uuid="0582bcf8-3f2d-40a8-a3a6-6a69f1167022">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="botgarden-prod-via-tunnel"/>
+	<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<queryString>
+		<![CDATA[select * from findvoucherlabels()]]>
+	</queryString>
+	<field name="objectnumber" class="java.lang.String"/>
+	<field name="determinationformatted" class="java.lang.String"/>
+	<field name="family" class="java.lang.String"/>
+	<field name="collectioninfo" class="java.lang.String"/>
+	<field name="vouchernumber" class="java.lang.String"/>
+	<field name="numbersheets" class="java.lang.Integer"/>
+	<field name="labelrequested" class="java.lang.String"/>
+	<field name="gardeninfo" class="java.lang.String"/>
+	<field name="vouchertype" class="java.lang.String"/>
+	<field name="fieldcollectionnote" class="java.lang.String"/>
+	<field name="annotation" class="java.lang.String"/>
+	<field name="vouchercollectioninfo" class="java.lang.String"/>
+	<detail>
+		<band height="315" splitType="Prevent">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<frame>
+				<reportElement x="0" y="1" width="280" height="309" uuid="75bf9210-e515-422a-bdec-484ac76d5489">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<line>
+					<reportElement x="0" y="3" width="267" height="1" uuid="607374d6-f3f8-4f93-b210-eeb79fe3d989"/>
+				</line>
+				<textField>
+					<reportElement x="0" y="10" width="267" height="20" uuid="b26034ef-8932-4bb1-b372-edb53d79b35b"/>
+					<textElement textAlignment="Center">
+						<font fontName="Serif" pdfFontName="Times-Roman" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA["University of California Botanical Garden at Berkeley"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="43" width="267" height="14" isPrintWhenDetailOverflows="true" uuid="041da522-a521-4ef6-b050-23828f498383"/>
+					<textElement textAlignment="Left" verticalAlignment="Top">
+						<font fontName="Serif" pdfFontName="Times-Roman" size="9"/>
+						<paragraph spacingBefore="1"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{family}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement positionType="Float" x="0" y="176" width="267" height="14" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" uuid="c789b75c-d997-4dba-875c-3efaa2a05dd2">
+						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					</reportElement>
+					<textElement textAlignment="Left" verticalAlignment="Top">
+						<font fontName="Serif" pdfFontName="Times-Roman" size="9"/>
+						<paragraph spacingBefore="1"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{gardeninfo}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="65" width="267" height="14" isPrintWhenDetailOverflows="true" uuid="22c892fc-d10c-4d02-a0f0-199e8fc76d7b">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement textAlignment="Left" verticalAlignment="Top" markup="html">
+						<font fontName="Serif" pdfFontName="Times-Roman" size="9"/>
+						<paragraph spacingBefore="1"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{determinationformatted}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement positionType="Float" x="0" y="196" width="267" height="14" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" uuid="87525171-2419-45b3-9661-4fdb25edc5fa"/>
+					<textElement textAlignment="Left" verticalAlignment="Top">
+						<font fontName="Serif" pdfFontName="Times-Roman" size="9"/>
+						<paragraph spacingBefore="1"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{annotation}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="86" width="267" height="14" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" uuid="caa74580-08c5-4fe1-8315-8e20d28e80ee">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					</reportElement>
+					<textElement textAlignment="Left" verticalAlignment="Top">
+						<font fontName="Serif" pdfFontName="Times-Roman" size="9"/>
+						<paragraph spacingBefore="1"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{fieldcollectionnote}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement positionType="Float" x="0" y="107" width="267" height="14" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" uuid="b57b1769-54ab-415c-8538-2591c8bcf227">
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					</reportElement>
+					<textElement textAlignment="Left" verticalAlignment="Top">
+						<font fontName="Serif" pdfFontName="Times-Roman" size="9"/>
+						<paragraph spacingBefore="1"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{collectioninfo}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement positionType="FixRelativeToBottom" x="13" y="235" width="200" height="14" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" uuid="3e083ad4-92bd-4e11-9dd5-58a5092e6bd8">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Bottom">
+						<font fontName="Serif" pdfFontName="Times-Roman" size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{vouchernumber}]]></textFieldExpression>
+				</textField>
+				<componentElement>
+					<reportElement positionType="FixRelativeToBottom" x="75" y="252" width="164" height="50" uuid="fe22bbea-3136-4303-8ddf-930deda6713b">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					</reportElement>
+					<jr:Code39 xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" textPosition="bottom">
+						<jr:codeExpression><![CDATA[$F{objectnumber}]]></jr:codeExpression>
+					</jr:Code39>
+				</componentElement>
+				<textField isBlankWhenNull="true">
+					<reportElement positionType="Float" x="0" y="129" width="267" height="14" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" uuid="20790f62-3852-4365-9487-5837ef75cb34"/>
+					<textElement textAlignment="Left" verticalAlignment="Top">
+						<font fontName="Serif" pdfFontName="Times-Roman" size="9"/>
+						<paragraph spacingBefore="1"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{vouchertype}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement positionType="Float" x="0" y="153" width="267" height="14" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" uuid="2ab7f871-c647-4ffe-933e-a3fb0efd99c0"/>
+					<textElement textAlignment="Left" verticalAlignment="Top">
+						<font fontName="Serif" pdfFontName="Times-Roman" size="9"/>
+						<paragraph spacingBefore="1"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{vouchercollectioninfo}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement positionType="Float" mode="Transparent" x="1" y="308" width="267" height="1" uuid="f5fcc3a0-1adb-4d14-b300-db9ec70897ee">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+				</line>
+			</frame>
+		</band>
+	</detail>
+</jasperReport>

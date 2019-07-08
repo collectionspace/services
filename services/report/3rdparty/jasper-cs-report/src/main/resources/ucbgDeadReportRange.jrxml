@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="object" language="groovy" pageWidth="612" pageHeight="792" columnWidth="540" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="36" uuid="19d6f4bc-81ee-4b6e-8486-3b83aefd8d14">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Title" fontName="SansSerif" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="SubTitle" forecolor="#666666" fontName="SansSerif" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="SansSerif" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="SansSerif" fontSize="12"/>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[35]]></defaultValueExpression>
+	</parameter>
+	<parameter name="startdate-yyyy-mm-dd" class="java.lang.String">
+		<defaultValueExpression><![CDATA["2012-01-01"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="enddate-yyyy-mm-dd" class="java.lang.String">
+		<defaultValueExpression><![CDATA["2012-06-30"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select co1.objectnumber,
+findhybridaffinname(tig.id) Determination,
+deaddate
+from collectionobjects_common co1
+
+join collectionobjects_botgarden cob on (co1.id=cob.id)
+
+left outer join hierarchy htig
+     on (co1.id = htig.parentid and htig.pos = 0 and htig.name = 'collectionobjects_naturalhistory:taxonomicIdentGroupList')
+left outer join taxonomicIdentGroup tig on (tig.id = htig.id)
+
+join collectionspace_core core on (core.id=co1.id and core.tenantid=$P{tenantid})
+join misc  on (misc.id = co1.id and misc.lifecyclestate <> 'deleted')
+
+where deadflag='true' and to_char(deaddate, 'yyyy-MM-dd') between $P{startdate-yyyy-mm-dd} and $P{enddate-yyyy-mm-dd}
+order by objectnumber]]>
+	</queryString>
+	<field name="objectnumber" class="java.lang.String"/>
+	<field name="determination" class="java.lang.String"/>
+	<field name="deaddate" class="java.sql.Timestamp"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="25" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="49f30908-e6be-4cd6-b6ce-f394a91c1a33" x="151" y="0" width="216" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[UC Botanical Garden at Berkeley]]></text>
+			</staticText>
+			<textField pattern="dd-MMM-yyyy">
+				<reportElement uuid="8a1f82f0-85e5-4316-b6c3-394fd673a7a2" style="Column header" x="0" y="0" width="145" height="20" forecolor="#000000"/>
+				<textElement>
+					<font fontName="SansSerif" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="e5e13a0a-c296-4211-9224-95149c87a7d0" x="367" y="0" width="156" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$P{startdate-yyyy-mm-dd} + " to " + $P{enddate-yyyy-mm-dd}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="22" splitType="Stretch">
+			<line>
+				<reportElement uuid="11a95058-9ba8-4d2d-a405-9e1b4a7429e7" positionType="FixRelativeToBottom" x="0" y="19" width="520" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement uuid="0780b295-a512-42fa-b640-1fecef3e5695" x="3" y="2" width="516" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Dead List"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="19" splitType="Prevent">
+			<textField>
+				<reportElement uuid="87be5c47-f388-45b9-af16-eed07b902aff" x="3" y="0" width="62" height="18"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="882cfac6-d5b7-4603-87c8-4b946d05b153" x="88" y="0" width="406" height="18"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$F{determination}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement uuid="0f538b83-45c1-4979-9c4e-53db30944ed8" x="68" y="4" width="12" height="12"/>
+			</rectangle>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement uuid="2a636bd1-0a90-4461-9e00-32e82f841d72" x="399" y="0" width="80" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="1e405f05-fd72-48ee-83cc-3295344ca36f" x="479" y="0" width="40" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

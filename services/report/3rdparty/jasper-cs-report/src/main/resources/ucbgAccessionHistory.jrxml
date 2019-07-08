@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ucbgAccessionHistory" language="groovy" pageWidth="612" pageHeight="792" columnWidth="540" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="36" uuid="78deb05b-f9ff-4936-8d6f-c206cdc03776">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="csid" class="java.lang.String">
+		<defaultValueExpression><![CDATA["0511fac1-baa9-485e-9005-b7e653b44343"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select co1.objectnumber,
+findhybridaffinname(tig.id) Determination,
+date(mc.locationdate + interval '8 hours') actiondate,
+getdispl(mc.reasonformove) actionreason,
+mb.labelrequested,
+mb.labelcount,
+getdispl(mb.labelsize) labelsize,
+getdispl(mb.labelstandtype) labelstandtype,
+case when (mb.previouslocation is not null and mb.previouslocation <> '')
+     then getdispl(mb.previouslocation)
+end as previouslocation,
+case when (mc.currentlocation is not null and mc.currentlocation <> '')
+     then getdispl(mc.currentlocation)
+end as currentlocation,
+mc.movementnote,
+case when getdispl(mc.reasonformove) = 'Other' then 1 else 0 end as reasonsort
+from collectionobjects_common co1
+join hierarchy h1 on co1.id=h1.id
+left outer join hierarchy htig
+     on (co1.id = htig.parentid and htig.pos = 0 and htig.name = 'collectionobjects_naturalhistory:taxonomicIdentGroupList')
+left outer join taxonomicIdentGroup tig on (tig.id = htig.id)
+join relations_common r1 on (h1.name=r1.subjectcsid and objectdocumenttype='Movement')
+join hierarchy h2 on (r1.objectcsid=h2.name and h2.isversion is true)
+join movements_common mc on (mc.id=h2.id)
+left outer join movements_botgarden mb on (mc.id=mb.id)
+join collectionspace_core core on mc.id=core.id
+where h1.name=$P{csid}
+order by locationdate asc, reasonsort, core.updatedat, core.createdat, currentlocation]]>
+	</queryString>
+	<field name="objectnumber" class="java.lang.String"/>
+	<field name="determination" class="java.lang.String"/>
+	<field name="actiondate" class="java.sql.Date"/>
+	<field name="actionreason" class="java.lang.String"/>
+	<field name="labelrequested" class="java.lang.String"/>
+	<field name="labelcount" class="java.lang.Long"/>
+	<field name="labelsize" class="java.lang.String"/>
+	<field name="labelstandtype" class="java.lang.String"/>
+	<field name="previouslocation" class="java.lang.String"/>
+	<field name="currentlocation" class="java.lang.String"/>
+	<field name="movementnote" class="java.lang.String"/>
+	<field name="reasonsort" class="java.lang.Integer"/>
+	<group name="objectnumber">
+		<groupExpression><![CDATA[$F{objectnumber}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="61" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="0634979c-a635-4740-a590-5dc438ecf9a1" x="0" y="35" width="540" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Accession History Report]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="411090bf-650f-426a-85f9-3ad76e1fbea2" positionType="FixRelativeToBottom" x="0" y="57" width="540" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+				</graphicElement>
+			</line>
+			<textField pattern="MM/dd/yyyy">
+				<reportElement uuid="3bef2b95-1ee5-48f7-b702-91590afa2f65" x="438" y="0" width="100" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="d36f8350-66d9-46c0-aa5f-a14e57018ac5" x="146" y="0" width="248" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom"/>
+				<text><![CDATA[UC Botanical Garden at Berkeley]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="41" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="d6e62f7e-e088-4504-846d-0907f051d769" x="111" y="3" width="427" height="15"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{determination}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="e48f743e-5f55-487c-9ad0-0dbd3b973982" x="0" y="3" width="100" height="15"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="feb778bc-c13f-4900-a943-bf1170b7f611" x="0" y="21" width="75" height="15" forecolor="#666666"/>
+				<textElement verticalAlignment="Bottom">
+					<font isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="feefd8e1-548f-4e01-a972-74cd4439060b" x="75" y="21" width="89" height="15" forecolor="#666666"/>
+				<textElement verticalAlignment="Bottom">
+					<font isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Action]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b43f455b-0e8c-48cc-b14b-62c79afb45fe" x="164" y="21" width="40" height="15" forecolor="#666666"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Label?]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="508e3804-a575-470c-b931-a7356bd1884e" x="204" y="21" width="33" height="15" forecolor="#666666"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Count]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="24218978-189d-42dd-96f1-3b906b4408b9" x="239" y="21" width="37" height="15" forecolor="#666666"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Size]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c1b640be-c9f2-4b93-bd06-1eef3d7b2401" x="276" y="21" width="59" height="15" forecolor="#666666"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Stand Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d6ade7f6-43c2-4858-94b6-a5b39ded0bc2" x="338" y="21" width="100" height="15" forecolor="#666666"/>
+				<textElement verticalAlignment="Bottom">
+					<font isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[From]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="adb321f2-7f83-4059-a541-ef5dd4b43c2e" x="438" y="21" width="100" height="15" forecolor="#666666"/>
+				<textElement verticalAlignment="Bottom">
+					<font isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[To]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="bf4e3fce-4fb3-479b-8ebd-f3dd2c296eba" positionType="FixRelativeToBottom" x="0" y="38" width="520" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="34" splitType="Prevent">
+			<textField isStretchWithOverflow="true" pattern="MM/dd/yyyy">
+				<reportElement uuid="2857b9f7-a9ea-42a7-b0dc-2fedc2cdcd66" stretchType="RelativeToBandHeight" x="0" y="0" width="75" height="15" isPrintWhenDetailOverflows="true"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{actiondate}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="b365bd83-ce17-4c10-9c86-b6c8cea043af" stretchType="RelativeToBandHeight" x="75" y="0" width="89" height="15" isPrintWhenDetailOverflows="true"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{actionreason}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="52690d51-c175-4214-a8ce-c545854910c5" stretchType="RelativeToBandHeight" x="164" y="0" width="40" height="15" isPrintWhenDetailOverflows="true"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{labelrequested}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="4f2c707d-928f-4220-af8a-ea2829233038" stretchType="RelativeToBandHeight" x="204" y="0" width="33" height="15" isPrintWhenDetailOverflows="true"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{labelcount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="a03ac59a-f59c-4ade-a716-624b9a4b163b" stretchType="RelativeToBandHeight" x="239" y="0" width="37" height="15" isPrintWhenDetailOverflows="true"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{labelsize}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="83dc8660-964b-4ab3-bf32-57cf74bac093" stretchType="RelativeToBandHeight" x="276" y="0" width="59" height="15" isPrintWhenDetailOverflows="true"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{labelstandtype}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="a01790be-77e8-4a0c-a242-a5a04284c140" stretchType="RelativeToBandHeight" x="338" y="0" width="100" height="15" isPrintWhenDetailOverflows="true"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{previouslocation}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="62bc3a54-9915-40b9-83e8-c8cce9df866c" stretchType="RelativeToBandHeight" x="438" y="0" width="100" height="15" isPrintWhenDetailOverflows="true"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{currentlocation}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="02d99a8f-00f8-407c-b92d-d5c7767fbbc4" stretchType="RelativeToBandHeight" x="75" y="15" width="465" height="15" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{movementnote}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="1af136da-9c72-4abb-ab42-4152c80b6aec" x="0" y="31" width="540" height="1" forecolor="#000000"/>
+				<graphicElement>
+					<pen lineColor="#CCCCCC"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="22" splitType="Stretch">
+			<textField>
+				<reportElement uuid="abf2940f-3db6-4cba-a725-90af44c7c716" x="420" y="2" width="80" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="95e3b682-5d11-4a07-a031-4e578ffa6716" x="500" y="2" width="40" height="20"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

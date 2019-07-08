@@ -1,4 +1,4 @@
-As an example of invoking the acq_basic report from, e.g., poster, here is a payload that shows how to use parameters. The report has a parameter called "queryYear" that when invoked in the no-context mode, will restrict the acquisitions to that year. See the actual report for how the query is built. 
+As an example of invoking the acq_basic report from, e.g., poster, here is a payload that shows how to use parameters. The report has a parameter called "queryYear" that when invoked in the no-context mode, will restrict the acquisitions to that year -see the actual report for how the query is built. 
 
 The invocation payload is:
 
