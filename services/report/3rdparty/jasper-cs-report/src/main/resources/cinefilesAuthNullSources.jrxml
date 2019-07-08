@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CineFiles: Authorities" language="groovy" pageWidth="612" pageHeight="792" columnWidth="570" leftMargin="21" rightMargin="21" topMargin="21" bottomMargin="36" uuid="00039d14-8750-45ca-b1fa-81722dbd5f9d">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[select
+  hwc.name as csid,
+  'Work' as authority_name,
+  wtg.termdisplayname as term_name,
+  '<a href="https://cinefiles.cspace.berkeley.edu/collectionspace/ui/cinefiles/html/work.html?csid=' ||
+    hwc.name || '">' || wtg.termdisplayname || '</a>' as csid_link
+from worktermgroup wtg
+inner join hierarchy hwtg on (wtg.id = hwtg.id)
+inner join works_common wc on (hwtg.parentid = wc.id)
+inner join hierarchy hwc on (wc.id = hwc.id)
+join misc mwc on (wc.id = mwc.id and mwc.lifecyclestate <> 'deleted')
+where wtg.termsource is null or wtg.termsource = ''
+UNION
+select
+  hoc.name as csid,
+  'Org: ' || getdispl(oac.refname) as authority_name,
+  getdispl(oc.refname) || ': ' || otg.termdisplayname as term_name,
+  '<a href="https://cinefiles.cspace.berkeley.edu/collectionspace/ui/cinefiles/html/organization.html?csid=' ||
+    hoc.name || '">' || getdispl(oc.refname) || ': ' || otg.termdisplayname || '</a>' as csid_link
+from orgtermgroup otg
+inner join hierarchy hotg on (otg.id = hotg.id)
+inner join organizations_common oc on (hotg.parentid = oc.id)
+inner join hierarchy hoc on (oc.id = hoc.id)
+inner join hierarchy hoac on (oc.inauthority = hoac.name)
+inner join orgauthorities_common oac on (hoac.id = oac.id)
+join misc moc on (oc.id = moc.id and moc.lifecyclestate <> 'deleted')
+where otg.termsource is null or otg.termsource = ''
+UNION
+select
+  hpc.name as csid,
+  'Person' as authority_name,
+  ptg.termdisplayname as term_name,
+  '<a href="https://cinefiles.cspace.berkeley.edu/collectionspace/ui/cinefiles/html/person.html?csid=' ||
+    hpc.name || '">' || ptg.termdisplayname || '</a>' as csid_link
+from persontermgroup ptg
+inner join hierarchy hptg on (ptg.id = hptg.id)
+inner join persons_common pc on (hptg.parentid = pc.id)
+inner join hierarchy hpc on (pc.id = hpc.id)
+join misc mpc on (pc.id = mpc.id and mpc.lifecyclestate <> 'deleted')
+where ptg.termsource is null or ptg.termsource = ''
+UNION
+select
+  hcc.name as csid,
+  'Concept: ' || getdispl(cac.refname) as authority_name,
+  getdispl(cc.refname) || ': ' || ctg.termdisplayname as term_name,
+  '<a href="https://cinefiles.cspace.berkeley.edu/collectionspace/ui/cinefiles/html/concept.html?csid=' ||
+    hcc.name || '">' || getdispl(cc.refname) || ': ' || ctg.termdisplayname || '</a>' as csid_link
+from concepttermgroup ctg
+inner join hierarchy hctg on (ctg.id = hctg.id)
+inner join concepts_common cc on (hctg.parentid = cc.id)
+inner join hierarchy hcc on (cc.id = hcc.id)
+inner join hierarchy hcac on (cc.inauthority = hcac.name)
+inner join conceptauthorities_common cac on (hcac.id = cac.id and cac.shortidentifier not in ('genre', 'concept'))
+join misc mcc on (cc.id = mcc.id and mcc.lifecyclestate <> 'deleted')
+where ctg.termsource is null or ctg.termsource = ''
+order by authority_name, term_name]]>
+	</queryString>
+	<field name="csid" class="java.lang.String"/>
+	<field name="authority_name" class="java.lang.String"/>
+	<field name="term_name" class="java.lang.String"/>
+	<field name="csid_link" class="java.lang.String"/>
+	<title>
+		<band height="84" splitType="Stretch">
+			<image>
+				<reportElement uuid="38ebc361-38be-4ce7-9525-42dade10d093" x="0" y="0" width="366" height="61"/>
+				<imageExpression><![CDATA["http://www.collectionspace.org/wp-content/uploads/2014/11/CSpaceLogo.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement uuid="610bdc26-3968-4115-b85c-cc9f1cbc3630" mode="Transparent" x="0" y="64" width="570" height="20" forecolor="#000000"/>
+				<textElement textAlignment="Center" markup="none">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CineFiles: Authority Records with Null or Blank Sources]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="28" splitType="Stretch">
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="06fd2da7-1de6-4e3a-92c1-c05b3e6872a4" mode="Transparent" x="0" y="2" width="570" height="16" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="16" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="ba188a5c-2acb-4089-b07c-1c641a0d9062" x="0" y="0" width="100" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Authority]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ca9bf02c-d8be-45d9-bb6a-bd3bc959243f" x="100" y="0" width="200" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[CSID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2b6673cc-d34e-4c18-b004-b6756f375177" x="300" y="0" width="270" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Term Name]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="ccd172fa-2de0-42fa-8bdb-c5373d5b7a03" stretchType="RelativeToBandHeight" x="100" y="0" width="200" height="12"/>
+				<textElement markup="none">
+					<font fontName="Serif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{csid}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="7a215486-c7dd-4a46-a785-adda78b80f9f" x="0" y="0" width="100" height="12"/>
+				<textElement>
+					<font fontName="Serif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{authority_name}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="ed80a646-fa4d-4257-8278-01fbde34c71c" stretchType="RelativeToBandHeight" x="300" y="0" width="270" height="12"/>
+				<textElement markup="html">
+					<font fontName="Serif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{csid_link}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="24" splitType="Stretch">
+			<textField evaluationTime="Now">
+				<reportElement uuid="8fc0002a-ee4c-4378-a211-77d7f7934068" x="0" y="8" width="300" height="16"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="45792f78-4cd1-42b7-b114-88e573a9682e" x="303" y="8" width="40" height="16"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>
+

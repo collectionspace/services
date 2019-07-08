@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CineFiles: Duplicate Report" language="groovy" columnCount="2" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="375" leftMargin="21" rightMargin="21" topMargin="21" bottomMargin="36" uuid="00039d14-8750-45ca-b1fa-81722dbd5f9d">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[select * from (
+select distinct
+        coc.objectnumber as doc_id,
+        cocf.docdisplayname || coalesce(': ' || mc.title, '') as title,
+        'media title' as description
+from collectionobjects_common coc
+left outer join collectionobjects_cinefiles cocf on (coc.id = cocf.id)
+inner join media_common mc on (
+        coc.objectnumber = trim('.' from substring(mc.title from 1 for position('.' in mc.title))))
+inner join (
+        select
+                trim('.' from substring(mc.title from 1 for position('.' in mc.title))) as doc_id,
+                mc.title as title
+        from media_common mc
+        group by mc.title having count(*) > 1) x on (
+        coc.objectnumber = x.doc_id and mc.title = x.title)
+UNION
+select distinct
+        coc.objectnumber as doc_id,
+        cocf.docdisplayname || coalesce(': ' || bc.name, '') as title,
+        'blob filename' as description
+from collectionobjects_common coc
+left outer join collectionobjects_cinefiles cocf on (coc.id = cocf.id)
+inner join blobs_common bc on (
+        coc.objectnumber = trim('.' from substring(bc.name from 1 for position('.' in bc.name))))
+inner join (
+        select
+                trim('.' from substring(bc.name from 1 for position('.' in bc.name))) as doc_id,
+                bc.name as title
+        from blobs_common bc
+        group by bc.name having count(*) > 1) x on (
+        coc.objectnumber = x.doc_id and bc.name = x.title)
+UNION
+select distinct
+        coc.objectnumber as doc_id,
+        cocf.docdisplayname || coalesce(': ' || coc.objectnumber, '') as title,
+        'document id' as description
+from collectionobjects_common coc
+left outer join collectionobjects_cinefiles cocf on (coc.id = cocf.id)
+inner join (
+        select coc.objectnumber as doc_id
+        from collectionobjects_common coc
+        group by coc.objectnumber
+        having count(*) > 1) x on (coc.objectnumber = x.doc_id)
+UNION
+select distinct
+        coc.objectnumber as doc_id,
+        cocf.docdisplayname || coalesce(': ' || x.page_num::text, '') as title,
+        'page number' as description
+from collectionobjects_common coc
+left outer join collectionobjects_cinefiles cocf on (coc.id = cocf.id)
+inner join (select coc.objectnumber as doc_id, mcin.page as page_num
+        from collectionobjects_common coc
+        inner join misc mcoc on (coc.id = mcoc.id and mcoc.lifecyclestate != 'deleted')
+        inner join media_common mcom on (coc.objectnumber =
+                trim('.' from substring(mcom.title from 1 for position('.' in mcom.title))))
+        inner join misc mmcom on (mcom.id = mmcom.id and mmcom.lifecyclestate != 'deleted')
+        left outer join media_cinefiles mcin on (mcom.id = mcin.id)
+        group by coc.objectnumber, mcin.page
+        having count(*) > 1) x on (coc.objectnumber = x.doc_id)
+) y
+order by title, description]]>
+	</queryString>
+	<field name="doc_id" class="java.lang.String"/>
+	<field name="title" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<title>
+		<band height="84" splitType="Stretch">
+			<image>
+				<reportElement uuid="38ebc361-38be-4ce7-9525-42dade10d093" x="0" y="0" width="366" height="61"/>
+				<imageExpression><![CDATA["http://www.collectionspace.org/wp-content/uploads/2014/11/CSpaceLogo.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement uuid="610bdc26-3968-4115-b85c-cc9f1cbc3630" mode="Transparent" x="0" y="64" width="750" height="20" forecolor="#000000"/>
+				<textElement textAlignment="Center" markup="none">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CineFiles: Duplicate Media Titles, Blob Filenames, Doc Ids and Page Numbers]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="28" splitType="Stretch">
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="06fd2da7-1de6-4e3a-92c1-c05b3e6872a4" mode="Transparent" x="0" y="2" width="750" height="16" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="16" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="5813d40b-7a37-4b94-979c-cd985345a498" x="0" y="0" width="40" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Doc ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4e5b008e-23e6-4faa-8312-1fa6084fc67c" x="40" y="0" width="255" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Document Title: Duplicated Value]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1e5deee1-32b4-4fff-b655-d312ba1b9d70" x="300" y="0" width="75" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Dup Field]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="ccd172fa-2de0-42fa-8bdb-c5373d5b7a03" x="0" y="0" width="40" height="12"/>
+				<textElement>
+					<font fontName="Serif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{doc_id}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="74bbc319-5476-4350-9043-29cd32744f83" stretchType="RelativeToBandHeight" x="40" y="0" width="255" height="12"/>
+				<textElement>
+					<font fontName="Serif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="61620fa5-a1a1-427b-ad11-3cc578ae1867" x="300" y="0" width="75" height="12"/>
+				<textElement>
+					<font fontName="Serif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="24" splitType="Stretch">
+			<textField>
+				<reportElement uuid="8fc0002a-ee4c-4378-a211-77d7f7934068" x="0" y="8" width="390" height="16"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="45792f78-4cd1-42b7-b114-88e573a9682e" x="393" y="8" width="40" height="16"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[ $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>
