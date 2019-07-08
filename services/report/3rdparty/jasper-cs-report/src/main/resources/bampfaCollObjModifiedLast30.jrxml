@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BAMPFA: CollObj Modified Last 30 Days" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="742" leftMargin="25" rightMargin="25" topMargin="30" bottomMargin="30" uuid="00039d14-8750-45ca-b1fa-81722dbd5f9d">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[select
+    coc.objectnumber accnNumber,
+    con.numbervalue otherNumber,
+    utils.getdispl(boppg.bampfaobjectproductionperson) artist,
+    btg.bampfaformattedtitle title,
+    csc.updatedat modDate,
+    csc.updatedby modBy
+from collectionobjects_common coc
+left outer join collectionobjects_bampfa cob ON (
+    coc.id = cob.id)
+left outer join hierarchy hcon ON (
+        coc.id = hcon.parentid
+        and hcon.primarytype = 'otherNumber'
+        and hcon.pos = 0)
+left outer join othernumber con ON (
+    hcon.id = con.id)
+left outer join hierarchy hboppg ON (
+coc.id = hboppg.parentid
+    and hboppg.primarytype = 'bampfaObjectProductionPersonGroup'
+    and hboppg.pos = 0)
+left outer join bampfaobjectproductionpersongroup boppg ON (
+    hboppg.id = boppg.id)
+left outer join hierarchy hbtg ON (
+        coc.id = hbtg.parentid
+        and hbtg.primarytype = 'bampfaTitleGroup'
+        and hbtg.pos = 0)
+left outer join bampfatitlegroup btg ON (
+    hbtg.id = btg.id)
+left outer join collectionspace_core csc on (
+    coc.id = csc.id)
+where (current_date::date - csc.updatedat::date) <= 30
+order by csc.updatedat desc, csc.updatedby]]>
+	</queryString>
+	<field name="accnnumber" class="java.lang.String"/>
+	<field name="othernumber" class="java.lang.String"/>
+	<field name="artist" class="java.lang.String"/>
+	<field name="title" class="java.lang.String"/>
+	<field name="moddate" class="java.sql.Timestamp"/>
+	<field name="modby" class="java.lang.String"/>
+	<title>
+		<band height="90" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="610bdc26-3968-4115-b85c-cc9f1cbc3630" mode="Transparent" x="0" y="56" width="742" height="24" forecolor="#000000"/>
+				<textElement textAlignment="Center" markup="none">
+					<font fontName="SansSerif" size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cataloging Records Modified in the Last 30 Days]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="20e65934-92fe-47c0-bae5-d3ba148e202e" mode="Opaque" x="0" y="1" width="742" height="40" forecolor="#000000" backcolor="#999999"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font fontName="SansSerif" size="22" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ Berkeley Art Museum and Pacific Film Archive]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="ab7c19c5-bc90-44fd-9d33-02951be13387" x="191" y="2" width="130" height="16" forecolor="#404040"/>
+				<textElement>
+					<font fontName="SansSerif" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Artist]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e88a7572-31ab-457e-b4cb-70cd98d60ff4" x="91" y="2" width="100" height="16" forecolor="#404040"/>
+				<textElement>
+					<font fontName="SansSerif" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Other Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1e5deee1-32b4-4fff-b655-d312ba1b9d70" x="1" y="2" width="90" height="16" forecolor="#404040"/>
+				<textElement>
+					<font fontName="SansSerif" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Accession Num]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="deae3fbc-9ac5-4a6e-9f7f-c76340c2af1f" x="621" y="2" width="120" height="16" forecolor="#404040"/>
+				<textElement>
+					<font fontName="SansSerif" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Modified By]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a283a001-ab1d-498a-a736-95a347933738" x="541" y="2" width="80" height="16" forecolor="#404040"/>
+				<textElement>
+					<font fontName="SansSerif" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Modified Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1fbc6a43-8e9c-4f14-968f-0698c8bde678" x="321" y="2" width="220" height="16" forecolor="#404040"/>
+				<textElement>
+					<font fontName="SansSerif" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Title]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="24" splitType="Stretch">
+			<line>
+				<reportElement uuid="4010b9b9-0f5f-4753-99be-515989bd918b" x="0" y="2" width="742" height="1"/>
+			</line>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="61620fa5-a1a1-427b-ad11-3cc578ae1867" stretchType="RelativeToBandHeight" x="1" y="5" width="90" height="16"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{accnnumber}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="5f715b3d-dfd8-45e5-9f47-454e2b7a143b" stretchType="RelativeToBandHeight" x="91" y="5" width="100" height="16"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{othernumber}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="MM-dd-yyyy" isBlankWhenNull="true">
+				<reportElement uuid="b2774bdb-bff4-407c-87f7-b3917d04807d" stretchType="RelativeToBandHeight" x="541" y="5" width="80" height="16"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{moddate}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="73fc7934-b5c2-40f9-9736-74fc178cff3a" stretchType="RelativeToBandHeight" x="621" y="5" width="120" height="16"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{modby}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="9be02d41-7cea-4ef2-9fd8-660c6f15483f" stretchType="RelativeToBandHeight" x="191" y="5" width="130" height="16"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{artist}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="751f5b2c-ccad-4deb-91b4-db9894220113" stretchType="RelativeToBandHeight" x="321" y="5" width="220" height="16"/>
+				<textElement markup="html">
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement uuid="8fc0002a-ee4c-4378-a211-77d7f7934068" x="0" y="4" width="80" height="16"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="M/d/yyyy">
+				<reportElement uuid="06fd2da7-1de6-4e3a-92c1-c05b3e6872a4" mode="Transparent" x="542" y="4" width="200" height="16" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

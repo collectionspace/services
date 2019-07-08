@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="bampfaExhibitionChecklistGroup" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0ab8c86a-1229-415f-be1b-6ffb7c15b660">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="csid" class="java.lang.String">
+		<defaultValueExpression><![CDATA["d0b6211b-8f83-4639-b441"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+   gc.title groupTitle,
+   gc.scopenote groupScope,
+   hrc.name groupCSID,
+   coc.objectnumber accnNumber,
+   cob.sortableEffectiveObjectNumber accnNumberSort,
+   con.numbervalue otherNumber,
+   utils.getdispl(boppg.bampfaobjectproductionperson) artist,
+   case when (cob.artistdisplayoverride is null or cob.artistdisplayoverride='') then utils.concat_artists(hrc.name)
+     else cob.artistdisplayoverride end as artistCalc,
+   btg.bampfaformattedtitle title,
+   coc.physicaldescription materials,
+   replace(mpg.dimensionsummary, '-', ' ') measurementSummary,
+   cob.creditline,
+   sdg.datedisplaydate dateMade,
+   utils.get_mediumjpeg_filepath(hrc.name) imagefilepath
+from
+   groups_common gc
+   INNER JOIN hierarchy hgc ON (gc.id = hgc.id)
+   INNER JOIN relations_common rc ON (hgc.name = rc.objectcsid)
+   INNER JOIN hierarchy hrc ON (rc.subjectcsid = hrc.name)
+   INNER JOIN collectionobjects_common coc ON (hrc.id = coc.id)
+   INNER JOIN misc m ON (
+        coc.id = m.id
+        AND m.lifecyclestate <> 'deleted')
+   LEFT OUTER JOIN collectionobjects_bampfa cob ON (coc.id = cob.id)
+   LEFT OUTER JOIN hierarchy hcon ON (
+        coc.id = hcon.parentid
+        AND hcon.name = 'collectionobjects_common:otherNumberList'
+        AND hcon.pos = 0)
+   LEFT OUTER JOIN othernumber con ON (hcon.id = con.id)
+   LEFT OUTER JOIN hierarchy hboppg ON (
+        coc.id = hboppg.parentid
+        AND hboppg.name = 'collectionobjects_bampfa:bampfaObjectProductionPersonGroupList'
+        AND hboppg.pos = 0)
+   LEFT OUTER JOIN bampfaobjectproductionpersongroup boppg ON (hboppg.id = boppg.id)
+   LEFT OUTER JOIN hierarchy hbtg ON (
+        coc.id = hbtg.parentid
+        AND hbtg.name = 'collectionobjects_bampfa:bampfaTitleGroupList'
+        AND hbtg.pos = 0)
+   LEFT OUTER JOIN bampfatitlegroup btg ON (hbtg.id = btg.id)
+   LEFT OUTER JOIN hierarchy hmpg ON (
+        coc.id = hmpg.parentid
+        AND hmpg.name = 'collectionobjects_common:measuredPartGroupList'
+        AND hmpg.pos = 0)
+   LEFT OUTER JOIN measuredpartgroup mpg ON (hmpg.id = mpg.id)
+   LEFT OUTER JOIN hierarchy h2
+      ON (h2.parentid = coc.id AND h2.name='collectionobjects_common:objectProductionDateGroupList' and h2.pos=0)
+   LEFT OUTER JOIN structuredDateGroup sdg ON (h2.id = sdg.id)
+WHERE hgc.name = $P{csid}
+order by sdg.dateearliestscalarvalue, btg.bampfaformattedtitle, accnNumberSort]]>
+	</queryString>
+	<field name="grouptitle" class="java.lang.String"/>
+	<field name="groupscope" class="java.lang.String"/>
+	<field name="groupcsid" class="java.lang.String"/>
+	<field name="accnnumber" class="java.lang.String"/>
+	<field name="accnnumbersort" class="java.lang.String"/>
+	<field name="othernumber" class="java.lang.String"/>
+	<field name="artist" class="java.lang.String"/>
+	<field name="artistcalc" class="java.lang.String"/>
+	<field name="title" class="java.lang.String"/>
+	<field name="materials" class="java.lang.String"/>
+	<field name="measurementsummary" class="java.lang.String"/>
+	<field name="creditline" class="java.lang.String"/>
+	<field name="datemade" class="java.lang.String"/>
+	<field name="imagefilepath" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="64" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="3638b213-eeba-4372-9405-798dfc760774" mode="Opaque" x="0" y="0" width="572" height="40" forecolor="#000000" backcolor="#999999"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font fontName="SansSerif" size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[UC Berkeley Art Museum and Pacific Film Archive (BAM/PFA)]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="61" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="a69b575d-66e8-4e63-8c4a-1f0e21eb7801" x="0" y="0" width="563" height="20"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{grouptitle}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="7a4697db-9db9-4d60-b3c0-d1ee3646e021" x="0" y="20" width="563" height="41"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{groupscope}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="149" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="a16519ac-beee-4940-a59f-9bf1026d76b3" x="0" y="5" width="376" height="18" isRemoveLineWhenBlank="true"/>
+				<textElement markup="html">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="a1890a0e-9cf0-403d-bc4f-75b8f1ee0ab9" positionType="Float" x="0" y="23" width="376" height="18" isRemoveLineWhenBlank="true"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{datemade}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="b224d0c7-42e3-4224-b66e-d656406ef02c" positionType="Float" x="0" y="41" width="376" height="18" isRemoveLineWhenBlank="true"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{materials}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="fb18dc65-e481-45c7-b554-8f74f6e63c99" positionType="Float" x="0" y="59" width="376" height="18" isRemoveLineWhenBlank="true"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{measurementsummary}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="ddd3499a-a9db-404a-be08-b7ac36b1d692" positionType="Float" x="0" y="77" width="376" height="18" isRemoveLineWhenBlank="true"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{creditline}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="fa8879e7-2329-440f-a1d7-70f6dcb0db65" positionType="Float" x="0" y="95" width="376" height="18" isRemoveLineWhenBlank="true"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{accnnumber}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="ff59ac77-e327-4c0a-9738-94af445c6901" x="0" y="1" width="572" height="1"/>
+			</line>
+			<image onErrorType="Blank">
+				<reportElement uuid="b16495a5-80af-4b77-ae76-11314f16c07d" positionType="Float" x="403" y="7" width="168" height="137"/>
+				<imageExpression><![CDATA[$F{imagefilepath}]]></imageExpression>
+			</image>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="31" splitType="Stretch">
+			<textField>
+				<reportElement uuid="ef99fe65-38bd-4e69-ae03-73e5b0d2f984" x="451" y="7" width="80" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="a4634996-9d1a-4f6b-bcf6-6a9ec8e86366" x="531" y="7" width="40" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MM/dd/yyyy">
+				<reportElement uuid="b5afac7d-1ca0-4052-a5fe-5ce574591638" x="0" y="7" width="177" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>
