@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ucjepsMuirCollectorLabel" language="groovy" columnCount="2" pageWidth="612" pageHeight="792" whenNoDataType="BlankPage" columnWidth="288" leftMargin="18" rightMargin="18" topMargin="18" bottomMargin="18" uuid="3fad77f9-ba13-4981-85c7-b52eeaa54e5d">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="csid" class="java.lang.String">
+		<defaultValueExpression><![CDATA["96ce0296-99c8-4859-b9e0"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+    coc.id,
+    case when coc.objectnumber is null then '' else coc.objectnumber end as Accession_ID,
+    case when conh.labelheader like 'urn:%' then getdispl(conh.labelheader)
+        else conh.labelheader
+    end as Label_Header,
+    getdispl(tig.taxon) as Scientific_Name,
+    ttg.termformatteddisplayname as Sci_Name_Fmt,
+    lng.localname as Local_Name,
+    coalesce('<b>Locality Verbatim:</b> ' || lg.fieldlocverbatim, '') ||
+    coalesce('<br><b>Locality:</b> ' || concat_localitynote(coc.id), '') ||
+    case when coc.fieldcollectionnote is null or coc.fieldcollectionnote = '' then ''
+        else '<br><b>Habitat:</b> ' || coc.fieldcollectionnote end ||
+    coalesce('<br><b>Associated Taxa:</b> ' || concat_assoctaxa(coc.id), '') ||
+    case when rg.reference is null or rg.reference = '' then ''
+        else '<br><b>Reference:</b> ' || rg.reference end ||
+    case when cocbd.item is null or cocbd.item = '' then ''
+        else '<br>' || cocbd.item end ||
+    case when getdispl(coc.phase) is null or getdispl(coc.phase) = '' then ''
+        else '<br>' || getdispl(coc.phase) end ||
+    case when coc.sex is null or coc.sex = '' then ''
+        else '; ' || coc.sex end ||
+    coalesce('<br><b>Collector(s):</b> ' || concat_collectors(coc.id), '')  ||
+    case when coc.fieldcollectionnumber is null or coc.fieldcollectionnumber = '' then ''
+        else '; ' || coc.fieldcollectionnumber end ||
+    case when sdg.datedisplaydate is null or sdg.datedisplaydate = '' then ''
+        else '<br><b>Date:</b> ' || get_fieldcolldate_range(coc.id) ||
+             '<br><b>Date Verbatim:</b> ' || sdg.datedisplaydate end ||
+    case when nps.numbervalue is null or nps.numbervalue = '' then ''
+        else '<br><b>' || getdispl(nps.numbertype) || ':</b> ' || nps.numbervalue end ||
+    case when onps.numbervalue is null or onps.numbervalue = '' then ''
+        else '<br><b>' || getdispl(onps.numbertype) || ':</b> ' || onps.numbervalue end as Concat_Data,
+    case
+        when conh.labelfooter is null or conh.labelfooter = '' then ''
+        when conh.labelfooter like 'urn:%' then '<b>' || getdispl(conh.labelfooter) || '</b>'
+        else '<b>' || conh.labelfooter || '</b>'
+    end ||
+    case
+        when conh.objectcountnumber is null and coc.numberofobjects is null then ''
+        else '<br>Sheet ' || coalesce(conh.objectcountnumber::text, ' ') ||
+        ' of ' || coalesce(coc.numberofobjects::text, ' ')
+    end as Label_Footer,
+    case
+        when conh.objectcountnumber is null and coc.numberofobjects is null then ''
+        else 'Sheet ' || coalesce(conh.objectcountnumber::text, ' ') ||
+            ' of ' || coalesce(coc.numberofobjects::text, ' ')
+    end as Sheet
+from groups_common gc
+join hierarchy hgc ON (gc.id = hgc.id)
+join relations_common rc ON (hgc.name = rc.subjectcsid)
+join hierarchy hrc ON (rc.objectcsid = hrc.name)
+left outer join collectionobjects_common coc ON (hrc.id = coc.id)
+left outer join collectionobjects_naturalhistory conh on (coc.id = conh.id)
+left outer join hierarchy htig on (
+    coc.id = htig.parentid
+    and htig.primarytype = 'taxonomicIdentGroup'
+    and htig.pos = 0)
+left outer join taxonomicIdentGroup tig on (htig.id = tig.id)
+left outer join taxon_common tc on (tig.taxon = tc.refname)
+left outer join hierarchy httg on (
+    tc.id = httg.parentid
+    and httg.name = 'taxon_common:taxonTermGroupList'
+    and httg.pos = 0)
+left outer join taxontermgroup ttg on (ttg.id = httg.id)
+left outer join hierarchy hrg on (
+    coc.id = hrg.parentid
+    and hrg.primarytype = 'referenceGroup'
+    and hrg.pos = 0)
+left outer join referenceGroup rg on (hrg.id = rg.id)
+left outer join hierarchy hlng on (
+    coc.id = hlng.parentid
+    and hlng.primarytype = 'localNameGroup'
+    and hlng.pos = 0)
+left outer join localNameGroup lng on (hlng.id = lng.id)
+left outer join hierarchy hlg on (
+    coc.id = hlg.parentid
+    and hlg.primarytype = 'localityGroup'
+    and hlg.pos = 0)
+left outer join localityGroup lg on (hlg.id = lg.id)
+left outer join hierarchy hsdg on (
+    coc.id = hsdg.parentid
+    and hsdg.name = 'collectionobjects_common:fieldCollectionDateGroup')
+left outer join structuredDateGroup sdg on (hsdg.id = sdg.id)
+left outer join collectionobjects_common_briefdescriptions cocbd on (
+    coc.id = cocbd.id
+    and cocbd.pos = 0)
+left outer join (
+    select h.parentid, getdispl(o.numbertype) numbertype, o.numbervalue
+    from othernumber o, hierarchy h
+    where h.id = o.id
+    and h.primarytype = 'otherNumber'
+    and getdispl(o.numbertype) = 'National Park Service Accession Number') nps on (coc.id = nps.parentid)
+left outer join (
+    select h.parentid, getdispl(o.numbertype) numbertype, o.numbervalue
+    from othernumber o, hierarchy h
+    where h.id = o.id
+    and h.primarytype = 'otherNumber'
+    and getdispl(o.numbertype) = 'Old NPS catalog number') onps on (coc.id = onps.parentid)
+where hgc.name = $P{csid}]]>
+	</queryString>
+	<field name="id" class="java.lang.String"/>
+	<field name="accession_id" class="java.lang.String"/>
+	<field name="label_header" class="java.lang.String"/>
+	<field name="scientific_name" class="java.lang.String"/>
+	<field name="sci_name_fmt" class="java.lang.String"/>
+	<field name="local_name" class="java.lang.String"/>
+	<field name="concat_data" class="java.lang.String"/>
+	<field name="label_footer" class="java.lang.String"/>
+	<field name="sheet" class="java.lang.String"/>
+	<detail>
+		<band height="180" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="aba96d0a-6a03-4ea9-a3b2-b76bac5b1f6e" x="10" y="5" width="270" height="20"/>
+				<textElement textAlignment="Center" markup="html">
+					<font size="10" isBold="true"/>
+					<paragraph spacingBefore="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{label_header}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="18f328a1-d3e3-41de-8613-f18fa516d371" positionType="Float" stretchType="RelativeToTallestObject" x="10" y="155" width="270" height="20" isRemoveLineWhenBlank="true"/>
+				<textElement textAlignment="Center" markup="html">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{label_footer}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="af7a2340-ed99-49d4-93d7-4469c59061a9" stretchType="RelativeToBandHeight" x="10" y="63" width="270" height="90"/>
+				<textElement markup="html">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{concat_data}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="482a958d-31b0-4a1f-a1b6-105ba1176a46" x="10" y="27" width="270" height="10"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{accession_id}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="b20a04d2-3f65-4b67-b198-40abe4794c3f" x="10" y="39" width="270" height="10"/>
+				<textElement markup="html">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sci_name_fmt}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="a409f16f-08b9-46ba-b926-1de80bd62955" positionType="Float" x="10" y="51" width="270" height="10" isRemoveLineWhenBlank="true"/>
+				<textElement markup="html">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{local_name}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="f45a3efb-9ad6-4f13-9ec4-c98988a9dd9d" positionType="FixRelativeToBottom" isPrintRepeatedValues="false" x="6" y="176" width="278" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement uuid="00351a5d-24f0-44e9-9608-7a857ab4f905" x="6" y="2" width="278" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement uuid="b8c7195b-b25a-44e4-a84a-86c36a7ce521" stretchType="RelativeToBandHeight" x="2" y="4" width="1" height="170"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement uuid="675cf200-e916-4ee2-ac0e-b4183e59c744" stretchType="RelativeToBandHeight" x="286" y="4" width="1" height="170"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="duplicatefilename" language="groovy" pageWidth="612" pageHeight="792" columnWidth="540" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="36">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString language="SQL">
+		<![CDATA[select bc2.name filename,
+    mc2.identificationnumber accessionnumber,
+    case when (mu.scientifictaxonomy is not null and mu.scientifictaxonomy <> '')
+         then regexp_replace(mu.scientifictaxonomy, '^.*\)''(.*)''$', '\1')
+    end as taxonomy
+from blobs_common bc2, misc m3, hierarchy h2, media_common mc2, misc m4, media_ucjeps mu
+where bc2.id = m3.id and m3.lifecyclestate <> 'deleted'
+and bc2.id=h2.id and h2.name=mc2.blobcsid and mc2.id=m4.id and m4.lifecyclestate <> 'deleted'
+and mc2.id=mu.id
+and bc2.name in
+(select bc1.name
+from blobs_common bc1, misc m1, hierarchy h1, media_common mc, misc m2
+where bc1.id = m1.id and m1.lifecyclestate <> 'deleted'
+and bc1.id=h1.id and h1.name=mc.blobcsid and mc.id=m2.id and m2.lifecyclestate <> 'deleted'
+group by bc1.name
+having count(*) > 1)
+order by filename]]>
+	</queryString>
+	<field name="filename" class="java.lang.String"/>
+	<field name="accessionnumber" class="java.lang.String"/>
+	<field name="taxonomy" class="java.lang.String"/>
+	<group name="filename">
+		<groupExpression><![CDATA[$F{filename}]]></groupExpression>
+		<groupHeader>
+			<band height="5">
+				<line>
+					<reportElement x="0" y="2" width="540" height="1"/>
+				</line>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="23" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="540" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Duplicate File Names in Media Handling Records]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="22" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="20"/>
+				<textElement verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[File name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="134" y="0" width="100" height="20"/>
+				<textElement verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Accession]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="234" y="0" width="100" height="20"/>
+				<textElement verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Determination]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField>
+				<reportElement isPrintRepeatedValues="false" x="0" y="0" width="100" height="12"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{filename}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="134" y="0" width="100" height="12"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{accessionnumber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="234" y="0" width="306" height="12"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{taxonomy}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="25" splitType="Stretch">
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="0" y="2" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="420" y="5" width="80" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="500" y="5" width="40" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

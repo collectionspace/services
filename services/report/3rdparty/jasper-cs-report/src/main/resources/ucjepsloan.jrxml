@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ucjeps-loan1" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="csid" class="java.lang.String">
+		<defaultValueExpression><![CDATA["5a4af2d1-095f-4cac-84d6"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+    loanoutnumber,
+    case
+        when (borrower is not null and borrower <> '')
+        then getdispl(borrower)
+    end as borrower,
+    date(lnh.shipdate + interval '8 hour') shipdate,
+    date(loanoutdate + interval '8 hour') loanoutdate,
+    lnh.transportmethod,
+    lnh.numpackages,
+    lnh.majorgroup,
+    case
+        when (borrowerscontact is not null and borrowerscontact <> '')
+        then getdispl(borrowerscontact)
+    end as borrowerscontact,
+    specialconditionsofloan,
+    loanoutnote,
+    lnh.numlent,
+    org.displayname,
+    org.id,
+    geog.item geography,
+    case
+        when (tax.item is not null and tax.item<>'')
+        then getdispl(tax.item)
+        else null
+    end as taxonomy,
+    h3.parentid,
+    ag.addressplace1,
+    ag.addressplace2,
+    ag.addressmunicipality,
+    ag.addressstateorprovince,
+    ag.addresspostcode,
+    ag.addresscountry,
+    ag.addressmunicipality || ' ' ||
+        coalesce(ag.addressstateorprovince, ' ') || ' ' ||
+        ag.addresspostcode address_line3
+FROM
+    public.loansout_common lc
+join hierarchy h1 on lc.id = h1.id
+left outer join loansout_naturalhistory lnh on lc.id = lnh.id
+left outer join organizations_common org on lc.borrower = org.refname
+left outer join loansout_naturalhistory_geographylist geog on lc.id = geog.id
+left outer join loansout_naturalhistory_taxonomylist tax on lc.id = tax.id
+join hierarchy h2 on (org.id = h2.id)
+left outer join contacts_common cc on (h2.name = cc.initem)
+left outer join hierarchy h3 on (cc.id = h3.parentid)
+left outer join addressgroup ag on (h3.id = ag.id)
+where h1.name = $P{csid}
+and (geog.pos = 0 or geog.pos is null)
+and (tax.pos = 0 or tax.pos is null)
+and (h3.pos = 0 or h3.pos is null)
+and (h3.name is null or h3.name = 'contacts_common:addressGroupList')]]>
+	</queryString>
+	<field name="loanoutnumber" class="java.lang.String"/>
+	<field name="borrower" class="java.lang.String"/>
+	<field name="shipdate" class="java.sql.Date"/>
+	<field name="loanoutdate" class="java.sql.Date"/>
+	<field name="transportmethod" class="java.lang.String"/>
+	<field name="numpackages" class="java.lang.Long"/>
+	<field name="majorgroup" class="java.lang.String"/>
+	<field name="borrowerscontact" class="java.lang.String"/>
+	<field name="specialconditionsofloan" class="java.lang.String"/>
+	<field name="loanoutnote" class="java.lang.String"/>
+	<field name="numlent" class="java.lang.Long"/>
+	<field name="displayname" class="java.lang.String"/>
+	<field name="id" class="java.lang.String"/>
+	<field name="geography" class="java.lang.String"/>
+	<field name="taxonomy" class="java.lang.String"/>
+	<field name="parentid" class="java.lang.String"/>
+	<field name="addressplace1" class="java.lang.String"/>
+	<field name="addressplace2" class="java.lang.String"/>
+	<field name="addressmunicipality" class="java.lang.String"/>
+	<field name="addressstateorprovince" class="java.lang.String"/>
+	<field name="addresspostcode" class="java.lang.String"/>
+	<field name="addresscountry" class="java.lang.String"/>
+	<field name="address_line3" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="97" splitType="Stretch">
+			<staticText>
+				<reportElement x="76" y="0" width="427" height="97"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[UNIVERSITY HERBARIUM (UC) AND JEPSON HERBARIUM (JEPS)
+1001 VALLEY LIFE SCIENCES BUILDING #2465
+UNIVERSITY OF CALIFORNIA, BERKELEY, CA 94720-2465
+
+TEL: (510) 642-2465   FAX: (510) 643-5390
+URL: http://ucjeps.berkeley.edu]]></text>
+			</staticText>
+			<image onErrorType="Icon">
+				<reportElement x="500" y="11" width="72" height="72"/>
+				<imageExpression><![CDATA["https://ucjeps.cspace.berkeley.edu/reports/images/jepslogosmall.png"]]></imageExpression>
+			</image>
+			<image onErrorType="Icon">
+				<reportElement x="0" y="11" width="72" height="72"/>
+				<imageExpression><![CDATA["https://ucjeps.cspace.berkeley.edu/reports/images/uclogosmall.png"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="11" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="5" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="367" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement x="31" y="0" width="486" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{borrower}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="31" y="101" width="63" height="20"/>
+				<textElement/>
+				<text><![CDATA[Date:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="140" y="122" width="168" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{transportmethod}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="31" y="122" width="63" height="20"/>
+				<textElement/>
+				<text><![CDATA[Sent by: ]]></text>
+			</staticText>
+			<textField pattern="MMMMM dd, yyyy" isBlankWhenNull="true">
+				<reportElement x="140" y="101" width="168" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{shipdate}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="400" y="122" width="100" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{numpackages}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="305" y="122" width="90" height="20"/>
+				<textElement/>
+				<text><![CDATA[No. of Packages:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="305" y="101" width="90" height="20"/>
+				<textElement/>
+				<text><![CDATA[Date wrapped:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="31" y="149" width="502" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[TRANSACTION DESCRIPTION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="31" y="198" width="105" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Group:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="140" y="198" width="190" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{majorgroup}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="31" y="20" width="192" height="16" isRemoveLineWhenBlank="true"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{addressplace1}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="31" y="37" width="192" height="16" isRemoveLineWhenBlank="true"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{addressplace2}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="31" y="71" width="192" height="16" isRemoveLineWhenBlank="true"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{addresscountry}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="140" y="258" width="191" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{borrowerscontact}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="31" y="258" width="105" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[For study by:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="140" y="178" width="191" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{loanoutnumber}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="31" y="178" width="105" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Loan no.:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="31" y="334" width="501" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{specialconditionsofloan}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="31" y="218" width="105" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Taxonomy:*]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="140" y="218" width="190" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{taxonomy}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="31" y="238" width="105" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Geography:*]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="140" y="238" width="190" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{geography}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="31" y="278" width="105" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[No. of specimens:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="140" y="278" width="100" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{numlent}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="31" y="306" width="501" height="20" isRemoveLineWhenBlank="true"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{loanoutnote}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="31" y="54" width="419" height="16" isRemoveLineWhenBlank="true"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{address_line3}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="239" splitType="Stretch">
+			<staticText>
+				<reportElement x="31" y="13" width="502" height="115"/>
+				<textElement/>
+				<text><![CDATA[LOAN CONDITIONS: When corresponding, please refer to UC/JEPS loan numbers.  Permission must be obtained prior to removal of material for destructive sampling (http://ucjeps.berkeley.edu/destructive_sampling.html).  Specimens are lent with the understanding that appropriate annotations will be provided by the researcher.  If the specimens were not borrowed for monographic purposes, please indicate the type of research they were used for.  Type specimens should be annotated with basionym and place of publication.  Cite University Herbarium specimens as "UC"; cite Jepson Herbarium specimens as "JEPS".  We appreciate receiving copies of publications based on studies of our materials.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="31" y="128" width="486" height="20"/>
+				<textElement/>
+				<text><![CDATA[Above materials received in good condition (except as noted): ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="31" y="159" width="247" height="20"/>
+				<textElement/>
+				<text><![CDATA[Signature: _____________________________________ ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="304" y="159" width="247" height="20"/>
+				<textElement/>
+				<text><![CDATA[Date: _____________________________________ ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="31" y="189" width="247" height="37"/>
+				<textElement>
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[Return Yellow Copy to UC/JEPS
+(Yellow copy included in shipment)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="304" y="189" width="247" height="37"/>
+				<textElement/>
+				<text><![CDATA[Keep White Copy for your records
+(White copy mailed separately)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="31" y="223" width="177" height="16"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<text><![CDATA[* others may be present]]></text>
+			</staticText>
+		</band>
+	</columnFooter>
+</jasperReport>

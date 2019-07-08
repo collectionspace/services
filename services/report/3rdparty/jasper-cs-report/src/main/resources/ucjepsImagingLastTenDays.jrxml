@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="UCJeps Last Ten Days" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="720" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="36" uuid="95054fc4-b44c-4b16-a13f-ac79d4b4b2c1">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["/home/app_ucjeps/tomcat7/cspace/reports/"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+     mc.identificationnumber AS accn_num,
+     bc.name AS file_name,
+     csc.updatedat AS updated_at,
+     bc.length AS length_bytes,
+     regexp_replace(mu.scientifictaxonomy, '^.*\)''(.*)''$', '\1') AS scientific_name
+FROM blobs_common bc
+     INNER JOIN hierarchy h ON bc.id = h.id
+     INNER JOIN media_common mc ON h.name = mc.blobcsid
+     INNER JOIN media_ucjeps mu ON mc.id = mu.id
+     INNER JOIN public.misc mmc ON mc.id = mmc.id
+     INNER JOIN collectionspace_core csc ON bc.id = csc.id
+     INNER JOIN public.misc mbc ON bc.id = mbc.id
+WHERE
+     mmc.lifecyclestate != 'deleted'
+ AND mbc.lifecyclestate != 'deleted'
+ AND csc.updatedat >= current_date - 10
+ORDER BY
+     updatedat DESC]]>
+	</queryString>
+	<field name="accn_num" class="java.lang.String"/>
+	<field name="file_name" class="java.lang.String"/>
+	<field name="updated_at" class="java.sql.Timestamp"/>
+	<field name="length_bytes" class="java.lang.String"/>
+	<field name="scientific_name" class="java.lang.String"/>
+	<title>
+		<band height="104" splitType="Stretch">
+			<image onErrorType="Icon">
+				<reportElement uuid="4dac5156-9fdc-4ff4-9941-133839d3d5c9" x="0" y="0" width="366" height="61"/>
+				<imageExpression><![CDATA["https://ucjeps.cspace.berkeley.edu/reports/images/header-logo-cspace.png"]]></imageExpression>
+			</image>
+			<subreport>
+				<reportElement uuid="0d3e9ba0-e71e-4be6-bb64-f9967cf55fb5" x="0" y="66" width="720" height="38"/>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ucjepsImagingLastTenDaysTotal.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="28"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="e5cfcca2-204f-43ff-8b33-9c366e9f8875" x="0" y="1" width="90" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Accession Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="df1acd17-3a5d-427b-b6fe-a82a25127bd2" x="92" y="1" width="100" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[File Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9493e6ee-4283-44f2-98f8-c0fc1dab2ef8" x="400" y="1" width="320" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Scientific Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b1fc9ea1-dca2-4c16-b95d-5779ab7a58bf" x="194" y="1" width="110" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[File Uploaded]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="072a77de-da94-4a9b-92b3-3955ef175f45" x="306" y="1" width="90" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Length (bytes)]]></text>
+			</staticText>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="2b93f089-0bf8-466f-a520-8436ca7ea80c" mode="Transparent" x="217" y="-25" width="150" height="16" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date() - 10]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="95d153bb-a264-4587-87ba-b78f3c1077c7" mode="Transparent" x="367" y="-25" width="17" height="16" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" - "]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="40c8856e-1dbe-47d2-81d4-af5baee5d964" mode="Transparent" x="384" y="-25" width="120" height="16" forecolor="#000000"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement uuid="7a7cdad3-bc5d-48ed-8bcb-5b8f6aa0ff28" x="0" y="3" width="90" height="16"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{accn_num}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="ce7ef2a1-163c-4fcc-90b7-26c286d80b9b" x="92" y="3" width="100" height="16"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{file_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="561a1f0a-7fd6-417f-8c86-340df2099c73" x="194" y="3" width="110" height="16"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{updated_at}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="97884fab-c745-4dec-bc1b-2ab9bfd5f537" x="306" y="3" width="90" height="16"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{length_bytes}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="f5598b78-190b-4540-bed2-d5f960eec31f" x="400" y="2" width="320" height="16"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{scientific_name}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="24">
+			<textField>
+				<reportElement uuid="0a9d2db0-93a6-4d77-a356-fb2b76c7aebb" x="302" y="7" width="80" height="16"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="05015d95-b839-4834-b219-03b7866ad8e9" x="382" y="7" width="40" height="16"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

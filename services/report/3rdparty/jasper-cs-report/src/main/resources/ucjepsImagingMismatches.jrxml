@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="UCJeps Mismatched Filenames" language="groovy" pageWidth="612" pageHeight="792" columnWidth="566" leftMargin="23" rightMargin="23" topMargin="36" bottomMargin="36" uuid="df00ba6a-c492-43d4-b322-bf910f6b6819">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[SELECT
+     mc.identificationnumber AS accn_num,
+     bc.name AS file_name,
+     csc.updatedat AS updated_at,
+     regexp_replace(mu.scientifictaxonomy, '^.*\)''(.*)''$', '\1') AS scientific_name
+FROM blobs_common bc
+     INNER JOIN hierarchy h ON bc.id = h.id
+     INNER JOIN media_common mc ON h.name = mc.blobcsid
+     INNER JOIN media_ucjeps mu ON mc.id = mu.id
+     INNER JOIN public.misc mmc ON mc.id = mmc.id
+     INNER JOIN public.collectionspace_core csc ON bc.id = csc.id
+     INNER JOIN public.misc mbc ON bc.id = mbc.id
+     INNER JOIN taxon_common tc ON tc.refname = mu.scientifictaxonomy
+     INNER JOIN taxon_ucjeps tu ON tu.id = tc.id
+WHERE mc.identificationnumber != regexp_replace(bc.name, '^([A-Za-z]+[0-9]+).*$', '\1')
+ AND mu.scientifictaxonomy is not null
+ AND mu.scientifictaxonomy != ''
+ AND tu.taxonmajorgroup in ('Bryophytes', 'Algae')
+ AND mmc.lifecyclestate != 'deleted'
+ AND mbc.lifecyclestate != 'deleted'
+ AND mc.identificationnumber !~* 'test'
+ORDER BY
+     updatedat DESC]]>
+	</queryString>
+	<field name="accn_num" class="java.lang.String"/>
+	<field name="file_name" class="java.lang.String"/>
+	<field name="updated_at" class="java.sql.Timestamp"/>
+	<field name="scientific_name" class="java.lang.String"/>
+	<title>
+		<band height="84" splitType="Stretch">
+			<image onErrorType="Icon">
+				<reportElement uuid="939a7714-856d-4655-8133-f5f3967e7477" x="0" y="0" width="366" height="61"/>
+				<imageExpression><![CDATA["https://ucjeps.cspace.berkeley.edu/reports/images/header-logo-cspace.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement uuid="c19d0d24-a8cc-4043-bdac-fb33c3bc2fed" mode="Transparent" x="0" y="64" width="566" height="20" forecolor="#000000"/>
+				<textElement textAlignment="Center" markup="none">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[UCJEPS Imaging Project: Mismatched Filenames for Bryophytes & Algae]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="28" splitType="Stretch">
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="608ce7ee-da2b-4704-8e8a-4711d97878bf" mode="Transparent" x="208" y="2" width="150" height="16" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="c0753c15-61b4-4171-9cab-15546cc8e287" x="0" y="0" width="70" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Accession]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="494743e0-f422-4e76-982e-027bab39a0e6" x="70" y="0" width="90" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[File Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="49fe46fc-47df-4490-a5cf-2df634606673" x="266" y="0" width="300" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Scientific Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="20eba8a1-c533-4b0a-99fd-fd99c8ab359a" x="160" y="0" width="105" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[File Uploaded]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement uuid="a2e5bc16-97f8-4dc8-831c-6cb933276f0c" x="0" y="0" width="70" height="16"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{accn_num}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="cf8dd497-0bb9-4202-8bde-c50b947c4f54" x="70" y="0" width="90" height="16"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{file_name}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="fff2b169-9dd8-486d-bcf7-acaa3d3589ac" x="266" y="0" width="300" height="16"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{scientific_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="89286609-f251-4820-94c4-0b460093d35e" x="160" y="0" width="105" height="16"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{updated_at}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="24" splitType="Stretch">
+			<textField>
+				<reportElement uuid="a730bd5e-1de0-479c-acbf-7f14ea56e982" x="212" y="8" width="80" height="16"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="b11f1b92-206c-4e28-ac72-062297e782aa" x="291" y="8" width="40" height="16"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

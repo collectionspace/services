@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="UOCApprovalStatus" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1da71959-7468-4c0d-8036-685691a34b6d">
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="Parameter1" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select
+        uc.title as title,
+        getdispl(ug.user) as req_by,
+        null as req_date,
+        getdispl(ag.authorizedby) as auth_by,
+        to_char(ag.authorizationdate, 'MM/DD/YYYY') as auth_date,
+        getdispl(ag.authorizationstatus) as auth_status,
+        string_agg(coc.objectnumber, ', '
+                order by coc.objectnumber) as req_object,
+        to_char(min(ssdg.startsingledate), 'MM/DD/YYYY') as start_date,
+        to_char(uc.enddate, 'MM/DD/YYYY') as end_date
+from uoc_common uc
+left outer join hierarchy huc on (uc.id = huc.id)
+left outer join relations_common rc on (huc.name = rc.subjectcsid and rc.subjectdocumenttype = 'Uoc')
+left outer join hierarchy hcoc on (rc.objectcsid = hcoc.name and rc.objectdocumenttype = 'CollectionObject')
+left outer join collectionobjects_common coc on (hcoc.id = coc.id)
+left outer join hierarchy hug on (uc.id = hug.parentid and hug.name = 'uoc_common:userGroupList' and hug.pos = 0)
+left outer join usergroup ug on (hug.id = ug.id)
+left outer join hierarchy hag on (uc.id = hag.parentid and hag.name = 'uoc_common:authorizationGroupList' and hag.pos = 0)
+left outer join authorizationgroup ag on (hag.id = ag.id)
+left outer join hierarchy hssdg on (uc.id = hssdg.parentid and hssdg.name = 'uoc_common:startSingleDateGroupList')
+left outer join startsingledategroup ssdg on (hssdg.id = ssdg.id)
+group by uc.title, ug.user, ag.authorizedby, ag.authorizationdate, ag.authorizationstatus, uc.startsingledate, uc.enddate
+order by uc.title]]>
+	</queryString>
+	<field name="auth_status" class="java.lang.String"/>
+	<field name="req_by" class="java.lang.String"/>
+	<field name="req_date" class="java.lang.String"/>
+	<field name="auth_by" class="java.lang.String"/>
+	<field name="auth_date" class="java.lang.String"/>
+	<field name="title" class="java.lang.String"/>
+	<field name="req_object" class="java.lang.String"/>
+	<field name="start_date" class="java.lang.String"/>
+	<field name="end_date" class="java.lang.String"/>
+	<background>
+		<band/>
+	</background>
+	<title>
+		<band height="72">
+			<frame>
+				<reportElement mode="Opaque" x="-20" y="-20" width="842" height="92" backcolor="#006699" uuid="9f12c9cf-ebe1-43b5-bf2a-0172314c34f1"/>
+				<staticText>
+					<reportElement x="20" y="40" width="800" height="40" forecolor="#FFFFFF" uuid="2f28d156-e300-4f24-a38a-526872ab1d4d"/>
+					<textElement textAlignment="Center">
+						<font size="26" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Use of Collections Approval Status]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="20" y="10" width="180" height="20" forecolor="#FFFFFF" uuid="02c8ee9d-04d6-4c60-8c77-8dfa3013ba1a"/>
+					<textElement textAlignment="Left">
+						<font size="14" isBold="false"/>
+					</textElement>
+					<text><![CDATA[UC & Jepson Herbaria]]></text>
+				</staticText>
+			</frame>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="13"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="50">
+			<line>
+				<reportElement x="-20" y="46" width="842" height="1" forecolor="#666666" uuid="b0d93450-f528-487c-bceb-c3bfb92903bb"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="2" width="80" height="18" uuid="de6844a3-761e-48e8-92cb-0a3cb6ddc63f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5cdbc204-8862-42b9-b91b-33c0867dcc0f"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Status]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="80" y="2" width="160" height="18" uuid="d6124ea1-46a1-4c19-b450-6b6a1ae1f946">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5cdbc204-8862-42b9-b91b-33c0867dcc0f"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Authorizor]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="642" y="0" width="80" height="18" uuid="3cdd0b2a-6fa4-4b65-9f4b-79696d5fed9b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5cdbc204-8862-42b9-b91b-33c0867dcc0f"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Start Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="240" y="2" width="80" height="18" uuid="4fa4ce99-3a20-44f7-ba14-e2092e1d320a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5cdbc204-8862-42b9-b91b-33c0867dcc0f"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Auth. Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="360" y="22" width="440" height="18" uuid="1a25653d-abe7-4086-a7ad-1a6343973f8f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5cdbc204-8862-42b9-b91b-33c0867dcc0f"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[List of Objects]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="722" y="0" width="80" height="18" uuid="675bc864-bb98-491e-8efc-30c8b1a68d6e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5cdbc204-8862-42b9-b91b-33c0867dcc0f"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[End Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="260" y="22" width="80" height="18" uuid="5668271a-c9a2-49d4-bed1-99d5b1c14d1c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5cdbc204-8862-42b9-b91b-33c0867dcc0f"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Req. Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="22" width="80" height="18" uuid="c2c13e58-20fb-4ea8-974c-dcfdb992d8f9">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5cdbc204-8862-42b9-b91b-33c0867dcc0f"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Requestor]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="340" y="2" width="302" height="18" uuid="e1b29ae6-c70d-45ae-8237-659cb6dd15bf">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5cdbc204-8862-42b9-b91b-33c0867dcc0f"/>
+				</reportElement>
+				<textElement verticalAlignment="Bottom">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Title]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="52">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="48" width="802" height="1" uuid="0b3ce662-22aa-4bc5-a028-66e095b15b11"/>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="2" width="80" height="18" uuid="39f17ac8-6ac9-4255-b8a4-8e0cbb051382">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="19140a39-c9b1-49e1-bfec-76d569492dd6"/>
+				</reportElement>
+				<textElement verticalAlignment="Top">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{auth_status}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="80" y="2" width="160" height="18" uuid="98fd26b8-f785-494d-ba63-44585eb3a399">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c2edfa9f-bfe4-47f5-90bb-318c0742a10e"/>
+				</reportElement>
+				<textElement verticalAlignment="Top">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{auth_by}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="240" y="2" width="80" height="18" uuid="c4d77159-2dc9-4ff9-aacf-7fab9518efc2">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="77c76441-c84f-4503-8639-e54f76b0ebcd"/>
+				</reportElement>
+				<textElement verticalAlignment="Top">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{auth_date}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="100" y="22" width="100" height="18" uuid="68949d75-8cd1-41b7-88e1-70ccbfd834b4">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4682a942-f203-4dd9-bc32-e890bbc19702"/>
+				</reportElement>
+				<textElement verticalAlignment="Top">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{req_by}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="260" y="22" width="80" height="18" uuid="8a80b895-fbbe-471a-8940-f4ece10220fe">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ca057090-d63c-4693-8b6e-37a4a8b881c1"/>
+				</reportElement>
+				<textElement verticalAlignment="Top">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{req_date}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="340" y="2" width="302" height="18" uuid="844030ec-6263-4214-9d56-577c1831c99d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1f3cce93-eec6-4d65-939b-abe46f3ea104"/>
+				</reportElement>
+				<textElement verticalAlignment="Top">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="360" y="22" width="440" height="18" isPrintWhenDetailOverflows="true" uuid="91fccf18-efd2-493a-a056-04c846575504">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="dcc1f0e6-4cbf-423a-8d68-8d51d76fafd9"/>
+				</reportElement>
+				<textElement verticalAlignment="Top">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{req_object}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="642" y="2" width="80" height="18" uuid="f0d4c4f5-ac42-4923-86ba-1cf771b42f6d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2b6c48dd-274f-4957-861f-3ff03d0c2e05"/>
+				</reportElement>
+				<textElement verticalAlignment="Top">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{start_date}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="720" y="2" width="80" height="18" uuid="29795750-a244-46e4-9ce2-3ffc4062d24e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="88051d4e-a77b-4bb0-93aa-f06bf68f7fe5"/>
+				</reportElement>
+				<textElement verticalAlignment="Top">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{end_date}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<pageFooter>
+		<band height="17">
+			<textField>
+				<reportElement mode="Opaque" x="0" y="4" width="762" height="13" backcolor="#E6E6E6" uuid="fd586714-2cf5-47b1-89a6-9d2a304c980a"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement mode="Opaque" x="762" y="4" width="40" height="13" backcolor="#E6E6E6" uuid="ca0cf69c-a9dc-4d66-af2d-c20ade6bea78"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="0" y="4" width="180" height="13" uuid="049049f9-5f5a-4fe2-9fbc-dc4be35ec07f"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band/>
+	</summary>
+</jasperReport>

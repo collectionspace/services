@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="UCJeps Missing Major Group and Rank" language="groovy" columnCount="2" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="351" columnSpacing="18" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="36" uuid="df00ba6a-c492-43d4-b322-bf910f6b6819">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[select tc.displayname
+from taxon_common tc
+left outer join taxon_ucjeps tu on (tc.id = tu.id)
+left outer join misc m on (tc.id = m.id)
+left outer join collectionspace_core csc on (tc.id = csc.id)
+where (tu.taxonmajorgroup is null or tu.taxonmajorgroup = '')
+and (tc.taxonrank is null or tc.taxonrank = '')
+and tc.displayname is not null
+and tc.inauthority = '87036424-e55f-4e39-bd12'
+and m.lifecyclestate != 'deleted'
+order by tc.displayname;]]>
+	</queryString>
+	<field name="displayname" class="java.lang.String"/>
+	<title>
+		<band height="84" splitType="Stretch">
+			<image onErrorType="Icon">
+				<reportElement uuid="939a7714-856d-4655-8133-f5f3967e7477" x="0" y="0" width="366" height="61"/>
+				<imageExpression><![CDATA["https://ucjeps.cspace.berkeley.edu/reports/images/header-logo-cspace.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement uuid="820db3d9-ac47-4b97-8d72-72ad6a782752" mode="Transparent" x="0" y="64" width="720" height="20" forecolor="#000000"/>
+				<textElement textAlignment="Center" markup="none">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[UCJeps: Default Taxon Authority Names Missing Major Group and Rank]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="28" splitType="Stretch">
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="608ce7ee-da2b-4704-8e8a-4711d97878bf" mode="Transparent" x="285" y="2" width="150" height="16" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="49fe46fc-47df-4490-a5cf-2df634606673" x="0" y="4" width="350" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Scientific Name]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="fff2b169-9dd8-486d-bcf7-acaa3d3589ac" x="0" y="4" width="350" height="16"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{displayname}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="24" splitType="Stretch">
+			<textField>
+				<reportElement uuid="a730bd5e-1de0-479c-acbf-7f14ea56e982" x="290" y="8" width="80" height="16"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="b11f1b92-206c-4e28-ac72-062297e782aa" x="369" y="8" width="40" height="16"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>
