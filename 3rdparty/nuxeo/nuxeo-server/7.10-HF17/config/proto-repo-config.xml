@@ -28,7 +28,7 @@
 	</extension>
     <extension target="org.nuxeo.ecm.core.storage.sql.RepositoryService" point="repository">
         <repository name="default" factory="org.nuxeo.ecm.core.storage.sql.ra.PoolingRepositoryFactory">
-			<pool minPoolSize="0" maxPoolSize="20" blockingTimeoutMillis="100" idleTimeoutMinutes="10"/>
+			<pool minPoolSize="0" maxPoolSize="40" blockingTimeoutMillis="200" idleTimeoutMinutes="10"/>
 			<clustering enabled="false" delay="1000"/>                
 			<xa-datasource>@XA_DATASOURCE@</xa-datasource> <!-- The transactional datasource for Nuxeo -->
 			<noDDL>false</noDDL>
