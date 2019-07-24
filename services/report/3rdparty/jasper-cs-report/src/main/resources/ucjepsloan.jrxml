@@ -25,7 +25,7 @@
     specialconditionsofloan,
     loanoutnote,
     lnh.numlent,
-    org.displayname,
+    getdispl(org.refname) as displayname,
     org.id,
     geog.item geography,
     case
@@ -201,7 +201,7 @@ URL: http://ucjeps.berkeley.edu]]></text>
 				<textFieldExpression><![CDATA[$F{addresscountry}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="140" y="258" width="191" height="20"/>
+				<reportElement x="140" y="258" width="371" height="20"/>
 				<textElement>
 					<font isBold="true"/>
 				</textElement>
