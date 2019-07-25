@@ -60,6 +60,7 @@ import org.collectionspace.services.person.PersonAuthorityResource;
 import org.collectionspace.services.citation.CitationAuthorityResource;
 import org.collectionspace.services.claim.ClaimResource;
 import org.collectionspace.services.exhibition.ExhibitionResource;
+import org.collectionspace.services.osteology.OsteologyResource;
 import org.collectionspace.services.conditioncheck.ConditioncheckResource;
 import org.collectionspace.services.conservation.ConservationResource;
 import org.collectionspace.services.authorization.PermissionResource;
@@ -74,7 +75,7 @@ import java.util.Set;
 
 //import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.authorization.RoleResource;
-import org.collectionspace.services.common.NuxeoBasedResource;	  	
+import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ResourceMapHolder;
 import org.collectionspace.services.common.ResourceMapImpl;
@@ -94,16 +95,16 @@ public class CollectionSpaceJaxRsApplication extends Application
 					implements ResourceMapHolder {
 
     private Set<Object> singletons = new HashSet<Object>();
-    private Set<Class<?>> empty = new HashSet<Class<?>>();    
+    private Set<Class<?>> empty = new HashSet<Class<?>>();
     private ResourceMap resourceMap = new ResourceMapImpl();
     private ServletContext servletContext = null;
 
-    public CollectionSpaceJaxRsApplication() {    	
+    public CollectionSpaceJaxRsApplication() {
     	//
     	// Instantiate all our JaxRS resources
     	//
         singletons.add(new SecurityInterceptor());
-        
+
         singletons.add(new AccountResource());
         singletons.add(new TenantResource());
         singletons.add(new RoleResource());
@@ -134,9 +135,10 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new LoaninResource());
         addResourceToMapAndSingletons(new LoanoutResource());
         addResourceToMapAndSingletons(new ExhibitionResource());
+        addResourceToMapAndSingletons(new OsteologyResource());
         addResourceToMapAndSingletons(new ConditioncheckResource());
         addResourceToMapAndSingletons(new ConservationResource());
-        addResourceToMapAndSingletons(new UocResource());        
+        addResourceToMapAndSingletons(new UocResource());
         addResourceToMapAndSingletons(new ValuationcontrolResource());
         addResourceToMapAndSingletons(new ObjectExitResource());
         addResourceToMapAndSingletons(new BatchResource());
@@ -150,19 +152,19 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new PublicItemResource());
 
         singletons.add(new IDResource());
-        
+
         /*
         singletons.add(new WorkflowResource());
         */
 //        singletons.add(new DomainIdentifierResource());
 //        singletons.add(new PingResource());
     }
-    
+
     private void addResourceToMapAndSingletons(NuxeoBasedResource resource) {
         singletons.add(resource);
         resourceMap.put(resource.getServiceName(), resource);
     }
-    
+
     @Override
     public Set<Class<?>> getClasses() {
         return empty;
@@ -177,14 +179,13 @@ public class CollectionSpaceJaxRsApplication extends Application
     public ResourceMap getResourceMap() {
         return resourceMap;
     }
-    
+
     public void setServletContext(ServletContext servletContext) {
     	this.servletContext = servletContext;
     }
-    
+
     public ServletContext getServletContext() {
     	return this.servletContext;
     }
 
 }
-

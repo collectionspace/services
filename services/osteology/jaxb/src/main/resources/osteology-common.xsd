@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Osteology schema (XSD)
+
+    Entity  : Osteology
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+-->
+
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns:ns="http://collectionspace.org/services/osteology"
+  xmlns="http://collectionspace.org/services/osteology"
+  targetNamespace="http://collectionspace.org/services/osteology"
+  version="0.1"
+>
+
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+
+    <!--  Osteology Information Group -->
+    <xs:element name="osteology_common">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="InventoryID" type="xs:string"/>
+                <xs:element name="NotesOnElementInventory" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

@@ -173,6 +173,7 @@
         <ant antfile="loanout/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="claim/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="exhibition/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="osteology/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="conditioncheck/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="conservation/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="valuationcontrol/build.xml" target="deploy" inheritAll="false"/>
@@ -222,6 +223,7 @@
         <ant antfile="valuationcontrol/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="claim/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="exhibition/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="osteology/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="conditioncheck/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="conservation/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="batch/build.xml" target="undeploy" inheritAll="false"/>
@@ -283,6 +285,7 @@
         <ant antfile="taxonomy/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="claim/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="exhibition/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="osteology/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="conditioncheck/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="conservation/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="valuationcontrol/build.xml" target="dist" inheritAll="false"/>
@@ -324,9 +327,9 @@
         <ant antfile="loanin/build.xml" target="dist_installer" inheritAll="false"/>
         <ant antfile="acquisition/build.xml" target="dist_installer" inheritAll="false"/>
         <ant antfile="JaxRsServiceProvider/build.xml" target="dist_installer" inheritAll="false"/>
--->        
+-->
     </target>
-    
+
    <target name="generate-dependencies-reports"
             description="Generate a report of dependencies, including their licensing information.">
         <exec executable="mvn" failonerror="true">
@@ -335,7 +338,7 @@
         </exec>
     </target>
 
-    <target name="copy-dependencies-reports" 
+    <target name="copy-dependencies-reports"
             description="Copy dependencies reports to a single directory.">
         <property name="dependencies-reports-dir" value="${basedir}/target/dependencies"/>
         <mkdir dir="${dependencies-reports-dir}"/>
