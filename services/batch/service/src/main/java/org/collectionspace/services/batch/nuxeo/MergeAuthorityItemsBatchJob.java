@@ -71,10 +71,13 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 	public void run() {
 		setCompletionStatus(STATUS_MIN_PROGRESS);
 
+		String mode = getInvocationContext().getMode(); 
+
 		try {
 			String docType = null;
 			String targetCsid = null;
 			List<String> sourceCsids = new ArrayList<String>();
+
 
 			for (Param param : this.getParams()) {
 				String key = param.getKey();
@@ -95,17 +98,33 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 				}
 			}
 
+			if (mode.equalsIgnoreCase(INVOCATION_MODE_LIST)) {
+				// Now that these appear in the UI, we can fetch the docType and the sourceCSIDlists 
+				if (docType == null) {
+					docType = invocationCtx.getDocType();
+				}
+				if (sourceCsids.size() == 0) {
+					sourceCsids = this.getListCsids();
+				}
+			}
+
 			if (docType == null || docType.equals("")) {
 				throw new Exception("a docType must be supplied");
 			}
 
 			if (targetCsid == null || targetCsid.equals("")) {
-				throw new Exception("a target csid parameter (targetCSID) must be supplied");
+				throw new Exception("a target csid parameter (targetCSID) must be supplied.");
+			}
+
+			if (sourceCsids.contains(targetCsid)) {
+				sourceCsids.remove(targetCsid);
+				logger.warn("Attempted to merge targetCSID of " + targetCsid + " with itself. The record has been removed from the sourceCSIDs list.");
 			}
 
 			if (sourceCsids.size() == 0) {
 				throw new Exception("a source csid must be supplied");
 			}
+			
 
 			InvocationResults results = merge(docType, targetCsid, sourceCsids);
 
