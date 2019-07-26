@@ -103,10 +103,9 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 				if (docType == null) {
 					docType = invocationCtx.getDocType();
 				}
-			}
-
-			if (sourceCsids.size() == 0) {
-				sourceCsids = this.getListCsids();
+				if (sourceCsids.size() == 0) {
+					sourceCsids = this.getListCsids();
+				}
 			}
 
 			if (docType == null || docType.equals("")) {
@@ -120,6 +119,9 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 			if (sourceCsids.contains(targetCsid)) {
 				sourceCsids.remove(targetCsid);
 				logger.warn("Attempted to merge targetCSID of " + targetCsid + " with itself. The record has been removed from the sourceCSIDs list.");
+				if (sourceCsids.size() == 0) {
+					throw new Exception("Attempted to merge record with itself, resulting in an empty source list. The batch job has been stopped.");
+				}
 			}
 
 			if (sourceCsids.size() == 0) {
