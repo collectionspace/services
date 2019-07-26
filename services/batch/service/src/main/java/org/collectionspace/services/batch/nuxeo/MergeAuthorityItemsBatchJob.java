@@ -103,9 +103,10 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 				if (docType == null) {
 					docType = invocationCtx.getDocType();
 				}
-				if (sourceCsids.size() == 0) {
-					sourceCsids = this.getListCsids();
-				}
+			}
+
+			if (sourceCsids.size() == 0) {
+				sourceCsids = this.getListCsids();
 			}
 
 			if (docType == null || docType.equals("")) {
