@@ -2,16 +2,16 @@
 
 <!--
     CollectionObject schema (XSD)
-    
+
     Entity  : CollectionObject
     Part    : Common
     Used for: JAXB binding between XML and Java objects
-    
+
     $LastChangedRevision$
     $LastChangedDate$
 -->
 
-<xs:schema 
+<xs:schema
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
   jaxb:version="1.0" elementFormDefault="unqualified"
@@ -19,7 +19,7 @@
   xmlns="http://collectionspace.org/services/collectionobject"
   targetNamespace="http://collectionspace.org/services/collectionobject"
   version="0.1">
-    
+
 <!--
     Avoid XmlRootElement nightmare:
     See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
@@ -31,13 +31,14 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="csid" type="xs:string"/>
-                
+
                 <!-- Object Identification Information -->
 
                 <xs:element name="objectNumber" type="xs:string"/>
                 <xs:element name="otherNumberList" type="otherNumberList"/>
 
                 <xs:element name="briefDescriptions" type="briefDescriptionList"/>
+                <xs:element name="inventoryStatusList" type="inventoryStatusList"/>
                 <xs:element name="comments" type="commentList"/>
                 <xs:element name="distinguishingFeatures" type="xs:string"/>
                 <xs:element name="numberOfObjects" type="xs:integer"/>
@@ -167,7 +168,7 @@
                 <xs:element name="fieldCollectionSources" type="fieldCollectionSourceList"/>
                 <xs:element name="fieldCollectors" type="fieldCollectorList"/>
                 <xs:element name="fieldColEventNames" type="fieldColEventNameList"/>
-                
+
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -217,7 +218,7 @@
             <xs:element name="titleType" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="titleTranslationSubGroupList">
         <xs:sequence>
             <xs:element name="titleTranslationSubGroup" type="titleTranslationSubGroup" minOccurs="0"
@@ -257,7 +258,7 @@
             <xs:element name="contentObjectType" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="contentOtherGroupList">
         <xs:sequence>
             <xs:element name="contentOtherGroup" type="contentOtherGroup" minOccurs="0"
@@ -282,10 +283,16 @@
             <xs:element name="comment" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="briefDescriptionList">
         <xs:sequence>
             <xs:element name="briefDescription" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="inventoryStatusList">
+        <xs:sequence>
+            <xs:element name="inventoryStatus" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -294,7 +301,7 @@
             <xs:element name="color" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="contentActivityList">
         <xs:sequence>
             <xs:element name="contentActivity" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
@@ -382,7 +389,7 @@
             <xs:element name="dimensionNote" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
-    
+
     <!-- Object description Inscription - Content Information -->
     <xs:complexType name="textualInscriptionGroupList">
             <xs:sequence>
@@ -452,7 +459,7 @@
             <xs:element name="materialSource" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="objectStatusList">
         <xs:sequence>
             <xs:element name="objectStatus" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
@@ -524,7 +531,7 @@
             <xs:element name="objectProductionPeopleRole" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="objectProductionPersonGroupList">
         <xs:sequence>
             <xs:element name="objectProductionPersonGroup" type="objectProductionPersonGroup" minOccurs="0"
@@ -633,25 +640,25 @@
             <xs:element name="assocDateNote" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="assocEventOrganizationList">
         <xs:sequence>
             <xs:element name="assocEventOrganization" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="assocEventPeopleList">
         <xs:sequence>
             <xs:element name="assocEventPeople" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="assocEventPersonList">
         <xs:sequence>
             <xs:element name="assocEventPerson" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="assocEventPlaceList">
         <xs:sequence>
             <xs:element name="assocEventPlace" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
@@ -727,7 +734,7 @@
             <xs:element name="assocPlaceNote" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="ownershipDateGroupList">
         <xs:sequence>
             <xs:element name="ownershipDateGroup" type="structuredDateGroup" minOccurs="0"
@@ -771,7 +778,7 @@
             <xs:element name="referenceGroup" type="referenceGroup" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-	 
+
     <xs:complexType name="referenceGroup">
         <xs:sequence>
             <xs:element name="reference" type="xs:string"/>
@@ -802,7 +809,7 @@
             <xs:element name="fieldColEventName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="structuredDateGroup">
         <xs:sequence>
             <xs:element name="dateDisplayDate" type="xs:string"/>
@@ -830,6 +837,5 @@
             <xs:element name="scalarValuesComputed" type="xs:boolean"/>
         </xs:sequence>
     </xs:complexType>
-        
-</xs:schema>
 
+</xs:schema>
