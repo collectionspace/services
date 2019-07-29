@@ -121,9 +121,7 @@
 	</target>
 
 	<target name="undeploy_js">
-		<delete>
-			<fileset dir="${jee.deploy.cspace.ui.shared}" includes="*" />
-		</delete>
+		<delete dir="${jee.deploy.cspace.ui.shared}" />
 	</target>
 
 	<target name="deploy" depends="deploy_tenants" description="deploy cspace ui to ${jee.server.cspace}" />
