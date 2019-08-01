@@ -7,7 +7,7 @@
 		<![CDATA[select
      coc.objectnumber as accession_id,
      hcoc.name as collectionobject_csid,
-     tc.displayname as scientific_name
+     getdispl(tc.refname) as scientific_name
 from collectionobjects_common coc
 left outer join misc mcoc ON (coc.id = mcoc.id)
 left outer join hierarchy htig on (
