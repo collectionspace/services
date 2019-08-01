@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="inventory" language="groovy" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="baa3a829-2cdf-4505-b140-15d9282910ca">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Title" fontName="SansSerif" fontSize="26" isBold="true" pdfFontName="Helvetica"/>
+	<style name="SubTitle" forecolor="#666666" fontName="SansSerif" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="SansSerif" fontSize="12" isBold="true"/>
+	<style name="Location Header" fontName="SansSerif" fontSize="12"/>
+	<style name="Detail" fontName="SansSerif" fontSize="12"/>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[15]]></defaultValueExpression>
+	</parameter>
+	<parameter name="startLocation" class="java.lang.String">
+		<defaultValueExpression><![CDATA["Kroeber, 20A, AA  1,  1"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="endLocation" class="java.lang.String">
+		<defaultValueExpression><![CDATA["Kroeber, 20A, AA  1, 10"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+regexp_replace(c.computedcurrentlocation, '^.*\)''(.*)''$', '\1') as storageLocation,
+replace(regexp_replace(c.computedcurrentlocation, '^.*\)''(.*)''$', '\1'), ' ', '0') as locationkey,
+c.objectnumber objectNumber,
+c.numberofobjects objectCount,
+ong.objectName objectName
+FROM collectionobjects_common c
+left outer join hierarchy h1 on (c.id = h1.parentid and h1.pos=0 and h1.name='collectionobjects_common:objectNameList')
+left outer join objectnamegroup ong on (ong.id=h1.id)
+join misc ms on (c.id=ms.id and ms.lifecyclestate <> 'deleted')
+WHERE replace(regexp_replace(c.computedcurrentlocation, '^.*\)''(.*)''$', '\1'), ' ', '0') >= replace(regexp_replace($P{startLocation}, '^.*\)''(.*)''$', '\1'), ' ', '0')
+  and replace(regexp_replace(c.computedcurrentlocation, '^.*\)''(.*)''$', '\1'), ' ', '0') <= replace(regexp_replace($P{endLocation}, '^.*\)''(.*)''$', '\1'), ' ', '0')
+order by locationkey, objectnumber, objectName desc]]>
+	</queryString>
+	<field name="storagelocation" class="java.lang.String"/>
+	<field name="locationkey" class="java.lang.String"/>
+	<field name="objectnumber" class="java.lang.String"/>
+	<field name="objectcount" class="java.lang.Long"/>
+	<field name="objectname" class="java.lang.String"/>
+	<group name="storageLocation" isReprintHeaderOnEachPage="true">
+		<groupExpression><![CDATA[$F{storagelocation}]]></groupExpression>
+		<groupHeader>
+			<band height="21">
+				<textField>
+					<reportElement uuid="814641e8-f9a0-4184-a18e-160c39cf4465" style="Detail" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2" y="3" width="550" height="15" isPrintInFirstWholeBand="true" printWhenGroupChanges="storageLocation" forecolor="#FFFFFF" backcolor="#739dd2"/>
+					<textElement>
+						<font fontName="SansSerif" size="11" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{storagelocation}]]></textFieldExpression>
+				</textField>
+				<rectangle>
+					<reportElement uuid="07552d11-1abf-4e09-9fa6-08699a32fb3d" x="553" y="3" width="15" height="15"/>
+				</rectangle>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="53" splitType="Stretch">
+			<image onErrorType="Blank">
+				<reportElement uuid="3ca0df28-85c7-41bc-bf2c-ff7f74c802c0" x="423" y="0" width="150" height="51"/>
+				<imageExpression><![CDATA["https://raw.githubusercontent.com/collectionspace/cspace-ui.js/master/images/collectionspace.svg"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement uuid="4101e028-2c15-4e3e-a310-643830492372" style="Title" x="0" y="0" width="263" height="24"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="18"/>
+				</textElement>
+				<text><![CDATA[Systematic Inventory]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="7d9407b7-7048-44aa-906b-578b675557f3" positionType="FixRelativeToBottom" x="0" y="52" width="555" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="280a2415-3015-4649-93d5-1ad76b100b80" style="SubTitle" x="152" y="29" width="16" height="16"/>
+				<textElement>
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<text><![CDATA[to:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="8d4fb112-5a3c-4534-981b-3766c89c4700" style="Detail" positionType="Float" stretchType="RelativeToTallestObject" x="31" y="28" width="115" height="16"/>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{startLocation}.substring($P{startLocation}.indexOf("'") + 1, $P{startLocation}.length() - 1)]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="b3a93249-4c39-4e71-958a-c461bfbccd4f" style="Detail" positionType="Float" stretchType="RelativeToTallestObject" x="171" y="28" width="129" height="16"/>
+				<textElement>
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{endLocation}.substring($P{endLocation}.indexOf("'") + 1, $P{endLocation}.length() - 1)]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="05b4bc60-59c1-41b9-ae06-7d763309b2a0" style="SubTitle" x="0" y="29" width="28" height="16"/>
+				<textElement>
+					<font fontName="SansSerif" size="7"/>
+				</textElement>
+				<text><![CDATA[from:]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="17" splitType="Stretch">
+			<line>
+				<reportElement uuid="3d394d63-75b3-4ed6-8ac2-79105fb1da25" positionType="FixRelativeToBottom" x="0" y="16" width="555" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="0047f7ec-c461-41ec-a697-3617d703b27d" style="Column header" x="0" y="1" width="96" height="15"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Museum #]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="795e218b-325f-4179-b305-9af70eb39f3e" style="Column header" x="106" y="1" width="91" height="15"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Object name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="44fd4c83-9519-47a1-8065-910d94c5fa10" style="Column header" x="276" y="1" width="138" height="15"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Located?]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="17a9f924-edc3-4b9f-b52c-14c8ed0358e1" style="Column header" x="414" y="1" width="138" height="15"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Notes]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="532c8391-225b-4f3f-8061-cccdd53b4dfd" style="Column header" x="234" y="1" width="32" height="15"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[Count]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="17" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="d3d389c9-257e-444d-82d0-c8f9ce206dd8" style="Detail" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="2" y="1" width="94" height="16" backcolor="#FFFFFF"/>
+				<textElement>
+					<font fontName="SansSerif" size="11" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="69888981-1b4b-458e-859a-ddc4bdde07a1" style="Detail" stretchType="RelativeToTallestObject" mode="Opaque" x="106" y="1" width="118" height="16"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{objectname}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="4db8037c-9da1-4b4c-8ede-fe183b7bde88" style="Detail" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="244" y="1" width="29" height="16"/>
+				<textElement>
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{objectcount}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="fb12ae68-60c0-424a-9bc8-7de085742cff" positionType="FixRelativeToBottom" x="0" y="16" width="555" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<rectangle>
+				<reportElement uuid="9b664b4c-1792-4418-a64b-1403885549b9" x="290" y="1" width="15" height="15"/>
+			</rectangle>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="63" splitType="Stretch">
+			<textField>
+				<reportElement uuid="9e8264cf-652b-4901-81ba-151ac0f94ca1" style="Column header" x="433" y="47" width="80" height="16"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="1e5185b5-7657-403e-90f0-2b47f0bffce9" style="Column header" x="513" y="47" width="40" height="16"/>
+				<textElement>
+					<font fontName="SansSerif" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="74c7411a-2c7d-442c-897a-748b4a195da1" style="Column header" x="0" y="47" width="197" height="16"/>
+				<textElement>
+					<font fontName="SansSerif" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="1d8eba80-9ec1-4980-b438-4f98f52708fb" style="Column header" x="233" y="47" width="80" height="16"/>
+				<textElement textAlignment="Left">
+					<font fontName="SansSerif" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["By: "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="68613fb6-8de9-48e2-867a-46191b838eab" style="Detail" mode="Transparent" x="0" y="1" width="552" height="46"/>
+				<textElement textAlignment="Left">
+					<font fontName="SansSerif" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Additional notes: "]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>
