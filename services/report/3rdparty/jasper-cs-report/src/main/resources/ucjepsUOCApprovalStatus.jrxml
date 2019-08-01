@@ -10,12 +10,15 @@
 	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
-	<parameter name="Parameter1" class="java.lang.String"/>
+	<parameter name="Requester" class="java.lang.String">
+		<parameterDescription><![CDATA[Requester Name:]]></parameterDescription>
+		<defaultValueExpression><![CDATA["%"]]></defaultValueExpression>
+	</parameter>
 	<queryString>
 		<![CDATA[select
         uc.title as title,
-        getdispl(ug.user) as req_by,
-        null as req_date,
+        getdispl(sg.staffname) as req_by,
+        uc.daterequested as req_date,
         getdispl(ag.authorizedby) as auth_by,
         to_char(ag.authorizationdate, 'MM/DD/YYYY') as auth_date,
         getdispl(ag.authorizationstatus) as auth_status,
@@ -28,13 +31,15 @@ left outer join hierarchy huc on (uc.id = huc.id)
 left outer join relations_common rc on (huc.name = rc.subjectcsid and rc.subjectdocumenttype = 'Uoc')
 left outer join hierarchy hcoc on (rc.objectcsid = hcoc.name and rc.objectdocumenttype = 'CollectionObject')
 left outer join collectionobjects_common coc on (hcoc.id = coc.id)
-left outer join hierarchy hug on (uc.id = hug.parentid and hug.name = 'uoc_common:userGroupList' and hug.pos = 0)
-left outer join usergroup ug on (hug.id = ug.id)
+left outer join hierarchy hsg on (uc.id = hsg.parentid and hsg.name = 'uoc_common:staffGroupList')
+left outer join staffgroup sg on (hsg.id = sg.id)
 left outer join hierarchy hag on (uc.id = hag.parentid and hag.name = 'uoc_common:authorizationGroupList' and hag.pos = 0)
 left outer join authorizationgroup ag on (hag.id = ag.id)
 left outer join hierarchy hssdg on (uc.id = hssdg.parentid and hssdg.name = 'uoc_common:startSingleDateGroupList')
 left outer join startsingledategroup ssdg on (hssdg.id = ssdg.id)
-group by uc.title, ug.user, ag.authorizedby, ag.authorizationdate, ag.authorizationstatus, uc.startsingledate, uc.enddate
+where getdispl(sg.staffrole) = 'requester'
+and getdispl(sg.staffname) like $P{Requester}
+group by uc.title, sg.staffname, uc.daterequested, ag.authorizedby, ag.authorizationdate, ag.authorizationstatus, uc.startsingledate, uc.enddate
 order by uc.title]]>
 	</queryString>
 	<field name="auth_status" class="java.lang.String"/>
