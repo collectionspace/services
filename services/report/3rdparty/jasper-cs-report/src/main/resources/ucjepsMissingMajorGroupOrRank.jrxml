@@ -5,7 +5,7 @@
 	<property name="ireport.y" value="0"/>
 	<queryString>
 		<![CDATA[select
-        tc.displayname,
+        getdispl(tc.refname) as displayname,
         getdispl(tc.taxonrank) as taxonrank,
         tu.taxonmajorgroup,
         case
@@ -35,7 +35,7 @@ left outer join collectionspace_core csc on (tc.id = csc.id)
 join hierarchy h on (tc.inauthority = h.name)
 join taxonomyauthority_common tac on (h.id = tac.id)
 where (tu.taxonmajorgroup is null or tc.taxonrank is null)
-and tc.displayname is not null
+and getdispl(tc.refname) is not null
 and tac.shortidentifier = 'taxon'
 and m.lifecyclestate != 'deleted'
 and tc.id not in (
@@ -46,9 +46,9 @@ and tc.id not in (
         join taxonomyauthority_common tac on (h.id = tac.id)
         where (tu.taxonmajorgroup is null or tu.taxonmajorgroup = '')
         and (tc.taxonrank is null or tc.taxonrank = '')
-        and tc.displayname is not null
+        and getdispl(tc.refname) is not null
         and tac.shortidentifier = 'taxon')
-order by taxonrank_order, tc.displayname;]]>
+order by taxonrank_order, getdispl(tc.refname)]]>
 	</queryString>
 	<field name="displayname" class="java.lang.String"/>
 	<field name="taxonrank" class="java.lang.String"/>
