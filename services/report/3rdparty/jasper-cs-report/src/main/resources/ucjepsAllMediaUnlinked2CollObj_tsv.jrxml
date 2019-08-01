@@ -9,7 +9,7 @@
      mc.identificationnumber as accession_id,
      bc.name as file_name,
      hmc.name as media_csid,
-     tc.displayname as scientific_name
+     getdispl(tc.refname) as scientific_name
 from media_common mc
 left outer join misc mmc ON (mc.id = mmc.id)
 left outer join hierarchy hmc on (mc.id = hmc.id)
@@ -18,7 +18,7 @@ left outer join relations_common rc on (
         and rc.subjectdocumenttype = 'Media'
         and rc.objectdocumenttype = 'CollectionObject')
 left outer join media_ucjeps mu ON (mc.id = mu.id)
-left outer join taxon_common tc on (getdispl(mu.scientifictaxonomy) = tc.displayname)
+left outer join taxon_common tc on (getdispl(mu.scientifictaxonomy) = getdispl(tc.refname))
 left outer join taxon_ucjeps tu on (tc.id = tu.id)
 left outer join hierarchy hbc on (mc.blobcsid = hbc.name)
 left outer join blobs_common bc on (hbc.id = bc.id)
@@ -27,7 +27,7 @@ and mmc.lifecyclestate != 'deleted'
 and mc.identificationnumber !~* 'test'
 and mc.identificationnumber !~* 'SL'
 and mc.identificationnumber !~* 'DP'
-order by tu.taxonmajorgroup, tc.displayname]]>
+order by tu.taxonmajorgroup, getdispl(tc.refname)]]>
 	</queryString>
 	<field name="major_group" class="java.lang.String"/>
 	<field name="accession_id" class="java.lang.String"/>

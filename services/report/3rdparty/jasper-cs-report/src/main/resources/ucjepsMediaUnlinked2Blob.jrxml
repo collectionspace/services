@@ -11,7 +11,7 @@
 from media_common mc
 left outer join misc mmc ON (mc.id = mmc.id)
 left outer join media_ucjeps mu ON (mc.id = mu.id)
-left outer join taxon_common tc on (getdispl(mu.scientifictaxonomy) = tc.displayname)
+left outer join taxon_common tc on (getdispl(mu.scientifictaxonomy) = getdispl(tc.refname))
 left outer join taxon_ucjeps tu on (tc.id = tu.id)
 left outer join hierarchy hmc on (mc.id = hmc.id)
 where tu.taxonmajorgroup = 'Bryophytes'
