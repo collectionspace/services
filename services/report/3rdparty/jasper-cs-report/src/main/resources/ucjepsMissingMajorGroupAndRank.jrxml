@@ -4,17 +4,17 @@
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<queryString>
-		<![CDATA[select tc.displayname
+		<![CDATA[select getdispl(tc.refname) as displayname
 from taxon_common tc
 left outer join taxon_ucjeps tu on (tc.id = tu.id)
 left outer join misc m on (tc.id = m.id)
 left outer join collectionspace_core csc on (tc.id = csc.id)
 where (tu.taxonmajorgroup is null or tu.taxonmajorgroup = '')
 and (tc.taxonrank is null or tc.taxonrank = '')
-and tc.displayname is not null
+and getdispl(tc.refname) is not null
 and tc.inauthority = '87036424-e55f-4e39-bd12'
 and m.lifecyclestate != 'deleted'
-order by tc.displayname;]]>
+order by getdispl(tc.refname)]]>
 	</queryString>
 	<field name="displayname" class="java.lang.String"/>
 	<title>
