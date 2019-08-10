@@ -4,63 +4,53 @@
 -- You may not use this file except in compliance with this License.
 --
 
--- use cspace;
-DROP TABLE IF EXISTS acl_entry;
-DROP TABLE IF EXISTS acl_object_identity;
-DROP TABLE IF EXISTS acl_sid;
-DROP TABLE IF EXISTS acl_class;
-
 --
 -- Table structure for table acl_class
 --
-CREATE TABLE acl_class(
-  id bigserial not null primary key,
-  class varchar(100) not null,
-  constraint unique_uk_2 unique(class)
+CREATE TABLE IF NOT EXISTS acl_class (
+  id BIGSERIAL NOT NULL PRIMARY KEY,
+  class VARCHAR(100) NOT NULL UNIQUE
 );
-
 
 --
 -- Table structure for table acl_sid
 --
-CREATE TABLE acl_sid(
-  id bigserial not null primary key,
-  principal boolean not null,
-  sid varchar(100) not null,
-  constraint unique_uk_1 unique(sid,principal)
+CREATE TABLE IF NOT EXISTS acl_sid (
+  id BIGSERIAL NOT NULL PRIMARY KEY,
+  principal BOOLEAN NOT NULL,
+  sid VARCHAR(100) NOT NULL,
+  UNIQUE (sid, principal)
 );
 
 --
 -- Table structure for table acl_object_identity
 --
-CREATE TABLE acl_object_identity(
-  id bigserial primary key,
-  object_id_class bigint not null,
-  object_id_identity bigint not null,
-  parent_object bigint,
-  owner_sid bigint,
-  entries_inheriting boolean not null,
-  constraint unique_uk_3 unique(object_id_class,object_id_identity),
-  constraint acl_obj_id_ibfk_1 foreign key(parent_object) references acl_object_identity(id),
-  constraint acl_obj_id_ibfk_2 foreign key(object_id_class) references acl_class(id),
-  constraint acl_obj_id_ibfk_3 foreign key(owner_sid) references acl_sid(id)
+CREATE TABLE IF NOT EXISTS acl_object_identity (
+  id BIGSERIAL PRIMARY KEY,
+  object_id_class BIGINT NOT NULL,
+  object_id_identity BIGINT NOT NULL,
+  parent_object BIGINT,
+  owner_sid BIGINT,
+  entries_inheriting BOOLEAN NOT NULL,
+  UNIQUE (object_id_class, object_id_identity),
+  FOREIGN KEY (parent_object) REFERENCES acl_object_identity (id),
+  FOREIGN KEY (object_id_class) REFERENCES acl_class (id),
+  FOREIGN KEY (owner_sid) REFERENCES acl_sid (id)
 );
 
 --
 -- Table structure for table acl_entry
 --
-CREATE TABLE acl_entry(
-  id bigserial primary key,
-  acl_object_identity bigint not null,
-  ace_order int not null,
-  sid bigint not null,
-  mask integer not null,
-  granting boolean not null,
-  audit_success boolean not null,
-  audit_failure boolean not null,
-  constraint unique_uk_4 unique(acl_object_identity,ace_order),
-  constraint acl_entry_ibfk_1 foreign key(acl_object_identity)
-      references acl_object_identity(id),
-  constraint acl_entry_ibfk_2 foreign key(sid) references acl_sid(id)
+CREATE TABLE IF NOT EXISTS acl_entry (
+  id BIGSERIAL PRIMARY KEY,
+  acl_object_identity BIGINT NOT NULL,
+  ace_order INT NOT NULL,
+  sid BIGINT NOT NULL,
+  mask INTEGER NOT NULL,
+  granting BOOLEAN NOT NULL,
+  audit_success BOOLEAN NOT NULL,
+  audit_failure BOOLEAN NOT NULL,
+  UNIQUE(acl_object_identity,ace_order),
+  FOREIGN KEY (acl_object_identity) REFERENCES acl_object_identity (id),
+  FOREIGN KEY (sid) REFERENCES acl_sid (id)
 );
-

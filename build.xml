@@ -195,7 +195,7 @@
 		Top-level target to create (or recreate) CollectionSpace related databases.  Checks the
 		'recreate_db' property or environment variable.
 	-->
-	<target name="create_db" depends="-create_db, -create_db_erase, -create_db_warn"
+	<target name="create_db" depends="-set_recreate_db, -no_recreate_db_warn, -recreate_db_warn, -create_db"
 		description="Creates or recreates CollectionSpace database(s), invoke subtasks for indexes, etc.">
 	</target>
 
@@ -207,7 +207,7 @@
 		If the environment variable 'recreate_db' is set to true then the Ant property 'create_db.recreate' will get set to true; otherwise,
 		it will get set to the current value of the Ant property 'recreate_db' -which will be null if not set on the command line.
 	-->
-	<target name="-create_db">
+	<target name="-set_recreate_db">
 		<property environment="env"/>
 		<condition property="create_db.recreate" else="${recreate_db}" value="true">
 			<equals arg1="${env.recreate_db}" arg2="true"/>
@@ -217,7 +217,7 @@
 	<!--
 		This target sends the 'create_nuxeo_db' and 'create_nuxeo_db' targets to all the Ant sub-modules/directories
 	-->
-	<target name="-create_db_erase" if="${create_db.recreate}" depends="create_db-unix, create_db-windows">
+	<target name="-create_db" depends="-validate_create_db_unix, -validate_create_db_windows">
 		<antcall target="create_nuxeo_db" />
 		<antcall target="create_cspace_db" />
 	</target>
@@ -225,24 +225,28 @@
 	<!--
 		Outputs a warning to the user that existing CollectionSpace databases will be replaced/overridden.
 	-->
-	<target name="-create_db_warn" unless="${create_db.recreate}">
-		<echo message="*** WARNING!  This target will delete any and all existing CollectionSpace databases."/>
-		<echo message="*** WARNING!  You must set the Ant recreate_db property to 'true' to invoke this target."/>
-		<echo message="*** WARNING!  For example,"/>
-		<echo message="*** WARNING!"/>
-		<echo message="*** WARNING!      'ant create_db -Drecreate_db=true'."/>
-		<echo message="*** WARNING!"/>
-		<echo message="*** WARNING!  Optionally, you can set an environment variable named recreate_db=true as well."/>
+	<target name="-no_recreate_db_warn" unless="${create_db.recreate}">
+		<echo message="The recreate_db property is false or not set. CollectionSpace databases will be created"/>
+		<echo message="only if they do not exist. To delete all databases and recreate them from scratch, run"/>
+		<echo message="ant with the argument -Drecreate_db=true, or set the environment variable recreate_db"/>
+		<echo message="to true."/>
 	</target>
 
-	<target name="create_db-unix" if="osfamily-unix">
+	<!--
+		Outputs a warning to the user that existing CollectionSpace databases will be replaced/overridden.
+	-->
+	<target name="-recreate_db_warn" if="${create_db.recreate}">
+		<echo message="*** WARNING! The recreate_db property is true. This target will delete all existing CollectionSpace databases."/>
+	</target>
+
+	<target name="-validate_create_db_unix" if="osfamily-unix">
 		<exec executable="mvn" failonerror="true">
 			<arg value="validate" /> <!-- Ensure proper env vars are set -->
 			<arg value="${mvn.opts}" />
 		</exec>
 	</target>
 
-	<target name="create_db-windows" if="osfamily-windows">
+	<target name="-validate_create_db_windows" if="osfamily-windows">
 		<exec executable="cmd" failonerror="true">
 			<arg value="/c" />
 			<arg value="mvn" />
@@ -251,23 +255,29 @@
 		</exec>
 	</target>
 
-
-	<target name="create_nuxeo_db" description="create nuxeo database">
+	<target name="recreate_nuxeo_db" if="${create_db.recreate}" description="recreate nuxeo database">
+		<echo>Recreating nuxeo databases with credentials ${db.csadmin.user}:${db.csadmin.user.password}</echo>
 		<sql driver="${db.jdbc.driver.class}" url="${db.jdbc.csadmin.url}" userid="${db.csadmin.user}" password="${db.csadmin.user.password}" autocommit="true" src="${db.script.dir}/init_nuxeo_db.sql">
 			<classpath>
 				<pathelement path="${db.driver.jar}" />
 			</classpath>
 		</sql>
+	</target>
+
+	<target name="create_nuxeo_db" depends="recreate_nuxeo_db">
 		<ant antfile="services/build.xml" target="create_nuxeo_db" inheritAll="false" />
 	</target>
 
-	<target name="create_cspace_db" description="create cspace database">
-	    <echo>Creating the cspace database with credentials ${db.cspace.user}:${db.cspace.user.password}</echo>
+	<target name="recreate_cspace_db" if="${create_db.recreate}" description="recreate cspace database">
+		<echo>Recreating the cspace database with credentials ${db.csadmin.user}:${db.csadmin.user.password}</echo>
 		<sql driver="${db.jdbc.driver.class}" url="${db.jdbc.csadmin.url}" userid="${db.csadmin.user}" password="${db.csadmin.user.password}" autocommit="true" src="${db.script.dir}/init_cspace_db.sql">
 			<classpath>
 				<pathelement path="${db.driver.jar}" />
 			</classpath>
 		</sql>
+	</target>
+
+	<target name="create_cspace_db" depends="recreate_cspace_db">
 		<ant antfile="services/build.xml" target="create_cspace_db" inheritAll="false" />
 	</target>
 

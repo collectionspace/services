@@ -1,5 +1,16 @@
-DROP TABLE IF EXISTS users;
-create table users (username varchar(128) not null, created_at timestamp not null, passwd varchar(128) not null, updated_at timestamp, primary key (username));
+CREATE TABLE IF NOT EXISTS users (
+  username VARCHAR(128) NOT NULL PRIMARY KEY,
+  created_at TIMESTAMP NOT NULL,
+  passwd VARCHAR(128) NOT NULL,
+  updated_at TIMESTAMP
+);
 
-DROP TABLE IF EXISTS tokens;
-create table tokens (id varchar(128) not null, account_csid varchar(128) not null, tenant_id varchar(128) not null, expire_seconds integer not null, enabled boolean not null, created_at timestamp not null, updated_at timestamp, primary key (id));
+CREATE TABLE IF NOT EXISTS tokens (
+  id VARCHAR(128) NOT NULL PRIMARY KEY,
+  account_csid VARCHAR(128) NOT NULL,
+  tenant_id VARCHAR(128) NOT NULL,
+  expire_seconds INTEGER NOT NULL,
+  enabled BOOLEAN NOT NULL,
+  created_at TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP
+);

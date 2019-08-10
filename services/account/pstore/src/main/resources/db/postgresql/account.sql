@@ -1,14 +1,33 @@
--- alter table accounts_tenants drop constraint FKFDA649B05A9CEEB5;
-DROP TABLE IF EXISTS accounts_common CASCADE;
-DROP TABLE IF EXISTS accounts_tenants CASCADE;
-DROP TABLE IF EXISTS tenants CASCADE;
-DROP SEQUENCE IF EXISTS hibernate_sequence;
-create table accounts_common (csid varchar(128) not null, created_at timestamp not null, email varchar(255) not null, mobile varchar(255), person_ref_name varchar(255), phone varchar(255), screen_name varchar(128) not null, 
-	status varchar(15) not null, updated_at timestamp, userid varchar(128) not null, 
-	metadata_protection varchar(255), roles_protection varchar(255), 
-	primary key (csid), unique (userid));
+CREATE TABLE IF NOT EXISTS accounts_common (
+	csid VARCHAR(128) NOT NULL PRIMARY KEY,
+	created_at TIMESTAMP NOT NULL,
+	email VARCHAR(255) NOT NULL,
+	mobile VARCHAR(255),
+	person_ref_name VARCHAR(255),
+	phone VARCHAR(255),
+	screen_name VARCHAR(128) NOT NULL,
+	status VARCHAR(15) NOT NULL,
+	updated_at TIMESTAMP,
+	userid VARCHAR(128) NOT NULL UNIQUE,
+	metadata_protection VARCHAR(255),
+	roles_protection VARCHAR(255)
+);
 
-	create table accounts_tenants (HJID int8 not null, tenant_id varchar(128) not null, TENANTS_ACCOUNTS_COMMON_CSID varchar(128), primary key (HJID));
-create table tenants (id varchar(128) not null, created_at timestamp not null, name varchar(255) not null, config_md5hash varchar(255), authorities_initialized boolean not null, disabled boolean not null, updated_at timestamp, primary key (id));
-alter table accounts_tenants add constraint FKFDA649B05A9CEEB5 foreign key (TENANTS_ACCOUNTS_COMMON_CSID) references accounts_common;
-create sequence hibernate_sequence;
+CREATE TABLE IF NOT EXISTS accounts_tenants (
+	hjid INT8 NOT NULL PRIMARY KEY,
+	tenant_id VARCHAR(128) NOT NULL,
+	tenants_accounts_common_csid VARCHAR(128),
+	FOREIGN KEY (tenants_accounts_common_csid) REFERENCES accounts_common
+);
+
+CREATE TABLE IF NOT EXISTS tenants (
+	id VARCHAR(128) NOT NULL PRIMARY KEY,
+	created_at TIMESTAMP NOT NULL,
+	name VARCHAR(255) NOT NULL,
+	config_md5hash VARCHAR(255),
+	authorities_initialized BOOLEAN NOT NULL,
+	disabled BOOLEAN NOT NULL,
+	updated_at TIMESTAMP
+);
+
+CREATE SEQUENCE IF NOT EXISTS hibernate_sequence;

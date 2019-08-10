@@ -1,28 +1,61 @@
--- alter table permissions_actions drop constraint FK85F82042E2DC84FD;
-DROP TABLE IF EXISTS accounts_roles CASCADE;
-DROP TABLE IF EXISTS permissions CASCADE;
-DROP TABLE IF EXISTS permissions_actions CASCADE;
-DROP TABLE IF EXISTS permissions_roles CASCADE;
-DROP TABLE IF EXISTS roles CASCADE;
-DROP SEQUENCE IF EXISTS hibernate_sequence;
+CREATE TABLE IF NOT EXISTS accounts_roles (
+	hjid INT8 NOT NULL PRIMARY KEY,
+	account_id VARCHAR(128) NOT NULL,
+	created_at TIMESTAMP NOT NULL,
+	role_id VARCHAR(128) NOT NULL,
+	role_name VARCHAR(255) NOT NULL,
+	screen_name VARCHAR(255),
+	user_id VARCHAR(128) NOT NULL,
+	UNIQUE (account_id, role_id)
+);
 
-create table accounts_roles (HJID int8 not null, account_id varchar(128) not null, created_at timestamp not null, role_id varchar(128) not null, 
-	role_name varchar(255) not null, screen_name varchar(255), user_id varchar(128) not null, primary key (HJID), unique (account_id, role_id));
+CREATE TABLE IF NOT EXISTS permissions (
+	csid VARCHAR(128) NOT NULL PRIMARY KEY,
+	action_group VARCHAR(128),
+	attribute_name VARCHAR(128),
+	created_at TIMESTAMP NOT NULL,
+	description VARCHAR(255),
+	effect VARCHAR(32) NOT NULL,
+	metadata_protection VARCHAR(255),
+	actions_protection VARCHAR(255),
+	resource_name VARCHAR(128) NOT NULL,
+	tenant_id VARCHAR(128) NOT NULL,
+	updated_at TIMESTAMP
+);
 
-create table permissions (csid varchar(128) not null, action_group varchar(128), attribute_name varchar(128), created_at timestamp not null, description varchar(255), effect varchar(32) not null, 
-	metadata_protection varchar(255), actions_protection varchar(255), 
-	resource_name varchar(128) not null, tenant_id varchar(128) not null,
-	updated_at timestamp, primary key (csid));
+CREATE TABLE IF NOT EXISTS permissions_actions (
+	hjid INT8 NOT NULL PRIMARY KEY,
+	name VARCHAR(128) NOT NULL,
+	objectidentity VARCHAR(128) NOT NULL,
+	objectidentityresource VARCHAR(128) NOT NULL,
+	action__permission_csid VARCHAR(128),
+	FOREIGN KEY (action__permission_csid) REFERENCES permissions
+);
 
-create table permissions_actions (HJID int8 not null, name varchar(128) not null, objectIdentity varchar(128) not null, objectIdentityResource varchar(128) not null, 
-	ACTION__PERMISSION_CSID varchar(128), primary key (HJID));
+CREATE TABLE IF NOT EXISTS permissions_roles (
+	hjid INT8 NOT NULL PRIMARY KEY,
+	actiongroup VARCHAR(255),
+	created_at TIMESTAMP NOT NULL,
+	permission_id VARCHAR(128) NOT NULL,
+	permission_resource VARCHAR(255),
+	role_id VARCHAR(128) NOT NULL,
+	role_name VARCHAR(255),
+	UNIQUE (permission_id, role_id)
+);
 
-	create table permissions_roles (HJID int8 not null, actionGroup varchar(255), created_at timestamp not null, permission_id varchar(128) not null, permission_resource varchar(255), role_id varchar(128) not null, role_name varchar(255), primary key (HJID), unique (permission_id, role_id));
+CREATE TABLE IF NOT EXISTS roles (
+	csid VARCHAR(128) NOT NULL PRIMARY KEY,
+	created_at TIMESTAMP NOT NULL,
+	description VARCHAR(255),
+	displayname VARCHAR(200) NOT NULL,
+	rolegroup VARCHAR(255),
+	rolename VARCHAR(200) NOT NULL,
+	tenant_id VARCHAR(128) NOT NULL,
+	metadata_protection VARCHAR(255),
+	perms_protection VARCHAR(255),
+	updated_at TIMESTAMP,
+	UNIQUE (rolename, tenant_id),
+	UNIQUE (displayname, tenant_id)
+);
 
-create table roles (csid varchar(128) not null, created_at timestamp not null, description varchar(255), displayname varchar(200) not null, rolegroup varchar(255), 
-	rolename varchar(200) not null, tenant_id varchar(128) not null, 
-	metadata_protection varchar(255), perms_protection varchar(255), 
-	updated_at timestamp, primary key (csid), unique (rolename, tenant_id), unique (displayname, tenant_id));
-
-alter table permissions_actions add constraint FK85F82042E2DC84FD foreign key (ACTION__PERMISSION_CSID) references permissions;
-create sequence hibernate_sequence;
+CREATE SEQUENCE IF NOT EXISTS hibernate_sequence;
