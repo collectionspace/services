@@ -30,4 +30,6 @@ CREATE TABLE IF NOT EXISTS tenants (
 	updated_at TIMESTAMP
 );
 
+UPDATE tenants SET authorities_initialized = FALSE;
+
 CREATE SEQUENCE IF NOT EXISTS hibernate_sequence;
