@@ -109,15 +109,19 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 					sourceCsids.add(param.getValue());
 				}
 			}
+			
+			if (sourceCsids.size() == 0 && docType == null) {
+				// In order to main backwards compatability, do a series of checks here to differentiate
 
-			if (docType == null) {
 				docType = invocationCtx.getDocType();
-			}
 
-			if (mode.equalsIgnoreCase(INVOCATION_MODE_LIST)) {
-				// Now that these appear in the UI, we can fetch the docType and the sourceCSIDlists 
-				if (sourceCsids.size() == 0) {
-					sourceCsids = this.getListCsids();
+				if (mode.equalsIgnoreCase(INVOCATION_MODE_LIST)) {
+					// Now that these appear in the UI, we can fetch the docType and the sourceCSIDlists 
+					if (sourceCsids.size() == 0) {
+						sourceCsids = this.getListCsids();
+					}
+				} else if (mode.equalsIgnoreCase(INVOCATION_MODE_SINGLE)) {
+					sourceCsids.add(invocationCtx.getSingleCSID());
 				}
 			}
 
