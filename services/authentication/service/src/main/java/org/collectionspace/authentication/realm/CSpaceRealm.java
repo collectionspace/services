@@ -38,6 +38,14 @@ import org.collectionspace.authentication.CSpaceTenant;
  * Interface for the CollectionSpace realm.
  */
 public interface CSpaceRealm {
+	
+	/**
+	 * Retrieves the "salt" used to encrypt the user's password
+	 * @param username
+	 * @return
+	 * @throws AccountException
+	 */
+	public String getSalt(String username) throws AccountException;
 
     /**
      * Retrieves the hashed password used to authenticate a user.
