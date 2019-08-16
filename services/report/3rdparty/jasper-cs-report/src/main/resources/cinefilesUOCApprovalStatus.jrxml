@@ -48,11 +48,11 @@ order by uoc.daterequested]]>
 					<text><![CDATA[Use of Collections Approval Status Report]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="20" y="10" width="180" height="20" forecolor="#FFFFFF" uuid="02c8ee9d-04d6-4c60-8c77-8dfa3013ba1a"/>
+					<reportElement x="20" y="10" width="582" height="20" forecolor="#FFFFFF" uuid="02c8ee9d-04d6-4c60-8c77-8dfa3013ba1a"/>
 					<textElement textAlignment="Left">
 						<font size="14" isBold="false"/>
 					</textElement>
-					<text><![CDATA[Cinefiles]]></text>
+					<text><![CDATA[CineFiles]]></text>
 				</staticText>
 			</frame>
 		</band>
