@@ -102,6 +102,11 @@
             <version>${spring.security.oauth2.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+            <scope>provided</scope>
+		</dependency>
     </dependencies>
 
     <build>

@@ -112,7 +112,7 @@
         <property name="src.hibernate.cfg" value="${basedir}/src/test/resources/hibernate.cfg.xml"/>
         <property name="dest.hibernate.cfg" value="${basedir}/target/test-classes/hibernate.cfg.xml"/>
         <delete file="${dest.hibernate.cfg}" verbose="true" />
-        <filter token="DB_CSPACE_URL" value="${db.jdbc.cspace.url}" />
+        <filter token="DB_CSPACE_URL" value="${db.jdbc.cspace.url.encoded}" />
         <filter token="DB_DRIVER_CLASS" value="${db.jdbc.driver.class}" />
         <filter token="DB_CSPACE_USER" value="${db.cspace.user}" />
         <filter token="DB_CSPACE_PASSWORD" value="${env.DB_CSPACE_PASSWORD}" /> <!-- double-sub from ${db.cspace.user.password} fails -->

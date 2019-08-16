@@ -277,7 +277,7 @@ public class AuthZ {
     	
     	HashSet<CSpaceTenant> tenantSet = new HashSet<CSpaceTenant>();
     	tenantSet.add(tenant);
-    	CSpaceUser principal = new CSpaceUser(user, password, tenantSet, grantedAuthorities);
+    	CSpaceUser principal = new CSpaceUser(user, password, null, tenantSet, grantedAuthorities);
     	
         Authentication authRequest = new UsernamePasswordAuthenticationToken(principal, password, grantedAuthorities);
         SecurityContextHolder.getContext().setAuthentication(authRequest);
