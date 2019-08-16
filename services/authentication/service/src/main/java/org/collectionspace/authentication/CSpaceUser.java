@@ -66,4 +66,12 @@ public class CSpaceUser extends User {
         return primaryTenant;
     }
     
+    /**
+     * Returns a "salt" string to use when encrypting a user's password
+     * @return
+     */
+    public String getSalt() {
+    	return "";
+    }
+    
 }
