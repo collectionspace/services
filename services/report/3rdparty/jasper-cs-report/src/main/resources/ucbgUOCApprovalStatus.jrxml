@@ -10,6 +10,22 @@
 	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="StartDate" class="java.lang.String">
+		<parameterDescription><![CDATA[StartDate]]></parameterDescription>
+		<defaultValueExpression><![CDATA["0001-01-01"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="EndDate" class="java.lang.String">
+		<parameterDescription><![CDATA[End Date]]></parameterDescription>
+		<defaultValueExpression><![CDATA["9999-12-31"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="AuthBy" class="java.lang.String">
+		<parameterDescription><![CDATA[AuthBy]]></parameterDescription>
+		<defaultValueExpression><![CDATA["%"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="AuthStatus" class="java.lang.String">
+		<parameterDescription><![CDATA[AuthStatus]]></parameterDescription>
+		<defaultValueExpression><![CDATA["%"]]></defaultValueExpression>
+	</parameter>
 	<queryString>
 		<![CDATA[select
         case
@@ -22,11 +38,12 @@
                                 else ': <i>' || uoc.title || '</i>'
                         end
         end as reftitle,
-        to_char(uoc.daterequested, 'MM/DD/YYYY') as requested,
-        to_char(uoc.datecompleted, 'MM/DD/YYYY') as completed,
-        get_uoc_authby(uoc.id) as authby
+        to_char(uoc.daterequested, 'yyyy-mm-dd') as requested,
+        to_char(uoc.datecompleted, 'yyyy-mm-dd') as completed,
+        get_uoc_authby(uoc.id, $P{AuthBy}, $P{AuthStatus}) as authby
 from uoc_common uoc
-where get_uoc_authby(uoc.id) is not null
+where get_uoc_authby(uoc.id, $P{AuthBy}, $P{AuthStatus}) is not null
+and (uoc.daterequested + interval '7h') between to_date($P{StartDate}, 'yyyy-mm-dd') and to_date($P{EndDate}, 'yyyy-mm-dd')
 order by uoc.daterequested]]>
 	</queryString>
 	<field name="authby" class="java.lang.String"/>
