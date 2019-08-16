@@ -68,6 +68,7 @@ import javax.sql.DataSource;
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.authentication.CSpaceTenant;
 import org.collectionspace.authentication.realm.CSpaceRealm;
+import org.postgresql.util.PSQLState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,6 +81,7 @@ public class CSpaceDbRealm implements CSpaceRealm {
     
     private String datasourceName;
     private String principalsQuery;
+    private String saltQuery;
     private String rolesQuery;
     private String tenantsQueryNoDisabled;
     private String tenantsQueryWithDisabled;
@@ -139,6 +141,10 @@ public class CSpaceDbRealm implements CSpaceRealm {
         Object tmp = options.get("principalsQuery");
         if (tmp != null) {
             principalsQuery = tmp.toString();
+        }
+        tmp = options.get("saltQuery");
+        if (tmp != null) {
+        	saltQuery = tmp.toString();
         }
         tmp = options.get("rolesQuery");
         if (tmp != null) {
@@ -642,5 +648,68 @@ public class CSpaceDbRealm implements CSpaceRealm {
 
 		return result;
 	}
+
+	@Override
+	public String getSalt(String username) throws AccountException {
+        String salt = null;
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            conn = getConnection();
+            // Get the salt
+            if (logger.isDebugEnabled()) {
+                logger.debug("Executing query: " + saltQuery + ", with username: " + username);
+            }
+            ps = conn.prepareStatement(saltQuery);
+            ps.setString(1, username);
+            rs = ps.executeQuery();
+            if (rs.next() == false) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug(saltQuery + " returned no matches from db");
+                }
+                throw new AccountNotFoundException("No matching username found");
+            }
+
+            salt = rs.getString(1);
+        } catch (SQLException ex) {
+        	// Assuming PostgreSQL
+            if (PSQLState.UNDEFINED_COLUMN.getState().equals(ex.getSQLState())) {
+            	String msg = "'USERS' table is missing 'salt' column for password encyrption.  Assuming existing passwords are unsalted.";
+            	logger.warn(msg);
+            } else {
+                AccountException ae = new AccountException("Authentication query failed: " + ex.getLocalizedMessage());
+                ae.initCause(ex);
+                throw ae;
+            }
+        } catch (AccountNotFoundException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            AccountException ae = new AccountException("Unknown Exception");
+            ae.initCause(ex);
+            throw ae;
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                }
+            }
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                }
+            }
+        }
+        
+        return salt;
+    }
     
 }

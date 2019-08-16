@@ -28,6 +28,8 @@
 package org.collectionspace.services.account.storage.csidp;
 
 import java.util.Date;
+import java.util.UUID;
+
 import javax.persistence.Query;
 
 import org.collectionspace.services.authentication.User;
@@ -61,7 +63,9 @@ public class UserStorageClient {
     public User create(String userId, byte[] password) throws Exception {
         User user = new User();
         user.setUsername(userId);
-        user.setPasswd(getEncPassword(userId, password));
+        String salt = UUID.randomUUID().toString();
+        user.setPasswd(getEncPassword(userId, password, salt));
+        user.setSalt(salt);
         user.setCreatedAtItem(new Date());
         return user;
     }
@@ -111,7 +115,7 @@ public class UserStorageClient {
             throws DocumentNotFoundException, Exception {
         User userFound = get(jpaTransactionContext, userId);
         if (userFound != null) {
-            userFound.setPasswd(getEncPassword(userId, password));
+            userFound.setPasswd(getEncPassword(userId, password, userFound.getSalt()));
             userFound.setUpdatedAtItem(new Date());
             if (logger.isDebugEnabled()) {
                 logger.debug("updated user=" + JaxbUtils.toString(userFound, User.class));
@@ -144,7 +148,7 @@ public class UserStorageClient {
         }
     }
 
-    private String getEncPassword(String userId, byte[] password) throws BadRequestException {
+    private String getEncPassword(String userId, byte[] password, String salt) throws BadRequestException {
         //jaxb unmarshaller already unmarshal xs:base64Binary, no need to b64 decode
         //byte[] bpass = Base64.decodeBase64(accountReceived.getPassword());
         try {
@@ -153,7 +157,7 @@ public class UserStorageClient {
             throw new BadRequestException(e.getMessage());
         }
         String secEncPasswd = SecurityUtils.createPasswordHash(
-                userId, new String(password));
+                userId, new String(password), salt);
         return secEncPasswd;
     }
 }
