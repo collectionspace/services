@@ -90,12 +90,17 @@
 
     <bean id="daoAuthenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
         <property name="userDetailsService" ref="userDetailsService" />
+        <property name="saltSource" ref="saltSource"/>
         <property name="passwordEncoder">
             <bean class="org.springframework.security.authentication.encoding.ShaPasswordEncoder">
                 <constructor-arg value="256"/>
                 <property name="encodeHashAsBase64" value="true" />
             </bean>
         </property>
+    </bean>
+    
+    <bean id="saltSource" class="org.collectionspace.authentication.CSpaceSaltSource">
+        <property name="userPropertyToUse" value="salt" />
     </bean>
 
     <bean id="userDetailsService" class="org.collectionspace.authentication.spring.CSpaceUserDetailsService">
@@ -105,6 +110,7 @@
                     <util:map>
                         <entry key="dsJndiName" value="CspaceDS" />
                         <entry key="principalsQuery" value="select passwd from users where username=?" />
+                        <entry key="saltQuery" value="select salt from users where username=?" />
                         <entry key="rolesQuery" value="select r.rolename from roles as r, accounts_roles as ar where ar.user_id=? and ar.role_id=r.csid" />
                         <entry key="tenantsQueryWithDisabled" value="select t.id, t.name from accounts_common as a, accounts_tenants as at, tenants as t where a.userid=? and a.csid = at.TENANTS_ACCOUNTS_COMMON_CSID and at.tenant_id = t.id order by t.id" />
                         <entry key="tenantsQueryNoDisabled" value="select t.id, t.name from accounts_common as a, accounts_tenants as at, tenants as t where a.userid=? and a.csid = at.TENANTS_ACCOUNTS_COMMON_CSID and at.tenant_id = t.id and NOT t.disabled order by t.id" />
