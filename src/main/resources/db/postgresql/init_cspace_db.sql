@@ -1,8 +1,3 @@
--- drop all the objects before dropping roles
-DROP database IF EXISTS @DB_CSPACE_NAME@;
-
-DROP USER IF EXISTS @DB_CSPACE_USER@;
-
 CREATE ROLE @DB_CSPACE_USER@ WITH PASSWORD '@DB_CSPACE_PASSWORD@' LOGIN;
 
 --

@@ -196,7 +196,7 @@ public class ServiceMain {
         // to include DROP statements for each of the Nuxeo-managed
         // database names and for each relevant datasource user.
         String[] dataSourceNames = {JDBCTools.NUXEO_DATASOURCE_NAME, JDBCTools.NUXEO_READER_DATASOURCE_NAME};
-        updateInitializationScript(getNuxeoDatabasesInitScriptFilename(),
+        updateInitializationScript(getNuxeoDatabasesDropScriptFilename(),
                 dbsCheckedOrCreated, dataSourceNames);
 
         //
@@ -642,9 +642,9 @@ public class ServiceMain {
      * @return the full path to the Nuxeo databases initialization script file.
      * Returns an empty String for the path if the database scripts path is null or empty.
      */
-    private String getNuxeoDatabasesInitScriptFilename() {
+    private String getNuxeoDatabasesDropScriptFilename() {
         return Tools.notBlank(getDatabaseScriptsPath()) ?
-                getDatabaseScriptsPath() + File.separator + JEEServerDeployment.NUXEO_DB_INIT_SCRIPT_FILENAME : "";
+                getDatabaseScriptsPath() + File.separator + JEEServerDeployment.NUXEO_DB_DROP_SCRIPT_FILENAME : "";
     }
 
     /**

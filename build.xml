@@ -255,29 +255,39 @@
 		</exec>
 	</target>
 
-	<target name="recreate_nuxeo_db" if="${create_db.recreate}" description="recreate nuxeo database">
-		<echo>Recreating nuxeo databases with credentials ${db.csadmin.user}:${db.csadmin.user.password}</echo>
-		<sql driver="${db.jdbc.driver.class}" url="${db.jdbc.csadmin.url}" userid="${db.csadmin.user}" password="${db.csadmin.user.password}" autocommit="true" src="${db.script.dir}/init_nuxeo_db.sql">
+	<target name="drop_nuxeo_db" if="${create_db.recreate}" description="drop nuxeo database">
+		<echo>Dropping nuxeo databases with credentials ${db.csadmin.user}:${db.csadmin.user.password}</echo>
+		<sql driver="${db.jdbc.driver.class}" url="${db.jdbc.csadmin.url}" userid="${db.csadmin.user}" password="${db.csadmin.user.password}" autocommit="true" src="${db.script.dir}/drop_nuxeo_db.sql">
 			<classpath>
 				<pathelement path="${db.driver.jar}" />
 			</classpath>
 		</sql>
 	</target>
 
-	<target name="create_nuxeo_db" depends="recreate_nuxeo_db">
+	<target name="create_nuxeo_db" depends="drop_nuxeo_db">
 		<ant antfile="services/build.xml" target="create_nuxeo_db" inheritAll="false" />
 	</target>
 
-	<target name="recreate_cspace_db" if="${create_db.recreate}" description="recreate cspace database">
-		<echo>Recreating the cspace database with credentials ${db.csadmin.user}:${db.csadmin.user.password}</echo>
-		<sql driver="${db.jdbc.driver.class}" url="${db.jdbc.csadmin.url}" userid="${db.csadmin.user}" password="${db.csadmin.user.password}" autocommit="true" src="${db.script.dir}/init_cspace_db.sql">
+	<target name="drop_cspace_db" if="${create_db.recreate}" description="drop cspace database">
+		<echo>Dropping the cspace database with credentials ${db.csadmin.user}:${db.csadmin.user.password}</echo>
+		<sql driver="${db.jdbc.driver.class}" url="${db.jdbc.csadmin.url}" userid="${db.csadmin.user}" password="${db.csadmin.user.password}" autocommit="true" src="${db.script.dir}/drop_cspace_db.sql">
 			<classpath>
 				<pathelement path="${db.driver.jar}" />
 			</classpath>
 		</sql>
 	</target>
 
-	<target name="create_cspace_db" depends="recreate_cspace_db">
+	<target name="create_cspace_db" depends="drop_cspace_db">
+		<echo>Creating the cspace database with credentials ${db.csadmin.user}:${db.csadmin.user.password}</echo>
+		<!--
+			The SQL create role/database statements may fail if the cspace role/database already exists. Since the goal of this target
+			is for the cspace role and database to be created, it's fine if they already exist, so onerror is set to "continue".
+		-->
+		<sql driver="${db.jdbc.driver.class}" url="${db.jdbc.csadmin.url}" userid="${db.csadmin.user}" password="${db.csadmin.user.password}" autocommit="true" src="${db.script.dir}/init_cspace_db.sql" onerror="continue">
+			<classpath>
+				<pathelement path="${db.driver.jar}" />
+			</classpath>
+		</sql>
 		<ant antfile="services/build.xml" target="create_cspace_db" inheritAll="false" />
 	</target>
 
@@ -298,7 +308,7 @@
 	<target name="setup_initdb.sql" description="copy init_db scripts, replacing keywords">
 		<mkdir dir="${jee.server.cspace}/cspace/services/db/postgresql"/>
 		<copy todir="${jee.server.cspace}/cspace/services/db/postgresql">
-			<fileset dir="${jee.server.cspace}/cspace/services/db/postgresql" includes="init_cspace_db.sql, init_nuxeo_db.sql">
+			<fileset dir="${jee.server.cspace}/cspace/services/db/postgresql" includes="drop_cspace_db.sql, init_cspace_db.sql, drop_nuxeo_db.sql">
 				<present targetdir="${src}/main/resources/db/postgresql" />
 			</fileset>
 			<globmapper from="*" to="*.bak" />
