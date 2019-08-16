@@ -20,6 +20,7 @@ public class CSpaceUser extends User {
 
     private Set<CSpaceTenant> tenants;
     private CSpaceTenant primaryTenant;
+    private String salt;
     
     /**
      * Creates a CSpaceUser with the given username, hashed password, associated
@@ -30,7 +31,7 @@ public class CSpaceUser extends User {
      * @param tenants the tenants associated with the user
      * @param authorities the authorities that have been granted to the user
      */
-    public CSpaceUser(String username, String password,
+    public CSpaceUser(String username, String password, String salt,
             Set<CSpaceTenant> tenants,
             Set<? extends GrantedAuthority> authorities) {
 
@@ -42,12 +43,13 @@ public class CSpaceUser extends User {
                 authorities);
 
         this.tenants = tenants;
+        this.salt = salt;
         
         if (!tenants.isEmpty()) {
             primaryTenant = tenants.iterator().next();
         }
     }
-
+    
     /**
      * Retrieves the tenants associated with the user.
      * 
@@ -64,6 +66,14 @@ public class CSpaceUser extends User {
      */
     public CSpaceTenant getPrimaryTenant() {
         return primaryTenant;
+    }
+    
+    /**
+     * Returns a "salt" string to use when encrypting a user's password
+     * @return
+     */
+    public String getSalt() {
+    	return salt != null ? salt : "";
     }
     
 }
