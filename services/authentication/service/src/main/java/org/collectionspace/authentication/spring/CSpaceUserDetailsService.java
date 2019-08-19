@@ -74,11 +74,13 @@ public class CSpaceUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         String password = null;
+        String salt = null;
         Set<CSpaceTenant> tenants = null;
         Set<GrantedAuthority> grantedAuthorities = null;
         
         try {
             password = realm.getPassword(username);
+            salt = realm.getSalt(username);
             tenants = getTenants(username);
             grantedAuthorities = getAuthorities(username);
         }
@@ -89,12 +91,15 @@ public class CSpaceUserDetailsService implements UserDetailsService {
             throw new AuthenticationServiceException(e.getMessage(), e);
         }
         
-        return
+        CSpaceUser cspaceUser = 
             new CSpaceUser(
                 username,
                 password,
+                salt,
                 tenants,
                 grantedAuthorities);
+                
+        return cspaceUser;
     }
     
     protected Set<GrantedAuthority> getAuthorities(String username) throws AccountException {
