@@ -65,7 +65,7 @@ order by uoc.referencenumber]]>
 					<textElement textAlignment="Left">
 						<font size="14" isBold="false"/>
 					</textElement>
-					<text><![CDATA[UC & Jepson Herbaria]]></text>
+					<text><![CDATA[Phoebe A. Hearst Museum of Anthropology]]></text>
 				</staticText>
 			</frame>
 		</band>
