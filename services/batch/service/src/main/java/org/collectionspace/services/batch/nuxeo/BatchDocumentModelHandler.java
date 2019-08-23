@@ -48,6 +48,7 @@ import org.collectionspace.services.batch.ResourceActionGroup;
 import org.collectionspace.services.batch.ResourceActionGroupList;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.authorization_mgt.ActionGroup;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -160,7 +161,8 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 			AccountResource accountResource = new AccountResource();
 			List<String> roleDisplayNameList = accountResource.getAccountRoles(AuthN.get().getUserId(), AuthN.get().getCurrentTenantId());
 			for (String target : forRolesList.getRoleDisplayName()) {
-				if (roleDisplayNameList.contains(target)) {
+				String inferredTarget = RoleClient.inferDisplayName(target, this.getServiceContext().getTenantId());
+				if (roleDisplayNameList.contains(target) || roleDisplayNameList.contains(inferredTarget)) {
 					result = true;
 					break;
 				}
