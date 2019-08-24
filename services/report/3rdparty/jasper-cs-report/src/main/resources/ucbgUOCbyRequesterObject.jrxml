@@ -33,11 +33,11 @@
         to_char(uoc.datecompleted, 'yyyy-mm-dd') as Completed,
         get_uoc_authby(uoc.id) as Authorizations,
         get_uoc_reqby(uoc.id) as Requesters,
-        get_uoc_objnum(uoc.id) as Objects
+        get_uoc_objnumtaxon(uoc.id) as Objects
 from uoc_common uoc
 join hierarchy huoc on (uoc.id = huoc.id)
 where check_reqbyobjnum(uoc.id, $P{Requester}, $P{ObjectNumber}) is true
-and (get_uoc_reqby(uoc.id) is not null or get_uoc_objnum(uoc.id) is not null)
+and (get_uoc_reqby(uoc.id) is not null or get_uoc_objnumtaxon(uoc.id) is not null)
 order by uoc.referencenumber]]>
 	</queryString>
 	<field name="RefNumTitle" class="java.lang.String"/>
