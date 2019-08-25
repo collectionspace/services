@@ -83,6 +83,7 @@
                     "collectionobjects_materials:materialContainerGroupList",
                     "collectionobjects_materials:materialConditionGroupList",
                     "collectionobjects_materials:materialHandlingGroupList",
+                    "collectionobjects_materials:materialPhysicalDescriptions",
                     "collectionobjects_common:colors",
                     "collectionobjects_materials:materialGenericColors",
                     "collectionobjects_materials:materialFinishGroupList",
