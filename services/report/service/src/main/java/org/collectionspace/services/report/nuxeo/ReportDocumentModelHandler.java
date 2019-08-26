@@ -156,8 +156,6 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			StringBuffer outMimeType,
 			StringBuffer outReportFileName) throws Exception {
 
-				logger.warn(outMimeType.toString());
-
 		CoreSessionInterface repoSession = null;
 		boolean releaseRepoSession = false;
 
@@ -170,8 +168,6 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 		
 		// Note we set before we put in the default ones, so they cannot override tenant or CSID.
 		setParamsFromContext(params, invContext);
-
-		logger.warn(params.toString());
 		
 		if(Invocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationMode)) {
 			modeProperty = InvocableJAXBSchema.SUPPORTS_SINGLE_DOC;
@@ -239,10 +235,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			//
 	    	// If the invocation context contains a MIME type then use it.  Otherwise, look in the report resource.  If no MIME type in the report resource,
 	    	// use the default MIME type.
-				//
-				logger.warn("The mime type is " + invContext.getOutputMIME());
-				
-				logger.warn("The inv context is " + invContext.toString());
+
 	    	if (!Tools.isEmpty(invContext.getOutputMIME())) {
 	    		outMimeType.append(invContext.getOutputMIME());
 				} else if(outMimeType == null || Tools.isEmpty(outMimeType.toString())) {
