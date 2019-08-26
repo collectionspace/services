@@ -155,12 +155,14 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			InvocationContext invContext,
 			StringBuffer outMimeType,
 			StringBuffer outReportFileName) throws Exception {
+
 		CoreSessionInterface repoSession = null;
 		boolean releaseRepoSession = false;
 
 		String invocationMode = invContext.getMode();
 		String modeProperty = null;
 		HashMap<String, Object> params = new HashMap<String, Object>();
+
 		params.put(REPORTS_STD_TENANTID_PARAM, ctx.getTenantId());
 		boolean checkDocType = true;
 		
@@ -233,11 +235,14 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			//
 	    	// If the invocation context contains a MIME type then use it.  Otherwise, look in the report resource.  If no MIME type in the report resource,
 	    	// use the default MIME type.
-	    	//
+
 	    	if (!Tools.isEmpty(invContext.getOutputMIME())) {
 	    		outMimeType.append(invContext.getOutputMIME());
-	    	}
-	    	if (outMimeType == null || Tools.isEmpty(outMimeType.toString())) {
+				} else if(Tools.isEmpty(outMimeType.toString()) && params.containsKey("OutputMIME")) {
+					// See https://jira.ets.berkeley.edu/jira/browse/CC-748
+					outMimeType.append(params.get("OutputMIME"));
+				} else {
+					 // Use the default
     	    	String reportOutputMime = (String) NuxeoUtils.getProperyValue(docModel, ReportJAXBSchema.OUTPUT_MIME); //docModel.getPropertyValue(ReportJAXBSchema.OUTPUT_MIME);
     			if (!Tools.isEmpty(reportOutputMime)) {
     				outMimeType.append(reportOutputMime);
