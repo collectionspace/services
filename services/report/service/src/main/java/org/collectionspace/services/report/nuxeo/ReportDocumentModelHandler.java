@@ -238,7 +238,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 
 	    	if (!Tools.isEmpty(invContext.getOutputMIME())) {
 	    		outMimeType.append(invContext.getOutputMIME());
-				} else if(outMimeType == null || Tools.isEmpty(outMimeType.toString())) {
+				} else if(Tools.isEmpty(outMimeType.toString()) && params.containsKey("OutputMIME")) {
 					// See https://jira.ets.berkeley.edu/jira/browse/CC-748
 					outMimeType.append(params.get("OutputMIME"));
 				} else {
