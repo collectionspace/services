@@ -65,6 +65,7 @@ public class UserStorageClient {
         user.setUsername(userId);
         String salt = UUID.randomUUID().toString();
         user.setPasswd(getEncPassword(userId, password, salt));
+        user.setSalt(salt);
         user.setCreatedAtItem(new Date());
         return user;
     }
