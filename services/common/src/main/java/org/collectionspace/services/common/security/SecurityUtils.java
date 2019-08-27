@@ -351,14 +351,14 @@ public class SecurityUtils {
         try
         {
             if(hashCharset == null)
-                passBytes = password.getBytes();
+                passBytes = saltedPassword.getBytes();
             else
-                passBytes = password.getBytes(hashCharset);
+                passBytes = saltedPassword.getBytes(hashCharset);
         }
         catch(UnsupportedEncodingException uee)
         {
             logger.error((new StringBuilder()).append("charset ").append(hashCharset).append(" not found. Using platform default.").toString(), uee);
-            passBytes = password.getBytes();
+            passBytes = saltedPassword.getBytes();
         }
         try
         {

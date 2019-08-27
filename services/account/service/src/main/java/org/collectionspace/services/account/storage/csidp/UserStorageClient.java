@@ -28,6 +28,8 @@
 package org.collectionspace.services.account.storage.csidp;
 
 import java.util.Date;
+import java.util.UUID;
+
 import javax.persistence.Query;
 
 import org.collectionspace.services.authentication.User;
@@ -61,7 +63,8 @@ public class UserStorageClient {
     public User create(String userId, byte[] password) throws Exception {
         User user = new User();
         user.setUsername(userId);
-        user.setPasswd(getEncPassword(userId, password, userId));
+        String salt = UUID.randomUUID().toString();
+        user.setPasswd(getEncPassword(userId, password, salt));
         user.setCreatedAtItem(new Date());
         return user;
     }

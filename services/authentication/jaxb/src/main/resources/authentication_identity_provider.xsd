@@ -70,7 +70,7 @@
                     <xs:annotation>
                         <xs:appinfo>
                             <hj:basic>
-                                <orm:column name="salt" length="128" nullable="false"/>
+                                <orm:column name="salt" length="128" nullable="false" default=""/>
                             </hj:basic>
                         </xs:appinfo>
                     </xs:annotation>

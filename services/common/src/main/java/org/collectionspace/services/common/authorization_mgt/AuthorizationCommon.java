@@ -143,7 +143,7 @@ public class AuthorizationCommon {
     		"SELECT username FROM users WHERE username LIKE '"
     			+TENANT_ADMIN_ACCT_PREFIX+"%' OR username LIKE '"+TENANT_READER_ACCT_PREFIX+"%'";
 	final private static String INSERT_USER_SQL =
-			"INSERT INTO users (username,passwd,salt created_at) VALUES (?,?, now())";
+			"INSERT INTO users (username,passwd,salt, created_at) VALUES (?,?,?, now())";
 	final private static String INSERT_ACCOUNT_SQL = 
 			"INSERT INTO accounts_common "
 					+ "(csid, email, userid, status, screen_name, metadata_protection, roles_protection, created_at) "
