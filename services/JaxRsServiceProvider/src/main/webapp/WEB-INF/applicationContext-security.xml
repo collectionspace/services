@@ -21,6 +21,8 @@
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
+	<bean class="org.collectionspace.authentication.CSpaceAuthenticationSuccessEvent" />
+
     <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
         <!-- Read properties from security.properties file in the classpath. -->
         <!-- Values in the file override the defaults set below. -->
