@@ -77,6 +77,8 @@ import org.slf4j.LoggerFactory;
  * @author 
  */
 public class CSpaceDbRealm implements CSpaceRealm {
+	public static String DEFAULT_DATASOURCE_NAME = "CspaceDS";
+	
     private Logger logger = LoggerFactory.getLogger(CSpaceDbRealm.class);
     
     private String datasourceName;
@@ -128,6 +130,10 @@ public class CSpaceDbRealm implements CSpaceRealm {
 	protected long getDelayBetweenAttemptsMillis() {
 		return this.delayBetweenAttemptsMillis;
 	}
+	
+	public CSpaceDbRealm() {
+        datasourceName = DEFAULT_DATASOURCE_NAME;
+	}
     
     /**
      * CSpace Database Realm
@@ -136,7 +142,7 @@ public class CSpaceDbRealm implements CSpaceRealm {
     public CSpaceDbRealm(Map<String, ?> options) {
         datasourceName = (String) options.get("dsJndiName");
         if (datasourceName == null) {
-            datasourceName = "java:/DefaultDS";
+            datasourceName = DEFAULT_DATASOURCE_NAME;
         }
         Object tmp = options.get("principalsQuery");
         if (tmp != null) {
@@ -172,7 +178,6 @@ public class CSpaceDbRealm implements CSpaceRealm {
             logger.trace("rolesQuery=" + rolesQuery);
             logger.trace("suspendResume=" + suspendResume);
         }
-
     }
 
     @Override
@@ -445,7 +450,7 @@ public class CSpaceDbRealm implements CSpaceRealm {
      * it will retry for the next 'getMaxRetrySeconds()' seconds.  If it is unable to get the connection then it will timeout and
      * throw an exception.
      */
-    private Connection getConnection() throws Exception {
+    public Connection getConnection() throws Exception {
         Connection result = null;
 		boolean failed = true;
 		Exception lastException = null;
