@@ -115,7 +115,9 @@ public class UserStorageClient {
             throws DocumentNotFoundException, Exception {
         User userFound = get(jpaTransactionContext, userId);
         if (userFound != null) {
-            userFound.setPasswd(getEncPassword(userId, password, userFound.getSalt()));
+            String salt = UUID.randomUUID().toString();
+            userFound.setPasswd(getEncPassword(userId, password, salt));
+            userFound.setSalt(salt);
             userFound.setUpdatedAtItem(new Date());
             if (logger.isDebugEnabled()) {
                 logger.debug("updated user=" + JaxbUtils.toString(userFound, User.class));
