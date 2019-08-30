@@ -45,7 +45,7 @@
 from uoc_common uoc
 join hierarchy huoc on (uoc.id = huoc.id)
 where get_uoc_authby(uoc.id, $P{AuthBy}, $P{AuthStatus}) is not null
-and (uoc.daterequested + interval '7h') between to_date($P{StartDate}, 'yyyy-mm-dd') and to_date($P{EndDate}, 'yyyy-mm-dd')
+and uoc.daterequested between to_date($P{StartDate}, 'yyyy-mm-dd') and to_date($P{EndDate}, 'yyyy-mm-dd')
 order by uoc.daterequested]]>
 	</queryString>
 	<field name="authby" class="java.lang.String"/>
