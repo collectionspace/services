@@ -23,21 +23,20 @@ public class CSpaceAuthenticationSuccessEvent implements ApplicationListener<Aut
 	public void onApplicationEvent(AuthenticationSuccessEvent event) {
 		// TODO Auto-generated method stub
 		System.out.println(); //org.springframework.security.authentication.UsernamePasswordAuthenticationToken@8a633e91: Principal: org.collectionspace.authentication.CSpaceUser@b122ec20: Username: admin@core.collectionspace.org; Password: [PROTECTED]; Enabled: true; AccountNonExpired: true; credentialsNonExpired: true; AccountNonLocked: true; Granted Authorities: ROLE_1_TENANT_ADMINISTRATOR,ROLE_SPRING_ADMIN; Credentials: [PROTECTED]; Authenticated: true; Details: {grant_type=password, username=admin@core.collectionspace.org}; Granted Authorities: ROLE_1_TENANT_ADMINISTRATOR, ROLE_SPRING_ADMIN
-		String userName = null;
+		String username = null;
 		CSpaceDbRealm cspaceDbRealm = new CSpaceDbRealm();
 		
 		if (event.getSource() instanceof UsernamePasswordAuthenticationToken) {
 			UsernamePasswordAuthenticationToken eventSource = (UsernamePasswordAuthenticationToken)event.getSource();
 			if (eventSource.getPrincipal() instanceof CSpaceUser) {
 				CSpaceUser cspaceUser = (CSpaceUser) eventSource.getPrincipal();
-				userName = cspaceUser.getUsername();
+				username = cspaceUser.getUsername();
 				try {
-					setLastLogin(cspaceDbRealm, userName);
+					setLastLogin(cspaceDbRealm, username);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				System.out.println();
 			}
 		}
 	}
@@ -46,20 +45,20 @@ public class CSpaceAuthenticationSuccessEvent implements ApplicationListener<Aut
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
+        
         try {
             conn = cspaceDbRealm.getConnection();
-            // Get the salt
-
             ps = conn.prepareStatement(UPDATE_USER_SQL);
             ps.setString(1, username);
-            rs = ps.executeQuery();
-            if (rs.next() == false) {
-                throw new AccountNotFoundException("No matching username found");
+            int affected = ps.executeUpdate();
+            if (affected < 1) {
+            	String errMsg = String.format("No matching username '%s' found.", username);
+                throw new AccountException(errMsg);
             }
         } catch (SQLException ex) {
         	// Assuming PostgreSQL
             if (PSQLState.UNDEFINED_COLUMN.getState().equals(ex.getSQLState())) {
-            	System.err.println("'USERS' table is missing 'lastlogin' column.");
+            	System.err.println("'users' table is missing 'lastlogin' column.");
             } else {
                 AccountException ae = new AccountException("Authentication query failed: " + ex.getLocalizedMessage());
                 ae.initCause(ex);
@@ -92,6 +91,4 @@ public class CSpaceAuthenticationSuccessEvent implements ApplicationListener<Aut
             }
         }
     }
-
-
 }
