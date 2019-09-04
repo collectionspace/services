@@ -18,3 +18,4 @@ target
 m2-settings.xml
 *.log
 cspace-app-perflog.csv
+.flattened-pom.xml
