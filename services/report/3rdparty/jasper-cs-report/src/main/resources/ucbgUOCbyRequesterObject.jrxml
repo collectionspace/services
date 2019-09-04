@@ -188,7 +188,7 @@ order by uoc.referencenumber]]>
 					<reportElement stretchType="RelativeToTallestObject" mode="Transparent" x="560" y="3" width="242" height="18" isPrintWhenDetailOverflows="true" uuid="91fccf18-efd2-493a-a056-04c846575504">
 						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="dcc1f0e6-4cbf-423a-8d68-8d51d76fafd9"/>
 					</reportElement>
-					<textElement verticalAlignment="Top">
+					<textElement verticalAlignment="Top" markup="html">
 						<font size="10"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{Objects}]]></textFieldExpression>
