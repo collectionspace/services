@@ -5,14 +5,15 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.collectionspace.services</groupId>
 	<artifactId>org.collectionspace.services</artifactId>
-	<version>5.2</version>
+	<version>${revision}</version>
 	<packaging>pom</packaging>
 	<name>services</name>
 
 	<properties>
+		<revision>5.2-SNAPSHOT</revision>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<cspace.services.version>5.2</cspace.services.version>
-		<cspace.services.client.version>5.2</cspace.services.client.version>
+		<cspace.services.version>${revision}</cspace.services.version>
+		<cspace.services.client.version>${revision}</cspace.services.client.version>
 		<nuxeo.general.release>9.10-HF30</nuxeo.general.release>
 		<nuxeo.shell.version>${nuxeo.general.release}</nuxeo.shell.version>
 		<nuxeo.platform.version>${nuxeo.general.release}</nuxeo.platform.version>
@@ -368,6 +369,30 @@
 		</pluginManagement>
 
 		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>flatten-maven-plugin</artifactId>
+				<version>1.1.0</version>
+				<configuration>
+					<updatePomFile>true</updatePomFile>
+				</configuration>
+				<executions>
+					<execution>
+						<id>flatten</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>flatten</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>flatten.clean</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<!-- This plugin ensures that the required environment variables are set
 				before we perform any build related tasks. -->
 			<plugin>
