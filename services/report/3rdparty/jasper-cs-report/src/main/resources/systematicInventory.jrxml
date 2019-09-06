@@ -61,7 +61,7 @@ order by locationkey, objectnumber, objectName desc]]>
 		<band height="53" splitType="Stretch">
 			<image onErrorType="Blank">
 				<reportElement uuid="3ca0df28-85c7-41bc-bf2c-ff7f74c802c0" x="423" y="0" width="150" height="51"/>
-				<imageExpression><![CDATA["https://raw.githubusercontent.com/collectionspace/cspace-ui.js/master/images/collectionspace.svg"]]></imageExpression>
+				<imageExpression><![CDATA["https://raw.githubusercontent.com/collectionspace/ui/master/src/main/webapp/defaults/images/header-logo.png"]]></imageExpression>
 			</image>
 			<staticText>
 				<reportElement uuid="4101e028-2c15-4e3e-a310-643830492372" style="Title" x="0" y="0" width="263" height="24"/>
