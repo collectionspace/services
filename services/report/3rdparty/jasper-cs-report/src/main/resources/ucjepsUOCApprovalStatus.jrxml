@@ -71,7 +71,7 @@ order by uoc.daterequested]]>
 					<textElement textAlignment="Left">
 						<font size="14" isBold="false"/>
 					</textElement>
-					<text><![CDATA[Universiy & Jepson Herbaria]]></text>
+					<text><![CDATA[University & Jepson Herbaria]]></text>
 				</staticText>
 			</frame>
 		</band>
@@ -208,7 +208,7 @@ order by uoc.daterequested]]>
 					<textElement textAlignment="Left">
 						<font size="14" isBold="false"/>
 					</textElement>
-					<text><![CDATA[Universiy & Jepson Herbaria]]></text>
+					<text><![CDATA[University & Jepson Herbaria]]></text>
 				</staticText>
 			</frame>
 			<staticText>
