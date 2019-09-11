@@ -35,7 +35,7 @@ public class DeleteDeadLocationListener extends AbstractCSEventListenerImpl {
             	
             	logger.debug("actionCode=" + actionCode);
             	
-            	if (actionCode != null && actionCode.equals(MovementBotGardenConstants.DEAD_ACTION_CODE)) {
+            	if (actionCode != null && actionCode.contains(MovementBotGardenConstants.DEAD_ACTION_CODE)) {
             		CoreSession session = context.getCoreSession();
             		
             		if (session.getAllowedStateTransitions(doc.getRef()).contains(WorkflowClient.WORKFLOWTRANSITION_DELETE)) {
