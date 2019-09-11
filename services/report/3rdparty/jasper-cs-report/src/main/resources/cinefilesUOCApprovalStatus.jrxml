@@ -52,9 +52,6 @@ order by uoc.daterequested]]>
 	<field name="reftitle" class="java.lang.String"/>
 	<field name="requested" class="java.lang.String"/>
 	<field name="completed" class="java.lang.String"/>
-	<background>
-		<band/>
-	</background>
 	<title>
 		<band height="72">
 			<frame>
@@ -67,7 +64,7 @@ order by uoc.daterequested]]>
 					<text><![CDATA[Use of Collections Approval Status Report]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="20" y="10" width="582" height="20" forecolor="#FFFFFF" uuid="02c8ee9d-04d6-4c60-8c77-8dfa3013ba1a"/>
+					<reportElement x="20" y="10" width="572" height="20" forecolor="#FFFFFF" uuid="02c8ee9d-04d6-4c60-8c77-8dfa3013ba1a"/>
 					<textElement textAlignment="Left">
 						<font size="14" isBold="false"/>
 					</textElement>
@@ -85,7 +82,7 @@ order by uoc.daterequested]]>
 				</graphicElement>
 			</rectangle>
 			<staticText>
-				<reportElement x="20" y="20" width="467" height="16" uuid="d6124ea1-46a1-4c19-b450-6b6a1ae1f946">
+				<reportElement x="12" y="20" width="475" height="16" uuid="d6124ea1-46a1-4c19-b450-6b6a1ae1f946">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5cdbc204-8862-42b9-b91b-33c0867dcc0f"/>
 				</reportElement>
 				<textElement verticalAlignment="Bottom">
@@ -94,7 +91,7 @@ order by uoc.daterequested]]>
 				<text><![CDATA[Authorizations]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="487" y="2" width="65" height="16" uuid="3cdd0b2a-6fa4-4b65-9f4b-79696d5fed9b">
+				<reportElement x="487" y="2" width="70" height="16" uuid="3cdd0b2a-6fa4-4b65-9f4b-79696d5fed9b">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5cdbc204-8862-42b9-b91b-33c0867dcc0f"/>
 				</reportElement>
 				<textElement verticalAlignment="Bottom">
@@ -104,10 +101,10 @@ order by uoc.daterequested]]>
 				<text><![CDATA[Requested]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="507" y="20" width="65" height="16" uuid="675bc864-bb98-491e-8efc-30c8b1a68d6e">
+				<reportElement x="502" y="20" width="70" height="16" uuid="675bc864-bb98-491e-8efc-30c8b1a68d6e">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5cdbc204-8862-42b9-b91b-33c0867dcc0f"/>
 				</reportElement>
-				<textElement verticalAlignment="Bottom">
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
 					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Completed]]></text>
@@ -138,7 +135,7 @@ order by uoc.daterequested]]>
 					<pen lineWidth="1.0" lineColor="#E6E6E6"/>
 				</graphicElement>
 			</rectangle>
-			<textField isStretchWithOverflow="true">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="0" y="2" width="487" height="40" isPrintWhenDetailOverflows="true" uuid="fdbdbd45-edb8-449e-b84a-e2a1e03f0b09">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="080f84e5-41b2-483a-8ea5-6acf96f76c7c"/>
 				</reportElement>
@@ -148,7 +145,7 @@ order by uoc.daterequested]]>
 				<textFieldExpression><![CDATA[$F{reftitle} + "<p><br>" +  $F{authby}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement mode="Transparent" x="487" y="2" width="65" height="16" uuid="f0d4c4f5-ac42-4923-86ba-1cf771b42f6d">
+				<reportElement mode="Transparent" x="487" y="2" width="70" height="16" uuid="f0d4c4f5-ac42-4923-86ba-1cf771b42f6d">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2b6c48dd-274f-4957-861f-3ff03d0c2e05"/>
 				</reportElement>
 				<textElement verticalAlignment="Top">
@@ -158,10 +155,10 @@ order by uoc.daterequested]]>
 				<textFieldExpression><![CDATA[$F{requested}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement mode="Transparent" x="502" y="20" width="65" height="16" uuid="29795750-a244-46e4-9ce2-3ffc4062d24e">
+				<reportElement mode="Transparent" x="497" y="20" width="70" height="16" uuid="29795750-a244-46e4-9ce2-3ffc4062d24e">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="88051d4e-a77b-4bb0-93aa-f06bf68f7fe5"/>
 				</reportElement>
-				<textElement verticalAlignment="Top">
+				<textElement textAlignment="Right" verticalAlignment="Top">
 					<font size="10"/>
 					<paragraph leftIndent="2" spacingBefore="2" spacingAfter="2" tabStopWidth="0"/>
 				</textElement>
@@ -169,9 +166,6 @@ order by uoc.daterequested]]>
 			</textField>
 		</band>
 	</detail>
-	<columnFooter>
-		<band/>
-	</columnFooter>
 	<pageFooter>
 		<band height="17">
 			<textField>
@@ -189,9 +183,6 @@ order by uoc.daterequested]]>
 			</textField>
 		</band>
 	</pageFooter>
-	<summary>
-		<band/>
-	</summary>
 	<noData>
 		<band height="122">
 			<frame>
@@ -204,7 +195,7 @@ order by uoc.daterequested]]>
 					<text><![CDATA[Use of Collections Approval Status Report]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="20" y="10" width="582" height="20" forecolor="#FFFFFF" uuid="02c8ee9d-04d6-4c60-8c77-8dfa3013ba1a"/>
+					<reportElement x="20" y="10" width="572" height="20" forecolor="#FFFFFF" uuid="02c8ee9d-04d6-4c60-8c77-8dfa3013ba1a"/>
 					<textElement textAlignment="Left">
 						<font size="14" isBold="false"/>
 					</textElement>
