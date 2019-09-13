@@ -100,6 +100,8 @@ public class UpdateArtistDisplayNameListener implements EventListener {
                 
                 // if they are equal, we don't need to update the lists
                 if (previousDisplayName.equals(newDisplayName)) {
+                    logger.warn("The version of the Artist Display Name listener currently in use is the optimized version");
+
                     if (logger.isTraceEnabled()) {
                         logger.trace("There are no changes to the display field in this record. No updates to any collection object required. " + NO_FURTHER_PROCESSING_MESSAGE);
                     }

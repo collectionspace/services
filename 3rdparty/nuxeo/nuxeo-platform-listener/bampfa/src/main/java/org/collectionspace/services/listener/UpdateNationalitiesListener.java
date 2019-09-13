@@ -104,7 +104,7 @@ public class UpdateNationalitiesListener implements EventListener {
                 List newNationalities = (List) docModel.getProperty(PERSONS_SCHEMA, NATIONALITIES_FIELD);
                 List newNationalitiesCopy = newNationalities;
                 
-                if (previousNationalities.size() == 0 || newNationalities.size() == 0) {
+                if (previousNationalities == null || newNationalities == null || previousNationalities.size() == 0 || newNationalities.size() == 0) {
                     logger.trace("There are no nationalities involved in this record. No updates to any collection object required. " + NO_FURTHER_PROCESSING_MESSAGE);
                     return;
                 }
@@ -122,6 +122,7 @@ public class UpdateNationalitiesListener implements EventListener {
                  */    
                 // if they are equal, we don't need to update the lists
                 if (newNationalities.equals(previousNationalities)) {
+                    logger.warn("The version of the Nationalities listener currently in use is the optimized version");
                     if (logger.isTraceEnabled()) {
                         logger.trace("There are no changes to the nationalities field in this record. No updates to any collection object required. " + NO_FURTHER_PROCESSING_MESSAGE);
                     }
