@@ -2,16 +2,16 @@
 
 <!--
  pom.xml
- 
+
  A Maven 2 project file for the 'service' module of the ID Service project.
 
  This document is a part of the source code and related artifacts
  for CollectionSpace, an open source collections management system
  for museums and related institutions:
- 
+
  http://www.collectionspace.org
  http://wiki.collectionspace.org
- 
+
  $LastChangedRevision: 302 $
  $LastChangedDate: 2009-06-29 15:36:29 -0700 (Mon, 29 Jun 2009) $
 -->
@@ -64,7 +64,7 @@
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
-      <version>1.4.2</version>
+      <version>1.4.6</version>
     </dependency>
 
   </dependencies>
