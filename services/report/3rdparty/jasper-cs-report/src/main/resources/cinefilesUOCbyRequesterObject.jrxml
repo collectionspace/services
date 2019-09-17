@@ -29,8 +29,8 @@
                                         else ': <i>' || uoc.title || '</i>'
                                 end
                 end || '</a>' as RefNumTitle,
-        to_char(uoc.daterequested, 'yyyy-mm-dd') as Requested,
-        to_char(uoc.datecompleted, 'yyyy-mm-dd') as Completed,
+        to_char(uoc.daterequested::timestamp at time zone 'US/Pacific' at time zone 'UTC', 'yyyy-mm-dd') as Requested,
+        to_char(uoc.datecompleted::timestamp at time zone 'US/Pacific' at time zone 'UTC', 'yyyy-mm-dd') as Completed,
         get_uoc_authby(uoc.id) as Authorizations,
         get_uoc_reqby(uoc.id) as Requesters,
         get_uoc_objnum(uoc.id) as Objects
@@ -46,9 +46,6 @@ order by uoc.referencenumber]]>
 	<field name="Authorizations" class="java.lang.String"/>
 	<field name="Requesters" class="java.lang.String"/>
 	<field name="Objects" class="java.lang.String"/>
-	<background>
-		<band/>
-	</background>
 	<title>
 		<band height="72">
 			<frame>
@@ -70,9 +67,6 @@ order by uoc.referencenumber]]>
 			</frame>
 		</band>
 	</title>
-	<pageHeader>
-		<band height="13"/>
-	</pageHeader>
 	<columnHeader>
 		<band height="50">
 			<line>
@@ -196,9 +190,6 @@ order by uoc.referencenumber]]>
 			</frame>
 		</band>
 	</detail>
-	<columnFooter>
-		<band/>
-	</columnFooter>
 	<pageFooter>
 		<band height="17">
 			<textField>
@@ -216,9 +207,6 @@ order by uoc.referencenumber]]>
 			</textField>
 		</band>
 	</pageFooter>
-	<summary>
-		<band/>
-	</summary>
 	<noData>
 		<band height="122">
 			<frame>
