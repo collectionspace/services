@@ -39,13 +39,13 @@
                                         else ': <i>' || uoc.title || '</i>'
                                 end
                 end || '</a>' as reftitle,
-        to_char(uoc.daterequested, 'yyyy-mm-dd') as requested,
-        to_char(uoc.datecompleted, 'yyyy-mm-dd') as completed,
+        to_char(uoc.daterequested::timestamp at time zone 'US/Pacific' at time zone 'UTC', 'yyyy-mm-dd') as requested,
+        to_char(uoc.datecompleted::timestamp at time zone 'US/Pacific' at time zone 'UTC', 'yyyy-mm-dd') as completed,
         get_uoc_authby(uoc.id, $P{AuthBy}, $P{AuthStatus}) as authby
 from uoc_common uoc
 join hierarchy huoc on (uoc.id = huoc.id)
 where get_uoc_authby(uoc.id, $P{AuthBy}, $P{AuthStatus}) is not null
-and coalesce(uoc.daterequested, '0001-01-01') between to_date($P{StartDate}, 'yyyy-mm-dd') and to_date($P{EndDate}, 'yyyy-mm-dd')
+and coalesce(uoc.daterequested::timestamp at time zone 'US/Pacific' at time zone 'UTC', '0001-01-01') between to_date($P{StartDate}, 'yyyy-mm-dd') and to_date($P{EndDate}, 'yyyy-mm-dd')
 order by uoc.daterequested]]>
 	</queryString>
 	<field name="authby" class="java.lang.String"/>
