@@ -17,7 +17,7 @@
             },
             "refname_shortid_char_filter" : {
               "type" : "pattern_replace",
-              "pattern" : "^.*:item:name\\((.*)\\).*$",
+              "pattern" : "^.*:item:name\\((.*?)\\).*$",
               "replacement" : "$1"
             },
             "doctype_tenant_unqualified_char_filter" : {
