@@ -27,12 +27,9 @@
 		</dependency>
 		<!-- External dependencies -->
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
+			<version>${postgres.driver.version}</version>			
 		</dependency>
 		<!-- CollectionSpace dependencies -->
 		<dependency>
@@ -121,12 +118,9 @@
 						</configuration>
 						<dependencies>
 							<dependency>
-								<groupId>mysql</groupId>
-								<artifactId>mysql-connector-java</artifactId>
-							</dependency>
-							<dependency>
 								<groupId>org.postgresql</groupId>
 								<artifactId>postgresql</artifactId>
+								<version>${postgres.driver.version}</version>
 							</dependency>
 						</dependencies>
 					</plugin>

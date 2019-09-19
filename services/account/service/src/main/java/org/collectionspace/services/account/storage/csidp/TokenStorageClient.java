@@ -186,7 +186,7 @@ public class TokenStorageClient {
             throw new BadRequestException(e.getMessage());
         }
         String secEncPasswd = SecurityUtils.createPasswordHash(
-                userId, new String(password));
+                userId, new String(password), null);
         return secEncPasswd;
     }
 }

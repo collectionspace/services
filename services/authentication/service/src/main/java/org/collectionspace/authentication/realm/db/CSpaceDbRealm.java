@@ -68,6 +68,7 @@ import javax.sql.DataSource;
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.authentication.CSpaceTenant;
 import org.collectionspace.authentication.realm.CSpaceRealm;
+import org.postgresql.util.PSQLState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,10 +77,13 @@ import org.slf4j.LoggerFactory;
  * @author 
  */
 public class CSpaceDbRealm implements CSpaceRealm {
+	public static String DEFAULT_DATASOURCE_NAME = "CspaceDS";
+	
     private Logger logger = LoggerFactory.getLogger(CSpaceDbRealm.class);
     
     private String datasourceName;
     private String principalsQuery;
+    private String saltQuery;
     private String rolesQuery;
     private String tenantsQueryNoDisabled;
     private String tenantsQueryWithDisabled;
@@ -126,6 +130,10 @@ public class CSpaceDbRealm implements CSpaceRealm {
 	protected long getDelayBetweenAttemptsMillis() {
 		return this.delayBetweenAttemptsMillis;
 	}
+	
+	public CSpaceDbRealm() {
+        datasourceName = DEFAULT_DATASOURCE_NAME;
+	}
     
     /**
      * CSpace Database Realm
@@ -134,11 +142,15 @@ public class CSpaceDbRealm implements CSpaceRealm {
     public CSpaceDbRealm(Map<String, ?> options) {
         datasourceName = (String) options.get("dsJndiName");
         if (datasourceName == null) {
-            datasourceName = "java:/DefaultDS";
+            datasourceName = DEFAULT_DATASOURCE_NAME;
         }
         Object tmp = options.get("principalsQuery");
         if (tmp != null) {
             principalsQuery = tmp.toString();
+        }
+        tmp = options.get("saltQuery");
+        if (tmp != null) {
+        	saltQuery = tmp.toString();
         }
         tmp = options.get("rolesQuery");
         if (tmp != null) {
@@ -166,7 +178,6 @@ public class CSpaceDbRealm implements CSpaceRealm {
             logger.trace("rolesQuery=" + rolesQuery);
             logger.trace("suspendResume=" + suspendResume);
         }
-
     }
 
     @Override
@@ -439,7 +450,7 @@ public class CSpaceDbRealm implements CSpaceRealm {
      * it will retry for the next 'getMaxRetrySeconds()' seconds.  If it is unable to get the connection then it will timeout and
      * throw an exception.
      */
-    private Connection getConnection() throws Exception {
+    public Connection getConnection() throws Exception {
         Connection result = null;
 		boolean failed = true;
 		Exception lastException = null;
@@ -642,5 +653,68 @@ public class CSpaceDbRealm implements CSpaceRealm {
 
 		return result;
 	}
+
+	@Override
+	public String getSalt(String username) throws AccountException {
+        String salt = null;
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            conn = getConnection();
+            // Get the salt
+            if (logger.isDebugEnabled()) {
+                logger.debug("Executing query: " + saltQuery + ", with username: " + username);
+            }
+            ps = conn.prepareStatement(saltQuery);
+            ps.setString(1, username);
+            rs = ps.executeQuery();
+            if (rs.next() == false) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug(saltQuery + " returned no matches from db");
+                }
+                throw new AccountNotFoundException("No matching username found");
+            }
+
+            salt = rs.getString(1);
+        } catch (SQLException ex) {
+        	// Assuming PostgreSQL
+            if (PSQLState.UNDEFINED_COLUMN.getState().equals(ex.getSQLState())) {
+            	String msg = "'USERS' table is missing 'salt' column for password encyrption.  Assuming existing passwords are unsalted.";
+            	logger.warn(msg);
+            } else {
+                AccountException ae = new AccountException("Authentication query failed: " + ex.getLocalizedMessage());
+                ae.initCause(ex);
+                throw ae;
+            }
+        } catch (AccountNotFoundException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            AccountException ae = new AccountException("Unknown Exception");
+            ae.initCause(ex);
+            throw ae;
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                }
+            }
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                }
+            }
+        }
+        
+        return salt;
+    }
     
 }

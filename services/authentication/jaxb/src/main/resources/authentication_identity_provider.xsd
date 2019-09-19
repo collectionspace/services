@@ -66,6 +66,15 @@
                         </xs:appinfo>
                     </xs:annotation>
                 </xs:element>
+                <xs:element name="salt" type="xs:string" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="salt" length="128" nullable="false" default=""/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element name="createdAt" type="xs:dateTime">
                     <xs:annotation>
                         <xs:appinfo>
@@ -84,7 +93,15 @@
                         </xs:appinfo>
                     </xs:annotation>
                 </xs:element>
-
+                <xs:element name="lastLogin" type="xs:dateTime">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="lastLogin" />
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
             </xs:sequence>
         </xs:complexType>
     </xs:element>

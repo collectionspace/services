@@ -142,8 +142,8 @@ public class AuthorizationCommon {
 	final private static String QUERY_USERS_SQL = 
     		"SELECT username FROM users WHERE username LIKE '"
     			+TENANT_ADMIN_ACCT_PREFIX+"%' OR username LIKE '"+TENANT_READER_ACCT_PREFIX+"%'";
-	final private static String INSERT_USER_SQL = 
-			"INSERT INTO users (username,passwd, created_at) VALUES (?,?, now())";
+	final private static String INSERT_USER_SQL =
+			"INSERT INTO users (username,passwd,salt, created_at) VALUES (?,?,?, now())";
 	final private static String INSERT_ACCOUNT_SQL = 
 			"INSERT INTO accounts_common "
 					+ "(csid, email, userid, status, screen_name, metadata_protection, roles_protection, created_at) "
@@ -466,10 +466,12 @@ public class AuthorizationCommon {
         	for(String tName : tenantInfo.values()) {
         		String adminAcctName = getDefaultAdminUserID(tName);
         		if(!usersInRepo.contains(adminAcctName)) {
+        			String salt = UUID.randomUUID().toString();
         			String secEncPasswd = SecurityUtils.createPasswordHash(
-        					adminAcctName, DEFAULT_ADMIN_PASSWORD);
+        					adminAcctName, DEFAULT_ADMIN_PASSWORD, salt);
         			pstmt.setString(1, adminAcctName);	// set username param
         			pstmt.setString(2, secEncPasswd);	// set passwd param
+        			pstmt.setString(3, salt);
         			if (logger.isDebugEnabled()) {
         				logger.debug("createDefaultUsersAndAccounts adding user: "
         						+adminAcctName+" for tenant: "+tName);
@@ -483,10 +485,12 @@ public class AuthorizationCommon {
 
         		String readerAcctName =  getDefaultReaderUserID(tName);
         		if(!usersInRepo.contains(readerAcctName)) {
+        			String salt = UUID.randomUUID().toString();
         			String secEncPasswd = SecurityUtils.createPasswordHash(
-        					readerAcctName, DEFAULT_READER_PASSWORD);
+        					readerAcctName, DEFAULT_READER_PASSWORD, salt);
         			pstmt.setString(1, readerAcctName);	// set username param
         			pstmt.setString(2, secEncPasswd);	// set passwd param
+        			pstmt.setString(3, salt);
         			if (logger.isDebugEnabled()) {
         				logger.debug("createDefaultUsersAndAccounts adding user: "
         						+readerAcctName+" for tenant: "+tName);
@@ -583,11 +587,13 @@ public class AuthorizationCommon {
         	}
         	rs.close();
         	if(!foundTMgrUser) {
+        		String salt = UUID.randomUUID().toString();
         		pstmt = conn.prepareStatement(INSERT_USER_SQL); // create a statement
     			String secEncPasswd = SecurityUtils.createPasswordHash(
-    					TENANT_MANAGER_USER, DEFAULT_TENANT_MANAGER_PASSWORD);
+    					TENANT_MANAGER_USER, DEFAULT_TENANT_MANAGER_PASSWORD, salt);
     			pstmt.setString(1, TENANT_MANAGER_USER);	// set username param
     			pstmt.setString(2, secEncPasswd);	// set passwd param
+    			pstmt.setString(3, salt);
     			if (logger.isDebugEnabled()) {
     				logger.debug("findOrCreateTenantManagerUserAndAccount adding tenant manager user: "
     						+TENANT_MANAGER_USER);
