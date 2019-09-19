@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMP NOT NULL,
   lastLogin TIMESTAMP,
   passwd VARCHAR(128) NOT NULL,
-  salt VARCHAR(128)
+  salt VARCHAR(128),
   updated_at TIMESTAMP
 );
 
