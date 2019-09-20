@@ -211,6 +211,21 @@
 	        <url>http://repository.gbif.org/content/groups/gbif</url>
 	    </repository>
 
+		<!--
+			Need this for jasperreports-functions 6.3.1
+			(6.8+ seems to be available in other repos, so this can be removed in the future.)
+		-->
+		<repository>
+			<snapshots>
+					<enabled>false</enabled>
+			</snapshots>
+			<releases>
+					<enabled>true</enabled>
+			</releases>
+			<id>jaspersoft</id>
+			<name>jaspersoft</name>
+			<url>https://jaspersoft.jfrog.io/jaspersoft/jr-ce-releases</url>
+		</repository>
 	</repositories>
 
 	<pluginRepositories>
