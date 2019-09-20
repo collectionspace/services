@@ -59,10 +59,10 @@ public class SystemInfoResource extends AbstractCollectionSpaceResourceImpl<Syst
     	try {
     		result = new SystemInfoCommon();
     		result.setInstanceId(ServiceMain.getInstance().getCspaceInstanceId());
-    		result.setDisplayName("CollectionSpace Services v5.2");
+    		result.setDisplayName("CollectionSpace Services v5.3");
     		Version ver = new Version();
     		ver.setMajor("5");
-    		ver.setMinor("2");
+    		ver.setMinor("3");
     		ver.setPatch("0");
     		ver.setBuild("1");
     		result.setVersion(ver);
