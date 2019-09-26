@@ -164,8 +164,6 @@
                         <argument>-xmlReplayBaseDir</argument>
                         <argument>${basedir}/src/test/resources/test-data/xmlreplay</argument>
                     </arguments>
-                    <systemProperties>
-                    </systemProperties>
                 </configuration>
             </plugin>
 

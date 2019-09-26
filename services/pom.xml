@@ -130,16 +130,11 @@
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>3.0.0-M1</version>
 					<configuration>
-						<systemProperties>
-							<property>
-								<name>log4j.configuration</name>
-								<value>file:${project.build.directory}/test-classes/log4j.properties</value>
-							</property>
-							<property>
-								<name>maven.basedir</name>
-								<value>${basedir}</value>
-							</property>
-						</systemProperties>
+						<systemPropertyVariables>
+							<log4j.configurationFile>file:${maven.multiModuleProjectDirectory}/src/main/resources/log4j2-surefire.xml</log4j.configurationFile>
+							<org.jboss.logging.provider>slf4j</org.jboss.logging.provider>
+							<maven.basedir>${basedir}</maven.basedir>
+						</systemPropertyVariables>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -248,8 +243,8 @@
 					<configuration>
 						<systemProperties>
 							<systemProperty>
-								<key>log4j.configuration</key>
-								<value>file:${project.build.directory}/classes/log4j.properties</value>
+								<key>log4j.configurationFile</key>
+								<value>file:${maven.multiModuleProjectDirectory}/src/main/resources/log4j2-exec.xml</value>
 							</systemProperty>
 						</systemProperties>
 					</configuration>

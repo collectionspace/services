@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	This config is used by the maven exec plugin, as configured in services/pom.xml.
+	For runtime logging config, see services/JaxRsServiceProvider/src/main/resources/log4j2.xml.
+-->
+<Configuration status="WARN">
+	<Properties>
+		<Property name="logPattern">%d %-5p [%t] [%c:%L] %m%n</Property>
+	</Properties>
+
+	<Appenders>
+		<Console name="ConsoleAppender" target="SYSTEM_OUT">
+			<PatternLayout pattern="${logPattern}" />
+		</Console>
+
+		<File name="LogFileAppender" append="false" fileName="target/exec.log">
+			<PatternLayout pattern="${logPattern}" />
+		</File>
+	</Appenders>
+
+	<Loggers>
+		<Root level="INFO">
+			<AppenderRef ref="ConsoleAppender"/>
+			<AppenderRef ref="LogFileAppender" />
+		</Root>
+	</Loggers>
+</Configuration>

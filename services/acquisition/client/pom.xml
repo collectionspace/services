@@ -71,12 +71,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <systemProperties>
-                        <property>
-                            <name>test-data.fileName</name>
-                            <value>${project.build.directory}/test-classes/test-data</value>
-                        </property>
-                    </systemProperties>
+                    <systemPropertyVariables>
+                        <test-data.fileName>${project.build.directory}/test-classes/test-data</test-data.fileName>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
         </plugins>

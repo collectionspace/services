@@ -290,8 +290,6 @@
 						<argument>-edir</argument>
 						<argument>${basedir}/target</argument>
 					</arguments>
-					<systemProperties>
-					</systemProperties>
 				</configuration>
 				<dependencies>
 					<!-- <dependency> <groupId>mysql</groupId> <artifactId>mysql-connector-java</artifactId>
