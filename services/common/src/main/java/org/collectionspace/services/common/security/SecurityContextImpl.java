@@ -44,40 +44,41 @@ public class SecurityContextImpl implements SecurityContext {
     private String userId;
     private String currentTenantName;
     private String currentTenantId;
-    
+
     private String getTenantId(UriInfo uriInfo) throws UnauthorizedException {
-    	String result = AuthN.get().getCurrentTenantId();
-    	
-    	String userId = AuthN.get().getUserId();
+        String result = AuthN.get().getCurrentTenantId();
+        String userId = AuthN.get().getUserId();
+
         if (userId.equals(AuthN.ANONYMOUS_USER) == true) {
             //
             // If anonymous access is being attempted, then a tenant ID needs to be set as a query param
-            //        	
-        	if (uriInfo == null) {
-        		String errMsg = "Anonymous access attempted with missing or invalid tenant ID query or path paramter. A null 'UriInfo' instance was passed into the service context constructor.";
-        		logger.warn(errMsg);
-        		throw new UnauthorizedException(errMsg);
-        	}
-        	
-        	String tenantIdQueryParam = uriInfo.getQueryParameters().getFirst(AuthN.TENANT_ID_QUERY_PARAM);
-        	String tenantPathParam = uriInfo.getPathParameters().getFirst(AuthN.TENANT_ID_PATH_PARAM);
-        	if (tenantIdQueryParam == null && tenantPathParam == null) {
-        		String errMsg = String.format("Anonymous access to '%s' attempted without a valid tenant ID query or path paramter.",
-        				uriInfo.getPath());
-        		logger.error(errMsg);
-        		throw new UnauthorizedException(errMsg);
-        	}
-        	
+            //
+            if (uriInfo == null) {
+                String errMsg = "Anonymous access attempted with null UriInfo.";
+                logger.warn(errMsg);
+                throw new UnauthorizedException(errMsg);
+            }
+
+            String tenantIdQueryParam = uriInfo.getQueryParameters().getFirst(AuthN.TENANT_ID_QUERY_PARAM);
+            String tenantPathParam = uriInfo.getPathParameters().getFirst(AuthN.TENANT_ID_PATH_PARAM);
+
+            if (tenantIdQueryParam == null && tenantPathParam == null) {
+                String errMsg = String.format("Anonymous access to '%s' attempted without a valid tenant ID query or path parameter.",
+                        uriInfo.getPath());
+                logger.warn(errMsg);
+                throw new UnauthorizedException(errMsg);
+            }
+
 	        result = tenantIdQueryParam != null ? tenantIdQueryParam : tenantPathParam; // If both have value, user the query param (not path) value
         }
-        
+
         return result;
     }
 
     public SecurityContextImpl(UriInfo uriInfo) throws UnauthorizedException {
         userId = AuthN.get().getUserId();
-        currentTenantId = getTenantId(uriInfo);               
-        currentTenantName = AuthN.get().getCurrentTenantName();        
+        currentTenantId = getTenantId(uriInfo);
+        currentTenantName = AuthN.get().getCurrentTenantName();
     }
 
     @Override
