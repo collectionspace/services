@@ -192,27 +192,27 @@ public class AuthorityServiceUtils {
      * The domain name part of refnames on SAS may not match that of local refnames, so we need to update all the payload's
      * refnames with the correct domain name
      */
-	static public PoxPayloadIn filterRefnameDomains(ServiceContext ctx,
-			PoxPayloadIn payload) throws org.dom4j.DocumentException {
+	static public PoxPayloadIn filterRefnameDomains(ServiceContext ctx, PoxPayloadIn payload) throws org.dom4j.DocumentException {
 		PoxPayloadIn result = null;
-
 
 		String payloadStr = payload.getXmlPayload();
 		Pattern p = Pattern.compile("(urn:cspace:)(([a-z]{1,}\\.?)*)"); // matches the domain name part of a RefName.  For example, matches "core.collectionspace.org" of RefName urn:cspace:core.collectionspace.org:personauthorities:name(person):item:name(BigBird1461101206103)'Big Bird'
 		Matcher m = p.matcher(payloadStr);
-
 		StringBuffer filteredPayloadStr = new StringBuffer();
+
 		while (m.find() == true) {
 			if (logger.isDebugEnabled()) {
-				logger.debug("Replacing: " + m.group(2));
+				logger.debug("Replacing " + m.group(2) + " with " + ctx.getTenantName());
 			}
 			m.appendReplacement(filteredPayloadStr, m.group(1) + ctx.getTenantName());
 		}
+
 		m.appendTail(filteredPayloadStr);
+
 		result = new PoxPayloadIn(filteredPayloadStr.toString());
 
 		if (logger.isDebugEnabled()) {
-			logger.debug(String.format("", filteredPayloadStr));
+			logger.debug(String.format("Updated payload:\n%s", filteredPayloadStr));
 		}
 
 		return result;
