@@ -20,6 +20,7 @@ import javax.xml.transform.stream.StreamSource;
 import com.sun.xml.bind.api.impl.NameConverter;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -329,29 +330,34 @@ public abstract class PoxPayload<PT extends PayloadPart> {
         return nc.toPackageName(namespaceURI);
     }
 
-    /**
-     * Attempts to unmarshal a DOM4j element (for a part) into an instance of a JAXB object
-     *
-     * @param elementInput the element input
-     * @return the object
-     */
-    public static Object toObject(Element elementInput) {
-    	Object result = null;
-    	try {
-    		Namespace namespace = elementInput.getNamespace();
-    		String thePackage = getPackage(namespace);
-	    	JAXBContext jc = JAXBContext.newInstance(thePackage);
-	    	Unmarshaller um = jc.createUnmarshaller();
-	    	result = um.unmarshal(
-	    			new StreamSource(new StringReader(elementInput.asXML())));
-    	} catch (Exception e) {
-    		String msg = String.format("Could not unmarshal XML payload '%s' into a JAXB object.",
-    				elementInput.getName());
-    		logger.warn(msg);
-    	}
+		/**
+		 * Attempts to unmarshal a DOM4j element (for a part) into an instance of a JAXB object
+		 *
+		 * @param elementInput the element input
+		 * @return the object
+		 */
+		public static Object toObject(Element elementInput) {
+			Object result = null;
 
-    	return result;
-    }
+			try {
+				Namespace namespace = elementInput.getNamespace();
+
+				if (StringUtils.isNotEmpty(namespace.getURI())) {
+					String thePackage = getPackage(namespace);
+					JAXBContext jc = JAXBContext.newInstance(thePackage);
+					Unmarshaller um = jc.createUnmarshaller();
+
+					result = um.unmarshal(new StreamSource(new StringReader(elementInput.asXML())));
+				}
+			} catch (Exception e) {
+				if (logger.isInfoEnabled()) {
+					String msg = String.format("Could not unmarshal XML element '%s' into a JAXB object.", elementInput.getName());
+					logger.info(msg);
+				}
+			}
+
+			return result;
+		}
 
     /**
      * Attempts to unmarshal a JAXB object (for a part) to a DOM4j element.
