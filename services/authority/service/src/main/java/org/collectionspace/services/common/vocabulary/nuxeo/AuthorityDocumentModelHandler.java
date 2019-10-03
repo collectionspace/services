@@ -195,8 +195,8 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 		//
 		// Iterate over the list of items/terms in the remote authority
 		//
-		PoxPayloadIn sasPayloadInItemList = requestPayloadInItemList(ctx, sasAuthoritySpecifier);
-		List<Element> itemList = getItemList(sasPayloadInItemList);
+		PoxPayloadIn itemListPayload = requestItemList(ctx, sasAuthoritySpecifier);
+		List<Element> itemList = getItemList(itemListPayload);
 		if (itemList != null) {
 			for (Element e:itemList) {
 				String remoteRefName = XmlTools.getElementValue(e, AuthorityItemJAXBSchema.REF_NAME);
@@ -507,53 +507,39 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 	}
 
 	/**
-	 * Request an authority item list payload from the SAS server.  This is a non-paging solution.  If the authority
-	 * has a very large number of items/terms, we might not be able to handle them all.
+	 * Request an authority item list payload from the SAS server. This is a non-paging solution.
+	 * If the authority has a very large number of items/terms, we might not be able to handle them
+	 * all.
 	 *
 	 * @param ctx
 	 * @param specifier
 	 * @return
 	 * @throws Exception
 	 */
-	private PoxPayloadIn requestPayloadInItemList(ServiceContext ctx, Specifier specifier) throws Exception {
+	private PoxPayloadIn requestItemList(ServiceContext ctx, Specifier specifier) throws Exception {
 		PoxPayloadIn result = null;
 		AuthorityClient client = (AuthorityClient) ctx.getClient();
 
-		//
-		// First find out how many items exist
-		Response res = client.readItemList(specifier.getURNValue(),
-				null,	// partial term string
-				null,	// keyword string
-				0,		// page size
-				0		// page number
-				);
-		assertStatusCode(res, specifier, client);
-		AbstractCommonList commonList;
-		try {
-			commonList = res.readEntity(AbstractCommonList.class);
-		} finally {
-			res.close();
-		}
-		long numOfItems = commonList.getTotalItems();
+		// Request the item list using the max page size (0).
 
-		//
-		// Next, request a payload list with all the items
-		res = client.readItemList(specifier.getURNValue(),
-				null,		// partial term string
-				null,		// keyword string
-				numOfItems,	// page size
-				0			// page number
-				);
+		Response res = client.readItemList(
+			specifier.getURNValue(),
+			null, // partial term string
+			null, // keyword string
+			0,    // page size
+			0     // page number
+		);
+
 		assertStatusCode(res, specifier, client);
+
 		try {
-			result = new PoxPayloadIn((String)res.readEntity(getEntityResponseType())); // Get the entire response.
+			result = new PoxPayloadIn((String) res.readEntity(getEntityResponseType())); // Get the entire response.
 		} finally {
 			res.close();
 		}
 
 		return result;
 	}
-
 
 	/*
 	 * Non standard injection of CSID into common part, since caller may access through
