@@ -117,7 +117,7 @@ public class AuthorityServiceUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	static public PoxPayloadIn requestPayloadInFromRemoteServer(ServiceContext ctx, String remoteClientConfigName, Specifier specifier, Class responseType) throws Exception {
+	public static PoxPayloadIn requestPayloadInFromRemoteServer(ServiceContext ctx, String remoteClientConfigName, Specifier specifier, Class responseType) throws Exception {
 		PoxPayloadIn result = null;
 
 		RemoteClientConfig remoteClientConfig = getRemoteClientConfig(ctx, remoteClientConfigName);
@@ -146,7 +146,7 @@ public class AuthorityServiceUtils {
 	//
 	// Makes a call to the remote SAS server for a authority item payload
 	//
-	static public PoxPayloadIn requestPayloadInFromRemoteServer(
+	public static PoxPayloadIn requestPayloadInFromRemoteServer(
 			AuthorityItemSpecifier specifier,
 			String remoteClientConfigName,
 			String serviceName,
@@ -179,7 +179,7 @@ public class AuthorityServiceUtils {
 		return result;
 	}
 
-	static public boolean setAuthorityItemDeprecated(ServiceContext ctx,
+	public static boolean setAuthorityItemDeprecated(ServiceContext ctx,
 			DocumentModel docModel, String authorityItemCommonSchemaName, Boolean flag) throws Exception {
 		boolean result = false;
 
@@ -196,7 +196,7 @@ public class AuthorityServiceUtils {
 	 * The domain name part of refnames on a remote SAS may not match that of local refnames.
 	 * Update all the payload's refnames with the local domain name.
 	 */
-	static public PoxPayloadIn localizeRefNameDomains(ServiceContext ctx, PoxPayloadIn payload) throws org.dom4j.DocumentException {
+	public static PoxPayloadIn localizeRefNameDomains(ServiceContext ctx, PoxPayloadIn payload) throws org.dom4j.DocumentException {
 		String localDomain = ctx.getTenantName();
 		Matcher matcher = REFNAME_DOMAIN_PATTERN.matcher(payload.getXmlPayload());
 		StringBuffer localizedXmlBuffer = new StringBuffer();
@@ -227,7 +227,7 @@ public class AuthorityServiceUtils {
 	 * @param itemInfo
 	 * @throws Exception
 	 */
-	static public boolean markAuthorityItemAsDeprecated(ServiceContext ctx, String authorityItemCommonSchemaName, AuthorityItemSpecifier authorityItemSpecifier) throws Exception {
+	public static boolean markAuthorityItemAsDeprecated(ServiceContext ctx, String authorityItemCommonSchemaName, AuthorityItemSpecifier authorityItemSpecifier) throws Exception {
 		boolean result = false;
 
 		try {
