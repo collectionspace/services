@@ -55,7 +55,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 
 	// The list of POX parts contained in the xmlText payload
 	/** The parts. */
-	private List<PT> parts = new ArrayList<PT>();
+	private List<PT> parts = null;
 
 	// Valid root element labels
 	private static Set<String> validRootElementLabels = new HashSet<String>(Arrays.asList(DOCUMENT_ROOT_ELEMENT_LABEL,
@@ -83,14 +83,16 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 
 	private void setDomDocument(Document dom) throws DocumentException {
 		this.domDocument = dom;
+		this.parts = null;
+
 		String label = domDocument.getRootElement().getName().toLowerCase();
+
 		if (label != null && getValidRootElementLables().contains(label)) {
 			this.payloadName = label;
 		} else {
 			String msg = "The following incoming request payload is missing the root <document> element or is otherwise malformed.  For example valid payloads, see https://wiki.collectionspace.org/display/DOC/Common+Services+REST+API+documentation";
 			throw new DocumentException(msg + '\n' + this.xmlPayload);
 		}
-		parseParts();
 	}
 
 	/**
@@ -186,20 +188,26 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	 *
 	 * @throws DocumentException the document exception
 	 */
-	protected void parseParts() throws DocumentException {
-		Iterator<Element> it = getDOMDocument().getRootElement().elementIterator();
-		PT payloadPart = null;
-		while (it.hasNext() == true) {
-			Element element = (Element) it.next();
-			String label = element.getName();
-			Object jaxbObject = PoxPayload.toObject(element);
-			if (jaxbObject != null) {
-				payloadPart = createPart(label, jaxbObject, element);
-			} else {
-				payloadPart = createPart(label, element);
-			}
-			if (payloadPart != null) {
-				this.addPart(payloadPart);
+	protected void parseParts() {
+		parts = new ArrayList<PT>();
+
+		Document document = this.domDocument;
+
+		if (document != null) {
+			Iterator<Element> it = document.getRootElement().elementIterator();
+
+			while (it.hasNext() == true) {
+				Element element = (Element) it.next();
+				String label = element.getName();
+				Object jaxbObject = PoxPayload.toObject(element);
+
+				PT payloadPart = (jaxbObject == null)
+					? createPart(label, element)
+					: createPart(label, jaxbObject, element);
+
+				if (payloadPart != null) {
+					this.addPart(payloadPart);
+				}
 			}
 		}
 	}
@@ -239,6 +247,8 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	 */
 	public PT getPart(String label) {
 		PT result = null;
+		List<PT> parts = getParts();
+
 		if (parts != null) {
 			Iterator<PT> it = parts.iterator();
 			while (it.hasNext() == true) {
@@ -252,27 +262,34 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 		return result;
 	}
 
-    public List<PT> getParts(String label) {
-        List<PT> result = new ArrayList<PT>();
-        if (parts != null) {
-            Iterator<PT> it = parts.iterator();
-            while (it.hasNext() == true) {
-                PT part = it.next();
-                if (part.getLabel().equalsIgnoreCase(label) == true) {
-                    result.add(part);
-                }
-            }
-        }
+	public List<PT> getParts(String label) {
+		List<PT> result = new ArrayList<PT>();
+		List<PT> parts = getParts();
 
-        return result;
-    }
+		if (parts != null) {
+			Iterator<PT> it = parts.iterator();
+			while (it.hasNext() == true) {
+				PT part = it.next();
+				if (part.getLabel().equalsIgnoreCase(label) == true) {
+					result.add(part);
+				}
+			}
+		}
+
+		return result;
+	}
 
 	/**
 	 * Gets a list of the POX parts.
 	 *
 	 * @return the parts
+	 * @throws DocumentException
 	 */
 	public List<PT> getParts() {
+		if (parts == null) {
+			parseParts();
+		}
+
 		return parts;
 	}
 
@@ -288,12 +305,15 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	/**
 	 * Adds a POX part to the list of existing parts with the label 'label'.
 	 *
-	 * @param label the label
+	 * @param label  the label
 	 * @param entity the entity
 	 * @return the pT
 	 */
 	public PT addPart(String label, PT entity) {
+		List<PT> parts = getParts();
+
 		parts.add(entity);
+
 		return entity;
 	}
 
@@ -304,15 +324,21 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	 * @return the pT
 	 */
 	public PT addPart(PT entity) {
+		List<PT> parts = getParts();
+
 		parts.add(entity);
+
 		return entity;
 	}
 
 	/**
 	 * Removes a POX part from our list of parts
+	 *
 	 * @param entity
 	 */
 	public void removePart(PT entity) {
+		List<PT> parts = getParts();
+
 		parts.remove(entity);
 	}
 
