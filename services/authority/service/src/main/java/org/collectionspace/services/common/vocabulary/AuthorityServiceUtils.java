@@ -52,6 +52,10 @@ public class AuthorityServiceUtils {
 
 	public static final Boolean NO_CHANGE = null;
 
+	// Matches the domain name part of a refname. For example, "core.collectionspace.org" of
+	// urn:cspace:core.collectionspace.org:personauthorities:name(person):item:name(BigBird1461101206103)'Big Bird'.
+	public static final	Pattern REFNAME_DOMAIN_PATTERN = Pattern.compile("(urn:cspace:)(([a-z]{1,}\\.?)*)");
+
 	/*
 	 * Try to find a named remote client configuration in the current tenant bindings.  If the value of the incoming param 'remoteClientConfigName' is
 	 * blank or null, we'll try to find a name in the authority service's bindings.  If we can't find a name there, we'll try using the default name.
@@ -189,33 +193,31 @@ public class AuthorityServiceUtils {
 	}
 
 	/*
-	 * The domain name part of refnames on SAS may not match that of local refnames, so we need to update all the payload's
-	 * refnames with the correct domain name
+	 * The domain name part of refnames on a remote SAS may not match that of local refnames.
+	 * Update all the payload's refnames with the local domain name.
 	 */
-	static public PoxPayloadIn filterRefnameDomains(ServiceContext ctx, PoxPayloadIn payload) throws org.dom4j.DocumentException {
-		PoxPayloadIn result = null;
+	static public PoxPayloadIn localizeRefNameDomains(ServiceContext ctx, PoxPayloadIn payload) throws org.dom4j.DocumentException {
+		String localDomain = ctx.getTenantName();
+		Matcher matcher = REFNAME_DOMAIN_PATTERN.matcher(payload.getXmlPayload());
+		StringBuffer localizedXmlBuffer = new StringBuffer();
 
-		String payloadStr = payload.getXmlPayload();
-		Pattern p = Pattern.compile("(urn:cspace:)(([a-z]{1,}\\.?)*)"); // matches the domain name part of a RefName.  For example, matches "core.collectionspace.org" of RefName urn:cspace:core.collectionspace.org:personauthorities:name(person):item:name(BigBird1461101206103)'Big Bird'
-		Matcher m = p.matcher(payloadStr);
-		StringBuffer filteredPayloadStr = new StringBuffer();
+		while (matcher.find() == true) {
+			String remoteDomain = matcher.group(2);
 
-		while (m.find() == true) {
 			if (logger.isDebugEnabled()) {
-				logger.debug("Replacing " + m.group(2) + " with " + ctx.getTenantName());
+				logger.debug("Replacing " + remoteDomain + " with " + localDomain);
 			}
-			m.appendReplacement(filteredPayloadStr, m.group(1) + ctx.getTenantName());
+
+			matcher.appendReplacement(localizedXmlBuffer, matcher.group(1) + localDomain);
 		}
 
-		m.appendTail(filteredPayloadStr);
+		matcher.appendTail(localizedXmlBuffer);
 
-		result = new PoxPayloadIn(filteredPayloadStr.toString());
-
-		if (logger.isDebugEnabled()) {
-			logger.debug(String.format("Updated payload:\n%s", filteredPayloadStr));
+		if (logger.isTraceEnabled()) {
+			logger.trace(String.format("Updated payload:\n%s", localizedXmlBuffer));
 		}
 
-		return result;
+		return new PoxPayloadIn(localizedXmlBuffer.toString());
 	}
 
 	/**

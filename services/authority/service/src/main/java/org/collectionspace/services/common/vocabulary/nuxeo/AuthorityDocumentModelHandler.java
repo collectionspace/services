@@ -369,7 +369,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 		//
 		PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.requestPayloadInFromRemoteServer(sasAuthorityItemSpecifier, remoteClientConfigName,
 				ctx.getServiceName(), getEntityResponseType(), syncHierarchicalRelationships);
-		sasPayloadIn = AuthorityServiceUtils.filterRefnameDomains(ctx, sasPayloadIn); // We need to filter domain name part of any and all refnames in the payload
+		sasPayloadIn = AuthorityServiceUtils.localizeRefNameDomains(ctx, sasPayloadIn); // We need to filter domain name part of any and all refnames in the payload
 		//
 		// Using the payload from the remote server, create a local copy of the item
 		//
