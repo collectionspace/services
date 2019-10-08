@@ -1,6 +1,8 @@
 package org.collectionspace.services.common.vocabulary;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,6 +11,8 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.api.RefNameUtils;
+import org.collectionspace.services.common.api.RefNameUtils.AuthorityTermInfo;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -21,9 +25,12 @@ import org.collectionspace.services.config.tenant.RemoteClientConfigurations;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Node;
+import org.dom4j.XPath;
 import org.collectionspace.services.common.document.DocumentException;
-
-//import org.dom4j.DocumentException;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -218,6 +225,122 @@ public class AuthorityServiceUtils {
 		}
 
 		return new PoxPayloadIn(localizedXmlBuffer.toString());
+	}
+
+	/**
+	 * Localizes the relations list in an authority item payload from a remote server during SAS sync.
+	 *
+	 * Relations to items that do not exist in the local authority are removed. If the related item
+	 * doesn't exist locally because it is new on the remote and hasn't been synced yet, the relations
+	 * will be created when the new item is synced, because the new item's relations list will include
+	 * them.
+	 *
+	 * The following elements are removed from each relation: uri, csid, subjectCsid, objectCsid,
+	 * object/csid, object/uri, subject/csid, subject/uri. These apply only to the remote. By removing
+	 * them, the relation will be created locally if necessary.
+	 *
+	 * @param ctx
+	 * @param authorityResource
+	 * @param parentCsid
+	 * @param itemSpecifier
+	 * @param payload
+	 * @return
+	 * @throws Exception
+	 */
+	public static PoxPayloadIn localizeRelations(ServiceContext ctx, AuthorityResource authorityResource, String parentCsid, Specifier itemSpecifier, PoxPayloadIn payload) throws Exception {
+		// TODO: Relations to items that don't exist need to be removed, because a create/update will fail
+		// if the subject/object of any supplied relation can't be found. Consider changing the create/update
+		// code to ignore any relations to items that don't exist, but still save the record and any other
+		// relations. This will speed up sync when many items have relations, since the checks to see if
+		// all related items exist locally can be skipped.
+
+		String itemShortId = itemSpecifier.value;
+		Document document = payload.getDOMDocument();
+
+		Map<String, String> namespaceUris = new HashMap<String, String>();
+		namespaceUris.put("rel", "http://collectionspace.org/services/relation");
+
+		XPath xPath = DocumentHelper.createXPath("//rel:relations-common-list/relation-list-item");
+		xPath.setNamespaceURIs(namespaceUris);
+
+		List<Node> listItemNodes = xPath.selectNodes(document);
+
+		if (logger.isDebugEnabled()) {
+			logger.debug(String.format("Found %d relation list items", listItemNodes.size()));
+		}
+
+		for (Node listItemNode : listItemNodes) {
+			String objectRefName = listItemNode.selectSingleNode("object/refName").getText();
+			AuthorityTermInfo objectTermInfo = RefNameUtils.parseAuthorityTermInfo(objectRefName);
+			String objectShortId = objectTermInfo.name;
+
+			if (
+				!objectShortId.equals(itemShortId)
+				&& !checkItemExists(ctx, authorityResource, parentCsid, Specifier.createShortIdURNValue(objectShortId))
+			) {
+				if (logger.isDebugEnabled()) {
+					logger.debug(String.format("Omitting remote relation: object with short id %s does does not exist locally", objectShortId));
+				}
+
+				listItemNode.detach();
+				continue;
+			}
+
+			String subjectRefName = listItemNode.selectSingleNode("subject/refName").getText();
+			AuthorityTermInfo subjectTermInfo = RefNameUtils.parseAuthorityTermInfo(subjectRefName);
+			String subjectShortId = subjectTermInfo.name;
+
+			if (
+				!subjectShortId.equals(itemShortId)
+				&& !checkItemExists(ctx, authorityResource, parentCsid, Specifier.createShortIdURNValue(subjectShortId))
+			) {
+				if (logger.isDebugEnabled()) {
+					logger.debug(String.format("Omitting remote relation: subject with short id %s does does not exist locally", subjectShortId));
+				}
+
+				listItemNode.detach();
+				continue;
+			}
+
+			listItemNode.selectSingleNode("csid").detach();
+			listItemNode.selectSingleNode("objectCsid").detach();
+			listItemNode.selectSingleNode("subjectCsid").detach();
+			listItemNode.selectSingleNode("uri").detach();
+			listItemNode.selectSingleNode("object/csid").detach();
+			listItemNode.selectSingleNode("object/uri").detach();
+			listItemNode.selectSingleNode("subject/csid").detach();
+			listItemNode.selectSingleNode("subject/uri").detach();
+		}
+
+		String xml = document.asXML();
+
+		if (logger.isTraceEnabled()) {
+			logger.trace("Prepared remote relations:\n" + xml);
+		}
+
+		return new PoxPayloadIn(xml);
+	}
+
+	/**
+	 * Check if an item with a given short ID exists in a parent.
+	 *
+	 * @param ctx
+	 * @param authorityResource
+	 * @param parentCsid
+	 * @param itemSpecifier
+	 * @return true if the item exists, false otherwise.
+	 * @throws Exception
+	 */
+	public static boolean checkItemExists(ServiceContext ctx, AuthorityResource authorityResource, String parentCsid, String itemSpecifier) throws Exception {
+		String itemCsid = null;
+
+		try {
+			itemCsid = authorityResource.lookupItemCSID(ctx, itemSpecifier, parentCsid, "checkItemExists()", "CHECK_ITEM_EXISTS");
+		} catch (DocumentNotFoundException e) {
+			itemCsid = null;
+		}
+
+		return (itemCsid != null);
 	}
 
 	/**

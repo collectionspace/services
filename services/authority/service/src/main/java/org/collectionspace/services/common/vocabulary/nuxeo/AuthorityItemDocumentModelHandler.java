@@ -439,116 +439,19 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
 		}
 	}
 
-	/**
-	 *
-	 * @param wrapDoc
-	 * @return
-	 * @throws Exception
-	 */
-	protected boolean handleRelationsSync(DocumentWrapper<Object> wrapDoc) throws Exception {
-		boolean result = false;
-		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
-
-		//
-		// Get information about the local authority item so we can compare with corresponding item on the shared authority server
-		//
-		AuthorityItemSpecifier authorityItemSpecifier = (AuthorityItemSpecifier) wrapDoc.getWrappedObject();
-		DocumentModel itemDocModel = NuxeoUtils.getDocFromSpecifier(ctx, getRepositorySession(), getAuthorityItemCommonSchemaName(),
-				authorityItemSpecifier);
-		if (itemDocModel == null) {
-			throw new DocumentNotFoundException(String.format("Could not find authority item resource with CSID='%s'",
-					authorityItemSpecifier.getItemSpecifier().value));
-		}
-		Long localItemRev = (Long) NuxeoUtils.getProperyValue(itemDocModel, AuthorityItemJAXBSchema.REV);
-		Boolean localIsProposed = (Boolean) NuxeoUtils.getProperyValue(itemDocModel, AuthorityItemJAXBSchema.PROPOSED);
-		String localItemCsid = itemDocModel.getName();
-		String localItemWorkflowState = itemDocModel.getCurrentLifeCycleState();
-		String itemShortId = (String) NuxeoUtils.getProperyValue(itemDocModel, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
-
-		//
-		// Now get the item's Authority (the parent) information
-		//
-		DocumentModel authorityDocModel = NuxeoUtils.getDocFromSpecifier(ctx, getRepositorySession(), authorityCommonSchemaName,
-				authorityItemSpecifier.getParentSpecifier());
-		String authorityShortId = (String)NuxeoUtils.getProperyValue(authorityDocModel, AuthorityJAXBSchema.SHORT_IDENTIFIER);
-		String localParentCsid = authorityDocModel.getName();
-		String remoteClientConfigName = (String)NuxeoUtils.getProperyValue(authorityDocModel, AuthorityJAXBSchema.REMOTECLIENT_CONFIG_NAME);
-		//
-		// Using the short IDs of the local authority and item, create URN specifiers and retrieve the SAS authority item
-		//
-		AuthorityItemSpecifier sasAuthorityItemSpecifier = new AuthorityItemSpecifier(SpecifierForm.URN_NAME, authorityShortId, itemShortId);
-		// Get the shared authority server's copy
-		PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.requestPayloadInFromRemoteServer(sasAuthorityItemSpecifier,
-				remoteClientConfigName, getAuthorityServicePath(), getEntityResponseType(), AuthorityClient.INCLUDE_RELATIONS);
-
-		//
-		// Get the RelationsCommonList and remove the CSIDs since they are for remote items only. We'll use
-		// the refnames in the payload instead to find the local CSIDs
-		//
-		PayloadInputPart relationsCommonListPart = sasPayloadIn.getPart(RelationClient.SERVICE_COMMON_LIST_NAME);
-		relationsCommonListPart.clearElementBody(); // clear the existing DOM element that was created from the incoming XML payload
-		RelationsCommonList rcl = (RelationsCommonList) relationsCommonListPart.getBody();  // Get the JAX-B object and clear the CSID values
-		for (RelationsCommonList.RelationListItem listItem : rcl.getRelationListItem()) {
-			// clear the remote relation item's CSID
-			listItem.setCsid(null);
-			// clear the remote subject's CSID
-			listItem.setSubjectCsid(null);
-			listItem.getSubject().setCsid(null);
-			listItem.getSubject().setUri(null);
-			// clear the remote object's CSID
-			listItem.setObjectCsid(null);
-			listItem.getObject().setCsid(null);
-			listItem.getObject().setUri(null);
-		}
-
-		//
-		// Remove all the payload parts except the relations part since we only want to sync the relationships
-		//
-		ArrayList<PayloadInputPart> newPartList = new ArrayList<PayloadInputPart>();
-		newPartList.add(relationsCommonListPart); // add our CSID filtered RelationsCommonList part
-		sasPayloadIn.setParts(newPartList);
-		sasPayloadIn = new PoxPayloadIn(sasPayloadIn.toXML()); // Builds a new payload using the current set of parts -i.e., just the relations part
-
-		sasPayloadIn = AuthorityServiceUtils.localizeRefNameDomains(ctx, sasPayloadIn); // We need to filter the domain name part of any and all refnames in the payload
-		AuthorityResource authorityResource = (AuthorityResource) ctx.getResource(getAuthorityServicePath());
-		PoxPayloadOut payloadOut = authorityResource.updateAuthorityItem(ctx,
-				ctx.getResourceMap(),
-				ctx.getUriInfo(),
-				localParentCsid,						 // parent's CSID
-				localItemCsid,							 // item's CSID
-				sasPayloadIn,							// the payload from the remote SAS
-				AuthorityServiceUtils.DONT_UPDATE_REV,	// don't update the parent's revision number
-				AuthorityServiceUtils.NOT_PROPOSED,		// The items is not proposed, make it a real SAS item now
-				AuthorityServiceUtils.SAS_ITEM);		// Since we're sync'ing, this must be a SAS item
-		if (payloadOut != null) {
-			ctx.setOutput(payloadOut);
-			result = true;
-		}
-
-		return result;
-	}
-
 	@Override
 	public boolean handleSync(DocumentWrapper<Object> wrapDoc) throws Exception {
-		boolean result = false;
-
-		if (this.getShouldSyncHierarchicalRelationships() == true) {
-			result = handleRelationsSync(wrapDoc);
-		} else {
-			result = handlePayloadSync(wrapDoc);
-		}
-
-		return result;
+		return handleItemSync(wrapDoc);
 	}
 
-	/**
+		/**
 	 *
 	 * @param wrapDoc
 	 * @return
 	 * @throws Exception
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected boolean handlePayloadSync(DocumentWrapper<Object> wrapDoc) throws Exception {
+	protected boolean handleItemSync(DocumentWrapper<Object> wrapDoc) throws Exception {
 		boolean result = false;
 		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
 
@@ -583,15 +486,21 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
 		AuthorityItemSpecifier sasAuthorityItemSpecifier = new AuthorityItemSpecifier(SpecifierForm.URN_NAME, authorityShortId, itemShortId);
 		// Get the shared authority server's copy
 		PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.requestPayloadInFromRemoteServer(sasAuthorityItemSpecifier,
-				remoteClientConfigName, getAuthorityServicePath(), getEntityResponseType(), AuthorityClient.DONT_INCLUDE_RELATIONS);
+				remoteClientConfigName, getAuthorityServicePath(), getEntityResponseType(), AuthorityClient.INCLUDE_RELATIONS);
 		Long sasRev = getRevision(sasPayloadIn);
 		String sasWorkflowState = getWorkflowState(sasPayloadIn);
 		//
 		// If the shared authority item is newer, update our local copy
 		//
 		if (sasRev > localItemRev || localIsProposed || ctx.shouldForceSync()) {
-			sasPayloadIn = AuthorityServiceUtils.localizeRefNameDomains(ctx, sasPayloadIn); // We need to filter the domain name part of any and all refnames in the payload
 			AuthorityResource authorityResource = (AuthorityResource) ctx.getResource(getAuthorityServicePath());
+
+			// Remove remote uris and csids from relations, and remove relations to items that don't exist locally.
+			sasPayloadIn = AuthorityServiceUtils.localizeRelations(ctx, authorityResource, localParentCsid, authorityItemSpecifier.getItemSpecifier(), sasPayloadIn);
+
+			// Localize domain name parts of refnames in the payload.
+			sasPayloadIn = AuthorityServiceUtils.localizeRefNameDomains(ctx, sasPayloadIn);
+
 			PoxPayloadOut payloadOut = authorityResource.updateAuthorityItem(ctx,
 					ctx.getResourceMap(),
 					ctx.getUriInfo(),
