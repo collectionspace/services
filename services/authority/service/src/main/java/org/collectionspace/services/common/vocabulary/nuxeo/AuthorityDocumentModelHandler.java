@@ -23,13 +23,17 @@
  */
 package org.collectionspace.services.common.vocabulary.nuxeo;
 
+import java.net.URI;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.collectionspace.services.client.AbstractCommonListUtils;
@@ -51,6 +55,7 @@ import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentReferenceException;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.query.UriInfoImpl;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
@@ -81,8 +86,8 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 @SuppressWarnings("rawtypes")
-public abstract class AuthorityDocumentModelHandler<AuthCommon>
-		extends NuxeoDocumentModelHandler<AuthCommon> {
+public abstract class AuthorityDocumentModelHandler<AuthCommon> extends NuxeoDocumentModelHandler<AuthCommon> {
+	private static final long SAS_SYNC_PAGE_SIZE = 500;
 
 	private final Logger logger = LoggerFactory.getLogger(AuthorityDocumentModelHandler.class);
 
@@ -112,17 +117,16 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 
 	@Override
 	public void prepareSync() throws Exception {
-		this.setShouldUpdateRevNumber(AuthorityServiceUtils.DONT_UPDATE_REV);  // Never update rev nums on sync operations
+		this.setShouldUpdateRevNumber(AuthorityServiceUtils.DONT_UPDATE_REV); // Never update rev nums on sync operations
 	}
 
-	protected PayloadInputPart extractPart(Response res, String partLabel)
-			throws Exception {
-			PoxPayloadIn input = new PoxPayloadIn((String)res.readEntity(getEntityResponseType()));
-			PayloadInputPart payloadInputPart = input.getPart(partLabel);
-			if (payloadInputPart == null) {
-				logger.error("Part " + partLabel + " was unexpectedly null.");
-			}
-			return payloadInputPart;
+	protected PayloadInputPart extractPart(Response res, String partLabel) throws Exception {
+		PoxPayloadIn input = new PoxPayloadIn((String) res.readEntity(getEntityResponseType()));
+		PayloadInputPart payloadInputPart = input.getPart(partLabel);
+		if (payloadInputPart == null) {
+			logger.error("Part " + partLabel + " was unexpectedly null.");
+		}
+		return payloadInputPart;
 	}
 
 	@Override
@@ -131,46 +135,58 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
 		Specifier specifier = (Specifier) wrapDoc.getWrappedObject();
 		//
-		// Get the rev number of the authority so we can compare with rev number of shared authority
+		// Get the rev number of the authority so we can compare with rev number of
+		// shared authority
 		//
-		DocumentModel docModel = NuxeoUtils.getDocFromSpecifier(ctx, getRepositorySession(), authorityCommonSchemaName, specifier);
+		DocumentModel docModel = NuxeoUtils.getDocFromSpecifier(ctx, getRepositorySession(), authorityCommonSchemaName,
+				specifier);
 		if (docModel != null) {
 			String authorityCsid = docModel.getName();
 			Long localRev = (Long) NuxeoUtils.getProperyValue(docModel, AuthorityJAXBSchema.REV);
 			String shortId = (String) NuxeoUtils.getProperyValue(docModel, AuthorityJAXBSchema.SHORT_IDENTIFIER);
-			String remoteClientConfigName = (String) NuxeoUtils.getProperyValue(docModel, AuthorityJAXBSchema.REMOTECLIENT_CONFIG_NAME); // If set, contains the name of the remote client configuration (remoteClientConfigName) from the tenant bindings
+			String remoteClientConfigName = (String) NuxeoUtils.getProperyValue(docModel,
+					// If set, contains the name of the remote client configuration (remoteClientConfigName) from the tenant bindings
+					AuthorityJAXBSchema.REMOTECLIENT_CONFIG_NAME);
 			//
-			// Using the short ID of the local authority, create a URN specifier to retrieve the SAS authority
+			// Using the short ID of the local authority, create a URN specifier to retrieve
+			// the SAS authority
 			//
 			Specifier sasSpecifier = new Specifier(SpecifierForm.URN_NAME, shortId);
-			PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.requestPayloadInFromRemoteServer(ctx, remoteClientConfigName, sasSpecifier, getEntityResponseType());
+			PoxPayloadIn sasPayloadIn = AuthorityServiceUtils.requestPayloadInFromRemoteServer(ctx, remoteClientConfigName,
+					sasSpecifier, getEntityResponseType());
 			//
-			// If the authority on the SAS is newer, synch all the items and then the authority record as well
+			// If the authority on the SAS is newer, synch all the items and then the
+			// authority record as well
 			//
 			//
 			Long sasRev = getRevision(sasPayloadIn);
-			if (sasRev > localRev || true) { // FIXME: Along with the revision number, we need to use other meta information to determine if a sync should happen -for now, alway sync
+			// FIXME: Along with the revision number, we need to use other meta information
+			// to determine if a sync should happen -for now, always sync
+			if (sasRev > localRev || true) {
 				//
 				// First, sync all the authority items
 				//
-				syncAllItems(ctx, authorityCsid, sasSpecifier);  // FIXME: We probably want to consider "paging" this instead of handling the entire set of items.
+				syncAllItems(ctx, authorityCsid, sasSpecifier);
 				//
 				// Next, sync the authority resource/record itself
 				//
 				AuthorityResource authorityResource = (AuthorityResource) ctx.getResource();
-				ctx.setProperty(AuthorityServiceUtils.SHOULD_UPDATE_REV_PROPERTY, AuthorityServiceUtils.DONT_UPDATE_REV); // Don't update the rev number, use the rev number for the SAS instance instead
-				PoxPayloadOut payloadOut = authorityResource.update(ctx, ctx.getResourceMap(), ctx.getUriInfo(), docModel.getName(),
-						sasPayloadIn);
+				// Don't update the rev number, use the rev number for the SAS instance instead
+				ctx.setProperty(AuthorityServiceUtils.SHOULD_UPDATE_REV_PROPERTY, AuthorityServiceUtils.DONT_UPDATE_REV);
+				PoxPayloadOut payloadOut = authorityResource.update(ctx, ctx.getResourceMap(), ctx.getUriInfo(),
+						docModel.getName(), sasPayloadIn);
 				if (payloadOut != null) {
 					ctx.setOutput(payloadOut);
 					result = true;
 				}
 				//
-				// We may need to transition the authority into a replicated state the first time we sync it.
+				// We may need to transition the authority into a replicated state the first
+				// time we sync it.
 				//
 				String workflowState = docModel.getCurrentLifeCycleState();
 				if (workflowState.contains(WorkflowClient.WORKFLOWSTATE_REPLICATED) == false) {
-					authorityResource.updateWorkflowWithTransition(ctx, ctx.getUriInfo(), authorityCsid, WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
+					authorityResource.updateWorkflowWithTransition(ctx, ctx.getUriInfo(), authorityCsid,
+							WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
 				}
 			}
 		} else {
@@ -184,9 +200,9 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 	}
 
 	/*
-	 * Get the list of authority items from the remote shared authority server (SAS) and
-	 * synchronize them with the local authority items. If items exist on the remote but not the local,
-	 * create them.
+	 * Get the list of authority items from the remote shared authority server (SAS)
+	 * and synchronize them with the local authority items. If items exist on the
+	 * remote but not the local, create them.
 	 */
 	protected void syncAllItems(ServiceContext ctx, String parentCsid, Specifier sasAuthoritySpecifier) throws Exception {
 		int createdCount = 0;
@@ -199,10 +215,28 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 
 		// Iterate over the list of items in the remote authority.
 
-		PoxPayloadIn itemListPayload = requestItemList(ctx, sasAuthoritySpecifier);
-		List<Element> itemElements = getItemList(itemListPayload);
+		long pageNum = 0;
+		long pageSize = SAS_SYNC_PAGE_SIZE;
 
-		if (itemElements != null) {
+		List<Element> itemElements;
+
+		do {
+			if (logger.isDebugEnabled()) {
+				logger.debug(String.format("Reading remote items in %s: page size %d, page num %d", sasAuthoritySpecifier.value, pageSize, pageNum));
+			}
+
+			PoxPayloadIn itemListPayload = requestItemList(ctx, sasAuthoritySpecifier, pageSize, pageNum);
+
+			itemElements = getItemList(itemListPayload);
+
+			if (itemElements == null) {
+				itemElements = Collections.EMPTY_LIST;
+			}
+
+			if (logger.isDebugEnabled()) {
+				logger.debug(String.format("Found %d items", itemElements.size()));
+			}
+
 			for (Element e : itemElements) {
 				String remoteRefName = XmlTools.getElementValue(e, AuthorityItemJAXBSchema.REF_NAME);
 				String remoteShortId = XmlTools.getElementValue(e, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
@@ -221,10 +255,14 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 
 				totalProcessedCount++;
 			}
-		}
 
-		// Deprecate or delete items that have been hard-deleted from the SAS but still exist locally.
-		// Subtract (remove) the set of remote items from the set of local items to determine which
+			pageNum = pageNum + 1;
+		} while (itemElements.size() > 0 && itemElements.size() == SAS_SYNC_PAGE_SIZE);
+
+		// Deprecate or delete items that have been hard-deleted from the SAS but still
+		// exist locally.
+		// Subtract (remove) the set of remote items from the set of local items to
+		// determine which
 		// of the remote items have been hard deleted.
 
 		Set<String> localShortIds = getItemsInLocalAuthority(ctx, sasAuthoritySpecifier);
@@ -232,7 +270,8 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 		localShortIds.removeAll(remoteShortIds);
 
 		if (localShortIds.size() > 0) {
-			// Delete the remaining items (or mark them as deprecated if they still have records referencing them).
+			// Delete the remaining items (or mark them as deprecated if they still have
+			// records referencing them).
 
 			deletedCount = deleteOrDeprecateItems(ctx, sasAuthoritySpecifier, localShortIds);
 
@@ -256,20 +295,22 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 	 * @return
 	 * @throws Exception
 	 */
-	private int deleteOrDeprecateItems(ServiceContext ctx, Specifier authoritySpecifier, Set<String> itemShortIds) throws Exception {
+	private int deleteOrDeprecateItems(ServiceContext ctx, Specifier authoritySpecifier, Set<String> itemShortIds)
+			throws Exception {
 		int result = 0;
 		AuthorityItemSpecifier authorityItemSpecificer = null;
 
-		ctx.setProperty(AuthorityServiceUtils.SHOULD_UPDATE_REV_PROPERTY, false); // Don't update the revision number when we delete or deprecate the item
-		for (String itemShortId:itemShortIds) {
+		// Don't update the revision number when we delete or deprecate the item
+		ctx.setProperty(AuthorityServiceUtils.SHOULD_UPDATE_REV_PROPERTY, false);
+
+		for (String itemShortId : itemShortIds) {
 			AuthorityResource authorityResource = (AuthorityResource) ctx.getResource();
 			try {
 				authorityItemSpecificer = new AuthorityItemSpecifier(SpecifierForm.URN_NAME, authoritySpecifier.value,
 						itemShortId);
-				authorityResource.deleteAuthorityItem(ctx,
-						authorityItemSpecificer.getParentSpecifier().getURNValue(),
-						authorityItemSpecificer.getItemSpecifier().getURNValue(),
-						AuthorityServiceUtils.DONT_UPDATE_REV); // Since we're sync'ing, we shouldn't update the revision number (obviously this only applies to soft-deletes since hard-deletes destroy the record)
+				// Since we're sync'ing, we shouldn't update the revision number (obviously this only applies to soft-deletes since hard-deletes destroy the record)
+				authorityResource.deleteAuthorityItem(ctx, authorityItemSpecificer.getParentSpecifier().getURNValue(),
+						authorityItemSpecificer.getItemSpecifier().getURNValue(), AuthorityServiceUtils.DONT_UPDATE_REV);
 				result++;
 			} catch (DocumentReferenceException de) {
 				logger.info(String.format("Authority item with '%s' has existing references and cannot be removed during sync.",
@@ -287,7 +328,8 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 
 		if (logger.isWarnEnabled() == true) {
 			if (result != itemShortIds.size()) {
-				logger.warn(String.format("Unable to delete or deprecate some authority items during synchronization with SAS.  Deleted or deprecated %d of %d.  See the services log file for details.",
+				logger.warn(String.format(
+						"Unable to delete or deprecate some authority items during synchronization with SAS.  Deleted or deprecated %d of %d.  See the services log file for details.",
 						result, itemShortIds.size()));
 			}
 		}
@@ -296,10 +338,8 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 	}
 
 	/**
-	 * Gets the list of SAS related items in the local authority.  Exludes items with the "proposed" flag to
-	 * include only SAS created items.
-	 *
-	 * FIXME: Add pagination support to this call!!!
+	 * Gets the list of SAS related items in the local authority. Exludes items with
+	 * the "proposed" flag to include only SAS created items.
 	 *
 	 * @param ctx
 	 * @param authoritySpecifier
@@ -307,24 +347,53 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 	 * @throws Exception
 	 */
 	private Set<String> getItemsInLocalAuthority(ServiceContext ctx, Specifier authoritySpecifier) throws Exception {
-		Set<String> result = new HashSet<String>();
+		Set<String> itemShortIds = new HashSet<String>();
 
 		ResourceMap resourceMap = ctx.getResourceMap();
 		String resourceName = ctx.getClient().getServiceName();
 		AuthorityResource authorityResource = (AuthorityResource) resourceMap.get(resourceName);
-		AbstractCommonList acl = authorityResource.getAuthorityItemList(ctx, authoritySpecifier.getURNValue(), ctx.getUriInfo());
 
-		List<ListItem> listItems = acl.getListItem();
+		long pageNum = 0;
+		long pageSize = SAS_SYNC_PAGE_SIZE;
 
-		for (ListItem listItem : listItems) {
-			Boolean proposed = getBooleanValue(listItem, AuthorityItemJAXBSchema.PROPOSED);
+		List<ListItem> listItems;
 
-			if (proposed == false) { // exclude "proposed" (i.e., local-only items)
-				result.add(AbstractCommonListUtils.ListItemGetElementValue(listItem, AuthorityItemJAXBSchema.SHORT_IDENTIFIER));
+		do {
+			if (logger.isDebugEnabled()) {
+				logger.debug(String.format("Reading local items in %s: page size %d, page num %d", authoritySpecifier.value,
+						pageSize, pageNum));
 			}
-		}
 
-		return result;
+			// Construct a UriInfo to retrieve one page of results.
+
+			UriInfo uriInfo = new UriInfoImpl(
+				new URI(""),
+				new URI(""),
+				"",
+				"pgSz=" + pageSize + "&pgNum=" + pageNum,
+				Collections.<PathSegment> emptyList()
+			);
+
+			AbstractCommonList acl = authorityResource.getAuthorityItemList(ctx, authoritySpecifier.getURNValue(), uriInfo);
+
+			listItems = acl.getListItem();
+
+			if (logger.isDebugEnabled()) {
+				logger.debug(String.format("Found %d items", listItems.size()));
+			}
+
+			for (ListItem listItem : listItems) {
+				Boolean proposed = getBooleanValue(listItem, AuthorityItemJAXBSchema.PROPOSED);
+
+				if (proposed == false) { // exclude "proposed" (i.e., local-only items)
+					itemShortIds.add(AbstractCommonListUtils.ListItemGetElementValue(listItem, AuthorityItemJAXBSchema.SHORT_IDENTIFIER));
+				}
+			}
+
+			pageNum = pageNum + 1;
+		} while (listItems.size() > 0 && listItems.size() == SAS_SYNC_PAGE_SIZE);
+
+		return itemShortIds;
 	}
 
 	private Boolean getBooleanValue(ListItem listItem, String name) {
@@ -469,27 +538,23 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 	}
 
 	/**
-	 * Request an authority item list payload from the SAS server. This is a non-paging solution.
-	 * If the authority has a very large number of items/terms, we might not be able to handle them
-	 * all.
+	 * Request an authority item list payload from the SAS server.
 	 *
 	 * @param ctx
 	 * @param specifier
 	 * @return
 	 * @throws Exception
 	 */
-	private PoxPayloadIn requestItemList(ServiceContext ctx, Specifier specifier) throws Exception {
+	private PoxPayloadIn requestItemList(ServiceContext ctx, Specifier specifier, long pageSize, long pageNum) throws Exception {
 		PoxPayloadIn result = null;
 		AuthorityClient client = (AuthorityClient) ctx.getClient();
-
-		// Request the item list using the max page size (0).
 
 		Response res = client.readItemList(
 			specifier.getURNValue(),
 			null, // partial term string
 			null, // keyword string
-			0,    // page size
-			0     // page number
+			pageSize,
+			pageNum
 		);
 
 		assertStatusCode(res, specifier, client);
