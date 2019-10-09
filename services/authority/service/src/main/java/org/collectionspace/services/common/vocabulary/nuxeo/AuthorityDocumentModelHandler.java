@@ -273,10 +273,10 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon> extends NuxeoDoc
 			// Delete the remaining items (or mark them as deprecated if they still have
 			// records referencing them).
 
-			deletedCount = deleteOrDeprecateItems(ctx, sasAuthoritySpecifier, localShortIds);
+			deletedCount = deleteOrDeprecateItems(ctx, parentCsid, localShortIds);
 
 			if (deletedCount != localShortIds.size()) {
-				throw new Exception("Error deleting or deprecating authority items during synchronization.");
+				logger.warn("Could not delete or deprecate some items during sync.");
 			}
 		}
 
@@ -288,53 +288,48 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon> extends NuxeoDoc
 	}
 
 	/**
-	 * This method should ***only*** be used as part of a SAS synch operation.
+	 * This method should ***only*** be used as part of a SAS sync operation.
 	 *
 	 * @param ctx
 	 * @param refNameList
 	 * @return
 	 * @throws Exception
 	 */
-	private int deleteOrDeprecateItems(ServiceContext ctx, Specifier authoritySpecifier, Set<String> itemShortIds)
+	private int deleteOrDeprecateItems(ServiceContext ctx, String parentCsid, Set<String> itemShortIds)
 			throws Exception {
-		int result = 0;
-		AuthorityItemSpecifier authorityItemSpecificer = null;
 
-		// Don't update the revision number when we delete or deprecate the item
+		// Don't update the revision number when we delete or deprecate items.
 		ctx.setProperty(AuthorityServiceUtils.SHOULD_UPDATE_REV_PROPERTY, false);
 
+		Specifier parentSpecifier = new Specifier(SpecifierForm.CSID, parentCsid);
+		AuthorityResource authorityResource = (AuthorityResource) ctx.getResource();
+		int handledCount = 0;
+
 		for (String itemShortId : itemShortIds) {
-			AuthorityResource authorityResource = (AuthorityResource) ctx.getResource();
+			Specifier itemSpecifier = new Specifier(SpecifierForm.URN_NAME, itemShortId);
+
 			try {
-				authorityItemSpecificer = new AuthorityItemSpecifier(SpecifierForm.URN_NAME, authoritySpecifier.value,
-						itemShortId);
-				// Since we're sync'ing, we shouldn't update the revision number (obviously this only applies to soft-deletes since hard-deletes destroy the record)
-				authorityResource.deleteAuthorityItem(ctx, authorityItemSpecificer.getParentSpecifier().getURNValue(),
-						authorityItemSpecificer.getItemSpecifier().getURNValue(), AuthorityServiceUtils.DONT_UPDATE_REV);
-				result++;
-			} catch (DocumentReferenceException de) {
-				logger.info(String.format("Authority item with '%s' has existing references and cannot be removed during sync.",
-						authorityItemSpecificer), de);
-				boolean marked = AuthorityServiceUtils.markAuthorityItemAsDeprecated(ctx, authorityItemCommonSchemaName,
-						authorityItemSpecificer);
-				if (marked == true) {
-					result++;
+				authorityResource.deleteAuthorityItem(ctx, parentSpecifier.getURNValue(),
+						itemSpecifier.getURNValue(), AuthorityServiceUtils.DONT_UPDATE_REV);
+
+				handledCount++;
+			} catch (DocumentReferenceException dre) {
+				logger.info(String.format("Item %s has existing references and cannot be deleted.", itemShortId), dre);
+
+				AuthorityItemSpecifier authorityItemSpecifier = new AuthorityItemSpecifier(parentSpecifier, itemSpecifier);
+				boolean deprecated = AuthorityServiceUtils.markAuthorityItemAsDeprecated(ctx, authorityItemCommonSchemaName, authorityItemSpecifier);
+
+				if (deprecated == true) {
+					handledCount++;
 				}
 			} catch (Exception e) {
-				logger.warn(String.format("Unable to delete authority item '%s'", authorityItemSpecificer), e);
-				throw e;
+				logger.error(String.format("Unable to delete or deprecate item %s", itemShortId), e);
+
+				throw(e);
 			}
 		}
 
-		if (logger.isWarnEnabled() == true) {
-			if (result != itemShortIds.size()) {
-				logger.warn(String.format(
-						"Unable to delete or deprecate some authority items during synchronization with SAS.  Deleted or deprecated %d of %d.  See the services log file for details.",
-						result, itemShortIds.size()));
-			}
-		}
-
-		return result;
+		return handledCount;
 	}
 
 	/**
