@@ -76,7 +76,7 @@
         <copy file="${cspace.ui.lib.download.file}" todir="${jee.deploy.cspace.ui.shared.webapp}"/>
     </target>
 
-    <target name="deploy" unless="cspace.ui.core" depends="deploylib" description="deploy cspace ui to ${jee.server.cspace}">
+    <target name="deployprimary" unless="cspace.ui.core" depends="deploylib" description="deploy cspace ui to ${jee.server.cspace}">
         <filter token="CSPACE_UI_LIB_URL" value="/${cspace.ui.shared.webapp}/${cspace.ui.lib.file}" />
         <filter token="CSPACE_PROFILE_PLUGIN_LIB_URL" value="/${cspace.ui.shared.webapp}/${cspace.ui.profile.plugin.lib.file}" />
         <filter token="CSPACE_PROFILE_PLUGIN_LIB_NAME" value="${cspace.ui.profile.plugin.lib.name}" />
@@ -86,8 +86,21 @@
             <fileset dir="src/main/resources/cspace-ui-webapp"/>
         </copy>
     </target>
+    
+    <target name="deploy" depends="deployprimary" description="deploy alt cspace ui to ${jee.server.cspace}">
+        <filter token="CSPACE_UI_LIB_URL" value="/${cspace.ui.shared.webapp}/${cspace.ui.lib.file}" />
+        <filter token="CSPACE_PROFILE_PLUGIN_LIB_URL" value="/${cspace.ui.shared.webapp}/${cspace.ui.profile.plugin.lib.file}" />
+        <filter token="CSPACE_PROFILE_PLUGIN_LIB_NAME" value="${cspace.ui.profile.plugin.lib.name}" />
+        <filter token="UCB_RELEASE" value="${ucb.release}" />
+        <filter token="ALT_WEBAPP_NAME" value="${cspace.ui.webapp.alt}" />
+    
+        <copy todir="${jee.deploy.cspace.ui.webapp.alt}" overwrite="true" filtering="true">
+            <fileset dir="src/main/resources/cspace-ui-webapp-alt"/>
+        </copy>
+    </target>
 
     <target name="undeploy" description="undeploy cspace ui from ${jee.server.cspace}">
+    	<delete dir="${jee.deploy.cspace.ui.webapp.alt}" />
         <delete dir="${jee.deploy.cspace.ui.webapp}" />
         <delete dir="${jee.deploy.cspace.ui.shared.webapp}" />
     </target>

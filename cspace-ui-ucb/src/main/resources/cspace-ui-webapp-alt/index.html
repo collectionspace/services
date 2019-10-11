@@ -1,0 +1,32 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <div id="cspace"></div>
+    <script src="@CSPACE_UI_LIB_URL@"></script>
+    <script src="@CSPACE_PROFILE_PLUGIN_LIB_URL@"></script>
+    <script>
+        cspaceUI({
+            messages: {
+                'footer.release': 'Release {version} (@UCB_RELEASE@ - @ALT_WEBAPP_NAME@)',
+            },
+            recordTypes: {
+				collectionobject: {
+					forms: {
+						default: {
+							disabled: false,
+						},
+						collectorLabel: {
+							disabled: false,
+						}
+					},
+				},
+			},
+            plugins: [
+                @CSPACE_PROFILE_PLUGIN_LIB_NAME@(),
+            ],
+        });
+    </script>
+</body>
+</html>
