@@ -28,13 +28,13 @@
 
 	<distributionManagement>
 		<repository>
-			<id>libs-release-local</id>
-			<name>libs-release-local</name>
+			<id>collectionspace-libs-release-local</id>
+			<name>collectionspace-libs-release-local</name>
 			<url>http://nightly.collectionspace.org:8081/artifactory/libs-release-local</url>
 		</repository>
 		<snapshotRepository>
-			<id>libs-snapshot-local</id>
-			<name>libs-snapshot-local</name>
+			<id>collectionspace-libs-snapshot-local</id>
+			<name>collectionspace-libs-snapshot-local</name>
 			<url>http://nightly.collectionspace.org:8081/artifactory/libs-snapshot-local</url>
 		</snapshotRepository>
 	</distributionManagement>
@@ -54,16 +54,16 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>libs-release-local</id>
-			<name>libs-release-local</name>
+			<id>collectionspace-libs-release-local</id>
+			<name>collectionspace-libs-release-local</name>
 			<url>http://nightly.collectionspace.org:8081/artifactory/libs-release-local</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
 		<repository>
-			<id>libs-snapshot-local</id>
-			<name>libs-snapshot-local</name>
+			<id>collectionspace-libs-snapshot-local</id>
+			<name>collectionspace-libs-snapshot-local</name>
 			<url>http://nightly.collectionspace.org:8081/artifactory/libs-snapshot-local</url>
 			<snapshots>
 				<enabled>true</enabled>
@@ -126,8 +126,8 @@
 		-->
 
 		<repository>
-			<id>nuxeo-public</id>
-			<name>nuxeo-public</name>
+			<id>collectionspace-nuxeo-public</id>
+			<name>collectionspace-nuxeo-public</name>
 			<url>http://nightly.collectionspace.org:8081/artifactory/nuxeo-public</url>
 			<releases>
 				<enabled>true</enabled>
@@ -239,8 +239,8 @@
 			</snapshots>
 		</pluginRepository>
 	    <pluginRepository>
-	        <id>plugins-snapshot-local</id>
-	        <name>plugins-snapshot-local</name>
+	        <id>collectionspace-plugins-snapshot-local</id>
+	        <name>collectionspace-plugins-snapshot-local</name>
 	        <url>http://nightly.collectionspace.org:8081/artifactory/plugins-snapshot-local</url>
 	        <snapshots>
 	            <enabled>true</enabled>
