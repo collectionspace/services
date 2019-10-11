@@ -38,9 +38,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
@@ -49,7 +49,6 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.XmlTools;
 import org.collectionspace.services.client.workflow.WorkflowClient;
-
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
@@ -79,26 +78,24 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.Hierarchy;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.repository.RepositoryClient;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
-import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
-import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
-import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
-
+import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.description.ServiceDescription;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
 import org.collectionspace.services.lifecycle.TransitionDef;
-import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
+import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentFilter;
 import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.workflow.WorkflowCommon;
-import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
-import org.collectionspace.services.description.ServiceDescription;
-
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -934,6 +931,14 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         return result.getBytes();
     }
 
+    public PoxPayloadOut updateItemWorkflowWithTransition(ServiceContext<PoxPayloadIn, PoxPayloadOut> existingContext,
+            String parentIdentifier,
+            String itemIdentifier,
+            String transition,
+            boolean updateRevNumber) throws DocumentReferenceException {
+        return updateItemWorkflowWithTransition(existingContext, parentIdentifier, itemIdentifier, transition, updateRevNumber, true);
+    }
+
     /**
      * Update an authority item's workflow state.
      * @param existingContext
@@ -947,7 +952,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             String parentIdentifier,
             String itemIdentifier,
             String transition,
-            boolean updateRevNumber) throws DocumentReferenceException {
+            boolean updateRevNumber,
+            boolean rollbackOnException) throws DocumentReferenceException {
         PoxPayloadOut result = null;
 
         try {
@@ -963,6 +969,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             PoxPayloadIn input = new PoxPayloadIn(WorkflowClient.SERVICE_PAYLOAD_NAME, new WorkflowCommon(),
                     WorkflowClient.SERVICE_COMMONPART_NAME);
             MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME, input);
+            ctx.setRollbackOnException(rollbackOnException);
             if (existingContext != null && existingContext.getCurrentRepositorySession() != null) {
                 ctx.setCurrentRepositorySession(existingContext.getCurrentRepositorySession());// If a repo session is already open, we need to use it and not create a new one
             }
@@ -1534,6 +1541,13 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         return result;
     }
 
+    public boolean deleteAuthorityItem(ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
+            String parentIdentifier,
+            String itemIdentifier,
+            boolean shouldUpdateRevNumber) throws Exception {
+        return deleteAuthorityItem(existingCtx, parentIdentifier, itemIdentifier, shouldUpdateRevNumber, true);
+    }
+
     /**
      *
      * @param existingCtx
@@ -1544,11 +1558,13 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     public boolean deleteAuthorityItem(ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
             String parentIdentifier,
             String itemIdentifier,
-            boolean shouldUpdateRevNumber
+            boolean shouldUpdateRevNumber,
+            boolean rollbackOnException
             ) throws Exception {
         boolean result = true;
 
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), existingCtx.getUriInfo());
+        ctx.setRollbackOnException(rollbackOnException);
         if (existingCtx != null && existingCtx.getCurrentRepositorySession() != null) {
             ctx.setCurrentRepositorySession(existingCtx.getCurrentRepositorySession());
             ctx.setProperties(existingCtx.getProperties());

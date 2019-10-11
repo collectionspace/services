@@ -1,5 +1,6 @@
 package org.collectionspace.services.common.vocabulary;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,15 +11,17 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.RefNameUtils.AuthorityTermInfo;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
-import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityIdentifierUtils;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.tenant.RemoteClientConfig;
 import org.collectionspace.services.config.tenant.RemoteClientConfigurations;
@@ -29,8 +32,6 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
 import org.dom4j.XPath;
-import org.collectionspace.services.common.document.DocumentException;
-import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,9 @@ public class AuthorityServiceUtils {
 	public static final String SHOULD_UPDATE_REV_PROPERTY = "SHOULD_UPDATE_REV_PROPERTY";
 	public static final boolean UPDATE_REV = true;
 	public static final boolean DONT_UPDATE_REV = !UPDATE_REV;
+
+	public static final boolean ROLLBACK_ON_EXCEPTION = true;
+	public static final boolean DONT_ROLLBACK_ON_EXCEPTION = !ROLLBACK_ON_EXCEPTION;
 
 	// Used to keep track if an authority item is a locally proposed member of a SAS authority
 	public static final String IS_PROPOSED_PROPERTY = "IS_PROPOSED";
@@ -182,19 +186,6 @@ public class AuthorityServiceUtils {
 		} finally {
 			res.close();
 		}
-
-		return result;
-	}
-
-	public static boolean setAuthorityItemDeprecated(ServiceContext ctx,
-			DocumentModel docModel, String authorityItemCommonSchemaName, Boolean flag) throws Exception {
-		boolean result = false;
-
-		docModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.DEPRECATED,
-				new Boolean(flag));
-		CoreSessionInterface repoSession = (CoreSessionInterface) ctx.getCurrentRepositorySession();
-		repoSession.saveDocument(docModel);
-		result = true;
 
 		return result;
 	}
@@ -350,16 +341,131 @@ public class AuthorityServiceUtils {
 	 * @param itemInfo
 	 * @throws Exception
 	 */
-	public static boolean markAuthorityItemAsDeprecated(ServiceContext ctx, String authorityItemCommonSchemaName, AuthorityItemSpecifier authorityItemSpecifier) throws Exception {
-		boolean result = false;
+	public static boolean setAuthorityItemDeprecated(ServiceContext ctx, AuthorityResource authorityResource, String authorityItemCommonSchemaName, AuthorityItemSpecifier authorityItemSpecifier) throws Exception {
+		DocumentModel docModel = NuxeoUtils.getDocFromSpecifier(ctx, (CoreSessionInterface)ctx.getCurrentRepositorySession(),
+				authorityItemCommonSchemaName, authorityItemSpecifier);
 
-		try {
-			DocumentModel docModel = NuxeoUtils.getDocFromSpecifier(ctx, (CoreSessionInterface)ctx.getCurrentRepositorySession(),
-					authorityItemCommonSchemaName, authorityItemSpecifier);
-			result = setAuthorityItemDeprecated(ctx, docModel, authorityItemCommonSchemaName, AuthorityServiceUtils.DEPRECATED);
-		} catch (Exception e) {
-			logger.warn(String.format("Could not mark item '%s' as deprecated.", authorityItemSpecifier.getItemSpecifier().getURNValue()), e);
-			throw e;
+		return setAuthorityItemDeprecated(ctx, authorityResource, authorityItemSpecifier.getParentSpecifier().value, authorityItemSpecifier.getItemSpecifier().getURNValue(), docModel);
+	}
+
+	public static boolean setAuthorityItemDeprecated(ServiceContext ctx, AuthorityResource authorityResource, String parentIdentifier, String itemIdentifier, DocumentModel docModel) throws Exception {
+		String currentWorkflowState = docModel.getCurrentLifeCycleState();
+
+		// Find the transitions needed to get from the current state to the replicated deprecated state.
+		List<String> transitions = AuthorityServiceUtils.getTransitionList(WorkflowClient.WORKFLOWSTATE_DEPRECATED, currentWorkflowState);
+
+		if (!transitions.isEmpty()) {
+			for (String transition : transitions) {
+				authorityResource.updateItemWorkflowWithTransition(ctx, parentIdentifier, itemIdentifier, transition, AuthorityServiceUtils.DONT_UPDATE_REV);
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * We need to change the local item's state to one that maps to the replication server's workflow
+	 * state.  This might involve making multiple transitions.
+	 *
+	 * WIKI:
+	 *	 See table at https://collectionspace.atlassian.net/wiki/spaces/SDR/pages/665886940/Workflow+transitions+to+map+SAS+item+states+to+Local+item+states
+	 *	 (was https://wiki.collectionspace.org/pages/viewpage.action?pageId=162496564)
+	 *
+	 */
+	public static List<String> getTransitionList(String sasWorkflowState, String localItemWorkflowState) throws DocumentException {
+		List<String> result = new ArrayList<String>();
+		//
+		// The first set of conditions maps a replication-server "project" state to a local client state of "replicated"
+		//
+		if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_UNDELETE);
+			result.add(WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED)) {
+			// Do nothing.  We're good with this state
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_UNDELETE);
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DEPRECATED)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_UNDEPRECATE);
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DEPRECATED_DELETED)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_UNDELETE);
+			result.add(WorkflowClient.WORKFLOWTRANSITION_UNDEPRECATE);
+		//
+		// The second set of conditions maps a replication-server "deleted" state to a local client state of "deleted"
+		//
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
+			result.add(WorkflowClient.WORKFLOWTRANSITION_DELETE);
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_DELETE);
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED)) {
+			// Do nothing.  We're good with this state
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DEPRECATED)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_UNDEPRECATE);
+			result.add(WorkflowClient.WORKFLOWTRANSITION_DELETE);
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DEPRECATED_DELETED)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_UNDEPRECATE);
+		//
+		// The third set of conditions maps a replication-server "replicated" state to a local state of "replicated"
+		//
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_UNDELETE);
+			result.add(WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED)) {
+			// Do nothing.  We're good with this state
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_UNDELETE);
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DEPRECATED)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_UNDEPRECATE);
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DEPRECATED_DELETED)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_UNDELETE);
+			result.add(WorkflowClient.WORKFLOWTRANSITION_UNDEPRECATE);
+		//
+		// The fourth set of conditions maps a replicatation-server "deprecated" state to a local state of "replicated_deprecated"
+		//
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DEPRECATED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
+			result.add(WorkflowClient.WORKFLOWTRANSITION_DEPRECATE);
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DEPRECATED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_UNDELETE);
+			result.add(WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
+			result.add(WorkflowClient.WORKFLOWTRANSITION_DEPRECATE);
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DEPRECATED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_DEPRECATE);
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DEPRECATED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_UNDELETE);
+			result.add(WorkflowClient.WORKFLOWTRANSITION_DEPRECATE);
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DEPRECATED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DEPRECATED)) {
+			// Do nothing.
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DEPRECATED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DEPRECATED_DELETED)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_UNDELETE);
+		//
+		// The last set of conditions maps a replication-server "replicated_deleted" state to a local client state of "deleted"
+		//
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_PROJECT)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
+			result.add(WorkflowClient.WORKFLOWTRANSITION_DELETE);
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_REPLICATE);
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_DELETE);
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED)) {
+			// Do nothing.  We're good with this state
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DEPRECATED)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_UNDEPRECATE);
+			result.add(WorkflowClient.WORKFLOWTRANSITION_DELETE);
+		} else if (sasWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED) && localItemWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DEPRECATED_DELETED)) {
+			result.add(WorkflowClient.WORKFLOWTRANSITION_UNDEPRECATE);
+		} else {
+			//
+			// If we get here, we've encountered a SAS workflow state that we don't recognize.
+			//
+			throw new DocumentException(String.format("Encountered an invalid workflow state of '%s' on a SAS authority item.", sasWorkflowState));
 		}
 
 		return result;

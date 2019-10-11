@@ -310,22 +310,18 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon> extends NuxeoDoc
 
 			try {
 				authorityResource.deleteAuthorityItem(ctx, parentSpecifier.getURNValue(),
-						itemSpecifier.getURNValue(), AuthorityServiceUtils.DONT_UPDATE_REV);
+						itemSpecifier.getURNValue(), AuthorityServiceUtils.DONT_UPDATE_REV, AuthorityServiceUtils.DONT_ROLLBACK_ON_EXCEPTION);
 
 				handledCount++;
 			} catch (DocumentReferenceException dre) {
-				logger.info(String.format("Item %s has existing references and cannot be deleted.", itemShortId), dre);
+				logger.info(String.format("Failed to delete %s: item is referenced, and will be deprecated instead", itemShortId));
 
 				AuthorityItemSpecifier authorityItemSpecifier = new AuthorityItemSpecifier(parentSpecifier, itemSpecifier);
-				boolean deprecated = AuthorityServiceUtils.markAuthorityItemAsDeprecated(ctx, authorityItemCommonSchemaName, authorityItemSpecifier);
+				boolean deprecated = AuthorityServiceUtils.setAuthorityItemDeprecated(ctx, authorityResource, authorityItemCommonSchemaName, authorityItemSpecifier);
 
 				if (deprecated == true) {
 					handledCount++;
 				}
-			} catch (Exception e) {
-				logger.error(String.format("Unable to delete or deprecate item %s", itemShortId), e);
-
-				throw(e);
 			}
 		}
 

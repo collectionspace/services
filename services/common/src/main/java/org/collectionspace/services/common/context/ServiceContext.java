@@ -66,9 +66,9 @@ public interface ServiceContext<IT, OT> {
     /** The Constant PART_COMMON_LABEL. */
     public static final String PART_COMMON_LABEL = "common";
     /** Used to qualify document types **/
-	public static final String TENANT_SUFFIX = "Tenant";    
+	public static final String TENANT_SUFFIX = "Tenant";
 
-    /** 
+    /**
      * Tells the TransactionManager to use the default value.  The default value can
      * be set in this file:
      * 		services/JaxRsServiceProvider/src/main/webapp/META-INF/context.xml
@@ -78,25 +78,25 @@ public interface ServiceContext<IT, OT> {
      *			transactionTimeoutSeconds="300"/>
      * See the following documentation page for more details:
      * 		http://docs.oracle.com/javaee/7/api/javax/transaction/TransactionManager.html#setTransactionTimeout(int)
-     * 
+     *
      */
 	public static final int DEFAULT_TX_TIMEOUT = 0;
-	
-	/* 
+
+	/*
 	 * Sets the current/open repository session
 	 */
 	public void setCurrentRepositorySession(Object repoSession) throws Exception;
-	
+
 	/*
 	 * Decrements the context's repo session ref count and nulls it if the count becomes 0.
 	 */
 	public void clearCurrentRepositorySession();
-	
+
 	/*
 	 * If a current repository session exists, returns it.
 	 */
 	public Object getCurrentRepositorySession();
-	
+
     /**
      * getSecurityContext is contains security info. for the service layer
      */
@@ -108,12 +108,12 @@ public interface ServiceContext<IT, OT> {
      * @return
      */
     public boolean shouldUpdateCoreValues();
-    
+
     /**
      * getTimeoutSecs();
      */
     public int getTimeoutSecs();
-    
+
     /**
      * getUserId get authenticated user's userId
      */
@@ -149,16 +149,16 @@ public interface ServiceContext<IT, OT> {
      * @return service name
      */
     public String getDocumentType();
-    
+
     /**
      * Returns a tenant qualified document type.
-     * 
+     *
      */
     public String getTenantQualifiedDoctype();
-    
+
     /**
      * Returns a tenant qualified document type.
-     * 
+     *
      */
     public String getTenantQualifiedDoctype(String docType);
 
@@ -180,16 +180,16 @@ public interface ServiceContext<IT, OT> {
      * @return repository domain for the tenant
      */
     public String getRepositoryDomainName();
-    
+
     /*
      * The name of the repository/db for the current context
      */
     public String getRepositoryName() throws Exception;
-    
+
     /*
      * Get's the name/label used to create the storage container (folder or directory name)
      */
-    public String getRepositoryDomainStorageName();    
+    public String getRepositoryDomainStorageName();
 
     /**
      * getRepositoryClientName returns the repository client name as
@@ -228,7 +228,7 @@ public interface ServiceContext<IT, OT> {
      * @return the input
      */
     public IT getInput();
-    
+
     /**
      * setInput is used to set request input before starting to
      * process input data
@@ -257,9 +257,9 @@ public interface ServiceContext<IT, OT> {
      * @param map the map of service names to resource instances.
      */
     public void setResourceMap(ResourceMap map);
-    
+
     /**
-     * 
+     *
      * @param jaxsRsRequest - Keep track of the JAX-RS request information
      */
     public void setRequestInfo(Request jaxsRsRequest);
@@ -271,14 +271,14 @@ public interface ServiceContext<IT, OT> {
     public Map<String, ObjectPartType> getPartsMetadata();
 
     /**
-     * getCommonPartLabel returns label for common part of a service 
+     * getCommonPartLabel returns label for common part of a service
      * @return label
      */
     public String getCommonPartLabel();
 
     /**
      * getCommonPartLabel returns label for common part of a specified schema.
-     * This is useful for sub-resources. 
+     * This is useful for sub-resources.
      * @return label
      */
     public String getCommonPartLabel(String schemaName);
@@ -325,11 +325,11 @@ public interface ServiceContext<IT, OT> {
 
     /**
      * Gets the document hanlder.
-     * 
+     *
      * @param queryParams the query params
-     * 
+     *
      * @return the document hanlder
-     * 
+     *
      * @throws Exception the exception
      */
     public DocumentHandler getDocumentHandler(MultivaluedMap<String, String> queryParams) throws Exception;
@@ -350,7 +350,7 @@ public interface ServiceContext<IT, OT> {
 
     /**
      * Gets the query params.
-     * 
+     *
      * @return the query params
      */
     public MultivaluedMap<String, String> getQueryParams();
@@ -359,7 +359,7 @@ public interface ServiceContext<IT, OT> {
 
     /**
      * Sets the query params.
-     * 
+     *
      * @param queryParams the query params
      */
     public void setQueryParams(MultivaluedMap<String, String> queryParams);
@@ -373,20 +373,20 @@ public interface ServiceContext<IT, OT> {
 	public void setRepositoryDomain(RepositoryDomainType repositoryDomain);
 
 	public CollectionSpaceClient getClient() throws Exception;
-	
+
 	public CollectionSpaceClient getClient(String clientProperitesFilename) throws Exception;
-	
+
 	public CollectionSpaceClient getClient(RemoteClientConfig remoteClientConfig) throws Exception;
 
     /**
      * @return the JAX-RS resource of service for the current context.
-     * @throws Exception 
+     * @throws Exception
      */
     public CollectionSpaceResource<IT, OT> getResource() throws Exception;
 
     /**
      * @return the JAX-RS resource of service for the current context.
-     * @throws Exception 
+     * @throws Exception
      */
 	public CollectionSpaceResource<IT, OT> getResource(
 			String serviceName) throws Exception;
@@ -405,44 +405,44 @@ public interface ServiceContext<IT, OT> {
 	public boolean shouldForceSync();
 
 	/**
-	 * 
+	 *
 	 * @return The JAX-RS request information
 	 */
 	Request getRequestInfo();
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public TransactionContext openConnection() throws TransactionException; // Only 1 active connection at a time
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public boolean hasActiveConnection();
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public void closeConnection() throws TransactionException; // Assumes there's been a call to getConnection.
-	
+
 	/**
-	 * @throws TransactionException 
-	 * 
+	 * @throws TransactionException
+	 *
 	 */
 	void setTransactionContext(TransactionContext transactionCtx) throws TransactionException; // For sharing a transaction context with another service context.
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public boolean isTransactionContextShared() throws TransactionException;
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	TransactionContext getCurrentTransactionContext();
 
+	public void setRollbackOnException(boolean rollbackOnException);
+
+	public boolean isRollbackOnException();
 }
-
-
-

@@ -32,42 +32,6 @@ import java.util.UUID;
 import javax.sql.rowset.CachedRowSet;
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.collectionspace.services.lifecycle.TransitionDef;
-import org.collectionspace.services.nuxeo.util.CSReindexFulltextRoot;
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.IQueryManager;
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.client.Profiler;
-import org.collectionspace.services.client.index.IndexClient;
-import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.query.QueryContext;
-import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.common.storage.JDBCTools;
-import org.collectionspace.services.common.storage.PreparedStatementSimpleBuilder;
-import org.collectionspace.services.common.document.BadRequestException;
-import org.collectionspace.services.common.document.DocumentException;
-import org.collectionspace.services.common.document.DocumentFilter;
-import org.collectionspace.services.common.document.DocumentHandler;
-import org.collectionspace.services.common.document.DocumentNotFoundException;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
-import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.document.DocumentWrapperImpl;
-import org.collectionspace.services.common.document.TransactionException;
-import org.collectionspace.services.common.CSWebApplicationException;
-import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.api.Tools;
-import org.collectionspace.services.common.config.ConfigUtils;
-import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
-import org.collectionspace.services.common.config.TenantBindingUtils;
-import org.collectionspace.services.common.storage.PreparedStatementBuilder;
-import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
-import org.collectionspace.services.config.service.ServiceBindingType;
-import org.collectionspace.services.config.tenant.TenantBindingType;
-import org.collectionspace.services.config.tenant.RepositoryDomainType;
-
 //
 // CSPACE-5036 - How to make CMISQL queries from Nuxeo
 //
@@ -75,24 +39,57 @@ import org.apache.chemistry.opencmis.commons.enums.CmisVersion;
 import org.apache.chemistry.opencmis.commons.server.CallContext;
 import org.apache.chemistry.opencmis.server.impl.CallContextImpl;
 import org.apache.chemistry.opencmis.server.shared.ThresholdOutputStreamFactory;
+import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.IQueryManager;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.Profiler;
+import org.collectionspace.services.client.index.IndexClient;
+import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.common.CSWebApplicationException;
+import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.config.ConfigUtils;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.config.TenantBindingUtils;
+import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentFilter;
+import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.document.DocumentWrapperImpl;
+import org.collectionspace.services.common.document.TransactionException;
+import org.collectionspace.services.common.query.QueryContext;
+import org.collectionspace.services.common.repository.RepositoryClient;
+import org.collectionspace.services.common.storage.JDBCTools;
+import org.collectionspace.services.common.storage.PreparedStatementBuilder;
+import org.collectionspace.services.common.storage.PreparedStatementSimpleBuilder;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
+import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.RepositoryDomainType;
+import org.collectionspace.services.config.tenant.TenantBindingType;
+import org.collectionspace.services.lifecycle.TransitionDef;
+import org.collectionspace.services.nuxeo.util.CSReindexFulltextRoot;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.common.utils.IdUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.IterableQueryResult;
-import org.nuxeo.ecm.core.api.VersioningOption;
-import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
+import org.nuxeo.ecm.core.api.IterableQueryResult;
 import org.nuxeo.ecm.core.api.PathRef;
-import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.runtime.transaction.TransactionRuntimeException;
+import org.nuxeo.ecm.core.api.VersioningOption;
+import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
 import org.nuxeo.ecm.core.opencmis.bindings.NuxeoCmisServiceFactory;
 import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoCmisService;
-import org.nuxeo.elasticsearch.api.ElasticSearchAdmin;
-import org.nuxeo.elasticsearch.api.ElasticSearchIndexing;
-import org.nuxeo.elasticsearch.api.ElasticSearchService;
 import org.nuxeo.elasticsearch.ElasticSearchComponent;
+import org.nuxeo.elasticsearch.api.ElasticSearchService;
+import org.nuxeo.runtime.api.Framework;
+import org.nuxeo.runtime.transaction.TransactionRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -216,10 +213,14 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             handler.complete(Action.CREATE, wrapDoc);
             return id;
         } catch (BadRequestException bre) {
-        	rollbackTransaction(repoSession);
+            if (ctx.isRollbackOnException()) {
+                rollbackTransaction(repoSession);
+            }
             throw bre;
         } catch (Throwable e) {
-        	rollbackTransaction(repoSession);
+            if (ctx.isRollbackOnException()) {
+                rollbackTransaction(repoSession);
+            }
         	if (logger.isDebugEnabled()) {
         		logger.debug("Call to low-level Nuxeo document create call failed: ", e);
         	}
@@ -278,7 +279,9 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             CSReindexFulltextRoot indexer = new CSReindexFulltextRoot(repoSession);
             indexer.reindexFulltext(0, 0, queryString);
         } catch (Throwable e) {
-        	rollbackTransaction(repoSession);
+            if (ctx.isRollbackOnException()) {
+                rollbackTransaction(repoSession);
+            }
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception trying to reindex Nuxeo repository ", e);
             }
@@ -342,7 +345,9 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
 
             result = true;
         } catch (Throwable e) {
-        	rollbackTransaction(repoSession);
+            if (ctx.isRollbackOnException()) {
+                rollbackTransaction(repoSession);
+            }
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception trying to reindex Nuxeo repository ", e);
             }
@@ -374,13 +379,19 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             result = handler.handle(Action.SYNC, wrapDoc);
             handler.complete(Action.SYNC, wrapDoc);
         } catch (IllegalArgumentException iae) {
-        	rollbackTransaction(repoSession);
+            if (ctx.isRollbackOnException()) {
+                rollbackTransaction(repoSession);
+            }
             throw iae;
         } catch (DocumentException de) {
-        	rollbackTransaction(repoSession);
+            if (ctx.isRollbackOnException()) {
+                rollbackTransaction(repoSession);
+            }
             throw de;
         } catch (Throwable e) {
-        	rollbackTransaction(repoSession);
+            if (ctx.isRollbackOnException()) {
+                rollbackTransaction(repoSession);
+            }
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
@@ -413,13 +424,19 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             result = handler.handle(Action.SYNC, wrapDoc);
             handler.complete(Action.SYNC, wrapDoc);
         } catch (IllegalArgumentException iae) {
-        	rollbackTransaction(repoSession);
+            if (ctx.isRollbackOnException()) {
+                rollbackTransaction(repoSession);
+            }
             throw iae;
         } catch (DocumentException de) {
-        	rollbackTransaction(repoSession);
+            if (ctx.isRollbackOnException()) {
+                rollbackTransaction(repoSession);
+            }
             throw de;
         } catch (Throwable e) {
-        	rollbackTransaction(repoSession);
+            if (ctx.isRollbackOnException()) {
+                rollbackTransaction(repoSession);
+            }
             throw new NuxeoDocumentException(e);
         } finally {
             if (repoSession != null) {
@@ -1709,16 +1726,25 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             doc.refresh();
             handler.complete(Action.UPDATE, wrapDoc);
         } catch (BadRequestException bre) {
-        	rollbackTransaction(repoSession);
+            if (ctx.isRollbackOnException()) {
+                rollbackTransaction(repoSession);
+            }
             throw bre;
         } catch (DocumentException de) {
-        	rollbackTransaction(repoSession);
+            if (ctx.isRollbackOnException()) {
+                rollbackTransaction(repoSession);
+            }
+
             throw de;
         } catch (CSWebApplicationException wae) {
-        	rollbackTransaction(repoSession);
+            if (ctx.isRollbackOnException()) {
+                rollbackTransaction(repoSession);
+            }
             throw wae;
         } catch (Throwable e) {
-        	rollbackTransaction(repoSession);
+            if (ctx.isRollbackOnException()) {
+                rollbackTransaction(repoSession);
+            }
             throw new NuxeoDocumentException(e);
         } finally {
             if (repoSession != null) {
@@ -1868,10 +1894,14 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
 	            handler.complete(Action.DELETE, wrapDoc);
             }
         } catch (DocumentException de) {
-        	rollbackTransaction(repoSession);
+            if (ctx.isRollbackOnException()) {
+        	    rollbackTransaction(repoSession);
+            }
             throw de;
         } catch (Throwable e) {
-        	rollbackTransaction(repoSession);
+            if (ctx.isRollbackOnException()) {
+                rollbackTransaction(repoSession);
+            }
             throw new NuxeoDocumentException(e);
         } finally {
             if (repoSession != null) {
@@ -1961,7 +1991,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
                 logger.debug("Path to Workspaces root: " + workspacesRoot.getPathAsString());
             }
         } catch (Throwable e) {
-        	rollbackTransaction(repoSession);
+            rollbackTransaction(repoSession);
             if (logger.isDebugEnabled()) {
                 logger.debug("Could not create tenant domain name=" + repositoryDomain.getStorageName() + " caught exception ", e);
             }
@@ -2063,7 +2093,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
                         + " id=" + workspaceId);
             }
         } catch (Throwable e) {
-        	rollbackTransaction(repoSession);
+            rollbackTransaction(repoSession);
             if (logger.isDebugEnabled()) {
                 logger.debug("createWorkspace caught exception ", e);
             }
