@@ -42,6 +42,7 @@ public class ReportClient extends AbstractCommonListPoxServiceClientImpl<ReportP
     public static final String SERVICE_NAME = "reports";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
     public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
+	public static final String SERVICE_COMMON_PART_NAME = SERVICE_NAME + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
     public static final String PDF_MIME_TYPE = "application/pdf";
     public static final String CSV_MIME_TYPE = "text/csv";
     public static final String TSV_MIME_TYPE = "text/tab-separated-values";
