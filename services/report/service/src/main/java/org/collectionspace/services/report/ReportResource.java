@@ -29,6 +29,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.report.nuxeo.ReportDocumentModelHandler;
 import org.collectionspace.services.publicitem.PublicitemsCommon;
 import org.collectionspace.services.client.IQueryManager;
+import org.collectionspace.services.client.PayloadPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.ReportClient;
@@ -224,12 +225,24 @@ public class ReportResource extends NuxeoBasedResource {
 			builder = builder.header("Content-Disposition","inline;filename=\""+ outFileName.toString() +"\"");
 	        response = builder.build();
         } catch (Exception e) {
-            throw bigReThrow(e, ServiceMessages.POST_FAILED);
+        	String msg = e.getMessage();
+            throw bigReThrow(e, ServiceMessages.POST_FAILED + msg != null ? msg : "");
         }
 
         return response;
     }
 
+	private ReportsCommon getReportsCommon(String csid) throws Exception {
+		ReportsCommon result = null;
+
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+		PoxPayloadOut ppo = get(csid, ctx);
+		PayloadPart reportsCommonPart = ppo.getPart(ReportClient.SERVICE_COMMON_PART_NAME);
+		result = (ReportsCommon)reportsCommonPart.getBody();
+
+    	return result;
+    }
+	
     /*
      * Does the actual report generation and returns an InputStream with the results.
      */
@@ -253,8 +266,9 @@ public class ReportResource extends NuxeoBasedResource {
             logger.trace("invokeReport with csid=" + csid);
         }
 
+        ReportsCommon reportsCommon = getReportsCommon(csid);
         ReportDocumentModelHandler handler = (ReportDocumentModelHandler)createDocumentHandler(ctx);
-        result = handler.invokeReport(ctx, csid, invContext, outMimeType, outReportFileName);
+        result = handler.invokeReport(ctx, csid, reportsCommon, invContext, outMimeType, outReportFileName);
 
         return result;
     }

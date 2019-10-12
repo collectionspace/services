@@ -55,7 +55,17 @@ import net.sf.jasperreports.engine.export.ooxml.JRDocxExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRPptxExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 
+import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.ReportJAXBSchema;
+import org.collectionspace.services.account.AccountResource;
+import org.collectionspace.services.authorization.AuthZ;
+import org.collectionspace.services.authorization.CSpaceResource;
+import org.collectionspace.services.authorization.PermissionException;
+import org.collectionspace.services.authorization.URIResourceImpl;
+import org.collectionspace.services.authorization.perms.ActionType;
+import org.collectionspace.services.report.ResourceActionGroup;
+import org.collectionspace.services.report.ResourceActionGroupList;
+import org.collectionspace.services.report.ReportsCommon.ForRoles;
 import org.collectionspace.services.report.MIMEType;
 import org.collectionspace.services.report.MIMETypeItemType;
 import org.collectionspace.services.report.ReportsCommon;
@@ -68,6 +78,7 @@ import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.authorization_mgt.ActionGroup;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -175,12 +186,20 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 	public InputStream invokeReport(
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
 			String csid,
+			ReportsCommon reportsCommon,
 			InvocationContext invContext,
 			StringBuffer outMimeType,
 			StringBuffer outReportFileName) throws Exception {
 
 		CoreSessionInterface repoSession = null;
 		boolean releaseRepoSession = false;
+		
+		// Ensure the current user has permission to run this report
+		if (isAuthoritzed(reportsCommon) == false) {
+			String msg = String.format("Report Resource: The user '%s' is not authorized to run the report '%s' CSID='%s'", 
+					AuthN.get().getUserId(), reportsCommon.getName(), csid);
+			throw new PermissionException(msg);
+		}
 
 		String invocationMode = invContext.getMode();
 		String modeProperty = null;
@@ -192,10 +211,10 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 		// Note we set before we put in the default ones, so they cannot override tenant or CSID.
 		setParamsFromContext(params, invContext);
 		
-		if(Invocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationMode)) {
+		if (Invocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationMode)) {
 			modeProperty = InvocableJAXBSchema.SUPPORTS_SINGLE_DOC;
     		params.put(REPORTS_STD_CSID_PARAM, invContext.getSingleCSID());
-		} else if(Invocable.INVOCATION_MODE_LIST.equalsIgnoreCase(invocationMode)) {
+		} else if (Invocable.INVOCATION_MODE_LIST.equalsIgnoreCase(invocationMode)) {
 			modeProperty = InvocableJAXBSchema.SUPPORTS_DOC_LIST;
 			List<String> csids = null;
 			InvocationContext.ListCSIDs listThing = invContext.getListCSIDs();
@@ -238,7 +257,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			releaseRepoSession = true;
 		}
 
-		// Get properties from the batch docModel, and release the session
+		// Get properties from the report docModel, and release the session
 		String reportFileNameProperty;
 		try {
 			DocumentWrapper<DocumentModel> wrapper = repoClient.getDoc(repoSession, ctx, csid);
@@ -279,12 +298,12 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 	    	}
 		} catch (PropertyException pe) {
 			if (logger.isDebugEnabled()) {
-				logger.debug("Property exception getting batch values: ", pe);
+				logger.debug("Property exception getting report values: ", pe);
 			}
 			throw pe;
 		} catch (DocumentException de) {
 			if (logger.isDebugEnabled()) {
-				logger.debug("Problem getting batch doc: ", de);
+				logger.debug("Problem getting report report: ", de);
 			}
 			throw de;
 		} catch (Exception e) {
@@ -501,6 +520,108 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
     	
     	return result;
     }
+
+	/**
+	 * Check to see if the current user is authorized to run/invoke this report.  If the report
+	 * did not specify any permissions, we assume that the current user is authorized to run the report.
+	 * @param reportsCommon
+	 * @return
+	 */
+	protected boolean isAuthoritzedWithPermissions(ReportsCommon reportsCommon) {
+		boolean result = true;
+		
+		ResourceActionGroupList resourceActionGroupList = reportsCommon.getResourceActionGroupList();
+		if (resourceActionGroupList != null) {
+			String tenantId = AuthN.get().getCurrentTenantId();
+			for (ResourceActionGroup resourceActionGroup: resourceActionGroupList.getResourceActionGroup()) {
+				String resourceName = resourceActionGroup.getResourceName();
+				ActionGroup actionGroup = ActionGroup.creatActionGroup(resourceActionGroup.getActionGroup());
+				for (ActionType actionType: actionGroup.getActions()) {
+					CSpaceResource res = new URIResourceImpl(tenantId, resourceName, AuthZ.getMethod(actionType));
+					if (AuthZ.get().isAccessAllowed(res) == false) {
+						return false;
+					}
+				}
+			}
+		}
+		
+		return result;
+	}
+
+	/**
+	 * Returns true if we found any required permissions.
+	 * 
+	 * @param reportCommon
+	 * @return
+	 */
+	private boolean hasRequiredPermissions(ReportsCommon reportCommon) {
+		boolean result = false;
+		
+		try {
+			result = reportCommon.getResourceActionGroupList().getResourceActionGroup().size() > 0;
+		} catch (NullPointerException e) {
+			// ignore exception, we're just testing to see if we have any list elements
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Returns true if we found any required roles.
+	 * 
+	 * @param reportCommon
+	 * @return
+	 */
+	private boolean hasRequiredRoles(ReportsCommon reportCommon) {
+		boolean result = false;
+		
+		try {
+			result = reportCommon.getForRoles().getRoleDisplayName().size() > 0;
+		} catch (NullPointerException e) {
+			// ignore exception, we're just testing to see if we have any list elements
+		}
+		
+		return result;
+	}
+    
+	/**
+	 * The current user is authorized to run the report if:
+	 * 	1. No permissions or roles are specified in the report
+	 *  2. No roles are specified, but permissions are specified and the current user has those permissions
+	 *  3. Roles are specified and the current user is a member of at least one of the roles.
+	 * 
+	 * @param reportsCommon
+	 * @return
+	 */
+	protected boolean isAuthoritzed(ReportsCommon reportsCommon) {
+		boolean result = true;
+		
+		if (hasRequiredRoles(reportsCommon)) { 
+			result = isAuthorizedWithRoles(reportsCommon);
+		} else if (hasRequiredPermissions(reportsCommon)) {
+			result = isAuthoritzedWithPermissions(reportsCommon);
+		}
+		 		
+		return result;
+	}
+	
+	protected boolean isAuthorizedWithRoles(ReportsCommon reportCommon) {
+		boolean result = false;
+		
+		ForRoles forRolesList = reportCommon.getForRoles();
+		if (forRolesList != null) {
+			AccountResource accountResource = new AccountResource();
+			List<String> roleDisplayNameList = accountResource.getAccountRoles(AuthN.get().getUserId(), AuthN.get().getCurrentTenantId());
+			for (String target : forRolesList.getRoleDisplayName()) {
+				if (roleDisplayNameList.contains(target)) {
+					result = true;
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
 
 }
 
