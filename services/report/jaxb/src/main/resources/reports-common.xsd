@@ -42,6 +42,14 @@
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
+                <xs:element name="forRoles" minOccurs="0" maxOccurs="1">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="roleDisplayName" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="resourceActionGroupList" type="resourceActionGroupList" minOccurs="0" maxOccurs="1"/>
 				<xs:element name="supportsNoContext" type="xs:boolean" />
 				<xs:element name="supportsSingleDoc" type="xs:boolean" />
 				<xs:element name="supportsDocList" type="xs:boolean" />
@@ -52,6 +60,19 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
+
+    <xs:complexType name="resourceActionGroupList">
+        <xs:sequence>
+            <xs:element name="resourceActionGroup" type="resourceActionGroup" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
     
+    <xs:complexType name="resourceActionGroup">
+        <xs:sequence>
+            <xs:element name="resourceName" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="actionGroup" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
 </xs:schema>
 

@@ -172,14 +172,10 @@
       -->
     </target>
 
-    <target name="undeploy" depends="undeploy_report_files"
-      description="Undeploy report-related artifacts">
-        <ant antfile="nuxeo-platform-cs-report/build.xml" target="undeploy" inheritall="false"/>
+    <target name="undeploy" depends="undeploy_report_files" description="Undeploy report-related artifacts">
     </target>
 
-    <target name="dist"
-    description="Generate distribution for report" depends="package">
-        <ant antfile="nuxeo-platform-cs-report/build.xml" target="dist" inheritall="false"/>
+    <target name="dist" description="Generate distribution for report" depends="package">
     </target>
 
 
