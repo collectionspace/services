@@ -26,6 +26,8 @@
  */
 package org.collectionspace.services.client;
 
+import java.util.List;
+
 public interface IQueryManager {
 	
 	final static String SEARCH_GROUP_OPEN = "(";
@@ -168,6 +170,8 @@ public interface IQueryManager {
 	 * @return the string
 	 */
 	public String createWhereClauseForInvocableByMode(String schema, String mode);
+
+	public String createWhereClauseForInvocableByMode(String schema, List<String> modes);
 
 	/*
 	 * 

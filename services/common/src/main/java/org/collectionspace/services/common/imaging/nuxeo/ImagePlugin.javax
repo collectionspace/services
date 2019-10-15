@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.nuxeo.common.utils.IdUtils;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.ClientException;
@@ -38,12 +36,14 @@ import org.nuxeo.ecm.platform.filemanager.utils.FileManagerUtils;
 import org.nuxeo.ecm.platform.picture.api.ImagingDocumentConstants;
 import org.nuxeo.ecm.platform.picture.api.adapters.PictureResourceAdapter;
 import org.nuxeo.ecm.platform.types.TypeManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ImagePlugin extends AbstractFileImporter {
 
     private static final long serialVersionUID = 5850210255138418118L;
 
-    private static final Log log = LogFactory.getLog(ImagePlugin.class);
+    private static final Logger logger = LoggerFactory.getLogger(ImagePlugin.class);
 
     public DocumentModel create(CoreSession documentManager, Blob content,
             String path, boolean overwrite, String fullname,

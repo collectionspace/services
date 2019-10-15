@@ -26,26 +26,23 @@
  */
 package org.collectionspace.services.common.query.nuxeo;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//import org.nuxeo.ecm.core.client.NuxeoClient;
-
-
-
+import org.apache.commons.lang3.StringUtils;
 
 import org.collectionspace.services.jaxb.InvocableJAXBSchema;
-//import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
-//import org.collectionspace.services.nuxeo.client.java.NxConnect;
-
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.common.invocable.InvocableUtils;
 import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.common.storage.JDBCTools;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class QueryManagerNuxeoImpl implements IQueryManager {
 
@@ -299,24 +296,46 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 
 	/**
 	 * Creates a filtering where clause from invocation mode, for invocables.
-	 * 
+	 *
 	 * @param mode
 	 *            the mode
-	 * 
+	 *
 	 * @return the string
 	 */
 	@Override
 	public String createWhereClauseForInvocableByMode(String schema, String mode) {
-		String trimmed = (mode == null) ? "" : mode.trim();
-		if (trimmed.isEmpty()) {
-			throw new RuntimeException("No docType specified.");
-		}
+		return createWhereClauseForInvocableByMode(schema, Arrays.asList(mode));
+	}
+
+	@Override
+	public String createWhereClauseForInvocableByMode(String schema, List<String> modes) {
 		if (schema == null || schema.isEmpty()) {
 			throw new RuntimeException("No match schema specified.");
 		}
-		String wClause = InvocableUtils.getPropertyNameForInvocationMode(
-				schema, trimmed) + " != 0";
-		return wClause;
+
+		if (modes == null || modes.isEmpty()) {
+			throw new RuntimeException("No mode specified.");
+		}
+
+		List<String> whereClauses = new ArrayList<String>();
+
+		for (String mode : modes) {
+			String propName = InvocableUtils.getPropertyNameForInvocationMode(schema, mode.trim());
+
+			if (propName != null && !propName.isEmpty()) {
+				whereClauses.add(propName + " != 0");
+			}
+		}
+
+		if (whereClauses.size() > 1) {
+			return ("(" + StringUtils.join(whereClauses, " OR ") + ")");
+		}
+
+		if (whereClauses.size() > 0) {
+			return whereClauses.get(0);
+		}
+
+		return "";
 	}
 
 	/**

@@ -33,10 +33,6 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
-import org.collectionspace.services.authorization.perms.Permission;
-import org.collectionspace.services.authorization.PermissionValue;
-import org.collectionspace.services.authorization.Role;
-import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.AccountRoleRel;
 import org.collectionspace.services.authorization.PermissionRoleRel;
 import org.collectionspace.services.common.api.Tools;
@@ -50,7 +46,6 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.document.JaxbUtils;
-import org.hsqldb.lib.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

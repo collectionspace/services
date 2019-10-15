@@ -3,7 +3,6 @@ package org.collectionspace.services.common.storage.jpa;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
-import javax.persistence.RollbackException;
 
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.InconsistentStateException;
@@ -16,7 +15,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("rawtypes")
 public class JPATransactionContext extends TransactionContext {
     /** The logger. */
-    private final Logger logger = LoggerFactory.getLogger(TransactionContext.class);
+    private final Logger logger = LoggerFactory.getLogger(JPATransactionContext.class);
 
 	private int transactionRefCount = 0;
 	private boolean aclTablesUpdatedFlag = false;
