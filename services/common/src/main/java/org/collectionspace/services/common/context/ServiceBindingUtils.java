@@ -20,6 +20,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 
 import java.lang.IndexOutOfBoundsException;
 
+import org.collectionspace.services.client.index.IndexClient;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.slf4j.Logger;
@@ -30,6 +31,8 @@ public class ServiceBindingUtils {
 	public static final boolean QUALIFIED_PROP_NAMES = true;
 	public static final boolean UNQUALIFIED_PROP_NAMES = false;
 	public static final String OUTPUT_MIME_PROP = "outputMIME";
+	public static final String FULLTEXT_QUERY = IndexClient.FULLTEXT_ID;
+	public static final String ELASTICSEARCH_QUERY = IndexClient.ELASTICSEARCH_ID;
 	public static final String AUTH_REF_PROP = "authRef";
 	public static final String TERM_REF_PROP = "termRef";
 	public static final String OBJ_NUMBER_PROP = "objectNumberProperty";

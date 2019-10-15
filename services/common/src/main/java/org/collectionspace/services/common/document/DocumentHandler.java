@@ -340,7 +340,14 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * @throws DocumentException 
      */
     public String getDocumentsToIndexQuery(String indexId, String csid) throws DocumentException, Exception;
-    
+
+    /**
+     * get a query string that will be used to return a set of documents that should be indexed/re-index
+     * @throws Exception
+     * @throws DocumentException
+     */
+    public String getDocumentsToIndexQuery(String indexId, String documentType, String csid) throws DocumentException, Exception;
+
     /**
      * Creates the CMIS query from the service context.  Each document handler is responsible for returning a valid CMIS query using the
      * information in the current service context -which includes things like the query parameters, etc.

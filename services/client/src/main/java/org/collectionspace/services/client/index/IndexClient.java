@@ -37,6 +37,11 @@ public class IndexClient extends AbstractCommonListPoxServiceClientImpl<IndexPro
 	public static final String SERVICE_COMMONPART_NAME = SERVICE_NAME + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
 	public static final String SERVICE_AUTHZ_SUFFIX = "/*/" + SERVICE_PATH_COMPONENT + "/";
 	public static final String INDEX_ID_PARAM = "indexid";
+	public static final String FULLTEXT_ID = "fulltext";
+	public static final String ELASTICSEARCH_ID = "elasticsearch";
+	public static final String DEFAULT_REINDEX_QUERY = "SELECT ecm:uuid, ecm:primaryType FROM Document"
+            + " WHERE ecm:isProxy = 0"
+            + " ORDER BY ecm:uuid";
 	
 	public IndexClient() throws Exception {
 		super();

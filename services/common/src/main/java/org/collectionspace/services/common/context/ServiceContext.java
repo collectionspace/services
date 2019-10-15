@@ -442,7 +442,7 @@ public interface ServiceContext<IT, OT> {
 	 */
 	TransactionContext getCurrentTransactionContext();
 
+	public void setRollbackOnException(boolean rollbackOnException);
+
+	public boolean isRollbackOnException();
 }
-
-
-

@@ -261,6 +261,28 @@
 		</tenant:serviceBindings>
 		<!-- end blob service meta-data -->
 
+		<!-- begin batch-invoke service meta-data -->
+		<tenant:serviceBindings id="batch/invoke" merge:matcher="id" name="batch/invoke"
+			type="utility" version="1.0">
+			<!-- other URI paths through which this service could be accessed -->
+			<!-- <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'> /batch/*/invoke </service:uriPath> -->
+			<service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.batch.nuxeo.BatchDocumentModelHandler
+			</service:documentHandler>
+			<!-- <service:validatorHandler xmlns:service='http://collectionspace.org/services/config/service'> org.collectionspace.services.batch.nuxeo.BatchDocumentModelHandler
+				</service:validatorHandler> -->
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" name="BatchInvoke"
+				version="1.0">
+				<service:part id="0" control_group="Managed" versionable="true" auditable="false" label="batchinvoke_system"
+					updated="" order="0">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/config/system"
+							schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+					</service:content>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+		<!-- end batch-invoke service meta-data -->
+
 		<!-- begin batch service meta-data -->
 		<tenant:serviceBindings id="Batch" merge:matcher="id" name="Batch" type="utility" version="1.0">
 			<service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
@@ -385,10 +407,21 @@
 		<tenant:serviceBindings id="Index" merge:matcher="id" name="Index" type="utility"
 			version="1.0">
 			<service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
-			<service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.common.index.service.nuxeo.WorkflowDocumentModelHandler
+			<service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.index.nuxeo.IndexDocumentModelHandler
 			</service:documentHandler>
-			<service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.index.nuxeo.WorkflowValidatorHandler
+			<service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.index.nuxeo.IndexValidatorHandler
 			</service:validatorHandler>
+			<service:properties xmlns:service="http://collectionspace.org/services/config/service">
+				<types:item xmlns:types="http://collectionspace.org/services/config/types">
+					<types:key>fulltext</types:key>
+					<types:value>SELECT ecm:uuid, ecm:primaryType FROM Document WHERE ecm:isProxy = 0 ORDER BY ecm:uuid</types:value>
+				</types:item>
+				<types:item xmlns:types="http://collectionspace.org/services/config/types">
+					<types:key>elasticsearch</types:key>
+					<!-- %s in value will be substituted with the appropriate doc type -->
+					<types:value>SELECT ecm:uuid FROM %s</types:value>
+				</types:item>
+			</service:properties>
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" name="Index"
 				version="1.0">
 				<service:part id="0" control_group="Managed" versionable="true" auditable="false" label="index-system"
@@ -407,7 +440,29 @@
 				</service:part>
 			</service:object>
 		</tenant:serviceBindings>
-		<!-- end Index service meta-data -->		
+		<!-- end Index service meta-data -->
+
+		<!-- begin reports-invoke service meta-data -->
+		<tenant:serviceBindings id="reports/invoke" merge:matcher="id" name="reports/invoke"
+			type="utility" version="1.0">
+			<!-- other URI paths through which this service could be accessed -->
+			<!-- <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'> /reports/*/invoke </service:uriPath> -->
+			<service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.report.nuxeo.ReportDocumentModelHandler
+			</service:documentHandler>
+			<!-- <service:validatorHandler xmlns:service='http://collectionspace.org/services/config/service'> org.collectionspace.services.report.nuxeo.ReportDocumentModelHandler
+				</service:validatorHandler> -->
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" name="ReportsInvoke"
+				version="1.0">
+				<service:part id="0" control_group="Managed" versionable="true" auditable="false" label="reportsinvoke_system"
+					updated="" order="0">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/config/system"
+							schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+					</service:content>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+		<!-- end reports-invoke service meta-data -->
 
 		<!-- begin report service meta-data -->
 		<tenant:serviceBindings id="Reports" merge:matcher="id" name="Reports" type="utility" version="1.0">

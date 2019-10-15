@@ -105,7 +105,7 @@ public class JDBCTools {
 		        	// now cache this DataSource instance for future references
 		        	cachedDataSources.put(dataSourceName, result);
 		        }
-	    	} finally {
+	    	} finally { // We should explicitly close both context instances
 	            if (ctx != null) {
 	                try {
 	                    ctx.close();
