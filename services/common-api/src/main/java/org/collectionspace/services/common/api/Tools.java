@@ -28,6 +28,8 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 import  java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
+
 
 import java.util.regex.Matcher;
 
@@ -406,5 +408,17 @@ public class Tools {
         } else {
             return true;
         }
+    }
+    
+    static public boolean listContainsIgnoreCase(List<String> theList, String searchStr) {
+    	boolean result = false;
+    	
+    	for (String listItem : theList) {
+    		if (StringUtils.containsIgnoreCase(listItem, searchStr)) {
+    			return true;
+    		}
+    	}
+    	
+    	return result;
     }
 }
