@@ -67,6 +67,10 @@ public class ServiceMessages {
     public static String resourceNotFoundMsg(String csid) {
         return String.format("The resource identified by CSID '%s' was not found.", csid);
     }
+    
+    public static String indexResourceNotFoundMsg(String indexId) {
+        return String.format("The index resource '%s' was not found.", indexId);
+    }
 
     public static String resourceNotReindexedMsg(String csid) {
         return String.format("The resource identified by CSID '%s' could not be reindexed. See the service logs for details.", csid);

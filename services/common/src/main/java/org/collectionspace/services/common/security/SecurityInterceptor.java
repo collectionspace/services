@@ -84,11 +84,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 
 	/** The Constant logger. */
 	private static final Logger logger = LoggerFactory.getLogger(SecurityInterceptor.class);
-	private static final String REPORTS_MIME_OUTPUTS = "reports/mimetypes";
-	private static final String ACCOUNT_PERMISSIONS = "accounts/*/accountperms";
-	private static final String STRUCTURED_DATE_REQUEST = "structureddate";
-	private static final String PASSWORD_RESET = "accounts/requestpasswordreset";
-	private static final String PROCESS_PASSWORD_RESET = "accounts/processpasswordreset";
+	
 	private static final String SYSTEM_INFO = SystemInfoClient.SERVICE_NAME;
 	private static final String NUXEO_ADMIN = null;
     //
@@ -107,8 +103,8 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
     	
 		String resName = SecurityUtils.getResourceName(request.getUri()).toLowerCase();
 		switch (resName) {
-			case PASSWORD_RESET:
-			case PROCESS_PASSWORD_RESET:
+			case AuthZ.PASSWORD_RESET:
+			case AuthZ.PROCESS_PASSWORD_RESET:
 			case SYSTEM_INFO:
 				return true;
 		}
@@ -139,9 +135,9 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
     	// STRUCTURED_DATE_REQUEST: All user can request the parsing of a structured date string.
     	//
     	switch (resName) {
-    		case STRUCTURED_DATE_REQUEST:
-    		case ACCOUNT_PERMISSIONS:
-    		case REPORTS_MIME_OUTPUTS:
+			case AuthZ.STRUCTURED_DATE_REQUEST:
+			case AuthZ.ACCOUNT_PERMISSIONS:
+			case AuthZ.REPORTS_MIME_OUTPUTS:
     			result = false;
     			break;
     		default:
@@ -186,14 +182,24 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 			String resEntity = SecurityUtils.getResourceEntity(resName);
 			
 			//
-			// If the resource entity is acting as a proxy then all sub-resource will map to the resource itself.
-			// This essentially means that the sub-resource inherit all the authz permissions of the entity.
+			// If the resource entity is acting as a proxy then all sub-resources will map to the resource itself.
+			// This essentially means sub-resources inherit all the authz permissions of the entity.
 			//
-			if (SecurityUtils.isEntityProxy() == true && !resName.equalsIgnoreCase(ACCOUNT_PERMISSIONS)) {
+			if (SecurityUtils.isResourceProxied(resName) == true) {
 				resName = resEntity;
+			} else {
+				//
+				// If our resName is not proxied, we may need to tweak it.
+				//
+				switch (resName) {
+					case AuthZ.REPORTS_INVOKE:
+					case AuthZ.BATCH_INVOKE: {
+						resName = resName.replace("/*/", "/");
+					}
+				}
 			}
 			//
-			// Make sure the account is current and active
+			// Make sure the account of the user making the request is current and active
 			//
 			checkActive();
 			

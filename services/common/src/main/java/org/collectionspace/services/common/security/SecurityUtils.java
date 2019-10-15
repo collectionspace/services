@@ -35,6 +35,7 @@ import org.collectionspace.services.authorization.URIResourceImpl;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.index.IndexClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.authentication.AuthN;
 
@@ -85,6 +86,7 @@ class CSpacePasswordEncoder extends BasePasswordEncoder {
 public class SecurityUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityUtils.class);
+    
     public static final String URI_PATH_SEPARATOR = "/";
     public static final int MIN_PASSWORD_LENGTH = 8;
     public static final int MAX_PASSWORD_LENGTH = 24;
@@ -230,6 +232,7 @@ public class SecurityUtils {
 		
 		uriPath = uriPath.replace("//", "/"); // replace duplicate '/' characters
 		uriPath = uriPath.startsWith("/") ? uriPath.substring(1) : uriPath; // if present, strip the leading '/' character
+		
 		return uriPath;
 	}
     
@@ -267,7 +270,7 @@ public class SecurityUtils {
 	    while (strTok.hasMoreTokens() == true) {
 	    	pathSegment = strTok.nextToken();
 	    	if (pathSegment.equals("*") || 
-	    			pathSegment.equals("index") || pathSegment.equals(CollectionSpaceClient.SERVICE_DESCRIPTION_PATH)) {  // Strip off subresource paths since they inherit their parent's permissions
+	    			pathSegment.equals(IndexClient.SERVICE_PATH_COMPONENT) || pathSegment.equals(CollectionSpaceClient.SERVICE_DESCRIPTION_PATH)) {  // Strip off subresource paths since they inherit their parent's permissions
 	    		//
 	    		// leave the loop if we hit a wildcard character or the "index" subresource
 	    		//
@@ -277,6 +280,12 @@ public class SecurityUtils {
 	    		result = result.concat(URI_PATH_SEPARATOR);
 	    	}
 	    	result = result.concat(pathSegment);
+	    }
+	    //
+	    // Special case for the "index" services since "index" is also a subresource for some of the other services.
+	    //
+	    if (Tools.isEmpty(result) && pathSegment.equals(IndexClient.SERVICE_PATH_COMPONENT)) {
+	    	result = IndexClient.SERVICE_PATH_COMPONENT; 
 	    }
 		
 		return result;
@@ -302,13 +311,21 @@ public class SecurityUtils {
      *
      * @return true, if is entity proxy is acting as a proxy for all sub-resources
      */
-    public static final boolean isEntityProxy() {
-    	//
-    	// should be getting this information from  the cspace config settings (tenent bindings file).
-    	return true;
+    public static final boolean isResourceProxied(String resName) {
+    	boolean result = true;
+    	
+    	switch (resName) {
+    		case AuthZ.REPORTS_INVOKE:
+    		case AuthZ.BATCH_INVOKE:
+    		case AuthZ.ACCOUNT_PERMISSIONS:
+    			result = false;
+    			break;
+    	}
+    	
+    	return result;
     }
 
-    
+
     /**
      * isCSpaceAdmin check if authenticated user is a CSpace administrator
      * @param tenantId
