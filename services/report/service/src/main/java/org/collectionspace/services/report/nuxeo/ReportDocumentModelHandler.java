@@ -613,7 +613,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			AccountResource accountResource = new AccountResource();
 			List<String> roleDisplayNameList = accountResource.getAccountRoles(AuthN.get().getUserId(), AuthN.get().getCurrentTenantId());
 			for (String target : forRolesList.getRoleDisplayName()) {
-				if (roleDisplayNameList.contains(target)) {
+				if (Tools.listContainsIgnoreCase(roleDisplayNameList, target)) {
 					result = true;
 					break;
 				}
