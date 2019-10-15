@@ -489,6 +489,11 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     	return null;
     }
 
+    @Override
+    public String getDocumentsToIndexQuery(String indexId, String documentType, String csid) throws DocumentException, Exception {
+    	return null;
+    }
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#getServiceContextPath()
      */
