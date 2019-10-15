@@ -160,7 +160,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
         return result;
     }
 
-    private String printInvocationContext(InvocationContext invContext, Map<String, Object> params) {
+    private String getInvocationContextLogging(InvocationContext invContext, Map<String, Object> params) {
 		String outputMIME = invContext.getOutputMIME();
 		String mode = invContext.getMode();
 		String updateCoreValues = invContext.getUpdateCoreValues();
@@ -180,8 +180,6 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 				"\n \t Parameters: " + params.toString() + "}";
 		return result;
 	}
-
-
     
 	public InputStream invokeReport(
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
@@ -190,7 +188,6 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			InvocationContext invContext,
 			StringBuffer outMimeType,
 			StringBuffer outReportFileName) throws Exception {
-
 		CoreSessionInterface repoSession = null;
 		boolean releaseRepoSession = false;
 		
@@ -204,7 +201,6 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 		String invocationMode = invContext.getMode();
 		String modeProperty = null;
 		HashMap<String, Object> params = new HashMap<String, Object>();
-
 		params.put(REPORTS_STD_TENANTID_PARAM, ctx.getTenantId());
 		boolean checkDocType = true;
 		
@@ -246,7 +242,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
         			+invocationMode);
 		}
 
-		logger.warn("The invocation context is: \n " + printInvocationContext(invContext, params));
+		logger.debug("The invocation context is: \n " + getInvocationContextLogging(invContext, params));
 		logger.debug("The report is being called with the following parameters, which are being passed to Jasper: \n" + params.toString());
 		logger.debug("The mode being passed to Jasper is: " + invocationMode);
 		
@@ -281,20 +277,20 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			//
 	    	// If the invocation context contains a MIME type then use it.  Otherwise, look in the report resource.  If no MIME type in the report resource,
 	    	// use the default MIME type.
-
+	    	//
 	    	if (!Tools.isEmpty(invContext.getOutputMIME())) {
 	    		outMimeType.append(invContext.getOutputMIME());
-				} else if(Tools.isEmpty(outMimeType.toString()) && params.containsKey("OutputMIME")) {
-					// See https://jira.ets.berkeley.edu/jira/browse/CC-748
-					outMimeType.append(params.get("OutputMIME"));
-				} else {
-					 // Use the default
-    	    	String reportOutputMime = (String) NuxeoUtils.getProperyValue(docModel, ReportJAXBSchema.OUTPUT_MIME); //docModel.getPropertyValue(ReportJAXBSchema.OUTPUT_MIME);
-    			if (!Tools.isEmpty(reportOutputMime)) {
-    				outMimeType.append(reportOutputMime);
-    			} else {
-    				outMimeType.append(ReportClient.DEFAULT_REPORT_OUTPUT_MIME);
-    			}
+	    	} else if (Tools.isEmpty(outMimeType.toString()) && params.containsKey("OutputMIME")) {
+	    		// See https://jira.ets.berkeley.edu/jira/browse/CC-748
+	    		outMimeType.append(params.get("OutputMIME"));
+	    	} else {
+	    		// Use the default
+	    		String reportOutputMime = (String) NuxeoUtils.getProperyValue(docModel, ReportJAXBSchema.OUTPUT_MIME); //docModel.getPropertyValue(ReportJAXBSchema.OUTPUT_MIME);
+	    		if (!Tools.isEmpty(reportOutputMime)) {
+	    			outMimeType.append(reportOutputMime);
+	    		} else {
+	    			outMimeType.append(ReportClient.DEFAULT_REPORT_OUTPUT_MIME);
+	    		}
 	    	}
 		} catch (PropertyException pe) {
 			if (logger.isDebugEnabled()) {

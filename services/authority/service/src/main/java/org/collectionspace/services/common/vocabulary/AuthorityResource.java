@@ -38,9 +38,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
@@ -79,25 +79,25 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.Hierarchy;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
-import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
+import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
+import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
+import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
 
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.description.ServiceDescription;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
 import org.collectionspace.services.lifecycle.TransitionDef;
-import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
+import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentFilter;
 import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.workflow.WorkflowCommon;
-import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
-import org.collectionspace.services.description.ServiceDescription;
 
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -287,17 +287,19 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     public String lookupItemCSID(ServiceContext<PoxPayloadIn, PoxPayloadOut> existingContext, String itemspecifier, String parentcsid, String method, String op)
             throws Exception {
         String itemcsid;
-
         Specifier itemSpec = Specifier.getSpecifier(itemspecifier, method, op);
+        
         if (itemSpec.form == SpecifierForm.CSID) {
             itemcsid = itemSpec.value;
         } else {
-            String itemWhereClause = RefNameServiceUtils.buildWhereForAuthItemByName(authorityItemCommonSchemaName, itemSpec.value, parentcsid);
-            MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(getItemServiceName());
             CoreSessionInterface repoSession = null;
+            MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(getItemServiceName());
+
             if (existingContext != null) {
                 repoSession = (CoreSessionInterface) existingContext.getCurrentRepositorySession();  // We want to use the thread's current repo session
             }
+
+            String itemWhereClause = RefNameServiceUtils.buildWhereForAuthItemByName(authorityItemCommonSchemaName, itemSpec.value, parentcsid);
             itemcsid = getRepositoryClient(ctx).findDocCSID(repoSession, ctx, itemWhereClause); //FIXME: REM - Should we be looking for the 'wf_deleted' query param and filtering on it?
         }
 

@@ -723,11 +723,6 @@ public class ServiceMain {
                             JDBCTools.createNewDatabaseUser(JDBCTools.CSADMIN_DATASOURCE_NAME, repositoryName, cspaceInstanceId, dbType, readerUser, readerPW);
                         }
                         // Create the database
-                        if (logger.isInfoEnabled()) {
-                			DataSource csadminDataSource = JDBCTools.getDataSource(JDBCTools.CSADMIN_DATASOURCE_NAME);
-                        	logger.info(String.format("Using datasource connected '%s', attempting to create database named '%s' with ownder '%s'",
-                        			JDBCTools.CSADMIN_DATASOURCE_NAME, dbName, nuxeoUser));
-                        }
                         createDatabaseWithRights(dbType, dbName, nuxeoUser, nuxeoPW, readerUser, readerPW);
                     }
                     nuxeoDBsChecked.add(dbName);

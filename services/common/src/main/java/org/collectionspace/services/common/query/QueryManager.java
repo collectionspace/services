@@ -26,6 +26,8 @@
  */
 package org.collectionspace.services.common.query;
 
+import java.util.List;
+
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
@@ -118,5 +120,8 @@ public class QueryManager {
 	static public String createWhereClauseForInvocableByMode(String schema, String mode) {
 		return queryManager.createWhereClauseForInvocableByMode(schema, mode);
 	}
-	
+
+	static public String createWhereClauseForInvocableByMode(String schema, List<String> modes) {
+		return queryManager.createWhereClauseForInvocableByMode(schema, modes);
+	}
 }

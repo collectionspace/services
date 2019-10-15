@@ -24,6 +24,7 @@
 package org.collectionspace.services.report;
 
 import java.io.InputStream;
+import java.util.List;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.report.nuxeo.ReportDocumentModelHandler;
@@ -44,8 +45,7 @@ import org.collectionspace.services.common.invocable.Invocable;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.publicitem.PublicItemUtil;
 import org.collectionspace.services.common.query.QueryManager;
-import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.common.storage.JDBCTools;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,27 +55,19 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
 
 @Path(ReportClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
 //@Produces("application/xml;charset=UTF-8")
 public class ReportResource extends NuxeoBasedResource {
-    private static String REPOSITORY_NAME = JDBCTools.NUXEO_DATASOURCE_NAME;
-    private static String REPORTS_FOLDER = "reports";
-    private static String CSID_LIST_SEPARATOR = ",";
     final Logger logger = LoggerFactory.getLogger(ReportResource.class);
-
-    private static String REPORTS_STD_CSID_PARAM = "csid";
-    private static String REPORTS_STD_GROUPCSID_PARAM = "groupcsid";
-    private static String REPORTS_STD_CSIDLIST_PARAM = "csidlist";
-    private static String REPORTS_STD_TENANTID_PARAM = "tenantid";
 
     @Override
     protected String getVersionString() {
@@ -103,7 +95,7 @@ public class ReportResource extends NuxeoBasedResource {
             MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
             DocumentHandler handler = createDocumentHandler(ctx);
             String docType = queryParams.getFirst(IQueryManager.SEARCH_TYPE_DOCTYPE);
-            String mode = queryParams.getFirst(IQueryManager.SEARCH_TYPE_INVOCATION_MODE);
+            List<String> modes = queryParams.get(IQueryManager.SEARCH_TYPE_INVOCATION_MODE);
             String whereClause = null;
             DocumentFilter documentFilter = null;
             String common_part =ctx.getCommonPartLabel();
@@ -113,9 +105,9 @@ public class ReportResource extends NuxeoBasedResource {
                 documentFilter = handler.getDocumentFilter();
                 documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }
-            if (mode != null && !mode.isEmpty()) {
+            if (modes != null && !modes.isEmpty()) {
                 whereClause = QueryManager.createWhereClauseForInvocableByMode(
-                		common_part, mode);
+                		common_part, modes);
                 documentFilter = handler.getDocumentFilter();
                 documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }
@@ -160,9 +152,6 @@ public class ReportResource extends NuxeoBasedResource {
      * @param csid the csid
      * @return the report
      */
-//    @GET
-//    @Path("{csid}/output")
-//    @Produces("application/pdf")
     public Response invokeReport(
     		@Context UriInfo ui,
             @PathParam("csid") String csid) {
@@ -190,15 +179,21 @@ public class ReportResource extends NuxeoBasedResource {
             StringBuffer outMimeType = new StringBuffer();
             StringBuffer outReportFileName = new StringBuffer();
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
-            InputStream reportInputStream = invokeReport(ctx, csid, invContext, outMimeType, outReportFileName);
-            response = PublicItemUtil.publishToRepository(
-            		(PublicitemsCommon)null,
-            		resourceMap,
-            		uriInfo,
-            		getRepositoryClient(ctx),
-            		ctx,
-            		reportInputStream,
-            		outReportFileName.toString());
+            
+            if (isAuthorizedToInvokeReports(ctx) == true) {
+	            InputStream reportInputStream = invokeReport(ctx, csid, invContext, outMimeType, outReportFileName);
+	            response = PublicItemUtil.publishToRepository(
+	            		(PublicitemsCommon)null,
+	            		resourceMap,
+	            		uriInfo,
+	            		getRepositoryClient(ctx),
+	            		ctx,
+	            		reportInputStream,
+	            		outReportFileName.toString());
+            } else {
+				ResponseBuilder builder = Response.status(Status.FORBIDDEN);
+		        response = builder.build();
+            }
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.POST_FAILED);
         }
@@ -206,9 +201,40 @@ public class ReportResource extends NuxeoBasedResource {
         return response;
     }
 
+    /*
+     * This method allows backward compatibility with the old API for running reports.
+     */
+    private boolean isAuthorizedToInvokeReports(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
+    	boolean result = true;
+    			
+		//
+		// Until we enforce a user having POST perms on "/reports/*/invoke", we will continue to allow users with
+		// POST perms on "/reports" to run reports -see JIRA issue https://collectionspace.atlassian.net/browse/DRYD-732
+    	//
+    	// To start enforcing POST perms on "/reports/*/invoke", uncomment the following block of code
+		//
+
+    	/*
+    	CSpaceResource res = new URIResourceImpl(ctx.getTenantId(), REPORT_INVOKE_RESNAME, AuthZ.getMethod(ActionType.CREATE));
+		if (AuthZ.get().isAccessAllowed(res) == false) {
+			result = false;
+		}
+		*/
+
+		return result;
+    }
+
+    /**
+     * This method is deprecated at of CollectionSpace v5.3.
+     * @param ui
+     * @param csid
+     * @param invContext
+     * @return
+     */
     @POST
     @Path("{csid}")
-    public Response invokeReport(
+    @Deprecated
+    public Response invokeReportDeprecated(
     		@Context UriInfo ui,
     		@PathParam("csid") String csid,
     		InvocationContext invContext) {
@@ -218,12 +244,17 @@ public class ReportResource extends NuxeoBasedResource {
             StringBuffer outMimeType = new StringBuffer();
             StringBuffer outFileName = new StringBuffer();
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
-            InputStream reportInputStream = invokeReport(ctx, csid, invContext, outMimeType, outFileName);
-
-			// Need to set response type for what is requested...
-			ResponseBuilder builder = Response.ok(reportInputStream, outMimeType.toString());
-			builder = builder.header("Content-Disposition","inline;filename=\""+ outFileName.toString() +"\"");
-	        response = builder.build();
+            
+            if (isAuthorizedToInvokeReports(ctx) == true) {
+	            InputStream reportInputStream = invokeReport(ctx, csid, invContext, outMimeType, outFileName);
+				// Need to set response type for what is requested...
+				ResponseBuilder builder = Response.ok(reportInputStream, outMimeType.toString());
+				builder = builder.header("Content-Disposition","inline;filename=\""+ outFileName.toString() +"\"");
+		        response = builder.build();
+            } else {
+				ResponseBuilder builder = Response.status(Status.FORBIDDEN);
+		        response = builder.build();
+            }
         } catch (Exception e) {
         	String msg = e.getMessage();
             throw bigReThrow(e, ServiceMessages.POST_FAILED + msg != null ? msg : "");
@@ -271,6 +302,32 @@ public class ReportResource extends NuxeoBasedResource {
         result = handler.invokeReport(ctx, csid, reportsCommon, invContext, outMimeType, outReportFileName);
 
         return result;
+    }
+
+    @POST
+    @Path("{csid}/invoke")
+    public Response invokeReport(
+    		@Context UriInfo ui,
+    		@PathParam("csid") String csid,
+    		InvocationContext invContext) {
+    	Response response = null;
+
+        try {
+            StringBuffer outMimeType = new StringBuffer();
+            StringBuffer outFileName = new StringBuffer();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            InputStream reportInputStream = invokeReport(ctx, csid, invContext, outMimeType, outFileName);
+
+			// Need to set response type for what is requested...
+			ResponseBuilder builder = Response.ok(reportInputStream, outMimeType.toString());
+			builder = builder.header("Content-Disposition","inline;filename=\""+ outFileName.toString() +"\"");
+	        response = builder.build();
+        } catch (Exception e) {
+        	String msg = e.getMessage();
+            throw bigReThrow(e, ServiceMessages.POST_FAILED + msg != null ? msg : "");
+        }
+
+        return response;
     }
 
 }
