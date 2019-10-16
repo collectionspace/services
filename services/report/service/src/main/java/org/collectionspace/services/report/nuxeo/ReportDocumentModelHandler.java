@@ -148,6 +148,29 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 
         return result;
     }
+
+    private String printInvocationContext(InvocationContext invContext, Map<String, Object> params) {
+		String outputMIME = invContext.getOutputMIME();
+		String mode = invContext.getMode();
+		String updateCoreValues = invContext.getUpdateCoreValues();
+		String docType = invContext.getDocType();
+		String singleCSID = invContext.getSingleCSID();
+		String groupCSID = invContext.getGroupCSID();
+		String listCSIDs = invContext.getListCSIDs() == null ? "" : invContext.getListCSIDs().toString();
+
+		String result =
+				"{MIME type: "  + outputMIME +
+				"\n \t Context mode: " + mode +
+				"\n \t Update Core Values: " + updateCoreValues +
+				"\n \t Document type: " + docType +
+				"\n \t CSID: " + singleCSID +
+				"\n \t Group CSID: " + groupCSID +
+				"\n \t List CSIDs: " + listCSIDs +
+				"\n \t Parameters: " + params.toString() + "}";
+		return result;
+	}
+
+
     
 	public InputStream invokeReport(
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
@@ -203,6 +226,10 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			throw new BadRequestException("ReportResource: unknown Invocation Mode: "
         			+invocationMode);
 		}
+
+		logger.log("The invocation context is: \n " + printInvocationContext(invContext, params));
+		logger.debug("The report is being called with the following parameters, which are being passed to Jasper: \n" + params.toString());
+		logger.debug("The mode being passed to Jasper is: " + invocationMode);
 		
 		NuxeoRepositoryClientImpl repoClient = (NuxeoRepositoryClientImpl)this.getRepositoryClient(ctx);
 		repoSession = this.getRepositorySession();
