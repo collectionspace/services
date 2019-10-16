@@ -227,7 +227,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
         			+invocationMode);
 		}
 
-		logger.log("The invocation context is: \n " + printInvocationContext(invContext, params));
+		logger.warn("The invocation context is: \n " + printInvocationContext(invContext, params));
 		logger.debug("The report is being called with the following parameters, which are being passed to Jasper: \n" + params.toString());
 		logger.debug("The mode being passed to Jasper is: " + invocationMode);
 		
