@@ -11,6 +11,7 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.api.RefNameUtils;
@@ -20,6 +21,7 @@ import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.DocumentReferenceException;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.config.service.ServiceBindingType;
@@ -332,6 +334,37 @@ public class AuthorityServiceUtils {
 		}
 
 		return (itemCsid != null);
+	}
+
+	public static boolean syncWorkflowState(
+			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+			AuthorityResource authorityResource,
+			String sasWorkflowState,
+			String localParentCsid,
+			String localItemCsid,
+			DocumentModel localItemDocModel) throws Exception {
+		String localItemWorkflowState = localItemDocModel.getCurrentLifeCycleState();
+		List<String> transitionList = AuthorityServiceUtils.getTransitionList(sasWorkflowState, localItemWorkflowState);
+
+		if (!transitionList.isEmpty()) {
+			try {
+				// Transition the local item to the new workflow state. This might involve multiple transitions.
+
+				for (String transition : transitionList) {
+					authorityResource.updateItemWorkflowWithTransition(ctx, localParentCsid, localItemCsid, transition, AuthorityServiceUtils.DONT_UPDATE_REV, AuthorityServiceUtils.DONT_ROLLBACK_ON_EXCEPTION);
+				}
+			} catch (DocumentReferenceException de) {
+				logger.info(String.format("Failed to soft-delete %s (transition from %s to %s): item is referenced, and will be deprecated instead", localItemCsid, localItemWorkflowState, sasWorkflowState));
+
+				// One or more of the transitions may have succeeded, so refresh the document model to make sure it
+				// reflects the current workflow state.
+				localItemDocModel.refresh();
+
+				AuthorityServiceUtils.setAuthorityItemDeprecated(ctx, authorityResource, localParentCsid, localItemCsid, localItemDocModel);
+			}
+		}
+
+		return true;
 	}
 
 	/**

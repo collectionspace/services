@@ -511,36 +511,14 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
 				result = true;
 			}
 		}
-		//
-		// Check to see if we need to update the local items's workflow state to reflect that of the remote's
-		//
-		List<String> transitionList = AuthorityServiceUtils.getTransitionList(sasWorkflowState, localItemWorkflowState);
 
-		if (transitionList.isEmpty() == false) {
-			AuthorityResource authorityResource = (AuthorityResource) ctx.getResource(getAuthorityServicePath()); // Get the authority (parent) client not the item client
-			//
-			// We need to move the local item to the SAS workflow state.  This might involve multiple transitions.
-			//
-			try {
-				for (String transition:transitionList) {
-					authorityResource.updateItemWorkflowWithTransition(ctx, localParentCsid, localItemCsid, transition, AuthorityServiceUtils.DONT_UPDATE_REV, AuthorityServiceUtils.DONT_ROLLBACK_ON_EXCEPTION);
-				}
-			} catch (DocumentReferenceException de) {
-				//
-				// This exception means we tried unsuccessfully to soft-delete (workflow transition 'delete') an item that still has references to it from other records.
-				//
-				logger.info(String.format("Failed to soft-delete %s (transition from %s to %s): item is referenced, and will be deprecated instead", localItemCsid, localItemWorkflowState, sasWorkflowState));
-
-				// One or more of the transitions may have succeeded, so refresh the document model to make sure it
-				// reflects the current workflow state.
-				itemDocModel.refresh();
-
-				// Since we can't soft-delete it, we need to mark it as deprecated since it is soft-deleted on the SAS.
-				AuthorityServiceUtils.setAuthorityItemDeprecated(ctx, authorityResource, localParentCsid, localItemCsid, itemDocModel);
-			}
-
-			result = true;
-		}
+		AuthorityServiceUtils.syncWorkflowState(
+			ctx,
+			(AuthorityResource) ctx.getResource(getAuthorityServicePath()),
+			sasWorkflowState,
+			localParentCsid,
+			localItemCsid,
+			itemDocModel);
 
 		return result;
 	}

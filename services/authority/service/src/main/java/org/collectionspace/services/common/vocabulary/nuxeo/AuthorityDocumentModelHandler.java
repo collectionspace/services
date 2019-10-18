@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -41,7 +40,6 @@ import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.client.XmlTools;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ResourceMap;
@@ -68,11 +66,10 @@ import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
 import org.collectionspace.services.lifecycle.TransitionDef;
-import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-import org.collectionspace.services.relation.RelationsCommonList;
 import org.dom4j.Element;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -448,12 +445,22 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon> extends NuxeoDoc
 			throw new DocumentException(String.format("Could not create new authority item '%s' during synchronization of the '%s' authority.",
 					itemIdentifier, parentIdentifier));
 		}
-		//
-		// Since we're creating an item that was sourced from the replication server, we need to replicate it locally.
-		//
-		authorityResource.updateItemWorkflowWithTransition(ctx, parentIdentifier, itemIdentifier,
-				WorkflowClient.WORKFLOWTRANSITION_REPLICATE, AuthorityServiceUtils.DONT_UPDATE_REV); // don't update the rev number of the new replicated item (use the rev number of the sourced item)
-		}
+
+		// Sync the workflow state.
+
+		String itemLocation = response.getHeaderString("Location");
+		String itemCsid = itemLocation.substring(itemLocation.lastIndexOf("/") + 1);
+
+		DocumentModel itemDocModel = NuxeoUtils.getDocFromCsid(ctx, getRepositorySession(), itemCsid);
+
+		AuthorityServiceUtils.syncWorkflowState(
+			ctx,
+			authorityResource,
+			getWorkflowState(sasPayloadIn),
+			parentIdentifier,
+			itemIdentifier,
+			itemDocModel);
+	}
 
 	/**
 	 * Synchronize a remote item (using its refName) with a local item.  If the local doesn't yet
