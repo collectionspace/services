@@ -10,7 +10,7 @@
 			<PatternLayout pattern="${logPattern}" />
 		</Console>
 
-		<RollingFile name="LogFileAppender" fileName="cspace-services.log" filePattern="cspace-services.%i.log">
+		<RollingFile name="LogFileAppender" fileName="logs/cspace-services.log" filePattern="logs/cspace-services.%i.log">
 			<PatternLayout pattern="${logPattern}" />
 			<SizeBasedTriggeringPolicy size="5 MB"/>
 			<DefaultRolloverStrategy fileIndex="min" max="10"/>

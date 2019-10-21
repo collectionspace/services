@@ -574,6 +574,12 @@
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core</artifactId>
+            <exclusions>
+            	<exclusion>
+            		<groupId>log4j</groupId>
+            		<artifactId>log4j</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
@@ -582,6 +588,12 @@
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-convert</artifactId>
+            <exclusions>
+            	<exclusion>
+            		<groupId>log4j</groupId>
+            		<artifactId>log4j</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
@@ -635,6 +647,12 @@
           	<artifactId>nuxeo-platform-commandline-executor</artifactId>
             <version>${nuxeo.core.version}</version>
             <scope>provided</scope>
+            <exclusions>
+            	<exclusion>
+            		<groupId>log4j</groupId>
+            		<artifactId>log4j</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
