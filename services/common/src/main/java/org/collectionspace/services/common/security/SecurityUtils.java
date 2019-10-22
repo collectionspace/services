@@ -86,6 +86,7 @@ class CSpacePasswordEncoder extends BasePasswordEncoder {
 public class SecurityUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityUtils.class);
+
     public static final String URI_PATH_SEPARATOR = "/";
     public static final int MIN_PASSWORD_LENGTH = 8;
     public static final int MAX_PASSWORD_LENGTH = 24;
@@ -231,6 +232,7 @@ public class SecurityUtils {
 		
 		uriPath = uriPath.replace("//", "/"); // replace duplicate '/' characters
 		uriPath = uriPath.startsWith("/") ? uriPath.substring(1) : uriPath; // if present, strip the leading '/' character
+				
 		return uriPath;
 	}
     
@@ -309,10 +311,18 @@ public class SecurityUtils {
      *
      * @return true, if is entity proxy is acting as a proxy for all sub-resources
      */
-    public static final boolean isEntityProxy() {
-    	//
-    	// should be getting this information from  the cspace config settings (tenent bindings file).
-    	return true;
+    public static final boolean isResourceProxied(String resName) {
+    	boolean result = true;
+    	
+    	switch (resName) {
+    		case AuthZ.REPORTS_INVOKE:
+    		case AuthZ.BATCH_INVOKE:
+    		case AuthZ.ACCOUNT_PERMISSIONS:
+    			result = false;
+    			break;
+    	}
+    	
+    	return result;
     }
 
     
