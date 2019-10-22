@@ -1,56 +1,82 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 <!--
-    StructuredDate schema (XSD)
+	StructuredDate schema (XSD)
 
-    Entity  : StructuredDate
-    Part    : Common
-    Used for: JAXB binding between XML and Java objects
-
+	Entity  : StructuredDate
+	Part    : Common
+	Used for: JAXB binding between XML and Java objects
 -->
 
 <xs:schema
-  xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-  jaxb:version="1.0" elementFormDefault="unqualified"
-  xmlns:ns="http://collectionspace.org/services/structureddate"
-  xmlns="http://collectionspace.org/services/structureddate"
-  targetNamespace="http://collectionspace.org/services/structureddate"
-  version="0.1"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	jaxb:version="1.0" elementFormDefault="unqualified"
+	xmlns:ns="http://collectionspace.org/services/structureddate"
+	xmlns="http://collectionspace.org/services/structureddate"
+	targetNamespace="http://collectionspace.org/services/structureddate"
+	version="1.0"
 >
 
 <!--
-    Avoid XmlRootElement nightmare:
-    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+	Avoid XmlRootElement nightmare:
+	See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
 -->
 
-    <xs:element name="structureddate_common">
+	<xs:element name="structureddate_common">
 		<xs:complexType>
 			<xs:sequence>
-			    <xs:element name="displayDate" type="xs:string"/>
-			    <xs:element name="note" type="xs:string"/>
-			    <xs:element name="association" type="xs:string"/>
-			    <xs:element name="period" type="xs:string"/>
-			    <xs:element name="earliestSingleDate" type="date_common"/>
-			    <xs:element name="latestDate" type="date_common"/>
-			    <xs:element name="earliestScalarValue" type="xs:string"/>
-			    <xs:element name="latestScalarValue" type="xs:string"/>
-			    <xs:element name="scalarValuesComputed" type="xs:boolean"/>
+				<xs:element name="dateDisplayDate" type="xs:string" />
+				<xs:element name="datePeriod" type="xs:string" />
+				<xs:element name="dateAssociation" type="xs:string" />
+				<xs:element name="dateNote" type="xs:string" />
+
+				<xs:element name="dateEarliestSingleYear" type="xs:integer" />
+				<xs:element name="dateEarliestSingleMonth" type="xs:integer" />
+				<xs:element name="dateEarliestSingleDay" type="xs:integer" />
+				<xs:element name="dateEarliestSingleEra" type="xs:string" />
+				<xs:element name="dateEarliestSingleCertainty" type="xs:string" />
+				<xs:element name="dateEarliestSingleQualifier" type="xs:string" />
+				<xs:element name="dateEarliestSingleQualifierValue" type="xs:integer" />
+				<xs:element name="dateEarliestSingleQualifierUnit" type="xs:string" />
+
+				<xs:element name="dateLatestYear" type="xs:integer" />
+				<xs:element name="dateLatestMonth" type="xs:integer" />
+				<xs:element name="dateLatestDay" type="xs:integer" />
+				<xs:element name="dateLatestEra" type="xs:string" />
+				<xs:element name="dateLatestCertainty" type="xs:string" />
+				<xs:element name="dateLatestQualifier" type="xs:string" />
+				<xs:element name="dateLatestQualifierValue" type="xs:integer" />
+				<xs:element name="dateLatestQualifierUnit" type="xs:string" />
+
+				<xs:element name="dateEarliestScalarValue" type="xs:string" />
+				<xs:element name="dateLatestScalarValue" type="xs:string" />
+				<xs:element name="scalarValuesComputed" type="xs:boolean" />
+
+				<!-- Deprecated -->
+				<xs:element name="displayDate" type="xs:string"/>
+				<xs:element name="period" type="xs:string"/>
+				<xs:element name="association" type="xs:string"/>
+				<xs:element name="note" type="xs:string"/>
+				<xs:element name="earliestSingleDate" type="date_common"/>
+				<xs:element name="latestDate" type="date_common"/>
+				<xs:element name="earliestScalarValue" type="xs:string"/>
+				<xs:element name="latestScalarValue" type="xs:string"/>
 			</xs:sequence>
 		</xs:complexType>
-    </xs:element>
+	</xs:element>
 
-    <xs:complexType name="date_common">
-        <xs:sequence>
-            <xs:element name="year" type="xs:integer"/>
-            <xs:element name="month" type="xs:integer"/>
-            <xs:element name="day" type="xs:integer"/>
-            <xs:element name="era" type="xs:string"/>
-            <xs:element name="certainty" type="xs:string"/>
-            <xs:element name="qualifierType" type="xs:string"/>
-            <xs:element name="qualifierValue" type="xs:string"/>
-            <xs:element name="qualifierUnit" type="xs:string"/>
-        </xs:sequence>
-    </xs:complexType>
-
+	<!-- Deprecated -->
+	<xs:complexType name="date_common">
+		<xs:sequence>
+			<xs:element name="year" type="xs:integer"/>
+			<xs:element name="month" type="xs:integer"/>
+			<xs:element name="day" type="xs:integer"/>
+			<xs:element name="era" type="xs:string"/>
+			<xs:element name="certainty" type="xs:string"/>
+			<xs:element name="qualifierType" type="xs:string"/>
+			<xs:element name="qualifierValue" type="xs:integer"/>
+			<xs:element name="qualifierUnit" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
 </xs:schema>
