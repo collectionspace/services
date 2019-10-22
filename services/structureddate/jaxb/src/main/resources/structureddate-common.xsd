@@ -2,14 +2,14 @@
 
 <!--
     StructuredDate schema (XSD)
-    
+
     Entity  : StructuredDate
     Part    : Common
     Used for: JAXB binding between XML and Java objects
 
 -->
 
-<xs:schema 
+<xs:schema
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
   jaxb:version="1.0" elementFormDefault="unqualified"
@@ -33,13 +33,13 @@
 			    <xs:element name="period" type="xs:string"/>
 			    <xs:element name="earliestSingleDate" type="date_common"/>
 			    <xs:element name="latestDate" type="date_common"/>
-			    <xs:element name="earliestScalarDate" type="xs:string"/>
-			    <xs:element name="latestScalarDate" type="xs:string"/>
+			    <xs:element name="earliestScalarValue" type="xs:string"/>
+			    <xs:element name="latestScalarValue" type="xs:string"/>
 			    <xs:element name="scalarValuesComputed" type="xs:boolean"/>
 			</xs:sequence>
 		</xs:complexType>
     </xs:element>
-    
+
     <xs:complexType name="date_common">
         <xs:sequence>
             <xs:element name="year" type="xs:integer"/>
@@ -52,5 +52,5 @@
             <xs:element name="qualifierUnit" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
-        
+
 </xs:schema>

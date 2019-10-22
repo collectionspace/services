@@ -40,26 +40,26 @@ public class StructuredDateResource extends AbstractCollectionSpaceResourceImpl<
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	//
 	// API Endpoints
 	//
-	
+
     @GET
     public StructureddateCommon get(@Context UriInfo ui) {
     	StructureddateCommon result = null;
-    	
+
     	try {
     		ServiceContext<StructureddateCommon, StructureddateCommon> ctx = createServiceContext(getServiceName());
 	    	MultivaluedMap<String,String> queryParams = ui.getQueryParameters();
 	    	String dateToParse = queryParams.getFirst(StructuredDateClient.DATE_TO_PARSE_QP);
-	    	if (Tools.isEmpty(dateToParse) != true) {    	
+	    	if (Tools.isEmpty(dateToParse) != true) {
 		    	StructuredDateInternal structuredDate = StructuredDateInternal.parse(dateToParse);
 		    	result = toStructureddateCommon(ctx.getTenantName(), structuredDate);
 	    	} else {
 	    		String msg = String.format("Use the '%s' query parameter to specify a date string you want parsed.",
 	    				StructuredDateClient.DATE_TO_PARSE_QP);
-	    		Response response = 
+	    		Response response =
 		            	Response.status(Response.Status.BAD_REQUEST).entity(msg).type("text/plain").build();
 	                throw new CSWebApplicationException(response);
 	    	}
@@ -67,83 +67,95 @@ public class StructuredDateResource extends AbstractCollectionSpaceResourceImpl<
     		Response response = Response.status(Response.Status.BAD_REQUEST).entity(fe.getMessage()).type("text/plain").build();
             throw new CSWebApplicationException(response);
     	} catch (Exception e) {
-    		throw bigReThrow(e, ServiceMessages.GET_FAILED); 
+    		throw bigReThrow(e, ServiceMessages.GET_FAILED);
     	}
-    	
-    	return result;
-    }
-    
-    private StructureddateCommon toStructureddateCommon(String tenantDomain, StructuredDateInternal structuredDate) {
-    	StructureddateCommon result = new StructureddateCommon();
-    	
-    	String association = structuredDate.getAssociation();
-    	if (!Tools.isEmpty(association)) {
-    		result.setAssociation(association);
-    	}
-    	
-    	String displayDate = structuredDate.getDisplayDate();
-    	if (!Tools.isEmpty(displayDate)) {
-    		result.setDisplayDate(displayDate);
-    	}    	
-    	
-    	String earliestScalarDate = structuredDate.getEarliestScalarDate();
-    	if (!Tools.isEmpty(earliestScalarDate)) {
-    		result.setEarliestScalarDate(earliestScalarDate);
-    	}    	
-    	
-    	Date earliestSingleDate = structuredDate.getEarliestSingleDate();
-    	if (earliestSingleDate != null) {
-    		result.setEarliestSingleDate(toDateCommon(tenantDomain, earliestSingleDate));
-    	}    	
-    	
-    	result.setLatestDate(toDateCommon(tenantDomain, structuredDate.getLatestDate()));
-    	Date latestDate = structuredDate.getLatestDate();
-    	if (latestDate != null) {
-    		result.setLatestDate(toDateCommon(tenantDomain, latestDate));
-    	}    	
-    	
+
     	return result;
     }
 
+		private StructureddateCommon toStructureddateCommon(String tenantDomain, StructuredDateInternal structuredDate) {
+			StructureddateCommon result = new StructureddateCommon();
+
+			String association = structuredDate.getAssociation();
+
+			if (!Tools.isEmpty(association)) {
+				result.setAssociation(association);
+			}
+
+			String displayDate = structuredDate.getDisplayDate();
+
+			if (!Tools.isEmpty(displayDate)) {
+				result.setDisplayDate(displayDate);
+			}
+
+			String earliestScalarValue = structuredDate.getEarliestScalarValue();
+
+			if (!Tools.isEmpty(earliestScalarValue)) {
+				result.setEarliestScalarValue(earliestScalarValue);
+			}
+
+			String latestScalarValue = structuredDate.getLatestScalarValue();
+
+			if (!Tools.isEmpty(latestScalarValue)) {
+				result.setLatestScalarValue(latestScalarValue);
+			}
+
+			result.setScalarValuesComputed(structuredDate.areScalarValuesComputed());
+
+			Date earliestSingleDate = structuredDate.getEarliestSingleDate();
+
+			if (earliestSingleDate != null) {
+				result.setEarliestSingleDate(toDateCommon(tenantDomain, earliestSingleDate));
+			}
+
+			Date latestDate = structuredDate.getLatestDate();
+
+			if (latestDate != null) {
+				result.setLatestDate(toDateCommon(tenantDomain, latestDate));
+			}
+
+			return result;
+		}
+
     private DateCommon toDateCommon(String tenantDomain, org.collectionspace.services.structureddate.Date date) {
     	DateCommon result = null;
-    	
+
     	if (date != null) {
         	result = new DateCommon();
-        	
+
 	    	if (date.getCertainty() != null) {
 	    		result.setCertainty(date.getCertainty().toString());
 	    	}
-	    	
+
 	    	if (date.getDay() != null) {
 	    		result.setDay(BigInteger.valueOf(date.getDay()));
 	    	}
-	    	
+
 	    	if (date.getEra() != null) {
 	    		result.setEra(date.getEra().toString(tenantDomain));
 	    	}
-	    	
+
 	    	if (date.getMonth() != null) {
 	    		result.setMonth(BigInteger.valueOf(date.getMonth()));
 	    	}
-	    	
+
 	    	if (date.getQualifierType() != null) {
 	    		result.setQualifierType(date.getQualifierType().toString());
 	    	}
-	    	
+
 	    	if (date.getQualifierUnit() != null) {
 	    		result.setQualifierUnit(date.getQualifierUnit().toString());
 	    	}
-	    	
+
 	    	if (date.getQualifierValue() != null) {
 	    		result.setQualifierValue(date.getQualifierValue().toString());
 	    	}
-	    	
+
 	    	if (date.getYear() != null) {
 	    		result.setYear(BigInteger.valueOf(date.getYear()));
 	    	}
     	}
-    	
+
     	return result;
     }
 

@@ -125,7 +125,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		result = new StructuredDateInternal();
 		result.setDisplayDate(displayDate);
 
-		// Instantiate a parser from the lowercased display date, so that parsing will be case insensitive 
+		// Instantiate a parser from the lowercased display date, so that parsing will be case insensitive
 		ANTLRInputStream inputStream = new ANTLRInputStream(displayDate.toLowerCase());
 		StructuredDateLexer lexer = new StructuredDateLexer(inputStream);
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
@@ -152,6 +152,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			throw new StructuredDateFormatException(getErrorMessage(re), re);
 		}
 
+		result.computeScalarValues();
+
 		// The parsing was successful. Return the result.
 		return result;
 	}
@@ -170,7 +172,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 				temp = earliestDate;
 				earliestDate = latestDate;
 				latestDate = temp;
-	
+
 				// Check to see if the dates were reversed AND calculated. If they were
 				// Then this probably means the absolute earliestDate should have month and day as "1"
 				// and the latestDate momth 12, day 31.
@@ -248,13 +250,13 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		int earliestInterval = DateUtils.getCircaIntervalYears(earliestDate.getYear(), earliestDate.getEra());
 		int latestInterval = DateUtils.getCircaIntervalYears(latestDate.getYear(), latestDate.getEra());
 
-		// Express the circa interval as a qualifier.	
+		// Express the circa interval as a qualifier.
 
- 		// stack.push(earliestDate.withQualifier(QualifierType.MINUS, earliestInterval, QualifierUnit.YEARS));	
-		// stack.push(latestDate.withQualifier(QualifierType.PLUS, latestInterval, QualifierUnit.YEARS));	
+ 		// stack.push(earliestDate.withQualifier(QualifierType.MINUS, earliestInterval, QualifierUnit.YEARS));
+		// stack.push(latestDate.withQualifier(QualifierType.PLUS, latestInterval, QualifierUnit.YEARS));
 
- 		// OR:	
-		 
+ 		// OR:
+
 		// Express the circa interval as an offset calculated into the year.
 
 		DateUtils.subtractYears(earliestDate, earliestInterval);
@@ -431,7 +433,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			stack.push(new Date(earliestYear, earlyMonth, DateUtils.getDaysInMonth(earlyMonth, earliestYear, era), era)); // Latest Early Date
 			stack.push(new Date(lateYear, latestMonth, 1, era)); // Earliest Latest Date
 			stack.push(new Date(lateYear, latestMonth, DateUtils.getDaysInMonth(latestMonth, lateYear, era), era)); // Latest Late Date
-			
+
 		}
 	}
 
@@ -532,7 +534,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitDayFirstDate(DayFirstDateContext ctx) {
 		if (ctx.exception != null) return ;
-		
+
 		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer month = (Integer) stack.pop();
@@ -690,7 +692,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		stack.push(era);
 	}
 
-	@Override 
+	@Override
 	public void exitSeasonYear(SeasonYearContext ctx) {
 		if (ctx.exception != null) return;
 
@@ -1005,7 +1007,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			throw new StructuredDateFormatException("unexpected half '" + n + "'");
 		}
 	}
-	
+
 
 	@Override
 	public void exitNthQuarterInYearRange(NthQuarterInYearRangeContext ctx) {
@@ -1028,7 +1030,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 	@Override
 	public void exitNthQuarterYear(NthQuarterYearContext ctx) {
-		
+
 		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 
 		stack.push(era);
@@ -1237,7 +1239,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitRomanDate(RomanDateContext ctx) {
 		if (ctx.exception != null) return;
-		
+
 		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer month = (Integer) stack.pop();
@@ -1262,7 +1264,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		if (ctx.exception != null) return;
 
 		Integer adjustmentDate = (Integer) stack.pop();
-		Integer mainYear = (Integer) stack.pop(); 
+		Integer mainYear = (Integer) stack.pop();
 
 		Integer earliestYear = (BP_ZERO_YEAR - mainYear) - adjustmentDate;
 		Integer latestYear = (BP_ZERO_YEAR - mainYear) + adjustmentDate;
