@@ -29,10 +29,6 @@ import java.util.List;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.report.nuxeo.ReportDocumentModelHandler;
 import org.collectionspace.services.publicitem.PublicitemsCommon;
-import org.collectionspace.services.authorization.AuthZ;
-import org.collectionspace.services.authorization.CSpaceResource;
-import org.collectionspace.services.authorization.URIResourceImpl;
-import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PayloadPart;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -49,8 +45,7 @@ import org.collectionspace.services.common.invocable.Invocable;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.publicitem.PublicItemUtil;
 import org.collectionspace.services.common.query.QueryManager;
-import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.common.storage.JDBCTools;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +55,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -73,16 +67,7 @@ import javax.ws.rs.core.Response.Status;
 @Produces("application/xml")
 //@Produces("application/xml;charset=UTF-8")
 public class ReportResource extends NuxeoBasedResource {
-    private static String REPOSITORY_NAME = JDBCTools.NUXEO_DATASOURCE_NAME;
-    private static String REPORTS_FOLDER = "reports";
-    private static String CSID_LIST_SEPARATOR = ",";
     final Logger logger = LoggerFactory.getLogger(ReportResource.class);
-
-    private static String REPORTS_STD_CSID_PARAM = "csid";
-    private static String REPORTS_STD_GROUPCSID_PARAM = "groupcsid";
-    private static String REPORTS_STD_CSIDLIST_PARAM = "csidlist";
-    private static String REPORTS_STD_TENANTID_PARAM = "tenantid";
-    private static String REPORT_INVOKE_RESNAME = "reports/invoke";
 
     @Override
     protected String getVersionString() {
