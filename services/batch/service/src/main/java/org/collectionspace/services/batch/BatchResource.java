@@ -42,6 +42,11 @@ import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.authorization.AuthZ;
+import org.collectionspace.services.authorization.CSpaceResource;
+import org.collectionspace.services.authorization.PermissionException;
+import org.collectionspace.services.authorization.URIResourceImpl;
+import org.collectionspace.services.authorization.perms.ActionType;
 
 import java.util.List;
 
@@ -60,6 +65,7 @@ import javax.ws.rs.core.UriInfo;
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
 public class BatchResource extends NuxeoBasedResource {
+    private static String BATCH_INVOKE_RESNAME = "batch/invoke";
 
 	protected final String COMMON_SCHEMA = "batch_common";
 
@@ -209,8 +215,56 @@ public class BatchResource extends NuxeoBasedResource {
     	return result;
     }
 
+    /*
+     * This method allows backward compatibility with the old API for running reports.
+     */
+    private boolean isAuthorizedToInvokeBatchJobs(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
+    	boolean result = true;
+    			
+		//
+		// Until we enforce a user having POST perms on "/batch/*/invoke", we will continue to allow users with
+		// POST perms on "/batch" to run reports -see JIRA issue https://collectionspace.atlassian.net/browse/DRYD-732
+    	//
+    	// To start enforcing POST perms on "/batch/*/invoke", uncomment the following block of code
+		//
+
+    	CSpaceResource res = new URIResourceImpl(ctx.getTenantId(), BATCH_INVOKE_RESNAME, AuthZ.getMethod(ActionType.CREATE));
+		if (AuthZ.get().isAccessAllowed(res) == false) {
+			result = false;
+		}
+
+		return result;
+    }
+
+    /*
+     * This method is deprecated as of CollectionSpace v5.3.  POST/invoke requests should be made to the
+     * '/reports/{csid}/invoke' endpoint
+     */
     @POST
     @Path("{csid}")
+    @Deprecated
+    public InvocationResults invokeBatchJobDeprecated(
+    		@Context ResourceMap resourceMap,
+    		@Context UriInfo ui,
+    		@PathParam("csid") String csid,
+    		InvocationContext invContext) {
+        try {
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
+            if (isAuthorizedToInvokeBatchJobs(ctx)) {
+	            BatchDocumentModelHandler handler = (BatchDocumentModelHandler)createDocumentHandler(ctx);
+	            return handler.invokeBatchJob(ctx, csid, resourceMap, invContext, getBatchCommon(csid));
+            } else {
+            	throw new PermissionException();
+            }
+        } catch (Exception e) {
+        	String msg = String.format("%s Could not invoke batch job with CSID='%s'.",
+        			ServiceMessages.POST_FAILED, csid);
+            throw bigReThrow(e, msg);
+        }
+    }
+
+    @POST
+    @Path("{csid}/invoke")
     public InvocationResults invokeBatchJob(
     		@Context ResourceMap resourceMap,
     		@Context UriInfo ui,
