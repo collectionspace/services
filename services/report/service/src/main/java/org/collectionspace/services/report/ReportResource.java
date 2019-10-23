@@ -164,9 +164,6 @@ public class ReportResource extends NuxeoBasedResource {
      * @param csid the csid
      * @return the report
      */
-//    @GET
-//    @Path("{csid}/output")
-//    @Produces("application/pdf")
     public Response invokeReport(
     		@Context UriInfo ui,
             @PathParam("csid") String csid) {
@@ -249,7 +246,7 @@ public class ReportResource extends NuxeoBasedResource {
     @POST
     @Path("{csid}")
     @Deprecated
-    public Response invokeReport(
+    public Response invokeReportDeprecated(
     		@Context UriInfo ui,
     		@PathParam("csid") String csid,
     		InvocationContext invContext) {
@@ -280,7 +277,7 @@ public class ReportResource extends NuxeoBasedResource {
     
     @POST
     @Path("{csid}/invoke")
-    public Response invokeReportNew(
+    public Response invokeReport(
     		@Context UriInfo ui,
     		@PathParam("csid") String csid,
     		InvocationContext invContext) {
