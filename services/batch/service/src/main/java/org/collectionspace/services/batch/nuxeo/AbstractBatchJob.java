@@ -245,7 +245,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	}
 	
 	protected List<String> findAll(NuxeoBasedResource resource, int pageSize, int pageNum, String sortBy) throws URISyntaxException, DocumentException {
-		AbstractCommonList list = resource.getList(createPagedListUriInfo(resource.getServiceName(), pageNum, pageSize, sortBy));
+		AbstractCommonList list = resource.getList(getServiceContext(), createPagedListUriInfo(resource.getServiceName(), pageNum, pageSize, sortBy));
 		List<String> csids = new ArrayList<String>();
 
 		if (list instanceof RelationsCommonList) {
@@ -279,7 +279,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	}
 
 	protected List<String> getVocabularyCsids(AuthorityResource<?, ?> resource) throws URISyntaxException {
-		AbstractCommonList vocabularyList = resource.getAuthorityList(createDeleteFilterUriInfo());
+		AbstractCommonList vocabularyList = resource.getAuthorityList(getServiceContext(), createDeleteFilterUriInfo());
 		List<String> csids = new ArrayList<String>();
 		
 		for (AbstractCommonList.ListItem item : vocabularyList.getListItem()) {
@@ -294,18 +294,18 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		return csids;
 	}
 	
-	protected List<String> findAllAuthorityItems(String serviceName, String vocabularyCsid, int pageSize, int pageNum) throws URISyntaxException, DocumentException {
+	protected List<String> findAllAuthorityItems(String serviceName, String vocabularyCsid, int pageSize, int pageNum) throws Exception {
 		return findAllAuthorityItems(serviceName, vocabularyCsid, pageSize, pageNum, null);
 	}
 	
-	protected List<String> findAllAuthorityItems(String serviceName, String vocabularyCsid, int pageSize, int pageNum, String sortBy) throws URISyntaxException, DocumentException {
+	protected List<String> findAllAuthorityItems(String serviceName, String vocabularyCsid, int pageSize, int pageNum, String sortBy) throws Exception {
 		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
 
 		return findAllAuthorityItems(resource, vocabularyCsid, pageSize, pageNum, sortBy);
 	}
 	
-	protected List<String> findAllAuthorityItems(AuthorityResource<?, ?> resource, String vocabularyCsid, int pageSize, int pageNum, String sortBy) throws URISyntaxException, DocumentException {
-		AbstractCommonList list = resource.getAuthorityItemList(vocabularyCsid, createPagedListUriInfo(resource.getServiceName(), pageNum, pageSize, sortBy));
+	protected List<String> findAllAuthorityItems(AuthorityResource<?, ?> resource, String vocabularyCsid, int pageSize, int pageNum, String sortBy) throws Exception {
+		AbstractCommonList list = resource.getAuthorityItemList(getServiceContext(), vocabularyCsid, createPagedListUriInfo(resource.getServiceName(), pageNum, pageSize, sortBy));
 		List<String> csids = new ArrayList<String>();		
 		
 		for (AbstractCommonList.ListItem item : list.getListItem()) {

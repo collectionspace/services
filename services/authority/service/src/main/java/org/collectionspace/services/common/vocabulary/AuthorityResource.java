@@ -527,6 +527,11 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @Produces("application/xml")
     public AbstractCommonList getAuthorityList(@Context UriInfo uriInfo) { //FIXME - REM 5/3/2012 - This is not reachable from the JAX-RS dispatcher.  Instead the equivalent method in ResourceBase is getting called.
         uriInfo = new UriInfoWrapper(uriInfo);
+        return this.getAuthorityList(null, uriInfo);
+    }
+    
+    public AbstractCommonList getAuthorityList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, @Context UriInfo uriInfo) {
+        uriInfo = new UriInfoWrapper(uriInfo);
         AbstractCommonList result = null;
 
         try {
