@@ -86,9 +86,12 @@ public class ReportResource extends NuxeoBasedResource {
     }
 
     @Override
-    protected AbstractCommonList getCommonList(UriInfo ui) {
+    protected AbstractCommonList getCommonList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, UriInfo ui) {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
+            if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
+                ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
+            }
             MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
             DocumentHandler handler = createDocumentHandler(ctx);
             String docType = queryParams.getFirst(IQueryManager.SEARCH_TYPE_DOCTYPE);
@@ -260,32 +263,6 @@ public class ReportResource extends NuxeoBasedResource {
         return response;
     }
     
-    @POST
-    @Path("{csid}/invoke")
-    public Response invokeReport(
-    		@Context UriInfo ui,
-    		@PathParam("csid") String csid,
-    		InvocationContext invContext) {
-    	Response response = null;
-
-        try {
-            StringBuffer outMimeType = new StringBuffer();
-            StringBuffer outFileName = new StringBuffer();
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
-            InputStream reportInputStream = invokeReport(ctx, csid, invContext, outMimeType, outFileName);
-
-			// Need to set response type for what is requested...
-			ResponseBuilder builder = Response.ok(reportInputStream, outMimeType.toString());
-			builder = builder.header("Content-Disposition","inline;filename=\""+ outFileName.toString() +"\"");
-	        response = builder.build();
-        } catch (Exception e) {
-        	String msg = e.getMessage();
-            throw bigReThrow(e, ServiceMessages.POST_FAILED + msg != null ? msg : "");
-        }
-
-        return response;
-    }
-
 	private ReportsCommon getReportsCommon(String csid) throws Exception {
 		ReportsCommon result = null;
 
@@ -296,7 +273,7 @@ public class ReportResource extends NuxeoBasedResource {
 
     	return result;
     }
-	
+
     /*
      * Does the actual report generation and returns an InputStream with the results.
      */
@@ -325,6 +302,32 @@ public class ReportResource extends NuxeoBasedResource {
         result = handler.invokeReport(ctx, csid, reportsCommon, invContext, outMimeType, outReportFileName);
 
         return result;
+    }
+
+    @POST
+    @Path("{csid}/invoke")
+    public Response invokeReport(
+    		@Context UriInfo ui,
+    		@PathParam("csid") String csid,
+    		InvocationContext invContext) {
+    	Response response = null;
+
+        try {
+            StringBuffer outMimeType = new StringBuffer();
+            StringBuffer outFileName = new StringBuffer();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            InputStream reportInputStream = invokeReport(ctx, csid, invContext, outMimeType, outFileName);
+
+			// Need to set response type for what is requested...
+			ResponseBuilder builder = Response.ok(reportInputStream, outMimeType.toString());
+			builder = builder.header("Content-Disposition","inline;filename=\""+ outFileName.toString() +"\"");
+	        response = builder.build();
+        } catch (Exception e) {
+        	String msg = e.getMessage();
+            throw bigReThrow(e, ServiceMessages.POST_FAILED + msg != null ? msg : "");
+        }
+
+        return response;
     }
 
 }
