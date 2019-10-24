@@ -48,6 +48,12 @@ public class StructuredDateInternal {
 				getLatestDate().toString() + "\n";
 		}
 
+		string +=
+			"\n" +
+			"\tearliestScalarValue: " + getEarliestScalarValue() + "\n" +
+			"\tlatestScalarValue: " + getLatestScalarValue() + "\n" +
+			"\tscalarValuesComputed: " + areScalarValuesComputed() + "\n";
+
 		return string;
 	}
 
@@ -75,81 +81,127 @@ public class StructuredDateInternal {
 				.append(this.getPeriod(), that.getPeriod())
 				.append(this.getEarliestSingleDate(), that.getEarliestSingleDate())
 				.append(this.getLatestDate(), that.getLatestDate())
+				// .append(this.getEarliestScalarValue(), that.getEarliestScalarValue())
+				// .append(this.getLatestScalarValue(), that.getLatestScalarValue())
 				.append(this.areScalarValuesComputed(), that.areScalarValuesComputed())
 				.isEquals();
 	}
 
-	public void computeScalarValues() {
+	private String computeEarliestScalarValue() {
 		Date earliestDate = getEarliestSingleDate();
-		Date latestDate = getLatestDate();
 
-		if (earliestDate == null && latestDate == null) {
-			setEarliestScalarValue(null);
-			setLatestScalarValue(null);
+		Integer year = null;
+		Integer month = null;
+		Integer day = null;
+		Era era = null;
 
-			return;
+		if (earliestDate != null) {
+			year = earliestDate.getYear();
+			month = earliestDate.getMonth();
+			day = earliestDate.getDay();
+			era = earliestDate.getEra();
 		}
 
-		if (earliestDate == null) {
-			earliestDate = latestDate.copy();
-		}
-		else {
-			earliestDate = earliestDate.copy();
+		if (year == null && month == null && day == null) {
+			return null;
 		}
 
-		if (latestDate == null) {
-			latestDate = earliestDate.copy();
-		}
-		else {
-			latestDate = latestDate.copy();
-		}
-
-		if (earliestDate.getYear() == null || latestDate.getYear() == null) {
-			// The dates must at least specify a year.
+		if (year == null) {
+			// The date must at least specify a year.
 			throw new InvalidDateException("year must not be null");
 		}
 
-		if (earliestDate.getDay() != null && earliestDate.getMonth() == null) {
+		if (day != null && month == null) {
 			// If a day is specified, the month must be specified.
 			throw new InvalidDateException("month may not be null when day is not null");
 		}
 
-		if (latestDate.getDay() != null && latestDate.getMonth() == null) {
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
+		}
+
+		if (month == null) {
+			month = 1;
+			day = 1;
+		}
+
+		if (day == null) {
+			day = 1;
+		}
+
+		Date date = new Date(year, month, day, era);
+
+		return DateUtils.formatEarliestScalarValue(date);
+	}
+
+	private String computeLatestScalarValue() {
+		Date latestDate = getLatestDate();
+
+		Integer year = null;
+		Integer month = null;
+		Integer day = null;
+		Era era = null;
+
+		if (latestDate != null) {
+			year = latestDate.getYear();
+			month = latestDate.getMonth();
+			day = latestDate.getDay();
+			era = latestDate.getEra();
+		}
+
+		if (year == null && month == null && day == null) {
+			// No latest date parts are specified. Inherit year, month, and day from earliest/single.
+
+			Date earliestDate = getEarliestSingleDate();
+
+			// TODO: What if no date parts are specified, but the era/certainty/qualifier is different than
+			// the earliest/single?
+
+			if (earliestDate != null) {
+				year = earliestDate.getYear();
+				month = earliestDate.getMonth();
+				day = earliestDate.getDay();
+			}
+		}
+
+		if (year == null && month == null && day == null) {
+			return null;
+		}
+
+		if (year == null) {
+			// The date must at least specify a year.
+			throw new InvalidDateException("year must not be null");
+		}
+
+		if (day != null && month == null) {
 			// If a day is specified, the month must be specified.
 			throw new InvalidDateException("month may not be null when day is not null");
 		}
 
-		if (earliestDate.getEra() == null) {
-			earliestDate.setEra(Date.DEFAULT_ERA);
+		if (era == null) {
+			era = Date.DEFAULT_ERA;
 		}
 
-		if (latestDate.getEra() == null) {
-			latestDate.setEra(Date.DEFAULT_ERA);
+		if (month == null) {
+			month = 12;
+			month = 31;
 		}
 
-		if (earliestDate.getMonth() == null) {
-			earliestDate.setMonth(1);
-			earliestDate.setDay(1);
+		if (day == null) {
+			day = DateUtils.getDaysInMonth(month, year, era);
 		}
 
-		if (latestDate.getMonth() == null) {
-			latestDate.setMonth(12);
-			latestDate.setDay(31);
-		}
+		Date date = new Date(year, month, day, era);
 
-		if (earliestDate.getDay() == null) {
-			earliestDate.setDay(1);
-		}
+		// Add one day to the latest day, since that's what the UI has historically (*sigh*) done.
+		DateUtils.addDays(date, 1);
 
-		if (latestDate.getDay() == null) {
-			latestDate.setDay(DateUtils.getDaysInMonth(latestDate.getMonth(), latestDate.getYear(), latestDate.getEra()));
-		}
+		return DateUtils.formatLatestScalarValue(date);
+	}
 
-		// Add one day to the latest day, since that's what the UI does.
-		DateUtils.addDays(latestDate, 1);
-
-		setEarliestScalarValue(DateUtils.getEarliestScalarValue(earliestDate));
-		setLatestScalarValue(DateUtils.getLatestScalarValue(latestDate));
+	public void computeScalarValues() {
+		setEarliestScalarValue(computeEarliestScalarValue());
+		setLatestScalarValue(computeLatestScalarValue());
 		setScalarValuesComputed(true);
 	}
 

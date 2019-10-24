@@ -925,8 +925,8 @@
                                          latestDate:         [2013,  4,  5, CE]
 
   '5/3/1962-4/5/2013 BC':                # hyphenatedRange, date
-                                         earliestSingleDate:  [2013,  4,  5, BCE]
-                                         latestDate:          [1962,  5,  3, BCE]
+                                         earliestSingleDate: [2013,  4,  5, BCE]
+                                         latestDate:         [1962,  5,  3, BCE]
 
   '5/3/1962 BC-4/5/2013':                # hyphenatedRange, date
                                          earliestSingleDate: [1962,  5,  3, BCE]
@@ -1106,54 +1106,54 @@
   "3/4/2000?":                           # oneDisplayDate - with question mark
                                          earliestSingleDate: [2000,  3,  4, CE]
 
-  "13 april 1995":                       # Rule 6 oneDisplayDate: - SingleInterval with Day (cardinal) Month Year Format 
-                                         earliestSingleDate: [1995,  4,  13, CE]
+  "13 april 1995":                       # Rule 6 oneDisplayDate: - SingleInterval with Day (cardinal) Month Year Format
+                                         earliestSingleDate: [1995,  4, 13, CE]
 
   "13 apr 1995":                         # oneDisplayDate: - SingleInterval with Day (cardinal) Month Year Format
-                                         earliestSingleDate: [1995,  4,  13, CE]
+                                         earliestSingleDate: [1995,  4, 13, CE]
 
   "13th APRIL 1995":                     # oneDisplayDate: - SingleInterval with Day (ordinal) Month (all caps) Year Format
-                                         earliestSingleDate: [1995,  4,  13, CE]
+                                         earliestSingleDate: [1995,  4, 13, CE]
 
-  "bc 1995 april 13":                    # oneDisplayDate: - SingleInterval - With Era Year Month Day format  
-                                         earliestSingleDate: [1995,  4,  13, BCE]
+  "bc 1995 april 13":                    # oneDisplayDate: - SingleInterval - With Era Year Month Day format
+                                         earliestSingleDate: [1995,  4, 13, BCE]
 
-  "bc 1995, april 13":                   # oneDisplayDate: - SingleInterval - With Era Year Month Day format  
-                                         earliestSingleDate: [1995,  4,  13, BCE]
+  "bc 1995, april 13":                   # oneDisplayDate: - SingleInterval - With Era Year Month Day format
+                                         earliestSingleDate: [1995,  4, 13, BCE]
 
   "13th april 1995":                     # oneDisplayDate: - SingleInterval with Day (ordinal) Month (all caps) Year Format
-                                         earliestSingleDate: [1995,  4,  13, CE]
+                                         earliestSingleDate: [1995,  4, 13, CE]
 
   "1995, april 13":                      # oneDisplayDate: - SingleInterval - Year COMMA month day format (no era)
-                                         earliestSingleDate: [1995,  4,  13, CE]
+                                         earliestSingleDate: [1995,  4, 13, CE]
 
-  "1995, april 13 AD":                   # oneDisplayDate: - SingleInterval - Year COMMA month day era format 
-                                         earliestSingleDate: [1995,  4,  13, CE]
+  "1995, april 13 AD":                   # oneDisplayDate: - SingleInterval - Year COMMA month day era format
+                                         earliestSingleDate: [1995,  4, 13, CE]
 
   "1995 april 13":                       # oneDisplayDate -  singleInterval - dayOrYearFirstDate - Year month day, no era
-                                         earliestSingleDate: [1995,  4,  13, CE]
+                                         earliestSingleDate: [1995,  4, 13, CE]
 
   "13 april 1995":                       # oneDisplayDate -  singleInterval - dayOrYearFirstDate - Day month year, no era
-                                         earliestSingleDate: [1995,  4,  13, CE]
+                                         earliestSingleDate: [1995,  4, 13, CE]
 
   "13 april, 1995":                      # oneDisplayDate -  singleInterval - dayFirstDate - Day Month Year
-                                         earliestSingleDate: [1995,  4,  13, CE]
+                                         earliestSingleDate: [1995,  4, 13, CE]
 
   "13 april, 1995 AD":                   # oneDisplayDate -  singleInterval - dayFirstDate - Day Month Year  with comma and era
-                                         earliestSingleDate: [1995,  4,  13, CE]
+                                         earliestSingleDate: [1995,  4, 13, CE]
 
   "13 april 1995 AD":                    # oneDisplayDate -  singleInterval - dayFirstDate - Day Month Year with era, no comma
-                                         earliestSingleDate: [1995,  4,  13, CE]
+                                         earliestSingleDate: [1995,  4, 13, CE]
 
   "13th april, 1995":                    # oneDisplayDate -  singleInterval - dayFirstDate - Day (ordinal) Month Year
-                                         earliestSingleDate: [1995,  4,  13, CE]
+                                         earliestSingleDate: [1995,  4, 13, CE]
 
   "13th april, 1995 - 5th may 1999":     # oneDisplayDate -  hyphenatedRange - dayFirstDate - Day (ordinal) Month Year
-                                         earliestSingleDate: [1995,  4,  13, CE]
+                                         earliestSingleDate: [1995,  4, 13, CE]
                                          latestDate:         [1999,  5,  5, CE]
 
   "13 april 15":                         # oneDisplayDate - ambigous day and year - should be Year month day
-                                         earliestSingleDate: [13,  4,  15, CE]
+                                         earliestSingleDate: [  13,  4, 15, CE]
 
   "before 13 april 1995":                # beforeAfterDate - Empty earliestSingleDate - Day Month Year Format
                                          earliestSingleDate: []
@@ -1171,111 +1171,111 @@
   "after april 13 1995":                 # beforeAfterDate - Empty latestDate calculated as current date -  Month Day Year Format
                                          earliestSingleDate: [1995,  4, 13, CE]
                                          latestDate:         "current date"
-  
+
   "10/2005-12/2006":                     # Month/Year - Month/Year date
-                                         earliestSingleDate: [2005,  10, 1, CE]
-                                         latestDate:         [2006,  12, 31, CE]
+                                         earliestSingleDate: [2005, 10,  1, CE]
+                                         latestDate:         [2006, 12, 31, CE]
 
   "04/1995-04/2018":                     # Month/Year - Month/Year date
-                                         earliestSingleDate: [1995,  4, 1, CE]
+                                         earliestSingleDate: [1995,  4,  1, CE]
                                          latestDate:         [2018,  4, 30, CE]
 
   "unknown":                             # Unknown date: Should result in empty fields
                                          earliestSingleDate: []
 
   "13 april 15":                         # oneDisplayDate - ambiguous day and year, intepreted as year month day
-                                         earliestSingleDate: [13,  4, 15, CE]
+                                         earliestSingleDate: [  13,  4, 15, CE]
 
   "04/5-6/2018":                         # Month/Day - Day/Year date
-                                         earliestSingleDate: [2018,  4, 5, CE]
-                                         latestDate:         [2018,  4, 6, CE]
-  
+                                         earliestSingleDate: [2018,  4,  5, CE]
+                                         latestDate:         [2018,  4,  6, CE]
+
   "04/03-07/09":                         # Ambigious NumDayInMonthRange - should be interpreted as Month/Day - Day/Year date
-                                         earliestSingleDate: [9,  4, 3, CE]
-                                         latestDate:         [9,  4, 7, CE] 
+                                         earliestSingleDate: [   9,  4,  3, CE]
+                                         latestDate:         [   9,  4,  7, CE]
 
   '04/1996-07/09':                       # Semi-ambigious NumDayInMonthRange - should be interpreted as Month/Year - Month/Year date
-                                         earliestSingleDate: [9,     7, 31, CE]
+                                         earliestSingleDate: [   9,  7, 31, CE]
                                          latestDate:         [1996,  4,  1, CE]
 
   "1200±50 BP":                          # Uncalibrated date with ± symbol
-                                         earliestSingleDate: [700, 1, 1, CE]
-                                         latestDate:         [800, 12, 31, CE ]
+                                         earliestSingleDate: [ 700,  1,  1, CE]
+                                         latestDate:         [ 800, 12, 31, CE ]
 
   "3100 +/- 150 BP":                     # Uncalibrated date with +/- instead of ± symbol
-                                         earliestSingleDate: [1300, 1, 1, BCE]
+                                         earliestSingleDate: [1300,  1,  1, BCE]
                                          latestDate:         [1000, 12, 31, BCE]
 
   "3100+/-150 BP":                       # Uncalibrated date with +/- instead of ± symbol, no spaces
-                                         earliestSingleDate: [1300, 1, 1, BCE]
+                                         earliestSingleDate: [1300,  1,  1, BCE]
                                          latestDate:         [1000, 12, 31, BCE]
 
   "3100+/-150 years BP":                 # Uncalibrated date with 'years' in it
-                                         earliestSingleDate: [1300, 1, 1, BCE]
+                                         earliestSingleDate: [1300,  1,  1, BCE]
                                          latestDate:         [1000, 12, 31, BCE]
 
   "3,100+/-150 years BP":                # Uncalibrated date with 'years' in it as well as with a comma
-                                         earliestSingleDate: [1300, 1, 1, BCE]
+                                         earliestSingleDate: [1300,  1,  1, BCE]
                                          latestDate:         [1000, 12, 31, BCE]
 
   "2000±100 BP":                         # Uncalibrated date with BCE and AD mix
-                                         earliestSingleDate: [150, 1, 1, BCE]
-                                         latestDate:         [50, 12, 31, CE]
+                                         earliestSingleDate: [ 150,  1,  1, BCE]
+                                         latestDate:         [  50, 12, 31, CE]
 
   "5580-5460 BC":                        # Calibrated date with commas
-                                         earliestSingleDate: [5580,  1, 1, BCE]
-                                         latestDate:         [5460,  12, 31, BCE]
+                                         earliestSingleDate: [5580,  1,  1, BCE]
+                                         latestDate:         [5460, 12, 31, BCE]
 
   "5,580 - 5,460 BC":                    # Calibrated date with commas and spaces
-                                         earliestSingleDate: [5580,  1, 1, BCE]
-                                         latestDate:         [5460,  12, 31, BCE]
+                                         earliestSingleDate: [5580,  1,  1, BCE]
+                                         latestDate:         [5460, 12, 31, BCE]
 
   "5460-5580 BC":                        # Calibrated date with dates reversed
-                                         earliestSingleDate: [5580,  1, 1, BCE]
-                                         latestDate:         [5460,  12, 31, BCE]
+                                         earliestSingleDate: [5580,  1,  1, BCE]
+                                         latestDate:         [5460, 12, 31, BCE]
 
   "c. 69 BC":                            # Circa date, ± 10 years
-                                         earliestSingleDate: [74, 1, 1, BCE]
-                                         latestDate:         [64, 12, 31, BCE]
+                                         earliestSingleDate: [  74,  1,  1, BCE]
+                                         latestDate:         [  64, 12, 31, BCE]
 
   "ca. 60 BC":                           # Circa date, ± 5 years
-                                         earliestSingleDate: [70, 1, 1, BCE]
-                                         latestDate:         [50, 12, 31, BCE]
+                                         earliestSingleDate: [  70,  1,  1, BCE]
+                                         latestDate:         [  50, 12, 31, BCE]
 
   "circa 200 BC":                        # Circa date, ± 50 years
-                                         earliestSingleDate: [250, 1, 1, BCE]
-                                         latestDate:         [150, 12, 31, BCE]
+                                         earliestSingleDate: [ 250,  1,  1, BCE]
+                                         latestDate:         [ 150, 12, 31, BCE]
 
   "circa 1000 BC":                       # Circa date, ± 500 years
-                                         earliestSingleDate: [1500, 1, 1, BCE]
-                                         latestDate:         [500, 12, 31, BCE]
+                                         earliestSingleDate: [1500,  1,  1, BCE]
+                                         latestDate:         [ 500, 12, 31, BCE]
 
-  '5/13/54,962 BC-4/5/2,019':            # hyphenatedRange, date with comma'd numbers
-                                         earliestSingleDate: [54962,  5,  13, BCE]
+  '5/13/5,962 BC-4/5/2,019':             # hyphenatedRange, date with comma'd numbers
+                                         earliestSingleDate: [5962,  5, 13, BCE]
                                          latestDate:         [2019,  4,  5, CE]
 
-  '01-I-2017 BCE':                       # Day-Month-Year with roman numeral as month 
+  '01-I-2017 BCE':                       # Day-Month-Year with roman numeral as month
                                          earliestSingleDate: [2017,  1,  1, BCE]
 
-  '19-XI-2018':                          # Day-Month-Year with roman numeral as month 
-                                         earliestSingleDate: [2018,  11,  19, CE]
+  '19-XI-2018':                          # Day-Month-Year with roman numeral as month
+                                         earliestSingleDate: [2018, 11, 19, CE]
 
-  '27-III-1843 BCE':                     # Day-Month-Year with roman numeral as month 
-                                         earliestSingleDate: [1843,  3,  27, BCE]
+  '27-III-1843 BCE':                     # Day-Month-Year with roman numeral as month
+                                         earliestSingleDate: [1843,  3, 27, BCE]
 
-  '29-IV-2018':                          # Day-Month-Year with roman numeral as month 
-                                         earliestSingleDate: [2018,  4,  29, CE]
+  '29-IV-2018':                          # Day-Month-Year with roman numeral as month
+                                         earliestSingleDate: [2018,  4, 29, CE]
 
   '01-IV-2017 BCE':                      # Day-Month-Year with roman numeral as month, with Era
-                                         earliestSingleDate: [2017, 4, 1, BCE]  
-  
+                                         earliestSingleDate: [2017,  4,  1, BCE]
+
   '12 june 1942 BCE - 13 june 1943':     # hyphenatedRange range with era only in first interval, mixed eras
-                                         earliestSingleDate: [1942,  6,  12, BCE]
-                                         latestDate:         [1943,  6,  13, CE]
+                                         earliestSingleDate: [1942,  6, 12, BCE]
+                                         latestDate:         [1943,  6, 13, CE]
 
   '13 april 1995 CE - 18 april 2019':    # hyphenatedRange range with era only in first interval
-                                         earliestSingleDate: [1995, 4, 13, CE]
-                                         latestDate:         [2019, 4, 18, CE]
+                                         earliestSingleDate: [1995,  4, 13, CE]
+                                         latestDate:         [2019,  4, 18, CE]
 
 # -------------------------------------------------------------------------------------------------------
 # Invalid dates

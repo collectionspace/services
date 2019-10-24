@@ -1277,11 +1277,11 @@ public class DateUtils {
 		addYears(date, -years);
 	}
 
-	public static String getEarliestTimestamp(Date date) {
+	public static String formatEarliestTimestamp(Date date) {
 		return formatEarliest(date, timestampFormatter);
 	}
 
-	public static String getEarliestScalarValue(Date date) {
+	public static String formatEarliestScalarValue(Date date) {
 		return formatEarliest(date, scalarValueFormatter);
 	}
 
@@ -1306,11 +1306,11 @@ public class DateUtils {
 		return scalarDate;
 	}
 
-	public static String getLatestTimestamp(Date date) {
+	public static String formatLatestTimestamp(Date date) {
 		return formatLatest(date, timestampFormatter);
 	}
 
-	public static String getLatestScalarValue(Date date) {
+	public static String formatLatestScalarValue(Date date) {
 		return formatLatest(date, scalarValueFormatter);
 	}
 

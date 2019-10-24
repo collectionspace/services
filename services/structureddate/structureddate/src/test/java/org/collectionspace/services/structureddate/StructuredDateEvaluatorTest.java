@@ -1,13 +1,11 @@
 package org.collectionspace.services.structureddate;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
@@ -40,7 +38,7 @@ public class StructuredDateEvaluatorTest {
 
 			StructuredDateInternal expectedStructuredDate = createStructuredDateFromYamlSpec(displayDate, expectedStructuredDateFields);
 			StructuredDateInternal actualStructuredDate = null;
-			
+
 			try {
 				actualStructuredDate = StructuredDateInternal.parse(displayDate);
 			}
@@ -55,22 +53,31 @@ public class StructuredDateEvaluatorTest {
 	private StructuredDateInternal createStructuredDateFromYamlSpec(String displayDate, Map<String, Object> structuredDateFields) {
 		StructuredDateInternal structuredDate = null;
 
-		if (structuredDateFields != null && structuredDateFields.containsKey("latestDate")) {
-			Object latestDate = structuredDateFields.get("latestDate");
-			if (latestDate instanceof String) {
-				Date currentDate = DateUtils.getCurrentDate();
-				ArrayList latestDateItems = new ArrayList<>();
-				if (latestDate.equals("current date")) {
+		if (structuredDateFields != null) {
+			if (structuredDateFields.containsKey("latestDate")) {
+				Object latestDate = structuredDateFields.get("latestDate");
+
+				if (latestDate instanceof String && latestDate.equals("current date")) {
+					Date currentDate = DateUtils.getCurrentDate();
+					ArrayList latestDateItems = new ArrayList<>();
+
 					latestDateItems.add(currentDate.getYear());
 					latestDateItems.add(currentDate.getMonth());
 					latestDateItems.add(currentDate.getDay());
-					latestDateItems.add(currentDate.getEra() == Era.BCE ? "BCE" : "CE");
+					latestDateItems.add(currentDate.getEra().toDisplayString());
+
 					structuredDateFields.put("latestDate", latestDateItems);
 				}
 			}
-		}
 
-		if (structuredDateFields != null) {
+			if (!structuredDateFields.containsKey("displayDate")) {
+				structuredDateFields.put("displayDate", displayDate);
+			}
+
+			if (!structuredDateFields.containsKey("scalarValuesComputed")) {
+				structuredDateFields.put("scalarValuesComputed", true);
+			}
+
 			structuredDate = new StructuredDateInternal();
 
 			for (String propertyName : structuredDateFields.keySet()) {
@@ -94,10 +101,6 @@ public class StructuredDateEvaluatorTest {
 				catch(IllegalAccessException e) {
 					logger.error("could not access property " + propertyName);
 				}
-			}
-			
-			if (structuredDate.getDisplayDate() == null) {
-				structuredDate.setDisplayDate(displayDate);
 			}
 		}
 
@@ -128,7 +131,7 @@ public class StructuredDateEvaluatorTest {
 			}
 			catch(IllegalAccessException e) {
 				logger.error("could not access property " + propertyName);
-			}   		
+			}
 		}
 
 		return date;
