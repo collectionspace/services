@@ -3,7 +3,6 @@ package org.collectionspace.services.common.storage.jpa;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
-import javax.persistence.RollbackException;
 
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.InconsistentStateException;
