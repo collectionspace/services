@@ -752,13 +752,14 @@ public class ServiceMain {
 			String ownerPW, String readerName, String readerPW) throws Exception {
                 Connection conn = null;
 		Statement stmt = null;
+		String sql = null;
 		try {
 			DataSource csadminDataSource = JDBCTools.getDataSource(JDBCTools.CSADMIN_DATASOURCE_NAME);
 			conn = csadminDataSource.getConnection();
 			stmt = conn.createStatement();
 			if (dbType == DatabaseProductType.POSTGRESQL) {
 				// PostgreSQL does not need passwords in grant statements.
-				String sql = "CREATE DATABASE " + dbName + " ENCODING 'UTF8' OWNER " + ownerName;
+				sql = "CREATE DATABASE " + dbName + " ENCODING 'UTF8' OWNER " + ownerName;
 				stmt.executeUpdate(sql);
 				if (logger.isDebugEnabled()) {
 					logger.debug("Created db: '" + dbName + "' with owner: '" + ownerName + "'");
@@ -773,7 +774,7 @@ public class ServiceMain {
 				// Note that select rights for reader must be granted after
 				// Nuxeo startup.
 			} else if (dbType == DatabaseProductType.MYSQL) {
-				String sql = "CREATE database " + dbName + " DEFAULT CHARACTER SET utf8";
+				sql = "CREATE database " + dbName + " DEFAULT CHARACTER SET utf8";
 				stmt.executeUpdate(sql);
 				sql = "GRANT ALL PRIVILEGES ON " + dbName + ".* TO '" + ownerName + "'@'localhost' IDENTIFIED BY '"
 						+ ownerPW + "' WITH GRANT OPTION";
