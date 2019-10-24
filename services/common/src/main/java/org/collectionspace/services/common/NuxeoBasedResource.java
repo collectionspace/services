@@ -483,7 +483,6 @@ public abstract class NuxeoBasedResource
             throw bigReThrow(e, ServiceMessages.LIST_FAILED);
         }
     }
-    
 
     protected AbstractCommonList finish_getList(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, 
     		DocumentHandler handler) {
