@@ -320,30 +320,31 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		
 		return csids;
 	}	
-	
+
 	protected PoxPayloadOut findAuthorityItemByCsid(String serviceName, String csid) throws URISyntaxException, DocumentException {
 		List<String> vocabularyCsids = getVocabularyCsids(serviceName);
 		PoxPayloadOut itemPayload = null;
-		
+
 		for (String vocabularyCsid : vocabularyCsids) {
 			logger.debug("vocabularyCsid=" + vocabularyCsid);
-			
-			// FIXME: This throws DocumentNotFoundException, so will never go to the next vocabulary
-			itemPayload = findAuthorityItemByCsid(serviceName, vocabularyCsid, csid);
-			
+
+			try {
+				itemPayload = findAuthorityItemByCsid(serviceName, vocabularyCsid, csid);
+			} catch (Exception e) {
+				itemPayload = null;
+			}
+
 			if (itemPayload != null) {
 				break;
 			}
 		}
-		
+
 		return itemPayload;
 	}
-	
-	protected PoxPayloadOut findAuthorityItemByCsid(String serviceName, String vocabularyCsid, String csid) throws URISyntaxException, DocumentException {
+
+	protected PoxPayloadOut findAuthorityItemByCsid(String serviceName, String vocabularyCsid, String csid) throws URISyntaxException, DocumentException, Exception {
 		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
-		byte[] response = resource.getAuthorityItem(null, createDeleteFilterUriInfo(), getResourceMap(), vocabularyCsid, csid);
-		 
-		PoxPayloadOut payload = new PoxPayloadOut(response);
+		PoxPayloadOut payload = resource.getAuthorityItemWithExistingContext(getServiceContext(), createDeleteFilterUriInfo(), getResourceMap(), vocabularyCsid, csid);
 
 		return payload;
 	}
@@ -450,7 +451,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		return csids;
 	}
 	
-	protected List<String> findReferencingObjects(String serviceName, String csid, String type, String sourceField) throws URISyntaxException, DocumentException {
+	protected List<String> findReferencingObjects(String serviceName, String csid, String type, String sourceField) throws Exception {
 		logger.debug("findReferencingObjects serviceName=" + serviceName + " csid=" + csid + " type=" + type + " sourceField=" + sourceField);
 
 		List<String> vocabularyCsids = getVocabularyCsids(serviceName);
@@ -473,7 +474,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		return findReferencingObjects(serviceName, parentCsid, csid, type, sourceField);
 	}
 
-	protected List<String> findReferencingCollectionObjects(String serviceName, String csid, String sourceField) throws URISyntaxException, DocumentException {
+	protected List<String> findReferencingCollectionObjects(String serviceName, String csid, String sourceField) throws Exception {
 		return findReferencingObjects(serviceName, csid, ServiceBindingUtils.SERVICE_TYPE_OBJECT, sourceField);
 	}
 

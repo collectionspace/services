@@ -1049,9 +1049,18 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
             String parentIdentifier,
             String itemIdentifier) throws Exception {
+        return getAuthorityItemWithExistingContext(existingCtx, existingCtx.getUriInfo(), existingCtx.getResourceMap(), parentIdentifier, itemIdentifier);
+    }
+
+    public PoxPayloadOut getAuthorityItemWithExistingContext(
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
+            UriInfo uriInfo,
+            ResourceMap resourceMap,
+            String parentIdentifier,
+            String itemIdentifier) throws Exception {
         PoxPayloadOut result = null;
 
-        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), existingCtx.getResourceMap(), existingCtx.getUriInfo());
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), resourceMap, uriInfo);
         if (existingCtx.getCurrentRepositorySession() != null) {
             ctx.setCurrentRepositorySession(existingCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
             ctx.setProperties(existingCtx.getProperties());
