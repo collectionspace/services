@@ -170,12 +170,19 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
         
     /*
      * We should change this method.  The RepositoryClient (from call to getRepositoryClient) should support a call getWorkflowTransition() instead.
-     */    
+     */
     @GET
     @Path("{csid}" + WorkflowClient.SERVICE_PATH)
     public byte[] getWorkflow(
     		@Context UriInfo uriInfo,
             @PathParam("csid") String csid) {
+        return getWorkflowWithExistingContext(null, uriInfo, csid);
+    }
+
+    public byte[] getWorkflowWithExistingContext(
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> existingContext,
+            UriInfo uriInfo,
+            String csid) {
         PoxPayloadOut result = null;
 
         try {
@@ -183,6 +190,9 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
             String parentWorkspaceName = parentCtx.getRepositoryWorkspaceName();
 
             MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME, uriInfo);
+            if (existingContext != null && existingContext.getCurrentRepositorySession() != null) {
+            	ctx.setCurrentRepositorySession(existingContext.getCurrentRepositorySession()); // Reuse the current repo session if one exists
+            }
             WorkflowDocumentModelHandler handler = createWorkflowDocumentHandler(ctx);
             ctx.setRespositoryWorkspaceName(parentWorkspaceName); //find the document in the parent's workspace
             getRepositoryClient(ctx).get(ctx, csid, handler);
