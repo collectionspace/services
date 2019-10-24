@@ -29,8 +29,6 @@ import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.NuxeoBasedResource;
-import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.UriTemplateRegistry;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
@@ -93,7 +91,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 			"</document>";
 
 		NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(RelationClient.SERVICE_NAME);
-		Response response = resource.create(getResourceMap(), null, createRelationPayload);
+		Response response = resource.create(getServiceContext(), getResourceMap(), null, createRelationPayload);
 
 		if (response.getStatus() == CREATED_STATUS) {
 			relationCsid = CollectionSpaceClientUtils.extractId(response);
@@ -119,7 +117,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	 */
 	protected List<RelationListItem> findRelated(String subjectCsid, String subjectDocType, String predicate, String objectCsid, String objectDocType) throws URISyntaxException {
 		RelationResource relationResource = (RelationResource) getResourceMap().get(RelationClient.SERVICE_NAME);
-		RelationsCommonList relationList = relationResource.getList(createRelationSearchUriInfo(subjectCsid, subjectDocType, predicate, objectCsid, objectDocType));
+		RelationsCommonList relationList = relationResource.getList(getServiceContext(), createRelationSearchUriInfo(subjectCsid, subjectDocType, predicate, objectCsid, objectDocType));
 
 		return relationList.getRelationListItem();
 	}
@@ -211,7 +209,11 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 			String csid = uriParts[4];
 			
 			if (items.equals("items")) {
-				payload = findAuthorityItemByCsid(serviceName, vocabularyCsid, csid);
+				try {
+					payload = findAuthorityItemByCsid(serviceName, vocabularyCsid, csid);
+				} catch (Exception e) {
+					payload = null;
+				}
 			}
 		}
 
@@ -220,10 +222,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 
 	protected PoxPayloadOut findByCsid(String serviceName, String csid) throws URISyntaxException, DocumentException {
 		NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(serviceName);
-		byte[] outputBytes = (byte[]) resource.get(null, null, createUriInfo(), csid).getEntity();
-
-		PoxPayloadOut payload = new PoxPayloadOut(outputBytes);
-
+		PoxPayloadOut payload = resource.getWithParentCtx(getServiceContext(), csid);
 		return payload;
 	}
 
