@@ -112,7 +112,7 @@ public abstract class NuxeoBasedResource
         
         if (success == false) {
             Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    ServiceMessages.REINDEX_FAILED + ServiceMessages.indexResourceNotFoundMsg(indexid)).type("text/plain").build();
+                    ServiceMessages.REINDEX_FAILED + ServiceMessages.resourceTypeNotReindexedMsg(indexid)).type("text/plain").build();
             throw new CSWebApplicationException(response);
         }
 
@@ -140,7 +140,7 @@ public abstract class NuxeoBasedResource
 
         if (success == false) {
             Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    ServiceMessages.REINDEX_FAILED + ServiceMessages.indexResourceNotFoundMsg(indexid)).type("text/plain").build();
+                    ServiceMessages.REINDEX_FAILED + ServiceMessages.resourceTypeNotReindexedMsg(indexid)).type("text/plain").build();
             throw new CSWebApplicationException(response);
         }
 
