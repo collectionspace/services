@@ -462,8 +462,15 @@ public abstract class NuxeoBasedResource
     }
     
     protected AbstractCommonList getCommonList(UriInfo uriInfo) {
+        return getCommonList(null, uriInfo);
+    }
+    
+    protected AbstractCommonList getCommonList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, UriInfo uriInfo) {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
+            if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
+                ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
+            }
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             AbstractCommonList list = (AbstractCommonList) handler.getCommonPartList();
@@ -472,6 +479,7 @@ public abstract class NuxeoBasedResource
             throw bigReThrow(e, ServiceMessages.LIST_FAILED);
         }
     }
+    
 
     protected AbstractCommonList finish_getList(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, 
     		DocumentHandler handler) {
