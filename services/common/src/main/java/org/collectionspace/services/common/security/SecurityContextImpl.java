@@ -54,7 +54,7 @@ public class SecurityContextImpl implements SecurityContext {
             // If anonymous access is being attempted, then a tenant ID needs to be set as a query param
             //
             if (uriInfo == null) {
-                String errMsg = "Anonymous access attempted with null UriInfo.";
+        		String errMsg = "Anonymous access attempted with missing or invalid tenant ID query or path paramter. A null 'UriInfo' instance was passed into the service context constructor.";
                 logger.warn(errMsg);
                 throw new UnauthorizedException(errMsg);
             }
