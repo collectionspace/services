@@ -37,6 +37,7 @@
 			</types:item>
 			<!-- By default, term completion searches return a maximum number of terms in their search results. The default value
 				is 40 terms. -->
+			<!-- Example: You can change this default to 100. -->
 			<types:item id="maxlistitemsjdbc" merge:matcher="skip" merge:action="insert" xmlns:types="http://collectionspace.org/services/config/types">
 				<types:key>maxListItemsReturnedLimitOnJdbcQueries</types:key>
 				<types:value>40</types:value>
@@ -45,6 +46,7 @@
 				data is isolated within its own repository, or on a shared repository system where only one tenant has data, this restriction
 				can be removed by setting the value below to 'false'. That will remove one SQL JOIN from the query, potentially improving
 				search performance. -->
+			<!-- If your deployment does not use shared repositories, change the default to 'false'. -->	
 			<types:item id="jdbcqueriestenantrestricted" merge:matcher="skip" merge:action="insert" xmlns:types="http://collectionspace.org/services/config/types">
 				<types:key>jdbcQueriesAreTenantIdRestricted</types:key>
 				<types:value>true</types:value>
@@ -59,6 +61,10 @@
 			<service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
 				<service:classname>org.collectionspace.services.common.init.RunSqlScripts</service:classname>
 				<service:params>
+				   <!-- <service:property>
+                        <service:key>sqlScriptName</service:key>
+                        <service:value>grant_reporters_privileges.sql</service:value>
+                    </service:property> -->
 					<service:property>
 						<service:key>sqlScriptName</service:key>
 						<service:value>create_id_generators_table.sql</service:value>
