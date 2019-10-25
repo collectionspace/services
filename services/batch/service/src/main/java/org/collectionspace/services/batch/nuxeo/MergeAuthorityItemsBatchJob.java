@@ -539,6 +539,7 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 	}
 
 	private void mergeTermGroupLists(Element targetTermGroupListElement, Element sourceTermGroupListElement) {
+		// done in place
 		Map<String, Element> sourceTermGroups;
 
 		try {
