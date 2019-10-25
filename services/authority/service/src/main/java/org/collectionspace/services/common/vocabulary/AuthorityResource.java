@@ -49,7 +49,6 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.XmlTools;
 import org.collectionspace.services.client.workflow.WorkflowClient;
-
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
@@ -80,12 +79,11 @@ import org.collectionspace.services.common.document.Hierarchy;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
-import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.SpecifierForm;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
-
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.description.ServiceDescription;
@@ -98,7 +96,6 @@ import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentFilter;
 import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.workflow.WorkflowCommon;
-
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -529,11 +526,6 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @GET
     @Produces("application/xml")
     public AbstractCommonList getAuthorityList(@Context UriInfo uriInfo) { //FIXME - REM 5/3/2012 - This is not reachable from the JAX-RS dispatcher.  Instead the equivalent method in ResourceBase is getting called.
-        uriInfo = new UriInfoWrapper(uriInfo);
-        return this.getAuthorityList(null, uriInfo);
-    }
-    
-    public AbstractCommonList getAuthorityList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, @Context UriInfo uriInfo) {
         uriInfo = new UriInfoWrapper(uriInfo);
         AbstractCommonList result = null;
 
@@ -1052,18 +1044,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
             String parentIdentifier,
             String itemIdentifier) throws Exception {
-        return getAuthorityItemWithExistingContext(existingCtx, existingCtx.getUriInfo(), existingCtx.getResourceMap(), parentIdentifier, itemIdentifier);
-    }
-
-    public PoxPayloadOut getAuthorityItemWithExistingContext(
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
-            UriInfo uriInfo,
-            ResourceMap resourceMap,
-            String parentIdentifier,
-            String itemIdentifier) throws Exception {
         PoxPayloadOut result = null;
 
-        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), resourceMap, uriInfo);
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), existingCtx.getResourceMap(), existingCtx.getUriInfo());
         if (existingCtx.getCurrentRepositorySession() != null) {
             ctx.setCurrentRepositorySession(existingCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
             ctx.setProperties(existingCtx.getProperties());
