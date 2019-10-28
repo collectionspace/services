@@ -526,13 +526,20 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @GET
     @Produces("application/xml")
     public AbstractCommonList getAuthorityList(@Context UriInfo uriInfo) { //FIXME - REM 5/3/2012 - This is not reachable from the JAX-RS dispatcher.  Instead the equivalent method in ResourceBase is getting called.
+    	uriInfo = new UriInfoWrapper(uriInfo);
+        return this.getAuthorityList(null, uriInfo);
+    }
+
+    public AbstractCommonList getAuthorityList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, @Context UriInfo uriInfo) {
         uriInfo = new UriInfoWrapper(uriInfo);
         AbstractCommonList result = null;
 
         try {
             MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
-
+            if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
+            	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
+            }
             DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
             DocumentFilter myFilter = handler.getDocumentFilter();
             // Need to make the default sort order for authority items
@@ -768,6 +775,21 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             Boolean isProposed,
             Boolean isSASItem
             ) throws Exception {
+    	return updateAuthorityItem(null, itemServiceCtx, resourceMap, uriInfo, parentspecifier, itemspecifier, theUpdate, shouldUpdateRevNumber, isProposed, isSASItem);
+    }
+    
+    public PoxPayloadOut updateAuthorityItem(
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> itemServiceCtx, // Ok to be null.  Will be null on PUT calls, but not on sync calls
+            ResourceMap resourceMap,
+            UriInfo uriInfo,
+            String parentspecifier,
+            String itemspecifier,
+            PoxPayloadIn theUpdate,
+            boolean shouldUpdateRevNumber,
+            Boolean isProposed,
+            Boolean isSASItem
+            ) throws Exception {
         PoxPayloadOut result = null;
 
         CsidAndShortIdentifier csidAndShortId = lookupParentCSIDAndShortIdentifer(itemServiceCtx, parentspecifier, "updateAuthorityItem(parent)", "UPDATE_ITEM", null);
@@ -779,6 +801,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = itemServiceCtx;
         if (ctx == null) {
             ctx = createServiceContext(getItemServiceName(), theUpdate, resourceMap, uriInfo);
+            if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
+                ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
+            }
         } else {
             ctx.setInput(theUpdate); // the update payload
         }
@@ -908,8 +933,6 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         return result.getBytes();
     }
 
-    //FIXME: This method is almost identical to the method org.collectionspace.services.common.updateWorkflowWithTransition() so
-    // they should be consolidated -be DRY (D)on't (R)epeat (Y)ourself.
     @PUT
     @Path("{csid}/items/{itemcsid}" + WorkflowClient.SERVICE_PATH + "/{transition}")
     public byte[] updateItemWorkflowWithTransition(
@@ -918,10 +941,23 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             @PathParam("itemcsid") String itemIdentifier,
             @PathParam("transition") String transition) {
         uriInfo = new UriInfoWrapper(uriInfo);
+        return updateItemWorkflowWithTransition(null, uriInfo, parentIdentifier, itemIdentifier, transition);
+    }
+    
+    public byte[] updateItemWorkflowWithTransition(
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> existingContext,
+            UriInfo uriInfo,
+            String parentIdentifier,
+            String itemIdentifier,
+            String transition) {
+        uriInfo = new UriInfoWrapper(uriInfo);
         PoxPayloadOut result = null;
 
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), uriInfo);
+            if (existingContext != null && existingContext.getCurrentRepositorySession() != null) {
+                ctx.setCurrentRepositorySession(existingContext.getCurrentRepositorySession());// If a repo session is already open, we need to use it and not create a new one
+            }
             result = updateItemWorkflowWithTransition(ctx,
                     parentIdentifier, itemIdentifier, transition, AuthorityServiceUtils.UPDATE_REV);
         } catch (Exception e) {
@@ -1044,9 +1080,18 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
             String parentIdentifier,
             String itemIdentifier) throws Exception {
+    	return getAuthorityItemWithExistingContext(existingCtx, existingCtx.getUriInfo(), existingCtx.getResourceMap(), parentIdentifier, itemIdentifier);
+    }
+
+    public PoxPayloadOut getAuthorityItemWithExistingContext(
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
+            UriInfo uriInfo,
+            ResourceMap resourceMap,
+            String parentIdentifier,
+            String itemIdentifier) throws Exception {
         PoxPayloadOut result = null;
 
-        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), existingCtx.getResourceMap(), existingCtx.getUriInfo());
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), resourceMap, uriInfo);
         if (existingCtx.getCurrentRepositorySession() != null) {
             ctx.setCurrentRepositorySession(existingCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
             ctx.setProperties(existingCtx.getProperties());
@@ -1489,12 +1534,22 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             @PathParam("csid") String parentSpecifier,
             @PathParam("itemcsid") String itemSpecifier,
             String xmlPayload) {
+    	return updateAuthorityItem(null, resourceMap, uriInfo, parentSpecifier, itemSpecifier, xmlPayload);
+    }
+ 
+    public byte[] updateAuthorityItem(
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
+            ResourceMap resourceMap,
+            UriInfo uriInfo,
+            String parentSpecifier,
+            String itemSpecifier,
+            String xmlPayload) {
         uriInfo = new UriInfoWrapper(uriInfo);
         PoxPayloadOut result = null;
 
         try {
             PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
-            result = updateAuthorityItem(null, resourceMap, uriInfo, parentSpecifier, itemSpecifier, theUpdate,
+            result = updateAuthorityItem(parentCtx, null, resourceMap, uriInfo, parentSpecifier, itemSpecifier, theUpdate,
                     AuthorityServiceUtils.UPDATE_REV,            // passing TRUE so rev num increases, passing
                     AuthorityServiceUtils.NO_CHANGE,    // don't change the state of the "proposed" field -we could be performing a sync or just a plain update
                     AuthorityServiceUtils.NO_CHANGE);    // don't change the state of the "sas" field -we could be performing a sync or just a plain update
@@ -1504,8 +1559,6 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 
         return result.getBytes();
     }
-
-
 
     /**
      * Delete authorityItem.
