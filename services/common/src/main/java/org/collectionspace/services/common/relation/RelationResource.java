@@ -92,7 +92,7 @@ public class RelationResource extends NuxeoBasedResource {
 		return this.getList(parentCtx, parentCtx.getUriInfo());
 	}
 	
-	private RelationsCommonList getList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, UriInfo uriInfo) {
+	public RelationsCommonList getList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, UriInfo uriInfo) {
 		MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
 		
 		String subjectCsid = queryParams.getFirst(IRelationsManager.SUBJECT_QP);

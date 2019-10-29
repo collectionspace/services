@@ -65,7 +65,6 @@ import javax.ws.rs.core.Response.Status;
 @Path(ReportClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
-//@Produces("application/xml;charset=UTF-8")
 public class ReportResource extends NuxeoBasedResource {
     final Logger logger = LoggerFactory.getLogger(ReportResource.class);
 
@@ -86,9 +85,12 @@ public class ReportResource extends NuxeoBasedResource {
     }
 
     @Override
-    protected AbstractCommonList getCommonList(UriInfo ui) {
+    protected AbstractCommonList getCommonList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, UriInfo ui) {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
+            if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
+                ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
+            }
             MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
             DocumentHandler handler = createDocumentHandler(ctx);
             String docType = queryParams.getFirst(IQueryManager.SEARCH_TYPE_DOCTYPE);
