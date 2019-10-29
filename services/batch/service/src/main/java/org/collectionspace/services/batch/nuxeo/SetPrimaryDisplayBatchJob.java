@@ -7,18 +7,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
-import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.NuxeoBasedResource;
-import org.collectionspace.services.common.ResourceMap;
-import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
-import org.nuxeo.runtime.transaction.TransactionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.collectionspace.services.client.MediaClient;
-import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 
 public class SetPrimaryDisplayBatchJob extends AbstractBatchJob {
 	final Logger log = LoggerFactory.getLogger(SetPrimaryDisplayBatchJob.class);

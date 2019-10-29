@@ -20,7 +20,6 @@ import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.CollectionSpaceClientUtils;
 import org.collectionspace.services.client.IRelationsManager;
-import org.collectionspace.services.client.MediaClient;
 import org.collectionspace.services.client.MovementClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PlaceAuthorityClient;

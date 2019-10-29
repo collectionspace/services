@@ -120,7 +120,6 @@
         <ant antfile="updaterelationsondelete/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="updateimagederivatives/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="naturalhistory/build.xml" target="deploy" inheritall="false"/>
-        <ant antfile="botgarden/build.xml" target="deploy" inheritall="false"/>        
     </target>
 
     <target name="undeploy"
@@ -130,7 +129,6 @@
         <ant antfile="updaterelationsondelete/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="updateimagederivatives/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="naturalhistory/build.xml" target="undeploy" inheritall="false"/>
-        <ant antfile="botgarden/build.xml" target="undeploy" inheritall="false"/>        
     </target>
 
     <target name="dist"
@@ -140,7 +138,6 @@
         <ant antfile="updaterelationsondelete/build.xml" target="dist" inheritall="false"/>
         <ant antfile="updateimagederivatives/build.xml" target="dist" inheritall="false"/>
         <ant antfile="naturalhistory/build.xml" target="dist" inheritall="false"/>
-        <ant antfile="botgarden/build.xml" target="dist" inheritall="false"/>        
     </target>
 
 </project>
