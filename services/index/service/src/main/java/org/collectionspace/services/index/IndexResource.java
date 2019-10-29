@@ -26,10 +26,13 @@ package org.collectionspace.services.index;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.index.IndexClient;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler;
@@ -137,5 +140,9 @@ public class IndexResource extends NuxeoBasedResource {
 				.build();
 		throw new CSWebApplicationException(response);
 	}
-    
+
+	@Override
+	public AbstractCommonList getList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, UriInfo uriInfo) {
+		throw new UnsupportedOperationException();
+	}
 }

@@ -81,16 +81,18 @@ public class BatchResource extends NuxeoBasedResource {
     }
 
     @Override
-    //public Class<BatchCommon> getCommonPartClass() {
-    public Class getCommonPartClass() {
+    public Class<?> getCommonPartClass() {
     	return BatchCommon.class;
     }
 
 	// other resource methods and use the getRepositoryClient() methods.
 	@Override
-    protected AbstractCommonList getCommonList(UriInfo ui) {
+	protected AbstractCommonList getCommonList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, UriInfo ui) {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
+            if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
+                ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
+            }
             MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
             DocumentHandler handler = createDocumentHandler(ctx);
             String docType = queryParams.getFirst(IQueryManager.SEARCH_TYPE_DOCTYPE);

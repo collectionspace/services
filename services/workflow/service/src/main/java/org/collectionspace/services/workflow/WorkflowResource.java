@@ -23,11 +23,14 @@
  */
 package org.collectionspace.services.workflow;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import javax.ws.rs.Consumes;
@@ -37,7 +40,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -104,5 +106,9 @@ public class WorkflowResource extends NuxeoBasedResource {
 				.build();
 		throw new CSWebApplicationException(response);
 	}
-    
+
+	@Override
+	public AbstractCommonList getList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, UriInfo uriInfo) {
+		throw new UnsupportedOperationException();
+	}
 }

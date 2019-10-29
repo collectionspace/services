@@ -445,6 +445,10 @@ public abstract class NuxeoBasedResource
     @GET
     public AbstractCommonList getList(@Context UriInfo uriInfo) {
     	uriInfo = new UriInfoWrapper(uriInfo);
+        return this.getList(null, uriInfo);
+    }
+
+    public AbstractCommonList getList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, UriInfo uriInfo) {
         AbstractCommonList list = null;
         
         MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
@@ -453,18 +457,24 @@ public abstract class NuxeoBasedResource
             String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
             String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
             String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
-            list = search(uriInfo, orderBy, keywords, advancedSearch, partialTerm);
+            list = search(parentCtx, uriInfo, orderBy, keywords, advancedSearch, partialTerm);
         } else {
-            list = getCommonList(uriInfo);
+            list = getCommonList(parentCtx, uriInfo);
         }
         
         return list;
     }
     
     protected AbstractCommonList getCommonList(UriInfo uriInfo) {
+    	return getCommonList(null, uriInfo);
+    }
+
+    protected AbstractCommonList getCommonList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, UriInfo uriInfo) {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
-            DocumentHandler handler = createDocumentHandler(ctx);
+            if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
+                ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
+            }            DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             AbstractCommonList list = (AbstractCommonList) handler.getCommonPartList();
             return list;
@@ -536,6 +546,7 @@ public abstract class NuxeoBasedResource
     }
 
     private AbstractCommonList search(
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
     		UriInfo uriInfo,
     		String orderBy,
     		String keywords,
@@ -546,6 +557,9 @@ public abstract class NuxeoBasedResource
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx;
     	try {
     		ctx = createServiceContext(uriInfo);
+    		if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
+            	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
+            }
     		DocumentHandler handler = createDocumentHandler(ctx);
     		result = search(ctx, handler, uriInfo, orderBy, keywords, advancedSearch, partialTerm);
     	} catch (Exception e) {
