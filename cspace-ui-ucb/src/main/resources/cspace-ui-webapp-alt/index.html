@@ -22,61 +22,61 @@
 							disabled: false,
 						},
 					},
-                    fields: {
-                        'ns2:collectionobjects_common': {
-                            objectNumber: {
-                                [config]: {
-                                    cloneable: false,
-                                    required: true,
+                                        fields: {
+                                                'ns2:collectionobjects_common': {
+                                                        objectNumber: {
+                                                                [config]: {
+                                                                        cloneable: false,
+                                                                        required: true,
+                                                                },
+                                                        },
+                                                        comments: {
+                                                                comment: {
+                                                                        "[config]": {
+                                                                                cloneable: false,
+                                                                        },
+                                                                },
+                                                        },
+                                                },
+                                                'ns2:collectionobjects_naturalhistory': {
+                                                localityGroupList: {
+                                                        localityGroup: {
+                                                                fieldLocCounty: {
+                                                                        '[config]': {
+                                                                                cloneable: false,
+                                                                        },
+                                                                },
+                                                                fieldLocState: {
+                                                                        '[config]': {
+                                                                                cloneable: false,
+                                                                },
+                                                        },
+                                                        fieldLocCountry: {
+                                                                '[config]': {
+                                                                                cloneable: false,
+                                                                        },
+                                                                },
+                                                        },
+                                                },
+                                                taxonomicIdentGroupList: {
+                                                        taxonomicIdentGroup: {
+                                                                taxon: {
+                                                                        '[config]': {
+                                                                        cloneable: false,
+                                                                        required: true,
+                                                                        },
+                                                                },
+                                                                qualifier: {
+                                                                        '[config]': {
+                                                                                cloneable: false,
+                                                                        },
+                                                                },
+                                                        },
+                                                },
+                                        },
                                 },
-                            },
-                            comments: {
-                                comment: {
-                                    "[config]": {
-                                        cloneable: false,
-                                    },
-                                },
-                            },
-                        },
-                        'ns2:collectionobjects_naturalhistory': {
-                            localityGroupList: {
-                                localityGroup: {
-                                    fieldLocCounty: {
-                                        '[config]': {
-                                            cloneable: false,
-                                        },
-                                    },
-                                    'fieldLocState': {
-                                        '[config]': {
-                                            cloneable: false,
-                                        },
-                                    },
-                                    'fieldLocCountry': {
-                                        '[config]': {
-                                            cloneable: false,
-                                        },
-                                    },
-                                },
-                            },
-                            taxonomicIdentGroupList: {
-                                taxonomicIdentGroup: {
-                                    taxon: {
-                                        '[config]': {
-                                            cloneable: false,
-                                            required: true,
-                                        },
-                                    },
-                                    qualifier: {
-                                        '[config]': {
-                                            cloneable: false,
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                    },
-				},
 			},
+		},
             plugins: [
                 @CSPACE_PROFILE_PLUGIN_LIB_NAME@(),
             ],
