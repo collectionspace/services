@@ -10,6 +10,10 @@ import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 
+/*
+ * As of v5.1, this listener is not used by any CollectionSpace deployments.
+ */
+@Deprecated
 public class UpdateThumbListener implements EventListener {
  
     public void handleEvent(Event event) throws ClientException {
