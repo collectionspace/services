@@ -48,7 +48,6 @@ import org.collectionspace.services.batch.ResourceActionGroup;
 import org.collectionspace.services.batch.ResourceActionGroupList;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorization_mgt.ActionGroup;

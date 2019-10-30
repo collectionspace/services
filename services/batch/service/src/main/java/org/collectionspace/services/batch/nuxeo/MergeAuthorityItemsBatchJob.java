@@ -27,8 +27,6 @@ import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.relation.RelationResource;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.relation.RelationsCommonList;
-import org.collectionspace.services.common.api.RefName;
-import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
 import org.dom4j.Document;
