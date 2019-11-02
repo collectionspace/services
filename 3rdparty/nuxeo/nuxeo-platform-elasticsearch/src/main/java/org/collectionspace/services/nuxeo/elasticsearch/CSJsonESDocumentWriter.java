@@ -262,7 +262,9 @@ public class CSJsonESDocumentWriter extends JsonESDocumentWriter {
         for (Map<String, Object> group : groups) {
             String org = (String) group.get("materialTermAttributionContributingOrganization");
 
-            orgs.add(org);
+            if (StringUtils.isNotEmpty(org)) {
+                orgs.add(org);
+            }
         }
 
         return orgs;
@@ -276,7 +278,9 @@ public class CSJsonESDocumentWriter extends JsonESDocumentWriter {
         for (Map<String, Object> group : groups) {
             String org = (String) group.get("materialTermAttributionEditingOrganization");
 
-            orgs.add(org);
+            if (StringUtils.isNotEmpty(org)) {
+                orgs.add(org);
+            }
         }
 
         return orgs;
