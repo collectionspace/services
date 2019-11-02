@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -102,7 +103,7 @@ public class CSJsonESDocumentWriter extends JsonESDocumentWriter {
             // Combine term creator organizations and term editor organizations into a holding
             // institutions field.
 
-            Set<String> holdingInstitutions = new HashSet<String>();
+            Set<String> holdingInstitutions = new LinkedHashSet<String>();
 
             holdingInstitutions.addAll(getTermAttributionContributors(doc));
             holdingInstitutions.addAll(getTermAttributionEditors(doc));
@@ -255,7 +256,7 @@ public class CSJsonESDocumentWriter extends JsonESDocumentWriter {
     }
 
     private Set<String> getTermAttributionContributors(DocumentModel doc) {
-        Set orgs = new HashSet<String>();
+        Set orgs = new LinkedHashSet<String>();
 
         List<Map<String, Object>> groups = (List<Map<String, Object>>) doc.getProperty("materials_common", "materialTermAttributionContributingGroupList");
 
@@ -271,7 +272,7 @@ public class CSJsonESDocumentWriter extends JsonESDocumentWriter {
     }
 
     private Set<String> getTermAttributionEditors(DocumentModel doc) {
-        Set orgs = new HashSet<String>();
+        Set orgs = new LinkedHashSet<String>();
 
         List<Map<String, Object>> groups = (List<Map<String, Object>>) doc.getProperty("materials_common", "materialTermAttributionEditingGroupList");
 
