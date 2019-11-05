@@ -29,6 +29,7 @@ import org.collectionspace.services.client.PayloadPart;
 
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
+import org.collectionspace.services.taxonomy.nuxeo.TaxonConstants;
 
 
 public class UpdateHybridNameBatchJob extends AbstractBatchJob {
@@ -73,14 +74,10 @@ public class UpdateHybridNameBatchJob extends AbstractBatchJob {
     }
 
     private void updateRecord(String csid) throws Exception {
-        // Need to get _THIS_ csid's attributes findCollectionObjectByCsid
         PoxPayloadOut currentRecord = findCollectionObjectByCsid(csid);
-
-        ArrayList<String> hybridNames = new ArrayList<String>();
 
         // Get the GroupList element
         Element naturalHistoryElement = currentRecord.getPart("collectionobjects_naturalhistory").asElement();
-        Element parentGroupList = null;
         Element taxonIdentGroupList = null;
         Iterator<Element> childIterator = naturalHistoryElement.elementIterator();
 
@@ -92,13 +89,10 @@ public class UpdateHybridNameBatchJob extends AbstractBatchJob {
             if (candidateElement.getName().contains("taxonomicIdentGroupList")) {
                 taxonIdentGroupList = candidateElement;
             }
-            if (candidateElement.getName().contains("hybridParentGroupList")) {
-                parentGroupList = candidateElement;
-            }
         }
 
         if (taxonIdentGroupList == null) {
-            throw new Exception("Blah");
+            throw new Exception("No lists to update on record with csid " + csid);
         }
 
         ArrayList<Element> updatedTermGroups = new ArrayList<Element>();
@@ -123,62 +117,16 @@ public class UpdateHybridNameBatchJob extends AbstractBatchJob {
         if (logger.isDebugEnabled()) {
             logger.debug(String.format("Batch resource: Resonse from collectionobject (cataloging record) update: %s", new String(responseBytes)));
         }
-        
-        // String serviceName = getAuthorityServiceNameForDocType("collectionobject");
-        // AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
-        
-		// resource.updateAuthorityItem(getServiceContext(), getResourceMap(), createUriInfo(), inAuthority, csid, payload);
-
-
     }
 
-
-	// private String getUpdatePayload(Element originalTermGroupListElement, Element updatedTermGroupListElement) {
-	// 	List<Element> parents = new ArrayList<Element>();
-
-	// 	for (Element e = originalTermGroupListElement; e != null; e = e.getParent()) {
-	// 		parents.add(e);
-	// 	}
-
-	// 	Collections.reverse(parents);
-
-	// 	// Remove the original termGroupList element
-	// 	parents.remove(parents.size() - 1);
-
-	// 	// Remove the root
-	// 	Element rootElement = parents.remove(0);
-
-	// 	// Copy the root to a new document
-	// 	Document document = DocumentHelper.createDocument(copyElement(rootElement));
-	// 	Element current = document.getRootElement();
-
-	// 	// Copy the remaining parents
-	// 	for (Element parent : parents) {
-	// 		Element parentCopy = copyElement(parent);
-
-	// 		current.add(parentCopy);
-	// 		current = parentCopy;
-	// 	}
-
-	// 	// Add the updated termGroupList element
-
-	// 	current.add(updatedTermGroupListElement);
-
-	// 	String payload = document.asXML();
-
-	// 	return payload;
-	// }
-
-
     public void updateElement(Element termGroupElement) {
-        int x = 0;
         String taxonomicIdentHybridName = "";
 
-        Node hybridFlagNode = termGroupElement.selectSingleNode("hybridFlag");
-        String affinityTaxon = termGroupElement.selectSingleNode("affinityTaxon").getText();
+        Node hybridFlagNode = termGroupElement.selectSingleNode(TaxonConstants.HYBRID_FLAG);
+        String affinityTaxon = termGroupElement.selectSingleNode(TaxonConstants.AFF_TAXON).getText();
         affinityTaxon = affinityTaxon.equals("") ? "" : RefNameUtils.getDisplayName(affinityTaxon);
 
-        String taxon = termGroupElement.selectSingleNode("taxon").getText();
+        String taxon = termGroupElement.selectSingleNode(TaxonConstants.TAXON_NAME).getText();
         taxon = taxon.equals("") ? "" : RefNameUtils.getDisplayName(taxon);
 
 
@@ -196,12 +144,12 @@ public class UpdateHybridNameBatchJob extends AbstractBatchJob {
             while (hybridParentGroupListIterator.hasNext()) {
                 Element candidateElement = hybridParentGroupListIterator.next();
 
-                if (candidateElement.getName().contains("taxonomicIdentHybridParentGroupList")) {
+                if (candidateElement.getName().contains(TaxonConstants.TAXON_HYBRID_PARENT_GROUP_LIST)) {
                     hybridParentGroupList = candidateElement;
                 }
             }
 
-            List<Node> hybridParentGroup = hybridParentGroupList.selectNodes("taxonomicIdentHybridParentGroup");
+            List<Node> hybridParentGroup = hybridParentGroupList.selectNodes(TaxonConstants.TAXON_HYBRID_PARENT_GROUP);
 
             if (hybridParentGroup.size() != 2) {
                 return;
@@ -210,16 +158,14 @@ public class UpdateHybridNameBatchJob extends AbstractBatchJob {
             Node firstParentNode = hybridParentGroup.get(0);
             Node secondParentNode =hybridParentGroup.get(1);
 
-            String firstParentSex = firstParentNode.selectSingleNode("taxonomicIdentHybridParentQualifier").getText();
-
-            String secondParentSex = secondParentNode.selectSingleNode("taxonomicIdentHybridParentQualifier").getText();
+            String firstParentSex = firstParentNode.selectSingleNode(TaxonConstants.TAXON_HYBRID_PARENT_QUALIF).getText();
 
             Node maleParentNode = firstParentSex.equals("male") ? firstParentNode : secondParentNode;
             Node femaleParentNode = firstParentSex.equals("female") ? firstParentNode : secondParentNode;
 
 
-            String maleParentName = RefNameUtils.getDisplayName(maleParentNode.selectSingleNode("taxonomicIdentHybridParent").getText());
-            String femaleParentName = RefNameUtils.getDisplayName(femaleParentNode.selectSingleNode("taxonomicIdentHybridParent").getText());
+            String maleParentName = RefNameUtils.getDisplayName(maleParentNode.selectSingleNode(TaxonConstants.TAXON_HYBRID_PARENT).getText());
+            String femaleParentName = RefNameUtils.getDisplayName(femaleParentNode.selectSingleNode(TaxonConstants.TAXON_HYBRID_PARENT).getText());
 
             int maleParentGenusIndex = maleParentName.indexOf(' ');
             
@@ -249,28 +195,9 @@ public class UpdateHybridNameBatchJob extends AbstractBatchJob {
                 
             }
 
-
-
         }
 
-        Node hybridNameNode = termGroupElement.selectSingleNode("taxonomicIdentHybridName");
+        Node hybridNameNode = termGroupElement.selectSingleNode(TaxonConstants.TAXON_HYBRID_NAME);
         hybridNameNode.setText(taxonomicIdentHybridName) ;
-
-        // if Node displayNameNode = termGroupElement.selectSingleNode("termDisplayName");
-
     }
-
-
-
-    // private Element getTermGroupListElement(PoxPayloadOut itemPayload) {
-    //     currentRecord.getPart("collectionobjects_naturalhistory").asElement()
-	// 	Element termGroupListElement = null;
-	// 	Element commonPartElement = findCommonPartElement(itemPayload);
-
-	// 	if (commonPartElement != null) {
-	// 		termGroupListElement = findTermGroupListElement(commonPartElement);
-	// 	}
-
-	// 	return termGroupListElement;
-	// }
 }
