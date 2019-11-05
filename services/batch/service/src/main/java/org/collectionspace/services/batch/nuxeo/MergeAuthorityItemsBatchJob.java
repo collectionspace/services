@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -73,9 +74,19 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 		setCompletionStatus(STATUS_MIN_PROGRESS);
 
 		try {
-			String docType = null;
-			String targetCsid = null;
-			List<String> sourceCsids = new ArrayList<String>();
+			String target = null;
+			Set<String> sourceCsids = new LinkedHashSet<String>();
+			String docType = this.getDocType();
+
+			if (this.requestIsForInvocationModeSingle()) {
+				String singleCsid = this.getSingleCsid();
+
+				if (singleCsid != null) {
+					sourceCsids.add(singleCsid);
+				}
+			} else if (this.requestIsForInvocationModeList()) {
+				sourceCsids.addAll(this.getListCsids());
+			}
 
 			for (Param param : this.getParams()) {
 				String key = param.getKey();
@@ -88,27 +99,26 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 				if (key.equals("docType")) {
 					docType = param.getValue();
 				}
+				else if (key.equals("target")) {
+					target = param.getValue();
+				}
 				else if (key.equals("targetCSID")) {
-					targetCsid = param.getValue();
+					target = param.getValue();
 				}
 				else if (key.equals("sourceCSID")) {
 					sourceCsids.add(param.getValue());
 				}
 			}
 
-			if (docType == null || docType.equals("")) {
-				throw new Exception("a docType must be supplied");
-			}
-
-			if (targetCsid == null || targetCsid.equals("")) {
-				throw new Exception("a target csid parameter (targetCSID) must be supplied");
+			if (target == null || target.equals("")) {
+				throw new Exception("a target or targetCSID parameter must be supplied");
 			}
 
 			if (sourceCsids.size() == 0) {
 				throw new Exception("a source csid must be supplied");
 			}
 
-			InvocationResults results = merge(docType, targetCsid, sourceCsids);
+			InvocationResults results = merge(docType, target, sourceCsids);
 
 			setResults(results);
 			setCompletionStatus(STATUS_COMPLETE);
@@ -119,16 +129,19 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 		}
 	}
 
-	public InvocationResults merge(String docType, String targetCsid, String sourceCsid) throws URISyntaxException, DocumentException {
-		return merge(docType, targetCsid, Arrays.asList(sourceCsid));
+	public InvocationResults merge(String docType, String target, String sourceCsid) throws URISyntaxException, DocumentException {
+		return merge(docType, target, new LinkedHashSet<String>(Arrays.asList(sourceCsid)));
 	}
 
-	public InvocationResults merge(String docType, String targetCsid, List<String> sourceCsids) throws URISyntaxException, DocumentException {
-		logger.debug("Merging docType=" + docType + " targetCsid=" + targetCsid + " sourceCsids=" + StringUtils.join(sourceCsids, ","));
+	public InvocationResults merge(String docType, String target, Set<String> sourceCsids) throws URISyntaxException, DocumentException {
+		logger.debug("Merging docType=" + docType + " target=" + target + " sourceCsids=" + StringUtils.join(sourceCsids, ","));
 
 		String serviceName = getAuthorityServiceNameForDocType(docType);
 
-		PoxPayloadOut targetItemPayload = findAuthorityItemByCsid(serviceName, targetCsid);
+		PoxPayloadOut targetItemPayload = RefNameUtils.isTermRefname(target)
+			? findAuthorityItemByRefName(serviceName, target)
+			: findAuthorityItemByCsid(serviceName, target);
+
 		List<PoxPayloadOut> sourceItemPayloads = new ArrayList<PoxPayloadOut>();
 
 		for (String sourceCsid : sourceCsids) {
@@ -169,7 +182,9 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 
 		updateAuthorityItem(docType, inAuthority, targetCsid, getUpdatePayload(targetTermGroupListElement, mergedTermGroupListElement));
 
-		userNotes.add("The target record with CSID " + targetCsid + " (" + targetRefName + ") was updated.");
+		String targetDisplayName = RefNameUtils.getDisplayName(targetRefName);
+
+		userNotes.add("Updated the target record, " + targetDisplayName + ".");
 		numAffected++;
 
 		String serviceName = getAuthorityServiceNameForDocType(docType);
@@ -192,7 +207,7 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 			String sourceCsid = getCsid(sourceItemPayload);
 			String sourceRefName = getRefName(sourceItemPayload);
 
-			InvocationResults results = deleteAuthorityItem(docType, getFieldValue(sourceItemPayload, "inAuthority"), sourceCsid);
+			InvocationResults results = deleteAuthorityItem(docType, getFieldValue(sourceItemPayload, "inAuthority"), sourceCsid, sourceRefName);
 
 			userNotes.add(results.getUserNote());
 			numAffected += results.getNumAffected();
@@ -207,6 +222,8 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 
 	private InvocationResults updateReferences(String serviceName, String inAuthority, String sourceCsid, String sourceRefName, String targetRefName) throws URISyntaxException, DocumentException {
 		logger.debug("Updating references: serviceName=" + serviceName + " inAuthority=" + inAuthority + " sourceCsid=" + sourceCsid + " sourceRefName=" + sourceRefName + " targetRefName=" + targetRefName);
+
+		String sourceDisplayName = RefNameUtils.getDisplayName(sourceRefName);
 
 		int pageNum = 0;
 		int pageSize = 100;
@@ -273,9 +290,18 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 
 		InvocationResults results = new InvocationResults();
 		results.setNumAffected(numUpdated);
-		results.setUserNote(numUpdated > 0 ?
-				numUpdated + " records that referenced the source record with CSID " + sourceCsid + " were updated." :
-				"No records referenced the source record with CSID " + sourceCsid + ".");
+
+		if (numUpdated > 0) {
+			results.setUserNote(
+				"Updated "
+				+ numUpdated
+				+ (numUpdated == 1 ? " record " : " records ")
+				+ "that referenced the source record, "
+				+ sourceDisplayName + "."
+			);
+		} else {
+			results.setUserNote("No records referenced the source record, " + sourceDisplayName + ".");
+		}
 
 		return results;
 	}
@@ -372,9 +398,10 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 		resource.updateAuthorityItem(getResourceMap(), createUriInfo(), inAuthority, csid, payload);
 	}
 
-	private InvocationResults deleteAuthorityItem(String docType, String inAuthority, String csid) throws URISyntaxException {
+	private InvocationResults deleteAuthorityItem(String docType, String inAuthority, String csid, String refName) throws URISyntaxException {
 		int numAffected = 0;
 		List<String> userNotes = new ArrayList<String>();
+		String displayName = RefNameUtils.getDisplayName(refName);
 
 		// If the item is the broader context of any items, warn and do nothing.
 
@@ -383,26 +410,34 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 		if (narrowerItemCsids.size() > 0) {
 			logger.debug("Item " + csid + " has narrower items -- not deleting");
 
-			userNotes.add("The source record with CSID " + csid + " was not deleted because it has narrower context items.");
+			userNotes.add("The source record, " + displayName + ", was not deleted because it has narrower items in its hierarchy.");
 		}
 		else {
 			// If the item has a broader context, delete the relation.
 
-			List<String> relationCsids = new ArrayList<String>();
+			List<RelationsCommonList.RelationListItem> relationItems = new ArrayList<RelationsCommonList.RelationListItem>();
 
 			for (RelationsCommonList.RelationListItem item : findRelated(csid, null, "hasBroader", null, null)) {
-				relationCsids.add(item.getCsid());
+				relationItems.add(item);
 			}
 
-			if (relationCsids.size() > 0) {
+			if (relationItems.size() > 0) {
 				RelationResource relationResource = (RelationResource) getResourceMap().get(RelationClient.SERVICE_NAME);
 
-				for (String relationCsid : relationCsids) {
+				for (RelationsCommonList.RelationListItem item : relationItems) {
+					String relationCsid = item.getCsid();
+
+					String subjectRefName = item.getSubject().getRefName();
+					String subjectDisplayName = RefNameUtils.getDisplayName(subjectRefName);
+
+					String objectRefName = item.getObject().getRefName();
+					String objectDisplayName = RefNameUtils.getDisplayName(objectRefName);
+
 					logger.debug("Deleting hasBroader relation " + relationCsid);
 
 					relationResource.delete(relationCsid);
 
-					userNotes.add("The broader relation with CSID " + relationCsid + " was deleted.");
+					userNotes.add("Deleted the \"has broader\" relation from " + subjectDisplayName + " to " + objectDisplayName + ".");
 					numAffected++;
 				}
 			}
@@ -414,7 +449,7 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 
 			resource.updateItemWorkflowWithTransition(null, inAuthority, csid, "delete");
 
-			userNotes.add("The source record with CSID " + csid + " was soft deleted.");
+			userNotes.add("Deleted the source record, " + displayName + ".");
 			numAffected++;
 		}
 

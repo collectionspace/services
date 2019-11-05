@@ -38,7 +38,7 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
     public final int INT_ERROR_STATUS = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
     protected final String CSID_VALUES_NOT_PROVIDED_IN_INVOCATION_CONTEXT =
             "Could not find required CSID values in the invocation context for this batch job.";
-    
+
     private ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx;
     private List<String> invocationModes;
     private ResourceMap resourceMap;
@@ -83,37 +83,37 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
     public void setServiceContext(ServiceContext<PoxPayloadIn, PoxPayloadOut> context) {
         this.ctx = context;
     }
-    
+
     @Override
     public ServiceContext<PoxPayloadIn, PoxPayloadOut> getServiceContext() {
         return ctx;
     }
-	
+
     @Override
     public CoreSessionInterface getRepoSession() {
     	CoreSessionInterface result = null;
-    	
+
     	if (ctx != null) {
     		result = (CoreSessionInterface) ctx.getCurrentRepositorySession();
     	} else {
-    		logger.error(String.format("Batch job '%s' invoked with a null/empty service context.", 
+    		logger.error(String.format("Batch job '%s' invoked with a null/empty service context.",
     				this.getClass().getName()));
     	}
-    	
+
     	return result;
     }
-    
-    @Override    
+
+    @Override
     public String getTenantId() {
         String result = null;
-        
+
         if (ctx != null) {
         	result = ctx.getTenantId();
         } else {
-    		logger.error(String.format("Batch job '%s' invoked with a null/empty service context.", 
+    		logger.error(String.format("Batch job '%s' invoked with a null/empty service context.",
     				this.getClass().getName()));
     	}
-        
+
         return result;
     }
 
@@ -170,6 +170,10 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
         return (INVOCATION_MODE_NO_CONTEXT.equalsIgnoreCase(getInvocationContext().getMode()) ? true : false);
     }
 
+    protected String getSingleCsid() {
+        return this.getInvocationContext().getSingleCSID();
+    }
+
     protected List<String> getListCsids() {
         List<String> emptyCsidsList = Collections.emptyList();
         InvocationContext.ListCSIDs lcsids = getInvocationContext().getListCSIDs();
@@ -198,6 +202,10 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
                 return paramsList;
             }
         }
+    }
+
+    protected String getDocType() {
+        return this.getInvocationContext().getDocType();
     }
 
     protected void setErrorResult(String message) {
