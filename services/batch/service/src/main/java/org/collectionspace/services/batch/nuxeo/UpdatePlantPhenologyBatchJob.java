@@ -30,6 +30,12 @@ import org.collectionspace.services.common.invocable.InvocationContext.Params.Pa
 import org.collectionspace.services.common.ResourceMap;
 
 
+/**
+ * This batch job updates the fruiting and flowering months, as well as the sex, fruit color and flower color of collectionobject records.
+ * It can be invoked in either list or single mode.
+ * @author Cesar Villalobos
+ *
+ */
 public class UpdatePlantPhenologyBatchJob extends AbstractBatchJob {
   final Logger logger = LoggerFactory.getLogger(UpdatePlantPhenologyBatchJob.class);
   
@@ -54,14 +60,11 @@ public class UpdatePlantPhenologyBatchJob extends AbstractBatchJob {
         csids.add(csid);
 
       } else if (mode.equalsIgnoreCase(INVOCATION_MODE_LIST)) {
-        // ListCSIDs csids = ctx.getListCSIDs();
         csids.addAll(ctx.getListCSIDs().getCsid());
       } else {
         throw new Exception("Unsupported invocation mode: " + mode);
       }
 
-      // get the values
-      // List<String> values = this.getValues();
       HashMap<String, String> fieldsToValues = this.getValues();
 
       if (fieldsToValues.isEmpty()) {
@@ -103,8 +106,6 @@ public class UpdatePlantPhenologyBatchJob extends AbstractBatchJob {
   }
 
   public void updateRecord(String csid, HashMap<String, String> values) throws URISyntaxException {
-    // do the updating!
-    // CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
     String valuesToUpdate = "";
     String sex = "";
     
@@ -117,16 +118,16 @@ public class UpdatePlantPhenologyBatchJob extends AbstractBatchJob {
     }
 
     String payload = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-                      "<document name=\"collectionobjects\">" +
-                      "ns2:collectionobjects_common" +
-                      "xmlns:ns2=\"http://collectionspace.org/services/collectionobject\"" +
-                      "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""  +
-                      sex + "</ns2:collectionobjects_common>" +
-                      "<ns2:collectionobjects_botgarden " +
-                      "xmlns:ns2=\"http://collectionspace.org/services/collectionobject/local/botgarden\" " +
-                      "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-                      valuesToUpdate + 
-                      "</ns2:collectionobjects_botgarden>" +
+                        "<document name=\"collectionobjects\">" +
+                        "<ns2:collectionobjects_common " +
+                        "xmlns:ns2=\"http://collectionspace.org/services/collectionobject\" " +
+                        "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"  +
+                        sex + "</ns2:collectionobjects_common>" +
+                        "<ns2:collectionobjects_botgarden " +
+                        "xmlns:ns2=\"http://collectionspace.org/services/collectionobject/local/botgarden\" " +
+                        "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
+                        valuesToUpdate + 
+                        "</ns2:collectionobjects_botgarden>" +
                       "</document>";
 
 
