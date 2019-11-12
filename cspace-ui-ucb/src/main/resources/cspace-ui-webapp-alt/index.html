@@ -9,56 +9,57 @@
     <script>
         cspaceUI({
         	basename: '@ALT_WEBAPP_NAME@',
-            messages: {
-                'footer.release': 'Release {version} (@UCB_RELEASE@ - @ALT_WEBAPP_NAME@)',
-            },
-            recordTypes: {
-				collectionobject: {
-					forms: {
-						default: {
-							disabled: false,
-						},
-						collectorLabel: {
-							disabled: false,
-						},
-					},
-                                        fields: {
-                                                'ns2:collectionobjects_common': {
-                                                        objectNumber: {
-                                                                [config]: {
-                                                                        cloneable: false,
-                                                                        required: true,
-                                                                },
-                                                        },
-                                                        comments: {
-                                                                comment: {
-                                                                        "[config]": {
-                                                                                cloneable: false,
-                                                                        },
-                                                                },
-                                                        },
-                                                },
-                                                taxonomicIdentGroupList: {
-                                                        taxonomicIdentGroup: {
-                                                                taxon: {
-                                                                        '[config]': {
-                                                                                required: true,
-                                                                        },
-                                                                },
-                                                                qualifier: {
-                                                                        '[config]': {
-                                                                                cloneable: false,
-                                                                        },
-                                                                },
-                                                        },
-                                                },
+                messages: {
+                        'footer.release': 'Release {version} (@UCB_RELEASE@ - @ALT_WEBAPP_NAME@)',
+                },
+                recordTypes: {
+                        collectionobject: {
+                                forms: {
+                                        default: {
+                                                disabled: false,
+                                        },
+                                        collectorLabel: {
+                                                disabled: false,
                                         },
                                 },
-			},
-		},
-            plugins: [
-                @CSPACE_PROFILE_PLUGIN_LIB_NAME@(),
-            ],
+                fields: {
+                  'ns2:collectionobjects_common': {
+                    objectNumber: {
+                      '[config]': {
+                        cloneable: false,
+                        required: true,
+                      },
+                    },
+                    comments: {
+                      comment: {
+                        '[config]': {
+                          cloneable: false,
+                        },
+                      },
+                    },
+                  },
+                  'ns2:collectionobjects_naturalhistory': {
+                    taxonomicIdentGroupList: {
+                      taxonomicIdentGroup: {
+                        taxon: {
+                          '[config]': {
+                            required: true,
+                          },
+                        },
+                        qualifier: {
+                          '[config]': {
+                            cloneable: false,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+                plugins: [
+                        @CSPACE_PROFILE_PLUGIN_LIB_NAME@(),
+                ],
         });
     </script>
 </body>
