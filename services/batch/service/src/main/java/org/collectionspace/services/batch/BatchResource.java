@@ -231,10 +231,12 @@ public class BatchResource extends NuxeoBasedResource {
     	// To start enforcing POST perms on "/batch/*/invoke", uncomment the following block of code
 		//
 
+    	/*
     	CSpaceResource res = new URIResourceImpl(ctx.getTenantId(), BATCH_INVOKE_RESNAME, AuthZ.getMethod(ActionType.CREATE));
 		if (AuthZ.get().isAccessAllowed(res) == false) {
 			result = false;
 		}
+		*/
 
 		return result;
     }
