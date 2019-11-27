@@ -55,6 +55,7 @@ import org.collectionspace.services.systeminfo.SystemInfoResource;
 import org.collectionspace.services.contact.ContactResource;
 import org.collectionspace.services.vocabulary.VocabularyResource;
 import org.collectionspace.services.organization.OrgAuthorityResource;
+import org.collectionspace.services.osteology.OsteologyResource;
 import org.collectionspace.services.person.PersonAuthorityResource;
 import org.collectionspace.services.citation.CitationAuthorityResource;
 import org.collectionspace.services.claim.ClaimResource;
@@ -134,7 +135,8 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new ExhibitionResource());
         addResourceToMapAndSingletons(new ConditioncheckResource());
         addResourceToMapAndSingletons(new ConservationResource());
-        addResourceToMapAndSingletons(new UocResource());        
+        addResourceToMapAndSingletons(new UocResource());      
+        addResourceToMapAndSingletons(new OsteologyResource());      
         addResourceToMapAndSingletons(new ValuationcontrolResource());
         addResourceToMapAndSingletons(new ObjectExitResource());
         addResourceToMapAndSingletons(new BatchResource());
