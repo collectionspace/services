@@ -30,10 +30,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,7 +53,6 @@ import org.nuxeo.ecm.platform.filemanager.service.FileManagerService;
 import org.nuxeo.ecm.platform.filemanager.service.extension.FileImporter;
 import org.nuxeo.ecm.platform.filemanager.utils.FileManagerUtils;
 import org.nuxeo.ecm.platform.types.TypeManager;
-import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.blobholder.BlobHolder;
@@ -67,12 +64,13 @@ import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.PropertyException;
-import org.nuxeo.ecm.core.api.VersioningOption;
 import org.nuxeo.ecm.core.blob.BlobManager;
 import org.nuxeo.ecm.core.blob.BlobProvider;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.io.IOUtils;
+
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.FileUtilities;
@@ -95,8 +93,8 @@ import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
-import org.collectionspace.services.nuxeo.extension.thumbnail.ThumbnailConstants;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.collectionspace.services.nuxeo.util.ThumbnailConstants;
 import org.collectionspace.services.config.service.ListResultField;
 
 /**
@@ -515,7 +513,7 @@ public class NuxeoBlobUtils {
 					result.setMeasuredPartGroupList(measuredPartGroupList);
 				}
 			}
-			
+
 			// Check to see if a thumbnail preview was created by Nuxeo
             if (documentModel.hasFacet(ThumbnailConstants.THUMBNAIL_FACET)) {
     			String errorMsg = null;
@@ -531,7 +529,7 @@ public class NuxeoBlobUtils {
 						logger.debug(errorMsg, e);
 					}
 				}
-				
+
 				if (errorMsg == null) {
 					logger.info("A thumbnail preview was created for this document blob: " + thumbnailName);
 				} else {

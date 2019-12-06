@@ -110,7 +110,7 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 	 * @throws URISyntaxException
 	 * @throws DocumentException
 	 */
-	public InvocationResults updateReferencingRareFlags(String taxonCsid) throws URISyntaxException, DocumentException {
+	public InvocationResults updateReferencingRareFlags(String taxonCsid, String vocabularyCsid) throws URISyntaxException, DocumentException {
 		PoxPayloadOut taxonPayload = findTaxonByCsid(taxonCsid);
 		String taxonRefName = getFieldValue(taxonPayload, TaxonConstants.REFNAME_SCHEMA_NAME, TaxonConstants.REFNAME_FIELD_NAME);
 
@@ -144,6 +144,10 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 		return results;
 	}
 	
+	public InvocationResults updateReferencingRareFlags(String taxonCsid) throws URISyntaxException, DocumentException, Exception {
+		return updateReferencingRareFlags(taxonCsid, null);
+	}
+
 	/**
 	 * Updates the rare flag of the specified collectionobject.
 	 * 
