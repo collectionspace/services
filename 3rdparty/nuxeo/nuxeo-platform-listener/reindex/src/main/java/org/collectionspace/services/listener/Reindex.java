@@ -4,8 +4,9 @@ import java.util.List;
 
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.collectionspace.services.nuxeo.listener.AbstractCSEventPostCommitListenerImpl;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -26,7 +27,7 @@ import org.nuxeo.runtime.api.Framework;
  * index time.
  */
 public class Reindex extends AbstractCSEventPostCommitListenerImpl {
-	private final static Log logger = LogFactory.getLog(Reindex.class);
+	private static final Logger logger = LoggerFactory.getLogger(Reindex.class);
 
     // FIXME: This listener runs asynchronously post-commit, so that reindexing records after a
     // save does not hold up the save.
@@ -108,7 +109,7 @@ public class Reindex extends AbstractCSEventPostCommitListenerImpl {
 	}
 
 	@Override
-	protected Log getLogger() {
+	protected Logger getLogger() {
 		return logger;
 	}
 

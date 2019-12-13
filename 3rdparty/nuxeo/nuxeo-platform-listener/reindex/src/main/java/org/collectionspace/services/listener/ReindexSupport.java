@@ -3,8 +3,8 @@ package org.collectionspace.services.listener;
 import java.io.Serializable;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.collectionspace.services.nuxeo.listener.AbstractCSEventSyncListenerImpl;
 
@@ -29,7 +29,7 @@ import org.nuxeo.runtime.api.Framework;
  * will only run synchronously).
  */
 public class ReindexSupport extends AbstractCSEventSyncListenerImpl {
-    final static Log logger = LogFactory.getLog(ReindexSupport.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReindexSupport.class);
 
     @Override
 	public boolean shouldHandleEvent(Event event) {
@@ -74,7 +74,7 @@ public class ReindexSupport extends AbstractCSEventSyncListenerImpl {
     }
     
     @Override
-    public Log getLogger() {
+    public Logger getLogger() {
     	return logger;
     }
 }

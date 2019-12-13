@@ -1,8 +1,10 @@
 package org.collectionspace.services.listener;
 
 import java.io.Serializable;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
 import org.nuxeo.ecm.core.api.ClientException;
@@ -12,7 +14,8 @@ public class UpdateObjectLocationAndCrateOnMove extends UpdateObjectLocationOnMo
 
     // FIXME: We might experiment here with using log4j instead of Apache Commons Logging;
     // am using the latter to follow Ray's pattern for now
-    private final Log logger = LogFactory.getLog(UpdateObjectLocationAndCrateOnMove.class);
+    private static final Logger logger = LoggerFactory.getLogger(UpdateObjectLocationAndCrateOnMove.class);
+    
     // FIXME: Get values below from external constants
     private final static String COLLECTIONOBJECTS_ANTHROPOLOGY_SCHEMA = "collectionobjects_anthropology";
     private final static String MOVEMENTS_ANTHROPOLOGY_SCHEMA = "movements_anthropology";

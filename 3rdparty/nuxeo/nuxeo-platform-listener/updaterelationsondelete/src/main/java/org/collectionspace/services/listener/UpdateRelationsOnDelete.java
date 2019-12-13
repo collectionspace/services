@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.IllegalFormatException;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.document.DocumentException;
@@ -24,7 +24,7 @@ public class UpdateRelationsOnDelete extends AbstractCSEventSyncListenerImpl {
 
     // FIXME: We might experiment here with using log4j instead of Apache Commons Logging;
     // am using the latter to follow Ray's pattern for now
-    final Log logger = LogFactory.getLog(UpdateRelationsOnDelete.class);
+    private static final Logger logger = LoggerFactory.getLogger(UpdateRelationsOnDelete.class);
     
     // FIXME: Get these constant values from external sources rather than redeclaring here
     final static String RELATION_DOCTYPE = "Relation";
@@ -103,7 +103,7 @@ public class UpdateRelationsOnDelete extends AbstractCSEventSyncListenerImpl {
     }
 
     @Override
-    public Log getLogger() {
+    public Logger getLogger() {
     	return this.logger;
     }
 }

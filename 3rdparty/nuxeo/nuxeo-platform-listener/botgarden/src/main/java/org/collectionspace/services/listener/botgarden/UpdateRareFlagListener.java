@@ -3,8 +3,8 @@ package org.collectionspace.services.listener.botgarden;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.collectionspace.services.batch.BatchResource;
 import org.collectionspace.services.batch.nuxeo.UpdateRareFlagBatchJob;
@@ -41,7 +41,7 @@ import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
  *
  */
 public class UpdateRareFlagListener extends AbstractCSEventSyncListenerImpl {
-	static final Log logger = LogFactory.getLog(UpdateRareFlagListener.class);
+	private static final Logger logger = LoggerFactory.getLogger(UpdateRareFlagListener.class);
 
 	public static final String PREVIOUS_TAXON_PROPERTY_NAME = "UpdateRareFlagListener.previousTaxon";
 	public static final String PREVIOUS_HAS_RARE_CONSERVATION_CATEGORY_PROPERTY_NAME = "UpdateRareFlagListener.previousHasRareConservationCategory";
@@ -219,7 +219,7 @@ public class UpdateRareFlagListener extends AbstractCSEventSyncListenerImpl {
 	}
 	
 	@Override
-	public Log getLogger() {
+	public Logger getLogger() {
 		return logger;
 	}
 }

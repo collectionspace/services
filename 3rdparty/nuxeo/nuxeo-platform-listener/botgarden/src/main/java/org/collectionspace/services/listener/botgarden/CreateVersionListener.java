@@ -1,7 +1,7 @@
 package org.collectionspace.services.listener.botgarden;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
@@ -15,7 +15,7 @@ import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 
 public class CreateVersionListener extends AbstractCSEventSyncListenerImpl {
 	public static final String SKIP_PROPERTY = "CreateVersionListener.SKIP";
-	static final Log logger = LogFactory.getLog(CreateVersionListener.class);
+	private static final Logger logger = LoggerFactory.getLogger(CreateVersionListener.class);
 
     @Override
 	public boolean shouldHandleEvent(Event event) {
@@ -57,7 +57,7 @@ public class CreateVersionListener extends AbstractCSEventSyncListenerImpl {
 	}
 
 	@Override
-	public Log getLogger() {
+	public Logger getLogger() {
 		return logger;
 	}
 }

@@ -1,7 +1,7 @@
 package org.collectionspace.services.listener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
@@ -11,7 +11,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 
 public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValues {
 
-    private final Log logger = LogFactory.getLog(UpdateObjectLocationOnMove.class);
+    private static final Logger logger = LoggerFactory.getLogger(UpdateObjectLocationOnMove.class);
 
     @Override
     protected boolean updateCollectionObjectLocation(DocumentModel collectionObjectDocModel,
@@ -47,7 +47,7 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
     }
 
     @Override
-    public Log getLogger() {
+    public Logger getLogger() {
     	return logger;
     }
 }

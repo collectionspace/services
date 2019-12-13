@@ -1,7 +1,7 @@
 package org.collectionspace.services.listener.botgarden;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
@@ -27,7 +27,7 @@ import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 
 public class UpdateStyledNameListener extends AbstractCSEventSyncListenerImpl {
 	public static final String RUN_AFTER_MODIFIED_PROPERTY = "UpdateStyledNameListener.RUN_AFTER_MODIFIED";
-	static final Log logger = LogFactory.getLog(UpdateStyledNameListener.class);
+	private static final Logger logger = LoggerFactory.getLogger(UpdateStyledNameListener.class);
 
     @Override
 	public boolean shouldHandleEvent(Event event) {
@@ -115,7 +115,7 @@ public class UpdateStyledNameListener extends AbstractCSEventSyncListenerImpl {
 	}
 	
 	@Override
-	public Log getLogger() {
+	public Logger getLogger() {
 		return logger;
 	}
 }

@@ -6,7 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
+
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.config.tenant.EventListenerConfig;
@@ -211,7 +212,7 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
 	//
 	// Derived classes need to implement.
 	//
-	abstract protected Log getLogger();
+	abstract protected Logger getLogger();
 
 	//FIXME: Does not include all the sync-related "delete" workflow states
 	/**

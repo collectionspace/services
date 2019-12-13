@@ -2,8 +2,8 @@ package org.collectionspace.services.listener;
 
 import java.io.Serializable;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.collectionspace.services.common.api.CommonAPI;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
@@ -24,7 +24,7 @@ public class UpdateImageDerivatives extends AbstractCSEventSyncListenerImpl {
 	// All Nuxeo sessions that get passed around to CollectionSpace code need to
 	// be wrapped inside of a CoreSessionWrapper. For example:
 	// 		CoreSessionInterface coreSession = new CoreSessionWrapper(docEventContext.getCoreSession());
-	private static final Log logger = LogFactory.getLog(UpdateImageDerivatives.class);
+	private static final Logger logger = LoggerFactory.getLogger(UpdateImageDerivatives.class);
 
     @Override
 	public boolean shouldHandleEvent(Event event) {
@@ -92,7 +92,7 @@ public class UpdateImageDerivatives extends AbstractCSEventSyncListenerImpl {
 	}
 
 	@Override
-	public Log getLogger() {
+	public Logger getLogger() {
 		return logger;
 	}
 }

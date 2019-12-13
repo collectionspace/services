@@ -256,7 +256,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
 		try {
 			relationDocModels = coreSession.query(query);
 		} catch (DocumentException e) {
-			getLogger().error(e);
+			getLogger().error(String.format("Error running this NXQL query: %s", query), e);
 		}
 		
         if (relationDocModels == null || relationDocModels.isEmpty()) {
@@ -354,7 +354,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
 		try {
 			relationDocModels = session.query(query);
 		} catch (DocumentException e) {
-			getLogger().error(e);
+			getLogger().error(String.format("Error running this NXQL query: %s", query), e);
 			return null;
 		}
 		

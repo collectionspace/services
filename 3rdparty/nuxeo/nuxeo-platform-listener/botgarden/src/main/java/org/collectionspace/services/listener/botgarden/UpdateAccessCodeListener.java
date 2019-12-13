@@ -8,8 +8,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.collectionspace.services.batch.BatchResource;
 import org.collectionspace.services.batch.nuxeo.UpdateAccessCodeBatchJob;
@@ -48,7 +49,7 @@ import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
  *
  */
 public class UpdateAccessCodeListener extends AbstractCSEventSyncListenerImpl {
-	static final Log logger = LogFactory.getLog(UpdateAccessCodeListener.class);
+	private static final Logger logger = LoggerFactory.getLogger(UpdateAccessCodeListener.class);
 
 	public static final String PREVIOUS_DEAD_FLAG_PROPERTY_NAME = "UpdateAccessCodeListener.previousDeadFlag";
 	public static final String PREVIOUS_TAXON_NAMES_PROPERTY_NAME = "UpdateAccessCodeListener.previousTaxonNames";
@@ -376,7 +377,7 @@ public class UpdateAccessCodeListener extends AbstractCSEventSyncListenerImpl {
 	}
 	
 	@Override
-	public Log getLogger() {
+	public Logger getLogger() {
 		return logger;
 	}
 }

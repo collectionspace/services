@@ -1,7 +1,7 @@
 package org.collectionspace.services.listener.botgarden;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.movement.nuxeo.MovementBotGardenConstants;
@@ -15,7 +15,7 @@ import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 
 public class DeleteDeadLocationListener extends AbstractCSEventSyncListenerImpl {
-	static final Log logger = LogFactory.getLog(DeleteDeadLocationListener.class);
+	private static final Logger logger = LoggerFactory.getLogger(DeleteDeadLocationListener.class);
 
     @Override
 	public boolean shouldHandleEvent(Event event) {
@@ -60,7 +60,7 @@ public class DeleteDeadLocationListener extends AbstractCSEventSyncListenerImpl 
     }
     
     @Override
-    public Log getLogger() {
+    public Logger getLogger() {
     	return logger;
     }
 }

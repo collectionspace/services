@@ -1,7 +1,7 @@
 package org.collectionspace.services.listener.botgarden;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.collectionspace.services.batch.BatchResource;
 import org.collectionspace.services.batch.nuxeo.UpdateDeadFlagBatchJob;
@@ -28,13 +28,13 @@ import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 
 public class UpdateDeadFlagListener extends AbstractCSEventSyncListenerImpl {
-	static final Log logger = LogFactory.getLog(UpdateDeadFlagListener.class);
+	private static final Logger logger = LoggerFactory.getLogger(UpdateDeadFlagListener.class);
 
     @Override
 	public boolean shouldHandleEvent(Event event) {
     	return event.getContext() instanceof DocumentEventContext;
     }
-    
+
 	/*
 	 * Set the dead flag and dead date on collectionobjects related to a new or modified movement record.
 	 */
@@ -119,7 +119,7 @@ public class UpdateDeadFlagListener extends AbstractCSEventSyncListenerImpl {
 	}
 	
 	@Override
-	public Log getLogger() {
+	public Logger getLogger() {
 		return logger;
 	}
 }

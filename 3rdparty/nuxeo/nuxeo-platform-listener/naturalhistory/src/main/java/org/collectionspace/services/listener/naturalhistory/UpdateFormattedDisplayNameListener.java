@@ -5,8 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.api.RefName;
@@ -25,7 +26,7 @@ import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 
 public class UpdateFormattedDisplayNameListener extends AbstractCSEventSyncListenerImpl {
 	public static final String RUN_AFTER_MODIFIED_PROPERTY = "UpdateFormattedDisplayNameListener.RUN_AFTER_MODIFIED";
-	static final Log logger = LogFactory.getLog(UpdateFormattedDisplayNameListener.class);
+	private static final Logger logger = LoggerFactory.getLogger(UpdateFormattedDisplayNameListener.class);
 
 	private static final String[] DISPLAY_NAME_PATH_ELEMENTS = TaxonConstants.DISPLAY_NAME_FIELD_NAME.split("/");
 	private static final String TERM_GROUP_LIST_FIELD_NAME = DISPLAY_NAME_PATH_ELEMENTS[0];
@@ -130,7 +131,7 @@ public class UpdateFormattedDisplayNameListener extends AbstractCSEventSyncListe
 	*/
 	
 	@Override
-	public Log getLogger() {
+	public Logger getLogger() {
 		return logger;
 	}
 }
