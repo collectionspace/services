@@ -21,11 +21,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.collectionspace.services</groupId>
-			<artifactId>org.collectionspace.services.3rdparty.nuxeo.thumbnail</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.collectionspace.services</groupId>
 			<artifactId>org.collectionspace.services.common-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -165,7 +160,6 @@
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-servlet-api</artifactId>
-			<version>${tomcat.version}</version>
 			<scope>provided</scope>
 		</dependency>
 

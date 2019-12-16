@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.collectionspace.services.nuxeo.util.ThumbnailConstants;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.blobholder.BlobHolder;
 import org.nuxeo.ecm.core.api.impl.blob.FileBlob;

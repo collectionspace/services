@@ -28,13 +28,16 @@
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-convert</artifactId>
-            <version>${nuxeo.core.version}</version>
         </dependency>
         <dependency>
           <groupId>org.nuxeo.ecm.platform</groupId>
           <artifactId>nuxeo-platform-imaging-core</artifactId>
-          <version>${nuxeo.platform.version}</version>
           <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.common</artifactId>
+            <version>${project.version}</version>
         </dependency>
 	</dependencies>
 

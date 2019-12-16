@@ -1,5 +1,11 @@
 package org.collectionspace.services.nuxeo.extension.thumbnail;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.collectionspace.services.nuxeo.listener.AbstractCSEventSyncListenerImpl;
+import org.collectionspace.services.nuxeo.util.ThumbnailConstants;
+
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -7,12 +13,19 @@ import org.nuxeo.ecm.core.api.blobholder.BlobHolder;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
-import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 
-public class UpdateThumbListener implements EventListener {
- 
-    public void handleEvent(Event event) throws ClientException {
+public class UpdateThumbListener extends AbstractCSEventSyncListenerImpl {
+    private static final Logger logger = LoggerFactory.getLogger(UpdateThumbListener.class);
+
+    @Override
+	public boolean shouldHandleEvent(Event event) {
+        EventContext ec = event.getContext();
+
+        return ec instanceof DocumentEventContext;
+    }
+    
+    public void handleCSEvent(Event event) throws ClientException {
         EventContext ec = event.getContext();
         if (ec instanceof DocumentEventContext) {
             DocumentEventContext context = (DocumentEventContext) ec;
@@ -39,5 +52,10 @@ public class UpdateThumbListener implements EventListener {
                 }
             }
         }
+    }
+
+    @Override
+    public Logger getLogger() {
+    	return logger;
     }
 }

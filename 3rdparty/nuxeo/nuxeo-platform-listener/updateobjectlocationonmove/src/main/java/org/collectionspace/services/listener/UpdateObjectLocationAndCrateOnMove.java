@@ -1,15 +1,21 @@
 package org.collectionspace.services.listener;
 
 import java.io.Serializable;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class UpdateObjectLocationAndCrateOnMove extends UpdateObjectLocationOnMove {
-    private final Logger logger = LoggerFactory.getLogger(UpdateObjectLocationAndCrateOnMove.class);
+
+    // FIXME: We might experiment here with using log4j instead of Apache Commons Logging;
+    // am using the latter to follow Ray's pattern for now
+    private static final Logger logger = LoggerFactory.getLogger(UpdateObjectLocationAndCrateOnMove.class);
+    
     // FIXME: Get values below from external constants
     private final static String COLLECTIONOBJECTS_ANTHROPOLOGY_SCHEMA = "collectionobjects_anthropology";
     private final static String MOVEMENTS_ANTHROPOLOGY_SCHEMA = "movements_anthropology";
@@ -22,14 +28,14 @@ public class UpdateObjectLocationAndCrateOnMove extends UpdateObjectLocationOnMo
             String mostRecentLocation) throws ClientException {
         boolean flag = super.updateCollectionObjectLocation(collectionObjectDocModel, movementDocModel, mostRecentLocation);
         collectionObjectDocModel = updateComputedCrateValue(collectionObjectDocModel, movementDocModel);
-
+        
         return flag;
     }
 
     private DocumentModel updateComputedCrateValue(DocumentModel collectionObjectDocModel,
             DocumentModel movementDocModel)
             throws ClientException {
-
+        
         // Get the current crate value from the Movement (the "new" value)
         String crateRefName =
                 (String) movementDocModel.getProperty(MOVEMENTS_ANTHROPOLOGY_SCHEMA, CRATE_PROPERTY);
@@ -81,7 +87,7 @@ public class UpdateObjectLocationAndCrateOnMove extends UpdateObjectLocationOnMo
                 logger.trace("crate refName does NOT require updating.");
             }
         }
-
+        
         return collectionObjectDocModel;
     }
 }

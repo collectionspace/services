@@ -2,11 +2,9 @@ package org.collectionspace.services.listener;
 
 import java.util.GregorianCalendar;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.collectionspace.services.client.LocationAuthorityClient;
-import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.document.DocumentException;
@@ -15,8 +13,9 @@ import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
-import org.collectionspace.services.nuxeo.listener.AbstractCSEventListenerImpl;
+import org.collectionspace.services.nuxeo.listener.AbstractCSEventSyncListenerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -24,23 +23,19 @@ import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEventListenerImpl {
-    private final static Logger logger = LoggerFactory.getLogger(AbstractUpdateObjectLocationValues.class);
-
+public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEventSyncListenerImpl {
     // FIXME: Make the following message, or its equivalent, a constant usable by all event listeners
     private final static String NO_FURTHER_PROCESSING_MESSAGE =
             "This event listener will not continue processing this event ...";
-
+    
     private final static GregorianCalendar EARLIEST_COMPARISON_DATE = new GregorianCalendar(1600, 1, 1);
     private final static String RELATIONS_COMMON_SCHEMA = "relations_common"; // FIXME: Get from external constant
-
+    
     private final static String COLLECTIONOBJECT_DOCTYPE = CollectionObjectConstants.NUXEO_DOCTYPE;
     private final static String RELATION_DOCTYPE = RelationConstants.NUXEO_DOCTYPE;//"Relation"; // FIXME: Get from external constant
     private final static String MOVEMENT_DOCTYPE = MovementConstants.NUXEO_DOCTYPE;
-
+    
     private final static String SUBJECT_CSID_PROPERTY = "subjectCsid"; // FIXME: Get from external constant
     private final static String OBJECT_CSID_PROPERTY = "objectCsid"; // FIXME: Get from external constant
     private final static String SUBJECT_DOCTYPE_PROPERTY = "subjectDocumentType"; // FIXME: Get from external constant
@@ -54,111 +49,45 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
     protected final static String COLLECTIONSPACE_CORE_SCHEMA = "collectionspace_core"; // FIXME: Get from external constant
     protected final static String CREATED_AT_PROPERTY = "createdAt"; // FIXME: Get from external constant
     protected final static String UPDATED_AT_PROPERTY = "updatedAt"; // FIXME: Get from external constant
-
+    
     // Use this meta URN/refname to mark computed locations that are indeterminate
     private final static String INDETERMINATE_ID = "indeterminate";
     protected final static String INDETERMINATE_LOCATION = RefName.buildAuthorityItem(INDETERMINATE_ID, LocationAuthorityClient.SERVICE_NAME, INDETERMINATE_ID,
     		INDETERMINATE_ID, "~Indeterminate Location~").toString();
 
-    // SQL clauses
-    private final static String NONVERSIONED_NONPROXY_DOCUMENT_WHERE_CLAUSE_FRAGMENT =
-            "AND ecm:isCheckedInVersion = 0"
-            + " AND ecm:isProxy = 0 ";
-    private final static String ACTIVE_DOCUMENT_WHERE_CLAUSE_FRAGMENT =
-            "AND (ecm:currentLifeCycleState <> 'deleted') "
-            + NONVERSIONED_NONPROXY_DOCUMENT_WHERE_CLAUSE_FRAGMENT;
-
     // Used to set/get temp values in a DocumentModel instance
 	private static final String IGNORE_LOCATION_UPDATE_EVENT_LABEL = "IGNORE_LOCATION_UPDATE_EVENT";
-
+    
     public enum EventNotificationDocumentType {
         // Document type about which we've received a notification
-
         MOVEMENT, RELATION, COLLECTIONOBJECT;
     }
 
-    private static void logEvent(Event event, String message) {
-    	logEvent(event, message, false);
-    }
-
-    private static void logEvent(Event event, String message, boolean forceLogging) {
-    	if (logger.isDebugEnabled() || forceLogging) {
-	        DocumentEventContext docEventContext = (DocumentEventContext) event.getContext();
-	        DocumentModel docModel = docEventContext.getSourceDocument();
-	        String eventType = event.getName();
-	        String csid = NuxeoUtils.getCsid(docModel);
-
-	    	logger.debug(String.format("### %s:", message != null ? message : "Unspecified"));
-	    	logger.debug(String.format("### \t-Event type: %s", eventType));
-
-	    	logger.debug("### \t-Target documment:");
-	    	logger.debug(String.format("### \t\tCSID=%s", csid));
-	    	logger.debug(String.format("### \t\tDocType=%s", docModel.getDocumentType().getName()));
-
-	    	if (documentMatchesType(docModel, RELATION_DOCTYPE)) {
-	            String subjectDocType = (String) docModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_DOCTYPE_PROPERTY);
-	            String objectDocType = (String) docModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_DOCTYPE_PROPERTY);
-                String subjectCsid = (String) docModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_CSID_PROPERTY);
-                String objectCsid = (String) docModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
-	    		logger.debug(String.format("\tRelation info subject=%s:%s\tobject=%s:%s",
-	    				subjectCsid, subjectDocType, objectCsid, objectDocType));
-	    	} else if (documentMatchesType(docModel, MOVEMENT_DOCTYPE)) {
-	            String currentLocation = (String) docModel.getProperty(MOVEMENTS_COMMON_SCHEMA, CURRENT_LOCATION_ELEMENT_NAME);
-	            GregorianCalendar locationDate = (GregorianCalendar) docModel.getProperty(MOVEMENTS_COMMON_SCHEMA, LOCATION_DATE_PROPERTY);
-		    	logger.debug("### \t-Movement Info:");
-	    		logger.debug(String.format("### \t\tCSID=%s", csid));
-	    		logger.debug(String.format("### \t\tlocation=%s", currentLocation != null ? currentLocation : "null"));
-	    		if (locationDate != null) {
-	    			logger.debug(String.format("### \t\tdate=%1$tm-%1$te-%1$tY", locationDate != null ? locationDate : ""));
-	    		} else {
-	    			logger.debug(String.format("### \t\tdate=<empty>"));
-	    		}
-	    	} else {
-		    	logger.debug(String.format("### Ignoring Update Location event: %s", eventType));
-	    	}
-    	}
-    }
-
-    /*
-     * Figure out if we should ignore this event.
-     */
-    private boolean shouldIgnoreEvent(DocumentEventContext docEventContext, String ignoreEventLabel) {
-    	boolean result = false;
-
-        Boolean shouldIgnoreEvent = (Boolean) docEventContext.getProperties().get(DOCMODEL_CONTEXT_PROPERTY_PREFIX + ignoreEventLabel);
-        if (shouldIgnoreEvent != null && shouldIgnoreEvent) {
-        	result = true;
-        }
-
-        return result;
-    }
-
-    @Override
-    public void handleEvent(Event event) {
+    public boolean shouldHandleEvent(Event event) {
         // Ensure we have all the event data we need to proceed.
-        if (isRegistered(event) == false || !(event.getContext() instanceof DocumentEventContext)) {
-        	if (logger.isTraceEnabled() == true) {
-        		logEvent(event, "Update Location", true);
-        	}
-            return;
+        if (event.getContext() instanceof DocumentEventContext == false) {
+            return false;
         }
-
-        Map<String, String> params = this.getParams(event);  // Will be null if no params were configured.
-        logEvent(event, "Update Location");
-
-        DocumentEventContext docEventContext = (DocumentEventContext) event.getContext();
-        DocumentModel eventDocModel = docEventContext.getSourceDocument();
-        String eventType = event.getName();
-        boolean isAboutToBeRemovedEvent = eventType.equals(DocumentEventTypes.ABOUT_TO_REMOVE);
-
         //
         // This event handler itself sometimes triggers additional events.  To prevent unnecessary cascading event handling, this event
-        // handler sets a flag in the document model indicating we should ignore cascading events.  This method checks that flag and
+        // handler sets a temp flag in the document model's context indicating we should ignore cascading events.  This method checks that flag and
         // exits if it is set.
-    	if (shouldIgnoreEvent(docEventContext, IGNORE_LOCATION_UPDATE_EVENT_LABEL) == true) {
-    		return;
-    	}
+        DocumentEventContext docEventContext = (DocumentEventContext) event.getContext();
+        Boolean shouldIgnoreEvent = (Boolean) getContextPropertyValue(docEventContext, IGNORE_LOCATION_UPDATE_EVENT_LABEL);
+        if (shouldIgnoreEvent != null && shouldIgnoreEvent) {
+        	return false;
+        }
 
+        return true;
+    }
+    
+    @Override
+    public void handleCSEvent(Event event) {
+        DocumentEventContext docEventContext = (DocumentEventContext) event.getContext();
+        DocumentModel eventDocModel = docEventContext.getSourceDocument();        
+        String eventType = event.getName();
+        boolean isAboutToBeRemovedEvent = eventType.equals(DocumentEventTypes.ABOUT_TO_REMOVE);
+        
         //
         // Ensure this event relates to a relationship record (between cataloging and movement records) or a movement record.  If so, get the CSID
         // of the corresponding movement record.  Otherwise, exit.
@@ -177,8 +106,8 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
             // Otherwise, get a Movement CSID directly from the Movement record.
             eventMovementCsid = NuxeoUtils.getCsid(eventDocModel);
             if (Tools.isBlank(eventMovementCsid)) {
-                logger.warn("Could not obtain CSID for Movement record from document event.");
-                logger.warn(NO_FURTHER_PROCESSING_MESSAGE);
+            	getLogger().warn("Could not obtain CSID for Movement record from document event.");
+            	getLogger().warn(NO_FURTHER_PROCESSING_MESSAGE);
                 return;
             }
         } else if (documentMatchesType(eventDocModel, COLLECTIONOBJECT_DOCTYPE) &&
@@ -206,7 +135,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
 
         //
         // Get a list of all the CollectionObject records affected by this event.
-        //
+        // 
         CoreSessionInterface session = new CoreSessionWrapper(docEventContext.getCoreSession()); // NOTE: All Nuxeo sessions that get passed around to CollectionSpace code need to be wrapped inside of a CoreSessionWrapper
         Set<String> collectionObjectCsids = new HashSet<>();
         if (notificationDocumentType == EventNotificationDocumentType.RELATION) {
@@ -227,15 +156,14 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
         if (collectionObjectCsids.isEmpty() == true) {
             return;
         }
-
+        
         //
         // Now iterate through the list of affected CollectionObjects found.
         // For each CollectionObject, obtain its most recent, related Movement record,
         // and update update the Computed Current Location field if needed.
         //
         DocumentModel collectionObjectDocModel;
-        DocumentModel mostRecentMovementDocModel;
-        for (String collectionObjectCsid : collectionObjectCsids) {
+        for (String collectionObjectCsid : collectionObjectCsids) {            
             collectionObjectDocModel = getCurrentDocModelFromCsid(session, collectionObjectCsid);
             if (isActiveDocument(collectionObjectDocModel) == true) {
             	DocumentModel movementDocModel = getCurrentDocModelFromCsid(session, eventMovementCsid);
@@ -249,7 +177,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
 	            // Update the CollectionObject's Computed Current Location field with the Movement record's location
 				//
 	            boolean didLocationChange = updateCollectionObjectLocation(collectionObjectDocModel, movementDocModel, mostRecentLocation);
-
+	            
 	            //
 	            // If the location changed, save/persist the change to the repository and log the change.
 	            //
@@ -257,23 +185,23 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
             		persistLocationChange(session, collectionObjectDocModel);
     	            //
     	            // Log an INFO message if we've changed the cataloging record's location
-    	            //
-    	            if (logger.isInfoEnabled()) {
+    	            //	            
+    	            if (getLogger().isInfoEnabled()) {
 		                String computedCurrentLocationRefName =
 		                        (String) collectionObjectDocModel.getProperty(COLLECTIONOBJECTS_COMMON_SCHEMA, COMPUTED_CURRENT_LOCATION_PROPERTY);
-		                logger.info(String.format("Updating cataloging record=%s current location to %s",
+		                getLogger().info(String.format("Updating cataloging record=%s current location to %s",
 		                		NuxeoUtils.getCsid(collectionObjectDocModel), computedCurrentLocationRefName));
     	            }
             	}
             }
         }
     }
-
+    
     //
     // Disable update/documentModified events and persist the location change.
     //
     private void persistLocationChange(CoreSessionInterface session, DocumentModel collectionObjectDocModel) {
-
+    	
     	//
     	// Set a flag in the document model indicating that we want to ignore the update event that
     	// will be triggered by this save/persist request.
@@ -282,7 +210,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
     	//
     	// Save/Persist the document to the DB
         session.saveDocument(collectionObjectDocModel);
-
+        
         //
         // Clear the flag we set to ignore events triggered by our save request.
         clearDocModelContextProperty(collectionObjectDocModel, IGNORE_LOCATION_UPDATE_EVENT_LABEL);
@@ -296,7 +224,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
      * @throws ClientException
      * @return the CSIDs of the CollectionObject records, if any, which are
      * related to the Movement record.
-     * @throws DocumentException
+     * @throws DocumentException 
      */
     private Set<String> getCollectionObjectCsidsRelatedToMovement(String movementCsid,
             CoreSessionInterface coreSession) throws ClientException {
@@ -323,18 +251,18 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
                 + ")"
                 + ACTIVE_DOCUMENT_WHERE_CLAUSE_FRAGMENT,
                 RELATION_DOCTYPE, RELATIONS_COMMON_SCHEMA, movementCsid, COLLECTIONOBJECT_DOCTYPE);
-
+        
         DocumentModelList relationDocModels = null;
 		try {
 			relationDocModels = coreSession.query(query);
 		} catch (DocumentException e) {
-			logger.error(e.getMessage());
+			getLogger().error(String.format("Error running this NXQL query: %s", query), e);
 		}
-
+		
         if (relationDocModels == null || relationDocModels.isEmpty()) {
             return csids;
         }
-
+        
         // Iterate through the list of Relation records found and build
         // a list of CollectionObject CSIDs, by extracting the relevant CSIDs
         // from those Relation records.
@@ -345,120 +273,21 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
                 csids.add(csid);
             }
         }
-
+        
         return csids;
     }
-
-// FIXME: Generic methods like many of those below might be split off from
-// this specific event listener/handler, into an event handler utilities
-// class, base classes, or otherwise.
-//
-// FIXME: Identify whether the equivalent of the documentMatchesType utility
-// method is already implemented and substitute a call to the latter if so.
-// This may well already exist.
-    /**
-     * Identifies whether a document matches a supplied document type.
-     *
-     * @param docModel a document model.
-     * @param docType a document type string.
-     * @return true if the document matches the supplied document type; false if
-     * it does not.
-     */
-    protected static boolean documentMatchesType(DocumentModel docModel, String docType) {
-        if (docModel == null || Tools.isBlank(docType)) {
-            return false;
-        }
-        if (docModel.getType().startsWith(docType)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    protected static boolean isActiveDocument(DocumentModel docModel) {
-    	return isActiveDocument(docModel, false, null);
-    }
-
-    /**
-     * Identifies whether a document is an active document; currently, whether
-     * it is not in a 'deleted' workflow state.
-     *
-     * @param docModel
-     * @return true if the document is an active document; false if it is not.
-     */
-    protected static boolean isActiveDocument(DocumentModel docModel, boolean isAboutToBeRemovedEvent, String aboutToBeRemovedCsid) {
-        boolean isActiveDocument = false;
-
-        if (docModel != null) {
-            if (!docModel.getCurrentLifeCycleState().contains(WorkflowClient.WORKFLOWSTATE_DELETED)) {
-                isActiveDocument = true;
-            }
-	        //
-	        // If doc model is the target of the "aboutToBeRemoved" event, mark it as not active.
-	        //
-	        if (isAboutToBeRemovedEvent && Tools.notBlank(aboutToBeRemovedCsid)) {
-	        	if (NuxeoUtils.getCsid(docModel).equalsIgnoreCase(aboutToBeRemovedCsid)) {
-	        		isActiveDocument = false;
-	        	}
-	        }
-        }
-
-        return isActiveDocument;
-    }
-
-    /**
-     * Returns the current document model for a record identified by a CSID.
-     *
-     * Excludes documents which have been versioned (i.e. are a non-current
-     * version of a document), are a proxy for another document, or are
-     * un-retrievable via their CSIDs.
-     *
-     * @param session a repository session.
-     * @param csid a CollectionObject identifier (CSID)
-     * @return a document model for the document identified by the supplied
-     * CSID.
-     */
-    protected static DocumentModel getCurrentDocModelFromCsid(CoreSessionInterface session, String csid) {
-        DocumentModelList docModelList = null;
-
-        if (Tools.isEmpty(csid)) {
-        	return null;
-        }
-
-        try {
-            final String query = "SELECT * FROM "
-                    + NuxeoUtils.BASE_DOCUMENT_TYPE
-                    + " WHERE "
-                    + NuxeoUtils.getByNameWhereClause(csid)
-                    + " "
-                    + NONVERSIONED_NONPROXY_DOCUMENT_WHERE_CLAUSE_FRAGMENT;
-            docModelList = session.query(query);
-        } catch (Exception e) {
-            logger.warn("Exception in query to get active document model for CSID: " + csid, e);
-        }
-
-        if (docModelList == null || docModelList.isEmpty()) {
-            logger.warn("Could not get active document models for CSID=" + csid);
-            return null;
-        } else if (docModelList.size() != 1) {
-            logger.error("Found more than 1 active document with CSID=" + csid);
-            return null;
-        }
-
-        return docModelList.get(0);
-    }
-
+    
     //
     // Returns true if this event is for the creation of a new relationship record
     //
     private static boolean isCreatingNewRelationship(Event event) {
     	boolean result = false;
-
+    	
     	DocumentModel docModel = ((DocumentEventContext)event.getContext()).getSourceDocument();
     	if (event.getName().equals(DocumentEventTypes.DOCUMENT_CREATED) && documentMatchesType(docModel, RELATION_DOCTYPE)) {
         	result = true;
     	}
-
+    	
     	return result;
     }
 
@@ -495,7 +324,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
      * @throws ClientException
      * @return the most recent Movement record related to the CollectionObject
      * identified by the supplied CSID.
-     * @throws DocumentException
+     * @throws DocumentException 
      */
     protected String getMostRecentLocation(Event event,
     		CoreSessionInterface session, String collectionObjectCsid,
@@ -504,7 +333,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
     	// Assume we can determine the most recent location by creating an indeterminate result
     	//
 		String result = INDETERMINATE_LOCATION;
-
+		
         //
         // Get active Relation records involving Movement records related to this CollectionObject.
         //
@@ -519,31 +348,31 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
                 + ")"
                 + ACTIVE_DOCUMENT_WHERE_CLAUSE_FRAGMENT,
                 RELATION_DOCTYPE, RELATIONS_COMMON_SCHEMA, collectionObjectCsid, MOVEMENT_DOCTYPE);
-        logger.trace("query=" + query);
+        getLogger().trace("query=" + query);
 
         DocumentModelList relationDocModels;
 		try {
 			relationDocModels = session.query(query);
 		} catch (DocumentException e) {
-			logger.error(e.getMessage());
+			getLogger().error(String.format("Error running this NXQL query: %s", query), e);
 			return null;
 		}
-
+		
     	if (isCreatingNewRelationship(event) == true) {
         	DocumentModel newRelation = ((DocumentEventContext)event.getContext()).getSourceDocument();
         	relationDocModels.add(newRelation);
     	}
-
+                
         //
         // Remove redundant document models from the list.
         //
-        relationDocModels = removeRedundantRelations(relationDocModels);
-
+        relationDocModels = removeRedundantRelations(relationDocModels);        
+        
         //
         // Remove relationships that are with inactive movement records
         //
         relationDocModels = removeInactiveRelations(session, relationDocModels, isAboutToBeRemovedEvent, eventMovementCsid);
-
+        
         //
         // If there are no candidate relationships after we removed the duplicates and inactive ones,
         // throw an exception.
@@ -551,7 +380,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
         if (relationDocModels == null || relationDocModels.size() == 0) {
         	return result;
         }
-
+        
         //
         // If there is only one related movement record, then return it as the most recent
         // movement record -but only if it's current location element is not empty.
@@ -560,17 +389,17 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
         	DocumentModel relationDocModel = relationDocModels.get(0);
         	DocumentModel movementDocModel = getMovementDocModelFromRelation(session, relationDocModel);
             String location = (String) movementDocModel.getProperty(MOVEMENTS_COMMON_SCHEMA, CURRENT_LOCATION_ELEMENT_NAME);
-
+            
             if (Tools.isBlank(location) == false) {
             	result = location;
             } else { // currentLocation must be set
-            	logger.error(String.format("Movement record=%s is missing its required location value and so is excluded from the computation of cataloging record=%s's current location.",
+            	getLogger().error(String.format("Movement record=%s is missing its required location value and so is excluded from the computation of cataloging record=%s's current location.",
             			NuxeoUtils.getCsid(movementDocModel), collectionObjectCsid));
             }
 
             return result;
         }
-
+        
         //
         // Iterate through the list (>2) of related movement records, to find the related
         // Movement record with the most recent location date.
@@ -590,18 +419,18 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
             }
             movementDocModel = getCurrentDocModelFromCsid(session, relatedMovementCsid);
             String location = (String) movementDocModel.getProperty(MOVEMENTS_COMMON_SCHEMA, CURRENT_LOCATION_ELEMENT_NAME);
-
+            
             //
             // If the current Movement record lacks a location date, it cannot
             // be established as the most recent Movement record; skip over it.
             //
             GregorianCalendar locationDate = (GregorianCalendar) movementDocModel.getProperty(MOVEMENTS_COMMON_SCHEMA, LOCATION_DATE_PROPERTY);
             if (locationDate == null) {
-            	logger.info(String.format("Movement record=%s has no location date and so is excluded from computation of cataloging record=%s current location.",
+            	getLogger().info(String.format("Movement record=%s has no location date and so is excluded from computation of cataloging record=%s current location.",
             			NuxeoUtils.getCsid(movementDocModel), collectionObjectCsid));
                 continue;
             }
-
+            
             GregorianCalendar updatedDate = (GregorianCalendar) movementDocModel.getProperty(COLLECTIONSPACE_CORE_SCHEMA, UPDATED_AT_PROPERTY);
             if (locationDate.after(mostRecentLocationDate)) {
                 mostRecentLocationDate = locationDate;
@@ -619,17 +448,17 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
                 }
             }
         }
-
+        
         return result;
     }
-
+    
 	//
     // This method assumes that the relation passed into this method is between a Movement record
     // and a CollectionObject (cataloging) record.
     //
-    private static DocumentModel getMovementDocModelFromRelation(CoreSessionInterface session, DocumentModel relationDocModel) {
+    private DocumentModel getMovementDocModelFromRelation(CoreSessionInterface session, DocumentModel relationDocModel) {
     	String movementCsid = null;
-
+    	
         String subjectDocType = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_DOCTYPE_PROPERTY);
         if (subjectDocType.endsWith(MOVEMENT_DOCTYPE)) {
         	movementCsid = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_CSID_PROPERTY);
@@ -642,11 +471,11 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
 
 	//
     // Compares two Relation document models to see if they're either identical or
-    // reciprocal equivalents.
+    // reciprocal equivalents. 
     //
     private static boolean compareRelationDocModels(DocumentModel r1, DocumentModel r2) {
     	boolean result = false;
-
+    	
         String r1_subjectDocType = (String) r1.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_DOCTYPE_PROPERTY);
         String r1_objectDocType = (String) r1.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_DOCTYPE_PROPERTY);
         String r1_subjectCsid = (String) r1.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_CSID_PROPERTY);
@@ -656,13 +485,13 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
         String r2_objectDocType = (String) r2.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_DOCTYPE_PROPERTY);
         String r2_subjectCsid = (String) r2.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_CSID_PROPERTY);
         String r2_objectCsid = (String) r2.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
-
+        
         // Check to see if they're identical
         if (r1_subjectDocType.equalsIgnoreCase(r2_subjectDocType) && r1_objectDocType.equalsIgnoreCase(r2_objectDocType)
         		&& r1_subjectCsid.equalsIgnoreCase(r2_subjectCsid) && r1_objectCsid.equalsIgnoreCase(r2_objectCsid)) {
         	return true;
         }
-
+        
         // Check to see if they're reciprocal
         if (r1_subjectDocType.equalsIgnoreCase(r2_objectDocType) && r1_objectDocType.equalsIgnoreCase(r2_subjectDocType)
         		&& r1_subjectCsid.equalsIgnoreCase(r2_objectCsid) && r1_objectCsid.equalsIgnoreCase(r2_subjectCsid)) {
@@ -677,7 +506,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
     //
     private static DocumentModelList removeRedundantRelations(DocumentModelList relationDocModelList) {
     	DocumentModelList resultList = null;
-
+    	
     	if (relationDocModelList != null && relationDocModelList.size() > 0) {
 	    	resultList = new DocumentModelListImpl();
 	    	for (DocumentModel relationDocModel : relationDocModelList) {
@@ -686,21 +515,20 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
 	    		}
 	    	}
     	}
-
-		// TODO Auto-generated method stub
+    	
 		return resultList;
 	}
-
+    
     //
     // Return just the list of active relationships with active Movement records.  A value of 'true' for the 'isAboutToBeRemovedEvent'
     // argument indicates that relationships with the 'movementCsid' record should be considered inactive.
     //
-    private static DocumentModelList removeInactiveRelations(CoreSessionInterface session,
+    private DocumentModelList removeInactiveRelations(CoreSessionInterface session,
     		DocumentModelList relationDocModelList,
     		boolean isAboutToBeRemovedEvent,
     		String eventMovementCsid) {
     	DocumentModelList resultList = null;
-
+    	
     	if (relationDocModelList != null && relationDocModelList.size() > 0) {
     		resultList = new DocumentModelListImpl();
 	    	for (DocumentModel relationDocModel : relationDocModelList) {
@@ -709,29 +537,28 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
 	            if (isActiveDocument(movementDocModel, isAboutToBeRemovedEvent, eventMovementCsid) == true) {
 	    			resultList.add(relationDocModel);
 	            } else {
-	            	logger.debug(String.format("Disqualified relationship=%s with Movement record=%s from current location computation.",
+	            	getLogger().debug(String.format("Disqualified relationship=%s with Movement record=%s from current location computation.",
 	            			NuxeoUtils.getCsid(relationDocModel), movementCsid));
 	            }
 	    	}
     	}
-
+    	
 		return resultList;
 	}
-
 
     //
     // Check to see if the Relation (or its equivalent reciprocal) is already in the list.
     //
 	private static boolean existsInResultList(DocumentModelList relationDocModelList, DocumentModel relationDocModel) {
 		boolean result = false;
-
+		
     	for (DocumentModel target : relationDocModelList) {
     		if (compareRelationDocModels(relationDocModel, target) == true) {
     			result = true;
     			break;
     		}
     	}
-
+		
 		return result;
 	}
 
@@ -743,7 +570,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
      * @param desiredDocType a desired document type.
      * @param relatedDocType a related document type.
      * @throws ClientException
-     *
+     * 
      * @return the CSID from the desired document type in the relation. Returns
      * null if the Relation record does not involve both the desired
      * and related document types.
@@ -753,13 +580,13 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
         String csid = null;
         String subjectDocType = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_DOCTYPE_PROPERTY);
         String objectDocType = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_DOCTYPE_PROPERTY);
-
+        
         if (subjectDocType.startsWith(desiredDocType) && objectDocType.startsWith(relatedDocType)) {  // Use startsWith() method, because customized tenant type names differ in their suffix.
             csid = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_CSID_PROPERTY);
         } else if (subjectDocType.startsWith(relatedDocType) && objectDocType.startsWith(desiredDocType)) {
             csid = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
         }
-
+        
         return csid;
     }
 

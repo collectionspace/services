@@ -1,14 +1,17 @@
 package org.collectionspace.services.listener;
 
-import org.collectionspace.services.common.api.RefNameUtils;
-import org.collectionspace.services.common.api.Tools;
-import org.nuxeo.ecm.core.api.ClientException;
-import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.collectionspace.services.common.api.RefNameUtils;
+import org.collectionspace.services.common.api.Tools;
+
+import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.DocumentModel;
+
 public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValues {
-    private final Logger logger = LoggerFactory.getLogger(UpdateObjectLocationOnMove.class);
+
+    private static final Logger logger = LoggerFactory.getLogger(UpdateObjectLocationOnMove.class);
 
     @Override
     protected boolean updateCollectionObjectLocation(DocumentModel collectionObjectDocModel,
@@ -28,7 +31,7 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
             		movementRecordsLocation));
             return result;
         }
-
+        
         // Get the computed current location value of the CollectionObject.
         String existingComputedCurrentLocation = (String) collectionObjectDocModel.getProperty(COLLECTIONOBJECTS_COMMON_SCHEMA,
                 COMPUTED_CURRENT_LOCATION_PROPERTY);
@@ -39,7 +42,12 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
             		COMPUTED_CURRENT_LOCATION_PROPERTY, movementRecordsLocation);
             result = true; // We've updated the location field.
         }
-
+        
         return result;
+    }
+
+    @Override
+    public Logger getLogger() {
+    	return logger;
     }
 }
