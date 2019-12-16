@@ -36,6 +36,7 @@
 		<Logger name="org.collectionspace.services.common.security.SecurityInterceptor" level="ERROR" />
 		<Logger name="org.collectionspace.services.common.ServiceMain" level="INFO" />
 		<Logger name="org.collectionspace.services.common.storage.JDBCTools" level="ERROR" />
+		<Logger name="org.collectionspace.services.listener.*" level="ERROR" />
 		<Logger name="org.collectionspace.services.listener.AbstractUpdateObjectLocationValues" level="INFO" />
 		<Logger name="org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper" level="ERROR" />
 		<Logger name="org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded" level="ERROR" />
