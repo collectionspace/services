@@ -49,6 +49,13 @@
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
+                <xs:element name="supportsOutputMIMEList">
+		       		<xs:complexType>
+		           		<xs:sequence>
+		               		<xs:element name="outputMIME" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+		           		</xs:sequence>
+		       		</xs:complexType>
+    			</xs:element>
                 <xs:element name="resourceActionGroupList" type="resourceActionGroupList" minOccurs="0" maxOccurs="1"/>
 				<xs:element name="supportsNoContext" type="xs:boolean" />
 				<xs:element name="supportsSingleDoc" type="xs:boolean" />
