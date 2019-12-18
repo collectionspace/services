@@ -23,7 +23,7 @@
 	<property name="net.sf.jasperreports.exports.xls.font.size.fix.enabled" value="false"/>
 	<property name="net.sf.jasperreports.page.break.no.pagination" value="apply"/>
 	<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
-	<parameter name="location" class="java.lang.String">
+	<parameter name="csid" class="java.lang.String">
 		<parameterDescription><![CDATA[Use percent as wild card (e.g., 3A%) or full name as in CollectionSpace (e.g., 3A, Vernal Pool, Californian).  Case sensitive.]]></parameterDescription>
 		<defaultValueExpression><![CDATA["3A%"]]></defaultValueExpression>
 	</parameter>
@@ -50,9 +50,11 @@ join relations_common rc on (hco.name = rc.subjectcsid and objectdocumenttype = 
 join hierarchy hmc on (rc.objectcsid = hmc.name and hmc.isversion is true)
 join movements_common mc on (hmc.id = mc.id)
 left outer join movements_botgarden mb on (mc.id = mb.id)
+left outer join locations_common lc on (mb.previouslocation = lc.refname)
+left outer join hierarchy hlc on (lc.id = hlc.id)
 inner join misc mmc on (mc.id = mmc.id and mmc.lifecyclestate <> 'deleted')
 where getdispl(mc.reasonformove) = 'Dead'
-and mb.previouslocation = $P{location}
+and hlc.name = $P{csid}
 order by determination, mc.locationdate desc]]>
 	</queryString>
 	<field name="objectnumber" class="java.lang.String"/>

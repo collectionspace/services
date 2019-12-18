@@ -6,10 +6,10 @@
     <forDocTypes>
       <forDocType>Locationitem</forDocType>
     </forDocTypes>
-    <supportsSingleDoc>false</supportsSingleDoc>
+    <supportsSingleDoc>true</supportsSingleDoc>
     <supportsDocList>false</supportsDocList>
     <supportsGroup>false</supportsGroup>
-    <supportsNoContext>true</supportsNoContext>
+    <supportsNoContext>false</supportsNoContext>
     <supportsParams>true</supportsParams>
     <outputMIME>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</outputMIME>
     <notes>Individuals that died in a specified garden location</notes>
