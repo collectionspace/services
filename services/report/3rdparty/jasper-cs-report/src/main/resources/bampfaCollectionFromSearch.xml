@@ -4,7 +4,7 @@
     <name>Collection From Search</name>
     <filename>bampfaCollectionFromSearch.jasper</filename>
     <forDocTypes>
-      <forDocType/>
+      <forDocType>CollectionObject</forDocType>
     </forDocTypes>
     <supportsSingleDoc>false</supportsSingleDoc>
     <supportsDocList>true</supportsDocList>
