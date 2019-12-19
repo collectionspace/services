@@ -7,13 +7,15 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.TaxonFormatter;
-import org.collectionspace.services.nuxeo.listener.AbstractCSEventListenerImpl;
+import org.collectionspace.services.nuxeo.listener.AbstractCSEventSyncListenerImpl;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonBotGardenConstants;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonConstants;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonomyAuthorityConstants;
+
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.event.CoreEventConstants;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
@@ -21,8 +23,9 @@ import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 
-public class UpdateFormattedDisplayNameListener extends AbstractCSEventListenerImpl {
+public class UpdateFormattedDisplayNameListener extends AbstractCSEventSyncListenerImpl {
 	public static final String RUN_AFTER_MODIFIED_PROPERTY = "UpdateFormattedDisplayNameListener.RUN_AFTER_MODIFIED";
+	static final Log logger = LogFactory.getLog(UpdateFormattedDisplayNameListener.class);
 
 	private static final String[] DISPLAY_NAME_PATH_ELEMENTS = TaxonConstants.DISPLAY_NAME_FIELD_NAME.split("/");
 	private static final String TERM_GROUP_LIST_FIELD_NAME = DISPLAY_NAME_PATH_ELEMENTS[0];
@@ -31,13 +34,12 @@ public class UpdateFormattedDisplayNameListener extends AbstractCSEventListenerI
 	private static final String[] FORMATTED_DISPLAY_NAME_PATH_ELEMENTS = TaxonConstants.FORMATTED_DISPLAY_NAME_FIELD_NAME.split("/");
 	private static final String FORMATTED_DISPLAY_NAME_FIELD_NAME = FORMATTED_DISPLAY_NAME_PATH_ELEMENTS[2];
 
-	final Log logger = LogFactory.getLog(UpdateFormattedDisplayNameListener.class);
 
-	@Override
-	public void handleEvent(Event event) {
+    @Override
+	public boolean shouldHandleEvent(Event event) {
 		EventContext ec = event.getContext();
 
-		if (isRegistered(event) && ec instanceof DocumentEventContext) {
+		if (ec instanceof DocumentEventContext) {
 			DocumentEventContext context = (DocumentEventContext) ec;
 			DocumentModel doc = context.getSourceDocument();
 			String docType = doc.getType();
@@ -49,24 +51,37 @@ public class UpdateFormattedDisplayNameListener extends AbstractCSEventListenerI
 					!doc.isVersion() &&
 					!doc.isProxy() &&
 					!doc.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+				return true;
+			}
+		}
 
-				String refName = (String) doc.getProperty(TaxonConstants.REFNAME_SCHEMA_NAME, TaxonConstants.REFNAME_FIELD_NAME);
-				RefName.AuthorityItem item = RefName.AuthorityItem.parse(refName);
-				String parentShortId = item.getParentShortIdentifier();
+		return false;
+    }
 
-				logger.debug("parentShortId=" + parentShortId);
+	@Override
+	public void handleCSEvent(Event event) {
+		EventContext ec = event.getContext();
+		DocumentEventContext context = (DocumentEventContext) ec;
+		DocumentModel doc = context.getSourceDocument();
+		
+		String docType = doc.getType();
+		logger.debug("docType=" + docType);
 
-				if (!parentShortId.equals(TaxonBotGardenConstants.COMMON_VOCABULARY_SHORTID)) {
-					if (event.getName().equals(DocumentEventTypes.DOCUMENT_CREATED)) {
-						// Save the document, to get the BEFORE_DOC_UPDATE branch to run.
-						doc.getCoreSession().saveDocument(doc);
-					}
-					else if (event.getName().equals(DocumentEventTypes.BEFORE_DOC_UPDATE)) {
-						DocumentModel previousDoc = (DocumentModel) context.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
+		String refName = (String) doc.getProperty(TaxonConstants.REFNAME_SCHEMA_NAME, TaxonConstants.REFNAME_FIELD_NAME);
+		RefName.AuthorityItem item = RefName.AuthorityItem.parse(refName);
+		String parentShortId = item.getParentShortIdentifier();
 
-						updateFormattedDisplayNames(doc, previousDoc);
-					}
-				}
+		logger.debug("parentShortId=" + parentShortId);
+
+		if (!parentShortId.equals(TaxonBotGardenConstants.COMMON_VOCABULARY_SHORTID)) {
+			if (event.getName().equals(DocumentEventTypes.DOCUMENT_CREATED)) {
+				// Save the document, to get the BEFORE_DOC_UPDATE branch to run.
+				doc.getCoreSession().saveDocument(doc);
+			}
+			else if (event.getName().equals(DocumentEventTypes.BEFORE_DOC_UPDATE)) {
+				DocumentModel previousDoc = (DocumentModel) context.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
+
+				updateFormattedDisplayNames(doc, previousDoc);
 			}
 		}
 	}
@@ -113,4 +128,9 @@ public class UpdateFormattedDisplayNameListener extends AbstractCSEventListenerI
 		return displayNames;
 	}
 	*/
+	
+	@Override
+	public Log getLogger() {
+		return logger;
+	}
 }
