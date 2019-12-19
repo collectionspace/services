@@ -595,6 +595,7 @@ public class JDBCTools {
              String cspaceInstanceId, DatabaseProductType dbType, String username, String userPW) throws Exception {
         Statement stmt = null;
         Connection conn = null;
+        String sql = null;
         if (dbType != DatabaseProductType.POSTGRESQL) {
             throw new UnsupportedOperationException("createNewDatabaseUser only supports PostgreSQL");
         }
@@ -606,7 +607,7 @@ public class JDBCTools {
             } else {
                 conn = getConnection(dataSourceName, repositoryName, cspaceInstanceId);
                 stmt = conn.createStatement();
-                String sql = "CREATE ROLE " + username + " WITH PASSWORD '" + userPW + "' LOGIN";
+                sql = "CREATE ROLE " + username + " WITH PASSWORD '" + userPW + "' LOGIN";
                 stmt.executeUpdate(sql);
                 if (logger.isDebugEnabled()) {
                     logger.debug("Created User: " + username);
@@ -614,6 +615,7 @@ public class JDBCTools {
             }
         } catch (Exception e) {
             logger.error("createNewDatabaseUser failed on exception: " + e.getLocalizedMessage());
+            logger.error(String.format("The following SQL statement failed using credentials from datasource named '%s': '%s'", dataSourceName, sql));
             throw e;
         } finally {
             try {
