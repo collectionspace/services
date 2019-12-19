@@ -10,6 +10,9 @@ import java.util.GregorianCalendar;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.collectionspace.services.nuxeo.util.ThumbnailConstants;
+
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.CoreSession;
@@ -20,10 +23,6 @@ import org.nuxeo.ecm.core.convert.api.ConversionService;
 import org.nuxeo.ecm.platform.filemanager.api.FileManager;
 import org.nuxeo.runtime.api.Framework;
 
-/*
- * As of v5.1, this class is not used by any CollectionSpace deployments.
- */
-@Deprecated
 public class AddThumbnailUnrestricted extends UnrestrictedSessionRunner {
  
     private static final Log logger = LogFactory
