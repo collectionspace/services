@@ -2,15 +2,15 @@ package org.collectionspace.services.listener;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
+
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
 public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValues {
 
-    // FIXME: We might experiment here with using log4j instead of Apache Commons Logging;
-    // am using the latter to follow Ray's pattern for now
     private final Log logger = LogFactory.getLog(UpdateObjectLocationOnMove.class);
 
     @Override
@@ -44,5 +44,10 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
         }
         
         return result;
+    }
+
+    @Override
+    public Log getLogger() {
+    	return logger;
     }
 }
