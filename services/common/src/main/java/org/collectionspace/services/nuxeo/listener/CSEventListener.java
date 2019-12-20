@@ -6,9 +6,8 @@ import java.util.Map;
 import org.collectionspace.services.config.tenant.EventListenerConfig;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.event.Event;
-import org.nuxeo.ecm.core.event.EventListener;
 
-public interface CSEventListener extends EventListener {
+public interface CSEventListener {
 	/**
 	 * Register ourself as an event listener for the named repository -the repo name corresponds to a specific tenant.
 	 * @param respositoryName - The name of the Nuxeo repository which links us to a CollectionSpace tenant.
@@ -16,6 +15,18 @@ public interface CSEventListener extends EventListener {
 	 * @return
 	 */
 	boolean register(String respositoryName, EventListenerConfig eventListenerConfig);
+	
+	/**
+	 * If the listener wants to handle the event, it should return 'true'.
+	 * @param event
+	 * @return
+	 */
+	boolean shouldHandleEvent(Event event);
+	
+	/**
+	 * Processing of the event.
+	 */
+	void handleCSEvent(Event event);
 	
 	/**
 	 * Determines if we are a registered event listener for the given event.
@@ -51,5 +62,5 @@ public interface CSEventListener extends EventListener {
 	 * Returns the name of the event listener as defined during registration -see register() method.
 	 * @return
 	 */
-	String getName(String repositoryName);
+	String getName(String repositoryName);	
 }

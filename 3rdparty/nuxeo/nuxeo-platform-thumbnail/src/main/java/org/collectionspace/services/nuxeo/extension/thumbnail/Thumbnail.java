@@ -1,6 +1,7 @@
 package org.collectionspace.services.nuxeo.extension.thumbnail;
 
 import java.io.Serializable;
+import org.collectionspace.services.nuxeo.util.ThumbnailConstants;
 
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;

@@ -95,8 +95,8 @@ import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
-import org.collectionspace.services.nuxeo.extension.thumbnail.ThumbnailConstants;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.collectionspace.services.nuxeo.util.ThumbnailConstants;
 import org.collectionspace.services.config.service.ListResultField;
 
 /**
