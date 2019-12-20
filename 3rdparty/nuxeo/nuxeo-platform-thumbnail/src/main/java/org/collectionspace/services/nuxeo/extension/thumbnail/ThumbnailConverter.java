@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.collectionspace.services.nuxeo.util.ThumbnailConstants;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

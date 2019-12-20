@@ -1,4 +1,4 @@
-package org.collectionspace.services.nuxeo.extension.thumbnail;
+package org.collectionspace.services.nuxeo.util;
 
 public class ThumbnailConstants {
 	public static final String THUMBNAIL_SIZE_PARAMETER_NAME = "size";
