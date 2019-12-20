@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.collectionspace.services.batch.BatchResource;
 import org.collectionspace.services.batch.nuxeo.UpdateObjectFromPersonsAuthorityBatchJob;
 import org.collectionspace.services.common.api.Tools;
@@ -22,14 +23,16 @@ import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
+import org.collectionspace.services.nuxeo.listener.AbstractCSEventSyncListenerImpl;
+
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
+
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.event.CoreEventConstants;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
-import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.event.EventListener;
 
@@ -43,7 +46,7 @@ import org.nuxeo.ecm.core.event.EventListener;
  *
  * @author Cesar Villalobos
  */
-public class UpdateNationalitiesListener implements EventListener {
+public class UpdateNationalitiesListener extends AbstractCSEventSyncListenerImpl {
 
     private final static Log logger = LogFactory.getLog(UpdateNationalitiesListener.class);
     private final static String NO_FURTHER_PROCESSING_MESSAGE =
@@ -58,114 +61,6 @@ public class UpdateNationalitiesListener implements EventListener {
 
     public static final String PREVIOUS_NATIONALITIES_PROPERTY_NAME = "UpdateNationalitiesListener.prevousNationalities";
 
-
-
-    @Override
-    public void handleEvent(Event event) throws ClientException {
-        logger.trace("In handleEvent in update nationalities listener.");
-
-        EventContext eventContext = event.getContext();
-        if (eventContext == null || !(eventContext instanceof DocumentEventContext)) {
-            return;
-        }
-
-        DocumentEventContext docEventContext = (DocumentEventContext) eventContext;
-        DocumentModel docModel = docEventContext.getSourceDocument();
-        String docType = docModel.getType();
-
-        // Check if the event involves a person authority, a collection object, or neither
-        if (documentMatchesType(docModel, PERSON_DOCTYPE) &&
-					!documentMatchesType(docModel, "Personauthority") &&
-					!docModel.isVersion() &&
-					!docModel.isProxy() &&
-					!docModel.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
-            
-            if (logger.isTraceEnabled()) {
-                logger.trace("The update involved a person authority record. Now checking if updating a collection object is required");
-            }
-
-            if (event.getName().equals(DocumentEventTypes.DOCUMENT_CREATED)) {
-                // If the document has just beeen created, it will definitely not be used by any collection object record
-                if (logger.isTraceEnabled()) {
-                    logger.trace("It is not necessary to update any collection objects. " + NO_FURTHER_PROCESSING_MESSAGE);
-                }
-                return;
-            } else if (event.getName().equals(DocumentEventTypes.BEFORE_DOC_UPDATE)) {
-                // Store the previous nationalities in order to retrieve them in the after the document is created. 
-
-                DocumentModel previousDoc = (DocumentModel) docEventContext.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
-                ArrayList previousNationalities = (ArrayList) previousDoc.getProperty(PERSONS_SCHEMA, NATIONALITIES_FIELD);
-                if (previousNationalities.size() == 0) {
-                    return;
-                }
-                docEventContext.setProperty(PREVIOUS_NATIONALITIES_PROPERTY_NAME, previousNationalities);
-            } else {
-                List previousNationalities = (List) docEventContext.getProperty(PREVIOUS_NATIONALITIES_PROPERTY_NAME);
-                List newNationalities = (List) docModel.getProperty(PERSONS_SCHEMA, NATIONALITIES_FIELD);
-                List newNationalitiesCopy = newNationalities;
-                
-                if (previousNationalities == null || newNationalities == null || previousNationalities.size() == 0 || newNationalities.size() == 0) {
-                    logger.trace("There are no nationalities involved in this record. No updates to any collection object required. " + NO_FURTHER_PROCESSING_MESSAGE);
-                    return;
-                }
-
-                Collections.sort(previousNationalities);
-                Collections.sort(newNationalitiesCopy);
-
-                /*
-                 * IMPORTANT: This following bit of code is trying to be smart and is short-circuiting the listener in the event
-                 *          that there is an update to a persons record, but the nationalities have not changed. This is to avoid
-                 *          useless updates to collectionobjects records. If a person is used by 30,000 records, we don't want 
-                 *          all of these records to be updated every time. HOWEVER, in the event that the links between the two
-                 *          records haven't been made, this piece of code will cause the links to fail to go through and update
-                 *          collection objects records. If this is something that needs to be done, comment out the next 6 lines of code.
-                 */    
-                // if they are equal, we don't need to update the lists
-                if (newNationalities.equals(previousNationalities)) {
-                    logger.warn("The version of the Nationalities listener currently in use is the optimized version");
-                    if (logger.isTraceEnabled()) {
-                        logger.trace("There are no changes to the nationalities field in this record. No updates to any collection object required. " + NO_FURTHER_PROCESSING_MESSAGE);
-                    }
-                    return;
-                }
-                
-                // Get a list of the nationalities that need to be deleted, and those that need to be added.
-                Map<String, List> nationalitiesToUpdate = findNationalitiesToUpdate(previousNationalities, newNationalities);
-                
-                try {
-                    String personCsid = (String) docModel.getName();
-                    InvocationResults results = updateCollectionObjectsFromPerson(docEventContext).updateNationalitiesFromPerson(personCsid, nationalitiesToUpdate);
-                    if (logger.isDebugEnabled()) {
-                    logger.debug("updateParentAccessCode complete: numAffected=" + results.getNumAffected() + " userNote=" + results.getUserNote());
-                    }
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-
-        } else if (documentMatchesType(docModel, COLLECTIONOBJECT_DOCTYPE)) {
-            if (event.getName().equals((DocumentEventTypes.DOCUMENT_CREATED))) {
-                // If the document is created, we simply call saveDocument in order to trigger the beforeDocumentSaved event
-                docModel.getCoreSession().saveDocument(docModel);
-                return;
-            }
-
-            CoreSession coreSession = docEventContext.getCoreSession();
-            List<String> nationalities = getNationalitiesFromPersonAuthority(docModel, coreSession);
-
-            docModel.setProperty(COLLECTIONOBJECTS_BAMPFA_SCHEMA, NATIONALITIES_FIELD, nationalities);
-            if (logger.isTraceEnabled()) {
-                logger.trace("Updated collection object with csid=" + docModel.getName());
-            }
-            return;
-        } else {
-            if (logger.isTraceEnabled()) {
-                logger.trace("No persons or collection object record was involved.");
-            }
-            return;
-        }
-    }
-
     /**
      * In the case that one or more collection objects need to have their nationalities list updated, this
      * method is called to determine which fields need to be added, and which need to be deleted.
@@ -175,8 +70,8 @@ public class UpdateNationalitiesListener implements EventListener {
      * @return A Map<String, List> containing the keys "add" and "del", each corresponding to a list of nationalities
      * that need to be either added or deleted.
      */
-    public Map<String, List> findNationalitiesToUpdate(List oldNationalities, List newNationalities) {
-        Map<String, List> nationalities =  new HashMap<String, List>();
+    private Map<String, List<String>> findNationalitiesToUpdate(List<String> oldNationalities, List<String> newNationalities) {
+        Map<String, List<String>> nationalities =  new HashMap<String, List<String>>();
 
         List<String> fieldsToDelete = new ArrayList<String>();
         List<String> fieldsToAdd = new ArrayList<String>();
@@ -223,7 +118,7 @@ public class UpdateNationalitiesListener implements EventListener {
             if (coreSession.query(query).size() == 0) {
                 continue;
             }
-            List<String> nationalities = (List) coreSession.query(query).get(0).getProperty(PERSONS_SCHEMA, NATIONALITIES_FIELD);
+            List<String> nationalities = (List<String>) coreSession.query(query).get(0).getProperty(PERSONS_SCHEMA, NATIONALITIES_FIELD);
             
             for (Object n : nationalities) {
                 String nationality = (String) n;
@@ -261,7 +156,7 @@ public class UpdateNationalitiesListener implements EventListener {
 		BatchResource batchResource = (BatchResource) resourceMap.get(BatchClient.SERVICE_NAME);
 		ServiceContext<PoxPayloadIn, PoxPayloadOut> serviceContext = batchResource.createServiceContext(batchResource.getServiceName());
 
-		serviceContext.setCurrentRepositorySession(new CoreSessionWrapper(context.getCoreSession()));
+		serviceContext.setCurrentRepositorySession(new CoreSessionWrapper(context.getCoreSession())); // FIXME: We shouldn't be creating a new session.  Instead, we should be using the one in the event context.
 
         UpdateObjectFromPersonsAuthorityBatchJob updater = new UpdateObjectFromPersonsAuthorityBatchJob();
 
@@ -270,5 +165,117 @@ public class UpdateNationalitiesListener implements EventListener {
         
         return updater;
     }
+
+	@Override
+	public boolean shouldHandleEvent(Event event) {
+	    return event.getContext() instanceof DocumentEventContext;
+    }
+
+	@Override
+	public void handleCSEvent(Event event) {
+		EventContext eventContext = event.getContext();
+        DocumentEventContext docEventContext = (DocumentEventContext) eventContext;
+        DocumentModel docModel = docEventContext.getSourceDocument();
+        String docType = docModel.getType();
+        
+        logger.trace("In handleEvent in update nationalities listener.");
+
+        // Check if the event involves a person authority, a collection object, or neither
+        if (documentMatchesType(docModel, PERSON_DOCTYPE) &&
+					!documentMatchesType(docModel, "Personauthority") &&
+					!docModel.isVersion() &&
+					!docModel.isProxy() &&
+					!docModel.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+            
+            if (logger.isTraceEnabled()) {
+                logger.trace("The update involved a person authority record. Now checking if updating a collection object is required");
+            }
+
+            if (event.getName().equals(DocumentEventTypes.DOCUMENT_CREATED)) {
+                // If the document has just beeen created, it will definitely not be used by any collection object record
+                if (logger.isTraceEnabled()) {
+                    logger.trace("It is not necessary to update any collection objects. " + NO_FURTHER_PROCESSING_MESSAGE);
+                }
+                return;
+            } else if (event.getName().equals(DocumentEventTypes.BEFORE_DOC_UPDATE)) {
+                // Store the previous nationalities in order to retrieve them in the after the document is created. 
+
+                DocumentModel previousDoc = (DocumentModel) docEventContext.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
+                ArrayList<String> previousNationalities = (ArrayList<String>) previousDoc.getProperty(PERSONS_SCHEMA, NATIONALITIES_FIELD);
+                if (previousNationalities.size() == 0) {
+                    return;
+                }
+                docEventContext.setProperty(PREVIOUS_NATIONALITIES_PROPERTY_NAME, previousNationalities);
+            } else {
+                List<String> previousNationalities = (List<String>) docEventContext.getProperty(PREVIOUS_NATIONALITIES_PROPERTY_NAME);
+                List<String> newNationalities = (List<String>) docModel.getProperty(PERSONS_SCHEMA, NATIONALITIES_FIELD);
+                List<String> newNationalitiesCopy = newNationalities;
+                
+                if (previousNationalities == null || newNationalities == null || previousNationalities.size() == 0 || newNationalities.size() == 0) {
+                    logger.trace("There are no nationalities involved in this record. No updates to any collection object required. " + NO_FURTHER_PROCESSING_MESSAGE);
+                    return;
+                }
+
+                Collections.sort(previousNationalities);
+                Collections.sort(newNationalitiesCopy);
+
+                /*
+                 * IMPORTANT: This following bit of code is trying to be smart and is short-circuiting the listener in the event
+                 *          that there is an update to a persons record, but the nationalities have not changed. This is to avoid
+                 *          useless updates to collectionobjects records. If a person is used by 30,000 records, we don't want 
+                 *          all of these records to be updated every time. HOWEVER, in the event that the links between the two
+                 *          records haven't been made, this piece of code will cause the links to fail to go through and update
+                 *          collection objects records. If this is something that needs to be done, comment out the next 6 lines of code.
+                 */    
+                // if they are equal, we don't need to update the lists
+                if (newNationalities.equals(previousNationalities)) {
+                    logger.warn("The version of the Nationalities listener currently in use is the optimized version");
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("There are no changes to the nationalities field in this record. No updates to any collection object required. " + NO_FURTHER_PROCESSING_MESSAGE);
+                    }
+                    return;
+                }
+                
+                // Get a list of the nationalities that need to be deleted, and those that need to be added.
+                Map<String, List<String>> nationalitiesToUpdate = findNationalitiesToUpdate(previousNationalities, newNationalities);
+                
+                try {
+                    String personCsid = (String) docModel.getName();
+                    InvocationResults results = updateCollectionObjectsFromPerson(docEventContext).updateNationalitiesFromPerson(personCsid, nationalitiesToUpdate);
+                    if (logger.isDebugEnabled()) {
+                    logger.debug("updateParentAccessCode complete: numAffected=" + results.getNumAffected() + " userNote=" + results.getUserNote());
+                    }
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+
+        } else if (documentMatchesType(docModel, COLLECTIONOBJECT_DOCTYPE)) {
+            if (event.getName().equals((DocumentEventTypes.DOCUMENT_CREATED))) {
+                // If the document is created, we simply call saveDocument in order to trigger the beforeDocumentSaved event
+                docModel.getCoreSession().saveDocument(docModel);
+                return;
+            }
+
+            CoreSession coreSession = docEventContext.getCoreSession();
+            List<String> nationalities = getNationalitiesFromPersonAuthority(docModel, coreSession);
+
+            docModel.setProperty(COLLECTIONOBJECTS_BAMPFA_SCHEMA, NATIONALITIES_FIELD, nationalities);
+            if (logger.isTraceEnabled()) {
+                logger.trace("Updated collection object with csid=" + docModel.getName());
+            }
+            return;
+        } else {
+            if (logger.isTraceEnabled()) {
+                logger.trace("No persons or collection object record was involved.");
+            }
+            return;
+        }
+    }
+
+	@Override
+	protected Log getLogger() {
+		return logger;
+	}
 
 }

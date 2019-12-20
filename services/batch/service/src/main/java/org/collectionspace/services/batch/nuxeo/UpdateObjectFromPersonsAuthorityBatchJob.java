@@ -1,23 +1,19 @@
 package org.collectionspace.services.batch.nuxeo;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.collectionspace.services.client.CollectionObjectClient;
-import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
-import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
-import org.collectionspace.services.common.vocabulary.AuthorityResource;
+
 import org.dom4j.DocumentException;
 import java.net.URISyntaxException;
-import javax.ws.rs.core.UriInfo;
 
 /**
  * This batch job updates the nationalities of all collection objects records that use the person record with personCsid.
@@ -48,7 +44,7 @@ public class UpdateObjectFromPersonsAuthorityBatchJob extends AbstractBatchJob {
      * @param nationalitiesToUpdate A Map<String, List> containing the keys "add" and "del", each corresponding to a list of nationalities
      * that need to be either added or deleted.
      */
-    public InvocationResults updateNationalitiesFromPerson(String personCsid, Map<String, List> nationalitiesToUpdate) throws URISyntaxException, DocumentException, Exception {
+    public InvocationResults updateNationalitiesFromPerson(String personCsid, Map<String, List<String>> nationalitiesToUpdate) throws URISyntaxException, DocumentException, Exception {
         InvocationResults results = new InvocationResults();
 
         String sourceField = "collectionobjects_bampfa:bampfaObjectProductionPerson";
@@ -90,14 +86,14 @@ public class UpdateObjectFromPersonsAuthorityBatchJob extends AbstractBatchJob {
      * that need to be either added or deleted.
      * @param objCsid The csid of the collection object record that is to be updated.
      */
-    public void updateNationalities(List<String> collectionObjNationalities, Map<String, List> nationalitiesToUpdate, String objCsid) throws URISyntaxException {
+    public void updateNationalities(List<String> collectionObjNationalities, Map<String, List<String>> nationalitiesToUpdate, String objCsid) throws URISyntaxException {
         if (logger.isTraceEnabled()) {
             logger.trace("Updating collection object record with csid=" + objCsid);
         }
 
         // Assemble a list of what the new nationalities repeating field should look like for this collection object
-        List nationalitiesToAdd = nationalitiesToUpdate.get("add");
-        List nationalitiesToDelete = nationalitiesToUpdate.get("del");
+        List<String> nationalitiesToAdd = nationalitiesToUpdate.get("add");
+        List<String> nationalitiesToDelete = nationalitiesToUpdate.get("del");
 
         collectionObjNationalities.addAll(nationalitiesToAdd);
         collectionObjNationalities.removeAll(nationalitiesToDelete);
