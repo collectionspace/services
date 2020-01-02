@@ -1,14 +1,5 @@
 package org.collectionspace.services.listener.bampfa;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.batch.BatchResource;
@@ -32,8 +23,6 @@ import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
-import org.nuxeo.ecm.core.api.CoreSession;
-import org.nuxeo.ecm.core.event.EventListener;
 
 
 /**
@@ -47,13 +36,8 @@ public class UpdateArtistDisplayNameListener extends AbstractCSEventSyncListener
     private final static String NO_FURTHER_PROCESSING_MESSAGE =
             "This event listener will not continue processing this event ...";
 
-    private final static String COLLECTIONOBJECT_DOCTYPE = "CollectionObject";
-    private final static String COLLECTIONOBJECTS_BAMPFA_SCHEMA = "collectionobjects_bampfa";
-
     private final static String PERSON_DOCTYPE = "Person";
     private final static String PERSONS_SCHEMA = "persons_common";
-    private final static String ARTISTDISPLAYNAME_FIELD = "computedartistname";
-
     public static final String PREVIOUS_DISPLAYNAME_PROPERTY = "UpdateArtistDisplayNameListener.previousName";
 
     public static final String DISPLAYNAME_FIELD = "personTermGroupList";
@@ -101,8 +85,7 @@ public class UpdateArtistDisplayNameListener extends AbstractCSEventSyncListener
 
         DocumentEventContext docEventContext = (DocumentEventContext) eventContext;
         DocumentModel docModel = docEventContext.getSourceDocument();
-        String docType = docModel.getType();
-
+        
         // Check if the event involves a person authority
         if (documentMatchesType(docModel, PERSON_DOCTYPE) &&
 					!documentMatchesType(docModel, "Personauthority") &&
@@ -120,8 +103,6 @@ public class UpdateArtistDisplayNameListener extends AbstractCSEventSyncListener
         EventContext eventContext = event.getContext();
         DocumentEventContext docEventContext = (DocumentEventContext) eventContext;
         DocumentModel docModel = docEventContext.getSourceDocument();
-        
-        logger.trace("In handleEvent in update nationalities listener.");
 
         if (logger.isTraceEnabled()) {
             logger.trace("The update involved a person authority record. Now checking if updating a collection object is required");
