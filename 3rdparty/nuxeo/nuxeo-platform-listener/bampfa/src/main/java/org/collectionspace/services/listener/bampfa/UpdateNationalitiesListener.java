@@ -156,7 +156,7 @@ public class UpdateNationalitiesListener extends AbstractCSEventSyncListenerImpl
 		BatchResource batchResource = (BatchResource) resourceMap.get(BatchClient.SERVICE_NAME);
 		ServiceContext<PoxPayloadIn, PoxPayloadOut> serviceContext = batchResource.createServiceContext(batchResource.getServiceName());
 
-		serviceContext.setCurrentRepositorySession(new CoreSessionWrapper(context.getCoreSession())); // FIXME: We shouldn't be creating a new session.  Instead, we should be using the one in the event context.
+		serviceContext.setCurrentRepositorySession(new CoreSessionWrapper(context.getCoreSession()));
 
         UpdateObjectFromPersonsAuthorityBatchJob updater = new UpdateObjectFromPersonsAuthorityBatchJob();
 
