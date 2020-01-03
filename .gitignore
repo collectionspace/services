@@ -20,3 +20,4 @@ m2-settings.xml
 services/JaxRsServiceProvider/logs/
 cspace-app-perflog.csv
 .flattened-pom.xml
+bin
