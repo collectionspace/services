@@ -14,6 +14,8 @@
         value="org.collectionspace.services.batch.3rdparty.nuxeo-${cspace.release}.jar"/>
     <property name="nuxeo.batch.jars.all"
         value="org.collectionspace.services.batch.3rdparty.nuxeo-*.jar"/>
+    <property name="nuxeo.batch.jars.extra"
+        value="collectionspace.batch.*.jar"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -123,6 +125,7 @@
         <delete>
             <fileset dir="${jee.deploy.nuxeo.plugins}">
                 <include name="${nuxeo.batch.jars.all}"/>
+                <include name="${nuxeo.batch.jars.extra}"/>
             </fileset>
         </delete>
     </target>
