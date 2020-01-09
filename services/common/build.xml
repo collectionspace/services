@@ -211,9 +211,6 @@
     <target name="undeploy_nuxeo"
         description="undeploy nuxeo binaries from ${jee.server.cspace}">
         <delete>
-            <fileset dir="${jee.server.cspace}/lib" includes="nuxeo-*.jar"/>
-        </delete>
-        <delete>
             <fileset dir="${jee.deploy.nuxeo.plugins}">
                 <include name="collectionspace.shared.schema.collectionspace_core.jar"/>
             </fileset>
