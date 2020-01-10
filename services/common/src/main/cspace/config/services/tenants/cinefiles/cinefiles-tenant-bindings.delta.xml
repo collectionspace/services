@@ -4,6 +4,11 @@
 	xmlns:tenant='http://collectionspace.org/services/config/tenant'>
     
 	<tenant:tenantBinding id="50">
+		<!-- Remove the 'UpdateObjectLocationOnMove' event listener since CineFiles doesn't use the LMI procedure -->
+		<tenant:eventListenerConfigurations id="default" merge:matcher="id">
+			<tenant:eventListenerConfig id="UpdateObjectLocationOnMove" merge:matcher="id" merge:action="delete" />
+		</tenant:eventListenerConfigurations>
+
 		<tenant:serviceBindings merge:matcher="id" id="idgenerators">
 			<service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
 				<service:params>
