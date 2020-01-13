@@ -5,6 +5,7 @@
 	
 	<tenant:tenantBinding id="20">
 		<tenant:eventListenerConfigurations id="default" merge:matcher="id">
+			<tenant:eventListenerConfig id="UpdateObjectLocationOnMove" merge:matcher="id" merge:action="delete" />
 			<tenant:eventListenerConfig id="UpdateFormattedDisplayNameListener" merge:matcher="id">
 				<tenant:className>org.collectionspace.services.listener.naturalhistory.UpdateFormattedDisplayNameListener</tenant:className>
 			</tenant:eventListenerConfig>
