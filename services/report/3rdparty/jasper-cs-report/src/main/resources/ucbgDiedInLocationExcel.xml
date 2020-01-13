@@ -11,6 +11,9 @@
     <supportsGroup>false</supportsGroup>
     <supportsNoContext>false</supportsNoContext>
     <supportsParams>true</supportsParams>
+    <supportsOutputMIMEList>
+      <outputMIME>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</outputMIME>
+    </supportsOutputMIMEList>
     <outputMIME>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</outputMIME>
     <notes>Individuals that died in a specified garden location</notes>
   </ns2:reports_common>
