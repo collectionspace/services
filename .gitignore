@@ -17,3 +17,4 @@ target
 .factorypath
 m2-settings.xml
 *.log
+.flattened-pom.xml
