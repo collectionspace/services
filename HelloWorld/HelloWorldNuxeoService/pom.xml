@@ -21,7 +21,7 @@
         <repository>
             <id>maven repo</id>
             <name>maven repo</name>
-            <url>http://repo1.maven.org/maven2/</url>
+            <url>https://repo1.maven.org/maven2/</url>
         </repository>
         <!-- For resteasy -->
         <repository>
@@ -150,7 +150,7 @@
             <version>1.6.1</version>
             <scope>provided</scope>
         </dependency>
-        
+
         <!-- jboss -->
 
         <!-- nuxeo -->
@@ -183,7 +183,7 @@
 
 
     </dependencies>
-    
+
     <build>
         <finalName>helloworld</finalName>
         <plugins>
