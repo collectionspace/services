@@ -12,11 +12,11 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		
+
 		<nuxeo.general.release>5.5.0-HF07</nuxeo.general.release>
 		<nuxeo.shell.version>${nuxeo.general.release}</nuxeo.shell.version>
 		<nuxeo.platform.version>${nuxeo.general.release}</nuxeo.platform.version>
-		<nuxeo.core.version>${nuxeo.general.release}</nuxeo.core.version>		
+		<nuxeo.core.version>${nuxeo.general.release}</nuxeo.core.version>
 <!--
 		<nuxeo.shell.version>5.5-I20111104_1115</nuxeo.shell.version>
 		<nuxeo.platform.version>5.5-I20111104_1115</nuxeo.platform.version>
@@ -66,7 +66,7 @@
 		<repository>
 			<id>repo1</id>
 			<name>Maven repo1</name>
-			<url>http://repo1.maven.org/maven2</url>
+			<url>https://repo1.maven.org/maven2</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -74,7 +74,7 @@
 		<repository>
 			<id>repo2</id>
 			<name>Maven repo2</name>
-			<url>http://repo2.maven.org/maven2</url>
+			<url>https://repo2.maven.org/maven2</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -87,8 +87,8 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-		<!-- <repository> <id>maven1-repository.dev.java.net</id> <name>Java.net 
-			Maven 1 Repository</name> <url>http://download.java.net/maven/1</url> <layout>legacy</layout> 
+		<!-- <repository> <id>maven1-repository.dev.java.net</id> <name>Java.net
+			Maven 1 Repository</name> <url>http://download.java.net/maven/1</url> <layout>legacy</layout>
 			<snapshots> <enabled>false</enabled> </snapshots> </repository> -->
 
 		<repository>
@@ -98,7 +98,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-		<!-- some security binaries available under .com only perhaps due to licensing 
+		<!-- some security binaries available under .com only perhaps due to licensing
 			issues -->
 		<repository>
 			<id>jboss.com</id>
@@ -153,10 +153,10 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-		<!-- This should no longer be needed since we're using only "releases" 
-			artifacts <repository> <id>nuxeo-public-snapshot</id> <name>nuxeo-public-snapshot</name> 
-			<url>http://source.collectionspace.org:8081/artifactory/nuxeo-public-snapshot</url> 
-			<releases> <enabled>false</enabled> </releases> <snapshots> <enabled>true</enabled> 
+		<!-- This should no longer be needed since we're using only "releases"
+			artifacts <repository> <id>nuxeo-public-snapshot</id> <name>nuxeo-public-snapshot</name>
+			<url>http://source.collectionspace.org:8081/artifactory/nuxeo-public-snapshot</url>
+			<releases> <enabled>false</enabled> </releases> <snapshots> <enabled>true</enabled>
 			<updatePolicy>never</updatePolicy> </snapshots> </repository> -->
 
 		<repository>
@@ -186,7 +186,7 @@
 		<pluginRepository>
 			<id>repo1</id>
 			<name>Maven repo1</name>
-			<url>http://repo1.maven.org/maven2</url>
+			<url>https://repo1.maven.org/maven2</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -194,7 +194,7 @@
 		<pluginRepository>
 			<id>maven repo</id>
 			<name>maven repo</name>
-			<url>http://repo2.maven.org/maven2</url>
+			<url>https://repo2.maven.org/maven2</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -244,9 +244,9 @@
 					<configuration>
 					</configuration>
 				</plugin>
-				<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-site-plugin</artifactId> 
-					<configuration> <dependencyLocationEnabled>false</dependencyLocationEnabled> 
-					<unzipCommand>/usr/bin/unzip -o &gt; err.txt</unzipCommand> </configuration> 
+				<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-site-plugin</artifactId>
+					<configuration> <dependencyLocationEnabled>false</dependencyLocationEnabled>
+					<unzipCommand>/usr/bin/unzip -o &gt; err.txt</unzipCommand> </configuration>
 					</plugin> -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -361,7 +361,7 @@
 				<version>6.1.1</version>
                 <!-- <version>5.6</version> -->
                 <scope>test</scope>
-            </dependency>			
+            </dependency>
 			<dependency>
 				<groupId>javax.ejb</groupId>
 				<artifactId>ejb</artifactId>
@@ -433,8 +433,8 @@
 					</reportSet>
 				</reportSets>
 			</plugin>
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-javadoc-plugin</artifactId> 
-				<version>2.6.1</version> <configuration> <show>public</show> </configuration> 
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.6.1</version> <configuration> <show>public</show> </configuration>
 				</plugin> -->
 		</plugins>
 	</reporting>
