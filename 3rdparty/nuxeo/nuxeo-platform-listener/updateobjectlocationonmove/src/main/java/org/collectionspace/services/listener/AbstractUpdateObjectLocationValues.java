@@ -42,7 +42,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
     private final static String OBJECT_DOCTYPE_PROPERTY = "objectDocumentType"; // FIXME: Get from external constant
     protected final static String COLLECTIONOBJECTS_COMMON_SCHEMA = "collectionobjects_common"; // FIXME: Get from external constant
     protected final static String COMPUTED_CURRENT_LOCATION_PROPERTY = "computedCurrentLocation"; // FIXME: Create and then get from external constant
-    private final static String CURRENT_LOCATION_ELEMENT_NAME = "currentLocation"; // From movement_commons schema.  FIXME: Get from external constant that already exists
+    protected final static String CURRENT_LOCATION_ELEMENT_NAME = "currentLocation"; // From movement_commons schema.  FIXME: Get from external constant that already exists
     protected final static String MOVEMENTS_COMMON_SCHEMA = "movements_common"; // FIXME: Get from external constant
     private final static String LOCATION_DATE_PROPERTY = "locationDate"; // FIXME: Get from external constant
     protected final static String CURRENT_LOCATION_PROPERTY = "currentLocation"; // FIXME: Get from external constant
@@ -166,17 +166,17 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
         for (String collectionObjectCsid : collectionObjectCsids) {            
             collectionObjectDocModel = getCurrentDocModelFromCsid(session, collectionObjectCsid);
             if (isActiveDocument(collectionObjectDocModel) == true) {
-            	DocumentModel movementDocModel = getCurrentDocModelFromCsid(session, eventMovementCsid);
 	            //
 	            // Get the CollectionObject's most recent, valid related Movement to use for computing the
 	            // object's current location.
 	            //
-				String mostRecentLocation = getMostRecentLocation(event, session, collectionObjectCsid,
+				DocumentModel mostRecentMovement = getMostRecentMovementRecord(event, session, collectionObjectCsid,
 						isAboutToBeRemovedEvent, eventMovementCsid);
+
 	            //
 	            // Update the CollectionObject's Computed Current Location field with the Movement record's location
 				//
-	            boolean didLocationChange = updateCollectionObjectLocation(collectionObjectDocModel, movementDocModel, mostRecentLocation);
+	            boolean didLocationChange = updateCollectionObjectLocation(collectionObjectDocModel, mostRecentMovement);
 	            
 	            //
 	            // If the location changed, save/persist the change to the repository and log the change.
@@ -326,13 +326,10 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
      * identified by the supplied CSID.
      * @throws DocumentException 
      */
-    protected String getMostRecentLocation(Event event,
+    protected DocumentModel getMostRecentMovementRecord(Event event,
     		CoreSessionInterface session, String collectionObjectCsid,
             boolean isAboutToBeRemovedEvent, String eventMovementCsid) throws ClientException {
-    	//
-    	// Assume we can determine the most recent location by creating an indeterminate result
-    	//
-		String result = INDETERMINATE_LOCATION;
+    	DocumentModel result = null;
 		
         //
         // Get active Relation records involving Movement records related to this CollectionObject.
@@ -391,7 +388,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
             String location = (String) movementDocModel.getProperty(MOVEMENTS_COMMON_SCHEMA, CURRENT_LOCATION_ELEMENT_NAME);
             
             if (Tools.isBlank(location) == false) {
-            	result = location;
+            	result = movementDocModel;
             } else { // currentLocation must be set
             	getLogger().error(String.format("Movement record=%s is missing its required location value and so is excluded from the computation of cataloging record=%s's current location.",
             			NuxeoUtils.getCsid(movementDocModel), collectionObjectCsid));
@@ -408,17 +405,14 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
         GregorianCalendar mostRecentUpdatedDate = EARLIEST_COMPARISON_DATE;
 
         for (DocumentModel relationDocModel : relationDocModels) {
-            String relatedMovementCsid;
-            DocumentModel movementDocModel;
         	//
         	// The movement record is either the subject or object of the relationship, but not both.
         	//
-            relatedMovementCsid = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_CSID_PROPERTY);
+            String relatedMovementCsid = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_CSID_PROPERTY);
             if (relatedMovementCsid.equals(collectionObjectCsid)) {
                 relatedMovementCsid = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
             }
-            movementDocModel = getCurrentDocModelFromCsid(session, relatedMovementCsid);
-            String location = (String) movementDocModel.getProperty(MOVEMENTS_COMMON_SCHEMA, CURRENT_LOCATION_ELEMENT_NAME);
+            DocumentModel movementDocModel = getCurrentDocModelFromCsid(session, relatedMovementCsid);
             
             //
             // If the current Movement record lacks a location date, it cannot
@@ -435,7 +429,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
             if (locationDate.after(mostRecentLocationDate)) {
                 mostRecentLocationDate = locationDate;
                 mostRecentUpdatedDate = updatedDate;
-                result = location;
+                result = movementDocModel;
             } else if (locationDate.compareTo(mostRecentLocationDate) == 0) {
                 // If the current Movement record's location date is identical
                 // to that of the (at this time) most recent Movement record, then
@@ -444,7 +438,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
                     // The most recent location date value doesn't need to be
                     // updated here, as the two records' values are identical
                     mostRecentUpdatedDate = updatedDate;
-                    result = location;
+                    result = movementDocModel;
                 }
             }
         }
@@ -603,7 +597,5 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
      * record.
      * @throws ClientException
      */
-    protected abstract boolean updateCollectionObjectLocation(DocumentModel collectionObjectDocModel,
-    		DocumentModel movmentDocModel,
-    		String movementRecordsLocation);
+    protected abstract boolean updateCollectionObjectLocation(DocumentModel collectionObjectDocModel, DocumentModel movmentDocModel);
 }
