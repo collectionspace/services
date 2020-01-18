@@ -15,8 +15,7 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
 
     @Override
     protected boolean updateCollectionObjectLocation(DocumentModel collectionObjectDocModel,
-    		DocumentModel movementDocModel,
-    		String movementRecordsLocation) throws ClientException {
+    		DocumentModel mostRecentMovement) throws ClientException {
     	boolean result = false;
 
         // Check that the location value returned, which is expected to be a reference (refName) to an authority term (such as a storage
@@ -24,15 +23,18 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
         // 	* Ensure it is not blank.
         // 	* Ensure it is successfully parsed by the authority item parser.
         //
+        String movementRecordsLocation = (String) mostRecentMovement.getProperty(MOVEMENTS_COMMON_SCHEMA, CURRENT_LOCATION_ELEMENT_NAME);
         if (Tools.isBlank(movementRecordsLocation)) {
+            logger.error(String.format("Ignoring movment record since it's location field is empty/blank.",
+            		movementRecordsLocation));
             return result;
         } else if (RefNameUtils.parseAuthorityTermInfo(movementRecordsLocation) == null) {
-            logger.warn(String.format("Ignoring movment record.  Could not parse the location field's refName '%s'.",
+            logger.error(String.format("Ignoring movment record.  Could not parse the location field's refName '%s'.",
             		movementRecordsLocation));
             return result;
         }
-        
-        // Get the computed current location value of the CollectionObject.
+
+        // Get the existing computed current location value of the CollectionObject.
         String existingComputedCurrentLocation = (String) collectionObjectDocModel.getProperty(COLLECTIONOBJECTS_COMMON_SCHEMA,
                 COMPUTED_CURRENT_LOCATION_PROPERTY);
 
