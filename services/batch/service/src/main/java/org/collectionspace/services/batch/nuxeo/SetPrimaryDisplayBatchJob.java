@@ -103,6 +103,6 @@ public class SetPrimaryDisplayBatchJob extends AbstractBatchJob {
                 "</document>";
 
         NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(MediaClient.SERVICE_NAME);
-        resource.update(getResourceMap(), createUriInfo(), mediaCsid, updatePayload);
+        resource.update(this.getServiceContext(), getResourceMap(), createUriInfo(), mediaCsid, updatePayload);
 	}
 }
