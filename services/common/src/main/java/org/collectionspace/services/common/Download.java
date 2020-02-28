@@ -4,6 +4,7 @@ import java.net.*;
 import java.util.*;
 
 // This class downloads a file from a URL.
+@Deprecated // - see JIRA DRYD-832
 public class Download extends Observable implements Runnable {
     
     public static URL verifyUrl(String url) {
