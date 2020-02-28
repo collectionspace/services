@@ -2,6 +2,7 @@ package org.collectionspace.services.common.blob;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.common.Download;
+import org.collectionspace.services.common.HttpDownloadUtility;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.imaging.nuxeo.NuxeoBlobUtils;
@@ -195,25 +197,14 @@ public class BlobInput {
 		
 		return result;
 	}
-	
-	public void createBlobFile(String theBlobUri) throws MalformedURLException, Exception {
+		
+	public void createBlobFile(String theBlobUri) throws MalformedURLException, Exception {		
 		URL blobUrl = new URL(theBlobUri);
     	File theBlobFile = null;
-		if (isProtocolHttp(blobUrl) == true) {
-			Download fetchedFile = new Download(blobUrl);
-			if (logger.isDebugEnabled() == true) {
-				logger.debug("Starting blob download into temp file:" + fetchedFile.getFilePath());
-			}
-			while (fetchedFile.getStatus() == Download.DOWNLOADING) {
-				// Do nothing while we wait for the file to download
-			}
-			if (logger.isDebugEnabled() == true) {
-				logger.debug("Finished blob download into temp file: " + fetchedFile.getFilePath());
-			}
-			
-			int status = fetchedFile.getStatus();
-			if (status == Download.COMPLETE) {
-				theBlobFile = fetchedFile.getFile();
+
+    	if (isProtocolHttp(blobUrl) == true) {
+    		theBlobFile = HttpDownloadUtility.downloadFile(theBlobUri);
+			if (theBlobFile != null) {
 				setIsTemporaryFile(true); // setting to true ensures the file will get cleanup (removed) when we're done with it
 			} else {
 				String msg = URL_DOWNLOAD_FAILED + theBlobUri;
