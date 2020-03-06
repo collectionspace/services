@@ -26,7 +26,7 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
 	private static Map<String, List<String>> mapOfrepositoryNames = new HashMap<String, List<String>>(); // <className, repositoryName>
 	private static Map<String, Map<String, Map<String, String>>> eventListenerParamsMap = new HashMap<String, Map<String, Map<String, String>>>();  // <repositoryName, Map<EventListenerId, Map<key, value>>>
 	private static Map<String, String> nameMap = new HashMap<String, String>();
-	
+
     // SQL clauses
     private final static String NONVERSIONED_NONPROXY_DOCUMENT_WHERE_CLAUSE_FRAGMENT =
             "AND ecm:isCheckedInVersion = 0"
@@ -46,14 +46,14 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
 	@Override
 	public boolean isRegistered(Event event) {
 		boolean result = false;
-		
+
 		if (event != null && event.getContext() != null) {
 			result = getRepositoryNameList().contains(event.getContext().getRepositoryName());
 		}
-		
+
 		return result;
 	}
-	
+
 	/*
 	 * This method is meant to be the bottleneck for handling a Nuxeo document event.
 	 */
@@ -86,24 +86,24 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
 			}
 		}
 	}
-	
+
 	/**
 	 * An event listener can be registered by multiple tenants, so we keep track of that here.
-	 * 
+	 *
 	 * @return - the list of tenants/repositories that an event listener is registered with.
 	 */
 	protected List<String> getRepositoryNameList() {
 		String key = this.getClass().getName();
 		List<String> result = mapOfrepositoryNames.get(key);
-		
+
 		if (result == null) synchronized(this) {
 			result = new ArrayList<String>();
 			mapOfrepositoryNames.put(key, result);
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * The list of parameters (specified in a tenant's bindings) for event listeners
 	 * @return
@@ -113,20 +113,20 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
 	}
 
 	/**
-	 * Returns 'true' if this collection changed as a result of the call. 
+	 * Returns 'true' if this collection changed as a result of the call.
 	 */
 	@Override
 	public boolean register(String respositoryName, EventListenerConfig eventListenerConfig) {
 		boolean result = false;
-		
+
 		// Using the repositoryName as a qualifier, register this event listener's name as specified in the tenant bindings.
 		setName(respositoryName, eventListenerConfig.getId());
-		
+
 		// Register this event listener with the given repository name
 		if (getRepositoryNameList().add(respositoryName)) {
 			result = true;
 		}
-		
+
 		if (eventListenerConfig.getParamList() != null) {
 			// Set this event listeners parameters, if any.  Params are qualified with the repositoryName since multiple tenants might be registering the same event listener but with different params.
 			List<Param> paramList = eventListenerConfig.getParamList().getParam(); // values from the tenant bindings that we need to copy into the event listener
@@ -159,10 +159,10 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
 				}
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	protected void setName(String repositoryName, String eventListenerName) {
 		nameMap.put(repositoryName, eventListenerName);
 	}
@@ -178,12 +178,12 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public String getName(String repositoryName) {
 		return nameMap.get(repositoryName);
 	}
-	
+
 	//
 	// Return a property in the document model's transient context.
 	//
@@ -197,16 +197,16 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
 	@Override
     public void setDocModelContextProperty(DocumentModel collectionObjectDocModel, String key, Serializable value) {
     	ScopedMap contextData = collectionObjectDocModel.getContextData();
-    	contextData.putIfAbsent(DOCMODEL_CONTEXT_PROPERTY_PREFIX + key, value);        
+    	contextData.putIfAbsent(DOCMODEL_CONTEXT_PROPERTY_PREFIX + key, value);
     }
-	
+
     //
     // Clear a property from the docModel's context
 	//
 	@Override
 	public void clearDocModelContextProperty(DocumentModel docModel, String key) {
     	ScopedMap contextData = docModel.getContextData();
-    	contextData.remove(DOCMODEL_CONTEXT_PROPERTY_PREFIX + key);	
+    	contextData.remove(DOCMODEL_CONTEXT_PROPERTY_PREFIX + key);
 	}
 
 	//
@@ -214,32 +214,39 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
 	//
 	abstract protected Logger getLogger();
 
-	//FIXME: Does not include all the sync-related "delete" workflow states
 	/**
-     * Identifies whether a supplied event concerns a document that has
-     * been transitioned to the 'deleted' workflow state.
-     * 
-     * @param eventContext an event context
-     * 
-     * @return true if this event concerns a document that has
-     * been transitioned to the 'deleted' workflow state.
-     */
-    protected boolean isDocumentSoftDeletedEvent(EventContext eventContext) {
-        boolean isSoftDeletedEvent = false;
-        
-        if (eventContext instanceof DocumentEventContext) {
-            if (eventContext.getProperties().containsKey(WorkflowClient.WORKFLOWTRANSITION_TO)
-                    &&
-                (eventContext.getProperties().get(WorkflowClient.WORKFLOWTRANSITION_TO).equals(WorkflowClient.WORKFLOWSTATE_DELETED)
-                		||
-                eventContext.getProperties().get(WorkflowClient.WORKFLOWTRANSITION_TO).equals(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED))) {
-                isSoftDeletedEvent = true;
-            }
-        }
-        
-        return isSoftDeletedEvent;
-    }
-    
+	 * Identifies whether a supplied event concerns a document that has
+	 * been transitioned to the 'deleted' workflow state.
+	 *
+	 * @param eventContext an event context
+	 *
+	 * @return true if this event concerns a document that has
+	 * been transitioned to the 'deleted' workflow state.
+	 */
+	protected boolean isDocumentSoftDeletedEvent(EventContext eventContext) {
+		boolean isSoftDeletedEvent = false;
+
+		if (eventContext instanceof DocumentEventContext) {
+			Map<String, Serializable> properties = eventContext.getProperties();
+
+			if (properties.containsKey(WorkflowClient.WORKFLOWTRANSITION_TO)) {
+				String transitionTo = (String) properties.get(WorkflowClient.WORKFLOWTRANSITION_TO);
+
+				if (
+					transitionTo.equals(WorkflowClient.WORKFLOWSTATE_DELETED)
+					|| transitionTo.equals(WorkflowClient.WORKFLOWSTATE_LOCKED_DELETED)
+					|| transitionTo.equals(WorkflowClient.WORKFLOWSTATE_DEPRECATED_DELETED)
+					|| transitionTo.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DELETED)
+					|| transitionTo.equals(WorkflowClient.WORKFLOWSTATE_REPLICATED_DEPRECATED_DELETED)
+				) {
+					isSoftDeletedEvent = true;
+				}
+			}
+		}
+
+		return isSoftDeletedEvent;
+	}
+
 	 /**
 	  * Identifies whether a document matches a supplied document type.
 	  *
@@ -258,7 +265,7 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
              return false;
          }
      }
-     
+
      /**
       * Identifies whether a document is an active document; currently, whether
       * it is not in a 'deleted' workflow state.
@@ -269,11 +276,11 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
      protected static boolean isActiveDocument(DocumentModel docModel) {
      	return isActiveDocument(docModel, false, null);
      }
-     
+
      protected static boolean isActiveDocument(DocumentModel docModel, boolean isAboutToBeRemovedEvent, String aboutToBeRemovedCsid) {
          boolean isActiveDocument = false;
 
-         if (docModel != null) {	        
+         if (docModel != null) {
              if (!docModel.getCurrentLifeCycleState().contains(WorkflowClient.WORKFLOWSTATE_DELETED)) {
                  isActiveDocument = true;
              }
@@ -286,7 +293,7 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
  	        	}
  	        }
          }
-         
+
          return isActiveDocument;
      }
 
@@ -304,11 +311,11 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
       */
      protected DocumentModel getCurrentDocModelFromCsid(CoreSessionInterface session, String csid) {
          DocumentModelList docModelList = null;
-         
+
          if (Tools.isEmpty(csid)) {
          	return null;
          }
-         
+
          try {
              final String query = "SELECT * FROM "
                      + NuxeoUtils.BASE_DOCUMENT_TYPE
@@ -320,7 +327,7 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
          } catch (Exception e) {
              getLogger().warn("Exception in query to get active document model for CSID: " + csid, e);
          }
-         
+
          if (docModelList == null || docModelList.isEmpty()) {
         	 getLogger().warn("Could not get active document models for CSID=" + csid);
              return null;
