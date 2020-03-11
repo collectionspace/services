@@ -28,6 +28,7 @@ import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
+import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.CollectionSpaceResource;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ServiceMain;
@@ -330,8 +331,11 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		for (String vocabularyCsid : vocabularyCsids) {
 			logger.debug("vocabularyCsid=" + vocabularyCsid);
 
-			// FIXME: This throws DocumentNotFoundException, so will never go to the next vocabulary
-			itemPayload = findAuthorityItemByCsid(serviceName, vocabularyCsid, csid);
+			try {
+				itemPayload = findAuthorityItemByCsid(serviceName, vocabularyCsid, csid);
+			} catch (CSWebApplicationException e) {
+				itemPayload = null;
+			}
 
 			if (itemPayload != null) {
 				break;
