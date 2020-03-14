@@ -106,6 +106,19 @@
 		validationQuery="SELECT 1"
 		logAbandoned="true"/>
 
+	<Resource name="jdbc/Csadmin_NuxeoDS"
+		auth="Container"
+		type="javax.sql.DataSource"
+		username="${db.csadmin.user}"
+		password="${db.csadmin.user.password}"
+		driverClassName="${db.jdbc.driver.class}"
+		url="${db.jdbc.nuxeo.url.encoded}"
+		maxTotal="8"
+		maxIdle="4"
+		testWhileIdle="true"
+		validationQuery="SELECT 1"
+		logAbandoned="true"/>
+
   <Resource name="jdbc/NuxeoReaderDS"
 		auth="Container"
 		type="javax.sql.DataSource"
