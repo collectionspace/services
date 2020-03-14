@@ -17,15 +17,18 @@ public class CollectionSpaceServiceContextListener implements ServletContextList
 
     @Override
     public void contextInitialized(ServletContextEvent event) {
-        try {            
+        try {
             //
             // Initialize/start the Nuxeo EP server instance and create/retrieve the service workspaces
             //
             ServletContext servletContext = event.getServletContext();
             ServiceMain svcMain = ServiceMain.getInstance(servletContext);
-            
+
             svcMain.retrieveAllWorkspaceIds();
-            
+
+            // Upgrade database schema
+            svcMain.upgradeDatabase();
+
             // Create required indexes (aka indices) in tables not associated
             // with any specific tenant.
             svcMain.createRequiredIndices();
@@ -34,7 +37,7 @@ public class CollectionSpaceServiceContextListener implements ServletContextList
             // Typically, these handlers modify column types and add indexes to the Nuxeo db schema.
             //
             svcMain.firePostInitHandlers();
-                        
+
         } catch (Throwable e) {
             e.printStackTrace();
             //fail here
@@ -48,7 +51,7 @@ public class CollectionSpaceServiceContextListener implements ServletContextList
     @Override
     public void contextDestroyed(ServletContextEvent event) {
         ServiceMain instance = null;
-        
+
         try {
         	ServiceMain.getInstance();
         } catch (Throwable t) {
