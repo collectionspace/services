@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at TIMESTAMP
 );
 
--- Upgrade older users tables to 5.3
+-- Upgrade older users tables to 6.0
 ALTER TABLE users ADD COLUMN IF NOT EXISTS lastlogin TIMESTAMP;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS salt VARCHAR(128);
 

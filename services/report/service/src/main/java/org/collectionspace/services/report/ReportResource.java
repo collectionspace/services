@@ -128,13 +128,13 @@ public class ReportResource extends NuxeoBasedResource {
     	try {
 	        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
 	        ReportDocumentModelHandler handler = (ReportDocumentModelHandler)createDocumentHandler(ctx);
-	
+
 	    	return handler.getSupportMIMETypes(ctx);
     	} catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.LIST_MIMETYPES_FAILED);
-        } 
+        }
     }
-    
+
     /*
      * TODO: provide a static utility that will load a report, interrogate it
      * for information about the properties, and return that information.
@@ -178,7 +178,7 @@ public class ReportResource extends NuxeoBasedResource {
             StringBuffer outMimeType = new StringBuffer();
             StringBuffer outReportFileName = new StringBuffer();
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
-            
+
             if (isAuthorizedToInvokeReports(ctx) == true) {
 	            InputStream reportInputStream = invokeReport(ctx, csid, invContext, outMimeType, outReportFileName);
 	            response = PublicItemUtil.publishToRepository(
@@ -199,13 +199,13 @@ public class ReportResource extends NuxeoBasedResource {
 
         return response;
     }
-    
+
     /*
      * This method allows backward compatibility with the old API for running reports.
      */
     private boolean isAuthorizedToInvokeReports(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
     	boolean result = true;
-    			
+
 		//
 		// Until we enforce a user having POST perms on "/reports/*/invoke", we will continue to allow users with
 		// POST perms on "/reports" to run reports -see JIRA issue https://collectionspace.atlassian.net/browse/DRYD-732
@@ -224,7 +224,7 @@ public class ReportResource extends NuxeoBasedResource {
     }
 
     /**
-     * This method is deprecated at of CollectionSpace v5.3.
+     * This method is deprecated at of CollectionSpace v6.0.
      * @param ui
      * @param csid
      * @param invContext
@@ -243,7 +243,7 @@ public class ReportResource extends NuxeoBasedResource {
             StringBuffer outMimeType = new StringBuffer();
             StringBuffer outFileName = new StringBuffer();
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
-            
+
             if (isAuthorizedToInvokeReports(ctx) == true) {
 	            InputStream reportInputStream = invokeReport(ctx, csid, invContext, outMimeType, outFileName);
 				// Need to set response type for what is requested...
@@ -261,7 +261,7 @@ public class ReportResource extends NuxeoBasedResource {
 
         return response;
     }
-    
+
     @POST
     @Path("{csid}/invoke")
     public Response invokeReport(
@@ -298,7 +298,7 @@ public class ReportResource extends NuxeoBasedResource {
 
     	return result;
     }
-	
+
     /*
      * Does the actual report generation and returns an InputStream with the results.
      */

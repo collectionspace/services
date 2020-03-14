@@ -222,7 +222,7 @@ public class BatchResource extends NuxeoBasedResource {
      */
     private boolean isAuthorizedToInvokeBatchJobs(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
     	boolean result = true;
-    			
+
 		//
 		// Until we enforce a user having POST perms on "/batch/*/invoke", we will continue to allow users with
 		// POST perms on "/batch" to run reports -see JIRA issue https://collectionspace.atlassian.net/browse/DRYD-732
@@ -239,7 +239,7 @@ public class BatchResource extends NuxeoBasedResource {
     }
 
     /*
-     * This method is deprecated as of CollectionSpace v5.3.  POST/invoke requests should be made to the
+     * This method is deprecated as of CollectionSpace v6.0.  POST/invoke requests should be made to the
      * '/reports/{csid}/invoke' endpoint
      */
     @POST
