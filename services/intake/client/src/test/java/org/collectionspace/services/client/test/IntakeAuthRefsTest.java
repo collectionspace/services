@@ -40,6 +40,9 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.intake.ConditionCheckerOrAssessorList;
+import org.collectionspace.services.intake.CurrentOwnerList;
+import org.collectionspace.services.intake.DepositorGroup;
+import org.collectionspace.services.intake.DepositorGroupList;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.InsurerList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -68,7 +71,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     private String knownResourceId = null;
     private List<String> intakeIdsCreated = new ArrayList<String>();
     private List<String> personIdsCreated = new ArrayList<String>();
-    private String personAuthCSID = null; 
+    private String personAuthCSID = null;
     private String currentOwnerRefName = null;
     private String depositorRefName = null;
     private String conditionCheckerOrAssessorRefName = null;
@@ -80,7 +83,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 	protected String getServiceName() {
 		throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498
 	}
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
@@ -93,7 +96,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
 	}
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
@@ -112,10 +115,10 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
-        
+
         // Create all the person refs and entities
         createPersonRefs();
-        
+
         // Submit the request to the service and store the response.
         IntakeClient intakeClient = new IntakeClient();
         PoxPayloadOut multipart = createIntakeInstance(
@@ -156,12 +159,12 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
         }
-        
+
         // Store the IDs from every resource created by tests,
         // so they can be deleted after tests have been run.
         intakeIdsCreated.add(newId);
     }
-    
+
     protected void createPersonRefs() throws Exception {
     	//
     	// First, create a new person authority
@@ -179,32 +182,32 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         } finally {
         	res.close();
         }
-        
+
         String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
         String csid = createPerson("Olivier", "Owner", "olivierOwner", authRefName);
         currentOwnerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         personIdsCreated.add(csid);
-        
+
         csid = createPerson("Debbie", "Depositor", "debbieDepositor", authRefName);
         depositorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         personIdsCreated.add(csid);
-        
+
         csid = createPerson("Andrew", "Assessor", "andrewAssessor", authRefName);
         conditionCheckerOrAssessorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         personIdsCreated.add(csid);
-        
+
         csid = createPerson("Ingrid", "Insurer", "ingridInsurer", authRefName);
         insurerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         personIdsCreated.add(csid);
-        
+
         csid = createPerson("Vince", "Valuer", "vinceValuer", authRefName);
         valuerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         personIdsCreated.add(csid);
     }
-    
+
     protected String createPerson(String firstName, String surName, String shortId, String authRefName ) throws Exception {
     	String result = null;
-    	
+
         PersonClient personAuthClient = new PersonClient();
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
@@ -216,10 +219,10 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         term.setTermDisplayName(termName);
         term.setTermName(termName);
         personTerms.add(term);
-        PoxPayloadOut multipart = 
-    		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
+        PoxPayloadOut multipart =
+    		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
     				authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
-        
+
         Response res = personAuthClient.createItem(personAuthCSID, multipart);
         try {
         	int statusCode = res.getStatus();
@@ -230,7 +233,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         } finally {
         	res.close();
         }
-        
+
     	return result;
     }
 
@@ -249,7 +252,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 	        IntakesCommon intake = (IntakesCommon) extractPart(input, intakeClient.getCommonPartName(), IntakesCommon.class);
 	        Assert.assertNotNull(intake);
 	        // Check a couple of fields
-	        Assert.assertEquals(intake.getCurrentOwner(), currentOwnerRefName);
+	        Assert.assertEquals(intake.getCurrentOwners().getCurrentOwner().get(0), currentOwnerRefName);
 	        Assert.assertEquals(intake.getConditionCheckersOrAssessors().getConditionCheckerOrAssessor().get(0), conditionCheckerOrAssessorRefName);
 	        Assert.assertEquals(intake.getInsurers().getInsurer().get(0), insurerRefName);
         } finally {
@@ -257,7 +260,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
                 res.close();
             }
         }
-        
+
         // Get the auth refs and check them
         res = intakeClient.getAuthorityRefs(knownResourceId);
         AuthorityRefList list = null;
@@ -269,7 +272,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         		res.close();
             }
         }
-        
+
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
         int numAuthRefsFound = items.size();
         if (logger.isDebugEnabled()) {
@@ -308,7 +311,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
-     * @throws Exception 
+     * @throws Exception
      */
     @AfterClass(alwaysRun=true)
     public void cleanUp() throws Exception {
@@ -345,17 +348,30 @@ public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     }
 
    private PoxPayloadOut createIntakeInstance(String entryNumber,
-    		String entryDate,
-				String currentOwner,
-				String depositor,
-				String conditionCheckerAssessor,
-				String insurer,
-				String Valuer ) throws Exception {
+            String entryDate,
+            String currentOwner,
+            String depositor,
+            String conditionCheckerAssessor,
+            String insurer,
+            String Valuer ) throws Exception {
         IntakesCommon intake = new IntakesCommon();
         intake.setEntryNumber(entryNumber);
         intake.setEntryDate(entryDate);
-        intake.setCurrentOwner(currentOwner);
-        intake.setDepositor(depositor);
+
+        CurrentOwnerList currentOwnerList = new CurrentOwnerList();
+        List<String> currentOwners = currentOwnerList.getCurrentOwner();
+
+        currentOwners.add(currentOwner);
+        intake.setCurrentOwners(currentOwnerList);
+
+        DepositorGroupList depositorGroupList = new DepositorGroupList();
+        List<DepositorGroup> depositorGroups = depositorGroupList.getDepositorGroup();
+        DepositorGroup depositorGroup = new DepositorGroup();
+
+        depositorGroup.setDepositor(depositor);
+        depositorGroups.add(depositorGroup);
+
+        intake.setDepositorGroupList(depositorGroupList);
         intake.setValuer(Valuer);
 
         ConditionCheckerOrAssessorList checkerOrAssessorList = new ConditionCheckerOrAssessorList();

@@ -66,6 +66,8 @@ import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.client.RoleFactory;
 import org.collectionspace.services.client.test.BaseServiceTest;
 import org.collectionspace.services.dimension.DimensionsCommon;
+import org.collectionspace.services.intake.DepositorGroup;
+import org.collectionspace.services.intake.DepositorGroupList;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.testng.Assert;
@@ -226,7 +228,7 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.collectionspace.services.client.test.BaseServiceTest#getClientInstance
 	 * ()
@@ -325,13 +327,21 @@ public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList
 	 * @param depositor
 	 *            the depositor
 	 * @return the multipart output
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	private PoxPayloadOut createIntakeInstance(String entryNumber, String entryDate, String depositor) throws Exception {
 		IntakesCommon intake = new IntakesCommon();
 		intake.setEntryNumber(entryNumber);
 		intake.setEntryDate(entryDate);
-		intake.setDepositor(depositor);
+
+		DepositorGroupList depositorGroupList = new DepositorGroupList();
+		List<DepositorGroup> depositorGroups = depositorGroupList.getDepositorGroup();
+		DepositorGroup depositorGroup = new DepositorGroup();
+
+		depositorGroup.setDepositor(depositor);
+		depositorGroups.add(depositorGroup);
+
+		intake.setDepositorGroupList(depositorGroupList);
 
 		PoxPayloadOut multipart = new PoxPayloadOut(IntakeClient.SERVICE_PAYLOAD_NAME);
 		PayloadOutputPart commonPart = multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);

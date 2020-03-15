@@ -1,4 +1,4 @@
-/**	
+/**
  * This document is a part of the source code and related artifacts
  * for CollectionSpace, an open source collections management system
  * for museums and related institutions:
@@ -31,7 +31,8 @@ import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.common.api.Tools;
 
 import org.collectionspace.services.organization.StructuredDateGroup;
-import org.collectionspace.services.organization.ContactNameList;
+import org.collectionspace.services.organization.ContactGroup;
+import org.collectionspace.services.organization.ContactGroupList;
 import org.collectionspace.services.organization.FunctionList;
 import org.collectionspace.services.organization.GroupList;
 import org.collectionspace.services.organization.HistoryNoteList;
@@ -48,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * OrgAuthorityClientUtils.
  */
 public class OrgAuthorityClientUtils {
-    
+
     /** The Constant logger. */
     private static final Logger logger =
         LoggerFactory.getLogger(OrgAuthorityClientUtils.class);
@@ -58,13 +59,13 @@ public class OrgAuthorityClientUtils {
      * @param csid the id of the OrgAuthority
      * @param client if null, creates a new client
      * @return
-     * @throws Exception 
+     * @throws Exception
      */
     public static String getAuthorityRefName(String csid, OrganizationClient client) throws Exception{
     	if (client==null) {
     		client = new OrganizationClient();
     	}
-    	
+
         Response res = client.read(csid);
         try {
 	        int statusCode = res.getStatus();
@@ -74,7 +75,7 @@ public class OrgAuthorityClientUtils {
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
 	            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
-	            OrgauthoritiesCommon orgAuthority = 
+	            OrgauthoritiesCommon orgAuthority =
 	            	(OrgauthoritiesCommon) CollectionSpaceClientUtils.extractPart(input,
 	                    client.getCommonPartName(), OrgauthoritiesCommon.class);
 		        if(orgAuthority==null) {
@@ -94,13 +95,13 @@ public class OrgAuthorityClientUtils {
      * @param csid the ID of the Organization
      * @param client if null, creates a new client
      * @return
-     * @throws Exception 
+     * @throws Exception
      */
     public static String getOrgRefName(String inAuthority, String csid, OrganizationClient client) throws Exception{
     	if (client == null) {
     		client = new OrganizationClient();
     	}
-    	
+
         Response res = client.readItem(inAuthority, csid);
         try {
 	        int statusCode = res.getStatus();
@@ -111,7 +112,7 @@ public class OrgAuthorityClientUtils {
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
 	            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
-	            OrganizationsCommon org = 
+	            OrganizationsCommon org =
 	            	(OrganizationsCommon) CollectionSpaceClientUtils.extractPart(input,
 	                    client.getItemCommonPartName(), OrganizationsCommon.class);
 		        if(org==null) {
@@ -130,7 +131,7 @@ public class OrgAuthorityClientUtils {
      * Creates the org authority instance.
      *
      * @param displayName the display name
-     * @param shortIdentifier the short Id 
+     * @param shortIdentifier the short Id
      * @param headerLabel the header label
      * @return the multipart output
      */
@@ -181,14 +182,14 @@ public class OrgAuthorityClientUtils {
     				+"\" in orgAuthority: \"" + orgAuthorityRefName +"\"");
     	}
     	PoxPayloadOut multipart =
-    		createOrganizationInstance(orgAuthorityRefName, 
+    		createOrganizationInstance(orgAuthorityRefName,
     				orgInfo, terms, orgRepeatablesInfo, client.getItemCommonPartName());
 
     	Response res = client.createItem(inAuthority, multipart);
     	String result;
-    	try {	
+    	try {
 	    	int statusCode = res.getStatus();
-	
+
 	    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
    	    		throw new RuntimeException("Could not create Item: \""+orgInfo.get(OrganizationJAXBSchema.SHORT_IDENTIFIER)
 	    				+"\" in orgAuthority: \"" + orgAuthorityRefName
@@ -198,15 +199,15 @@ public class OrgAuthorityClientUtils {
 	    		throw new RuntimeException("Unexpected Status when creating Item: \""+ orgInfo.get(OrganizationJAXBSchema.SHORT_IDENTIFIER)
 	    				+"\" in orgAuthority: \"" + orgAuthorityRefName +"\", Status:"+ statusCode);
 	    	}
-	
+
 	    	result = extractId(res);
     	} finally {
     		res.close();
     	}
-    	
+
     	return result;
     }
-    
+
     public static List<OrgTermGroup> getTermGroupInstance(String shortIdentifier, String displayName) {
         if (Tools.isBlank(shortIdentifier)) {
             shortIdentifier = getGeneratedIdentifier();
@@ -214,7 +215,7 @@ public class OrgAuthorityClientUtils {
         if (Tools.isBlank(shortIdentifier)) {
             displayName = shortIdentifier;
         }
-        
+
         List<OrgTermGroup> terms = new ArrayList<OrgTermGroup>();
         OrgTermGroup term = new OrgTermGroup();
         term.setTermDisplayName(displayName);
@@ -222,21 +223,21 @@ public class OrgAuthorityClientUtils {
         terms.add(term);
         return terms;
     }
-    
+
     /*
      * Create a very simple Organization term -just a short ID and display name.
      */
     public static PoxPayloadOut createOrganizationInstance(String shortIdentifier, String displayName,
             String headerLabel) {
         List<OrgTermGroup> terms = getTermGroupInstance(shortIdentifier, displayName);
-        
+
         Map<String, String> orgInfo = new HashMap<String, String>();
         orgInfo.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortIdentifier);
-        
+
         final Map<String, List<String>> EMPTY_ORG_REPEATABLES_INFO = new HashMap<String, List<String>>();
 
         return createOrganizationInstance(null, orgInfo, terms, EMPTY_ORG_REPEATABLES_INFO, headerLabel);
-    }      
+    }
 
     /**
      * Creates the organization instance.
@@ -266,35 +267,42 @@ public class OrgAuthorityClientUtils {
      * @param headerLabel the header label
      * @return the multipart output
      */
-    public static PoxPayloadOut createOrganizationInstance( 
-        		String orgAuthRefName, 
-        		Map<String, String> orgInfo, 
+    public static PoxPayloadOut createOrganizationInstance(
+        		String orgAuthRefName,
+        		Map<String, String> orgInfo,
         		List<OrgTermGroup> terms,
         		Map<String, List<String>> orgRepeatablesInfo,
         		String headerLabel) {
-        
+
         OrganizationsCommon organization = new OrganizationsCommon();
         	String shortId = orgInfo.get(OrganizationJAXBSchema.SHORT_IDENTIFIER);
         	if (shortId == null || shortId.isEmpty()) {
         		throw new IllegalArgumentException("shortIdentifier cannot be null or empty");
-        	}      	
+        	}
         	organization.setShortIdentifier(shortId);
        	String value = null;
         List<String> values = null;
-        
+
         // Set values in the Term Information Group
         OrgTermGroupList termList = new OrgTermGroupList();
         if (terms == null || terms.isEmpty()) {
             terms = getTermGroupInstance(getGeneratedIdentifier());
         }
-        termList.getOrgTermGroup().addAll(terms); 
+        termList.getOrgTermGroup().addAll(terms);
         organization.setOrgTermGroupList(termList);
-        
+
         if ((values = (List<String>)orgRepeatablesInfo.get(OrganizationJAXBSchema.CONTACT_NAMES))!=null) {
-                ContactNameList contactsList = new ContactNameList();
-                List<String> contactNames = contactsList.getContactName();
-        	contactNames.addAll(values);
-                organization.setContactNames(contactsList);
+            ContactGroupList contactGroupList = new ContactGroupList();
+            List<ContactGroup> contactGroups = contactGroupList.getContactGroup();
+
+            for (String contactName : values) {
+                ContactGroup contactGroup = new ContactGroup();
+                contactGroup.setContactName(contactName);
+
+                contactGroups.add(contactGroup);
+            }
+
+            organization.setContactGroupList(contactGroupList);
         }
         if ((value = (String)orgInfo.get(OrganizationJAXBSchema.FOUNDING_DATE))!=null) {
             StructuredDateGroup foundingDate = new StructuredDateGroup();
@@ -375,7 +383,7 @@ public class OrgAuthorityClientUtils {
         }
         return id;
     }
-    
+
     /**
      * Creates the org auth ref name.
      *
@@ -451,9 +459,9 @@ public class OrgAuthorityClientUtils {
         terms.add(term);
         return terms;
     }
-    
+
     private static String getGeneratedIdentifier() {
-        return "id" + new Date().getTime(); 
+        return "id" + new Date().getTime();
    }
-    
+
 }

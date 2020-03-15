@@ -39,6 +39,8 @@ import org.collectionspace.services.intake.EntryMethodList;
 import org.collectionspace.services.intake.FieldCollectionEventNameList;
 import org.collectionspace.services.intake.CurrentLocationGroup;
 import org.collectionspace.services.intake.CurrentLocationGroupList;
+import org.collectionspace.services.intake.DepositorGroup;
+import org.collectionspace.services.intake.DepositorGroupList;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.testng.Assert;
@@ -76,7 +78,7 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
     protected String getServiceName() {
         return IntakeClient.SERVICE_NAME;
     }
-    
+
     // ---------------------------------------------------------------
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
@@ -112,7 +114,7 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
                 "UTF-8 data retrieved '" + fromRead.getEntryNote()
                 + "' does not match expected data '" + getUTF8DataFragment());
 	}
-    
+
     @Override
     public void delete(String testName) throws Exception {
     	// Do nothing because this test is not ready to delete the "knownResourceId".
@@ -121,7 +123,7 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
     	// test is run, the localDelete() test/method will get run.  The localDelete() test/method in turn
     	// calls the inherited delete() test/method.
     }
-    
+
     @Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests", "verifyReadOnlyCoreFields"})
     public void localDelete(String testName) throws Exception {
     	// Because of issues with TestNG not allowing @Test annotations on on override methods,
@@ -154,12 +156,12 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
 	            logger.debug(testName + ": read status = " + res.getStatus());
 	        }
 	        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
-	
+
 	        input = new PoxPayloadIn(res.readEntity(String.class));
         } finally {
         	res.close();
         }
-        
+
         PayloadInputPart payloadInputPart = input.getPart(COLLECTIONSPACE_CORE_SCHEMA);
         Element coreAsElement = null;
         if (payloadInputPart != null) {
@@ -188,7 +190,7 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
         Element createdBy = coreAsElement.element(COLLECTIONSPACE_CORE_CREATED_BY);
         String originalCreatedBy = createdBy.getText();
         createdBy.setText("foo");
-        
+
         if (logger.isDebugEnabled()) {
             logger.debug("Core part to be updated:");
             logger.debug(coreAsElement.asXML());
@@ -197,7 +199,7 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
         // Create an output payload to send to the service, and add the common part
         PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart corePart = output.addPart(COLLECTIONSPACE_CORE_SCHEMA, coreAsElement);
-        
+
         // Submit the request to the service and store the response.
         res = client.update(knownResourceId, output);
 	    try {
@@ -209,19 +211,19 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
 	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
 	                invalidStatusCodeMessage(testRequestType, statusCode));
 	        Assert.assertEquals(statusCode, testExpectedStatusCode);
-	
+
 	        input = new PoxPayloadIn(res.readEntity(String.class));
 	    } finally {
 	    	res.close();
 	    }
-	        
+
         PayloadInputPart updatedCorePart = input.getPart(COLLECTIONSPACE_CORE_SCHEMA);
         Element updatedCoreAsElement = null;
         if (updatedCorePart != null) {
         	updatedCoreAsElement = updatedCorePart.getElementBody();
         }
         Assert.assertNotNull(updatedCoreAsElement);
-        
+
         tenantId = updatedCoreAsElement.element(COLLECTIONSPACE_CORE_TENANTID);
         String updatedTenantId = tenantId.getText();
         Assert.assertEquals(updatedTenantId, originalTenantId,
@@ -244,7 +246,7 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
     // ---------------------------------------------------------------
     // Utility tests : tests of code used in tests above
     // ---------------------------------------------------------------
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
      */
@@ -258,7 +260,7 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
      *
      * @param identifier the identifier
      * @return the multipart output
-     * @throws Exception 
+     * @throws Exception
      */
     @Override
     protected PoxPayloadOut createInstance(String identifier) throws Exception {
@@ -275,7 +277,7 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
      * @param entryDate the entry date
      * @param depositor the depositor
      * @return the multipart output
-     * @throws Exception 
+     * @throws Exception
      */
     private PoxPayloadOut createIntakeInstance(String entryNumber,
             String entryDate,
@@ -283,7 +285,15 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
         IntakesCommon intake = new IntakesCommon();
         intake.setEntryNumber(entryNumber);
         intake.setEntryDate(entryDate);
-        intake.setDepositor(depositor);
+
+        DepositorGroupList depositorGroupList = new DepositorGroupList();
+        List<DepositorGroup> depositorGroups = depositorGroupList.getDepositorGroup();
+        DepositorGroup depositorGroup = new DepositorGroup();
+
+        depositorGroup.setDepositor(depositor);
+        depositorGroups.add(depositorGroup);
+
+        intake.setDepositorGroupList(depositorGroupList);
 
         EntryMethodList entryMethodsList = new EntryMethodList();
         List<String> entryMethods = entryMethodsList.getEntryMethod();
@@ -332,27 +342,27 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
 	@Override
 	protected IntakesCommon updateInstance(IntakesCommon intakesCommon) {
 		IntakesCommon result = new IntakesCommon();
-		
+
 		result.setEntryNumber("updated-" + intakesCommon.getEntryNumber());
 		result.setEntryNote(intakesCommon.getEntryNote());
 
         CurrentLocationGroupList currentLocationGroupList = intakesCommon.getCurrentLocationGroupList();
         Assert.assertNotNull(currentLocationGroupList);
-        
+
         List<CurrentLocationGroup> currentLocationGroups = currentLocationGroupList.getCurrentLocationGroup();
-        Assert.assertNotNull(currentLocationGroups);        
+        Assert.assertNotNull(currentLocationGroups);
         Assert.assertTrue(currentLocationGroups.size() > 0);
-        
+
         CurrentLocationGroup currentLocationGroup = currentLocationGroups.get(0);
         Assert.assertNotNull(currentLocationGroup);
-        
+
         String currentLocationNote = currentLocationGroup.getCurrentLocationNote();
         Assert.assertNotNull(currentLocationNote);
-        
+
         String updatedCurrentLocationNote = "updated-" + currentLocationNote;
         currentLocationGroups.get(0).setCurrentLocationNote(updatedCurrentLocationNote);
         result.setCurrentLocationGroupList(currentLocationGroupList);
-        
+
         return result;
 	}
 
@@ -362,20 +372,20 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
         Assert.assertEquals(updated.getEntryNumber(),
         		original.getEntryNumber(),
                 "Data in updated object did not match submitted data.");
-        
+
         CurrentLocationGroupList currentLocationGroupList = updated.getCurrentLocationGroupList();
         Assert.assertNotNull(currentLocationGroupList);
         List<CurrentLocationGroup> currentLocationGroups = currentLocationGroupList.getCurrentLocationGroup();
         Assert.assertNotNull(currentLocationGroups);
         Assert.assertTrue(currentLocationGroups.size() > 0);
         Assert.assertNotNull(currentLocationGroups.get(0));
-        
+
         String updatedCurrentLocationNote = original.getCurrentLocationGroupList()
         		.getCurrentLocationGroup().get(0).getCurrentLocationNote();
         Assert.assertEquals(updatedCurrentLocationNote,
                 currentLocationGroups.get(0).getCurrentLocationNote(),
                 "Data in updated object did not match submitted data.");
-        
+
         Assert.assertEquals(updated.getEntryNote(), original.getEntryNote(),
                 "Data in updated object did not match submitted data.");
         //
@@ -387,7 +397,7 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
         }
         Assert.assertTrue(updated.getEntryNote().contains(getUTF8DataFragment()),
                 "UTF-8 data retrieved '" + updated.getEntryNote()
-                + "' does not contain expected data '" + getUTF8DataFragment());        
+                + "' does not contain expected data '" + getUTF8DataFragment());
 	}
 
     /*
@@ -397,8 +407,8 @@ public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
     @Override
     @Test(dataProvider = "testName",
     		dependsOnMethods = {
-        		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
+        		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})
 	public void CRUDTests(String testName) {
-		// Needed for TestNG dependency chain.		
+		// Needed for TestNG dependency chain.
 	}
 }

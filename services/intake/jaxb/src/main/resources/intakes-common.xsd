@@ -2,7 +2,7 @@
 
 <!--
     Intake schema (XSD)
-    
+
     Entity  : Intake
     Part    : Common
     Used for: JAXB binding between XML and Java objects
@@ -11,7 +11,7 @@
     $LastChangedDate$
 -->
 
-<xs:schema 
+<xs:schema
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
   jaxb:version="1.0" elementFormDefault="unqualified"
@@ -25,18 +25,17 @@
     Avoid XmlRootElement nightmare:
     See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
 -->
-<!-- See http://wiki.collectionspace.org/display/collectionspace/Intake+Schema -->    
-    
+<!-- See http://wiki.collectionspace.org/display/collectionspace/Intake+Schema -->
+
     <!-- intake  -->
     <xs:element name="intakes_common">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="csid" type="xs:string" />
-                
+
                 <!--  Object Entry Information Group -->
-                <xs:element name="currentOwner" type="xs:string"/>
-                <xs:element name="depositor" type="xs:string"/>
-                <xs:element name="depositorsRequirements" type="xs:string"/>
+                <xs:element name="currentOwners" type="currentOwnerList"/>
+                <xs:element name="depositorGroupList" type="depositorGroupList"/>
                 <xs:element name="entryDate" type="xs:string"/>
                 <xs:element name="entryMethods" type="entryMethodList"/>
                 <xs:element name="entryNote" type="xs:string"/>
@@ -82,6 +81,25 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+    <xs:complexType name="currentOwnerList">
+        <xs:sequence>
+            <xs:element name="currentOwner" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="depositorGroupList">
+        <xs:sequence>
+            <xs:element name="depositorGroup" type="depositorGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="depositorGroup">
+        <xs:sequence>
+            <xs:element name="depositor" type="xs:string"/>
+            <xs:element name="depositorsRequirements" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
 
     <xs:complexType name="entryMethodList">
         <xs:sequence>
@@ -150,6 +168,5 @@
             <xs:element name="conditionCheckerOrAssessor" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-    
-</xs:schema>
 
+</xs:schema>

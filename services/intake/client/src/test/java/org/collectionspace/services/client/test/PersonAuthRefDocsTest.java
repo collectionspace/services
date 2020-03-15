@@ -39,6 +39,9 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.intake.ConditionCheckerOrAssessorList;
+import org.collectionspace.services.intake.CurrentOwnerList;
+import org.collectionspace.services.intake.DepositorGroup;
+import org.collectionspace.services.intake.DepositorGroupList;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.InsurerList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -82,10 +85,10 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
             GregorianCalendarDateTimeUtils.currentDateUTC();
 
     @Override
-    public String getServiceName() { 
-    	throw new UnsupportedOperationException(); //FIXME: REM - http://issues.collectionspace.org/browse/CSPACE-3498   
+    public String getServiceName() {
+    	throw new UnsupportedOperationException(); //FIXME: REM - http://issues.collectionspace.org/browse/CSPACE-3498
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
@@ -167,7 +170,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
 
     /**
      * Creates the person refs.
-     * @throws Exception 
+     * @throws Exception
      */
     protected void createPersonRefs() throws Exception {
         PersonClient personAuthClient = new PersonClient();
@@ -225,7 +228,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
 
     protected String createPerson(String firstName, String surName, String shortId, String authRefName) throws Exception {
     	String result = null;
-    	
+
         PersonClient personAuthClient = new PersonClient();
         Map<String, String> personInfo = new HashMap<String, String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
@@ -243,7 +246,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         Response res = personAuthClient.createItem(personAuthCSID, multipart);
         try {
 	        int statusCode = res.getStatus();
-	
+
 	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
 	                invalidStatusCodeMessage(testRequestType, statusCode));
 	        Assert.assertEquals(statusCode, STATUS_CREATED);
@@ -251,7 +254,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         } finally {
         	res.close();
         }
-        
+
         return result;
     }
 
@@ -274,7 +277,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
                 res.close();
             }
         }
-        
+
         List<AuthorityRefDocList.AuthorityRefDocItem> items =
                 list.getAuthorityRefDocItem();
         Assert.assertTrue(items != null);
@@ -313,12 +316,12 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
                 res.close();
             }
         }
-        
+
         items = list.getAuthorityRefDocItem();
         Assert.assertTrue(items != null);
         Assert.assertTrue(items.size() > 0);
         Assert.assertTrue(items.get(0) != null);
-        
+
         // Optionally output additional data about list members for debugging.
         iterateThroughList = true;
         fFoundIntake = false;
@@ -365,7 +368,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
                 res.close();
             }
         }
-        
+
         List<AuthorityRefDocList.AuthorityRefDocItem> items =
                 list.getAuthorityRefDocItem();
         Assert.assertTrue(items != null);
@@ -405,7 +408,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
-     * @throws Exception 
+     * @throws Exception
      */
     @AfterClass(alwaysRun = true)
     public void cleanUp() throws Exception {
@@ -452,8 +455,21 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         IntakesCommon intake = new IntakesCommon();
         intake.setEntryNumber(entryNumber);
         intake.setEntryDate(entryDate);
-        intake.setCurrentOwner(currentOwner);
-        intake.setDepositor(depositor);
+
+        CurrentOwnerList currentOwnerList = new CurrentOwnerList();
+        List<String> currentOwners = currentOwnerList.getCurrentOwner();
+
+        currentOwners.add(currentOwner);
+        intake.setCurrentOwners(currentOwnerList);
+
+        DepositorGroupList depositorGroupList = new DepositorGroupList();
+        List<DepositorGroup> depositorGroups = depositorGroupList.getDepositorGroup();
+        DepositorGroup depositorGroup = new DepositorGroup();
+
+        depositorGroup.setDepositor(depositor);
+        depositorGroups.add(depositorGroup);
+
+        intake.setDepositorGroupList(depositorGroupList);
         intake.setValuer(Valuer);
 
         ConditionCheckerOrAssessorList checkerOrAssessorList = new ConditionCheckerOrAssessorList();

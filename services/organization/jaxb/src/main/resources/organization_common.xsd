@@ -8,7 +8,7 @@
     Used for: JAXB binding between XML and Java objects
 -->
 
-<xs:schema 
+<xs:schema
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
     jaxb:version="1.0" elementFormDefault="unqualified"
@@ -29,30 +29,42 @@
                 <!--  Common identifier -->
                 <xs:element name="csid" type="xs:string" />
 				<xs:element name="rev" type="xs:integer" /> <!-- Revision number -->
-                
+
                 <!--  Organization Information Group -->
                 <xs:element name="inAuthority" type="xs:string" />
                 <xs:element name="shortIdentifier" type="xs:string"/>
                 <xs:element name="refName" type="xs:string"/>
-                
+
                 <!-- Term Information repeatable group -->
                 <xs:element name="orgTermGroupList" type="orgTermGroupList"/>
-                                
+
                 <xs:element name="foundingDateGroup" type="structuredDateGroup"/>
                 <xs:element name="dissolutionDateGroup" type="structuredDateGroup"/>
                 <xs:element name="foundingPlace" type="xs:string"/>
-                
+
                 <xs:element name="groups" type="groupList"/>
                 <xs:element name="functions" type="functionList"/>
-                <xs:element name="contactNames" type="contactNameList"/>
+                <xs:element name="contactGroupList" type="contactGroupList"/>
                 <xs:element name="historyNotes" type="historyNoteList"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    
-    <xs:complexType name="contactNameList">
+
+    <xs:element name="contactGroupList" type="contactGroupList"/>
+
+    <xs:complexType name="contactGroupList">
         <xs:sequence>
-            <xs:element name="contactName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="contactGroup" type="contactGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="contactGroup">
+        <xs:sequence>
+            <xs:element name="contactName" type="xs:string"/>
+            <xs:element name="contactRole" type="xs:string"/>
+            <xs:element name="contactStatus" type="xs:string"/>
+            <xs:element name="contactDateGroup" type="structuredDateGroup"/>
+            <xs:element name="contactEndDateGroup" type="structuredDateGroup"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -73,7 +85,7 @@
             <xs:element name="historyNote" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="orgTermGroupList">
         <xs:sequence>
             <xs:element name="orgTermGroup" type="orgTermGroup" minOccurs="0" maxOccurs="unbounded"/>
@@ -131,6 +143,5 @@
             <xs:element name="scalarValuesComputed" type="xs:boolean"/>
         </xs:sequence>
     </xs:complexType>
-    
-</xs:schema>
 
+</xs:schema>

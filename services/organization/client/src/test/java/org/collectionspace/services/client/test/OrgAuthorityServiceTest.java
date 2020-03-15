@@ -47,6 +47,7 @@ import org.collectionspace.services.client.OrgAuthorityClientUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.organization.OrgauthoritiesCommon;
 import org.collectionspace.services.organization.OrganizationsCommon;
+import org.collectionspace.services.organization.ContactGroup;
 import org.collectionspace.services.organization.OrgTermGroup;
 import org.collectionspace.services.organization.OrgTermGroupList;
 import org.slf4j.Logger;
@@ -75,7 +76,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
     	super();
         TEST_SHORTID = "TestOrg";
     }
-    
+
     @Override
     public String getServicePathComponent() {
         return OrganizationClient.SERVICE_PATH_COMPONENT;
@@ -85,23 +86,23 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
     protected String getServiceName() {
         return OrganizationClient.SERVICE_NAME;
     }
-    
+
     private final String TEST_ORG_NAME = "Test Org";
     private final String TEST_ORG_MAIN_BODY_NAME = "The real official test organization";
     private final String TEST_ORG_FOUNDING_PLACE = "Anytown, USA";
     private final String TEST_ORG_FOUNDING_DATE = "May 26, 1907";
-    
+
     /** The known item resource short ID. */
     private String knownItemResourceShortIdentifer = null;
-    
+
     /** The known contact resource id. */
     private String knownContactResourceId = null;
-    
+
     /** The all contact resource ids created. */
     private Map<String, String> allContactResourceIdsCreated = new HashMap<String, String>();
 
     /**
-     * 
+     *
      */
     protected void setKnownItemResource(String id, String shortIdentifer) {
         knownItemResourceId = id;
@@ -133,13 +134,13 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
     @Override
     protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) throws Exception {
         String headerLabel = new OrganizationClient().getItemCommonPartName();
-        
+
         String shortId = TEST_SHORTID + identifier;
         Map<String, String> testOrgMap = new HashMap<String, String>();
         testOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
         testOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, TEST_ORG_FOUNDING_DATE);
         testOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, TEST_ORG_FOUNDING_PLACE);
-        
+
         List<OrgTermGroup> terms = new ArrayList<OrgTermGroup>();
         OrgTermGroup term = new OrgTermGroup();
         term.setTermDisplayName(TEST_ORG_NAME);
@@ -154,7 +155,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 	protected String createItemInAuthority(AuthorityClient client, String authorityId, String shortId) {
 		return createItemInAuthority(client, authorityId, shortId, null /*refname*/);
 	}
-    
+
     /**
      * Creates the item in authority.
      *
@@ -168,19 +169,19 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ":...");
         }
-        
+
         Map<String, String> testOrgMap = new HashMap<String, String>();
         testOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
         testOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, TEST_ORG_FOUNDING_DATE);
         testOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, TEST_ORG_FOUNDING_PLACE);
-        
+
         List<OrgTermGroup> terms = new ArrayList<OrgTermGroup>();
         OrgTermGroup term = new OrgTermGroup();
         term.setTermDisplayName(TEST_ORG_NAME);
         term.setTermName(TEST_ORG_NAME);
         term.setMainBodyName(TEST_ORG_MAIN_BODY_NAME);
         terms.add(term);
-        
+
         Map<String, List<String>> testOrgRepeatablesMap = new HashMap<String, List<String>>();
         List<String> testOrgContactNames = new ArrayList<String>();
         testOrgContactNames.add("joe@example.org");
@@ -211,7 +212,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      * Creates the contact.
      *
      * @param testName the test name
-     * @throws Exception 
+     * @throws Exception
      */
     @Test(dataProvider = "testName", groups = {"create"},
     		dependsOnMethods = {"createItem"})
@@ -226,7 +227,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      * @param parentcsid the parentcsid
      * @param itemcsid the itemcsid
      * @return the string
-     * @throws Exception 
+     * @throws Exception
      */
     private String createContactInItem(String parentcsid, String itemcsid) throws Exception {
 
@@ -327,7 +328,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             Assert.fail("readInternal: Internal error. One of CSID or shortId must be non-null");
         }
         try {
-            assertStatusCode(res, testName);        	
+            assertStatusCode(res, testName);
             //FIXME: remove the following try catch once Aron fixes signatures
             try {
                 PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
@@ -349,7 +350,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
     /**
      * Read item in Named Auth.
-     * 
+     *
      * TODO Enable this if we really need this - it is a funky case, where we would have
      * the shortId of the item, but the CSID of the parent authority!? Unlikely.
      *
@@ -361,7 +362,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
     readItemInternal(testName, null, knownResourceShortIdentifer, knownItemResourceId, null);
     }
      */
-    
+
     /**
      * Read named item.
      *
@@ -373,7 +374,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
     public void readNamedItem(String testName) throws Exception {
         readItemInternal(testName, knownResourceId, null, null, knownItemResourceShortIdentifer);
     }
-    
+
     /**
      * Read item in Named Auth.
      *
@@ -444,24 +445,24 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
             // Verify the number and contents of values in a repeatable field,
             // as created in the instance record used for testing.
-            List<String> contactNames = organization.getContactNames().getContactName();
-            Assert.assertTrue(contactNames.size() > 0);
-            Assert.assertNotNull(contactNames.get(0));
 
+            List<ContactGroup> contactGroups = organization.getContactGroupList().getContactGroup();
+            Assert.assertTrue(contactGroups.size() > 0);
+            Assert.assertNotNull(contactGroups.get(0).getContactName());
         } finally {
         	if (res != null) {
                 res.close();
             }
         }
     }
-    
+
     @Override
     protected void verifyReadItemInstance(OrganizationsCommon item) throws Exception {
-        List<String> contactNames = item.getContactNames().getContactName();
-        Assert.assertTrue(contactNames.size() > 0);
-        Assert.assertNotNull(contactNames.get(0));
+        List<ContactGroup> contactGroups = item.getContactGroupList().getContactGroup();
+        Assert.assertTrue(contactGroups.size() > 0);
+        Assert.assertNotNull(contactGroups.get(0).getContactName());
     }
-    
+
     /**
      * Verify illegal item display name.
      *
@@ -479,7 +480,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         Response res = client.readItem(knownResourceId, knownItemResourceId);
         OrganizationsCommon organization = null;
         try {
-            assertStatusCode(res, testName);        	
+            assertStatusCode(res, testName);
             // Check whether organization has expected displayName.
             PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
             organization = (OrganizationsCommon) extractPart(input,
@@ -490,7 +491,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
                 res.close();
             }
         }
-        
+
         //
         // Make an invalid UPDATE request, without a display name
         //
@@ -501,7 +502,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         Assert.assertTrue(terms.size() > 0);
         terms.get(0).setTermDisplayName(null);
         terms.get(0).setTermName(null);
-        
+
         setupUpdateWithInvalidBody(); // we expect a failure
         // Submit the updated resource to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(OrganizationClient.SERVICE_ITEM_PAYLOAD_NAME);
@@ -534,7 +535,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         Response res =client.readContact(knownResourceId, knownItemResourceId,
                 knownContactResourceId);
         try {
-            assertStatusCode(res, testName);        	
+            assertStatusCode(res, testName);
             // Check whether we've received a contact.
             PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
             ContactsCommon contact = (ContactsCommon) extractPart(input,
@@ -558,7 +559,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      * Read contact non existent.
      *
      * @param testName the test name
-     * @throws Exception 
+     * @throws Exception
      */
     @Test(dataProvider = "testName", groups = {"readItem"},
     		dependsOnMethods = {"readContact"})
@@ -589,7 +590,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
     /**
      * Read item list.
-     * @throws Exception 
+     * @throws Exception
      */
     @Override
 //	@Test(groups = {"readList"}, dependsOnMethods = {"readList"})
@@ -599,7 +600,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
     /**
      * Read item list by authority name.
-     * @throws Exception 
+     * @throws Exception
      */
     @Override
 //    @Test(dataProvider = "testName",
@@ -613,7 +614,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      *
      * @param vcsid the vcsid
      * @param name the name
-     * @throws Exception 
+     * @throws Exception
      */
     private void readItemList(String vcsid, String name) throws Exception {
 
@@ -631,17 +632,17 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         } else {
             Assert.fail("readItemList passed null csid and name!");
         }
-        
+
         AbstractCommonList list = null;
         try {
-            assertStatusCode(res, testName);        	
+            assertStatusCode(res, testName);
             list = res.readEntity(AbstractCommonList.class);
         } finally {
         	if (res != null) {
                 res.close();
             }
         }
-        
+
         List<AbstractCommonList.ListItem> items = list.getListItem();
         int nItemsReturned = items.size();
         // There will be 'nItemsToCreateInList'
@@ -669,7 +670,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
     /**
      * Read contact list.
-     * @throws Exception 
+     * @throws Exception
      */
     @Test(groups = {"readList"},
     		dependsOnMethods = {"org.collectionspace.services.client.test.AbstractAuthorityServiceTest.readItemList"})
@@ -682,7 +683,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      *
      * @param parentcsid the parentcsid
      * @param itemcsid the itemcsid
-     * @throws Exception 
+     * @throws Exception
      */
     private void readContactList(String parentcsid, String itemcsid) throws Exception {
         final String testName = "readContactList";
@@ -742,7 +743,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         Response res = client.readContact(knownResourceId, knownItemResourceId, knownContactResourceId);
         ContactsCommon contact = null;
         try {
-            assertStatusCode(res, testName);        	
+            assertStatusCode(res, testName);
             if (logger.isDebugEnabled()) {
                 logger.debug("got Contact to update with ID: "
                         + knownContactResourceId
@@ -791,7 +792,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 	                (ContactsCommon) extractPart(input,
 	                new ContactClient().getCommonPartName(), ContactsCommon.class);
 	        Assert.assertNotNull(updatedContact);
-	
+
 	        // Verify that the updated resource received the correct data.
 	        Assert.assertEquals(updatedContact.getAddressGroupList().getAddressGroup().get(0).getAddressPlace1(),
 	                contact.getAddressGroupList().getAddressGroup().get(0).getAddressPlace1(),
@@ -855,8 +856,8 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
     public void delete(String testName) throws Exception {
     	// Do nothing.  See localDelete().  This ensure proper test order.
     }
-    
-    @Test(dataProvider = "testName", dependsOnMethods = {"localDeleteItem"})    
+
+    @Test(dataProvider = "testName", dependsOnMethods = {"localDeleteItem"})
     public void localDelete(String testName) throws Exception {
     	super.delete(testName);
     }
@@ -866,18 +867,18 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
     	// Do nothing.  We need to wait until after the test "localDelete" gets run.  When it does,
     	// its dependencies will get run first and then we can call the base class' delete method.
     }
-    
+
     @Test(dataProvider = "testName", groups = {"delete"},
     	dependsOnMethods = {"verifyIllegalItemDisplayName", "testContactSubmitRequest", "deleteContact"})
     public void localDeleteItem(String testName) throws Exception {
     	super.deleteItem(testName);
-    }    
-    
+    }
+
     /**
      * Delete non existent contact.
      *
      * @param testName the test name
-     * @throws Exception 
+     * @throws Exception
      */
     @Test(dataProvider = "testName", groups = {"delete"},
     		dependsOnMethods = {"deleteContact"})
@@ -932,7 +933,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
-     * @throws Exception 
+     * @throws Exception
      */
     @AfterClass(alwaysRun = true)
     @Override
@@ -1066,12 +1067,12 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 	@Override
 	public void authorityTests(String testName) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	protected OrganizationsCommon updateItemInstance(OrganizationsCommon organizationsCommon) {
-                            
+
             OrgTermGroupList termList = organizationsCommon.getOrgTermGroupList();
             Assert.assertNotNull(termList);
             List<OrgTermGroup> terms = termList.getOrgTermGroup();
@@ -1088,23 +1089,23 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 	protected void compareUpdatedItemInstances(OrganizationsCommon original,
 			OrganizationsCommon updated,
 			boolean compareRevNumbers) throws Exception {
-            
+
             OrgTermGroupList originalTermList = original.getOrgTermGroupList();
             Assert.assertNotNull(originalTermList);
             List<OrgTermGroup> originalTerms = originalTermList.getOrgTermGroup();
             Assert.assertNotNull(originalTerms);
             Assert.assertTrue(originalTerms.size() > 0);
-            
+
             OrgTermGroupList updatedTermList = updated.getOrgTermGroupList();
             Assert.assertNotNull(updatedTermList);
             List<OrgTermGroup> updatedTerms = updatedTermList.getOrgTermGroup();
             Assert.assertNotNull(updatedTerms);
             Assert.assertTrue(updatedTerms.size() > 0);
-            
+
             Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(),
                 originalTerms.get(0).getTermDisplayName(),
                 "Value in updated record did not match submitted data.");
-            
+
             if (compareRevNumbers == true) {
             	Assert.assertEquals(original.getRev(), updated.getRev(), "Revision numbers should match.");
             }
@@ -1131,7 +1132,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
                 displayName, shortId, commonPartName);
         return result;
 	}
-	
+
     protected PoxPayloadOut createNonExistenceItemInstance(String commonPartName,
     		String identifier) {
         Map<String, String> nonexOrgMap = new HashMap<String, String>();
@@ -1146,10 +1147,10 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 	@Override
 	protected OrgauthoritiesCommon updateInstance(OrgauthoritiesCommon orgauthoritiesCommon) {
 		OrgauthoritiesCommon result = new OrgauthoritiesCommon();
-		
+
         result.setDisplayName("updated-" + orgauthoritiesCommon.getDisplayName());
         result.setVocabType("updated-" + orgauthoritiesCommon.getVocabType());
-        
+
 		return result;
 	}
 

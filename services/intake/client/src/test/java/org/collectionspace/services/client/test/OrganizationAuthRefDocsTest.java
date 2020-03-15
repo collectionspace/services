@@ -39,6 +39,9 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.intake.ConditionCheckerOrAssessorList;
+import org.collectionspace.services.intake.CurrentOwnerList;
+import org.collectionspace.services.intake.DepositorGroup;
+import org.collectionspace.services.intake.DepositorGroupList;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.InsurerList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -67,9 +70,9 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
     private String knownIntakeId = null;
     private List<String> intakeIdsCreated = new ArrayList<String>();
     private List<String> orgIdsCreated = new ArrayList<String>();
-    private String orgAuthCSID = null; 
-    //private String orgAuthRefName = null; 
-    private String currentOwnerOrgCSID = null; 
+    private String orgAuthCSID = null;
+    //private String orgAuthRefName = null;
+    private String currentOwnerOrgCSID = null;
     private String currentOwnerRefName = null;
     private String depositorRefName = null;
     private String conditionCheckerAssessorRefName = null;
@@ -83,7 +86,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
 	protected String getServiceName() {
 		throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498
 	}
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
@@ -96,7 +99,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
 	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
 	}
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
@@ -115,7 +118,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
 
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
-        
+
         // Create all the organization refs and entities
         createOrgRefs();
 
@@ -133,7 +136,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         Response res = intakeClient.create(intakePayload);
         try {
 	        int statusCode = res.getStatus();
-	
+
 	        // Check the status code of the response: does it match
 	        // the expected response(s)?
 	        //
@@ -150,14 +153,14 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
             Assert.assertNotNull(newIntakeId, "Could not create a new Intake record.");
 
 	        // Store the ID returned from the first resource created
-	        // for additional tests below.            
+	        // for additional tests below.
 	        if (knownIntakeId == null) {
 	            knownIntakeId = newIntakeId;
 	            if (logger.isDebugEnabled()) {
 	                logger.debug(testName + ": knownIntakeId=" + knownIntakeId);
 	            }
 	        }
-	        
+
 	        // Store the IDs from every resource created by tests,
 	        // so they can be deleted after tests have been run.
 	        intakeIdsCreated.add(newIntakeId);
@@ -166,14 +169,14 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         }
 
     }
-    
+
     /**
      * Creates the organization refs.
-     * @throws Exception 
+     * @throws Exception
      */
     protected void createOrgRefs() throws Exception{
         OrganizationClient orgAuthClient = new OrganizationClient();
-        //orgAuthRefName = 
+        //orgAuthRefName =
     	//	OrgAuthorityClientUtils.createOrgAuthRefName(ORGANIZATION_AUTHORITY_NAME, null);
         PoxPayloadOut multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
     			ORGANIZATION_AUTHORITY_NAME, ORGANIZATION_AUTHORITY_NAME, orgAuthClient.getCommonPartName());
@@ -188,40 +191,40 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         } finally {
         	res.close();
         }
-        
+
 		currentOwnerOrgCSID = createOrganization("olivierOwnerCompany", "Olivier Owner Company", "Olivier Owner Company");
         orgIdsCreated.add(currentOwnerOrgCSID);
         currentOwnerRefName = OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, currentOwnerOrgCSID, orgAuthClient);
-        
+
 		String newOrgCSID =
                         createOrganization("debbieDepositorAssocs", "Debbie Depositor & Associates", "Debbie Depositor & Associates");
-        depositorRefName = 
+        depositorRefName =
         	OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, newOrgCSID, orgAuthClient);
         orgIdsCreated.add(newOrgCSID);
-        
+
 		newOrgCSID = createOrganization("andrewCheckerAssessorLtd", "Andrew Checker-Assessor Ltd.", "Andrew Checker-Assessor Ltd.");
-		conditionCheckerAssessorRefName = 
+		conditionCheckerAssessorRefName =
         	OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, newOrgCSID, orgAuthClient);
         orgIdsCreated.add(newOrgCSID);
-        
+
 		newOrgCSID = createOrganization("ingridInsurerBureau", "Ingrid Insurer Bureau", "Ingrid Insurer Bureau");
-		insurerRefName = 
+		insurerRefName =
         	OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, newOrgCSID, orgAuthClient);
         orgIdsCreated.add(newOrgCSID);
-        
+
 		newOrgCSID = createOrganization("vinceValuerLLC", "Vince Valuer LLC", "Vince Valuer LLC");
-		valuerRefName = 
+		valuerRefName =
         	OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, newOrgCSID, orgAuthClient);
         orgIdsCreated.add(newOrgCSID);
     }
 
     protected String createOrganization(String shortId, String shortName, String longName) throws Exception {
     	String result = null;
-    	
+
         OrganizationClient orgAuthClient = new OrganizationClient();
         Map<String, String> orgInfo = new HashMap<String,String>();
         orgInfo.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
-        
+
         List<OrgTermGroup> orgTerms = new ArrayList<OrgTermGroup>();
         OrgTermGroup term = new OrgTermGroup();
         term.setTermDisplayName(shortName);
@@ -235,7 +238,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         Response res = orgAuthClient.createItem(orgAuthCSID, multipart);
         try {
 	        int statusCode = res.getStatus();
-	
+
 	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
 	                invalidStatusCodeMessage(testRequestType, statusCode));
 	        Assert.assertEquals(statusCode, STATUS_CREATED);
@@ -243,7 +246,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         } finally {
         	res.close();
         }
-        
+
         return result;
     }
 
@@ -253,7 +256,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
     public void readAndCheckAuthRefDocs(String testName) throws Exception {
         // Perform setup.
         testSetup(STATUS_OK, ServiceRequestType.READ);
-        
+
         // Get the auth ref docs and check them
        OrganizationClient orgAuthClient = new OrganizationClient();
        Response refDocListResp = orgAuthClient.getReferencingObjects(orgAuthCSID, currentOwnerOrgCSID);
@@ -305,7 +308,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
-     * @throws Exception 
+     * @throws Exception
      */
     @AfterClass(alwaysRun=true)
     public void cleanUp() throws Exception {
@@ -352,8 +355,21 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         IntakesCommon intake = new IntakesCommon();
         intake.setEntryNumber(entryNumber);
         intake.setEntryDate(entryDate);
-        intake.setCurrentOwner(currentOwner);
-        intake.setDepositor(depositor);
+
+        CurrentOwnerList currentOwnerList = new CurrentOwnerList();
+        List<String> currentOwners = currentOwnerList.getCurrentOwner();
+
+        currentOwners.add(currentOwner);
+        intake.setCurrentOwners(currentOwnerList);
+
+        DepositorGroupList depositorGroupList = new DepositorGroupList();
+        List<DepositorGroup> depositorGroups = depositorGroupList.getDepositorGroup();
+        DepositorGroup depositorGroup = new DepositorGroup();
+
+        depositorGroup.setDepositor(depositor);
+        depositorGroups.add(depositorGroup);
+
+        intake.setDepositorGroupList(depositorGroupList);
         intake.setValuer(Valuer);
 
         ConditionCheckerOrAssessorList checkerOrAssessorList = new ConditionCheckerOrAssessorList();
