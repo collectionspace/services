@@ -142,6 +142,14 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 			? findAuthorityItemByRefName(serviceName, target)
 			: findAuthorityItemByCsid(serviceName, target);
 
+		String targetItemCsid = getCsid(targetItemPayload);
+
+		for (String sourceCsid : sourceCsids) {
+			if (sourceCsid.equals(targetItemCsid)) {
+				throw new DocumentException("Can't merge a record into itself.");
+			}
+		}
+
 		List<PoxPayloadOut> sourceItemPayloads = new ArrayList<PoxPayloadOut>();
 
 		for (String sourceCsid : sourceCsids) {
