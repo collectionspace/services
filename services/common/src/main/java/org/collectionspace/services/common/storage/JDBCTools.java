@@ -17,10 +17,14 @@
  */
 package org.collectionspace.services.common.storage;
 
+import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.ConfigUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java_cup.version;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -41,8 +45,14 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetFactory;
@@ -823,10 +833,8 @@ public class JDBCTools {
 
     public static void runScript(Connection conn, File scriptFile) throws FileNotFoundException {
         ScriptRunner scriptRunner = new ScriptRunner(conn);
+        Reader reader = new BufferedReader(new FileReader(scriptFile));
 
-        scriptRunner.setAutoCommit(false);
-        scriptRunner.setStopOnError(true);
-
-        scriptRunner.runScript(new BufferedReader(new FileReader(scriptFile)));
+        scriptRunner.runScript(reader);
     }
 }

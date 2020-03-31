@@ -505,9 +505,6 @@ public class ServiceMain {
 			conn.commit();
 		}
 		catch (Exception e) {
-			logger.error(String.format("Could not upgrade %s repository", repositoryName));
-			logger.error(e.toString());
-
 			if (conn != null) {
 				conn.rollback();
 			}
