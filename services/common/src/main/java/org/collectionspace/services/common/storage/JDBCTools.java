@@ -32,7 +32,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.Reader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -826,6 +825,7 @@ public class JDBCTools {
 
         scriptRunner.setAutoCommit(false);
         scriptRunner.setStopOnError(true);
+        scriptRunner.setSendFullScript(true);
 
         scriptRunner.runScript(new BufferedReader(new FileReader(scriptFile)));
     }

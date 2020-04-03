@@ -477,10 +477,15 @@ public class ServiceMain {
 	}
 
 	private void upgradeRepository(String dataSourceName, String repositoryName, String cspaceInstanceId) throws Exception {
-		// Install the pgcrypto extension so that the gen_random_uuid function will be available
-		// to upgrade scripts.
+		// Install the uuid-ossp extension so that the uuid_generate_v4 function will be available to
+		// upgrade scripts.
 
-		JDBCTools.executeUpdate(JDBCTools.CSADMIN_NUXEO_DATASOURCE_NAME, repositoryName, cspaceInstanceId, "CREATE EXTENSION IF NOT EXISTS \"pgcrypto\"");
+		try {
+			JDBCTools.executeUpdate(JDBCTools.CSADMIN_NUXEO_DATASOURCE_NAME, repositoryName, cspaceInstanceId, "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"");
+		}
+		catch(Exception e) {
+			logger.warn("Could not install uuid-ossp postgresql extension. Database upgrades may fail without this extension. On some platforms you may need to manually install this extension as a superuser.");
+		}
 
 		String stage = "post-init";
 		Connection conn = null;
