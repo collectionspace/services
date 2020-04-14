@@ -2,6 +2,6 @@
 <component name="org.collectionspace.nuxeo.elasticsearch">
   <extension target="org.nuxeo.elasticsearch.ElasticSearchComponent"
     point="elasticSearchDocWriter">
-    <writer class="org.collectionspace.services.nuxeo.elasticsearch.CSJsonESDocumentWriter" />
+    <writer class="org.collectionspace.services.nuxeo.elasticsearch.TenantConfiguredESDocumentWriter" />
   </extension>
 </component>

@@ -15,75 +15,75 @@
 
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns="http://collectionspace.org/services/config/tenant"
-           xmlns:types="http://collectionspace.org/services/config/types"
-           xmlns:service="http://collectionspace.org/services/config/service"
-           xmlns:remoteclientconfig="http://collectionspace.org/services/config/remoteclientconfig"
-           targetNamespace="http://collectionspace.org/services/config/tenant"
-           version="0.1"
-           elementFormDefault="qualified">
+			xmlns="http://collectionspace.org/services/config/tenant"
+			xmlns:types="http://collectionspace.org/services/config/types"
+			xmlns:service="http://collectionspace.org/services/config/service"
+			xmlns:remoteclientconfig="http://collectionspace.org/services/config/remoteclientconfig"
+			targetNamespace="http://collectionspace.org/services/config/tenant"
+			version="0.1"
+			elementFormDefault="qualified">
 
-    <xs:import namespace="http://collectionspace.org/services/config/types" schemaLocation="types.xsd" />
+	<xs:import namespace="http://collectionspace.org/services/config/types" schemaLocation="types.xsd" />
 	<xs:import namespace="http://collectionspace.org/services/config/service" schemaLocation="service.xsd" />
-	
-    <xs:element name="TenantBindingConfig">
-        <xs:annotation>
-            <xs:documentation/>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="tenantBinding" type="TenantBindingType" minOccurs="0" maxOccurs="1"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
 
-    <!--
-        TenantBindingType describes bindings for each tenant in CollectionSpace
-    -->
-    <xs:complexType name="TenantBindingType">
-        <xs:annotation>
-            <xs:documentation>Tenant bindings</xs:documentation>
-        </xs:annotation>
-        <xs:sequence>
-            <xs:element name="repositoryDomain" type="RepositoryDomainType" minOccurs="1" maxOccurs="unbounded"/>
-            <xs:element name="eventListenerConfigurations" type="EventListenerConfigurations" minOccurs="0" maxOccurs="1"/>
-            <xs:element name="binaryStorePath" type="xs:string" minOccurs="0" maxOccurs="1"/>
-            <xs:element name="properties" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
-        	<xs:element name="remoteClientConfigurations" type="RemoteClientConfigurations" minOccurs="0" maxOccurs="1"/>
-        	<xs:element name="emailConfig" type="EmailConfig" minOccurs="0" maxOccurs="1"/>
-            <xs:element name="elasticSearchIndexConfig" type="ElasticSearchIndexConfig" minOccurs="0" maxOccurs="1"/>
-            <xs:element name="serviceBindings" type="service:ServiceBindingType" minOccurs="0" maxOccurs="unbounded"/>
+	<xs:element name="TenantBindingConfig">
+		<xs:annotation>
+			<xs:documentation/>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="tenantBinding" type="TenantBindingType" minOccurs="0" maxOccurs="1"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<!--
+		TenantBindingType describes bindings for each tenant in CollectionSpace
+	-->
+	<xs:complexType name="TenantBindingType">
+		<xs:annotation>
+			<xs:documentation>Tenant bindings</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="repositoryDomain" type="RepositoryDomainType" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element name="eventListenerConfigurations" type="EventListenerConfigurations" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="binaryStorePath" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="properties" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="remoteClientConfigurations" type="RemoteClientConfigurations" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="emailConfig" type="EmailConfig" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="elasticSearchDocumentWriter" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="elasticSearchIndexConfig" type="ElasticSearchIndexConfig" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="serviceBindings" type="service:ServiceBindingType" minOccurs="0" maxOccurs="unbounded"/>
 			<!--
 				Processing all of the tenant bindings at startup involves several sub-tasks and is expensive (slow), so we'll compute the MD5 hash of the config and persist it in the corresponding tenant record.
 				Some of the startup sub-tasks can compare the MD5 hash of the current tenant bindings with that of the last startup to see if anything has changed.  If the hashes match, there's been no changes so
-				a sub-task can decide whether to run or not.				  
-			-->        	
-        	<xs:element name="configMD5Hash" type="xs:string" minOccurs="0" maxOccurs="1"/>					<!-- Transient, only used during startup.  Not part of config file. -->
-        	<xs:element name="configChangedSinceLastStart" type="xs:boolean" minOccurs="0" maxOccurs="1"/>	<!-- Transient, only used during startup.  Not part of config file. -->
-        </xs:sequence>
-        <!-- tenant id, a UUID -->
-        <xs:attribute name="id" type="xs:ID" use="required"/>
-        <!-- domain name including subdomain but not TLD -->
-        <!-- e.g. hearstmuseum.berkeley or movingimage.us -->
-        <xs:attribute name="name" type="xs:string" use="required"/>
-        <!-- display name as Museum of Moving Images -->
-        <xs:attribute name="displayName" type="xs:string" use="required"/>
-        <xs:attribute name="version" type="types:VersionType" use="required"/>
-        <xs:attribute name="createDisabled" type="xs:boolean" use="optional" default="false"/>
-        <xs:attribute name="forceUpdate" type="xs:boolean" use="optional" default="false"/>
+				a sub-task can decide whether to run or not.
+			-->
+			<xs:element name="configMD5Hash" type="xs:string" minOccurs="0" maxOccurs="1"/>					<!-- Transient, only used during startup.  Not part of config file. -->
+			<xs:element name="configChangedSinceLastStart" type="xs:boolean" minOccurs="0" maxOccurs="1"/>	<!-- Transient, only used during startup.  Not part of config file. -->
+		</xs:sequence>
+		<!-- tenant id, a UUID -->
+		<xs:attribute name="id" type="xs:ID" use="required"/>
+		<!-- domain name including subdomain but not TLD -->
+		<!-- e.g. hearstmuseum.berkeley or movingimage.us -->
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<!-- display name as Museum of Moving Images -->
+		<xs:attribute name="displayName" type="xs:string" use="required"/>
+		<xs:attribute name="version" type="types:VersionType" use="required"/>
+		<xs:attribute name="createDisabled" type="xs:boolean" use="optional" default="false"/>
+		<xs:attribute name="forceUpdate" type="xs:boolean" use="optional" default="false"/>
+	</xs:complexType>
 
-    </xs:complexType>
-
-    <xs:complexType name="RepositoryDomainType">
-        <xs:annotation>
-            <xs:documentation>Repository domain configuartion</xs:documentation>
-        </xs:annotation>
-        <xs:sequence/>
-        <xs:attribute name="name" type="xs:string" use="required"/>
-        <xs:attribute name="storageName" type="xs:string" use="required"/>
-        <xs:attribute name="repositoryName" type="xs:string" use="optional" default="default"/>        
-        <xs:attribute name="repositoryClient" type="xs:string" use="optional" default="nuxeo-java"/>
-    </xs:complexType>
+	<xs:complexType name="RepositoryDomainType">
+		<xs:annotation>
+			<xs:documentation>Repository domain configuartion</xs:documentation>
+		</xs:annotation>
+		<xs:sequence/>
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="storageName" type="xs:string" use="required"/>
+		<xs:attribute name="repositoryName" type="xs:string" use="optional" default="default"/>
+		<xs:attribute name="repositoryClient" type="xs:string" use="optional" default="nuxeo-java"/>
+	</xs:complexType>
 
 	<xs:complexType name="RemoteClientConfigurations">
 		<xs:sequence>
@@ -91,7 +91,7 @@
 		</xs:sequence>
 		<xs:attribute name="id" type="xs:string" use="required"/>
 	</xs:complexType>
-	
+
 	<xs:complexType name="RemoteClientConfig">
 		<xs:annotation>
 			<xs:documentation>Connection details for a remote CollectionSpace instance.  Used for things like the Share Authority Server</xs:documentation>
@@ -103,11 +103,11 @@
 			<xs:element name="password" type="xs:string" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="tenantId" type="xs:string" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="tenantName" type="xs:string" minOccurs="0" maxOccurs="1"/>
-			<xs:element name="ssl" type="xs:string" minOccurs="0" maxOccurs="1"/>        
+			<xs:element name="ssl" type="xs:string" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="auth" type="xs:string" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>
-	
+
 	<xs:complexType name="EmailConfig">
 		<xs:annotation>
 			<xs:documentation>Configuration for how a tenant sends email notifications</xs:documentation>
@@ -116,7 +116,7 @@
 			<xs:element name="baseurl" type="xs:string" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="from" type="xs:string" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="smtpConfig" type="SMTPConfig" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="passwordResetConfig" type="PasswordResetConfig" minOccurs="1" maxOccurs="1"/>			
+			<xs:element name="passwordResetConfig" type="PasswordResetConfig" minOccurs="1" maxOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>
 
@@ -141,7 +141,7 @@
 			<xs:element name="smtpAuth" type="SMTPAuthConfig" minOccurs="1" maxOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>
-	
+
 	<xs:complexType name="SMTPAuthConfig">
 		<xs:annotation>
 			<xs:documentation>SMTP authentication config for sending emails.</xs:documentation>
@@ -152,51 +152,49 @@
 		</xs:sequence>
 		<xs:attribute name="enabled" type="xs:boolean" use="optional" default="false"/>
 	</xs:complexType>
-	
+
 	<xs:complexType name="PasswordResetConfig">
 		<xs:annotation>
 			<xs:documentation>Config for password resets</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="tokenExpirationSeconds" type="xs:integer" minOccurs="1" maxOccurs="1"/>		
+			<xs:element name="tokenExpirationSeconds" type="xs:integer" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="loginpage" type="xs:string" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="subject" type="xs:string" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="message" type="xs:string" minOccurs="1" maxOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>
-	
+
 	<xs:complexType name="EventListenerConfigurations">
 		<xs:sequence>
 			<xs:element name="eventListenerConfig" type="EventListenerConfig" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
-	
+
 	<xs:complexType name="EventListenerConfig">
 		<xs:annotation>
 			<xs:documentation>Connection details for a remote CollectionSpace instance.  Used for things like the Share Authority Server</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="className" type="xs:string" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="paramList" type="ParamList" minOccurs="0" maxOccurs="1">
-	            
-            </xs:element>
+			<xs:element name="paramList" type="ParamList" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
 		<xs:attribute name="id" type="xs:string" use="required"/>
 		<xs:attribute name="required" type="xs:boolean" use="optional" default="false"/>
 	</xs:complexType>
-	
+
 	<xs:complexType name="ParamList">
 		<xs:sequence>
 			<xs:element name="param" type="Param" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 		<xs:attribute name="id" type="xs:string" use="required"/>
 	</xs:complexType>
-	
+
 	<xs:complexType name="Param">
-	    <xs:sequence>
-	        <xs:element name="key" type="xs:string" minOccurs="1" maxOccurs="1"/>
-	        <xs:element name="value" type="xs:string" minOccurs="1" maxOccurs="1"/>
-	   	</xs:sequence>
+		<xs:sequence>
+			<xs:element name="key" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="value" type="xs:string" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
 	</xs:complexType>
 
 </xs:schema>

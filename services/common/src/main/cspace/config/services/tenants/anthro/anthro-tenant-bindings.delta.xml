@@ -1,13 +1,252 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tenant:TenantBindingConfig
-        xmlns:merge='http://xmlmerge.el4j.elca.ch'
-        xmlns:tenant='http://collectionspace.org/services/config/tenant'>
-    
-    <!-- Add your changes, if any, within the following tag pair. -->
-    <!-- The value of the 'id' attribute, below, should match the corresponding -->
-    <!-- value in cspace/config/services/tenants/anthro-tenant-bindings-proto.xml -->
+		xmlns:merge='http://xmlmerge.el4j.elca.ch'
+		xmlns:tenant='http://collectionspace.org/services/config/tenant'>
 
-    <tenant:tenantBinding id="1500">
-    </tenant:tenantBinding>
+	<!-- Add your changes, if any, within the following tag pair. -->
+	<!-- The value of the 'id' attribute, below, should match the corresponding -->
+	<!-- value in cspace/config/services/tenants/anthro-tenant-bindings-proto.xml -->
 
+	<tenant:tenantBinding id="1500">
+		<tenant:elasticSearchDocumentWriter merge:action="replace">
+			org.collectionspace.services.nuxeo.elasticsearch.anthro.AnthroESDocumentWriter
+		</tenant:elasticSearchDocumentWriter>
+
+		<tenant:elasticSearchIndexConfig>
+			<tenant:mapping merge:action="replace">
+				{
+					// For now, don't index a field unless there's a mapping explicitly defined. This keeps the
+					// index as small as possible. We may want to turn this on in the future, to support arbitrary
+					// searches through Elasticsearch, e.g. NXQL queries for ad hoc reporting in the CSpace UI.
+					"dynamic": false,
+					"_all" : {
+						"enabled": false
+					},
+					"_source": {
+						"includes": [
+							"collectionobjects_common:briefDescriptions",
+							"collectionobjects_common:collection",
+							"collectionobjects_common:colors",
+							"collectionobjects_common:computedCurrentLocation",
+							"collectionobjects_common:contentConcepts",
+							"collectionobjects_common:fieldCollectionDateGroup",
+							"collectionobjects_common:fieldCollectors",
+							"collectionobjects_common:materialGroupList",
+							"collectionobjects_common:measuredPartGroupList",
+							"collectionobjects_common:numberOfObjects",
+							"collectionobjects_common:objectNameList",
+							"collectionobjects_common:objectNumber",
+							"collectionobjects_common:objectProductionDateGroupList",
+							"collectionobjects_common:objectProductionOrganizationGroupList",
+							"collectionobjects_common:objectProductionPersonGroupList",
+							"collectionobjects_common:objectProductionPeopleGroupList",
+							"collectionobjects_common:objectProductionPlaceGroupList",
+							"collectionobjects_common:objectStatusList",
+							"collectionobjects_common:otherNumberList",
+							"collectionobjects_common:publishToList",
+							"collectionobjects_common:responsibleDepartments",
+							"collectionobjects_common:techniqueGroupList",
+							"collectionobjects_common:titleGroupList",
+							"collectionobjects_naturalhistory_extension:taxonomicIdentGroupList",
+							"collectionspace_core:*",
+							"collectionspace_denorm:*",
+							"ecm:currentLifeCycleState",
+							"ecm:name",
+							"ecm:primaryType",
+							"media_common:blobCsid"
+						]
+					},
+					"properties" : {
+						"all_field": {
+							"type": "text",
+							"analyzer": "fulltext"
+						},
+
+						"ecm:currentLifeCycleState": {
+							"type": "keyword"
+						},
+						"ecm:name": {
+							"type": "keyword"
+						},
+						"ecm:primaryType": {
+							"type": "text",
+							"analyzer" : "doctype_analyzer"
+						},
+
+						"collectionspace_core:createdAt": {
+							"type": "date",
+							"format": "date_time"
+						},
+						"collectionobjects_common:publishToList": {
+							"type": "keyword",
+							"fields": {
+								"shortid": {
+									"type": "keyword",
+									"normalizer": "refname_shortid_normalizer"
+								}
+							}
+						},
+
+						"collectionspace_denorm:title": {
+							"type": "keyword",
+							"normalizer": "sorting_normalizer"
+						},
+						"collectionspace_denorm:hasMedia": {
+							"type": "boolean"
+						},
+						"collectionspace_denorm:prodYears": {
+							"type": "integer"
+						},
+						"collectionspace_denorm:collectionYears": {
+							"type": "integer"
+						},
+
+						"collectionobjects_common:objectNumber": {
+							"type": "keyword",
+							"copy_to": "all_field"
+						},
+						"collectionobjects_common:titleGroupList": {
+							"type": "object",
+							"properties": {
+								"title": {
+									"type": "text",
+									"copy_to": "all_field"
+								}
+							}
+						},
+						"collectionobjects_common:objectNameList": {
+							"type": "object",
+							"properties": {
+								"objectName": {
+									"type": "keyword",
+									"copy_to": "all_field"
+								}
+							}
+						},
+						"collectionobjects_common:objectProductionPersonGroupList": {
+							"type": "object",
+							"properties": {
+								"objectProductionPerson": {
+									"type": "keyword",
+									"copy_to": "all_field",
+									"fields": {
+										"displayName": {
+											"type": "keyword",
+											"normalizer": "refname_displayname_normalizer"
+										}
+									}
+								}
+							}
+						},
+						"collectionobjects_common:objectProductionOrganizationGroupList": {
+							"type": "object",
+							"properties": {
+								"objectProductionOrganization": {
+									"type": "keyword",
+									"copy_to": "all_field",
+									"fields": {
+										"displayName": {
+											"type": "keyword",
+											"normalizer": "refname_displayname_normalizer"
+										}
+									}
+								}
+							}
+						},
+						"collectionobjects_common:objectProductionPeopleGroupList": {
+							"type": "object",
+							"properties": {
+								"objectProductionPeople": {
+									"type": "keyword",
+									"copy_to": "all_field"
+								}
+							}
+						},
+						"collectionobjects_common:objectProductionDateGroupList": {
+							"type": "object",
+							"properties": {
+								"dateDisplayDate": {
+									"type": "text",
+									"copy_to": "all_field"
+								}
+							}
+						},
+						"collectionobjects_common:objectProductionPlaceGroupList": {
+							"type": "object",
+							"properties": {
+								"objectProductionPlace": {
+									"type": "keyword",
+									"copy_to": "all_field"
+								}
+							}
+						},
+						"collectionobjects_common:materialGroupList": {
+							"type": "object",
+							"properties": {
+								"material": {
+									"type": "keyword",
+									"copy_to": "all_field"
+								}
+							}
+						},
+						"collectionobjects_common:colors": {
+							"type": "keyword",
+							"copy_to": "all_field"
+						},
+						"collectionobjects_common:responsibleDepartments": {
+							"type": "keyword",
+							"copy_to": "all_field"
+						},
+						"collectionobjects_common:contentConcepts": {
+							"type": "keyword",
+							"copy_to": "all_field",
+							"fields": {
+								"displayName": {
+									"type": "keyword",
+									"normalizer": "refname_displayname_normalizer"
+								}
+							}
+						},
+						"collectionobjects_common:techniqueGroupList": {
+							"type": "object",
+							"properties": {
+								"technique": {
+									"type": "keyword",
+									"copy_to": "all_field"
+								}
+							}
+						},
+						"collectionobjects_naturalhistory_extension:taxonomicIdentGroupList": {
+							"type": "object",
+							"properties": {
+								"taxon": {
+									"type": "keyword",
+									"copy_to": "all_field",
+									"fields": {
+										"displayName": {
+											"type": "keyword",
+											"normalizer": "refname_displayname_normalizer"
+										}
+									}
+								}
+							}
+						},
+
+						"media_common:blobCsid": {
+							"type": "keyword"
+						},
+						"media_common:publishToList": {
+							"type": "keyword",
+							"fields": {
+								"shortid": {
+									"type": "keyword",
+									"normalizer": "refname_shortid_normalizer"
+								}
+							}
+						}
+					}
+				}
+			</tenant:mapping>
+		</tenant:elasticSearchIndexConfig>
+	</tenant:tenantBinding>
 </tenant:TenantBindingConfig>
