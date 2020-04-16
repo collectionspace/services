@@ -41,10 +41,13 @@ public class RefNameUtils {
 
     private final Logger logger = LoggerFactory.getLogger(RefNameUtils.class);
 
-    public static final String URN_PREFIX = "urn:cspace:";
-    public static final int URN_PREFIX_LEN = 11;
+    public static final String SEPARATOR = ":";
+    public static final String URN_PREFIX = "urn";
+    public static final String URN_CSPACE = "cspace";
+    public static final String URN_CSPACE_PREFIX = URN_PREFIX + SEPARATOR + URN_CSPACE + SEPARATOR; // "urn:cspace:"
+    public static final int URN_PREFIX_LEN = URN_CSPACE_PREFIX.length();
     public static final String URN_NAME_PREFIX = "urn:cspace:name(";
-    public static final int URN_NAME_PREFIX_LEN = 16;
+    public static final int URN_NAME_PREFIX_LEN = URN_NAME_PREFIX.length();
     public static final String NAME_SPECIFIER = "name";
     public static final String ID_SPECIFIER = "id";
     
@@ -64,7 +67,17 @@ public class RefNameUtils {
     private static final int INSTANCE_DISPLAYNAME_TOKEN = 2;// optional displayName suffix
     private static final int INSTANCE_TOKENS_MIN = 2;
     private static final int INSTANCE_TOKENS_MAX = 3;
-    public static final String SEPARATOR = ":";
+    
+	public static String domainToPhrase(String domain) {
+		String result = "";
+		
+		String[] split = domain.split("\\.", 0);
+		for (String token : split) {
+			result = result + token + ' ';
+		}
+		
+		return result.trim();
+	}
 
     public static class AuthorityInfo {
         private final Logger logger = LoggerFactory.getLogger(AuthorityInfo.class);
@@ -197,14 +210,14 @@ public class RefNameUtils {
 
     public static AuthorityInfo parseAuthorityInfo(String refName)
             throws IllegalArgumentException {
-    	if(refName==null || !refName.startsWith(URN_PREFIX))
+    	if(refName==null || !refName.startsWith(URN_CSPACE_PREFIX))
     		throw new IllegalArgumentException( "Null or invalid refName syntax");
     	String[] refNameTokens = refName.substring(URN_PREFIX_LEN).split(SEPARATOR, AUTH_REFNAME_TOKENS);
     	return new AuthorityInfo(refNameTokens);
     }
 
 	public static AuthorityTermInfo parseAuthorityTermInfo(String refName) throws IllegalArgumentException {
-		if (refName == null || !refName.startsWith(URN_PREFIX)) {
+		if (refName == null || !refName.startsWith(URN_CSPACE_PREFIX)) {
 			throw new IllegalArgumentException("Null or invalid refName syntax");
 		}
 		String[] refNameTokens = refName.substring(URN_PREFIX_LEN).split(SEPARATOR, AUTH_ITEM_REFNAME_TOKENS);
@@ -213,12 +226,12 @@ public class RefNameUtils {
 
     public static String stripAuthorityTermDisplayName(String refName)
             throws IllegalArgumentException {
-    	if(refName==null || !refName.startsWith(URN_PREFIX))
+    	if(refName==null || !refName.startsWith(URN_CSPACE_PREFIX))
     		throw new IllegalArgumentException( "Null or invalid refName syntax");
     	String[] refNameTokens = refName.substring(URN_PREFIX_LEN).split(SEPARATOR, AUTH_ITEM_REFNAME_TOKENS);
     	int rightParen = refNameTokens[ITEM_INSTANCE_TOKEN].indexOf(')');
     	refNameTokens[ITEM_INSTANCE_TOKEN] = refNameTokens[ITEM_INSTANCE_TOKEN].substring(0, rightParen+1);
-    	return URN_PREFIX + implodeStringArray(refNameTokens, SEPARATOR);
+    	return URN_CSPACE_PREFIX + implodeStringArray(refNameTokens, SEPARATOR);
     }
 
     public static String implodeStringArray(String tokens[], String separator) {

@@ -429,7 +429,8 @@ public class RefNameServiceUtils {
                     authRefFieldsByService,
                     filter.getWhereClause(), 
                     null, // orderByClause
-                    2*pageSize,
+                    2, // pageScale
+                    pageSize,
                     useDefaultOrderByClause,
                     computeTotal);
 
@@ -589,6 +590,7 @@ public class RefNameServiceUtils {
             Map<String, List<AuthRefConfigInfo>> authRefFieldsByService,
             String whereClauseAdditions,
             String orderByClause,
+            int pageScale,
             int pageSize,
             boolean useDefaultOrderByClause,
             boolean computeTotal) throws DocumentException, DocumentNotFoundException {
@@ -603,7 +605,7 @@ public class RefNameServiceUtils {
         			authRefFieldsByService,
         			whereClauseAdditions, 
         			orderByClause,
-        			pageSize, 
+        			pageSize*pageScale, 
         			useDefaultOrderByClause, 
         			computeTotal);
     }
@@ -642,10 +644,12 @@ public class RefNameServiceUtils {
         if (query == null) { // found no authRef fields - nothing to query
             return null;
         }
+        
         // Additional qualifications, like workflow state
         if (Tools.notBlank(whereClauseAdditions)) {
             query += " AND " + whereClauseAdditions;
         }
+        
         // Now we have to issue the search
         NuxeoRepositoryClientImpl nuxeoRepoClient = (NuxeoRepositoryClientImpl) repoClient;
         DocumentWrapper<DocumentModelList> docListWrapper = nuxeoRepoClient.findDocs(
@@ -653,9 +657,9 @@ public class RefNameServiceUtils {
                 repoSession,
                 docTypes, 
                 query, 
-                orderByClause, 
-                pageNum, 
-                pageSize, 
+                orderByClause,
+                pageNum,
+                pageSize,
                 useDefaultOrderByClause, 
                 computeTotal);
         // Now we gather the info for each document into the list and return
@@ -699,22 +703,26 @@ public class RefNameServiceUtils {
         if (fFirst) { // found no authRef fields - nothing to query
             return null;
         }
-        // We used to build a complete matches query, but that was too complex.
-        // Just build a keyword query based upon some key pieces - the urn syntax elements and the shortID
-        // Note that this will also match the Item itself, but that will get filtered out when
+
+        // Note that this will also match the term item itself, but that will get filtered out when
         // we compute actual matches.
         AuthorityTermInfo authTermInfo = RefNameUtils.parseAuthorityTermInfo(refName);
+        
+        // Example refname: urn:cspace:pahma.cspace.berkeley.edu:personauthorities:name(person):item:name(ReneRichie1586477168934)
+        // Corresponding phrase: "urn cspace pahma cspace berkeley edu personauthorities name person item name ReneRichie1586477168934
+        
+        String refnamePhrase = String.format("urn cspace %s %s name %s item name %s",
+        		RefNameUtils.domainToPhrase(authTermInfo.inAuthority.domain),
+        		authTermInfo.inAuthority.resource,
+        		authTermInfo.inAuthority.name,
+        		authTermInfo.name
+        		);
+        refnamePhrase = String.format("\"%s\"", refnamePhrase); // surround the phase in double quotes to indicate this is a NXQL phrase search
 
-        String keywords = RefNameUtils.URN_PREFIX
-                + " AND " + (authTermInfo.inAuthority.name != null
-                ? authTermInfo.inAuthority.name : authTermInfo.inAuthority.csid)
-                + " AND " + (authTermInfo.name != null
-                ? authTermInfo.name : authTermInfo.csid); // REM - This seems likely to cause trouble?  We should consider searching for the full refname -excluding the display name suffix?
-
-        String whereClauseStr = QueryManager.createWhereClauseFromKeywords(keywords);
+        String whereClauseStr = QueryManager.createWhereClauseFromKeywords(refnamePhrase);
 
         if (logger.isTraceEnabled()) {
-            logger.trace("The 'where' clause to find refObjs is: ", whereClauseStr);
+            logger.trace("The 'where' clause to find refObjs is: ", refnamePhrase);
         }
 
         return whereClauseStr;
@@ -780,6 +788,8 @@ public class RefNameServiceUtils {
         UriTemplateRegistry registry = ServiceMain.getInstance().getUriTemplateRegistry();
         Iterator<DocumentModel> iter = docList.iterator();
         int nRefsFoundTotal = 0;
+        int nRefsFalsePositives = 0;
+        int nRefsPagesProcessed = 1;
         boolean foundSelf = false;
 
         // When paginating results, we have to guess at the total. First guess is the number of docs returned
@@ -789,6 +799,12 @@ public class RefNameServiceUtils {
         int nDocsProcessed = 0;
         int firstItemInPage = pageNum*pageSize;
         while (iter.hasNext()) {
+        	if (nRefsFalsePositives / pageSize > nRefsPagesProcessed) {
+        		nRefsPagesProcessed++;
+        		String msg = String.format("Found %d false-postives when looking for documents referencing term: %s.  This could be significantly be affecting the performance of CollectionSpace.",
+        				nRefsFalsePositives, refName);
+        		logger.warn(msg);
+        	}
             DocumentModel docModel = iter.next();
             AuthorityRefDocList.AuthorityRefDocItem ilistItem;
 
@@ -811,9 +827,10 @@ public class RefNameServiceUtils {
                 if (newAuthorityRefName != null) {
                     throw new InternalError("processRefObjsDocList() called with both an itemList and a new RefName!");
                 }
-                if(firstItemInPage > 100) {
-                	logger.warn("Processing a large offset (size:{}, num:{}) for refObjs - will be expensive!!!",
-                				pageSize, pageNum);
+                if (firstItemInPage > 100) {
+                	String msg = String.format("Processing a large offset for records referencing (term:%s, size:%d, num:%d) - will be expensive!!!",
+                			refName, pageSize, pageNum);
+                	logger.warn(msg);
                 }
                 // Note that we have to go through check all the fields to determine the actual page start
                 ilistItem = new AuthorityRefDocList.AuthorityRefDocItem();
@@ -877,9 +894,6 @@ public class RefNameServiceUtils {
                 throw new RuntimeException(
                         "getAuthorityRefDocs: internal logic error: can't fetch authRefFields for DocType.");
             }
-            //String authRefAncestorField = "";
-            //String authRefDescendantField = "";
-            //String sourceField = "";
 
             ArrayList<RefNameServiceUtils.AuthRefInfo> foundProps = new ArrayList<RefNameServiceUtils.AuthRefInfo>();
             try {
@@ -916,6 +930,7 @@ public class RefNameServiceUtils {
                 						+ "] appears to be self for: ["
                 						+ refName + "]");
                 	} else {
+                		nRefsFalsePositives++;
                 		logger.debug("getAuthorityRefDocs: Result: "
                 						+ docType + " [" + NuxeoUtils.getCsid(docModel)
                 						+ "] does not reference ["
@@ -926,24 +941,40 @@ public class RefNameServiceUtils {
             	throw new RuntimeException(
             			"getAuthorityRefDocs: Problem fetching values from repo: " + ce.getLocalizedMessage());
             }
+            
             nDocsProcessed++;
+            if (nDocsProcessed > 1.5*pageSize) {
+            	// Log a warning that we're finding a lot of false-positives
+            	String msg = String.format("Finding a lot of false-positives when looking for records referencing the term:%s",
+            			refName);
+            	logger.trace(msg);
+            }
+            
             // Done processing that doc. Are we done with the whole page?
             // Note pageSize <=0 means do them all
             if((pageSize > 0) && ((nRefsFoundTotal-firstItemInPage)>=pageSize)) {
             	// Quitting early, so we need to estimate the total. Assume one per doc
             	// for the rest of the docs we matched in the query
             	int unprocessedDocs = nDocsReturnedInQuery - nDocsProcessed;
-            	if(unprocessedDocs>0) {
+            	if (unprocessedDocs > 0) {
             		// We generally match ourselves in the keyword search. If we already saw ourselves
             		// then do not try to correct for this. Otherwise, decrement the total.
             		// Yes, this is fairly goofy, but the whole estimation mechanism is goofy. 
-                	if(!foundSelf)
+                	if (!foundSelf)
                 		unprocessedDocs--;
                 	nRefsFoundTotal += unprocessedDocs;
             	}
             	break;
             }
         } // close while(iterator)
+        
+        // Log a warning if we find to many false-positives.
+        if (nRefsFalsePositives > nRefsFoundTotal) {
+        	String msg = String.format("Found %d false-positives and %d true references the refname:%s",
+        			nRefsFalsePositives, nRefsFoundTotal, refName);
+        	logger.warn(msg);
+        }
+
         return nRefsFoundTotal;
     }
 
