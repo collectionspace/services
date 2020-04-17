@@ -455,7 +455,7 @@ public class RefNameServiceUtils {
     		String strippedRefName = RefNameUtils.stripAuthorityTermDisplayName(refName);
     		
     		// *** Need to pass in pagination info here. 
-            int nRefsFound = processRefObjsDocListForList(docList, ctx.getTenantId(), strippedRefName, 
+            long nRefsFound = processRefObjsDocListForList(docList, ctx.getTenantId(), strippedRefName, 
             		queriedServiceBindings, authRefFieldsByService, // the actual list size needs to be updated to the size of "list"
                     list, pageSize, pageNum);
             	
@@ -555,7 +555,7 @@ public class RefNameServiceUtils {
 
                 // Only match complete refNames - unless and until we decide how to resolve changes
                 // to NPTs we will defer that and only change PTs or refNames as passed in.
-                int nRefsFoundThisPage = processRefObjsDocListForUpdate(ctx, docList, ctx.getTenantId(), oldRefName, 
+                long nRefsFoundThisPage = processRefObjsDocListForUpdate(ctx, docList, ctx.getTenantId(), oldRefName, 
                 		queriedServiceBindings, authRefFieldsByService, // Perform the refName updates on the list of document models
                         newRefName);
                 if (nRefsFoundThisPage > 0) {
@@ -735,7 +735,7 @@ public class RefNameServiceUtils {
 		return result;
 	}
 
-    private static int processRefObjsDocListForUpdate(
+    private static long processRefObjsDocListForUpdate(
     		ServiceContext ctx,
             DocumentModelList docList,
             String tenantId,
@@ -754,7 +754,7 @@ public class RefNameServiceUtils {
     			authRefFieldsByService, null, 0, 0, newAuthorityRefName);
     }
     			
-    private static int processRefObjsDocListForList(
+    private static long processRefObjsDocListForList(
             DocumentModelList docList,
             String tenantId,
             String refName,
@@ -775,7 +775,7 @@ public class RefNameServiceUtils {
      * an open session, and caller must release Session after calling this.
      *
      */
-    private static int processRefObjsDocList(
+    private static long processRefObjsDocList(
             DocumentModelList docList,
             String tenantId,
             String refName,
@@ -787,22 +787,22 @@ public class RefNameServiceUtils {
             String newAuthorityRefName) {
         UriTemplateRegistry registry = ServiceMain.getInstance().getUriTemplateRegistry();
         Iterator<DocumentModel> iter = docList.iterator();
-        int nRefsFoundTotal = 0;
-        int nRefsFalsePositives = 0;
-        int nRefsPagesProcessed = 1;
+        long nRefsFoundTotal = 0;
+        long nRefsFalsePositives = 0;
         boolean foundSelf = false;
+        boolean warningLogged = false;
 
         // When paginating results, we have to guess at the total. First guess is the number of docs returned
         // by the query. However, this returns some false positives, so may be high. 
         // In addition, we can match multiple fields per doc, so this may be low. Fun, eh?
-        int nDocsReturnedInQuery = (int)docList.totalSize();
-        int nDocsProcessed = 0;
-        int firstItemInPage = pageNum*pageSize;
+        long nDocsReturnedInQuery = (int)docList.totalSize();
+        long nDocsProcessed = 0;
+        long firstItemInPage = pageNum*pageSize;
         while (iter.hasNext()) {
-        	if (nRefsFalsePositives / pageSize > nRefsPagesProcessed) {
-        		nRefsPagesProcessed++;
-        		String msg = String.format("Found %d false-postives when looking for documents referencing term: %s.  This could be significantly be affecting the performance of CollectionSpace.",
-        				nRefsFalsePositives, refName);
+        	if (!warningLogged && (float)nRefsFalsePositives / nDocsReturnedInQuery > 0.5) {
+        		warningLogged = true;
+        		String msg = String.format("When searching for documents referencing the term '%s', more than 1/2 of the results were false-positives.",
+        				refName);
         		logger.warn(msg);
         	}
             DocumentModel docModel = iter.next();
@@ -925,13 +925,13 @@ public class RefNameServiceUtils {
 	            			:refName.equals(docRefName)) {
                 		// We found the self for an item
                 		foundSelf = true;
-                		logger.debug("getAuthorityRefDocs: Result: "
+                		logger.trace("getAuthorityRefDocs: Result: "
                 						+ docType + " [" + NuxeoUtils.getCsid(docModel)
                 						+ "] appears to be self for: ["
                 						+ refName + "]");
                 	} else {
                 		nRefsFalsePositives++;
-                		logger.debug("getAuthorityRefDocs: Result: "
+                		logger.trace("getAuthorityRefDocs: Result: "
                 						+ docType + " [" + NuxeoUtils.getCsid(docModel)
                 						+ "] does not reference ["
                 						+ refName + "]");
@@ -941,21 +941,15 @@ public class RefNameServiceUtils {
             	throw new RuntimeException(
             			"getAuthorityRefDocs: Problem fetching values from repo: " + ce.getLocalizedMessage());
             }
-            
+
             nDocsProcessed++;
-            if (nDocsProcessed > 1.5*pageSize) {
-            	// Log a warning that we're finding a lot of false-positives
-            	String msg = String.format("Finding a lot of false-positives when looking for records referencing the term:%s",
-            			refName);
-            	logger.trace(msg);
-            }
-            
+
             // Done processing that doc. Are we done with the whole page?
             // Note pageSize <=0 means do them all
-            if((pageSize > 0) && ((nRefsFoundTotal-firstItemInPage)>=pageSize)) {
+            if ((pageSize > 0) && ((nRefsFoundTotal - firstItemInPage) >= pageSize)) {
             	// Quitting early, so we need to estimate the total. Assume one per doc
             	// for the rest of the docs we matched in the query
-            	int unprocessedDocs = nDocsReturnedInQuery - nDocsProcessed;
+            	long unprocessedDocs = nDocsReturnedInQuery - nDocsProcessed;
             	if (unprocessedDocs > 0) {
             		// We generally match ourselves in the keyword search. If we already saw ourselves
             		// then do not try to correct for this. Otherwise, decrement the total.
@@ -968,9 +962,9 @@ public class RefNameServiceUtils {
             }
         } // close while(iterator)
         
-        // Log a warning if we find to many false-positives.
-        if (nRefsFalsePositives > nRefsFoundTotal) {
-        	String msg = String.format("Found %d false-positives and %d true references the refname:%s",
+        // Log a final warning if we find too many false-positives.
+        if ((float)nRefsFalsePositives / nDocsReturnedInQuery > 0.33) {
+        	String msg = String.format("Found %d false-positives and %d only true references the refname:%s",
         			nRefsFalsePositives, nRefsFoundTotal, refName);
         	logger.warn(msg);
         }
