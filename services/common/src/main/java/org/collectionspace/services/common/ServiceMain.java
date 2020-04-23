@@ -1560,16 +1560,13 @@ public class ServiceMain {
         return repoConfigDoc;
     }
 
-    private String getElasticsearchIndexName(Document repoConfigDoc, String repositoryName,
-    		String cspaceInstanceId) {
-    	String result = ConfigUtils.DEFAULT_ELASTICSEARCH_INDEX_NAME;
+	private String getElasticsearchIndexName(Document repoConfigDoc, String repositoryName, String cspaceInstanceId) {
+		String repo = repositoryName.equalsIgnoreCase(ConfigUtils.DEFAULT_NUXEO_REPOSITORY_NAME)
+			? ConfigUtils.DEFAULT_ELASTICSEARCH_INDEX_NAME
+			: repositoryName;
 
-    	if (repositoryName.equalsIgnoreCase(ConfigUtils.DEFAULT_NUXEO_REPOSITORY_NAME) == false) {
-    		return repositoryName;
-    	}
-
-    	return result;
-    }
+		return repo + cspaceInstanceId;
+	}
 
     /*
      * This method is filling out the elasticsearch-config.xml file with tenant specific repository information.
