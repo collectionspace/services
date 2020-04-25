@@ -8,7 +8,7 @@
 	<!-- value in cspace/config/services/tenants/fcart-tenant-bindings-proto.xml -->
 
 	<tenant:tenantBinding id="1000">
-		<tenant:elasticSearchIndexConfig>
+		<tenant:elasticSearchIndexConfig merge:action="replace">
 			<tenant:mapping merge:action="replace">
 				{
 					// For now, don't index a field unless there's a mapping explicitly defined. This keeps the

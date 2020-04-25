@@ -12,7 +12,7 @@
 			org.collectionspace.services.nuxeo.elasticsearch.anthro.AnthroESDocumentWriter
 		</tenant:elasticSearchDocumentWriter>
 
-		<tenant:elasticSearchIndexConfig>
+		<tenant:elasticSearchIndexConfig merge:action="replace">
 			<tenant:mapping merge:action="replace">
 				{
 					// For now, don't index a field unless there's a mapping explicitly defined. This keeps the
