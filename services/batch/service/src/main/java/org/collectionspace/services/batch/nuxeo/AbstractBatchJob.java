@@ -476,7 +476,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		return csids;
 	}
 
-	protected List<String> findReferencingObjects(String serviceName, String csid, String type, String sourceField) throws Exception {
+	protected List<String> findReferencingObjects(String serviceName, String csid, String type, String sourceField) throws URISyntaxException, Exception {
 		logger.debug("findReferencingObjects serviceName=" + serviceName + " csid=" + csid + " type=" + type + " sourceField=" + sourceField);
 
 		List<String> vocabularyCsids = getVocabularyCsids(serviceName);
@@ -487,7 +487,13 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		}
 		else {
 			for (String vocabularyCsid : vocabularyCsids) {
-				PoxPayloadOut itemPayload = findAuthorityItemByCsid(serviceName, vocabularyCsid, csid);
+				PoxPayloadOut itemPayload = null;
+
+				try {
+					itemPayload = findAuthorityItemByCsid(serviceName, vocabularyCsid, csid);
+				} catch(Exception e) {
+					itemPayload = null;
+				}
 
 				if (itemPayload != null) {
 					parentCsid = vocabularyCsid;
@@ -499,11 +505,11 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		return findReferencingObjects(serviceName, parentCsid, csid, type, sourceField);
 	}
 
-	protected List<String> findReferencingCollectionObjects(String serviceName, String csid, String sourceField) throws Exception {
+	protected List<String> findReferencingCollectionObjects(String serviceName, String csid, String sourceField) throws URISyntaxException, Exception {
 		return findReferencingObjects(serviceName, csid, ServiceBindingUtils.SERVICE_TYPE_OBJECT, sourceField);
 	}
 
-	protected List<String> findReferencingCollectionObjects(String serviceName, String vocabularyShortId, String csid, String sourceField) throws Exception {
+	protected List<String> findReferencingCollectionObjects(String serviceName, String vocabularyShortId, String csid, String sourceField) throws URISyntaxException, DocumentException, Exception {
 		return findReferencingObjects(serviceName, "urn:cspace:name(" + vocabularyShortId + ")", csid, ServiceBindingUtils.SERVICE_TYPE_OBJECT, sourceField);
 	}
 
