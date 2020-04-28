@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.context.AbstractServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
@@ -17,6 +18,9 @@ import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.AbstractIterator;
 
@@ -32,6 +36,7 @@ import com.google.common.collect.AbstractIterator;
  * 
  */
 public class LazyAuthorityRefDocList extends DocumentModelListImpl {
+    private static final Logger logger = LoggerFactory.getLogger(LazyAuthorityRefDocList.class);
 	private static final long serialVersionUID = 1L;
 	
 	private ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx;
@@ -197,8 +202,9 @@ public class LazyAuthorityRefDocList extends DocumentModelListImpl {
 			
 			try {
 				nextPageDocList = fetchPage(nextPageNum, false, true);
+			} catch(DocumentException e) {
+				logger.error(e.getMessage());
 			}
-			catch(DocumentException e) {}
 			
 			if (nextPageDocList == null || nextPageDocList.size() == 0) {
 				// There are no more pages.

@@ -104,7 +104,7 @@ public class FormatVoucherNameBatchJob extends AbstractBatchJob {
 	private List<String> findLabelRequests() throws URISyntaxException {
 		List<String> csids = new ArrayList<String>();
 		LoanoutResource loanoutResource = (LoanoutResource) getResourceMap().get(LoanoutClient.SERVICE_NAME);
-		AbstractCommonList loanoutList = loanoutResource.getList(createLabelRequestSearchUriInfo());
+		AbstractCommonList loanoutList = loanoutResource.getList(getServiceContext(), createLabelRequestSearchUriInfo());
 
 		for (AbstractCommonList.ListItem item : loanoutList.getListItem()) {
 			for (org.w3c.dom.Element element : item.getAny()) {
@@ -197,7 +197,7 @@ public class FormatVoucherNameBatchJob extends AbstractBatchJob {
 			"</document>";
 			
 		NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(LoanoutClient.SERVICE_NAME);
-		resource.update(getResourceMap(), createUriInfo(), loanoutCsid, updatePayload);		
+		resource.update(getServiceContext(), getResourceMap(), createUriInfo(), loanoutCsid, updatePayload);		
 	}
 	
 	private UriInfo createLabelRequestSearchUriInfo() throws URISyntaxException {

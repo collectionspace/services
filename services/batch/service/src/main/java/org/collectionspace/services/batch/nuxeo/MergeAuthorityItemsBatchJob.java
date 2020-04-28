@@ -129,11 +129,11 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 		}
 	}
 
-	public InvocationResults merge(String docType, String target, String sourceCsid) throws URISyntaxException, DocumentException {
+	public InvocationResults merge(String docType, String target, String sourceCsid) throws Exception {
 		return merge(docType, target, new LinkedHashSet<String>(Arrays.asList(sourceCsid)));
 	}
 
-	public InvocationResults merge(String docType, String target, Set<String> sourceCsids) throws URISyntaxException, DocumentException {
+	public InvocationResults merge(String docType, String target, Set<String> sourceCsids) throws Exception {
 		logger.debug("Merging docType=" + docType + " target=" + target + " sourceCsids=" + StringUtils.join(sourceCsids, ","));
 
 		String serviceName = getAuthorityServiceNameForDocType(docType);
@@ -159,7 +159,7 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 		return merge(docType, targetItemPayload, sourceItemPayloads);
 	}
 
-	private InvocationResults merge(String docType, PoxPayloadOut targetItemPayload, List<PoxPayloadOut> sourceItemPayloads) throws URISyntaxException, DocumentException {
+	private InvocationResults merge(String docType, PoxPayloadOut targetItemPayload, List<PoxPayloadOut> sourceItemPayloads) throws Exception {
 		int numAffected = 0;
 		List<String> userNotes = new ArrayList<String>();
 
@@ -228,7 +228,7 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 		return results;
 	}
 
-	private InvocationResults updateReferences(String serviceName, String inAuthority, String sourceCsid, String sourceRefName, String targetRefName) throws URISyntaxException, DocumentException {
+	private InvocationResults updateReferences(String serviceName, String inAuthority, String sourceCsid, String sourceRefName, String targetRefName) throws Exception {
 		logger.debug("Updating references: serviceName=" + serviceName + " inAuthority=" + inAuthority + " sourceCsid=" + sourceCsid + " sourceRefName=" + sourceRefName + " targetRefName=" + targetRefName);
 
 		String sourceDisplayName = RefNameUtils.getDisplayName(sourceRefName);

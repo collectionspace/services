@@ -23,6 +23,8 @@
  */
 package org.collectionspace.services.vocabulary.nuxeo;
 
+import org.collectionspace.services.client.VocabularyClient;
+
 /**
  * VocabularyConstants processes CollectionObject document
  *
@@ -32,4 +34,10 @@ public class VocabularyConstants {
     public final static String NUXEO_DOCTYPE = "Vocabulary";
     public final static String NUXEO_SCHEMA_NAME = "vocabulary";
     public final static String NUXEO_DC_TITLE = "CollectionSpace-Vocabulary";
+    
+	public static final String COMMON_SCHEMA_NAME = VocabularyClient.SERVICE_COMMON_PART_NAME;
+	public final static String COMMON_ITEM_SCHEMA_NAME = VocabularyClient.SERVICE_ITEM_COMMON_PART_NAME;
+    
+    public final static String DISPLAY_NAME_SCHEMA_NAME = COMMON_ITEM_SCHEMA_NAME;
+    public final static String DISPLAY_NAME_FIELD_NAME = "displayName";
 }

@@ -255,14 +255,17 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 	    	//
 	    	if (!Tools.isEmpty(invContext.getOutputMIME())) {
 	    		outMimeType.append(invContext.getOutputMIME());
-	    	}
-	    	if (outMimeType == null || Tools.isEmpty(outMimeType.toString())) {
-    	    	String reportOutputMime = (String) NuxeoUtils.getProperyValue(docModel, ReportJAXBSchema.OUTPUT_MIME); //docModel.getPropertyValue(ReportJAXBSchema.OUTPUT_MIME);
-    			if (!Tools.isEmpty(reportOutputMime)) {
-    				outMimeType.append(reportOutputMime);
-    			} else {
-    				outMimeType.append(ReportClient.DEFAULT_REPORT_OUTPUT_MIME);
-    			}
+	    	} else if (Tools.isEmpty(outMimeType.toString()) && params.containsKey("OutputMIME")) {
+	    		// See UCB - https://github.com/cspace-deployment/services/pull/140/files
+	    		outMimeType.append(params.get("OutputMIME"));
+	    	} else {
+	    		// Use the default
+	    		String reportOutputMime = (String) NuxeoUtils.getProperyValue(docModel, ReportJAXBSchema.OUTPUT_MIME); //docModel.getPropertyValue(ReportJAXBSchema.OUTPUT_MIME);
+	    		if (!Tools.isEmpty(reportOutputMime)) {
+	    			outMimeType.append(reportOutputMime);
+	    		} else {
+	    			outMimeType.append(ReportClient.DEFAULT_REPORT_OUTPUT_MIME);
+	    		}
 	    	}
 		} catch (PropertyException pe) {
 			if (logger.isDebugEnabled()) {

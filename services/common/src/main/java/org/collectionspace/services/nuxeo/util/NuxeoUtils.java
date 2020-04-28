@@ -1053,7 +1053,8 @@ public class NuxeoUtils {
 		try {
 			result = docModel.getPropertyValue(propertyName);
 		} catch (NullPointerException npe) {
-			result = null;
+			logger.warn(String.format("Could not get a value for the property '%s' in Nuxeo document with CSID '%s'.",
+					propertyName, docModel != null ? docModel.getName() : "<null>"));
 		}
 
 		return result;

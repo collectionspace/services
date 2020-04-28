@@ -474,7 +474,8 @@ public abstract class NuxeoBasedResource
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
             if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
                 ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
-            }            DocumentHandler handler = createDocumentHandler(ctx);
+            }
+            DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             AbstractCommonList list = (AbstractCommonList) handler.getCommonPartList();
             return list;
