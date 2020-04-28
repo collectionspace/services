@@ -314,17 +314,17 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		return csids;
 	}
 
-	protected List<String> findAllAuthorityItems(String serviceName, String vocabularyCsid, int pageSize, int pageNum) throws Exception {
+	protected List<String> findAllAuthorityItems(String serviceName, String vocabularyCsid, int pageSize, int pageNum) throws URISyntaxException, DocumentException, Exception {
 		return findAllAuthorityItems(serviceName, vocabularyCsid, pageSize, pageNum, null);
 	}
 
-	protected List<String> findAllAuthorityItems(String serviceName, String vocabularyCsid, int pageSize, int pageNum, String sortBy) throws Exception {
+	protected List<String> findAllAuthorityItems(String serviceName, String vocabularyCsid, int pageSize, int pageNum, String sortBy) throws URISyntaxException, DocumentException, Exception {
 		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
 
 		return findAllAuthorityItems(resource, vocabularyCsid, pageSize, pageNum, sortBy);
 	}
 
-	protected List<String> findAllAuthorityItems(AuthorityResource<?, ?> resource, String vocabularyCsid, int pageSize, int pageNum, String sortBy) throws Exception {
+	protected List<String> findAllAuthorityItems(AuthorityResource<?, ?> resource, String vocabularyCsid, int pageSize, int pageNum, String sortBy) throws URISyntaxException, DocumentException, Exception {
 		AbstractCommonList list = resource.getAuthorityItemList(getServiceContext(), vocabularyCsid, createPagedListUriInfo(resource.getServiceName(), pageNum, pageSize, sortBy));
 		List<String> csids = new ArrayList<String>();
 
@@ -423,7 +423,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		return findAuthorityItemByRefName(TaxonomyAuthorityClient.SERVICE_NAME, refName);
 	}
 
-	protected List<AuthorityRefDocList.AuthorityRefDocItem> findReferencingFields(String serviceName, String parentCsid, String csid, String type, int pageNum, int pageSize) throws Exception {
+	protected List<AuthorityRefDocList.AuthorityRefDocItem> findReferencingFields(String serviceName, String parentCsid, String csid, String type, int pageNum, int pageSize) throws URISyntaxException, Exception {
 		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
 
 		// The pageNum and pageSize params don't work right for the refobj request.
@@ -453,9 +453,9 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	 *                    Only records that reference the given item in the specified field are returned.
 	 *                    If null, returns records that reference the item in any field.
 	 * @return            A List containing the csids of referencing records.
-	 * @throws Exception 
+	 * @throws URISyntaxException 
 	 */
-	protected List<String> findReferencingObjects(String serviceName, String parentCsid, String csid, String type, String sourceField) throws Exception {
+	protected List<String> findReferencingObjects(String serviceName, String parentCsid, String csid, String type, String sourceField) throws URISyntaxException, Exception {
 		logger.debug("findReferencingObjects serviceName=" + serviceName + " parentCsid=" + parentCsid + " csid=" + csid + " type=" + type + " sourceField=" + sourceField);
 
 		List<AuthorityRefDocList.AuthorityRefDocItem> items = findReferencingFields(serviceName, parentCsid, csid, type, 0, 0);
@@ -476,7 +476,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		return csids;
 	}
 
-	protected List<String> findReferencingObjects(String serviceName, String csid, String type, String sourceField) throws URISyntaxException, Exception {
+	protected List<String> findReferencingObjects(String serviceName, String csid, String type, String sourceField) throws URISyntaxException, DocumentException, Exception {
 		logger.debug("findReferencingObjects serviceName=" + serviceName + " csid=" + csid + " type=" + type + " sourceField=" + sourceField);
 
 		List<String> vocabularyCsids = getVocabularyCsids(serviceName);
@@ -505,7 +505,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		return findReferencingObjects(serviceName, parentCsid, csid, type, sourceField);
 	}
 
-	protected List<String> findReferencingCollectionObjects(String serviceName, String csid, String sourceField) throws URISyntaxException, Exception {
+	protected List<String> findReferencingCollectionObjects(String serviceName, String csid, String sourceField) throws URISyntaxException, DocumentException, Exception {
 		return findReferencingObjects(serviceName, csid, ServiceBindingUtils.SERVICE_TYPE_OBJECT, sourceField);
 	}
 
