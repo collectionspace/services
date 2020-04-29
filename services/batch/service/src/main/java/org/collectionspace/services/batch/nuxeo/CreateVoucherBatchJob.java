@@ -72,11 +72,11 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 		}
 	}
 
-	public InvocationResults createVoucherFromCataloging(String collectionObjectCsid) throws Exception {
+	public InvocationResults createVoucherFromCataloging(String collectionObjectCsid) throws ResourceException, URISyntaxException, DocumentException, Exception {
 		return createVoucherFromCataloging(collectionObjectCsid, null);
 	}
 	
-	public InvocationResults createVoucherFromCataloging(String collectionObjectCsid, String movementCsid) throws Exception {
+	public InvocationResults createVoucherFromCataloging(String collectionObjectCsid, String movementCsid) throws ResourceException, URISyntaxException, DocumentException, Exception {
 		InvocationResults results = new InvocationResults();
 
 		PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(collectionObjectCsid);
@@ -126,7 +126,7 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 		return results;
 	}
 	
-	private String getFieldCollectionNote(PoxPayloadOut collectionObjectPayload) throws Exception {
+	private String getFieldCollectionNote(PoxPayloadOut collectionObjectPayload) throws URISyntaxException, DocumentException, Exception {
 		String placeNote = "";
 		String reverseFieldCollectionPlace = getReverseFieldCollectionPlace(collectionObjectPayload);
 		
@@ -159,7 +159,7 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 		return collectionNote;
 	}
 	
-	private String getReverseFieldCollectionPlace(PoxPayloadOut collectionObjectPayload) throws Exception {
+	private String getReverseFieldCollectionPlace(PoxPayloadOut collectionObjectPayload) throws URISyntaxException, DocumentException, Exception {
 		String reverseDisplayName = null;
 		String fieldCollectionPlaceRefName = getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.FIELD_COLLECTION_PLACE_SCHEMA_NAME, 
 				CollectionObjectBotGardenConstants.FIELD_COLLECTION_PLACE_FIELD_NAME);		
@@ -230,7 +230,7 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 		return annotation;
 	}
 	
-	public InvocationResults createVoucherFromCurrentLocation(String movementCsid) throws Exception {
+	public InvocationResults createVoucherFromCurrentLocation(String movementCsid) throws ResourceException, URISyntaxException, DocumentException, Exception {
 		long numAffected = 0;
 		String primaryUriCreated = null;
 		

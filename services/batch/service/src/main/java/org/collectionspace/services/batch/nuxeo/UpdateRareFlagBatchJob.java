@@ -107,9 +107,10 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 	 * 
 	 * @param taxonCsid		The csid of the taxon record
 	 * @return
-	 * @throws Exception 
+	 * @throws URISyntaxException
+	 * @throws DocumentException
 	 */
-	public InvocationResults updateReferencingRareFlags(String taxonCsid, String vocabularyCsid) throws Exception {
+	public InvocationResults updateReferencingRareFlags(String taxonCsid, String vocabularyCsid) throws URISyntaxException, DocumentException, Exception {
 		PoxPayloadOut taxonPayload = vocabularyCsid == null
 				? findTaxonByCsid(taxonCsid)
 				: findTaxonByCsid(taxonCsid, vocabularyCsid);
@@ -154,9 +155,10 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 	 * 
 	 * @param collectionObjectCsid	The csid of the collectionobject
 	 * @return
-	 * @throws Exception 
+	 * @throws URISyntaxException
+	 * @throws DocumentException
 	 */
-	public InvocationResults updateRareFlag(String collectionObjectCsid) throws Exception {
+	public InvocationResults updateRareFlag(String collectionObjectCsid) throws URISyntaxException, DocumentException, Exception {
 		PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(collectionObjectCsid);
 		
 		return updateRareFlag(collectionObjectPayload);
@@ -170,9 +172,10 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 	 * 
 	 * @param collectionObjectPayload	The payload representing the collectionobject
 	 * @return
-	 * @throws Exception 
+	 * @throws URISyntaxException
+	 * @throws DocumentException
 	 */
-	public InvocationResults updateRareFlag(PoxPayloadOut collectionObjectPayload) throws Exception {
+	public InvocationResults updateRareFlag(PoxPayloadOut collectionObjectPayload) throws URISyntaxException, DocumentException, Exception {
 		InvocationResults results = new InvocationResults();
 
 		String uri = this.getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.URI_SCHEMA_NAME, 
@@ -270,9 +273,10 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 	 * 
 	 * @param collectionObjectCsids		The csids of the collectionobjects
 	 * @return
-	 * @throws Exception
+	 * @throws URISyntaxException
+	 * @throws DocumentException
 	 */
-	public InvocationResults updateRareFlags(List<String> collectionObjectCsids) throws Exception {
+	public InvocationResults updateRareFlags(List<String> collectionObjectCsids) throws URISyntaxException, DocumentException, Exception {
 		int numSubmitted = collectionObjectCsids.size();
 		long numAffected = 0;
 		
@@ -294,9 +298,10 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 	 * Updates the rare flags of all collectionobjects.
 	 * 
 	 * @return
-	 * @throws Exception
+	 * @throws URISyntaxException
+	 * @throws DocumentException
 	 */
-	public InvocationResults updateAllRareFlags() throws Exception {
+	public InvocationResults updateAllRareFlags() throws URISyntaxException, DocumentException, Exception {
 		long numFound = 0;
 		long numAffected = 0;
 		

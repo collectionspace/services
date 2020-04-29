@@ -135,7 +135,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 	//
 	@Override
 	protected List<String> findAllAuthorityItems(AuthorityResource<?, ?> resource, String vocabularyCsid, int pageSize, int pageNum, String sortBy)
-			throws URISyntaxException, Exception {
+			throws URISyntaxException, DocumentException, Exception {
 		boolean tx = false;
 		if (TransactionHelper.isTransactionActive() == false) {
 			tx = TransactionHelper.startTransaction();
@@ -149,7 +149,6 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 			}
 		}
 	}
-
 
 	@Override
 	public void run() {
