@@ -372,7 +372,7 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 
 			NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(serviceName);
 
-			resource.update(getResourceMap(), createUriInfo(), csid, payload);
+			resource.update(getServiceContext(), getResourceMap(), createUriInfo(), csid, payload);
 		}
 		else if (uriParts.length == 5) {
 			String serviceName = uriParts[1];
@@ -383,7 +383,7 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 			if (items.equals("items")) {
 				AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
 
-				resource.updateAuthorityItem(getResourceMap(), createUriInfo(), vocabularyCsid, csid, payload);
+				resource.updateAuthorityItem(getServiceContext(), getResourceMap(), createUriInfo(), vocabularyCsid, csid, payload);
 			}
 		}
 		else {
