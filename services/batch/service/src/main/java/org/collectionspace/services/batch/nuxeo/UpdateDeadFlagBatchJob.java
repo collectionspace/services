@@ -229,6 +229,6 @@ public class UpdateDeadFlagBatchJob extends AbstractBatchJob {
 			"</document>";
 		
 		NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(CollectionObjectClient.SERVICE_NAME);
-		resource.update(getResourceMap(), createUriInfo(), collectionObjectCsid, updatePayload);
+		resource.update(getServiceContext(), getResourceMap(), createUriInfo(), collectionObjectCsid, updatePayload);
 	}
 }

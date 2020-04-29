@@ -8,7 +8,8 @@ package org.collectionspace.services.batch.nuxeo;
 import java.io.File;
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.security.Principal;
+import java.net.URISyntaxException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.collectionspace.services.batch.BatchCommon;
 import org.collectionspace.services.common.CollectionSpaceResource;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.StoredValuesUriTemplate;
@@ -29,11 +31,12 @@ import org.collectionspace.services.common.invocable.InvocationContext.ListCSIDs
 import org.collectionspace.services.common.invocable.InvocationContext.Params.Param;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
+
+import org.dom4j.DocumentException;
 import org.nuxeo.ecm.core.api.AbstractSession;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.IterableQueryResult;
 import org.nuxeo.ecm.core.api.NuxeoException;
-import org.nuxeo.ecm.core.api.NuxeoPrincipal;
 import org.nuxeo.ecm.core.event.EventService;
 import org.nuxeo.ecm.core.query.QueryFilter;
 import org.nuxeo.ecm.core.query.sql.NXQL;
@@ -84,9 +87,76 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 
 		log.debug("stop file directory is " + stopFileDirectory);
 	}
+	
+	//
+	// Since the ReindexFullTextBatchJob class deals with transactions differently than other batch jobs, we need to
+	// override this method to ensure there is an active transaction.
+	//
+	@Override
+	protected List<String> getVocabularyCsids(AuthorityResource<?, ?> resource) throws URISyntaxException {
+		boolean tx = false;
+		if (TransactionHelper.isTransactionActive() == false) {
+			tx = TransactionHelper.startTransaction();
+		}
+
+		try {
+			return super.getVocabularyCsids(resource);
+		} finally {
+			if (tx) {
+				TransactionHelper.commitOrRollbackTransaction();
+			}
+		}
+	}
+
+	//
+	// Since the ReindexFullTextBatchJob class deals with transactions differently than other batch jobs, we need to
+	// override this method to ensure there is an active transaction.
+	//
+	@Override
+	protected List<String> findAll(NuxeoBasedResource resource, int pageSize, int pageNum, String sortBy)
+			throws URISyntaxException, DocumentException {
+		boolean tx = false;
+		if (TransactionHelper.isTransactionActive() == false) {
+			tx = TransactionHelper.startTransaction();
+		}
+		
+		try {
+			return super.findAll(resource, pageSize, pageNum, sortBy);
+		} finally {
+			if (tx) {
+				TransactionHelper.commitOrRollbackTransaction();
+			}
+		}
+	}
+
+	//
+	// Since the ReindexFullTextBatchJob class deals with transactions differently than other batch jobs, we need to
+	// override this method to ensure there is an active transaction.
+	//
+	@Override
+	protected List<String> findAllAuthorityItems(AuthorityResource<?, ?> resource, String vocabularyCsid, int pageSize, int pageNum, String sortBy)
+			throws URISyntaxException, DocumentException, Exception {
+		boolean tx = false;
+		if (TransactionHelper.isTransactionActive() == false) {
+			tx = TransactionHelper.startTransaction();
+		}
+		
+		try {
+			return super.findAllAuthorityItems(resource, vocabularyCsid, pageSize, pageNum, sortBy);
+		} finally {
+			if (tx) {
+				TransactionHelper.commitOrRollbackTransaction();
+			}
+		}
+	}
 
 	@Override
 	public void run() {
+		run(null);
+	}
+
+	@Override
+	public void run(BatchCommon batchCommon) {
 		setCompletionStatus(STATUS_MIN_PROGRESS);
 
 		numAffected = 0;
@@ -172,6 +242,16 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 						if (StringUtils.isNotEmpty(docType)) {
 							docTypes.add(docType);
 						}
+					}
+				}
+
+				//
+				// If docTypes is empty, we should use the <forDocTypes> list from the resource/payload
+				//
+				if (docTypes.isEmpty() == true && batchCommon != null) {
+					List<String> payloadDocTypes = batchCommon.getForDocTypes().getForDocType();
+					if (payloadDocTypes != null && !payloadDocTypes.isEmpty()) {
+						docTypes = convertListToSet(payloadDocTypes);
 					}
 				}
 

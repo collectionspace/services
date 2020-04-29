@@ -296,7 +296,7 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 				}
 			}
 	
-			batchInstance.run();
+			batchInstance.run(batchCommon);
 			int status = batchInstance.getCompletionStatus();
 			if (status == Invocable.STATUS_ERROR) {
 				InvocationError error = batchInstance.getErrorInfo();

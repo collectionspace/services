@@ -87,13 +87,13 @@ public class ClearPotTagLabelRequestBatchJob extends AbstractBatchJob {
 			"</document>";
 				
 		NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(PottagClient.SERVICE_NAME);
-		resource.update(getResourceMap(), createUriInfo(), potTagCsid, updatePayload);
+		resource.update(getServiceContext(), getResourceMap(), createUriInfo(), potTagCsid, updatePayload);
 	}
 	
 	private List<String> findLabelRequests() throws URISyntaxException {
 		List<String> csids = new ArrayList<String>();
 		PottagResource potTagResource = (PottagResource) getResourceMap().get(PottagClient.SERVICE_NAME);
-		AbstractCommonList potTagList = potTagResource.getList(createLabelRequestSearchUriInfo());
+		AbstractCommonList potTagList = potTagResource.getList(getServiceContext(), createLabelRequestSearchUriInfo());
 
 		for (AbstractCommonList.ListItem item : potTagList.getListItem()) {
 			for (org.w3c.dom.Element element : item.getAny()) {

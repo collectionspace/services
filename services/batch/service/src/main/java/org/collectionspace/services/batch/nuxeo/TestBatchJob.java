@@ -3,6 +3,7 @@ package org.collectionspace.services.batch.nuxeo;
 import java.util.Arrays;
 
 import org.collectionspace.services.batch.AbstractBatchInvocable;
+import org.collectionspace.services.batch.BatchCommon;
 
 public class TestBatchJob extends AbstractBatchInvocable {
 
@@ -16,5 +17,9 @@ public class TestBatchJob extends AbstractBatchInvocable {
 	public void run() {
 		// An empty batch job used just for testing.
 	}
-
+	
+	@Override
+	public void run(BatchCommon batchCommon) {
+		// An empty batch job used just for testing.
+	}
 }
