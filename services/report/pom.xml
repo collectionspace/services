@@ -47,6 +47,11 @@
 			<artifactId>jasperreports-fonts</artifactId>
 			<version>6.0.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.mozilla</groupId>
+			<artifactId>rhino</artifactId>
+			<version>1.7.12</version>
+		</dependency>
 		<!-- For some reason, have to declare this dependency explicitly, ot it does not find it.
 			It is a dependency of jasperreports
 			-->
