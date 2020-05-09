@@ -103,15 +103,32 @@ public class JDBCTools {
 	        	logger.debug("Looking up DataSource instance in JNDI with name: " + dataSourceName);
 	        }
 
-            envCtx = (Context) ctx.lookup("java:comp/env");
-            DataSource ds = (DataSource) envCtx.lookup("jdbc/" + dataSourceName);
-            if (ds == null) {
-                throw new IllegalArgumentException("DataSource instance not found: " + dataSourceName);
-            } else {
-                result = ds;
-                // now cache this DataSource instance for future references
-                cachedDataSources.put(dataSourceName, result);
-            }
+        	try {
+		        envCtx = (Context) ctx.lookup("java:comp/env");
+		        DataSource ds = (DataSource) envCtx.lookup("jdbc/" + dataSourceName);
+		        if (ds == null) {
+		            throw new IllegalArgumentException("DataSource instance not found: " + dataSourceName);
+		        } else {
+		        	result = ds;
+		        	// now cache this DataSource instance for future references
+		        	cachedDataSources.put(dataSourceName, result);
+		        }
+	    	} finally { // We should explicitly close both context instances
+	            if (ctx != null) {
+	                try {
+	                    ctx.close();
+	                } catch (Exception e) {
+	                	logger.error("Error getting DataSource for: " + dataSourceName, e);
+	                }
+	            }
+	            if (envCtx != null) {
+	                try {
+	                	envCtx.close();
+	                } catch (Exception e) {
+	                	logger.trace("Error getting DataSource for: " + dataSourceName, e);
+	                }
+	            }
+	    	}
     	}
 
     	if (result != null) {
