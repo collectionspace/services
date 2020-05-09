@@ -15,6 +15,7 @@ public class ConfigUtils {
     public static final String COMPONENT_EXTENSION_XPATH = "/component" + EXTENSION_XPATH;
     public static final String DATASOURCE_EXTENSION_POINT_XPATH = String.format(COMPONENT_EXTENSION_XPATH, "datasources");
     public static final String REPOSITORY_EXTENSION_POINT_XPATH = String.format(COMPONENT_EXTENSION_XPATH, "repository");
+    public static final String CS_TENANT_DATASOURCE_VALUE = "jdbc/TenantDS";
     public static final String CONFIGURATION_EXTENSION_POINT_XPATH = String.format(COMPONENT_EXTENSION_XPATH, "configuration");
     public static final String ELASTICSEARCH_INDEX_EXTENSION_XPATH = String.format(EXTENSION_XPATH, "elasticSearchIndex");
     public static final String ELASTICSEARCH_EXTENSIONS_EXPANDER_STR = "%elasticSearchIndex_extensions%";
@@ -43,6 +44,24 @@ public class ConfigUtils {
 		
     	return result;
     }
+    
+    /*
+     * Returns 'true' if the tenant declares the default repository.
+     */
+    public static boolean containsDefaultRepository(List<RepositoryDomainType> repoDomainList) {
+    	boolean result = false;
+
+		if (repoDomainList != null && repoDomainList.isEmpty() == false) {
+			for (RepositoryDomainType repoDomain : repoDomainList) {
+				if (repoDomain.isDefaultRepository() == true) {
+					result = true;
+					break;
+				}
+			}
+		}
+   
+    	return result;
+    }
         
     public static String getRepositoryName(TenantBindingType tenantBindingType, String domainName) {
 		String result = null;
@@ -60,7 +79,7 @@ public class ConfigUtils {
 		} else {
 			logger.error(String.format("There was no domain name specified on a call to getRepositoryName() method."));
 		}
-		
+
 		if (result == null && logger.isTraceEnabled()) {
 			logger.trace(String.format("Could not find the repository name for tenent name='%s' and domain='%s'",
 					tenantBindingType.getName(), domainName));

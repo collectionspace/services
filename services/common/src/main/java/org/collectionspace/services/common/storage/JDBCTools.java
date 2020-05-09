@@ -125,7 +125,7 @@ public class JDBCTools {
 	                try {
 	                	envCtx.close();
 	                } catch (Exception e) {
-	                	logger.error("Error getting DataSource for: " + dataSourceName, e);
+	                	logger.trace("Error getting DataSource for: " + dataSourceName, e);
 	                }
 	            }
 	    	}
