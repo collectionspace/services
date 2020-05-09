@@ -60,7 +60,9 @@ import org.collectionspace.services.nuxeo.listener.CSEventListener;
 import org.collectionspace.services.nuxeo.listener.AbstractCSEventListenerImpl;
 
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.dom4j.Attribute;
 import org.dom4j.Document;
+import org.dom4j.tree.DefaultElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1249,6 +1251,11 @@ public class ServiceMain {
 			logger.info(String.format("Using prototype Nuxeo server configuration file at path %s",
 					prototypeNuxeoDatasourceFile.getAbsolutePath()));
 		}
+		
+		//
+		// If multiple active tenants, set the "default" repository for Nuxeo services to use.
+		//
+		setDefaultNuxeoRepository();
 
 		//
 		// For each tenant config we find, create the xml datasource config file and fill in the correct values.
@@ -1278,7 +1285,7 @@ public class ServiceMain {
 					datasourceConfigDoc = (Document) prototypeConfigDoc.clone();
 					// Update this config file by inserting values pertinent to the
 					// current repository.
-					datasourceConfigDoc = updateRepositoryDatasourceDoc(datasourceConfigDoc, repositoryName, this.getCspaceInstanceId());
+					datasourceConfigDoc = updateRepositoryDatasourceDoc(datasourceConfigDoc, repositoryName, tbt.getRepositoryDomain(), this.getCspaceInstanceId());
 					logger.debug("Updated Nuxeo datasource config file contents=\n" + datasourceConfigDoc.asXML());
 
 					// Write this config file to the Nuxeo server config directory.
@@ -1288,6 +1295,137 @@ public class ServiceMain {
 					XmlTools.xmlDocumentToFile(datasourceConfigDoc, repofile);
 				}
 			}
+		}
+	}
+
+	private boolean isImpliedDefaultRepository(RepositoryDomainType repositoryDomain) {
+		boolean result = false;
+
+		String repoName = repositoryDomain.getRepositoryName();
+		if (repoName == null || repoName.equals(ConfigUtils.DEFAULT_NUXEO_REPOSITORY_NAME)) {
+			result = true;
+		}
+
+		return result;
+	}
+
+	private void setDefaultNuxeoRepository() throws Exception {
+		boolean moreThanOne = false;
+		boolean defaultIsSet = false;
+		String defaultRepositoryName = null;
+		
+		Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
+		
+		//
+		// Ensure we have at least one tenant binding and at least one corresponding repository domain 
+		//
+		if (tenantBindingTypeMap.values().size() == 0) {
+			String msg = "At least one tenant binding must be configured.";
+			throw new Exception(msg);
+		}
+		
+		//
+		// If we have just one tenant, make its (or one of its) repository domain(s) the default one.
+		//
+		if (tenantBindingTypeMap.values().size() == 1) {
+			TenantBindingType tbt = (TenantBindingType) tenantBindingTypeMap.values().toArray()[0];
+			List<RepositoryDomainType> repositoryDomainList = tbt.getRepositoryDomain();
+			for (RepositoryDomainType repositoryDomain : repositoryDomainList) {
+    			if (repositoryDomain.isDefaultRepository() && defaultIsSet == false) {
+    				defaultIsSet = true;
+    				defaultRepositoryName = repositoryDomain.getRepositoryName();
+    			} else if (repositoryDomain.isDefaultRepository() && defaultIsSet == true) {
+    				moreThanOne = true;
+    				String msg = String.format("The tenant '%s' configuration is declaring '%s' the default repository.  However, '%s' is already the default repository.  Please ensure only one tenant is configured to be the default repository.",
+    						tbt.getName(), repositoryDomain.getRepositoryName(), defaultRepositoryName);
+    				logger.error(msg);
+    			}
+			}
+			
+			if (moreThanOne == true) {
+				String msg = String.format("The tenant '%s' has more than one repository domain configured to be the default.  Please configure only one default repository.", 
+						tbt.getName());
+				throw new Exception(msg);
+			}
+			
+			//
+			// If the only active tenant is not explicitly configuring a repository domain as default, do so now.
+			//
+			if (defaultIsSet == false) {
+				RepositoryDomainType repositoryDomain = repositoryDomainList.get(0);
+				repositoryDomain.setDefaultRepository(Boolean.TRUE);
+				defaultIsSet = true;
+				defaultRepositoryName = repositoryDomain.getRepositoryName();
+			}
+			
+			if (logger.isDebugEnabled()) {
+				String msg = String.format("The tenant '%s' has configured the default repository to be '%s'.", 
+						tbt.getName(), defaultRepositoryName);
+				logger.debug(msg);
+			}
+			
+			return;
+		}
+		
+		//
+		// If we have multiple tenants, figure out which one is declaring the default repository.
+		//
+		for (TenantBindingType tbt : tenantBindingTypeMap.values()) {
+			List<RepositoryDomainType> repositoryDomainList = tbt.getRepositoryDomain();
+			for (RepositoryDomainType repositoryDomain : repositoryDomainList) {
+    			if (repositoryDomain.isDefaultRepository() && defaultIsSet == false) {
+    				repositoryDomain.setDefaultRepository(Boolean.TRUE);
+    				defaultIsSet = true;
+    				defaultRepositoryName = repositoryDomain.getRepositoryName();
+    			} else if (repositoryDomain.isDefaultRepository() && defaultIsSet == true) {
+    				moreThanOne = true;
+    				String msg = String.format("The tenant '%s' configuration is declaring itself as the default repository domain.  However, another tenant has already declared '%s' to be the default repository.  Please ensure only one tenant is configured to have the default repository.",
+    						tbt.getName(), defaultRepositoryName);
+    				logger.error(msg);
+    			}
+			}
+		}
+		
+		//
+		// If more than one tenant has declared itself the default repository domain then
+		// throw an exception
+		//
+		if (moreThanOne == true) {
+			String msg = "More than one tenant is configured to be the repository domain.  Please configure only one default repository.";
+			throw new Exception(msg);
+		}
+		
+		//
+		// If no tenant has declared itself the default repository, look for an "implied" default.  Tenants configured with
+		// no repository name are inferred to be the default repository.  If more than one tenant is configured without a repository name,
+		// we'll use the first one found.
+		//
+		if (defaultIsSet == false) {
+    		for (TenantBindingType tbt : tenantBindingTypeMap.values()) {
+    			List<RepositoryDomainType> repositoryDomainList = tbt.getRepositoryDomain();
+    			for (RepositoryDomainType repositoryDomain : repositoryDomainList) {
+        			if (isImpliedDefaultRepository(repositoryDomain) && defaultIsSet == false) {
+        				repositoryDomain.setDefaultRepository(Boolean.TRUE);
+        				defaultIsSet = true;
+        				defaultRepositoryName = repositoryDomain.getRepositoryName();
+        			} else if (isImpliedDefaultRepository(repositoryDomain) && defaultIsSet == true) {
+        				moreThanOne = true;
+        				String msg = String.format("The tenant '%s' configuration implies (no repository name was defined) it is the default repository domain.  However, another tenant's domain has implied '%s' is the default repository.  Please ensure only one tenant defines the default repository.",
+        						tbt.getName(), defaultRepositoryName);
+        				logger.error(msg);
+        			}
+    			}
+    		}
+		}
+
+		//
+		// As of v6.0, this is just a warning.  However, future versions may require a default repository.
+		//
+		if (defaultIsSet == false) {
+			logger.warn("No tenant's configuration explicitly declared nor implied its repository to be the default.  Future versions of CollectionSpace may require a default repository.");
+		} else if (logger.isDebugEnabled()) {
+			String msg = String.format("The default repository has been set to '%s'.", defaultRepositoryName);
+			logger.debug(msg);
 		}
 	}
 
@@ -1505,8 +1643,10 @@ public class ServiceMain {
     /*
      * This method is filling out the proto-datasource-config.xml file with tenant specific repository information.
      */
-    private Document updateRepositoryDatasourceDoc(Document repoConfigDoc, String repositoryName,
+    private Document updateRepositoryDatasourceDoc(Document repoConfigDoc, String repositoryName, List<RepositoryDomainType> repoDomainList,
     		String cspaceInstanceId) {
+
+    	boolean isDefaultRepository = ConfigUtils.containsDefaultRepository(repoDomainList);
         String databaseName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
 
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc, "/component", "name",
@@ -1550,12 +1690,20 @@ public class ServiceMain {
         repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
         		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/datasource", "password", password);
 
-        // Set the <link> element's name attribute
-        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/link", "name", "jdbc/repository_" + repositoryName);
-        // Set the <link> element's global attribute
-        repoConfigDoc = XmlTools.setAttributeValue(repoConfigDoc,
-        		ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/link", "global", datasoureName);
+        //
+        // Adjust various Nuxeo components' datasource links to use the tenant repository.
+        // In a multi-tenant deployment, it is unclear if there will be name clashes -i.e., two or more tenants declaring
+        // themselves to be the datasource for a Nuxeo component.
+        //
+        List<DefaultElement> linkNodes = XmlTools.getElementNodes(repoConfigDoc, ConfigUtils.DATASOURCE_EXTENSION_POINT_XPATH + "/link");
+        for (DefaultElement node : linkNodes) {
+        	Attribute nameAttribute = node.attribute("name");
+        	if (nameAttribute.getValue().equals(ConfigUtils.CS_TENANT_DATASOURCE_VALUE)) {
+        		nameAttribute.setValue("jdbc/repository_" + repositoryName);
+        	}
+        	Attribute globalAttribute = node.attribute("global");
+       		globalAttribute.setValue(datasoureName);
+        }
 
         return repoConfigDoc;
     }
