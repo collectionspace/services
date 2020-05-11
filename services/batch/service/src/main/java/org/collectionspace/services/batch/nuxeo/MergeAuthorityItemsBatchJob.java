@@ -129,11 +129,11 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 		}
 	}
 
-	public InvocationResults merge(String docType, String target, String sourceCsid) throws URISyntaxException, DocumentException, Exception {
+	public InvocationResults merge(String docType, String target, String sourceCsid) throws URISyntaxException, DocumentException {
 		return merge(docType, target, new LinkedHashSet<String>(Arrays.asList(sourceCsid)));
 	}
 
-	public InvocationResults merge(String docType, String target, Set<String> sourceCsids) throws URISyntaxException, DocumentException, Exception {
+	public InvocationResults merge(String docType, String target, Set<String> sourceCsids) throws URISyntaxException, DocumentException {
 		logger.debug("Merging docType=" + docType + " target=" + target + " sourceCsids=" + StringUtils.join(sourceCsids, ","));
 
 		String serviceName = getAuthorityServiceNameForDocType(docType);
@@ -159,7 +159,7 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 		return merge(docType, targetItemPayload, sourceItemPayloads);
 	}
 
-	private InvocationResults merge(String docType, PoxPayloadOut targetItemPayload, List<PoxPayloadOut> sourceItemPayloads) throws URISyntaxException, DocumentException, Exception {
+	private InvocationResults merge(String docType, PoxPayloadOut targetItemPayload, List<PoxPayloadOut> sourceItemPayloads) throws URISyntaxException, DocumentException {
 		int numAffected = 0;
 		List<String> userNotes = new ArrayList<String>();
 
@@ -228,7 +228,7 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 		return results;
 	}
 
-	private InvocationResults updateReferences(String serviceName, String inAuthority, String sourceCsid, String sourceRefName, String targetRefName) throws URISyntaxException, DocumentException, Exception {
+	private InvocationResults updateReferences(String serviceName, String inAuthority, String sourceCsid, String sourceRefName, String targetRefName) throws URISyntaxException, DocumentException {
 		logger.debug("Updating references: serviceName=" + serviceName + " inAuthority=" + inAuthority + " sourceCsid=" + sourceCsid + " sourceRefName=" + sourceRefName + " targetRefName=" + targetRefName);
 
 		String sourceDisplayName = RefNameUtils.getDisplayName(sourceRefName);
@@ -372,7 +372,7 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 
 			NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(serviceName);
 
-			resource.update(getServiceContext(), getResourceMap(), createUriInfo(), csid, payload);
+			resource.update(getResourceMap(), createUriInfo(), csid, payload);
 		}
 		else if (uriParts.length == 5) {
 			String serviceName = uriParts[1];
@@ -383,7 +383,7 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 			if (items.equals("items")) {
 				AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
 
-				resource.updateAuthorityItem(getServiceContext(), getResourceMap(), createUriInfo(), vocabularyCsid, csid, payload);
+				resource.updateAuthorityItem(getResourceMap(), createUriInfo(), vocabularyCsid, csid, payload);
 			}
 		}
 		else {
@@ -403,10 +403,10 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 		String serviceName = getAuthorityServiceNameForDocType(docType);
 		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
 
-		resource.updateAuthorityItem(getServiceContext(), getResourceMap(), createUriInfo(), inAuthority, csid, payload);
+		resource.updateAuthorityItem(getResourceMap(), createUriInfo(), inAuthority, csid, payload);
 	}
 
-	private InvocationResults deleteAuthorityItem(String docType, String inAuthority, String csid, String refName) throws URISyntaxException, Exception {
+	private InvocationResults deleteAuthorityItem(String docType, String inAuthority, String csid, String refName) throws URISyntaxException {
 		int numAffected = 0;
 		List<String> userNotes = new ArrayList<String>();
 		String displayName = RefNameUtils.getDisplayName(refName);
@@ -443,7 +443,7 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 
 					logger.debug("Deleting hasBroader relation " + relationCsid);
 
-					relationResource.deleteWithParentCtx(getServiceContext(), relationCsid);
+					relationResource.delete(relationCsid);
 
 					userNotes.add("Deleted the \"has broader\" relation from " + subjectDisplayName + " to " + objectDisplayName + ".");
 					numAffected++;
@@ -455,7 +455,7 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 
 			logger.debug("Soft deleting: docType=" + docType + " inAuthority=" + inAuthority + " csid=" + csid);
 
-			resource.updateItemWorkflowWithTransition(getServiceContext(), createUriInfo(), inAuthority, csid, "delete");
+			resource.updateItemWorkflowWithTransition(null, inAuthority, csid, "delete");
 
 			userNotes.add("Deleted the source record, " + displayName + ".");
 			numAffected++;

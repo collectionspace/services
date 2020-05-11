@@ -15,6 +15,4 @@ public interface BatchInvocable extends Invocable {
 	public CoreSessionInterface getRepoSession();
 
 	public String getTenantId();
-	
-    public void run(BatchCommon batchCommon);
 }

@@ -1339,14 +1339,6 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             ServiceContext<PoxPayloadIn, PoxPayloadOut> existingContext,
             String parentspecifier,
             String itemspecifier,
-            UriInfo uriInfo) throws Exception {
-        return getReferencingObjects(existingContext, parentspecifier, itemspecifier, uriInfo, PAGE_NUM_FROM_QUERYPARAMS, PAGE_SIZE_FROM_QUERYPARAMS, true, true);
-    }
-
-    public AuthorityRefDocList getReferencingObjects(
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> existingContext,
-            String parentspecifier,
-            String itemspecifier,
             UriInfo uriInfo,
             Integer pageNum,
             Integer pageSize,

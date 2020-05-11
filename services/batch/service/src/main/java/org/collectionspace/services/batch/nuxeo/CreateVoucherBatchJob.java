@@ -72,11 +72,11 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 		}
 	}
 
-	public InvocationResults createVoucherFromCataloging(String collectionObjectCsid) throws ResourceException, URISyntaxException, DocumentException, Exception {
+	public InvocationResults createVoucherFromCataloging(String collectionObjectCsid) throws ResourceException, URISyntaxException, DocumentException {
 		return createVoucherFromCataloging(collectionObjectCsid, null);
 	}
 	
-	public InvocationResults createVoucherFromCataloging(String collectionObjectCsid, String movementCsid) throws ResourceException, URISyntaxException, DocumentException, Exception {
+	public InvocationResults createVoucherFromCataloging(String collectionObjectCsid, String movementCsid) throws ResourceException, URISyntaxException, DocumentException {
 		InvocationResults results = new InvocationResults();
 
 		PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(collectionObjectCsid);
@@ -119,14 +119,14 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 			logger.debug("relations created: forwardRelationCsid=" + forwardRelationCsid + " backwardRelationCsid=" + backwardRelationCsid);
 			
 			results.setNumAffected(1);
-			results.setPrimaryURICreated("/loansout/" + voucherCsid);
+			results.setPrimaryURICreated("loanout.html?csid=" + voucherCsid);
 			results.setUserNote("Voucher created");
 		}
 		
 		return results;
 	}
 	
-	private String getFieldCollectionNote(PoxPayloadOut collectionObjectPayload) throws URISyntaxException, DocumentException, Exception {
+	private String getFieldCollectionNote(PoxPayloadOut collectionObjectPayload) throws URISyntaxException, DocumentException {
 		String placeNote = "";
 		String reverseFieldCollectionPlace = getReverseFieldCollectionPlace(collectionObjectPayload);
 		
@@ -159,7 +159,7 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 		return collectionNote;
 	}
 	
-	private String getReverseFieldCollectionPlace(PoxPayloadOut collectionObjectPayload) throws URISyntaxException, DocumentException, Exception {
+	private String getReverseFieldCollectionPlace(PoxPayloadOut collectionObjectPayload) throws URISyntaxException, DocumentException {
 		String reverseDisplayName = null;
 		String fieldCollectionPlaceRefName = getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.FIELD_COLLECTION_PLACE_SCHEMA_NAME, 
 				CollectionObjectBotGardenConstants.FIELD_COLLECTION_PLACE_FIELD_NAME);		
@@ -230,7 +230,7 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 		return annotation;
 	}
 	
-	public InvocationResults createVoucherFromCurrentLocation(String movementCsid) throws ResourceException, URISyntaxException, DocumentException, Exception {
+	public InvocationResults createVoucherFromCurrentLocation(String movementCsid) throws ResourceException, URISyntaxException, DocumentException {
 		long numAffected = 0;
 		String primaryUriCreated = null;
 		
@@ -275,7 +275,7 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 			"</document>";
 
 		NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(LoanoutClient.SERVICE_NAME);
-		Response response = resource.create(getServiceContext(), getResourceMap(), null, createVoucherPayload);
+		Response response = resource.create(getResourceMap(), null, createVoucherPayload);
 
 		if (response.getStatus() == CREATED_STATUS) {
 			voucherCsid = CollectionSpaceClientUtils.extractId(response);

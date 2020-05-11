@@ -110,10 +110,8 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 	 * @throws URISyntaxException
 	 * @throws DocumentException
 	 */
-	public InvocationResults updateReferencingRareFlags(String taxonCsid, String vocabularyCsid) throws URISyntaxException, DocumentException, Exception {
-		PoxPayloadOut taxonPayload = vocabularyCsid == null
-				? findTaxonByCsid(taxonCsid)
-				: findTaxonByCsid(taxonCsid, vocabularyCsid);
+	public InvocationResults updateReferencingRareFlags(String taxonCsid, String vocabularyCsid) throws URISyntaxException, DocumentException {
+		PoxPayloadOut taxonPayload = findTaxonByCsid(taxonCsid);
 		String taxonRefName = getFieldValue(taxonPayload, TaxonConstants.REFNAME_SCHEMA_NAME, TaxonConstants.REFNAME_FIELD_NAME);
 
 		RefName.AuthorityItem item = RefName.AuthorityItem.parse(taxonRefName);
@@ -158,7 +156,7 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 	 * @throws URISyntaxException
 	 * @throws DocumentException
 	 */
-	public InvocationResults updateRareFlag(String collectionObjectCsid) throws URISyntaxException, DocumentException, Exception {
+	public InvocationResults updateRareFlag(String collectionObjectCsid) throws URISyntaxException, DocumentException {
 		PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(collectionObjectCsid);
 		
 		return updateRareFlag(collectionObjectPayload);
@@ -175,7 +173,7 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 	 * @throws URISyntaxException
 	 * @throws DocumentException
 	 */
-	public InvocationResults updateRareFlag(PoxPayloadOut collectionObjectPayload) throws URISyntaxException, DocumentException, Exception {
+	public InvocationResults updateRareFlag(PoxPayloadOut collectionObjectPayload) throws URISyntaxException, DocumentException {
 		InvocationResults results = new InvocationResults();
 
 		String uri = this.getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.URI_SCHEMA_NAME, 
@@ -276,7 +274,7 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 	 * @throws URISyntaxException
 	 * @throws DocumentException
 	 */
-	public InvocationResults updateRareFlags(List<String> collectionObjectCsids) throws URISyntaxException, DocumentException, Exception {
+	public InvocationResults updateRareFlags(List<String> collectionObjectCsids) throws URISyntaxException, DocumentException {
 		int numSubmitted = collectionObjectCsids.size();
 		long numAffected = 0;
 		
@@ -301,7 +299,7 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 	 * @throws URISyntaxException
 	 * @throws DocumentException
 	 */
-	public InvocationResults updateAllRareFlags() throws URISyntaxException, DocumentException, Exception {
+	public InvocationResults updateAllRareFlags() throws URISyntaxException, DocumentException {
 		long numFound = 0;
 		long numAffected = 0;
 		
@@ -348,6 +346,6 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 			"</document>";
 		
 		NuxeoBasedResource resource = (NuxeoBasedResource) getResourceMap().get(CollectionObjectClient.SERVICE_NAME);
-		resource.update(getServiceContext(), getResourceMap(), createUriInfo(), collectionObjectCsid, updatePayload);
+		resource.update(getResourceMap(), createUriInfo(), collectionObjectCsid, updatePayload);
 	}
 }

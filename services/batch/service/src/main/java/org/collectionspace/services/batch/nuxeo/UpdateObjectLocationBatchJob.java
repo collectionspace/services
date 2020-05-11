@@ -14,7 +14,6 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.batch.AbstractBatchInvocable;
-import org.collectionspace.services.batch.BatchCommon;
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.IClientQueryParams;
@@ -74,12 +73,6 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_SINGLE, INVOCATION_MODE_LIST,
                 INVOCATION_MODE_GROUP, INVOCATION_MODE_NO_CONTEXT));
     }
-
-	@Override
-	public void run(BatchCommon batchCommon) {
-		String errMsg = String.format("%s class does not support run(BatchCommon batchCommon) method.", getClass().getName());
-		throw new java.lang.UnsupportedOperationException(errMsg);
-	}
 
     /**
      * The main work logic of the batch job. Will be called after setContext.
@@ -402,23 +395,19 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             logger.trace("Update payload: " + "\n" + collectionObjectUpdatePayload);
         }
         
-        //
-        // Update the record and save the response for debugging message
-        //
         UriInfo uriInfo = this.setupQueryParamForUpdateRecords(); // Determines if we'll updated the updateAt and updatedBy core values
-        byte[] responseBytes = collectionObjectResource.update(getServiceContext(), resourcemap, uriInfo, collectionObjectCsid,
-                collectionObjectUpdatePayload);
-        numUpdated++;
-
         if (logger.isDebugEnabled()) {
+	        byte[] responseBytes = collectionObjectResource.update(resourcemap, uriInfo, collectionObjectCsid,
+	                collectionObjectUpdatePayload);
 	        logger.debug(String.format("Batch resource: Resonse from collectionobject (cataloging record) update: %s", new String(responseBytes)));
         }
+        numUpdated++;
         
         if (logger.isTraceEnabled()) {
             logger.trace("Computed current location value for CollectionObject " + collectionObjectCsid
                     + " was set to " + computedCurrentLocation);
-        }
 
+        }
         return numUpdated;
     }
     
@@ -445,7 +434,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
     	PoxPayloadOut result = null;
     	
     	try {
-			result = resource.getWithParentCtx(getServiceContext(), csid);
+			result = resource.getResourceFromCsid(null, createUriInfo(), csid);
 		} catch (Exception e) {
 			String msg = String.format("UpdateObjectLocation batch job could find/get resource CSID='%s' of type '%s'",
 					csid, resource.getServiceName());
@@ -532,7 +521,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             throws URISyntaxException, DocumentException {
         boolean isDeleted = false;
         
-        byte[] workflowResponse = resource.getWorkflowWithExistingContext(getServiceContext(), createUriInfo(), collectionObjectCsid);
+        byte[] workflowResponse = resource.getWorkflow(createUriInfo(), collectionObjectCsid);
         if (workflowResponse != null) {
             PoxPayloadOut payloadOut = new PoxPayloadOut(workflowResponse);
             String workflowState =
@@ -573,7 +562,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         }
         // The 'resource' type used here identifies the record type of the
         // related records to be retrieved
-        AbstractCommonList relatedRecords = resource.getList(getServiceContext(), uriInfo);
+        AbstractCommonList relatedRecords = resource.getList(uriInfo);
         if (logger.isTraceEnabled()) {
             logger.trace("Identified " + relatedRecords.getTotalItems()
                     + " record(s) related to the object record via direction " + relationshipDirection + " with CSID " + csid);
@@ -676,7 +665,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         
         while (morePages == true) {
 	        uriInfo = addFilterForPageSize(uriInfo, currentPage, pageSize);
-	        AbstractCommonList collectionObjects = collectionObjectResource.getList(getServiceContext(), uriInfo);
+	        AbstractCommonList collectionObjects = collectionObjectResource.getList(uriInfo);
 	        appendItemsToCsidsList(noContextCsids, collectionObjects);
 	        
 	        if (collectionObjects.getItemsInPage() == pageSize) { // We know we're at the last page when the number of items returned in the last request is less than the page size.
