@@ -440,7 +440,7 @@ BEGIN
         IF 2 = (SELECT count(*) c
                 FROM information_schema.columns
                 WHERE table_name = 'usergroup'
-                AND (column_name = 'usertype' OR column_name = 'userinstitutionrole'))
+                AND column_name IN ('usertype', 'userinstitutionrole'))
         THEN
                 UPDATE usergroup
                 SET userinstitutionrole = usertype
