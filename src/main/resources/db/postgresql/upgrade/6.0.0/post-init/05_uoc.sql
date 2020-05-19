@@ -432,8 +432,23 @@ $$;
 */
 
 -- Migrate v5.2 UOC User Type data from userType to userInstitutionRole in the userGroup table:
+-- Check to make sure both columns exist in userGroup table.
+-- Only update when userInstitutionRole is NULL.
 
-update usergroup
-set userinstitutionrole = usertype;
+DO $$
+BEGIN   
+        IF 2 = (SELECT count(*) c
+                FROM information_schema.columns
+                WHERE table_name = 'usergroup'
+                AND column_name IN ('usertype', 'userinstitutionrole'))
+        THEN
+                UPDATE usergroup
+                SET userinstitutionrole = usertype
+                WHERE userinstitutionrole IS NULL;
+        ELSE
+                RAISE NOTICE 'Unable to update userGroup: userType and/or userInstitutionRole columns missing.';
+        END IF;
+END $$;
+
 
 -- END OF MIGRATION
