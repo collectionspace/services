@@ -31,7 +31,7 @@
 
     public.uoc_common ============> MIGRATION NEEDED: various fields updated to repeatable fields/groups.
     public.uoc_common_methodlist => NO MIGRATION NEEDED.
-    public.usergroup =============> MIGRATION NEEDED: 3 new fields added; MIGRATE userType to userInstitutionRole
+    public.usergroup =============> MIGRATION NEEDED: 2 new fields added; MIGRATE userType to userInstitutionRole
 
 -- Version 5.2 uoc_common table description and migration note:
 
@@ -416,7 +416,6 @@ $$;
          usertype            | character varying     |           | MIGRATE to userinstitutionrole
          user                | character varying     |           | NO CHANGE
          userinstitution     | character varying     |           | NEW COLUMN
-         userrole            | character varying     |           | NEW COLUMN
          userinstitutionrole | character varying     |           | NEW; MIGRATE from usertype
          useruocrole         | character varying     |           | NEW COLUMN
         Indexes:
@@ -426,7 +425,7 @@ $$;
 
     -- Migration Note:
 
-       Three new columns were added for User Role, User Institution Role, and User Use of Collections role.
+       Two new columns were added for User: Institution Role, and User: Use of Collections role.
        Instead of re-nameing the userType column to userInstitutionRole, the old column will remain, and
        the userType data is migrated to userInstitutionRole.
 */
