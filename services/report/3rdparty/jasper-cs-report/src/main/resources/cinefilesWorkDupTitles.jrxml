@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CineFiles: Duplicate Film Titles" language="groovy" pageWidth="612" pageHeight="792" columnWidth="570" leftMargin="21" rightMargin="21" topMargin="21" bottomMargin="36" uuid="00039d14-8750-45ca-b1fa-81722dbd5f9d">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[select
+   count(*), filmtitle||', '||director||', '||cast(filmyear as varchar) string1 from cinefiles_denorm.filmlist_view
+group by string1
+having count(*)>1
+order by string1]]>
+	</queryString>
+	<field name="count" class="java.lang.Long"/>
+	<field name="string1" class="java.lang.String"/>
+	<title>
+		<band height="84" splitType="Stretch">
+			<image>
+				<reportElement uuid="38ebc361-38be-4ce7-9525-42dade10d093" x="0" y="0" width="366" height="61"/>
+				<imageExpression><![CDATA["http://www.collectionspace.org/wp-content/uploads/2014/11/CSpaceLogo.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement uuid="610bdc26-3968-4115-b85c-cc9f1cbc3630" mode="Transparent" x="0" y="64" width="570" height="20" forecolor="#000000"/>
+				<textElement textAlignment="Center" markup="none">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CineFiles: Works with Duplicate Film Titles, Directors, and Years]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="28" splitType="Stretch">
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="06fd2da7-1de6-4e3a-92c1-c05b3e6872a4" mode="Transparent" x="0" y="2" width="570" height="16" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="16" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="ba188a5c-2acb-4089-b07c-1c641a0d9062" x="0" y="0" width="40" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Count]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ca9bf02c-d8be-45d9-bb6a-bd3bc959243f" x="40" y="0" width="265" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Title, Director, Year]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="7a215486-c7dd-4a46-a785-adda78b80f9f" x="0" y="0" width="40" height="12"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{count}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="a9b1733a-8ca4-4cfe-8425-32b4b707ce9f" x="40" y="0" width="326" height="12"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{string1}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="24" splitType="Stretch">
+			<textField evaluationTime="Now">
+				<reportElement uuid="8fc0002a-ee4c-4378-a211-77d7f7934068" x="0" y="8" width="300" height="16"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="45792f78-4cd1-42b7-b114-88e573a9682e" x="303" y="8" width="10" height="16"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="cinefilesDocPageMediaMismatch" pageWidth="842" pageHeight="595" whenNoDataType="AllSectionsNoDetail" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d4a1d5eb-82dd-412f-a620-202e4bdf9dba">
+	<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+	<queryString>
+		<![CDATA[select x.doc_number, x.doc_moddate, x.doc_url, x.doc_title, x.page_count, x.media_count
+from
+(select
+    coc.objectnumber as doc_number,
+    csc.updatedat::date as doc_moddate,
+    'https://' || get_deplname() || '.cspace.berkeley.edu/record/collectionobject/' || hcoc.name as doc_url,
+    cocf.doctitle as doc_title,
+    coc.numberofobjects as page_count,
+    sum(case when bc.id is not null then 1 else 0 end) as media_count
+from relations_common rc
+join hierarchy hcoc on (rc.subjectcsid = hcoc.name and rc.subjectdocumenttype = 'CollectionObject')
+join collectionobjects_common coc on (hcoc.id = coc.id)
+join collectionobjects_cinefiles cocf on (coc.id = cocf.id)
+join collectionspace_core csc on (coc.id = csc.id)
+join hierarchy hmc on (rc.objectcsid = hmc.name and rc.objectdocumenttype = 'Media')
+join media_common mc on (hmc.id = mc.id)
+join hierarchy hbc on (mc.blobcsid = hbc.name)
+join blobs_common bc on (hbc.id = bc.id and bc.mimetype != 'application/pdf')
+group by coc.objectnumber, csc.updatedat, hcoc.name, cocf.doctitle, coc.numberofobjects) x
+where x.page_count != x.media_count]]>
+	</queryString>
+	<field name="doc_number" class="java.lang.String"/>
+	<field name="doc_moddate" class="java.util.Date"/>
+	<field name="doc_url" class="java.lang.String"/>
+	<field name="doc_title" class="java.lang.String"/>
+	<field name="page_count" class="java.lang.Integer"/>
+	<field name="media_count" class="java.lang.Integer"/>
+	<pageHeader>
+		<band height="13"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="31">
+			<staticText>
+				<reportElement x="0" y="10" width="100" height="16" isPrintWhenDetailOverflows="true" uuid="a477648c-dfbc-4a39-b18d-d2de2aa79651"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Doc. Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="600" y="10" width="100" height="16" isPrintWhenDetailOverflows="true" uuid="c57080a5-2484-443c-8161-8aa6ecb8e0f9"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[No. of Pages]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="700" y="10" width="100" height="16" isPrintWhenDetailOverflows="true" uuid="94a90e67-907e-4b24-ba84-caf01af31897"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[No. of Media]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="400" y="10" width="200" height="16" isPrintWhenDetailOverflows="true" uuid="aec9a3ca-7cdb-4bd5-b46b-dc4abaf4b944"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Document Title]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="10" width="200" height="16" isPrintWhenDetailOverflows="true" uuid="c9e226f7-a7c0-4f10-841c-414f85a17fbb"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Document URL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="10" width="100" height="16" isPrintWhenDetailOverflows="true" uuid="4c49dbe2-2eb8-4032-ae23-6496101a84a6"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Doc. Mod Date]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30">
+			<textField>
+				<reportElement x="400" y="5" width="200" height="20" isPrintWhenDetailOverflows="true" uuid="d989ca21-e5b1-408d-9158-0abe62dee923">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e4324387-2b94-4a6c-b11d-18b3d0c6fcef"/>
+				</reportElement>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{doc_title}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="600" y="5" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="00485358-dddf-4253-95a4-d971e033c971">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e4324387-2b94-4a6c-b11d-18b3d0c6fcef"/>
+				</reportElement>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{page_count}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="700" y="5" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="7a5a4e44-472b-490c-8130-612668cd9e31">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e4324387-2b94-4a6c-b11d-18b3d0c6fcef"/>
+				</reportElement>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{media_count}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="5" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="2c669e63-553a-49e6-9d58-5b65cbb4cdc2">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e4324387-2b94-4a6c-b11d-18b3d0c6fcef"/>
+				</reportElement>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{doc_number}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="5" width="200" height="20" isPrintWhenDetailOverflows="true" uuid="49edc4a5-b3d3-4023-a65b-f3115cfb9a66">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e4324387-2b94-4a6c-b11d-18b3d0c6fcef"/>
+				</reportElement>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{doc_url}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="5" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="b3d3c3c0-e02f-497b-afd0-a7eb1056e40f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e4324387-2b94-4a6c-b11d-18b3d0c6fcef"/>
+				</reportElement>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{doc_moddate}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
+
