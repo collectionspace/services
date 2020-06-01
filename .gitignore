@@ -20,3 +20,5 @@ cspace-app-perflog.csv
 .flattened-pom.xml
 bin
 *.diff
+logged_schemas
+logs
