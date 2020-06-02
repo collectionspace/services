@@ -59,17 +59,18 @@ public class AuthZ {
     private AuthZ() {
         setupProvider();
     }
-    
+
 	//
 	// URI paths that require special handling
 	//
     public static final String REPORTS_MIME_OUTPUTS = "reports/mimetypes";
     public static final String ACCOUNT_PERMISSIONS = "accounts/*/accountperms";
+    public static final String ACCOUNT_ROLES = "accounts/*/accountroles";
     public static final String STRUCTURED_DATE_REQUEST = "structureddate";
     public static final String PASSWORD_RESET = "accounts/requestpasswordreset";
     public static final String PROCESS_PASSWORD_RESET = "accounts/processpasswordreset";
 	public static final String REPORTS_INVOKE = "reports/*/invoke";
-	public static final String BATCH_INVOKE = "batch/*/invoke";	
+	public static final String BATCH_INVOKE = "batch/*/invoke";
 
     /**
      *
