@@ -74,9 +74,9 @@ import org.slf4j.LoggerFactory;
 public class ServiceMain {
 	final static Logger logger = LoggerFactory.getLogger(ServiceMain.class);
 
-	public static final String VER_DISPLAY_NAME = "CollectionSpace Services v6.0";
+	public static final String VER_DISPLAY_NAME = "CollectionSpace Services v6.1";
 	public static final String VER_MAJOR = "6";
-	public static final String VER_MINOR = "0";
+	public static final String VER_MINOR = "1";
 	public static final String VER_PATCH = "0";
 	public static final String VER_BUILD = "1";
 
@@ -1251,7 +1251,7 @@ public class ServiceMain {
 			logger.info(String.format("Using prototype Nuxeo server configuration file at path %s",
 					prototypeNuxeoDatasourceFile.getAbsolutePath()));
 		}
-		
+
 		//
 		// If multiple active tenants, set the "default" repository for Nuxeo services to use.
 		//
@@ -1313,17 +1313,17 @@ public class ServiceMain {
 		boolean moreThanOne = false;
 		boolean defaultIsSet = false;
 		String defaultRepositoryName = null;
-		
+
 		Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
-		
+
 		//
-		// Ensure we have at least one tenant binding and at least one corresponding repository domain 
+		// Ensure we have at least one tenant binding and at least one corresponding repository domain
 		//
 		if (tenantBindingTypeMap.values().size() == 0) {
 			String msg = "At least one tenant binding must be configured.";
 			throw new Exception(msg);
 		}
-		
+
 		//
 		// If we have just one tenant, make its (or one of its) repository domain(s) the default one.
 		//
@@ -1341,13 +1341,13 @@ public class ServiceMain {
     				logger.error(msg);
     			}
 			}
-			
+
 			if (moreThanOne == true) {
-				String msg = String.format("The tenant '%s' has more than one repository domain configured to be the default.  Please configure only one default repository.", 
+				String msg = String.format("The tenant '%s' has more than one repository domain configured to be the default.  Please configure only one default repository.",
 						tbt.getName());
 				throw new Exception(msg);
 			}
-			
+
 			//
 			// If the only active tenant is not explicitly configuring a repository domain as default, do so now.
 			//
@@ -1357,16 +1357,16 @@ public class ServiceMain {
 				defaultIsSet = true;
 				defaultRepositoryName = repositoryDomain.getRepositoryName();
 			}
-			
+
 			if (logger.isDebugEnabled()) {
-				String msg = String.format("The tenant '%s' has configured the default repository to be '%s'.", 
+				String msg = String.format("The tenant '%s' has configured the default repository to be '%s'.",
 						tbt.getName(), defaultRepositoryName);
 				logger.debug(msg);
 			}
-			
+
 			return;
 		}
-		
+
 		//
 		// If we have multiple tenants, figure out which one is declaring the default repository.
 		//
@@ -1385,7 +1385,7 @@ public class ServiceMain {
     			}
 			}
 		}
-		
+
 		//
 		// If more than one tenant has declared itself the default repository domain then
 		// throw an exception
@@ -1394,7 +1394,7 @@ public class ServiceMain {
 			String msg = "More than one tenant is configured to be the repository domain.  Please configure only one default repository.";
 			throw new Exception(msg);
 		}
-		
+
 		//
 		// If no tenant has declared itself the default repository, look for an "implied" default.  Tenants configured with
 		// no repository name are inferred to be the default repository.  If more than one tenant is configured without a repository name,
