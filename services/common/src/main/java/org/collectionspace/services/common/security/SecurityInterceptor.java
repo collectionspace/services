@@ -77,14 +77,14 @@ import org.slf4j.LoggerFactory;
 @ServerInterceptor
 @Provider
 public class SecurityInterceptor implements PreProcessInterceptor, PostProcessInterceptor {
-	
+
 	static {
 		System.err.println("Static initialization of: " + SecurityInterceptor.class.getCanonicalName());
 	}
 
 	/** The Constant logger. */
 	private static final Logger logger = LoggerFactory.getLogger(SecurityInterceptor.class);
-	
+
 	private static final String SYSTEM_INFO = SystemInfoClient.SERVICE_NAME;
 	private static final String NUXEO_ADMIN = null;
     //
@@ -96,11 +96,11 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
     // Error messages
     //
     private static final String ERROR_NUXEO_LOGOUT = "Attempt to logout when Nuxeo login context was null.";
-    private static final String ERROR_UNBALANCED_LOGINS = "The number of Logins vs Logouts to the Nuxeo framework was unbalanced.";    
-	    
+    private static final String ERROR_UNBALANCED_LOGINS = "The number of Logins vs Logouts to the Nuxeo framework was unbalanced.";
+
     private boolean isAnonymousRequest(HttpRequest request, ResourceMethodInvoker resourceMethodInvoker) { // see C:\dev\src\cspace\services\services\JaxRsServiceProvider\src\main\webapp\WEB-INF\applicationContext-security.xml
     	boolean result = false;
-    	
+
 		String resName = SecurityUtils.getResourceName(request.getUri()).toLowerCase();
 		switch (resName) {
 			case AuthZ.PASSWORD_RESET:
@@ -108,7 +108,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 			case SYSTEM_INFO:
 				return true;
 		}
-		    	
+
 		Class<?> resourceClass = resourceMethodInvoker.getResourceClass();
 		try {
 			CollectionSpaceResource resourceInstance = (CollectionSpaceResource)resourceClass.newInstance();
@@ -121,32 +121,34 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 
     	return result;
     }
-        
-    /*
-     * Check to see if the resource required authorization to access
-     * 
-     */
-    private boolean requiresAuthorization(String resName) {
-    	boolean result = true;
-		//
-    	// ACCOUNT_PERMISSIONS: All active users are allowed to see the *their* (we enforce this) current list of permissions.  If this is not
-		// the request, then we'll do a full AuthZ check.
-    	//
-    	// STRUCTURED_DATE_REQUEST: All user can request the parsing of a structured date string.
-    	//
-    	switch (resName) {
-    		case AuthZ.STRUCTURED_DATE_REQUEST:
-    		case AuthZ.ACCOUNT_PERMISSIONS:
-    		case AuthZ.REPORTS_MIME_OUTPUTS:
-    			result = false;
-    			break;
-    		default:
-    			result = true;
-    	}
-    	
-    	return result;
-    }
-    
+
+		/*
+			* Check to see if the resource required authorization to access
+			*
+			*/
+		private boolean requiresAuthorization(String resName) {
+			boolean result = true;
+			//
+			// ACCOUNT_PERMISSIONS, ACCOUNT_ROLES: All active users are allowed to see the *their*
+			// (we enforce this) current list of permissions and roles.  If this is not the request, then
+			// we'll do a full AuthZ check.
+			//
+			// STRUCTURED_DATE_REQUEST: All user can request the parsing of a structured date string.
+			//
+			switch (resName) {
+				case AuthZ.STRUCTURED_DATE_REQUEST:
+				case AuthZ.ACCOUNT_PERMISSIONS:
+				case AuthZ.ACCOUNT_ROLES:
+				case AuthZ.REPORTS_MIME_OUTPUTS:
+					result = false;
+					break;
+				default:
+					result = true;
+			}
+
+			return result;
+		}
+
 	/* (non-Javadoc)
 	 * @see org.jboss.resteasy.spi.interception.PreProcessInterceptor#preProcess(org.jboss.resteasy.spi.HttpRequest, org.jboss.resteasy.core.ResourceMethod)
 	 */
@@ -155,21 +157,21 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 			throws Failure, CSWebApplicationException {
 		ServerResponse result = null; // A null value essentially means success for this method
 		Method resourceMethod = resourceMethodInvoker.getMethod();
-		
+
 		try {
 			if (isAnonymousRequest(request, resourceMethodInvoker) == true) {
 				// We don't need to check credentials for anonymous requests.  Just login to Nuxeo and
 				// exit
 				nuxeoPreProcess(request, resourceMethodInvoker); // We login to Nuxeo only after we've checked authorization
-	
+
 				return result;
 			}
-			
+
 			final String servicesResource = "/cspace-services/"; // HACK - this is configured in war, get this from tomcat instead
 			final int servicesResourceLen = servicesResource.length();
 			String httpMethod = request.getHttpMethod();
 			String uriPath = request.getUri().getPath();
-			
+
 			if (logger.isDebugEnabled()) {
 				String fullRequest = request.getUri().getRequestUri().toString();
 				int servicesResourceIdx = fullRequest.indexOf(servicesResource);
@@ -177,10 +179,10 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 													: fullRequest.substring(servicesResourceIdx+servicesResourceLen);
 				logger.debug("received " + httpMethod + " on " + relativeRequest);
 			}
-			
+
 			String resName = SecurityUtils.getResourceName(request.getUri());
 			String resEntity = SecurityUtils.getResourceEntity(resName);
-			
+
 			//
 			// If the resource entity is acting as a proxy then all sub-resources will map to the resource itself.
 			// This essentially means sub-resources inherit all the authz permissions of the entity.
@@ -202,7 +204,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 			// Make sure the account of the user making the request is current and active
 			//
 			checkActive();
-			
+
 			if (requiresAuthorization(resName) == true) { //see comment immediately above
 				AuthZ authZ = AuthZ.get();
 				CSpaceResource res = new URIResourceImpl(AuthN.get().getCurrentTenantId(), resName, httpMethod);
@@ -244,7 +246,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 				// Login to Nuxeo
 				//
 				nuxeoPreProcess(request, resourceMethodInvoker); // We login to Nuxeo only after we've checked authorization
-				
+
 				//
 				// We've passed all the checks.  Now just log the results
 				//
@@ -260,25 +262,25 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 			}
 			throw t;
 		}
-		
+
 		return result;
 	}
-	
+
 	@Override
 	public void postProcess(ServerResponse arg0) {
 		//
 		// Log out of the Nuxeo framework
 		//
 		nuxeoPostProcess(arg0);
-	}	
+	}
 
 	/**
 	 * checkActive check if account is active
-	 * @throws CSWebApplicationException 
+	 * @throws CSWebApplicationException
 	 */
 	private void checkActive() throws CSWebApplicationException {
 		String userId = AuthN.get().getUserId();
-				
+
 		try {
 			//
 			// Need to ensure that user's tenant is not disabled
@@ -290,18 +292,18 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 						userId, tenantBindingType.getDisplayName());
 				Response response = Response.status(
 						Response.Status.CONFLICT).entity(errMsg).type("text/plain").build();
-				throw new CSWebApplicationException(response);				
+				throw new CSWebApplicationException(response);
 			}
 		} catch (IllegalStateException ise) {
 			String errMsg = "User's account is not associated to any active tenants, userId=" + userId;
 			// Note the RFC on return types:
-			// If the request already included Authorization credentials, then the 401 response 
+			// If the request already included Authorization credentials, then the 401 response
 			// indicates that authorization has been refused for those credentials.
 			Response response = Response.status(
 					Response.Status.UNAUTHORIZED).entity(errMsg).type("text/plain").build();
 			throw new CSWebApplicationException(ise, response);
 		}
-		
+
 		try {
 			//can't use JAXB here as this runs from the common jar which cannot
 			//depend upon the account service
@@ -349,10 +351,10 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 					Response.Status.INTERNAL_SERVER_ERROR).entity(msg).type("text/plain").build();
 			throw new CSWebApplicationException(e, response);
 		}
-		
+
 		return null;
 	}
-	
+
 	public void nuxeoPostProcess(ServerResponse arg0) {
 		try {
 			nuxeoLogout();
@@ -360,8 +362,8 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 			String msg = "Unable to logout of the Nuxeo framework.";
 			logger.error(msg, e);
 		}
-	}	
-    
+	}
+
     private void logLoginContext(LoginContext loginContext) {
     	if (!logger.isTraceEnabled()) return;
 
@@ -374,10 +376,10 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 			logger.trace("[" + principal.getName() + "]");
 		}
     }
-    
+
     private void logLogoutContext(LoginContext loginContext) {
     	if (!logger.isTraceEnabled()) return;
-    	
+
     	if (loginContext != null) {
 			logger.trace("CollectionSpace services now logging out of Nuxeo with LoginContext: "
 					+ loginContext);
@@ -391,8 +393,8 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
     		logger.trace("Logged out.");
     	}
     }
-    
-    
+
+
     /*
      * Login to Nuxeo and save the LoginContext instance in a thread local variable
      */
@@ -407,9 +409,9 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
     					Thread.currentThread(), threadLocalLoginContext));
     		}
     	}
-    	
+
     	LoginContext loginContext = threadLocalLoginContext.get();
-    	
+
     	if (loginContext == null) {
     		loginContext = Framework.loginAs(user);
     		frameworkLogins++;
@@ -434,9 +436,9 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
     		frameworkLogins++;
     	}
     }
-    
+
     private synchronized void nuxeoLogout() throws LoginException {
-    	LoginContext loginContext = threadLocalLoginContext != null ? threadLocalLoginContext.get() : null; 
+    	LoginContext loginContext = threadLocalLoginContext != null ? threadLocalLoginContext.get() : null;
         if (loginContext != null) {
    			logLogoutContext(loginContext);
             loginContext.logout();
@@ -451,7 +453,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
         		logger.warn(ERROR_NUXEO_LOGOUT);  // If we get here, it means our login/logout bookkeeping has failed.
         	}
         }
-        
+
         if (frameworkLogins == 0) {
         	if (threadLocalLoginContext != null) {
 	        	logger.trace(String.format("Thread ID %s: Clearing ThreadLocal instance %s - %s ",
@@ -459,5 +461,5 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
         	}
         	threadLocalLoginContext = null; //Clear the ThreadLocal to void Tomcat warnings associated with thread pools.
         }
-    }	
+    }
 }
