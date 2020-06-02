@@ -81,7 +81,7 @@ class CSpacePasswordEncoder extends BasePasswordEncoder {
 
 /**
  *
- * @author 
+ * @author
  */
 public class SecurityUtils {
 
@@ -90,12 +90,12 @@ public class SecurityUtils {
     public static final String URI_PATH_SEPARATOR = "/";
     public static final int MIN_PASSWORD_LENGTH = 8;
     public static final int MAX_PASSWORD_LENGTH = 24;
-    
+
     public static final String BASE64_ENCODING = "BASE64";
     public static final String BASE16_ENCODING = "HEX";
     public static final String RFC2617_ENCODING = "RFC2617";
     private static char MD5_HEX[] = "0123456789abcdef".toCharArray();
-    
+
     /**
      * createPasswordHash creates password has using configured digest algorithm
      * and encoding
@@ -123,7 +123,7 @@ public class SecurityUtils {
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }
-        if (password.length() < MIN_PASSWORD_LENGTH 
+        if (password.length() < MIN_PASSWORD_LENGTH
         		|| password.length() > MAX_PASSWORD_LENGTH) {
             String msg = "Bad password: '"+password+"': length should be >= "
             		+ MIN_PASSWORD_LENGTH + " and <= " + MAX_PASSWORD_LENGTH;
@@ -134,11 +134,11 @@ public class SecurityUtils {
 
     public static String getWorkflowResourceName(HttpRequest request) {
     	String result = null;
-    			
+
     	UriInfo uriInfo = request.getUri();
     	String workflowSubResName = SecurityUtils.getResourceName(uriInfo);
     	String resEntity = SecurityUtils.getResourceEntity(workflowSubResName);
-    	
+
 		MultivaluedMap<String, String> pathParams = uriInfo.getPathParameters();
 		String workflowTransition = pathParams.getFirst(WorkflowClient.TRANSITION_PARAM_JAXRS);
 		if (workflowTransition != null) {
@@ -147,17 +147,17 @@ public class SecurityUtils {
 			// e.g., intakes/workflow or intakes/*/workflow
 			result = resEntity;
 		}
-    	
+
     	return result;
     }
-    
+
     public static String getIndexResourceName(HttpRequest request) {
     	String result = null;
-    			
+
     	UriInfo uriInfo = request.getUri();
     	String indexSubResName = SecurityUtils.getResourceName(uriInfo);
     	String resEntity = SecurityUtils.getResourceEntity(indexSubResName);
-    	
+
 		MultivaluedMap<String, String> pathParams = uriInfo.getPathParameters();
 		String indexId = pathParams.getFirst(IndexClient.INDEX_ID_PARAM);
 		if (indexId != null  && pathParams.containsKey("csid")) {
@@ -165,12 +165,12 @@ public class SecurityUtils {
 	    	result = resEntity + "/*/" + IndexClient.SERVICE_NAME + "/" + indexId;
 		} else if (indexId != null) {
 			// e.g., intakes/index/fulltext
-	    	result = resEntity + "/" + IndexClient.SERVICE_NAME + "/" + indexId;			
+	    	result = resEntity + "/" + IndexClient.SERVICE_NAME + "/" + indexId;
 		} else {
 			// e.g., intakes
 			result = resEntity;
 		}
-		
+
 		//
 		// Overriding the result from above.
 		//
@@ -178,10 +178,10 @@ public class SecurityUtils {
 		// we're just going to return the index resource name.
 		//
 		result = IndexClient.SERVICE_NAME;
-    	
+
     	return result;
-    }    
-    
+    }
+
 	/**
 	 * Gets the resource name.
 	 *
@@ -192,7 +192,7 @@ public class SecurityUtils {
 		String uriPath = uriInfo.getPath();
 
 		MultivaluedMap<String, String> pathParams = uriInfo.getPathParameters();
-		
+
 		for (String pathParamName : pathParams.keySet()) {
 			//assumption : path params for csid for any entity has substring csid in name
 			String pathParamValue = pathParams.get(pathParamName).get(0);
@@ -216,9 +216,9 @@ public class SecurityUtils {
 			if ((pathParamName.toLowerCase().indexOf("indexid") > -1)) {
 				//replace indexid with wildcard
 				uriPath = uriPath.replace(pathParamValue, "*");
-			}			
+			}
 		}
-		
+
 		// FIXME: REM
 		// Since the hjid (HyperJaxb3 generated IDs) are not unique strings in URIs that also have a CSID,
 		// we need to replace hjid last.  We can fix this by having HyperJaxb3 generate UUID.
@@ -229,13 +229,13 @@ public class SecurityUtils {
 			String hjidValue = hjidValueList.get(0); //should be just one value, so get the first.
 			uriPath = uriPath.replace(hjidValue, "*");
 		}
-		
+
 		uriPath = uriPath.replace("//", "/"); // replace duplicate '/' characters
 		uriPath = uriPath.startsWith("/") ? uriPath.substring(1) : uriPath; // if present, strip the leading '/' character
-				
+
 		return uriPath;
 	}
-    
+
 	/**
 	 * Gets the resource name.
 	 *
@@ -244,16 +244,16 @@ public class SecurityUtils {
 	 */
 	public static String getResourceEntity(UriInfo uriInfo) {
 		String result = null;
-		
+
 		result = getResourceEntity(uriInfo.getPath());
 //		List<PathSegment> pathSegmentList = uriInfo.getPathSegments();
 //		if (pathSegmentList.isEmpty() == false) {
 //			result = pathSegmentList.get(0).getPath();
 //		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * Gets the resource entity by returning the first segment of the resource path
 	 *
@@ -264,12 +264,12 @@ public class SecurityUtils {
 	public static String getResourceEntity(String relativePath)
 	{
 		String result = "";
-		
+
 	    StringTokenizer strTok = new StringTokenizer(relativePath, URI_PATH_SEPARATOR);
 	    String pathSegment = null;
 	    while (strTok.hasMoreTokens() == true) {
 	    	pathSegment = strTok.nextToken();
-	    	if (pathSegment.equals("*") || 
+	    	if (pathSegment.equals("*") ||
 	    			pathSegment.equals(IndexClient.SERVICE_PATH_COMPONENT) || pathSegment.equals(CollectionSpaceClient.SERVICE_DESCRIPTION_PATH)) {  // Strip off subresource paths since they inherit their parent's permissions
 	    		//
 	    		// leave the loop if we hit a wildcard character or the "index" subresource
@@ -285,15 +285,15 @@ public class SecurityUtils {
 	    // Special case for the "index" services since "index" is also a subresource for some of the other services.
 	    //
 	    if (Tools.isEmpty(result) && pathSegment.equals(IndexClient.SERVICE_PATH_COMPONENT)) {
-	    	result = IndexClient.SERVICE_PATH_COMPONENT; 
+	    	result = IndexClient.SERVICE_PATH_COMPONENT;
 	    }
-		
+
 		return result;
 	}
-    
+
 	public static List<ServiceBindingType> getReadableServiceBindingsForCurrentUser(
 			List<ServiceBindingType> serviceBindings) {
-		ArrayList<ServiceBindingType> readableList = 
+		ArrayList<ServiceBindingType> readableList =
 				new ArrayList<ServiceBindingType>(serviceBindings.size());
 		AuthZ authZ = AuthZ.get();
     	for(ServiceBindingType binding:serviceBindings) {
@@ -305,7 +305,7 @@ public class SecurityUtils {
     	}
     	return readableList;
 	}
-    
+
     /**
      * Checks if is entity is action as a proxy for all sub-resources.
      *
@@ -313,19 +313,20 @@ public class SecurityUtils {
      */
     public static final boolean isResourceProxied(String resName) {
     	boolean result = true;
-    	
+
     	switch (resName) {
     		case AuthZ.REPORTS_INVOKE:
     		case AuthZ.BATCH_INVOKE:
-    		case AuthZ.ACCOUNT_PERMISSIONS:
+				case AuthZ.ACCOUNT_PERMISSIONS:
+				case AuthZ.ACCOUNT_ROLES:
     			result = false;
     			break;
     	}
-    	
+
     	return result;
     }
 
-    
+
     /**
      * isCSpaceAdmin check if authenticated user is a CSpace administrator
      * @param tenantId
@@ -333,24 +334,24 @@ public class SecurityUtils {
      */
     public static boolean isCSpaceAdmin() {
     	boolean result = false;
-    	
+
     	String tenantId = null;
     	try {
     		tenantId = AuthN.get().getCurrentTenantId();
     	} catch (Throwable e) {
     		tenantId = AuthN.ADMIN_TENANT_ID;
     	}
-    	
+
         if (tenantId != null) {
             if (AuthN.ADMIN_TENANT_ID.equals(tenantId) == true ||
             		AuthN.ANONYMOUS_TENANT_ID.equals(tenantId)) {
                 result = true;
             }
         }
-        
+
         return result;
     }
-    
+
     public static String createPasswordHash(String hashAlgorithm, String hashEncoding, String hashCharset,
     		String username, String password, String salt)
     {
@@ -362,7 +363,7 @@ public class SecurityUtils {
     {
     	CSpacePasswordEncoder passwordEncoder = new CSpacePasswordEncoder();
     	String saltedPassword = passwordEncoder.mergePasswordAndSalt(password, salt); //
-    	  
+
         String passwordHash = null;
         byte passBytes[];
         try
@@ -463,5 +464,5 @@ public class SecurityUtils {
         return Base64Utils.fromb64(str);
     }
 
-    
+
 }
