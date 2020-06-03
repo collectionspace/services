@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+
+import org.collectionspace.services.batch.BatchCommon;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionObjectFactory;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -27,6 +29,11 @@ public class UpdateInventoryStatusBatchJob extends AbstractBatchJob {
 
 	@Override
 	public void run() {
+		run(null);
+	}
+
+	@Override
+	public void run(BatchCommon batchCommon) {
 		setCompletionStatus(STATUS_MIN_PROGRESS);
 
 		try {

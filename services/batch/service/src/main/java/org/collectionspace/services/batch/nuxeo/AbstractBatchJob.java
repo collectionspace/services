@@ -63,12 +63,12 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	private Map<String, String> authorityServiceNamesByDocType;
 
 	@SuppressWarnings("unchecked")
-	protected static <T> Set<T> convertListToSet(List<T> list) 
-    { 
-        // create a set from the List 
-        return (Set<T>) list.stream().collect(Collectors.toSet()); 
+	protected static <T> Set<T> convertListToSet(List<T> list)
+    {
+        // create a set from the List
+        return (Set<T>) list.stream().collect(Collectors.toSet());
     }
-	
+
 	@Override
 	public void run(BatchCommon batchCommon) {
 		String errMsg = String.format("%s class does not support run(BatchCommon batchCommon) method.", getClass().getName());
@@ -395,10 +395,10 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	protected PoxPayloadOut findTaxonByCsid(String csid) throws URISyntaxException, DocumentException {
 		return findAuthorityItemByCsid(TaxonomyAuthorityClient.SERVICE_NAME, csid);
 	}
-	
+
 	protected PoxPayloadOut findAuthorityItemByShortId(String serviceName, String vocabularyShortId, String itemShortId) throws URISyntaxException, DocumentException, Exception {
 		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
-		PoxPayloadOut payload = resource.getAuthorityItemWithExistingContext(getServiceContext(), createDeleteFilterUriInfo(), getResourceMap(), 
+		PoxPayloadOut payload = resource.getAuthorityItemWithExistingContext(getServiceContext(), createDeleteFilterUriInfo(), getResourceMap(),
 				"urn:cspace:name(" + vocabularyShortId + ")", "urn:cspace:name(" + itemShortId + ")");
 
 		return payload;
@@ -453,7 +453,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	 *                    Only records that reference the given item in the specified field are returned.
 	 *                    If null, returns records that reference the item in any field.
 	 * @return            A List containing the csids of referencing records.
-	 * @throws URISyntaxException 
+	 * @throws URISyntaxException
 	 */
 	protected List<String> findReferencingObjects(String serviceName, String parentCsid, String csid, String type, String sourceField) throws URISyntaxException, Exception {
 		logger.debug("findReferencingObjects serviceName=" + serviceName + " parentCsid=" + parentCsid + " csid=" + csid + " type=" + type + " sourceField=" + sourceField);

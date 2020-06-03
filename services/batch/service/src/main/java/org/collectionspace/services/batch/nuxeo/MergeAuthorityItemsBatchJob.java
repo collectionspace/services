@@ -15,12 +15,15 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
+import org.collectionspace.services.batch.BatchCommon;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.NuxeoBasedResource;
+import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.RefNameUtils;
+import org.collectionspace.services.common.api.RefNameUtils.AuthorityInfo;
 import org.collectionspace.services.common.api.RefNameUtils.AuthorityTermInfo;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.invocable.InvocationContext.Params.Param;
@@ -71,6 +74,11 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 
 	@Override
 	public void run() {
+		run(null);
+	}
+
+	@Override
+	public void run(BatchCommon batchCommon) {
 		setCompletionStatus(STATUS_MIN_PROGRESS);
 
 		try {
@@ -137,10 +145,21 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 		logger.debug("Merging docType=" + docType + " target=" + target + " sourceCsids=" + StringUtils.join(sourceCsids, ","));
 
 		String serviceName = getAuthorityServiceNameForDocType(docType);
+		PoxPayloadOut targetItemPayload;
 
-		PoxPayloadOut targetItemPayload = RefNameUtils.isTermRefname(target)
-			? findAuthorityItemByRefName(serviceName, target)
-			: findAuthorityItemByCsid(serviceName, target);
+		if (RefNameUtils.isTermRefname(target)) {
+			AuthorityTermInfo termInfo = RefNameUtils.parseAuthorityTermInfo(target);
+			AuthorityInfo authorityInfo = termInfo.inAuthority;
+			String targetServiceName = authorityInfo.resource;
+
+			if (!targetServiceName.equals(serviceName)) {
+				throw new DocumentException("Source item and target item must be the same record type.");
+			}
+
+			targetItemPayload	= findAuthorityItemByRefName(serviceName, target);
+		} else {
+			targetItemPayload = findAuthorityItemByCsid(serviceName, target);
+		}
 
 		String targetItemCsid = getCsid(targetItemPayload);
 
@@ -150,10 +169,19 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 			}
 		}
 
+		String targetDocName = getFieldValue(targetItemPayload, "/document/@name");
+
 		List<PoxPayloadOut> sourceItemPayloads = new ArrayList<PoxPayloadOut>();
 
 		for (String sourceCsid : sourceCsids) {
-			sourceItemPayloads.add(findAuthorityItemByCsid(serviceName, sourceCsid));
+			PoxPayloadOut sourceItemPayload = findAuthorityItemByCsid(serviceName, sourceCsid);
+			String sourceDocName = getFieldValue(sourceItemPayload, "/document/@name");
+
+			if (!sourceDocName.equals(targetDocName)) {
+				throw new DocumentException("Source item and target item must be the same record type.");
+			}
+
+			sourceItemPayloads.add(sourceItemPayload);
 		}
 
 		return merge(docType, targetItemPayload, sourceItemPayloads);
