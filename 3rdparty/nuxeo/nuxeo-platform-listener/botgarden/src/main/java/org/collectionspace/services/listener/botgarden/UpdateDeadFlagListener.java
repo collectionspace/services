@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.collectionspace.services.batch.BatchResource;
-import org.collectionspace.services.batch.nuxeo.UpdateDeadFlagBatchJob;
+import org.collectionspace.services.batch.nuxeo.botgarden.UpdateDeadFlagBatchJob;
 import org.collectionspace.services.client.BatchClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;

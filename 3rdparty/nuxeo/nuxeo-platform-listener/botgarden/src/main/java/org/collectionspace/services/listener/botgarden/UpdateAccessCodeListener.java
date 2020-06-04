@@ -13,21 +13,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.collectionspace.services.batch.BatchResource;
-import org.collectionspace.services.batch.nuxeo.UpdateAccessCodeBatchJob;
-import org.collectionspace.services.batch.nuxeo.UpdateAccessCodeBatchJob.UpdateAccessCodeResults;
+import org.collectionspace.services.batch.nuxeo.botgarden.UpdateAccessCodeBatchJob;
+import org.collectionspace.services.batch.nuxeo.botgarden.UpdateAccessCodeBatchJob.UpdateAccessCodeResults;
 import org.collectionspace.services.client.BatchClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectBotGardenConstants;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
+import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectNaturalHistoryConstants;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
 import org.collectionspace.services.nuxeo.listener.AbstractCSEventSyncListenerImpl;
-import org.collectionspace.services.taxonomy.nuxeo.TaxonBotGardenConstants;
+import org.collectionspace.services.taxonomy.nuxeo.TaxonNaturalHistoryConstants;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonConstants;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonomyAuthorityConstants;
 
@@ -44,7 +45,7 @@ import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
  * A listener that updates the access code on taxon records when collectionobjects
  * or taxon records are created or modified.
  *
- * @see org.collectionspace.services.batch.nuxeo.UpdateAccessCodeBatchJob
+ * @see org.collectionspace.services.batch.nuxeo.botgarden.UpdateAccessCodeBatchJob
  * @author ray
  *
  */
@@ -56,7 +57,7 @@ public class UpdateAccessCodeListener extends AbstractCSEventSyncListenerImpl {
 	public static final String PREVIOUS_ACCESS_CODE_PROPERTY_NAME = "UpdateAccessCodeListener.previousAccessCode";
 	public static final String DELETED_RELATION_PARENT_CSID_PROPERTY_NAME = "UpdateAccessCodeListener.deletedRelationParentCsid";
 
-	private static final String[] TAXON_PATH_ELEMENTS = CollectionObjectBotGardenConstants.TAXON_FIELD_NAME.split("/");
+	private static final String[] TAXON_PATH_ELEMENTS = CollectionObjectNaturalHistoryConstants.TAXON_FIELD_NAME.split("/");
 	private static final String TAXONOMIC_IDENT_GROUP_LIST_FIELD_NAME = TAXON_PATH_ELEMENTS[0];
 	private static final String TAXON_FIELD_NAME = TAXON_PATH_ELEMENTS[2];
 
@@ -205,7 +206,7 @@ public class UpdateAccessCodeListener extends AbstractCSEventSyncListenerImpl {
 				// Stash the previous access code value, so it can be retrieved in the documentModified handler.
 
 				DocumentModel previousDoc = (DocumentModel) context.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
-				String previousAccessCode = (String) previousDoc.getProperty(TaxonBotGardenConstants.ACCESS_CODE_SCHEMA_NAME, TaxonBotGardenConstants.ACCESS_CODE_FIELD_NAME);
+				String previousAccessCode = (String) previousDoc.getProperty(TaxonNaturalHistoryConstants.ACCESS_CODE_SCHEMA_NAME, TaxonNaturalHistoryConstants.ACCESS_CODE_FIELD_NAME);
 
 				context.setProperty(PREVIOUS_ACCESS_CODE_PROPERTY_NAME, previousAccessCode);
 			}
@@ -218,7 +219,7 @@ public class UpdateAccessCodeListener extends AbstractCSEventSyncListenerImpl {
 					// record if it has.
 
 					String previousAccessCode = (String) context.getProperty(PREVIOUS_ACCESS_CODE_PROPERTY_NAME);
-					String currentAccessCode = (String) doc.getProperty(TaxonBotGardenConstants.ACCESS_CODE_SCHEMA_NAME, TaxonBotGardenConstants.ACCESS_CODE_FIELD_NAME);
+					String currentAccessCode = (String) doc.getProperty(TaxonNaturalHistoryConstants.ACCESS_CODE_SCHEMA_NAME, TaxonNaturalHistoryConstants.ACCESS_CODE_FIELD_NAME);
 
 					if (previousAccessCode == null) {
 						previousAccessCode = "";
@@ -321,7 +322,7 @@ public class UpdateAccessCodeListener extends AbstractCSEventSyncListenerImpl {
 	}
 
 	private List<String> getTaxonNames(DocumentModel doc) {
-		List<Map<String, Object>> taxonomicIdentGroupList = (List<Map<String, Object>>) doc.getProperty(CollectionObjectBotGardenConstants.TAXON_SCHEMA_NAME,
+		List<Map<String, Object>> taxonomicIdentGroupList = (List<Map<String, Object>>) doc.getProperty(CollectionObjectNaturalHistoryConstants.TAXON_SCHEMA_NAME,
 				TAXONOMIC_IDENT_GROUP_LIST_FIELD_NAME);
 		List<String> taxonNames = new ArrayList<String>();
 
