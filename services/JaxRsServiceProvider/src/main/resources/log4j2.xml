@@ -18,7 +18,7 @@
 	</Appenders>
 
 	<Loggers>
-		<Root level="DEBUG">
+		<Root level="WARN">
 			<AppenderRef ref="ConsoleAppender"/>
 			<AppenderRef ref="LogFileAppender" />
 		</Root>
