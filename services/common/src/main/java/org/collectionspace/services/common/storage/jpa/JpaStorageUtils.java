@@ -336,12 +336,6 @@ public class JpaStorageUtils {
 	//FIXME: REM - This method should probably be moved to the AccountPermissionDocumentHandler
 	public static AccountRole getAccountRoles(String csid)
 		throws UnauthorizedException, DocumentNotFoundException {
-		return getAccountRoles(csid, null, null);
-	}
-
-	//FIXME: REM - This method should probably be moved to the AccountPermissionDocumentHandler
-	public static AccountRole getAccountRoles(String csid, String currentResource, String permissionResource)
-		throws UnauthorizedException, DocumentNotFoundException {
 		//
 		// Make sure the user asking for this list has the correct
 		// permission -that is, the csid's userId match the currently logged in userId or
@@ -381,12 +375,18 @@ public class JpaStorageUtils {
 			Query q = em.createQuery(queryStr);
 			resultList = q.getResultList().iterator();
 
-			if (resultList.hasNext()) {
-				List<RoleValue> roleValues = new ArrayList<RoleValue>();
-				while (resultList.hasNext()) {
-					AccountRoleRel accountRolRel = (AccountRoleRel)resultList.next();
-					roleValues.add(AuthorizationRoleRel.buildRoleValue(accountRolRel));
+			List<RoleValue> roleValues = new ArrayList<RoleValue>();
+
+			while (resultList.hasNext()) {
+				AccountRoleRel accountRolRel = (AccountRoleRel) resultList.next();
+				RoleValue roleValue = AuthorizationRoleRel.buildRoleValue(accountRolRel);
+
+				if (roleValue != null) {
+					roleValues.add(roleValue);
 				}
+			}
+
+			if (roleValues.size() > 0) {
 				result.setRole(roleValues);
 			}
 		} catch (NoResultException nre) {

@@ -67,17 +67,17 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 	private final Logger logger = LoggerFactory.getLogger(BatchDocumentModelHandler.class);
 
 	protected final int BAD_REQUEST_STATUS = Response.Status.BAD_REQUEST.getStatusCode();
-	
+
 	/**
 	 * Return true if the batch job supports the requested mode.
 	 * @param invocationCtx
 	 * @param batchCommon
 	 * @return
-	 * @throws BadRequestException 
+	 * @throws BadRequestException
 	 */
 	protected boolean supportsInvokationMode(InvocationContext invocationCtx, BatchCommon batchCommon) throws BadRequestException {
 		boolean result = false;
-		
+
 		String invocationMode = invocationCtx.getMode().toLowerCase();
 		if (BatchInvocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationMode)) {
 			result = batchCommon.isSupportsSingleDoc(); //BatchJAXBSchema.SUPPORTS_SINGLE_DOC;
@@ -92,43 +92,43 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 					invocationMode, batchCommon.getName());
 			throw new BadRequestException(msg);
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * Returns true if we found any required permissions.
-	 * 
+	 *
 	 * @param batchCommon
 	 * @return
 	 */
 	private boolean hasRequiredPermissions(BatchCommon batchCommon) {
 		boolean result = false;
-		
+
 		try {
 			result = batchCommon.getResourceActionGroupList().getResourceActionGroup().size() > 0;
 		} catch (NullPointerException e) {
 			// ignore exception, we're just testing to see if we have any list elements
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * Returns true if we found any required roles.
-	 * 
+	 *
 	 * @param batchCommon
 	 * @return
 	 */
 	private boolean hasRequiredRoles(BatchCommon batchCommon) {
 		boolean result = false;
-		
+
 		try {
 			result = batchCommon.getForRoles().getRoleDisplayName().size() > 0;
 		} catch (NullPointerException e) {
 			// ignore exception, we're just testing to see if we have any list elements
 		}
-		
+
 		return result;
 	}
 
@@ -137,29 +137,29 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 	 * 	1. No permissions or roles are specified in the batch job
 	 *  2. No roles are specified, but permissions are specified and the current user has those permissions
 	 *  3. Roles are specified and the current user is a member of at least one of the roles.
-	 * 
+	 *
 	 * @param batchCommon
 	 * @return
 	 */
 	protected boolean isAuthoritzed(BatchCommon batchCommon) {
 		boolean result = true;
-		
-		if (hasRequiredRoles(batchCommon)) { 
+
+		if (hasRequiredRoles(batchCommon)) {
 			result = isAuthorizedWithRoles(batchCommon);
 		} else if (hasRequiredPermissions(batchCommon)) {
 			result = isAuthoritzedWithPermissions(batchCommon);
 		}
-		 		
+
 		return result;
 	}
-	
+
 	protected boolean isAuthorizedWithRoles(BatchCommon batchCommon) {
 		boolean result = false;
-		
+
 		ForRoles forRolesList = batchCommon.getForRoles();
 		if (forRolesList != null) {
 			AccountResource accountResource = new AccountResource();
-			List<String> roleDisplayNameList = accountResource.getAccountRoles(AuthN.get().getUserId(), AuthN.get().getCurrentTenantId());
+			List<String> roleDisplayNameList = accountResource.getAccountRoleDisplayNames(AuthN.get().getUserId(), AuthN.get().getCurrentTenantId());
 			for (String target : forRolesList.getRoleDisplayName()) {
 				if (Tools.listContainsIgnoreCase(roleDisplayNameList, target)) {
 					result = true;
@@ -167,10 +167,10 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 				}
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * Check to see if the current user is authorized to run/invoke this batch job.  If the batch job
 	 * did not specify any permissions, we assume that the current user is authorized to run the job.
@@ -179,7 +179,7 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 	 */
 	protected boolean isAuthoritzedWithPermissions(BatchCommon batchCommon) {
 		boolean result = true;
-		
+
 		ResourceActionGroupList resourceActionGroupList = batchCommon.getResourceActionGroupList();
 		if (resourceActionGroupList != null) {
 			String tenantId = AuthN.get().getCurrentTenantId();
@@ -194,19 +194,19 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 				}
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * Returns a copy of the incoming list of strings all lower-cased.  Also removes any duplicates.
-	 * 
+	 *
 	 * @param listOfStrings
 	 * @return
 	 */
 	private List<String> toLowerCase(List<String> listOfStrings) {
 		List<String> result = null;
-		
+
 		if (listOfStrings != null) {
 			Set<String> stringSet = new HashSet<String>();
 			for (String s : listOfStrings) {
@@ -214,7 +214,7 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 			}
 			result = new ArrayList<String>(stringSet);
 		}
-		
+
 		return result;
 	}
 
@@ -234,19 +234,19 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 			//
 			// Ensure the current user has permission to run this batch job
 			if (isAuthoritzed(batchCommon) == false) {
-				String msg = String.format("BatchResource: The user '%s' does not have permission to run the batch job '%s' CSID='%s'", 
+				String msg = String.format("BatchResource: The user '%s' does not have permission to run the batch job '%s' CSID='%s'",
 						AuthN.get().getUserId(), batchCommon.getName(), csid);
 				throw new PermissionException(msg);
 			}
-			
+
 			//
 			// Ensure the batch job supports the requested invocation context's mode type
 			if (supportsInvokationMode(invocationCtx, batchCommon) == false) {
-				String msg = String.format("BatchResource: The batch job '%s' CSID='%s' does not support the invocation mode '%s'.", 
+				String msg = String.format("BatchResource: The batch job '%s' CSID='%s' does not support the invocation mode '%s'.",
 						batchCommon.getName(), csid, invocationCtx.getMode());
 				throw new BadRequestException(msg);
 			}
-			
+
 			//
 			// Ensure the batch job supports the requested invocation context's document type
 			if (!Invocable.INVOCATION_MODE_NO_CONTEXT.equalsIgnoreCase(invocationCtx.getMode())) {
@@ -254,7 +254,7 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 				if (forDocTypes != null) {
 					List<String> forDocTypeList = toLowerCase(forDocTypes.getForDocType()); // convert all strings to lowercase.
 					if (forDocTypeList == null || !forDocTypeList.contains(invocationCtx.getDocType().toLowerCase())) {
-						String msg = String.format("BatchResource: The batch job '%s' CSID='%s' does not support the invocation document type '%s'.", 
+						String msg = String.format("BatchResource: The batch job '%s' CSID='%s' does not support the invocation document type '%s'.",
 								batchCommon.getName(), csid, invocationCtx.getDocType());
 						throw new BadRequestException(msg);
 					}
@@ -265,7 +265,7 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 			// Now that we've ensure all the prerequisites have been met, let's try to
 			// instantiate and run the batch job.
 			//
-			
+
 			String className = batchCommon.getClassName().trim();
 			ClassLoader tccl = Thread.currentThread().getContextClassLoader();
 			Class<?> c = tccl.loadClass(className);
@@ -273,7 +273,7 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 			if (!BatchInvocable.class.isAssignableFrom(c)) {
 				throw new RuntimeException("BatchResource: Class: " + className + " does not implement BatchInvocable!");
 			}
-	
+
 			BatchInvocable batchInstance = (BatchInvocable) c.newInstance();
 			List<String> modes = batchInstance.getSupportedInvocationModes();
 			if (!modes.contains(invocationCtx.getMode().toLowerCase())) {
@@ -281,10 +281,10 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 						invocationCtx.getMode().toLowerCase(), className, modes.toString());
 				throw new BadRequestException(msg);
 			}
-	
+
 			batchInstance.setInvocationContext(invocationCtx);
 			batchInstance.setServiceContext(ctx);
-			
+
 			if (resourceMap != null) {
 				batchInstance.setResourceMap(resourceMap);
 			} else {
@@ -295,7 +295,7 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 					logger.warn("BatchResource.invoke did not get a resourceMapHolder in context!");
 				}
 			}
-	
+
 			batchInstance.run(batchCommon);
 			int status = batchInstance.getCompletionStatus();
 			if (status == Invocable.STATUS_ERROR) {
@@ -306,10 +306,10 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 				} else {
 					throw new RuntimeException("BatchResouce: batchProcess encountered error: "
 							+ batchInstance.getErrorInfo());
-	
+
 				}
 			}
-	
+
 			InvocationResults results = batchInstance.getResults();
 			return results;
 		} catch (PermissionException e) {

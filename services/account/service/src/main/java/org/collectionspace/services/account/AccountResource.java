@@ -195,7 +195,7 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
      * @param userId
      * @return
      */
-    public List<String> getAccountRoles(String userId, String tenantId) {
+    public List<String> getAccountRoleDisplayNames(String userId, String tenantId) {
     	List<String> result = null;
 
     	String accountCsid = getAccountCsid(userId);
