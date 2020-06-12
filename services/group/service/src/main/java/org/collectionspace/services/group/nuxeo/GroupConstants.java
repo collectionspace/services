@@ -21,14 +21,14 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.collectionspace.services.taxonomy.nuxeo;
+package org.collectionspace.services.group.nuxeo;
 
 /**
- * TaxonomyAuthorityConstants
+ * GroupConstant processes Group document
+ *
  */
-public class TaxonomyAuthorityConstants {
+public class GroupConstants {
 
-    public final static String NUXEO_DOCTYPE = "Taxonomyauthority";
-    public final static String NUXEO_SCHEMA_NAME = "taxonomyauthority";
-    public final static String NUXEO_DC_TITLE = "CollectionSpace-TaxonomyAuthority";
+    public final static String NUXEO_DOCTYPE = "Group";
+	
 }

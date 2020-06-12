@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 import org.collectionspace.services.batch.BatchResource;
-import org.collectionspace.services.batch.nuxeo.FormatVoucherNameBatchJob;
+import org.collectionspace.services.batch.nuxeo.botgarden.FormatVoucherNameBatchJob;
 import org.collectionspace.services.client.BatchClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;

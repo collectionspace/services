@@ -45,7 +45,7 @@
 				is 40 terms. -->
 			<types:item id="maxlistitemsjdbc" merge:matcher="skip" merge:action="insert" xmlns:types="http://collectionspace.org/services/config/types">
 				<types:key>maxListItemsReturnedLimitOnJdbcQueries</types:key>
-				<types:value>40</types:value>
+				<types:value>100</types:value>
 			</types:item>
 			<!-- By default, term completion searches are restricted (constrained) to the current tenant. On a system where a tenant's
 				data is isolated within its own repository, or on a shared repository system where only one tenant has data, this restriction
@@ -53,7 +53,7 @@
 				search performance. -->
 			<types:item id="jdbcqueriestenantrestricted" merge:matcher="skip" merge:action="insert" xmlns:types="http://collectionspace.org/services/config/types">
 				<types:key>jdbcQueriesAreTenantIdRestricted</types:key>
-				<types:value>true</types:value>
+				<types:value>false</types:value>
 			</types:item>
 		</tenant:properties>
 
@@ -65,6 +65,10 @@
 			<service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
 				<service:classname>org.collectionspace.services.common.init.RunSqlScripts</service:classname>
 				<service:params>
+					<service:property>
+						<service:key>sqlScriptName</service:key>
+						<service:value>grant_reporters_privileges.sql</service:value>
+					</service:property>
 					<service:property>
 						<service:key>sqlScriptName</service:key>
 						<service:value>create_id_generators_table.sql</service:value>

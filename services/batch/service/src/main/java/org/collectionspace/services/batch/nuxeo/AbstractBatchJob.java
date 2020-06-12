@@ -687,7 +687,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		return getFieldValue(payload, CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA, CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME);
 	}
 
-	protected class ResourceException extends Exception {
+	public class ResourceException extends Exception {
 		private static final long serialVersionUID = 1L;
 
 		private Response response;
