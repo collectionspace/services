@@ -1,19 +1,15 @@
 package org.collectionspace.services.listener.bampfa;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.collectionspace.services.batch.BatchResource;
-import org.collectionspace.services.batch.nuxeo.UpdateObjectFromPersonsAuthorityBatchJob;
+import org.collectionspace.services.batch.nuxeo.bampfa.UpdateObjectFromPersonsAuthorityBatchJob;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.client.BatchClient;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -34,7 +30,6 @@ import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 import org.nuxeo.ecm.core.api.CoreSession;
-import org.nuxeo.ecm.core.event.EventListener;
 
 
 /**
@@ -48,7 +43,8 @@ import org.nuxeo.ecm.core.event.EventListener;
  */
 public class UpdateNationalitiesListener extends AbstractCSEventSyncListenerImpl {
 
-    private final static Log logger = LogFactory.getLog(UpdateNationalitiesListener.class);
+	private static final Logger logger = LoggerFactory.getLogger(UpdateNationalitiesListener.class);
+    
     private final static String NO_FURTHER_PROCESSING_MESSAGE =
             "This event listener will not continue processing this event ...";
 
@@ -274,7 +270,7 @@ public class UpdateNationalitiesListener extends AbstractCSEventSyncListenerImpl
     }
 
 	@Override
-	protected Log getLogger() {
+	protected Logger getLogger() {
 		return logger;
 	}
 

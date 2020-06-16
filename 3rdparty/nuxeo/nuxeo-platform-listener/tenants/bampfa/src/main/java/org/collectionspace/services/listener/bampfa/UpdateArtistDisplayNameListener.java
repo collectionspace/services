@@ -1,9 +1,10 @@
 package org.collectionspace.services.listener.bampfa;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.collectionspace.services.batch.BatchResource;
-import org.collectionspace.services.batch.nuxeo.UpdateObjectFromPersonsAuthorityBatchJob;
+import org.collectionspace.services.batch.nuxeo.bampfa.UpdateObjectFromPersonsAuthorityBatchJob;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.client.BatchClient;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -32,7 +33,8 @@ import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
  */
 public class UpdateArtistDisplayNameListener extends AbstractCSEventSyncListenerImpl {
 
-    private final static Log logger = LogFactory.getLog(UpdateArtistDisplayNameListener.class);
+	private static final Logger logger = LoggerFactory.getLogger(UpdateArtistDisplayNameListener.class);
+
     private final static String NO_FURTHER_PROCESSING_MESSAGE =
             "This event listener will not continue processing this event ...";
 
@@ -150,7 +152,7 @@ public class UpdateArtistDisplayNameListener extends AbstractCSEventSyncListener
     }
 
 	@Override
-	protected Log getLogger() {
+	protected Logger getLogger() {
 		return logger;
 	}
 

@@ -4,18 +4,19 @@
     xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>org.collectionspace.services.3rdparty.nuxeo.listener</artifactId>
+        <artifactId>org.collectionspace.services.3rdparty.nuxeo.listener.tenants</artifactId>
         <groupId>org.collectionspace.services</groupId>
         <version>${revision}</version>        
     </parent>
+    
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    <artifactId>org.collectionspace.services.listener.botgarden</artifactId>
-    <name>org.collectionspace.services.listener.botgarden</name>
+    
+    <artifactId>org.collectionspace.services.listener.bampfa</artifactId>
+    <name>org.collectionspace.services.listener.bampfa</name>
     <url>http://maven.apache.org</url>
 
-	 
 	<dependencies>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
@@ -44,7 +45,6 @@
         </dependency>
 	</dependencies>
 
-	
     <build>
         <resources>
             <resource>

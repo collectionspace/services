@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tenant:TenantBindingConfig
+	xmlns:merge='http://xmlmerge.el4j.elca.ch'
+	xmlns:tenant='http://collectionspace.org/services/config/tenant'>
+
+	<tenant:tenantBinding id="55">
+		<tenant:eventListenerConfigurations id="default" merge:matcher="id">
+			<!-- Disable the default listener for updating an object's location and enable our version -->
+			<tenant:eventListenerConfig id="UpdateObjectLocationOnMove" merge:matcher="id" merge:action="delete" />
+			<tenant:eventListenerConfig id="UpdateObjectLocationAndCrateOnMove" merge:matcher="id">
+				<tenant:className>org.collectionspace.services.listener.UpdateObjectLocationAndCrateOnMove</tenant:className>
+			</tenant:eventListenerConfig>
+			
+			<!-- Listener to denormalize artist name into collectionobject record -->
+			<tenant:eventListenerConfig id="UpdateArtistDisplayNameListener" merge:matcher="id">
+				<tenant:className>org.collectionspace.services.listener.bampfa.UpdateArtistDisplayNameListener</tenant:className>
+			</tenant:eventListenerConfig>
+			
+			<!-- Listener to denormalize "object production" person's nationality into collectionobject record -->
+			<tenant:eventListenerConfig id="UpdateNationalitiesListener" merge:matcher="id">
+				<tenant:className>org.collectionspace.services.listener.bampfa.UpdateNationalitiesListener</tenant:className>
+			</tenant:eventListenerConfig>
+		</tenant:eventListenerConfigurations>
+
+		<tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
+			<service:validatorHandler merge:matcher="tag" merge:action="replace" xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.collectionobject.nuxeo.BAMPFACollectionObjectValidatorHandler</service:validatorHandler>
+		</tenant:serviceBindings>
+
+		<tenant:serviceBindings merge:matcher="id" id="idgenerators">
+			<service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
+				<service:params>
+					<service:property merge:matcher="skip" merge:action="insert">
+						<service:key>sqlScriptName</service:key>
+						<service:value>set_bampfa_vocabulary_csids.sql</service:value>
+					</service:property>
+					<service:property merge:matcher="skip" merge:action="insert">
+						<service:key>sqlScriptName</service:key>
+						<service:value>grant_bampfa_reporters_privileges.sql</service:value>
+					</service:property>
+				</service:params>
+			</service:initHandler>
+		</tenant:serviceBindings>
+
+		<!-- An attempt to add a local schema extension to Dimensions. Neither the services, app, or UI layers handle this properly. -->
+		<!-- <tenant:serviceBindings merge:matcher="id" id="Dimensions">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service">
+				<service:part id="3" control_group="Managed" versionable="true" auditable="false" label="dimensions_bampfa" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/dimension/local/bampfa" schemaLocation="http://collectionspace.org/services/dimension/local/bampfa http://collectionspace.org/services/dimension/local/dimensions_bampfa.xsd"/>
+					</service:content>
+					<service:properties>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>bampfaMeasuredPartGroupList/*/bampfaDimensionSubGroupList/*/bampfaMeasuredBy</types:value>
+						</types:item>
+					</service:properties>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings> -->
+	</tenant:tenantBinding>
+</tenant:TenantBindingConfig>
