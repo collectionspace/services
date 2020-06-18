@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="bampfaImageMetadata" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="cd1a2b9c-3651-4724-bf31-ba13eda96eeb">
+	<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="idNumber" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+  artistcalc Artist,
+  fullbampfacreditline CreditLine,
+  datemade,
+  idnumber,
+  itemclass,
+  materials,
+  measurement,
+  artistorigin OriginOrPlace,
+  title,
+  photocredit,
+  site,
+  copyrightcredit,
+  subjectone,
+  subjecttwo,
+  subjectthree,
+  subjectfour,
+  subjectfive
+FROM bampfa_denorm.bampfa_collectionitems_vw
+WHERE idnumber = $P{idNumber}]]>
+	</queryString>
+	<field name="artist" class="java.lang.String"/>
+	<field name="creditline" class="java.lang.String"/>
+	<field name="datemade" class="java.lang.String"/>
+	<field name="idnumber" class="java.lang.String"/>
+	<field name="itemclass" class="java.lang.String"/>
+	<field name="materials" class="java.lang.String"/>
+	<field name="measurement" class="java.lang.String"/>
+	<field name="originorplace" class="java.lang.String"/>
+	<field name="title" class="java.lang.String"/>
+	<field name="photocredit" class="java.lang.String"/>
+	<field name="site" class="java.lang.String"/>
+	<field name="copyrightcredit" class="java.lang.String"/>
+	<field name="subjectone" class="java.lang.String"/>
+	<field name="subjecttwo" class="java.lang.String"/>
+	<field name="subjectthree" class="java.lang.String"/>
+	<field name="subjectfour" class="java.lang.String"/>
+	<field name="subjectfive" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="34" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="af8d9a3e-0893-4233-8b81-549168b38ced" x="0" y="0" width="25" height="20"/>
+				<textElement/>
+				<text><![CDATA[creditline]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="33dc47ac-aceb-40ad-afb6-a9f681992fe1" x="25" y="0" width="25" height="20"/>
+				<textElement/>
+				<text><![CDATA[datemade]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="16443f86-6f59-42e4-8f1c-82d79f4c806f" x="50" y="0" width="25" height="20"/>
+				<textElement/>
+				<text><![CDATA[artist]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0158b401-4752-4c76-b2d7-72d7830f57a8" x="75" y="0" width="25" height="20"/>
+				<textElement/>
+				<text><![CDATA[idnumber]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="bee93f99-6f96-436f-bae2-10ea8079b527" x="100" y="0" width="25" height="20"/>
+				<textElement/>
+				<text><![CDATA[itemclass]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="836918bd-f90f-4dd7-aa44-5e82c5bb8970" x="125" y="0" width="25" height="20"/>
+				<textElement/>
+				<text><![CDATA[materials]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4d354582-f9ec-4819-8ae4-704e5a32f114" x="150" y="0" width="25" height="20"/>
+				<textElement/>
+				<text><![CDATA[measurement]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="fc9c3cd0-6ad4-4bf5-b1ed-886cb24fa2d5" x="175" y="0" width="25" height="20"/>
+				<textElement/>
+				<text><![CDATA[originorplace]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="080f6ba4-1eb8-46b4-9fcf-0ce4ed7122f2" x="200" y="0" width="25" height="20"/>
+				<textElement/>
+				<text><![CDATA[title]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b5acebd4-9041-4d08-861e-4c15b76a88d6" x="225" y="0" width="25" height="20"/>
+				<textElement/>
+				<text><![CDATA[photocredit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9ab7fe25-aeec-4348-aa69-c289f659205e" x="250" y="0" width="25" height="20"/>
+				<textElement/>
+				<text><![CDATA[site]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f5bef588-d03b-4439-bee4-71fb66ddb80e" x="275" y="0" width="25" height="20"/>
+				<textElement/>
+				<text><![CDATA[copyrightcredit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="002b3d69-bba9-4d89-890a-ad329522b0c1" x="300" y="0" width="25" height="20"/>
+				<textElement/>
+				<text><![CDATA[subjectone]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="888a8f26-ce7e-4e55-a801-46794f6784f6" x="325" y="0" width="25" height="20"/>
+				<textElement/>
+				<text><![CDATA[subjecttwo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="00f4d89e-3e9a-4c0e-aece-308d74e8261e" x="350" y="0" width="25" height="20"/>
+				<textElement/>
+				<text><![CDATA[subjectthree]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9939537b-5d2e-46de-932e-8d73534b4de9" x="375" y="0" width="25" height="20"/>
+				<textElement/>
+				<text><![CDATA[subjectfour]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d3c53d4d-35f1-4945-8d51-c214e9e0b5f1" x="400" y="0" width="25" height="20"/>
+				<textElement/>
+				<text><![CDATA[subjectfive]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch">
+			<textField>
+				<reportElement uuid="f4655445-a6fe-4e85-b861-1787ec602847" x="0" y="0" width="25" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{creditline}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="7cd1180d-080b-43f0-b89e-9ea9af4b64b2" x="25" y="0" width="25" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{datemade}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="cf9aacfc-211a-4fa9-9403-b5e2b70872f5" x="50" y="0" width="25" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{artist}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="e7c0c1e3-4bef-4c1a-8fff-ba321b8ac459" x="75" y="0" width="25" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{idnumber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="5aa4294e-40a3-4cf8-b99a-199faa71e6c7" x="100" y="0" width="25" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{itemclass}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="9ee558d4-0c1f-4887-9828-2820a3ffe3ce" x="125" y="0" width="25" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{materials}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="00a76929-ad94-4a0c-b373-22e294cbe0f3" x="150" y="0" width="25" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{measurement}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="a1eaca99-7913-4310-9cbf-5d218fba8785" x="175" y="0" width="25" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{originorplace}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="40674406-1bde-4a14-9d2b-017da4728215" x="200" y="0" width="25" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="8dc66ba0-6693-4326-9fe9-a45441bd6de7" x="225" y="0" width="25" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{photocredit}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="4c646a62-175f-4d6a-97c9-148e181f4a96" x="250" y="0" width="25" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{site}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="eb3991c5-a83f-4636-8d13-f48a02ea7690" x="275" y="0" width="25" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{copyrightcredit}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="0a3d5541-4e33-4c55-9533-81fb7b30e982" x="300" y="0" width="25" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{subjectone}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="752b18fc-a280-486d-8c03-a281028815e5" x="325" y="0" width="25" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{subjecttwo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="38939560-f2f4-4a1b-90e9-ec79bff16a0c" x="350" y="0" width="25" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{subjectthree}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="e9170bcc-b859-419b-bd71-44838d9e41ce" x="375" y="0" width="25" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{subjectfour}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="532a6a65-62c4-455b-807d-a81ddb043561" x="400" y="0" width="25" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{subjectfive}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

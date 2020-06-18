@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BAMPFA: Location Report" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="740" leftMargin="26" rightMargin="26" topMargin="30" bottomMargin="30" uuid="00039d14-8750-45ca-b1fa-81722dbd5f9d">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="csid" class="java.lang.String">
+		<defaultValueExpression><![CDATA["680e5f19-abc5-44d7-b5e6"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+   hrc.name groupCSID,
+   coc.objectnumber accnNumber,
+   cob.sortableEffectiveObjectNumber accnNumberSort,
+   case
+        when (cob.artistdisplayoverride is null or cob.artistdisplayoverride='')
+            then utils.concat_artists(hrc.name)
+        else cob.artistdisplayoverride
+   end artistCalc,
+   btg.bampfaformattedtitle title,
+   utils.getdispl(cob.itemclass) itemClass,
+   replace(mpg.dimensionsummary, '-', ' ') measurementSummary,
+   CASE
+      WHEN coc.computedcurrentlocation is not null AND coc.computedcurrentlocation != ''
+      THEN utils.getdispl(coc.computedcurrentlocation) ||
+         CASE
+            WHEN cob.computedcrate is not null AND cob.computedcrate != ''
+            THEN ' (Package: ' || utils.getdispl(cob.computedcrate) || ')'
+            ELSE ''
+         END
+      ELSE
+         CASE
+            WHEN cob.computedcrate is not null AND cob.computedcrate != ''
+            THEN '(Package: ' || utils.getdispl(cob.computedcrate) || ')'
+            ELSE null
+         END
+      END AS currentLocation
+FROM groups_common gc
+INNER JOIN hierarchy hgc ON (gc.id = hgc.id)
+INNER JOIN relations_common rc ON (hgc.name = rc.objectcsid)
+INNER JOIN hierarchy hrc ON (rc.subjectcsid = hrc.name)
+INNER JOIN collectionobjects_common coc ON (hrc.id = coc.id)
+INNER JOIN misc m ON (
+   coc.id = m.id
+   AND m.lifecyclestate <> 'deleted')
+LEFT OUTER JOIN collectionobjects_bampfa cob ON (coc.id = cob.id)
+LEFT OUTER JOIN hierarchy hbtg ON (
+   coc.id = hbtg.parentid
+   AND hbtg.name = 'collectionobjects_bampfa:bampfaTitleGroupList'
+   AND hbtg.pos = 0)
+LEFT OUTER JOIN bampfatitlegroup btg ON (hbtg.id = btg.id)
+LEFT OUTER JOIN hierarchy hmpg ON (
+   coc.id = hmpg.parentid
+   AND hmpg.name = 'collectionobjects_common:measuredPartGroupList'
+   AND hmpg.pos = 0)
+LEFT OUTER JOIN measuredpartgroup mpg ON (hmpg.id = mpg.id)
+WHERE hgc.name = $P{csid}
+ORDER BY cob.sortableEffectiveObjectNumber]]>
+	</queryString>
+	<field name="groupcsid" class="java.lang.String"/>
+	<field name="accnnumber" class="java.lang.String"/>
+	<field name="accnnumbersort" class="java.lang.String"/>
+	<field name="artistcalc" class="java.lang.String"/>
+	<field name="title" class="java.lang.String"/>
+	<field name="itemclass" class="java.lang.String"/>
+	<field name="measurementsummary" class="java.lang.String"/>
+	<field name="currentlocation" class="java.lang.String"/>
+	<title>
+		<band height="90" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="610bdc26-3968-4115-b85c-cc9f1cbc3630" mode="Transparent" x="0" y="56" width="740" height="24" forecolor="#000000"/>
+				<textElement textAlignment="Center" markup="none">
+					<font fontName="SansSerif" size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Location Report]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="20e65934-92fe-47c0-bae5-d3ba148e202e" mode="Opaque" x="1" y="2" width="740" height="40" forecolor="#000000" backcolor="#999999"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font fontName="SansSerif" size="24" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ Berkeley Art Museum and Pacific Film Archive]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="ab7c19c5-bc90-44fd-9d33-02951be13387" x="93" y="0" width="130" height="16" forecolor="#404040"/>
+				<textElement>
+					<font fontName="SansSerif" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Artist]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1e5deee1-32b4-4fff-b655-d312ba1b9d70" x="0" y="0" width="90" height="16" forecolor="#404040"/>
+				<textElement>
+					<font fontName="SansSerif" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Accession No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="deae3fbc-9ac5-4a6e-9f7f-c76340c2af1f" x="226" y="0" width="200" height="16" forecolor="#404040"/>
+				<textElement>
+					<font fontName="SansSerif" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Title]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="045ba768-cba6-4950-b145-250ea4b72aab" x="640" y="0" width="100" height="16" forecolor="#404040"/>
+				<textElement>
+					<font fontName="SansSerif" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Location]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="61a7a862-233b-4e0b-8454-3bd09354630e" x="429" y="0" width="80" height="16" forecolor="#404040"/>
+				<textElement>
+					<font fontName="SansSerif" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Item Class]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="831bf368-03ea-4a8d-87e5-ceac2ffb9e2d" x="512" y="0" width="125" height="16" forecolor="#404040"/>
+				<textElement>
+					<font fontName="SansSerif" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Measurement	]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="25" splitType="Stretch">
+			<line>
+				<reportElement uuid="4010b9b9-0f5f-4753-99be-515989bd918b" x="0" y="2" width="740" height="1"/>
+			</line>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="61620fa5-a1a1-427b-ad11-3cc578ae1867" stretchType="RelativeToBandHeight" x="0" y="5" width="90" height="16"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{accnnumber}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="b2774bdb-bff4-407c-87f7-b3917d04807d" stretchType="RelativeToBandHeight" x="93" y="5" width="130" height="16"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{artistcalc}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="73fc7934-b5c2-40f9-9736-74fc178cff3a" stretchType="RelativeToBandHeight" x="226" y="5" width="200" height="16"/>
+				<textElement markup="html">
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="7831d85e-27e5-4ef5-b536-7ff9286be84d" stretchType="RelativeToBandHeight" x="640" y="5" width="100" height="16"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{currentlocation}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="75b2963b-3d0d-41ac-a097-f7fe243e81ea" stretchType="RelativeToBandHeight" x="429" y="5" width="80" height="16"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{itemclass}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="1faba5bd-76a0-4deb-acee-aba368ce4601" stretchType="RelativeToBandHeight" x="512" y="5" width="125" height="16"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{measurementsummary}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement uuid="8fc0002a-ee4c-4378-a211-77d7f7934068" x="0" y="4" width="80" height="16"/>
+				<textElement>
+					<font fontName="SansSerif"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="M/d/yyyy">
+				<reportElement uuid="06fd2da7-1de6-4e3a-92c1-c05b3e6872a4" mode="Transparent" x="540" y="4" width="200" height="16" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

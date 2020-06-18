@@ -1,5 +1,6 @@
-package org.collectionspace.services.collectionobject.nuxeo;
+package org.collectionspace.services.collectionobject.nuxeo.validators;
 
+import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectValidatorHandler;
 import org.collectionspace.services.common.document.InvalidDocumentException;
 
 public class BotGardenCollectionObjectValidatorHandler extends CollectionObjectValidatorHandler {
