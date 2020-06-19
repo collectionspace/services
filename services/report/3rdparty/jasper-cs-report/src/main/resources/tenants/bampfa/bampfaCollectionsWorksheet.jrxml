@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.3.0.final using JasperReports Library version 6.3.0  -->
+<!-- 2016-07-13T19:02:55 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="bampfaCollectionsWorksheet" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="73f0dc23-1df9-45b6-a0a1-979b2bfe0f35">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="25"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="inch"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="csid" class="java.lang.String">
+		<defaultValueExpression><![CDATA["0e11750a-d18f-49a4-b6de-3951d7c8cc3b"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+   h1.name objectCSID,
+   co.objectnumber idNumber,
+   cb.sortableEffectiveObjectNumber sortObjectNumber,
+   con.numbervalue otherNumber,
+   utils.getdispl(cb.itemclass) itemclass,
+   case when (cb.artistdisplayoverride is null or cb.artistdisplayoverride='') then utils.concat_artists(h1.name)
+     else cb.artistdisplayoverride end as artistCalc,
+   utils.getdispl(ba.bampfaobjectproductionperson) artist,
+   case when (pc.birthplace is null or pc.birthplace='') then pcn.item
+     else pcn.item||', born '||pc.birthplace end as artistorigin,
+   sdgpb.datedisplaydate artistbirthdate,
+   sdgpd.datedisplaydate artistdeathdate,
+   pb.datesactive,
+   bt.bampfaformattedtitle title,
+   cb.seriestitle seriestitle,
+   cb.initialvalue,
+   cv.currentvalue,
+   cv.currentvaluesource,
+   sdgcv.datedisplaydate currentvaluedate,
+   cb.creditline,
+   sdg.datedisplaydate dateMade,
+   mp.dimensionsummary measurement,
+   co.physicaldescription materials,
+   sdgac.datedisplaydate dateacquired, -- in future will need case statements to get from intake
+   cas.item acquisitionsource,
+   cb.provenance,
+   sg.inscriptioncontent signature,
+   ccom.item notescomments,
+   cg.catalogername cataloger,
+   cg.catalognote catalognote,
+   to_char(date(cg.catalogdate + interval '8 hours'), 'MM/dd/yyyy') catalogdate
+from
+   hierarchy h1
+   INNER JOIN collectionobjects_common co
+      ON (h1.id = co.id AND h1.primarytype = 'CollectionObjectTenant55')
+   INNER JOIN misc m
+      ON (co.id = m.id AND m.lifecyclestate <> 'deleted')
+   LEFT OUTER JOIN collectionobjects_bampfa cb
+      ON (co.id = cb.id)
+   INNER JOIN collectionspace_core core on co.id=core.id
+   LEFT OUTER JOIN hierarchy h2
+      ON (h2.parentid = co.id AND h2.name='collectionobjects_common:objectProductionDateGroupList' and h2.pos=0)
+   LEFT OUTER JOIN structuredDateGroup sdg ON (h2.id = sdg.id)
+   LEFT OUTER JOIN hierarchy h3
+      ON (h3.parentid = co.id AND h3.name = 'collectionobjects_common:otherNumberList' and h3.pos=0)
+   LEFT OUTER JOIN othernumber con
+      ON (h3.id = con.id)
+   LEFT OUTER JOIN hierarchy h4
+      ON (h4.parentid = co.id AND h4.name = 'collectionobjects_bampfa:bampfaTitleGroupList' and h4.pos=0)
+   LEFT OUTER JOIN bampfatitlegroup bt
+      ON (h4.id = bt.id)
+   LEFT OUTER JOIN hierarchy h5
+      ON (h5.parentid = co.id AND h5.name = 'collectionobjects_bampfa:currentValueGroupList' and h5.pos=0)
+   LEFT OUTER JOIN currentvaluegroup cv
+      ON (h5.id = cv.id)
+   LEFT OUTER JOIN hierarchy h6
+      ON (h6.parentid = cv.id AND h6.name='currentValueDateGroup')
+   LEFT OUTER JOIN structuredDateGroup sdgcv ON (h6.id = sdgcv.id)
+   LEFT OUTER JOIN hierarchy h7
+      ON (h7.parentid = co.id AND h7.name = 'collectionobjects_common:measuredPartGroupList' and h7.pos=0)
+   LEFT OUTER JOIN measuredpartgroup mp
+      ON (h7.id = mp.id)
+   LEFT OUTER JOIN hierarchy h8
+      ON (h8.parentid = co.id AND h8.name = 'collectionobjects_common:textualInscriptionGroupList' and h8.pos=0)
+   LEFT OUTER JOIN textualinscriptiongroup sg
+      ON (h8.id = sg.id)
+   LEFT OUTER JOIN hierarchy h9
+      ON (h9.parentid = co.id AND h9.name='collectionobjects_bampfa:acquisitionDateGroupList' and h9.pos=0)
+   LEFT OUTER JOIN structuredDateGroup sdgac ON (h9.id = sdgac.id)
+   LEFT OUTER JOIN collectionobjects_bampfa_acquisitionsources cas on (co.id=cas.id and cas.pos=0)
+   LEFT OUTER JOIN collectionobjects_common_comments ccom on (co.id=ccom.id and ccom.pos=0)
+   LEFT OUTER JOIN hierarchy h10
+      ON (h10.parentid = co.id AND h10.name = 'collectionobjects_bampfa:catalogerGroupList' and h10.pos=0)
+   LEFT OUTER JOIN catalogergroup cg
+      ON (h10.id = cg.id)
+   LEFT OUTER JOIN hierarchy h11
+      ON (h11.parentid = co.id AND h11.name = 'collectionobjects_bampfa:bampfaObjectProductionPersonGroupList' and h11.pos=0)
+   LEFT OUTER JOIN bampfaobjectproductionpersongroup ba
+      ON (h11.id = ba.id)
+   LEFT OUTER JOIN persons_common pc on (ba.bampfaobjectproductionperson=pc.refname)
+   LEFT OUTER JOIN persons_common_nationalities pcn on (pc.id=pcn.id and pcn.pos=0)
+   LEFT OUTER JOIN hierarchy h12
+      ON (h12.parentid = pc.id AND h12.name='persons_common:birthDateGroup')
+   LEFT OUTER JOIN structuredDateGroup sdgpb ON (h12.id = sdgpb.id)
+   LEFT OUTER JOIN hierarchy h13
+      ON (h13.parentid = pc.id AND h13.name='persons_common:deathDateGroup')
+   LEFT OUTER JOIN structuredDateGroup sdgpd ON (h13.id = sdgpd.id)
+   LEFT OUTER JOIN persons_bampfa pb on (pc.id=pb.id)
+WHERE h1.name = $P{csid}]]>
+	</queryString>
+	<field name="objectcsid" class="java.lang.String"/>
+	<field name="idnumber" class="java.lang.String"/>
+	<field name="sortobjectnumber" class="java.lang.String"/>
+	<field name="othernumber" class="java.lang.String"/>
+	<field name="itemclass" class="java.lang.String"/>
+	<field name="artistcalc" class="java.lang.String"/>
+	<field name="artist" class="java.lang.String"/>
+	<field name="artistorigin" class="java.lang.String"/>
+	<field name="artistbirthdate" class="java.lang.String"/>
+	<field name="artistdeathdate" class="java.lang.String"/>
+	<field name="datesactive" class="java.lang.String"/>
+	<field name="title" class="java.lang.String"/>
+	<field name="seriestitle" class="java.lang.String"/>
+	<field name="initialvalue" class="java.lang.Double"/>
+	<field name="currentvalue" class="java.lang.Double"/>
+	<field name="currentvaluesource" class="java.lang.String"/>
+	<field name="currentvaluedate" class="java.lang.String"/>
+	<field name="creditline" class="java.lang.String"/>
+	<field name="datemade" class="java.lang.String"/>
+	<field name="measurement" class="java.lang.String"/>
+	<field name="materials" class="java.lang.String"/>
+	<field name="dateacquired" class="java.lang.String"/>
+	<field name="acquisitionsource" class="java.lang.String"/>
+	<field name="provenance" class="java.lang.String"/>
+	<field name="signature" class="java.lang.String"/>
+	<field name="notescomments" class="java.lang.String"/>
+	<field name="cataloger" class="java.lang.String"/>
+	<field name="catalognote" class="java.lang.String"/>
+	<field name="catalogdate" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="52" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="572" height="19" uuid="d0bbf58f-b503-48fb-815d-dc9a48c1b537"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[University of California, Berkeley Art Museum]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="23" width="572" height="19" uuid="aeb33858-43e2-4bb6-8146-9758b3f42af4"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[COLLECTIONS WORKSHEET]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="647" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="20" uuid="87d9a460-1a78-4171-b801-0e44d5cb223d"/>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Classification]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="108" y="0" width="252" height="20" uuid="205008f3-3b10-407c-8abe-79fcc6248188"/>
+				<textElement textAlignment="Left">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{itemclass}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="20" width="100" height="20" uuid="c3d6da51-7d29-4130-ac4d-b704f15dfbb8"/>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Accession #]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="108" y="20" width="252" height="20" uuid="f658c866-d609-4168-a4e5-ad538d0bf3bf"/>
+				<textElement textAlignment="Left">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{idnumber}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="40" width="100" height="20" uuid="ff93ac2c-1673-4842-b23f-f53a7c9dfa42"/>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Artist]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="108" y="40" width="461" height="36" uuid="dc5a30e1-58a3-4e21-880b-d6c757e892a7"/>
+				<textElement textAlignment="Left">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{artistcalc}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="396" y="0" width="71" height="40" uuid="5ea0f055-803d-4585-87c5-a5060b22f26a"/>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Other Numbers]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="472" y="0" width="100" height="40" uuid="76a99507-2b41-4119-82a4-483713e3d352"/>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{othernumber}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="78" width="100" height="20" uuid="03c06d79-87c6-47ac-a4e4-b27939f10d46"/>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Origin or Place]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="108" y="78" width="461" height="20" uuid="62e67930-b242-48db-8754-a9f84749fd08"/>
+				<textElement textAlignment="Left">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{artistorigin}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="98" width="100" height="20" uuid="4e0e4f32-2c98-4e97-a5c6-2e24c2d86abe"/>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date of Birth]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="108" y="98" width="461" height="20" uuid="86b756e2-82b2-4f88-a85c-ecac3dc964d7"/>
+				<textElement textAlignment="Left">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{artistbirthdate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="118" width="100" height="20" uuid="099aa00e-ee0a-401c-b253-cc9d3d901525"/>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date of Death]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="108" y="118" width="461" height="20" uuid="8a882a67-5a15-468c-981b-479809448ce0"/>
+				<textElement textAlignment="Left">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{artistdeathdate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="138" width="100" height="20" uuid="f89eab43-d58d-44bc-a36f-f6d1050d1f03"/>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Dates Active]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="108" y="138" width="461" height="20" uuid="c45dd467-c2ea-4215-bd0b-bcb2c40e4391"/>
+				<textElement textAlignment="Left">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{datesactive}]]></textFieldExpression>
+			</textField>
+			<elementGroup>
+				<elementGroup>
+					<staticText>
+						<reportElement x="0" y="158" width="100" height="20" uuid="a57b45cc-725c-4e6d-913d-f3764b8589c5"/>
+						<textElement textAlignment="Left">
+							<font size="12" isBold="true"/>
+						</textElement>
+						<text><![CDATA[Title]]></text>
+					</staticText>
+					<textField isBlankWhenNull="true">
+						<reportElement x="108" y="158" width="461" height="20" uuid="f60df71d-eb19-4cb6-a1a3-7606d6281d54"/>
+						<textElement textAlignment="Left" markup="html">
+							<font size="12" isBold="false"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
+					</textField>
+				</elementGroup>
+			</elementGroup>
+			<elementGroup>
+				<staticText>
+					<reportElement x="0" y="206" width="100" height="20" uuid="d92e8b88-5d5c-4266-8863-ef5c33bdbfb6"/>
+					<textElement textAlignment="Left">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Date Made]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="108" y="206" width="462" height="20" uuid="5f098566-f397-4013-965d-bb9f7d6bc400"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{datemade}]]></textFieldExpression>
+				</textField>
+			</elementGroup>
+			<elementGroup>
+				<staticText>
+					<reportElement x="0" y="226" width="100" height="20" uuid="5bbb9cee-17a2-4620-b5f3-c4da02e2469f"/>
+					<textElement textAlignment="Left">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Materials]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="108" y="226" width="462" height="44" uuid="0914cecd-862f-4f66-8cb4-379038fc8d9c"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{materials}]]></textFieldExpression>
+				</textField>
+			</elementGroup>
+			<elementGroup>
+				<textField isBlankWhenNull="true">
+					<reportElement x="108" y="274" width="462" height="20" uuid="8700f8d7-a41d-4829-b675-b0aff98cab78"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{measurement}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="274" width="100" height="20" uuid="f69df523-106a-4e7d-8250-a17f4bcccb1f"/>
+					<textElement textAlignment="Left">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Measurement]]></text>
+				</staticText>
+			</elementGroup>
+			<elementGroup>
+				<textField isBlankWhenNull="true">
+					<reportElement x="108" y="294" width="462" height="30" uuid="106548ed-1bba-4439-b9d5-606ddafda6a8"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{signature}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="294" width="100" height="20" uuid="6b642b41-484b-44b1-b7d0-a7ca770b1ca5"/>
+					<textElement textAlignment="Left">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Signature]]></text>
+				</staticText>
+			</elementGroup>
+			<elementGroup>
+				<staticText>
+					<reportElement x="0" y="324" width="100" height="20" uuid="2ae9ac3e-d1b6-4085-a60c-b073edc2e8e7"/>
+					<textElement textAlignment="Left">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Credit Line]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="108" y="324" width="462" height="42" uuid="3b634388-6e0b-44e3-b8b5-0ad6bed9244c"/>
+					<textElement textAlignment="Left">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{creditline}]]></textFieldExpression>
+				</textField>
+			</elementGroup>
+			<staticText>
+				<reportElement x="0" y="367" width="100" height="20" uuid="fecab5f2-1418-4b80-8f3d-55c3cdb4909e"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date Acquired]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="108" y="367" width="462" height="20" uuid="0bdaa4ca-27ce-44a7-b663-8b5ac7a07ac9"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dateacquired}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="387" width="100" height="20" uuid="d0646ba8-5cc2-4bc3-8dd6-dc1bf091da86"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Source]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="108" y="387" width="462" height="44" uuid="733cd6bd-4cbc-408a-823b-fff2bc74ba7a"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{acquisitionsource}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="431" width="100" height="20" uuid="a7e715ae-5147-47e1-a778-85284a6a4cff"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Provenance]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="108" y="431" width="462" height="36" uuid="770e1e78-c231-4898-b578-c0813977f367"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{provenance}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="467" width="100" height="20" uuid="494ffd2a-d0e6-4e9f-ab9c-4aed70218fb8"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cataloger]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="108" y="467" width="461" height="20" uuid="8df26b4b-813b-4aac-bae0-29448d64e087"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cataloger}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="487" width="100" height="48" uuid="6bca400d-0f71-4c95-a056-b15407adc278"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cataloger Notes and Date]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="108" y="487" width="316" height="20" uuid="912ffc86-8f5a-4916-9f2c-16dc642b4063"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{catalognote}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="535" width="100" height="20" uuid="a2f9a362-c2ee-4e02-a1f9-18f3c8ce7963"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Initial Value]]></text>
+			</staticText>
+			<textField pattern="###0" isBlankWhenNull="true">
+				<reportElement x="108" y="535" width="113" height="20" uuid="10ccbe2c-db1f-4f7f-bc23-b2f3e61bf9c2"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{initialvalue}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="555" width="100" height="20" uuid="9587b7aa-beaf-4806-88f0-e71305fcffc2"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Current Value]]></text>
+			</staticText>
+			<textField pattern="###0" isBlankWhenNull="true">
+				<reportElement x="108" y="555" width="113" height="20" uuid="8306db19-3d71-4eb4-a74a-9fa85128bea8"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{currentvalue}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="221" y="535" width="134" height="20" uuid="6dc6be9e-278d-49d1-91f7-56f73e97a3da"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Current Value Source]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="360" y="536" width="211" height="20" uuid="62374fa9-5a9c-4495-8126-c154e611af7a"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{currentvaluesource}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="221" y="555" width="134" height="20" uuid="f242c3f8-2687-46b8-8486-a26283a40a63"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Current Value Date]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="360" y="556" width="211" height="20" uuid="39c3f2be-8c1e-43d5-834d-95462318069d"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{currentvaluedate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="575" width="290" height="20" uuid="0793077b-a8d0-4832-9980-07660c91336e"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[General Notes or Comments]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="595" width="570" height="45" uuid="eb949950-35c5-46ab-8923-dd3af257755a"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{notescomments}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement key="" x="107" y="508" width="147" height="20" uuid="b1b27d7f-05b9-43f9-b32d-8597f5019713"/>
+				<textElement textAlignment="Left">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{catalogdate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="182" width="100" height="20" uuid="f012725f-7bce-4001-ba92-08a422dab994"/>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Series Title]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="108" y="182" width="461" height="20" uuid="4854c5ee-5205-43ec-8a40-3e5bb3d96428"/>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{seriestitle}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

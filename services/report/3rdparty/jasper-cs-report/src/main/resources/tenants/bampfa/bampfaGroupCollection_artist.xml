@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="report">
+  <ns2:reports_common xmlns:ns2="http://collectionspace.org/services/report">
+    <name>Collection Report (Sort by Artist)</name>
+    <notes></notes>
+    <forDocTypes>
+      <forDocType>Group</forDocType>
+    </forDocTypes>
+    <supportsSingleDoc>true</supportsSingleDoc>
+    <supportsDocList>false</supportsDocList>
+    <supportsGroup>true</supportsGroup>
+    <supportsNoContext>true</supportsNoContext>
+    <filename>bampfaGroupCollection_artist.jasper</filename>
+    <outputMIME>application/vnd.openxmlformats-officedocument.wordprocessingml.document</outputMIME>
+    <supportsParams>false</supportsParams>
+  </ns2:reports_common>
+</document>

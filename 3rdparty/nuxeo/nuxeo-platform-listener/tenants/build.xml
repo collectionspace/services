@@ -1,0 +1,51 @@
+<project name="cspace.ui" default="package" xmlns:if="ant:if" xmlns:unless="ant:unless">
+	<description>
+		Deploy Nuxeo event listeners
+	</description>
+
+	<!-- set global properties for this build -->
+	<property name="services.trunk" value="../../../.."/>
+	<echo>CSpace Release is ${cspace.release}</echo>
+
+	<!-- Environment should be declared before reading build.properties -->
+	<property environment="env" />
+	<property file="${services.trunk}/build.properties" />
+
+	<target name="deploy_tenants">
+		<subant target="deploy_tenant" genericantfile="${ant.file}" inheritall="true">
+			<dirset dir="." includes="*" excludes=".*,target" />
+		</subant>
+	</target>
+
+	<target name="deploy_tenant">
+		<basename property="tenant.shortname" file="${basedir}" />
+		<echo>Deploy tenant listers for ${tenant.shortname}</echo>
+		<ant antfile="build.xml" target="deploy" inheritall="false"/>
+	</target>
+
+	<target name="undeploy_tenants">
+		<subant target="undeploy_tenant" genericantfile="${ant.file}" inheritall="true">
+			<dirset dir="." includes="*" />
+		</subant>
+	</target>
+
+	<target name="undeploy_tenant">
+		<basename property="tenant.shortname" file="${basedir}" />
+
+		<property file="${basedir}/build.properties" />
+
+		<antcall target="undeploy_tenant_webapp" />
+	</target>
+
+	<target name="undeploy_tenant_webapp">
+		<delete dir="${jee.deploy.cspace}/${tenant.ui.webapp.dir}" />
+	</target>
+
+	<target name="undeploy_js">
+		<delete dir="${jee.deploy.cspace.ui.shared}" />
+	</target>
+
+	<target name="deploy" depends="deploy_tenants" description="deploy event listeners ${jee.server.cspace}" />
+
+	<target name="undeploy" depends="undeploy_tenants" description="undeploy event listeners ${jee.server.cspace}" />
+</project>

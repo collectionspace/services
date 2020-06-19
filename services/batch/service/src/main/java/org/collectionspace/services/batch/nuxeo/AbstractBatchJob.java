@@ -3,7 +3,6 @@ package org.collectionspace.services.batch.nuxeo;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,11 +30,8 @@ import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
-import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.CollectionSpaceResource;
 import org.collectionspace.services.common.NuxeoBasedResource;
-import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.UriTemplateRegistry;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
@@ -58,7 +54,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 
-	final Logger logger = LoggerFactory.getLogger(AbstractBatchJob.class);
+	protected final Logger logger = LoggerFactory.getLogger(AbstractBatchJob.class);
 
 	private Map<String, String> authorityServiceNamesByDocType;
 
