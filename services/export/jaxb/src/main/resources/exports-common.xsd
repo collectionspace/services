@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+	Export schema (XSD)
+
+	Entity  : Export
+	Part    : Common
+	Used for: JAXB binding between XML and Java objects
+
+	$LastChangedRevision: 2498 $
+	$LastChangedDate: 2010-06-16 14:47:45 -0700 (Wed, 16 Jun 2010) $
+-->
+
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns:ns="http://collectionspace.org/services/export"
+  xmlns="http://collectionspace.org/services/export"
+  targetNamespace="http://collectionspace.org/services/export"
+  version="0.1"
+>
+
+	<!--
+		Avoid XmlRootElement nightmare:
+		See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+	-->
+	<xs:element name="exports_common">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="csid" type="xs:string" />
+				<xs:element name="name" type="xs:string" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

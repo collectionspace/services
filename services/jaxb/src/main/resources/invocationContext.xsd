@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!--
     Invocation Context schema (XSD)
-    
+
     Entity  : Invocation
     Used for: JAXB binding between XML and Java objects
 
@@ -17,12 +17,46 @@
                 <xs:element name="mode" type="xs:string"></xs:element>
                 <xs:element name="updateCoreValues" type="xs:string"></xs:element>
                 <xs:element name="docType" type="xs:string"></xs:element>
+                <xs:element name="vocabulary" type="xs:string"></xs:element>
                 <xs:element name="singleCSID" type="xs:string"></xs:element>
                 <xs:element name="groupCSID" type="xs:string"></xs:element>
                 <xs:element name="listCSIDs">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="csid" type="xs:string" minOccurs="0" maxOccurs="unbounded"></xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="query">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="kw" type="xs:string"></xs:element>
+                            <xs:element name="as" type="xs:string"></xs:element>
+                            <xs:element name="pgSz" type="xs:integer"></xs:element>
+                            <xs:element name="pgNum" type="xs:integer"></xs:element>
+                            <xs:element name="wf_deleted" type="xs:boolean" minOccurs="0"></xs:element>
+
+                            <!-- Relation query parameters -->
+                            <xs:element name="sbj" type="xs:string"></xs:element>
+                            <xs:element name="sbjType" type="xs:string"></xs:element>
+                            <xs:element name="prd" type="xs:string"></xs:element>
+                            <xs:element name="obj" type="xs:string"></xs:element>
+                            <xs:element name="objType" type="xs:string"></xs:element>
+                            <xs:element name="andReciprocal" type="xs:boolean" minOccurs="0"></xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="includeFields">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="field" type="xs:string" minOccurs="0" maxOccurs="unbounded"></xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="excludeFields">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="field" type="xs:string" minOccurs="0" maxOccurs="unbounded"></xs:element>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>

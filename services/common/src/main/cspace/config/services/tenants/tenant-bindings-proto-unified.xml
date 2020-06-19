@@ -375,6 +375,44 @@
 		</tenant:serviceBindings>
 		<!-- end imports service meta-data -->
 
+		<!-- begin export service meta-data -->
+		<tenant:serviceBindings id="Exports" merge:matcher="id" name="Exports" type="utility" version="1.0">
+			<service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+			<service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.export.nuxeo.ExportDocumentModelHandler
+			</service:documentHandler>
+			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+				<service:params>
+					<service:ListResultsFields>
+					</service:ListResultsFields>
+				</service:params>
+			</service:DocHandlerParams>
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" name="Export"
+				version="1.0">
+				<service:part id="0" control_group="Managed" versionable="true" auditable="false" label="exports-system"
+					updated="" order="0">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/config/system"
+							schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+					</service:content>
+				</service:part>
+				<service:part id="1" control_group="Managed" versionable="true" auditable="false" label="exports_common"
+					updated="" order="1">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/export"
+							schemaLocation="http://collectionspace.org/services/export http://services.collectionspace.org/export/exports_common.xsd" />
+					</service:content>
+				</service:part>
+				<service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core"
+					updated="" order="2">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/"
+							schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd" />
+					</service:content>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+		<!-- end export service meta-data -->
+
 		<!-- begin Workflow service meta-data -->
 		<tenant:serviceBindings id="Workflow" merge:matcher="id" name="Workflow" type="utility"
 			version="1.0">

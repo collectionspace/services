@@ -1,0 +1,108 @@
+
+<project name="export" default="package" basedir=".">
+    <description>
+        export service
+    </description>
+  <!-- set global properties for this build -->
+    <property name="services.trunk" value="../.."/>
+    <!-- enviornment should be declared before reading build.properties -->
+    <property environment="env" />
+    <property file="${services.trunk}/build.properties" />
+    <property name="mvn.opts" value="-V" />
+    <property name="src" location="src"/>
+
+    <condition property="osfamily-unix">
+        <os family="unix" />
+    </condition>
+    <condition property="osfamily-windows">
+        <os family="windows" />
+    </condition>
+
+    <target name="package" depends="package-unix,package-windows"
+  description="Package CollectionSpace Services" />
+
+    <target name="package-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="package" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="package-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn" />
+            <arg value="package" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+
+    <target name="install" depends="install-unix,install-windows"
+  description="Install" />
+    <target name="install-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="install" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="install-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn" />
+            <arg value="install" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="clean" depends="clean-unix,clean-windows"
+  description="Delete target directories" >
+        <delete dir="${build}"/>
+    </target>
+    <target name="clean-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="clean" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="clean-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn" />
+            <arg value="clean" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="test" depends="test-unix,test-windows" description="Run tests" />
+    <target name="test-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="test" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="test-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn" />
+            <arg value="test" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+</project>

@@ -38,6 +38,7 @@ import org.collectionspace.services.valuationcontrol.ValuationcontrolResource;
 import org.collectionspace.services.objectexit.ObjectExitResource;
 import org.collectionspace.services.batch.BatchResource;
 import org.collectionspace.services.imports.ImportsResource;
+import org.collectionspace.services.export.ExportResource;
 import org.collectionspace.services.location.LocationAuthorityResource;
 import org.collectionspace.services.place.PlaceAuthorityResource;
 import org.collectionspace.services.work.WorkAuthorityResource;
@@ -111,6 +112,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         singletons.add(new PermissionResource());
         singletons.add(new ServiceGroupResource());
         singletons.add(new ImportsResource());
+        singletons.add(new ExportResource());
         singletons.add(new StructuredDateResource());
         singletons.add(new SystemInfoResource());
         singletons.add(new IndexResource());

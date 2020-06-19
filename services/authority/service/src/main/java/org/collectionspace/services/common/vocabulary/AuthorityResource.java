@@ -49,6 +49,7 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.XmlTools;
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.common.CollectionSpaceResource;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
@@ -777,7 +778,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             ) throws Exception {
     	return updateAuthorityItem(null, itemServiceCtx, resourceMap, uriInfo, parentspecifier, itemspecifier, theUpdate, shouldUpdateRevNumber, isProposed, isSASItem);
     }
-    
+
     public PoxPayloadOut updateAuthorityItem(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
             ServiceContext<PoxPayloadIn, PoxPayloadOut> itemServiceCtx, // Ok to be null.  Will be null on PUT calls, but not on sync calls
@@ -943,7 +944,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         uriInfo = new UriInfoWrapper(uriInfo);
         return updateItemWorkflowWithTransition(null, uriInfo, parentIdentifier, itemIdentifier, transition);
     }
-    
+
     public byte[] updateItemWorkflowWithTransition(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> existingContext,
             UriInfo uriInfo,
@@ -1065,7 +1066,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         }
 
         result = (PoxPayloadOut) ctx.getOutput();
-        if (result != null) {
+        if (result != null && !parentcsid.equals(PARENT_WILDCARD)) {
             String inAuthority = XmlTools.getElementValue(result.getDOMDocument(), "//" + AuthorityItemJAXBSchema.IN_AUTHORITY);
             if (inAuthority.equalsIgnoreCase(parentcsid) == false) {
                 throw new Exception(String.format("Looked up item = '%s' and found with inAuthority = '%s', but expected inAuthority = '%s'.",
@@ -1544,7 +1545,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             String xmlPayload) {
     	return updateAuthorityItem(null, resourceMap, uriInfo, parentSpecifier, itemSpecifier, xmlPayload);
     }
- 
+
     public byte[] updateAuthorityItem(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
             ResourceMap resourceMap,
@@ -1740,4 +1741,20 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         return csid;
     }
 
+	public static AuthorityResource<?, ?> getResourceForItem(ResourceMap resourceMap, String tenantId, String itemDocType) {
+		for (String serviceName : resourceMap.keySet()) {
+			CollectionSpaceResource<?, ?> resource = (CollectionSpaceResource<?, ?>) resourceMap.get(serviceName);
+
+			if (resource instanceof AuthorityResource) {
+				AuthorityResource<?, ?> authorityResource = (AuthorityResource<?, ?>) resource;
+				String docType = authorityResource.getItemDocType(tenantId);
+
+				if (docType.equals(itemDocType)) {
+					return authorityResource;
+				}
+			}
+		}
+
+		return null;
+	}
 }

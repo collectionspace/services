@@ -22,7 +22,6 @@
  */
 package org.collectionspace.services.common.invocable;
 
-import org.collectionspace.services.common.invocable.InvocationContext;
 import java.util.List;
 
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -64,16 +63,16 @@ public interface Invocable {
 
         @Override
         public String toString() {
-            return (Tools.notBlank(message)) ? message : "No error message provided";  
+            return (Tools.notBlank(message)) ? message : "No error message provided";
         }
     }
-    
-    public String INVOCATION_MODE_SINGLE = "single";
-    public String INVOCATION_MODE_LIST = "list";
-    public String INVOCATION_MODE_GROUP = "group";
-    public String INVOCATION_MODE_NO_CONTEXT = "nocontext";
-    //public String INVOCATION_MODE_QUERY = "query"; NYI
-    
+
+    public final String INVOCATION_MODE_SINGLE = "single";
+    public final String INVOCATION_MODE_LIST = "list";
+    public final String INVOCATION_MODE_GROUP = "group";
+    public final String INVOCATION_MODE_NO_CONTEXT = "nocontext";
+    public final String INVOCATION_MODE_QUERY = "query";
+
     public final int STATUS_ERROR = -1;
     public final int STATUS_UNSTARTED = 0;
     public final int STATUS_MIN_PROGRESS = 1;
