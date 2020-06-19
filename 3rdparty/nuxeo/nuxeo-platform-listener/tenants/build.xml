@@ -4,7 +4,8 @@
 	</description>
 
 	<!-- set global properties for this build -->
-	<property name="services.trunk" value="../../.."/>
+	<property name="services.trunk" value="../../../.."/>
+	<echo>CSpace Release is ${cspace.release}</echo>
 
 	<!-- Environment should be declared before reading build.properties -->
 	<property environment="env" />
@@ -12,7 +13,7 @@
 
 	<target name="deploy_tenants">
 		<subant target="deploy_tenant" genericantfile="${ant.file}" inheritall="true">
-			<dirset dir="." includes="*" />
+			<dirset dir="." includes="*" excludes=".*,target" />
 		</subant>
 	</target>
 

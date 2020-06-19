@@ -3,7 +3,7 @@
     CollectionSpace Nuxeo listener component type
   </description>
   <!-- Set global properties for this build -->
-  <property name="services.trunk" value="../../../../../.."/>
+  <property name="services.trunk" value="../../../../.."/>
   <!-- Environment should be declared before reading build.properties -->
   <property environment="env" />
   <!-- Set global properties for this build -->
