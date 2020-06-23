@@ -39,6 +39,7 @@ import org.collectionspace.services.common.query.UriInfoImpl;
 import org.collectionspace.services.common.relation.RelationResource;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.media.nuxeo.MediaConstants;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
@@ -164,6 +165,10 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 
 	protected List<String> findRelatedMovements(String subjectCsid) throws URISyntaxException {
 		return findRelatedObjects(subjectCsid, null, "affects", null, MovementConstants.NUXEO_DOCTYPE);
+	}
+
+	protected List<String> findRelatedMedia(String subjectCsid) throws URISyntaxException {
+		return findRelatedObjects(subjectCsid, null, "affects", null, MediaConstants.NUXEO_DOCTYPE);
 	}
 
 	protected String findBroader(String subjectCsid) throws URISyntaxException {

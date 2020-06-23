@@ -9,9 +9,9 @@ import java.util.Set;
 
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.NuxeoBasedResource;
+import org.collectionspace.services.client.MediaClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.collectionspace.services.client.MediaClient;
 
 public class SetPrimaryDisplayBatchJob extends AbstractBatchJob {
 	final Logger log = LoggerFactory.getLogger(SetPrimaryDisplayBatchJob.class);
