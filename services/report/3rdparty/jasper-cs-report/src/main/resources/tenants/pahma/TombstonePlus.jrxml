@@ -1,0 +1,532 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.1.0.final using JasperReports Library version 6.1.0  -->
+<!-- 2015-09-04T20:09:13 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Tombstone Plus test 3" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="faebc082-c7be-4fed-8b9b-a911e377d5a5">
+	<parameter name="csid" class="java.lang.String">
+		<defaultValueExpression><![CDATA["bd0c5831-06fa-458f-b686"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT ec.exhibitionnumber AS "Exh. number", ec.title AS "Exhibit title", cc.objectnumber AS "Mus. number", cp.sortableobjectnumber,  
+eog.exhibitionobjectsection AS "Section",
+eog.exhibitionobjectcase AS "Case",
+eog.exhibitionobjectseqnum AS "Seq. num.",
+eog.exhibitionobjectmount AS "Mount",
+ong.objectName AS "Name",
+spd.datedisplaydate AS "Prod. date", 
+scd.datedisplaydate AS "Coll. date",
+STRING_AGG(DISTINCT REGEXP_REPLACE(fc.item, '^.*\)''(.*)''$', '\1'), '; ') AS "Collector(s)",
+STRING_AGG(DISTINCT ac.acquisitionreferencenumber, '; ') AS "Acc. No.",
+STRING_AGG(DISTINCT REGEXP_REPLACE(adg.donor, '^.*\)''(.*)''$', '\1'), '; ') AS "Donor(s)",
+STRING_AGG(DISTINCT REGEXP_REPLACE(apg.assocpeople, '^.*\)''(.*)''$', '\1'),'; ') AS "Culture",
+REGEXP_REPLACE(opp.objectproductionperson, '^.*\)''(.*)''$', '\1') AS "Maker",
+REGEXP_REPLACE(oppl.objectproductionplace, '^.*\)''(.*)''$', '\1') AS "Production place",
+REGEXP_REPLACE(fcp.item, '^.*\)''(.*)''$', '\1') AS "Field collection place",
+STRING_AGG(DISTINCT(CASE 
+        WHEN dim.value = 0 OR dim.value IS NULL OR dim.measurementunit IS NULL THEN ''
+        WHEN mpg.measuredpart IS NULL AND dim.dimension IS NULL THEN CAST(dim.value AS numeric) || ' ' || dim.measurementunit
+        WHEN mpg.measuredpart IS NULL THEN dim.dimension || ' ' || CAST(dim.value AS numeric) || ' ' || dim.measurementunit
+        WHEN dim.dimension IS NULL THEN mpg.measuredpart || '— ' || CAST(dim.value AS numeric) || ' ' || dim.measurementunit
+        ELSE mpg.measuredpart || '— ' || dim.dimension || ' ' || CAST(dim.value AS numeric) || ' ' || dim.measurementunit
+        END), '; ') AS "Dimension(s)",
+STRING_AGG(DISTINCT REGEXP_REPLACE(mat.material, '^.*\)''(.*)''$', '\1')
+	       ||CASE WHEN (mat.materialcomponent IS NOT NULL OR mat.materialcomponentnote IS NOT NULL) THEN ' (' ELSE '' END
+	       ||CASE WHEN (mat.materialcomponent IS NOT NULL AND mat.materialcomponent <>'') THEN mat.materialcomponent ELSE '' END
+	       ||CASE WHEN (mat.materialcomponent IS NOT NULL AND mat.materialcomponentnote IS NOT NULL) THEN ', ' ELSE '' END
+	       ||CASE WHEN (mat.materialcomponentnote IS NOT NULL AND mat.materialcomponentnote <>'') THEN mat.materialcomponentnote ELSE '' END
+	       ||CASE WHEN (mat.materialcomponent IS NOT NULL OR mat.materialcomponentnote IS NOT NULL) THEN ')' ELSE '' END, '; ') AS "Material(s)",
+REGEXP_REPLACE(cc.computedcurrentlocation, '^.*\)''(.*)''$', '\1') AS "Storage location",
+REGEXP_REPLACE(ca.computedcrate, '^.*\)''(.*)''$', '\1') AS "Box",
+CASE WHEN (ca.computedcrate IS NOT NULL) THEN 
+        REGEXP_REPLACE(cc.computedcurrentlocation, '^.*\)''(.*)''$', '\1') ||'—'|| 
+        REGEXP_REPLACE(ca.computedcrate, '^.*\)''(.*)''$', '\1')
+        ELSE REGEXP_REPLACE(cc.computedcurrentlocation, '^.*\)''(.*)''$', '\1')
+        END AS "Full location",
+com.item AS "Label text",
+(SELECT ccg.condition 
+        FROM relations_common rcc
+        LEFT OUTER JOIN hierarchy hcc ON (hcc.name=rcc.objectcsid)
+        LEFT OUTER JOIN conditionchecks_common ccc ON (hcc.id=ccc.id)
+        LEFT OUTER JOIN misc ON (misc.id=ccc.id)
+        LEFT OUTER JOIN hierarchy hccg ON (hccg.parentid=ccc.id AND hccg.name='conditionchecks_common:conditionCheckGroupList')
+        LEFT OUTER JOIN conditioncheckgroup ccg ON (ccg.id=hccg.id)
+        WHERE h1.name=rcc.subjectcsid AND rcc.objectdocumenttype='Conditioncheck' AND misc.lifecyclestate<>'deleted'
+        ORDER BY ccc.conditioncheckassessmentdate DESC
+        LIMIT 1) AS "Latest condition",
+(SELECT ccc.conditionchecknote 
+        FROM relations_common rcc
+        LEFT OUTER JOIN hierarchy hcc ON (hcc.name=rcc.objectcsid)
+        LEFT OUTER JOIN conditionchecks_common ccc ON (hcc.id=ccc.id)
+        LEFT OUTER JOIN misc ON (misc.id=ccc.id)
+        WHERE h1.name=rcc.subjectcsid AND rcc.objectdocumenttype='Conditioncheck' AND misc.lifecyclestate<>'deleted'
+        ORDER BY ccc.conditioncheckassessmentdate DESC
+        LIMIT 1) AS "Latest condition note",
+(SELECT 'https://webapps.cspace.berkeley.edu/pahma/imageserver/blobs/'||mc.blobcsid||'/derivatives/Medium/content' 
+        FROM relations_common rcm
+        LEFT OUTER JOIN hierarchy hmd ON (hmd.name=rcm.objectcsid)
+        LEFT OUTER JOIN media_pahma mp ON (hmd.id=mp.id AND mp.primarydisplay='true')
+        LEFT OUTER JOIN media_common mc ON (mp.id=mc.id)
+        LEFT OUTER JOIN misc ON (misc.id=mc.id)
+        WHERE h1.name=rcm.subjectcsid AND rcm.objectdocumenttype='Media' AND misc.lifecyclestate<>'deleted'
+        LIMIT 1) AS "imagefilepath"
+
+FROM collectionobjects_common cc
+LEFT OUTER JOIN collectionobjects_pahma cp ON (cc.id=cp.id)
+LEFT OUTER JOIN collectionobjects_anthropology ca ON (cc.id=ca.id)
+
+JOIN hierarchy h1 ON (cc.id=h1.id)
+JOIN relations_common rc ON (h1.name=rc.subjectcsid AND rc.objectdocumenttype='Exhibition')
+JOIN hierarchy h2 ON (rc.objectcsid=h2.name)
+LEFT OUTER JOIN exhibitions_common ec ON (h2.id=ec.id)
+LEFT OUTER JOIN hierarchy hn ON (cc.id=hn.parentid AND hn.name='collectionobjects_common:objectNameList' AND (hn.pos=0 OR hn.pos IS NULL))
+LEFT OUTER JOIN objectnamegroup ong ON (ong.id=hn.id)
+LEFT OUTER JOIN hierarchy hpd ON (hpd.parentid=cc.id AND hpd.primarytype='structuredDateGroup' AND hpd.name='collectionobjects_common:objectProductionDateGroupList' AND (hpd.pos=0 or hpd.pos IS NULL))
+LEFT OUTER JOIN hierarchy hcd ON (hcd.parentid=cc.id AND hcd.primarytype='structuredDateGroup' AND hcd.name='collectionobjects_pahma:pahmaFieldCollectionDateGroupList' AND (hcd.pos=0 or hcd.pos IS NULL))
+LEFT OUTER JOIN structureddategroup spd ON (spd.id=hpd.id)
+LEFT OUTER JOIN structureddategroup scd ON (scd.id=hcd.id)
+LEFT OUTER JOIN collectionobjects_common_fieldcollectors fc ON (fc.id=cc.id)
+LEFT OUTER JOIN relations_common rca ON (h1.name=rca.subjectcsid AND rca.objectdocumenttype='Acquisition')
+LEFT OUTER JOIN hierarchy hac ON (hac.name=rca.objectcsid AND (hac.pos=0 OR hac.pos IS NULL))
+LEFT OUTER JOIN acquisitions_common ac ON (hac.id=ac.id)
+LEFT OUTER JOIN hierarchy hadg ON (hadg.parentid=hac.id AND hadg.name='acquisitions_pahma:acquisitionDonorGroupList' AND hadg.primarytype='acquisitionDonorGroup')
+LEFT OUTER JOIN acquisitiondonorgroup adg ON (adg.id=hadg.id)
+LEFT OUTER JOIN hierarchy hc ON (hc.parentid=cc.id AND hc.primarytype='assocPeopleGroup')
+LEFT OUTER JOIN assocpeoplegroup apg ON (apg.id=hc.id)
+LEFT OUTER JOIN hierarchy hmk ON (cc.id=hmk.parentid AND hmk.name='collectionobjects_common:objectProductionPersonGroupList' AND (hmk.pos=0 OR hmk.pos IS NULL))
+LEFT OUTER JOIN objectproductionpersongroup opp ON (opp.id=hmk.id)
+LEFT OUTER JOIN collectionobjects_pahma_pahmafieldcollectionplacelist fcp ON (fcp.id=cc.id AND (fcp.pos=0 OR fcp.pos IS NULL))
+LEFT OUTER JOIN places_common pc ON (pc.shortidentifier=REGEXP_REPLACE(fcp.item, '^.*item:name\((.*)\)''.*', '\1'))
+LEFT OUTER JOIN hierarchy hdm ON (cc.id=hdm.parentid AND hdm.primarytype='measuredPartGroup')
+LEFT OUTER JOIN measuredpartgroup mpg ON (mpg.id=hdm.id)
+LEFT OUTER JOIN hierarchy hdm2 ON (mpg.id=hdm2.parentid AND hdm2.primarytype='dimensionSubGroup')
+LEFT OUTER JOIN dimensionsubgroup dim ON (dim.id=hdm2.id AND dim.measurementunit <> 'pixels' AND dim.measurementunit <> 'bits')
+LEFT OUTER JOIN hierarchy hm ON (hm.parentid=cc.id AND hm.primarytype='materialGroup')
+LEFT OUTER JOIN materialgroup mat ON (mat.id=hm.id)
+LEFT OUTER JOIN collectionobjects_common_comments com ON (com.id=cc.id AND (com.pos=0 OR com.pos IS NULL))
+LEFT OUTER JOIN hierarchy hpp ON (hpp.parentid=cc.id AND hpp.primarytype='objectProductionPlaceGroup')
+LEFT OUTER JOIN objectproductionplacegroup oppl ON (hpp.id=oppl.id)
+LEFT OUTER JOIN exhibitionobjectgroup eog ON (eog.exhibitionobjectnumber=cc.objectnumber)
+JOIN hierarchy h3 ON (h3.id=eog.id AND h3.parentid=ec.id)
+
+WHERE h2.name = $P{csid}
+
+GROUP BY ec.exhibitionnumber, ec.title, 
+eog.exhibitionobjectsection,
+eog.exhibitionobjectcase,
+eog.exhibitionobjectseqnum,
+eog.exhibitionobjectmount,
+cc.objectnumber, ong.objectname, 
+opp.objectproductionperson, oppl.objectproductionplace, spd.datedisplaydate, scd.datedisplaydate, 
+fcp.item, cc.computedcurrentlocation, ca.computedcrate, com.item, cp.sortableobjectnumber, h1.name
+
+ORDER BY eog.exhibitionobjectsection, eog.exhibitionobjectcase, eog.exhibitionobjectseqnum, cp.sortableobjectnumber]]>
+	</queryString>
+	<field name="Exh. number" class="java.lang.String"/>
+	<field name="Exhibit title" class="java.lang.String"/>
+	<field name="Mus. number" class="java.lang.String"/>
+	<field name="sortableobjectnumber" class="java.lang.String"/>
+	<field name="Section" class="java.lang.String"/>
+	<field name="Case" class="java.lang.String"/>
+	<field name="Seq. num." class="java.lang.String"/>
+	<field name="Mount" class="java.lang.String"/>
+	<field name="Name" class="java.lang.String"/>
+	<field name="Prod. date" class="java.lang.String"/>
+	<field name="Coll. date" class="java.lang.String"/>
+	<field name="Collector(s)" class="java.lang.String"/>
+	<field name="Acc. No." class="java.lang.String"/>
+	<field name="Donor(s)" class="java.lang.String"/>
+	<field name="Culture" class="java.lang.String"/>
+	<field name="Maker" class="java.lang.String"/>
+	<field name="Production place" class="java.lang.String"/>
+	<field name="Field collection place" class="java.lang.String"/>
+	<field name="Dimension(s)" class="java.lang.String"/>
+	<field name="Material(s)" class="java.lang.String"/>
+	<field name="Storage location" class="java.lang.String"/>
+	<field name="Box" class="java.lang.String"/>
+	<field name="Full location" class="java.lang.String"/>
+	<field name="Label text" class="java.lang.String"/>
+	<field name="Latest condition" class="java.lang.String"/>
+	<field name="Latest condition note" class="java.lang.String"/>
+	<field name="imagefilepath" class="java.lang.String"/>
+	<group name="Section" minHeightToStartNewPage="50">
+		<groupExpression><![CDATA[$F{Section}]]></groupExpression>
+		<groupHeader>
+			<band height="16">
+				<textField isBlankWhenNull="true">
+					<reportElement mode="Opaque" x="0" y="1" width="550" height="15" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" forecolor="#FFFFFF" backcolor="#660000" uuid="14a6229d-9760-4654-98f1-5afb7d46c955">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font size="11" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{Section}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="Case" minHeightToStartNewPage="50">
+		<groupExpression><![CDATA[$F{Case}]]></groupExpression>
+		<groupHeader>
+			<band height="14">
+				<textField isBlankWhenNull="true">
+					<reportElement mode="Opaque" x="10" y="1" width="540" height="13" isPrintInFirstWholeBand="true" forecolor="#FFFFFF" backcolor="#804D4D" uuid="7eebf24a-585b-49d1-b3ff-e94553e2bf20">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{Case}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="Seq. num." minHeightToStartNewPage="50">
+		<groupExpression><![CDATA[$F{Seq. num.}]]></groupExpression>
+		<groupHeader>
+			<band height="14">
+				<textField isBlankWhenNull="true">
+					<reportElement mode="Opaque" x="20" y="1" width="530" height="13" isPrintInFirstWholeBand="true" forecolor="#FFFFFF" backcolor="#804D4D" uuid="9160c344-6d45-4bdd-b1ea-088ca32557e4">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{Seq. num.}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<title>
+		<band height="52" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="264" height="22" uuid="260dcc1e-a3a6-4525-af8a-9a12fee1541e">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tombstone information]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="29" width="279" height="23" uuid="2fae7f61-6890-4eff-ad11-526f893ce55f"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Exhibit title}]]></textFieldExpression>
+			</textField>
+			<image onErrorType="Icon">
+				<reportElement x="303" y="0" width="270" height="51" uuid="61478610-671d-4c77-a020-cecde2d6de40">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<imageExpression><![CDATA["https://pahma.cspace.berkeley.edu/reports/images/pahmalogo.png"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<detail>
+		<band height="74" splitType="Stretch">
+			<staticText>
+				<reportElement x="-8" y="2" width="100" height="12" uuid="994f0aa5-09eb-4e31-826a-86d742492a21">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Museum Number:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-8" y="17" width="100" height="12" uuid="d58b216b-7fae-4985-9ccd-69f026f938b4">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Object name:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-8" y="32" width="100" height="12" uuid="d69ea1e6-1c29-41df-aedf-83ce7349277b">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Culture:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-8" y="47" width="100" height="12" uuid="4c8e7f3e-502a-4af1-9dc9-e2a548619a67">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Maker:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-8" y="62" width="100" height="12" uuid="63556a61-cd8a-4c1f-93f3-f329932cd163">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Material(s):]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="95" y="62" width="458" height="12" uuid="4f6d20a8-93ed-4df6-b349-3b919646a20d">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Material(s)}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="95" y="47" width="458" height="12" uuid="7651774f-05bc-42ac-8528-624cdc2bc1cd">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Maker}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="95" y="32" width="458" height="12" uuid="dd93dbc4-d250-4971-b2b1-e3dbb8ae370a">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Culture}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="95" y="17" width="458" height="12" uuid="9cd060a2-dfac-4b45-ae1d-ef8cbec1e54f">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement key="Mus. number" x="95" y="2" width="386" height="12" uuid="c5abacb0-3bc5-460f-88fc-ca2397cab4f0">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Mus. number}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="74">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<staticText>
+				<reportElement x="-8" y="2" width="100" height="12" uuid="60d55c62-8dce-46d1-94ba-7ae331063407">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Production date:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="95" y="2" width="458" height="12" uuid="64418eb3-0444-478c-b75b-ebb900bf5762">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Prod. date}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="-8" y="17" width="100" height="12" uuid="cc044c4f-3e54-4a1e-a743-a2a452ce3bb9">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Production place:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="95" y="17" width="458" height="12" uuid="a97ba69b-cc1e-4f79-8525-eedcd74dffad">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Production place}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="-8" y="32" width="100" height="12" uuid="1329b3cd-e9ee-485e-8d6f-54ecb5289648">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Collection date:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="95" y="32" width="458" height="12" uuid="dbbb8e2f-919e-4ec8-9d2b-e9d82dad919c">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Coll. date}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="-8" y="47" width="100" height="12" uuid="659697a3-6c81-43c8-81be-5241debc6acd">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Collection place:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="95" y="47" width="458" height="12" uuid="b2020e09-2404-4b5e-9fd9-b4311aad72a9">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Field collection place}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="-8" y="62" width="100" height="12" uuid="2b2e949b-b38d-4f31-83a8-092af304517b">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Collector(s):]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="95" y="62" width="458" height="12" uuid="58162160-8769-4fcb-a2ea-78ab1fb86c19">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Collector(s)}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="13">
+			<staticText>
+				<reportElement x="-8" y="1" width="100" height="12" uuid="359c515b-8384-4d47-9abd-dacd1a62f4ae">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Donor(s):]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="95" y="1" width="458" height="12" uuid="969cd2cd-252d-4bd7-a414-2ee4ca90f239">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Donor(s)}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="13">
+			<staticText>
+				<reportElement x="-8" y="1" width="100" height="12" uuid="11c60393-03ff-4f77-a4af-3b05c6e47580">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Label text:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="96" y="1" width="458" height="12" uuid="a495cda8-d8e8-4f1c-b086-2b8e7dd495e0">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Label text}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="3">
+			<line>
+				<reportElement stretchType="RelativeToTallestObject" x="0" y="2" width="550" height="1" forecolor="#BDB9B9" uuid="b97c05f6-feb8-4668-a9a2-36ef31180453">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+			</line>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="13" splitType="Stretch">
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="0" y="1" width="197" height="12" uuid="7127d039-ff8a-4b49-9b71-0778b4748aba">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="433" y="1" width="80" height="12" uuid="6d24bbb9-2b06-4311-ad04-afa1110a770c"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="513" y="1" width="40" height="12" uuid="2f64249c-3a96-4046-b2fe-d128ade418f3">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

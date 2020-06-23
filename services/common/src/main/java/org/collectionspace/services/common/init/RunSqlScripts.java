@@ -91,6 +91,12 @@ public class RunSqlScripts extends InitHandler implements IInitHandler {
                 logger.warn(CANNOT_PERFORM_TASKS_MESSAGE);
                 continue;
             }
+            
+            if (logger.isInfoEnabled()) {
+            	String msg = String.format("Running SQL script from Java class path '%s'", scriptPath);
+            	logger.info(msg);
+            	logger.trace(scriptContents);
+            }
             runScript(dataSourceName, repositoryName, cspaceInstanceId, scriptContents, "resource path " + scriptPath);
         }
 

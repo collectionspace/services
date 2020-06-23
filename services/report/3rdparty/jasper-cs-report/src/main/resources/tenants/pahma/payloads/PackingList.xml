@@ -1,0 +1,17 @@
+<document name="report">
+  <ns2:reports_common xmlns:ns2="http://collectionspace.org/services/report">
+    <name>Packing List Report</name>
+    <filename>PackingList.jrxml</filename>
+    <forDocTypes>
+      <forDocType>Group</forDocType>
+    </forDocTypes>
+    <supportsDocList>false</supportsDocList>
+    <supportsGroup>true</supportsGroup>
+    <supportsNoContext>false</supportsNoContext>
+    <supportsSingleDoc>false</supportsSingleDoc>
+    <supportsParams/>
+    <supportsOutputMIMEList/>
+    <outputMIME>application/pdf</outputMIME>
+    <notes/>
+  </ns2:reports_common>
+</document>

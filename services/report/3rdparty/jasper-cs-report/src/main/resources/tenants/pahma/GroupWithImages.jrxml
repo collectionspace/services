@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.1.0.final using JasperReports Library version 6.1.0  -->
+<!-- 2015-09-04T15:23:04 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="GroupWithImages" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6ff7d5f1-1ce4-458e-bc9c-a91b39731abf">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Tunnel to CSpace Prod"/>
+	<parameter name="csid" class="java.lang.String">
+		<defaultValueExpression><![CDATA["b7b7562d-66b5-42f0-b7a4"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT gc.title AS "Title", cc.objectnumber AS "Mus. number", cc.numberofobjects AS "Count", cp.sortableobjectnumber AS "Sort",  
+ong.objectName AS "Name", bd.item AS "Description",
+STRING_AGG(DISTINCT REGEXP_REPLACE(apg.assocpeople, '^.*\)''(.*)''$', '\1'),'; ') AS "Culture",
+REGEXP_REPLACE(fcp.item, '^.*\)''(.*)''$', '\1') AS "Field collection place",
+CASE WHEN (
+        SELECT mp.primarydisplay 
+        FROM relations_common rcm
+        LEFT OUTER JOIN hierarchy hmd ON (hmd.name=rcm.objectcsid)
+        LEFT OUTER JOIN media_pahma mp ON (hmd.id=mp.id AND mp.primarydisplay='true')
+        LEFT OUTER JOIN misc ON (misc.id=mp.id)
+        WHERE h1.name=rcm.subjectcsid AND rcm.objectdocumenttype='Media' AND misc.lifecyclestate<>'deleted'
+        LIMIT 1) IS NULL
+THEN (SELECT 'https://webapps.cspace.berkeley.edu/pahma/imageserver/blobs/'||mc.blobcsid||'/derivatives/Medium/content' 
+        FROM relations_common rcm
+        LEFT OUTER JOIN hierarchy hmd ON (hmd.name=rcm.objectcsid)
+        LEFT OUTER JOIN media_pahma mp ON (hmd.id=mp.id)
+        LEFT OUTER JOIN media_common mc ON (mp.id=mc.id)
+        LEFT OUTER JOIN misc ON (misc.id=mc.id)
+        WHERE h1.name=rcm.subjectcsid AND rcm.objectdocumenttype='Media' AND misc.lifecyclestate<>'deleted'
+        LIMIT 1)
+ELSE (SELECT 'https://webapps.cspace.berkeley.edu/pahma/imageserver/blobs/'||mc.blobcsid||'/derivatives/Medium/content' 
+        FROM relations_common rcm
+        LEFT OUTER JOIN hierarchy hmd ON (hmd.name=rcm.objectcsid)
+        LEFT OUTER JOIN media_pahma mp ON (hmd.id=mp.id AND mp.primarydisplay='true')
+        LEFT OUTER JOIN media_common mc ON (mp.id=mc.id)
+        LEFT OUTER JOIN misc ON (misc.id=mc.id)
+        LEFT OUTER JOIN collectionspace_core c ON (mc.id=c.id)
+        WHERE h1.name=rcm.subjectcsid AND rcm.objectdocumenttype='Media' AND misc.lifecyclestate<>'deleted'
+        ORDER BY c.updatedat DESC
+        LIMIT 1)
+END AS "imagefilepath"
+
+FROM collectionobjects_common cc
+LEFT OUTER JOIN collectionobjects_pahma cp ON (cc.id=cp.id)
+LEFT OUTER JOIN collectionobjects_anthropology ca ON (cc.id=ca.id)
+LEFT OUTER JOIN collectionobjects_common_briefdescriptions bd ON (bd.id=cc.id AND bd.pos=0)
+JOIN hierarchy h1 ON (cc.id=h1.id)
+JOIN relations_common rc ON (h1.name=rc.subjectcsid AND rc.objectdocumenttype='Group')
+JOIN hierarchy h2 ON (rc.objectcsid=h2.name)
+LEFT OUTER JOIN groups_common gc ON (h2.id=gc.id)
+LEFT OUTER JOIN hierarchy hn ON (cc.id=hn.parentid AND hn.name='collectionobjects_common:objectNameList' AND (hn.pos=0 OR hn.pos IS NULL))
+LEFT OUTER JOIN objectnamegroup ong ON (ong.id=hn.id)
+LEFT OUTER JOIN hierarchy hc ON (hc.parentid=cc.id AND hc.primarytype='assocPeopleGroup')
+LEFT OUTER JOIN assocpeoplegroup apg ON (apg.id=hc.id)
+LEFT OUTER JOIN collectionobjects_pahma_pahmafieldcollectionplacelist fcp ON (fcp.id=cc.id AND (fcp.pos=0 OR fcp.pos IS NULL))
+LEFT OUTER JOIN places_common pc ON (pc.shortidentifier=REGEXP_REPLACE(fcp.item, '^.*item:name\((.*)\)''.*', '\1'))
+
+WHERE h2.name = $P{csid}
+
+GROUP BY gc.title, cc.objectnumber, cc.numberofobjects, ong.objectname, bd.item,
+fcp.item, cp.sortableobjectnumber, h1.name
+
+ORDER BY cp.sortableobjectnumber]]>
+	</queryString>
+	<field name="Title" class="java.lang.String"/>
+	<field name="Mus. number" class="java.lang.String"/>
+	<field name="Count" class="java.lang.Long"/>
+	<field name="Sort" class="java.lang.String"/>
+	<field name="Name" class="java.lang.String"/>
+	<field name="Description" class="java.lang.String"/>
+	<field name="Culture" class="java.lang.String"/>
+	<field name="Field collection place" class="java.lang.String"/>
+	<field name="imagefilepath" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="55" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<image onErrorType="Icon">
+				<reportElement x="303" y="0" width="270" height="51" uuid="be38b8c5-e686-4e23-b82e-c46cfff991ea">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<imageExpression><![CDATA["https://pahma.cspace.berkeley.edu/reports/images/pahmalogo.png"]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="0" y="0" width="290" height="51" uuid="fdd2afba-b5b0-4d8a-9aff-cc8489acee5d"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Title}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="-20" y="53" width="591" height="1" uuid="02e15f4a-ceaf-4553-9bce-cb52fa8ed3b1">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+			</line>
+		</band>
+	</title>
+	<detail>
+		<band height="105" splitType="Stretch">
+			<image>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="457" y="1" width="110" height="100" uuid="b47b794e-de72-4495-9b9b-b2fe2f5e48ba">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<imageExpression><![CDATA[$F{imagefilepath}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="89" y="3" width="170" height="12" uuid="dadbac2c-d86c-4c7c-9d00-ca6826875833">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Mus. number}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="-10" y="3" width="92" height="12" uuid="34797665-840f-49e2-8f99-d4e06d9c8b44">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Museum number:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-10" y="20" width="92" height="12" uuid="0c7ac266-3762-491f-9358-689b336ff5b1">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Object name:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="3" width="43" height="12" uuid="9618e04a-d4ed-4415-b822-a39ccb6731ba">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Count:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-10" y="54" width="92" height="12" uuid="673511ee-88db-4201-96d5-f09debd16696">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Culture:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-10" y="71" width="92" height="12" uuid="f9518a59-e8b6-40d8-b6c5-42d166d4b9a1">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Description:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="330" y="3" width="70" height="12" uuid="5833cd63-fa97-4981-84af-911fae92e80f">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Count}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="-10" y="37" width="92" height="12" uuid="14279684-d9a7-4161-8b9b-d1be24b5a144">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Collection place:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="90" y="20" width="360" height="12" uuid="6f0c05d8-dcc8-4669-941f-41ec1a725a18">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Name}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="90" y="38" width="360" height="12" uuid="a6778e25-d050-48b3-bab0-3555e312ebe5">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Field collection place}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="90" y="54" width="360" height="12" uuid="873fdc2d-28e7-45bc-8823-8ef02ef7400e">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Culture}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="90" y="71" width="360" height="25" uuid="d17d2487-27d9-4e1e-a1a6-27c35bb0c3f1">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Description}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement positionType="Float" x="-20" y="103" width="591" height="1" uuid="32f9c462-0109-4b55-bdbb-9e199640ae69">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+			</line>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="17" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="0" y="1" width="197" height="16" uuid="c343be38-0fff-4456-83ba-9b2ed792d8ce">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="433" y="1" width="80" height="12" uuid="dcfee607-094d-4d60-9ca6-392754b9647e"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="513" y="1" width="40" height="12" uuid="02265e31-5016-457f-bf48-d00965fe2f0c">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>
