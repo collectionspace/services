@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="UCJeps: Media Unlinked to CollObj" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="750" leftMargin="21" rightMargin="21" topMargin="21" bottomMargin="36" uuid="00039d14-8750-45ca-b1fa-81722dbd5f9d">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[select
+     tu.taxonmajorgroup as major_group,
+     mc.identificationnumber as accession_id,
+     bc.name as file_name,
+     hmc.name as media_csid,
+     getdispl(tc.refname) as scientific_name
+from media_common mc
+left outer join misc mmc ON (mc.id = mmc.id)
+left outer join hierarchy hmc on (mc.id = hmc.id)
+left outer join relations_common rc on (
+        hmc.name = rc.subjectcsid
+        and rc.subjectdocumenttype = 'Media'
+        and rc.objectdocumenttype = 'CollectionObject')
+left outer join media_ucjeps mu ON (mc.id = mu.id)
+left outer join taxon_common tc on (getdispl(mu.scientifictaxonomy) = getdispl(tc.refname))
+left outer join taxon_ucjeps tu on (tc.id = tu.id)
+left outer join hierarchy hbc on (mc.blobcsid = hbc.name)
+left outer join blobs_common bc on (hbc.id = bc.id)
+where rc.id is null
+and mmc.lifecyclestate != 'deleted'
+and mc.identificationnumber !~* 'test'
+and mc.identificationnumber !~* 'SL'
+and mc.identificationnumber !~* 'DP'
+order by tu.taxonmajorgroup, getdispl(tc.refname)]]>
+	</queryString>
+	<field name="major_group" class="java.lang.String"/>
+	<field name="accession_id" class="java.lang.String"/>
+	<field name="file_name" class="java.lang.String"/>
+	<field name="media_csid" class="java.lang.String"/>
+	<field name="scientific_name" class="java.lang.String"/>
+	<title>
+		<band height="25" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="610bdc26-3968-4115-b85c-cc9f1cbc3630" mode="Transparent" x="0" y="0" width="750" height="20" forecolor="#000000"/>
+				<textElement markup="none">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[UCJeps: Media Records Not Linked to Collection Object Record]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="20" splitType="Stretch">
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="06fd2da7-1de6-4e3a-92c1-c05b3e6872a4" mode="Transparent" x="0" y="2" width="750" height="16" forecolor="#000000"/>
+				<textElement>
+					<font fontName="Serif" pdfFontName="Times-Roman" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="1e5deee1-32b4-4fff-b655-d312ba1b9d70" x="100" y="0" width="100" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Accession ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e88a7572-31ab-457e-b4cb-70cd98d60ff4" x="300" y="0" width="130" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Media CSID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ab7c19c5-bc90-44fd-9d33-02951be13387" x="430" y="0" width="320" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Scientific Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5ee91dc0-acbc-41cf-b852-660b3072555d" x="200" y="0" width="100" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[File Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f230807f-c846-4af3-b31a-4fae530f1478" x="0" y="0" width="100" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Major Group]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="61620fa5-a1a1-427b-ad11-3cc578ae1867" x="100" y="0" width="100" height="12"/>
+				<textElement>
+					<font fontName="Serif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{accession_id}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="5f715b3d-dfd8-45e5-9f47-454e2b7a143b" x="300" y="0" width="130" height="12"/>
+				<textElement>
+					<font fontName="Serif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{media_csid}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="b2774bdb-bff4-407c-87f7-b3917d04807d" x="430" y="0" width="320" height="12"/>
+				<textElement>
+					<font fontName="Serif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{scientific_name}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="ccb7a9a7-a480-4ab5-85f1-4113e7d41704" x="200" y="0" width="100" height="12"/>
+				<textElement>
+					<font fontName="Serif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{file_name}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="ac617e98-a760-4826-b462-648578976779" x="0" y="0" width="100" height="12"/>
+				<textElement>
+					<font fontName="Serif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{major_group}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

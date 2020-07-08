@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="UCJeps Duplicates by Accession" language="groovy" pageWidth="612" pageHeight="792" columnWidth="566" leftMargin="23" rightMargin="23" topMargin="36" bottomMargin="36" uuid="00039d14-8750-45ca-b1fa-81722dbd5f9d">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[SELECT
+        mc.identificationnumber AS accnnum,
+        bc.name AS filename,
+        csc.createdat AS dateuploaded,
+        case when mu.scientifictaxonomy not like '%'''
+              then regexp_replace(mu.scientifictaxonomy, '^.*\)''(.*)$', '\1')
+              else regexp_replace(mu.scientifictaxonomy, '^.*\)''(.*)''$', '\1')
+        end AS scientificname
+FROM blobs_common bc
+INNER JOIN hierarchy hbc ON bc.id = hbc.id
+INNER JOIN collectionspace_core csc ON bc.id = csc.id
+INNER JOIN misc mbc ON csc.id = mbc.id
+INNER JOIN media_common mc ON hbc.name = mc.blobcsid
+INNER JOIN media_ucjeps mu ON mu.id = mc.id
+INNER JOIN hierarchy hmc ON mc.id = hmc.id
+INNER JOIN misc mmc ON hmc.id = mmc.id
+WHERE mbc.lifecyclestate != 'deleted'
+AND mmc.lifecyclestate != 'deleted'
+AND mc.identificationnumber in (
+        SELECT xmc.identificationnumber
+        FROM blobs_common xbc
+        INNER JOIN hierarchy xhbc ON xbc.id = xhbc.id
+        INNER JOIN collectionspace_core xcsc ON xbc.id = xcsc.id
+        INNER JOIN misc xmbc ON xcsc.id = xmbc.id
+        INNER JOIN media_common xmc ON xhbc.name = xmc.blobcsid
+        INNER JOIN hierarchy xhmc ON xmc.id = xhmc.id
+        INNER JOIN misc xmmc ON xhmc.id = xmmc.id
+        WHERE xmbc.lifecyclestate != 'deleted'
+        AND xmmc.lifecyclestate != 'deleted'
+        GROUP BY xmc.identificationnumber
+        HAVING count(xmc.identificationnumber) > 1)
+order by mc.identificationnumber, csc.createdat;]]>
+	</queryString>
+	<field name="accnnum" class="java.lang.String"/>
+	<field name="filename" class="java.lang.String"/>
+	<field name="dateuploaded" class="java.sql.Timestamp"/>
+	<field name="scientificname" class="java.lang.String"/>
+	<title>
+		<band height="84" splitType="Stretch">
+			<image onErrorType="Icon">
+				<reportElement uuid="38ebc361-38be-4ce7-9525-42dade10d093" x="0" y="0" width="366" height="61"/>
+				<imageExpression><![CDATA["https://ucjeps.cspace.berkeley.edu/reports/images/header-logo-cspace.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement uuid="610bdc26-3968-4115-b85c-cc9f1cbc3630" mode="Transparent" x="0" y="64" width="566" height="20" forecolor="#000000"/>
+				<textElement textAlignment="Center" markup="none">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[UCJEPS Imaging Project: Duplicated Accessions Ordered by Accession]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="28" splitType="Stretch">
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="06fd2da7-1de6-4e3a-92c1-c05b3e6872a4" mode="Transparent" x="208" y="2" width="150" height="16" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="5813d40b-7a37-4b94-979c-cd985345a498" x="0" y="0" width="70" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Accession]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="dd0cc1d3-f290-40ae-a776-d4fe4f63f95f" x="70" y="0" width="90" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Filename]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9e8699d4-30d5-4b39-9e1b-3dc9be831d8b" x="160" y="0" width="105" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date Uploaded]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4e5b008e-23e6-4faa-8312-1fa6084fc67c" x="266" y="0" width="300" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Scientific Name]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement uuid="afa79658-830a-4f74-899a-5a3f4ae6800f" x="70" y="0" width="90" height="16"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{filename}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="ccd172fa-2de0-42fa-8bdb-c5373d5b7a03" x="0" y="0" width="70" height="16"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{accnnum}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="f169dbe0-3949-4838-8f28-a58049d4f0d6" x="160" y="0" width="105" height="16"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{dateuploaded}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="74bbc319-5476-4350-9043-29cd32744f83" x="266" y="0" width="300" height="16"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{scientificname}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="24" splitType="Stretch">
+			<textField>
+				<reportElement uuid="8fc0002a-ee4c-4378-a211-77d7f7934068" x="214" y="8" width="80" height="16"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="45792f78-4cd1-42b7-b114-88e573a9682e" x="293" y="8" width="40" height="16"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

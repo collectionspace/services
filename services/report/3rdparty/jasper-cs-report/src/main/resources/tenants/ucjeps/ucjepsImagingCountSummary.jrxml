@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="UCJeps Count Summary" language="groovy" pageWidth="612" pageHeight="792" columnWidth="540" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="36" uuid="00fc645a-4130-4969-8b63-4040f076edd3">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[SELECT month_yyyy, bscanned, ascanned, adbased
+from ireport_count_summary_bral_vw;]]>
+	</queryString>
+	<field name="month_yyyy" class="java.lang.String"/>
+	<field name="ascanned" class="java.lang.Integer"/>
+	<field name="adbased" class="java.lang.Integer"/>
+	<field name="bscanned" class="java.lang.Integer"/>
+	<variable name="ascan_count" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{ascanned}]]></variableExpression>
+	</variable>
+	<variable name="bscan_count" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{bscanned}]]></variableExpression>
+	</variable>
+	<variable name="adbase_count" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{adbased}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="110" splitType="Stretch">
+			<image onErrorType="Icon">
+				<reportElement uuid="6c0d31e4-7c5e-409d-9234-71734fc3112f" x="0" y="0" width="366" height="61"/>
+				<imageExpression><![CDATA["https://ucjeps.cspace.berkeley.edu/reports/images/header-logo-cspace.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement uuid="b855e80f-3aca-482c-9f52-fcfbc9bde351" mode="Transparent" x="0" y="65" width="540" height="20" forecolor="#000000"/>
+				<textElement textAlignment="Center" markup="none">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[UCJEPS Imaging Project:  ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f72ec447-299e-4272-acc1-4fded90bf675" mode="Transparent" x="0" y="86" width="540" height="20" forecolor="#000000"/>
+				<textElement textAlignment="Center" markup="none">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Summary of Scanned Bryophytes & Algae and Databased Algae Images]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="30" splitType="Stretch">
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="59e18715-7583-4042-a525-7df79dcadc1f" mode="Transparent" x="195" y="0" width="150" height="16" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="0dd1feab-3cb6-4f17-adb1-d45e2931cec4" x="0" y="0" width="150" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Month Year]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="edb8c164-de49-49e4-8865-79d958966661" x="290" y="0" width="120" height="16"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Algae Scanned]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ae483b77-cc40-48b7-9528-6740ac493b07" x="420" y="0" width="120" height="16"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Algae Databased]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6a1a344b-981e-4301-827b-0678ca7e85af" x="160" y="0" width="120" height="16"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Bryophytes Scanned]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement uuid="b467ba0e-6ac1-4c98-805e-4c063d898333" x="0" y="0" width="150" height="16"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{month_yyyy}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="35cf8717-f7f8-43c7-9929-8ab95959ef0a" x="290" y="0" width="120" height="16"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{ascanned}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="efc33b09-d26e-452f-a9f8-cf608d234df8" x="420" y="0" width="120" height="16"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{adbased}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="334863b4-52e5-4845-aef6-82415c0cad2c" x="160" y="0" width="120" height="16"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{bscanned}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="24" splitType="Stretch">
+			<textField>
+				<reportElement uuid="d6eb55fc-f5c0-4a5b-a48d-91d337575457" x="206" y="8" width="80" height="16"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="c2127f51-1817-4d42-81fc-e17c004d2fa0" x="285" y="8" width="40" height="16"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="32">
+			<line>
+				<reportElement uuid="bbf37240-8507-4198-ada8-57ea89e63bc9" x="0" y="4" width="540" height="1"/>
+			</line>
+			<textField>
+				<reportElement uuid="ff950244-1e22-4780-abe7-259c2e35c32c" x="290" y="9" width="120" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{ascan_count}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="175ab09b-cea2-4f68-be4d-4143b723e9f8" x="0" y="9" width="150" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Totals]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="1c631192-a25d-4424-8204-3af621875a85" x="420" y="9" width="120" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{adbase_count}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="c433e29c-9ee6-42d0-8e00-2151f2d63add" x="160" y="9" width="120" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{bscan_count}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

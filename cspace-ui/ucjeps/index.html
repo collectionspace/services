@@ -1,0 +1,20 @@
+<html>
+	<head>
+		<meta charset="UTF-8" />
+	</head>
+	<body>
+		<div id="cspace"></div>
+		<script src="/cspace-ui/@UI_FILENAME@"></script>
+		<script src="/cspace-ui/@UI_PROFILE_PLUGIN_FILENAME@"></script>
+		<script>
+			cspaceUI({
+				basename: '@BASENAME@',
+				plugins: [
+					@UI_PROFILE_PLUGIN_LIBRARY_NAME@(),
+				],
+				prettyUrls: true,
+				tenantId: '@TENANT_ID@',
+			});
+		</script>
+	</body>
+</html>

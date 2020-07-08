@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="UCJeps: Media Unlinked to CollObj" language="groovy" pageWidth="612" pageHeight="792" columnWidth="570" leftMargin="21" rightMargin="21" topMargin="21" bottomMargin="36" uuid="00039d14-8750-45ca-b1fa-81722dbd5f9d">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[select
+     mc.identificationnumber as accession_id,
+     hmc.name as media_csid,
+     tc.displayname as scientific_name
+from media_common mc
+left outer join misc mmc ON (mc.id = mmc.id)
+left outer join hierarchy hmc on (mc.id = hmc.id)
+left outer join relations_common rc on (
+        hmc.name = rc.subjectcsid
+        and rc.subjectdocumenttype = 'Media'
+        and rc.objectdocumenttype = 'CollectionObject')
+left outer join media_ucjeps mu ON (mc.id = mu.id)
+left outer join taxon_common tc on (getdispl(mu.scientifictaxonomy) = tc.displayname)
+left outer join taxon_ucjeps tu on (tc.id = tu.id)
+where tu.taxonmajorgroup = 'Bryophytes'
+and rc.id is null
+and mmc.lifecyclestate != 'deleted'
+and mc.identificationnumber !~* 'test'
+and mc.identificationnumber !~* 'DHN'
+and mc.identificationnumber !~* 'SL'
+and mc.identificationnumber !~* 'DP'
+order by mc.identificationnumber]]>
+	</queryString>
+	<field name="accession_id" class="java.lang.String"/>
+	<field name="media_csid" class="java.lang.String"/>
+	<field name="scientific_name" class="java.lang.String"/>
+	<title>
+		<band height="84" splitType="Stretch">
+			<image onErrorType="Icon">
+				<reportElement uuid="38ebc361-38be-4ce7-9525-42dade10d093" x="0" y="0" width="366" height="61"/>
+				<imageExpression><![CDATA["https://ucjeps.cspace.berkeley.edu/reports/images/header-logo-cspace.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement uuid="610bdc26-3968-4115-b85c-cc9f1cbc3630" mode="Transparent" x="0" y="64" width="570" height="20" forecolor="#000000"/>
+				<textElement textAlignment="Center" markup="none">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[UCJeps: Bryophyte Media Records Not Linked to Collection Object Record]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="28" splitType="Stretch">
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="06fd2da7-1de6-4e3a-92c1-c05b3e6872a4" mode="Transparent" x="0" y="2" width="570" height="16" forecolor="#000000"/>
+				<textElement textAlignment="Center">
+					<font fontName="Serif" pdfFontName="Times-Roman" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="16" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="1e5deee1-32b4-4fff-b655-d312ba1b9d70" x="0" y="0" width="70" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Accession ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e88a7572-31ab-457e-b4cb-70cd98d60ff4" x="70" y="0" width="190" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Media CSID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ab7c19c5-bc90-44fd-9d33-02951be13387" x="260" y="0" width="310" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Scientific Name]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="61620fa5-a1a1-427b-ad11-3cc578ae1867" x="0" y="0" width="70" height="12"/>
+				<textElement>
+					<font fontName="Serif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{accession_id}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="5f715b3d-dfd8-45e5-9f47-454e2b7a143b" x="70" y="0" width="190" height="12"/>
+				<textElement>
+					<font fontName="Serif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{media_csid}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="b2774bdb-bff4-407c-87f7-b3917d04807d" x="260" y="0" width="310" height="12"/>
+				<textElement>
+					<font fontName="Serif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{scientific_name}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="24" splitType="Stretch">
+			<textField>
+				<reportElement uuid="8fc0002a-ee4c-4378-a211-77d7f7934068" x="217" y="8" width="80" height="16"/>
+				<textElement textAlignment="Right">
+					<font fontName="Serif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="45792f78-4cd1-42b7-b114-88e573a9682e" x="296" y="8" width="40" height="16"/>
+				<textElement>
+					<font fontName="Serif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

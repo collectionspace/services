@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ucjepsloanitemreport" language="groovy" pageWidth="612" pageHeight="792" columnWidth="520" leftMargin="46" rightMargin="46" topMargin="54" bottomMargin="36">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="14"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="csid" class="java.lang.String">
+		<defaultValueExpression><![CDATA["53f785cc-2b55-4586-832f-4bad0bcfd498"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+    loanoutnumber,
+    case when (borrower is not null and borrower <> '')
+         then getdispl(borrower)
+    end as borrower,
+    case when (borrowerscontact is not null and borrowerscontact <> '')
+         then getdispl(borrowerscontact)
+    end as borrowerscontact,
+    lnh.numlent,
+    '' as accessionlist,
+    og.objectnumbers accession,
+    og.objectconditions conditions,
+    og.objectnotes notes,
+    case when (tig.taxon is not null and tig.taxon <> '')
+         then getdispl(tig.taxon)
+    end as Determination,
+    case when (fc.item is not null and fc.item <> '')
+         then getdispl(fc.item)
+    end as Collector,
+    cc.fieldcollectionnumber as CollectorNumber,
+    sdg.datedisplaydate as CollectionDate,
+    case when length(lg.fieldlocverbatim)>65 then substr(lg.fieldlocverbatim, 0, 65)||'...'
+       else lg.fieldlocverbatim end as Locality
+FROM
+    public.loansout_common lc
+join hierarchy h1 on lc.id = h1.id
+left outer join loansout_naturalhistory lnh on lc.id = lnh.id
+left outer join hierarchy h2 on (
+    lc.id = h2.parentid
+    and h2.name = 'loansout_naturalhistory:objectGroupList')
+left outer join objectgroup og on h2.id = og.id
+left outer join collectionobjects_common cc on (cc.objectnumber = og.objectnumbers)
+left outer join hierarchy htig on (
+    cc.id = htig.parentid
+    and htig.name = 'collectionobjects_naturalhistory:taxonomicIdentGroupList'
+    and htig.pos = 0)
+left outer join taxonomicIdentGroup tig on (tig.id = htig.id)
+left outer join collectionobjects_common_fieldCollectors fc on (cc.id = fc.id and fc.pos = 0)
+left outer join hierarchy hfcdg on (
+    cc.id = hfcdg.parentid
+    and hfcdg.name = 'collectionobjects_common:fieldCollectionDateGroup')
+left outer join structureddategroup sdg on (sdg.id = hfcdg.id)
+left outer join hierarchy hlg on (
+    cc.id = hlg.parentid
+    and hlg.pos = 0
+    and hlg.name = 'collectionobjects_naturalhistory:localityGroupList')
+left outer join localitygroup lg on (lg.id = hlg.id)
+where h1.name = $P{csid}
+union
+SELECT
+    loanoutnumber,
+    case
+        when (borrower is not null and borrower <> '')
+        then getdispl(borrower)
+    end as borrower,
+    case
+        when (borrowerscontact is not null and borrowerscontact <> '')
+        then getdispl(borrowerscontact)
+    end as borrowerscontact,
+    lnh.numlent,
+    lnh.loanoutitems accessionlist,
+    null as accession,
+    null as conditions,
+    null as notes,
+    null Determination,
+    null Collector,
+    null CollectorNumber,
+    null CollectionDate,
+    null Locality
+FROM
+    public.loansout_common lc
+join hierarchy h1 on lc.id = h1.id
+left outer join loansout_naturalhistory lnh on lc.id = lnh.id
+where h1.name = $P{csid}
+order by accession]]>
+	</queryString>
+	<field name="loanoutnumber" class="java.lang.String"/>
+	<field name="borrower" class="java.lang.String"/>
+	<field name="borrowerscontact" class="java.lang.String"/>
+	<field name="numlent" class="java.lang.Long"/>
+	<field name="accessionlist" class="java.lang.String"/>
+	<field name="accession" class="java.lang.String"/>
+	<field name="conditions" class="java.lang.String"/>
+	<field name="notes" class="java.lang.String"/>
+	<field name="determination" class="java.lang.String"/>
+	<field name="collector" class="java.lang.String"/>
+	<field name="collectornumber" class="java.lang.String"/>
+	<field name="collectiondate" class="java.lang.String"/>
+	<field name="locality" class="java.lang.String"/>
+	<group name="loanoutnumber">
+		<groupExpression><![CDATA[$F{loanoutnumber}]]></groupExpression>
+		<groupHeader>
+			<band height="22">
+				<staticText>
+					<reportElement x="0" y="1" width="100" height="20"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Accession]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="83">
+			<image onErrorType="Icon">
+				<reportElement x="447" y="3" width="72" height="72"/>
+				<imageExpression class="java.lang.String"><![CDATA["https://ucjeps.cspace.berkeley.edu/reports/images/jepslogosmall.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="80" y="18" width="66" height="15"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Loan to:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="146" y="18" width="290" height="15"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{borrower}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="146" y="34" width="139" height="15"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{loanoutnumber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="80" y="50" width="346" height="15"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA['Sheets: (' + $F{numlent}.toString() + ' accession numbers)']]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="80" y="34" width="66" height="15"/>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Loan No.:]]></text>
+			</staticText>
+			<image onErrorType="Icon">
+				<reportElement x="2" y="3" width="72" height="72"/>
+				<imageExpression class="java.lang.String"><![CDATA["https://ucjeps.cspace.berkeley.edu/reports/images/uclogosmall.png"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<detail>
+		<band height="52" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="72" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{accession}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="72" y="0" width="289" height="12" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{determination}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="361" y="0" width="159" height="12" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true"/>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{collector}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="72" y="13" width="84" height="12" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{collectiondate}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="422" y="13" width="97" height="12" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true"/>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{collectornumber}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="156" y="13" width="270" height="12" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{locality}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="72" y="26" width="447" height="12" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{conditions}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="72" y="39" width="447" height="12" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{notes}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="2" y="0" width="378" height="12" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{accessionlist}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="15" splitType="Stretch">
+			<textField>
+				<reportElement x="399" y="2" width="80" height="12"/>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="479" y="2" width="40" height="12"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>
