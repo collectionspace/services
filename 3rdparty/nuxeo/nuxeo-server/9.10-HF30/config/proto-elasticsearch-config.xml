@@ -17,6 +17,8 @@
   <extension target="org.nuxeo.elasticsearch.ElasticSearchComponent" point="elasticSearchClient">
     <elasticSearchClient class="org.nuxeo.elasticsearch.client.ESRestClientFactory">
       <option name="addressList">http://localhost:9200</option>
+      <option name="connection.timeout.ms">30000</option>
+      <option name="socket.timeout.ms">40000</option>
     </elasticSearchClient>
   </extension>
 
