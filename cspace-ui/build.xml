@@ -29,7 +29,7 @@
 
 	<target name="deploy_cspace_ui_js">
 		<exec executable="curl" failonerror="true">
-			<arg line="-o ${cspace.ui.filename} --fail --insecure --remote-name --location https://unpkg.com/cspace-ui@${cspace.ui.version}/dist/${cspace.ui.library.name}.min.js"/>
+			<arg line="-o ${cspace.ui.filename} --fail --insecure --remote-name --location https://unpkg.com/@ucb-cspace/cspace-ui@${cspace.ui.version}/dist/${cspace.ui.library.name}.min.js"/>
 		</exec>
 
 		<move file="${cspace.ui.filename}" todir="${jee.deploy.cspace.ui.shared}"></move>
