@@ -45,6 +45,7 @@ import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
+import org.collectionspace.services.common.invocable.Field;
 import org.collectionspace.services.common.invocable.Invocable;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.dom4j.Node;
@@ -185,10 +186,11 @@ public class ExportResource extends AbstractCollectionSpaceResourceImpl<PoxPaylo
 		InvocationContext.ExcludeFields excludeFields = invocationContext.getExcludeFields();
 
 		if (excludeFields != null) {
-			List<String> fields = excludeFields.getField();
+			List<Field> fields = excludeFields.getField();
 
-			for (String field : fields) {
-				String[] segments = field.split(":", 2);
+			for (Field field : fields) {
+				String fieldSpec = field.getValue();
+				String[] segments = fieldSpec.split(":", 2);
 
 				String partName = segments[0];
 				String xpath = segments[1];
@@ -197,7 +199,7 @@ public class ExportResource extends AbstractCollectionSpaceResourceImpl<PoxPaylo
 
 				if (part != null) {
 					org.dom4j.Element partElement = part.getElementBody();
-					List<Node> matches = (List<Node>) partElement.createXPath(xpath).selectNodes(partElement);
+					List<Node> matches = (List<Node>) partElement.selectNodes(xpath);
 
 					for (Node excludeNode : matches) {
 						if (excludeNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -211,10 +213,11 @@ public class ExportResource extends AbstractCollectionSpaceResourceImpl<PoxPaylo
 		InvocationContext.IncludeFields includeFields = invocationContext.getIncludeFields();
 
 		if (includeFields != null) {
-			List<String> fields = includeFields.getField();
+			List<Field> fields = includeFields.getField();
 
-			for (String field : fields) {
-				String[] segments = field.split(":", 2);
+			for (Field field : fields) {
+				String fieldSpec = field.getValue();
+				String[] segments = fieldSpec.split(":", 2);
 
 				String partName = segments[0];
 				String xpath = segments[1];
@@ -223,7 +226,7 @@ public class ExportResource extends AbstractCollectionSpaceResourceImpl<PoxPaylo
 
 				if (part != null) {
 					org.dom4j.Element partElement = part.getElementBody();
-					List<Node> matches = (List<Node>) partElement.createXPath(xpath).selectNodes(partElement);
+					List<Node> matches = (List<Node>) partElement.selectNodes(xpath);
 
 					for (Node includeNode : matches) {
 						if (includeNode.getNodeType() == Node.ELEMENT_NODE) {

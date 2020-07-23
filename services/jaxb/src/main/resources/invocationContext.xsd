@@ -49,14 +49,14 @@
                 <xs:element name="includeFields">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name="field" type="xs:string" minOccurs="0" maxOccurs="unbounded"></xs:element>
+                            <xs:element name="field" type="field" minOccurs="0" maxOccurs="unbounded"></xs:element>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
                 <xs:element name="excludeFields">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name="field" type="xs:string" minOccurs="0" maxOccurs="unbounded"></xs:element>
+                            <xs:element name="field" type="field" minOccurs="0" maxOccurs="unbounded"></xs:element>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
@@ -77,4 +77,12 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+    <xs:complexType name="field">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="name" type="xs:string" use="optional" />
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
 </xs:schema>

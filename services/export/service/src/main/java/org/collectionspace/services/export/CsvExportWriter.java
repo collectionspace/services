@@ -19,6 +19,7 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
+import org.collectionspace.services.common.invocable.Field;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.service.ServiceObjectType;
@@ -42,7 +43,7 @@ public class CsvExportWriter extends AbstractExportWriter {
 		// present.
 
 		InvocationContext.IncludeFields includeFields = invocationContext.getIncludeFields();
-		List<String> fields = (includeFields != null ? includeFields.getField() : new ArrayList<String>());
+		List<Field> fields = (includeFields != null ? includeFields.getField() : new ArrayList<Field>());
 
 		if (fields.size() == 0) {
 			throw new Exception("For CSV output, the fields to export must be specified using includeFields.");
@@ -50,18 +51,23 @@ public class CsvExportWriter extends AbstractExportWriter {
 
 		List<String> headers = new ArrayList<>();
 
-		for (String field : fields) {
-			Matcher matcher = VALID_FIELD_XPATH_PATTERN.matcher(field);
+		for (Field field : fields) {
+			String fieldSpec = field.getValue();
+			Matcher matcher = VALID_FIELD_XPATH_PATTERN.matcher(fieldSpec);
 
 			if (!matcher.matches()) {
-				throw new Exception("The includeField XPath expression \"" + field + "\" is not valid for CSV output. For CSV output, all included fields must be individually specified without using wildcards.");
+				throw new Exception("The includeField expression \"" + fieldSpec + "\" is not valid for CSV output. For CSV output, all included fields must be individually specified without using wildcards.");
 			}
 
-			String fieldName = matcher.group(2);
+			String fieldName = field.getName();
+
+			if (fieldName == null) {
+				fieldName = matcher.group(2);
+			}
 
 			headers.add(fieldName);
 
-			if (isFieldWithinAuthItemTermGroup(field)) {
+			if (isFieldWithinAuthItemTermGroup(fieldSpec)) {
 				headers.add(fieldName + "NonPreferred");
 			}
 		}
@@ -79,19 +85,21 @@ public class CsvExportWriter extends AbstractExportWriter {
 			return;
 		}
 
-		List<String> fields = includeFields.getField();
+		List<Field> fields = includeFields.getField();
 		List<String> csvRecord = new ArrayList<>();
 
-		for (String field : fields) {
-			if (isFieldWithinAuthItemTermGroup(field)) {
+		for (Field field : fields) {
+			String fieldSpec = field.getValue();
+
+			if (isFieldWithinAuthItemTermGroup(fieldSpec)) {
 				// Write a column for values within the preferred (primary) term group.
-				csvRecord.add(collectValues(document, field.replace(AUTH_ITEM_TERM_GROUP_SUFFIX + "/", AUTH_ITEM_TERM_GROUP_SUFFIX + "[position()=1]/")));
+				csvRecord.add(collectValues(document, fieldSpec.replace(AUTH_ITEM_TERM_GROUP_SUFFIX + "/", AUTH_ITEM_TERM_GROUP_SUFFIX + "[position()=1]/")));
 
 				// Write a column for values within non-preferred term groups.
-				csvRecord.add(collectValues(document, field.replace(AUTH_ITEM_TERM_GROUP_SUFFIX + "/", AUTH_ITEM_TERM_GROUP_SUFFIX + "[position()>1]/")));
+				csvRecord.add(collectValues(document, fieldSpec.replace(AUTH_ITEM_TERM_GROUP_SUFFIX + "/", AUTH_ITEM_TERM_GROUP_SUFFIX + "[position()>1]/")));
 			}
 			else {
-				csvRecord.add(collectValues(document, field));
+				csvRecord.add(collectValues(document, fieldSpec));
 			}
 		}
 
@@ -105,15 +113,15 @@ public class CsvExportWriter extends AbstractExportWriter {
 	  csvPrinter.close();
 	}
 
-	private boolean isFieldWithinAuthItemTermGroup(String field) {
+	private boolean isFieldWithinAuthItemTermGroup(String fieldSpec) {
 		// FIXME: How to know a NonPreferred column is needed without hardcoding "TermGroup"?
 
-		return field.contains(AUTH_ITEM_TERM_GROUP_SUFFIX + "/");
+		return fieldSpec.contains(AUTH_ITEM_TERM_GROUP_SUFFIX + "/");
 	}
 
-	private String collectValues(PoxPayloadOut document, String field) {
+	private String collectValues(PoxPayloadOut document, String fieldSpec) {
 		String delimitedValues = "";
-		String[] segments = field.split(":", 2);
+		String[] segments = fieldSpec.split(":", 2);
 		String partName = segments[0];
 		String xpath = segments[1];
 
@@ -130,7 +138,7 @@ public class CsvExportWriter extends AbstractExportWriter {
 		String delimitedValues = "";
 		String fieldName = path.get(depth);
 		String delimiter = (depth / 2 > 0) ? "^^" : ";";
-		List<Node> matches = element.createXPath(fieldName).selectNodes(element);
+		List<Node> matches = element.selectNodes(fieldName);
 
 		if (matches.size() > 0) {
 			List<String> values = new ArrayList<>();
