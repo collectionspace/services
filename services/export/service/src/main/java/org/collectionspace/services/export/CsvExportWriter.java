@@ -31,9 +31,12 @@ import org.dom4j.VisitorSupport;
 public class CsvExportWriter extends AbstractExportWriter {
 	private static final Pattern VALID_FIELD_XPATH_PATTERN = Pattern.compile("^\\w+:(\\w+\\/)*(\\w+)$");
 	private static final String AUTH_ITEM_TERM_GROUP_SUFFIX = "TermGroup";
+	private static final String VALUE_DELIMITER_PARAM_NAME = "delimiter";
 
 	private CSVPrinter csvPrinter;
 	private Map<String, Map<String, Set<String>>> refFieldsByDocType = new HashMap<>();
+	private String valueDelimiter = "|";
+	private String nestedValueDelimiter = "^^";
 
 	@Override
 	public void start() throws Exception {
@@ -75,6 +78,20 @@ public class CsvExportWriter extends AbstractExportWriter {
 		String[] headersArray = new String[headers.size()];
 
 		this.csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(headers.toArray(headersArray)));
+
+		// Set the delimiter.
+
+		InvocationContext.Params params = invocationContext.getParams();
+
+		if (params != null) {
+			for (InvocationContext.Params.Param param : params.getParam()) {
+				if (param.getKey().equals(VALUE_DELIMITER_PARAM_NAME)) {
+					this.valueDelimiter = param.getValue();
+
+					break;
+				}
+			};
+		}
 	}
 
 	@Override
@@ -137,7 +154,7 @@ public class CsvExportWriter extends AbstractExportWriter {
 	private String collectValues(String docType, String partName, Element element, List<String> path, int depth) {
 		String delimitedValues = "";
 		String fieldName = path.get(depth);
-		String delimiter = (depth / 2 > 0) ? "^^" : ";";
+		String delimiter = (depth / 2 > 0) ? this.nestedValueDelimiter : this.valueDelimiter;
 		List<Node> matches = element.selectNodes(fieldName);
 
 		if (matches.size() > 0) {
