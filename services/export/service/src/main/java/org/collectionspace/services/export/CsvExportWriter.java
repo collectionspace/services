@@ -30,7 +30,6 @@ import org.dom4j.VisitorSupport;
 
 public class CsvExportWriter extends AbstractExportWriter {
 	private static final Pattern VALID_FIELD_XPATH_PATTERN = Pattern.compile("^\\w+:(\\w+\\/)*(\\w+)$");
-	private static final String AUTH_ITEM_TERM_GROUP_SUFFIX = "TermGroup";
 	private static final String VALUE_DELIMITER_PARAM_NAME = "delimiter";
 
 	private CSVPrinter csvPrinter;
@@ -69,10 +68,6 @@ public class CsvExportWriter extends AbstractExportWriter {
 			}
 
 			headers.add(fieldName);
-
-			if (isFieldWithinAuthItemTermGroup(fieldSpec)) {
-				headers.add(fieldName + "NonPreferred");
-			}
 		}
 
 		String[] headersArray = new String[headers.size()];
@@ -106,18 +101,7 @@ public class CsvExportWriter extends AbstractExportWriter {
 		List<String> csvRecord = new ArrayList<>();
 
 		for (Field field : fields) {
-			String fieldSpec = field.getValue();
-
-			if (isFieldWithinAuthItemTermGroup(fieldSpec)) {
-				// Write a column for values within the preferred (primary) term group.
-				csvRecord.add(collectValues(document, fieldSpec.replace(AUTH_ITEM_TERM_GROUP_SUFFIX + "/", AUTH_ITEM_TERM_GROUP_SUFFIX + "[position()=1]/")));
-
-				// Write a column for values within non-preferred term groups.
-				csvRecord.add(collectValues(document, fieldSpec.replace(AUTH_ITEM_TERM_GROUP_SUFFIX + "/", AUTH_ITEM_TERM_GROUP_SUFFIX + "[position()>1]/")));
-			}
-			else {
-				csvRecord.add(collectValues(document, fieldSpec));
-			}
+			csvRecord.add(collectValues(document, field.getValue()));
 		}
 
 		if (csvRecord.size() > 0) {
@@ -128,12 +112,6 @@ public class CsvExportWriter extends AbstractExportWriter {
 	@Override
 	public void close() throws Exception {
 	  csvPrinter.close();
-	}
-
-	private boolean isFieldWithinAuthItemTermGroup(String fieldSpec) {
-		// FIXME: How to know a NonPreferred column is needed without hardcoding "TermGroup"?
-
-		return fieldSpec.contains(AUTH_ITEM_TERM_GROUP_SUFFIX + "/");
 	}
 
 	private String collectValues(PoxPayloadOut document, String fieldSpec) {
