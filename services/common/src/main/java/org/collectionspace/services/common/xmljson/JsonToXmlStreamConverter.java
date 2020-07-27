@@ -29,6 +29,8 @@ import com.fasterxml.jackson.core.JsonToken;
  * <ul>
  * <li>JSON fields starting with "@xmlns:" are converted XML namespace declarations.</li>
  * <li>JSON fields starting with "@" are converted to XML attributes.</li>
+ * <li>JSON fields named "." are converted to XML element content. This is useful when the desired
+ *     XML output is an element with one or more attributes, and some text content.<li>
  * <li>Other JSON fields are converted to identically-named XML elements.</li>
  * <li>The contents of JSON objects are converted to XML child elements.</li>
  * <li>The contents of JSON arrays are expanded into multiple XML elements, each
@@ -267,6 +269,9 @@ public class JsonToXmlStreamConverter {
 
                 xmlWriter.writeAttribute(localName, value);
             }
+        }
+        else if (field.isScalar() && isXmlContent(name)) {
+            xmlWriter.writeCharacters(value);
         }
         else {
             // It doesn't look like an XML attribute or namespace declaration.

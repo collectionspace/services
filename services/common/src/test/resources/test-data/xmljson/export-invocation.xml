@@ -1,0 +1,15 @@
+<ns2:invocationContext xmlns:ns2="http://collectionspace.org/services/common/invocable">
+	<mode>single</mode>
+	<singleCSID>dc929ede-081f-4eaa-a439-358b89887c91</singleCSID>
+	<docType>CollectionObject</docType>
+	<includeFields>
+		<field>collectionobjects_common:objectNumber</field>
+		<field name="fieldCollectionDateGroup">collectionobjects_common:fieldCollectionDateGroup/dateDisplayDate</field>
+		<field>collectionobjects_common:titleGroupList/titleGroup/title</field>
+		<field>collectionobjects_common:titleGroupList/titleGroup/titleLanguage</field>
+		<field>collectionobjects_common:titleGroupList/titleGroup/titleType</field>
+		<field>collectionobjects_common:titleGroupList/titleGroup/titleTranslationSubGroupList/titleTranslationSubGroup/titleTranslation</field>
+		<field>collectionobjects_common:titleGroupList/titleGroup/titleTranslationSubGroupList/titleTranslationSubGroup/titleTranslationLanguage</field>
+	</includeFields>
+	<outputMIME>text/csv</outputMIME>
+</ns2:invocationContext>

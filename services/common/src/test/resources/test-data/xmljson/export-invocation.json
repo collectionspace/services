@@ -1,0 +1,23 @@
+{
+	"ns2:invocationContext": {
+		"@xmlns:ns2": "http://collectionspace.org/services/common/invocable",
+		"mode": "single",
+		"singleCSID": "dc929ede-081f-4eaa-a439-358b89887c91",
+		"docType": "CollectionObject",
+		"includeFields": {
+			"field": [
+				"collectionobjects_common:objectNumber",
+				{
+					"@name": "fieldCollectionDateGroup",
+					".": "collectionobjects_common:fieldCollectionDateGroup/dateDisplayDate"
+				},
+				"collectionobjects_common:titleGroupList/titleGroup/title",
+				"collectionobjects_common:titleGroupList/titleGroup/titleLanguage",
+				"collectionobjects_common:titleGroupList/titleGroup/titleType",
+				"collectionobjects_common:titleGroupList/titleGroup/titleTranslationSubGroupList/titleTranslationSubGroup/titleTranslation",
+				"collectionobjects_common:titleGroupList/titleGroup/titleTranslationSubGroupList/titleTranslationSubGroup/titleTranslationLanguage"
+			]
+		},
+		"outputMIME": "text/csv"
+	}
+}
