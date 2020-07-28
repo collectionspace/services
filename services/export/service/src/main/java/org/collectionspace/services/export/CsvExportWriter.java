@@ -25,7 +25,7 @@ import org.dom4j.Node;
 
 public class CsvExportWriter extends AbstractExportWriter {
 	private static final Pattern VALID_FIELD_XPATH_PATTERN = Pattern.compile("^\\w+:(\\w+\\/)*(\\w+)(\\[.*\\])?$");
-	private static final String VALUE_DELIMITER_PARAM_NAME = "delimiter";
+	private static final String VALUE_DELIMITER_PARAM_NAME = "valuedelimiter";
 
 	private CSVPrinter csvPrinter;
 	private Map<String, Map<String, Set<String>>> refFieldsByDocType = new HashMap<>();
