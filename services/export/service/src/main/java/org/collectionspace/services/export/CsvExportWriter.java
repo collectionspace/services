@@ -1,9 +1,7 @@
 package org.collectionspace.services.export;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,14 +20,11 @@ import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.invocable.Field;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.config.service.ServiceBindingType;
-import org.collectionspace.services.config.service.ServiceObjectType;
 import org.dom4j.Element;
-import org.dom4j.Namespace;
 import org.dom4j.Node;
-import org.dom4j.VisitorSupport;
 
 public class CsvExportWriter extends AbstractExportWriter {
-	private static final Pattern VALID_FIELD_XPATH_PATTERN = Pattern.compile("^\\w+:(\\w+\\/)*(\\w+)$");
+	private static final Pattern VALID_FIELD_XPATH_PATTERN = Pattern.compile("^\\w+:(\\w+\\/)*(\\w+)(\\[.*\\])?$");
 	private static final String VALUE_DELIMITER_PARAM_NAME = "delimiter";
 
 	private CSVPrinter csvPrinter;
@@ -148,7 +143,7 @@ public class CsvExportWriter extends AbstractExportWriter {
 				else {
 					textValue = node.getText();
 
-					boolean isRefName = isRefField(docType, partName, fieldName);
+					boolean isRefName = isRefField(docType, partName, fieldName.replaceFirst("\\[.*\\]", ""));
 
 					if (isRefName && StringUtils.isNotEmpty(textValue)) {
 						textValue = RefNameUtils.getDisplayName(textValue);
