@@ -62,5 +62,30 @@ public interface CSEventListener {
 	 * Returns the name of the event listener as defined during registration -see register() method.
 	 * @return
 	 */
-	String getName(String repositoryName);	
+	String getName(String repositoryName);
+	
+	/*
+	 * Used to set the name of the current repository at setup to event handling
+	 */
+	void setCurrentRepository(Event event);
+	
+	/*
+	 * Returns the name of the event's current repository -see method setCurrentRepository()
+	 */
+	String getCurrentRepository();
+
+	/**
+	 * Returns a parameter value for the given key for the given repository/tenant
+	 * @param key
+	 * @return
+	 */
+	String getParamValue(String key);
+
+	/**
+	 * For a given repository/tenant, set the name of the listener as defined in the tenant bindings.
+	 * 
+	 * @param repositoryName
+	 * @param eventListenerName
+	 */
+	void setName(String repositoryName, String eventListenerName);
 }
