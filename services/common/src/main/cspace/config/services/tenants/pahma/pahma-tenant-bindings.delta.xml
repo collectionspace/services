@@ -5,10 +5,21 @@
 
 	<tenant:tenantBinding id="15">
 		<tenant:eventListenerConfigurations id="default" merge:matcher="id">
+			<!-- Disable the default listener for updating an object's location and enable our version -->
 			<tenant:eventListenerConfig id="UpdateObjectLocationOnMove" merge:matcher="id" merge:action="delete" />
 
 			<tenant:eventListenerConfig id="UpdateObjectLocationAndCrateOnMove" merge:matcher="id">
 				<tenant:className>org.collectionspace.services.listener.UpdateObjectLocationAndCrateOnMove</tenant:className>
+				<tenant:paramList id="FFHgpt60mj3IW2UA7odXqt4SmCUVy1rEIKkZdTCe7N8KqT2A">
+					<tenant:param>
+						<tenant:key>TENANT_COLLECTIONOBJECTS_SCHEMANAME_KEY</tenant:key>
+						<tenant:value>collectionobjects_anthropology</tenant:value>
+					</tenant:param>
+					<tenant:param>
+						<tenant:key>TENANT_MOVEMENTS_SCHEMANAME_KEY</tenant:key>
+						<tenant:value>movements_anthropology</tenant:value>
+					</tenant:param>
+				</tenant:paramList>
 			</tenant:eventListenerConfig>
 		</tenant:eventListenerConfigurations>
 
