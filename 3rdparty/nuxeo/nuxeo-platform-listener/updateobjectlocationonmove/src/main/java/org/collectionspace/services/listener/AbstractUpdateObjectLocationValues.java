@@ -87,7 +87,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
         DocumentModel eventDocModel = docEventContext.getSourceDocument();        
         String eventType = event.getName();
         boolean isAboutToBeRemovedEvent = eventType.equals(DocumentEventTypes.ABOUT_TO_REMOVE);
-        
+
         //
         // Ensure this event relates to a relationship record (between cataloging and movement records) or a movement record.  If so, get the CSID
         // of the corresponding movement record.  Otherwise, exit.
