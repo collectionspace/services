@@ -34,6 +34,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.core.MediaType;
 import javax.naming.NamingException;
@@ -111,7 +112,9 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<ReportsCommon> {
-    private final Logger logger = LoggerFactory.getLogger(ReportDocumentModelHandler.class);
+		private final Logger logger = LoggerFactory.getLogger(ReportDocumentModelHandler.class);
+
+		private static final Pattern INVALID_CSID_PATTERN = Pattern.compile("[^\\w\\-]");
     private static String REPORTS_FOLDER = "reports";
     private static String CSID_LIST_SEPARATOR = ",";
 
@@ -181,6 +184,14 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 		return result;
 	}
 
+	private String assertValidCsid(String csid) throws IllegalArgumentException {
+		if (INVALID_CSID_PATTERN.matcher(csid).find()) {
+			throw new IllegalArgumentException("Invalid csid: " + csid);
+		}
+
+		return csid;
+	}
+
 	public InputStream invokeReport(
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
 			String csid,
@@ -209,7 +220,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 
 		if (Invocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationMode)) {
 			modeProperty = InvocableJAXBSchema.SUPPORTS_SINGLE_DOC;
-    		params.put(REPORTS_STD_CSID_PARAM, invContext.getSingleCSID());
+			params.put(REPORTS_STD_CSID_PARAM, assertValidCsid(invContext.getSingleCSID()));
 		} else if (Invocable.INVOCATION_MODE_LIST.equalsIgnoreCase(invocationMode)) {
 			modeProperty = InvocableJAXBSchema.SUPPORTS_DOC_LIST;
 			List<String> csids = null;
@@ -228,12 +239,12 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 						first = false;
 					else
 						sb.append(CSID_LIST_SEPARATOR);
-	   				sb.append(csidItem);
+	   				sb.append(assertValidCsid(csidItem));
 				}
     		params.put(REPORTS_STD_CSIDLIST_PARAM, sb.toString());
 		} else if(Invocable.INVOCATION_MODE_GROUP.equalsIgnoreCase(invocationMode)) {
 			modeProperty = InvocableJAXBSchema.SUPPORTS_GROUP;
-    		params.put(REPORTS_STD_GROUPCSID_PARAM, invContext.getGroupCSID());
+			params.put(REPORTS_STD_GROUPCSID_PARAM, assertValidCsid(invContext.getGroupCSID()));
 		} else if(Invocable.INVOCATION_MODE_NO_CONTEXT.equalsIgnoreCase(invocationMode)) {
 			modeProperty = InvocableJAXBSchema.SUPPORTS_NO_CONTEXT;
 			checkDocType = false;
