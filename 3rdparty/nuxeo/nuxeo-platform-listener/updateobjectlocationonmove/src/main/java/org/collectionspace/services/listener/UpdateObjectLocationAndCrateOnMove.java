@@ -66,7 +66,7 @@ public class UpdateObjectLocationAndCrateOnMove extends UpdateObjectLocationOnMo
         // If the new value is blank, any non-blank existing value should always
         // be overwritten ('nulled out') with a blank value.
         if (Tools.isBlank(crateRefName) && Tools.notBlank(existingCrateRefName)) {
-            collectionObjectDocModel.setProperty(TENANT_COLLECTIONOBJECTS_SCHEMANAME_KEY,
+            collectionObjectDocModel.setProperty(getParamValue(TENANT_COLLECTIONOBJECTS_SCHEMANAME_KEY),
                     COMPUTED_CRATE_PROPERTY, (Serializable) null);
             // Otherwise, if the new value is not blank, and
             // * the existing value is blank, or
@@ -79,7 +79,7 @@ public class UpdateObjectLocationAndCrateOnMove extends UpdateObjectLocationOnMo
             }
             // ... update the existing value in the CollectionObject with the
             // new value from the Movement.
-            collectionObjectDocModel.setProperty(TENANT_COLLECTIONOBJECTS_SCHEMANAME_KEY,
+            collectionObjectDocModel.setProperty(getParamValue(TENANT_COLLECTIONOBJECTS_SCHEMANAME_KEY),
                     COMPUTED_CRATE_PROPERTY, crateRefName);
         } else {
             if (logger.isTraceEnabled()) {
