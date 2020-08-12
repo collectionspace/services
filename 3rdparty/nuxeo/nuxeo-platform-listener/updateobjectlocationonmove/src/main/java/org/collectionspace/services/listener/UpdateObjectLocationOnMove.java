@@ -15,8 +15,8 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
 
     @Override
     protected boolean updateCollectionObjectLocation(DocumentModel collectionObjectDocModel,
-    		DocumentModel movementDocModel,
-    		String movementRecordsLocation) throws ClientException {
+    		DocumentModel movementDocModel, //FIXME: Not needed?
+    		DocumentModel mostRecentMovementDocumentModel) throws ClientException {
     	boolean result = false;
 
         // Check that the location value returned, which is expected to be a reference (refName) to an authority term (such as a storage
@@ -24,6 +24,7 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
         // 	* Ensure it is not blank.
         // 	* Ensure it is successfully parsed by the authority item parser.
         //
+    	String movementRecordsLocation = (String) mostRecentMovementDocumentModel.getProperty(MOVEMENTS_COMMON_SCHEMA, CURRENT_LOCATION_ELEMENT_NAME);
         if (Tools.isBlank(movementRecordsLocation)) {
             return result;
         } else if (RefNameUtils.parseAuthorityTermInfo(movementRecordsLocation) == null) {
