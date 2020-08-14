@@ -37,9 +37,12 @@ public class UpdateObjectLocationAndCrateOnMove extends UpdateObjectLocationOnMo
             throws ClientException {
     	boolean result = false;
     	
-        // Get the current crate value from the Movement (the "new" value)
-        String crateRefName = (String) movementDocModel.getProperty(getParamValue(TENANT_MOVEMENTS_SCHEMANAME_KEY),
-                		CRATE_PROPERTY);
+    	String crateRefName = null;
+    	if (movementDocModel != null) {
+	        // Get the current crate value from the Movement (the "new" value)
+	        crateRefName = (String) movementDocModel.getProperty(getParamValue(TENANT_MOVEMENTS_SCHEMANAME_KEY),
+	                		CRATE_PROPERTY);
+    	}
 
         // Check that the value returned, which is expected to be a
         // reference (refName) to an authority term:
