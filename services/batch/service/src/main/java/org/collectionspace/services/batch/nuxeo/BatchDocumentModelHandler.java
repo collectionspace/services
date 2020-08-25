@@ -300,7 +300,7 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 				batchInstance.run(batchCommon);
 			} catch (UnsupportedOperationException t) {
 				// Support for run() will be deprecated in a future release.  See DRYD-878
-				logger.debug(t.getMessage());
+				logger.info(t.getMessage());
 				batchInstance.run();
 			}
 

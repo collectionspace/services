@@ -69,15 +69,6 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
         return (Set<T>) list.stream().collect(Collectors.toSet());
     }
 
-	/**
-	 * Subclasses should override this method.  See DRYD-878
-	 */
-	@Override
-	public void run(BatchCommon batchCommon) {
-		String errMsg = String.format("%s class does not support run(BatchCommon batchCommon) method.", getClass().getName());
-		throw new java.lang.UnsupportedOperationException(errMsg);
-	}
-
 	protected String getFieldXml(Map<String, String> fields, String fieldName) {
 		return getFieldXml(fieldName, fields.get(fieldName));
 	}
