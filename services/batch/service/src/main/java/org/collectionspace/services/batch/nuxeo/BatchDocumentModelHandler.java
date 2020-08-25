@@ -295,8 +295,15 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 					logger.warn("BatchResource.invoke did not get a resourceMapHolder in context!");
 				}
 			}
-	
-			batchInstance.run(batchCommon);
+
+			try {
+				batchInstance.run(batchCommon);
+			} catch (UnsupportedOperationException t) {
+				// Support for run() will be deprecated in a future release.  See DRYD-878
+				logger.info(t.getMessage());
+				batchInstance.run();
+			}
+
 			int status = batchInstance.getCompletionStatus();
 			if (status == Invocable.STATUS_ERROR) {
 				InvocationError error = batchInstance.getErrorInfo();
