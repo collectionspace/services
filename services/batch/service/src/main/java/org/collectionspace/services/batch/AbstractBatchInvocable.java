@@ -235,4 +235,10 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
 
     @Override
     public abstract void run();
+    
+	@Override
+	public void run(BatchCommon batchCommon) {
+		throw new UnsupportedOperationException("This CollectionSpace batch-job/data-update class does not support the 'public void run(BatchCommon batchCommon)' method.");
+	}
+
 }
