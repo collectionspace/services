@@ -235,4 +235,13 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
 
     @Override
     public abstract void run();
+
+	/**
+	 * Subclasses should override this method.  See DRYD-878
+	 */
+	@Override
+	public void run(BatchCommon batchCommon) {
+		String errMsg = String.format("%s class does not support run(BatchCommon batchCommon) method.", getClass().getName());
+		throw new java.lang.UnsupportedOperationException(errMsg);
+	}
 }
