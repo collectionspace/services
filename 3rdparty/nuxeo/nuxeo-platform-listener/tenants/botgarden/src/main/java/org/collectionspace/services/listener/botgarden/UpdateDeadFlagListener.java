@@ -11,6 +11,7 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceMap;
+import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
@@ -89,7 +90,9 @@ public class UpdateDeadFlagListener extends AbstractCSEventSyncListenerImpl {
 
 				logger.debug("actionCode=" + actionCode);
 
-				if (actionCode != null && (actionCode.equals(MovementBotGardenConstants.DEAD_ACTION_CODE) || actionCode.equals(MovementBotGardenConstants.REVIVED_ACTION_CODE))) {
+				if (actionCode != null &&
+						(RefNameUtils.doShortIDsMatch(actionCode, MovementBotGardenConstants.DEAD_ACTION_CODE) ||
+						 RefNameUtils.doShortIDsMatch(actionCode, MovementBotGardenConstants.REVIVED_ACTION_CODE))) {
 					String movementCsid = doc.getName();
 
 					try {
