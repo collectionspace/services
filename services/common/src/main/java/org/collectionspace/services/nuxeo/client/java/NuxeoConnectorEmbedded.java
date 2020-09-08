@@ -110,7 +110,7 @@ public class NuxeoConnectorEmbedded {
 	            + "WHERE ecm:mixinType = 'Picture' AND ecm:isProxy = 0 AND views/*/title = 'Original' "
 	            + "AND content/data IS NULL";
 
-		String msg = String.format("Check for candidate Pictures that Nuxeo needs to migrate.  Using this query: ", PICTURES_TO_MIGRATE_QUERY);
+		String msg = String.format("Check for candidate Pictures that Nuxeo needs to migrate.  Using this query: %s", PICTURES_TO_MIGRATE_QUERY);
 		System.out.println(msg);
 
 		DocumentModelList queryResult = coreSession.query(PICTURES_TO_MIGRATE_QUERY);
@@ -118,8 +118,8 @@ public class NuxeoConnectorEmbedded {
 			msg = String.format("Found %d candidate Pictures for migration by Nuxeo.", queryResult.size());
 			System.out.println(msg);
 			for (DocumentModel docModel : queryResult) {
-				System.out.format("Candidate for Nuxeo migration: CSID='%s'\tType='%s'",
-						docModel.getName(), docModel.getType());
+				System.out.format("Candidate for Nuxeo migration: ID='%s'\tname='%s'\tType='%s'",
+						docModel.getId(), docModel.getName(), docModel.getType());
 			}
 		} else {
 			System.out.println("No candidate Picutres found.");
