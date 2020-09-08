@@ -100,6 +100,31 @@ public class NuxeoConnectorEmbedded {
 
 		return result;
 	}
+	
+	//
+	// For testing of CC-https://jira.ets.berkeley.edu/jira/browse/CC-1268
+	// FIXME: CC-1268 - Not for production
+	//
+	private void runCCdash1268(CoreSession coreSession) throws Exception {
+		final String PICTURES_TO_MIGRATE_QUERY = "SELECT ecm:uuid FROM Document "
+	            + "WHERE ecm:mixinType = 'Picture' AND ecm:isProxy = 0 AND views/*/title = 'Original' "
+	            + "AND content/data IS NULL";
+
+		String msg = String.format("Check for candidate Pictures that Nuxeo needs to migrate.  Using this query: ", PICTURES_TO_MIGRATE_QUERY);
+		System.out.println(msg);
+
+		DocumentModelList queryResult = coreSession.query(PICTURES_TO_MIGRATE_QUERY);
+		if (queryResult != null && queryResult.isEmpty() == false) {
+			msg = String.format("Found %d candidate Pictures for migration by Nuxeo.", queryResult.size());
+			System.out.println(msg);
+			for (DocumentModel docModel : queryResult) {
+				System.out.format("Candidate for Nuxeo migration: CSID='%s'\tType='%s'",
+						docModel.getName(), docModel.getType());
+			}
+		} else {
+			System.out.println("No candidate Picutres found.");
+		}
+	}
 
 	//
 	// Start/boot the Nuxeo EP server instance
@@ -133,7 +158,14 @@ public class NuxeoConnectorEmbedded {
 		try {
 			Repository defaultRepo = Framework.getService(RepositoryManager.class).getDefaultRepository();
 			coreSession = CoreInstance.openCoreSession(defaultRepo.getName(), new SystemPrincipal(null));
-		} catch (Throwable t) {
+			//
+			// CC-1268 - Not for production
+			//
+			runCCdash1268(coreSession); // FIXME: CC-1268 - Not for production
+			//
+			// CC-1268 - Not for production
+			//
+			} catch (Throwable t) {
 			logger.error(t.getMessage());
 			throw new RuntimeException("Could not start the Nuxeo EP Framework", t);
 		} finally {
