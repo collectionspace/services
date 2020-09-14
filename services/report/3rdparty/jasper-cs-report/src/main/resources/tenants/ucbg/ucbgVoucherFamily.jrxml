@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="object" language="groovy" pageWidth="612" pageHeight="792" columnWidth="540" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="36" uuid="8ed2f832-ac83-4894-b970-86b6c5a6cf2a">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Title" fontName="SansSerif" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="SubTitle" forecolor="#666666" fontName="SansSerif" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="SansSerif" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="SansSerif" fontSize="12"/>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[35]]></defaultValueExpression>
+	</parameter>
+	<parameter name="family" class="java.lang.String">
+		<parameterDescription><![CDATA[Use form %FAMILYNAME% (e.g., %CACTACEAE%)
+or %'FAMILYNAME' to avoid homonyms]]></parameterDescription>
+		<defaultValueExpression><![CDATA["%CACTACEAE'"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select co1.objectnumber,
+findhybridaffinname(tig.id) determination,
+case when (tn.family is not null and tn.family <> '')
+     then regexp_replace(tn.family, '^.*\)''(.*)''$', '\1')
+end as family,
+regexp_replace(lc.borrower, '^.*\)''(.*)''$', '\1') voucherinstitution,
+case when lb.hortwild='Horticultural' then 'hort'
+     when lb.hortwild='Wild' then 'wild'
+end as hortwild
+from loansout_common lc
+left outer join loansout_naturalhistory lnh on (lc.id=lnh.id)
+left outer join loansout_botgarden lb on (lc.id=lb.id)
+
+join hierarchy h1 on lc.id=h1.id
+join relations_common r1 on (h1.name=r1.subjectcsid and objectdocumenttype='CollectionObject')
+join hierarchy h2 on (r1.objectcsid=h2.name)
+join collectionobjects_common co1 on (co1.id=h2.id)
+
+join collectionspace_core core on (core.id=co1.id and core.tenantid=$P{tenantid})
+join misc misc1 on (misc1.id = lc.id and misc1.lifecyclestate <> 'deleted')
+join misc misc2 on (misc2.id = co1.id and misc2.lifecyclestate <> 'deleted')
+
+left outer join collectionobjects_naturalhistory con on (co1.id=con.id)
+
+left outer join hierarchy htig
+     on (co1.id = htig.parentid and htig.pos = 0 and htig.name = 'collectionobjects_naturalhistory:taxonomicIdentGroupList')
+left outer join taxonomicIdentGroup tig on (tig.id = htig.id)
+
+left outer join taxon_common tc on (tig.taxon=tc.refname)
+left outer join taxon_naturalhistory tn on (tc.id=tn.id)
+
+where tn.family like $P{family}
+
+order by determination]]>
+	</queryString>
+	<field name="objectnumber" class="java.lang.String"/>
+	<field name="determination" class="java.lang.String"/>
+	<field name="family" class="java.lang.String"/>
+	<field name="voucherinstitution" class="java.lang.String"/>
+	<field name="hortwild" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="25" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="9e60f7f1-c1ba-488c-a6d8-e04ab93f1c34" x="151" y="0" width="216" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[UC Botanical Garden at Berkeley]]></text>
+			</staticText>
+			<textField pattern="dd-MMM-yyyy">
+				<reportElement uuid="e8bbdcc2-87c1-4c95-a2ce-a052dc54a356" style="Column header" x="0" y="0" width="145" height="20" forecolor="#000000"/>
+				<textElement>
+					<font fontName="SansSerif" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="42" splitType="Stretch">
+			<line>
+				<reportElement uuid="235681a4-b40d-483a-ace2-184f711ba5c1" positionType="FixRelativeToBottom" x="0" y="40" width="540" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement uuid="6f7135a4-c9bd-466d-8913-370776c76e0c" x="3" y="2" width="536" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Voucher by Family: " + $P{family}.replaceAll( "%", "" )]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="e4519f15-3730-4f4a-a69c-eacc8f6427c7" x="77" y="26" width="116" height="12"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Full Taxonomic Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1772b710-f50a-4add-ae15-7638e1825dae" x="342" y="26" width="116" height="12"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Voucher Institution]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e5158bf9-86ac-4278-98d5-38c293c8d3d6" x="484" y="26" width="55" height="12"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Hort/Wild]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0524c0f2-8eca-4d00-9a92-d03ecfa48108" x="13" y="26" width="64" height="12"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Accession]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="22" splitType="Prevent">
+			<textField>
+				<reportElement uuid="adccae2a-86c9-4cb4-9910-e124ae71f96a" x="13" y="0" width="62" height="18"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="ef4a81a9-a4f5-4035-8fae-9a0066d4e76b" x="77" y="0" width="262" height="18"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$F{determination}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="2a235742-955c-426b-bc7a-c3390990b3f5" x="342" y="0" width="152" height="18"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$F{voucherinstitution}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="2ed6f5bf-453a-43b1-a5d2-e7e289e61214" x="499" y="0" width="41" height="18"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[$F{hortwild}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="f7fe7694-a376-4732-9ac8-a43fff163a72" positionType="FixRelativeToBottom" x="0" y="20" width="540" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement uuid="1c370072-2df1-4eea-a1ab-e49c97473779" x="419" y="0" width="80" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="2315ac77-01f8-46a4-b593-afb5898234ef" x="499" y="0" width="40" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

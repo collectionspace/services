@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ucbgAccessionHistory" language="groovy" pageWidth="612" pageHeight="792" columnWidth="540" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="36" uuid="78deb05b-f9ff-4936-8d6f-c206cdc03776">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="location" class="java.lang.String">
+		<parameterDescription><![CDATA[Use percent as wild card (e.g., 3A%) or full name as in CollectionSpace (e.g., 3A, Vernal Pool, Californian).  Case sensitive.]]></parameterDescription>
+		<defaultValueExpression><![CDATA["3A%"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select co1.objectnumber,
+case when (tn.family is not null and tn.family <> '')
+   then getdispl(tn.family)
+end as family,
+findhybridaffinname(tig.id) Determination,
+date(mc.locationdate + interval '8 hours') actiondate,
+getdispl(mc.reasonformove) actionreason,
+case when (mb.previouslocation is not null and mb.previouslocation <> '')
+     then getdispl(mb.previouslocation)
+end as previouslocation
+from collectionobjects_common co1
+join hierarchy h1 on co1.id=h1.id
+left outer join hierarchy htig
+     on (co1.id = htig.parentid and htig.pos = 0 and htig.name = 'collectionobjects_naturalhistory:taxonomicIdentGroupList')
+left outer join taxonomicIdentGroup tig on (tig.id = htig.id)
+left outer join taxon_common tc on (tig.taxon=tc.refname)
+left outer join taxon_naturalhistory tn on (tc.id=tn.id)
+join relations_common r1 on (h1.name=r1.subjectcsid and objectdocumenttype='Movement')
+join hierarchy h2 on (r1.objectcsid=h2.name and h2.isversion is true)
+join movements_common mc on (mc.id=h2.id)
+left outer join movements_botgarden mb on (mc.id=mb.id)
+left outer join loctermgroup lct on (getdispl(mb.previouslocation)=lct.termdisplayname)
+inner join misc misc1 on (mc.id=misc1.id and misc1.lifecyclestate <> 'deleted')
+join collectionspace_core core on mc.id=core.id
+where getdispl(mc.reasonformove) = 'Dead' and lct.termdisplayname like $P{location}
+order by determination, locationdate desc]]>
+	</queryString>
+	<field name="objectnumber" class="java.lang.String"/>
+	<field name="family" class="java.lang.String"/>
+	<field name="determination" class="java.lang.String"/>
+	<field name="actiondate" class="java.sql.Date"/>
+	<field name="actionreason" class="java.lang.String"/>
+	<field name="previouslocation" class="java.lang.String"/>
+	<group name="objectnumber">
+		<groupExpression><![CDATA[$F{objectnumber}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="61" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="35" width="540" height="20" uuid="cc406c4d-1098-4564-b10b-0b10c78f097f"/>
+				<textElement textAlignment="Center" markup="none">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Individuals that died in location: " + $P{location}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="57" width="540" height="1" uuid="411090bf-650f-426a-85f9-3ad76e1fbea2"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+				</graphicElement>
+			</line>
+			<textField pattern="MM/dd/yyyy">
+				<reportElement x="438" y="0" width="100" height="20" uuid="3bef2b95-1ee5-48f7-b702-91590afa2f65"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="146" y="0" width="248" height="20" uuid="d36f8350-66d9-46c0-aa5f-a14e57018ac5"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom"/>
+				<text><![CDATA[UC Botanical Garden at Berkeley]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="29" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.spreadsheet.SpreadsheetLayout"/>
+			<staticText>
+				<reportElement x="0" y="7" width="65" height="15" forecolor="#666666" uuid="feb778bc-c13f-4900-a943-bf1170b7f611"/>
+				<textElement verticalAlignment="Bottom">
+					<font isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="65" y="7" width="65" height="15" forecolor="#666666" uuid="b986452e-da5a-4525-868f-d1f11c198364"/>
+				<textElement verticalAlignment="Bottom">
+					<font isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Accession No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="130" y="7" width="260" height="15" forecolor="#666666" uuid="23076c14-39a0-447e-a79a-2e556fec7293"/>
+				<textElement verticalAlignment="Bottom">
+					<font isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Determination]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="390" y="7" width="150" height="15" forecolor="#666666" uuid="d6ade7f6-43c2-4858-94b6-a5b39ded0bc2"/>
+				<textElement verticalAlignment="Bottom">
+					<font isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Location]]></text>
+			</staticText>
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="24" width="540" height="1" uuid="bf4e3fce-4fb3-479b-8ebd-f3dd2c296eba"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="18" splitType="Prevent">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.spreadsheet.SpreadsheetLayout"/>
+			<textField isStretchWithOverflow="true" pattern="MM/dd/yyyy" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="65" height="18" isPrintWhenDetailOverflows="true" uuid="2857b9f7-a9ea-42a7-b0dc-2fedc2cdcd66"/>
+				<box>
+					<topPen lineWidth="0.25" lineColor="#999696"/>
+				</box>
+				<textElement>
+					<paragraph spacingBefore="3" spacingAfter="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{actiondate}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="65" y="0" width="65" height="18" isPrintWhenDetailOverflows="true" uuid="0eee323f-2e84-4308-9bdb-0c954b9264bd"/>
+				<box>
+					<topPen lineWidth="0.25" lineColor="#999696"/>
+				</box>
+				<textElement>
+					<paragraph spacingBefore="3" spacingAfter="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="130" y="0" width="260" height="18" isPrintWhenDetailOverflows="true" uuid="7bcb7b9c-a325-4cd1-ace5-44aa35dfa254"/>
+				<box>
+					<topPen lineWidth="0.25" lineColor="#999696"/>
+				</box>
+				<textElement>
+					<paragraph spacingBefore="3" spacingAfter="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{determination}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="390" y="0" width="150" height="18" isPrintWhenDetailOverflows="true" uuid="a01790be-77e8-4a0c-a242-a5a04284c140"/>
+				<box>
+					<topPen lineWidth="0.25" lineColor="#999696"/>
+				</box>
+				<textElement>
+					<paragraph spacingBefore="3" spacingAfter="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{previouslocation}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="22" splitType="Stretch">
+			<textField>
+				<reportElement x="420" y="2" width="80" height="20" uuid="abf2940f-3db6-4cba-a725-90af44c7c716"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="500" y="2" width="40" height="20" uuid="95e3b682-5d11-4a07-a031-4e578ffa6716"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>
+

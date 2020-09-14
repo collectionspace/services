@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="report">
+  <ns2:reports_common xmlns:ns2="http://collectionspace.org/services/report">
+    <name>All Accessions Ever in Bed</name>
+    <filename>ucbgAccessionsByBedDate.jasper</filename>
+    <forDocTypes>
+      <forDocType>Locationitem</forDocType>
+    </forDocTypes>
+    <supportsSingleDoc>true</supportsSingleDoc>
+    <supportsDocList>false</supportsDocList>
+    <supportsGroup>false</supportsGroup>
+    <supportsNoContext>false</supportsNoContext>
+    <supportsParams>true</supportsParams>
+    <outputMIME>application/pdf</outputMIME>
+    <notes>Bed Accession History: All accessions ever planted in bed location.</notes>
+  </ns2:reports_common>
+</document>

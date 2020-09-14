@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="object" language="groovy" columnCount="5" pageWidth="595" pageHeight="842" columnWidth="104" leftMargin="36" rightMargin="36" topMargin="36" bottomMargin="36" scriptletClass="net.sf.jasperreports.engine.JRDefaultScriptlet" uuid="21621d7a-0a14-4525-8ffd-30bb004a4df9">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Title" fontName="SansSerif" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="SubTitle" forecolor="#666666" fontName="SansSerif" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="SansSerif" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="SansSerif" fontSize="12">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{accnno}.contains( "Count" )]]></conditionExpression>
+			<style isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[35]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select 'Count: '||to_char(count(*), '999999') accnno, 'a' sortkey
+from collectionobjects_common co1
+join collectionobjects_botgarden cob on (co1.id=cob.id)
+join collectionspace_core core on (core.id=co1.id and core.tenantid=35)
+join misc  on (misc.id = co1.id and misc.lifecyclestate <> 'deleted')
+where cob.deadflag='false'
+union
+select co1.objectnumber accnno, 'b' sortkey
+from collectionobjects_common co1
+join collectionobjects_botgarden cob on (co1.id=cob.id)
+join collectionspace_core core on (core.id=co1.id and core.tenantid=35)
+join misc  on (misc.id = co1.id and misc.lifecyclestate <> 'deleted')
+where cob.deadflag='false'
+order by sortkey, accnno]]>
+	</queryString>
+	<field name="accnno" class="java.lang.String"/>
+	<field name="sortkey" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="25" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="9031f755-d090-4371-8cf4-d6af5eb1dd9f" x="151" y="0" width="216" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[UC Botanical Garden at Berkeley]]></text>
+			</staticText>
+			<textField pattern="dd-MMM-yyyy">
+				<reportElement uuid="ea105c5b-a22a-4e6b-8b9c-407aa5b48a2e" style="Column header" x="378" y="0" width="145" height="20" forecolor="#000000"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="20" splitType="Stretch">
+			<line>
+				<reportElement uuid="2e5f76f9-15e1-493b-8ba0-f4cea9af5bd8" positionType="FixRelativeToBottom" x="0" y="1" width="520" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement uuid="9c93a789-3988-457e-9e5a-ac388128b084" x="0" y="0" width="520" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Accession Count]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="35">
+			<staticText>
+				<reportElement uuid="a87d986c-aa37-4e81-bd7c-8b129fd8ed92" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="74" height="30"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Accession Number]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="17" splitType="Prevent">
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="080f7c2a-ac0e-4f88-abc6-4d43a05c0231" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="90" height="15"/>
+				<textElement>
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{accnno}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="1fe59266-fd8e-41dd-aa03-9d50bbc2c95f" positionType="Float" x="-11" y="15" width="520" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement uuid="ede46193-4583-4bc8-862a-49f42e9750fb" x="400" y="0" width="80" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="e99f2520-26b8-4cdb-81fe-6f2e1cd058af" x="481" y="0" width="40" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>
