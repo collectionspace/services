@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="report">
+  <ns2:reports_common xmlns:ns2="http://collectionspace.org/services/report">
+    <name>Deads in Bed (Excel)</name>
+    <filename>ucbgDiedInLocationExcel.jasper</filename>
+    <forDocTypes>
+      <forDocType>Locationitem</forDocType>
+    </forDocTypes>
+    <supportsSingleDoc>true</supportsSingleDoc>
+    <supportsDocList>false</supportsDocList>
+    <supportsGroup>false</supportsGroup>
+    <supportsNoContext>false</supportsNoContext>
+    <supportsParams>true</supportsParams>
+    <supportsOutputMIMEList>
+      <outputMIME>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</outputMIME>
+    </supportsOutputMIMEList>
+    <outputMIME>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</outputMIME>
+    <notes>Individuals that died in a specified garden location</notes>
+  </ns2:reports_common>
+</document>

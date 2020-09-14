@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Died In Location (Excel)" language="groovy" pageWidth="792" pageHeight="612" columnWidth="792" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="78deb05b-f9ff-4936-8d6f-c206cdc03776">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.3" value="lastPageFooter"/>
+	<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.collapse.row.span" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.column.width.ratio" value="1.10f"/>
+	<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.ignore.cell.background" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.ignore.graphics" value="false"/>
+	<property name="net.sf.jasperreports.export.xls.ignore.page.margins=true"/>
+	<property name="net.sf.jasperreports.export.xls.one.page.per.sheet" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.one.page.per.sheet=true"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.white.page.background" value="false"/>
+	<property name="net.sf.jasperreports.export.xls.wrap.text" value="true"/>
+	<property name="net.sf.jasperreports.exports.xls.font.size.fix.enabled" value="false"/>
+	<property name="net.sf.jasperreports.page.break.no.pagination" value="apply"/>
+	<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+	<parameter name="csid" class="java.lang.String">
+		<parameterDescription><![CDATA[Use percent as wild card (e.g., 3A%) or full name as in CollectionSpace (e.g., 3A, Vernal Pool, Californian).  Case sensitive.]]></parameterDescription>
+		<defaultValueExpression><![CDATA["3A%"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+co.objectnumber,
+case when (tn.family is not null and tn.family <> '')
+   then getdispl(tn.family)
+end as family,
+findhybridaffinname(tig.id) determination,
+date(mc.locationdate + interval '8 hours') actiondate,
+getdispl(mc.reasonformove) actionreason,
+case when (mb.previouslocation is not null and mb.previouslocation <> '')
+     then getdispl(mb.previouslocation)
+end as previouslocation
+from collectionobjects_common co
+join hierarchy hco on co.id = hco.id
+left outer join hierarchy htig
+     on (co.id = htig.parentid and htig.pos = 0 and htig.name = 'collectionobjects_naturalhistory:taxonomicIdentGroupList')
+left outer join taxonomicIdentGroup tig on (htig.id = tig.id)
+left outer join taxon_common tc on (tig.taxon = tc.refname)
+left outer join taxon_naturalhistory tn on (tc.id = tn.id)
+join relations_common rc on (hco.name = rc.subjectcsid and objectdocumenttype = 'Movement')
+join hierarchy hmc on (rc.objectcsid = hmc.name and hmc.isversion is true)
+join movements_common mc on (hmc.id = mc.id)
+left outer join movements_botgarden mb on (mc.id = mb.id)
+left outer join locations_common lc on (mb.previouslocation = lc.refname)
+left outer join hierarchy hlc on (lc.id = hlc.id)
+inner join misc mmc on (mc.id = mmc.id and mmc.lifecyclestate <> 'deleted')
+where getdispl(mc.reasonformove) = 'Dead'
+and hlc.name = $P{csid}
+order by determination, mc.locationdate desc]]>
+	</queryString>
+	<field name="objectnumber" class="java.lang.String"/>
+	<field name="family" class="java.lang.String"/>
+	<field name="determination" class="java.lang.String"/>
+	<field name="actiondate" class="java.sql.Date"/>
+	<field name="actionreason" class="java.lang.String"/>
+	<field name="previouslocation" class="java.lang.String"/>
+	<columnHeader>
+		<band height="29" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.spreadsheet.SpreadsheetLayout"/>
+			<staticText>
+				<reportElement x="0" y="7" width="100" height="18" forecolor="#666666" uuid="feb778bc-c13f-4900-a943-bf1170b7f611"/>
+				<textElement verticalAlignment="Bottom">
+					<font isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="7" width="100" height="18" forecolor="#666666" uuid="b986452e-da5a-4525-868f-d1f11c198364"/>
+				<textElement verticalAlignment="Bottom">
+					<font isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Accession No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="7" width="392" height="18" forecolor="#666666" uuid="23076c14-39a0-447e-a79a-2e556fec7293"/>
+				<textElement verticalAlignment="Bottom">
+					<font isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Determination]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="592" y="7" width="200" height="18" forecolor="#666666" uuid="d6ade7f6-43c2-4858-94b6-a5b39ded0bc2"/>
+				<textElement verticalAlignment="Bottom">
+					<font isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Location]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="18" splitType="Prevent">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.spreadsheet.SpreadsheetLayout"/>
+			<textField isStretchWithOverflow="true" pattern="MM/dd/yyyy" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="18" isPrintWhenDetailOverflows="true" uuid="2857b9f7-a9ea-42a7-b0dc-2fedc2cdcd66"/>
+				<box>
+					<topPen lineWidth="0.25" lineColor="#999696"/>
+				</box>
+				<textElement>
+					<paragraph spacingBefore="3" spacingAfter="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{actiondate}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="100" y="0" width="100" height="18" isPrintWhenDetailOverflows="true" uuid="0eee323f-2e84-4308-9bdb-0c954b9264bd"/>
+				<box>
+					<topPen lineWidth="0.25" lineColor="#999696"/>
+				</box>
+				<textElement>
+					<paragraph spacingBefore="3" spacingAfter="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="200" y="0" width="392" height="18" isPrintWhenDetailOverflows="true" uuid="7bcb7b9c-a325-4cd1-ace5-44aa35dfa254"/>
+				<box>
+					<topPen lineWidth="0.25" lineColor="#999696"/>
+				</box>
+				<textElement>
+					<paragraph spacingBefore="3" spacingAfter="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{determination}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="592" y="0" width="200" height="18" isPrintWhenDetailOverflows="true" uuid="a01790be-77e8-4a0c-a242-a5a04284c140"/>
+				<box>
+					<topPen lineWidth="0.25" lineColor="#999696"/>
+				</box>
+				<textElement>
+					<paragraph spacingBefore="3" spacingAfter="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{previouslocation}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
