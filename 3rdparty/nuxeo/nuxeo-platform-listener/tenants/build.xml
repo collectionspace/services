@@ -25,20 +25,14 @@
 
 	<target name="undeploy_tenants">
 		<subant target="undeploy_tenant" genericantfile="${ant.file}" inheritall="true">
-			<dirset dir="." includes="*" />
+			<dirset dir="." includes="*" excludes=".*,target" />
 		</subant>
 	</target>
 
 	<target name="undeploy_tenant">
 		<basename property="tenant.shortname" file="${basedir}" />
-
-		<property file="${basedir}/build.properties" />
-
-		<antcall target="undeploy_tenant_webapp" />
-	</target>
-
-	<target name="undeploy_tenant_webapp">
-		<delete dir="${jee.deploy.cspace}/${tenant.ui.webapp.dir}" />
+		<echo>Deploy tenant listers for ${tenant.shortname}</echo>
+		<ant antfile="build.xml" target="undeploy" inheritall="false"/>
 	</target>
 
 	<target name="undeploy_js">
