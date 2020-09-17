@@ -249,6 +249,7 @@ public class RunSqlScripts extends InitHandler implements IInitHandler {
             rows = JDBCTools.executeUpdate(dataSourceName, repositoryName, cspaceInstanceId, scriptContents);
         } catch (Throwable e) {
             logger.warn("Running SQL script from " + scriptPath + " resulted in error: ", e.getMessage());
+            e.printStackTrace(System.err);
             rows = -1;
         }
         // FIXME: Verify which row values represent failure; should there always
