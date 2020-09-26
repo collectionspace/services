@@ -206,11 +206,13 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
     			if (roleValueList.isEmpty() == false) {
     				result = new ArrayList<String>();
     				for (RoleValue roleValue: roleValueList) {
-    					String displayName = roleValue.getDisplayName();
-    					if (displayName == null) {
-    						displayName = RoleClient.inferDisplayName(roleValue.getRoleName(), tenantId);
+    					if (roleValue != null) {
+	    					String displayName = roleValue.getDisplayName();
+	    					if (displayName == null) {
+	    						displayName = RoleClient.inferDisplayName(roleValue.getRoleName(), tenantId);
+	    					}
+	    					result.add(displayName);
     					}
-    					result.add(displayName);
     				}
     			}
     		}
