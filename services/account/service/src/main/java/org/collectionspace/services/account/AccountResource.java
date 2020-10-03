@@ -345,6 +345,7 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
 			        }
 				} catch (Throwable t) {
 					transactionCtx.markForRollback();
+					transactionCtx.close(); // https://jira.ets.berkeley.edu/jira/browse/CC-241
 					String errMsg = String.format("Could not reset password using token ID='%s'. Error: '%s'",
 							t.getMessage(), token.getId());
 		        	response = Response.status(Response.Status.BAD_REQUEST).entity(errMsg).type("text/plain").build();
