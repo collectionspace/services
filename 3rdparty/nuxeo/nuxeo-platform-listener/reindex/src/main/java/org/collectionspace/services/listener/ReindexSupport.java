@@ -47,7 +47,8 @@ public class ReindexSupport extends AbstractCSEventSyncListenerImpl {
 				docType.startsWith("Media")
 				|| docType.startsWith("Relation")
 				|| docType.startsWith("Acquisition")
-			) {
+				|| docType.startsWith("Exhibition")
+				) {
 				return true;
 			}
 		}
@@ -63,7 +64,9 @@ public class ReindexSupport extends AbstractCSEventSyncListenerImpl {
 
 		// For core/all profiles:
 		// - When a media record is about to be updated, store the value of the publishToList
-		//   field.
+		//   and altText fields.
+		// - When an exhibition record is about to be updated, store the value of the title,
+		//   generalNote, and curatorialNote fields.
 
 		// For materials profile:
 		// - When a media record is about to be updated, store the value of the coverage field.
@@ -78,6 +81,7 @@ public class ReindexSupport extends AbstractCSEventSyncListenerImpl {
 			if (eventName.equals(DocumentEventTypes.BEFORE_DOC_UPDATE)) {
 				DocumentModel previousDoc = (DocumentModel) eventContext.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
 				String coverage = (String) previousDoc.getProperty("media_common", "coverage");
+				String altText = (String) previousDoc.getProperty("media_common", "altText");
 
 				// Materials profile had publishToList defined in a local extension schema before
 				// that field was added to the common schema.
@@ -86,6 +90,7 @@ public class ReindexSupport extends AbstractCSEventSyncListenerImpl {
 					previousDoc.hasSchema("media_materials") ? "media_materials" : "media_common",
 					"publishToList");
 
+				eventContext.setProperty(Reindex.PREV_ALT_TEXT_KEY, altText);
 				eventContext.setProperty(Reindex.PREV_COVERAGE_KEY, coverage);
 				eventContext.setProperty(Reindex.PREV_PUBLISH_TO_KEY, (Serializable) publishTo);
 			}
@@ -108,13 +113,34 @@ public class ReindexSupport extends AbstractCSEventSyncListenerImpl {
 				storePrevRelatedCollectionObjects(eventContext, doc);
 			}
 		}
+		else if (docType.startsWith("Exhibition")) {
+			if (eventName.equals(DocumentEventTypes.BEFORE_DOC_UPDATE)) {
+				DocumentModel previousDoc = (DocumentModel) eventContext.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
+				String title = (String) previousDoc.getProperty("exhibitions_common", "title");
+				String generalNote = (String) previousDoc.getProperty("exhibitions_common", "generalNote");
+				String curatorialNote = (String) previousDoc.getProperty("exhibitions_common", "curatorialNote");
+				List<String> publishTo = (List<String>) previousDoc.getProperty("exhibitions_common", "publishToList");
+
+				eventContext.setProperty(Reindex.PREV_EXH_TITLE_KEY, title);
+				eventContext.setProperty(Reindex.PREV_EXH_GENERAL_NOTE_KEY, generalNote);
+				eventContext.setProperty(Reindex.PREV_EXH_CURATORIAL_NOTE_KEY, curatorialNote);
+				eventContext.setProperty(Reindex.PREV_EXH_PUBLISH_TO_KEY, (Serializable) publishTo);
+			}
+			else if (eventName.equals(DocumentEventTypes.ABOUT_TO_REMOVE)) {
+				storePrevRelatedCollectionObjects(eventContext, doc);
+			}
+		}
 		else if (docType.startsWith("Relation")) {
 			if (eventName.equals(DocumentEventTypes.ABOUT_TO_REMOVE)) {
 				String subjectDocumentType = (String) doc.getProperty("relations_common", "subjectDocumentType");
 				String objectDocumentType = (String) doc.getProperty("relations_common", "objectDocumentType");
 
 				if (
-					(subjectDocumentType.equals("Media") || subjectDocumentType.equals("Acquisition"))
+					(
+						subjectDocumentType.equals("Media") ||
+						subjectDocumentType.equals("Acquisition") ||
+						subjectDocumentType.equals("Exhibition")
+					)
 					&& objectDocumentType.equals("CollectionObject")
 				) {
 					String collectionObjectCsid = (String) doc.getProperty("relations_common", "objectCsid");

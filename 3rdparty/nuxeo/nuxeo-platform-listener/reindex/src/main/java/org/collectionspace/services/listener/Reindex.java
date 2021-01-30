@@ -35,8 +35,13 @@ public class Reindex extends AbstractCSEventPostCommitListenerImpl {
 	// save does not hold up the save.
 
 	public static final String PREV_COVERAGE_KEY = "Reindex.PREV_COVERAGE";
+	public static final String PREV_ALT_TEXT_KEY = "Reindex.PREV_ALT_TEXT";
 	public static final String PREV_CREDIT_LINE_KEY = "Reindex.PREV_CREDIT_LINE";
 	public static final String PREV_PUBLISH_TO_KEY = "Reindex.PREV_PUBLISH_TO";
+	public static final String PREV_EXH_TITLE_KEY = "Reindex.PREV_EXH_TITLE";
+	public static final String PREV_EXH_GENERAL_NOTE_KEY = "Reindex.PREV_EXH_GENERAL_NOTE";
+	public static final String PREV_EXH_CURATORIAL_NOTE_KEY = "Reindex.PREV_EXH_CURATORIAL_NOTE";
+	public static final String PREV_EXH_PUBLISH_TO_KEY = "Reindex.PREV_EXH_PUBLISH_TO";
 	public static final String PREV_RELATED_COLLECTION_OBJECT_CSID_KEY = "Reindex.PREV_RELATED_COLLECTION_OBJECT_CSID";
 	public static final String ELASTICSEARCH_ENABLED_PROP = "elasticsearch.enabled";
 
@@ -59,6 +64,7 @@ public class Reindex extends AbstractCSEventPostCommitListenerImpl {
 			docType.startsWith("Media")
 			|| docType.startsWith("Relation")
 			|| docType.startsWith("Acquisition")
+			|| docType.startsWith("Exhibition")
 		) {
 			return true;
 		}
@@ -103,8 +109,12 @@ public class Reindex extends AbstractCSEventPostCommitListenerImpl {
 					doc.hasSchema("media_materials") ? "media_materials" : "media_common",
 					"publishToList");
 
+				String prevAltText = (String) eventContext.getProperty(PREV_ALT_TEXT_KEY);
+				String altText = (String) doc.getProperty("media_common", "altText");
+
 				if (
 					!ListUtils.isEqualList(prevPublishTo, publishTo) ||
+					!StringUtils.equals(prevAltText, altText) ||
 					!StringUtils.equals(prevCoverage, coverage)
 				) {
 					if (!StringUtils.equals(prevCoverage, coverage)) {
@@ -113,7 +123,10 @@ public class Reindex extends AbstractCSEventPostCommitListenerImpl {
 
 					reindexMaterial(doc.getRepositoryName(), coverage);
 
-					if (!ListUtils.isEqualList(prevPublishTo, publishTo)) {
+					if (
+						!ListUtils.isEqualList(prevPublishTo, publishTo) ||
+						!StringUtils.equals(prevAltText, altText)
+					) {
 						reindexRelatedCollectionObjects(doc);
 					}
 				}
@@ -143,6 +156,31 @@ public class Reindex extends AbstractCSEventPostCommitListenerImpl {
 				reindexPrevRelatedCollectionObjects(eventContext);
 			}
 		}
+		else if (docType.startsWith("Exhibition")) {
+			if (eventName.equals(DocumentEventTypes.DOCUMENT_UPDATED)) {
+				String prevTitle = (String) eventContext.getProperty(PREV_EXH_TITLE_KEY);
+				String prevGeneralNote = (String) eventContext.getProperty(PREV_EXH_GENERAL_NOTE_KEY);
+				String prevCuratorialNote = (String) eventContext.getProperty(PREV_EXH_CURATORIAL_NOTE_KEY);
+				List<String> prevPublishTo = (List<String>) eventContext.getProperty(PREV_EXH_PUBLISH_TO_KEY);
+
+				String title = (String) doc.getProperty("exhibitions_common", "title");
+				String generalNote = (String) doc.getProperty("exhibitions_common", "generalNote");
+				String curatorialNote = (String) doc.getProperty("exhibitions_common", "curatorialNote");
+				List<String> publishTo = (List<String>) doc.getProperty("exhibitions_common", "publishToList");
+
+				if (
+					!ListUtils.isEqualList(prevPublishTo, publishTo) ||
+					!StringUtils.equals(prevTitle, title) ||
+					!StringUtils.equals(prevGeneralNote, generalNote) ||
+					!StringUtils.equals(prevCuratorialNote, curatorialNote)
+				) {
+					reindexRelatedCollectionObjects(doc);
+				}
+			}
+			else if (eventName.equals(DocumentEventTypes.DOCUMENT_REMOVED)) {
+				reindexPrevRelatedCollectionObjects(eventContext);
+			}
+		}
 		else if (docType.startsWith("Relation")) {
 			if (
 				eventName.equals(DocumentEventTypes.DOCUMENT_CREATED)
@@ -152,7 +190,11 @@ public class Reindex extends AbstractCSEventPostCommitListenerImpl {
 				String objectDocumentType = (String) doc.getProperty("relations_common", "objectDocumentType");
 
 				if (
-					(subjectDocumentType.equals("Media") || subjectDocumentType.equals("Acquisition"))
+					(
+						subjectDocumentType.equals("Media") ||
+						subjectDocumentType.equals("Acquisition") ||
+						subjectDocumentType.equals("Exhibition")
+					)
 					&& objectDocumentType.equals("CollectionObject")
 				) {
 					String collectionObjectCsid = (String) doc.getProperty("relations_common", "objectCsid");

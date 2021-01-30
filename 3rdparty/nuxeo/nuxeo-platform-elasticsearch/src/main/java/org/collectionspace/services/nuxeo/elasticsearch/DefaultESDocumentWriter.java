@@ -59,6 +59,7 @@ public class DefaultESDocumentWriter extends JsonESDocumentWriter {
 
 			denormMediaRecords(session, csid, tenantId, denormValues);
 			denormAcquisitionRecords(session, csid, tenantId, denormValues);
+			denormExhibitionRecords(session, csid, tenantId, denormValues);
 
 			// Compute the title of the record for the public browser, and store it so that it can
 			// be used for sorting ES query results.
@@ -97,11 +98,12 @@ public class DefaultESDocumentWriter extends JsonESDocumentWriter {
 	}
 
 	private void denormMediaRecords(CoreSession session, String csid, String tenantId, ObjectNode denormValues) {
-		// Store the csids of media records that are related to this object.
+		// Store the csid and alt text of media records that are related to this object.
 
 		String relatedRecordQuery = String.format("SELECT * FROM Relation WHERE relations_common:subjectCsid = '%s' AND relations_common:objectDocumentType = 'Media' AND ecm:currentLifeCycleState = 'project' AND collectionspace_core:tenantId = '%s'", csid, tenantId);
 		DocumentModelList relationDocs = session.query(relatedRecordQuery);
 		List<JsonNode> mediaCsids = new ArrayList<JsonNode>();
+		List<JsonNode> mediaAltTexts = new ArrayList<JsonNode>();
 
 		if (relationDocs.size() > 0) {
 			Iterator<DocumentModel> iterator = relationDocs.iterator();
@@ -109,14 +111,24 @@ public class DefaultESDocumentWriter extends JsonESDocumentWriter {
 			while (iterator.hasNext()) {
 				DocumentModel relationDoc = iterator.next();
 				String mediaCsid = (String) relationDoc.getProperty("relations_common", "objectCsid");
+				DocumentModel mediaDoc = getRecordByCsid(session, tenantId, "Media", mediaCsid);
 
-				if (isMediaPublished(session, tenantId, mediaCsid)) {
+				if (isMediaPublished(mediaDoc)) {
 					mediaCsids.add(new TextNode(mediaCsid));
+
+					String altText = (String) mediaDoc.getProperty("media_common", "altText");
+
+					if (altText == null) {
+						altText = "";
+					}
+
+					mediaAltTexts.add(new TextNode(altText));
 				}
 			}
 		}
 
 		denormValues.putArray("mediaCsid").addAll(mediaCsids);
+		denormValues.putArray("mediaAltText").addAll(mediaAltTexts);
 		denormValues.put("hasMedia", mediaCsids.size() > 0);
 	}
 
@@ -142,6 +154,40 @@ public class DefaultESDocumentWriter extends JsonESDocumentWriter {
 		}
 
 		denormValues.putArray("creditLine").addAll(creditLines);
+}
+
+private void denormExhibitionRecords(CoreSession session, String csid, String tenantId, ObjectNode denormValues) {
+	// Store the title, general note, and curatorial note of exhibition records that are published, and related to this object.
+
+	String relatedRecordQuery = String.format("SELECT * FROM Relation WHERE relations_common:subjectCsid = '%s' AND relations_common:objectDocumentType = 'Exhibition' AND ecm:currentLifeCycleState = 'project' AND collectionspace_core:tenantId = '%s'", csid, tenantId);
+	DocumentModelList relationDocs = session.query(relatedRecordQuery);
+	List<JsonNode> exhibitions = new ArrayList<JsonNode>();
+
+	if (relationDocs.size() > 0) {
+		Iterator<DocumentModel> iterator = relationDocs.iterator();
+
+		while (iterator.hasNext()) {
+			DocumentModel relationDoc = iterator.next();
+			String exhibitionCsid = (String) relationDoc.getProperty("relations_common", "objectCsid");
+			DocumentModel exhibitionDoc = getRecordByCsid(session, tenantId, "Exhibition", exhibitionCsid);
+
+			if (exhibitionDoc != null && isExhibitionPublished(exhibitionDoc)) {
+				ObjectNode exhibitionNode = objectMapper.createObjectNode();
+
+				String title = (String) exhibitionDoc.getProperty("exhibitions_common", "title");
+				String generalNote = (String) exhibitionDoc.getProperty("exhibitions_common", "generalNote");
+				String curatorialNote = (String) exhibitionDoc.getProperty("exhibitions_common", "curatorialNote");
+
+				exhibitionNode.put("title", title);
+				exhibitionNode.put("generalNote", generalNote);
+				exhibitionNode.put("curatorialNote", curatorialNote);
+
+				exhibitions.add(exhibitionNode);
+			}
+		}
+	}
+
+	denormValues.putArray("exhibition").addAll(exhibitions);
 }
 
 	/**
@@ -172,12 +218,11 @@ public class DefaultESDocumentWriter extends JsonESDocumentWriter {
 		return primaryObjectName;
 	}
 
-	private boolean isMediaPublished(CoreSession session, String tenantId, String mediaCsid) {
+	private boolean isPublished(DocumentModel doc, String publishedFieldPart, String publishedFieldName) {
 		boolean isPublished = false;
-		DocumentModel mediaDoc = getRecordByCsid(session, tenantId, "Media", mediaCsid);
 
-		if (mediaDoc != null) {
-			List<String> publishToValues = (List<String>) mediaDoc.getProperty("media_common", "publishToList");
+		if (doc != null) {
+			List<String> publishToValues = (List<String>) doc.getProperty(publishedFieldPart, publishedFieldName);
 
 			if (publishToValues != null) {
 				for (int i=0; i<publishToValues.size(); i++) {
@@ -193,6 +238,15 @@ public class DefaultESDocumentWriter extends JsonESDocumentWriter {
 		}
 
 		return isPublished;
+
+	}
+
+	private boolean isMediaPublished(DocumentModel mediaDoc) {
+		return isPublished(mediaDoc, "media_common", "publishToList");
+	}
+
+	private boolean isExhibitionPublished(DocumentModel exhibitionDoc) {
+		return isPublished(exhibitionDoc, "exhibitions_common", "publishToList");
 	}
 
 	private String getCreditLine(CoreSession session, String tenantId, String acquisitionCsid) {

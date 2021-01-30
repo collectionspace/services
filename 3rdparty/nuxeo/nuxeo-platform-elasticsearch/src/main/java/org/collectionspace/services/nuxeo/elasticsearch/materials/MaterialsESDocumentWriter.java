@@ -39,28 +39,9 @@ public class MaterialsESDocumentWriter extends DefaultESDocumentWriter {
 			String refName = (String) doc.getProperty("collectionspace_core", "refName");
 
 			if (StringUtils.isNotEmpty(refName)) {
-				String escapedRefName = refName.replace("'", "\\'");
 				String tenantId = (String) doc.getProperty("collectionspace_core", "tenantId");
-				String mediaQuery = String.format("SELECT * FROM Media WHERE media_common:coverage = '%s' AND ecm:currentLifeCycleState = 'project' AND collectionspace_core:tenantId = '%s' ORDER BY media_common:identificationNumber", escapedRefName, tenantId);
 
-				DocumentModelList mediaDocs = session.query(mediaQuery);
-				List<JsonNode> mediaCsids = new ArrayList<JsonNode>();
-
-				if (mediaDocs.size() > 0) {
-					Iterator<DocumentModel> iterator = mediaDocs.iterator();
-
-					while (iterator.hasNext()) {
-						DocumentModel mediaDoc = iterator.next();
-
-						if (isMediaPublished(mediaDoc)) {
-							String mediaCsid = (String) mediaDoc.getName();
-
-							mediaCsids.add(new TextNode(mediaCsid));
-						}
-					}
-				}
-
-				denormValues.putArray("mediaCsid").addAll(mediaCsids);
+				denormMediaRecords(session, refName, tenantId, denormValues);
 			}
 
 			// Compute the title of the record for the public browser, and store it so that it can
@@ -163,6 +144,42 @@ public class MaterialsESDocumentWriter extends DefaultESDocumentWriter {
 
 		return denormValues;
 	}
+
+	private void denormMediaRecords(CoreSession session, String refName, String tenantId, ObjectNode denormValues) {
+		// Store the csid and alt text of media records that are related to this object.
+
+		String escapedRefName = refName.replace("'", "\\'");
+		String mediaQuery = String.format("SELECT * FROM Media WHERE media_common:coverage = '%s' AND ecm:currentLifeCycleState = 'project' AND collectionspace_core:tenantId = '%s' ORDER BY media_common:identificationNumber", escapedRefName, tenantId);
+		DocumentModelList mediaDocs = session.query(mediaQuery);
+		List<JsonNode> mediaCsids = new ArrayList<JsonNode>();
+		List<JsonNode> mediaAltTexts = new ArrayList<JsonNode>();
+
+		if (mediaDocs.size() > 0) {
+			Iterator<DocumentModel> iterator = mediaDocs.iterator();
+
+			while (iterator.hasNext()) {
+				DocumentModel mediaDoc = iterator.next();
+
+				if (isMediaPublished(mediaDoc)) {
+					String mediaCsid = (String) mediaDoc.getName();
+
+					mediaCsids.add(new TextNode(mediaCsid));
+
+					String altText = (String) mediaDoc.getProperty("media_common", "altText");
+
+					if (altText == null) {
+						altText = "";
+					}
+
+					mediaAltTexts.add(new TextNode(altText));
+				}
+			}
+		}
+
+		denormValues.putArray("mediaCsid").addAll(mediaCsids);
+		denormValues.putArray("mediaAltText").addAll(mediaAltTexts);
+	}
+
 
 	/**
 	 * Compute a title for the public browser. This needs to be indexed in ES so that it can

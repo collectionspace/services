@@ -70,11 +70,13 @@
                     "materials_common:rapidPrototypingProcesses",
                     "materials_common:additionalProcessGroupList",
                     "materials_common:processNote",
+                    "collectionobjects_common:objectHistoryNote",
                     "collectionobjects_common:objectNumber",
                     "collectionobjects_common:objectStatusList",
                     "collectionobjects_common:publishToList",
                     "collectionobjects_common:materialGroupList",
                     "collectionobjects_common:otherNumberList",
+                    "collectionobjects_common:ownersContributionNote",
                     "collectionobjects_common:collection",
                     "collectionobjects_common:computedCurrentLocation",
                     "collectionobjects_materials:materialContainerGroupList",
@@ -87,6 +89,7 @@
                     "collectionobjects_common:numberOfObjects",
                     "collectionobjects_common:briefDescriptions",
                     "collectionobjects_common:measuredPartGroupList",
+                    "collectionobjects_common:viewersContributionNote",
                     "media_common:blobCsid",
                     "media_materials:publishToList"
                   ]
@@ -127,6 +130,27 @@
                       "displayName": {
                         "type": "keyword",
                         "normalizer": "refname_displayname_normalizer"
+                      }
+                    }
+                  },
+                  "collectionspace_denorm:mediaAltText": {
+                    "type": "text",
+                    "copy_to": "all_field"
+                  },
+                  "collectionspace_denorm:exhibition": {
+                    "type": "object",
+                    "properties": {
+                      "title": {
+                        "type": "text",
+                        "copy_to": "all_field"
+                      },
+                      "generalNote": {
+                        "type": "text",
+                        "copy_to": "all_field"
+                      },
+                      "curatorialNote": {
+                        "type": "text",
+                        "copy_to": "all_field"
                       }
                     }
                   },
@@ -596,6 +620,18 @@
                         }
                       }
                     }
+                  },
+                  "collectionobjects_common:objectHistoryNote": {
+                    "type": "text",
+                    "copy_to": "all_field"
+                  },
+                  "collectionobjects_common:ownersContributionNote": {
+                    "type": "text",
+                    "copy_to": "all_field"
+                  },
+                  "collectionobjects_common:viewersContributionNote": {
+                    "type": "text",
+                    "copy_to": "all_field"
                   },
 
                   "media_materials:publishToList": {
