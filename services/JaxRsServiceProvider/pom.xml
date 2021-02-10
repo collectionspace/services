@@ -205,6 +205,11 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.transport.service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.uoc.service</artifactId>
             <version>${project.version}</version>
         </dependency>

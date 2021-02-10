@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <groupId>org.collectionspace.services</groupId>
+        <artifactId>org.collectionspace.services.transport.3rdparty</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>org.collectionspace.services.transport.3rdparty.nuxeo</artifactId>
+    <name>services.transport.3rdparty.nuxeo</name>
+    <packaging>jar</packaging>
+    <description>
+        Transport Nuxeo Document Type
+    </description>
+
+    <properties>
+        <ServiceName>transport</ServiceName>
+        <NuxeoDocTypeName>Transport</NuxeoDocTypeName>
+        <CommonSchemaName>transports_common</CommonSchemaName>
+        <Lifecycle>cs_default</Lifecycle>
+    </properties>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>../../../../3rdparty/nuxeo/nuxeo-doctype/src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestFile>target/classes/META-INF/MANIFEST.MF</manifestFile>
+                        <manifestEntries>
+                            <Bundle-Version>${eclipseVersion}</Bundle-Version>
+                            <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

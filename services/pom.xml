@@ -69,6 +69,7 @@
 		<module>claim</module>
 		<module>exhibition</module>
 		<module>osteology</module>
+		<module>transport</module>
 		<module>conditioncheck</module>
 		<module>conservation</module>
 		<module>valuationcontrol</module>

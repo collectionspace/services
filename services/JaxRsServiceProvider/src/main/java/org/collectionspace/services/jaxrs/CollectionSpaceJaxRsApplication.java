@@ -33,6 +33,7 @@ import org.collectionspace.services.intake.IntakeResource;
 import org.collectionspace.services.index.IndexResource;
 import org.collectionspace.services.loanin.LoaninResource;
 import org.collectionspace.services.loanout.LoanoutResource;
+import org.collectionspace.services.transport.TransportResource;
 import org.collectionspace.services.uoc.UocResource;
 import org.collectionspace.services.valuationcontrol.ValuationcontrolResource;
 import org.collectionspace.services.objectexit.ObjectExitResource;
@@ -152,6 +153,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new ClaimResource());
         addResourceToMapAndSingletons(new ReportResource());
         addResourceToMapAndSingletons(new PublicItemResource());
+        addResourceToMapAndSingletons(new TransportResource());
 
         singletons.add(new IDResource());
 
