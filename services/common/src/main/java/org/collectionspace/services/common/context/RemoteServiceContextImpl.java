@@ -290,8 +290,11 @@ public class RemoteServiceContextImpl<IT, OT>
 			TransactionContext transactionCtx = getCurrentTransactionContext();
 			if (transactionCtx != null) {
 				if (--transactionConnectionRefCount == 0) {
-					transactionCtx.close();
-			        this.setProperty(StorageClient.SC_TRANSACTION_CONTEXT_KEY, null);
+					try {
+						transactionCtx.close();
+					} finally {
+				        this.setProperty(StorageClient.SC_TRANSACTION_CONTEXT_KEY, null);
+					}
 				}
 			} else {
 				throw new TransactionException("Attempted to release a non-existent storage connection.  Transaction context missing from service context.");
