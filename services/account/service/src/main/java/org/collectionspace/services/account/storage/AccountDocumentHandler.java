@@ -232,7 +232,21 @@ public class AccountDocumentHandler
             AccountListItem accListItem = new AccountListItem();
             accListItem.setScreenName(account.getScreenName());
             accListItem.setUserid(account.getUserId());
-            accListItem.setTenantid(account.getTenants().get(0).getTenantId()); // pick the default/first tenant
+            //
+            // Since accounts can be associated with more than 1 tenant, we only want to include
+            // the tenant information for the current service context.
+            //
+        	String tenantInCtx = this.getServiceContext().getTenantId();
+            List<AccountTenant> associatedTenantList = account.getTenants();
+            for (AccountTenant associatedTenant : associatedTenantList) {
+                if (associatedTenant != null && associatedTenant.getTenantId() != null) {
+                	if (associatedTenant.getTenantId().equalsIgnoreCase(tenantInCtx)) {
+                		accListItem.setTenantid(associatedTenant.getTenantId());
+                		break;
+                	}
+                }
+            }
+
             accListItem.setTenants(account.getTenants());
             accListItem.setEmail(account.getEmail());
             accListItem.setStatus(account.getStatus());

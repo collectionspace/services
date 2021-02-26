@@ -256,11 +256,13 @@ public class JpaStorageClientImpl implements StorageClient {
             handler.complete(Action.GET_ALL, wrapDoc);
             jpaConnectionContext.commitTransaction();
         } catch (DocumentException de) {
+        	jpaConnectionContext.markForRollback();
             throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
+            jpaConnectionContext.markForRollback();
             throw new DocumentException(e);
         } finally {
             ctx.closeConnection();

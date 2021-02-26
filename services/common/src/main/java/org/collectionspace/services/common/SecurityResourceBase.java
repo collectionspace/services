@@ -4,6 +4,8 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.storage.TransactionContext;
 import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.slf4j.Logger;
@@ -141,6 +143,12 @@ public abstract class SecurityResourceBase<IT, OT> extends AbstractCollectionSpa
             throw bigReThrow(e, ServiceMessages.LIST_FAILED);
         }
     }
+    
+    protected OT sanitize(DocumentHandler handler, OT outputObject) {
+        DocumentWrapper<OT> wrapDoc = new DocumentWrapperImpl<OT>(outputObject);
+        handler.sanitize(wrapDoc);
+        return outputObject;
+    }    
 
     public Object update(String csid, IT theUpdate, Class<?> objectClass) {
         return update((UriInfo)null, csid, theUpdate, objectClass);
@@ -155,13 +163,19 @@ public abstract class SecurityResourceBase<IT, OT> extends AbstractCollectionSpa
             ServiceContext<IT, OT> ctx = createServiceContext(theUpdate, objectClass, ui);
             DocumentHandler handler = createDocumentHandler(ctx);
             getStorageClient(ctx).update(ctx, csid, handler);
-            return ctx.getOutput();
+            return sanitize(handler, ctx.getOutput());
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.PUT_FAILED, csid);
         }
     }
     
     public Object update(ServiceContext<?, ?> parentCtx, UriInfo ui, String csid, IT theUpdate, Class objectClass) {
+    	return update(parentCtx, ui, csid, theUpdate, objectClass, true);
+    }
+
+    public Object update(ServiceContext<?, ?> parentCtx, UriInfo ui, String csid, IT theUpdate, Class objectClass, boolean sanitize) {
+    	Object result = null;
+    	
         if (logger.isDebugEnabled()) {
             logger.debug("updateRole with csid=" + csid);
         }
@@ -171,10 +185,16 @@ public abstract class SecurityResourceBase<IT, OT> extends AbstractCollectionSpa
             ServiceContext<IT, OT> ctx = createServiceContext(parentCtx, theUpdate, objectClass, ui);
             DocumentHandler handler = createDocumentHandler(ctx);
             getStorageClient(ctx).update(ctx, csid, handler);
-            return ctx.getOutput();
+            if (sanitize == true) {
+            	result = sanitize(handler, ctx.getOutput());
+            } else {
+            	result = ctx.getOutput();
+            }
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.PUT_FAILED, csid);
         }
+        
+        return result;
     }
 
     protected ServiceContext<IT, OT> createServiceContext(
