@@ -206,11 +206,13 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
     			if (roleValueList.isEmpty() == false) {
     				result = new ArrayList<String>();
     				for (RoleValue roleValue: roleValueList) {
-    					String displayName = roleValue.getDisplayName();
-    					if (displayName == null) {
-    						displayName = RoleClient.inferDisplayName(roleValue.getRoleName(), tenantId);
+    					if (roleValue != null) {
+	    					String displayName = roleValue.getDisplayName();
+	    					if (displayName == null) {
+	    						displayName = RoleClient.inferDisplayName(roleValue.getRoleName(), tenantId);
+	    					}
+	    					result.add(displayName);
     					}
-    					result.add(displayName);
     				}
     			}
     		}
@@ -224,14 +226,13 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
     public AccountsCommon updateAccount(@Context UriInfo ui, @PathParam("csid") String csid, AccountsCommon theUpdate) {
         return (AccountsCommon)update(ui, csid, theUpdate, AccountsCommon.class);
     }
-
+    
     /*
-     * Use this when you have an existing and active ServiceContext.
+     * Use this when you have an existing and active ServiceContext. //FIXME: Use this only for password reset
      */
-    public AccountsCommon updateAccount(ServiceContext<AccountsCommon, AccountsCommon> parentContext, UriInfo ui, String csid, AccountsCommon theUpdate) {
-        return (AccountsCommon)update(parentContext, ui, csid, theUpdate, AccountsCommon.class);
+    private AccountsCommon updateAccountPassword(ServiceContext<AccountsCommon, AccountsCommon> parentContext, UriInfo ui, String csid, AccountsCommon theUpdate) {
+        return (AccountsCommon)update(parentContext, ui, csid, theUpdate, AccountsCommon.class, false);
     }
-
 
     /**
      * Resets an accounts password.
@@ -328,7 +329,7 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
 						AccountsCommon accountUpdate = new AccountsCommon();
 						accountUpdate.setUserId(targetAccount.getUserId());
 						accountUpdate.setPassword(password.getBytes());
-						updateAccount(ctx, ui, targetAccount.getCsid(), accountUpdate);
+						updateAccountPassword(ctx, ui, targetAccount.getCsid(), accountUpdate);
 						TokenStorageClient.update(transactionCtx, tokenId, false); // disable the token so it can't be used again.
 						transactionCtx.commitTransaction();
 						//
@@ -343,6 +344,7 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
 			        }
 				} catch (Throwable t) {
 					transactionCtx.markForRollback();
+					transactionCtx.close(); // https://jira.ets.berkeley.edu/jira/browse/CC-241					
 					String errMsg = String.format("Could not reset password using token ID='%s'. Error: '%s'",
 							t.getMessage(), token.getId());
 		        	response = Response.status(Response.Status.BAD_REQUEST).entity(errMsg).type("text/plain").build();
@@ -370,31 +372,43 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
 
         MultivaluedMap<String,String> queryParams = ui.getQueryParameters();
         String email = queryParams.getFirst(AccountClient.EMAIL_QUERY_PARAM);
-        if (email == null) {
+        if (email == null || email.isEmpty()) {
         	response = Response.status(Response.Status.BAD_REQUEST).entity("You must specify an 'email' query paramater.").type("text/plain").build();
         	return response;
         }
 
         String tenantId = queryParams.getFirst(AuthN.TENANT_ID_QUERY_PARAM);
-        if (tenantId == null) {
+        if (tenantId == null || tenantId.isEmpty()) {
         	response = Response.status(Response.Status.BAD_REQUEST).entity("You must specify an 'tid' (tenant ID) query paramater.").type("text/plain").build();
         	return response;
         }
-
+        //
+        // Search for an account with the provided email and tenant ID
+        //
+		boolean found = false;
+		AccountListItem accountListItem = null;
     	AccountsCommonList accountList = getAccountList(ui);
-    	if (accountList == null || accountList.getTotalItems() == 0) {
-        	response = Response.status(Response.Status.NOT_FOUND).entity("Could not locate an account associated with the email: " +
-        			email).type("text/plain").build();
-    	} else if (accountList.getTotalItems() > 1) {
-        	response = Response.status(Response.Status.BAD_REQUEST).entity("Located more than one account associated with the email: " +
-        			email).type("text/plain").build();
-    	} else {
-    		AccountListItem accountListItem = accountList.getAccountListItem().get(0);
-    		try {
+    	if (accountList != null || accountList.getTotalItems() > 0) {
+			List<AccountListItem> itemsList = accountList.getAccountListItem();
+			for (AccountListItem item : itemsList) {
+				if (item != null && item.getTenantid() != null && item.getTenantid().equalsIgnoreCase(tenantId)) {
+					accountListItem = item;
+					found = true;
+					break;
+				}
+			}
+    	}
+
+    	if (found == true) {
+			try {
 				response = requestPasswordReset(ui, tenantId, accountListItem);
 			} catch (Exception e) {
-            	response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).type("text/plain").build();
+	        	response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).type("text/plain").build();
 			}
+    	} else {
+    		String msg = String.format("Could not locate an account associated with the email '%s' and tenant ID '%s'",
+    				email , tenantId);
+        	response = Response.status(Response.Status.NOT_FOUND).entity(msg).type("text/plain").build();
     	}
 
         return response;
