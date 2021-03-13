@@ -947,3 +947,39 @@ INSERT INTO id_generators
         SELECT  csid
         FROM    id_generators
         );
+
+-- TRANSPORT_REFERENCE_NUMBER
+
+INSERT INTO id_generators
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
+    SELECT
+        'cc92bbc1-014a-4673-a81d-0c14375375d0',
+        'Transport Reference Number',
+        'Identifies a Transport.',
+        '9',
+        '',
+   '<org.collectionspace.services.id.SettableIDGenerator>
+     <parts>
+       <org.collectionspace.services.id.StringIDGeneratorPart>
+         <initialValue>TR</initialValue>
+         <currentValue>TR</currentValue>
+       </org.collectionspace.services.id.StringIDGeneratorPart>
+       <org.collectionspace.services.id.YearIDGeneratorPart>
+         <currentValue></currentValue>
+       </org.collectionspace.services.id.YearIDGeneratorPart>
+       <org.collectionspace.services.id.StringIDGeneratorPart>
+         <initialValue>.</initialValue>
+         <currentValue>.</currentValue>
+       </org.collectionspace.services.id.StringIDGeneratorPart>
+       <org.collectionspace.services.id.NumericIDGeneratorPart>
+         <maxLength>6</maxLength>
+         <initialValue>1</initialValue>
+         <currentValue>-1</currentValue>
+       </org.collectionspace.services.id.NumericIDGeneratorPart>
+     </parts>
+   </org.collectionspace.services.id.SettableIDGenerator>'
+    WHERE 'cc92bbc1-014a-4673-a81d-0c14375375d0' NOT IN
+        (
+        SELECT  csid
+        FROM    id_generators
+        );

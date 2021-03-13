@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>org.collectionspace.services</groupId>
+        <artifactId>org.collectionspace.services.main</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>org.collectionspace.services.transport</artifactId>
+    <name>services.transport</name>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>jaxb</module>
+        <module>service</module>
+        <module>3rdparty</module>
+        <module>client</module>
+    </modules>
+
+</project>

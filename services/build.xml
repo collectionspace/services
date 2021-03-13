@@ -199,6 +199,7 @@
         <ant antfile="contact/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="publicitem/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="uoc/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="transport/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="JaxRsServiceProvider/build.xml" target="deploy" inheritAll="false"/>
     </target>
 
@@ -210,6 +211,7 @@
         <ant antfile="citation/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="organization/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="person/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="transport/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="uoc/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="publicitem/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="contact/build.xml" target="undeploy" inheritAll="false"/>
@@ -289,6 +291,7 @@
         <ant antfile="taxonomy/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="claim/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="exhibition/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="transport/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="osteology/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="conditioncheck/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="conservation/build.xml" target="dist" inheritAll="false"/>
