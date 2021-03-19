@@ -141,7 +141,7 @@
                     "type": "object",
                     "properties": {
                       "title": {
-                        "type": "text",
+                        "type": "keyword",
                         "copy_to": "all_field"
                       },
                       "generalNote": {
