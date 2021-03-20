@@ -35,6 +35,7 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
             "AND (ecm:currentLifeCycleState <> 'deleted') "
             + NONVERSIONED_NONPROXY_DOCUMENT_WHERE_CLAUSE_FRAGMENT;
     static final String DOCMODEL_CONTEXT_PROPERTY_PREFIX = ScopeType.DEFAULT.getScopePrefix();
+	private String currentRepositoryName;
 
 	public AbstractCSEventListenerImpl() {
 		// Intentionally left blank
@@ -53,6 +54,16 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
 
 		return result;
 	}
+	
+	@Override
+	public void setCurrentRepository(Event event) {
+		currentRepositoryName = event.getContext().getRepositoryName();
+	}
+
+	@Override
+	public String getCurrentRepository() {
+		return currentRepositoryName;
+	}
 
 	/*
 	 * This method is meant to be the bottleneck for handling a Nuxeo document event.
@@ -64,6 +75,7 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
 
 		try {
 			if (isRegistered && shouldHandleEvent(event)) {
+				setCurrentRepository(event);
 				handleCSEvent(event);
 				getLogger().debug(String.format("Eventlistener '%s' accepted '%s' event.",
 						getClass().getName(), event.getName()));
@@ -163,10 +175,6 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
 		return result;
 	}
 
-	protected void setName(String repositoryName, String eventListenerName) {
-		nameMap.put(repositoryName, eventListenerName);
-	}
-
 	@Override
 	public Map<String, String> getParams(Event event) {
 		Map<String, String> result = null;
@@ -178,10 +186,34 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
 		}
 		return result;
 	}
+	
+	@Override
+	public String getParamValue(String key) {
+		String result = null;
+
+		
+		Map<String, Map<String, Map<String, String>>> allTenantallListenerParamMaps = getEventListenerParamsMap();
+		if (allTenantallListenerParamMaps != null && !allTenantallListenerParamMaps.isEmpty()) {
+			Map<String, Map<String, String>> allListenersParamsMap = allTenantallListenerParamMaps.get(getCurrentRepository());
+			if (allListenersParamsMap != null && !allListenersParamsMap.isEmpty()) {
+				Map<String, String> paramsMap = allListenersParamsMap.get(getName(getCurrentRepository()));
+				if (paramsMap != null && !paramsMap.isEmpty()) {
+					result = paramsMap.get(key);
+				}
+			}
+		}
+
+		return result;
+	}
+
+	@Override
+	public void setName(String repositoryName, String eventListenerName) {
+		nameMap.put(repositoryName + "." + this.getClass().getSimpleName(), eventListenerName);
+	}
 
 	@Override
 	public String getName(String repositoryName) {
-		return nameMap.get(repositoryName);
+		return nameMap.get(repositoryName + "." + this.getClass().getSimpleName());
 	}
 
 	//
