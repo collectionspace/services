@@ -184,14 +184,10 @@ public class AccountStorageClient extends JpaStorageClientImpl {
                         accountReceived.getPassword());
             }
             DocumentWrapper<AccountsCommon> wrapDoc =
-                    new DocumentWrapperImpl<AccountsCommon>(accountFound);
+            		new DocumentWrapperImpl<AccountsCommon>(accountFound);
             handler.handle(Action.UPDATE, wrapDoc);
             handler.complete(Action.UPDATE, wrapDoc); 
             jpaConnectionContext.commitTransaction();
-            //
-            // Don't sanitize until we've committed changes to the DB
-            //
-            handler.sanitize(wrapDoc);
         } catch (BadRequestException bre) {
         	jpaConnectionContext.markForRollback();
             throw bre;
