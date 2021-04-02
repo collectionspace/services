@@ -180,12 +180,8 @@ public class MaterialsESDocumentWriter extends DefaultESDocumentWriter {
 		denormValues.putArray("mediaAltText").addAll(mediaAltTexts);
 	}
 
-
-	/**
-	 * Compute a title for the public browser. This needs to be indexed in ES so that it can
-	 * be used for sorting. (Even if it's just extracting the primary value.)
-	 */
-	private String computeTitle(DocumentModel doc) {
+	@Override
+	protected String computeTitle(DocumentModel doc) {
 		List<Map<String, Object>> termGroups = (List<Map<String, Object>>) doc.getProperty("materials_common", "materialTermGroupList");
 		String primaryDisplayName = null;
 

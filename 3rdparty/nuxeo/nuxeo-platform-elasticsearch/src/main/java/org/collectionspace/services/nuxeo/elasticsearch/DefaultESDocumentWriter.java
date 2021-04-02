@@ -194,7 +194,7 @@ private void denormExhibitionRecords(CoreSession session, String csid, String te
 	 * Compute a title for the public browser. This needs to be indexed in ES so that it can
 	 * be used for sorting. (Even if it's just extracting the primary value.)
 	 */
-	private String computeTitle(DocumentModel doc) {
+	protected String computeTitle(DocumentModel doc) {
 		List<Map<String, Object>> titleGroups = (List<Map<String, Object>>) doc.getProperty("collectionobjects_common", "titleGroupList");
 		String primaryTitle = null;
 
