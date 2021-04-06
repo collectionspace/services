@@ -8,6 +8,7 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.InternetAddress;
 
 import org.collectionspace.services.config.tenant.EmailConfig;
 
@@ -48,6 +49,7 @@ public class EmailUtil {
 
 	    try {
 		    msg.setRecipients(Message.RecipientType.TO, recipient);
+		    msg.setFrom(new InternetAddress(props.getProperty("mail.from")));
 		    msg.setSubject("JavaMail hello world example");
 		    msg.setSentDate(new Date());
 		    msg.setText("Hello, world!\n");
@@ -83,6 +85,7 @@ public class EmailUtil {
 
 	    try {
 		    msg.setRecipients(Message.RecipientType.TO, recipients);
+		    msg.setFrom(new InternetAddress(emailConfig.getFrom()));
 		    msg.setSubject(emailConfig.getPasswordResetConfig().getSubject());
 		    msg.setSentDate(new Date());
 		    msg.setText(message);
