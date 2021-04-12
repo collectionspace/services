@@ -65,7 +65,8 @@ import org.testng.annotations.Test;
  */
 public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<OrgauthoritiesCommon, OrganizationsCommon> {
 
-    /** The logger. */
+    private static final int MAX_CONTACTS = 1;
+	/** The logger. */
     private final String CLASS_NAME = OrgAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
@@ -270,21 +271,6 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         allContactResourceIdsCreated.put(newID, itemcsid);
 
         return newID;
-    }
-
-    /**
-     * Creates the contact list.
-     *
-     * @param testName the test name
-     * @throws Exception the exception
-     */
-    @Test(dataProvider = "testName", groups = {"createList"},
-    		dependsOnMethods = {"createItemList"})
-    public void createContactList(String testName) throws Exception {
-        // Add contacts to the initially-created, known item record.
-        for (int j = 0; j < nItemsToCreateInList; j++) {
-            createContact(testName);
-        }
     }
 
     // ---------------------------------------------------------------
@@ -712,7 +698,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         // In addition, there will be 'nItemsToCreateInList'
         // additional items created by the createItemList test,
         // all associated with the same parent resource.
-        int nExpectedItems = nItemsToCreateInList + 1;
+        int nExpectedItems = MAX_CONTACTS;
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": Expected "
                     + nExpectedItems + " items; got: " + nItemsReturned);
