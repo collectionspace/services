@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="persons">
+    <ns2:persons_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:ns3="http://collectionspace.org/services/jaxb">
+        <personTermGroupList>
+            <personTermGroup>
+                <termDisplayName>${itemDisplayName}</termDisplayName>
+            </personTermGroup>   
+        </personTermGroupList>
+        <shortIdentifier>${itemShortIdentifier}</shortIdentifier>
+        <bioNote>${itemBioNote}</bioNote>
+        <foreName>${itemDisplayName}</foreName>
+    </ns2:persons_common>
+    <ns2:contacts_common xmlns:ns2="http://collectionspace.org/services/contact">
+        <emailGroupList>
+            <emailGroup>
+                <email>abc@town.com</email>
+                <emailType>business</emailType>
+            </emailGroup>
+        </emailGroupList>
+    </ns2:contacts_common>
+    <ns2:contacts_common xmlns:ns2="http://collectionspace.org/services/contact">
+        <emailGroupList>
+            <emailGroup>
+                <email>def@town.com</email>
+                <emailType>business</emailType>
+            </emailGroup>
+        </emailGroupList>
+    </ns2:contacts_common>    
+</document>

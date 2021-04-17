@@ -134,11 +134,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
             ServiceContext itemCtx = createServiceContext(getItemServiceName());
             String itemcsid = lookupItemCSID(itemCtx, itemspecifier, parentcsid, "createContact(item)", "CREATE_ITEM_CONTACT");
 
-            // Note that we have to create the service context and document
-            // handler for the Contact service, not the main service.
-            ServiceContext ctx = createServiceContext(getContactServiceName(), input);
-            DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid, ui);
-            String csid = getRepositoryClient(ctx).create(ctx, handler);
+            String csid = this.createContact(NULL_CONTEXT, parentcsid, itemcsid, input, ui);
 
             UriBuilder path = UriBuilder.fromResource(resourceClass);
             path.path("" + parentcsid + "/items/" + itemcsid + "/contacts/" + csid);
@@ -163,6 +159,17 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
             }
         }
         
+        //
+        // CC-1145: Ensure no more than one contact is associated with an authority term.
+        //
+        AbstractCommonList existingContactList = getContactList(ctx, parentCsid, itemCsid, null);
+        if (existingContactList.getTotalItems() > 0) {
+        	String errMsg = String.format("Term '%s' in Authority '%s' has an existing contact.  CollectionSpace currently supports no more than one contact for a term.",
+        			itemCsid, parentCsid);
+        	logger.error(errMsg);
+        	throw new DocumentException(DocumentException.DUPLICATE_RECORD_ERR, DocumentException.DUPLICATE_RECORD_MSG);
+        }
+
         DocumentHandler handler = createContactDocumentHandler(ctx, parentCsid, itemCsid, ui);
         String csid = getRepositoryClient(ctx).create(ctx, handler);
 

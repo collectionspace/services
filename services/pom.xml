@@ -15,7 +15,7 @@
 	<properties>
 		<annox.version>0.5.0</annox.version>
 		<jaxb2-basics.version>0.6.2</jaxb2-basics.version>
-		<maven-jaxb2-plugin.version>0.13.1</maven-jaxb2-plugin.version>
+		<maven-jaxb2-plugin.version>0.13.3</maven-jaxb2-plugin.version>
 		<jaxb.version>2.2.11</jaxb.version>
 		<resteasy.version>3.0.19.Final</resteasy.version>
 		<mysql.driver.version>5.1.8</mysql.driver.version>

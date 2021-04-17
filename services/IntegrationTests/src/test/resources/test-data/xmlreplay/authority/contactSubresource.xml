@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="contacts">
+    <ns2:contacts_common xmlns:ns2="http://collectionspace.org/services/contact" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <emailGroupList>
+            <emailGroup>
+                <emailType>business</emailType>
+                <email>richard@ronny.com</email>
+            </emailGroup>
+        </emailGroupList>
+    </ns2:contacts_common>
+</document>

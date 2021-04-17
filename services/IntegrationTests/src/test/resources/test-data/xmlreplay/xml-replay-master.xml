@@ -43,6 +43,7 @@
     <run controlFile="authrefs/authrefsSimple.xml" testGroup="AuthRefsSimple" />
     <run controlFile="authrefs/authrefsComplex.xml" testGroup="AuthRefsComplex" />
     <run controlFile="authority/authority.xml" testGroup="TestAuthoritiesMultiVocabSearch" />
+	<run controlFile="authority/authority.xml" testGroup="TestAuthorityItemsWithContacts" />
     
     <run controlFile="imports/imports.xml" testGroup="importsTestGroup" />
     <run controlFile="imports/imports.xml" testGroup="importsSeparateRepoTestGroup" />

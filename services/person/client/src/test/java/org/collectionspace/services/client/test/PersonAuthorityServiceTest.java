@@ -66,6 +66,9 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     private final String CLASS_NAME = PersonAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     
+    // number of contacts supported by the Services API
+    private static final int MAX_CONTACTS = 1;
+    
     /**
      * Default constructor.  Used to set the short ID for all tests authority items
      */
@@ -510,21 +513,6 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         }
     }
 
-    /**
-     * Creates the contact list.
-     *
-     * @param testName the test name
-     * @throws Exception the exception
-     */
-    @Test(dataProvider = "testName", groups = {"createList"},
-    		dependsOnMethods = {"org.collectionspace.services.client.test.AbstractAuthorityServiceTest.createItemList"})
-    public void createContactList(String testName) throws Exception {
-        // Add contacts to the initially-created, known item record.
-        for (int j = 0; j < nItemsToCreateInList; j++) {
-            createContact(testName);
-        }
-    }
-
     // ---------------------------------------------------------------
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
@@ -849,7 +837,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         // In addition, there will be 'nItemsToCreateInList'
         // additional items created by the createItemList test,
         // all associated with the same parent resource.
-        int nExpectedItems = nItemsToCreateInList + 1;
+        int nExpectedItems = MAX_CONTACTS;
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": Expected "
                     + nExpectedItems + " items; got: " + nItemsReturned);
