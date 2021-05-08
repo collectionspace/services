@@ -63,6 +63,7 @@
 		<module>collectionobject</module>
 		<module>servicegroup</module>
 		<module>group</module>
+		<module>insurance</module>
 		<module>intake</module>
 		<module>loanin</module>
 		<module>loanout</module>
