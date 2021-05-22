@@ -213,6 +213,17 @@ private void denormExhibitionRecords(CoreSession session, String csid, String te
 		if (objectNameGroups.size() > 0) {
 			Map<String, Object> primaryObjectNameGroup = objectNameGroups.get(0);
 			primaryObjectName = (String) primaryObjectNameGroup.get("objectName");
+
+			// The object might be a refname in some profiles/tenants. If it is, use only the display name.
+
+			try {
+				String displayName = RefNameUtils.getDisplayName(primaryObjectName);
+
+				if (displayName != null) {
+					primaryObjectName = displayName;
+				}
+			}
+			catch (Exception e) {}
 		}
 
 		return primaryObjectName;
