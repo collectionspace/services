@@ -1277,6 +1277,27 @@
                                          earliestSingleDate: [1995,  4, 13, CE]
                                          latestDate:         [2019,  4, 18, CE]
 
+  '(1997)':                              # enclosing parens
+                                         earliestSingleDate: [1997,  1,  1, CE]
+                                         latestDate:         [1997, 12, 31, CE]
+
+  '( 1997 )':                            # enclosing parens
+                                         earliestSingleDate: [1997,  1,  1, CE]
+                                         latestDate:         [1997, 12, 31, CE]
+
+  '[1997]':                              # enclosing square brackets
+                                         earliestSingleDate: [1997,  1,  1, CE]
+                                         latestDate:         [1997, 12, 31, CE]
+
+  '{1997}':                              # enclosing curly brackets
+                                         earliestSingleDate: [1997,  1,  1, CE]
+                                         latestDate:         [1997, 12, 31, CE]
+
+  ' ([1997 }]] )':                       # enclosing mixed brackets
+                                         earliestSingleDate: [1997,  1,  1, CE]
+                                         latestDate:         [1997, 12, 31, CE]
+
+
 # -------------------------------------------------------------------------------------------------------
 # Invalid dates
 # -------------------------------------------------------------------------------------------------------
