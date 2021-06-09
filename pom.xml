@@ -56,19 +56,27 @@
 
 		<repository>
 			<id>jboss</id>
-			<url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
+			<url>https://repository.jboss.org/nexus/content/groups/public-jboss</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
 
 		<repository>
+			<id>nuxeo-public-releases</id>
+			<url>https://maven-eu.nuxeo.org/nexus/content/repositories/public-releases</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		
+		<repository>
 			<id>nuxeo-vendor-releases</id>
 			<url>https://maven-eu.nuxeo.org/nexus/content/repositories/vendor-releases</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
-		</repository>
+		</repository>		
 
 		<repository>
 			<id>cspace-libs-release-local</id>
