@@ -74,10 +74,10 @@ import org.slf4j.LoggerFactory;
 public class ServiceMain {
 	final static Logger logger = LoggerFactory.getLogger(ServiceMain.class);
 
-	public static final String VER_DISPLAY_NAME = "CollectionSpace Services v6.1";
-	public static final String VER_MAJOR = "6";
-	public static final String VER_MINOR = "1";
-	public static final String VER_PATCH = "1";
+	public static final String VER_DISPLAY_NAME = "CollectionSpace Services v7.0";
+	public static final String VER_MAJOR = "7";
+	public static final String VER_MINOR = "0";
+	public static final String VER_PATCH = "0";
 	public static final String VER_BUILD = "1";
 
 	private static final int PRIMARY_REPOSITORY_DOMAIN = 0;
