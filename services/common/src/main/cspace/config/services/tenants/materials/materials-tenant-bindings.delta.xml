@@ -602,6 +602,10 @@
                       }
                     }
                   },
+                  "collectionobjects_common:briefDescriptions": {
+                    "type": "text",
+                    "copy_to": "all_field"
+                  },
                   "collectionobjects_common:materialGroupList": {
                     "type": "object",
                     "properties": {
