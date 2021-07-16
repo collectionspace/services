@@ -120,6 +120,10 @@
 							"type": "keyword",
 							"copy_to": "all_field"
 						},
+						"collectionobjects_common:briefDescriptions": {
+							"type": "text",
+							"copy_to": "all_field"
+						},
 						"collectionobjects_common:titleGroupList": {
 							"type": "object",
 							"properties": {
