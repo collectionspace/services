@@ -3,13 +3,15 @@
 -- Migrates existing data to the new nagpraReportFiledGroup repeating group table.
    1) "NAGPRA report filed": collectionobjects_nagpra.nagprareportfiled 
          Copy to nagprareportfiledgroup.nagprareportfiled as a new record.
-         Create new hierarchy record for primaryttype = 'nagpraReportFiledGroup'
+         Create new hierarchy record for primarytype = 'nagpraReportFiledGroup'
    2) "NAGPRA report filed by": collectionobjects_nagpra.nagprareportfiledby
          Copy to nagprareportfiledgroup.nagprareportfiledby as a new record.
-         Create new hierarchy record for primaryttype = 'nagpraReportFiledGroup' [same record as for 1)]
-   3) "NAGPRA report filed date":
+         Create new hierarchy record for primarytype = 'nagpraReportFiledGroup' [same record as for 1)]
+   3) "NAGPRA report filed date": structuredDateGroup.*
+       join structuredDateGroup s, hierarchy h, collectionobjects_nagpra c
+       on s.id = h.id and h.parentid = c.id and h.name = 'collectionobjects_nagpra:nagpraReportFiledDate'
          Copy to structureddategroup.* as a new record.
-         Create new hierarchy record for primaryttype = 'structuredDateGroup', name = 'nagpraReportFiledDate'
+         Create new hierarchy record for primarytype = 'structuredDateGroup', name = 'nagpraReportFiledDate'
 -- Notes:
 --    Requires uuid_generate_v4() function for generating UUID
 --    Since this script may possibly be run repeatedly, it checks for data in the new tables
@@ -43,7 +45,7 @@ BEGIN
          uuid_generate_v4()::varchar AS new_sdgid,
          sdg.*
       FROM collectionobjects_nagpra cn
-      LEFT OUTER JOIN hierarchy hsdg ON (cn.id = hsdg.parentid and hsdg.name = 'nagpraReportFiledDate')
+      LEFT OUTER JOIN hierarchy hsdg ON (cn.id = hsdg.parentid and hsdg.name = 'collectionobjects_nagpra:nagpraReportFiledDate')
       LEFT OUTER JOIN structureddategroup sdg ON (hsdg.id = sdg.id)
       ORDER BY cnid;
    
