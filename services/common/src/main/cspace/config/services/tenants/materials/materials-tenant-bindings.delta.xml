@@ -30,6 +30,7 @@
                     "ecm:name",
                     "ecm:primaryType",
                     "materials_common:shortIdentifier",
+                    "materials_common:featuredCollectionGroupList",
                     "materials_common:publishToList",
                     "materials_common:externalUrlGroupList",
                     "materials_common:materialTermGroupList",
@@ -78,6 +79,7 @@
                     "collectionobjects_common:otherNumberList",
                     "collectionobjects_common:ownersContributionNote",
                     "collectionobjects_common:collection",
+                    "collectionobjects_common:namedCollections",
                     "collectionobjects_common:computedCurrentLocation",
                     "collectionobjects_materials:materialContainerGroupList",
                     "collectionobjects_materials:materialConditionGroupList",
@@ -171,6 +173,15 @@
                     "properties": {
                       "termDisplayName": {
                         "type": "text",
+                        "copy_to": "all_field"
+                      }
+                    }
+                  },
+                  "materials_common:featuredCollectionGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "featuredCollection": {
+                        "type": "keyword",
                         "copy_to": "all_field"
                       }
                     }
