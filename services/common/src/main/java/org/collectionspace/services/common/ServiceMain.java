@@ -77,7 +77,7 @@ public class ServiceMain {
 	public static final String VER_DISPLAY_NAME = "CollectionSpace Services v6.1";
 	public static final String VER_MAJOR = "6";
 	public static final String VER_MINOR = "1";
-	public static final String VER_PATCH = "2";
+	public static final String VER_PATCH = "3";
 	public static final String VER_BUILD = "1";
 
 	private static final int PRIMARY_REPOSITORY_DOMAIN = 0;
