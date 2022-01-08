@@ -1,0 +1,45 @@
+{
+  "_all": {
+    "enabled": false
+  },
+  "dynamic_templates": [
+    {
+      "strings": {
+        "match_mapping_type": "string",
+        "mapping": {
+          "type": "keyword",
+          "ignore_above": 256
+        }
+      }
+    }
+  ],
+  "properties": {
+    "docPath": {
+      "type": "keyword",
+      "fields": {
+        "children": {
+          "type": "text",
+          "analyzer": "path_analyzer"
+        }
+      }
+    },
+    "logDate": {
+      "type": "date"
+    },
+    "eventDate": {
+      "type": "date"
+    },
+    "comment": {
+      "type": "text",
+      "fields": {
+        "fulltext": {
+          "analyzer": "fulltext",
+          "type": "text"
+        }
+      }
+    },
+    "id": {
+      "type": "long"
+    }
+  }
+}

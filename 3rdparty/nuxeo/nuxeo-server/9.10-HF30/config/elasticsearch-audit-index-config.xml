@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<component name="org.nuxeo.elasticsearch.index.audit.contrib">
+  <require>org.nuxeo.elasticsearch.ElasticSearchComponent</require>
+
+  <extension target="org.nuxeo.elasticsearch.ElasticSearchComponent"
+	     point="elasticSearchIndex">
+
+    <elasticSearchIndex name="nuxeo_kanga-audit" type="entry" >
+      <settings file="elasticsearch-audit-settings.json" />
+      <mapping file="elasticsearch-audit-mapping.json" />
+    </elasticSearchIndex>
+
+  </extension>
+
+</component>
