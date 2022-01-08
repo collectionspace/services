@@ -18,7 +18,7 @@
         <module>updaterelationsondelete</module>
         <module>updateimagederivatives</module>
         <module>naturalhistory</module>
-        <module>botgarden</module>
+        <module>tenants</module>
     </modules>
 
     <dependencies>
