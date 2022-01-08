@@ -25,20 +25,24 @@ public class UpdateObjectLocationAndCrateOnMove extends UpdateObjectLocationOnMo
     @Override
     protected boolean updateCollectionObjectLocation(DocumentModel collectionObjectDocModel,
             DocumentModel movementDocModel,
-            String mostRecentLocation) throws ClientException {
-        boolean flag = super.updateCollectionObjectLocation(collectionObjectDocModel, movementDocModel, mostRecentLocation);
-        collectionObjectDocModel = updateComputedCrateValue(collectionObjectDocModel, movementDocModel);
+            DocumentModel mostRecentMovementDocumentModel) throws ClientException {
+        boolean locationChanged = super.updateCollectionObjectLocation(collectionObjectDocModel, movementDocModel,
+                                                                       mostRecentMovementDocumentModel);
+        boolean crateChanged = updateComputedCrateValue(collectionObjectDocModel, mostRecentMovementDocumentModel);
         
-        return flag;
+        return locationChanged || crateChanged;
     }
 
-    private DocumentModel updateComputedCrateValue(DocumentModel collectionObjectDocModel,
-            DocumentModel movementDocModel)
-            throws ClientException {
+    private boolean updateComputedCrateValue(DocumentModel collectionObjectDocModel,
+                                             DocumentModel movementDocModel) throws ClientException {
+        boolean result = false;
 
-        // Get the current crate value from the Movement (the "new" value)
-        String crateRefName = (String) movementDocModel.getProperty(getParamValue(TENANT_MOVEMENTS_SCHEMANAME_KEY),
-                		CRATE_PROPERTY);
+        String crateRefName = null;
+        if (movementDocModel != null) {
+            // Get the current crate value from the Movement (the "new" value)
+            crateRefName = (String) movementDocModel.getProperty(getParamValue(TENANT_MOVEMENTS_SCHEMANAME_KEY),
+                                                                 CRATE_PROPERTY);
+        }
 
         // Check that the value returned, which is expected to be a
         // reference (refName) to an authority term:
@@ -48,7 +52,7 @@ public class UpdateObjectLocationAndCrateOnMove extends UpdateObjectLocationOnMo
         if (Tools.notBlank(crateRefName)
                 && RefNameUtils.parseAuthorityTermInfo(crateRefName) == null) {
             logger.warn("Could not parse crate refName '" + crateRefName + "'");
-            return collectionObjectDocModel;
+            return false;
         } else {
             if (logger.isTraceEnabled()) {
                 logger.trace("crate refName passes basic validation tests.");
@@ -66,27 +70,28 @@ public class UpdateObjectLocationAndCrateOnMove extends UpdateObjectLocationOnMo
         // If the new value is blank, any non-blank existing value should always
         // be overwritten ('nulled out') with a blank value.
         if (Tools.isBlank(crateRefName) && Tools.notBlank(existingCrateRefName)) {
-            collectionObjectDocModel.setProperty(TENANT_COLLECTIONOBJECTS_SCHEMANAME_KEY,
+            collectionObjectDocModel.setProperty(getParamValue(TENANT_COLLECTIONOBJECTS_SCHEMANAME_KEY),
                     COMPUTED_CRATE_PROPERTY, (Serializable) null);
+            result = true;
             // Otherwise, if the new value is not blank, and
             // * the existing value is blank, or
             // * the new value is different than the existing value ...
         } else if (Tools.notBlank(crateRefName) &&
-                    (Tools.isBlank(existingCrateRefName)
-                    || !crateRefName.equals(existingCrateRefName))) {
+                    (Tools.isBlank(existingCrateRefName) || !crateRefName.equals(existingCrateRefName))) {
             if (logger.isTraceEnabled()) {
                 logger.trace("crate refName requires updating.");
             }
             // ... update the existing value in the CollectionObject with the
             // new value from the Movement.
-            collectionObjectDocModel.setProperty(TENANT_COLLECTIONOBJECTS_SCHEMANAME_KEY,
+            collectionObjectDocModel.setProperty(getParamValue(TENANT_COLLECTIONOBJECTS_SCHEMANAME_KEY),
                     COMPUTED_CRATE_PROPERTY, crateRefName);
+            result = true;
         } else {
             if (logger.isTraceEnabled()) {
                 logger.trace("crate refName does NOT require updating.");
             }
         }
         
-        return collectionObjectDocModel;
+        return result;
     }
 }
