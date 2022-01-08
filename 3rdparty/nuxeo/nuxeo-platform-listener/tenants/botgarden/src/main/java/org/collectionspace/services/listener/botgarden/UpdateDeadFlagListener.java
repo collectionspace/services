@@ -37,7 +37,7 @@ public class UpdateDeadFlagListener extends AbstractCSEventSyncListenerImpl {
     }
 
 	/*
-	 * Set the dead flag and dead date on collectionObjects related to a new or modified movement record.
+	 * Set the dead flag and dead date on CollectionObjects related to a new or modified movement record.
 	 */
 	@Override
 	public void handleCSEvent(Event event) {
