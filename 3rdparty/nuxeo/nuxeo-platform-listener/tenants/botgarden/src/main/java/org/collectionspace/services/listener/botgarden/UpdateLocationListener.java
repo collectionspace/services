@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.movement.nuxeo.MovementBotGardenConstants;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
 import org.collectionspace.services.nuxeo.listener.AbstractCSEventSyncListenerImpl;
@@ -66,7 +67,7 @@ public class UpdateLocationListener extends AbstractCSEventSyncListenerImpl {
 			 * event to fire, taking us into the other branch of this code, with the current document
 			 * becoming the previous document.
 			 */
-			if (actionCode != null && actionCode.equals(MovementBotGardenConstants.DEAD_ACTION_CODE)) {
+			if (actionCode != null && RefNameUtils.doShortIDsMatch(actionCode, MovementBotGardenConstants.DEAD_ACTION_CODE)) {
 				context.getCoreSession().saveDocument(doc);
 
 				/*
@@ -77,7 +78,7 @@ public class UpdateLocationListener extends AbstractCSEventSyncListenerImpl {
 			}
 		}
 		else {
-			if (actionCode != null && actionCode.equals(MovementBotGardenConstants.DEAD_ACTION_CODE)) {
+			if (actionCode != null && RefNameUtils.doShortIDsMatch(actionCode, MovementBotGardenConstants.DEAD_ACTION_CODE)) {
 				doc.setProperty(MovementConstants.CURRENT_LOCATION_SCHEMA_NAME, MovementConstants.CURRENT_LOCATION_FIELD_NAME, MovementConstants.NONE_LOCATION);
 			}
 
@@ -86,7 +87,7 @@ public class UpdateLocationListener extends AbstractCSEventSyncListenerImpl {
 
 			logger.debug("previousLocation=" + previousLocation);
 
-			doc.setProperty(MovementConstants.PREVIOUS_LOCATION_SCHEMA_NAME, MovementConstants.PREVIOUS_LOCATION_FIELD_NAME, previousLocation);
+			doc.setProperty(MovementBotGardenConstants.PREVIOUS_LOCATION_SCHEMA_NAME, MovementBotGardenConstants.PREVIOUS_LOCATION_FIELD_NAME, previousLocation);
 		}
 	}
 	

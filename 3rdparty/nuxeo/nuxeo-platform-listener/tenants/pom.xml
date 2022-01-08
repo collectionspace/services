@@ -3,22 +3,17 @@
 
     <parent>
         <groupId>org.collectionspace.services</groupId>
-        <artifactId>org.collectionspace.services.3rdparty.nuxeo</artifactId>
+        <artifactId>org.collectionspace.services.3rdparty.nuxeo.listener</artifactId>
         <version>${revision}</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.collectionspace.services.3rdparty.nuxeo.listener</artifactId>
+    <artifactId>org.collectionspace.services.3rdparty.nuxeo.listener.tenants</artifactId>
     <packaging>pom</packaging>
-    <name>services.3rdparty.nuxeo.listener</name>
+    <name>services.3rdparty.nuxeo.listener.tenants</name>
 
     <modules>
-        <module>reindex</module>
-        <module>updateobjectlocationonmove</module>
-        <module>updaterelationsondelete</module>
-        <module>updateimagederivatives</module>
-        <module>naturalhistory</module>
-        <module>tenants</module>
+        <module>botgarden</module>
     </modules>
 
     <dependencies>
