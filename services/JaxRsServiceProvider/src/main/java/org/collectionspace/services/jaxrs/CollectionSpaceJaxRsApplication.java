@@ -32,6 +32,7 @@ import org.collectionspace.services.insurance.InsuranceResource;
 import org.collectionspace.services.iterationreport.IterationreportResource;
 import org.collectionspace.services.media.MediaResource;
 import org.collectionspace.services.group.GroupResource;
+import org.collectionspace.services.hit.HitResource;
 import org.collectionspace.services.intake.IntakeResource;
 import org.collectionspace.services.index.IndexResource;
 import org.collectionspace.services.loanin.LoaninResource;
@@ -141,6 +142,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new GroupResource());
         addResourceToMapAndSingletons(new InsuranceResource());
         addResourceToMapAndSingletons(new IntakeResource());
+        addResourceToMapAndSingletons(new HitResource());
         addResourceToMapAndSingletons(new DimensionResource());
         addResourceToMapAndSingletons(new RelationResource());
         addResourceToMapAndSingletons(new LoaninResource());
