@@ -34,6 +34,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
 import org.collectionspace.services.client.TenantClient;
+import org.apache.commons.lang.StringUtils;
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.authentication.AuthN;
 
@@ -148,19 +149,20 @@ public class AuthorizationGen {
         TenantBindingType tbinding = tenantBindings.get(tenantId);
         for (ServiceBindingType sbinding : tbinding.getServiceBindings()) {
 
+        	String globalActionGroup = sbinding.getGlobalActionGroup();
             //add permissions for the main path
         	String resourceName = sbinding.getName().toLowerCase().trim();
         	if (isEntityProxy == true) {
         		resourceName = SecurityUtils.getResourceEntity(resourceName);
         	}
-            Permission perm = buildAdminPermission(tbinding.getId(), resourceName);
+            Permission perm = buildAdminPermission(tbinding.getId(), resourceName, globalActionGroup);
             result.add(perm);
 
             //add permissions for alternate paths
             if (isEntityProxy == false) {
 	            List<String> uriPaths = sbinding.getUriPath();
 	            for (String uriPath : uriPaths) {
-	                perm = buildAdminPermission(tbinding.getId(), uriPath.toLowerCase());
+	                perm = buildAdminPermission(tbinding.getId(), uriPath.toLowerCase(), globalActionGroup);
 	                result.add(perm);
 	            }
             }
@@ -188,7 +190,7 @@ public class AuthorizationGen {
      * @return
      */
     private Permission  createTenantMgmntPermission(String resourceName) {
-    	Permission perm = buildAdminPermission(TENANT_MGMNT_ID, resourceName);
+    	Permission perm = buildAdminPermission(TENANT_MGMNT_ID, resourceName, null);
     	return perm;
     }
 
@@ -203,19 +205,22 @@ public class AuthorizationGen {
 
         TenantBindingType tbinding = tenantBindings.get(tenantId);
         for (ServiceBindingType sbinding : tbinding.getServiceBindings()) {
+        	
+        	String globalActionGroup = sbinding.getGlobalActionGroup();
+
             //add permissions for the main path
         	String resourceName = sbinding.getName().toLowerCase().trim();
         	if (isEntityProxy == true) {
         		resourceName = SecurityUtils.getResourceEntity(resourceName);
         	}
-            Permission perm = buildReadWritePermission(tbinding.getId(), resourceName);
+            Permission perm = buildReadWritePermission(tbinding.getId(), resourceName, globalActionGroup);
             apcList.add(perm);
 
             //add permissions for alternate paths
             if (isEntityProxy == false) {
 	            List<String> uriPaths = sbinding.getUriPath();
 	            for (String uriPath : uriPaths) {
-	                perm = buildReadWritePermission(tbinding.getId(), uriPath.toLowerCase());
+	                perm = buildReadWritePermission(tbinding.getId(), uriPath.toLowerCase(), globalActionGroup);
 	                apcList.add(perm);
 	            }
             }
@@ -236,19 +241,22 @@ public class AuthorizationGen {
         
         TenantBindingType tbinding = tenantBindings.get(tenantId);
         for (ServiceBindingType sbinding : tbinding.getServiceBindings()) {
+        	
+        	String globalActionGroup = sbinding.getGlobalActionGroup();
+
             //add permissions for the main path
         	String resourceName = sbinding.getName().toLowerCase().trim();
         	if (isEntityProxy == true) {
         		resourceName = SecurityUtils.getResourceEntity(resourceName);
         	}        	
-            Permission perm = buildReaderPermission(tbinding.getId(), resourceName);
+            Permission perm = buildReaderPermission(tbinding.getId(), resourceName, globalActionGroup);
             apcList.add(perm);
 
             //add permissions for alternate paths
             if (isEntityProxy == false) {
 	            List<String> uriPaths = sbinding.getUriPath();
 	            for (String uriPath : uriPaths) {
-	                perm = buildReaderPermission(tbinding.getId(), uriPath.toLowerCase());
+	                perm = buildReaderPermission(tbinding.getId(), uriPath.toLowerCase(), globalActionGroup);
 	                apcList.add(perm);
 	            }
             }
@@ -257,19 +265,28 @@ public class AuthorizationGen {
         return apcList;
     }
 
-    private Permission buildAdminPermission(String tenantId, String resourceName) {
+    private Permission buildAdminPermission(String tenantId, String resourceName, String globalActionGroup) {
+    	String actionGroup = AuthorizationCommon.ACTIONGROUP_CRUDL_NAME;
+    	if (StringUtils.isNotEmpty(globalActionGroup)) {
+    		actionGroup = globalActionGroup;
+    	}
     	String description = AuthN.GENERATED_STR + "admin permission.";
-    	return AuthorizationCommon.createPermission(tenantId, resourceName, description, AuthorizationCommon.ACTIONGROUP_CRUDL_NAME, true);
+    	return AuthorizationCommon.createPermission(tenantId, resourceName, description, actionGroup, true);
     }
     
-    private Permission buildReaderPermission(String tenantId, String resourceName) {
+    private Permission buildReaderPermission(String tenantId, String resourceName, String globalActionGroup) {
     	String description = AuthN.GENERATED_STR + "read-only (RL) permission.";
     	return AuthorizationCommon.createPermission(tenantId, resourceName, description, AuthorizationCommon.ACTIONGROUP_RL_NAME, true);    	
     }
     
-    private Permission buildReadWritePermission(String tenantId, String resourceName) {
+    private Permission buildReadWritePermission(String tenantId, String resourceName, String globalActionGroup) {
+    	String actionGroup = AuthorizationCommon.ACTIONGROUP_CRUL_NAME;
+    	if (StringUtils.isNotEmpty(globalActionGroup)) {
+    		actionGroup = globalActionGroup;
+    	}
+
     	String description = AuthN.GENERATED_STR + "read-write (CRUL) permission.";
-    	return AuthorizationCommon.createPermission(tenantId, resourceName, description, AuthorizationCommon.ACTIONGROUP_CRUL_NAME, true);    	
+    	return AuthorizationCommon.createPermission(tenantId, resourceName, description, actionGroup, true);    	
     }
 
     public List<Permission> getDefaultPermissions() {
