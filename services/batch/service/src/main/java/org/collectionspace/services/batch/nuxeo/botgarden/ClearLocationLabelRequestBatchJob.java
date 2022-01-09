@@ -1,4 +1,4 @@
-package org.collectionspace.services.batch.nuxeo;
+package org.collectionspace.services.batch.nuxeo.botgarden;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.batch.nuxeo.AbstractBatchJob;
 import org.collectionspace.services.client.MovementClient;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.VocabularyClient;
