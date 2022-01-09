@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    HIT (held-in-trust) schema (XSD)
+
+    Entity  : HIT (held-in-trust)
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+
+    $LastChangedRevision$
+    $LastChangedDate$
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    jaxb:version="1.0" elementFormDefault="unqualified"
+    xmlns:ns="http://collectionspace.org/services/hit"    
+    targetNamespace="http://collectionspace.org/services/hit" version="4.0">
+    
+    <!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+    
+    <xs:element name="hits_common">
+        <xs:complexType>
+            <xs:sequence >
+                <xs:element name="hitDepositorGroupList" type="ns:hitDepositorGroupList"/>
+                <xs:element name="hitNumber" type="xs:string"/>
+                <xs:element name="entryDate" type="xs:date"/>
+                <xs:element name="externalApprovalGroupList" type="ns:externalApprovalGroupList"/>
+                <xs:element name="entryNote" type="xs:string"/>
+                <xs:element name="returnDate" type="xs:date"/>
+                <xs:element name="correspondenceGroupList" type="ns:correspondenceGroupList"/>
+                <xs:element name="internalApprovalGroupList" type="ns:internalApprovalGroupList"/>
+                <xs:element name="entryMethods">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="entryMethod" type="xs:string" minOccurs="0" maxOccurs="unbounded"
+                            />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="handlingPreferences" type="xs:string"/>
+                <xs:element name="agreementRenewalDates">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="agreementRenewalDate" type="xs:date" minOccurs="0"
+                                maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="entryReason" type="xs:string"/>
+                <xs:element name="agreementGroupList" type="ns:agreementGroupList"/>
+                <xs:element name="handlingLimitationsGroupList" type="ns:handlingLimitationsGroupList"/>                
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:complexType name="hitDepositorGroupList">
+        <xs:sequence>
+            <xs:element name="hitDepositorGroup" type="ns:hitDepositorGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="hitDepositorGroup">
+        <xs:sequence>
+            <xs:element name="depositor" type="xs:string"/>
+            <xs:element name="depositorContact" type="xs:string"/>
+            <xs:element name="depositorContactType" type="xs:string"/>
+            <xs:element name="depositorNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="correspondenceGroupList">
+        <xs:sequence>
+            <xs:element name="correspondenceGroup" type="ns:correspondenceGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="correspondenceGroup">
+        <xs:sequence>
+            <xs:element name="correspondenceDate" type="xs:date"/>
+            <xs:element name="correspondenceSender" type="xs:string"/>
+            <xs:element name="correspondenceRecipient" type="xs:string"/>
+            <xs:element name="correspondenceSummary" type="xs:string"/>
+            <xs:element name="correspondenceReference" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="externalApprovalGroupList">
+        <xs:sequence>
+            <xs:element name="externalApprovalGroup" type="ns:externalApprovalGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="externalApprovalGroup">
+        <xs:sequence>
+            <xs:element name="externalApprovalGroupName" type="xs:string"/>
+            <xs:element name="externalApprovalIndividual" type="xs:string"/>
+            <xs:element name="externalApprovalStatus" type="xs:string"/>
+            <xs:element name="externalApprovalDate" type="xs:date"/>
+            <xs:element name="externalApprovalNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="internalApprovalGroupList">
+        <xs:sequence>
+            <xs:element name="internalApprovalGroup" type="ns:internalApprovalGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="internalApprovalGroup">
+        <xs:sequence>
+            <xs:element name="internalApprovalGroupName" type="xs:string"/>
+            <xs:element name="internalApprovalIndividual" type="xs:string"/>
+            <xs:element name="internalApprovalStatus" type="xs:string"/>
+            <xs:element name="internalApprovalDate" type="xs:date"/>
+            <xs:element name="internalApprovalNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="agreementGroupList">
+        <xs:sequence>
+            <xs:element name="agreementGroup" type="ns:agreementGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="agreementGroup">
+        <xs:sequence>
+            <xs:element name="agreementStatus" type="xs:string"/>
+            <xs:element name="agreementStatusDate" type="xs:date"/>
+            <xs:element name="agreementStatusNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="handlingLimitationsGroupList">
+        <xs:sequence>
+            <xs:element name="handlingLimitationsGroup" type="ns:handlingLimitationsGroup"
+                minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="handlingLimitationsGroup">
+        <xs:sequence>
+            <xs:element name="handlingLimitationsType" type="xs:string"/>
+            <xs:element name="handlingLimitationsLevel" type="xs:string"/>
+            <xs:element name="handlingLimitationsDetail" type="xs:string"/>
+            <xs:element name="handlingLimitationsRequestor" type="xs:string"/>
+            <xs:element name="handlingLimitationsOnBehalfOf" type="xs:string"/>
+            <xs:element name="handlingLimitationsDate" type="xs:date"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
