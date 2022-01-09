@@ -29,6 +29,9 @@
 			<tenant:eventListenerConfig id="Reindex">
 				<tenant:className>org.collectionspace.services.listener.Reindex</tenant:className>
 			</tenant:eventListenerConfig>
+			<tenant:eventListenerConfig id="CSpaceAuditLogger">
+				<tenant:className>org.collectionspace.services.listener.CSpaceAuditLogger</tenant:className>
+			</tenant:eventListenerConfig>
 		</tenant:eventListenerConfigurations>
 		<tenant:properties>
 			<!-- Controls whether term completion (aka partial term matching, aka autocomplete) searches will automatically insert
@@ -56,6 +59,32 @@
 				<types:value>true</types:value>
 			</types:item>
 		</tenant:properties>
+
+		<!-- begin SQL service service meta-data -->
+		<tenant:serviceBindings id="runsqlscripts" merge:matcher="id" name="runsqlscripts" type="utility"
+			version="1.0">
+			<!-- other URI paths through which this service could be accessed -->
+			<service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+			<service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
+				<service:classname>org.collectionspace.services.common.init.RunSqlScripts</service:classname>
+				<service:params>
+					<service:property>
+						<service:key>sqlScriptName</service:key>
+						<service:value>grant_reporters_privileges.sql</service:value>
+					</service:property>
+				</service:params>
+			</service:initHandler>
+		</tenant:serviceBindings>
+		<!-- end runsqlscripts service meta-data -->
+
+		<!-- begin auditservice -->
+		<tenant:serviceBindings id="Audit" merge:matcher="id" name="Audit" type="procedure" version="1.1" elasticsearchIndexed="false" globalActionGroup="RL">
+	      <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+	      <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.audit.nuxeo.AuditDocumentHandler</service:documentHandler>
+	      <service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.audit.nuxeo.AuditValidatorHandler</service:validatorHandler>
+	      <service:clientHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.client.AuditClient</service:clientHandler>
+	    </tenant:serviceBindings>		
+		<!-- end audit service meta-data -->
 
 		<!-- begin idgenerator service meta-data -->
 		<tenant:serviceBindings id="idgenerators" merge:matcher="id" name="idgenerators" type="utility"
@@ -734,6 +763,8 @@
 			<service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
 			<service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.contact.nuxeo.ContactDocumentModelHandler
 			</service:documentHandler>
+			<service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.contact.nuxeo.ContactValidatorHandler
+			</service:validatorHandler>
 			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
 				<service:params>
 					<service:ListResultsFields>
