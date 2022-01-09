@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.common.api;
 
+import org.collectionspace.services.common.api.RefNameUtils.AuthorityInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -301,6 +302,40 @@ public class RefNameUtils {
     	}
     	
     	return displayName;
-    }    
-}
+    }
 
+    /**
+     * Compare two refname strings.  They're considered equal if the short IDs match
+     *
+     * @param refname1
+     * @param refname2
+     * @return
+     */
+    public static boolean doShortIDsMatch(String refname1, String refname2) {
+        boolean result = false;
+
+        if (refname1 != null && refname2 != null) {
+
+            try {
+                String[] refNameTokens1 = refname1.substring(URN_PREFIX_LEN).split(SEPARATOR, AUTH_ITEM_REFNAME_TOKENS);
+                AuthorityTermInfo authTermInfo1 = new AuthorityTermInfo(refNameTokens1);
+                String inAuthority1 = authTermInfo1.inAuthority.name;
+                String shortID1 = authTermInfo1.name;
+
+                String[] refNameTokens2 = refname2.substring(URN_PREFIX_LEN).split(SEPARATOR, AUTH_ITEM_REFNAME_TOKENS);
+                AuthorityTermInfo authTermInfo2 = new AuthorityTermInfo(refNameTokens2);
+                String inAuthority2 = authTermInfo2.inAuthority.name;
+                String shortID2 = authTermInfo2.name;
+
+                if (shortID1.equals(shortID2) && inAuthority1.equals(inAuthority2)) {
+                    result = true;
+                }
+            } catch (Exception e) {
+                // do nothing
+            }
+
+        }
+
+        return result;
+    }
+}
