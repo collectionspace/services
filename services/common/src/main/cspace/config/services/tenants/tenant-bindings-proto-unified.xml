@@ -863,6 +863,8 @@
 			<service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
 			<service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.contact.nuxeo.ContactDocumentModelHandler
 			</service:documentHandler>
+			<service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.contact.nuxeo.ContactValidatorHandler
+			</service:validatorHandler>
 			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
 				<service:params>
 					<service:ListResultsFields>
