@@ -1758,21 +1758,4 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 		return null;
 	}
 
-	public static AuthorityResource<?, ?> getResourceForItem(ResourceMap resourceMap, String tenantId, String itemDocType) {
-		for (String serviceName : resourceMap.keySet()) {
-			CollectionSpaceResource<?, ?> resource = (CollectionSpaceResource<?, ?>) resourceMap.get(serviceName);
-
-			if (resource instanceof AuthorityResource) {
-				AuthorityResource<?, ?> authorityResource = (AuthorityResource<?, ?>) resource;
-				String docType = authorityResource.getItemDocType(tenantId);
-
-				if (docType.equals(itemDocType)) {
-					return authorityResource;
-				}
-			}
-		}
-
-		return null;
-	}
-
 }
