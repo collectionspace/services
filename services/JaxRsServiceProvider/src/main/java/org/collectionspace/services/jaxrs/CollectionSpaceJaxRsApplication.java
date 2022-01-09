@@ -30,12 +30,14 @@ import org.collectionspace.services.id.IDResource;
 import org.collectionspace.services.insurance.InsuranceResource;
 import org.collectionspace.services.media.MediaResource;
 import org.collectionspace.services.group.GroupResource;
+import org.collectionspace.services.hit.HitResource;
 import org.collectionspace.services.intake.IntakeResource;
 import org.collectionspace.services.index.IndexResource;
 import org.collectionspace.services.loanin.LoaninResource;
 import org.collectionspace.services.loanout.LoanoutResource;
 import org.collectionspace.services.transport.TransportResource;
 import org.collectionspace.services.uoc.UocResource;
+import org.collectionspace.services.audit.AuditResource;
 import org.collectionspace.services.valuationcontrol.ValuationcontrolResource;
 import org.collectionspace.services.objectexit.ObjectExitResource;
 import org.collectionspace.services.batch.BatchResource;
@@ -135,6 +137,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new GroupResource());
         addResourceToMapAndSingletons(new InsuranceResource());
         addResourceToMapAndSingletons(new IntakeResource());
+        addResourceToMapAndSingletons(new HitResource());
         addResourceToMapAndSingletons(new DimensionResource());
         addResourceToMapAndSingletons(new RelationResource());
         addResourceToMapAndSingletons(new LoaninResource());
@@ -158,6 +161,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new TransportResource());
 
         singletons.add(new IDResource());
+        singletons.add(new AuditResource());
 
         /*
         singletons.add(new WorkflowResource());

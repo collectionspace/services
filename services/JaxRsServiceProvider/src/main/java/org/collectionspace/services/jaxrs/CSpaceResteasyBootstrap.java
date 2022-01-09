@@ -12,6 +12,8 @@ import org.collectionspace.authentication.CSpaceTenant;
 import org.collectionspace.services.account.Tenant;
 import org.collectionspace.services.account.TenantResource;
 import org.collectionspace.services.authorization.AuthZ;
+import org.collectionspace.services.client.AuditClient;
+import org.collectionspace.services.client.AuditClientUtils;
 import org.collectionspace.services.client.AuthorityClient;
 
 import org.collectionspace.services.common.CSWebApplicationException;
@@ -30,6 +32,9 @@ import org.collectionspace.services.config.service.TermList;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
+import org.nuxeo.ecm.core.event.EventServiceAdmin;
+import org.nuxeo.ecm.core.event.impl.EventListenerDescriptor;
+import org.nuxeo.ecm.core.event.impl.EventListenerList;
 import org.nuxeo.elasticsearch.ElasticSearchComponent;
 import org.nuxeo.elasticsearch.api.ElasticSearchService;
 import org.nuxeo.runtime.api.Framework;
@@ -126,6 +131,18 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 		}
 	}
 
+	//
+	// Get the current enabled state of the CSpace audit logger
+	//
+	private boolean isCSpaceAuditLoggerEnabled() {
+        EventServiceAdmin eventAdmin = Framework.getService(EventServiceAdmin.class);
+        
+        EventListenerList listenerList = eventAdmin.getListenerList();
+        EventListenerDescriptor descriptor = listenerList.getDescriptor(AuditClientUtils.SERVICE_LISTENER_NAME);
+
+        return descriptor.isEnabled();
+	}
+
     /**
      * Initialize all authorities and vocabularies defined in the service bindings.
      * @param resourceMap
@@ -134,31 +151,43 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
     public void initializeAuthorities(ResourceMap resourceMap, boolean reset) throws Exception {
     	TenantBindingConfigReaderImpl tenantBindingConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();
     	Hashtable<String, TenantBindingType> tenantBindingsTable = tenantBindingConfigReader.getTenantBindings(false);
-    	for (TenantBindingType tenantBindings : tenantBindingsTable.values()) {
-			CSpaceTenant tenant = new CSpaceTenant(tenantBindings.getId(), tenantBindings.getName());
-			if (shouldInitializeAuthorities(tenant, reset) == true) {
-				logger.log(Level.INFO, String.format("Initializing vocabularies and authorities of tenant '%s'.",
-						tenant.getId()));
-	    		for (ServiceBindingType serviceBinding : tenantBindings.getServiceBindings()) {
-	    			AuthorityInstanceList element = serviceBinding.getAuthorityInstanceList();
-	    			if (element != null && element.getAuthorityInstance() != null) {
-	    				List<AuthorityInstanceType> authorityInstanceList = element.getAuthorityInstance();
-	    				for (AuthorityInstanceType authorityInstance : authorityInstanceList) {
-	    					try {
-	    						initializeAuthorityInstance(resourceMap, authorityInstance, serviceBinding, tenant, reset);
-	    					} catch (Exception e) {
-	    						logger.log(Level.SEVERE, "Could not initialize authorities and authority terms: " + e.getMessage());
-	    						throw e;
-	    					}
-	    				}
-	    			}
-	    		}
-	    		//
-	    		// If we made it this far, we've either created the tenant's authorities and terms or we've reset them.  Either way,
-	    		// we should mark the isAuthoritiesInitialized field of the tenant to 'true'.
-	    		//
-	    		setAuthoritiesInitialized(tenant, true);
-			}
+    	
+        EventServiceAdmin eventAdmin = Framework.getService(EventServiceAdmin.class);
+		boolean cspaceAuditLoggerState = isCSpaceAuditLoggerEnabled();
+    	try {
+    		// disable audit logs when initializing authorities
+	        eventAdmin = Framework.getService(EventServiceAdmin.class);
+	        eventAdmin.setListenerEnabledFlag(AuditClientUtils.SERVICE_LISTENER_NAME, false);
+	
+	    	for (TenantBindingType tenantBindings : tenantBindingsTable.values()) {
+				CSpaceTenant tenant = new CSpaceTenant(tenantBindings.getId(), tenantBindings.getName());
+				if (shouldInitializeAuthorities(tenant, reset) == true) {
+					logger.log(Level.INFO, String.format("Initializing vocabularies and authorities of tenant '%s'.",
+							tenant.getId()));
+		    		for (ServiceBindingType serviceBinding : tenantBindings.getServiceBindings()) {
+		    			AuthorityInstanceList element = serviceBinding.getAuthorityInstanceList();
+		    			if (element != null && element.getAuthorityInstance() != null) {
+		    				List<AuthorityInstanceType> authorityInstanceList = element.getAuthorityInstance();
+		    				for (AuthorityInstanceType authorityInstance : authorityInstanceList) {
+		    					try {
+		    						initializeAuthorityInstance(resourceMap, authorityInstance, serviceBinding, tenant, reset);
+		    					} catch (Exception e) {
+		    						logger.log(Level.SEVERE, "Could not initialize authorities and authority terms: " + e.getMessage());
+		    						throw e;
+		    					}
+		    				}
+		    			}
+		    		}
+		    		//
+		    		// If we made it this far, we've either created the tenant's authorities and terms or we've reset them.  Either way,
+		    		// we should mark the isAuthoritiesInitialized field of the tenant to 'true'.
+		    		//
+		    		setAuthoritiesInitialized(tenant, true);
+				}
+	    	}
+    	} finally {
+    		// set the enabled state of the audit logger back to what it was
+	        eventAdmin.setListenerEnabledFlag(AuditClientUtils.SERVICE_LISTENER_NAME, cspaceAuditLoggerState);
     	}
 	}
 
