@@ -98,6 +98,12 @@
 			<artifactId>org.collectionspace.services.authorization.service</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.collectionspace.services</groupId>
+			<artifactId>org.collectionspace.services.audit.jaxb</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 <!--
 		<dependency>
 			<groupId>org.collectionspace.services</groupId>
