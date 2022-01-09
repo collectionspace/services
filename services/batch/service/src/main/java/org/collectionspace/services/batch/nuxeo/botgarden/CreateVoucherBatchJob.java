@@ -1,4 +1,4 @@
-package org.collectionspace.services.batch.nuxeo;
+package org.collectionspace.services.batch.nuxeo.botgarden;
 
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -10,12 +10,14 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
+import org.collectionspace.services.batch.nuxeo.AbstractBatchJob;
 import org.collectionspace.services.client.CollectionSpaceClientUtils;
 import org.collectionspace.services.client.LoanoutClient;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectBotGardenConstants;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
+import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectNaturalHistoryConstants;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
@@ -134,8 +136,8 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 			placeNote = reverseFieldCollectionPlace;
 		}
 		else {
-			String taxonomicRange = this.getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.TAXONOMIC_RANGE_SCHEMA_NAME,
-					CollectionObjectBotGardenConstants.TAXONOMIC_RANGE_FIELD_NAME);
+			String taxonomicRange = this.getFieldValue(collectionObjectPayload, CollectionObjectNaturalHistoryConstants.TAXONOMIC_RANGE_SCHEMA_NAME,
+					CollectionObjectNaturalHistoryConstants.TAXONOMIC_RANGE_FIELD_NAME);
 
 			if (StringUtils.isNotBlank(taxonomicRange)) {
 				placeNote = "Geographic range " + taxonomicRange;
@@ -161,8 +163,8 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 	
 	private String getReverseFieldCollectionPlace(PoxPayloadOut collectionObjectPayload) throws URISyntaxException, DocumentException, Exception {
 		String reverseDisplayName = null;
-		String fieldCollectionPlaceRefName = getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.FIELD_COLLECTION_PLACE_SCHEMA_NAME, 
-				CollectionObjectBotGardenConstants.FIELD_COLLECTION_PLACE_FIELD_NAME);		
+		String fieldCollectionPlaceRefName = getFieldValue(collectionObjectPayload, CollectionObjectNaturalHistoryConstants.FIELD_COLLECTION_PLACE_SCHEMA_NAME, 
+				CollectionObjectNaturalHistoryConstants.FIELD_COLLECTION_PLACE_FIELD_NAME);		
 
 		if (StringUtils.isNotBlank(fieldCollectionPlaceRefName)) {			
 			PoxPayloadOut placePayload = null;
@@ -202,20 +204,20 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 	
 	private String getAnnotation(PoxPayloadOut collectionObjectPayload) {
 		String annotation = "";
-		String determinationKind = getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.DETERMINATION_KIND_SCHEMA_NAME, 
-				CollectionObjectBotGardenConstants.DETERMINATION_KIND_FIELD_NAME);
+		String determinationKind = getFieldValue(collectionObjectPayload, CollectionObjectNaturalHistoryConstants.DETERMINATION_KIND_SCHEMA_NAME, 
+				CollectionObjectNaturalHistoryConstants.DETERMINATION_KIND_FIELD_NAME);
 
-		if (determinationKind.equals(CollectionObjectBotGardenConstants.DETERMINATION_KIND_DETERMINATION_VALUE)) {
-			String determinationBy = getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.DETERMINATION_BY_SCHEMA_NAME, 
-					CollectionObjectBotGardenConstants.DETERMINATION_BY_FIELD_NAME));
+		if (determinationKind.equals(CollectionObjectNaturalHistoryConstants.DETERMINATION_KIND_DETERMINATION_VALUE)) {
+			String determinationBy = getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectNaturalHistoryConstants.DETERMINATION_BY_SCHEMA_NAME, 
+					CollectionObjectNaturalHistoryConstants.DETERMINATION_BY_FIELD_NAME));
 			
 			if (StringUtils.isNotBlank(determinationBy)) {
 				annotation += "det. by " + determinationBy;
 
-				String determinationInstitution = getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.DETERMINATION_INSTITUTION_SCHEMA_NAME, 
-						CollectionObjectBotGardenConstants.DETERMINATION_INSTITUTION_FIELD_NAME));
-				String determinationDate = getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.DETERMINATION_DATE_SCHEMA_NAME, 
-						CollectionObjectBotGardenConstants.DETERMINATION_DATE_FIELD_NAME);
+				String determinationInstitution = getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectNaturalHistoryConstants.DETERMINATION_INSTITUTION_SCHEMA_NAME, 
+						CollectionObjectNaturalHistoryConstants.DETERMINATION_INSTITUTION_FIELD_NAME));
+				String determinationDate = getFieldValue(collectionObjectPayload, CollectionObjectNaturalHistoryConstants.DETERMINATION_DATE_SCHEMA_NAME, 
+						CollectionObjectNaturalHistoryConstants.DETERMINATION_DATE_FIELD_NAME);
 
 				if (StringUtils.isNotBlank(determinationInstitution)) {
 					annotation += ", " + determinationInstitution;

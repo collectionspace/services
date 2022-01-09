@@ -1,19 +1,21 @@
-package org.collectionspace.services.batch.nuxeo;
+package org.collectionspace.services.batch.nuxeo.botgarden;
 
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.collectionspace.services.batch.nuxeo.AbstractBatchJob;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectBotGardenConstants;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
+import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectNaturalHistoryConstants;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
-import org.collectionspace.services.taxonomy.nuxeo.TaxonBotGardenConstants;
+import org.collectionspace.services.taxonomy.nuxeo.TaxonNaturalHistoryConstants;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonConstants;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
@@ -35,7 +37,7 @@ import org.slf4j.LoggerFactory;
 public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 	final Logger logger = LoggerFactory.getLogger(UpdateAccessCodeBatchJob.class);
 
-	private final String[] TAXON_FIELD_NAME_PARTS = CollectionObjectBotGardenConstants.TAXON_FIELD_NAME.split("\\/");
+	private final String[] TAXON_FIELD_NAME_PARTS = CollectionObjectNaturalHistoryConstants.TAXON_FIELD_NAME.split("\\/");
 	private final String TAXON_FIELD_NAME_WITHOUT_PATH = TAXON_FIELD_NAME_PARTS[TAXON_FIELD_NAME_PARTS.length - 1];
 
 	public UpdateAccessCodeBatchJob() {
@@ -124,7 +126,7 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 	public InvocationResults updateParentAccessCode(String taxonCsid, boolean propagate) throws URISyntaxException, DocumentException, Exception {
 		PoxPayloadOut taxonPayload = findTaxonByCsid(taxonCsid);
 		String taxonRefName = getFieldValue(taxonPayload, TaxonConstants.REFNAME_SCHEMA_NAME, TaxonConstants.REFNAME_FIELD_NAME);
-		String accessCode = getFieldValue(taxonPayload, TaxonBotGardenConstants.ACCESS_CODE_SCHEMA_NAME, TaxonBotGardenConstants.ACCESS_CODE_FIELD_NAME);
+		String accessCode = getFieldValue(taxonPayload, TaxonNaturalHistoryConstants.ACCESS_CODE_SCHEMA_NAME, TaxonNaturalHistoryConstants.ACCESS_CODE_FIELD_NAME);
 
 		logger.debug("updating parent access code: taxonRefName=" + taxonRefName + " propagate=" + propagate + " accessCode=" + accessCode);
 
@@ -162,8 +164,8 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 
 		logger.debug("updating referenced access codes: collectionObjectCsid=" + collectionObjectCsid + " propagate=" + propagate + " isAlive=" + isAlive);
 
-		List<String> taxonRefNames = getFieldValues(collectionObjectPayload, CollectionObjectBotGardenConstants.TAXON_SCHEMA_NAME,
-				CollectionObjectBotGardenConstants.TAXON_FIELD_NAME);
+		List<String> taxonRefNames = getFieldValues(collectionObjectPayload, CollectionObjectNaturalHistoryConstants.TAXON_SCHEMA_NAME,
+				CollectionObjectNaturalHistoryConstants.TAXON_FIELD_NAME);
 		long numAffected = 0;
 
 		for (String taxonRefName : taxonRefNames) {
@@ -232,7 +234,7 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 
 		String taxonCsid = getCsid(taxonPayload);
 		String taxonRefName = getFieldValue(taxonPayload, TaxonConstants.REFNAME_SCHEMA_NAME, TaxonConstants.REFNAME_FIELD_NAME);
-		String accessCode = getFieldValue(taxonPayload, TaxonBotGardenConstants.ACCESS_CODE_SCHEMA_NAME, TaxonBotGardenConstants.ACCESS_CODE_FIELD_NAME);
+		String accessCode = getFieldValue(taxonPayload, TaxonNaturalHistoryConstants.ACCESS_CODE_SCHEMA_NAME, TaxonNaturalHistoryConstants.ACCESS_CODE_FIELD_NAME);
 
 		logger.debug("updating access code: taxonRefName=" + taxonRefName + " deep=" + deep + " knownAlive=" + knownAlive);
 
@@ -252,7 +254,7 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 
 				if (!childResults.isSoftDeleted()) {
 					String childAccessCode = childResults.getAccessCode();
-					boolean isChildAlive = !childAccessCode.equals(TaxonBotGardenConstants.ACCESS_CODE_DEAD_VALUE);
+					boolean isChildAlive = !childAccessCode.equals(TaxonNaturalHistoryConstants.ACCESS_CODE_DEAD_VALUE);
 
 					if (isChildAlive) {
 						foundAlive = true;
@@ -273,9 +275,9 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 				for (String childTaxonCsid : childTaxonCsids) {
 					PoxPayloadOut childTaxonPayload = findTaxonByCsid(childTaxonCsid);
 
-					String childAccessCode = getFieldValue(childTaxonPayload, TaxonBotGardenConstants.ACCESS_CODE_SCHEMA_NAME,
-							TaxonBotGardenConstants.ACCESS_CODE_FIELD_NAME);
-					boolean isChildAlive = !childAccessCode.equals(TaxonBotGardenConstants.ACCESS_CODE_DEAD_VALUE);
+					String childAccessCode = getFieldValue(childTaxonPayload, TaxonNaturalHistoryConstants.ACCESS_CODE_SCHEMA_NAME,
+							TaxonNaturalHistoryConstants.ACCESS_CODE_FIELD_NAME);
+					boolean isChildAlive = !childAccessCode.equals(TaxonNaturalHistoryConstants.ACCESS_CODE_DEAD_VALUE);
 
 					if (isChildAlive) {
 						foundAlive = true;
@@ -292,7 +294,7 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 			String vocabularyShortId = item.getParentShortIdentifier();
 
 			List<String> collectionObjectCsids = findReferencingCollectionObjects(TaxonomyAuthorityClient.SERVICE_NAME, vocabularyShortId, taxonCsid,
-					CollectionObjectBotGardenConstants.TAXON_SCHEMA_NAME + ":" + TAXON_FIELD_NAME_WITHOUT_PATH);
+					CollectionObjectNaturalHistoryConstants.TAXON_SCHEMA_NAME + ":" + TAXON_FIELD_NAME_WITHOUT_PATH);
 
 			for (String collectionObjectCsid : collectionObjectCsids) {
 				PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(collectionObjectCsid);
@@ -319,11 +321,11 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 		// living example, and the access code is not dead, the current value of unrestricted
 		// or restricted should be retained.
 
-		if (foundAlive && (StringUtils.isEmpty(accessCode) || accessCode.equals(TaxonBotGardenConstants.ACCESS_CODE_DEAD_VALUE))) {
-			newAccessCode = TaxonBotGardenConstants.ACCESS_CODE_UNRESTRICTED_VALUE;
+		if (foundAlive && (StringUtils.isEmpty(accessCode) || accessCode.equals(TaxonNaturalHistoryConstants.ACCESS_CODE_DEAD_VALUE))) {
+			newAccessCode = TaxonNaturalHistoryConstants.ACCESS_CODE_UNRESTRICTED_VALUE;
 		}
 		else if (!foundAlive) {
-			newAccessCode = TaxonBotGardenConstants.ACCESS_CODE_DEAD_VALUE;
+			newAccessCode = TaxonNaturalHistoryConstants.ACCESS_CODE_DEAD_VALUE;
 		}
 		else {
 			newAccessCode = accessCode;
@@ -379,13 +381,13 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 	 */
 	public UpdateAccessCodeResults updateAccessCode(String taxonRefNameOrCsid, boolean deep, String newChildTaxonCsid) throws URISyntaxException, DocumentException, Exception {
 		PoxPayloadOut newChildTaxonPayload = findTaxonByCsid(newChildTaxonCsid);
-		String newChildTaxonAccessCode = getFieldValue(newChildTaxonPayload, TaxonBotGardenConstants.ACCESS_CODE_SCHEMA_NAME, TaxonBotGardenConstants.ACCESS_CODE_FIELD_NAME);
+		String newChildTaxonAccessCode = getFieldValue(newChildTaxonPayload, TaxonNaturalHistoryConstants.ACCESS_CODE_SCHEMA_NAME, TaxonNaturalHistoryConstants.ACCESS_CODE_FIELD_NAME);
 
 		if (newChildTaxonAccessCode == null) {
 			newChildTaxonAccessCode = "";
 		}
 
-		boolean knownAlive = !newChildTaxonAccessCode.equals(TaxonBotGardenConstants.ACCESS_CODE_DEAD_VALUE);
+		boolean knownAlive = !newChildTaxonAccessCode.equals(TaxonNaturalHistoryConstants.ACCESS_CODE_DEAD_VALUE);
 
 		return updateAccessCode(taxonRefNameOrCsid, deep, knownAlive);
 	}
@@ -414,7 +416,7 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 		logger.debug("updating parent access code: taxonCsid=" + taxonCsid + " accessCode=" + accessCode + " propagate=" + propagate);
 
 		if (parentTaxonCsid != null) {
-			boolean isAlive = (accessCode == null) || !accessCode.equals(TaxonBotGardenConstants.ACCESS_CODE_DEAD_VALUE);
+			boolean isAlive = (accessCode == null) || !accessCode.equals(TaxonNaturalHistoryConstants.ACCESS_CODE_DEAD_VALUE);
 
 			UpdateAccessCodeResults parentUpdateResults = updateAccessCode(parentTaxonCsid, false, isAlive);
 
@@ -453,7 +455,7 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 				"<document name=\"taxon\">" +
 					"<ns2:taxon_naturalhistory xmlns:ns2=\"http://collectionspace.org/services/taxonomy/domain/naturalhistory\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-						getFieldXml(TaxonBotGardenConstants.ACCESS_CODE_FIELD_NAME, accessCode) +
+						getFieldXml(TaxonNaturalHistoryConstants.ACCESS_CODE_FIELD_NAME, accessCode) +
 					"</ns2:taxon_naturalhistory>" +
 				"</document>";
 
