@@ -84,6 +84,11 @@ public class CSpaceUserDetailsService implements UserDetailsService {
             salt = realm.getSalt(username);
             requireSSO = realm.isRequireSSO(username);
             tenants = getTenants(username);
+            if (tenants == null || tenants.isEmpty()) {
+            	String msg = String.format("The account '%s' is not associated with any tenants.  Please contact your administrator.",
+            			username);
+            	throw new AccountException(msg);
+            }
             grantedAuthorities = getAuthorities(username);
         }
         catch (AccountNotFoundException e) {
