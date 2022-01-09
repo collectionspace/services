@@ -63,6 +63,23 @@
 			</types:item>
 		</tenant:properties>
 
+		<!-- begin SQL service service meta-data -->
+		<tenant:serviceBindings id="runsqlscripts" merge:matcher="id" name="runsqlscripts" type="utility"
+			version="1.0">
+			<!-- other URI paths through which this service could be accessed -->
+			<service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+			<service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
+				<service:classname>org.collectionspace.services.common.init.RunSqlScripts</service:classname>
+				<service:params>
+					<service:property>
+						<service:key>sqlScriptName</service:key>
+						<service:value>grant_reporters_privileges.sql</service:value>
+					</service:property>
+				</service:params>
+			</service:initHandler>
+		</tenant:serviceBindings>
+		<!-- end runsqlscripts service meta-data -->
+
 		<!-- begin idgenerator service meta-data -->
 		<tenant:serviceBindings id="idgenerators" merge:matcher="id" name="idgenerators" type="utility"
 			version="1.0">
