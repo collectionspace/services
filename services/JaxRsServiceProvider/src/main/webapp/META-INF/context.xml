@@ -8,7 +8,7 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License. -->
-<Context antiResourceLocking="false" privileged="true" path="/cspace-services"
+<Context antiResourceLocking="false" privileged="true" failCtxIfServletStartFails="true" path="/cspace-services"
     docBase="cspace-services">
 
     <!-- Disable HTTP Session persistence between restart since webengine session objects are not serializable -->
