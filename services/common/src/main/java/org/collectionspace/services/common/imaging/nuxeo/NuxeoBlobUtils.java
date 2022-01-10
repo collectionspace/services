@@ -59,6 +59,7 @@ import org.nuxeo.ecm.core.api.blobholder.BlobHolder;
 import org.nuxeo.ecm.core.api.blobholder.DocumentBlobHolder;
 import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
 import org.nuxeo.ecm.core.api.model.Property;
+import org.nuxeo.binary.metadata.api.BinaryMetadataService;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -360,42 +361,39 @@ public class NuxeoBlobUtils {
 		return commonList;
 	}
 
+    static public boolean isBlobAnImage(Blob input) {
+    	boolean result = false;
+
+		FileImporter importer = getFileManagerService().getPluginByName("Imageplugin");
+
+        String normalizedMimeType = getMimeService().getMimetypeEntryByMimeType(input.getMimeType()).getNormalized();
+        if (importer.isEnabled()
+                && (importer.matches(normalizedMimeType) || importer.matches(input.getMimeType()))) {
+        	result = true;
+        }
+
+        return result;
+    }
+
 	/*
 	 * [dublincore, uid, picture, iptc, common, image_metadata]
 	 */
-	static private Map<String, Object> getMetadata(Blob nuxeoBlob)
+	static private Map<String, Object> getMetadata(Blob nuxeoBlob) 
 			throws Exception {
+		
+		BinaryMetadataService binaryMetadataService = Framework.getService(BinaryMetadataService.class); 
+		Map<String, Object> blobProperties = binaryMetadataService.readMetadata(nuxeoBlob, false);
+		
 		ImagingService service = Framework.getService(ImagingService.class);
-		Map<String, Object> metadataMap = service.getImageMetadata(nuxeoBlob);
+		Map<String, Object> metadataMap = service.getImageMetadata(nuxeoBlob); // use org.nuxeo.binary.metadata.api.BinaryMetadataService#readMetadata(org.nuxeo.ecm.core.api.Blob)
 		return metadataMap;
-	}
-
-	private static String[] imageTypes = {"jpeg", "bmp", "gif", "png", "tiff", "octet-stream"};
-	static private boolean isImageMedia(Blob nuxeoBlob) {
-		boolean result = false;
-		
-		String mimeType = nuxeoBlob.getMimeType();
-		if (mimeType != null) {
-			mimeType = mimeType.toLowerCase().trim();
-			String[] parts = mimeType.split("/"); // split strings like "application/xml" into an array of two strings
-			if (parts.length == 2) {
-				for (String type : imageTypes) {
-					if (parts[1].equalsIgnoreCase(type)) {
-						result = true;
-						break;
-					}
-				}
-			}
-		}
-		
-		return result;
 	}
 	
 	static private MeasuredPartGroupList getDimensions(
 			DocumentModel documentModel, Blob nuxeoBlob) {
 		MeasuredPartGroupList result = null;
 		
-		if (isImageMedia(nuxeoBlob) == true) try {
+		if (isBlobAnImage(nuxeoBlob) == true) try {
 			ImagingService service = Framework.getService(ImagingService.class);
 			ImageInfo imageInfo = service.getImageInfo(nuxeoBlob);
 			Map<String, Object> metadataMap = getMetadata(nuxeoBlob);
