@@ -28,7 +28,7 @@ public class EmailUtil {
 
 	public static void main(String [] args) {
 		String username = "collectionspace.lyrasis@gmail.com";
-	    String password = "CSpace11-GG";
+	    String password = "bogus_password";
 	    String recipient = "remillet@gmail.com";
 
 	    Properties props = new Properties();
