@@ -60,6 +60,7 @@ public class ReportPostInitHandler extends InitHandler implements IInitHandler {
     public void onRepositoryInitialized(String dataSourceName,
     		String repositoryName,
     		String cspaceInstanceId,
+    		String tenantShortName,
     		ServiceBindingType sbt, 
     		List<Field> fields, 
     		List<Property> propertyList) throws Exception {
