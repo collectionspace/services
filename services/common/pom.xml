@@ -232,6 +232,11 @@
 		</dependency>
 		<!-- nuxeo -->
 		<dependency>
+			<groupId>org.nuxeo.binary.metadata</groupId>
+			<artifactId>nuxeo-binary-metadata</artifactId>
+			<version>${nuxeo.platform.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.nuxeo.lib.runtime</groupId>
 			<artifactId>nuxeo-runtime-launcher</artifactId>
 			<version>${nuxeo.platform.version}</version>
