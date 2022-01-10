@@ -163,6 +163,7 @@ public class ServiceMain {
                     	//celebrate success
                         initFailed = false;
                     } catch (Exception e) {
+                    	newInstance.release(); // attempt to release resources acquired during initialization attempt
                         instance = null;
                         if (e instanceof RuntimeException) {
                             throw (RuntimeException) e;
