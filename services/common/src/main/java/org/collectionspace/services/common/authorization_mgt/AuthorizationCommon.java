@@ -1304,7 +1304,7 @@ public class AuthorizationCommon {
 			}
 
 			if (result.contains("{{link}}") == false) {
-				logger.warn("The tenant's password reset message does not contain a required '{{link}}' marker.");
+				logger.error("The tenant's password reset message does not contain a required '{{link}}' marker.");
 				result = null;
 			}
 
