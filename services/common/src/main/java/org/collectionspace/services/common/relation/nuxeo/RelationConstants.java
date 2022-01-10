@@ -54,6 +54,6 @@ public class RelationConstants {
     public final static String TYPE_SCHEMA_NAME = COMMON_SCHEMA_NAME;
     public final static String TYPE_FIELD_NAME = IRelationsManager.RELATIONSHIP_TYPE;
     
-    public final static String AFFECTS_TYPE = RelationshipType.AFFECTS.toString();
-    public final static String BROADER_TYPE = RelationshipType.HAS_BROADER.toString();
+    public final static String AFFECTS_TYPE = RelationshipType.AFFECTS.toString().toLowerCase();
+    public final static String BROADER_TYPE = RelationshipType.HAS_BROADER.toString().toLowerCase();
 }
