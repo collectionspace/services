@@ -228,6 +228,11 @@
 		</dependency>
 		<!-- nuxeo -->
 		<dependency>
+			<groupId>org.nuxeo.binary.metadata</groupId>
+			<artifactId>nuxeo-binary-metadata</artifactId>
+			<version>${nuxeo.platform.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.nuxeo.lib.runtime</groupId>
 			<artifactId>nuxeo-runtime-launcher</artifactId>
 			<version>${nuxeo.platform.version}</version>
@@ -240,6 +245,12 @@
 		<dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-platform-types-core</artifactId>
+			<version>${nuxeo.platform.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.nuxeo.elasticsearch</groupId>
+			<artifactId>nuxeo-elasticsearch-audit</artifactId>
+			<scope>provided</scope>
 			<version>${nuxeo.platform.version}</version>
 		</dependency>
 		<dependency>
@@ -337,10 +348,6 @@
 			<version>1.2</version>
 		</dependency>
 		<dependency>
-			<groupId>ch.elca.el4j.modules</groupId>
-			<artifactId>module-xml_merge-common</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 		</dependency>
@@ -366,7 +373,6 @@
 				<artifactId>mybatis</artifactId>
 				<version>3.5.4</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymock</artifactId>
@@ -379,6 +385,14 @@
 			<version>2.2.1</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>ch.elca.el4j.modules</groupId>
+			<artifactId>module-xml_merge-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.nuxeo.ecm.platform</groupId>
+			<artifactId>nuxeo-platform-audit-core</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -388,6 +402,10 @@
 			<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>
