@@ -116,6 +116,8 @@ public class ServiceMain {
 		private static final String DROP_USER_IF_EXISTS_SQL_CMD = DROP_USER_SQL_CMD + " IF EXISTS %s;";
 		private static final String DROP_OBJECTS_SQL_COMMENT = "-- drop all the objects before dropping roles";
 		private static final String CSPACE_JEESERVER_HOME = "CSPACE_JEESERVER_HOME";
+    private static final String CSPACE_UTILS_SCHEMANAME = "utils";
+    private static final String RUNSQLSCRIPTS_SERVICE_NAME = "runsqlscripts";
 
     private ServiceMain() {
     	// Intentionally blank
@@ -163,6 +165,7 @@ public class ServiceMain {
                     	//celebrate success
                         initFailed = false;
                     } catch (Exception e) {
+                        newInstance.release(); // attempt to release resources acquired during initialization attempt
                         instance = null;
                         if (e instanceof RuntimeException) {
                             throw (RuntimeException) e;
@@ -733,7 +736,7 @@ public class ServiceMain {
 																// 1
 						fields.add(field);
 					}
-					addindices.onRepositoryInitialized(JDBCTools.NUXEO_DATASOURCE_NAME, repositoryName, cspaceInstanceId,
+					addindices.onRepositoryInitialized(JDBCTools.NUXEO_DATASOURCE_NAME, repositoryName, cspaceInstanceId, tbt.getShortName(),
 							null, fields, null);
 				}
 			} else {
@@ -744,10 +747,73 @@ public class ServiceMain {
         }
 	}
 
+    /**
+     * Search through the service bindings for the RUNSQLSCRIPTS_SERVICE_NAME service. Each tenant can add a set of SQL
+     * that will be run before the other Services' initHandlers.
+     *
+     * @param tenantBindingTypeMap
+     * @throws Exception
+     */
+    private void firePostInitRunSQLScripts(Hashtable<String, TenantBindingType> tenantBindingTypeMap) throws Exception {
+        String cspaceInstanceId = getCspaceInstanceId();
+        for (TenantBindingType tbt : tenantBindingTypeMap.values()) {
+            // Loop through all the services in this tenant
+            List<ServiceBindingType> sbtList = tbt.getServiceBindings();
+            for (ServiceBindingType sbt: sbtList) {
+                if (sbt.getName().equalsIgnoreCase(RUNSQLSCRIPTS_SERVICE_NAME)) {
+                    runInitHandler(cspaceInstanceId, tbt, sbt);
+                    return;
+                }
+            }
+        }
+    }
+
+    private void runInitHandler(String cspaceInstanceId, TenantBindingType tbt, ServiceBindingType sbt) throws Exception {
+        String repositoryName = null;
+        if (!sbt.getType().equalsIgnoreCase(ServiceBindingUtils.SERVICE_TYPE_SECURITY)) {
+            // Each service can have a different repo domain
+            repositoryName = ConfigUtils.getRepositoryName(tbt, sbt.getRepositoryDomain());
+        }
+
+        // Get the list of InitHandler elements, extract the first one (only one supported right now) and fire it using reflection.
+        List<org.collectionspace.services.config.service.InitHandler> list = sbt.getInitHandler();
+        if (list != null && !list.isEmpty()) {
+            // REM - 12/2012: We might want to think about supporting multiple post-init handlers
+            org.collectionspace.services.config.service.InitHandler handlerType = list.get(0);
+            String initHandlerClassname = handlerType.getClassname();
+            if (Tools.isEmpty(initHandlerClassname)) {
+                return;
+            }
+            logger.trace("Firing post-init handler {}...", initHandlerClassname);
+
+            List<org.collectionspace.services.config.service.InitHandler.Params.Field>
+                fields = handlerType.getParams().getField();
+
+            List<org.collectionspace.services.config.service.InitHandler.Params.Property>
+                props = handlerType.getParams().getProperty();
+
+            Object o = instantiate(initHandlerClassname, IInitHandler.class);
+            if (o instanceof IInitHandler){
+                // The InitHandler may be the default one,
+                // or specialized classes which still implement this interface and are registered in tenant-bindings.xm.
+                IInitHandler handler = (IInitHandler)o;
+                handler.onRepositoryInitialized(JDBCTools.NUXEO_DATASOURCE_NAME, repositoryName, cspaceInstanceId, tbt.getShortName(),
+                                                sbt, fields, props);
+            }
+        }
+    }
+
     public void firePostInitHandlers() throws Exception {
         Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
+
         //
-        //Loop through all tenants in tenant-bindings.xml
+        // We first need to run the init handler for the 'runsqlscripts' service to allow a tenant to perform
+        // any required tenant specific SQL setup.
+        //
+        firePostInitRunSQLScripts(tenantBindingTypeMap);
+
+        //
+        // Loop through all tenants in tenant-bindings.xml and run each service's initHandler
         //
         String cspaceInstanceId = getCspaceInstanceId();
         for (TenantBindingType tbt : tenantBindingTypeMap.values()) {
@@ -756,39 +822,10 @@ public class ServiceMain {
         	//
             List<ServiceBindingType> sbtList = tbt.getServiceBindings();
             for (ServiceBindingType sbt: sbtList) {
-            	String repositoryName = null;
-            	if (sbt.getType().equalsIgnoreCase(ServiceBindingUtils.SERVICE_TYPE_SECURITY) == false) {
-            		repositoryName = ConfigUtils.getRepositoryName(tbt, sbt.getRepositoryDomain()); // Each service can have a different repo domain
+                // skip the RUNSQLSCRIPTS_SERVICE_NAME since we ran it already
+            	if (!sbt.getName().equalsIgnoreCase(RUNSQLSCRIPTS_SERVICE_NAME)) {
+            		runInitHandler(cspaceInstanceId, tbt, sbt);
             	}
-                //Get the list of InitHandler elements, extract the first one (only one supported right now) and fire it using reflection.
-                List<org.collectionspace.services.config.service.InitHandler> list = sbt.getInitHandler();
-                if (list != null && list.size() > 0) {
-                	org.collectionspace.services.config.service.InitHandler handlerType = list.get(0);  // REM - 12/2012: We might want to think about supporting multiple post-init handlers
-                    String initHandlerClassname = handlerType.getClassname();
-                    if (Tools.isEmpty(initHandlerClassname)) {
-                        continue;
-                    }
-                    if (ServiceMain.logger.isTraceEnabled()) {
-                    	ServiceMain.logger.trace(String.format("Firing post-init handler %s ...", initHandlerClassname));
-                    }
-
-                    List<org.collectionspace.services.config.service.InitHandler.Params.Field>
-                            fields = handlerType.getParams().getField();
-
-                    List<org.collectionspace.services.config.service.InitHandler.Params.Property>
-                            props = handlerType.getParams().getProperty();
-
-                    //org.collectionspace.services.common.service.InitHandler.Fields ft = handlerType.getFields();
-                    //List<String> fields = ft.getField();
-                    Object o = instantiate(initHandlerClassname, IInitHandler.class);
-                    if (o != null && o instanceof IInitHandler){
-                        IInitHandler handler = (IInitHandler)o;
-                        handler.onRepositoryInitialized(JDBCTools.NUXEO_DATASOURCE_NAME, repositoryName, cspaceInstanceId,
-                        		sbt, fields, props);
-                        //The InitHandler may be the default one,
-                        //  or specialized classes which still implement this interface and are registered in tenant-bindings.xml.
-                    }
-                }
             }
         }
     }
@@ -974,7 +1011,8 @@ public class ServiceMain {
 							JDBCTools.createNewDatabaseUser(JDBCTools.CSADMIN_DATASOURCE_NAME, repositoryName, cspaceInstanceId, dbType, readerUser, readerPW);
 						}
 						// Create the database
-						createDatabaseWithRights(dbType, dbName, nuxeoUser, nuxeoPW, readerUser, readerPW);
+						createDatabaseWithRights(dbType, dbName, nuxeoUser, nuxeoPW, readerUser);
+						createUtilsSchemaWithRights(dbType, nuxeoUser, repositoryName, cspaceInstanceId);
 						initRepositoryDatabaseVersion(JDBCTools.NUXEO_DATASOURCE_NAME, repositoryName, cspaceInstanceId);
 					}
 					nuxeoDBsChecked.add(dbName);
@@ -1001,52 +1039,35 @@ public class ServiceMain {
 	 * @throws Exception
 	 */
 	private void createDatabaseWithRights(DatabaseProductType dbType, String dbName, String ownerName,
-			String ownerPW, String readerName, String readerPW) throws Exception {
+			String ownerPW, String readerName) throws Exception {
 		Connection conn = null;
 		Statement stmt = null;
+
+		String sql = null;
 		try {
 			DataSource csadminDataSource = JDBCTools.getDataSource(JDBCTools.CSADMIN_DATASOURCE_NAME);
 			conn = csadminDataSource.getConnection();
 			stmt = conn.createStatement();
 			if (dbType == DatabaseProductType.POSTGRESQL) {
 				// PostgreSQL does not need passwords in grant statements.
-				String sql = "CREATE DATABASE " + dbName + " ENCODING 'UTF8' OWNER " + ownerName;
+				sql = "CREATE DATABASE " + dbName + " ENCODING 'UTF8' OWNER " + ownerName;
 				stmt.executeUpdate(sql);
-				if (logger.isDebugEnabled()) {
-					logger.debug("Created db: '" + dbName + "' with owner: '" + ownerName + "'");
-				}
+				logger.debug("Created db: '{}' with owner: '{}'", dbName, ownerName);
 				if (readerName != null) {
 					sql = "GRANT CONNECT ON DATABASE " + dbName + " TO " + readerName;
 					stmt.executeUpdate(sql);
-					if (logger.isDebugEnabled()) {
-						logger.debug(" Granted connect rights on: '" + dbName + "' to reader: '" + readerName + "'");
-					}
+                    logger.debug("Granted connect rights on: '{}' to reader: '{}'", dbName, readerName);
 				}
 				// Note that select rights for reader must be granted after
 				// Nuxeo startup.
-			} else if (dbType == DatabaseProductType.MYSQL) {
-				String sql = "CREATE database " + dbName + " DEFAULT CHARACTER SET utf8";
-				stmt.executeUpdate(sql);
-				sql = "GRANT ALL PRIVILEGES ON " + dbName + ".* TO '" + ownerName + "'@'localhost' IDENTIFIED BY '"
-						+ ownerPW + "' WITH GRANT OPTION";
-				stmt.executeUpdate(sql);
-				if (logger.isDebugEnabled()) {
-					logger.debug("Created db: '" + dbName + "' with owner: '" + ownerName + "'");
-				}
-				if (readerName != null) {
-					sql = "GRANT SELECT ON " + dbName + ".* TO '" + readerName + "'@'localhost' IDENTIFIED BY '"
-							+ readerPW + "' WITH GRANT OPTION";
-					stmt.executeUpdate(sql);
-					if (logger.isDebugEnabled()) {
-						logger.debug(" Granted SELECT rights on: '" + dbName + "' to reader: '" + readerName + "'");
-					}
-				}
 			} else {
-				throw new UnsupportedOperationException("createDatabaseWithRights only supports PSQL - MySQL NYI!");
+				throw new UnsupportedOperationException(String.format("DB Type %s not supported", dbType));
 			}
 		} catch (Exception e) {
-			logger.error("createDatabaseWithRights failed on exception: " + e.getLocalizedMessage());
-			throw e; // propagate
+			logger.error("createDatabaseWithRights failed on exception:", e);
+            logger.error("The following SQL statement failed using credentials from datasource '{}': {}",
+                         JDBCTools.CSADMIN_DATASOURCE_NAME, sql);
+			throw e;
 		} finally { // close resources
 			try {
 				if (stmt != null) {
@@ -1056,10 +1077,48 @@ public class ServiceMain {
 					conn.close();
 				}
 			} catch (SQLException se) {
-				se.printStackTrace();
+                logger.error("Error closing connection", se);
 			}
 		}
 	}
+
+    /*
+     * For a specific repo/db, create a schema for misc SQL functions
+     */
+    private void createUtilsSchemaWithRights(DatabaseProductType dbType, String ownerName,
+                                             String repositoryName, String cspaceInstanceId) throws Exception {
+        Connection conn = null;
+        Statement stmt = null;
+
+        String sql = null;
+        try {
+            conn = JDBCTools.getConnection(JDBCTools.NUXEO_DATASOURCE_NAME, repositoryName, cspaceInstanceId);
+            stmt = conn.createStatement();
+            if (dbType == DatabaseProductType.POSTGRESQL) {
+                sql = "CREATE SCHEMA IF NOT EXISTS " + CSPACE_UTILS_SCHEMANAME + " AUTHORIZATION " + ownerName;
+                stmt.executeUpdate(sql);
+                logger.debug("Created SCHEMA: '{}' with owner: '{}'", CSPACE_UTILS_SCHEMANAME, ownerName);
+            } else {
+                throw new UnsupportedOperationException("CollectionSpace supports only PostgreSQL database servers.");
+            }
+        } catch (Exception e) {
+            logger.error("createUtilsSchemaWithRights() failed with exception:", e);
+            logger.error("The following SQL statement failed using credentials from datasource '{}': {}",
+                         JDBCTools.NUXEO_DATASOURCE_NAME, sql);
+            throw e; // propagate
+        } finally { // close resources
+            try {
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }
+        }
+    }
 
 	private void initRepositoryDatabaseVersion(String dataSourceName, String repositoryName, String cspaceInstanceId) throws Exception {
 		String version = getClass().getPackage().getImplementationVersion();
