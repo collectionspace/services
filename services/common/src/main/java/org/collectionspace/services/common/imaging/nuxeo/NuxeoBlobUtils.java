@@ -59,6 +59,7 @@ import org.nuxeo.ecm.core.api.blobholder.BlobHolder;
 import org.nuxeo.ecm.core.api.blobholder.DocumentBlobHolder;
 import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
 import org.nuxeo.ecm.core.api.model.Property;
+import org.nuxeo.binary.metadata.api.BinaryMetadataService;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -359,111 +360,101 @@ public class NuxeoBlobUtils {
 		} else {
 			handleGenericBlobs(docBlobHolder, commonList, uri);
 		}
-		
+
 		return commonList;
 	}
 
-	/*
-	 * [dublincore, uid, picture, iptc, common, image_metadata]
-	 */
-	static private Map<String, Object> getMetadata(Blob nuxeoBlob)
-			throws Exception {
-		ImagingService service = Framework.getService(ImagingService.class);
-		Map<String, Object> metadataMap = service.getImageMetadata(nuxeoBlob);
-		return metadataMap;
-	}
+    public static boolean isBlobAnImage(Blob input) {
+        boolean result = false;
 
-	private static String[] imageTypes = {"jpeg", "bmp", "gif", "png", "tiff", "octet-stream"};
-	static private boolean isImageMedia(Blob nuxeoBlob) {
-		boolean result = false;
-		
-		String mimeType = nuxeoBlob.getMimeType();
-		if (mimeType != null) {
-			mimeType = mimeType.toLowerCase().trim();
-			String[] parts = mimeType.split("/"); // split strings like "application/xml" into an array of two strings
-			if (parts.length == 2) {
-				for (String type : imageTypes) {
-					if (parts[1].equalsIgnoreCase(type)) {
-						result = true;
-						break;
-					}
-				}
-			}
-		}
-		
-		return result;
-	}
-	
+        FileImporter importer = getFileManagerService().getPluginByName("Imageplugin");
+
+        String normalizedMimeType = getMimeService().getMimetypeEntryByMimeType(input.getMimeType()).getNormalized();
+        if (importer.isEnabled() && (importer.matches(normalizedMimeType) || importer.matches(input.getMimeType()))) {
+            result = true;
+        }
+
+        return result;
+    }
+
+    /*
+     * [dublincore, uid, picture, iptc, common, image_metadata]
+     */
+    static private Map<String, Object> getMetadata(Blob nuxeoBlob) throws Exception {
+        BinaryMetadataService binaryMetadataService = Framework.getService(BinaryMetadataService.class);
+        Map<String, Object> blobProperties = binaryMetadataService.readMetadata(nuxeoBlob, false);
+
+        ImagingService service = Framework.getService(ImagingService.class);
+        Map<String, Object> metadataMap = service.getImageMetadata(nuxeoBlob); // use org.nuxeo.binary.metadata.api.BinaryMetadataService#readMetadata(org.nuxeo.ecm.core.api.Blob)
+        return metadataMap;
+    }
+
 	static private MeasuredPartGroupList getDimensions(
 			DocumentModel documentModel, Blob nuxeoBlob) {
 		MeasuredPartGroupList result = null;
-		
-		if (isImageMedia(nuxeoBlob) == true) try {
-			ImagingService service = Framework.getService(ImagingService.class);
-			ImageInfo imageInfo = service.getImageInfo(nuxeoBlob);
-			Map<String, Object> metadataMap = getMetadata(nuxeoBlob);
 
-			if (imageInfo != null) {
-				//
-				// Create a timestamp to add to all the image's dimensions
-				//
-				String valueDate = GregorianCalendarDateTimeUtils
-						.timestampUTC();
-				
-				result = new MeasuredPartGroupList();
-				List<MeasuredPartGroup> measuredPartGroupList = 
+		if (isBlobAnImage(nuxeoBlob)) {
+			try {
+				ImagingService service = Framework.getService(ImagingService.class);
+				ImageInfo imageInfo = service.getImageInfo(nuxeoBlob);
+				Map<String, Object> metadataMap = getMetadata(nuxeoBlob);
+
+				if (imageInfo != null) {
+					//
+					// Create a timestamp to add to all the image's dimensions
+					//
+					String valueDate = GregorianCalendarDateTimeUtils.timestampUTC();
+
+					result = new MeasuredPartGroupList();
+					List<MeasuredPartGroup> measuredPartGroupList =
 						(result).getMeasuredPartGroup();
-				//
-				// Create a new measured part for the "image"
-				//
-				MeasuredPartGroup mpGroup = new MeasuredPartGroup();
-				mpGroup.setMeasuredPart(PART_IMAGE);
-				mpGroup.setDimensionSummary(PART_SUMMARY);
-				mpGroup.setDimensionSubGroupList(new DimensionSubGroupList());
-				List<DimensionSubGroup> dimensionSubGroupList = mpGroup.getDimensionSubGroupList()
-						.getDimensionSubGroup();
+					//
+					// Create a new measured part for the "image"
+					//
+					MeasuredPartGroup mpGroup = new MeasuredPartGroup();
+					mpGroup.setMeasuredPart(PART_IMAGE);
+					mpGroup.setDimensionSummary(PART_SUMMARY);
+					mpGroup.setDimensionSubGroupList(new DimensionSubGroupList());
+					List<DimensionSubGroup> dimensionSubGroupList = mpGroup.getDimensionSubGroupList()
+																		   .getDimensionSubGroup();
 
-				//
-				// Set the width
-				//
-				DimensionSubGroup widthDimension = new DimensionSubGroup();
-				widthDimension.setDimension(WIDTH);
-				widthDimension.setMeasurementUnit(UNIT_PIXELS);
-				widthDimension.setValue(intToBigDecimal(imageInfo.getWidth()));
-				widthDimension.setValueDate(valueDate);
-				dimensionSubGroupList.add(widthDimension);
-				//
-				// Set the height
-				//
-				DimensionSubGroup heightDimension = new DimensionSubGroup();
-				heightDimension.setDimension(HEIGHT);
-				heightDimension.setMeasurementUnit(UNIT_PIXELS);
-				heightDimension
-						.setValue(intToBigDecimal(imageInfo.getHeight()));
-				heightDimension.setValueDate(valueDate);
-				dimensionSubGroupList.add(heightDimension);
-				//
-				// Set the depth
-				//
-				DimensionSubGroup depthDimension = new DimensionSubGroup();
-				depthDimension.setDimension(DEPTH);
-				depthDimension.setMeasurementUnit(UNIT_BITS);
-				depthDimension.setValue(intToBigDecimal(imageInfo.getDepth()));
-				depthDimension.setValueDate(valueDate);
-				dimensionSubGroupList.add(depthDimension);
-				//
-				// Now set out result
-				//
-				measuredPartGroupList.add(mpGroup);
-			} else {
-				if (logger.isWarnEnabled() == true) {
-					logger.warn("Could not synthesize a dimension list of the blob: "
-							+ documentModel.getName());
+					//
+					// Set the width
+					//
+					DimensionSubGroup widthDimension = new DimensionSubGroup();
+					widthDimension.setDimension(WIDTH);
+					widthDimension.setMeasurementUnit(UNIT_PIXELS);
+					widthDimension.setValue(intToBigDecimal(imageInfo.getWidth()));
+					widthDimension.setValueDate(valueDate);
+					dimensionSubGroupList.add(widthDimension);
+					//
+					// Set the height
+					//
+					DimensionSubGroup heightDimension = new DimensionSubGroup();
+					heightDimension.setDimension(HEIGHT);
+					heightDimension.setMeasurementUnit(UNIT_PIXELS);
+					heightDimension.setValue(intToBigDecimal(imageInfo.getHeight()));
+					heightDimension.setValueDate(valueDate);
+					dimensionSubGroupList.add(heightDimension);
+					//
+					// Set the depth
+					//
+					DimensionSubGroup depthDimension = new DimensionSubGroup();
+					depthDimension.setDimension(DEPTH);
+					depthDimension.setMeasurementUnit(UNIT_BITS);
+					depthDimension.setValue(intToBigDecimal(imageInfo.getDepth()));
+					depthDimension.setValueDate(valueDate);
+					dimensionSubGroupList.add(depthDimension);
+					//
+					// Now set out result
+					//
+					measuredPartGroupList.add(mpGroup);
+				} else {
+					logger.warn("Could not synthesize a dimension list of the blob: {}", documentModel.getName());
 				}
+			} catch (Exception e) {
+				logger.warn("Could not extract image information for blob: {}", documentModel.getName(), e);
 			}
-		} catch (Exception e) {
-			logger.warn("Could not extract image information for blob: "
-					+ documentModel.getName(), e);
 		}
 
 		return result;
