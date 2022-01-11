@@ -63,7 +63,7 @@ date:                  numDate
 |                      dayFirstDate
 |                      dayOrYearFirstDate
 |                      invStrDateEraLastDate
-|                      romanDate
+|                      romanStringDate
 ;
 
 month:                 monthYear
@@ -97,8 +97,7 @@ century:               ( strCentury | numCentury ) era? ;
 
 millennium:            nth MILLENNIUM era? ;
 
-partialEraRange:      num strMonth num era (DASH|HYPHEN) num strMonth num ;
-romanDate:             num (HYPHEN | SLASH) romanMonth (HYPHEN | SLASH) numYear era? ;
+partialEraRange:       num strMonth num era (DASH|HYPHEN) num strMonth num ;
 strDate:               strMonth ( numDayOfMonth | nth ) COMMA? numYear era?;
 invStrDate:            era num COMMA? strMonth num
 |                      era? num COMMA strMonth num ;
@@ -136,7 +135,9 @@ numMonth:              NUMBER ;
 numDayOfMonth:         NUMBER ;
 num:                   NUMBER ;
 unknownDate:           UNKNOWN ;
-romanMonth:            ROMANMONTH ; 
+romanMonth:            ROMANMONTH ;
+romanStringDate:  num ( DOT | DASH | HYPHEN ) ( MONTH | SHORTMONTH | ROMANMONTH ) ( DOT | DASH | HYPHEN ) num era?
+|                 ( MONTH | SHORTMONTH | ROMANMONTH ) ( DOT | DASH | HYPHEN ) num ( DOT | DASH | HYPHEN ) num era? ;
 
 /*
  * Lexer rules

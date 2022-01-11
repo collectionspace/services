@@ -1296,7 +1296,35 @@
   ' ([1997 }]] )':                       # enclosing mixed brackets
                                          earliestSingleDate: [1997,  1,  1, CE]
                                          latestDate:         [1997, 12, 31, CE]
+  '2021.sep.03':
+                                         earliestSingleDate: [2021,  9, 3, CE]
+                                         
+  '2021-oct-4':
+                                         earliestSingleDate: [2021,  10, 4, CE]
+                                         
+  '2021-november-5':
+                                         earliestSingleDate: [2021,  11, 5, CE]
+                                         
+  '2021.december.6':
+                                         earliestSingleDate: [2021,  12, 6, CE]
 
+  '1908-IX-01':
+                                         earliestSingleDate: [1908,  9, 1, CE]
+
+  'IX-01-1908':
+                                         earliestSingleDate: [1908,  9, 1, CE]
+
+  '01-IX-1908':
+                                         earliestSingleDate: [1908,  9, 1, CE]
+
+  '1908.IX.01':
+                                         earliestSingleDate: [1908,  9, 1, CE]
+
+  'IX.01.1908':
+                                         earliestSingleDate: [1908,  9, 1, CE]
+
+  '01.IX.1908':
+                                         earliestSingleDate: [1908,  9, 1, CE]
 
 # -------------------------------------------------------------------------------------------------------
 # Invalid dates
