@@ -117,9 +117,9 @@
 
     <target name="deploy_report_files"
         description="Deploy report files">
-        <copy todir="${jee.server.cspace}/cspace/reports" overwrite="true">
+        <copy todir="${jee.server.cspace}/cspace/reports" overwrite="true" flatten="true">
             <fileset dir="${basedir}/jasper-cs-report/src/main/resources"
-                includes="*.jrxml"/>
+                includes="**/*.jrxml"/>
         </copy>
     </target>
     
@@ -135,11 +135,10 @@
       description="Undeploy source (.jrxml) report files">
       <delete failonerror="false">
         <fileset dir="${jee.server.cspace}/cspace/reports" includes="*.jrxml">
-			<present targetdir="${basedir}/jasper-cs-report/src/main/resources" />
 		</fileset>
       </delete>
     </target>
-    
+ 
     <target name="undeploy_compiled_report_files"
       description="Undeploy compiled (.jasper) report files">
       <delete failonerror="false">
