@@ -28,6 +28,7 @@
 	<property name="cspace.ui.filename" value="${cspace.ui.library.name}@${cspace.ui.version}.min.js" />
 
 	<target name="deploy_cspace_ui_js">
+		<echo>curl -o ${cspace.ui.filename} --fail --insecure --remote-name --location https://unpkg.com/cspace-ui@${cspace.ui.version}/dist/${cspace.ui.library.name}.min.js</echo>
 		<exec executable="curl" failonerror="true">
 			<arg line="-o ${cspace.ui.filename} --fail --insecure --remote-name --location https://unpkg.com/cspace-ui@${cspace.ui.version}/dist/${cspace.ui.library.name}.min.js"/>
 		</exec>
@@ -59,6 +60,7 @@
 
 		<!-- Get the configured tenant ID from tenant bindings. This will be in the property tenant:tenantBinding.id. -->
 		<xmlproperty keepRoot="false" collapseAttributes="true" file="../../services/common/src/main/cspace/config/services/tenants/${tenant.shortname}/${tenant.shortname}-tenant-bindings.delta.xml" />
+		<echo>Binding file here: ../../services/common/src/main/cspace/config/services/tenants/${tenant.shortname}/${tenant.shortname}-tenant-bindings.delta.xml</echo>
 
 		<!-- A tenant ID must either exist tenant bindings, or be specified in the tenant.id property. -->
 		<fail message="Tenant ID not found for ${tenant.shortname}. Configure the tenantBinding id in ${tenant.shortname}-tenant-bindings.delta.xml, or set the tenant.id property in ${basedir}/build.properties.">

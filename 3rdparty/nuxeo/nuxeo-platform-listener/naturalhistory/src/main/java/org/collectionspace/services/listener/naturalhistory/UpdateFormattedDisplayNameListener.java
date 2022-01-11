@@ -13,7 +13,7 @@ import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.TaxonFormatter;
 import org.collectionspace.services.nuxeo.listener.AbstractCSEventSyncListenerImpl;
-import org.collectionspace.services.taxonomy.nuxeo.TaxonBotGardenConstants;
+import org.collectionspace.services.taxonomy.nuxeo.TaxonNaturalHistoryConstants;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonConstants;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonomyAuthorityConstants;
 
