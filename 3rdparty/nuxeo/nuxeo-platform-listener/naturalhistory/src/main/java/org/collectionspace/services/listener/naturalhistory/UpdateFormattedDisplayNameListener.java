@@ -74,7 +74,7 @@ public class UpdateFormattedDisplayNameListener extends AbstractCSEventSyncListe
 
 		logger.debug("parentShortId=" + parentShortId);
 
-		if (!parentShortId.equals(TaxonBotGardenConstants.COMMON_VOCABULARY_SHORTID)) {
+		if (!parentShortId.equals(TaxonNaturalHistoryConstants.COMMON_VOCABULARY_SHORTID)) {
 			if (event.getName().equals(DocumentEventTypes.DOCUMENT_CREATED)) {
 				// Save the document, to get the BEFORE_DOC_UPDATE branch to run.
 				doc.getCoreSession().saveDocument(doc);
