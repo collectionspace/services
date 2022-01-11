@@ -13,7 +13,6 @@
     <name>services.3rdparty.nuxeo.listener.tenants</name>
 
     <modules>
-        <module>bampfa</module>
         <module>botgarden</module>
     </modules>
 
