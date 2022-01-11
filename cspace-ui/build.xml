@@ -85,6 +85,7 @@
 	</target>
 
 	<target name="deploy_tenant_js" if="tenant.ui.profile.plugin.package.name" unless="${tenant.create.disabled}">
+		<echo>line="-o ${tenant.ui.profile.plugin.filename} --fail --insecure --remote-name --location https://unpkg.com/${tenant.ui.profile.plugin.package.name}@${tenant.ui.profile.plugin.version}/dist/${tenant.ui.profile.plugin.library.name}.min.js"</echo>
 		<exec executable="curl" failonerror="true">
 			<arg line="-o ${tenant.ui.profile.plugin.filename} --fail --insecure --remote-name --location https://unpkg.com/${tenant.ui.profile.plugin.package.name}@${tenant.ui.profile.plugin.version}/dist/${tenant.ui.profile.plugin.library.name}.min.js"/>
 		</exec>
