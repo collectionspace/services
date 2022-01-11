@@ -64,6 +64,8 @@
 		</xs:sequence>
 		<!-- tenant id, a UUID -->
 		<xs:attribute name="id" type="xs:ID" use="required"/>
+		<!-- tenant shortName -->
+		<xs:attribute name="shortName" type="xs:string" use="required"/>
 		<!-- domain name including subdomain but not TLD -->
 		<!-- e.g. hearstmuseum.berkeley or movingimage.us -->
 		<xs:attribute name="name" type="xs:string" use="required"/>
@@ -72,6 +74,7 @@
 		<xs:attribute name="version" type="types:VersionType" use="required"/>
 		<xs:attribute name="createDisabled" type="xs:boolean" use="optional" default="false"/>
 		<xs:attribute name="forceUpdate" type="xs:boolean" use="optional" default="false"/>
+		<xs:attribute name="auditRequired" type="xs:boolean" use="optional" default="false"/>
 	</xs:complexType>
 
 	<xs:complexType name="RepositoryDomainType">

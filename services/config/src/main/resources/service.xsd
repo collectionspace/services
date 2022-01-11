@@ -80,6 +80,7 @@
         <xs:attribute name="supportsReplicating" type="xs:boolean" default="false"/>
         <xs:attribute name="remoteClientConfigName" type="xs:string"/>
         <xs:attribute name="requiresUniqueShortId" type="xs:boolean" default="false"/>
+        <xs:attribute name="globalActionGroup" type="xs:string" use="optional" />
     </xs:complexType>
 
     <!-- Used for defining a vocabulary or authority instance and its terms -->
