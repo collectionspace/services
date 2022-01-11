@@ -1,0 +1,1 @@
+Place SQL scripts in this directory for Service initHandlers to find them.  Placing SQL scripts in tenant "shortname" specific folders when appropriate.  SQL scripts at this top-level will be available to all tenants.
