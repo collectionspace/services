@@ -384,7 +384,7 @@
 				before we perform any build related tasks. -->
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.8</version>
+				<version>1.8</version> <!-- Most recent version is 3.0.0 -->
 				<executions>
 					<execution>
 						<id>check-environment-vars</id>
