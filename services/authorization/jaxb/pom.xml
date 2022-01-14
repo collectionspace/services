@@ -45,7 +45,11 @@
 			<groupId>org.collectionspace.services</groupId>
 			<artifactId>org.collectionspace.services.hyperjaxb</artifactId>
 			<version>${project.version}</version>
-        </dependency>        
+        </dependency>
+        <dependency>
+        	<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+		</dependency>   
 <!--     
         <dependency>
             <groupId>javax.persistence</groupId>
