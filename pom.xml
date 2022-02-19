@@ -64,7 +64,7 @@
 
 		<repository>
 			<id>nuxeo-public-releases</id>
-			<url>https://maven-eu.nuxeo.org/nexus/content/repositories/public-releases</url>
+			<url>http://maven-eu.nuxeo.org/nexus/content/repositories/public-releases</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -72,7 +72,7 @@
 
 		<repository>
 			<id>nuxeo-vendor-releases</id>
-			<url>https://maven-eu.nuxeo.org/nexus/content/repositories/vendor-releases</url>
+			<url>http://maven-eu.nuxeo.org/nexus/content/repositories/vendor-releases</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
