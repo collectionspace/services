@@ -1156,10 +1156,8 @@ public class NuxeoBlobUtils {
 						}
 						outMimeType.append(MIME_JPEG);
 					}
-//					BufferedInputStream bufferedInputStream = new BufferedInputStream(
-//							remoteStream); 	
-//					result.setBlobInputStream(bufferedInputStream);
 					result.setBlobInputStream(remoteStream);
+					result.setBlobFile(docBlob.getFile());
 				}
 			} catch (DocumentNotFoundException d) {
 				throw d;

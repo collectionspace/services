@@ -58,6 +58,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -159,6 +160,42 @@ public class BlobResource extends NuxeoBasedResource {
     	}
     	
     	return result;
+    }
+
+    private File getBlobContentFile(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+                                    String csid,
+                                    String derivativeTerm,
+                                    StringBuffer outMimeType) throws CSWebApplicationException {
+        File result = null;
+
+        try {
+            BlobInput blobInput = BlobUtil.getBlobInput(ctx);
+            blobInput.setDerivativeTerm(derivativeTerm);
+            blobInput.setContentRequested(true);
+
+            PoxPayloadOut response = this.get(csid, ctx);
+            logger.debug(response.toString());
+
+            // The result of a successful get should have put the results in the blobInput instance
+            String mimeType = blobInput.getMimeType();
+            if (mimeType != null) {
+                outMimeType.append(mimeType); // blobInput's mime type was set on call to "get" above by the doc handler
+            }
+            result = BlobUtil.getBlobInput(ctx).getBlobFile();
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
+        }
+
+        if (result == null) {
+            String errMsg = String.format("Index failed. Could not get the contents for the Blob with CSID = '%s'.",
+                                          csid);
+            Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                                        .entity(errMsg)
+                                        .type(MediaType.TEXT_PLAIN).build();
+            throw new CSWebApplicationException(response);
+        }
+
+        return result;
     }
     
     /*
@@ -287,9 +324,9 @@ public class BlobResource extends NuxeoBasedResource {
 	    	ctx = createServiceContext(jaxRsRequest, uriInfo);
 			BlobsCommon blobsCommon = getBlobsCommon(csid);
 	    	StringBuffer mimeType = new StringBuffer();
-	    	InputStream contentStream = getBlobContent(ctx, csid, null /*derivative term*/, mimeType /*will get set*/);
-		    
-	    	Response.ResponseBuilder responseBuilder = Response.ok(contentStream, mimeType.toString());
+			File contentFile = getBlobContentFile(ctx, csid, null /*derivative term*/, mimeType /*will get set*/);
+
+			Response.ResponseBuilder responseBuilder = Response.ok(contentFile, mimeType.toString());
 	    	setCacheControl(ctx, responseBuilder);
 	    	responseBuilder = responseBuilder.header("Content-Disposition","inline;filename=\""
 	    			+ blobsCommon.getName() +"\"");
@@ -300,7 +337,7 @@ public class BlobResource extends NuxeoBasedResource {
 
     	return result;
     }
-    
+
 	private BlobsCommon getBlobsCommon(String csid) throws Exception {
     	BlobsCommon result = null;
     	
