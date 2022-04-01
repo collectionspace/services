@@ -188,7 +188,7 @@ public class ServiceMain {
         return instance;
     }
     
-	private boolean isAuditServiceReady() {
+	static boolean isAuditServiceReady() {
 		boolean result = true;
 		
 		try {
