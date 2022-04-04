@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -406,6 +407,27 @@ public class TenantBindingConfigReaderImpl extends AbstractConfigReaderImpl<List
 		return allTenantBindings.get(tenantId);
 	}
 
+	/**
+	 * getTenantBinding gets tenant binding for given tenant's repository name
+	 * 
+	 * @param tenantId
+	 * @return
+	 */
+	public TenantBindingType getTenantBindingByRepositoryName(String repositoryName) {
+		TenantBindingType result = null;
+		
+		Hashtable<String, TenantBindingType> tenantBindings = this.getTenantBindings();
+		for (TenantBindingType tenantBinding : tenantBindings.values()) {
+			String name = tenantBinding.getRepositoryDomain().get(0).getRepositoryName();
+			if (name.equalsIgnoreCase(repositoryName) == true) {
+				result = tenantBinding;
+				break;
+			}
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * getRepositoryDomain gets repository domain configuration for the given
 	 * name

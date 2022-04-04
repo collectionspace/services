@@ -13,7 +13,25 @@
   <name>Nuxeo CollectionSpace core extension</name>
   <description> Nuxeo Enterprise Platform: CS extensions </description>
 
+  <!--
+    ImageMagick root path (must include trailing slash '/' character if specified.
+    Set using Maven -D flag:
+       mvn clean install -Dcspace.im.root='etc/'
+  -->
+  <properties>
+    <cspace.im.root></cspace.im.root>
+  </properties>
+
   <build>
+	<filters>
+		<filter>../../../build.properties</filter>
+	</filters>
+	<resources>
+    	<resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+    	</resource>
+	</resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

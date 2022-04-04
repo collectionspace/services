@@ -70,8 +70,11 @@ import java.util.UUID;
  */
 
 import org.collectionspace.authentication.AuthN;
-import org.collectionspace.services.client.AuditClientUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.services.nuxeo.listener.AbstractCSEventSyncListenerImpl;
 
 	public class CSpaceAuditLogger extends AbstractCSEventSyncListenerImpl {
@@ -91,20 +94,52 @@ import org.collectionspace.services.nuxeo.listener.AbstractCSEventSyncListenerIm
 
 	@Override
 	public void handleCSEvent(Event event) {
-		EventContext ectx = event.getContext(); 
-		if (!(ectx instanceof DocumentEventContext)) {
+		EventContext eventContext = event.getContext(); 
+		if (!(eventContext instanceof DocumentEventContext)) {
 			return;
 		}
-
+		//
+		// Gather the tenant config to see if we need to audit this event
+		//
+		String repositoryName = eventContext.getRepositoryName();
+		TenantBindingConfigReaderImpl tenantBindingConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+		TenantBindingType tenantBindingType = tenantBindingConfigReader.getTenantBindingByRepositoryName(repositoryName);
+		if (tenantBindingType.isAuditRequired() == false) {
+			// tenant is configured for no auditing
+			return;
+		}
+		//
+		// Gather the service config to see if we need to audit this event
+		//
+		String tenantId = tenantBindingType.getId();
+		DocumentEventContext docCtx = (DocumentEventContext) eventContext;
+		DocumentModel targetDoc = docCtx.getSourceDocument();
+		ServiceBindingType serviceBinding = tenantBindingConfigReader.getServiceBindingForDocType(tenantId, targetDoc.getType());
+		if (serviceBinding.getObject().getPart().get(0).isAuditable() == false) {
+			// Document is of a type that requires no auditing.
+			return;
+		}
+		//
+		// Ensure our deployment has the Nuxeo Audit service configured.
+		//
 		AuditLogger logger = Framework.getLocalService(AuditLogger.class);
 		if (logger == null) {
 			getLogger().error("No AuditLogger implementation is available");
 			return;
 		}
-	
+		//
+		// Ensure the Nuxeo Audit Service is available and running.
+		//
+		if (ServiceMain.isAuditServiceReady() == false) {
+			getLogger().error("No Audit Service implementation is available.");
+			return;
+		}
+		//
+		// Process the event
+		//
 		try {
-			DocumentEventContext docCtx = (DocumentEventContext) ectx;
-			DocumentModel newDoc = docCtx.getSourceDocument();
+			DocumentEventContext docEventContext = (DocumentEventContext) eventContext;
+			DocumentModel newDoc = docEventContext.getSourceDocument();
 			DocumentModel oldDoc = null;
 			if (!event.getName().equalsIgnoreCase(DocumentEventTypes.DOCUMENT_REMOVED)) {
 				oldDoc = newDoc.getCoreSession().getDocument(newDoc.getRef());
