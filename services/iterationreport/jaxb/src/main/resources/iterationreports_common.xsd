@@ -27,7 +27,7 @@
     <xs:element name="iterationreports_common">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="iterationreportReferenceNumber" type="xs:string"/>
+                <xs:element name="iterationIdentificationNumber" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>

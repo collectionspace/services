@@ -41,11 +41,6 @@ public class IterationreportServiceTest extends AbstractPoxServiceTestImpl<Abstr
     /** The logger. */
     private final String CLASS_NAME = IterationreportServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    // Instance variables specific to this test.
-    /** The service path component. */
-    final String SERVICE_NAME = "transports";
-    final String SERVICE_PATH_COMPONENT = "transports";
-
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
@@ -158,11 +153,12 @@ public class IterationreportServiceTest extends AbstractPoxServiceTestImpl<Abstr
 
         // Get the common part of the response and verify that it is not null.
         PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
-        IterationreportsCommon transportCommon = null;
+        IterationreportsCommon iterationreportCommon = null;
         if (payloadInputPart != null) {
-            transportCommon = (IterationreportsCommon) payloadInputPart.getBody();
+            iterationreportCommon = (IterationreportsCommon) payloadInputPart.getBody();
         }
-        Assert.assertNotNull(transportCommon);
+        Assert.assertNotNull(iterationreportCommon);
+        Assert.assertNotNull(iterationreportCommon.getIterationIdentificationNumber());
     }
 
     // Failure outcomes
@@ -283,18 +279,18 @@ public class IterationreportServiceTest extends AbstractPoxServiceTestImpl<Abstr
 
         // Extract the common part from the response.
         PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
-        IterationreportsCommon transportCommon = null;
+        IterationreportsCommon iterationreportCommon = null;
         if (payloadInputPart != null) {
-            transportCommon = (IterationreportsCommon) payloadInputPart.getBody();
+            iterationreportCommon = (IterationreportsCommon) payloadInputPart.getBody();
         }
-        Assert.assertNotNull(transportCommon);
+        Assert.assertNotNull(iterationreportCommon);
 
         // Update the content of this resource.
-        transportCommon.setIterationreportReferenceNumber("updated-" + transportCommon.getIterationreportReferenceNumber());
+        iterationreportCommon.setIterationIdentificationNumber("updated-" + iterationreportCommon.getIterationIdentificationNumber());
 
         if (logger.isDebugEnabled()) {
             logger.debug("to be updated object");
-            logger.debug(objectAsXmlString(transportCommon, IterationreportsCommon.class));
+            logger.debug(objectAsXmlString(iterationreportCommon, IterationreportsCommon.class));
         }
 
         setupUpdate();
@@ -302,7 +298,7 @@ public class IterationreportServiceTest extends AbstractPoxServiceTestImpl<Abstr
         // Submit the updated common part in an update request to the service
         // and store the response.
         PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
-        PayloadOutputPart commonPart = output.addPart(client.getCommonPartName(), transportCommon);
+        PayloadOutputPart commonPart = output.addPart(client.getCommonPartName(), iterationreportCommon);
         res = client.update(knownResourceId, output);
         try {
             assertStatusCode(res, testName);
@@ -330,8 +326,8 @@ public class IterationreportServiceTest extends AbstractPoxServiceTestImpl<Abstr
         Assert.assertNotNull(updatedIterationreportCommon);
 
         // Check selected fields in the updated common part.
-        Assert.assertEquals(updatedIterationreportCommon.getIterationreportReferenceNumber(),
-                transportCommon.getIterationreportReferenceNumber(),
+        Assert.assertEquals(updatedIterationreportCommon.getIterationIdentificationNumber(),
+                iterationreportCommon.getIterationIdentificationNumber(),
                 "Data in updated object did not match submitted data.");
     }
 
@@ -475,25 +471,25 @@ public class IterationreportServiceTest extends AbstractPoxServiceTestImpl<Abstr
     }
 
     /**
-     * Creates the transport instance.
+     * Creates the iterationreport instance.
      *
-     * @param transportNumber the transport number
+     * @param iterationreportNumber the iterationreport number
      * @return the multipart output
      * @throws Exception
      */
-    private PoxPayloadOut createIterationreportInstance(String transportNumber) throws Exception {
+    private PoxPayloadOut createIterationreportInstance(String iterationreportNumber) throws Exception {
 
-        IterationreportsCommon transportCommon = new IterationreportsCommon();
-        transportCommon.setIterationreportReferenceNumber(transportNumber);
-        // transportCommon.setDestination(getUTF8DataFragment());
+        IterationreportsCommon iterationreportCommon = new IterationreportsCommon();
+        iterationreportCommon.setIterationIdentificationNumber(iterationreportNumber);
+        // iterationreportCommon.setDestination(getUTF8DataFragment());
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart =
-            multipart.addPart(new IterationreportClient().getCommonPartName(), transportCommon);
+            multipart.addPart(new IterationreportClient().getCommonPartName(), iterationreportCommon);
 
         if (logger.isDebugEnabled()) {
-            logger.debug("to be created, transport common");
-            logger.debug(objectAsXmlString(transportCommon, IterationreportsCommon.class));
+            logger.debug("to be created, iterationreport common");
+            logger.debug(objectAsXmlString(iterationreportCommon, IterationreportsCommon.class));
         }
 
         return multipart;
@@ -543,11 +539,11 @@ public class IterationreportServiceTest extends AbstractPoxServiceTestImpl<Abstr
      */
     @Override
     protected String getServicePathComponent() throws Exception {
-        return SERVICE_PATH_COMPONENT;
+        return IterationreportClient.SERVICE_PATH_COMPONENT;
     }
 
     @Override
     protected String getServiceName() {
-        return SERVICE_NAME;
+        return IterationreportClient.SERVICE_NAME;
     }
 }
