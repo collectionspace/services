@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.10.0.final using JasperReports Library version 6.10.0-unknown  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="obj_val" pageWidth="1000" pageHeight="800" orientation="Landscape" columnWidth="100" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="49b29b35-57c3-422f-8699-01975b0a33f9">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="net.sf.jasperreports.jrparameter.is.ignore.pagination" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.one.page.per.sheet" value="false"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.white.page.background" value="false"/>
+	<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+	<property name="net.sf.jasperreports.page.break.no.pagination" value="apply"/>
+	<property name="net.sf.jasperreports.export.xls.freeze.row" value="2"/>
+	<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.exports.xls.font.size.fix.enabled" value="false"/>
+	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="SansSerif" fontSize="12"/>
+	<parameter name="csidlist" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["100012"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="csids" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csidlist} != null ? ("'" + $P{csidlist}.replaceAll(",", "','") + "'") : "NOVALUE"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="whereclause" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csids} != "NOVALUE" ? ( "WHERE hier.name IN (" + $P{csids} + ")" ) : ""]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[WITH objects AS (
+SELECT
+hier.id AS objid,
+hier.name AS objcsid,
+common.objectnumber AS objnum
+from collectionobjects_common common
+inner join hierarchy hier on hier.id = common.id
+inner join misc on misc.id = hier.id AND misc.lifecyclestate != 'deleted'
+inner join collectionspace_core core on core.id = misc.id AND core.tenantid = $P{tenantid}
+$P!{whereclause}
+),
+
+obj_titles AS (
+SELECT objects.objnum, otg.title AS title
+FROM hierarchy hier
+INNER JOIN titlegroup otg ON hier.id = otg.id AND hier.name = 'collectionobjects_common:titleGroupList' AND hier.pos = 0
+INNER JOIN objects ON hier.parentid = objects.objid
+),
+
+obj_names AS (
+SELECT objects.objnum, ong.objectname AS objname
+FROM hierarchy hier
+INNER JOIN objectnamegroup ong ON hier.id = ong.id AND hier.name = 'collectionobjects_common:objectNameList' AND hier.pos = 0
+INNER JOIN objects ON hier.parentid = objects.objid
+),
+
+obj_latest_val AS (
+select distinct on (objects.objcsid) objects.objcsid, rc.objectcsid as vccsid, hier.id as vcid,
+vc.valuationcontrolrefnumber, vc.valuedate, vc.valuetype, va.valueamount,
+(select count(*) from relations_common where subjectcsid = rc.objectcsid and objectdocumenttype = 'CollectionObject') as rel_objs
+from objects
+inner join relations_common rc on rc.subjectcsid = objects.objcsid and rc.objectdocumenttype = 'Valuationcontrol'
+inner join hierarchy hier on hier.name = rc.objectcsid
+inner join misc on misc.id = hier.id AND misc.lifecyclestate != 'deleted'
+inner join collectionspace_core core on hier.id = core.id
+inner join valuationcontrols_common vc on hier.id = vc.id
+inner join hierarchy avh on avh.parentid = hier.id and avh.primarytype = 'valueAmounts' and avh.pos = 0
+inner join valueamounts va on avh.id = va.id
+order by objects.objcsid, coalesce(vc.valuedate, core.createdat) DESC
+)
+
+SELECT objects.objnum, ot.title, ong.objname, 
+bd.item AS briefdesc,
+olv.valuationcontrolrefnumber AS valuationid, olv.valuedate, olv.valuetype, olv.rel_objs, olv.valueamount,
+CASE
+  WHEN olv.rel_objs = 0 THEN NULL
+  WHEN olv.rel_objs = 1 THEN olv.valueamount
+  ELSE olv.valueamount / olv.rel_objs  END calculatedValue
+FROM objects
+LEFT OUTER JOIN obj_titles ot ON ot.objnum = objects.objnum
+LEFT OUTER JOIN obj_names ong ON ong.objnum = objects.objnum
+INNER JOIN collectionobjects_common_briefdescriptions bd ON bd.id = objects.objid AND bd.pos = 0
+LEFT OUTER JOIN obj_latest_val olv ON olv.objcsid = objects.objcsid]]>
+	</queryString>
+	<field name="objnum" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="objnum"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common"/>
+	</field>
+	<field name="title" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="title"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="titlegroup"/>
+	</field>
+	<field name="objname" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="objname"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="objectnamegroup"/>
+	</field>
+	<field name="briefdesc" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="briefdesc"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common_briefdescriptions"/>
+	</field>
+	<field name="valuationid" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="valuationid"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="valuationcontrols_common"/>
+	</field>
+	<field name="valuedate" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="valuedate"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="valuationcontrols_common"/>
+	</field>
+	<field name="valuetype" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="valuetype"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="valuationcontrols_common"/>
+	</field>
+	<field name="rel_objs" class="java.lang.Long">
+		<property name="com.jaspersoft.studio.field.label" value="rel_objs"/>
+	</field>
+	<field name="valueamount" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.label" value="valueamount"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="valueamounts"/>
+	</field>
+	<field name="calculatedvalue" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.label" value="calculatedvalue"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="44" splitType="Stretch">
+			<staticText>
+				<reportElement style="Column header" x="0" y="0" width="100" height="30" uuid="37d34f54-93f5-45ba-8ac2-8e03913ae0d2">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b041c620-9bb7-4738-bf6c-aa59452a7bf4"/>
+				</reportElement>
+				<text><![CDATA[objnum]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="100" y="0" width="100" height="30" uuid="09f43f6b-592b-454c-912c-83865bae2a92">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a225cc68-84b7-462e-9c88-82408a48067b"/>
+				</reportElement>
+				<text><![CDATA[title]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="200" y="0" width="100" height="30" uuid="1f50d31f-0e8e-4e52-8ad5-eea31c291e46">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="dad81e7f-3a4b-4c02-bf37-9607e8f7fbf8"/>
+				</reportElement>
+				<text><![CDATA[objname]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="300" y="0" width="100" height="30" uuid="4f08e4cb-05a4-44fd-bb9b-07302a17b2a7">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="56b3d5f9-94d0-4c68-89bd-3b47530f703a"/>
+				</reportElement>
+				<text><![CDATA[briefdesc]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="400" y="0" width="100" height="30" uuid="5c8d789e-aeab-461c-80d4-2de2b142ba29">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2d602d37-1890-4b1b-b7e1-2684656ae05a"/>
+				</reportElement>
+				<text><![CDATA[valuationid]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="500" y="0" width="100" height="30" uuid="bb98c9fa-9be9-4b6c-a485-434041f31613">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1f13a021-62a3-4a96-b924-0124fe0e9af7"/>
+				</reportElement>
+				<text><![CDATA[valuedate]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="600" y="0" width="100" height="30" uuid="d02bbf9e-2a17-4ca0-bd2d-b059873a7af8">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1b51f872-51ce-408f-ae43-01eed84ac953"/>
+				</reportElement>
+				<text><![CDATA[valuetype]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="700" y="0" width="100" height="30" uuid="7dcfca3e-355d-41f3-9927-4a874664d290">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce56b4f5-e8fa-490e-9705-12a884d9a5cf"/>
+				</reportElement>
+				<text><![CDATA[valueamount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="800" y="0" width="100" height="30" uuid="4b9b0973-0081-4364-9438-917af4bdc625">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c6b4dbe1-e33f-4522-ab01-5257d0d5901c"/>
+				</reportElement>
+				<text><![CDATA[rel_objs]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="900" y="0" width="100" height="30" uuid="f87e38be-5518-4fa2-a761-788057870d43">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5fe6c646-c069-4950-a3b6-2cd2d15d726a"/>
+				</reportElement>
+				<text><![CDATA[calculatedvalue]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.spreadsheet.SpreadsheetLayout"/>
+			<textField>
+				<reportElement style="Detail" x="0" y="0" width="100" height="30" uuid="6476284b-9eb5-4f8d-9383-b66a5b35352d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b041c620-9bb7-4738-bf6c-aa59452a7bf4"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{objnum}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="Detail" x="100" y="0" width="100" height="30" uuid="ad92e196-fbc2-418a-9176-6bf6e1fe4263">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a225cc68-84b7-462e-9c88-82408a48067b"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="0b6fe68a-8fb5-4a93-9a8c-fd84930b833e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="dad81e7f-3a4b-4c02-bf37-9607e8f7fbf8"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{objname}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="Detail" x="300" y="0" width="100" height="30" uuid="d71976b0-2a65-4296-8b6c-9b07d30ec327">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="56b3d5f9-94d0-4c68-89bd-3b47530f703a"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{briefdesc}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="b853d00c-aa36-4593-836e-fd2e2d6c141e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2d602d37-1890-4b1b-b7e1-2684656ae05a"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{valuationid}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="Detail" x="500" y="0" width="100" height="30" uuid="6838b22a-35d3-42f5-8b46-a8464afa48ef">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1f13a021-62a3-4a96-b924-0124fe0e9af7"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{valuedate}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="Detail" x="600" y="0" width="100" height="30" uuid="e6356873-71c1-4d18-b150-7c1c547fd3a2">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1b51f872-51ce-408f-ae43-01eed84ac953"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{valuetype}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="Detail" x="700" y="0" width="100" height="30" uuid="d095620e-4419-4a44-87e2-7c3dc556efc8">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ce56b4f5-e8fa-490e-9705-12a884d9a5cf"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{valueamount}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="Detail" x="800" y="0" width="100" height="30" uuid="4b9d4c1a-36d6-4370-94e0-396658787464">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c6b4dbe1-e33f-4522-ab01-5257d0d5901c"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{rel_objs}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="Detail" x="900" y="0" width="100" height="30" uuid="3719ab6e-6f66-4165-9763-ed409df253ee">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5fe6c646-c069-4950-a3b6-2cd2d15d726a"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{calculatedvalue}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
