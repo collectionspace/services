@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.1.1.final using JasperReports Library version 6.1.1  -->
-<!-- 2015-12-16T19:40:48 -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Groups Basic List" pageWidth="1224" pageHeight="792" orientation="Landscape" whenNoDataType="NoDataSection" columnWidth="1184" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="a1f690a3-5977-4467-85f8-6b0bcd5b7210">
+<!-- Created with Jaspersoft Studio version 6.12.2.final using JasperReports Library version 6.3.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Groups Basic List" language="javascript" pageWidth="1224" pageHeight="792" orientation="Landscape" whenNoDataType="NoDataSection" columnWidth="1184" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="a1f690a3-5977-4467-85f8-6b0bcd5b7210">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="CollectionSpace"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="318"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="677"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="699"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="292"/>
 	<style name="Title" fontName="SansSerif" fontSize="26" isBold="true"/>
 	<style name="SubTitle" forecolor="#666666" fontName="SansSerif" fontSize="18"/>
 	<style name="Column header" forecolor="#666666" fontName="SansSerif" fontSize="12" isBold="true"/>
@@ -24,10 +27,10 @@
 						objectname,
 						tg.title title,
 						cocbd.item description,
-						otg.termdisplayname oporg,
+						objectproductionorganization,
 						objectproductionorganizationrole,
 						objectproductionpersonrole,
-						ptg.termdisplayname opperson,
+						objectproductionperson,
 						objectproductionpeople,
 						datedisplaydate,
 						numberofobjects,
@@ -47,14 +50,8 @@
 	LEFT OUTER JOIN objectproductionpersongroup oppg ON (oppg.id = h5.id)
 	LEFT OUTER JOIN hierarchy h6 ON (coc.id = h6.parentid AND h6.primarytype='objectProductionPeopleGroup' AND h6.pos=0)
 	LEFT OUTER JOIN objectproductionpeoplegroup opplg ON (opplg.id = h6.id)
-	LEFT OUTER JOIN persons_common pc ON (oppg.objectproductionperson = pc.refname)
-	LEFT OUTER JOIN hierarchy h7 ON (pc.id = h7.parentid AND h7.primarytype='personTermGroup' AND h7.pos=0)
-	LEFT OUTER JOIN persontermgroup ptg ON (ptg.id = h7.id)
 	LEFT OUTER JOIN hierarchy h8 ON (coc.id = h8.parentid AND h8.primarytype='objectProductionOrganizationGroup' AND h8.pos=0)
 	LEFT OUTER JOIN objectproductionorganizationgroup opog ON (opog.id = h8.id)
-	LEFT OUTER JOIN organizations_common oc ON (opog.objectproductionorganization = oc.refname)
-	LEFT OUTER JOIN hierarchy h11 ON (oc.id = h11.parentid AND h11.primarytype='orgTermGroup' AND h11.pos=0)
-	LEFT OUTER JOIN orgtermgroup otg ON (otg.id = h11.id)
 	LEFT OUTER JOIN hierarchy h9 ON (coc.id = h9.parentid AND h9.name='collectionobjects_common:objectProductionDateGroupList' AND h9.pos=0)
 	LEFT OUTER JOIN structureddategroup sdg ON (sdg.id = h9.id)
 	LEFT OUTER JOIN hierarchy h10 ON (coc.id = h10.parentid AND h10.primarytype='measuredPartGroup' AND h10.pos=0)
@@ -68,10 +65,10 @@
 	<field name="objectname" class="java.lang.String"/>
 	<field name="title" class="java.lang.String"/>
 	<field name="description" class="java.lang.String"/>
-	<field name="oporg" class="java.lang.String"/>
+	<field name="objectproductionorganization" class="java.lang.String"/>
 	<field name="objectproductionorganizationrole" class="java.lang.String"/>
 	<field name="objectproductionpersonrole" class="java.lang.String"/>
-	<field name="opperson" class="java.lang.String"/>
+	<field name="objectproductionperson" class="java.lang.String"/>
 	<field name="objectproductionpeople" class="java.lang.String"/>
 	<field name="datedisplaydate" class="java.lang.String"/>
 	<field name="numberofobjects" class="java.lang.Long"/>
@@ -160,7 +157,11 @@
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="365" y="0" width="91" height="51" uuid="cd2614be-d303-42ec-b1ae-17986df423dd"/>
-				<textFieldExpression><![CDATA[$F{oporg}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[(
+  (it) => (it && it.startsWith("urn:"))
+    ? it.substring(it.indexOf("'") + 1, it.length - 1)
+    : it
+).call(null, $F{objectproductionorganization})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="456" y="0" width="91" height="51" uuid="f9b9b475-9f9e-48a7-8016-330cbcfb0fae"/>
@@ -168,7 +169,11 @@
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="547" y="0" width="91" height="51" uuid="2c3a2c4b-9124-43c8-8be3-69c482f4e5ad"/>
-				<textFieldExpression><![CDATA[$F{opperson}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[(
+  (it) => (it && it.startsWith("urn:"))
+    ? it.substring(it.indexOf("'") + 1, it.length - 1)
+    : it
+).call(null, $F{objectproductionperson})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="638" y="0" width="91" height="51" uuid="baa2cb50-03d1-45e0-9e32-dac575891da9"/>
@@ -176,7 +181,11 @@
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="729" y="0" width="91" height="51" uuid="00f2e1c6-6a9d-445a-9bb0-8792754d5f66"/>
-				<textFieldExpression><![CDATA[$F{objectproductionpeople}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[(
+  (it) => (it && it.startsWith("urn:"))
+    ? it.substring(it.indexOf("'") + 1, it.length - 1)
+    : it
+).call(null, $F{objectproductionpeople})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="820" y="0" width="91" height="51" uuid="f28c35cd-bc86-49a7-95ff-cebf40b6434f"/>
@@ -194,7 +203,11 @@
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="1093" y="0" width="91" height="51" uuid="569e8c92-bc33-49c8-bad7-a80b144d5406">
 					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{computedcurrentlocation}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[(
+  (it) => (it && it.startsWith("urn:"))
+    ? it.substring(it.indexOf("'") + 1, it.length - 1)
+    : it
+).call(null, $F{computedcurrentlocation})]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
@@ -204,7 +217,7 @@
 	<noData>
 		<band height="50">
 			<staticText>
-				<reportElement uuid="f449dbd9-0782-4ffc-9296-1c09a978c94b" style="Column header" x="0" y="22" width="375" height="28"/>
+				<reportElement style="Column header" x="0" y="22" width="375" height="28" uuid="f449dbd9-0782-4ffc-9296-1c09a978c94b"/>
 				<textElement>
 					<font size="14"/>
 				</textElement>
