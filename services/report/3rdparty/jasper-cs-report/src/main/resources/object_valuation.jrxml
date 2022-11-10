@@ -68,7 +68,7 @@ inner join valueamounts va on avh.id = va.id
 order by objects.objcsid, coalesce(vc.valuedate, core.createdat) DESC
 )
 
-SELECT objects.objnum, ot.title, ong.objname, 
+SELECT objects.objnum, ot.title, ong.objname,
 bd.item AS briefdesc,
 olv.valuationcontrolrefnumber AS valuationid, olv.valuedate, olv.valuetype, olv.rel_objs, olv.valueamount,
 CASE
@@ -78,7 +78,7 @@ CASE
 FROM objects
 LEFT OUTER JOIN obj_titles ot ON ot.objnum = objects.objnum
 LEFT OUTER JOIN obj_names ong ON ong.objnum = objects.objnum
-INNER JOIN collectionobjects_common_briefdescriptions bd ON bd.id = objects.objid AND bd.pos = 0
+LEFT OUTER JOIN collectionobjects_common_briefdescriptions bd ON bd.id = objects.objid AND bd.pos = 0
 LEFT OUTER JOIN obj_latest_val olv ON olv.objcsid = objects.objcsid]]>
 	</queryString>
 	<field name="objnum" class="java.lang.String">
