@@ -21,8 +21,37 @@
 	<parameter name="csid" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["0a60da6a-e3ea-4d0a-9731"]]></defaultValueExpression>
 	</parameter>
+	<parameter name="csidlist" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+	</parameter>
+	<parameter name="groupcsid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+	</parameter>
+	<parameter name="whereclause" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csidlist}
+	? (
+		'WHERE hierarchy.name IN ('
+		+ $P{csidlist}.split(',').map((csid) => "'" + csid.replace(/'/g, "''") + "'").join(', ')
+		+ ')'
+	)
+	: (
+		$P{groupcsid}
+		? (
+			'WHERE hierarchy.id IN (' +
+				'SELECT h_collectionobject.id ' +
+				'FROM relations_common rel_group ' +
+				"INNER JOIN misc misc_rel_group ON misc_rel_group.id = rel_group.id AND misc_rel_group.lifecyclestate != 'deleted' " +
+				'INNER JOIN hierarchy h_collectionobject ON h_collectionobject.name = rel_group.objectcsid ' +
+				"INNER JOIN misc misc_collectionobject ON misc_collectionobject.id = h_collectionobject.id AND misc_collectionobject.lifecyclestate != 'deleted' " +
+				'INNER JOIN collectionspace_core ON collectionspace_core.id = h_collectionobject.id ' +
+				"WHERE rel_group.subjectcsid = '" + $P{groupcsid}.replace(/'/g, "''") + "' AND rel_group.objectdocumenttype = 'CollectionObject' " +
+			')'
+		)
+		: "WHERE hierarchy.name = '" + ($P{csid} ? $P{csid}.replace(/'/g, "''") : '') + "'"
+	)]]></defaultValueExpression>
+	</parameter>
 	<queryString>
-		<![CDATA[select gc.title grouptitle,
+		<![CDATA[select
 						coc.objectnumber,
 						objectname,
 						tg.title title,
@@ -36,12 +65,11 @@
 						numberofobjects,
 						dimensionsummary,
 						computedcurrentlocation
-	FROM groups_common gc
-	JOIN hierarchy h1 ON (gc.id=h1.id)
-	JOIN relations_common rc1 ON (h1.name=rc1.subjectcsid)
-	JOIN hierarchy h2 ON (rc1.objectcsid=h2.name)
-	JOIN collectionobjects_common coc ON (h2.id=coc.id)
-	left join collectionobjects_common_briefdescriptions cocbd on (coc.id = cocbd.id)
+	FROM collectionobjects_common coc
+	INNER JOIN hierarchy ON hierarchy.id = coc.id
+	INNER JOIN misc ON misc.id = hierarchy.id AND misc.lifecyclestate != 'deleted'
+	INNER JOIN collectionspace_core core ON CORE.id = hierarchy.id AND core.tenantid = $P{tenantid}
+	LEFT OUTER JOIN collectionobjects_common_briefdescriptions cocbd on (coc.id = cocbd.id)
 	LEFT OUTER JOIN hierarchy h3 ON (coc.id = h3.parentid AND h3.primarytype='objectNameGroup' AND h3.pos=0)
 	LEFT OUTER JOIN objectnamegroup ong ON (ong.id=h3.id)
 	LEFT OUTER JOIN hierarchy h4 ON (coc.id = h4.parentid AND h4.primarytype='titleGroup' AND h4.pos=0)
@@ -56,10 +84,7 @@
 	LEFT OUTER JOIN structureddategroup sdg ON (sdg.id = h9.id)
 	LEFT OUTER JOIN hierarchy h10 ON (coc.id = h10.parentid AND h10.primarytype='measuredPartGroup' AND h10.pos=0)
 	LEFT OUTER JOIN measuredpartgroup mpg ON (mpg.id = h10.id)
-	LEFT OUTER JOIN collectionspace_core core ON (coc.id = core.id)
-	LEFT OUTER JOIN misc misc ON (misc.id = coc.id)
-	WHERE core.tenantid = $P{tenantid} AND misc.lifecyclestate != 'deleted'
-	AND h1.name = $P{csid}]]>
+	$P!{whereclause}]]>
 	</queryString>
 	<field name="objectnumber" class="java.lang.String"/>
 	<field name="objectname" class="java.lang.String"/>
