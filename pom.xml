@@ -64,7 +64,7 @@
 
 		<repository>
 			<id>nuxeo-public-releases</id>
-			<url>http://maven-eu.nuxeo.org/nexus/content/repositories/public-releases</url>
+			<url>https://maven-eu.nuxeo.org/nexus/content/repositories/public-releases</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -72,7 +72,7 @@
 
 		<repository>
 			<id>nuxeo-vendor-releases</id>
-			<url>http://maven-eu.nuxeo.org/nexus/content/repositories/vendor-releases</url>
+			<url>https://maven-eu.nuxeo.org/nexus/content/repositories/vendor-releases</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -102,7 +102,7 @@
 			<!-- Global Biodiversity Information Facility - http://www.gbif.org/ -->
 			<id>gbif-all</id>
 			<name>gbif-all</name>
-			<url>http://repository.gbif.org/content/groups/gbif</url>
+			<url>https://repository.gbif.org/content/groups/gbif</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
