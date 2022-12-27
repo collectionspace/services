@@ -27,7 +27,7 @@ import org.collectionspace.services.audit.AuditCommon;
  */
 public class AuditClient extends AbstractCommonListPoxServiceClientImpl<AuditProxy, AuditCommon> {
 
-    public static final String SERVICE_NAME = "audit";
+    public static final String SERVICE_NAME = AuditClientUtils.SERVICE_NAME;
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
     public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
     public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";

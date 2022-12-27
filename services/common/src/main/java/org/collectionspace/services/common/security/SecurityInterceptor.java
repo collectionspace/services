@@ -53,6 +53,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 import org.collectionspace.authentication.AuthN;
+import org.collectionspace.services.client.AuditClientUtils;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.URIResourceImpl;
@@ -63,7 +64,6 @@ import org.collectionspace.services.common.CollectionSpaceResource;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
-import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.services.systeminfo.SystemInfoClient;
 import org.slf4j.Logger;
@@ -76,7 +76,7 @@ import org.slf4j.LoggerFactory;
 @SecurityPrecedence
 @ServerInterceptor
 @Provider
-public class SecurityInterceptor implements PreProcessInterceptor, PostProcessInterceptor {
+public class SecurityInterceptor implements PreProcessInterceptor, PostProcessInterceptor { //https://howtodoinjava.com/resteasy/resteasy-containerrequestfilter-example/
 
 	static {
 		System.err.println("Static initialization of: " + SecurityInterceptor.class.getCanonicalName());
@@ -242,6 +242,16 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 					}
 
 				}
+				//
+				// If it is a request to the Audit service, check if that service is available
+				//
+				if (resName.equals(AuditClientUtils.SERVICE_NAME) &&
+						!ServiceMain.isAuditServiceReady()) {
+					Response response = Response.status(
+							Response.Status.SERVICE_UNAVAILABLE).entity("Audit service is unavailable").type("text/plain").build();
+					throw new CSWebApplicationException(response);
+				}
+				
 				//
 				// Login to Nuxeo
 				//
