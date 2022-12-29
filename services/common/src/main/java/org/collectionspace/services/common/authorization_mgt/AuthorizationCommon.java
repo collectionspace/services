@@ -1302,31 +1302,32 @@ public class AuthorizationCommon {
 	 */
 	private static String validatePasswordResetConfig(PasswordResetConfig passwordResetConfig) {
 		String result = null;
-		
+
 		if (passwordResetConfig != null) {
 			result = passwordResetConfig.getMessage();
 			if (result == null || result.length() == 0) {
 				result = DEFAULT_PASSWORD_RESET_EMAIL_MESSAGE;
 				logger.warn("Could not find a password reset message in the tenant's configuration.  Using the default one");
 			}
-			
+
 			if (result.contains("{{link}}") == false) {
-				logger.warn("The tenant's password reset message does not contain a required '{{link}}' marker.");
+				logger.error("The tenant's password reset message does not contain a required '{{link}}' marker.");
 				result = null;
 			}
-			
+
 			if (passwordResetConfig.getLoginpage() == null || passwordResetConfig.getLoginpage().trim().isEmpty()) {
-				logger.warn("The tenant's password reset configuration is missing a 'loginpage' value.  It should be set to something like '/collectionspace/ui/core/html/index.html'.");
+				logger.error("The tenant's password reset configuration is missing a 'loginpage' value.  It should be set to something like '/collectionspace/ui/core/html/index.html'.");
 				result = null;
 			}
-			
+
 		    String subject = passwordResetConfig.getSubject();
 		    if (subject == null || subject.trim().isEmpty()) {
 		    	passwordResetConfig.setSubject(DEFAULT_PASSWORD_RESET_EMAIL_SUBJECT);
 		    }
-
+		} else {
+			logger.error("PasswordResetConfig elements missing or malformed from the tenant bindings.");
 		}
-		
+
 		return result;
 	}
 	

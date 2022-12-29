@@ -23,7 +23,7 @@
 		<spring.security.version>4.1.1.RELEASE</spring.security.version>
 		<spring.security.oauth2.version>2.0.10.RELEASE</spring.security.oauth2.version>
 		<aspectj.version>1.7.4</aspectj.version>
-		<log4j.version>2.17.0</log4j.version>
+		<log4j.version>2.17.1</log4j.version>
 	</properties>
 
 	<distributionManagement>
@@ -275,6 +275,32 @@
 						</execution>
                 	</executions>
 				</plugin>
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.codehaus.mojo</groupId>
+										<artifactId>flatten-maven-plugin</artifactId>
+										<versionRange>[1.1.0,)</versionRange>
+										<goals>
+											<goal>flatten</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute>
+											<runOnIncremental>false</runOnIncremental>
+										</execute>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+            	</plugin>
 			</plugins>
 		</pluginManagement>
 
@@ -282,7 +308,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>flatten-maven-plugin</artifactId>
-				<version>1.1.0</version>
+				<version>1.2.2</version>
 				<configuration>
 					<updatePomFile>true</updatePomFile>
 				</configuration>
@@ -307,7 +333,7 @@
 				before we perform any build related tasks. -->
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.7</version>
+				<version>1.8</version> <!-- Most recent version is 3.0.0 -->
 				<executions>
 					<execution>
 						<id>check-environment-vars</id>
@@ -370,7 +396,7 @@
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
-				<version>1.7.21</version>
+				<version>1.7.32</version>
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
@@ -416,6 +442,10 @@
 						<groupId>xml-apis</groupId>
 						<artifactId>xml-apis</artifactId>
 					</exclusion>
+	        		<exclusion>
+	        			<groupId>xalan</groupId>
+	        			<artifactId>xalan</artifactId>
+	        		</exclusion>					
 				</exclusions>
 			</dependency>
 			<dependency>
@@ -537,6 +567,32 @@
 				<artifactId>nuxeo-common</artifactId>
 				<version>${nuxeo.core.version}</version>
 			</dependency>
+			<dependency>
+		    	<groupId>org.nuxeo.ecm.platform</groupId>
+				<artifactId>nuxeo-platform-audit-core</artifactId>
+				<version>${nuxeo.platform.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-log4j12</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+		    	<groupId>org.nuxeo.ecm.platform</groupId>
+				<artifactId>nuxeo-platform-audit-io</artifactId>
+				<version>${nuxeo.platform.version}</version>
+			</dependency>
+			<dependency>
+		    	<groupId>org.nuxeo.ecm.platform</groupId>
+				<artifactId>nuxeo-platform-audit-ws</artifactId>
+				<version>${nuxeo.platform.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.nuxeo.elasticsearch</groupId>
+				<artifactId>nuxeo-elasticsearch-http-read-only</artifactId>
+				<version>${nuxeo.platform.version}</version>
+			</dependency>	
 			<dependency>
 				<groupId>org.nuxeo.ecm.platform</groupId>
 				<artifactId>nuxeo-platform-imaging-core</artifactId>

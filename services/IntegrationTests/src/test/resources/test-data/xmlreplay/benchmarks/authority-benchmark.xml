@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+            
+    <testGroup ID="UpdateDisplayName" autoDeletePOSTS="true">
+        <test ID="getPersonItemsAllVocabs">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/_ALL_/items?pgSz=3&amp;pgNum=0</uri>
+            <response>
+                <expected level="TEXT"/>
+                <filename>authority/res/personItems.res.xml</filename>
+                <vars>
+                    <var ID="numItems">3</var>
+                </vars>
+            </response>
+        </test>    
+	</testGroup>
+
+    <testGroup ID="TestAuthoritiesMultiVocabSearch" autoDeletePOSTS="true">
+
+        <!--
+            Create three new vocabularies: two in the Person Authority,
+            and one in the Storage Location Authority.
+       
+        -->
+        <test ID="createPersonAuthority1">
+            <expectedCodes>201</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities</uri>
+            <filename>authority/personauthority.xml</filename>
+            <vars>
+                <!-- Nonsense words to build short identifiers and display -->
+                <!-- names, and to populate text field(s). -->
+                <var ID="word1">jlmbsoq</var>
+                <var ID="word2">tqbfjotld</var>
+                <var ID="word3">mepqcgjt</var>
+                <var ID="word4">fqgtmjb</var>
+                <var ID="word5">brvffaqj</var>
+                <!-- Partial term searches using one or more of those words. -->
+                <var ID="word1PartialTermStem">jlmb</var>
+                <var ID="word2PartialTermStem">tqbf</var>
+                <var ID="word2PartialTermMid">fjotl</var>
+                <!-- Populate the current record with those words. -->
+                <var ID="authDisplayName">jlmbsoqauth1</var>
+                <var ID="authShortIdentifier">jlmbsoqauth2</var>
+            </vars>
+        </test>
+        <test ID="createPersonAuthority2">
+            <expectedCodes>201</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities</uri>
+            <filename>authority/personauthority.xml</filename>
+            <vars>
+                <var ID="authDisplayName">${createPersonAuthority1.word2}auth2</var>
+                <var ID="authShortIdentifier">${createPersonAuthority1.word2}auth2</var>
+            </vars>
+        </test>
+                
+        <test ID="createLocationAuthority">
+            <expectedCodes>201</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/locationauthorities</uri>
+            <filename>authority/locationauthority.xml</filename>
+            <vars>
+                <var ID="authDisplayName">${createPersonAuthority1.word1}auth1</var>
+                <var ID="authShortIdentifier">${createPersonAuthority1.word1}auth2</var>
+            </vars>
+        </test>
+        
+        <!-- Create at least one item in each of those vocabularies. -->
+        
+        <!-- Create two items in the first vocabulary in the Person Authority -->
+        <test ID="createPersonItem1">
+            <expectedCodes>201</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities/${createPersonAuthority1.CSID}/items</uri>
+            <filename>authority/personitem.xml</filename>
+            <vars>
+                <var ID="itemDisplayName">${createPersonAuthority1.word1} ${createPersonAuthority1.word2}</var>
+                <var ID="itemShortIdentifier">${createPersonAuthority1.word1}item1</var>
+                <var ID="itemBioNote">A bio note for this Person.</var>
+            </vars>
+        </test>
+        <test ID="createPersonItem2">
+            <expectedCodes>201</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities/${createPersonAuthority1.CSID}/items</uri>
+            <filename>authority/personitem.xml</filename>
+            <vars>
+                <var ID="itemDisplayName">${createPersonAuthority1.word1}</var>
+                <var ID="itemShortIdentifier">${createPersonAuthority1.word1}item2</var>
+            </vars>
+        </test>
+        
+        <!-- Create one item in the second vocabulary in the Person Authority -->
+        <test ID="createPersonItem3">
+            <expectedCodes>201</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities/${createPersonAuthority2.CSID}/items</uri>
+            <filename>authority/personitem.xml</filename>
+            <vars>
+                <var ID="itemDisplayName">${createPersonAuthority1.word1} ${createPersonAuthority1.word2}</var>
+                <var ID="itemShortIdentifier">${createPersonAuthority1.word1}item3</var>
+            </vars>
+        </test>
+                
+        <!-- Create two items in a vocabulary in the Location Authority -->
+        <test ID="createLocationItem1">
+            <expectedCodes>201</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/locationauthorities/${createLocationAuthority.CSID}/items</uri>
+            <filename>authority/locationitem.xml</filename>
+            <vars>
+                <var ID="itemDisplayName">${createPersonAuthority1.word1} ${createPersonAuthority1.word2}</var>
+                <var ID="itemShortIdentifier">${createPersonAuthority1.word1}item1</var>
+            </vars>
+        </test>
+        <test ID="verifyLocationItem1">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/${createLocationAuthority.CSID}/items/${createLocationItem1.CSID}</uri>
+        </test>
+        <test ID="createLocationItem2">
+            <expectedCodes>201</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/locationauthorities/${createLocationAuthority.CSID}/items</uri>
+            <filename>authority/locationitem.xml</filename>
+            <vars>
+                <var ID="itemDisplayName">${createPersonAuthority1.word3} ${createPersonAuthority1.word4} ${createPersonAuthority1.word5}</var>
+                <var ID="itemShortIdentifier">${createPersonAuthority1.word3}item2</var>
+            </vars>
+        </test>
+        <test ID="verifyLocationItem2">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/${createLocationAuthority.CSID}/items/${createLocationItem2.CSID}</uri>
+        </test>
+        
+        <!--
+            Perform 'all vocabularies' searches and searches in each vocabulary,
+            and verify that the expected items were returned by each search.
+        -->
+        
+        <!-- List (without searching) -->
+        
+        <test ID="getPersonItemsAllVocabs">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/_ALL_/items?pgSz=3&amp;pgNum=0</uri>
+            <response>
+                <expected level="TEXT"/>
+                <filename>authority/res/personItems.res.xml</filename>
+                <vars>
+                    <var ID="numItems">3</var>
+                </vars>
+            </response>
+        </test>
+        <test ID="getPersonItemsVocab1">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/${createPersonAuthority1.CSID}/items?pgSz=2&amp;pgNum=0</uri>
+            <response>
+                <expected level="TEXT"/>
+                <filename>authority/res/personItems.res.xml</filename>
+                <vars>
+                    <var ID="numItems">2</var>
+                </vars>
+            </response>
+        </test>
+        <test ID="getPersonItemsVocab2">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/${createPersonAuthority1.CSID}/items?pgSz=1&amp;pgNum=0</uri>
+            <response>
+                <expected level="TEXT"/>
+                <filename>authority/res/personItems.res.xml</filename>
+                <vars>
+                    <var ID="numItems">1</var>
+                </vars>
+            </response>
+        </test>
+        
+        <!-- Perform a variety of searches across all person vocabularies -->
+                
+        <!-- Keyword searches -->
+        
+        <!-- On first word -->
+        <test ID="kwSearchPersonItems1">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/_ALL_/items?kw=${createPersonAuthority1.word1}</uri>
+            <response>
+                <expected level="TEXT"/>
+                <filename>authority/res/personItemsContainingWord1.res.xml</filename>
+            </response>
+        </test>
+        <!-- On second word -->
+        <test ID="kwSearchPersonItems2">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/_ALL_/items?kw=${createPersonAuthority1.word2}</uri>
+            <response>
+                <expected level="TEXT"/>
+                <filename>authority/res/personItemsContainingWord2.res.xml</filename>
+            </response>
+        </test>
+        
+        <!-- Partial term searches -->
+        
+        <!-- Stem matching on first word -->
+        <test ID="ptStemSearchPersonItemsFirstWord">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/_ALL_/items?pt=${createPersonAuthority1.word1PartialTermStem}</uri>
+            <response>
+                <expected level="TEXT"/>
+                <filename>authority/res/personItemsContainingWord1.res.xml</filename>
+            </response>
+        </test>
+        <!-- Stem matching on second word -->
+        <test ID="ptStemSearchPersonItemsSecondWord">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/_ALL_/items?pt=${createPersonAuthority1.word2PartialTermStem}</uri>
+            <response>
+                <expected level="TEXT"/>
+                <filename>authority/res/personItemsContainingWord2.res.xml</filename>
+            </response>
+        </test>
+        <!-- Middle-of-term matching on second word -->
+        <test ID="ptMiddleSearchPersonItems">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/_ALL_/items?pt=${createPersonAuthority1.word2PartialTermMid}</uri>
+            <response>
+                <expected level="TEXT"/>
+                <filename>authority/res/personItemsContainingWord2.res.xml</filename>
+            </response>
+        </test>
+        <!-- Using an anchor character (^) at the end of the search expression -->
+        <test ID="ptTrailingAnchorCharSearchPersonItems">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/_ALL_/items?pt=${createPersonAuthority1.word1}%5E</uri>
+            <response>
+                <expected level="TEXT"/>
+                <filename>authority/res/personItemsOnlyWord1.res.xml</filename>
+            </response>
+        </test>
+        
+        <!-- Advanced searches -->
+        
+        <!-- On first word -->
+        <test ID="advSearchPersonItems1">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/_ALL_/items?as=persons_common%3ApersonTermGroupList%2F*%2FtermDisplayName%20ILIKE%20%27%25${createPersonAuthority1.word1}%25%27</uri>
+            <response>
+                <expected level="TEXT"/>
+                <filename>authority/res/personItemsContainingWord1.res.xml</filename>
+            </response>
+        </test>
+        <!-- On second word -->
+        <test ID="advSearchPersonItems2">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/_ALL_/items?as=persons_common%3ApersonTermGroupList%2F*%2FtermDisplayName%20ILIKE%20%27%25${createPersonAuthority1.word2}%25%27</uri>
+            <response>
+                <expected level="TEXT"/>
+                <filename>authority/res/personItemsContainingWord2.res.xml</filename>
+            </response>
+        </test>
+        
+        <!-- Verify that tests work in an authority other than Person Authority -->
+        
+        <test ID="getLocationItemsAllVocabs">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/_ALL_/items?pgSz=2&amp;pgNum=0</uri>
+            <response>
+                <expected level="TEXT"/>
+                <filename>authority/res/locationItems.res.xml</filename>
+                <vars>
+                    <var ID="numItems">2</var>
+                </vars>
+            </response>
+        </test>
+        <test ID="getLocationItemsSingleVocab">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/${createLocationAuthority.CSID}/items?pgSz=2&amp;pgNum=0</uri>
+            <response>
+                <expected level="TEXT"/>
+                <filename>authority/res/locationItems.res.xml</filename>
+                <vars>
+                    <var ID="numItems">2</var>
+                </vars>
+            </response>
+        </test>
+        
+        <!-- Perform a variety of searches within a single storage location vocabulary -->
+
+        <!-- Keyword search -->
+        <test ID="kwSearchLocationItems">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/${createLocationAuthority.CSID}/items?kw=${createPersonAuthority1.word1}</uri>
+            <response>
+                <expected level="TEXT"/>
+                <filename>authority/res/locationItemsWithShortID.res.xml</filename>
+                <vars>
+                    <var ID="itemShortIdentifier">${createLocationItem1.itemShortIdentifier}</var>
+                </vars>
+            </response>
+        </test>
+        
+        <!-- Partial term searches -->
+        
+        <!-- Stem matching on first word -->
+        <test ID="ptStemSearchLocationItems">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/${createLocationAuthority.CSID}/items?pt=${createPersonAuthority1.word1PartialTermStem}</uri>
+            <response>
+                <expected level="TEXT"/>
+                <filename>authority/res/locationItemsWithShortID.res.xml</filename>
+                <vars>
+                    <var ID="itemShortIdentifier">${createLocationItem1.itemShortIdentifier}</var>
+                </vars>
+            </response>
+        </test>
+        <!-- Using a wildcard in the middle of a search expression -->
+        <test ID="ptWildcardSearchLocationItems">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/_ALL_/items?pt=${createPersonAuthority1.word3}*${createPersonAuthority1.word5}</uri>
+            <response>
+                <expected level="TEXT"/>
+                <filename>authority/res/locationItemsWithShortID.res.xml</filename>
+                <vars>
+                    <var ID="itemShortIdentifier">${createLocationItem2.itemShortIdentifier}</var>
+                </vars>
+            </response>
+        </test>
+        
+        <!-- Advanced searches -->
+        
+        <test ID="advSearchLocationItemsDisplayName">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/${createLocationAuthority.CSID}/items?as=locations_common%3AlocTermGroupList%2F*%2FtermDisplayName%20ILIKE%20%27%25${createPersonAuthority1.word1}%25%27</uri>
+            <response>
+                <expected level="TEXT"/>
+                <filename>authority/res/locationItemsWithShortID.res.xml</filename>
+                <vars>
+                    <var ID="itemShortIdentifier">${createLocationItem1.itemShortIdentifier}</var>
+                </vars>
+            </response>
+        </test>
+        <test ID="advSearchLocationItemsAccessNote">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/${createLocationAuthority.CSID}/items?as=locations_common%3AaccessNote%20ILIKE%20%27%25${createPersonAuthority1.word1}%25%27</uri>
+            <response>
+                <expected level="TEXT"/>
+                <filename>authority/res/locationItemsWithShortID.res.xml</filename>
+                <vars>
+                    <var ID="itemShortIdentifier">${createLocationItem1.itemShortIdentifier}</var>
+                </vars>
+            </response>
+        </test>
+        
+    </testGroup>
+    
+</xmlReplay>

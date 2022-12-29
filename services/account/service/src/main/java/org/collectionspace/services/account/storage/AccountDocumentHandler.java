@@ -35,13 +35,10 @@ import org.collectionspace.services.account.AccountListItem;
 import org.collectionspace.services.account.AccountRoleSubResource;
 import org.collectionspace.services.account.Status;
 import org.collectionspace.services.authorization.AccountRole;
-import org.collectionspace.services.authorization.PermissionRole;
-import org.collectionspace.services.authorization.PermissionRoleSubResource;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.account.RoleValue;
 import org.collectionspace.services.client.AccountClient;
 import org.collectionspace.services.client.AccountRoleFactory;
-import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.common.storage.TransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
 import org.collectionspace.services.common.api.Tools;
@@ -304,17 +301,8 @@ public class AccountDocumentHandler
         }
     }
 
-    /**
-     * sanitize removes data not needed to be sent to the consumer
-     * @param account
-     */
     @Override
-    public void sanitize(DocumentWrapper<AccountsCommon> wrapDoc) {
-        AccountsCommon account = wrapDoc.getWrappedObject();
-        sanitize(account);
-    }
-    
-    private void sanitize(AccountsCommon account) {
+    public void sanitize(AccountsCommon account) {
         account.setPassword(null);
         if (!SecurityUtils.isCSpaceAdmin()) {
             account.setTenants(new ArrayList<AccountTenant>(0));

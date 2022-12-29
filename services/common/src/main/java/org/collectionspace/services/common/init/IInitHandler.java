@@ -16,6 +16,7 @@ public interface IInitHandler {
     public void onRepositoryInitialized(String dataSourceName,
     		String repositoryName,
     		String cspaceInstanceId,
+    		String tenantShortName,
     		ServiceBindingType sbt, 
     		List<Field> fields, 
     		List<Property> property) throws Exception;

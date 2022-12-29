@@ -48,6 +48,10 @@
 			<artifactId>jaxb2-basics-runtime</artifactId>
 		</dependency>
 		 -->
+        <dependency>
+        	<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+		</dependency>
     <!-- Dependencies for HyperJaxB -->
 		<dependency>
 		    <groupId>javax.persistence</groupId>

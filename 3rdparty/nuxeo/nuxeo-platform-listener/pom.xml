@@ -13,12 +13,13 @@
     <name>services.3rdparty.nuxeo.listener</name>
 
     <modules>
+    	<module>cspaceauditlogger</module>
         <module>reindex</module>
         <module>updateobjectlocationonmove</module>
         <module>updaterelationsondelete</module>
         <module>updateimagederivatives</module>
         <module>naturalhistory</module>
-        <module>botgarden</module>
+        <module>tenants</module>
     </modules>
 
     <dependencies>

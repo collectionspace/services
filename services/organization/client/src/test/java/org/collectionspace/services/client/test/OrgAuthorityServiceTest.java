@@ -65,8 +65,7 @@ import org.testng.annotations.Test;
  */
 public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<OrgauthoritiesCommon, OrganizationsCommon> {
 
-    private static final int MAX_CONTACTS = 1;
-	/** The logger. */
+    /** The logger. */
     private final String CLASS_NAME = OrgAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
@@ -271,6 +270,18 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         allContactResourceIdsCreated.put(newID, itemcsid);
 
         return newID;
+    }
+
+    /**
+     * Creates the contact list.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
+    @Test(dataProvider = "testName", groups = {"createList"},
+    		dependsOnMethods = {"createItemList", "deleteContact"})
+    public void createContactList(String testName) throws Exception {
+        createContact(testName); // As of CollectionSpace 7.1, only one contact item can be associated with an authority resource
     }
 
     // ---------------------------------------------------------------
@@ -692,13 +703,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         List<AbstractCommonList.ListItem> listitems =
             list.getListItem();
         int nItemsReturned = listitems.size();
-        // There will be one item created, associated with a
-        // known parent resource, by the createItem test.
-        //
-        // In addition, there will be 'nItemsToCreateInList'
-        // additional items created by the createItemList test,
-        // all associated with the same parent resource.
-        int nExpectedItems = MAX_CONTACTS;
+        int nExpectedItems = 1; // As of CollectionSpace 7.1, only one contact item can be associated with an authority resource
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": Expected "
                     + nExpectedItems + " items; got: " + nItemsReturned);

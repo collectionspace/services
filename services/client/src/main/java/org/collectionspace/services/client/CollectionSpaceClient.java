@@ -76,6 +76,7 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
     public static final String AUTH_PROPERTY = "cspace.auth";
     public static final String TENANT_NAME_PROPERTY = "cspace.tenant";
     public static final String TENANT_ID_PROPERTY = "cspace.tenantID";
+    public static final String TEST_SAS_PROPERTY = "cspace.testSAS";
     
     // JAX-RS path for getting service description meta information
 	public static final String SERVICE_DESCRIPTION_PATH = "description";

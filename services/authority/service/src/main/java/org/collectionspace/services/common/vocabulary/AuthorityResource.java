@@ -1757,4 +1757,5 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 
 		return null;
 	}
+
 }

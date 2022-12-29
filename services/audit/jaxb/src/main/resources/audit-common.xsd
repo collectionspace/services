@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!-- Audit schema (XSD) Entity : Audit Trail Part : Common Used for: JAXB 
+	binding between XML and Java objects $LastChangedRevision: 2316 $ $LastChangedDate: 
+	2018-05-02 16:03:51 -0700 (Wed, 02 Jun 2010) $ -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="1.0"
+	elementFormDefault="unqualified"
+	xmlns:ns="http://collectionspace.org/services/audit"
+	xmlns="http://collectionspace.org/services/audit"
+	targetNamespace="http://collectionspace.org/services/audit"
+	version="0.1">
+
+	<!-- Avoid XmlRootElement nightmare: See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html -->
+
+	<!-- Audit -->
+	<xs:element name="audit_common" type="audit_common" />
+
+	<xs:complexType name="audit_common">
+		<xs:sequence>
+			<!-- Common identifier -->
+			<xs:element name="csid" type="xs:string" />
+			<xs:element name="idNumber" type="xs:string" />
+			<xs:element name="resourceType" type="xs:string" />
+			<xs:element name="resourceCSID" type="xs:string" />
+
+			<xs:element name="fieldChangedGroupList"
+				type="fieldChangedGroupList" />
+
+			<xs:element name="relationshipGroupList"
+				type="relationshipGroupList" />
+
+			<xs:element name="relResourceChecksumList"
+				type="relResourceChecksumList" />
+			<xs:element name="saveMessage" type="xs:string" />
+			<xs:element name="eventComment" type="xs:string" />
+			<xs:element name="eventType" type="xs:string" />
+			<xs:element name="principal" type="xs:string" />
+			<xs:element name="eventDate" type="xs:string" />
+			<xs:element name="resourceChecksum" type="xs:string" />
+
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="fieldChangedGroupList">
+		<xs:sequence>
+			<xs:element name="fieldChangedGroup"
+				type="fieldChangedGroup" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="relationshipGroupList">
+		<xs:sequence>
+			<xs:element name="relationshipGroup"
+				type="relationshipGroup" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="fieldChangedGroup">
+		<xs:sequence>
+			<xs:element name="key" type="xs:string" />		
+			<xs:element name="fieldName" type="xs:string" />
+			<xs:element name="originalValue" type="xs:string" />
+			<xs:element name="newValue" type="xs:string" />
+			<xs:element name="changeReason" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="relationshipGroup">
+		<xs:sequence>
+			<xs:element name="relPredicate" type="xs:string" />
+			<xs:element name="relObjResourceType" type="xs:string" />
+			<xs:element name="relObjectTitle" type="xs:string" />
+			<xs:element name="relChange" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="relResourceChecksumList">
+		<xs:sequence>
+			<xs:element name="relResourceChecksum" type="xs:string"
+				minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<!-- This is the base class for paginated lists -->
+	<xs:complexType name="abstractCommonList">
+		<xs:annotation>
+			<xs:appinfo>
+				<jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:complexType>
+	
+	<xs:element name="audit_common_list">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="abstractCommonList">                    
+					<xs:sequence>
+						<xs:element name="audit-list-item" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="csid" type="xs:string" />						
+									<xs:element name="idNumber" type="xs:string" />
+									<xs:element name="resourceType" type="xs:string" />
+									<xs:element name="resourceCSID" type="xs:string" />						
+									<xs:element name="saveMessage" type="xs:string" />
+									<xs:element name="eventComment" type="xs:string" />
+									<xs:element name="eventType" type="xs:string" />
+									<xs:element name="principal" type="xs:string" />
+									<xs:element name="eventDate" type="xs:string" />
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>        
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

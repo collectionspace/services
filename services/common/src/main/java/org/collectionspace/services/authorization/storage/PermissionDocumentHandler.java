@@ -362,7 +362,8 @@ public class PermissionDocumentHandler
      * Sanitize removes data not needed to be sent to the consumer
      * @param permission
      */
-    private void sanitize(Permission permission) {
+    @Override
+    public void sanitize(Permission permission) {
         if (!SecurityUtils.isCSpaceAdmin()) {
             // permission.setTenantId(null); // REM - Why are we removing the tenant ID from the payload? Commenting out this line for now.
         }

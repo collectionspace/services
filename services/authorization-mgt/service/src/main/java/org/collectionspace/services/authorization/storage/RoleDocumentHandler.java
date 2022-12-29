@@ -311,7 +311,8 @@ public class RoleDocumentHandler
      * sanitize removes data not needed to be sent to the consumer
      * @param roleFound
      */
-    private void sanitize(Role role) {
+    @Override
+    public void sanitize(Role role) {
         if (!SecurityUtils.isCSpaceAdmin()) {
             // role.setTenantId(null); // REM - There's no reason for hiding the tenant ID is there?
         }

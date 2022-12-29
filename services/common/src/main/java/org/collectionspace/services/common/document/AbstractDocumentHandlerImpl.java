@@ -268,7 +268,7 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     }
 
     @Override
-	public void sanitize(DocumentWrapper<WT> wrapDoc) {
+	public void sanitize(T commonObject) {
     	//
     	// By default, do nothing.  Sub-classes can override if they want to.
     	//

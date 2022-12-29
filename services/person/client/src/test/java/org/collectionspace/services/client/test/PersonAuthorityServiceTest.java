@@ -66,9 +66,6 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     private final String CLASS_NAME = PersonAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     
-    // number of contacts supported by the Services API
-    private static final int MAX_CONTACTS = 1;
-    
     /**
      * Default constructor.  Used to set the short ID for all tests authority items
      */
@@ -513,6 +510,22 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         }
     }
 
+    /**
+     * Creates the contact list.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
+    @Test(dataProvider = "testName", groups = {"createList"},
+    		dependsOnMethods = {"org.collectionspace.services.client.test.AbstractAuthorityServiceTest.createItemList",
+    			"deleteContact"})
+    public void createContactList(String testName) throws Exception {
+        // Add contacts to the initially-created, known item record.
+    	for (int j = 0; j < 1; j++) { // As of CollectionSpace 7.1, one contact item only can be associated with an authority resource
+            createContact(testName);
+        }
+    }
+
     // ---------------------------------------------------------------
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
@@ -831,13 +844,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         List<AbstractCommonList.ListItem> listitems =
                 list.getListItem();
         int nItemsReturned = listitems.size();
-        // There will be one item created, associated with a
-        // known parent resource, by the createItem test.
-        //
-        // In addition, there will be 'nItemsToCreateInList'
-        // additional items created by the createItemList test,
-        // all associated with the same parent resource.
-        int nExpectedItems = MAX_CONTACTS;
+        int nExpectedItems = 1;
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": Expected "
                     + nExpectedItems + " items; got: " + nItemsReturned);

@@ -392,7 +392,7 @@ public interface DocumentHandler<T, TL, WT, WTL> {
 	 */
 	void completeSync(DocumentWrapper<Object> wrapDoc) throws Exception;
 
-	public void sanitize(DocumentWrapper<WT> wrapDoc);
+	public void sanitize(T commonObject);
 
 	/**
 	 * Should return true if the document supports workflow states (usually, just Nuxeo documents/records)

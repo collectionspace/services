@@ -8,12 +8,14 @@ Bundle-Vendor: Nuxeo
 Require-Bundle: org.nuxeo.runtime, 
  org.nuxeo.ecm.core.api,
  org.nuxeo.ecm.core,
- org.nuxeo.ecm.webapp.core
+ org.nuxeo.ecm.webapp.core,
+ org.nuxeo.ecm.platform.commandline.executor.service.defaultContrib
 Provide-Package: org.collectionspace.shared
 Nuxeo-Component: OSGI-INF/core-types-contrib.xml,
  OSGI-INF/default-life-cycle-contrib.xml,
  OSGI-INF/ecm-types-contrib.xml,
  OSGI-INF/layouts-contrib.xml,
- OSGI-INF/querymodel-contrib.xml
+ OSGI-INF/querymodel-contrib.xml,
+ OSGI-INF/commandline-imagemagick-contrib.xml
 
 

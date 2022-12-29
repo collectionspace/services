@@ -14,6 +14,7 @@
 	-->
     <link name="jdbc/TenantDS" global="jdbc/default" type="javax.sql.DataSource" />
     <link name="jdbc/nxuidsequencer" global="jdbc/default" type="javax.sql.DataSource" />
+    <link name="jdbc/nxaudit-logs" global="jdbc/default" type="javax.sql.DataSource" />
 
     <!--
         These properties are passed into the CSpace code that generates the final version of this Nuxeo configuration file.

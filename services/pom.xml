@@ -15,7 +15,7 @@
 	<properties>
 		<annox.version>0.5.0</annox.version>
 		<jaxb2-basics.version>0.6.2</jaxb2-basics.version>
-		<maven-jaxb2-plugin.version>0.13.3</maven-jaxb2-plugin.version>
+		<maven-jaxb2-plugin.version>0.13.3</maven-jaxb2-plugin.version> <!-- 0.14.0 is a more recent version -->
 		<jaxb.version>2.2.11</jaxb.version>
 		<resteasy.version>3.0.19.Final</resteasy.version>
 		<mysql.driver.version>8.0.16</mysql.driver.version>
@@ -65,6 +65,7 @@
 		<module>group</module>
 		<module>insurance</module>
 		<module>intake</module>
+		<module>hit</module>
 		<module>loanin</module>
 		<module>loanout</module>
 		<module>claim</module>
@@ -94,6 +95,7 @@
 		<module>index</module>
 		<module>media</module>
 		<module>uoc</module>
+		<module>audit</module>
 		<module>publicitem</module>
 		<module>iterationreport</module>
 		<module>IntegrationTests</module>
@@ -129,6 +131,25 @@
 	<build>
 		<pluginManagement>
 			<plugins>
+	            <plugin>
+			        <groupId>org.codehaus.mojo</groupId>
+			        <artifactId>build-helper-maven-plugin</artifactId>
+			        <version>3.2.0</version>
+			        <executions>
+			          <execution>
+			            <id>add-source</id>
+			            <phase>generate-sources</phase>
+			            <goals>
+			              <goal>add-source</goal>
+			            </goals>
+			            <configuration>
+			              <sources>
+			                <source>${basedir}/target/generated-sources/xjc</source>
+			              </sources>
+			            </configuration>
+			          </execution>
+			        </executions>
+			    </plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
@@ -409,6 +430,11 @@
 				<groupId>com.sun.xml.bind</groupId>
 				<artifactId>jaxb-impl</artifactId>
 				<version>${jaxb.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.xml.bind</groupId>
+				<artifactId>jaxb-api</artifactId>
+				<version>${jaxb.version}</version>			
 			</dependency>
 			<dependency>
 				<groupId>javax.persistence</groupId>
