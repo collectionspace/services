@@ -28,6 +28,10 @@ import org.collectionspace.services.common.security.UnauthorizedException;
 @Consumes({"application/xml"})
 public class SystemInfoResource extends AbstractCollectionSpaceResourceImpl<SystemInfoCommon, SystemInfoCommon> {
 
+    private static final int MAJOR_IDX = 0;
+    private static final int MINOR_IDX = 1;
+    private static final int PATCH_IDX = 2;
+
     @Override
     public Class<?> getCommonPartClass() {
         // TODO Auto-generated method stub
@@ -57,11 +61,14 @@ public class SystemInfoResource extends AbstractCollectionSpaceResourceImpl<Syst
             result = new SystemInfoCommon();
             result.setInstanceId(ServiceMain.getInstance().getCspaceInstanceId());
             result.setDisplayName(ServiceMain.VER_DISPLAY_NAME);
+
+            String packageVersion = SystemInfoResource.class.getPackage().getImplementationVersion();
+            String[] versionParts = packageVersion.split("\\.");
             Version ver = new Version();
-            ver.setMajor(ServiceMain.VER_MAJOR);
-            ver.setMinor(ServiceMain.VER_MINOR);
-            ver.setPatch(ServiceMain.VER_PATCH);
-            ver.setBuild(ServiceMain.VER_BUILD);
+            ver.setMajor(versionParts[MAJOR_IDX]);
+            ver.setMinor(versionParts[MINOR_IDX]);
+            ver.setPatch(versionParts[PATCH_IDX]);
+            ver.setBuild("1");
             result.setVersion(ver);
 
             result.setHostTimezone(TimeZone.getDefault().getID());
