@@ -47,6 +47,7 @@ import net.sf.jasperreports.engine.JRParameter;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.export.JRCsvExporter;
 import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
 import net.sf.jasperreports.engine.export.JRHtmlExporter;
@@ -55,6 +56,7 @@ import net.sf.jasperreports.engine.export.JRXmlExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRDocxExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRPptxExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
 
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.ReportJAXBSchema;
@@ -372,9 +374,15 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 									reportCSID, sourceFilePath);
 					throw new RuntimeException("Report is missing the specified source file!");
 				}
-            	logger.info("Report for csid={} is not compiled. Compiling first, and saving to: {}",
-            			reportCSID, compiledFilePath);
-            	JasperCompileManager.compileReportToFile(sourceFilePath, compiledFilePath);
+
+				logger.info("Report for csid={} is not compiled. Compiling first, and saving to: {}",
+					reportCSID, compiledFilePath);
+
+				JasperDesign design = JRXmlLoader.load(sourceFilePath);
+
+				design.setScriptletClass("org.collectionspace.services.report.nuxeo.DefaultReportScriptlet");
+
+				JasperCompileManager.compileReportToFile(design, compiledFilePath);
 			}
 
 			conn = getConnection();
