@@ -50,6 +50,9 @@
 		: "WHERE hierarchy.name = '" + ($P{csid} ? $P{csid}.replace(/'/g, "''") : '') + "'"
 	)]]></defaultValueExpression>
 	</parameter>
+	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["objectproductionorganization,objectproductionperson,objectproductionpeople,computedcurrentlocation"]]></defaultValueExpression>
+	</parameter>
 	<queryString>
 		<![CDATA[select
 						coc.objectnumber,
@@ -182,11 +185,7 @@
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="365" y="0" width="91" height="51" uuid="cd2614be-d303-42ec-b1ae-17986df423dd"/>
-				<textFieldExpression><![CDATA[(
-  (it) => (it && it.startsWith("urn:"))
-    ? it.substring(it.indexOf("'") + 1, it.length - 1)
-    : it
-).call(null, $F{objectproductionorganization})]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{objectproductionorganization}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="456" y="0" width="91" height="51" uuid="f9b9b475-9f9e-48a7-8016-330cbcfb0fae"/>
@@ -194,11 +193,7 @@
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="547" y="0" width="91" height="51" uuid="2c3a2c4b-9124-43c8-8be3-69c482f4e5ad"/>
-				<textFieldExpression><![CDATA[(
-  (it) => (it && it.startsWith("urn:"))
-    ? it.substring(it.indexOf("'") + 1, it.length - 1)
-    : it
-).call(null, $F{objectproductionperson})]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{objectproductionperson}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="638" y="0" width="91" height="51" uuid="baa2cb50-03d1-45e0-9e32-dac575891da9"/>
@@ -206,11 +201,7 @@
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="729" y="0" width="91" height="51" uuid="00f2e1c6-6a9d-445a-9bb0-8792754d5f66"/>
-				<textFieldExpression><![CDATA[(
-  (it) => (it && it.startsWith("urn:"))
-    ? it.substring(it.indexOf("'") + 1, it.length - 1)
-    : it
-).call(null, $F{objectproductionpeople})]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{objectproductionpeople}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="820" y="0" width="91" height="51" uuid="f28c35cd-bc86-49a7-95ff-cebf40b6434f"/>
@@ -228,11 +219,7 @@
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="1093" y="0" width="91" height="51" uuid="569e8c92-bc33-49c8-bad7-a80b144d5406">
 					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[(
-  (it) => (it && it.startsWith("urn:"))
-    ? it.substring(it.indexOf("'") + 1, it.length - 1)
-    : it
-).call(null, $F{computedcurrentlocation})]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{computedcurrentlocation}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
