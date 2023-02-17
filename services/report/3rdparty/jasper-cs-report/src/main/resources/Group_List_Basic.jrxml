@@ -51,7 +51,7 @@
 	)]]></defaultValueExpression>
 	</parameter>
 	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["objectproductionorganization,objectproductionperson,objectproductionpeople,computedcurrentlocation"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["objectname,objectproductionorganization,objectproductionorganizationrole,objectproductionperson,objectproductionpersonrole,objectproductionpeople,computedcurrentlocation"]]></defaultValueExpression>
 	</parameter>
 	<queryString>
 		<![CDATA[select
