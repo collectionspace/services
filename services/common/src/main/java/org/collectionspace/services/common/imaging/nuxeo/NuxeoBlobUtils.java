@@ -293,11 +293,8 @@ public class NuxeoBlobUtils {
 		return result;
 	}
 
-	static private CommonList handleGenericBlobs(DocumentBlobHolder docBlobHolder,
-			CoreSessionInterface repoSession,
-			String repositoryId,
-			CommonList commonList,
-			String uri) {
+	static private void handleGenericBlobs(DocumentBlobHolder docBlobHolder, CommonList commonList, String uri) {
+		int total = 0;
 		List<Blob> docBlobs = docBlobHolder.getBlobs();			
 		// List<BlobListItem> blobListItems = result.getBlobListItem();
 		HashMap<String, Object> item = null;
@@ -305,34 +302,40 @@ public class NuxeoBlobUtils {
 			if (blob != null) {
 				item = createBlobListItem(blob, uri, blob.getDigest());
 				if (item != null) {
+					total++;
 					commonList.addItem(item);
 				}
 			}
 		}
 
-		return commonList;
+		commonList.setTotalItems(total);
+		commonList.setItemsInPage(total);
 	}
 	
-	static private CommonList handlePictureViewBlobs(PictureBlobHolder pictureBlobHolder,
+	static private void handlePictureViewBlobs(PictureBlobHolder pictureBlobHolder,
 			CoreSessionInterface repoSession,
 			String repositoryId,
 			CommonList commonList,
-			String uri) {		
-		Set<String> derivativeNameList = NuxeoBlobUtils.getPictureViewNameSet(repoSession, repositoryId);
+			String uri) {
+		int total = 0;
+		final Set<String> derivativeNameList = NuxeoBlobUtils.getPictureViewNameSet(repoSession, repositoryId);
 		for (String viewName : derivativeNameList) {
 			Blob blob = pictureBlobHolder.getBlob(viewName);
 			if (blob != null) {
 				HashMap<String, Object> item = createBlobListItem(blob, uri, viewName);
 				if (item != null) {
+					total++;
 					commonList.addItem(item);
 				}
 			} else {
 				String msg = String.format("Could not get blob view '%s' for Nuxeo picuture document ID='%s'.",
 						viewName, repositoryId);
+				logger.warn(msg);
 			}
 		}
 
-		return commonList;
+		commonList.setTotalItems(total);
+		commonList.setItemsInPage(total);
 	}
 
 	static public CommonList getBlobDerivatives(CoreSessionInterface repoSession,
@@ -340,7 +343,7 @@ public class NuxeoBlobUtils {
 			throws Exception {
 		CommonList commonList = new CommonList();
 		int nFields = resultsFields.size() + 2;
-		String fields[] = new String[nFields];// FIXME: REM - Patrick needs to fix this hack.  It is a "common list" issue
+		String[] fields = new String[nFields];// FIXME: REM - Patrick needs to fix this hack.  It is a "common list" issue
 		fields[0] = "csid";
 		fields[1] = "uri";
 		for (int i = 2; i < nFields; i++) {
@@ -352,9 +355,9 @@ public class NuxeoBlobUtils {
 		DocumentModel documentModel = repoSession.getDocument(new IdRef(repositoryId));
 		DocumentBlobHolder docBlobHolder = (DocumentBlobHolder) documentModel.getAdapter(BlobHolder.class);
 		if (docBlobHolder instanceof PictureBlobHolder) {
-			commonList = handlePictureViewBlobs((PictureBlobHolder)docBlobHolder, repoSession, repositoryId, commonList, uri);
+			handlePictureViewBlobs((PictureBlobHolder)docBlobHolder, repoSession, repositoryId, commonList, uri);
 		} else {
-			commonList = handleGenericBlobs((PictureBlobHolder)docBlobHolder, repoSession, repositoryId, commonList, uri);
+			handleGenericBlobs(docBlobHolder, commonList, uri);
 		}
 		
 		return commonList;
