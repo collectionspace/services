@@ -1,7 +1,9 @@
 package org.collectionspace.services.systeminfo;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.TimeZone;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -70,7 +72,7 @@ public class SystemInfoResource extends AbstractCollectionSpaceResourceImpl<Syst
             ver.setMajor(versionParts[MAJOR_IDX]);
             ver.setMinor(versionParts[MINOR_IDX]);
             ver.setPatch(versionParts[PATCH_IDX]);
-            ver.setBuild("1");
+            ver.setBuild(readGitCommitId());
             result.setVersion(ver);
 
             result.setHostTimezone(TimeZone.getDefault().getID());
@@ -107,6 +109,12 @@ public class SystemInfoResource extends AbstractCollectionSpaceResourceImpl<Syst
         }
 
         return result;
+    }
+
+    private String readGitCommitId() throws IOException {
+        Properties properties = new Properties();
+        properties.load(getClass().getClassLoader().getResourceAsStream("git.properties"));
+        return properties.getProperty("git.commit.id.abbrev");
     }
 
     @Override
