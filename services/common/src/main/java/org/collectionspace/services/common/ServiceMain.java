@@ -74,7 +74,6 @@ import org.slf4j.LoggerFactory;
 public class ServiceMain {
 	final static Logger logger = LoggerFactory.getLogger(ServiceMain.class);
 
-	public static final String VER_DISPLAY_NAME = "CollectionSpace Services v7.1";
 
 	private static final int PRIMARY_REPOSITORY_DOMAIN = 0;
 

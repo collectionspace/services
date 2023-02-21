@@ -28,6 +28,7 @@ import org.collectionspace.services.common.security.UnauthorizedException;
 @Consumes({"application/xml"})
 public class SystemInfoResource extends AbstractCollectionSpaceResourceImpl<SystemInfoCommon, SystemInfoCommon> {
 
+    private static final String VER_DISPLAY_NAME = "CollectionSpace Services v%s.%s";
     private static final int MAJOR_IDX = 0;
     private static final int MINOR_IDX = 1;
     private static final int PATCH_IDX = 2;
@@ -58,12 +59,13 @@ public class SystemInfoResource extends AbstractCollectionSpaceResourceImpl<Syst
         SystemInfoCommon result;
 
         try {
-            result = new SystemInfoCommon();
-            result.setInstanceId(ServiceMain.getInstance().getCspaceInstanceId());
-            result.setDisplayName(ServiceMain.VER_DISPLAY_NAME);
-
             String packageVersion = SystemInfoResource.class.getPackage().getImplementationVersion();
             String[] versionParts = packageVersion.split("\\.");
+
+            result = new SystemInfoCommon();
+            result.setInstanceId(ServiceMain.getInstance().getCspaceInstanceId());
+            result.setDisplayName(String.format(VER_DISPLAY_NAME, versionParts[MAJOR_IDX], versionParts[MINOR_IDX]));
+
             Version ver = new Version();
             ver.setMajor(versionParts[MAJOR_IDX]);
             ver.setMinor(versionParts[MINOR_IDX]);
