@@ -30,10 +30,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
 import org.collectionspace.services.client.ExportClient;
 import org.collectionspace.services.client.PayloadOutputPart;
@@ -48,6 +49,7 @@ import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.invocable.Field;
 import org.collectionspace.services.common.invocable.Invocable;
 import org.collectionspace.services.common.invocable.InvocationContext;
+import org.dom4j.Element;
 import org.dom4j.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,8 +72,9 @@ public class ExportResource extends AbstractCollectionSpaceResourceImpl<PoxPaylo
 	// There is no way to tell from config that collectionspace_core should not be exported, so it
 	// has to be hardcoded here. At that point we might as well also hardcode account_permission,
 	// so we don't need to look at config at all.
-
-	private static final List<String> EXCLUDE_PARTS = Arrays.asList("collectionspace_core", "account_permission");
+	private static final ImmutableMap<String, List<String>> EXCLUDE_PARTS = ImmutableMap.of(
+		"collectionspace_core", Arrays.asList("workflowState", "tenantId", "refName"),
+		"account_permission", Collections.<String>emptyList());
 
 	private static final String MIME_TYPE_CSV = "text/csv";
 	private static final String MIME_TYPE_XML = "application/xml";
@@ -175,11 +178,20 @@ public class ExportResource extends AbstractCollectionSpaceResourceImpl<PoxPaylo
 			return;
 		}
 
-		for (String partName : EXCLUDE_PARTS) {
+		for (String partName : EXCLUDE_PARTS.keySet()) {
+			final List<String> restrictedFields = EXCLUDE_PARTS.get(partName);
 			PayloadOutputPart part = document.getPart(partName);
 
 			if (part != null) {
-				document.removePart(part);
+				if (restrictedFields.isEmpty()) {
+					document.removePart(part);
+				} else {
+					final Element body = part.getElementBody();
+
+					for (String restrictedField : restrictedFields) {
+						detach(restrictedField, body);
+					}
+				}
 			}
 		}
 
@@ -196,16 +208,8 @@ public class ExportResource extends AbstractCollectionSpaceResourceImpl<PoxPaylo
 				String xpath = segments[1];
 
 				PayloadOutputPart part = document.getPart(partName);
-
 				if (part != null) {
-					org.dom4j.Element partElement = part.getElementBody();
-					List<Node> matches = (List<Node>) partElement.selectNodes(xpath);
-
-					for (Node excludeNode : matches) {
-						if (excludeNode.getNodeType() == Node.ELEMENT_NODE) {
-							excludeNode.detach();
-						}
-					}
+					detach(xpath, part.getElementBody());
 				}
 			}
 		}
@@ -248,6 +252,18 @@ public class ExportResource extends AbstractCollectionSpaceResourceImpl<PoxPaylo
 			}
 
 			document.setParts(includedParts);
+		}
+	}
+
+	private void detach(final String xpath, final Element element) {
+		if (element != null) {
+			List<Node> matches = (List<Node>) element.selectNodes(xpath);
+
+			for (Node excludeNode : matches) {
+				if (excludeNode.getNodeType() == Node.ELEMENT_NODE) {
+					excludeNode.detach();
+				}
+			}
 		}
 	}
 
