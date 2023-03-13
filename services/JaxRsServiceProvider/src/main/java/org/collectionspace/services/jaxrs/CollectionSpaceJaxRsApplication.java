@@ -25,6 +25,7 @@ package org.collectionspace.services.jaxrs;
 import org.collectionspace.services.account.AccountResource;
 import org.collectionspace.services.account.TenantResource;
 import org.collectionspace.services.blob.BlobResource;
+import org.collectionspace.services.chronology.ChronologyAuthorityResource;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.id.IDResource;
 import org.collectionspace.services.insurance.InsuranceResource;
@@ -158,6 +159,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new PublicItemResource());
         addResourceToMapAndSingletons(new TransportResource());
         addResourceToMapAndSingletons(new IterationreportResource());
+        addResourceToMapAndSingletons(new ChronologyAuthorityResource());
 
         singletons.add(new IDResource());
 
