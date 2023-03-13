@@ -18,4 +18,6 @@ import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 
 public interface ChronologyJAXBSchema extends AuthorityItemJAXBSchema {
     String CHRONOLOGIES_COMMON = "chronologies_common";
+    String CHRONOLOGY_DESCRIPTION = "description";
+
 }
