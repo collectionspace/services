@@ -19,29 +19,73 @@
 	</scriptdef>
 
 	<!-- set global properties for this build -->
-	<property name="services.trunk" value=".."/>
+	<property name="services.trunk" value=".." />
+	<property name="build.dir.name" value="build" />
+	<property name="build.dir" value="./${build.dir.name}" />
+	<property name="source.dir" value="${build.dir}/source" />
+	<property name="staging.dir" value="${build.dir}/staging" />
 
 	<!-- Environment should be declared before reading build.properties -->
 	<property environment="env" />
 	<property file="${services.trunk}/build.properties" />
+	<propertycopy name="cspace.ui.build" from="env.CSPACE_UI_BUILD" />
 
-	<property name="cspace.ui.filename" value="${cspace.ui.library.name}@${cspace.ui.version}.min.js" />
-
-	<target name="deploy_cspace_ui_js">
-		<exec executable="curl" failonerror="true">
-			<arg line="-o ${cspace.ui.filename} --fail --insecure --remote-name --location https://unpkg.com/cspace-ui@${cspace.ui.version}/dist/${cspace.ui.library.name}.min.js"/>
-		</exec>
-
-		<move file="${cspace.ui.filename}" todir="${jee.deploy.cspace.ui.shared}"></move>
+	<target name="clean">
+		<delete includeEmptyDirs="true">
+			<fileset dir="." includes="**/${build.dir.name}/" defaultexcludes="no" />
+		</delete>
 	</target>
 
-	<target name="undeploy_cspace_ui_js" description="undeploy collectionspace ui common components from ${jee.server.cspace}">
-		<delete file="${jee.deploy.cspace.ui.shared}/${cspace.ui.filename}" />
+	<target name="ensure_source_dir" if="${cspace.ui.build}">
+		<mkdir dir="${source.dir}" />
+	</target>
+
+	<target name="ensure_staging_dir">
+		<mkdir dir="${staging.dir}" />
+	</target>
+
+	<target name="install_nvm" if="${cspace.ui.build}">
+		<exec executable="bash" failonerror="true">
+			<arg value="-c" />
+			<arg line='"curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash"' />
+		</exec>
+	</target>
+
+	<target name="install_node" depends="install_nvm" if="${cspace.ui.build}">
+		<exec executable="bash" failonerror="true">
+			<arg value="-c" />
+			<arg value='source "$HOME/.nvm/nvm.sh" &amp;&amp; nvm install ${cspace.ui.build.node.ver} &amp;&amp; nvm use ${cspace.ui.build.node.ver} &amp;&amp; nvm install-latest-npm' />
+		</exec>
+	</target>
+
+	<target name="build_cspace_ui_js" depends="ensure_staging_dir,ensure_source_dir,install_node" if="${cspace.ui.build}">
+		<exec executable="bash" failonerror="true">
+			<arg value="-c" />
+			<arg value="./build_js.sh ${cspace.ui.package.name} ${cspace.ui.build.branch} ${source.dir} ${staging.dir} ${cspace.ui.library.name}"/>
+		</exec>
+	</target>
+
+	<target name="download_cspace_ui_js" depends="ensure_staging_dir" unless="${cspace.ui.build}">
+		<exec executable="curl" failonerror="true">
+			<arg line="-o ${staging.dir}/${cspace.ui.library.name}@${cspace.ui.version}.min.js --fail --insecure --location https://cdn.jsdelivr.net/npm/cspace-ui@${cspace.ui.version}/dist/${cspace.ui.library.name}.min.js"/>
+		</exec>
+	</target>
+
+	<target name="deploy_cspace_ui_js" depends="build_cspace_ui_js,download_cspace_ui_js">
+		<pathconvert property="cspace.ui.install.filename" targetos="unix">
+			<first>
+				<fileset dir="${staging.dir}" includes="${cspace.ui.library.name}@*.min.js" />
+			</first>
+
+			<mapper type="flatten" />
+		</pathconvert>
+
+		<copy file="${staging.dir}/${cspace.ui.install.filename}" todir="${jee.deploy.cspace.ui.shared}" />
 	</target>
 
 	<target name="deploy_tenants" depends="deploy_cspace_ui_js">
 		<subant target="deploy_tenant" genericantfile="${ant.file}" inheritall="true">
-			<dirset dir="." includes="*" />
+			<dirset dir="." includes="*" excludes="${build.dir.name}" />
 		</subant>
 	</target>
 
@@ -51,11 +95,12 @@
 		<propertycopy name="tenant.create.disabled" from="env.CSPACE_${tenant.shortname.upper}_CREATE_DISABLED_OPT" />
 
 		<property file="${basedir}/build.properties" />
-		<property name="tenant.ui.profile.plugin.filename" value="${tenant.ui.profile.plugin.library.name}@${tenant.ui.profile.plugin.version}.min.js" />
 
 		<!-- Default values, in case these weren't set in the tenant's build.properties. -->
 		<property name="tenant.ui.webapp.dir" value="cspace#${tenant.shortname}" />
 		<property name="tenant.ui.basename" value="/cspace/${tenant.shortname}" />
+
+		<echo message="Deploying tenant ${tenant.shortname}" />
 
 		<!-- Get the configured tenant ID from tenant bindings. This will be in the property tenant:tenantBinding.id. -->
 		<xmlproperty keepRoot="false" collapseAttributes="true" file="../../services/common/src/main/cspace/config/services/tenants/${tenant.shortname}/${tenant.shortname}-tenant-bindings.delta.xml" />
@@ -78,27 +123,74 @@
 			<isset property="tenant:tenantBinding.id"/>
 		</condition>
 
-		<antcall target="deploy_tenant_js" />
 		<antcall target="deploy_tenant_webapp" />
 	</target>
 
-	<target name="deploy_tenant_js" if="tenant.ui.profile.plugin.package.name" unless="${tenant.create.disabled}">
-		<exec executable="curl" failonerror="true">
-			<arg line="-o ${tenant.ui.profile.plugin.filename} --fail --insecure --remote-name --location https://unpkg.com/${tenant.ui.profile.plugin.package.name}@${tenant.ui.profile.plugin.version}/dist/${tenant.ui.profile.plugin.library.name}.min.js"/>
-		</exec>
-
-		<move file="${tenant.ui.profile.plugin.filename}" todir="${jee.deploy.cspace.ui.shared}"></move>
+	<target name="check_build_tenant_js">
+		<condition property="should.build.tenant.js">
+			<and>
+				<isset property="tenant.ui.profile.plugin.package.name" />
+				<isfalse value="${tenant.create.disabled}" />
+				<istrue value="${cspace.ui.build}" />
+			</and>
+		</condition>
 	</target>
 
-	<target name="deploy_tenant_webapp" unless="${tenant.create.disabled}">
-		<filter token="UI_FILENAME" value="${cspace.ui.filename}" />
-		<filter token="UI_PROFILE_PLUGIN_FILENAME" value="${tenant.ui.profile.plugin.filename}" />
+	<target name="build_tenant_js" depends="check_build_tenant_js,ensure_staging_dir,ensure_source_dir,install_node" if="should.build.tenant.js">
+		<fail message="Build branch not found for ${tenant.shortname}. Set the tenant.ui.profile.plugin.build.branch property in ${basedir}/build.properties.">
+			<condition>
+				<not>
+					<isset property="tenant.ui.profile.plugin.build.branch"/>
+				</not>
+			</condition>
+		</fail>
+
+		<exec executable="bash" failonerror="true">
+			<arg value="-c" />
+			<arg value="../build_js.sh ${tenant.ui.profile.plugin.package.name} ${tenant.ui.profile.plugin.build.branch} ${source.dir} ${staging.dir} ${tenant.ui.profile.plugin.library.name}"/>
+		</exec>
+	</target>
+
+	<target name="check_download_tenant_js">
+		<condition property="should.download.tenant.js">
+			<and>
+				<isset property="tenant.ui.profile.plugin.package.name" />
+				<isfalse value="${tenant.create.disabled}" />
+				<isfalse value="${cspace.ui.build}" />
+			</and>
+		</condition>
+	</target>
+
+	<target name="download_tenant_js" depends="check_download_tenant_js,ensure_staging_dir" if="should.download.tenant.js">
+		<exec executable="curl" failonerror="true">
+			<arg line="-o ${staging.dir}/${tenant.ui.profile.plugin.library.name}@${tenant.ui.profile.plugin.version}.min.js --fail --insecure --location https://cdn.jsdelivr.net/npm/${tenant.ui.profile.plugin.package.name}@${tenant.ui.profile.plugin.version}/dist/${tenant.ui.profile.plugin.library.name}.min.js"/>
+		</exec>
+	</target>
+
+	<target name="deploy_tenant_js" depends="build_tenant_js,download_tenant_js" if="tenant.ui.profile.plugin.package.name" unless="${tenant.create.disabled}">
+		<pathconvert property="tenant.ui.profile.plugin.install.filename" targetos="unix">
+			<first>
+				<fileset dir="${staging.dir}" includes="${tenant.ui.profile.plugin.library.name}@*.min.js" />
+			</first>
+
+			<mapper type="flatten" />
+		</pathconvert>
+
+		<copy file="${staging.dir}/${tenant.ui.profile.plugin.install.filename}" todir="${jee.deploy.cspace.ui.shared}" />
+	</target>
+
+	<target name="deploy_tenant_webapp" depends="deploy_tenant_js" unless="${tenant.create.disabled}">
+		<filter token="UI_FILENAME" value="${cspace.ui.install.filename}" />
+		<filter token="UI_PROFILE_PLUGIN_FILENAME" value="${tenant.ui.profile.plugin.install.filename}" />
 		<filter token="UI_PROFILE_PLUGIN_LIBRARY_NAME" value="${tenant.ui.profile.plugin.library.name}" />
 		<filter token="BASENAME" value="${tenant.ui.basename}" />
 		<filter token="TENANT_ID" value="${resolved.tenant.id}" />
 
 		<copy todir="${jee.deploy.cspace}/${tenant.ui.webapp.dir}" failonerror="false" filtering="true" overwrite="true">
-			<fileset dir="${basedir}" excludes="build.properties" />
+			<fileset dir="${basedir}">
+				<exclude name="build.properties" />
+				<exclude name="${build.dir.name}/" />
+			</fileset>
 		</copy>
 	</target>
 
@@ -124,7 +216,7 @@
 		<delete dir="${jee.deploy.cspace.ui.shared}" />
 	</target>
 
-	<target name="deploy" depends="deploy_tenants" description="deploy cspace ui to ${jee.server.cspace}" />
+	<target name="deploy" depends="clean,deploy_tenants" description="deploy cspace ui to ${jee.server.cspace}" />
 
-	<target name="undeploy" depends="undeploy_tenants, undeploy_js" description="undeploy collectionspace ui components from ${jee.server.cspace}" />
+	<target name="undeploy" depends="undeploy_tenants,undeploy_js" description="undeploy collectionspace ui components from ${jee.server.cspace}" />
 </project>
