@@ -6,6 +6,7 @@
 dev-master.xml
 .metadata/
 *tenant-bindings.merged.xml
+build
 target
 .settings
 .classpath
