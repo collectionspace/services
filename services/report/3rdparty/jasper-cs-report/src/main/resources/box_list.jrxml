@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="boxlist" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="38098e4f-3241-4565-bf21-09bee365eae1">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="800"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="625"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="361"/>
+	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="SansSerif" fontSize="12"/>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="csid" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="whereclause" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csid} != null ?  "WHERE hier.name = '" + $P{csid} + "'"  : ""]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[WITH lmis AS (
+  SELECT move.movementreferencenumber, move.currentlocation, hier.name AS csid
+  FROM movements_common move
+  INNER JOIN misc ON misc.id = move.id AND misc.lifecyclestate != 'deleted'
+  INNER JOIN collectionspace_core core ON misc.id = core.id AND core.tenantid = $P{tenantid}
+  INNER JOIN hierarchy hier ON move.id = hier.id
+  $P!{whereclause}
+), terms AS (
+  SELECT lmi.csid AS movementcsid, ltg.termname, ltg.termdisplayname
+  FROM lmis lmi
+  INNER JOIN locations_common lc ON lmi.currentlocation = lc.refname
+  INNER JOIN hierarchy hier ON lc.id = hier.parentid AND hier.primarytype = 'locTermGroup' AND hier.pos = 0
+  INNER JOIN loctermgroup ltg ON hier.id = ltg.id
+), collectionobjects AS (
+  SELECT co.id, co.objectnumber, hier.name AS csid, lmi.csid AS movementcsid
+  FROM lmis lmi
+  INNER JOIN relations_common rels ON rels.subjectcsid = lmi.csid AND rels.objectdocumenttype = 'CollectionObject'
+  INNER JOIN hierarchy hier ON hier.name = rels.objectcsid AND hier.primarytype = 'CollectionObject'
+  INNER JOIN collectionobjects_common co ON co.id = hier.id
+), objectnames AS (
+  SELECT ong.objectname, co.csid AS objectcsid
+  FROM collectionobjects co
+  INNER JOIN hierarchy hier ON hier.parentid = co.id AND hier.primarytype = 'objectNameGroup' AND hier.pos = 0
+  INNER JOIN objectnamegroup ong ON ong.id = hier.id
+), thumbnails AS (
+  SELECT relations.objectcsid as mediacsid, co.csid AS objectcsid
+  FROM collectionobjects co
+  INNER JOIN relations_common relations ON relations.subjectcsid = co.csid AND relations.objectdocumenttype = 'Media'
+)
+SELECT lmi.movementreferencenumber, terms.termdisplayname, terms.termname, co.objectnumber, objectnames.objectname, thumbnails.mediacsid
+FROM lmis lmi
+LEFT OUTER JOIN terms ON terms.movementcsid = lmi.csid
+LEFT OUTER JOIN collectionobjects co ON co.movementcsid = lmi.csid
+LEFT OUTER JOIN objectnames ON objectnames.objectcsid = co.csid
+LEFT OUTER JOIN thumbnails ON thumbnails.objectcsid = co.csid]]>
+	</queryString>
+	<field name="movementreferencenumber" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="movementreferencenumber"/>
+		<property name="com.jaspersoft.studio.field.label" value="movementreferencenumber"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="movements_common"/>
+	</field>
+	<field name="termname" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="termname"/>
+		<property name="com.jaspersoft.studio.field.label" value="termname"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="loctermgroup"/>
+	</field>
+	<field name="termdisplayname" class="java.lang.String"/>
+	<field name="objectnumber" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="objectnumber"/>
+		<property name="com.jaspersoft.studio.field.label" value="objectnumber"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common"/>
+	</field>
+	<field name="objectname" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="objectname"/>
+		<property name="com.jaspersoft.studio.field.label" value="objectname"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="objectnamegroup"/>
+	</field>
+	<field name="mediacsid" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="filename"/>
+		<property name="com.jaspersoft.studio.field.label" value="filename"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="view"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="44" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement style="Column header" x="0" y="0" width="100" height="44" uuid="bcc17d27-b28d-4986-9b26-b6c8551d95a5">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[reference number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="100" y="0" width="100" height="44" uuid="158337b6-7a3a-47fe-b604-12a3d21ab24c">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<text><![CDATA[current location]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="200" y="0" width="100" height="44" uuid="ac423c97-aee3-4c9b-bcd4-3458e45a0f0f">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<text><![CDATA[current location name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="300" y="0" width="100" height="44" uuid="030061fd-53dd-4512-9f51-e3c95773662a">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<text><![CDATA[objectnumber]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="400" y="0" width="100" height="44" uuid="1fbce98e-b1d9-4e9f-a63b-1bfcf844db25">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<text><![CDATA[objectname]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="500" y="0" width="100" height="44" uuid="c88a5c97-242d-4583-971a-61640d86c7f2">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<text><![CDATA[thumbnail]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="66" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement style="Detail" x="0" y="0" width="100" height="30" uuid="00603df5-d974-4732-9ae8-299fa37b2987">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{movementreferencenumber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="100" y="0" width="100" height="30" uuid="9de99e14-7bd6-47a9-b28e-903bb3f7bf6b">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{termdisplayname}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="53e52de5-3610-4c50-b27d-0cfa6b66410e">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{termname}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="300" y="0" width="100" height="30" uuid="9a48e9ea-699b-42b8-85f1-090a20cb0a38">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="de6e4b2e-cf86-4733-90b9-8bc416968623">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{objectname}]]></textFieldExpression>
+			</textField>
+			<image onErrorType="Blank">
+				<reportElement x="500" y="0" width="50" height="50" uuid="0fedd541-b1ad-4f49-a93a-b77d40828cad"/>
+				<imageExpression><![CDATA["cspace://media/" + $F{mediacsid} + "/blob/derivatives/Thumbnail/content"]]></imageExpression>
+			</image>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</summary>
+</jasperReport>
