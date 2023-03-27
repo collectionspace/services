@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 PACKAGE_NAME=$1
 BRANCH_NAME=$2
