@@ -380,7 +380,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 
 				JasperDesign design = JRXmlLoader.load(sourceFilePath);
 
-				design.setScriptletClass("org.collectionspace.services.report.nuxeo.DefaultReportScriptlet");
+				design.setScriptletClass("org.collectionspace.services.report.jasperreports.CSpaceReportScriptlet");
 
 				JasperCompileManager.compileReportToFile(design, compiledFilePath);
 			}

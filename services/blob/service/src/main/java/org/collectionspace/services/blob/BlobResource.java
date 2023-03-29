@@ -121,7 +121,7 @@ public class BlobResource extends NuxeoBasedResource {
     	return result;
     }
     
-    private InputStream getBlobContent(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    public InputStream getBlobContent(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
     		String csid, 
     		String derivativeTerm, 
     		StringBuffer outMimeType) throws CSWebApplicationException {
