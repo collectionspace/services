@@ -42,6 +42,8 @@ import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -109,16 +111,24 @@ public class MediaResource extends NuxeoBasedResource {
 //	}
 
 	private String getBlobCsid(String mediaCsid) throws Exception {
-		String result = null;
-		
-    	ServiceContext<PoxPayloadIn, PoxPayloadOut> mediaContext = createServiceContext();
-    	BlobInput blobInput = BlobUtil.getBlobInput(mediaContext);
-    	blobInput.setSchemaRequested(true);
-        get(mediaCsid, mediaContext); //this call sets the blobInput.blobCsid field for us
-        result = blobInput.getBlobCsid();
-    	ensureCSID(result, READ);
-		
-        return result;
+		return getBlobCsid(mediaCsid, true);
+	}
+
+	private String getBlobCsid(String mediaCsid, boolean requireNotNull) throws Exception {
+		ServiceContext<PoxPayloadIn, PoxPayloadOut> mediaContext = createServiceContext();
+
+		BlobInput blobInput = BlobUtil.getBlobInput(mediaContext);
+		blobInput.setSchemaRequested(true);
+
+		get(mediaCsid, mediaContext); // This call sets the blobInput.blobCsid field for us
+
+		String result = blobInput.getBlobCsid();
+
+		if (requireNotNull) {
+			ensureCSID(result, READ);
+		}
+
+		return result;
 	}	
 	
     @Override
@@ -336,6 +346,27 @@ public class MediaResource extends NuxeoBasedResource {
     	return result;
     }
             
+		public InputStream getDerivativeContent(String csid, String derivativeTerm) {
+			InputStream contentStream = null;
+
+			try {
+				ensureCSID(csid, READ);
+
+				String blobCsid = this.getBlobCsid(csid, false);
+
+				if (blobCsid != null) {
+					ServiceContext<PoxPayloadIn, PoxPayloadOut> blobContext = createServiceContext(BlobClient.SERVICE_NAME);
+					StringBuffer mimeType = new StringBuffer();
+
+					contentStream = getBlobResource().getBlobContent(blobContext, blobCsid, derivativeTerm, mimeType);
+				}
+			} catch (Exception e) {
+					throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);
+			}
+
+			return contentStream;
+		}
+
     @GET
     @Path("{csid}/blob/derivatives/{derivativeTerm}")
     public byte[] getDerivative(@PathParam("csid") String csid,

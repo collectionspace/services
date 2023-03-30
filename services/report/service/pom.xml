@@ -24,7 +24,7 @@
             <artifactId>org.collectionspace.services.account.service</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
-        </dependency>            
+        </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.config</artifactId>
@@ -53,6 +53,11 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.collectionobject.jaxb</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.media.service</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- External dependencies -->

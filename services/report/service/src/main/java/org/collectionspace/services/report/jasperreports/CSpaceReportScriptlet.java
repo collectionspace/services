@@ -1,4 +1,4 @@
-package org.collectionspace.services.report.nuxeo;
+package org.collectionspace.services.report.jasperreports;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -18,8 +18,8 @@ import org.slf4j.LoggerFactory;
  * fields to de-urn are supplied in the deurnfields parameter, as a comma-delimited list. If "*" is
  * specified, all string-typed fields are de-urned.
  */
-public class DefaultReportScriptlet extends JRDefaultScriptlet {
-	private final Logger logger = LoggerFactory.getLogger(DefaultReportScriptlet.class);
+public class CSpaceReportScriptlet extends JRDefaultScriptlet {
+	private final Logger logger = LoggerFactory.getLogger(CSpaceReportScriptlet.class);
 
 	private static String DEURN_FIELDS_PARAM = "deurnfields";
 
