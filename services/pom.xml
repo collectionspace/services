@@ -96,6 +96,7 @@
 		<module>uoc</module>
 		<module>publicitem</module>
 		<module>iterationreport</module>
+		<module>chronology</module>
 		<module>IntegrationTests</module>
 		<module>PerformanceTests</module>
 		<module>security</module>

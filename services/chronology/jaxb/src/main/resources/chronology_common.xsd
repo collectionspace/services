@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Chronology schema (XSD)
+
+    Entity  : Chronology
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+-->
+
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns="http://collectionspace.org/services/chronology"
+  targetNamespace="http://collectionspace.org/services/chronology"
+  version="0.1"
+>
+  <!--  Chronology Information Group -->
+  <xs:element name="chronologies_common">
+    <xs:complexType>
+      <xs:sequence>
+        <!--  Common identifier -->
+        <xs:element name="csid" type="xs:string" />
+
+        <!-- Revision number -->
+        <xs:element name="rev" type="xs:integer" />
+
+        <!--  Common Authority Information Group -->
+        <!--  inAuthority is the csid of the owning ConceptAuthority -->
+        <xs:element name="inAuthority" type="xs:string" />
+        <xs:element name="shortIdentifier" type="xs:string" />
+        <xs:element name="refName" type="xs:string" />
+
+        <xs:element name="chronologyTermGroupList" type="chronologyTermGroupList" />
+        <xs:element name="chronologyStructuredDateGroup" type="structuredDateGroup" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="chronologyTermGroupList">
+    <xs:sequence>
+      <xs:element name="chronologyTermGroup" type="chronologyTermGroup" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="chronologyTermGroup">
+    <xs:sequence>
+      <!-- Common across all authority item terms -->
+      <xs:element name="termDisplayName" type="xs:string" />
+      <xs:element name="termFormattedDisplayName" type="xs:string" />
+      <xs:element name="termName" type="xs:string" />
+      <xs:element name="termType" type="xs:string" />
+      <xs:element name="termStatus" type="xs:string" />
+      <xs:element name="termQualifier" type="xs:string" />
+      <xs:element name="termLanguage" type="xs:string" />
+      <xs:element name="termPrefForLang" type="xs:boolean" />
+      <xs:element name="termSource" type="xs:string" />
+      <xs:element name="termSourceDetail" type="xs:string" />
+      <xs:element name="termSourceID" type="xs:string" />
+      <xs:element name="termSourceNote" type="xs:string" />
+      <!-- Specific to chronology authority -->
+      <xs:element name="historicalStatus" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="structuredDateGroup">
+    <xs:sequence>
+      <xs:element name="dateDisplayDate" type="xs:string" />
+      <xs:element name="dateAssociation" type="xs:string" />
+      <xs:element name="dateEarliestSingleYear" type="xs:integer" />
+      <xs:element name="dateEarliestSingleMonth" type="xs:integer" />
+      <xs:element name="dateEarliestSingleDay" type="xs:integer" />
+      <xs:element name="dateEarliestSingleEra" type="xs:string" />
+      <xs:element name="dateEarliestSingleCertainty" type="xs:string" />
+      <xs:element name="dateEarliestSingleQualifier" type="xs:string" />
+      <xs:element name="dateEarliestSingleQualifierValue" type="xs:integer" />
+      <xs:element name="dateEarliestSingleQualifierUnit" type="xs:string" />
+      <xs:element name="dateLatestYear" type="xs:integer" />
+      <xs:element name="dateLatestMonth" type="xs:integer" />
+      <xs:element name="dateLatestDay" type="xs:integer" />
+      <xs:element name="dateLatestEra" type="xs:string" />
+      <xs:element name="dateLatestCertainty" type="xs:string" />
+      <xs:element name="dateLatestQualifier" type="xs:string" />
+      <xs:element name="dateLatestQualifierValue" type="xs:integer" />
+      <xs:element name="dateLatestQualifierUnit" type="xs:string" />
+      <xs:element name="datePeriod" type="xs:string" />
+      <xs:element name="dateNote" type="xs:string" />
+      <xs:element name="dateEarliestScalarValue" type="xs:date" />
+      <xs:element name="dateLatestScalarValue" type="xs:date" />
+      <xs:element name="scalarValuesComputed" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
