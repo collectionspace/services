@@ -12,7 +12,7 @@
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
  */
-package org.collectionspace.services.client;
+package org.collectionspace.services.client.test;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -30,7 +30,12 @@ import org.collectionspace.services.chronology.ChronologiesCommon;
 import org.collectionspace.services.chronology.ChronologyTermGroup;
 import org.collectionspace.services.chronology.ChronologyTermGroupList;
 import org.collectionspace.services.chronology.ChronologyauthoritiesCommon;
-import org.collectionspace.services.client.test.AbstractAuthorityServiceTest;
+import org.collectionspace.services.client.AuthorityClient;
+import org.collectionspace.services.client.ChronologyAuthorityClient;
+import org.collectionspace.services.client.ChronologyAuthorityClientUtils;
+import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
@@ -309,7 +314,7 @@ public class ChronologyAuthorityServiceTest
 
     @Override
     protected String getItemServiceRootURL(String parentResourceIdentifier) {
-        return getResourceURL(parentResourceIdentifier) + "/" + getServicePathComponent();
+        return getResourceURL(parentResourceIdentifier) + "/" + AuthorityClient.ITEMS;
     }
 
     @Override
