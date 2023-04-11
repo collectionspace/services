@@ -18,7 +18,7 @@
 		<maven-jaxb2-plugin.version>0.13.3</maven-jaxb2-plugin.version>
 		<jaxb.version>2.2.11</jaxb.version>
 		<resteasy.version>3.0.19.Final</resteasy.version>
-		<mysql.driver.version>8.0.16</mysql.driver.version>
+		<mysql.driver.version>8.0.28</mysql.driver.version>
 		<postgres.driver.version>42.2.1</postgres.driver.version>
 		<tomcat.version>8.5.40</tomcat.version>
 		<!-- The default life cycle policy for Nuxeo document types -->
