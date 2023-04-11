@@ -64,14 +64,14 @@ public class ChronologyAuthorityClientUtils {
      *
      * @param vcsid the csid of the authority
      * @param authRefName the refname of the authority
-     * @param materialMap properties for the new chronology
+     * @param chronologyMap properties for the new chronology
      * @param terms terms for the new chronology
      * @param client the service client
      * @return the csid of the new item
      */
     public static String createItemInAuthority(final String vcsid,
                                                final String authRefName,
-                                               final Map<String, String> materialMap,
+                                               final Map<String, String> chronologyMap,
                                                final List<ChronologyTermGroup> terms,
                                                final ChronologyAuthorityClient client) {
         // Expected status code: 201 Created
@@ -84,24 +84,24 @@ public class ChronologyAuthorityClientUtils {
             displayName = terms.get(0).getTermDisplayName();
         }
         logger.debug("Creating item with display name: {} in chronologyAuthority: {}", displayName, vcsid);
-        PoxPayloadOut multipart = createChronologyInstance(materialMap, terms, client.getItemCommonPartName());
+        PoxPayloadOut multipart = createChronologyInstance(chronologyMap, terms, client.getItemCommonPartName());
         String newID;
 
         final Response res = client.createItem(vcsid, multipart);
         try {
             int statusCode = res.getStatus();
 
-            if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
+            if (!REQUEST_TYPE.isValidStatusCode(statusCode)) {
                 final String error = "Could not create Item: %s in chronologyAuthority: %s, %s";
                 throw new RuntimeException(String.format(error,
-                                                         materialMap.get(ChronologyJAXBSchema.SHORT_IDENTIFIER),
+                                                         chronologyMap.get(ChronologyJAXBSchema.SHORT_IDENTIFIER),
                                                          authRefName,
                                                          invalidStatusCodeMessage(REQUEST_TYPE, statusCode)));
             }
-            if(statusCode != EXPECTED_STATUS_CODE) {
+            if (statusCode != EXPECTED_STATUS_CODE) {
                 final String error = "Unexpected Status when creating Item: %s in chronologyAuthority %s, Status: %d";
                 throw new RuntimeException(String.format(error,
-                                                         materialMap.get(ChronologyJAXBSchema.SHORT_IDENTIFIER),
+                                                         chronologyMap.get(ChronologyJAXBSchema.SHORT_IDENTIFIER),
                                                          authRefName,
                                                          statusCode));
             }
