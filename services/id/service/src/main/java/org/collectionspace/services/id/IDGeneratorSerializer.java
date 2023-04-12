@@ -14,7 +14,7 @@
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
  */
- 
+
 // @TODO: Revise exception handling to return custom Exceptions,
 // perhaps mirroring the subset of HTTP status codes returned.
 //
@@ -28,6 +28,8 @@ import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 import org.collectionspace.services.common.document.BadRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -39,11 +41,12 @@ import org.collectionspace.services.common.document.BadRequestException;
  * $LastChangedDate$
  */
 public class IDGeneratorSerializer {
+  static final Logger logger = LoggerFactory.getLogger(IDGeneratorSerializer.class);
 
   //////////////////////////////////////////////////////////////////////
   /**
    * Constructor (no-argument).
-   */ 
+   */
   public void IDGeneratorSerializer() {
   }
 
@@ -60,13 +63,13 @@ public class IDGeneratorSerializer {
    */
 	public static String serialize(SettableIDGenerator generator)
 	    throws BadRequestException {
-	
+
 	  if (generator == null) {
 	    throw new BadRequestException("ID generator cannot be null.");
 	  }
-  
-    XStream xstream = new XStream(new DomDriver()); 
-    
+
+    XStream xstream = new XStream(new DomDriver());
+
     String serializedGenerator = "";
     try {
       serializedGenerator = xstream.toXML(generator);
@@ -74,9 +77,9 @@ public class IDGeneratorSerializer {
 	    throw new BadRequestException(
 	      "Could not convert ID generator to XML for storage in database.");
     }
-    
+
     return serializedGenerator;
-  
+
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -99,16 +102,21 @@ public class IDGeneratorSerializer {
 
     XStream xstream = new XStream(new DomDriver());
 
+    xstream.allowTypeHierarchy(IDGenerator.class);
+    xstream.allowTypeHierarchy(IDGeneratorPart.class);
+
     SettableIDGenerator generator;
     try {
       generator = (SettableIDGenerator) xstream.fromXML(serializedGenerator);
     } catch (XStreamException e) {
+      logger.error(e.getMessage(), e);
+
 	    throw new BadRequestException(
 	      "Could not understand or parse this representation of an ID generator.", e);
     }
 
     return generator;
-  
+
   }
-  
+
 }
