@@ -30,12 +30,6 @@
             <artifactId>org.osgi.core</artifactId>
             <version>4.1.0</version>
         </dependency>
-        <!-- jboss -->
-        <dependency>
-		<groupId>org.jboss.remoting</groupId>
-		<artifactId>jboss-remoting</artifactId>
-        <scope>provided</scope>
-        </dependency>
     </dependencies>
 
 </project>
