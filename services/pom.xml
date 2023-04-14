@@ -443,9 +443,9 @@
 				<version>${postgres.driver.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.dom4j</groupId>
+				<groupId>dom4j</groupId>
 				<artifactId>dom4j</artifactId>
-				<version>2.1.4</version>
+				<version>1.6.1</version>
 				<scope>compile</scope>
 				<exclusions>
 					<exclusion>
