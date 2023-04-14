@@ -38,7 +38,7 @@
   from persons_common person
   inner join local_person_authority local_auth on person.inauthority = local_auth.name
   inner join hierarchy hier on hier.id = person.id
-  inner join hierarchy ptg_hier on ptg_hier.parentid = person.id and ptg_hier.primarytype = 'personTermGroup'
+  inner join hierarchy ptg_hier on ptg_hier.parentid = person.id and ptg_hier.primarytype = 'personTermGroup' and ptg_hier.pos = 0
   inner join persontermgroup ptg on ptg.id = ptg_hier.id
   left outer join contacts_common contact on contact.initem = hier.name
   left outer join hierarchy addr_hier on addr_hier.parentid = contact.id and addr_hier.primarytype = 'addressGroup' and addr_hier.pos = 0
@@ -48,7 +48,7 @@
   from organizations_common org
   inner join local_org_authority local_auth on org.inauthority = local_auth.name
   inner join hierarchy hier on hier.id = org.id
-  inner join hierarchy otg_hier on otg_hier.parentid = org.id and otg_hier.primarytype = 'orgTermGroup'
+  inner join hierarchy otg_hier on otg_hier.parentid = org.id and otg_hier.primarytype = 'orgTermGroup' and otg_hier.pos = 0
   inner join orgtermgroup otg on otg.id = otg_hier.id
   left outer join contacts_common contact on contact.initem = hier.name
   left outer join hierarchy addr_hier on addr_hier.parentid = contact.id and addr_hier.primarytype = 'addressGroup' and addr_hier.pos = 0
