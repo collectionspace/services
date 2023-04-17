@@ -12,12 +12,12 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.collectionspace.services.authentication.jaxb</artifactId>
     <name>services.authentication.jaxb</name>
-    
+
     <properties>
         <sql.file>authentication.sql</sql.file>
         <sql.dir>src/main/resources/db/mysql</sql.dir>
     </properties>
-    
+
     <dependencies>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
@@ -34,6 +34,11 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
+        </dependency>
+        <!-- Needed by hibernate-entitymanager, since we excluded dom4j:dom4j in order to upgrade to org.dom4j:dom4j -->
+        <dependency>
+            <groupId>org.dom4j</groupId>
+            <artifactId>dom4j</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jvnet.hyperjaxb3</groupId>

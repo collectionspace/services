@@ -32,7 +32,11 @@
         <dependency>
           <groupId>org.nuxeo.ecm.platform</groupId>
           <artifactId>nuxeo-platform-imaging-core</artifactId>
-          <scope>provided</scope>
+        </dependency>
+        <!-- Needed by nuxeo-platform-imaging-core, since we excluded dom4j:dom4j in order to upgrade to org.dom4j:dom4j -->
+        <dependency>
+            <groupId>org.dom4j</groupId>
+            <artifactId>dom4j</artifactId>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>

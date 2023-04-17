@@ -512,6 +512,12 @@
 				<scope>provided</scope>
 			</dependency>
 
+			<dependency>
+				<groupId>org.dom4j</groupId>
+				<artifactId>dom4j</artifactId>
+				<version>2.1.4</version>
+			</dependency>
+
 			<!-- Start of Nuxeo dependencies -->
 
 			<dependency>
@@ -535,6 +541,11 @@
 						<groupId>org.slf4j</groupId>
 						<artifactId>slf4j-log4j12</artifactId>
 					</exclusion>
+					<exclusion>
+						<!-- Exclude dom4j:dom4j so we can upgrade to org.dom4j:dom4j. -->
+						<groupId>dom4j</groupId>
+						<artifactId>dom4j</artifactId>
+					</exclusion>
 				</exclusions>
 			</dependency>
 			<dependency>
@@ -549,6 +560,11 @@
 					<exclusion>
 						<groupId>xerces</groupId>
 						<artifactId>xercesImpl</artifactId>
+					</exclusion>
+					<!-- Exclude dom4j:dom4j so we can upgrade to org.dom4j:dom4j. -->
+					<exclusion>
+						<groupId>dom4j</groupId>
+						<artifactId>dom4j</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
@@ -586,6 +602,11 @@
 						<groupId>com.sun.jersey</groupId>
 						<artifactId>jersey-servlet</artifactId>
 					</exclusion>
+					<!-- Exclude dom4j:dom4j so we can upgrade to org.dom4j:dom4j. -->
+					<exclusion>
+						<groupId>dom4j</groupId>
+						<artifactId>dom4j</artifactId>
+					</exclusion>
 				</exclusions>
 			</dependency>
 			<dependency>
@@ -618,6 +639,13 @@
 				<groupId>org.nuxeo.ecm.core</groupId>
 				<artifactId>nuxeo-core-io</artifactId>
 				<version>${nuxeo.core.version}</version>
+				<exclusions>
+					<!-- Exclude dom4j:dom4j so we can upgrade to org.dom4j:dom4j. -->
+					<exclusion>
+						<groupId>dom4j</groupId>
+						<artifactId>dom4j</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.nuxeo.ecm.core</groupId>
@@ -651,6 +679,11 @@
 						<groupId>org.slf4j</groupId>
 						<artifactId>slf4j-log4j12</artifactId>
 					</exclusion>
+					<!-- Exclude dom4j:dom4j so we can upgrade to org.dom4j:dom4j. -->
+					<exclusion>
+						<groupId>dom4j</groupId>
+						<artifactId>dom4j</artifactId>
+					</exclusion>
 				</exclusions>
 			</dependency>
 			<dependency>
@@ -661,6 +694,11 @@
 					<exclusion>
 						<groupId>com.sun.jersey</groupId>
 						<artifactId>jersey-core</artifactId>
+					</exclusion>
+					<!-- Exclude dom4j:dom4j so we can upgrade to org.dom4j:dom4j. -->
+					<exclusion>
+						<groupId>dom4j</groupId>
+						<artifactId>dom4j</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>

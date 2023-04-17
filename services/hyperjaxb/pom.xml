@@ -2,16 +2,16 @@
 
 <!--
  pom.xml
- 
+
  A Maven 2 project file for the 'jaxb' module of the ID Service project.
 
  This document is a part of the source code and related artifacts
  for CollectionSpace, an open source collections management system
  for museums and related institutions:
- 
+
  http://www.collectionspace.org
  http://wiki.collectionspace.org
- 
+
  Based on work by Sanjay Dalal and Richard Millet.
 
  $LastChangedBy: aron $
@@ -28,21 +28,21 @@
     <artifactId>org.collectionspace.services.main</artifactId>
     <version>${revision}</version>
   </parent>
-  
+
   <modelVersion>4.0.0</modelVersion>
   <artifactId>org.collectionspace.services.hyperjaxb</artifactId>
   <name>services.hyperjaxb</name>
-  
+
   <dependencies>
-  <!-- 
+  <!--
 		<dependency>
 		  <groupId>com.sun.xml.bind</groupId>
 		  <artifactId>jaxb-impl</artifactId>
-		</dependency>    
+		</dependency>
 		<dependency>
 		  <groupId>org.jvnet.jaxb2-commons</groupId>
 		  <artifactId>property-listener-injector</artifactId>
-		</dependency>   
+		</dependency>
 		<dependency>
 			<groupId>org.jvnet.jaxb2_commons</groupId>
 			<artifactId>jaxb2-basics-runtime</artifactId>
@@ -57,12 +57,17 @@
 		    <groupId>org.hibernate</groupId>
 		    <artifactId>hibernate-entitymanager</artifactId>
 		</dependency>
+		<!-- Needed by hibernate-entitymanager, since we excluded dom4j:dom4j in order to upgrade to org.dom4j:dom4j -->
+		<dependency>
+			<groupId>org.dom4j</groupId>
+			<artifactId>dom4j</artifactId>
+		</dependency>
 		<dependency>
 		    <groupId>org.jvnet.hyperjaxb3</groupId>
 		    <artifactId>hyperjaxb3-ejb-runtime</artifactId>
-		</dependency>    
+		</dependency>
   </dependencies>
-  
+
   <build>
     <finalName>collectionspace-services-hyperjaxb</finalName>
     <defaultGoal>install</defaultGoal>
