@@ -176,6 +176,11 @@
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
 		</dependency>
+		<!-- Needed by hibernate-entitymanager and nuxeo-platform-imaging-core, since we excluded dom4j:dom4j in order to upgrade to org.dom4j:dom4j -->
+		<dependency>
+			<groupId>org.dom4j</groupId>
+			<artifactId>dom4j</artifactId>
+		</dependency>
 		<!-- jboss -->
 		<dependency>
 			<groupId>jboss</groupId>
@@ -194,7 +199,6 @@
 			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-platform-imaging-core</artifactId>
 			<version>${nuxeo.platform.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>

@@ -30,6 +30,11 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
         </dependency>
+        <!-- Needed by hibernate-entitymanager, since we excluded dom4j:dom4j in order to upgrade to org.dom4j:dom4j -->
+        <dependency>
+            <groupId>org.dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.jvnet.hyperjaxb3</groupId>
             <artifactId>hyperjaxb3-ejb-runtime</artifactId>
@@ -43,7 +48,7 @@
 			<groupId>org.collectionspace.services</groupId>
 			<artifactId>org.collectionspace.services.hyperjaxb</artifactId>
 			<version>${project.version}</version>
-        </dependency>        
+        </dependency>
     </dependencies>
 
     <build>
