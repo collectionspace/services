@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="accessions" pageWidth="2000" pageHeight="500" orientation="Landscape" columnWidth="1960" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="de1a44a8-701e-4a45-a9f4-cf00969a4e76">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="800"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="625"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="361"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="SansSerif" fontSize="12"/>
+	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["approvalgroup,approvalindividual,acquisitionsource,approvalstatus"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="csid" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="whereclause" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csid} != null ?  "WHERE hier.name = '" + $P{csid} + "'"  : ""]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[WITH acquisitions AS (
+  SELECT
+    acq.id,
+    hier.name AS csid,
+    acq.acquisitionreferencenumber,
+    acq.acquisitionmethod,
+    acq.acquisitionnote,
+    acq.creditline,
+    acq.acquisitionprovisos,
+    source.item AS acquisitionsource,
+    appgroup.approvalgroup, appgroup.approvalindividual, appgroup.approvalstatus, appgroup.approvaldate,
+    acd_sdg.datedisplaydate AS accessiondate,
+    acdl_sdg.datedisplaydate AS acquisitiondate
+  FROM acquisitions_common acq
+  INNER JOIN misc ON misc.id = acq.id AND misc.lifecyclestate != 'deleted'
+  INNER JOIN collectionspace_core core ON misc.id = core.id AND core.tenantid = $P{tenantid}
+  INNER JOIN hierarchy hier ON acq.id = hier.id
+  LEFT JOIN acquisitions_common_acquisitionsources source ON source.id = acq.id AND source.pos = 0
+  LEFT JOIN hierarchy app_hier ON app_hier.parentid = acq.id AND app_hier.primarytype = 'approvalGroup' AND app_hier.pos = 0
+  LEFT JOIN approvalgroup appgroup ON appgroup.id = app_hier.id
+  LEFT JOIN hierarchy acd_hier ON acd_hier.parentid = acq.id AND acd_hier.name = 'acquisitions_common:accessionDateGroup'
+  LEFT JOIN structureddategroup acd_sdg ON acd_sdg.id = acd_hier.id
+  LEFT JOIN hierarchy adgl_hier ON adgl_hier.parentid = acq.id AND adgl_hier.name = 'acquisitions_common:acquisitionDateGroupList' AND adgl_hier.pos = 0
+  LEFT JOIN structureddategroup acdl_sdg ON acdl_sdg.id = adgl_hier.id
+	$P!{whereclause}
+), related_objects AS (
+  SELECT
+    object.collection,
+    object.objecthistorynote,
+    object.objectnumber,
+    ong.objectname,
+    bd.item AS briefdescription,
+    sdg.datedisplaydate AS objectproductiondate,
+    media.objectcsid AS mediacsid,
+    acq.csid AS acquisitioncsid
+  FROM acquisitions acq
+  INNER JOIN relations_common rels ON rels.subjectcsid = acq.csid AND rels.objectdocumenttype = 'CollectionObject'
+  INNER JOIN hierarchy hier ON hier.name = rels.objectcsid AND hier.primarytype = 'CollectionObject'
+  INNER JOIN collectionobjects_common object ON object.id = hier.id
+  LEFT JOIN relations_common media ON media.subjectcsid = hier.name AND media.objectdocumenttype = 'Media'
+  LEFT JOIN collectionobjects_common_briefdescriptions bd ON bd.id = object.id AND bd.pos = 0
+  LEFT JOIN hierarchy ong_hier ON ong_hier.parentid = object.id AND ong_hier.primarytype = 'objectNameGroup' AND ong_hier.pos = 0
+  LEFT JOIN objectnamegroup ong ON ong.id = ong_hier.id
+  LEFT JOIN hierarchy opdg_hier ON opdg_hier.parentid = object.id AND opdg_hier.name = 'collectionobjects_common:objectProductionDateGroupList' AND opdg_hier.pos = 0
+  LEFT JOIN structureddategroup sdg ON sdg.id = opdg_hier.id
+)
+SELECT
+  acq.acquisitionreferencenumber,
+  acq.accessiondate,
+  acq.acquisitiondate,
+  acq.acquisitionmethod,
+  acq.acquisitionsource,
+  acq.approvalgroup,
+  acq.approvalindividual,
+  acq.approvalstatus,
+  acq.approvaldate,
+  acq.acquisitionnote,
+  acq.acquisitionprovisos,
+  acq.creditline,
+  obj.objectnumber,
+  obj.objectname,
+  obj.objectproductiondate,
+  obj.collection,
+  obj.briefdescription,
+  obj.objecthistorynote,
+  obj.mediacsid
+FROM acquisitions acq
+LEFT JOIN related_objects obj ON obj.acquisitioncsid = acq.csid]]>
+	</queryString>
+	<field name="acquisitionreferencenumber" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="acquisitionreferencenumber"/>
+		<property name="com.jaspersoft.studio.field.label" value="acquisitionreferencenumber"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="acquisitions_common"/>
+	</field>
+	<field name="accessiondate" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="accessiondate"/>
+		<property name="com.jaspersoft.studio.field.label" value="accessiondate"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="structureddategroup"/>
+	</field>
+	<field name="acquisitiondate" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="acquisitiondate"/>
+		<property name="com.jaspersoft.studio.field.label" value="acquisitiondate"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="structureddategroup"/>
+	</field>
+	<field name="acquisitionmethod" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="acquisitionmethod"/>
+		<property name="com.jaspersoft.studio.field.label" value="acquisitionmethod"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="acquisitions_common"/>
+	</field>
+	<field name="acquisitionsource" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="acquisitionsource"/>
+		<property name="com.jaspersoft.studio.field.label" value="acquisitionsource"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="acquisitions_common_acquisitionsources"/>
+	</field>
+	<field name="approvalgroup" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="approvalgroup"/>
+		<property name="com.jaspersoft.studio.field.label" value="approvalgroup"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="approvalgroup"/>
+	</field>
+	<field name="approvalindividual" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="approvalindividual"/>
+		<property name="com.jaspersoft.studio.field.label" value="approvalindividual"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="approvalgroup"/>
+	</field>
+	<field name="approvalstatus" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="approvalstatus"/>
+		<property name="com.jaspersoft.studio.field.label" value="approvalstatus"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="approvalgroup"/>
+	</field>
+	<field name="approvaldate" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="approvaldate"/>
+		<property name="com.jaspersoft.studio.field.label" value="approvaldate"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="approvalgroup"/>
+	</field>
+	<field name="acquisitionnote" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="acquisitionnote"/>
+		<property name="com.jaspersoft.studio.field.label" value="acquisitionnote"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="acquisitions_common"/>
+	</field>
+	<field name="acquisitionprovisos" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="acquisitionprovisos"/>
+		<property name="com.jaspersoft.studio.field.label" value="acquisitionprovisos"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="acquisitions_common"/>
+	</field>
+	<field name="creditline" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="creditline"/>
+		<property name="com.jaspersoft.studio.field.label" value="creditline"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="acquisitions_common"/>
+	</field>
+	<field name="objectnumber" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="objectnumber"/>
+		<property name="com.jaspersoft.studio.field.label" value="objectnumber"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common"/>
+	</field>
+	<field name="objectname" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="objectname"/>
+		<property name="com.jaspersoft.studio.field.label" value="objectname"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="objectnamegroup"/>
+	</field>
+	<field name="objectproductiondate" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="objectproductiondate"/>
+		<property name="com.jaspersoft.studio.field.label" value="objectproductiondate"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="structureddategroup"/>
+	</field>
+	<field name="collection" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="collection"/>
+		<property name="com.jaspersoft.studio.field.label" value="collection"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common"/>
+	</field>
+	<field name="briefdescription" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="briefdescription"/>
+		<property name="com.jaspersoft.studio.field.label" value="briefdescription"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common_briefdescriptions"/>
+	</field>
+	<field name="objecthistorynote" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="objecthistorynote"/>
+		<property name="com.jaspersoft.studio.field.label" value="objecthistorynote"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common"/>
+	</field>
+	<field name="mediacsid" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="mediacsid"/>
+		<property name="com.jaspersoft.studio.field.label" value="mediacsid"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="relations_common"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="44" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement style="Column header" x="0" y="0" width="100" height="44" uuid="286bec9e-c109-42bd-8482-879bbb74ad4a">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[accession number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="100" y="0" width="100" height="44" uuid="cfce0620-6122-4f75-a743-329380e0ad5e">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[accession date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="200" y="0" width="100" height="44" uuid="f2b74fa7-1c3f-4df2-95aa-e37b81bb5310">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[acquisition date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="300" y="0" width="100" height="44" uuid="ca9fff93-eabd-4603-ae78-016c05dc6379">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[accession method]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="400" y="0" width="100" height="44" uuid="8e539733-e958-41ea-9fd6-8f52ad34d75c">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[accession source]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="500" y="0" width="100" height="44" uuid="0063010a-f0a6-4603-bb1c-25abaffee8c3">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[approval group]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="600" y="0" width="100" height="44" uuid="ea311180-32de-4679-955f-7a3a23c65f92">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[approval individual]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="700" y="0" width="100" height="44" uuid="85adfb98-db90-4d18-a70c-499245c035fc">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[approval status]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="800" y="0" width="100" height="44" uuid="6fdb921e-4203-4bd7-bbd4-8258587094e5">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[approval date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="900" y="0" width="100" height="44" uuid="9e2295c6-7ded-4863-93f8-88ad5e4bc0d8">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[note]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1000" y="0" width="100" height="44" uuid="f0438592-52a7-4d61-8685-9e97ef2a2451">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[provisos]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1100" y="0" width="100" height="44" uuid="5dea5252-9057-4577-ba41-4683fb1f0228">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[credit line]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1200" y="0" width="100" height="44" uuid="a8d9ce16-f843-4aec-a72d-eb24306ecf10">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[obj number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1300" y="0" width="100" height="44" uuid="0b7a4cbb-8afb-437c-bbc3-f9bd5f4b66db">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[obj name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1400" y="0" width="100" height="44" uuid="747802fe-3a76-414d-a051-f79f1b372bfa">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[obj production date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1500" y="0" width="100" height="44" uuid="fedf5da0-ae95-4863-9219-affebf18a704">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[obj collection]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1600" y="0" width="100" height="44" uuid="771d0835-fdae-4368-a0f2-fb52a97e0650">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[obj brief desc]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1700" y="0" width="100" height="44" uuid="fe445a1c-d1ff-47c8-87dd-0a8cb910eadd">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[obj history note]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1800" y="0" width="100" height="44" uuid="43bfe5e5-b866-4fd1-810c-fd9fa68c855a">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[obj thumbnail]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="66" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement style="Detail" x="0" y="0" width="100" height="30" uuid="2c9d4090-6f2b-4f69-990f-8f9f2d5561fe">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{acquisitionreferencenumber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="100" y="0" width="100" height="30" uuid="9b5e0176-bff5-49ce-a043-c53c2dc63c8e">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{accessiondate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="9b607c40-bd0f-4175-ba4a-820f9c47965d">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{acquisitiondate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="300" y="0" width="100" height="30" uuid="99f211f2-823e-4835-837c-c4f01747460c">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{acquisitionmethod}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="ac56c021-bd7e-4d2e-8147-d61bda92419c">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{acquisitionsource}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="500" y="0" width="100" height="30" uuid="83d043b0-3f48-43bd-98b3-13f8f77c6491">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{approvalgroup}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="600" y="0" width="100" height="30" uuid="3463786d-f302-4b6f-95da-40db00e707b9">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{approvalindividual}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="700" y="0" width="100" height="30" uuid="8c3f45c4-1c03-4def-977e-487651be6a1a">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{approvalstatus}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="800" y="0" width="100" height="30" uuid="256a37ec-1b0c-4f88-9b16-23ee81fad5d8">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{approvaldate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="900" y="0" width="100" height="30" uuid="f5483166-f9ee-4e6b-b07a-e92fd3b16cb0">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{acquisitionnote}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1000" y="0" width="100" height="30" uuid="ad70ae62-4e08-45d5-9579-8704b059879c">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{acquisitionprovisos}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1100" y="0" width="100" height="30" uuid="2ae0c1d6-fcc7-4aee-b3ef-023716b54e4b">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{creditline}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1200" y="0" width="100" height="30" uuid="6808a8d0-b840-40af-9d8e-ebb153040e5a">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1300" y="0" width="100" height="30" uuid="8ed99c27-103b-4090-8c29-cdb18e031fb9">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{objectname}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1400" y="0" width="100" height="30" uuid="7a0e5d56-7af8-4bfd-b327-60992006f8f9">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{objectproductiondate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1500" y="0" width="100" height="30" uuid="8e933259-1f43-4839-b0ab-8aef51648b4d">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{collection}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1600" y="0" width="100" height="30" uuid="90440d7c-7304-4ecb-8328-5ef7773f31b5">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{briefdescription}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1700" y="0" width="100" height="30" uuid="bda766c9-fb07-41cf-ac32-37f629023d4f">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{objecthistorynote}]]></textFieldExpression>
+			</textField>
+			<image onErrorType="Blank">
+				<reportElement x="1800" y="0" width="50" height="50" uuid="6f322724-c93c-435a-aee6-9570f304084a"/>
+				<imageExpression><![CDATA["cspace://media/" + $F{mediacsid} + "/blob/derivatives/Thumbnail/content"]]></imageExpression>
+			</image>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</summary>
+</jasperReport>
